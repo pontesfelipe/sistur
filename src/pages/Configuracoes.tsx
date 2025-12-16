@@ -548,8 +548,15 @@ export default function Configuracoes() {
                   <ul className="mt-2 space-y-1">
                     <li>Rankings públicos ou benchmarking entre municípios</li>
                     <li>Simulação preditiva ou machine learning</li>
-                    <li>Prescrições geradas por IA (o sistema é determinístico)</li>
                     <li>Exploração livre de cursos (capacitação é prescrita)</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <p className="font-semibold text-foreground">Prescrições vs. Relatórios:</p>
+                  <ul className="mt-2 space-y-1">
+                    <li><strong>Prescrições (SISTUR EDU):</strong> São 100% determinísticas e baseadas em regras. Cada curso é prescrito automaticamente quando: Indicador + Pilar + Status + Interpretação Territorial atendem os critérios. Nunca há IA envolvida nas prescrições.</li>
+                    <li><strong>Relatórios:</strong> Utilizam IA para síntese e análise dos dados diagnósticos, gerando planos estratégicos descritivos. A IA analisa os resultados, mas não prescreve cursos — apenas descreve e contextualiza.</li>
                   </ul>
                 </div>
               </CardContent>
