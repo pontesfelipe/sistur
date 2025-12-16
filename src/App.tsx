@@ -3,7 +3,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
+import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import Index from "./pages/Index";
+import Auth from "./pages/Auth";
 import Destinos from "./pages/Destinos";
 import Diagnosticos from "./pages/Diagnosticos";
 import DiagnosticoDetalhe from "./pages/DiagnosticoDetalhe";
@@ -19,16 +22,61 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/destinos" element={<Destinos />} />
-          <Route path="/diagnosticos" element={<Diagnosticos />} />
-          <Route path="/diagnosticos/:id" element={<DiagnosticoDetalhe />} />
-          <Route path="/indicadores" element={<Indicadores />} />
-          <Route path="/cursos" element={<Cursos />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Index />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/destinos"
+              element={
+                <ProtectedRoute>
+                  <Destinos />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/diagnosticos"
+              element={
+                <ProtectedRoute>
+                  <Diagnosticos />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/diagnosticos/:id"
+              element={
+                <ProtectedRoute>
+                  <DiagnosticoDetalhe />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/indicadores"
+              element={
+                <ProtectedRoute>
+                  <Indicadores />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cursos"
+              element={
+                <ProtectedRoute>
+                  <Cursos />
+                </ProtectedRoute>
+              }
+            />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
