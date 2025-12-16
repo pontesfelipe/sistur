@@ -2,14 +2,16 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import type { EduCourse, EduLive, EduTrack } from './useEdu';
+import type { EduTraining } from './useEduTrainings';
 import type { Json } from '@/integrations/supabase/types';
 
 export interface RecommendationReason {
-  indicator_id: string;
+  indicator_code: string;
   indicator_name: string;
+  pillar: string;
+  priority: number;
+  reason_template: string;
   contribution_score: number;
-  note?: string;
 }
 
 export interface LearningRecommendation {
@@ -18,7 +20,7 @@ export interface LearningRecommendation {
   entity_id: string;
   score: number;
   reasons: RecommendationReason[];
-  entity?: EduCourse | EduLive | EduTrack;
+  training?: EduTraining;
 }
 
 export interface LearningRun {
@@ -27,7 +29,7 @@ export interface LearningRun {
   territory_id?: string;
   inputs: {
     indicator_ids?: string[];
-    problems?: string[];
+    indicator_codes?: string[];
   };
   org_id: string;
   created_at: string;
@@ -45,7 +47,7 @@ interface RecommendationOutput {
   tracks: LearningRecommendation[];
 }
 
-// Main hook for generating recommendations
+// Main hook for generating recommendations using edu_indicator_training_map
 export function useLearningRecommendations() {
   const queryClient = useQueryClient();
   const [isCalculating, setIsCalculating] = useState(false);
@@ -65,13 +67,28 @@ export function useLearningRecommendations() {
 
       if (!profile) throw new Error('Profile not found');
 
-      // 1. Create learning run
+      // 1. Fetch indicator info for selected indicators (need codes for mapping)
+      const { data: indicators } = await supabase
+        .from('indicators')
+        .select('id, code, name, pillar')
+        .in('id', input.indicatorIds);
+
+      if (!indicators || indicators.length === 0) {
+        throw new Error('Nenhum indicador encontrado');
+      }
+
+      const indicatorCodes = indicators.map(i => i.code);
+
+      // 2. Create learning run
       const { data: run, error: runError } = await supabase
         .from('learning_runs')
         .insert({
           user_id: user.id,
           territory_id: input.territoryId || null,
-          inputs: { indicator_ids: input.indicatorIds },
+          inputs: { 
+            indicator_ids: input.indicatorIds,
+            indicator_codes: indicatorCodes,
+          },
           org_id: profile.org_id,
         })
         .select()
@@ -79,158 +96,107 @@ export function useLearningRecommendations() {
 
       if (runError) throw runError;
 
-      // 2. Fetch indicator info for selected indicators
-      const { data: indicators } = await supabase
-        .from('indicators')
-        .select('id, name, pillar')
-        .in('id', input.indicatorIds);
+      // 3. Fetch training mappings from edu_indicator_training_map
+      const { data: trainingMappings, error: mappingError } = await supabase
+        .from('edu_indicator_training_map')
+        .select('*')
+        .in('indicator_code', indicatorCodes);
 
-      // 3. Fetch course mappings for selected indicators
-      const { data: courseMappings } = await supabase
-        .from('indicator_course_map')
-        .select(`
-          indicator_id,
-          course_id,
-          weight,
-          course:edu_courses(*)
-        `)
-        .in('indicator_id', input.indicatorIds);
+      if (mappingError) {
+        console.error('Error fetching training mappings:', mappingError);
+      }
 
-      // 4. Fetch live mappings for selected indicators
-      const { data: liveMappings } = await supabase
-        .from('indicator_live_map')
-        .select(`
-          indicator_id,
-          live_id,
-          weight,
-          live:edu_lives(*)
-        `)
-        .in('indicator_id', input.indicatorIds);
-
-      // 5. Calculate course scores
-      const courseScores: Record<string, { score: number; reasons: RecommendationReason[]; course: EduCourse }> = {};
+      // 4. Get unique training IDs and fetch training details
+      const trainingIds = [...new Set((trainingMappings || []).map(m => m.training_id))];
       
-      (courseMappings || []).forEach((mapping: any) => {
-        if (!mapping.course) return;
+      const { data: trainings } = await supabase
+        .from('edu_trainings')
+        .select('*')
+        .in('training_id', trainingIds)
+        .eq('active', true);
+
+      // 5. Calculate scores for each training
+      const trainingScores: Record<string, { 
+        score: number; 
+        reasons: RecommendationReason[]; 
+        training: EduTraining;
+        type: string;
+      }> = {};
+
+      (trainingMappings || []).forEach((mapping) => {
+        const training = trainings?.find(t => t.training_id === mapping.training_id);
+        if (!training) return;
+
+        const indicator = indicators.find(i => i.code === mapping.indicator_code);
+        if (!indicator) return;
+
+        const trainingId = mapping.training_id;
         
-        const courseId = mapping.course_id;
-        const indicator = indicators?.find(i => i.id === mapping.indicator_id);
-        
-        if (!courseScores[courseId]) {
-          courseScores[courseId] = {
+        if (!trainingScores[trainingId]) {
+          trainingScores[trainingId] = {
             score: 0,
             reasons: [],
-            course: mapping.course,
+            training: training as EduTraining,
+            type: training.type,
           };
         }
+
+        // Score based on priority (higher priority = higher score)
+        // Priority 1 = most important, so we invert it
+        const priorityScore = (10 - Math.min(mapping.priority, 10)) * 10;
+        trainingScores[trainingId].score += priorityScore;
         
-        const baseScore = 10 * (mapping.weight || 1);
-        courseScores[courseId].score += baseScore;
-        courseScores[courseId].reasons.push({
-          indicator_id: mapping.indicator_id,
-          indicator_name: indicator?.name || 'Indicador',
-          contribution_score: baseScore,
+        // Build reason from template
+        const reasonText = mapping.reason_template
+          .replace('{indicator}', indicator.name)
+          .replace('{status}', 'selecionado')
+          .replace('{pillar}', mapping.pillar);
+
+        trainingScores[trainingId].reasons.push({
+          indicator_code: mapping.indicator_code,
+          indicator_name: indicator.name,
+          pillar: mapping.pillar,
+          priority: mapping.priority,
+          reason_template: reasonText,
+          contribution_score: priorityScore,
         });
       });
 
-      // 6. Calculate live scores
-      const liveScores: Record<string, { score: number; reasons: RecommendationReason[]; live: EduLive }> = {};
-      
-      (liveMappings || []).forEach((mapping: any) => {
-        if (!mapping.live) return;
-        
-        const liveId = mapping.live_id;
-        const indicator = indicators?.find(i => i.id === mapping.indicator_id);
-        
-        if (!liveScores[liveId]) {
-          liveScores[liveId] = {
-            score: 0,
-            reasons: [],
-            live: mapping.live,
-          };
-        }
-        
-        const baseScore = 10 * (mapping.weight || 1);
-        liveScores[liveId].score += baseScore;
-        liveScores[liveId].reasons.push({
-          indicator_id: mapping.indicator_id,
-          indicator_name: indicator?.name || 'Indicador',
-          contribution_score: baseScore,
-        });
-      });
+      // 6. Normalize and separate by type
+      const allScores = Object.values(trainingScores);
+      const maxScore = Math.max(...allScores.map(s => s.score), 1);
 
-      // 7. Normalize scores and sort
-      const maxCourseScore = Math.max(...Object.values(courseScores).map(c => c.score), 1);
-      const maxLiveScore = Math.max(...Object.values(liveScores).map(l => l.score), 1);
+      const courseRecommendations: LearningRecommendation[] = [];
+      const liveRecommendations: LearningRecommendation[] = [];
 
-      const courseRecommendations: LearningRecommendation[] = Object.entries(courseScores)
-        .map(([courseId, data]) => ({
+      Object.entries(trainingScores).forEach(([trainingId, data]) => {
+        const rec: LearningRecommendation = {
           id: '',
-          entity_type: 'course' as const,
-          entity_id: courseId,
-          score: (data.score / maxCourseScore) * 100,
+          entity_type: data.type === 'live' ? 'live' : 'course',
+          entity_id: trainingId,
+          score: (data.score / maxScore) * 100,
           reasons: data.reasons,
-          entity: data.course,
-        }))
-        .sort((a, b) => b.score - a.score);
+          training: data.training,
+        };
 
-      const liveRecommendations: LearningRecommendation[] = Object.entries(liveScores)
-        .map(([liveId, data]) => ({
-          id: '',
-          entity_type: 'live' as const,
-          entity_id: liveId,
-          score: (data.score / maxLiveScore) * 100,
-          reasons: data.reasons,
-          entity: data.live,
-        }))
-        .sort((a, b) => b.score - a.score);
-
-      // 8. Calculate track suggestions based on course coverage
-      const { data: allTracks } = await supabase
-        .from('edu_tracks')
-        .select(`
-          *,
-          courses:edu_track_courses(course_id)
-        `);
-
-      const trackScores: Record<string, { score: number; track: EduTrack; coverage: number }> = {};
-      
-      (allTracks || []).forEach((track: any) => {
-        const trackCourseIds = track.courses?.map((tc: any) => tc.course_id) || [];
-        const recommendedCourseIds = courseRecommendations.slice(0, 10).map(r => r.entity_id);
-        
-        const matchingCourses = trackCourseIds.filter((id: string) => recommendedCourseIds.includes(id));
-        const coverage = trackCourseIds.length > 0 ? matchingCourses.length / trackCourseIds.length : 0;
-        
-        if (coverage > 0.3) { // At least 30% coverage
-          trackScores[track.id] = {
-            score: coverage * 100,
-            track,
-            coverage,
-          };
+        if (data.type === 'live') {
+          liveRecommendations.push(rec);
+        } else {
+          courseRecommendations.push(rec);
         }
       });
 
-      const trackRecommendations: LearningRecommendation[] = Object.entries(trackScores)
-        .map(([trackId, data]) => ({
-          id: '',
-          entity_type: 'track' as const,
-          entity_id: trackId,
-          score: data.score,
-          reasons: [{
-            indicator_id: '',
-            indicator_name: `${Math.round(data.coverage * 100)}% dos cursos recomendados`,
-            contribution_score: data.score,
-          }],
-          entity: data.track,
-        }))
-        .sort((a, b) => b.score - a.score);
+      // Sort by score
+      courseRecommendations.sort((a, b) => b.score - a.score);
+      liveRecommendations.sort((a, b) => b.score - a.score);
 
-      // 9. Save recommendations to database
+      // 7. Track recommendations (based on course pillar coverage)
+      const trackRecommendations: LearningRecommendation[] = [];
+
+      // 8. Save recommendations to database
       const allRecommendations = [
         ...courseRecommendations.slice(0, 10),
         ...liveRecommendations.slice(0, 15),
-        ...trackRecommendations.slice(0, 3),
       ];
 
       if (allRecommendations.length > 0) {
@@ -321,41 +287,24 @@ export function useLearningRun(runId?: string) {
 
       if (recError) throw recError;
 
-      // Fetch entity details for each recommendation
-      const enrichedRecommendations = await Promise.all(
-        (recommendations || []).map(async (rec) => {
-          let entity = null;
-          
-          if (rec.entity_type === 'course') {
-            const { data } = await supabase
-              .from('edu_courses')
-              .select('*')
-              .eq('id', rec.entity_id)
-              .single();
-            entity = data;
-          } else if (rec.entity_type === 'live') {
-            const { data } = await supabase
-              .from('edu_lives')
-              .select('*')
-              .eq('id', rec.entity_id)
-              .single();
-            entity = data;
-          } else if (rec.entity_type === 'track') {
-            const { data } = await supabase
-              .from('edu_tracks')
-              .select('*')
-              .eq('id', rec.entity_id)
-              .single();
-            entity = data;
-          }
+      // Fetch training details for each recommendation
+      const trainingIds = recommendations
+        ?.filter(r => r.entity_type === 'course' || r.entity_type === 'live')
+        .map(r => r.entity_id) || [];
 
-          return { 
-            ...rec, 
-            entity,
-            reasons: (rec.reasons || []) as unknown as RecommendationReason[],
-          };
-        })
-      );
+      const { data: trainings } = await supabase
+        .from('edu_trainings')
+        .select('*')
+        .in('training_id', trainingIds);
+
+      const enrichedRecommendations = (recommendations || []).map(rec => {
+        const training = trainings?.find(t => t.training_id === rec.entity_id);
+        return {
+          ...rec,
+          training: training as EduTraining | undefined,
+          reasons: (rec.reasons || []) as unknown as RecommendationReason[],
+        };
+      });
 
       return {
         ...run,

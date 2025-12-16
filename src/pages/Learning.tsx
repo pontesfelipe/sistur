@@ -20,7 +20,8 @@ import {
   ChevronLeft,
   AlertCircle,
   Info,
-  Loader2
+  Loader2,
+  ExternalLink
 } from 'lucide-react';
 import { useIndicators } from '@/hooks/useIndicators';
 import { useDestinations } from '@/hooks/useDestinations';
@@ -58,7 +59,7 @@ const LearningResults = ({
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {results.courses.slice(0, 3).map((rec, index) => (
+              {results.courses.slice(0, 5).map((rec, index) => (
                 <div 
                   key={rec.entity_id}
                   className="flex items-start gap-4 p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
@@ -68,18 +69,28 @@ const LearningResults = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      {rec.entity && 'code' in rec.entity && (
-                        <Badge variant={(rec.entity as any).pillar?.toLowerCase() as 'ra' | 'oe' | 'ao'}>
-                          {(rec.entity as any).code}
+                      {rec.training && (
+                        <Badge variant={rec.training.pillar?.toLowerCase() as 'ra' | 'oe' | 'ao'}>
+                          {rec.training.pillar}
                         </Badge>
                       )}
-                      <Badge variant="outline" className="text-xs">
+                      {rec.training?.course_code && (
+                        <Badge variant="outline" className="text-xs">
+                          {rec.training.course_code}
+                        </Badge>
+                      )}
+                      <Badge variant="secondary" className="text-xs">
                         Score: {Math.round(rec.score)}%
                       </Badge>
                     </div>
                     <h4 className="font-medium">
-                      {rec.entity && 'title' in rec.entity ? (rec.entity as any).title : 'Curso'}
+                      {rec.training?.title || 'Curso'}
                     </h4>
+                    {rec.training?.objective && (
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                        {rec.training.objective}
+                      </p>
+                    )}
                     <div className="mt-2 flex flex-wrap gap-1">
                       {rec.reasons.slice(0, 3).map((reason, i) => (
                         <Badge key={i} variant="secondary" className="text-xs">
@@ -94,7 +105,7 @@ const LearningResults = ({
                     </div>
                   </div>
                   <Button variant="outline" size="sm" asChild>
-                    <Link to={`/edu/curso/${rec.entity_id}`}>Ver</Link>
+                    <Link to={`/edu/training/${rec.entity_id}`}>Ver</Link>
                   </Button>
                 </div>
               ))}
@@ -117,21 +128,23 @@ const LearningResults = ({
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {results.lives.slice(0, 10).map((rec) => (
-                <div 
+                <Link
                   key={rec.entity_id}
-                  className="p-3 rounded-lg border bg-card"
+                  to={`/edu/training/${rec.entity_id}`}
+                  className="p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <h4 className="font-medium text-sm truncate">
-                        {rec.entity && 'title' in rec.entity ? (rec.entity as any).title : 'Live'}
+                        {rec.training?.title || 'Live'}
                       </h4>
                       <p className="text-xs text-muted-foreground mt-1">
                         Relevância: {Math.round(rec.score)}%
                       </p>
                     </div>
+                    <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </CardContent>
@@ -154,7 +167,7 @@ const LearningResults = ({
               <div key={rec.entity_id} className="flex items-center justify-between">
                 <div>
                   <h4 className="font-semibold text-lg">
-                    {rec.entity && 'name' in rec.entity ? (rec.entity as any).name : 'Trilha'}
+                    {rec.training?.title || 'Trilha'}
                   </h4>
                   <p className="text-sm text-muted-foreground">
                     {rec.reasons[0]?.indicator_name || `Cobertura: ${Math.round(rec.score)}%`}
