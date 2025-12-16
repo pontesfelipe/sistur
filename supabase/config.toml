@@ -1,1 +1,4 @@
 project_id = "enexnpmkhvgufcervjsv"
+
+[functions.calculate-assessment]
+verify_jwt = true
