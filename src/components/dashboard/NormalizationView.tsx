@@ -33,7 +33,7 @@ import {
   Search,
   Filter,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatIndicatorName, formatIndicatorCode } from '@/lib/utils';
 
 interface IndicatorScore {
   id: string;
@@ -289,11 +289,11 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
                 return (
                   <TableRow key={score.id}>
                     <TableCell className="font-mono text-sm">
-                      {indicator.code}
+                      {formatIndicatorCode(indicator.code)}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm">{indicator.name}</span>
+                        <span className="font-medium text-sm">{formatIndicatorName(indicator.name)}</span>
                         {indicator.description && (
                           <Tooltip>
                             <TooltipTrigger>

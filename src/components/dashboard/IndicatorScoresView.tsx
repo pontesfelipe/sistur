@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, Filter, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatIndicatorName, formatIndicatorCode } from '@/lib/utils';
 
 interface IndicatorScore {
   id: string;
@@ -170,7 +170,7 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
                       {indicator?.pillar || '—'}
                     </Badge>
                     <span className="font-medium text-sm">
-                      {indicator?.name || 'Indicador'}
+                      {formatIndicatorName(indicator?.name || 'Indicador')}
                     </span>
                     {indicator?.theme && (
                       <span className="text-xs text-muted-foreground">
