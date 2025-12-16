@@ -16,6 +16,7 @@ import Cursos from "./pages/Cursos";
 import AdminCursos from "./pages/AdminCursos";
 import Configuracoes from "./pages/Configuracoes";
 import Relatorios from "./pages/Relatorios";
+import NovaRodada from "./pages/NovaRodada";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -106,6 +107,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Relatorios />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/nova-rodada"
+              element={
+                <ProtectedRoute>
+                  <NovaRodada />
                 </ProtectedRoute>
               }
             />
