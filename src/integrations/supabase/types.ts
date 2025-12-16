@@ -398,17 +398,22 @@ export type Database = {
           collection_type: Database["public"]["Enums"]["collection_type"] | null
           created_at: string
           data_source: Database["public"]["Enums"]["data_source"] | null
+          default_interpretation: string | null
           description: string | null
           direction: Database["public"]["Enums"]["indicator_direction"]
+          edu_suggested_titles: Json
           id: string
+          igma_dimension: string | null
           max_ref: number | null
           min_ref: number | null
           name: string
           normalization: Database["public"]["Enums"]["normalization_type"]
+          notes: string | null
           org_id: string | null
           pillar: Database["public"]["Enums"]["pillar_type"]
           reference_date: string | null
           reliability_score: number | null
+          source: string | null
           theme: string
           unit: string | null
           weight: number
@@ -420,17 +425,22 @@ export type Database = {
             | null
           created_at?: string
           data_source?: Database["public"]["Enums"]["data_source"] | null
+          default_interpretation?: string | null
           description?: string | null
           direction?: Database["public"]["Enums"]["indicator_direction"]
+          edu_suggested_titles?: Json
           id?: string
+          igma_dimension?: string | null
           max_ref?: number | null
           min_ref?: number | null
           name: string
           normalization?: Database["public"]["Enums"]["normalization_type"]
+          notes?: string | null
           org_id?: string | null
           pillar: Database["public"]["Enums"]["pillar_type"]
           reference_date?: string | null
           reliability_score?: number | null
+          source?: string | null
           theme: string
           unit?: string | null
           weight?: number
@@ -442,17 +452,22 @@ export type Database = {
             | null
           created_at?: string
           data_source?: Database["public"]["Enums"]["data_source"] | null
+          default_interpretation?: string | null
           description?: string | null
           direction?: Database["public"]["Enums"]["indicator_direction"]
+          edu_suggested_titles?: Json
           id?: string
+          igma_dimension?: string | null
           max_ref?: number | null
           min_ref?: number | null
           name?: string
           normalization?: Database["public"]["Enums"]["normalization_type"]
+          notes?: string | null
           org_id?: string | null
           pillar?: Database["public"]["Enums"]["pillar_type"]
           reference_date?: string | null
           reliability_score?: number | null
+          source?: string | null
           theme?: string
           unit?: string | null
           weight?: number
