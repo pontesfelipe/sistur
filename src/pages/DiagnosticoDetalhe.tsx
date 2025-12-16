@@ -5,6 +5,7 @@ import { IssueCard } from '@/components/dashboard/IssueCard';
 import { RecommendationCard } from '@/components/dashboard/RecommendationCard';
 import { NormalizationView } from '@/components/dashboard/NormalizationView';
 import { IndicatorScoresView } from '@/components/dashboard/IndicatorScoresView';
+import { IssuesView } from '@/components/dashboard/IssuesView';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -418,42 +419,7 @@ const DiagnosticoDetalhe = () => {
 
           {/* Gargalos Tab */}
           <TabsContent value="gargalos" className="space-y-4">
-            <div className="bg-card rounded-xl border p-6 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-severity-critical/10">
-                  <AlertTriangle className="h-6 w-6 text-severity-critical" />
-                </div>
-                <div>
-                  <h3 className="font-display font-semibold">
-                    {issues.filter((i) => i.severity === 'CRITICO').length}{' '}
-                    gargalos críticos identificados
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Priorizados pelo impacto no pilar mais crítico
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {issues.length > 0 ? (
-              <div className="space-y-3">
-                {issues.map((issue) => (
-                  <IssueCard
-                    key={issue.id}
-                    issue={{
-                      ...issue,
-                      pillar: issue.pillar as Pillar,
-                      severity: issue.severity as Severity,
-                      evidence: (issue.evidence as { indicators: { name: string; score: number }[] }) || { indicators: [] },
-                    }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                Nenhum gargalo identificado.
-              </div>
-            )}
+            <IssuesView issues={issues as any} />
           </TabsContent>
 
           {/* Tratamento Tab */}
