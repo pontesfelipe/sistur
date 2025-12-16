@@ -2,3 +2,6 @@ project_id = "enexnpmkhvgufcervjsv"
 
 [functions.calculate-assessment]
 verify_jwt = true
+
+[functions.generate-report]
+verify_jwt = false
