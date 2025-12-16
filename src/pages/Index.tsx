@@ -23,7 +23,8 @@ import {
 import { Link } from 'react-router-dom';
 import {
   useDashboardStats,
-  useLatestAssessment,
+  useAggregatedPillarScores,
+  useAggregatedIssues,
   useRecentAssessments,
   useTopRecommendations,
 } from '@/hooks/useDashboardData';
@@ -31,17 +32,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const Index = () => {
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
-  const { data: latestData, isLoading: latestLoading } = useLatestAssessment();
+  const { data: aggregatedData, isLoading: aggregatedLoading } = useAggregatedPillarScores();
+  const { data: aggregatedIssues, isLoading: issuesLoading } = useAggregatedIssues();
   const { data: recentAssessments, isLoading: recentLoading } = useRecentAssessments();
   const { data: recommendations, isLoading: recsLoading } = useTopRecommendations();
 
-  const criticalPillar = latestData?.pillarScores?.reduce((prev, current) =>
+  const criticalPillar = aggregatedData?.pillarScores?.reduce((prev, current) =>
     prev.score < current.score ? prev : current
-  , latestData.pillarScores[0]);
+  , aggregatedData.pillarScores[0]);
 
   // Calculate average score if pillar scores exist
-  const averageScore = latestData?.pillarScores?.length 
-    ? latestData.pillarScores.reduce((sum, ps) => sum + ps.score, 0) / latestData.pillarScores.length
+  const averageScore = aggregatedData?.pillarScores?.length 
+    ? aggregatedData.pillarScores.reduce((sum, ps) => sum + ps.score, 0) / aggregatedData.pillarScores.length
     : 0;
 
   return (
@@ -99,13 +101,13 @@ const Index = () => {
                   Radiografia do Destino
                 </CardTitle>
                 <CardDescription>
-                  {latestData?.assessment 
-                    ? `${latestData.assessment.title} - ${(latestData.assessment as any).destinations?.name}`
+                  {aggregatedData?.totalAssessments 
+                    ? `Resumo de ${aggregatedData.totalAssessments} diagnóstico(s) calculado(s)`
                     : 'Nenhum diagnóstico disponível'}
                 </CardDescription>
               </div>
               <div className="flex gap-2">
-                {latestData?.assessment && (
+                {aggregatedData?.totalAssessments && aggregatedData.totalAssessments > 0 && (
                   <>
                     <Button variant="outline" size="sm" asChild>
                       <Link to="/relatorios">
@@ -114,8 +116,8 @@ const Index = () => {
                       </Link>
                     </Button>
                     <Button variant="outline" size="sm" asChild>
-                      <Link to={`/diagnosticos/${latestData.assessment.id}`}>
-                        Ver detalhes
+                      <Link to="/diagnosticos">
+                        Ver diagnósticos
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
@@ -124,16 +126,16 @@ const Index = () => {
               </div>
             </CardHeader>
             <CardContent>
-              {latestLoading ? (
+              {aggregatedLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Skeleton className="h-32" />
                   <Skeleton className="h-32" />
                   <Skeleton className="h-32" />
                 </div>
-              ) : latestData?.pillarScores && latestData.pillarScores.length > 0 ? (
+              ) : aggregatedData?.pillarScores && aggregatedData.pillarScores.length > 0 ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    {latestData.pillarScores.map((pillarScore) => (
+                    {aggregatedData.pillarScores.map((pillarScore) => (
                       <PillarGauge
                         key={pillarScore.id}
                         pillar={pillarScore.pillar}
@@ -148,7 +150,7 @@ const Index = () => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-primary" />
-                        <span className="font-medium text-sm">Índice Geral SISTUR</span>
+                        <span className="font-medium text-sm">Índice Geral SISTUR (média)</span>
                       </div>
                       <span className="font-mono font-semibold">
                         {Math.round(averageScore * 100)}%
@@ -175,22 +177,22 @@ const Index = () => {
                 Gargalos Identificados
               </CardTitle>
               <Button variant="ghost" size="sm" asChild>
-                <Link to={latestData?.assessment ? `/diagnosticos/${latestData.assessment.id}` : '/diagnosticos'}>
+                <Link to="/diagnosticos">
                   Ver todos
                   <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
               </Button>
             </CardHeader>
             <CardContent>
-              {latestLoading ? (
+              {issuesLoading ? (
                 <div className="space-y-3">
                   <Skeleton className="h-16" />
                   <Skeleton className="h-16" />
                   <Skeleton className="h-16" />
                 </div>
-              ) : latestData?.issues && latestData.issues.length > 0 ? (
+              ) : aggregatedIssues && aggregatedIssues.length > 0 ? (
                 <div className="space-y-3">
-                  {latestData.issues.map((issue) => (
+                  {aggregatedIssues.map((issue) => (
                     <IssueCard key={issue.id} issue={issue as any} />
                   ))}
                 </div>
