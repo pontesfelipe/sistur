@@ -1,17 +1,21 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { 
   GraduationCap, 
   ExternalLink, 
   AlertCircle,
   BookOpen,
   Video,
-  ChevronRight
+  ChevronRight,
+  Filter
 } from 'lucide-react';
 import { useEduRecommendationsForAssessment, type EduRecommendation } from '@/hooks/useEduRecommendationsForAssessment';
+import { PILLAR_INFO } from '@/types/sistur';
 
 interface IndicatorScore {
   id: string;
@@ -30,7 +34,13 @@ interface EduRecommendationsPanelProps {
 }
 
 export function EduRecommendationsPanel({ indicatorScores }: EduRecommendationsPanelProps) {
+  const [pillarFilter, setPillarFilter] = useState<string>('all');
   const { data: recommendations, isLoading, error } = useEduRecommendationsForAssessment(indicatorScores);
+
+  // Filter recommendations by pillar
+  const filteredRecommendations = recommendations?.filter(rec => 
+    pillarFilter === 'all' || rec.pillar === pillarFilter
+  ) || [];
 
   if (isLoading) {
     return (
@@ -77,12 +87,74 @@ export function EduRecommendationsPanel({ indicatorScores }: EduRecommendationsP
     );
   }
 
-  // Group by type
-  const courses = recommendations.filter(r => r.training.type === 'curso');
-  const lives = recommendations.filter(r => r.training.type === 'live');
+  // Group by type using filtered results
+  const courses = filteredRecommendations.filter(r => r.training.type === 'curso');
+  const lives = filteredRecommendations.filter(r => r.training.type === 'live');
+
+  // Count by pillar for filter badges
+  const pillarCounts = {
+    all: recommendations.length,
+    RA: recommendations.filter(r => r.pillar === 'RA').length,
+    OE: recommendations.filter(r => r.pillar === 'OE').length,
+    AO: recommendations.filter(r => r.pillar === 'AO').length,
+  };
 
   return (
     <div className="space-y-6">
+      {/* Pillar Filter */}
+      <div className="flex items-center gap-3">
+        <Filter className="h-4 w-4 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">Filtrar por pilar:</span>
+        <ToggleGroup 
+          type="single" 
+          value={pillarFilter} 
+          onValueChange={(value) => value && setPillarFilter(value)}
+          className="gap-1"
+        >
+          <ToggleGroupItem value="all" size="sm" className="text-xs px-3">
+            Todos
+            <Badge variant="secondary" className="ml-1.5 text-xs px-1.5 py-0">
+              {pillarCounts.all}
+            </Badge>
+          </ToggleGroupItem>
+          <ToggleGroupItem value="RA" size="sm" className="text-xs px-3 data-[state=on]:bg-pillar-ra/20 data-[state=on]:text-pillar-ra">
+            IRA
+            {pillarCounts.RA > 0 && (
+              <Badge variant="secondary" className="ml-1.5 text-xs px-1.5 py-0">
+                {pillarCounts.RA}
+              </Badge>
+            )}
+          </ToggleGroupItem>
+          <ToggleGroupItem value="OE" size="sm" className="text-xs px-3 data-[state=on]:bg-pillar-oe/20 data-[state=on]:text-pillar-oe">
+            IOE
+            {pillarCounts.OE > 0 && (
+              <Badge variant="secondary" className="ml-1.5 text-xs px-1.5 py-0">
+                {pillarCounts.OE}
+              </Badge>
+            )}
+          </ToggleGroupItem>
+          <ToggleGroupItem value="AO" size="sm" className="text-xs px-3 data-[state=on]:bg-pillar-ao/20 data-[state=on]:text-pillar-ao">
+            IAO
+            {pillarCounts.AO > 0 && (
+              <Badge variant="secondary" className="ml-1.5 text-xs px-1.5 py-0">
+                {pillarCounts.AO}
+              </Badge>
+            )}
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+
+      {/* Empty state for filter */}
+      {filteredRecommendations.length === 0 && (
+        <Card>
+          <CardContent className="py-8 text-center">
+            <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+            <p className="text-muted-foreground text-sm">
+              Nenhuma prescrição encontrada para o pilar {pillarFilter}.
+            </p>
+          </CardContent>
+        </Card>
+      )}
       {/* Courses Section */}
       {courses.length > 0 && (
         <Card>
