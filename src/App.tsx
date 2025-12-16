@@ -17,6 +17,8 @@ import AdminCursos from "./pages/AdminCursos";
 import Configuracoes from "./pages/Configuracoes";
 import Relatorios from "./pages/Relatorios";
 import NovaRodada from "./pages/NovaRodada";
+import FAQ from "./pages/FAQ";
+import Ajuda from "./pages/Ajuda";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -115,6 +117,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <NovaRodada />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/faq"
+              element={
+                <ProtectedRoute>
+                  <FAQ />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ajuda"
+              element={
+                <ProtectedRoute>
+                  <Ajuda />
                 </ProtectedRoute>
               }
             />
