@@ -28,14 +28,16 @@ function useAssessmentDetails(assessmentId: string | undefined) {
     queryFn: async () => {
       if (!assessmentId) return null;
       
-      const [pillarScoresRes, issuesRes] = await Promise.all([
+      const [pillarScoresRes, issuesRes, prescriptionsRes] = await Promise.all([
         supabase.from('pillar_scores').select('*').eq('assessment_id', assessmentId),
         supabase.from('issues').select('*').eq('assessment_id', assessmentId),
+        supabase.from('prescriptions').select('*').eq('assessment_id', assessmentId),
       ]);
       
       return {
         pillarScores: pillarScoresRes.data ?? [],
         issues: issuesRes.data ?? [],
+        prescriptions: prescriptionsRes.data ?? [],
       };
     },
     enabled: !!assessmentId,
@@ -56,6 +58,7 @@ export default function Relatorios() {
   const { data: assessmentDetails } = useAssessmentDetails(selectedAssessmentId || undefined);
   const pillarScores = assessmentDetails?.pillarScores;
   const issues = assessmentDetails?.issues;
+  const prescriptions = assessmentDetails?.prescriptions;
 
   const calculatedAssessments = assessments?.filter(a => a.status === 'CALCULATED') || [];
 
@@ -85,6 +88,7 @@ export default function Relatorios() {
           destinationName: selectedDestination.name,
           pillarScores: pillarScoresMap,
           issues: issues || [],
+          prescriptions: prescriptions || [],
         }),
       });
 
@@ -315,6 +319,12 @@ export default function Relatorios() {
                   <Badge variant="outline" className="gap-1">
                     <AlertTriangle className="h-3 w-3" />
                     {issues.length} problema(s)
+                  </Badge>
+                )}
+                {prescriptions && prescriptions.length > 0 && (
+                  <Badge variant="outline" className="gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    {prescriptions.length} prescrição(ões)
                   </Badge>
                 )}
               </div>
