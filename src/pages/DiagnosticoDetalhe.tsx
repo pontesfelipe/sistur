@@ -3,6 +3,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
 import { IssueCard } from '@/components/dashboard/IssueCard';
 import { RecommendationCard } from '@/components/dashboard/RecommendationCard';
+import { RecommendationsView } from '@/components/dashboard/RecommendationsView';
 import { NormalizationView } from '@/components/dashboard/NormalizationView';
 import { IndicatorScoresView } from '@/components/dashboard/IndicatorScoresView';
 import { IssuesView } from '@/components/dashboard/IssuesView';
@@ -50,7 +51,7 @@ import {
 } from '@/hooks/useAssessmentData';
 import { useIndicatorValues } from '@/hooks/useIndicators';
 import { cn } from '@/lib/utils';
-import type { Pillar, Severity } from '@/types/sistur';
+import type { Pillar, Severity, TerritorialInterpretation } from '@/types/sistur';
 import { PILLAR_INFO, SEVERITY_INFO } from '@/types/sistur';
 import { toast } from 'sonner';
 
@@ -441,40 +442,23 @@ const DiagnosticoDetalhe = () => {
               </div>
             </div>
 
-            {recommendations.length > 0 ? (
-              <div className="space-y-4">
-                {recommendations.map((rec) => (
-                  <RecommendationCard
-                    key={rec.id}
-                    recommendation={{
-                      ...rec,
-                      issue: rec.issue ? {
-                        ...rec.issue,
-                        pillar: (rec.issue as any).pillar as Pillar,
-                        severity: (rec.issue as any).severity as Severity,
-                        evidence: (rec.issue as any).evidence || { indicators: [] },
-                      } : undefined,
-                      course: rec.course ? {
-                        ...rec.course,
-                        level: (rec.course as any).level as 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO',
-                        tags: (rec.course as any).tags || [],
-                      } : undefined,
-                    }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                Nenhuma recomendação gerada. Adicione cursos ao catálogo EDU.
-              </div>
-            )}
-
-            {recommendations.length > 0 && (
-              <Button className="w-full" size="lg">
-                <Download className="mr-2 h-4 w-4" />
-                Exportar Plano de Capacitação
-              </Button>
-            )}
+            <RecommendationsView 
+              recommendations={recommendations.map((rec) => ({
+                ...rec,
+                issue: rec.issue ? {
+                  ...rec.issue,
+                  pillar: (rec.issue as any).pillar as Pillar,
+                  severity: (rec.issue as any).severity as Severity,
+                  interpretation: (rec.issue as any).interpretation as TerritorialInterpretation | undefined,
+                  evidence: (rec.issue as any).evidence || { indicators: [] },
+                } : undefined,
+                course: rec.course ? {
+                  ...rec.course,
+                  level: (rec.course as any).level as 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO',
+                  tags: (rec.course as any).tags || [],
+                } : undefined,
+              }))}
+            />
           </TabsContent>
         </Tabs>
       ) : (
