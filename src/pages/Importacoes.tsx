@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,6 +82,9 @@ const sourceLabels: Record<DataSource, string> = {
 };
 
 const Importacoes = () => {
+  const [searchParams] = useSearchParams();
+  const assessmentFromUrl = searchParams.get('assessment');
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedAssessment, setSelectedAssessment] = useState<string>('');
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
@@ -90,6 +94,16 @@ const Importacoes = () => {
   const { indicators, isLoading: loadingIndicators } = useIndicators();
   const { assessments, isLoading: loadingAssessments } = useAssessments();
   const { values, isLoading: loadingValues, upsertValue, bulkUpsertValues } = useIndicatorValues(selectedAssessment);
+
+  // Pre-select assessment from URL parameter
+  useEffect(() => {
+    if (assessmentFromUrl && assessments?.length) {
+      const exists = assessments.some(a => a.id === assessmentFromUrl);
+      if (exists) {
+        setSelectedAssessment(assessmentFromUrl);
+      }
+    }
+  }, [assessmentFromUrl, assessments]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
