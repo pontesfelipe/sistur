@@ -120,7 +120,10 @@ export type Database = {
           id: string
           level: Database["public"]["Enums"]["course_level"]
           org_id: string | null
+          pillar: Database["public"]["Enums"]["pillar_type"] | null
           tags: Json
+          target_agent: Database["public"]["Enums"]["target_agent"] | null
+          theme: string | null
           title: string
           url: string | null
         }
@@ -131,7 +134,10 @@ export type Database = {
           id?: string
           level?: Database["public"]["Enums"]["course_level"]
           org_id?: string | null
+          pillar?: Database["public"]["Enums"]["pillar_type"] | null
           tags?: Json
+          target_agent?: Database["public"]["Enums"]["target_agent"] | null
+          theme?: string | null
           title: string
           url?: string | null
         }
@@ -142,7 +148,10 @@ export type Database = {
           id?: string
           level?: Database["public"]["Enums"]["course_level"]
           org_id?: string | null
+          pillar?: Database["public"]["Enums"]["pillar_type"] | null
           tags?: Json
+          target_agent?: Database["public"]["Enums"]["target_agent"] | null
+          theme?: string | null
           title?: string
           url?: string | null
         }
@@ -517,6 +526,154 @@ export type Database = {
           },
         ]
       }
+      prescription_cycles: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          current_score: number | null
+          evolution_state: string | null
+          id: string
+          org_id: string
+          prescription_id: string
+          previous_score: number | null
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          current_score?: number | null
+          evolution_state?: string | null
+          id?: string
+          org_id: string
+          prescription_id: string
+          previous_score?: number | null
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          current_score?: number | null
+          evolution_state?: string | null
+          id?: string
+          org_id?: string
+          prescription_id?: string
+          previous_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescription_cycles_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescription_cycles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescription_cycles_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prescriptions: {
+        Row: {
+          assessment_id: string
+          course_id: string | null
+          created_at: string
+          cycle_number: number
+          id: string
+          indicator_id: string | null
+          interpretation:
+            | Database["public"]["Enums"]["territorial_interpretation"]
+            | null
+          issue_id: string | null
+          justification: string
+          org_id: string
+          pillar: Database["public"]["Enums"]["pillar_type"]
+          priority: number
+          status: Database["public"]["Enums"]["severity_type"]
+          target_agent: Database["public"]["Enums"]["target_agent"]
+        }
+        Insert: {
+          assessment_id: string
+          course_id?: string | null
+          created_at?: string
+          cycle_number?: number
+          id?: string
+          indicator_id?: string | null
+          interpretation?:
+            | Database["public"]["Enums"]["territorial_interpretation"]
+            | null
+          issue_id?: string | null
+          justification: string
+          org_id: string
+          pillar: Database["public"]["Enums"]["pillar_type"]
+          priority?: number
+          status: Database["public"]["Enums"]["severity_type"]
+          target_agent?: Database["public"]["Enums"]["target_agent"]
+        }
+        Update: {
+          assessment_id?: string
+          course_id?: string | null
+          created_at?: string
+          cycle_number?: number
+          id?: string
+          indicator_id?: string | null
+          interpretation?:
+            | Database["public"]["Enums"]["territorial_interpretation"]
+            | null
+          issue_id?: string | null
+          justification?: string
+          org_id?: string
+          pillar?: Database["public"]["Enums"]["pillar_type"]
+          priority?: number
+          status?: Database["public"]["Enums"]["severity_type"]
+          target_agent?: Database["public"]["Enums"]["target_agent"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescriptions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescriptions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescriptions_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescriptions_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescriptions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -677,6 +834,7 @@ export type Database = {
       normalization_type: "MIN_MAX" | "BANDS" | "BINARY"
       pillar_type: "RA" | "OE" | "AO"
       severity_type: "CRITICO" | "MODERADO" | "BOM"
+      target_agent: "GESTORES" | "TECNICOS" | "TRADE"
       territorial_interpretation: "ESTRUTURAL" | "GESTAO" | "ENTREGA"
     }
     CompositeTypes: {
@@ -814,6 +972,7 @@ export const Constants = {
       normalization_type: ["MIN_MAX", "BANDS", "BINARY"],
       pillar_type: ["RA", "OE", "AO"],
       severity_type: ["CRITICO", "MODERADO", "BOM"],
+      target_agent: ["GESTORES", "TECNICOS", "TRADE"],
       territorial_interpretation: ["ESTRUTURAL", "GESTAO", "ENTREGA"],
     },
   },
