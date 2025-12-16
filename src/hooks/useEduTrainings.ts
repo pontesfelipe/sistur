@@ -76,10 +76,10 @@ export function useEduTraining(trainingId?: string) {
         .from('edu_trainings')
         .select('*')
         .eq('training_id', trainingId)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
-      return data as EduTraining;
+      return data as EduTraining | null;
     },
     enabled: !!trainingId,
   });

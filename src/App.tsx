@@ -18,6 +18,7 @@ import AdminCursos from "./pages/AdminCursos";
 import EduCatalogo from "./pages/EduCatalogo";
 import EduTrilhas, { EduTrilhaDetalhe } from "./pages/EduTrilhas";
 import EduCursoDetalhe from "./pages/EduCursoDetalhe";
+import EduTrainingDetalhe from "./pages/EduTrainingDetalhe";
 import Learning from "./pages/Learning";
 import Configuracoes from "./pages/Configuracoes";
 import Relatorios from "./pages/Relatorios";
@@ -130,6 +131,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <EduCursoDetalhe />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edu/training/:id"
+              element={
+                <ProtectedRoute>
+                  <EduTrainingDetalhe />
                 </ProtectedRoute>
               }
             />
