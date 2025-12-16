@@ -13,6 +13,7 @@ import DiagnosticoDetalhe from "./pages/DiagnosticoDetalhe";
 import Indicadores from "./pages/Indicadores";
 import Importacoes from "./pages/Importacoes";
 import Cursos from "./pages/Cursos";
+import AdminCursos from "./pages/AdminCursos";
 import Configuracoes from "./pages/Configuracoes";
 import Relatorios from "./pages/Relatorios";
 import NotFound from "./pages/NotFound";
@@ -81,6 +82,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Cursos />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/cursos"
+              element={
+                <ProtectedRoute>
+                  <AdminCursos />
                 </ProtectedRoute>
               }
             />
