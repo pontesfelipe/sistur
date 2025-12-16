@@ -12,45 +12,101 @@ serve(async (req) => {
   }
 
   try {
-    const { assessmentId, destinationName, pillarScores, issues } = await req.json();
+    const { assessmentId, destinationName, pillarScores, issues, prescriptions } = await req.json();
     
-    console.log('Generating report for:', destinationName);
+    console.log('Generating SISTUR report for:', destinationName);
     console.log('Assessment ID:', assessmentId);
     console.log('Pillar scores:', pillarScores);
     console.log('Issues count:', issues?.length || 0);
+    console.log('Prescriptions count:', prescriptions?.length || 0);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `Você é um especialista em planejamento e desenvolvimento turístico no Brasil. 
-Sua tarefa é gerar um plano de desenvolvimento turístico detalhado e personalizado para um destino específico baseado em dados de diagnóstico.
+    const systemPrompt = `Você é um especialista em inteligência territorial e desenvolvimento turístico no Brasil, utilizando a metodologia SISTUR.
 
-O relatório deve ser em português brasileiro e seguir esta estrutura:
-1. **Resumo Executivo**: Visão geral do destino e situação atual
-2. **Análise dos Pilares**: 
-   - RA (Recursos e Atrativos): Análise dos recursos naturais e culturais
-   - OE (Oferta e Equipamentos): Análise da infraestrutura turística
-   - AO (Ambiente Organizacional): Análise da gestão e governança
-3. **Diagnóstico de Problemas**: Principais desafios identificados
-4. **Plano de Ação**: Ações prioritárias com prazos sugeridos (curto, médio e longo prazo)
-5. **Recomendações de Capacitação**: Áreas onde o destino precisa desenvolver competências
-6. **Indicadores de Sucesso**: Métricas para acompanhar o progresso
+O SISTUR opera como uma infraestrutura de inteligência territorial que transforma indicadores públicos em decisões estratégicas e capacitação aplicada, fechando o ciclo entre diagnóstico, ação e resultado.
 
-Seja específico, prático e considere a realidade brasileira. Use formatação markdown para estruturar o relatório.`;
+PRINCÍPIOS FUNDAMENTAIS DO SISTUR:
+- Transparência: Todos os dados, fontes e cálculos são rastreáveis
+- Sem rankings: Avaliação individual — nunca comparativa ou competitiva
+- Determinístico: Status e prescrições são calculados automaticamente por regras
+- Ciclo fechado: Diagnóstico → Ação → Monitoramento → Melhoria
 
-    const userPrompt = `Gere um plano de desenvolvimento turístico para o destino: ${destinationName}
+OS TRÊS PILARES (Taxonomia Fixa):
+1. RA — Relações Ambientais: Contexto territorial, sociedade, meio ambiente, dados demográficos e segurança pública
+2. AO — Ações Operacionais: Governança pública, planejamento, orçamento e capacidade de tomada de decisão
+3. OE — Organização Estrutural: Infraestrutura turística, serviços, mercado, produtos e entrega ao visitante
 
-Dados do diagnóstico:
-- Score do Pilar RA (Recursos e Atrativos): ${pillarScores?.RA?.score !== undefined ? (pillarScores.RA.score * 100).toFixed(1) + '%' : 'Não calculado'} - Severidade: ${pillarScores?.RA?.severity || 'N/A'}
-- Score do Pilar OE (Oferta e Equipamentos): ${pillarScores?.OE?.score !== undefined ? (pillarScores.OE.score * 100).toFixed(1) + '%' : 'Não calculado'} - Severidade: ${pillarScores?.OE?.severity || 'N/A'}
-- Score do Pilar AO (Ambiente Organizacional): ${pillarScores?.AO?.score !== undefined ? (pillarScores.AO.score * 100).toFixed(1) + '%' : 'Não calculado'} - Severidade: ${pillarScores?.AO?.severity || 'N/A'}
+CLASSIFICAÇÃO DE STATUS (automático e imutável):
+- ADEQUADO (BOM): Score ≥ 0.67 (67%)
+- ATENÇÃO (MODERADO): 0.34 ≤ Score < 0.67 (34-66%)
+- CRÍTICO: Score ≤ 0.33 (≤33%)
 
-Problemas identificados:
-${issues?.length > 0 ? issues.map((issue: any) => `- [${issue.severity}] ${issue.title} (Pilar: ${issue.pillar}, Tema: ${issue.theme})`).join('\n') : 'Nenhum problema identificado ainda.'}
+INTERPRETAÇÃO TERRITORIAL (para indicadores não-adequados):
+- ESTRUTURAL: Restrições de longo prazo, socioeconômicas e territoriais
+- GESTÃO: Falhas de governança, planejamento e coordenação institucional
+- ENTREGA: Falhas de execução, qualidade de serviço e problemas na entrega
 
-Por favor, gere um relatório completo e detalhado considerando esses dados.`;
+Gere um relatório técnico de desenvolvimento turístico em português brasileiro com esta estrutura:
+
+1. **Resumo Executivo**: Visão geral do destino e situação atual baseada nos três pilares
+2. **Análise por Pilar**: 
+   - RA (Relações Ambientais): Diagnóstico do contexto territorial
+   - AO (Ações Operacionais): Diagnóstico da governança e gestão
+   - OE (Organização Estrutural): Diagnóstico da infraestrutura e serviços
+3. **Diagnóstico Territorial**: 
+   - Problemas ESTRUTURAIS identificados
+   - Problemas de GESTÃO identificados
+   - Problemas de ENTREGA identificados
+4. **Prescrições de Capacitação (SISTUR EDU)**: 
+   - Cursos prescritos por pilar
+   - Agentes-alvo (Gestores Públicos, Técnicos, Trade)
+   - Justificativa de cada prescrição
+5. **Plano de Ação por Horizonte Temporal**:
+   - Curto prazo (até 6 meses): Ações de ENTREGA
+   - Médio prazo (6-18 meses): Ações de GESTÃO
+   - Longo prazo (18+ meses): Ações ESTRUTURAIS
+6. **Indicadores de Monitoramento**: Métricas para acompanhar evolução, estagnação ou regressão
+
+Seja específico, técnico e considere a metodologia SISTUR. Use formatação markdown.`;
+
+    // Format prescriptions for the prompt
+    const prescriptionsText = prescriptions?.length > 0 
+      ? prescriptions.map((p: any) => 
+          `- [${p.status}] ${p.justification} (Pilar: ${p.pillar}, Agente: ${p.target_agent}, Interpretação: ${p.interpretation || 'N/A'})`
+        ).join('\n')
+      : 'Nenhuma prescrição gerada ainda.';
+
+    // Format issues with territorial interpretation
+    const issuesText = issues?.length > 0 
+      ? issues.map((issue: any) => 
+          `- [${issue.severity}] ${issue.title} (Pilar: ${issue.pillar}, Tema: ${issue.theme}, Interpretação: ${issue.interpretation || 'N/A'})`
+        ).join('\n')
+      : 'Nenhum problema identificado ainda.';
+
+    const userPrompt = `Gere um plano de desenvolvimento turístico SISTUR para o destino: ${destinationName}
+
+DADOS DO DIAGNÓSTICO:
+
+SCORES DOS PILARES:
+- I-RA (Índice Relações Ambientais): ${pillarScores?.RA?.score !== undefined ? (pillarScores.RA.score * 100).toFixed(1) + '%' : 'Não calculado'} - Status: ${pillarScores?.RA?.severity || 'N/A'}
+- I-AO (Índice Ações Operacionais): ${pillarScores?.AO?.score !== undefined ? (pillarScores.AO.score * 100).toFixed(1) + '%' : 'Não calculado'} - Status: ${pillarScores?.AO?.severity || 'N/A'}
+- I-OE (Índice Organização Estrutural): ${pillarScores?.OE?.score !== undefined ? (pillarScores.OE.score * 100).toFixed(1) + '%' : 'Não calculado'} - Status: ${pillarScores?.OE?.severity || 'N/A'}
+
+PROBLEMAS IDENTIFICADOS (com interpretação territorial):
+${issuesText}
+
+PRESCRIÇÕES DE CAPACITAÇÃO ATIVAS:
+${prescriptionsText}
+
+Por favor, gere um relatório completo seguindo a metodologia SISTUR, considerando que:
+1. Indicadores criam obrigação
+2. Aprendizado é execução
+3. Monitoramento fecha o ciclo
+4. O SISTUR não informa — o SISTUR transforma`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -91,7 +147,7 @@ Por favor, gere um relatório completo e detalhado considerando esses dados.`;
       });
     }
 
-    console.log('Streaming response from AI gateway');
+    console.log('Streaming SISTUR report from AI gateway');
     
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
