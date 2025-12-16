@@ -326,6 +326,50 @@ export type Database = {
           },
         ]
       }
+      edu_indicator_training_map: {
+        Row: {
+          created_at: string
+          id: string
+          indicator_code: string
+          interpretation_trigger: string | null
+          pillar: string
+          priority: number
+          reason_template: string
+          status_trigger: Json
+          training_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          indicator_code: string
+          interpretation_trigger?: string | null
+          pillar: string
+          priority?: number
+          reason_template?: string
+          status_trigger?: Json
+          training_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          indicator_code?: string
+          interpretation_trigger?: string | null
+          pillar?: string
+          priority?: number
+          reason_template?: string
+          status_trigger?: Json
+          training_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_indicator_training_map_training_id_fkey"
+            columns: ["training_id"]
+            isOneToOne: false
+            referencedRelation: "edu_trainings"
+            referencedColumns: ["training_id"]
+          },
+        ]
+      }
       edu_lives: {
         Row: {
           created_at: string
@@ -517,6 +561,65 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "edu_tracks_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_trainings: {
+        Row: {
+          active: boolean
+          aliases: Json
+          course_code: string | null
+          created_at: string
+          level: string | null
+          modules: Json
+          objective: string | null
+          org_id: string | null
+          pillar: string
+          source: string | null
+          target_audience: string | null
+          title: string
+          training_id: string
+          type: string
+        }
+        Insert: {
+          active?: boolean
+          aliases?: Json
+          course_code?: string | null
+          created_at?: string
+          level?: string | null
+          modules?: Json
+          objective?: string | null
+          org_id?: string | null
+          pillar: string
+          source?: string | null
+          target_audience?: string | null
+          title: string
+          training_id: string
+          type: string
+        }
+        Update: {
+          active?: boolean
+          aliases?: Json
+          course_code?: string | null
+          created_at?: string
+          level?: string | null
+          modules?: Json
+          objective?: string | null
+          org_id?: string | null
+          pillar?: string
+          source?: string | null
+          target_audience?: string | null
+          title?: string
+          training_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_trainings_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
