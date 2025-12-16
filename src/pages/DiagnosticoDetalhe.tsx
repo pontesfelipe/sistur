@@ -7,6 +7,7 @@ import { RecommendationsView } from '@/components/dashboard/RecommendationsView'
 import { NormalizationView } from '@/components/dashboard/NormalizationView';
 import { IndicatorScoresView } from '@/components/dashboard/IndicatorScoresView';
 import { IssuesView } from '@/components/dashboard/IssuesView';
+import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendationsPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -435,30 +436,38 @@ const DiagnosticoDetalhe = () => {
                     SISTUR EDU — Plano de Capacitação
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {recommendations.length} cursos recomendados com base nos
-                    gargalos identificados
+                    Prescrições automáticas baseadas nos indicadores críticos e em atenção
                   </p>
                 </div>
               </div>
             </div>
 
-            <RecommendationsView 
-              recommendations={recommendations.map((rec) => ({
-                ...rec,
-                issue: rec.issue ? {
-                  ...rec.issue,
-                  pillar: (rec.issue as any).pillar as Pillar,
-                  severity: (rec.issue as any).severity as Severity,
-                  interpretation: (rec.issue as any).interpretation as TerritorialInterpretation | undefined,
-                  evidence: (rec.issue as any).evidence || { indicators: [] },
-                } : undefined,
-                course: rec.course ? {
-                  ...rec.course,
-                  level: (rec.course as any).level as 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO',
-                  tags: (rec.course as any).tags || [],
-                } : undefined,
-              }))}
-            />
+            {/* EDU Recommendations Panel - New */}
+            <EduRecommendationsPanel indicatorScores={indicatorScores as any} />
+
+            {/* Legacy Recommendations View */}
+            {recommendations.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold mb-4">Recomendações Adicionais</h3>
+                <RecommendationsView 
+                  recommendations={recommendations.map((rec) => ({
+                    ...rec,
+                    issue: rec.issue ? {
+                      ...rec.issue,
+                      pillar: (rec.issue as any).pillar as Pillar,
+                      severity: (rec.issue as any).severity as Severity,
+                      interpretation: (rec.issue as any).interpretation as TerritorialInterpretation | undefined,
+                      evidence: (rec.issue as any).evidence || { indicators: [] },
+                    } : undefined,
+                    course: rec.course ? {
+                      ...rec.course,
+                      level: (rec.course as any).level as 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO',
+                      tags: (rec.course as any).tags || [],
+                    } : undefined,
+                  }))}
+                />
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       ) : (
