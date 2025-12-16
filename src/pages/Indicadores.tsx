@@ -57,7 +57,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { cn, formatIndicatorName, formatIndicatorCode } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
@@ -340,7 +340,7 @@ const Indicadores = () => {
                   <TableRow key={indicator.id} className={cn(isPending && 'opacity-60')}>
                     <TableCell className="font-mono text-sm">
                       <div className="flex items-center gap-2">
-                        {formatIndicatorCode(indicator.code)}
+                        {indicator.code}
                         {isPending && (
                           <Tooltip>
                             <TooltipTrigger>
@@ -361,7 +361,7 @@ const Indicadores = () => {
                             onClick={() => setSelectedIndicator(indicator)}
                           >
                             <div className="flex items-center gap-2">
-                              <span className="font-medium">{formatIndicatorName(indicator.name)}</span>
+                              <span className="font-medium">{indicator.name}</span>
                               {indicator.description && (
                                 <Info className="h-4 w-4 text-muted-foreground" />
                               )}
@@ -373,7 +373,7 @@ const Indicadores = () => {
                         </DialogTrigger>
                         <DialogContent className="max-w-lg">
                           <DialogHeader>
-                            <DialogTitle>{formatIndicatorName(indicator.name)}</DialogTitle>
+                            <DialogTitle>{indicator.name}</DialogTitle>
                             <DialogDescription>
                               Código: {indicator.code}
                             </DialogDescription>
