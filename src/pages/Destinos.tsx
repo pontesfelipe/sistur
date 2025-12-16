@@ -1,7 +1,7 @@
+import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { 
   Plus, 
   Search, 
@@ -9,10 +9,12 @@ import {
   MoreVertical,
   Edit,
   Trash2,
-  Eye
+  Eye,
+  Loader2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { mockDestinations } from '@/data/mockData';
+import { useDestinations } from '@/hooks/useDestinations';
+import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,15 +22,39 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const Destinos = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  
+  const { destinations, isLoading, createDestination, deleteDestination } = useDestinations();
+
+  const filteredDestinations = destinations?.filter((dest) =>
+    dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    dest.uf?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) ?? [];
+
+  const handleCreate = async (data: { name: string; uf: string; ibge_code?: string | null; latitude?: number | null; longitude?: number | null }) => {
+    await createDestination.mutateAsync(data);
+  };
+
+  const handleDelete = async () => {
+    if (deleteId) {
+      await deleteDestination.mutateAsync(deleteId);
+      setDeleteId(null);
+    }
+  };
+
   return (
     <AppLayout 
       title="Destinos" 
@@ -41,98 +67,143 @@ const Destinos = () => {
           <Input
             placeholder="Buscar destinos..."
             className="pl-9"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button>
+        <Button onClick={() => setIsFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Novo Destino
         </Button>
       </div>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      )}
+
       {/* Destinations Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockDestinations.map((destination, index) => (
-          <div
-            key={destination.id}
-            className="group p-6 rounded-xl border bg-card hover:shadow-lg transition-all duration-300 animate-fade-in"
-            style={{ animationDelay: `${index * 100}ms` }}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                  <MapPin className="h-6 w-6" />
+      {!isLoading && filteredDestinations.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredDestinations.map((destination, index) => (
+            <div
+              key={destination.id}
+              className="group p-6 rounded-xl border bg-card hover:shadow-lg transition-all duration-300 animate-fade-in"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
+                    <MapPin className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                      {destination.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {destination.uf}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-display font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-                    {destination.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {destination.uf}
-                  </p>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      <Eye className="mr-2 h-4 w-4" />
+                      Ver detalhes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Edit className="mr-2 h-4 w-4" />
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="text-destructive"
+                      onClick={() => setDeleteId(destination.id)}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-border">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Código IBGE</span>
+                  <span className="font-mono text-foreground">{destination.ibge_code || '—'}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm mt-2">
+                  <span className="text-muted-foreground">Coordenadas</span>
+                  <span className="font-mono text-foreground text-xs">
+                    {destination.latitude && destination.longitude 
+                      ? `${destination.latitude.toFixed(4)}, ${destination.longitude.toFixed(4)}`
+                      : '—'}
+                  </span>
                 </div>
               </div>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    <Eye className="mr-2 h-4 w-4" />
-                    Ver detalhes
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="text-destructive">
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
 
-            <div className="mt-4 pt-4 border-t border-border">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Código IBGE</span>
-                <span className="font-mono text-foreground">{destination.ibge_code || '—'}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm mt-2">
-                <span className="text-muted-foreground">Coordenadas</span>
-                <span className="font-mono text-foreground text-xs">
-                  {destination.latitude?.toFixed(4)}, {destination.longitude?.toFixed(4)}
-                </span>
-              </div>
+              <Button variant="outline" className="w-full mt-4" asChild>
+                <Link to={`/diagnosticos?destino=${destination.id}`}>
+                  Ver diagnósticos
+                </Link>
+              </Button>
             </div>
-
-            <Button variant="outline" className="w-full mt-4" asChild>
-              <Link to={`/diagnosticos?destino=${destination.id}`}>
-                Ver diagnósticos
-              </Link>
-            </Button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
-      {mockDestinations.length === 0 && (
+      {!isLoading && filteredDestinations.length === 0 && (
         <div className="text-center py-16">
           <MapPin className="mx-auto h-12 w-12 text-muted-foreground/50" />
           <h3 className="mt-4 text-lg font-semibold text-foreground">
-            Nenhum destino cadastrado
+            {searchQuery ? 'Nenhum destino encontrado' : 'Nenhum destino cadastrado'}
           </h3>
           <p className="mt-2 text-muted-foreground">
-            Comece cadastrando seu primeiro destino turístico.
+            {searchQuery 
+              ? 'Tente ajustar sua busca.'
+              : 'Comece cadastrando seu primeiro destino turístico.'}
           </p>
-          <Button className="mt-4">
-            <Plus className="mr-2 h-4 w-4" />
-            Novo Destino
-          </Button>
+          {!searchQuery && (
+            <Button className="mt-4" onClick={() => setIsFormOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Destino
+            </Button>
+          )}
         </div>
       )}
+
+      {/* Form Dialog */}
+      <DestinationFormDialog
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        onSubmit={handleCreate}
+      />
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir destino?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Todos os diagnósticos associados também serão excluídos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 };
