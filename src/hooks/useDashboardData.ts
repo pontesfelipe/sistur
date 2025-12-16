@@ -53,15 +53,21 @@ export function useLatestAssessment() {
 }
 
 // Aggregated pillar scores across all calculated assessments
-export function useAggregatedPillarScores() {
+export function useAggregatedPillarScores(destinationId?: string) {
   return useQuery({
-    queryKey: ['aggregated-pillar-scores'],
+    queryKey: ['aggregated-pillar-scores', destinationId],
     queryFn: async () => {
-      // Get all calculated assessments
-      const { data: assessments } = await supabase
+      // Get all calculated assessments, optionally filtered by destination
+      let query = supabase
         .from('assessments')
-        .select('id, title, destinations(name)')
+        .select('id, title, destination_id, destinations(name)')
         .eq('status', 'CALCULATED');
+
+      if (destinationId) {
+        query = query.eq('destination_id', destinationId);
+      }
+
+      const { data: assessments } = await query;
 
       if (!assessments || assessments.length === 0) return null;
 
@@ -101,31 +107,73 @@ export function useAggregatedPillarScores() {
         };
       });
 
+      // Get unique destinations from the filtered assessments
+      const uniqueDestinations = new Map<string, string>();
+      assessments.forEach(a => {
+        if (a.destination_id && (a.destinations as any)?.name) {
+          uniqueDestinations.set(a.destination_id, (a.destinations as any).name);
+        }
+      });
+
       return {
         pillarScores: aggregatedScores,
         totalAssessments: assessments.length,
         assessments: assessments.map(a => ({
           id: a.id,
           title: a.title,
+          destinationId: a.destination_id,
           destination: (a.destinations as any)?.name
-        }))
+        })),
+        destinations: Array.from(uniqueDestinations.entries()).map(([id, name]) => ({ id, name }))
       };
     },
   });
 }
 
-// Aggregated issues across all assessments
-export function useAggregatedIssues() {
+// Get all destinations that have calculated assessments
+export function useDestinationsWithAssessments() {
   return useQuery({
-    queryKey: ['aggregated-issues'],
+    queryKey: ['destinations-with-assessments'],
     queryFn: async () => {
-      const { data: issues } = await supabase
+      const { data: assessments } = await supabase
+        .from('assessments')
+        .select('destination_id, destinations(id, name)')
+        .eq('status', 'CALCULATED');
+
+      if (!assessments) return [];
+
+      // Get unique destinations
+      const uniqueDestinations = new Map<string, string>();
+      assessments.forEach(a => {
+        const dest = a.destinations as any;
+        if (dest?.id && dest?.name) {
+          uniqueDestinations.set(dest.id, dest.name);
+        }
+      });
+
+      return Array.from(uniqueDestinations.entries()).map(([id, name]) => ({ id, name }));
+    },
+  });
+}
+
+// Aggregated issues across all assessments
+export function useAggregatedIssues(destinationId?: string) {
+  return useQuery({
+    queryKey: ['aggregated-issues', destinationId],
+    queryFn: async () => {
+      let query = supabase
         .from('issues')
         .select(`
           *,
-          assessments!inner(title, status, destinations(name))
+          assessments!inner(title, status, destination_id, destinations(name))
         `)
-        .eq('assessments.status', 'CALCULATED')
+        .eq('assessments.status', 'CALCULATED');
+
+      if (destinationId) {
+        query = query.eq('assessments.destination_id', destinationId);
+      }
+
+      const { data: issues } = await query
         .order('severity', { ascending: true })
         .limit(5);
 
