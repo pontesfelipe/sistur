@@ -4,6 +4,7 @@ import { PillarGauge } from '@/components/dashboard/PillarGauge';
 import { IssueCard } from '@/components/dashboard/IssueCard';
 import { RecommendationCard } from '@/components/dashboard/RecommendationCard';
 import { NormalizationView } from '@/components/dashboard/NormalizationView';
+import { IndicatorScoresView } from '@/components/dashboard/IndicatorScoresView';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -412,66 +413,7 @@ const DiagnosticoDetalhe = () => {
 
           {/* Indicadores Tab */}
           <TabsContent value="indicadores" className="space-y-6">
-            <div className="bg-card rounded-xl border p-6">
-              <h3 className="text-lg font-display font-semibold mb-4">
-                Scores por Indicador
-              </h3>
-              {indicatorScores.length > 0 ? (
-                <div className="space-y-4">
-                  {indicatorScores.map((score) => {
-                    const indicator = score.indicator as { name?: string; pillar?: string; description?: string } | null;
-                    return (
-                      <div key={score.id} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Badge
-                              variant={
-                                (indicator?.pillar?.toLowerCase() || 'ra') as 'ra' | 'oe' | 'ao'
-                              }
-                            >
-                              {indicator?.pillar || '—'}
-                            </Badge>
-                            <span className="font-medium text-sm">
-                              {indicator?.name || 'Indicador'}
-                            </span>
-                          </div>
-                          <span
-                            className={cn(
-                              'font-mono text-sm font-semibold',
-                              score.score >= 0.67
-                                ? 'text-severity-good'
-                                : score.score >= 0.34
-                                ? 'text-severity-moderate'
-                                : 'text-severity-critical'
-                            )}
-                          >
-                            {Math.round(score.score * 100)}%
-                          </span>
-                        </div>
-                        <Progress
-                          value={score.score * 100}
-                          className={cn(
-                            'h-2',
-                            score.score >= 0.67
-                              ? '[&>div]:bg-severity-good'
-                              : score.score >= 0.34
-                              ? '[&>div]:bg-severity-moderate'
-                              : '[&>div]:bg-severity-critical'
-                          )}
-                        />
-                        {indicator?.description && (
-                          <p className="text-xs text-muted-foreground">
-                            {indicator.description}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-muted-foreground">Nenhum indicador calculado.</p>
-              )}
-            </div>
+            <IndicatorScoresView indicatorScores={indicatorScores as any} />
           </TabsContent>
 
           {/* Gargalos Tab */}
