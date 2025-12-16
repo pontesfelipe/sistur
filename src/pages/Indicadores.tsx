@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -78,6 +78,7 @@ const Indicadores = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [pillarFilter, setPillarFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
+  const [themeFilter, setThemeFilter] = useState('all');
   const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
   const [editingWeightId, setEditingWeightId] = useState<string | null>(null);
   const [editingWeightValue, setEditingWeightValue] = useState<string>('');
@@ -95,6 +96,15 @@ const Indicadores = () => {
     BINARY: 'Binário',
   };
 
+  // Get unique themes
+  const availableThemes = useMemo(() => {
+    const themes = new Set<string>();
+    indicators.forEach(i => {
+      if (i.theme) themes.add(i.theme);
+    });
+    return Array.from(themes).sort();
+  }, [indicators]);
+
   const filteredIndicators = indicators.filter(i => {
     const matchesSearch = i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       i.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -104,7 +114,8 @@ const Indicadores = () => {
     const matchesSource = sourceFilter === 'all' || 
       (sourceFilter === 'igma' && indicatorSource === 'IGMA') ||
       (sourceFilter === 'other' && indicatorSource !== 'IGMA');
-    return matchesSearch && matchesPillar && matchesSource;
+    const matchesTheme = themeFilter === 'all' || i.theme === themeFilter;
+    return matchesSearch && matchesPillar && matchesSource && matchesTheme;
   });
 
   const igmaCount = indicators.filter(i => (i as any).source === 'IGMA').length;
@@ -195,6 +206,17 @@ const Indicadores = () => {
               <SelectItem value="all">Todas</SelectItem>
               <SelectItem value="igma">IGMA</SelectItem>
               <SelectItem value="other">Outras</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={themeFilter} onValueChange={setThemeFilter}>
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="Tema" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os temas</SelectItem>
+              {availableThemes.map(theme => (
+                <SelectItem key={theme} value={theme}>{theme}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
