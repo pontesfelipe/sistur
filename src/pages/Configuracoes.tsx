@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UserManagement } from '@/components/users/UserManagement';
+import { LogAnalytics } from '@/components/analytics/LogAnalytics';
 import { 
   Calculator, 
   BookOpen, 
@@ -26,7 +27,8 @@ import {
   CheckCircle2,
   Clock,
   Activity,
-  Shield
+  Shield,
+  BarChart3
 } from 'lucide-react';
 
 export default function Configuracoes() {
@@ -35,10 +37,14 @@ export default function Configuracoes() {
       <div className="space-y-6">
 
         <Tabs defaultValue="usuarios" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+          <TabsList className="grid w-full grid-cols-5 max-w-3xl">
             <TabsTrigger value="usuarios" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               Usuários
+            </TabsTrigger>
+            <TabsTrigger value="logs" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Logs
             </TabsTrigger>
             <TabsTrigger value="metodologia" className="flex items-center gap-2">
               <Calculator className="h-4 w-4" />
@@ -57,6 +63,11 @@ export default function Configuracoes() {
           {/* USUARIOS TAB */}
           <TabsContent value="usuarios" className="space-y-6">
             <UserManagement />
+          </TabsContent>
+
+          {/* LOGS TAB */}
+          <TabsContent value="logs" className="space-y-6">
+            <LogAnalytics />
           </TabsContent>
 
           {/* METODOLOGIA TAB */}
