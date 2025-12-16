@@ -87,8 +87,8 @@ export function EduRecommendationsPanel({ indicatorScores }: EduRecommendationsP
     );
   }
 
-  // Group by type using filtered results
-  const courses = filteredRecommendations.filter(r => r.training.type === 'curso');
+  // Group by type using filtered results (type is 'course' or 'live' in DB)
+  const courses = filteredRecommendations.filter(r => r.training.type === 'course');
   const lives = filteredRecommendations.filter(r => r.training.type === 'live');
 
   // Count by pillar for filter badges
