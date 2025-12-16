@@ -9,6 +9,18 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import {
   ArrowLeft,
   Download,
@@ -20,8 +32,13 @@ import {
   GraduationCap,
   Loader2,
   FileText,
+  RotateCcw,
+  PlusCircle,
+  Edit,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
+import { useAssessments } from '@/hooks/useAssessments';
+import { useIndicators } from '@/hooks/useIndicators';
 import {
   useAssessment,
   usePillarScores,
@@ -33,11 +50,14 @@ import { useIndicatorValues } from '@/hooks/useIndicators';
 import { cn } from '@/lib/utils';
 import type { Pillar, Severity } from '@/types/sistur';
 import { PILLAR_INFO, SEVERITY_INFO } from '@/types/sistur';
+import { toast } from 'sonner';
 
 const DiagnosticoDetalhe = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { calculate, loading: calculating } = useCalculateAssessment();
+  const { updateAssessment } = useAssessments();
+  const { indicators } = useIndicators();
 
   // Fetch data
   const { data: assessment, isLoading: loadingAssessment, refetch: refetchAssessment } = useAssessment(id);
@@ -46,6 +66,12 @@ const DiagnosticoDetalhe = () => {
   const { data: issues = [], refetch: refetchIssues } = useIssues(id);
   const { data: recommendations = [], refetch: refetchRecommendations } = useRecommendations(id);
   const { values: indicatorValues = [] } = useIndicatorValues(id);
+
+  // Calculate data completeness
+  const totalIndicators = indicators.length;
+  const filledIndicators = indicatorValues.length;
+  const completenessPercentage = totalIndicators > 0 ? (filledIndicators / totalIndicators) * 100 : 0;
+  const hasIncompleteData = completenessPercentage < 100 && completenessPercentage > 0;
 
   const handleCalculate = async () => {
     if (!id) return;
@@ -57,6 +83,17 @@ const DiagnosticoDetalhe = () => {
       refetchIndicatorScores();
       refetchIssues();
       refetchRecommendations();
+    }
+  };
+
+  const handleResetToDraft = async () => {
+    if (!id) return;
+    try {
+      await updateAssessment.mutateAsync({ id, status: 'DRAFT' });
+      toast.success('Diagnóstico voltou para rascunho. Você pode editar os dados.');
+      refetchAssessment();
+    } catch (error) {
+      toast.error('Erro ao resetar diagnóstico');
     }
   };
 
@@ -137,20 +174,55 @@ const DiagnosticoDetalhe = () => {
           </Link>
         </Button>
         <div className="flex gap-2">
+          {/* Edit / Reset to Draft */}
+          {isCalculated && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline">
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Editar Dados
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Voltar para edição?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Isso irá mudar o status do diagnóstico para "Rascunho" e você poderá editar os dados dos indicadores. 
+                    Após as alterações, será necessário recalcular os índices.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleResetToDraft}>
+                    Sim, voltar para edição
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          
           {!isCalculated && (
-            <Button onClick={handleCalculate} disabled={calculating}>
-              {calculating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Calculando...
-                </>
-              ) : (
-                <>
-                  <Calculator className="mr-2 h-4 w-4" />
-                  Calcular Índices
-                </>
-              )}
-            </Button>
+            <>
+              <Button variant="outline" asChild>
+                <Link to={`/importacoes?assessment=${id}`}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Preencher Dados
+                </Link>
+              </Button>
+              <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
+                {calculating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Calculando...
+                  </>
+                ) : (
+                  <>
+                    <Calculator className="mr-2 h-4 w-4" />
+                    Calcular Índices
+                  </>
+                )}
+              </Button>
+            </>
           )}
           {isCalculated && (
             <>
@@ -168,6 +240,53 @@ const DiagnosticoDetalhe = () => {
           )}
         </div>
       </div>
+
+      {/* Incomplete Data Warning */}
+      {isCalculated && hasIncompleteData && (
+        <Card className="mb-6 border-accent bg-accent/5">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-accent/10">
+                  <PlusCircle className="h-5 w-5 text-accent" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">Dados podem ser enriquecidos</p>
+                  <p className="text-xs text-muted-foreground">
+                    {filledIndicators} de {totalIndicators} indicadores preenchidos ({Math.round(completenessPercentage)}%). 
+                    Adicionar mais dados pode melhorar a precisão do diagnóstico.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Progress value={completenessPercentage} className="w-24 h-2" />
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Adicionar dados
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Adicionar mais dados?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Para adicionar mais dados, o diagnóstico voltará ao status de rascunho e você poderá preencher os indicadores faltantes.
+                        Após as alterações, será necessário recalcular os índices.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleResetToDraft}>
+                        Sim, adicionar dados
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Header Card */}
       <div className="bg-card rounded-xl border p-6 mb-6">

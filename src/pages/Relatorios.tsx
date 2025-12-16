@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,12 +46,25 @@ function useAssessmentDetails(assessmentId: string | undefined) {
 }
 
 export default function Relatorios() {
+  const [searchParams] = useSearchParams();
+  const assessmentFromUrl = searchParams.get('assessment');
+  
   const { assessments, isLoading: assessmentsLoading } = useAssessments();
   const { destinations } = useDestinations();
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>('');
   const [report, setReport] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
+
+  // Pre-select assessment from URL parameter
+  useEffect(() => {
+    if (assessmentFromUrl && assessments?.length) {
+      const exists = assessments.some(a => a.id === assessmentFromUrl && a.status === 'CALCULATED');
+      if (exists) {
+        setSelectedAssessmentId(assessmentFromUrl);
+      }
+    }
+  }, [assessmentFromUrl, assessments]);
 
   const selectedAssessment = assessments?.find(a => a.id === selectedAssessmentId);
   const selectedDestination = destinations?.find(d => d.id === selectedAssessment?.destination_id);
