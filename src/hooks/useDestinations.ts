@@ -64,6 +64,41 @@ export function useDestinations() {
     },
   });
 
+  const updateDestination = useMutation({
+    mutationFn: async ({ id, ...destination }: {
+      id: string;
+      name: string;
+      uf: string;
+      ibge_code?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
+    }) => {
+      const { data, error } = await supabase
+        .from('destinations')
+        .update({
+          name: destination.name,
+          uf: destination.uf,
+          ibge_code: destination.ibge_code || null,
+          latitude: destination.latitude,
+          longitude: destination.longitude,
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['destinations'] });
+      toast.success('Destino atualizado com sucesso!');
+    },
+    onError: (error) => {
+      console.error('Error updating destination:', error);
+      toast.error('Erro ao atualizar destino. Tente novamente.');
+    },
+  });
+
   const deleteDestination = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -88,6 +123,7 @@ export function useDestinations() {
     isLoading,
     error,
     createDestination,
+    updateDestination,
     deleteDestination,
   };
 }
