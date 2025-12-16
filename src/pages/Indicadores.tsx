@@ -126,9 +126,8 @@ const Indicadores = () => {
     AO: 'Ações Operacionais',
   };
 
-  const isPendingConfirmation = (indicator: any) => {
-    return indicator.notes?.includes('Pendente de confirmação') || 
-           indicator.name?.includes('a confirmar');
+  const isPendingConfirmation = (_indicator: any) => {
+    return false; // Disabled - indicators 'a confirmar' are now shown normally
   };
 
   const handleStartEditWeight = (indicator: any) => {
