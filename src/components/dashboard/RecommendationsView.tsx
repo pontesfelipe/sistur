@@ -11,7 +11,7 @@ interface RecommendationsViewProps {
   recommendations: Recommendation[];
 }
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE_OPTIONS = [10, 25, 50];
 
 export function RecommendationsView({ recommendations }: RecommendationsViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,6 +20,7 @@ export function RecommendationsView({ recommendations }: RecommendationsViewProp
   const [interpretationFilter, setInterpretationFilter] = useState<string>('all');
   const [levelFilter, setLevelFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Get unique values for filters
   const { pillars, severities, interpretations, levels } = useMemo(() => {
@@ -46,7 +47,6 @@ export function RecommendationsView({ recommendations }: RecommendationsViewProp
   // Filter recommendations
   const filteredRecommendations = useMemo(() => {
     return recommendations.filter(rec => {
-      // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesSearch = 
@@ -56,22 +56,18 @@ export function RecommendationsView({ recommendations }: RecommendationsViewProp
         if (!matchesSearch) return false;
       }
 
-      // Pillar filter
       if (pillarFilter !== 'all' && rec.issue?.pillar !== pillarFilter) {
         return false;
       }
 
-      // Severity filter
       if (severityFilter !== 'all' && rec.issue?.severity !== severityFilter) {
         return false;
       }
 
-      // Interpretation filter
       if (interpretationFilter !== 'all' && rec.issue?.interpretation !== interpretationFilter) {
         return false;
       }
 
-      // Level filter
       if (levelFilter !== 'all' && rec.course?.level !== levelFilter) {
         return false;
       }
@@ -80,17 +76,17 @@ export function RecommendationsView({ recommendations }: RecommendationsViewProp
     });
   }, [recommendations, searchQuery, pillarFilter, severityFilter, interpretationFilter, levelFilter]);
 
-  // Reset to page 1 when filters change
+  // Reset to page 1 when filters or items per page change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, pillarFilter, severityFilter, interpretationFilter, levelFilter]);
+  }, [searchQuery, pillarFilter, severityFilter, interpretationFilter, levelFilter, itemsPerPage]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredRecommendations.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredRecommendations.length / itemsPerPage);
   const paginatedRecommendations = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredRecommendations.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredRecommendations, currentPage]);
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredRecommendations.slice(start, start + itemsPerPage);
+  }, [filteredRecommendations, currentPage, itemsPerPage]);
 
   const levelLabels: Record<string, string> = {
     BASICO: 'Básico',
@@ -193,49 +189,63 @@ export function RecommendationsView({ recommendations }: RecommendationsViewProp
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {filteredRecommendations.length > 0 && (
         <div className="flex items-center justify-between pt-4 border-t">
-          <div className="text-sm text-muted-foreground">
-            Página {currentPage} de {totalPages}
+          <div className="flex items-center gap-3">
+            <div className="text-sm text-muted-foreground">
+              Página {currentPage} de {totalPages || 1}
+            </div>
+            <Select value={String(itemsPerPage)} onValueChange={(v) => setItemsPerPage(Number(v))}>
+              <SelectTrigger className="w-24 h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ITEMS_PER_PAGE_OPTIONS.map(opt => (
+                  <SelectItem key={opt} value={String(opt)}>{opt}/pág</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
-          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

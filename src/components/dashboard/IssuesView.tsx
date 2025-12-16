@@ -16,7 +16,7 @@ interface IssuesViewProps {
   issues: Issue[];
 }
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE_OPTIONS = [10, 25, 50];
 
 export function IssuesView({ issues }: IssuesViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,6 +25,7 @@ export function IssuesView({ issues }: IssuesViewProps) {
   const [themeFilter, setThemeFilter] = useState('all');
   const [interpretationFilter, setInterpretationFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Get unique themes from issues
   const availableThemes = useMemo(() => {
@@ -40,24 +41,19 @@ export function IssuesView({ issues }: IssuesViewProps) {
   // Filter issues
   const filteredIssues = useMemo(() => {
     return issues.filter(issue => {
-      // Search filter
       const matchesSearch = searchQuery === '' ||
         issue.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         issue.theme.toLowerCase().includes(searchQuery.toLowerCase());
 
-      // Pillar filter
       const matchesPillar = pillarFilter === 'all' || 
         issue.pillar.toLowerCase() === pillarFilter;
 
-      // Severity filter
       const matchesSeverity = severityFilter === 'all' || 
         issue.severity === severityFilter;
 
-      // Theme filter
       const matchesTheme = themeFilter === 'all' || 
         issue.theme === themeFilter;
 
-      // Interpretation filter
       const matchesInterpretation = interpretationFilter === 'all' || 
         issue.interpretation === interpretationFilter;
 
@@ -65,17 +61,17 @@ export function IssuesView({ issues }: IssuesViewProps) {
     });
   }, [issues, searchQuery, pillarFilter, severityFilter, themeFilter, interpretationFilter]);
 
-  // Reset to page 1 when filters change
+  // Reset to page 1 when filters or items per page change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, pillarFilter, severityFilter, themeFilter, interpretationFilter]);
+  }, [searchQuery, pillarFilter, severityFilter, themeFilter, interpretationFilter, itemsPerPage]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredIssues.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredIssues.length / itemsPerPage);
   const paginatedIssues = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredIssues.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredIssues, currentPage]);
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredIssues.slice(start, start + itemsPerPage);
+  }, [filteredIssues, currentPage, itemsPerPage]);
 
   const criticalCount = filteredIssues.filter(i => i.severity === 'CRITICO').length;
   const moderateCount = filteredIssues.filter(i => i.severity === 'MODERADO').length;
@@ -178,49 +174,63 @@ export function IssuesView({ issues }: IssuesViewProps) {
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {filteredIssues.length > 0 && (
         <div className="flex items-center justify-between pt-4 border-t">
-          <div className="text-sm text-muted-foreground">
-            Página {currentPage} de {totalPages}
+          <div className="flex items-center gap-3">
+            <div className="text-sm text-muted-foreground">
+              Página {currentPage} de {totalPages || 1}
+            </div>
+            <Select value={String(itemsPerPage)} onValueChange={(v) => setItemsPerPage(Number(v))}>
+              <SelectTrigger className="w-24 h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ITEMS_PER_PAGE_OPTIONS.map(opt => (
+                  <SelectItem key={opt} value={String(opt)}>{opt}/pág</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
-          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

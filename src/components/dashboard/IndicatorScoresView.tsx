@@ -30,7 +30,7 @@ interface IndicatorScoresViewProps {
   indicatorScores: IndicatorScore[];
 }
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE_OPTIONS = [10, 25, 50];
 
 export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -38,6 +38,7 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
   const [themeFilter, setThemeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Get unique themes from indicators
   const availableThemes = useMemo(() => {
@@ -56,20 +57,16 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
       const indicator = score.indicator;
       if (!indicator) return false;
 
-      // Search filter
       const matchesSearch = searchQuery === '' ||
         indicator.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         indicator.code.toLowerCase().includes(searchQuery.toLowerCase());
 
-      // Pillar filter
       const matchesPillar = pillarFilter === 'all' || 
         indicator.pillar.toLowerCase() === pillarFilter;
 
-      // Theme filter
       const matchesTheme = themeFilter === 'all' || 
         indicator.theme === themeFilter;
 
-      // Status filter (by score severity)
       let matchesStatus = true;
       if (statusFilter !== 'all') {
         if (statusFilter === 'critico') {
@@ -85,17 +82,17 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
     });
   }, [indicatorScores, searchQuery, pillarFilter, themeFilter, statusFilter]);
 
-  // Reset to page 1 when filters change
+  // Reset to page 1 when filters or items per page change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, pillarFilter, themeFilter, statusFilter]);
+  }, [searchQuery, pillarFilter, themeFilter, statusFilter, itemsPerPage]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredScores.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredScores.length / itemsPerPage);
   const paginatedScores = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredScores.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredScores, currentPage]);
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredScores.slice(start, start + itemsPerPage);
+  }, [filteredScores, currentPage, itemsPerPage]);
 
   return (
     <div className="bg-card rounded-xl border p-6 space-y-4">
@@ -168,9 +165,7 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Badge
-                      variant={
-                        (indicator?.pillar?.toLowerCase() || 'ra') as 'ra' | 'oe' | 'ao'
-                      }
+                      variant={(indicator?.pillar?.toLowerCase() || 'ra') as 'ra' | 'oe' | 'ao'}
                     >
                       {indicator?.pillar || '—'}
                     </Badge>
@@ -225,49 +220,63 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {filteredScores.length > 0 && (
         <div className="flex items-center justify-between pt-4 border-t">
-          <div className="text-sm text-muted-foreground">
-            Página {currentPage} de {totalPages}
+          <div className="flex items-center gap-3">
+            <div className="text-sm text-muted-foreground">
+              Página {currentPage} de {totalPages || 1}
+            </div>
+            <Select value={String(itemsPerPage)} onValueChange={(v) => setItemsPerPage(Number(v))}>
+              <SelectTrigger className="w-24 h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ITEMS_PER_PAGE_OPTIONS.map(opt => (
+                  <SelectItem key={opt} value={String(opt)}>{opt}/pág</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
-          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
