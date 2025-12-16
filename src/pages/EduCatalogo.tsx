@@ -10,15 +10,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Search, 
   GraduationCap,
-  Clock,
   ExternalLink,
   Users,
   BookOpen,
   Route,
   Target,
-  Sparkles
+  Sparkles,
+  Video,
+  FileText
 } from 'lucide-react';
-import { useEduCourses, useEduTracks } from '@/hooks/useEdu';
+import { useEduTrainings, useEduTrainingStats } from '@/hooks/useEduTrainings';
+import { useEduTracks } from '@/hooks/useEdu';
 import {
   Select,
   SelectContent,
@@ -28,45 +30,38 @@ import {
 } from "@/components/ui/select";
 import { 
   PILLAR_INFO, 
-  TARGET_AGENT_INFO,
   type Pillar 
 } from '@/types/sistur';
 
 const EduCatalogo = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [audienceFilter, setAudienceFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<string>('all');
   
-  const { data: allCourses, isLoading: coursesLoading } = useEduCourses();
+  const { data: trainings, isLoading: trainingsLoading } = useEduTrainings();
+  const { data: stats } = useEduTrainingStats();
   const { data: tracks, isLoading: tracksLoading } = useEduTracks();
 
-  // Filter courses
-  const filteredCourses = allCourses?.filter(course => {
+  // Filter trainings
+  const filteredTrainings = trainings?.filter(training => {
     const matchesSearch = !searchQuery || 
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.code.toLowerCase().includes(searchQuery.toLowerCase());
+      training.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      training.course_code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      training.objective?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesPillar = activeTab === 'all' || course.pillar === activeTab;
+    const matchesPillar = activeTab === 'all' || training.pillar === activeTab;
     
-    const matchesAudience = audienceFilter === 'all' || course.audience === audienceFilter;
+    const matchesType = typeFilter === 'all' || training.type === typeFilter;
     
-    return matchesSearch && matchesPillar && matchesAudience;
+    return matchesSearch && matchesPillar && matchesType;
   }) || [];
 
-  // Group courses by pillar for stats
-  const coursesByPillar: Record<Pillar, number> = {
-    RA: allCourses?.filter(c => c.pillar === 'RA').length || 0,
-    OE: allCourses?.filter(c => c.pillar === 'OE').length || 0,
-    AO: allCourses?.filter(c => c.pillar === 'AO').length || 0,
-  };
-
-  const isLoading = coursesLoading || tracksLoading;
+  const isLoading = trainingsLoading || tracksLoading;
 
   return (
     <AppLayout 
       title="SISTUR EDU" 
-      subtitle="Catálogo de cursos e capacitação baseada em diagnóstico"
+      subtitle="Catálogo de cursos e lives baseado em diagnóstico IGMA"
     >
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-3 mb-6">
@@ -90,22 +85,30 @@ const EduCatalogo = () => {
           <div className="relative max-w-md flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar cursos por nome ou código..."
+              placeholder="Buscar por nome ou código..."
               className="pl-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Select value={audienceFilter} onValueChange={setAudienceFilter}>
-            <SelectTrigger className="w-48">
-              <Users className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Público-alvo" />
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os públicos</SelectItem>
-              <SelectItem value="GESTORES">Gestores Públicos</SelectItem>
-              <SelectItem value="TECNICOS">Técnicos</SelectItem>
-              <SelectItem value="TRADE">Trade Turístico</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="course">
+                <span className="flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4" />
+                  Cursos
+                </span>
+              </SelectItem>
+              <SelectItem value="live">
+                <span className="flex items-center gap-2">
+                  <Video className="h-4 w-4" />
+                  Lives
+                </span>
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -126,8 +129,20 @@ const EduCatalogo = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">{PILLAR_INFO[pillar].name}</p>
-                  <p className="text-2xl font-display font-bold">{coursesByPillar[pillar]}</p>
-                  <p className="text-xs text-muted-foreground">{PILLAR_INFO[pillar].fullName}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="text-center">
+                      <p className="text-xl font-display font-bold">
+                        {stats?.byPillar[pillar]?.courses || 0}
+                      </p>
+                      <p className="text-xs text-muted-foreground">cursos</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xl font-display font-bold">
+                        {stats?.byPillar[pillar]?.lives || 0}
+                      </p>
+                      <p className="text-xs text-muted-foreground">lives</p>
+                    </div>
+                  </div>
                 </div>
                 <Badge variant={pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
                   {pillar}
@@ -136,6 +151,18 @@ const EduCatalogo = () => {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Summary Stats */}
+      <div className="flex items-center gap-4 mb-6 text-sm text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <GraduationCap className="h-4 w-4" />
+          {stats?.totalCourses || 0} cursos
+        </span>
+        <span className="flex items-center gap-1">
+          <Video className="h-4 w-4" />
+          {stats?.totalLives || 0} lives
+        </span>
       </div>
 
       {isLoading ? (
@@ -149,78 +176,72 @@ const EduCatalogo = () => {
           <TabsList>
             <TabsTrigger value="all" className="gap-2">
               <BookOpen className="h-4 w-4" />
-              Todos ({allCourses?.length || 0})
+              Todos ({trainings?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="RA" className="gap-2">
-              IRA ({coursesByPillar.RA})
+              RA ({(stats?.byPillar.RA?.courses || 0) + (stats?.byPillar.RA?.lives || 0)})
             </TabsTrigger>
             <TabsTrigger value="OE" className="gap-2">
-              IOE ({coursesByPillar.OE})
+              OE ({(stats?.byPillar.OE?.courses || 0) + (stats?.byPillar.OE?.lives || 0)})
             </TabsTrigger>
             <TabsTrigger value="AO" className="gap-2">
-              IAO ({coursesByPillar.AO})
+              AO ({(stats?.byPillar.AO?.courses || 0) + (stats?.byPillar.AO?.lives || 0)})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value={activeTab} className="space-y-6">
-            {filteredCourses.length > 0 ? (
+            {filteredTrainings.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredCourses.map((course, index) => (
+                {filteredTrainings.map((training, index) => (
                   <Card
-                    key={course.id}
+                    key={training.training_id}
                     className="group hover:shadow-lg transition-all duration-300 animate-fade-in"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <CardHeader className="pb-3">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge variant={course.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
-                          {course.code}
+                        <Badge variant={training.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
+                          {training.course_code || training.pillar}
                         </Badge>
-                        {course.suggested_hours && (
-                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Clock className="h-3 w-3" />
-                            {course.suggested_hours}h
-                          </span>
-                        )}
+                        <Badge variant={training.type === 'course' ? 'default' : 'secondary'}>
+                          {training.type === 'course' ? (
+                            <><GraduationCap className="h-3 w-3 mr-1" />Curso</>
+                          ) : (
+                            <><Video className="h-3 w-3 mr-1" />Live</>
+                          )}
+                        </Badge>
                       </div>
-                      <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                        {course.title}
+                      <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-2">
+                        {training.title}
                       </CardTitle>
-                      {course.objective && (
-                        <CardDescription className="line-clamp-2">
-                          {course.objective}
+                      {training.objective && (
+                        <CardDescription className="line-clamp-3">
+                          {training.objective}
                         </CardDescription>
                       )}
                     </CardHeader>
                     <CardContent>
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {course.audience && (
-                          <Badge variant="outline" className="text-xs">
-                            <Users className="h-3 w-3 mr-1" />
-                            {TARGET_AGENT_INFO[course.audience].label}
+                        {training.target_audience && (
+                          <Badge variant="outline" className="text-xs line-clamp-1">
+                            <Users className="h-3 w-3 mr-1 flex-shrink-0" />
+                            <span className="truncate max-w-32">{training.target_audience.split(',')[0]}</span>
                           </Badge>
                         )}
-                        {course.certification && (
+                        {Array.isArray(training.modules) && training.modules.length > 0 && (
                           <Badge variant="secondary" className="text-xs">
-                            <GraduationCap className="h-3 w-3 mr-1" />
-                            Certificação
+                            <FileText className="h-3 w-3 mr-1" />
+                            {training.modules.length} módulos
                           </Badge>
                         )}
                       </div>
                       <div className="flex gap-2">
                         <Button variant="outline" className="flex-1" asChild>
-                          <Link to={`/edu/curso/${course.id}`}>
+                          <Link to={`/edu/training/${training.training_id}`}>
                             <Target className="mr-2 h-4 w-4" />
-                            Ver Módulos
+                            Ver Detalhes
                           </Link>
                         </Button>
-                        {course.url && (
-                          <Button variant="ghost" size="icon" asChild>
-                            <a href={course.url} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
-                          </Button>
-                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -230,13 +251,13 @@ const EduCatalogo = () => {
               <div className="text-center py-16">
                 <GraduationCap className="mx-auto h-12 w-12 text-muted-foreground/50" />
                 <h3 className="mt-4 text-lg font-semibold">
-                  {allCourses?.length === 0 
-                    ? 'Nenhum curso cadastrado' 
-                    : 'Nenhum curso encontrado'}
+                  {trainings?.length === 0 
+                    ? 'Nenhum treinamento cadastrado' 
+                    : 'Nenhum treinamento encontrado'}
                 </h3>
                 <p className="mt-2 text-muted-foreground">
-                  {allCourses?.length === 0 
-                    ? 'Os cursos serão importados em breve.'
+                  {trainings?.length === 0 
+                    ? 'Os treinamentos serão importados em breve.'
                     : 'Tente ajustar os filtros de busca.'}
                 </p>
               </div>
