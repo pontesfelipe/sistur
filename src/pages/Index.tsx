@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   MapPin, 
   ClipboardList, 
@@ -19,21 +21,26 @@ import {
   TrendingUp,
   CheckCircle2,
   Clock,
+  Filter,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
   useDashboardStats,
   useAggregatedPillarScores,
   useAggregatedIssues,
+  useDestinationsWithAssessments,
   useRecentAssessments,
   useTopRecommendations,
 } from '@/hooks/useDashboardData';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const Index = () => {
+  const [selectedDestination, setSelectedDestination] = useState<string | undefined>(undefined);
+  
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
-  const { data: aggregatedData, isLoading: aggregatedLoading } = useAggregatedPillarScores();
-  const { data: aggregatedIssues, isLoading: issuesLoading } = useAggregatedIssues();
+  const { data: destinations, isLoading: destinationsLoading } = useDestinationsWithAssessments();
+  const { data: aggregatedData, isLoading: aggregatedLoading } = useAggregatedPillarScores(selectedDestination);
+  const { data: aggregatedIssues, isLoading: issuesLoading } = useAggregatedIssues(selectedDestination);
   const { data: recentAssessments, isLoading: recentLoading } = useRecentAssessments();
   const { data: recommendations, isLoading: recsLoading } = useTopRecommendations();
 
@@ -45,6 +52,10 @@ const Index = () => {
   const averageScore = aggregatedData?.pillarScores?.length 
     ? aggregatedData.pillarScores.reduce((sum, ps) => sum + ps.score, 0) / aggregatedData.pillarScores.length
     : 0;
+
+  const selectedDestinationName = selectedDestination 
+    ? destinations?.find(d => d.id === selectedDestination)?.name 
+    : null;
 
   return (
     <AppLayout 
@@ -101,12 +112,32 @@ const Index = () => {
                   Radiografia do Destino
                 </CardTitle>
                 <CardDescription>
-                  {aggregatedData?.totalAssessments 
-                    ? `Resumo de ${aggregatedData.totalAssessments} diagnóstico(s) calculado(s)`
-                    : 'Nenhum diagnóstico disponível'}
+                  {selectedDestinationName 
+                    ? `Dados de ${selectedDestinationName} (${aggregatedData?.totalAssessments ?? 0} diagnóstico(s))`
+                    : aggregatedData?.totalAssessments 
+                      ? `Resumo de ${aggregatedData.totalAssessments} diagnóstico(s) calculado(s)`
+                      : 'Nenhum diagnóstico disponível'}
                 </CardDescription>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
+                {/* Destination Filter */}
+                <Select 
+                  value={selectedDestination ?? "all"} 
+                  onValueChange={(value) => setSelectedDestination(value === "all" ? undefined : value)}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <Filter className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Filtrar destino" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os destinos</SelectItem>
+                    {destinations?.map((dest) => (
+                      <SelectItem key={dest.id} value={dest.id}>
+                        {dest.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {aggregatedData?.totalAssessments && aggregatedData.totalAssessments > 0 && (
                   <>
                     <Button variant="outline" size="sm" asChild>
