@@ -23,6 +23,46 @@ interface IBGEMunicipio {
   };
 }
 
+interface NominatimResult {
+  lat: string;
+  lon: string;
+  display_name: string;
+}
+
+async function fetchCoordinates(municipioName: string, uf: string): Promise<{ latitude: number; longitude: number } | null> {
+  try {
+    const query = encodeURIComponent(`${municipioName}, ${uf}, Brasil`);
+    const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=br`;
+    
+    console.log(`Fetching coordinates for: ${municipioName}, ${uf}`);
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'SISTUR/1.0 (sistur.app)'
+      }
+    });
+    
+    if (!response.ok) {
+      console.error(`Nominatim API error: ${response.status}`);
+      return null;
+    }
+    
+    const results: NominatimResult[] = await response.json();
+    
+    if (results.length > 0) {
+      const lat = parseFloat(results[0].lat);
+      const lon = parseFloat(results[0].lon);
+      console.log(`Found coordinates: ${lat}, ${lon}`);
+      return { latitude: lat, longitude: lon };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error fetching coordinates:', error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -30,7 +70,7 @@ serve(async (req) => {
   }
 
   try {
-    const { name, uf } = await req.json();
+    const { name, uf, fetchCoords } = await req.json();
 
     if (!name || name.length < 2) {
       return new Response(
@@ -39,7 +79,7 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Searching IBGE for: ${name}, UF: ${uf || 'all'}`);
+    console.log(`Searching IBGE for: ${name}, UF: ${uf || 'all'}, fetchCoords: ${fetchCoords}`);
 
     // Fetch municipalities from IBGE API
     let url = 'https://servicodados.ibge.gov.br/api/v1/localidades/municipios';
@@ -66,7 +106,7 @@ serve(async (req) => {
       .replace(/[\u0300-\u036f]/g, '');
 
     // Filter and map results
-    const results = municipios
+    let results = municipios
       .filter((m) => {
         const nomeNormalized = m.nome
           .toLowerCase()
@@ -80,9 +120,29 @@ serve(async (req) => {
         name: m.nome,
         uf: uf || m.microrregiao?.mesorregiao?.UF?.sigla || '',
         uf_name: m.microrregiao?.mesorregiao?.UF?.nome || '',
+        latitude: null as number | null,
+        longitude: null as number | null,
       }));
 
     console.log(`Found ${results.length} municipalities`);
+
+    // If fetchCoords is true and we have exactly one result or exact match, fetch coordinates
+    if (fetchCoords && results.length > 0) {
+      // Find exact match first
+      const exactMatch = results.find(r => 
+        r.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') === searchNormalized
+      );
+      
+      const targetResult = exactMatch || results[0];
+      
+      if (targetResult) {
+        const coords = await fetchCoordinates(targetResult.name, targetResult.uf);
+        if (coords) {
+          targetResult.latitude = coords.latitude;
+          targetResult.longitude = coords.longitude;
+        }
+      }
+    }
 
     return new Response(
       JSON.stringify({ results }),

@@ -179,7 +179,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
     };
   }, [watchedName, watchedUf, selectedIBGE, searchIBGE]);
 
-  const handleSelectIBGE = (result: IBGEResult) => {
+  const handleSelectIBGE = async (result: IBGEResult) => {
     form.setValue('name', result.name);
     form.setValue('uf', result.uf);
     form.setValue('ibge_code', result.ibge_code);
@@ -187,6 +187,26 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
     setShowResults(false);
     setSearchError(null);
     setIbgeResults([]);
+
+    // Fetch coordinates for the selected municipality
+    setIsSearching(true);
+    try {
+      const { data } = await supabase.functions.invoke('search-ibge', {
+        body: { name: result.name, uf: result.uf, fetchCoords: true },
+      });
+
+      if (data?.results?.[0]) {
+        const coordResult = data.results[0];
+        if (coordResult.latitude && coordResult.longitude) {
+          form.setValue('latitude', coordResult.latitude.toFixed(6));
+          form.setValue('longitude', coordResult.longitude.toFixed(6));
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching coordinates:', err);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleNameChange = (value: string) => {
