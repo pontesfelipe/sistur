@@ -18,6 +18,9 @@ import {
   Trash2,
   Database,
   AlertTriangle,
+  Check,
+  X,
+  Loader2,
 } from 'lucide-react';
 import { useIndicators } from '@/hooks/useIndicators';
 import {
@@ -55,6 +58,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
 
@@ -75,8 +79,10 @@ const Indicadores = () => {
   const [pillarFilter, setPillarFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
   const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
+  const [editingWeightId, setEditingWeightId] = useState<string | null>(null);
+  const [editingWeightValue, setEditingWeightValue] = useState<string>('');
   
-  const { indicators, isLoading, deleteIndicator } = useIndicators();
+  const { indicators, isLoading, deleteIndicator, updateIndicator } = useIndicators();
 
   const directionLabels = {
     HIGH_IS_BETTER: '↑ Maior é melhor',
@@ -112,6 +118,45 @@ const Indicadores = () => {
   const isPendingConfirmation = (indicator: any) => {
     return indicator.notes?.includes('Pendente de confirmação') || 
            indicator.name?.includes('a confirmar');
+  };
+
+  const handleStartEditWeight = (indicator: any) => {
+    setEditingWeightId(indicator.id);
+    setEditingWeightValue(String(Math.round(indicator.weight * 100)));
+  };
+
+  const handleCancelEditWeight = () => {
+    setEditingWeightId(null);
+    setEditingWeightValue('');
+  };
+
+  const handleSaveWeight = async (indicatorId: string) => {
+    const newWeight = parseFloat(editingWeightValue) / 100;
+    
+    if (isNaN(newWeight) || newWeight < 0 || newWeight > 1) {
+      toast.error('Peso inválido. Use um valor entre 0 e 100.');
+      return;
+    }
+
+    try {
+      await updateIndicator.mutateAsync({
+        id: indicatorId,
+        weight: newWeight,
+      });
+      toast.success('Peso atualizado com sucesso');
+      setEditingWeightId(null);
+      setEditingWeightValue('');
+    } catch (error) {
+      toast.error('Erro ao atualizar peso');
+    }
+  };
+
+  const handleWeightKeyDown = (e: React.KeyboardEvent, indicatorId: string) => {
+    if (e.key === 'Enter') {
+      handleSaveWeight(indicatorId);
+    } else if (e.key === 'Escape') {
+      handleCancelEditWeight();
+    }
   };
 
   return (
@@ -182,9 +227,20 @@ const Indicadores = () => {
               <div className="mt-2">
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                   <span>Soma dos pesos</span>
-                  <span>{(totalWeight * 100).toFixed(0)}%</span>
+                  <span className={cn(
+                    totalWeight > 1 && 'text-amber-500 font-medium',
+                    totalWeight === 1 && 'text-green-500 font-medium'
+                  )}>
+                    {(totalWeight * 100).toFixed(0)}%
+                  </span>
                 </div>
-                <Progress value={totalWeight * 100} className="h-1.5" />
+                <Progress 
+                  value={Math.min(totalWeight * 100, 100)} 
+                  className={cn(
+                    "h-1.5",
+                    totalWeight > 1 && "[&>div]:bg-amber-500"
+                  )} 
+                />
               </div>
             </div>
           );
@@ -208,6 +264,15 @@ const Indicadores = () => {
         </div>
       </div>
 
+      {/* Inline Edit Info */}
+      <div className="mb-4 p-3 bg-muted/50 rounded-lg border flex items-center gap-3">
+        <Info className="h-4 w-4 text-muted-foreground shrink-0" />
+        <p className="text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">Edição de pesos:</span> Clique no peso de qualquer indicador para editá-lo diretamente. 
+          A soma dos pesos por pilar deve totalizar 100% para um cálculo correto.
+        </p>
+      </div>
+
       {/* Indicators Table */}
       <div className="bg-card rounded-xl border overflow-hidden">
         {isLoading ? (
@@ -225,7 +290,16 @@ const Indicadores = () => {
                 <TableHead>Dimensão/Tema</TableHead>
                 <TableHead>Interpretação</TableHead>
                 <TableHead>Normalização</TableHead>
-                <TableHead className="text-right">Peso</TableHead>
+                <TableHead className="text-right">
+                  <Tooltip>
+                    <TooltipTrigger className="cursor-help">
+                      Peso
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Clique para editar
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -238,6 +312,7 @@ const Indicadores = () => {
                 const igmaDimension = (indicator as any).igma_dimension;
                 const defaultInterpretation = (indicator as any).default_interpretation;
                 const isPending = isPendingConfirmation(indicator);
+                const isEditingWeight = editingWeightId === indicator.id;
 
                 return (
                   <TableRow key={indicator.id} className={cn(isPending && 'opacity-60')}>
@@ -380,8 +455,51 @@ const Indicadores = () => {
                     <TableCell>
                       <Badge variant="outline">{normLabels[indicator.normalization]}</Badge>
                     </TableCell>
-                    <TableCell className="text-right font-mono">
-                      {(indicator.weight * 100).toFixed(0)}%
+                    <TableCell className="text-right">
+                      {isEditingWeight ? (
+                        <div className="flex items-center justify-end gap-1">
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="1"
+                            className="w-16 h-7 text-right font-mono text-sm"
+                            value={editingWeightValue}
+                            onChange={(e) => setEditingWeightValue(e.target.value)}
+                            onKeyDown={(e) => handleWeightKeyDown(e, indicator.id)}
+                            autoFocus
+                          />
+                          <span className="text-xs text-muted-foreground">%</span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => handleSaveWeight(indicator.id)}
+                            disabled={updateIndicator.isPending}
+                          >
+                            {updateIndicator.isPending ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Check className="h-3 w-3 text-green-500" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={handleCancelEditWeight}
+                          >
+                            <X className="h-3 w-3 text-muted-foreground" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleStartEditWeight(indicator)}
+                          className="font-mono hover:bg-muted px-2 py-1 rounded transition-colors cursor-pointer"
+                        >
+                          {(indicator.weight * 100).toFixed(0)}%
+                        </button>
+                      )}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
@@ -391,9 +509,9 @@ const Indicadores = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleStartEditWeight(indicator)}>
                             <Edit className="mr-2 h-4 w-4" />
-                            Editar
+                            Editar Peso
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             className="text-destructive"

@@ -34,7 +34,8 @@ import {
   Clock,
   Activity,
   Shield,
-  BarChart3
+  BarChart3,
+  Database
 } from 'lucide-react';
 
 export default function Configuracoes() {
@@ -184,13 +185,13 @@ export default function Configuracoes() {
                     <AccordionTrigger className="text-left">
                       <div className="flex items-center gap-3">
                         <Activity className="h-4 w-4 text-primary" />
-                        Fontes de Dados
+                        Fontes de Dados e IGMA
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground space-y-2">
+                    <AccordionContent className="text-muted-foreground space-y-4">
                       <p>Os dados são coletados de diversas fontes oficiais:</p>
                       <ul className="list-disc list-inside space-y-1 ml-4">
-                        <li><strong>IGMA:</strong> Índice Geral de Gestão Municipal Aplicado (backbone oficial)</li>
+                        <li><strong>IGMA:</strong> Índice Geral de Gestão Municipal Aplicado (backbone oficial — 76 indicadores)</li>
                         <li><strong>IBGE:</strong> Dados demográficos e econômicos oficiais</li>
                         <li><strong>CADASTUR:</strong> Registro de prestadores de serviços turísticos</li>
                         <li><strong>DATASUS:</strong> Dados de saúde pública</li>
@@ -199,9 +200,78 @@ export default function Configuracoes() {
                         <li><strong>Pesquisa Local:</strong> Levantamentos de campo</li>
                         <li><strong>Manual:</strong> Dados inseridos por analistas</li>
                       </ul>
-                      <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                      
+                      <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
+                        <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                          <Database className="h-4 w-4 text-primary" />
+                          Integração IGMA
+                        </p>
+                        <p className="text-sm mt-2">
+                          O SISTUR integra <strong>76 indicadores do IGMA</strong> organizados em 7 dimensões:
+                        </p>
+                        <ul className="text-sm mt-2 space-y-1 ml-4 list-disc list-inside">
+                          <li>Educação (14 indicadores)</li>
+                          <li>Saúde e Bem-Estar (13 indicadores)</li>
+                          <li>Infraestrutura e Mobilidade (9 indicadores)</li>
+                          <li>Sustentabilidade (12 indicadores)</li>
+                          <li>Socioeconômico (5 indicadores)</li>
+                          <li>Desenvolvimento e Ordem Pública (10 indicadores)</li>
+                          <li>Governança, Eficiência Fiscal e Transparência (16 indicadores)</li>
+                        </ul>
+                        <div className="mt-3 p-2 bg-background/50 rounded text-xs">
+                          <strong>Importante:</strong> Os indicadores IGMA são mapeados para os pilares SISTUR (RA/AO/OE) 
+                          com interpretações territoriais padrão (Estrutural/Gestão/Entrega). Rankings ou scores IGMA 
+                          nunca são expostos no sistema.
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 bg-muted/50 rounded-lg">
                         <p className="text-sm font-medium text-foreground">IGMA como Camada de Legitimidade</p>
                         <p className="text-xs mt-1">O IGMA fornece autoridade institucional. O SISTUR fornece inteligência e ação.</p>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="weights">
+                    <AccordionTrigger className="text-left">
+                      <div className="flex items-center gap-3">
+                        <Scale className="h-4 w-4 text-primary" />
+                        Configuração de Pesos
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground space-y-3">
+                      <p>Cada indicador possui um peso que define sua importância relativa dentro do pilar:</p>
+                      
+                      <div className="grid gap-3">
+                        <div className="p-3 bg-muted/30 rounded-lg">
+                          <p className="font-medium text-foreground">Regra de Soma</p>
+                          <p className="text-sm mt-1">
+                            A soma dos pesos de todos os indicadores de um pilar deve totalizar <strong>100%</strong> (ou 1.0).
+                          </p>
+                        </div>
+                        
+                        <div className="p-3 bg-muted/30 rounded-lg">
+                          <p className="font-medium text-foreground">Edição Inline</p>
+                          <p className="text-sm mt-1">
+                            Na página de <strong>Indicadores</strong>, clique diretamente no peso de qualquer indicador para editá-lo.
+                            Pressione Enter para salvar ou Esc para cancelar.
+                          </p>
+                        </div>
+                        
+                        <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                          <p className="font-medium text-foreground flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4 text-amber-500" />
+                            Validação
+                          </p>
+                          <p className="text-sm mt-1">
+                            O sistema mostra um alerta visual quando a soma dos pesos de um pilar excede 100%.
+                            Ajuste os pesos para garantir cálculos corretos dos índices de pilar.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-3 font-mono text-sm bg-muted p-3 rounded">
+                        I-Pilar = Σ (Score_i × Peso_i) para todos indicadores do pilar
                       </div>
                     </AccordionContent>
                   </AccordionItem>
