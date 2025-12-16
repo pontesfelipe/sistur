@@ -400,6 +400,9 @@ export type Database = {
           created_at: string
           evidence: Json
           id: string
+          interpretation:
+            | Database["public"]["Enums"]["territorial_interpretation"]
+            | null
           org_id: string
           pillar: Database["public"]["Enums"]["pillar_type"]
           severity: Database["public"]["Enums"]["severity_type"]
@@ -411,6 +414,9 @@ export type Database = {
           created_at?: string
           evidence?: Json
           id?: string
+          interpretation?:
+            | Database["public"]["Enums"]["territorial_interpretation"]
+            | null
           org_id: string
           pillar: Database["public"]["Enums"]["pillar_type"]
           severity: Database["public"]["Enums"]["severity_type"]
@@ -422,6 +428,9 @@ export type Database = {
           created_at?: string
           evidence?: Json
           id?: string
+          interpretation?:
+            | Database["public"]["Enums"]["territorial_interpretation"]
+            | null
           org_id?: string
           pillar?: Database["public"]["Enums"]["pillar_type"]
           severity?: Database["public"]["Enums"]["severity_type"]
@@ -668,6 +677,7 @@ export type Database = {
       normalization_type: "MIN_MAX" | "BANDS" | "BINARY"
       pillar_type: "RA" | "OE" | "AO"
       severity_type: "CRITICO" | "MODERADO" | "BOM"
+      territorial_interpretation: "ESTRUTURAL" | "GESTAO" | "ENTREGA"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -804,6 +814,7 @@ export const Constants = {
       normalization_type: ["MIN_MAX", "BANDS", "BINARY"],
       pillar_type: ["RA", "OE", "AO"],
       severity_type: ["CRITICO", "MODERADO", "BOM"],
+      territorial_interpretation: ["ESTRUTURAL", "GESTAO", "ENTREGA"],
     },
   },
 } as const
