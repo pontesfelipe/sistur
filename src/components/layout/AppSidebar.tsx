@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  BookOpen,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,8 @@ const navigation = [
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList },
   { name: 'Indicadores', href: '/indicadores', icon: BarChart3 },
   { name: 'Importações', href: '/importacoes', icon: Upload },
-  { name: 'EDU - Cursos', href: '/cursos', icon: GraduationCap },
+  { name: 'SISTUR EDU', href: '/cursos', icon: GraduationCap },
+  { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen },
   { name: 'Relatórios', href: '/relatorios', icon: FileText },
 ];
 
