@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
 import { AssessmentCard } from '@/components/dashboard/AssessmentCard';
 import { IssueCard } from '@/components/dashboard/IssueCard';
 import { RecommendationCard } from '@/components/dashboard/RecommendationCard';
+import { DestinationComparison } from '@/components/dashboard/DestinationComparison';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +34,8 @@ import {
   useTopRecommendations,
 } from '@/hooks/useDashboardData';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [selectedDestination, setSelectedDestination] = useState<string | undefined>(undefined);
@@ -56,6 +59,65 @@ const Index = () => {
   const selectedDestinationName = selectedDestination 
     ? destinations?.find(d => d.id === selectedDestination)?.name 
     : null;
+
+  // Query for all destinations' pillar scores (for comparison)
+  const { data: allDestinationScores } = useQuery({
+    queryKey: ['all-destination-pillar-scores'],
+    queryFn: async () => {
+      if (!destinations || destinations.length === 0) return {};
+
+      const scoresMap: Record<string, { pillar: 'RA' | 'OE' | 'AO'; score: number; severity: string }[]> = {};
+
+      for (const dest of destinations) {
+        const { data: assessments } = await supabase
+          .from('assessments')
+          .select('id')
+          .eq('destination_id', dest.id)
+          .eq('status', 'CALCULATED');
+
+        if (!assessments || assessments.length === 0) continue;
+
+        const assessmentIds = assessments.map(a => a.id);
+        const { data: pillarScores } = await supabase
+          .from('pillar_scores')
+          .select('*')
+          .in('assessment_id', assessmentIds);
+
+        if (!pillarScores || pillarScores.length === 0) continue;
+
+        // Average by pillar
+        const pillarAggregates: Record<string, number[]> = {};
+        pillarScores.forEach(ps => {
+          if (!pillarAggregates[ps.pillar]) {
+            pillarAggregates[ps.pillar] = [];
+          }
+          pillarAggregates[ps.pillar].push(ps.score);
+        });
+
+        scoresMap[dest.id] = Object.entries(pillarAggregates).map(([pillar, scores]) => ({
+          pillar: pillar as 'RA' | 'OE' | 'AO',
+          score: scores.reduce((a, b) => a + b, 0) / scores.length,
+          severity: 'MODERADO',
+        }));
+      }
+
+      return scoresMap;
+    },
+    enabled: !!destinations && destinations.length > 0,
+  });
+
+  const getDestinationData = useCallback((destinationId: string) => {
+    const dest = destinations?.find(d => d.id === destinationId);
+    const scores = allDestinationScores?.[destinationId];
+    
+    if (!dest || !scores) return null;
+    
+    return {
+      destinationId,
+      destinationName: dest.name,
+      pillarScores: scores,
+    };
+  }, [destinations, allDestinationScores]);
 
   return (
     <AppLayout 
@@ -234,6 +296,14 @@ const Index = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Destination Comparison */}
+          {destinations && destinations.length >= 2 && (
+            <DestinationComparison 
+              destinations={destinations}
+              getDestinationData={getDestinationData}
+            />
+          )}
         </div>
 
         {/* Right Column */}

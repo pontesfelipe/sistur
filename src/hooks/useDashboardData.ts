@@ -130,6 +130,50 @@ export function useAggregatedPillarScores(destinationId?: string) {
   });
 }
 
+// Get pillar scores for a specific destination (for comparison)
+export function useDestinationPillarScores(destinationId: string | undefined) {
+  return useQuery({
+    queryKey: ['destination-pillar-scores', destinationId],
+    queryFn: async () => {
+      if (!destinationId) return null;
+
+      // Get all calculated assessments for this destination
+      const { data: assessments } = await supabase
+        .from('assessments')
+        .select('id')
+        .eq('destination_id', destinationId)
+        .eq('status', 'CALCULATED');
+
+      if (!assessments || assessments.length === 0) return null;
+
+      // Get pillar scores for these assessments
+      const assessmentIds = assessments.map(a => a.id);
+      const { data: pillarScores } = await supabase
+        .from('pillar_scores')
+        .select('*')
+        .in('assessment_id', assessmentIds);
+
+      if (!pillarScores || pillarScores.length === 0) return null;
+
+      // Average by pillar
+      const pillarAggregates: Record<string, number[]> = {};
+      pillarScores.forEach(ps => {
+        if (!pillarAggregates[ps.pillar]) {
+          pillarAggregates[ps.pillar] = [];
+        }
+        pillarAggregates[ps.pillar].push(ps.score);
+      });
+
+      return Object.entries(pillarAggregates).map(([pillar, scores]) => ({
+        pillar: pillar as 'RA' | 'OE' | 'AO',
+        score: scores.reduce((a, b) => a + b, 0) / scores.length,
+        severity: 'MODERADO' as const,
+      }));
+    },
+    enabled: !!destinationId,
+  });
+}
+
 // Get all destinations that have calculated assessments
 export function useDestinationsWithAssessments() {
   return useQuery({
