@@ -266,6 +266,7 @@ export type Database = {
           id: string
           indicator_id: string
           org_id: string
+          reference_date: string | null
           source: string | null
           value_raw: number | null
           value_text: string | null
@@ -277,6 +278,7 @@ export type Database = {
           id?: string
           indicator_id: string
           org_id: string
+          reference_date?: string | null
           source?: string | null
           value_raw?: number | null
           value_text?: string | null
@@ -288,6 +290,7 @@ export type Database = {
           id?: string
           indicator_id?: string
           org_id?: string
+          reference_date?: string | null
           source?: string | null
           value_raw?: number | null
           value_text?: string | null
@@ -319,7 +322,9 @@ export type Database = {
       indicators: {
         Row: {
           code: string
+          collection_type: Database["public"]["Enums"]["collection_type"] | null
           created_at: string
+          data_source: Database["public"]["Enums"]["data_source"] | null
           description: string | null
           direction: Database["public"]["Enums"]["indicator_direction"]
           id: string
@@ -329,13 +334,19 @@ export type Database = {
           normalization: Database["public"]["Enums"]["normalization_type"]
           org_id: string | null
           pillar: Database["public"]["Enums"]["pillar_type"]
+          reference_date: string | null
+          reliability_score: number | null
           theme: string
           unit: string | null
           weight: number
         }
         Insert: {
           code: string
+          collection_type?:
+            | Database["public"]["Enums"]["collection_type"]
+            | null
           created_at?: string
+          data_source?: Database["public"]["Enums"]["data_source"] | null
           description?: string | null
           direction?: Database["public"]["Enums"]["indicator_direction"]
           id?: string
@@ -345,13 +356,19 @@ export type Database = {
           normalization?: Database["public"]["Enums"]["normalization_type"]
           org_id?: string | null
           pillar: Database["public"]["Enums"]["pillar_type"]
+          reference_date?: string | null
+          reliability_score?: number | null
           theme: string
           unit?: string | null
           weight?: number
         }
         Update: {
           code?: string
+          collection_type?:
+            | Database["public"]["Enums"]["collection_type"]
+            | null
           created_at?: string
+          data_source?: Database["public"]["Enums"]["data_source"] | null
           description?: string | null
           direction?: Database["public"]["Enums"]["indicator_direction"]
           id?: string
@@ -361,6 +378,8 @@ export type Database = {
           normalization?: Database["public"]["Enums"]["normalization_type"]
           org_id?: string | null
           pillar?: Database["public"]["Enums"]["pillar_type"]
+          reference_date?: string | null
+          reliability_score?: number | null
           theme?: string
           unit?: string | null
           weight?: number
@@ -642,7 +661,9 @@ export type Database = {
     Enums: {
       app_role: "ADMIN" | "ANALYST" | "VIEWER"
       assessment_status: "DRAFT" | "DATA_READY" | "CALCULATED"
+      collection_type: "AUTOMATICA" | "MANUAL" | "ESTIMADA"
       course_level: "BASICO" | "INTERMEDIARIO" | "AVANCADO"
+      data_source: "IBGE" | "CADASTUR" | "PESQUISA_LOCAL" | "MANUAL" | "OUTRO"
       indicator_direction: "HIGH_IS_BETTER" | "LOW_IS_BETTER"
       normalization_type: "MIN_MAX" | "BANDS" | "BINARY"
       pillar_type: "RA" | "OE" | "AO"
@@ -776,7 +797,9 @@ export const Constants = {
     Enums: {
       app_role: ["ADMIN", "ANALYST", "VIEWER"],
       assessment_status: ["DRAFT", "DATA_READY", "CALCULATED"],
+      collection_type: ["AUTOMATICA", "MANUAL", "ESTIMADA"],
       course_level: ["BASICO", "INTERMEDIARIO", "AVANCADO"],
+      data_source: ["IBGE", "CADASTUR", "PESQUISA_LOCAL", "MANUAL", "OUTRO"],
       indicator_direction: ["HIGH_IS_BETTER", "LOW_IS_BETTER"],
       normalization_type: ["MIN_MAX", "BANDS", "BINARY"],
       pillar_type: ["RA", "OE", "AO"],

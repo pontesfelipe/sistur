@@ -11,6 +11,7 @@ import Destinos from "./pages/Destinos";
 import Diagnosticos from "./pages/Diagnosticos";
 import DiagnosticoDetalhe from "./pages/DiagnosticoDetalhe";
 import Indicadores from "./pages/Indicadores";
+import Importacoes from "./pages/Importacoes";
 import Cursos from "./pages/Cursos";
 import NotFound from "./pages/NotFound";
 
@@ -62,6 +63,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Indicadores />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/importacoes"
+              element={
+                <ProtectedRoute>
+                  <Importacoes />
                 </ProtectedRoute>
               }
             />

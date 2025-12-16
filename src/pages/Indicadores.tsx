@@ -1,17 +1,23 @@
+import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Plus, 
   Search, 
   BarChart3,
   Edit,
   MoreVertical,
-  Info
+  Info,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  Trash2,
 } from 'lucide-react';
-import { mockIndicators } from '@/data/mockData';
+import { useIndicators } from '@/hooks/useIndicators';
 import {
   Select,
   SelectContent,
@@ -38,8 +44,22 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+
+type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
+
+const reliabilityIcons = {
+  AUTOMATICA: { icon: ShieldCheck, color: 'text-severity-good', label: 'Automático' },
+  MANUAL: { icon: Shield, color: 'text-severity-moderate', label: 'Manual' },
+  ESTIMADA: { icon: ShieldAlert, color: 'text-severity-critical', label: 'Estimado' },
+};
 
 const Indicadores = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pillarFilter, setPillarFilter] = useState('all');
+  
+  const { indicators, isLoading, deleteIndicator } = useIndicators();
+
   const directionLabels = {
     HIGH_IS_BETTER: '↑ Maior é melhor',
     LOW_IS_BETTER: '↓ Menor é melhor',
@@ -49,6 +69,20 @@ const Indicadores = () => {
     MIN_MAX: 'Min-Max',
     BANDS: 'Faixas',
     BINARY: 'Binário',
+  };
+
+  const filteredIndicators = indicators.filter(i => {
+    const matchesSearch = i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      i.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      i.theme.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesPillar = pillarFilter === 'all' || i.pillar.toLowerCase() === pillarFilter;
+    return matchesSearch && matchesPillar;
+  });
+
+  const pillarNames = {
+    RA: 'Relações Ambientais',
+    OE: 'Organização Estrutural',
+    AO: 'Ações Operacionais',
   };
 
   return (
@@ -64,9 +98,11 @@ const Indicadores = () => {
             <Input
               placeholder="Buscar indicadores..."
               className="pl-9"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Select defaultValue="all">
+          <Select value={pillarFilter} onValueChange={setPillarFilter}>
             <SelectTrigger className="w-32">
               <SelectValue placeholder="Pilar" />
             </SelectTrigger>
@@ -87,13 +123,8 @@ const Indicadores = () => {
       {/* Summary by Pillar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {(['RA', 'OE', 'AO'] as const).map((pillar) => {
-          const pillarIndicators = mockIndicators.filter(i => i.pillar === pillar);
+          const pillarIndicators = indicators.filter(i => i.pillar === pillar);
           const totalWeight = pillarIndicators.reduce((sum, i) => sum + i.weight, 0);
-          const pillarNames = {
-            RA: 'Relações Ambientais',
-            OE: 'Organização Estrutural',
-            AO: 'Ações Operacionais',
-          };
           
           return (
             <div key={pillar} className="p-4 rounded-lg border bg-card">
@@ -123,89 +154,128 @@ const Indicadores = () => {
 
       {/* Indicators Table */}
       <div className="bg-card rounded-xl border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Nome</TableHead>
-              <TableHead>Pilar</TableHead>
-              <TableHead>Tema</TableHead>
-              <TableHead>Normalização</TableHead>
-              <TableHead className="text-right">Peso</TableHead>
-              <TableHead className="w-12"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {mockIndicators.map((indicator) => (
-              <TableRow key={indicator.id}>
-                <TableCell className="font-mono text-sm">
-                  {indicator.code}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{indicator.name}</span>
-                    {indicator.description && (
+        {isLoading ? (
+          <div className="p-8 space-y-3">
+            {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-12 w-full" />)}
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Código</TableHead>
+                <TableHead>Nome</TableHead>
+                <TableHead>Pilar</TableHead>
+                <TableHead>Tema</TableHead>
+                <TableHead>Confiança</TableHead>
+                <TableHead>Normalização</TableHead>
+                <TableHead className="text-right">Peso</TableHead>
+                <TableHead className="w-12"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredIndicators.map((indicator) => {
+                const collectionType = (indicator as any).collection_type as CollectionType | undefined;
+                const reliability = reliabilityIcons[collectionType || 'MANUAL'];
+                const ReliabilityIcon = reliability.icon;
+
+                return (
+                  <TableRow key={indicator.id}>
+                    <TableCell className="font-mono text-sm">
+                      {indicator.code}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{indicator.name}</span>
+                        {indicator.description && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className="h-4 w-4 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              {indicator.description}
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {directionLabels[indicator.direction]}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={indicator.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
+                        {indicator.pillar}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="capitalize">{indicator.theme}</TableCell>
+                    <TableCell>
                       <Tooltip>
                         <TooltipTrigger>
-                          <Info className="h-4 w-4 text-muted-foreground" />
+                          <div className="flex items-center gap-1.5">
+                            <ReliabilityIcon className={cn('h-4 w-4', reliability.color)} />
+                            <span className="text-xs text-muted-foreground">
+                              {Math.round(((indicator as any).reliability_score || 0.7) * 100)}%
+                            </span>
+                          </div>
                         </TooltipTrigger>
-                        <TooltipContent className="max-w-xs">
-                          {indicator.description}
+                        <TooltipContent>
+                          {reliability.label} - {(indicator as any).data_source || 'N/A'}
                         </TooltipContent>
                       </Tooltip>
-                    )}
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {directionLabels[indicator.direction]}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={indicator.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
-                    {indicator.pillar}
-                  </Badge>
-                </TableCell>
-                <TableCell className="capitalize">{indicator.theme}</TableCell>
-                <TableCell>
-                  <Badge variant="outline">{normLabels[indicator.normalization]}</Badge>
-                </TableCell>
-                <TableCell className="text-right font-mono">
-                  {(indicator.weight * 100).toFixed(0)}%
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Editar
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{normLabels[indicator.normalization]}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {(indicator.weight * 100).toFixed(0)}%
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => deleteIndicator.mutate(indicator.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       {/* Empty State */}
-      {mockIndicators.length === 0 && (
+      {!isLoading && filteredIndicators.length === 0 && (
         <div className="text-center py-16">
           <BarChart3 className="mx-auto h-12 w-12 text-muted-foreground/50" />
           <h3 className="mt-4 text-lg font-semibold text-foreground">
-            Nenhum indicador cadastrado
+            {indicators.length === 0 ? 'Nenhum indicador cadastrado' : 'Nenhum indicador encontrado'}
           </h3>
           <p className="mt-2 text-muted-foreground">
-            Comece cadastrando seu primeiro indicador.
+            {indicators.length === 0 
+              ? 'Comece cadastrando seu primeiro indicador.' 
+              : 'Tente ajustar os filtros de busca.'}
           </p>
-          <Button className="mt-4">
-            <Plus className="mr-2 h-4 w-4" />
-            Novo Indicador
-          </Button>
+          {indicators.length === 0 && (
+            <Button className="mt-4">
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Indicador
+            </Button>
+          )}
         </div>
       )}
     </AppLayout>
