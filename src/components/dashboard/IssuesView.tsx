@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -8,12 +9,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { IssueCard } from '@/components/dashboard/IssueCard';
-import { Search, Filter, AlertTriangle } from 'lucide-react';
+import { Search, Filter, AlertTriangle, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import type { Issue } from '@/types/sistur';
 
 interface IssuesViewProps {
   issues: Issue[];
 }
+
+const ITEMS_PER_PAGE = 10;
 
 export function IssuesView({ issues }: IssuesViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,6 +24,7 @@ export function IssuesView({ issues }: IssuesViewProps) {
   const [severityFilter, setSeverityFilter] = useState('all');
   const [themeFilter, setThemeFilter] = useState('all');
   const [interpretationFilter, setInterpretationFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Get unique themes from issues
   const availableThemes = useMemo(() => {
@@ -60,6 +64,18 @@ export function IssuesView({ issues }: IssuesViewProps) {
       return matchesSearch && matchesPillar && matchesSeverity && matchesTheme && matchesInterpretation;
     });
   }, [issues, searchQuery, pillarFilter, severityFilter, themeFilter, interpretationFilter]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, pillarFilter, severityFilter, themeFilter, interpretationFilter]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredIssues.length / ITEMS_PER_PAGE);
+  const paginatedIssues = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredIssues.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredIssues, currentPage]);
 
   const criticalCount = filteredIssues.filter(i => i.severity === 'CRITICO').length;
   const moderateCount = filteredIssues.filter(i => i.severity === 'MODERADO').length;
@@ -147,9 +163,9 @@ export function IssuesView({ issues }: IssuesViewProps) {
       </div>
 
       {/* Issues List */}
-      {filteredIssues.length > 0 ? (
+      {paginatedIssues.length > 0 ? (
         <div className="space-y-3">
-          {filteredIssues.map((issue) => (
+          {paginatedIssues.map((issue) => (
             <IssueCard key={issue.id} issue={issue} />
           ))}
         </div>
@@ -158,6 +174,53 @@ export function IssuesView({ issues }: IssuesViewProps) {
           {issues.length === 0 
             ? 'Nenhum gargalo identificado.' 
             : 'Nenhum gargalo encontrado com os filtros selecionados.'}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div className="text-sm text-muted-foreground">
+            Página {currentPage} de {totalPages}
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       )}
     </div>

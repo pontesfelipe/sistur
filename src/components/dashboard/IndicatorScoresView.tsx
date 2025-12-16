@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -9,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface IndicatorScore {
@@ -29,11 +30,14 @@ interface IndicatorScoresViewProps {
   indicatorScores: IndicatorScore[];
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [pillarFilter, setPillarFilter] = useState('all');
   const [themeFilter, setThemeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Get unique themes from indicators
   const availableThemes = useMemo(() => {
@@ -80,6 +84,18 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
       return matchesSearch && matchesPillar && matchesTheme && matchesStatus;
     });
   }, [indicatorScores, searchQuery, pillarFilter, themeFilter, statusFilter]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, pillarFilter, themeFilter, statusFilter]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredScores.length / ITEMS_PER_PAGE);
+  const paginatedScores = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredScores.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredScores, currentPage]);
 
   return (
     <div className="bg-card rounded-xl border p-6 space-y-4">
@@ -143,9 +159,9 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
       </div>
 
       {/* Indicator List */}
-      {filteredScores.length > 0 ? (
+      {paginatedScores.length > 0 ? (
         <div className="space-y-4">
-          {filteredScores.map((score) => {
+          {paginatedScores.map((score) => {
             const indicator = score.indicator;
             return (
               <div key={score.id} className="space-y-2">
@@ -206,6 +222,53 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
             ? 'Nenhum indicador calculado.' 
             : 'Nenhum indicador encontrado com os filtros selecionados.'}
         </p>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div className="text-sm text-muted-foreground">
+            Página {currentPage} de {totalPages}
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

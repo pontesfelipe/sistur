@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { RecommendationCard } from './RecommendationCard';
 import type { Recommendation, Pillar, Severity, TerritorialInterpretation } from '@/types/sistur';
 import { PILLAR_INFO, SEVERITY_INFO, INTERPRETATION_INFO } from '@/types/sistur';
@@ -10,12 +11,15 @@ interface RecommendationsViewProps {
   recommendations: Recommendation[];
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export function RecommendationsView({ recommendations }: RecommendationsViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [pillarFilter, setPillarFilter] = useState<string>('all');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [interpretationFilter, setInterpretationFilter] = useState<string>('all');
   const [levelFilter, setLevelFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Get unique values for filters
   const { pillars, severities, interpretations, levels } = useMemo(() => {
@@ -75,6 +79,18 @@ export function RecommendationsView({ recommendations }: RecommendationsViewProp
       return true;
     });
   }, [recommendations, searchQuery, pillarFilter, severityFilter, interpretationFilter, levelFilter]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, pillarFilter, severityFilter, interpretationFilter, levelFilter]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredRecommendations.length / ITEMS_PER_PAGE);
+  const paginatedRecommendations = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredRecommendations.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredRecommendations, currentPage]);
 
   const levelLabels: Record<string, string> = {
     BASICO: 'Básico',
@@ -164,15 +180,62 @@ export function RecommendationsView({ recommendations }: RecommendationsViewProp
       </div>
 
       {/* Recommendations list */}
-      {filteredRecommendations.length > 0 ? (
+      {paginatedRecommendations.length > 0 ? (
         <div className="space-y-4">
-          {filteredRecommendations.map((rec) => (
+          {paginatedRecommendations.map((rec) => (
             <RecommendationCard key={rec.id} recommendation={rec} />
           ))}
         </div>
       ) : (
         <div className="text-center py-12 text-muted-foreground">
           <p>Nenhuma recomendação encontrada com os filtros aplicados.</p>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div className="text-sm text-muted-foreground">
+            Página {currentPage} de {totalPages}
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       )}
     </div>
