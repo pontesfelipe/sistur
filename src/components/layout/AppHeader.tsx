@@ -1,6 +1,5 @@
-import { Search, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -56,15 +55,6 @@ export function AppHeader({ title, subtitle }: AppHeaderProps) {
 
         {/* Right: Actions */}
         <div className="flex items-center gap-4">
-          {/* Search */}
-          <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar..."
-              className="pl-9 w-64 bg-background"
-            />
-          </div>
-
           {/* Notifications */}
           <NotificationsDropdown />
 
