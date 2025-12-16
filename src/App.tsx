@@ -15,6 +15,10 @@ import Indicadores from "./pages/Indicadores";
 import Importacoes from "./pages/Importacoes";
 import Cursos from "./pages/Cursos";
 import AdminCursos from "./pages/AdminCursos";
+import EduCatalogo from "./pages/EduCatalogo";
+import EduTrilhas, { EduTrilhaDetalhe } from "./pages/EduTrilhas";
+import EduCursoDetalhe from "./pages/EduCursoDetalhe";
+import Learning from "./pages/Learning";
 import Configuracoes from "./pages/Configuracoes";
 import Relatorios from "./pages/Relatorios";
 import NovaRodada from "./pages/NovaRodada";
@@ -94,6 +98,46 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdminCursos />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edu"
+              element={
+                <ProtectedRoute>
+                  <EduCatalogo />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edu/trilhas"
+              element={
+                <ProtectedRoute>
+                  <EduTrilhas />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edu/trilha/:id"
+              element={
+                <ProtectedRoute>
+                  <EduTrilhaDetalhe />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edu/curso/:id"
+              element={
+                <ProtectedRoute>
+                  <EduCursoDetalhe />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/learning"
+              element={
+                <ProtectedRoute>
+                  <Learning />
                 </ProtectedRoute>
               }
             />
