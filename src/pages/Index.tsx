@@ -328,7 +328,7 @@ const Index = () => {
                 className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90"
                 asChild
               >
-                <Link to="/diagnosticos">
+                <Link to="/nova-rodada">
                   <Plus className="mr-2 h-4 w-4" />
                   Nova Rodada
                 </Link>
