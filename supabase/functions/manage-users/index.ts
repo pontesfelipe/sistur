@@ -24,8 +24,13 @@ Deno.serve(async (req) => {
       const { email, password, full_name, role, org_id, service_key } = data
       
       // Verify setup key
-      const setupKey = Deno.env.get('ADMIN_SETUP_KEY')
-      if (!setupKey || service_key !== setupKey) {
+      const setupKey = Deno.env.get('ADMIN_SETUP_KEY')?.trim()
+      const providedKey = service_key?.trim()
+      
+      console.log(`Setup key exists: ${!!setupKey}, length: ${setupKey?.length}`)
+      console.log(`Provided key exists: ${!!providedKey}, length: ${providedKey?.length}`)
+      
+      if (!setupKey || providedKey !== setupKey) {
         return new Response(JSON.stringify({ error: 'Invalid service key' }), {
           status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
