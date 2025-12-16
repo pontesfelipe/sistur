@@ -171,9 +171,15 @@ export function InteractiveWorkflowDiagram() {
 
         {/* Detail Panel */}
         {selectedStepData && (
-          <div className="animate-fade-in bg-muted/30 rounded-lg p-4 border-l-4" style={{ borderLeftColor: selectedStepData.color.replace('bg-', '').includes('blue') ? '#3b82f6' : selectedStepData.color.includes('indigo') ? '#6366f1' : selectedStepData.color.includes('purple') ? '#a855f7' : selectedStepData.color.includes('orange') ? '#f97316' : '#22c55e' }}>
+          <div className={`animate-fade-in bg-muted/30 rounded-lg p-4 border-l-4 ${
+            selectedStepData.color.includes('blue') ? 'border-l-blue-500' :
+            selectedStepData.color.includes('indigo') ? 'border-l-indigo-500' :
+            selectedStepData.color.includes('purple') ? 'border-l-purple-500' :
+            selectedStepData.color.includes('orange') ? 'border-l-orange-500' :
+            'border-l-green-500'
+          }`}>
             <div className="flex items-center gap-2 mb-3">
-              <selectedStepData.icon className="h-5 w-5" />
+              <selectedStepData.icon className="h-5 w-5 text-primary" />
               <h4 className="font-semibold">{selectedStepData.details.title}</h4>
             </div>
             <p className="text-sm text-muted-foreground mb-3">{selectedStepData.details.description}</p>
