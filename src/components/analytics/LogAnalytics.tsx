@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { 
   Activity, 
   UserCheck, 
@@ -13,9 +17,11 @@ import {
   Clock,
   TrendingUp,
   Users,
-  AlertCircle
+  AlertCircle,
+  CalendarIcon,
+  RefreshCw
 } from 'lucide-react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow, subDays, startOfDay, endOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface AuditEvent {
@@ -34,6 +40,11 @@ interface LoginEvent {
   last_login: string;
 }
 
+type DateRange = {
+  from: Date;
+  to: Date;
+};
+
 export function LogAnalytics() {
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [recentLogins, setRecentLogins] = useState<LoginEvent[]>([]);
@@ -44,33 +55,48 @@ export function LogAnalytics() {
     activeUsers: 0
   });
   const [loading, setLoading] = useState(true);
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: subDays(new Date(), 30),
+    to: new Date()
+  });
 
   useEffect(() => {
     fetchAnalytics();
-  }, []);
+  }, [dateRange]);
 
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
 
-      // Fetch audit events
+      const fromDate = startOfDay(dateRange.from).toISOString();
+      const toDate = endOfDay(dateRange.to).toISOString();
+
+      // Fetch audit events with date filter
       const { data: events } = await supabase
         .from('audit_events')
         .select('*')
+        .gte('created_at', fromDate)
+        .lte('created_at', toDate)
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(100);
 
-      // Fetch stats
+      // Fetch stats with date filter
       const [
         { count: assessmentCount },
         { count: destinationCount },
         { count: calculatedCount },
         { data: profiles }
       ] = await Promise.all([
-        supabase.from('assessments').select('*', { count: 'exact', head: true }),
-        supabase.from('destinations').select('*', { count: 'exact', head: true }),
-        supabase.from('assessments').select('*', { count: 'exact', head: true }).eq('status', 'CALCULATED'),
-        supabase.from('profiles').select('user_id, full_name, updated_at').order('updated_at', { ascending: false }).limit(10)
+        supabase.from('assessments').select('*', { count: 'exact', head: true })
+          .gte('created_at', fromDate).lte('created_at', toDate),
+        supabase.from('destinations').select('*', { count: 'exact', head: true })
+          .gte('created_at', fromDate).lte('created_at', toDate),
+        supabase.from('assessments').select('*', { count: 'exact', head: true })
+          .eq('status', 'CALCULATED')
+          .gte('created_at', fromDate).lte('created_at', toDate),
+        supabase.from('profiles').select('user_id, full_name, updated_at')
+          .gte('updated_at', fromDate).lte('updated_at', toDate)
+          .order('updated_at', { ascending: false }).limit(10)
       ]);
 
       setAuditEvents(events || []);
@@ -90,6 +116,13 @@ export function LogAnalytics() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleQuickFilter = (days: number) => {
+    setDateRange({
+      from: subDays(new Date(), days),
+      to: new Date()
+    });
   };
 
   const getEventIcon = (eventType: string) => {
@@ -138,6 +171,10 @@ export function LogAnalytics() {
   if (loading) {
     return (
       <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-10 w-32" />
+        </div>
         <div className="grid gap-4 md:grid-cols-4">
           {[1, 2, 3, 4].map(i => (
             <Card key={i}>
@@ -168,17 +205,105 @@ export function LogAnalytics() {
 
   return (
     <div className="space-y-6">
+      {/* Date Range Filter */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="justify-start text-left font-normal min-w-[140px]">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {format(dateRange.from, "dd/MM/yyyy", { locale: ptBR })}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateRange.from}
+                    onSelect={(date) => date && setDateRange(prev => ({ ...prev, from: date }))}
+                    disabled={(date) => date > dateRange.to || date > new Date()}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+              <span className="text-muted-foreground">até</span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="justify-start text-left font-normal min-w-[140px]">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {format(dateRange.to, "dd/MM/yyyy", { locale: ptBR })}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateRange.to}
+                    onSelect={(date) => date && setDateRange(prev => ({ ...prev, to: date }))}
+                    disabled={(date) => date < dateRange.from || date > new Date()}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => handleQuickFilter(7)}
+                className={cn(
+                  subDays(new Date(), 7).toDateString() === dateRange.from.toDateString() && 
+                  "bg-primary/10 text-primary"
+                )}
+              >
+                7 dias
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => handleQuickFilter(30)}
+                className={cn(
+                  subDays(new Date(), 30).toDateString() === dateRange.from.toDateString() && 
+                  "bg-primary/10 text-primary"
+                )}
+              >
+                30 dias
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => handleQuickFilter(90)}
+                className={cn(
+                  subDays(new Date(), 90).toDateString() === dateRange.from.toDateString() && 
+                  "bg-primary/10 text-primary"
+                )}
+              >
+                90 dias
+              </Button>
+            </div>
+
+            <Button variant="outline" size="sm" onClick={fetchAnalytics}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Atualizar
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Diagnósticos</CardTitle>
+            <CardTitle className="text-sm font-medium">Diagnósticos</CardTitle>
             <Calculator className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalAssessments}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.calculatedAssessments} calculados
+              {stats.calculatedAssessments} calculados no período
             </p>
           </CardContent>
         </Card>
@@ -191,7 +316,7 @@ export function LogAnalytics() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalDestinations}</div>
             <p className="text-xs text-muted-foreground">
-              destinos cadastrados
+              criados no período
             </p>
           </CardContent>
         </Card>
@@ -221,7 +346,7 @@ export function LogAnalytics() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.activeUsers}</div>
             <p className="text-xs text-muted-foreground">
-              recentemente ativos
+              ativos no período
             </p>
           </CardContent>
         </Card>
@@ -236,7 +361,7 @@ export function LogAnalytics() {
               Eventos do Sistema
             </CardTitle>
             <CardDescription>
-              Últimas atividades registradas
+              {auditEvents.length} eventos no período selecionado
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -244,7 +369,7 @@ export function LogAnalytics() {
               {auditEvents.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                   <AlertCircle className="h-8 w-8 mb-2" />
-                  <p>Nenhum evento registrado</p>
+                  <p>Nenhum evento no período</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -291,7 +416,7 @@ export function LogAnalytics() {
               Usuários Recentes
             </CardTitle>
             <CardDescription>
-              Últimas atividades de usuários
+              Atividade de usuários no período
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -299,7 +424,7 @@ export function LogAnalytics() {
               {recentLogins.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                   <Users className="h-8 w-8 mb-2" />
-                  <p>Nenhum usuário encontrado</p>
+                  <p>Nenhuma atividade no período</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -317,7 +442,7 @@ export function LogAnalytics() {
                         </p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          Último acesso: {format(new Date(login.last_login), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          {format(new Date(login.last_login), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                         </p>
                       </div>
                     </div>
