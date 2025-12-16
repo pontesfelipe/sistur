@@ -193,29 +193,8 @@ export function useLearningRecommendations() {
       // 7. Track recommendations (based on course pillar coverage)
       const trackRecommendations: LearningRecommendation[] = [];
 
-      // 8. Save recommendations to database
-      const allRecommendations = [
-        ...courseRecommendations.slice(0, 10),
-        ...liveRecommendations.slice(0, 15),
-      ];
-
-      if (allRecommendations.length > 0) {
-        const { error: insertError } = await supabase
-          .from('learning_recommendations')
-          .insert(
-            allRecommendations.map(rec => ({
-              run_id: run.id,
-              entity_type: rec.entity_type,
-              entity_id: rec.entity_id,
-              score: rec.score,
-              reasons: JSON.parse(JSON.stringify(rec.reasons)) as Json,
-            }))
-          );
-
-        if (insertError) {
-          console.error('Error saving recommendations:', insertError);
-        }
-      }
+      // Note: We skip saving to learning_recommendations table because entity_id is UUID
+      // but training_id is TEXT. Recommendations are returned directly instead.
 
       setIsCalculating(false);
 
