@@ -175,25 +175,25 @@ export interface PrescriptionCycle {
   created_at: string;
 }
 
-// Pillar metadata
+// Pillar metadata - SISTUR canonical definitions
 export const PILLAR_INFO: Record<Pillar, { name: string; fullName: string; description: string; color: string }> = {
   RA: {
-    name: 'IRA',
+    name: 'I-RA',
     fullName: 'Relações Ambientais',
-    description: 'Base do destino: aspectos ecológicos, sociais, culturais, econômicos e político-institucionais',
+    description: 'Contexto territorial, sociedade, meio ambiente, dados demográficos e segurança pública',
     color: 'pillar-ra',
   },
-  OE: {
-    name: 'IOE',
-    fullName: 'Organização Estrutural',
-    description: 'Estrutura de suporte: infraestrutura, superestrutura e capacidade institucional',
-    color: 'pillar-oe',
-  },
   AO: {
-    name: 'IAO',
+    name: 'I-AO',
     fullName: 'Ações Operacionais',
-    description: 'Mercado em ação: oferta, demanda e desempenho de mercado',
+    description: 'Governança pública, planejamento, orçamento e capacidade de tomada de decisão',
     color: 'pillar-ao',
+  },
+  OE: {
+    name: 'I-OE',
+    fullName: 'Organização Estrutural',
+    description: 'Infraestrutura turística, serviços, mercado, produtos e entrega ao visitante',
+    color: 'pillar-oe',
   },
 };
 
