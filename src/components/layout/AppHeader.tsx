@@ -1,6 +1,9 @@
 import { Bell, Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +20,28 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ title, subtitle }: AppHeaderProps) {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success('Você saiu da sua conta');
+    navigate('/auth');
+  };
+
+  // Get initials from email or user metadata
+  const getInitials = () => {
+    if (user?.user_metadata?.full_name) {
+      const names = user.user_metadata.full_name.split(' ');
+      return names.map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+    }
+    return user?.email?.slice(0, 2).toUpperCase() || 'U';
+  };
+
+  const getDisplayName = () => {
+    return user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário';
+  };
+
   return (
     <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30">
       <div className="h-full px-6 flex items-center justify-between">
@@ -51,18 +76,18 @@ export function AppHeader({ title, subtitle }: AppHeaderProps) {
               <Button variant="ghost" className="gap-2 px-2">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
-                    GS
+                    {getInitials()}
                   </AvatarFallback>
                 </Avatar>
-                <span className="hidden md:inline text-sm font-medium">Gestor</span>
+                <span className="hidden md:inline text-sm font-medium">{getDisplayName()}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col">
-                  <span>Gestor de Turismo</span>
+                  <span>{getDisplayName()}</span>
                   <span className="text-xs font-normal text-muted-foreground">
-                    gestor@prefeitura.gov.br
+                    {user?.email}
                   </span>
                 </div>
               </DropdownMenuLabel>
@@ -73,7 +98,7 @@ export function AppHeader({ title, subtitle }: AppHeaderProps) {
               </DropdownMenuItem>
               <DropdownMenuItem>Configurações</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                 Sair
               </DropdownMenuItem>
             </DropdownMenuContent>
