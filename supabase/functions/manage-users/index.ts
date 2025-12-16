@@ -17,6 +17,58 @@ Deno.serve(async (req) => {
       { auth: { autoRefreshToken: false, persistSession: false } }
     )
 
+    const { action, ...data } = await req.json()
+    
+    // Service-level user creation (for initial setup)
+    if (action === 'service_create') {
+      const { email, password, full_name, role, org_id, service_key } = data
+      
+      // Verify service key matches service role key
+      if (service_key !== Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')) {
+        return new Response(JSON.stringify({ error: 'Invalid service key' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      console.log(`Creating user: ${email} with role ${role}`)
+
+      // Create the user
+      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { full_name }
+      })
+
+      if (createError) {
+        console.error('Create error:', createError)
+        return new Response(JSON.stringify({ error: createError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      if (newUser.user && org_id) {
+        // Update the new user's profile to be in the specified org
+        await supabaseAdmin
+          .from('profiles')
+          .update({ org_id })
+          .eq('user_id', newUser.user.id)
+
+        // Update user role
+        await supabaseAdmin
+          .from('user_roles')
+          .update({ role: role || 'VIEWER', org_id })
+          .eq('user_id', newUser.user.id)
+      }
+
+      console.log(`User created successfully: ${newUser.user?.id}`)
+      return new Response(JSON.stringify({ success: true, user: newUser.user }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     // Get the authorization header to verify the requesting user
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
@@ -49,8 +101,6 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-
-    const { action, ...data } = await req.json()
 
     if (action === 'create') {
       const { email, password, full_name, role } = data
