@@ -12,22 +12,25 @@ import {
   GraduationCap,
   Plus,
   ArrowRight,
-  TrendingUp
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
-  mockDashboardStats,
-  mockAssessments,
-  mockPillarScores,
-  mockIssues,
-  mockRecommendations,
-} from '@/data/mockData';
+  useDashboardStats,
+  useLatestAssessment,
+  useRecentAssessments,
+  useTopRecommendations,
+} from '@/hooks/useDashboardData';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Index = () => {
-  // Find the critical pillar (lowest score)
-  const criticalPillar = mockPillarScores.reduce((prev, current) =>
+  const { data: stats, isLoading: statsLoading } = useDashboardStats();
+  const { data: latestData, isLoading: latestLoading } = useLatestAssessment();
+  const { data: recentAssessments, isLoading: recentLoading } = useRecentAssessments();
+  const { data: recommendations, isLoading: recsLoading } = useTopRecommendations();
+
+  const criticalPillar = latestData?.pillarScores?.reduce((prev, current) =>
     prev.score < current.score ? prev : current
-  );
+  , latestData.pillarScores[0]);
 
   return (
     <AppLayout 
@@ -36,30 +39,40 @@ const Index = () => {
     >
       {/* Hero Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          title="Destinos Cadastrados"
-          value={mockDashboardStats.totalDestinations}
-          icon={MapPin}
-          variant="primary"
-        />
-        <StatCard
-          title="Diagnósticos Ativos"
-          value={mockDashboardStats.activeAssessments}
-          icon={ClipboardList}
-          trend={{ value: 12, isPositive: true }}
-        />
-        <StatCard
-          title="Issues Críticos"
-          value={mockDashboardStats.criticalIssues}
-          icon={AlertTriangle}
-          variant="warning"
-        />
-        <StatCard
-          title="Recomendações"
-          value={mockDashboardStats.pendingRecommendations}
-          icon={GraduationCap}
-          variant="success"
-        />
+        {statsLoading ? (
+          <>
+            <Skeleton className="h-28" />
+            <Skeleton className="h-28" />
+            <Skeleton className="h-28" />
+            <Skeleton className="h-28" />
+          </>
+        ) : (
+          <>
+            <StatCard
+              title="Destinos Cadastrados"
+              value={stats?.totalDestinations ?? 0}
+              icon={MapPin}
+              variant="primary"
+            />
+            <StatCard
+              title="Diagnósticos Ativos"
+              value={stats?.activeAssessments ?? 0}
+              icon={ClipboardList}
+            />
+            <StatCard
+              title="Issues Críticos"
+              value={stats?.criticalIssues ?? 0}
+              icon={AlertTriangle}
+              variant="warning"
+            />
+            <StatCard
+              title="Recomendações"
+              value={stats?.pendingRecommendations ?? 0}
+              icon={GraduationCap}
+              variant="success"
+            />
+          </>
+        )}
       </div>
 
       {/* Main Content Grid */}
@@ -74,28 +87,44 @@ const Index = () => {
                   Radiografia do Destino
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Diagnóstico 2024 - Paraty
+                  {latestData?.assessment 
+                    ? `${latestData.assessment.title} - ${(latestData.assessment as any).destinations?.name}`
+                    : 'Nenhum diagnóstico disponível'}
                 </p>
               </div>
-              <Button variant="outline" asChild>
-                <Link to="/diagnosticos/a1">
-                  Ver detalhes
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              {latestData?.assessment && (
+                <Button variant="outline" asChild>
+                  <Link to={`/diagnosticos/${latestData.assessment.id}`}>
+                    Ver detalhes
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {mockPillarScores.map((pillarScore) => (
-                <PillarGauge
-                  key={pillarScore.id}
-                  pillar={pillarScore.pillar}
-                  score={pillarScore.score}
-                  severity={pillarScore.severity}
-                  isCritical={pillarScore.pillar === criticalPillar.pillar}
-                />
-              ))}
-            </div>
+            {latestLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Skeleton className="h-32" />
+                <Skeleton className="h-32" />
+                <Skeleton className="h-32" />
+              </div>
+            ) : latestData?.pillarScores && latestData.pillarScores.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {latestData.pillarScores.map((pillarScore) => (
+                  <PillarGauge
+                    key={pillarScore.id}
+                    pillar={pillarScore.pillar}
+                    score={pillarScore.score}
+                    severity={pillarScore.severity}
+                    isCritical={criticalPillar && pillarScore.pillar === criticalPillar.pillar}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                Nenhum dado de diagnóstico disponível ainda.
+              </p>
+            )}
           </div>
 
           {/* Issues */}
@@ -110,11 +139,23 @@ const Index = () => {
               </Button>
             </div>
 
-            <div className="space-y-3">
-              {mockIssues.slice(0, 3).map((issue) => (
-                <IssueCard key={issue.id} issue={issue} />
-              ))}
-            </div>
+            {latestLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-16" />
+                <Skeleton className="h-16" />
+                <Skeleton className="h-16" />
+              </div>
+            ) : latestData?.issues && latestData.issues.length > 0 ? (
+              <div className="space-y-3">
+                {latestData.issues.map((issue) => (
+                  <IssueCard key={issue.id} issue={issue as any} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-4">
+                Nenhum gargalo identificado.
+              </p>
+            )}
           </div>
         </div>
 
@@ -145,11 +186,22 @@ const Index = () => {
             <h2 className="text-lg font-display font-semibold text-foreground mb-4">
               Diagnósticos Recentes
             </h2>
-            <div className="space-y-3">
-              {mockAssessments.slice(0, 2).map((assessment) => (
-                <AssessmentCard key={assessment.id} assessment={assessment} />
-              ))}
-            </div>
+            {recentLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-20" />
+                <Skeleton className="h-20" />
+              </div>
+            ) : recentAssessments && recentAssessments.length > 0 ? (
+              <div className="space-y-3">
+                {recentAssessments.map((assessment) => (
+                  <AssessmentCard key={assessment.id} assessment={assessment as any} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-4">
+                Nenhum diagnóstico criado ainda.
+              </p>
+            )}
           </div>
 
           {/* Top Recommendations */}
@@ -159,11 +211,22 @@ const Index = () => {
                 Recomendações Prioritárias
               </h2>
             </div>
-            <div className="space-y-3">
-              {mockRecommendations.slice(0, 2).map((rec) => (
-                <RecommendationCard key={rec.id} recommendation={rec} />
-              ))}
-            </div>
+            {recsLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-16" />
+                <Skeleton className="h-16" />
+              </div>
+            ) : recommendations && recommendations.length > 0 ? (
+              <div className="space-y-3">
+                {recommendations.map((rec) => (
+                  <RecommendationCard key={rec.id} recommendation={rec as any} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-4">
+                Nenhuma recomendação disponível.
+              </p>
+            )}
             <Button variant="outline" className="w-full mt-4" asChild>
               <Link to="/cursos">
                 <GraduationCap className="mr-2 h-4 w-4" />
