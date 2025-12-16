@@ -13,6 +13,7 @@ import DiagnosticoDetalhe from "./pages/DiagnosticoDetalhe";
 import Indicadores from "./pages/Indicadores";
 import Importacoes from "./pages/Importacoes";
 import Cursos from "./pages/Cursos";
+import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -79,6 +80,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Cursos />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/configuracoes"
+              element={
+                <ProtectedRoute>
+                  <Configuracoes />
                 </ProtectedRoute>
               }
             />
