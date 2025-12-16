@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { UserManagement } from '@/components/users/UserManagement';
 import { 
   Calculator, 
   BookOpen, 
@@ -24,7 +25,8 @@ import {
   Brain,
   CheckCircle2,
   Clock,
-  Activity
+  Activity,
+  Shield
 } from 'lucide-react';
 
 export default function Configuracoes() {
@@ -32,8 +34,12 @@ export default function Configuracoes() {
     <AppLayout title="Configurações" subtitle="Documentação, metodologia de cálculo e ferramentas do SISTUR">
       <div className="space-y-6">
 
-        <Tabs defaultValue="metodologia" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-lg">
+        <Tabs defaultValue="usuarios" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+            <TabsTrigger value="usuarios" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Usuários
+            </TabsTrigger>
             <TabsTrigger value="metodologia" className="flex items-center gap-2">
               <Calculator className="h-4 w-4" />
               Metodologia
@@ -47,6 +53,11 @@ export default function Configuracoes() {
               Ferramentas
             </TabsTrigger>
           </TabsList>
+
+          {/* USUARIOS TAB */}
+          <TabsContent value="usuarios" className="space-y-6">
+            <UserManagement />
+          </TabsContent>
 
           {/* METODOLOGIA TAB */}
           <TabsContent value="metodologia" className="space-y-6">
