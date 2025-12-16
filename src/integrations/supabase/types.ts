@@ -273,6 +273,335 @@ export type Database = {
           },
         ]
       }
+      edu_courses: {
+        Row: {
+          audience: Database["public"]["Enums"]["target_agent"] | null
+          certification: string | null
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          objective: string | null
+          org_id: string | null
+          pillar: Database["public"]["Enums"]["pillar_type"]
+          suggested_hours: number | null
+          title: string
+          url: string | null
+        }
+        Insert: {
+          audience?: Database["public"]["Enums"]["target_agent"] | null
+          certification?: string | null
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          objective?: string | null
+          org_id?: string | null
+          pillar: Database["public"]["Enums"]["pillar_type"]
+          suggested_hours?: number | null
+          title: string
+          url?: string | null
+        }
+        Update: {
+          audience?: Database["public"]["Enums"]["target_agent"] | null
+          certification?: string | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          objective?: string | null
+          org_id?: string | null
+          pillar?: Database["public"]["Enums"]["pillar_type"]
+          suggested_hours?: number | null
+          title?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_courses_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_lives: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          org_id: string | null
+          tags: Json
+          title: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          org_id?: string | null
+          tags?: Json
+          title: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          org_id?: string | null
+          tags?: Json
+          title?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_lives_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_module_lives: {
+        Row: {
+          created_at: string
+          id: string
+          live_id: string
+          live_type: Database["public"]["Enums"]["live_type"]
+          module_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          live_id: string
+          live_type?: Database["public"]["Enums"]["live_type"]
+          module_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          live_id?: string
+          live_type?: Database["public"]["Enums"]["live_type"]
+          module_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_module_lives_live_id_fkey"
+            columns: ["live_id"]
+            isOneToOne: false
+            referencedRelation: "edu_lives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edu_module_lives_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "edu_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_modules: {
+        Row: {
+          activities: Json
+          course_id: string
+          created_at: string
+          id: string
+          module_index: number
+          title: string
+        }
+        Insert: {
+          activities?: Json
+          course_id: string
+          created_at?: string
+          id?: string
+          module_index?: number
+          title: string
+        }
+        Update: {
+          activities?: Json
+          course_id?: string
+          created_at?: string
+          id?: string
+          module_index?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_modules_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "edu_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_track_courses: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          sort_order: number
+          track_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          sort_order?: number
+          track_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          sort_order?: number
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_track_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "edu_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edu_track_courses_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "edu_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_tracks: {
+        Row: {
+          audience: Database["public"]["Enums"]["target_agent"] | null
+          created_at: string
+          delivery: string | null
+          description: string | null
+          id: string
+          name: string
+          objective: string | null
+          org_id: string | null
+        }
+        Insert: {
+          audience?: Database["public"]["Enums"]["target_agent"] | null
+          created_at?: string
+          delivery?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          objective?: string | null
+          org_id?: string | null
+        }
+        Update: {
+          audience?: Database["public"]["Enums"]["target_agent"] | null
+          created_at?: string
+          delivery?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          objective?: string | null
+          org_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_tracks_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indicator_course_map: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          indicator_id: string
+          weight: number
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          indicator_id: string
+          weight?: number
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          indicator_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicator_course_map_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "edu_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_course_map_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "indicators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indicator_live_map: {
+        Row: {
+          created_at: string
+          id: string
+          indicator_id: string
+          live_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          indicator_id: string
+          live_id: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          indicator_id?: string
+          live_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicator_live_map_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_live_map_live_id_fkey"
+            columns: ["live_id"]
+            isOneToOne: false
+            referencedRelation: "edu_lives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       indicator_scores: {
         Row: {
           assessment_id: string
@@ -538,6 +867,86 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_recommendations: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["recommendation_entity_type"]
+          id: string
+          reasons: Json
+          run_id: string
+          score: number
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["recommendation_entity_type"]
+          id?: string
+          reasons?: Json
+          run_id: string
+          score?: number
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: Database["public"]["Enums"]["recommendation_entity_type"]
+          id?: string
+          reasons?: Json
+          run_id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_recommendations_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "learning_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_runs: {
+        Row: {
+          created_at: string
+          id: string
+          inputs: Json
+          org_id: string
+          territory_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inputs?: Json
+          org_id: string
+          territory_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inputs?: Json
+          org_id?: string
+          territory_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_runs_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_runs_territory_id_fkey"
+            columns: ["territory_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
             referencedColumns: ["id"]
           },
         ]
@@ -910,8 +1319,10 @@ export type Database = {
       course_level: "BASICO" | "INTERMEDIARIO" | "AVANCADO"
       data_source: "IBGE" | "CADASTUR" | "PESQUISA_LOCAL" | "MANUAL" | "OUTRO"
       indicator_direction: "HIGH_IS_BETTER" | "LOW_IS_BETTER"
+      live_type: "primary" | "case" | "complementary"
       normalization_type: "MIN_MAX" | "BANDS" | "BINARY"
       pillar_type: "RA" | "OE" | "AO"
+      recommendation_entity_type: "course" | "live" | "track"
       severity_type: "CRITICO" | "MODERADO" | "BOM"
       target_agent: "GESTORES" | "TECNICOS" | "TRADE"
       territorial_interpretation: "ESTRUTURAL" | "GESTAO" | "ENTREGA"
@@ -1048,8 +1459,10 @@ export const Constants = {
       course_level: ["BASICO", "INTERMEDIARIO", "AVANCADO"],
       data_source: ["IBGE", "CADASTUR", "PESQUISA_LOCAL", "MANUAL", "OUTRO"],
       indicator_direction: ["HIGH_IS_BETTER", "LOW_IS_BETTER"],
+      live_type: ["primary", "case", "complementary"],
       normalization_type: ["MIN_MAX", "BANDS", "BINARY"],
       pillar_type: ["RA", "OE", "AO"],
+      recommendation_entity_type: ["course", "live", "track"],
       severity_type: ["CRITICO", "MODERADO", "BOM"],
       target_agent: ["GESTORES", "TECNICOS", "TRADE"],
       territorial_interpretation: ["ESTRUTURAL", "GESTAO", "ENTREGA"],
