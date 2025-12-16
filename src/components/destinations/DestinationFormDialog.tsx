@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -44,14 +44,25 @@ const destinationSchema = z.object({
 
 type DestinationFormValues = z.input<typeof destinationSchema>;
 
+export interface Destination {
+  id: string;
+  name: string;
+  uf: string | null;
+  ibge_code: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
 interface DestinationFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: { name: string; uf: string; ibge_code?: string | null; latitude?: number | null; longitude?: number | null }) => Promise<void>;
+  destination?: Destination | null;
 }
 
-export function DestinationFormDialog({ open, onOpenChange, onSubmit }: DestinationFormDialogProps) {
+export function DestinationFormDialog({ open, onOpenChange, onSubmit, destination }: DestinationFormDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isEditing = !!destination;
 
   const form = useForm<DestinationFormValues>({
     resolver: zodResolver(destinationSchema),
@@ -63,6 +74,26 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit }: Destinat
       longitude: '',
     },
   });
+
+  useEffect(() => {
+    if (open && destination) {
+      form.reset({
+        name: destination.name,
+        uf: destination.uf || '',
+        ibge_code: destination.ibge_code || '',
+        latitude: destination.latitude?.toString() || '',
+        longitude: destination.longitude?.toString() || '',
+      });
+    } else if (open && !destination) {
+      form.reset({
+        name: '',
+        uf: '',
+        ibge_code: '',
+        latitude: '',
+        longitude: '',
+      });
+    }
+  }, [open, destination, form]);
 
   const handleSubmit = async (values: DestinationFormValues) => {
     setIsSubmitting(true);
@@ -88,9 +119,9 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit }: Destinat
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Novo Destino</DialogTitle>
+          <DialogTitle>{isEditing ? 'Editar Destino' : 'Novo Destino'}</DialogTitle>
           <DialogDescription>
-            Cadastre um novo destino turístico para análise.
+            {isEditing ? 'Atualize as informações do destino turístico.' : 'Cadastre um novo destino turístico para análise.'}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -115,7 +146,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit }: Destinat
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Estado (UF)</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o estado" />
@@ -184,7 +215,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit }: Destinat
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Salvar
+                {isEditing ? 'Atualizar' : 'Salvar'}
               </Button>
             </div>
           </form>

@@ -32,20 +32,39 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+import type { Destination } from '@/components/destinations/DestinationFormDialog';
+
 const Destinos = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingDestination, setEditingDestination] = useState<Destination | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   
-  const { destinations, isLoading, createDestination, deleteDestination } = useDestinations();
+  const { destinations, isLoading, createDestination, updateDestination, deleteDestination } = useDestinations();
 
   const filteredDestinations = destinations?.filter((dest) =>
     dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     dest.uf?.toLowerCase().includes(searchQuery.toLowerCase())
   ) ?? [];
 
-  const handleCreate = async (data: { name: string; uf: string; ibge_code?: string | null; latitude?: number | null; longitude?: number | null }) => {
-    await createDestination.mutateAsync(data);
+  const handleSubmit = async (data: { name: string; uf: string; ibge_code?: string | null; latitude?: number | null; longitude?: number | null }) => {
+    if (editingDestination) {
+      await updateDestination.mutateAsync({ id: editingDestination.id, ...data });
+    } else {
+      await createDestination.mutateAsync(data);
+    }
+  };
+
+  const handleEdit = (destination: Destination) => {
+    setEditingDestination(destination);
+    setIsFormOpen(true);
+  };
+
+  const handleFormClose = (open: boolean) => {
+    setIsFormOpen(open);
+    if (!open) {
+      setEditingDestination(null);
+    }
   };
 
   const handleDelete = async () => {
@@ -119,7 +138,7 @@ const Destinos = () => {
                       <Eye className="mr-2 h-4 w-4" />
                       Ver detalhes
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleEdit(destination)}>
                       <Edit className="mr-2 h-4 w-4" />
                       Editar
                     </DropdownMenuItem>
@@ -183,8 +202,9 @@ const Destinos = () => {
       {/* Form Dialog */}
       <DestinationFormDialog
         open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        onSubmit={handleCreate}
+        onOpenChange={handleFormClose}
+        onSubmit={handleSubmit}
+        destination={editingDestination}
       />
 
       {/* Delete Confirmation */}
