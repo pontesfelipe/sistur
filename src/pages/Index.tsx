@@ -6,6 +6,7 @@ import { AssessmentCard } from '@/components/dashboard/AssessmentCard';
 import { IssueCard } from '@/components/dashboard/IssueCard';
 import { RecommendationCard } from '@/components/dashboard/RecommendationCard';
 import { DestinationComparison } from '@/components/dashboard/DestinationComparison';
+import { DestinationTrend } from '@/components/dashboard/DestinationTrend';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -303,6 +304,11 @@ const Index = () => {
               destinations={destinations}
               getDestinationData={getDestinationData}
             />
+          )}
+
+          {/* Destination Trend */}
+          {destinations && destinations.length > 0 && (
+            <DestinationTrend destinations={destinations} />
           )}
         </div>
 
