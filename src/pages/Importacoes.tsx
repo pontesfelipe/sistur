@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -26,6 +28,12 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import {
   AlertCircle,
   CheckCircle2,
   Upload,
@@ -37,6 +45,10 @@ import {
   Shield,
   ShieldAlert,
   ShieldCheck,
+  FileText,
+  PenLine,
+  Download,
+  HelpCircle,
 } from 'lucide-react';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -73,6 +85,7 @@ const Importacoes = () => {
   const [selectedAssessment, setSelectedAssessment] = useState<string>('');
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
   const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string }>>({});
+  const [activeTab, setActiveTab] = useState<string>('formulario');
 
   const { indicators, isLoading: loadingIndicators } = useIndicators();
   const { assessments, isLoading: loadingAssessments } = useAssessments();
@@ -163,6 +176,21 @@ const Importacoes = () => {
     });
   };
 
+  const handleSaveAllValues = async () => {
+    if (!selectedAssessment || Object.keys(editedValues).length === 0) return;
+
+    const dataToSave = Object.entries(editedValues).map(([indicatorId, data]) => ({
+      assessment_id: selectedAssessment,
+      indicator_id: indicatorId,
+      value_raw: data.value,
+      source: data.source,
+    }));
+
+    await bulkUpsertValues.mutateAsync(dataToSave);
+    setEditedValues({});
+    toast.success('Todos os valores foram salvos!');
+  };
+
   const getValueForIndicator = (indicatorId: string) => {
     if (editedValues[indicatorId] !== undefined) {
       return editedValues[indicatorId].value;
@@ -177,243 +205,344 @@ const Importacoes = () => {
     AO: 'Ações Operacionais',
   };
 
+  // Group indicators by pillar
+  const indicatorsByPillar = indicators.reduce((acc, ind) => {
+    const pillar = ind.pillar as 'RA' | 'OE' | 'AO';
+    if (!acc[pillar]) acc[pillar] = [];
+    acc[pillar].push(ind);
+    return acc;
+  }, {} as Record<string, typeof indicators>);
+
+  // Calculate fill progress
+  const filledCount = indicators.filter(ind => {
+    const value = getValueForIndicator(ind.id);
+    return value !== null && value !== undefined;
+  }).length;
+  const fillProgress = indicators.length > 0 ? (filledCount / indicators.length) * 100 : 0;
+
+  const downloadTemplate = () => {
+    const header = 'codigo,valor,fonte';
+    const rows = indicators.map(ind => `${ind.code},,`);
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'template_indicadores.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <AppLayout 
-      title="Fonte Única da Verdade" 
-      subtitle="Importação e edição de dados dos indicadores"
+      title="Preenchimento de Dados" 
+      subtitle="Importe ou preencha os valores dos indicadores"
     >
       {/* Assessment Selector */}
-      <div className="bg-card rounded-xl border p-6 mb-6">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Database className="h-5 w-5 text-primary" />
+      <Card className="mb-6">
+        <CardContent className="py-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Database className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Selecione o Diagnóstico</h3>
+                <p className="text-sm text-muted-foreground">
+                  Escolha o diagnóstico para preencher os dados
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold">Selecione o Diagnóstico</h3>
-              <p className="text-sm text-muted-foreground">
-                Escolha o diagnóstico para importar ou editar dados
-              </p>
-            </div>
+            <Select value={selectedAssessment} onValueChange={setSelectedAssessment}>
+              <SelectTrigger className="w-64">
+                <SelectValue placeholder="Selecionar diagnóstico" />
+              </SelectTrigger>
+              <SelectContent>
+                {assessments?.filter(a => a.status !== 'CALCULATED').map((a) => (
+                  <SelectItem key={a.id} value={a.id}>
+                    {a.title} - {(a.destinations as any)?.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={selectedAssessment} onValueChange={setSelectedAssessment}>
-            <SelectTrigger className="w-64">
-              <SelectValue placeholder="Selecionar diagnóstico" />
-            </SelectTrigger>
-            <SelectContent>
-              {assessments?.map((a) => (
-                <SelectItem key={a.id} value={a.id}>
-                  {a.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {selectedAssessment && (
         <>
-          {/* CSV Import Section */}
-          <div className="bg-card rounded-xl border p-6 mb-6">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-accent/10">
-                  <FileSpreadsheet className="h-5 w-5 text-accent" />
+          {/* Progress */}
+          <Card className="mb-6">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Progresso do Preenchimento</span>
+                <span className="text-sm text-muted-foreground">
+                  {filledCount} de {indicators.length} indicadores
+                </span>
+              </div>
+              <Progress value={fillProgress} className="h-2" />
+              {fillProgress === 100 && (
+                <p className="text-sm text-severity-good mt-2 flex items-center gap-1">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Todos os indicadores preenchidos! O diagnóstico pode ser calculado.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Tabs for Form vs CSV */}
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+              <TabsTrigger value="formulario" className="gap-2">
+                <PenLine className="h-4 w-4" />
+                Formulário
+              </TabsTrigger>
+              <TabsTrigger value="csv" className="gap-2">
+                <FileSpreadsheet className="h-4 w-4" />
+                Importar CSV
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Form Tab */}
+            <TabsContent value="formulario" className="space-y-6">
+              {/* Action bar */}
+              {Object.keys(editedValues).length > 0 && (
+                <Card className="border-accent">
+                  <CardContent className="py-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">
+                        {Object.keys(editedValues).length} valor(es) não salvo(s)
+                      </span>
+                      <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending}>
+                        <Save className="mr-2 h-4 w-4" />
+                        Salvar Todos
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {loadingIndicators ? (
+                <div className="space-y-3">
+                  {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-12 w-full" />)}
                 </div>
-                <div>
-                  <h3 className="font-semibold">Importar CSV</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Formato: código,valor,fonte (uma linha por indicador)
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".csv"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                />
-                <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Selecionar Arquivo
-                </Button>
-                {parsedData.length > 0 && (
-                  <Button onClick={handleImport} disabled={bulkUpsertValues.isPending}>
-                    <Save className="mr-2 h-4 w-4" />
-                    Importar {parsedData.filter(p => p.valid).length} linhas
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {/* Parsed Preview */}
-            {parsedData.length > 0 && (
-              <div className="border rounded-lg overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Código</TableHead>
-                      <TableHead>Valor</TableHead>
-                      <TableHead>Fonte</TableHead>
-                      <TableHead>Mensagem</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {parsedData.slice(0, 10).map((row, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell>
-                          {row.valid ? (
-                            <CheckCircle2 className="h-4 w-4 text-severity-good" />
-                          ) : (
-                            <AlertCircle className="h-4 w-4 text-severity-critical" />
-                          )}
-                        </TableCell>
-                        <TableCell className="font-mono text-sm">{row.indicator_code}</TableCell>
-                        <TableCell>{row.value ?? '—'}</TableCell>
-                        <TableCell>{row.source || '—'}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {row.error || 'OK'}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                {parsedData.length > 10 && (
-                  <div className="p-2 text-center text-sm text-muted-foreground border-t">
-                    +{parsedData.length - 10} linhas adicionais
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Manual Data Entry Table */}
-          <div className="bg-card rounded-xl border overflow-hidden">
-            <div className="p-4 border-b">
-              <h3 className="font-semibold">Edição Manual de Dados</h3>
-              <p className="text-sm text-muted-foreground">
-                Preencha ou edite os valores dos indicadores diretamente
-              </p>
-            </div>
-
-            {loadingIndicators ? (
-              <div className="p-8 space-y-3">
-                {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-12 w-full" />)}
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-24">Código</TableHead>
-                    <TableHead>Indicador</TableHead>
-                    <TableHead className="w-20">Pilar</TableHead>
-                    <TableHead className="w-24">Confiança</TableHead>
-                    <TableHead className="w-32">Valor</TableHead>
-                    <TableHead className="w-24"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {indicators.map((indicator) => {
-                    const currentValue = getValueForIndicator(indicator.id);
-                    const hasUnsavedChanges = editedValues[indicator.id] !== undefined;
-                    const collectionType = (indicator as any).collection_type as CollectionType | undefined;
-                    const reliability = reliabilityIcons[collectionType || 'MANUAL'];
-                    const ReliabilityIcon = reliability.icon;
-
-                    return (
-                      <TableRow key={indicator.id}>
-                        <TableCell className="font-mono text-sm">
-                          {indicator.code}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{indicator.name}</span>
-                            {indicator.description && (
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Info className="h-4 w-4 text-muted-foreground" />
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-xs">
-                                  {indicator.description}
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
-                          </div>
-                          <span className="text-xs text-muted-foreground">{indicator.theme}</span>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={indicator.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
-                            {indicator.pillar}
+              ) : (
+                <Accordion type="multiple" defaultValue={['RA', 'OE', 'AO']} className="space-y-4">
+                  {(['RA', 'OE', 'AO'] as const).map(pillar => (
+                    <AccordionItem key={pillar} value={pillar} className="border rounded-lg px-4">
+                      <AccordionTrigger className="hover:no-underline">
+                        <div className="flex items-center gap-3">
+                          <Badge variant={pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
+                            {pillar}
                           </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <div className="flex items-center gap-1.5">
-                                <ReliabilityIcon className={cn('h-4 w-4', reliability.color)} />
-                                <span className="text-xs text-muted-foreground">
-                                  {Math.round(((indicator as any).reliability_score || 0.7) * 100)}%
-                                </span>
+                          <span className="font-semibold">{pillarNames[pillar]}</span>
+                          <span className="text-sm text-muted-foreground">
+                            ({indicatorsByPillar[pillar]?.length || 0} indicadores)
+                          </span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4 py-2">
+                          {indicatorsByPillar[pillar]?.map((indicator) => {
+                            const currentValue = getValueForIndicator(indicator.id);
+                            const hasUnsavedChanges = editedValues[indicator.id] !== undefined;
+                            
+                            return (
+                              <div key={indicator.id} className="grid grid-cols-12 gap-4 items-center py-2 border-b last:border-0">
+                                <div className="col-span-1">
+                                  <span className="font-mono text-xs text-muted-foreground">
+                                    {indicator.code}
+                                  </span>
+                                </div>
+                                <div className="col-span-6">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-sm">{indicator.name}</span>
+                                    {indicator.description && (
+                                      <Tooltip>
+                                        <TooltipTrigger>
+                                          <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-xs">
+                                          {indicator.description}
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    )}
+                                  </div>
+                                  <span className="text-xs text-muted-foreground">
+                                    {indicator.unit && `Unidade: ${indicator.unit}`}
+                                    {indicator.min_ref !== null && indicator.max_ref !== null && 
+                                      ` | Ref: ${indicator.min_ref} - ${indicator.max_ref}`
+                                    }
+                                  </span>
+                                </div>
+                                <div className="col-span-3">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    value={currentValue ?? ''}
+                                    onChange={(e) => handleValueChange(indicator.id, e.target.value)}
+                                    className={cn(
+                                      'w-full',
+                                      hasUnsavedChanges && 'border-accent ring-1 ring-accent'
+                                    )}
+                                    placeholder="Valor"
+                                  />
+                                </div>
+                                <div className="col-span-2 flex justify-end">
+                                  {hasUnsavedChanges && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleSaveValue(indicator.id)}
+                                      disabled={upsertValue.isPending}
+                                    >
+                                      <Save className="h-3 w-3" />
+                                    </Button>
+                                  )}
+                                  {!hasUnsavedChanges && currentValue !== null && (
+                                    <CheckCircle2 className="h-5 w-5 text-severity-good" />
+                                  )}
+                                </div>
                               </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {reliability.label} ({collectionType || 'MANUAL'})
-                            </TooltipContent>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            step="any"
-                            value={currentValue ?? ''}
-                            onChange={(e) => handleValueChange(indicator.id, e.target.value)}
-                            className={cn(
-                              'w-full',
-                              hasUnsavedChanges && 'border-accent'
-                            )}
-                            placeholder="—"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          {hasUnsavedChanges && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleSaveValue(indicator.id)}
-                              disabled={upsertValue.isPending}
-                            >
-                              <Save className="h-3 w-3 mr-1" />
-                              Salvar
-                            </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            )}
+                            );
+                          })}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              )}
+            </TabsContent>
 
-            {indicators.length === 0 && !loadingIndicators && (
-              <div className="p-8 text-center text-muted-foreground">
-                <AlertTriangle className="mx-auto h-8 w-8 mb-2" />
-                <p>Nenhum indicador cadastrado. Cadastre indicadores primeiro.</p>
-              </div>
-            )}
-          </div>
+            {/* CSV Tab */}
+            <TabsContent value="csv" className="space-y-6">
+              {/* CSV Format Help */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Info className="h-5 w-5 text-primary" />
+                    Formato do Arquivo CSV
+                  </CardTitle>
+                  <CardDescription>
+                    O arquivo deve seguir exatamente este formato para importação correta
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm">
+                    <p className="text-muted-foreground mb-2"># Linha de cabeçalho (obrigatória):</p>
+                    <p className="text-foreground">codigo,valor,fonte</p>
+                    <p className="text-muted-foreground mt-3 mb-2"># Linhas de dados:</p>
+                    <p className="text-foreground">RA001,75,IBGE</p>
+                    <p className="text-foreground">RA002,92,Pesquisa Local</p>
+                    <p className="text-foreground">OE001,8500,Manual</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div className="p-3 bg-card border rounded-lg">
+                      <p className="font-medium mb-1">codigo</p>
+                      <p className="text-muted-foreground">Código do indicador (ex: RA001)</p>
+                    </div>
+                    <div className="p-3 bg-card border rounded-lg">
+                      <p className="font-medium mb-1">valor</p>
+                      <p className="text-muted-foreground">Valor numérico do indicador</p>
+                    </div>
+                    <div className="p-3 bg-card border rounded-lg">
+                      <p className="font-medium mb-1">fonte</p>
+                      <p className="text-muted-foreground">Fonte dos dados (opcional)</p>
+                    </div>
+                  </div>
+
+                  <Button variant="outline" onClick={downloadTemplate}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Baixar Template CSV
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Upload Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Upload className="h-5 w-5 text-primary" />
+                    Carregar Arquivo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-3">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".csv"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                    />
+                    <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+                      <FileSpreadsheet className="mr-2 h-4 w-4" />
+                      Selecionar Arquivo CSV
+                    </Button>
+                    {parsedData.length > 0 && (
+                      <Button onClick={handleImport} disabled={bulkUpsertValues.isPending}>
+                        <Save className="mr-2 h-4 w-4" />
+                        Importar {parsedData.filter(p => p.valid).length} valores
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Parsed Preview */}
+                  {parsedData.length > 0 && (
+                    <div className="mt-4 border rounded-lg overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-16">Status</TableHead>
+                            <TableHead>Código</TableHead>
+                            <TableHead>Valor</TableHead>
+                            <TableHead>Fonte</TableHead>
+                            <TableHead>Mensagem</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {parsedData.slice(0, 10).map((row, idx) => (
+                            <TableRow key={idx}>
+                              <TableCell>
+                                {row.valid ? (
+                                  <CheckCircle2 className="h-4 w-4 text-severity-good" />
+                                ) : (
+                                  <AlertCircle className="h-4 w-4 text-severity-critical" />
+                                )}
+                              </TableCell>
+                              <TableCell className="font-mono text-sm">{row.indicator_code}</TableCell>
+                              <TableCell>{row.value ?? '—'}</TableCell>
+                              <TableCell>{row.source || '—'}</TableCell>
+                              <TableCell className="text-sm text-muted-foreground">
+                                {row.error || 'OK'}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                      {parsedData.length > 10 && (
+                        <div className="p-2 text-center text-sm text-muted-foreground border-t">
+                          +{parsedData.length - 10} linhas adicionais
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </>
       )}
 
       {!selectedAssessment && (
-        <div className="bg-card rounded-xl border p-16 text-center">
+        <Card className="p-16 text-center">
           <Database className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
           <h3 className="text-lg font-semibold mb-2">Selecione um Diagnóstico</h3>
           <p className="text-muted-foreground">
-            Escolha um diagnóstico acima para começar a importar ou editar dados.
+            Escolha um diagnóstico acima para começar a preencher os dados dos indicadores.
           </p>
-        </div>
+        </Card>
       )}
     </AppLayout>
   );

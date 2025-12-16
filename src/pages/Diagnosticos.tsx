@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ import { AssessmentFormDialog } from '@/components/assessments/AssessmentFormDia
 import { Skeleton } from '@/components/ui/skeleton';
 
 const Diagnosticos = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -48,7 +50,11 @@ const Diagnosticos = () => {
     period_end?: string | null;
     status: 'DRAFT' | 'DATA_READY' | 'CALCULATED';
   }) => {
-    await createAssessment.mutateAsync(data);
+    const result = await createAssessment.mutateAsync(data);
+    // Navigate to the new assessment to start filling data
+    if (result?.id) {
+      navigate(`/diagnosticos/${result.id}`);
+    }
   };
 
   return (
@@ -95,6 +101,7 @@ const Diagnosticos = () => {
               {isLoading ? <Skeleton className="h-8 w-8" /> : statusCounts.DRAFT}
             </span>
           </div>
+          <p className="text-xs text-muted-foreground mt-1">Aguardando preenchimento de dados</p>
         </div>
         <div className="p-4 rounded-lg border bg-card">
           <div className="flex items-center gap-3">
@@ -103,6 +110,7 @@ const Diagnosticos = () => {
               {isLoading ? <Skeleton className="h-8 w-8" /> : statusCounts.DATA_READY}
             </span>
           </div>
+          <p className="text-xs text-muted-foreground mt-1">Pronto para calcular diagnóstico</p>
         </div>
         <div className="p-4 rounded-lg border bg-card">
           <div className="flex items-center gap-3">
@@ -111,6 +119,7 @@ const Diagnosticos = () => {
               {isLoading ? <Skeleton className="h-8 w-8" /> : statusCounts.CALCULATED}
             </span>
           </div>
+          <p className="text-xs text-muted-foreground mt-1">Diagnóstico completo</p>
         </div>
       </div>
 
