@@ -6,6 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UserManagement } from '@/components/users/UserManagement';
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
+import { NormalizationCalculator } from '@/components/tools/NormalizationCalculator';
+import { CycleMonitor } from '@/components/tools/CycleMonitor';
+import { DataExporter } from '@/components/tools/DataExporter';
 import { 
   Calculator, 
   BookOpen, 
@@ -584,9 +587,7 @@ export default function Configuracoes() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full" disabled>
-                    Em breve
-                  </Button>
+                  <NormalizationCalculator />
                 </CardContent>
               </Card>
 
@@ -601,9 +602,7 @@ export default function Configuracoes() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full" disabled>
-                    Em breve
-                  </Button>
+                  <DataExporter />
                 </CardContent>
               </Card>
 
@@ -635,9 +634,7 @@ export default function Configuracoes() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full" disabled>
-                    Em breve
-                  </Button>
+                  <CycleMonitor />
                 </CardContent>
               </Card>
 
