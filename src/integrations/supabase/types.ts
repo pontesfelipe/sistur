@@ -14,16 +14,639 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assessments: {
+        Row: {
+          algo_version: string
+          calculated_at: string | null
+          created_at: string
+          destination_id: string
+          id: string
+          org_id: string
+          period_end: string | null
+          period_start: string | null
+          status: Database["public"]["Enums"]["assessment_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          algo_version?: string
+          calculated_at?: string | null
+          created_at?: string
+          destination_id: string
+          id?: string
+          org_id: string
+          period_end?: string | null
+          period_start?: string | null
+          status?: Database["public"]["Enums"]["assessment_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          algo_version?: string
+          calculated_at?: string | null
+          created_at?: string
+          destination_id?: string
+          id?: string
+          org_id?: string
+          period_end?: string | null
+          period_start?: string | null
+          status?: Database["public"]["Enums"]["assessment_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessments_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessments_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_events: {
+        Row: {
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          event_type: string
+          id: string
+          metadata: Json
+          org_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json
+          org_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json
+          org_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          level: Database["public"]["Enums"]["course_level"]
+          org_id: string | null
+          tags: Json
+          title: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          level?: Database["public"]["Enums"]["course_level"]
+          org_id?: string | null
+          tags?: Json
+          title: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          level?: Database["public"]["Enums"]["course_level"]
+          org_id?: string | null
+          tags?: Json
+          title?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      destinations: {
+        Row: {
+          created_at: string
+          ibge_code: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          org_id: string
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ibge_code?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          org_id: string
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ibge_code?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          org_id?: string
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "destinations_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indicator_scores: {
+        Row: {
+          assessment_id: string
+          computed_at: string
+          id: string
+          indicator_id: string
+          max_ref_used: number | null
+          min_ref_used: number | null
+          org_id: string
+          score: number
+          weight_used: number | null
+        }
+        Insert: {
+          assessment_id: string
+          computed_at?: string
+          id?: string
+          indicator_id: string
+          max_ref_used?: number | null
+          min_ref_used?: number | null
+          org_id: string
+          score: number
+          weight_used?: number | null
+        }
+        Update: {
+          assessment_id?: string
+          computed_at?: string
+          id?: string
+          indicator_id?: string
+          max_ref_used?: number | null
+          min_ref_used?: number | null
+          org_id?: string
+          score?: number
+          weight_used?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicator_scores_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_scores_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_scores_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indicator_values: {
+        Row: {
+          assessment_id: string
+          collected_at: string
+          created_at: string
+          id: string
+          indicator_id: string
+          org_id: string
+          source: string | null
+          value_raw: number | null
+          value_text: string | null
+        }
+        Insert: {
+          assessment_id: string
+          collected_at?: string
+          created_at?: string
+          id?: string
+          indicator_id: string
+          org_id: string
+          source?: string | null
+          value_raw?: number | null
+          value_text?: string | null
+        }
+        Update: {
+          assessment_id?: string
+          collected_at?: string
+          created_at?: string
+          id?: string
+          indicator_id?: string
+          org_id?: string
+          source?: string | null
+          value_raw?: number | null
+          value_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicator_values_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_values_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_values_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indicators: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          direction: Database["public"]["Enums"]["indicator_direction"]
+          id: string
+          max_ref: number | null
+          min_ref: number | null
+          name: string
+          normalization: Database["public"]["Enums"]["normalization_type"]
+          org_id: string | null
+          pillar: Database["public"]["Enums"]["pillar_type"]
+          theme: string
+          unit: string | null
+          weight: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          direction?: Database["public"]["Enums"]["indicator_direction"]
+          id?: string
+          max_ref?: number | null
+          min_ref?: number | null
+          name: string
+          normalization?: Database["public"]["Enums"]["normalization_type"]
+          org_id?: string | null
+          pillar: Database["public"]["Enums"]["pillar_type"]
+          theme: string
+          unit?: string | null
+          weight?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          direction?: Database["public"]["Enums"]["indicator_direction"]
+          id?: string
+          max_ref?: number | null
+          min_ref?: number | null
+          name?: string
+          normalization?: Database["public"]["Enums"]["normalization_type"]
+          org_id?: string | null
+          pillar?: Database["public"]["Enums"]["pillar_type"]
+          theme?: string
+          unit?: string | null
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicators_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      issues: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          evidence: Json
+          id: string
+          org_id: string
+          pillar: Database["public"]["Enums"]["pillar_type"]
+          severity: Database["public"]["Enums"]["severity_type"]
+          theme: string
+          title: string
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          evidence?: Json
+          id?: string
+          org_id: string
+          pillar: Database["public"]["Enums"]["pillar_type"]
+          severity: Database["public"]["Enums"]["severity_type"]
+          theme: string
+          title: string
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          evidence?: Json
+          id?: string
+          org_id?: string
+          pillar?: Database["public"]["Enums"]["pillar_type"]
+          severity?: Database["public"]["Enums"]["severity_type"]
+          theme?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issues_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issues_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orgs: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      pillar_scores: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          id: string
+          org_id: string
+          pillar: Database["public"]["Enums"]["pillar_type"]
+          score: number
+          severity: Database["public"]["Enums"]["severity_type"]
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          id?: string
+          org_id: string
+          pillar: Database["public"]["Enums"]["pillar_type"]
+          score: number
+          severity: Database["public"]["Enums"]["severity_type"]
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          id?: string
+          org_id?: string
+          pillar?: Database["public"]["Enums"]["pillar_type"]
+          score?: number
+          severity?: Database["public"]["Enums"]["severity_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pillar_scores_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pillar_scores_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          org_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          org_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          org_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recommendations: {
+        Row: {
+          assessment_id: string
+          course_id: string | null
+          created_at: string
+          id: string
+          issue_id: string | null
+          org_id: string
+          priority: number
+          reason: string
+        }
+        Insert: {
+          assessment_id: string
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          issue_id?: string | null
+          org_id: string
+          priority?: number
+          reason: string
+        }
+        Update: {
+          assessment_id?: string
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          issue_id?: string | null
+          org_id?: string
+          priority?: number
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recommendations_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendations_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendations_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendations_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          org_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_id: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_org_id: { Args: { _user_id: string }; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      user_belongs_to_org: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "ADMIN" | "ANALYST" | "VIEWER"
+      assessment_status: "DRAFT" | "DATA_READY" | "CALCULATED"
+      course_level: "BASICO" | "INTERMEDIARIO" | "AVANCADO"
+      indicator_direction: "HIGH_IS_BETTER" | "LOW_IS_BETTER"
+      normalization_type: "MIN_MAX" | "BANDS" | "BINARY"
+      pillar_type: "RA" | "OE" | "AO"
+      severity_type: "CRITICO" | "MODERADO" | "BOM"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +773,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["ADMIN", "ANALYST", "VIEWER"],
+      assessment_status: ["DRAFT", "DATA_READY", "CALCULATED"],
+      course_level: ["BASICO", "INTERMEDIARIO", "AVANCADO"],
+      indicator_direction: ["HIGH_IS_BETTER", "LOW_IS_BETTER"],
+      normalization_type: ["MIN_MAX", "BANDS", "BINARY"],
+      pillar_type: ["RA", "OE", "AO"],
+      severity_type: ["CRITICO", "MODERADO", "BOM"],
+    },
   },
 } as const
