@@ -6,6 +6,8 @@ export type TerritorialInterpretation = 'ESTRUTURAL' | 'GESTAO' | 'ENTREGA';
 export type AssessmentStatus = 'DRAFT' | 'DATA_READY' | 'CALCULATED';
 export type UserRole = 'ADMIN' | 'ANALYST' | 'VIEWER';
 export type CourseLevel = 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO';
+export type TargetAgent = 'GESTORES' | 'TECNICOS' | 'TRADE';
+export type EvolutionState = 'EVOLUTION' | 'STAGNATION' | 'REGRESSION';
 
 export interface Org {
   id: string;
@@ -122,6 +124,9 @@ export interface Course {
   url?: string;
   duration_minutes?: number;
   level: CourseLevel;
+  pillar?: Pillar;
+  theme?: string;
+  target_agent?: TargetAgent;
   tags: { pillar: Pillar; theme: string }[];
   created_at: string;
 }
@@ -136,6 +141,37 @@ export interface Recommendation {
   course?: Course;
   reason: string;
   priority: number;
+  created_at: string;
+}
+
+export interface Prescription {
+  id: string;
+  org_id: string;
+  assessment_id: string;
+  issue_id?: string;
+  issue?: Issue;
+  course_id?: string;
+  course?: Course;
+  indicator_id?: string;
+  indicator?: Indicator;
+  pillar: Pillar;
+  status: Severity;
+  interpretation?: TerritorialInterpretation;
+  justification: string;
+  target_agent: TargetAgent;
+  priority: number;
+  cycle_number: number;
+  created_at: string;
+}
+
+export interface PrescriptionCycle {
+  id: string;
+  org_id: string;
+  prescription_id: string;
+  assessment_id: string;
+  previous_score?: number;
+  current_score?: number;
+  evolution_state?: EvolutionState;
   created_at: string;
 }
 
@@ -185,4 +221,27 @@ export const INTERPRETATION_INFO: Record<TerritorialInterpretation, { label: str
     description: 'Falhas na execução ou prestação de serviços ao turista',
     color: 'text-purple-600',
   },
+};
+
+// Target agent metadata
+export const TARGET_AGENT_INFO: Record<TargetAgent, { label: string; description: string }> = {
+  GESTORES: {
+    label: 'Gestores Públicos',
+    description: 'Secretários, diretores e gestores de turismo',
+  },
+  TECNICOS: {
+    label: 'Técnicos',
+    description: 'Analistas e técnicos de órgãos públicos',
+  },
+  TRADE: {
+    label: 'Trade Turístico',
+    description: 'Empresários e prestadores de serviços turísticos',
+  },
+};
+
+// Evolution state metadata
+export const EVOLUTION_INFO: Record<EvolutionState, { label: string; color: string; icon: string }> = {
+  EVOLUTION: { label: 'Evolução', color: 'text-green-600', icon: '↑' },
+  STAGNATION: { label: 'Estagnação', color: 'text-yellow-600', icon: '→' },
+  REGRESSION: { label: 'Regressão', color: 'text-red-600', icon: '↓' },
 };

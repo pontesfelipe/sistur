@@ -262,7 +262,8 @@ serve(async (req) => {
       }
     }
 
-    // 4. Delete existing scores/issues/recommendations for this assessment
+    // 4. Delete existing scores/issues/recommendations/prescriptions for this assessment
+    await supabase.from("prescriptions").delete().eq("assessment_id", assessment_id);
     await supabase.from("recommendations").delete().eq("assessment_id", assessment_id);
     await supabase.from("issues").delete().eq("assessment_id", assessment_id);
     await supabase.from("pillar_scores").delete().eq("assessment_id", assessment_id);
@@ -401,7 +402,37 @@ serve(async (req) => {
       console.error("Error fetching courses:", coursesError);
     }
 
-    // 10. Generate recommendations based on issues with explicit justification
+    // Helper function to determine target agent based on interpretation
+    function determineTargetAgent(interpretation: TerritorialInterpretation): "GESTORES" | "TECNICOS" | "TRADE" {
+      switch (interpretation) {
+        case "ESTRUTURAL":
+          return "GESTORES"; // Strategic decisions
+        case "GESTAO":
+          return "TECNICOS"; // Technical improvements
+        case "ENTREGA":
+          return "TRADE"; // Service delivery
+        default:
+          return "GESTORES";
+      }
+    }
+
+    // 10. Generate prescriptions with explicit justification (new prescription engine)
+    const prescriptions: Array<{
+      org_id: string;
+      assessment_id: string;
+      issue_id: string;
+      course_id: string;
+      indicator_id?: string;
+      pillar: string;
+      status: string;
+      interpretation: TerritorialInterpretation;
+      justification: string;
+      target_agent: string;
+      priority: number;
+      cycle_number: number;
+    }> = [];
+
+    // Also keep recommendations for backward compatibility
     const recommendations: Array<{
       org_id: string;
       assessment_id: string;
@@ -421,13 +452,16 @@ serve(async (req) => {
       });
       
       for (const issue of sortedIssues) {
-        // Find matching courses by pillar and theme
-        const matchingCourses = (courses as Course[]).filter(course => 
-          course.tags.some(tag => 
+        // Find matching courses by pillar (new single pillar field first, then tags)
+        const matchingCourses = (courses as any[]).filter(course => {
+          // Check new pillar field first
+          if (course.pillar === issue.pillar) return true;
+          // Fall back to tags for backward compatibility
+          return course.tags?.some((tag: { pillar: string; theme: string }) => 
             tag.pillar === issue.pillar && 
             tag.theme.toLowerCase() === issue.theme.toLowerCase()
-          )
-        );
+          );
+        });
 
         // Sort by level (BASICO first for critical issues)
         matchingCourses.sort((a, b) => {
@@ -435,7 +469,7 @@ serve(async (req) => {
           return (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99);
         });
 
-        // Get interpretation label for reason
+        // Get interpretation labels for justification
         const interpretationLabels: Record<string, string> = {
           ESTRUTURAL: "Estrutural",
           GESTAO: "Gestão",
@@ -450,23 +484,61 @@ serve(async (req) => {
         };
         const pillarName = pillarNames[issue.pillar] || issue.pillar;
 
-        // Add top 2 matching courses as recommendations with detailed justification
+        const severityLabels: Record<string, string> = {
+          CRITICO: "Crítico",
+          MODERADO: "Atenção"
+        };
+        const severityLabel = severityLabels[issue.severity] || issue.severity;
+
+        // Determine target agent based on interpretation
+        const targetAgent = determineTargetAgent(issue.interpretation);
+
+        // Add top 2 matching courses as prescriptions
         for (const course of matchingCourses.slice(0, 2)) {
-          const severityLabel = issue.severity === "CRITICO" ? "Crítico" : "Atenção";
-          
+          // Build the mandatory justification per spec
+          const justification = `Esta capacitação foi prescrita porque o indicador de ${issue.theme} está em nível ${severityLabel}, classificado no pilar ${pillarName}, com interpretação territorial ${interpretationLabel}.`;
+
+          prescriptions.push({
+            org_id: orgId,
+            assessment_id,
+            issue_id: issue.id,
+            course_id: course.id,
+            pillar: issue.pillar,
+            status: issue.severity,
+            interpretation: issue.interpretation,
+            justification,
+            target_agent: targetAgent,
+            priority: priority,
+            cycle_number: 1,
+          });
+
+          // Also add to recommendations for backward compatibility
           recommendations.push({
             org_id: orgId,
             assessment_id,
             issue_id: issue.id,
             course_id: course.id,
-            reason: `Prescrito porque o indicador de ${issue.theme} está em nível ${severityLabel} no pilar ${pillarName} com interpretação ${interpretationLabel}.`,
+            reason: justification,
             priority: priority++,
           });
         }
       }
     }
 
-    // Insert recommendations
+    // Insert prescriptions
+    if (prescriptions.length > 0) {
+      const { error: insertPrescError } = await supabase
+        .from("prescriptions")
+        .insert(prescriptions);
+
+      if (insertPrescError) {
+        console.error("Error inserting prescriptions:", insertPrescError);
+      }
+    }
+
+    console.log(`Created ${prescriptions.length} prescriptions`);
+
+    // Insert recommendations (for backward compatibility)
     if (recommendations.length > 0) {
       const { error: insertRecsError } = await supabase
         .from("recommendations")
