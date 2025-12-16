@@ -153,10 +153,18 @@ const DiagnosticoDetalhe = () => {
             </Button>
           )}
           {isCalculated && (
-            <Button variant="outline">
-              <Download className="mr-2 h-4 w-4" />
-              Exportar CSV
-            </Button>
+            <>
+              <Button variant="outline" asChild>
+                <Link to={`/relatorios?assessment=${id}`}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Gerar Relatório
+                </Link>
+              </Button>
+              <Button variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Exportar CSV
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -455,12 +463,16 @@ const DiagnosticoDetalhe = () => {
           </h3>
           <p className="text-muted-foreground max-w-md mx-auto mb-6">
             {assessment.status === 'DRAFT'
-              ? 'Complete o preenchimento dos indicadores ou importe um arquivo CSV com os dados.'
+              ? 'Complete o preenchimento dos indicadores via formulário ou importe um arquivo CSV com os dados.'
               : 'Todos os dados foram preenchidos. Clique no botão abaixo para calcular os índices e gerar o diagnóstico.'}
           </p>
           <div className="flex gap-3 justify-center">
             {assessment.status === 'DRAFT' && (
-              <Button variant="outline">Importar CSV</Button>
+              <Button variant="outline" asChild>
+                <Link to={`/importacoes?assessment=${id}`}>
+                  Preencher Dados
+                </Link>
+              </Button>
             )}
             <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
               {calculating ? (

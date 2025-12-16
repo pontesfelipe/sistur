@@ -1,4 +1,4 @@
-import { Bell, Search, User } from 'lucide-react';
+import { Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { NotificationsDropdown } from './NotificationsDropdown';
 
 interface AppHeaderProps {
   title: string;
@@ -65,10 +66,7 @@ export function AppHeader({ title, subtitle }: AppHeaderProps) {
           </div>
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5 text-muted-foreground" />
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-severity-critical" />
-          </Button>
+          <NotificationsDropdown />
 
           {/* User menu */}
           <DropdownMenu>
@@ -96,7 +94,9 @@ export function AppHeader({ title, subtitle }: AppHeaderProps) {
                 <User className="mr-2 h-4 w-4" />
                 Meu perfil
               </DropdownMenuItem>
-              <DropdownMenuItem>Configurações</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
+                Configurações
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                 Sair
