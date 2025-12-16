@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -10,6 +11,7 @@ import { LogAnalytics } from '@/components/analytics/LogAnalytics';
 import { NormalizationCalculator } from '@/components/tools/NormalizationCalculator';
 import { CycleMonitor } from '@/components/tools/CycleMonitor';
 import { DataExporter } from '@/components/tools/DataExporter';
+import { InteractiveWorkflowDiagram } from '@/components/tools/InteractiveWorkflowDiagram';
 import { 
   Calculator, 
   BookOpen, 
@@ -85,117 +87,8 @@ export default function Configuracoes() {
               </CardContent>
             </Card>
 
-            {/* Visual Workflow Diagram */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-primary" />
-                  Fluxo do Diagnóstico SISTUR
-                </CardTitle>
-                <CardDescription>
-                  Visualização do processo completo de diagnóstico e prescrição
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Main Workflow */}
-                <div className="relative">
-                  {/* Workflow Steps */}
-                  <div className="flex flex-col md:flex-row items-stretch gap-2 md:gap-1">
-                    {[
-                      { label: "Destino", sublabel: "Seleção", color: "bg-blue-500", icon: MapPin },
-                      { label: "Dados", sublabel: "Coleta", color: "bg-indigo-500", icon: Activity },
-                      { label: "Cálculo", sublabel: "Normalização", color: "bg-purple-500", icon: Calculator },
-                      { label: "Status", sublabel: "Automático", color: "bg-orange-500", icon: AlertTriangle },
-                      { label: "Prescrição", sublabel: "Determinística", color: "bg-green-500", icon: GraduationCap },
-                    ].map((step, idx, arr) => (
-                      <div key={idx} className="flex items-center flex-1">
-                        <div className={`${step.color} text-white p-3 rounded-lg flex-1 text-center min-w-[100px]`}>
-                          <step.icon className="h-5 w-5 mx-auto mb-1" />
-                          <p className="font-semibold text-sm">{step.label}</p>
-                          <p className="text-xs opacity-80">{step.sublabel}</p>
-                        </div>
-                        {idx < arr.length - 1 && (
-                          <div className="hidden md:block text-muted-foreground px-1">→</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Calculation Detail */}
-                <div>
-                  <p className="font-semibold text-sm mb-3">Fluxo de Cálculo de Scores</p>
-                  <div className="bg-muted/30 rounded-lg p-4 space-y-3">
-                    <div className="flex flex-wrap items-center gap-2 text-sm">
-                      <Badge variant="outline">Valor Bruto</Badge>
-                      <span className="text-muted-foreground">→</span>
-                      <Badge variant="outline">Normalização (0-1)</Badge>
-                      <span className="text-muted-foreground">→</span>
-                      <Badge variant="outline">Score × Peso</Badge>
-                      <span className="text-muted-foreground">→</span>
-                      <Badge className="bg-primary">Score do Pilar</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Fórmula: Score_Pilar = Σ(Score_i × Peso_i) / Σ(Peso_i) — média ponderada dos indicadores
-                    </p>
-                  </div>
-                </div>
-
-                {/* Status Thresholds */}
-                <div>
-                  <p className="font-semibold text-sm mb-3">Limiares de Status (Não Negociáveis)</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 text-center">
-                      <p className="font-bold text-green-600">≥ 0.67</p>
-                      <p className="text-xs text-muted-foreground">Adequado</p>
-                    </div>
-                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 text-center">
-                      <p className="font-bold text-yellow-600">0.34 – 0.66</p>
-                      <p className="text-xs text-muted-foreground">Atenção</p>
-                    </div>
-                    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-center">
-                      <p className="font-bold text-red-600">≤ 0.33</p>
-                      <p className="text-xs text-muted-foreground">Crítico</p>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Prescriptions vs Reports */}
-                <div>
-                  <p className="font-semibold text-sm mb-3">Prescrições vs. Relatórios</p>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="border rounded-lg p-4 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <GraduationCap className="h-5 w-5 text-green-500" />
-                        <p className="font-semibold">Prescrições (SISTUR EDU)</p>
-                      </div>
-                      <div className="bg-muted/30 rounded p-2 text-xs font-mono">
-                        Indicador + Pilar + Status + Interpretação → Curso
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        100% determinístico, baseado em regras. Sem IA.
-                      </p>
-                    </div>
-                    <div className="border rounded-lg p-4 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-blue-500" />
-                        <p className="font-semibold">Relatórios</p>
-                      </div>
-                      <div className="bg-muted/30 rounded p-2 text-xs font-mono">
-                        Dados Diagnósticos → IA → Plano Estratégico
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        IA para análise e síntese. Não prescreve cursos.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Interactive Workflow Diagram */}
+            <InteractiveWorkflowDiagram />
 
             <Card>
               <CardHeader>
