@@ -31,7 +31,7 @@ export function useLatestAssessment() {
         .select('*, destinations(name)')
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (!assessment) return null;
 
@@ -48,6 +48,88 @@ export function useLatestAssessment() {
         .limit(3);
 
       return { assessment, pillarScores: pillarScores ?? [], issues: issues ?? [] };
+    },
+  });
+}
+
+// Aggregated pillar scores across all calculated assessments
+export function useAggregatedPillarScores() {
+  return useQuery({
+    queryKey: ['aggregated-pillar-scores'],
+    queryFn: async () => {
+      // Get all calculated assessments
+      const { data: assessments } = await supabase
+        .from('assessments')
+        .select('id, title, destinations(name)')
+        .eq('status', 'CALCULATED');
+
+      if (!assessments || assessments.length === 0) return null;
+
+      // Get all pillar scores for calculated assessments
+      const assessmentIds = assessments.map(a => a.id);
+      const { data: allPillarScores } = await supabase
+        .from('pillar_scores')
+        .select('*')
+        .in('assessment_id', assessmentIds);
+
+      if (!allPillarScores || allPillarScores.length === 0) return null;
+
+      // Aggregate by pillar - calculate average scores
+      const pillarAggregates: Record<string, { scores: number[], severities: string[] }> = {};
+      
+      allPillarScores.forEach(ps => {
+        if (!pillarAggregates[ps.pillar]) {
+          pillarAggregates[ps.pillar] = { scores: [], severities: [] };
+        }
+        pillarAggregates[ps.pillar].scores.push(ps.score);
+        pillarAggregates[ps.pillar].severities.push(ps.severity);
+      });
+
+      const aggregatedScores = Object.entries(pillarAggregates).map(([pillar, data]) => {
+        const avgScore = data.scores.reduce((a, b) => a + b, 0) / data.scores.length;
+        // Determine severity based on average score
+        let severity: 'CRITICO' | 'MODERADO' | 'BOM' = 'BOM';
+        if (avgScore <= 0.33) severity = 'CRITICO';
+        else if (avgScore <= 0.66) severity = 'MODERADO';
+        
+        return {
+          id: pillar,
+          pillar: pillar as 'RA' | 'OE' | 'AO',
+          score: avgScore,
+          severity,
+          count: data.scores.length,
+        };
+      });
+
+      return {
+        pillarScores: aggregatedScores,
+        totalAssessments: assessments.length,
+        assessments: assessments.map(a => ({
+          id: a.id,
+          title: a.title,
+          destination: (a.destinations as any)?.name
+        }))
+      };
+    },
+  });
+}
+
+// Aggregated issues across all assessments
+export function useAggregatedIssues() {
+  return useQuery({
+    queryKey: ['aggregated-issues'],
+    queryFn: async () => {
+      const { data: issues } = await supabase
+        .from('issues')
+        .select(`
+          *,
+          assessments!inner(title, status, destinations(name))
+        `)
+        .eq('assessments.status', 'CALCULATED')
+        .order('severity', { ascending: true })
+        .limit(5);
+
+      return issues ?? [];
     },
   });
 }
