@@ -73,11 +73,20 @@ export function useTopRecommendations() {
     queryFn: async () => {
       const { data } = await supabase
         .from('recommendations')
-        .select('*, issues(title, pillar), courses(title, level)')
+        .select(`
+          *,
+          issues (id, title, pillar, severity, interpretation, evidence),
+          courses (id, title, description, level, duration_minutes, url, tags)
+        `)
         .order('priority', { ascending: true })
         .limit(2);
 
-      return data ?? [];
+      // Transform to match the expected shape
+      return (data ?? []).map(rec => ({
+        ...rec,
+        issue: rec.issues,
+        course: rec.courses,
+      }));
     },
   });
 }
