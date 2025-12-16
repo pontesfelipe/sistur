@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
 import { IssueCard } from '@/components/dashboard/IssueCard';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   ArrowLeft,
   Download,
@@ -16,23 +17,59 @@ import {
   BarChart3,
   AlertTriangle,
   GraduationCap,
-  FileText,
-  TrendingUp,
-  TrendingDown,
+  Loader2,
 } from 'lucide-react';
+import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import {
-  mockAssessments,
-  mockPillarScores,
-  mockIssues,
-  mockRecommendations,
-  mockIndicators,
-  mockIndicatorScores,
-} from '@/data/mockData';
+  useAssessment,
+  usePillarScores,
+  useIndicatorScores,
+  useIssues,
+  useRecommendations,
+} from '@/hooks/useAssessmentData';
 import { cn } from '@/lib/utils';
+import type { Pillar, Severity } from '@/types/sistur';
+import { PILLAR_INFO, SEVERITY_INFO } from '@/types/sistur';
 
 const DiagnosticoDetalhe = () => {
   const { id } = useParams();
-  const assessment = mockAssessments.find((a) => a.id === id);
+  const navigate = useNavigate();
+  const { calculate, loading: calculating } = useCalculateAssessment();
+
+  // Fetch data
+  const { data: assessment, isLoading: loadingAssessment, refetch: refetchAssessment } = useAssessment(id);
+  const { data: pillarScores = [], refetch: refetchPillarScores } = usePillarScores(id);
+  const { data: indicatorScores = [], refetch: refetchIndicatorScores } = useIndicatorScores(id);
+  const { data: issues = [], refetch: refetchIssues } = useIssues(id);
+  const { data: recommendations = [], refetch: refetchRecommendations } = useRecommendations(id);
+
+  const handleCalculate = async () => {
+    if (!id) return;
+    const result = await calculate(id);
+    if (result) {
+      // Refetch all data after calculation
+      refetchAssessment();
+      refetchPillarScores();
+      refetchIndicatorScores();
+      refetchIssues();
+      refetchRecommendations();
+    }
+  };
+
+  if (loadingAssessment) {
+    return (
+      <AppLayout title="Carregando...">
+        <div className="space-y-6">
+          <Skeleton className="h-32 w-full" />
+          <div className="grid grid-cols-3 gap-6">
+            <Skeleton className="h-48" />
+            <Skeleton className="h-48" />
+            <Skeleton className="h-48" />
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   if (!assessment) {
     return (
@@ -50,22 +87,15 @@ const DiagnosticoDetalhe = () => {
   }
 
   const isCalculated = assessment.status === 'CALCULATED';
-  const pillarScores = mockPillarScores;
-  const issues = mockIssues;
-  const recommendations = mockRecommendations;
 
   // Find critical pillar
-  const criticalPillar = pillarScores.reduce((prev, current) =>
-    prev.score < current.score ? prev : current
-  );
+  const criticalPillar = pillarScores.length > 0
+    ? pillarScores.reduce((prev, current) =>
+        current.score < prev.score ? current : prev
+      )
+    : null;
 
-  // Get indicator scores with indicator data
-  const indicatorScoresWithData = mockIndicatorScores.map((score) => ({
-    ...score,
-    indicator: mockIndicators.find((ind) => ind.id === score.indicator_id),
-  }));
-
-  const formatDate = (dateString?: string) => {
+  const formatDate = (dateString?: string | null) => {
     if (!dateString) return '—';
     return new Date(dateString).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -86,10 +116,13 @@ const DiagnosticoDetalhe = () => {
     CALCULATED: 'Calculado',
   };
 
+  // Type-safe destination access
+  const destination = assessment.destination as { name?: string; uf?: string } | null;
+
   return (
     <AppLayout
       title={assessment.title}
-      subtitle={`${assessment.destination?.name}, ${assessment.destination?.uf}`}
+      subtitle={destination ? `${destination.name}, ${destination.uf}` : undefined}
     >
       {/* Back button and actions */}
       <div className="flex items-center justify-between mb-6">
@@ -101,9 +134,18 @@ const DiagnosticoDetalhe = () => {
         </Button>
         <div className="flex gap-2">
           {!isCalculated && (
-            <Button>
-              <Calculator className="mr-2 h-4 w-4" />
-              Calcular Índices
+            <Button onClick={handleCalculate} disabled={calculating}>
+              {calculating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Calculando...
+                </>
+              ) : (
+                <>
+                  <Calculator className="mr-2 h-4 w-4" />
+                  Calcular Índices
+                </>
+              )}
             </Button>
           )}
           {isCalculated && (
@@ -120,8 +162,8 @@ const DiagnosticoDetalhe = () => {
         <div className="flex flex-wrap gap-6 items-start justify-between">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <Badge variant={statusVariants[assessment.status]}>
-                {statusLabels[assessment.status]}
+              <Badge variant={statusVariants[assessment.status as keyof typeof statusVariants]}>
+                {statusLabels[assessment.status as keyof typeof statusLabels]}
               </Badge>
               <span className="text-sm text-muted-foreground">
                 Versão do algoritmo: {assessment.algo_version}
@@ -129,12 +171,14 @@ const DiagnosticoDetalhe = () => {
             </div>
 
             <div className="flex flex-wrap gap-6">
-              <div className="flex items-center gap-2 text-sm">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span>
-                  {assessment.destination?.name}, {assessment.destination?.uf}
-                </span>
-              </div>
+              {destination && (
+                <div className="flex items-center gap-2 text-sm">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span>
+                    {destination.name}, {destination.uf}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span>
@@ -154,7 +198,7 @@ const DiagnosticoDetalhe = () => {
         </div>
       </div>
 
-      {isCalculated ? (
+      {isCalculated && pillarScores.length > 0 ? (
         <Tabs defaultValue="radiografia" className="space-y-6">
           <TabsList className="grid w-full max-w-lg grid-cols-4">
             <TabsTrigger value="radiografia" className="gap-2">
@@ -162,7 +206,7 @@ const DiagnosticoDetalhe = () => {
               <span className="hidden sm:inline">Radiografia</span>
             </TabsTrigger>
             <TabsTrigger value="indicadores" className="gap-2">
-              <TrendingUp className="h-4 w-4" />
+              <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Indicadores</span>
             </TabsTrigger>
             <TabsTrigger value="gargalos" className="gap-2">
@@ -181,10 +225,10 @@ const DiagnosticoDetalhe = () => {
               {pillarScores.map((ps) => (
                 <PillarGauge
                   key={ps.id}
-                  pillar={ps.pillar}
+                  pillar={ps.pillar as Pillar}
                   score={ps.score}
-                  severity={ps.severity}
-                  isCritical={ps.pillar === criticalPillar.pillar}
+                  severity={ps.severity as Severity}
+                  isCritical={criticalPillar && ps.pillar === criticalPillar.pillar}
                 />
               ))}
             </div>
@@ -196,17 +240,17 @@ const DiagnosticoDetalhe = () => {
               </h3>
               <div className="prose prose-sm max-w-none text-muted-foreground">
                 <p>
-                  O destino <strong>{assessment.destination?.name}</strong>{' '}
+                  O destino <strong>{destination?.name}</strong>{' '}
                   apresenta como <strong>ponto crítico</strong> o pilar{' '}
                   <strong className="text-severity-critical">
-                    {criticalPillar.pillar === 'RA'
+                    {criticalPillar?.pillar === 'RA'
                       ? 'Relações Ambientais (IRA)'
-                      : criticalPillar.pillar === 'OE'
+                      : criticalPillar?.pillar === 'OE'
                       ? 'Organização Estrutural (IOE)'
                       : 'Ações Operacionais (IAO)'}
                   </strong>{' '}
                   com score de{' '}
-                  <strong>{Math.round(criticalPillar.score * 100)}%</strong>.
+                  <strong>{Math.round((criticalPillar?.score || 0) * 100)}%</strong>.
                 </p>
                 <p>
                   Foram identificados <strong>{issues.length} gargalos</strong>{' '}
@@ -229,55 +273,61 @@ const DiagnosticoDetalhe = () => {
               <h3 className="text-lg font-display font-semibold mb-4">
                 Scores por Indicador
               </h3>
-              <div className="space-y-4">
-                {indicatorScoresWithData.map((score) => (
-                  <div key={score.id} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant={
-                            score.indicator?.pillar.toLowerCase() as
-                              | 'ra'
-                              | 'oe'
-                              | 'ao'
-                          }
-                        >
-                          {score.indicator?.pillar}
-                        </Badge>
-                        <span className="font-medium text-sm">
-                          {score.indicator?.name}
-                        </span>
-                      </div>
-                      <span
-                        className={cn(
-                          'font-mono text-sm font-semibold',
-                          score.score >= 0.67
-                            ? 'text-severity-good'
-                            : score.score >= 0.34
-                            ? 'text-severity-moderate'
-                            : 'text-severity-critical'
+              {indicatorScores.length > 0 ? (
+                <div className="space-y-4">
+                  {indicatorScores.map((score) => {
+                    const indicator = score.indicator as { name?: string; pillar?: string; description?: string } | null;
+                    return (
+                      <div key={score.id} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              variant={
+                                (indicator?.pillar?.toLowerCase() || 'ra') as 'ra' | 'oe' | 'ao'
+                              }
+                            >
+                              {indicator?.pillar || '—'}
+                            </Badge>
+                            <span className="font-medium text-sm">
+                              {indicator?.name || 'Indicador'}
+                            </span>
+                          </div>
+                          <span
+                            className={cn(
+                              'font-mono text-sm font-semibold',
+                              score.score >= 0.67
+                                ? 'text-severity-good'
+                                : score.score >= 0.34
+                                ? 'text-severity-moderate'
+                                : 'text-severity-critical'
+                            )}
+                          >
+                            {Math.round(score.score * 100)}%
+                          </span>
+                        </div>
+                        <Progress
+                          value={score.score * 100}
+                          className={cn(
+                            'h-2',
+                            score.score >= 0.67
+                              ? '[&>div]:bg-severity-good'
+                              : score.score >= 0.34
+                              ? '[&>div]:bg-severity-moderate'
+                              : '[&>div]:bg-severity-critical'
+                          )}
+                        />
+                        {indicator?.description && (
+                          <p className="text-xs text-muted-foreground">
+                            {indicator.description}
+                          </p>
                         )}
-                      >
-                        {Math.round(score.score * 100)}%
-                      </span>
-                    </div>
-                    <Progress
-                      value={score.score * 100}
-                      className={cn(
-                        'h-2',
-                        score.score >= 0.67
-                          ? '[&>div]:bg-severity-good'
-                          : score.score >= 0.34
-                          ? '[&>div]:bg-severity-moderate'
-                          : '[&>div]:bg-severity-critical'
-                      )}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      {score.indicator?.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-muted-foreground">Nenhum indicador calculado.</p>
+              )}
             </div>
           </TabsContent>
 
@@ -300,11 +350,25 @@ const DiagnosticoDetalhe = () => {
               </div>
             </div>
 
-            <div className="space-y-3">
-              {issues.map((issue) => (
-                <IssueCard key={issue.id} issue={issue} />
-              ))}
-            </div>
+            {issues.length > 0 ? (
+              <div className="space-y-3">
+                {issues.map((issue) => (
+                  <IssueCard
+                    key={issue.id}
+                    issue={{
+                      ...issue,
+                      pillar: issue.pillar as Pillar,
+                      severity: issue.severity as Severity,
+                      evidence: (issue.evidence as { indicators: { name: string; score: number }[] }) || { indicators: [] },
+                    }}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                Nenhum gargalo identificado.
+              </div>
+            )}
           </TabsContent>
 
           {/* Tratamento Tab */}
@@ -326,16 +390,40 @@ const DiagnosticoDetalhe = () => {
               </div>
             </div>
 
-            <div className="space-y-4">
-              {recommendations.map((rec) => (
-                <RecommendationCard key={rec.id} recommendation={rec} />
-              ))}
-            </div>
+            {recommendations.length > 0 ? (
+              <div className="space-y-4">
+                {recommendations.map((rec) => (
+                  <RecommendationCard
+                    key={rec.id}
+                    recommendation={{
+                      ...rec,
+                      issue: rec.issue ? {
+                        ...rec.issue,
+                        pillar: (rec.issue as any).pillar as Pillar,
+                        severity: (rec.issue as any).severity as Severity,
+                        evidence: (rec.issue as any).evidence || { indicators: [] },
+                      } : undefined,
+                      course: rec.course ? {
+                        ...rec.course,
+                        level: (rec.course as any).level as 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO',
+                        tags: (rec.course as any).tags || [],
+                      } : undefined,
+                    }}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                Nenhuma recomendação gerada. Adicione cursos ao catálogo EDU.
+              </div>
+            )}
 
-            <Button className="w-full" size="lg">
-              <Download className="mr-2 h-4 w-4" />
-              Exportar Plano de Capacitação
-            </Button>
+            {recommendations.length > 0 && (
+              <Button className="w-full" size="lg">
+                <Download className="mr-2 h-4 w-4" />
+                Exportar Plano de Capacitação
+              </Button>
+            )}
           </TabsContent>
         </Tabs>
       ) : (
@@ -358,9 +446,18 @@ const DiagnosticoDetalhe = () => {
             {assessment.status === 'DRAFT' && (
               <Button variant="outline">Importar CSV</Button>
             )}
-            <Button disabled={assessment.status === 'DRAFT'}>
-              <Calculator className="mr-2 h-4 w-4" />
-              Calcular Índices
+            <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
+              {calculating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Calculando...
+                </>
+              ) : (
+                <>
+                  <Calculator className="mr-2 h-4 w-4" />
+                  Calcular Índices
+                </>
+              )}
             </Button>
           </div>
         </div>
