@@ -14,6 +14,8 @@ import {
   ChevronRight,
   LogOut,
   BookOpen,
+  HelpCircle,
+  MessageCircleQuestion,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -32,6 +34,8 @@ const navigation = [
 ];
 
 const bottomNavigation = [
+  { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
+  { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
   { name: 'Configurações', href: '/configuracoes', icon: Settings },
 ];
 
