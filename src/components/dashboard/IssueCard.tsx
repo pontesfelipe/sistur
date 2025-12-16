@@ -1,18 +1,37 @@
 import { cn } from '@/lib/utils';
-import { AlertTriangle, ChevronRight } from 'lucide-react';
-import type { Issue } from '@/types/sistur';
-import { PILLAR_INFO, SEVERITY_INFO } from '@/types/sistur';
+import { AlertTriangle, ChevronRight, Building2, Users, Truck } from 'lucide-react';
+import type { Issue, TerritorialInterpretation } from '@/types/sistur';
+import { PILLAR_INFO, SEVERITY_INFO, INTERPRETATION_INFO } from '@/types/sistur';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface IssueCardProps {
   issue: Issue;
   onViewRecommendations?: () => void;
 }
 
+const InterpretationIcon = ({ interpretation }: { interpretation: TerritorialInterpretation }) => {
+  switch (interpretation) {
+    case 'ESTRUTURAL':
+      return <Building2 className="h-3.5 w-3.5" />;
+    case 'GESTAO':
+      return <Users className="h-3.5 w-3.5" />;
+    case 'ENTREGA':
+      return <Truck className="h-3.5 w-3.5" />;
+    default:
+      return null;
+  }
+};
+
 export function IssueCard({ issue, onViewRecommendations }: IssueCardProps) {
   const pillarInfo = PILLAR_INFO[issue.pillar];
   const severityInfo = SEVERITY_INFO[issue.severity];
+  const interpretationInfo = issue.interpretation ? INTERPRETATION_INFO[issue.interpretation] : null;
 
   const pillarVariant = issue.pillar.toLowerCase() as 'ra' | 'oe' | 'ao';
   const severityVariant = issue.severity === 'CRITICO' 
@@ -53,6 +72,24 @@ export function IssueCard({ issue, onViewRecommendations }: IssueCardProps) {
             <Badge variant="outline" className="text-xs">
               {issue.theme}
             </Badge>
+            {/* Territorial Interpretation Badge */}
+            {interpretationInfo && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Badge 
+                    variant="secondary" 
+                    className={cn("text-xs gap-1", interpretationInfo.color)}
+                  >
+                    <InterpretationIcon interpretation={issue.interpretation!} />
+                    {interpretationInfo.label}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="font-medium">{interpretationInfo.label}</p>
+                  <p className="text-xs text-muted-foreground">{interpretationInfo.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
 
           <h4 className="mt-2 font-medium text-foreground">{issue.title}</h4>

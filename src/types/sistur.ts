@@ -2,6 +2,7 @@
 
 export type Pillar = 'RA' | 'OE' | 'AO';
 export type Severity = 'CRITICO' | 'MODERADO' | 'BOM';
+export type TerritorialInterpretation = 'ESTRUTURAL' | 'GESTAO' | 'ENTREGA';
 export type AssessmentStatus = 'DRAFT' | 'DATA_READY' | 'CALCULATED';
 export type UserRole = 'ADMIN' | 'ANALYST' | 'VIEWER';
 export type CourseLevel = 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO';
@@ -105,6 +106,7 @@ export interface Issue {
   pillar: Pillar;
   theme: string;
   severity: Severity;
+  interpretation?: TerritorialInterpretation;
   title: string;
   evidence: {
     indicators: { name: string; score: number }[];
@@ -159,8 +161,28 @@ export const PILLAR_INFO: Record<Pillar, { name: string; fullName: string; descr
   },
 };
 
+// Status labels (Adequado, Atenção, Crítico per spec)
 export const SEVERITY_INFO: Record<Severity, { label: string; color: string; bgColor: string }> = {
   CRITICO: { label: 'Crítico', color: 'text-severity-critical', bgColor: 'bg-severity-critical' },
-  MODERADO: { label: 'Moderado', color: 'text-severity-moderate', bgColor: 'bg-severity-moderate' },
-  BOM: { label: 'Bom', color: 'text-severity-good', bgColor: 'bg-severity-good' },
+  MODERADO: { label: 'Atenção', color: 'text-severity-moderate', bgColor: 'bg-severity-moderate' },
+  BOM: { label: 'Adequado', color: 'text-severity-good', bgColor: 'bg-severity-good' },
+};
+
+// Territorial interpretation metadata
+export const INTERPRETATION_INFO: Record<TerritorialInterpretation, { label: string; description: string; color: string }> = {
+  ESTRUTURAL: {
+    label: 'Estrutural',
+    description: 'Restrições estruturais, históricas ou socioeconômicas do território',
+    color: 'text-blue-600',
+  },
+  GESTAO: {
+    label: 'Gestão',
+    description: 'Falhas de governança, planejamento ou coordenação institucional',
+    color: 'text-orange-600',
+  },
+  ENTREGA: {
+    label: 'Entrega',
+    description: 'Falhas na execução ou prestação de serviços ao turista',
+    color: 'text-purple-600',
+  },
 };

@@ -31,6 +31,55 @@ interface Course {
   tags: { pillar: string; theme: string }[];
 }
 
+type TerritorialInterpretation = "ESTRUTURAL" | "GESTAO" | "ENTREGA";
+
+// Rules for determining territorial interpretation based on pillar and theme
+function determineInterpretation(
+  pillar: "RA" | "OE" | "AO",
+  theme: string,
+  avgScore: number
+): TerritorialInterpretation {
+  const themeLower = theme.toLowerCase();
+  
+  // RA pillar - typically structural issues (historical, socioeconomic constraints)
+  if (pillar === "RA") {
+    if (themeLower.includes("social") || themeLower.includes("economico") || themeLower.includes("gini")) {
+      return "ESTRUTURAL";
+    }
+    if (themeLower.includes("ambiental") || themeLower.includes("cultural")) {
+      return avgScore < 0.33 ? "ESTRUTURAL" : "GESTAO";
+    }
+    return "ESTRUTURAL";
+  }
+  
+  // OE pillar - typically governance/planning issues
+  if (pillar === "OE") {
+    if (themeLower.includes("infraestrutura") || themeLower.includes("superestrutura")) {
+      return avgScore < 0.33 ? "ESTRUTURAL" : "GESTAO";
+    }
+    if (themeLower.includes("governanca") || themeLower.includes("institucional")) {
+      return "GESTAO";
+    }
+    return "GESTAO";
+  }
+  
+  // AO pillar - typically execution/delivery issues
+  if (pillar === "AO") {
+    if (themeLower.includes("oferta") || themeLower.includes("demanda")) {
+      return avgScore < 0.33 ? "GESTAO" : "ENTREGA";
+    }
+    if (themeLower.includes("marketing") || themeLower.includes("promocao")) {
+      return "ENTREGA";
+    }
+    if (themeLower.includes("desempenho") || themeLower.includes("mercado")) {
+      return "ENTREGA";
+    }
+    return "ENTREGA";
+  }
+  
+  return "GESTAO"; // Default fallback
+}
+
 // Normalize a value to 0-1 scale
 function normalizeValue(
   value: number | null,
@@ -70,7 +119,8 @@ function normalizeValue(
   return score;
 }
 
-// Determine severity based on score
+// Determine severity based on score (per SISTUR spec)
+// Adequado: ≥0.67, Atenção: 0.34-0.66, Crítico: ≤0.33
 function getSeverity(score: number): "CRITICO" | "MODERADO" | "BOM" {
   if (score <= 0.33) return "CRITICO";
   if (score <= 0.66) return "MODERADO";
@@ -167,7 +217,7 @@ serve(async (req) => {
       weight_used: number;
     }> = [];
 
-    const pillarData: Record<string, { scores: number[]; weights: number[]; themes: Map<string, { scores: number[]; names: string[] }> }> = {
+    const pillarData: Record<string, { scores: number[]; weights: number[]; themes: Map<string, { scores: number[]; names: string[]; codes: string[] }> }> = {
       RA: { scores: [], weights: [], themes: new Map() },
       OE: { scores: [], weights: [], themes: new Map() },
       AO: { scores: [], weights: [], themes: new Map() },
@@ -204,10 +254,11 @@ serve(async (req) => {
         // Aggregate by theme within pillar
         const theme = indicator.theme;
         if (!pillarData[pillar].themes.has(theme)) {
-          pillarData[pillar].themes.set(theme, { scores: [], names: [] });
+          pillarData[pillar].themes.set(theme, { scores: [], names: [], codes: [] });
         }
         pillarData[pillar].themes.get(theme)!.scores.push(score);
         pillarData[pillar].themes.get(theme)!.names.push(indicator.name);
+        pillarData[pillar].themes.get(theme)!.codes.push(indicator.code);
       }
     }
 
@@ -278,13 +329,14 @@ serve(async (req) => {
 
     console.log(`Critical pillar: ${criticalPillar?.pillar} with score ${criticalPillar?.score}`);
 
-    // 8. Detect issues (low-scoring themes)
+    // 8. Detect issues (low-scoring themes) with territorial interpretation
     const issues: Array<{
       org_id: string;
       assessment_id: string;
       pillar: string;
       theme: string;
       severity: string;
+      interpretation: TerritorialInterpretation;
       title: string;
       evidence: object;
     }> = [];
@@ -293,11 +345,18 @@ serve(async (req) => {
       for (const [theme, themeData] of data.themes) {
         const avgThemeScore = themeData.scores.reduce((a, b) => a + b, 0) / themeData.scores.length;
         
-        // Create issue if theme score is below 0.5
-        if (avgThemeScore < 0.5) {
+        // Create issue if theme score is below 0.67 (not Adequado)
+        if (avgThemeScore < 0.67) {
           const severity = getSeverity(avgThemeScore);
+          const interpretation = determineInterpretation(
+            pillar as "RA" | "OE" | "AO",
+            theme,
+            avgThemeScore
+          );
+          
           const indicators = themeData.names.map((name, i) => ({
             name,
+            code: themeData.codes[i],
             score: themeData.scores[i],
           }));
 
@@ -307,7 +366,8 @@ serve(async (req) => {
             pillar,
             theme,
             severity,
-            title: generateIssueTitle(pillar as "RA" | "OE" | "AO", theme, avgThemeScore),
+            interpretation,
+            title: generateIssueTitle(pillar as "RA" | "OE" | "AO", theme, avgThemeScore, interpretation),
             evidence: { indicators, avgScore: avgThemeScore },
           });
         }
@@ -341,7 +401,7 @@ serve(async (req) => {
       console.error("Error fetching courses:", coursesError);
     }
 
-    // 10. Generate recommendations based on issues
+    // 10. Generate recommendations based on issues with explicit justification
     const recommendations: Array<{
       org_id: string;
       assessment_id: string;
@@ -354,7 +414,13 @@ serve(async (req) => {
     if (courses && courses.length > 0 && insertedIssues.length > 0) {
       let priority = 1;
       
-      for (const issue of insertedIssues) {
+      // Sort issues by severity (CRITICO first)
+      const sortedIssues = [...insertedIssues].sort((a, b) => {
+        const severityOrder: Record<string, number> = { CRITICO: 1, MODERADO: 2, BOM: 3 };
+        return (severityOrder[a.severity] || 99) - (severityOrder[b.severity] || 99);
+      });
+      
+      for (const issue of sortedIssues) {
         // Find matching courses by pillar and theme
         const matchingCourses = (courses as Course[]).filter(course => 
           course.tags.some(tag => 
@@ -363,20 +429,37 @@ serve(async (req) => {
           )
         );
 
-        // Sort by level (BASICO first)
+        // Sort by level (BASICO first for critical issues)
         matchingCourses.sort((a, b) => {
           const levelOrder: Record<string, number> = { BASICO: 1, INTERMEDIARIO: 2, AVANCADO: 3 };
           return (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99);
         });
 
-        // Add top 2 matching courses as recommendations
+        // Get interpretation label for reason
+        const interpretationLabels: Record<string, string> = {
+          ESTRUTURAL: "Estrutural",
+          GESTAO: "Gestão",
+          ENTREGA: "Entrega"
+        };
+        const interpretationLabel = interpretationLabels[issue.interpretation] || issue.interpretation;
+        
+        const pillarNames: Record<string, string> = {
+          RA: "Relações Ambientais",
+          OE: "Organização Estrutural",
+          AO: "Ações Operacionais"
+        };
+        const pillarName = pillarNames[issue.pillar] || issue.pillar;
+
+        // Add top 2 matching courses as recommendations with detailed justification
         for (const course of matchingCourses.slice(0, 2)) {
+          const severityLabel = issue.severity === "CRITICO" ? "Crítico" : "Atenção";
+          
           recommendations.push({
             org_id: orgId,
             assessment_id,
             issue_id: issue.id,
             course_id: course.id,
-            reason: `Recomendado para resolver: ${issue.title}`,
+            reason: `Prescrito porque o indicador de ${issue.theme} está em nível ${severityLabel} no pilar ${pillarName} com interpretação ${interpretationLabel}.`,
             priority: priority++,
           });
         }
@@ -446,9 +529,14 @@ serve(async (req) => {
   }
 });
 
-// Generate a descriptive issue title
-function generateIssueTitle(pillar: "RA" | "OE" | "AO", theme: string, score: number): string {
-  const severity = score <= 0.33 ? "crítico" : "moderado";
+// Generate a descriptive issue title including interpretation
+function generateIssueTitle(
+  pillar: "RA" | "OE" | "AO", 
+  theme: string, 
+  score: number,
+  interpretation: TerritorialInterpretation
+): string {
+  const severityLabel = score <= 0.33 ? "Crítico" : "Atenção";
   
   const themeDescriptions: Record<string, string> = {
     ambiental: "Sustentabilidade ambiental",
@@ -469,5 +557,11 @@ function generateIssueTitle(pillar: "RA" | "OE" | "AO", theme: string, score: nu
     AO: "Ações Operacionais",
   };
 
-  return `${themeDesc} em nível ${severity} (${pillarNames[pillar]})`;
+  const interpretationLabels: Record<string, string> = {
+    ESTRUTURAL: "Estrutural",
+    GESTAO: "Gestão",
+    ENTREGA: "Entrega"
+  };
+
+  return `${themeDesc} em nível ${severityLabel} (${pillarNames[pillar]}) — Interpretação: ${interpretationLabels[interpretation]}`;
 }

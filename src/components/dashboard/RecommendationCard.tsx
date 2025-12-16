@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
-import { GraduationCap, Clock, ExternalLink, ArrowRight, AlertTriangle, Target } from 'lucide-react';
-import type { Recommendation } from '@/types/sistur';
+import { GraduationCap, Clock, ExternalLink, AlertTriangle, Target, Building2, Users, Truck } from 'lucide-react';
+import type { Recommendation, TerritorialInterpretation } from '@/types/sistur';
+import { SEVERITY_INFO, INTERPRETATION_INFO } from '@/types/sistur';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +13,19 @@ import {
 interface RecommendationCardProps {
   recommendation: Recommendation;
 }
+
+const InterpretationIcon = ({ interpretation }: { interpretation: TerritorialInterpretation }) => {
+  switch (interpretation) {
+    case 'ESTRUTURAL':
+      return <Building2 className="h-3 w-3" />;
+    case 'GESTAO':
+      return <Users className="h-3 w-3" />;
+    case 'ENTREGA':
+      return <Truck className="h-3 w-3" />;
+    default:
+      return null;
+  }
+};
 
 export function RecommendationCard({ recommendation }: RecommendationCardProps) {
   const course = recommendation.course;
@@ -35,6 +49,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
     INTERMEDIARIO: 'bg-severity-moderate/10 text-severity-moderate border-severity-moderate/20',
     AVANCADO: 'bg-severity-critical/10 text-severity-critical border-severity-critical/20',
   };
+
+  const interpretationInfo = issue?.interpretation ? INTERPRETATION_INFO[issue.interpretation as TerritorialInterpretation] : null;
 
   return (
     <div className="p-4 rounded-lg border bg-card hover:shadow-md transition-all duration-200">
@@ -71,7 +87,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             </p>
           )}
 
-          {/* SISTUR EDU Evidence Trail - Required by Add-on */}
+          {/* SISTUR EDU Evidence Trail - Prescription Justification */}
           <div className="mt-3 rounded-lg border bg-muted/30 p-3 space-y-2">
             <div className="flex items-center gap-2 text-xs font-medium text-foreground">
               <Target className="h-3.5 w-3.5 text-primary" />
@@ -82,12 +98,12 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               {recommendation.reason}
             </p>
 
-            {/* Issue Link */}
+            {/* Issue Link with Interpretation */}
             {issue && (
               <div className="pt-2 border-t border-border/50">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5">
                   <AlertTriangle className="h-3 w-3" />
-                  <span>Gargalo:</span>
+                  <span>Gargalo diagnosticado:</span>
                 </div>
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <Badge 
@@ -98,15 +114,33 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                   </Badge>
                   <Badge 
                     variant={
-                      issue.severity === 'CRITICO' ? 'destructive' : 
-                      issue.severity === 'MODERADO' ? 'moderate' : 'secondary'
+                      issue.severity === 'CRITICO' ? 'critical' : 
+                      issue.severity === 'MODERADO' ? 'moderate' : 'good'
                     }
                     className="text-xs h-5"
                   >
-                    {issue.severity}
+                    {SEVERITY_INFO[issue.severity as keyof typeof SEVERITY_INFO]?.label || issue.severity}
                   </Badge>
-                  <span className="text-xs font-medium truncate">{issue.title}</span>
+                  {/* Territorial Interpretation Badge */}
+                  {interpretationInfo && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Badge 
+                          variant="secondary" 
+                          className={cn("text-xs h-5 gap-1", interpretationInfo.color)}
+                        >
+                          <InterpretationIcon interpretation={issue.interpretation as TerritorialInterpretation} />
+                          {interpretationInfo.label}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p className="font-medium">{interpretationInfo.label}</p>
+                        <p className="text-xs text-muted-foreground">{interpretationInfo.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                 </div>
+                <p className="mt-1.5 text-xs font-medium truncate">{issue.title}</p>
 
                 {/* Evidence Indicators */}
                 {issue.evidence?.indicators && issue.evidence.indicators.length > 0 && (
