@@ -14,6 +14,70 @@ export type Database = {
   }
   public: {
     Tables: {
+      alerts: {
+        Row: {
+          alert_type: string
+          assessment_id: string | null
+          consecutive_cycles: number
+          created_at: string
+          destination_id: string
+          id: string
+          is_dismissed: boolean
+          is_read: boolean
+          message: string
+          org_id: string
+          pillar: Database["public"]["Enums"]["pillar_type"]
+        }
+        Insert: {
+          alert_type?: string
+          assessment_id?: string | null
+          consecutive_cycles?: number
+          created_at?: string
+          destination_id: string
+          id?: string
+          is_dismissed?: boolean
+          is_read?: boolean
+          message: string
+          org_id: string
+          pillar: Database["public"]["Enums"]["pillar_type"]
+        }
+        Update: {
+          alert_type?: string
+          assessment_id?: string | null
+          consecutive_cycles?: number
+          created_at?: string
+          destination_id?: string
+          id?: string
+          is_dismissed?: boolean
+          is_read?: boolean
+          message?: string
+          org_id?: string
+          pillar?: Database["public"]["Enums"]["pillar_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assessments: {
         Row: {
           algo_version: string

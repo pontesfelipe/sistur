@@ -564,7 +564,121 @@ serve(async (req) => {
       console.error("Error updating assessment:", updateError);
     }
 
-    // 12. Create audit event
+    // 12. Detect regression patterns and create alerts
+    const destinationId = assessment.destination_id;
+    console.log(`Checking regression patterns for destination: ${destinationId}`);
+
+    // Get all previous calculated assessments for this destination
+    const { data: previousAssessments } = await supabase
+      .from("assessments")
+      .select("id, calculated_at")
+      .eq("destination_id", destinationId)
+      .eq("status", "CALCULATED")
+      .neq("id", assessment_id)
+      .order("calculated_at", { ascending: false });
+
+    if (previousAssessments && previousAssessments.length > 0) {
+      // Get pillar scores for previous assessments
+      const prevAssessmentIds = previousAssessments.map(a => a.id);
+      const { data: previousPillarScores } = await supabase
+        .from("pillar_scores")
+        .select("assessment_id, pillar, score")
+        .in("assessment_id", prevAssessmentIds);
+
+      if (previousPillarScores && previousPillarScores.length > 0) {
+        // Group by assessment in chronological order
+        const scoresByAssessment = new Map<string, Map<string, number>>();
+        previousPillarScores.forEach(ps => {
+          if (!scoresByAssessment.has(ps.assessment_id)) {
+            scoresByAssessment.set(ps.assessment_id, new Map());
+          }
+          scoresByAssessment.get(ps.assessment_id)!.set(ps.pillar, ps.score);
+        });
+
+        // Current scores
+        const currentScores = new Map<string, number>();
+        pillarScores.forEach(ps => currentScores.set(ps.pillar, ps.score));
+
+        // Check each pillar for consecutive regressions
+        for (const pillar of ["RA", "OE", "AO"]) {
+          const currentScore = currentScores.get(pillar);
+          if (currentScore === undefined) continue;
+
+          let consecutiveRegressions = 0;
+          let lastScore = currentScore;
+
+          // Go through previous assessments in order (newest first)
+          for (const prevAssessment of previousAssessments) {
+            const prevScoreMap = scoresByAssessment.get(prevAssessment.id);
+            if (!prevScoreMap) continue;
+
+            const prevScore = prevScoreMap.get(pillar);
+            if (prevScore === undefined) continue;
+
+            // Check if there was regression (current score < previous score by more than 2%)
+            if (lastScore < prevScore - 0.02) {
+              consecutiveRegressions++;
+              lastScore = prevScore;
+            } else {
+              break; // No regression in this cycle, stop counting
+            }
+          }
+
+          // Create alert if 2+ consecutive regressions
+          if (consecutiveRegressions >= 2) {
+            const pillarNames: Record<string, string> = {
+              RA: "Relações Ambientais",
+              OE: "Organização Estrutural",
+              AO: "Ações Operacionais"
+            };
+
+            const alertMessage = `O pilar ${pillarNames[pillar]} (${pillar}) apresentou regressão em ${consecutiveRegressions} ciclos consecutivos. Ação corretiva urgente é recomendada.`;
+
+            // Check if similar alert already exists (not dismissed)
+            const { data: existingAlert } = await supabase
+              .from("alerts")
+              .select("id")
+              .eq("destination_id", destinationId)
+              .eq("pillar", pillar)
+              .eq("alert_type", "REGRESSION")
+              .eq("is_dismissed", false)
+              .maybeSingle();
+
+            if (!existingAlert) {
+              const { error: alertError } = await supabase
+                .from("alerts")
+                .insert({
+                  org_id: orgId,
+                  destination_id: destinationId,
+                  pillar,
+                  alert_type: "REGRESSION",
+                  consecutive_cycles: consecutiveRegressions,
+                  message: alertMessage,
+                  assessment_id: assessment_id,
+                });
+
+              if (alertError) {
+                console.error("Error creating regression alert:", alertError);
+              } else {
+                console.log(`Created regression alert for pillar ${pillar} (${consecutiveRegressions} cycles)`);
+              }
+            } else {
+              // Update existing alert with new cycle count
+              await supabase
+                .from("alerts")
+                .update({ 
+                  consecutive_cycles: consecutiveRegressions,
+                  assessment_id: assessment_id,
+                  is_read: false,
+                })
+                .eq("id", existingAlert.id);
+            }
+          }
+        }
+      }
+    }
+
+    // 13. Create audit event
     await supabase.from("audit_events").insert({
       org_id: orgId,
       event_type: "ASSESSMENT_CALCULATED",
