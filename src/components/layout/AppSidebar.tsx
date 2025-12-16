@@ -28,7 +28,7 @@ const navigation = [
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList },
   { name: 'Indicadores', href: '/indicadores', icon: BarChart3 },
   { name: 'Importações', href: '/importacoes', icon: Upload },
-  { name: 'SISTUR EDU', href: '/cursos', icon: GraduationCap },
+  { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap },
   { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen },
   { name: 'Relatórios', href: '/relatorios', icon: FileText },
 ];
