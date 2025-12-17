@@ -180,9 +180,9 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
   }, [watchedName, watchedUf, selectedIBGE, searchIBGE]);
 
   const handleSelectIBGE = async (result: IBGEResult) => {
-    form.setValue('name', result.name);
-    form.setValue('uf', result.uf);
-    form.setValue('ibge_code', result.ibge_code);
+    form.setValue('name', result.name, { shouldValidate: true });
+    form.setValue('uf', result.uf, { shouldValidate: true });
+    form.setValue('ibge_code', result.ibge_code, { shouldValidate: true });
     setSelectedIBGE(result);
     setShowResults(false);
     setSearchError(null);
@@ -198,8 +198,8 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
       if (data?.results?.[0]) {
         const coordResult = data.results[0];
         if (coordResult.latitude && coordResult.longitude) {
-          form.setValue('latitude', coordResult.latitude.toFixed(6));
-          form.setValue('longitude', coordResult.longitude.toFixed(6));
+          form.setValue('latitude', coordResult.latitude.toFixed(6), { shouldValidate: true });
+          form.setValue('longitude', coordResult.longitude.toFixed(6), { shouldValidate: true });
         }
       }
     } catch (err) {
@@ -210,10 +210,10 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
   };
 
   const handleNameChange = (value: string) => {
-    form.setValue('name', value);
+    form.setValue('name', value, { shouldValidate: true });
     if (selectedIBGE && value !== selectedIBGE.name) {
       setSelectedIBGE(null);
-      form.setValue('ibge_code', '');
+      form.setValue('ibge_code', '', { shouldValidate: true });
     }
   };
 
@@ -321,7 +321,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
                       field.onChange(value);
                       if (selectedIBGE) {
                         setSelectedIBGE(null);
-                        form.setValue('ibge_code', '');
+                        form.setValue('ibge_code', '', { shouldValidate: true });
                       }
                     }} 
                     value={field.value}
