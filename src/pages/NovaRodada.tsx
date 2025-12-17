@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDestinations } from '@/hooks/useDestinations';
 import { useAssessments } from '@/hooks/useAssessments';
 import { toast } from '@/hooks/use-toast';
+import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 
 interface WorkflowStep {
   id: number;
@@ -67,7 +68,7 @@ export default function NovaRodada() {
   const [currentStep, setCurrentStep] = useState(1);
   const [destinationMode, setDestinationMode] = useState<'select' | 'create'>('select');
   const [selectedDestination, setSelectedDestination] = useState<string>('');
-  const [newDestination, setNewDestination] = useState({ name: '', uf: '' });
+  const [isDestinationFormOpen, setIsDestinationFormOpen] = useState(false);
   const [assessmentTitle, setAssessmentTitle] = useState('');
   const [periodStart, setPeriodStart] = useState('');
   const [periodEnd, setPeriodEnd] = useState('');
@@ -90,27 +91,9 @@ export default function NovaRodada() {
   const handleNextStep = async () => {
     if (currentStep === 1) {
       // Validate destination
-      if (destinationMode === 'select' && !selectedDestination) {
+      if (!selectedDestination) {
         toast({ title: 'Selecione um destino', variant: 'destructive' });
         return;
-      }
-      if (destinationMode === 'create') {
-        if (!newDestination.name) {
-          toast({ title: 'Informe o nome do destino', variant: 'destructive' });
-          return;
-        }
-        // Create new destination
-        try {
-          const result = await createDestination.mutateAsync({
-            name: newDestination.name,
-            uf: newDestination.uf || '',
-          });
-          setSelectedDestination(result.id);
-          toast({ title: 'Destino criado com sucesso!' });
-        } catch (error) {
-          toast({ title: 'Erro ao criar destino', variant: 'destructive' });
-          return;
-        }
       }
       setCurrentStep(2);
     } else if (currentStep === 2) {
@@ -151,10 +134,16 @@ export default function NovaRodada() {
     }
   };
 
+  const handleCreateDestination = async (data: { name: string; uf: string; ibge_code?: string | null; latitude?: number | null; longitude?: number | null }) => {
+    const result = await createDestination.mutateAsync(data);
+    setSelectedDestination(result.id);
+    setDestinationMode('select');
+    toast({ title: 'Destino criado com sucesso!' });
+  };
+
   const canProceed = () => {
     if (currentStep === 1) {
-      if (destinationMode === 'select') return !!selectedDestination;
-      return !!newDestination.name;
+      return !!selectedDestination;
     }
     if (currentStep === 2) return !!assessmentTitle && !!selectedDestination;
     return true;
@@ -252,7 +241,10 @@ export default function NovaRodada() {
                 </Button>
                 <Button
                   variant={destinationMode === 'create' ? 'default' : 'outline'}
-                  onClick={() => setDestinationMode('create')}
+                  onClick={() => {
+                    setDestinationMode('create');
+                    setIsDestinationFormOpen(true);
+                  }}
                   className="flex-1"
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -278,23 +270,32 @@ export default function NovaRodada() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Nome do destino *</Label>
-                    <Input
-                      placeholder="Ex: Bonito"
-                      value={newDestination.name}
-                      onChange={(e) => setNewDestination({ ...newDestination, name: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>UF (opcional)</Label>
-                    <Input
-                      placeholder="Ex: MS"
-                      maxLength={2}
-                      value={newDestination.uf}
-                      onChange={(e) => setNewDestination({ ...newDestination, uf: e.target.value.toUpperCase() })}
-                    />
-                  </div>
+                  {selectedDestination ? (
+                    <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
+                      <p className="text-sm text-green-700 dark:text-green-300 flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <strong>Destino criado:</strong>{' '}
+                        {destinations.find(d => d.id === selectedDestination)?.name}
+                      </p>
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto text-green-700 dark:text-green-300"
+                        onClick={() => setIsDestinationFormOpen(true)}
+                      >
+                        Criar outro destino
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-muted/50 rounded-lg text-center">
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Clique no botão abaixo para criar um novo destino com busca automática no IBGE.
+                      </p>
+                      <Button onClick={() => setIsDestinationFormOpen(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Criar Destino
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </>
@@ -420,6 +421,13 @@ export default function NovaRodada() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Destination Form Dialog */}
+      <DestinationFormDialog
+        open={isDestinationFormOpen}
+        onOpenChange={setIsDestinationFormOpen}
+        onSubmit={handleCreateDestination}
+      />
     </AppLayout>
   );
 }
