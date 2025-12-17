@@ -27,15 +27,17 @@ export function useDestinations() {
       longitude?: number | null;
     }) => {
       // Get the user's org_id
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
       if (!user) throw new Error('Usuário não autenticado');
 
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('org_id')
         .eq('user_id', user.id)
         .single();
 
+      if (profileError) throw profileError;
       if (!profile) throw new Error('Perfil não encontrado');
 
       const { data, error } = await supabase
