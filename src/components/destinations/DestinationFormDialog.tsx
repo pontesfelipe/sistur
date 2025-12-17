@@ -246,7 +246,21 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
       onOpenChange(false);
     } catch (error) {
       console.error('Error submitting destination:', error);
-      toast.error('Não foi possível salvar o destino.');
+
+      if (error instanceof z.ZodError) {
+        toast.error('Revise os campos obrigatórios para salvar o destino.');
+        return;
+      }
+
+      const message =
+        typeof error === 'object' &&
+        error !== null &&
+        'message' in error &&
+        typeof (error as { message?: unknown }).message === 'string'
+          ? (error as { message: string }).message
+          : 'Não foi possível salvar o destino.';
+
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -334,9 +348,13 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
                       field.onChange(value);
                       if (selectedIBGE) {
                         setSelectedIBGE(null);
-                        form.setValue('ibge_code', '', { shouldValidate: true });
+                        form.setValue('ibge_code', '', {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                          shouldTouch: true,
+                        });
                       }
-                    }} 
+                    }}
                     value={field.value}
                   >
                     <FormControl>
