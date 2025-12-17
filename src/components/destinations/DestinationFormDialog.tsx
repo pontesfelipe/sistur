@@ -26,7 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Search, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
@@ -81,6 +82,8 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
 
   const form = useForm<DestinationFormValues>({
     resolver: zodResolver(destinationSchema),
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       name: '',
       uf: '',
@@ -180,10 +183,15 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
   }, [watchedName, watchedUf, selectedIBGE, searchIBGE]);
 
   const handleSelectIBGE = async (result: IBGEResult) => {
-    form.setValue('name', result.name, { shouldValidate: true });
-    form.setValue('uf', result.uf, { shouldValidate: true });
-    form.setValue('ibge_code', result.ibge_code, { shouldValidate: true });
-    setSelectedIBGE(result);
+    const safeName = result.name?.trim() ?? '';
+    const safeUf = result.uf?.trim().toUpperCase() ?? '';
+    const safeCode = result.ibge_code?.trim() ?? '';
+
+    form.setValue('name', safeName, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+    form.setValue('uf', safeUf, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+    form.setValue('ibge_code', safeCode, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+
+    setSelectedIBGE({ ...result, name: safeName, uf: safeUf, ibge_code: safeCode });
     setShowResults(false);
     setSearchError(null);
     setIbgeResults([]);
@@ -192,14 +200,14 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
     setIsSearching(true);
     try {
       const { data } = await supabase.functions.invoke('search-ibge', {
-        body: { name: result.name, uf: result.uf, fetchCoords: true },
+        body: { name: safeName, uf: safeUf, fetchCoords: true },
       });
 
       if (data?.results?.[0]) {
         const coordResult = data.results[0];
         if (coordResult.latitude && coordResult.longitude) {
-          form.setValue('latitude', coordResult.latitude.toFixed(6), { shouldValidate: true });
-          form.setValue('longitude', coordResult.longitude.toFixed(6), { shouldValidate: true });
+          form.setValue('latitude', coordResult.latitude.toFixed(6), { shouldValidate: true, shouldDirty: true });
+          form.setValue('longitude', coordResult.longitude.toFixed(6), { shouldValidate: true, shouldDirty: true });
         }
       }
     } catch (err) {
@@ -210,12 +218,16 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
   };
 
   const handleNameChange = (value: string) => {
-    form.setValue('name', value, { shouldValidate: true });
+    form.setValue('name', value, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
     if (selectedIBGE && value !== selectedIBGE.name) {
       setSelectedIBGE(null);
-      form.setValue('ibge_code', '', { shouldValidate: true });
+      form.setValue('ibge_code', '', { shouldValidate: true, shouldDirty: true });
     }
   };
+
+  const handleInvalid = useCallback(() => {
+    toast.error('Revise os campos obrigatórios para salvar o destino.');
+  }, []);
 
   const handleSubmit = async (values: DestinationFormValues) => {
     setIsSubmitting(true);
@@ -234,6 +246,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
       onOpenChange(false);
     } catch (error) {
       console.error('Error submitting destination:', error);
+      toast.error('Não foi possível salvar o destino.');
     } finally {
       setIsSubmitting(false);
     }
@@ -249,7 +262,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit, handleInvalid)} className="space-y-4">
             <FormField
               control={form.control}
               name="name"
