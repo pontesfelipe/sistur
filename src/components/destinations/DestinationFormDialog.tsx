@@ -37,16 +37,34 @@ const UF_OPTIONS = [
   'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
 ];
 
+const nullableNumber = (opts: { min: number; max: number; message: string }) =>
+  z.preprocess(
+    (val) => {
+      if (val === '' || val === null || val === undefined) return null;
+      if (typeof val === 'string') return Number(val);
+      return val;
+    },
+    z
+      .number()
+      .nullable()
+      .refine((v) => v === null || (Number.isFinite(v) && v >= opts.min && v <= opts.max), opts.message)
+  );
+
 const destinationSchema = z.object({
   name: z.string().trim().min(2, 'Nome deve ter pelo menos 2 caracteres').max(100, 'Nome muito longo'),
   uf: z.string().length(2, 'Selecione um estado'),
   ibge_code: z.string().regex(/^\d{7}$/, 'Código IBGE deve ter 7 dígitos').optional().or(z.literal('')),
-  latitude: z.string().optional().transform((val) => val ? parseFloat(val) : null).refine((val) => val === null || (val >= -90 && val <= 90), 'Latitude inválida'),
-  longitude: z.string().optional().transform((val) => val ? parseFloat(val) : null).refine((val) => val === null || (val >= -180 && val <= 180), 'Longitude inválida'),
+  latitude: nullableNumber({ min: -90, max: 90, message: 'Latitude inválida' }),
+  longitude: nullableNumber({ min: -180, max: 180, message: 'Longitude inválida' }),
 });
 
-type DestinationFormValues = z.input<typeof destinationSchema>;
-
+type DestinationFormValues = {
+  name: string;
+  uf: string;
+  ibge_code?: string;
+  latitude?: string | number;
+  longitude?: string | number;
+};
 interface IBGEResult {
   ibge_code: string;
   name: string;
