@@ -362,32 +362,33 @@ const Importacoes = () => {
                             const hasUnsavedChanges = editedValues[indicator.id] !== undefined;
                             
                             return (
-                              <div key={indicator.id} className="grid grid-cols-12 gap-4 items-center py-2 border-b last:border-0">
-                                <div className="col-span-1">
-                                  <span className="font-mono text-xs text-muted-foreground">
-                                    {indicator.code}
-                                  </span>
-                                </div>
-                                <div className="col-span-6">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium text-sm">{indicator.name}</span>
+                              <div key={indicator.id} className="grid grid-cols-12 gap-3 items-center py-3 border-b last:border-0">
+                                <div className="col-span-7">
+                                  <div className="flex items-start gap-2">
+                                    <span className="font-medium text-sm leading-tight">{indicator.name}</span>
                                     {indicator.description && (
                                       <Tooltip>
                                         <TooltipTrigger>
-                                          <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                                          <HelpCircle className="h-4 w-4 text-muted-foreground shrink-0" />
                                         </TooltipTrigger>
-                                        <TooltipContent className="max-w-xs">
+                                        <TooltipContent className="max-w-xs bg-popover text-popover-foreground z-50">
                                           {indicator.description}
                                         </TooltipContent>
                                       </Tooltip>
                                     )}
                                   </div>
-                                  <span className="text-xs text-muted-foreground">
-                                    {indicator.unit && `Unidade: ${indicator.unit}`}
-                                    {indicator.min_ref !== null && indicator.max_ref !== null && 
-                                      ` | Ref: ${indicator.min_ref} - ${indicator.max_ref}`
-                                    }
-                                  </span>
+                                  <div className="flex flex-wrap items-center gap-1 mt-1">
+                                    {indicator.theme && (
+                                      <Badge variant="outline" className="text-xs px-1.5 py-0">
+                                        {indicator.theme}
+                                      </Badge>
+                                    )}
+                                    {indicator.unit && (
+                                      <span className="text-xs text-muted-foreground">
+                                        {indicator.unit}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                                 <div className="col-span-3">
                                   <Input
@@ -402,7 +403,7 @@ const Importacoes = () => {
                                     placeholder="Valor"
                                   />
                                 </div>
-                                <div className="col-span-2 flex justify-end">
+                                <div className="col-span-2 flex justify-end items-center gap-1">
                                   {hasUnsavedChanges && (
                                     <Button
                                       size="sm"
