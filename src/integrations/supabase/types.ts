@@ -273,6 +273,63 @@ export type Database = {
           },
         ]
       }
+      diagnosis_data_snapshots: {
+        Row: {
+          assessment_id: string
+          confidence_level: number
+          created_at: string
+          id: string
+          indicator_code: string
+          org_id: string
+          reference_year: number | null
+          source_code: string
+          value_used: number | null
+          value_used_text: string | null
+          was_manually_adjusted: boolean
+        }
+        Insert: {
+          assessment_id: string
+          confidence_level?: number
+          created_at?: string
+          id?: string
+          indicator_code: string
+          org_id: string
+          reference_year?: number | null
+          source_code: string
+          value_used?: number | null
+          value_used_text?: string | null
+          was_manually_adjusted?: boolean
+        }
+        Update: {
+          assessment_id?: string
+          confidence_level?: number
+          created_at?: string
+          id?: string
+          indicator_code?: string
+          org_id?: string
+          reference_year?: number | null
+          source_code?: string
+          value_used?: number | null
+          value_used_text?: string | null
+          was_manually_adjusted?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnosis_data_snapshots_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnosis_data_snapshots_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       edu_courses: {
         Row: {
           audience: Database["public"]["Enums"]["target_agent"] | null
@@ -656,6 +713,111 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "orgs"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      external_data_sources: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          trust_level_default: number
+          update_frequency: string | null
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          trust_level_default?: number
+          update_frequency?: string | null
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          trust_level_default?: number
+          update_frequency?: string | null
+        }
+        Relationships: []
+      }
+      external_indicator_values: {
+        Row: {
+          collected_at: string
+          collection_method: Database["public"]["Enums"]["external_collection_method"]
+          confidence_level: number
+          created_at: string
+          id: string
+          indicator_code: string
+          municipality_ibge_code: string
+          notes: string | null
+          org_id: string
+          raw_value: number | null
+          raw_value_text: string | null
+          reference_year: number | null
+          source_code: string
+          validated: boolean
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          collected_at?: string
+          collection_method?: Database["public"]["Enums"]["external_collection_method"]
+          confidence_level?: number
+          created_at?: string
+          id?: string
+          indicator_code: string
+          municipality_ibge_code: string
+          notes?: string | null
+          org_id: string
+          raw_value?: number | null
+          raw_value_text?: string | null
+          reference_year?: number | null
+          source_code: string
+          validated?: boolean
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          collected_at?: string
+          collection_method?: Database["public"]["Enums"]["external_collection_method"]
+          confidence_level?: number
+          created_at?: string
+          id?: string
+          indicator_code?: string
+          municipality_ibge_code?: string
+          notes?: string | null
+          org_id?: string
+          raw_value?: number | null
+          raw_value_text?: string | null
+          reference_year?: number | null
+          source_code?: string
+          validated?: boolean
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_indicator_values_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_indicator_values_source_code_fkey"
+            columns: ["source_code"]
+            isOneToOne: false
+            referencedRelation: "external_data_sources"
+            referencedColumns: ["code"]
           },
         ]
       }
@@ -1488,6 +1650,7 @@ export type Database = {
       collection_type: "AUTOMATICA" | "MANUAL" | "ESTIMADA"
       course_level: "BASICO" | "INTERMEDIARIO" | "AVANCADO"
       data_source: "IBGE" | "CADASTUR" | "PESQUISA_LOCAL" | "MANUAL" | "OUTRO"
+      external_collection_method: "AUTOMATIC" | "BATCH" | "MANUAL"
       indicator_direction: "HIGH_IS_BETTER" | "LOW_IS_BETTER"
       live_type: "primary" | "case" | "complementary"
       normalization_type: "MIN_MAX" | "BANDS" | "BINARY"
@@ -1628,6 +1791,7 @@ export const Constants = {
       collection_type: ["AUTOMATICA", "MANUAL", "ESTIMADA"],
       course_level: ["BASICO", "INTERMEDIARIO", "AVANCADO"],
       data_source: ["IBGE", "CADASTUR", "PESQUISA_LOCAL", "MANUAL", "OUTRO"],
+      external_collection_method: ["AUTOMATIC", "BATCH", "MANUAL"],
       indicator_direction: ["HIGH_IS_BETTER", "LOW_IS_BETTER"],
       live_type: ["primary", "case", "complementary"],
       normalization_type: ["MIN_MAX", "BANDS", "BINARY"],

@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.search-ibge]
 verify_jwt = false
+
+[functions.fetch-official-data]
+verify_jwt = false
