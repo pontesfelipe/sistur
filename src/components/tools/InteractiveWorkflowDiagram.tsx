@@ -52,31 +52,50 @@ const workflowSteps: WorkflowStep[] = [
   },
   {
     id: 2,
-    label: "Dados",
-    sublabel: "Coleta",
-    color: "bg-indigo-500",
-    icon: Activity,
+    label: "Pré-preencher",
+    sublabel: "Dados Oficiais",
+    color: "bg-cyan-500",
+    icon: Database,
     details: {
-      title: "Coleta de Dados dos Indicadores",
-      description: "Preenchimento dos valores brutos de cada indicador, com rastreabilidade de fonte.",
+      title: "Pré-preenchimento de Dados Oficiais",
+      description: "Sistema busca automaticamente dados de fontes públicas nacionais, explicitando fonte, ano e nível de confiança.",
       items: [
-        "Dados do IBGE Cidades (automático)",
-        "Dados do CADASTUR (automático)",
-        "Pesquisas locais (manual)",
-        "Importação via CSV ou formulário"
+        "IBGE: dados demográficos e econômicos",
+        "DATASUS: saúde e bem-estar",
+        "INEP: educação (IDEB, matrículas)",
+        "STN: gestão fiscal municipal",
+        "CADASTUR: oferta turística"
       ],
-      example: "Ex: Taxa de formalização = 45.2% (fonte: CADASTUR 2024)"
+      example: "Ex: PIB per capita = R$ 25.000 (IBGE, 2022, confiança 5/5)"
     }
   },
   {
     id: 3,
+    label: "Validação",
+    sublabel: "Humana",
+    color: "bg-indigo-500",
+    icon: Activity,
+    details: {
+      title: "Validação Humana Obrigatória",
+      description: "Usuário revisa, confirma ou ajusta cada valor antes do cálculo. Nenhum dado é 'verdade absoluta'.",
+      items: [
+        "Visualização de fonte, ano e confiança",
+        "Edição de valores quando necessário",
+        "Justificativa para ajustes manuais",
+        "Congelamento (snapshot) dos dados validados"
+      ],
+      example: "Ex: Valor 45.2% confirmado pelo analista"
+    }
+  },
+  {
+    id: 4,
     label: "Cálculo",
     sublabel: "Normalização",
     color: "bg-purple-500",
     icon: Calculator,
     details: {
       title: "Normalização e Cálculo de Scores",
-      description: "Valores brutos são convertidos para escala 0-1 usando métodos específicos.",
+      description: "Valores validados são convertidos para escala 0-1 usando métodos específicos.",
       items: [
         "MIN_MAX: (valor - min) / (max - min)",
         "BANDS: faixas categóricas predefinidas",
@@ -87,7 +106,7 @@ const workflowSteps: WorkflowStep[] = [
     }
   },
   {
-    id: 4,
+    id: 5,
     label: "Status",
     sublabel: "Automático",
     color: "bg-orange-500",
@@ -105,7 +124,7 @@ const workflowSteps: WorkflowStep[] = [
     }
   },
   {
-    id: 5,
+    id: 6,
     label: "Prescrição",
     sublabel: "Determinística",
     color: "bg-green-500",
@@ -173,6 +192,7 @@ export function InteractiveWorkflowDiagram() {
         {selectedStepData && (
           <div className={`animate-fade-in bg-muted/30 rounded-lg p-4 border-l-4 ${
             selectedStepData.color.includes('blue') ? 'border-l-blue-500' :
+            selectedStepData.color.includes('cyan') ? 'border-l-cyan-500' :
             selectedStepData.color.includes('indigo') ? 'border-l-indigo-500' :
             selectedStepData.color.includes('purple') ? 'border-l-purple-500' :
             selectedStepData.color.includes('orange') ? 'border-l-orange-500' :
