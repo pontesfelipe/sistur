@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Pillar, TargetAgent } from '@/types/sistur';
+import { useAuth } from '@/hooks/useAuth';
 
 // Types
 export interface EduCourse {
@@ -521,4 +522,118 @@ export function useEduLiveMutations() {
   });
 
   return { createLive };
+}
+
+// ============================================
+// USER TRAINING PROGRESS
+// ============================================
+export interface UserTrainingProgress {
+  id: string;
+  user_id: string;
+  track_id: string;
+  training_id: string;
+  completed_at: string;
+  created_at: string;
+}
+
+export function useUserTrackProgress(trackId?: string) {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: ['user-track-progress', trackId, user?.id],
+    queryFn: async () => {
+      if (!trackId || !user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('user_training_progress')
+        .select('*')
+        .eq('track_id', trackId)
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      return data as UserTrainingProgress[];
+    },
+    enabled: !!trackId && !!user?.id,
+  });
+}
+
+export function useAllUserProgress() {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: ['all-user-progress', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('user_training_progress')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      return data as UserTrainingProgress[];
+    },
+    enabled: !!user?.id,
+  });
+}
+
+export function useTrainingProgressMutations() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  const markComplete = useMutation({
+    mutationFn: async ({ trackId, trainingId }: { trackId: string; trainingId: string }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('user_training_progress')
+        .insert({
+          user_id: user.id,
+          track_id: trackId,
+          training_id: trainingId,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['user-track-progress', variables.trackId] });
+      queryClient.invalidateQueries({ queryKey: ['all-user-progress'] });
+      toast.success('Treinamento marcado como concluído!');
+    },
+    onError: (error) => {
+      if (error.message.includes('duplicate')) {
+        toast.info('Este treinamento já está marcado como concluído');
+      } else {
+        toast.error(`Erro ao marcar progresso: ${error.message}`);
+      }
+    },
+  });
+
+  const markIncomplete = useMutation({
+    mutationFn: async ({ trackId, trainingId }: { trackId: string; trainingId: string }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('user_training_progress')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('track_id', trackId)
+        .eq('training_id', trainingId);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['user-track-progress', variables.trackId] });
+      queryClient.invalidateQueries({ queryKey: ['all-user-progress'] });
+      toast.success('Progresso removido');
+    },
+    onError: (error) => {
+      toast.error(`Erro ao remover progresso: ${error.message}`);
+    },
+  });
+
+  return { markComplete, markIncomplete };
 }
