@@ -27,8 +27,9 @@ const Diagnosticos = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   
-  const { assessments, isLoading, createAssessment } = useAssessments();
+  const { assessments, isLoading, createAssessment, deleteAssessment } = useAssessments();
 
   const filteredAssessments = assessments?.filter((assessment) => {
     const matchesSearch = assessment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -54,6 +55,15 @@ const Diagnosticos = () => {
     // Navigate to the new assessment to start filling data
     if (result?.id) {
       navigate(`/diagnosticos/${result.id}`);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      await deleteAssessment.mutateAsync(id);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -139,7 +149,11 @@ const Diagnosticos = () => {
               className="animate-fade-in"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <AssessmentCard assessment={assessment as any} />
+              <AssessmentCard 
+                assessment={assessment as any} 
+                onDelete={handleDelete}
+                isDeleting={deletingId === assessment.id}
+              />
             </div>
           ))}
         </div>
