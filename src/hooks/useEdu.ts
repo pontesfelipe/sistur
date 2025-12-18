@@ -339,8 +339,104 @@ export function useEduCourseMutations() {
   return { createCourse, updateCourse, deleteCourse };
 }
 
+export interface EduTrackTraining {
+  id: string;
+  track_id: string;
+  training_id: string;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface EduTrackWithTrainings extends EduTrack {
+  trainings: { training_id: string; sort_order: number }[];
+}
+
+export function useEduTrackWithTrainings(id?: string) {
+  return useQuery({
+    queryKey: ['edu-track-trainings', id],
+    queryFn: async () => {
+      if (!id) return null;
+      
+      const { data: track, error: trackError } = await supabase
+        .from('edu_tracks')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (trackError) throw trackError;
+      
+      const { data: trackTrainings, error: trainingsError } = await supabase
+        .from('edu_track_trainings')
+        .select('*')
+        .eq('track_id', id)
+        .order('sort_order', { ascending: true });
+      
+      if (trainingsError) throw trainingsError;
+      
+      return {
+        ...track,
+        trainings: trackTrainings || [],
+      } as EduTrackWithTrainings;
+    },
+    enabled: !!id,
+  });
+}
+
 export function useEduTrackMutations() {
   const queryClient = useQueryClient();
+
+  const createTrackWithTrainings = useMutation({
+    mutationFn: async ({ 
+      track, 
+      trainingIds 
+    }: { 
+      track: Omit<EduTrack, 'id' | 'created_at'>; 
+      trainingIds: string[];
+    }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', user.id)
+        .single();
+
+      // Create track
+      const { data: newTrack, error: trackError } = await supabase
+        .from('edu_tracks')
+        .insert({ ...track, org_id: profile?.org_id })
+        .select()
+        .single();
+
+      if (trackError) throw trackError;
+
+      // Add trainings to track
+      if (trainingIds.length > 0) {
+        const trackTrainings = trainingIds.map((trainingId, index) => ({
+          track_id: newTrack.id,
+          training_id: trainingId,
+          sort_order: index,
+        }));
+
+        const { error: trainingsError } = await supabase
+          .from('edu_track_trainings')
+          .insert(trackTrainings);
+
+        if (trainingsError) throw trainingsError;
+      }
+
+      return newTrack;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['edu-tracks'] });
+      queryClient.invalidateQueries({ queryKey: ['edu-track-trainings'] });
+      toast.success('Trilha criada com sucesso');
+    },
+    onError: (error) => {
+      toast.error(`Erro ao criar trilha: ${error.message}`);
+    },
+  });
 
   const createTrack = useMutation({
     mutationFn: async (track: Omit<EduTrack, 'id' | 'created_at'>) => {
@@ -371,7 +467,25 @@ export function useEduTrackMutations() {
     },
   });
 
-  return { createTrack };
+  const deleteTrack = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('edu_tracks')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['edu-tracks'] });
+      toast.success('Trilha excluída');
+    },
+    onError: (error) => {
+      toast.error(`Erro ao excluir: ${error.message}`);
+    },
+  });
+
+  return { createTrack, createTrackWithTrainings, deleteTrack };
 }
 
 export function useEduLiveMutations() {
