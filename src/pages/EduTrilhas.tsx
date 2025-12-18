@@ -171,7 +171,7 @@ const TrackFormDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {mode === 'create' ? 'Nova Trilha Formativa' : 'Editar Trilha'}
@@ -252,7 +252,7 @@ const TrackFormDialog = ({
                 className="pl-9"
               />
             </div>
-            <div className="border rounded-md max-h-60 overflow-y-auto">
+            <div className="border rounded-md max-h-80 overflow-y-auto">
               {filteredTrainings.length > 0 ? (
                 filteredTrainings.map((training) => (
                   <div
