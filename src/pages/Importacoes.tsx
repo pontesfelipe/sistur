@@ -234,6 +234,14 @@ const Importacoes = () => {
   }).length;
   const fillProgress = indicators.length > 0 ? (filledCount / indicators.length) * 100 : 0;
 
+  // Calculate pre-filled vs manual breakdown
+  const officialSources = ['IBGE', 'DATASUS', 'INEP', 'STN', 'CADASTUR', 'Pré-preenchido'];
+  const preFilledCount = values.filter(v => {
+    const source = v.source || '';
+    return officialSources.some(s => source.toUpperCase().includes(s.toUpperCase()));
+  }).length;
+  const manualCount = filledCount - preFilledCount;
+
   const downloadTemplate = () => {
     const header = 'codigo,valor,fonte';
     const rows = indicators.map(ind => `${ind.code},,`);
@@ -295,6 +303,33 @@ const Importacoes = () => {
                 </span>
               </div>
               <Progress value={fillProgress} className="h-2" />
+              
+              {/* Breakdown by source */}
+              {filledCount > 0 && (
+                <div className="flex items-center gap-4 mt-3 pt-3 border-t">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-primary" />
+                    <span className="text-xs text-muted-foreground">
+                      Pré-preenchido: <strong className="text-foreground">{preFilledCount}</strong>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-accent" />
+                    <span className="text-xs text-muted-foreground">
+                      Manual: <strong className="text-foreground">{manualCount}</strong>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 ml-auto">
+                    <Database className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      {preFilledCount > 0 
+                        ? `${Math.round((preFilledCount / filledCount) * 100)}% dos dados de fontes oficiais`
+                        : 'Nenhum dado pré-preenchido ainda'}
+                    </span>
+                  </div>
+                </div>
+              )}
+              
               {fillProgress === 100 && (
                 <p className="text-sm text-severity-good mt-2 flex items-center gap-1">
                   <CheckCircle2 className="h-4 w-4" />
@@ -360,10 +395,14 @@ const Importacoes = () => {
                           {indicatorsByPillar[pillar]?.map((indicator) => {
                             const currentValue = getValueForIndicator(indicator.id);
                             const hasUnsavedChanges = editedValues[indicator.id] !== undefined;
+                            const existingValue = values.find(v => v.indicator_id === indicator.id);
+                            const isPreFilled = existingValue?.source && officialSources.some(s => 
+                              existingValue.source?.toUpperCase().includes(s.toUpperCase())
+                            );
                             
                             return (
                               <div key={indicator.id} className="grid grid-cols-12 gap-3 items-center py-3 border-b last:border-0">
-                                <div className="col-span-7">
+                                <div className="col-span-6">
                                   <div className="flex items-start gap-2">
                                     <span className="font-medium text-sm leading-tight">{indicator.name}</span>
                                     {indicator.description && (
@@ -403,7 +442,35 @@ const Importacoes = () => {
                                     placeholder="Valor"
                                   />
                                 </div>
-                                <div className="col-span-2 flex justify-end items-center gap-1">
+                                <div className="col-span-3 flex justify-end items-center gap-2">
+                                  {/* Source indicator */}
+                                  {existingValue?.source && !hasUnsavedChanges && (
+                                    <Tooltip>
+                                      <TooltipTrigger>
+                                        <Badge 
+                                          variant="outline" 
+                                          className={cn(
+                                            "text-xs",
+                                            isPreFilled 
+                                              ? "border-primary/50 text-primary bg-primary/10" 
+                                              : "border-accent/50 text-accent bg-accent/10"
+                                          )}
+                                        >
+                                          {isPreFilled ? (
+                                            <Database className="h-3 w-3 mr-1" />
+                                          ) : (
+                                            <PenLine className="h-3 w-3 mr-1" />
+                                          )}
+                                          {existingValue.source.length > 10 
+                                            ? existingValue.source.substring(0, 10) + '...' 
+                                            : existingValue.source}
+                                        </Badge>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        Fonte: {existingValue.source}
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
                                   {hasUnsavedChanges && (
                                     <Button
                                       size="sm"
