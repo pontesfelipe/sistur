@@ -486,7 +486,61 @@ export function useEduTrackMutations() {
     },
   });
 
-  return { createTrack, createTrackWithTrainings, deleteTrack };
+  const updateTrackWithTrainings = useMutation({
+    mutationFn: async ({ 
+      id,
+      track, 
+      trainingIds 
+    }: { 
+      id: string;
+      track: Partial<Omit<EduTrack, 'id' | 'created_at'>>; 
+      trainingIds: string[];
+    }) => {
+      // Update track
+      const { error: trackError } = await supabase
+        .from('edu_tracks')
+        .update(track)
+        .eq('id', id);
+
+      if (trackError) throw trackError;
+
+      // Delete existing track trainings
+      const { error: deleteError } = await supabase
+        .from('edu_track_trainings')
+        .delete()
+        .eq('track_id', id);
+
+      if (deleteError) throw deleteError;
+
+      // Add new trainings
+      if (trainingIds.length > 0) {
+        const trackTrainings = trainingIds.map((trainingId, index) => ({
+          track_id: id,
+          training_id: trainingId,
+          sort_order: index,
+        }));
+
+        const { error: trainingsError } = await supabase
+          .from('edu_track_trainings')
+          .insert(trackTrainings);
+
+        if (trainingsError) throw trainingsError;
+      }
+
+      return id;
+    },
+    onSuccess: (id) => {
+      queryClient.invalidateQueries({ queryKey: ['edu-tracks'] });
+      queryClient.invalidateQueries({ queryKey: ['edu-track-trainings', id] });
+      queryClient.invalidateQueries({ queryKey: ['edu-track', id] });
+      toast.success('Trilha atualizada com sucesso');
+    },
+    onError: (error) => {
+      toast.error(`Erro ao atualizar trilha: ${error.message}`);
+    },
+  });
+
+  return { createTrack, createTrackWithTrainings, deleteTrack, updateTrackWithTrainings };
 }
 
 export function useEduLiveMutations() {

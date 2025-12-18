@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { 
   Route, 
   Users,
@@ -37,7 +48,11 @@ import {
   Video,
   Search,
   CheckCircle2,
-  Circle
+  Circle,
+  Edit,
+  Trash2,
+  Award,
+  Calendar
 } from 'lucide-react';
 import { 
   useEduTracks, 
@@ -46,10 +61,15 @@ import {
   useEduTrackWithTrainings,
   useUserTrackProgress,
   useAllUserProgress,
-  useTrainingProgressMutations
+  useTrainingProgressMutations,
+  EduTrack
 } from '@/hooks/useEdu';
 import { useEduTrainings, EduTraining } from '@/hooks/useEduTrainings';
+import { useAuth } from '@/hooks/useAuth';
 import { TARGET_AGENT_INFO, type TargetAgent } from '@/types/sistur';
+import { TrackCertificate } from '@/components/edu/TrackCertificate';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 // Track colors for visual differentiation
 const TRACK_COLORS = [
@@ -61,24 +81,54 @@ const TRACK_COLORS = [
   'from-cyan-500/20 to-cyan-600/5 border-cyan-500/30',
 ];
 
-interface CreateTrackDialogProps {
+interface TrackFormDialogProps {
   trainings: EduTraining[];
-  onCreateTrack: (data: { 
+  onSubmit: (data: { 
     track: { name: string; description?: string; objective?: string; audience?: TargetAgent; delivery?: string }; 
     trainingIds: string[] 
   }) => void;
-  isCreating: boolean;
+  isSubmitting: boolean;
+  initialData?: {
+    name: string;
+    description?: string;
+    objective?: string;
+    audience?: TargetAgent;
+    delivery?: string;
+    trainingIds: string[];
+  };
+  mode: 'create' | 'edit';
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-const CreateTrackDialog = ({ trainings, onCreateTrack, isCreating }: CreateTrackDialogProps) => {
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [objective, setObjective] = useState('');
-  const [audience, setAudience] = useState<TargetAgent | ''>('');
-  const [delivery, setDelivery] = useState('');
-  const [selectedTrainings, setSelectedTrainings] = useState<string[]>([]);
+const TrackFormDialog = ({ 
+  trainings, 
+  onSubmit, 
+  isSubmitting, 
+  initialData,
+  mode,
+  open,
+  onOpenChange
+}: TrackFormDialogProps) => {
+  const [name, setName] = useState(initialData?.name || '');
+  const [description, setDescription] = useState(initialData?.description || '');
+  const [objective, setObjective] = useState(initialData?.objective || '');
+  const [audience, setAudience] = useState<TargetAgent | ''>(initialData?.audience || '');
+  const [delivery, setDelivery] = useState(initialData?.delivery || '');
+  const [selectedTrainings, setSelectedTrainings] = useState<string[]>(initialData?.trainingIds || []);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Reset form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name || '');
+      setDescription(initialData.description || '');
+      setObjective(initialData.objective || '');
+      setAudience(initialData.audience || '');
+      setDelivery(initialData.delivery || '');
+      setSelectedTrainings(initialData.trainingIds || []);
+    }
+  }, [initialData]);
 
   const filteredTrainings = trainings.filter(t => 
     t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -88,7 +138,7 @@ const CreateTrackDialog = ({ trainings, onCreateTrack, isCreating }: CreateTrack
   const handleSubmit = () => {
     if (!name.trim() || selectedTrainings.length === 0) return;
     
-    onCreateTrack({
+    onSubmit({
       track: {
         name: name.trim(),
         description: description.trim() || undefined,
@@ -99,15 +149,16 @@ const CreateTrackDialog = ({ trainings, onCreateTrack, isCreating }: CreateTrack
       trainingIds: selectedTrainings,
     });
     
-    // Reset form
-    setOpen(false);
-    setName('');
-    setDescription('');
-    setObjective('');
-    setAudience('');
-    setDelivery('');
-    setSelectedTrainings([]);
-    setSearchQuery('');
+    if (mode === 'create') {
+      // Reset form only on create
+      setName('');
+      setDescription('');
+      setObjective('');
+      setAudience('');
+      setDelivery('');
+      setSelectedTrainings([]);
+      setSearchQuery('');
+    }
   };
 
   const toggleTraining = (trainingId: string) => {
@@ -119,18 +170,16 @@ const CreateTrackDialog = ({ trainings, onCreateTrack, isCreating }: CreateTrack
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Criar Trilha
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nova Trilha Formativa</DialogTitle>
+          <DialogTitle>
+            {mode === 'create' ? 'Nova Trilha Formativa' : 'Editar Trilha'}
+          </DialogTitle>
           <DialogDescription>
-            Crie uma trilha agrupando treinamentos para um percurso estruturado de capacitação.
+            {mode === 'create' 
+              ? 'Crie uma trilha agrupando treinamentos para um percurso estruturado de capacitação.'
+              : 'Edite os dados da trilha e os treinamentos associados.'}
           </DialogDescription>
         </DialogHeader>
         
@@ -245,14 +294,14 @@ const CreateTrackDialog = ({ trainings, onCreateTrack, isCreating }: CreateTrack
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
           <Button 
             onClick={handleSubmit} 
-            disabled={!name.trim() || selectedTrainings.length === 0 || isCreating}
+            disabled={!name.trim() || selectedTrainings.length === 0 || isSubmitting}
           >
-            {isCreating ? 'Criando...' : 'Criar Trilha'}
+            {isSubmitting ? 'Salvando...' : mode === 'create' ? 'Criar Trilha' : 'Salvar Alterações'}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -287,14 +336,8 @@ const TrackProgress = ({ trackId, totalTrainings }: TrackProgressProps) => {
 const EduTrilhas = () => {
   const { data: tracks, isLoading } = useEduTracks();
   const { data: trainings } = useEduTrainings();
-  const { data: allProgress } = useAllUserProgress();
   const { createTrackWithTrainings } = useEduTrackMutations();
-
-  // Get track training counts
-  const getTrackTrainingCount = (trackId: string) => {
-    // This is a simplified approach - in production you'd want to fetch this from the server
-    return allProgress?.filter(p => p.track_id === trackId).length || 0;
-  };
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   return (
     <AppLayout 
@@ -310,13 +353,26 @@ const EduTrilhas = () => {
         </Button>
         
         {trainings && trainings.length > 0 && (
-          <CreateTrackDialog 
-            trainings={trainings}
-            onCreateTrack={(data) => createTrackWithTrainings.mutate(data)}
-            isCreating={createTrackWithTrainings.isPending}
-          />
+          <Button onClick={() => setCreateDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Criar Trilha
+          </Button>
         )}
       </div>
+
+      {trainings && (
+        <TrackFormDialog
+          trainings={trainings}
+          onSubmit={(data) => {
+            createTrackWithTrainings.mutate(data);
+            setCreateDialogOpen(false);
+          }}
+          isSubmitting={createTrackWithTrainings.isPending}
+          mode="create"
+          open={createDialogOpen}
+          onOpenChange={setCreateDialogOpen}
+        />
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -338,11 +394,10 @@ const EduTrilhas = () => {
             Crie trilhas formativas agrupando treinamentos para seus públicos-alvo.
           </p>
           {trainings && trainings.length > 0 && (
-            <CreateTrackDialog 
-              trainings={trainings}
-              onCreateTrack={(data) => createTrackWithTrainings.mutate(data)}
-              isCreating={createTrackWithTrainings.isPending}
-            />
+            <Button onClick={() => setCreateDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Criar Trilha
+            </Button>
           )}
         </div>
       )}
@@ -351,7 +406,7 @@ const EduTrilhas = () => {
 };
 
 // Separate component to fetch progress for each track
-const TrackCard = ({ track, index }: { track: any; index: number }) => {
+const TrackCard = ({ track, index }: { track: EduTrack; index: number }) => {
   const { data: trackWithTrainings } = useEduTrackWithTrainings(track.id);
   const totalTrainings = trackWithTrainings?.trainings?.length || 0;
 
@@ -429,6 +484,24 @@ export const EduTrilhaDetalhe = () => {
   const { data: allTrainings } = useEduTrainings();
   const { data: userProgress } = useUserTrackProgress(id);
   const { markComplete, markIncomplete } = useTrainingProgressMutations();
+  const { updateTrackWithTrainings, deleteTrack } = useEduTrackMutations();
+  const { user } = useAuth();
+  
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [certificateOpen, setCertificateOpen] = useState(false);
+  const [userName, setUserName] = useState<string>('');
+
+  // Fetch user profile for certificate
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user?.id) return;
+      const { data } = await import('@/integrations/supabase/client').then(m => 
+        m.supabase.from('profiles').select('full_name').eq('user_id', user.id).maybeSingle()
+      );
+      setUserName(data?.full_name || user.email || 'Usuário');
+    };
+    fetchProfile();
+  }, [user]);
 
   const isLoading = trackLoading || trainingsLoading;
 
@@ -437,10 +510,21 @@ export const EduTrilhaDetalhe = () => {
     ?.map(tt => allTrainings?.find(t => t.training_id === tt.training_id))
     .filter(Boolean) as EduTraining[] | undefined;
 
+  // Create a map of training_id to completion date
+  const completionMap = new Map(
+    userProgress?.map(p => [p.training_id, new Date(p.completed_at)]) || []
+  );
+  
   const completedTrainingIds = new Set(userProgress?.map(p => p.training_id) || []);
   const totalTrainings = trackTrainings?.length || 0;
   const completedCount = trackTrainings?.filter(t => completedTrainingIds.has(t.training_id)).length || 0;
   const progressPercentage = totalTrainings > 0 ? Math.round((completedCount / totalTrainings) * 100) : 0;
+  const isTrackComplete = progressPercentage === 100 && totalTrainings > 0;
+
+  // Get latest completion date for certificate
+  const latestCompletionDate = userProgress?.length 
+    ? new Date(Math.max(...userProgress.map(p => new Date(p.completed_at).getTime())))
+    : new Date();
 
   const handleToggleComplete = (trainingId: string) => {
     if (!id) return;
@@ -450,6 +534,19 @@ export const EduTrilhaDetalhe = () => {
     } else {
       markComplete.mutate({ trackId: id, trainingId });
     }
+  };
+
+  const handleUpdateTrack = (data: { 
+    track: { name: string; description?: string; objective?: string; audience?: TargetAgent; delivery?: string }; 
+    trainingIds: string[] 
+  }) => {
+    if (!id) return;
+    updateTrackWithTrainings.mutate({
+      id,
+      track: data.track,
+      trainingIds: data.trainingIds,
+    });
+    setEditDialogOpen(false);
   };
 
   if (isLoading) {
@@ -479,14 +576,85 @@ export const EduTrilhaDetalhe = () => {
       title={track.name} 
       subtitle={track.objective || 'Trilha formativa SISTUR EDU'}
     >
-      <div className="mb-6">
+      <div className="flex items-center justify-between mb-6">
         <Button variant="outline" asChild>
           <Link to="/edu/trilhas">
             <ChevronLeft className="mr-2 h-4 w-4" />
             Voltar às Trilhas
           </Link>
         </Button>
+        
+        <div className="flex items-center gap-2">
+          {isTrackComplete && (
+            <Button onClick={() => setCertificateOpen(true)}>
+              <Award className="mr-2 h-4 w-4" />
+              Ver Certificado
+            </Button>
+          )}
+          <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
+            <Edit className="mr-2 h-4 w-4" />
+            Editar
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="icon" className="text-destructive hover:text-destructive">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Excluir trilha?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta ação não pode ser desfeita. A trilha "{track.name}" será permanentemente excluída.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={() => {
+                    deleteTrack.mutate(track.id);
+                    window.location.href = '/edu/trilhas';
+                  }}
+                >
+                  Excluir
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
+
+      {/* Edit Dialog */}
+      {allTrainings && (
+        <TrackFormDialog
+          trainings={allTrainings}
+          onSubmit={handleUpdateTrack}
+          isSubmitting={updateTrackWithTrainings.isPending}
+          mode="edit"
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          initialData={{
+            name: track.name,
+            description: track.description || undefined,
+            objective: track.objective || undefined,
+            audience: track.audience || undefined,
+            delivery: track.delivery || undefined,
+            trainingIds: trackWithTrainings?.trainings?.map(t => t.training_id) || [],
+          }}
+        />
+      )}
+
+      {/* Certificate Dialog */}
+      <TrackCertificate
+        open={certificateOpen}
+        onOpenChange={setCertificateOpen}
+        trackName={track.name}
+        userName={userName}
+        completedAt={latestCompletionDate}
+        totalTrainings={totalTrainings}
+        delivery={track.delivery || undefined}
+      />
 
       {/* Track Info with Progress */}
       <Card className="mb-8">
@@ -528,11 +696,17 @@ export const EduTrilhaDetalhe = () => {
                 <span className="text-muted-foreground">{progressPercentage}% concluído</span>
               </div>
               <Progress value={progressPercentage} className="h-3" />
-              {progressPercentage === 100 && (
-                <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Parabéns! Você concluiu todos os treinamentos desta trilha!
-                </p>
+              {isTrackComplete && (
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-sm text-green-600 flex items-center gap-1">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Parabéns! Você concluiu todos os treinamentos desta trilha!
+                  </p>
+                  <Button size="sm" variant="outline" onClick={() => setCertificateOpen(true)}>
+                    <Award className="mr-2 h-4 w-4" />
+                    Ver Certificado
+                  </Button>
+                </div>
               )}
             </div>
           )}
@@ -545,6 +719,7 @@ export const EduTrilhaDetalhe = () => {
         <div className="space-y-4">
           {trackTrainings.map((training, index) => {
             const isCompleted = completedTrainingIds.has(training.training_id);
+            const completionDate = completionMap.get(training.training_id);
             
             return (
               <Card 
@@ -576,7 +751,7 @@ export const EduTrilhaDetalhe = () => {
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <Badge variant={training.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
                           {training.course_code || training.pillar}
                         </Badge>
@@ -596,11 +771,19 @@ export const EduTrilhaDetalhe = () => {
                       <h4 className={`font-medium truncate ${isCompleted ? 'line-through text-muted-foreground' : ''}`}>
                         {training.title}
                       </h4>
-                      {training.objective && (
-                        <p className="text-sm text-muted-foreground line-clamp-1">
-                          {training.objective}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-4 mt-1">
+                        {training.objective && (
+                          <p className="text-sm text-muted-foreground line-clamp-1 flex-1">
+                            {training.objective}
+                          </p>
+                        )}
+                        {isCompleted && completionDate && (
+                          <span className="text-xs text-green-600 flex items-center gap-1 flex-shrink-0">
+                            <Calendar className="h-3 w-3" />
+                            {format(completionDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <Button variant="outline" size="sm" asChild>
                       <Link to={`/edu/training/${training.training_id}`}>
