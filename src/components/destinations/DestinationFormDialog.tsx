@@ -226,8 +226,17 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
   };
 
   const handleInvalid = useCallback(() => {
-    toast.error('Revise os campos obrigatórios para salvar o destino.');
-  }, []);
+    const errs = form.formState.errors;
+
+    const firstMessage =
+      (errs.name?.message as string | undefined) ||
+      (errs.uf?.message as string | undefined) ||
+      (errs.ibge_code?.message as string | undefined) ||
+      (errs.latitude?.message as string | undefined) ||
+      (errs.longitude?.message as string | undefined);
+
+    toast.error(firstMessage || 'Revise os campos obrigatórios para salvar o destino.');
+  }, [form.formState.errors]);
 
   const handleSubmit = async (values: DestinationFormValues) => {
     setIsSubmitting(true);
@@ -248,7 +257,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
       console.error('Error submitting destination:', error);
 
       if (error instanceof z.ZodError) {
-        toast.error('Revise os campos obrigatórios para salvar o destino.');
+        toast.error(error.issues?.[0]?.message || 'Revise os campos obrigatórios para salvar o destino.');
         return;
       }
 
@@ -345,7 +354,12 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
                   <FormLabel>Estado (UF)</FormLabel>
                   <Select 
                     onValueChange={(value) => {
-                      field.onChange(value);
+                      form.setValue('uf', value, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                        shouldTouch: true,
+                      });
+
                       if (selectedIBGE) {
                         setSelectedIBGE(null);
                         form.setValue('ibge_code', '', {
