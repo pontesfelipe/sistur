@@ -797,44 +797,6 @@ export const EduTrilhaDetalhe = () => {
             );
           })}
         </div>
-      ) : track.courses && track.courses.length > 0 ? (
-        // Fallback to old courses structure
-        <div className="space-y-4">
-          {track.courses.map((tc: any, index: number) => (
-            <Card key={tc.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      {tc.course && (
-                        <Badge variant={tc.course.pillar?.toLowerCase() as 'ra' | 'oe' | 'ao'}>
-                          {tc.course.code}
-                        </Badge>
-                      )}
-                    </div>
-                    <h4 className="font-medium truncate">
-                      {tc.course?.title || 'Curso não encontrado'}
-                    </h4>
-                    {tc.course?.objective && (
-                      <p className="text-sm text-muted-foreground line-clamp-1">
-                        {tc.course.objective}
-                      </p>
-                    )}
-                  </div>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to={`/edu/curso/${tc.course_id}`}>
-                      <Target className="mr-2 h-4 w-4" />
-                      Ver
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
       ) : (
         <div className="text-center py-8 text-muted-foreground">
           Nenhum treinamento associado a esta trilha.
