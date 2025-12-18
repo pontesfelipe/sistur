@@ -527,6 +527,38 @@ export type Database = {
           },
         ]
       }
+      edu_track_trainings: {
+        Row: {
+          created_at: string
+          id: string
+          sort_order: number
+          track_id: string
+          training_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sort_order?: number
+          track_id: string
+          training_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sort_order?: number
+          track_id?: string
+          training_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_track_trainings_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "edu_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       edu_tracks: {
         Row: {
           audience: Database["public"]["Enums"]["target_agent"] | null

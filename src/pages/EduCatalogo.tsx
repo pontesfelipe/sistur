@@ -10,12 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Search, 
   GraduationCap,
-  ExternalLink,
   Users,
   BookOpen,
   Route,
   Target,
-  Sparkles,
   Video,
   FileText
 } from 'lucide-react';
@@ -69,12 +67,6 @@ const EduCatalogo = () => {
           <Link to="/edu/trilhas">
             <Route className="mr-2 h-4 w-4" />
             Ver Trilhas ({tracks?.length || 0})
-          </Link>
-        </Button>
-        <Button asChild>
-          <Link to="/learning">
-            <Sparkles className="mr-2 h-4 w-4" />
-            Gerar Recomendações
           </Link>
         </Button>
       </div>
