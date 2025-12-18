@@ -8,6 +8,7 @@ import { NormalizationView } from '@/components/dashboard/NormalizationView';
 import { IndicatorScoresView } from '@/components/dashboard/IndicatorScoresView';
 import { IssuesView } from '@/components/dashboard/IssuesView';
 import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendationsPanel';
+import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,6 +27,14 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import {
   ArrowLeft,
   Download,
   Calculator,
@@ -39,6 +48,7 @@ import {
   RotateCcw,
   PlusCircle,
   Edit,
+  Database,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -51,10 +61,14 @@ import {
   useRecommendations,
 } from '@/hooks/useAssessmentData';
 import { useIndicatorValues } from '@/hooks/useIndicators';
+import { useFetchOfficialData, useExternalIndicatorValues, useValidateIndicatorValues } from '@/hooks/useOfficialData';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import type { Pillar, Severity, TerritorialInterpretation } from '@/types/sistur';
 import { PILLAR_INFO, SEVERITY_INFO } from '@/types/sistur';
 import { toast } from 'sonner';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const DiagnosticoDetalhe = () => {
   const { id } = useParams();
@@ -62,6 +76,19 @@ const DiagnosticoDetalhe = () => {
   const { calculate, loading: calculating } = useCalculateAssessment();
   const { updateAssessment } = useAssessments();
   const { indicators } = useIndicators();
+  const { user } = useAuth();
+  const [isPreFillOpen, setIsPreFillOpen] = useState(false);
+  const [orgId, setOrgId] = useState<string | undefined>();
+
+  // Fetch org_id for current user
+  useEffect(() => {
+    const fetchOrgId = async () => {
+      if (!user?.id) return;
+      const { data } = await supabase.from('profiles').select('org_id').eq('user_id', user.id).single();
+      if (data) setOrgId(data.org_id);
+    };
+    fetchOrgId();
+  }, [user?.id]);
 
   // Fetch data
   const { data: assessment, isLoading: loadingAssessment, refetch: refetchAssessment } = useAssessment(id);
@@ -70,6 +97,14 @@ const DiagnosticoDetalhe = () => {
   const { data: issues = [], refetch: refetchIssues } = useIssues(id);
   const { data: recommendations = [], refetch: refetchRecommendations } = useRecommendations(id);
   const { values: indicatorValues = [] } = useIndicatorValues(id);
+
+  // Official data hooks - destination info
+  const assessmentDestination = assessment?.destination as { name?: string; uf?: string; ibge_code?: string } | null;
+  const ibgeCode = assessmentDestination?.ibge_code;
+  
+  const { data: externalValues = [], isLoading: loadingExternalValues } = useExternalIndicatorValues(ibgeCode, orgId);
+  const fetchOfficialData = useFetchOfficialData();
+  const validateIndicatorValues = useValidateIndicatorValues();
 
   // Calculate data completeness
   const totalIndicators = indicators.length;
@@ -161,13 +196,10 @@ const DiagnosticoDetalhe = () => {
     CALCULATED: 'Calculado',
   };
 
-  // Type-safe destination access
-  const destination = assessment.destination as { name?: string; uf?: string } | null;
-
   return (
     <AppLayout
       title={assessment.title}
-      subtitle={destination ? `${destination.name}, ${destination.uf}` : undefined}
+      subtitle={assessmentDestination ? `${assessmentDestination.name}, ${assessmentDestination.uf}` : undefined}
     >
       {/* Back button and actions */}
       <div className="flex items-center justify-between mb-6">
@@ -207,6 +239,35 @@ const DiagnosticoDetalhe = () => {
           
           {!isCalculated && (
             <>
+              {/* Pre-fill button with Sheet */}
+              <Sheet open={isPreFillOpen} onOpenChange={setIsPreFillOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" disabled={!ibgeCode}>
+                    <Database className="mr-2 h-4 w-4" />
+                    Pré-preencher
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>Pré-preenchimento de Dados Oficiais</SheetTitle>
+                    <SheetDescription>
+                      Busque e valide dados de fontes oficiais para preencher automaticamente os indicadores
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="mt-6">
+                    <DataValidationPanel
+                      ibgeCode={ibgeCode || ''}
+                      orgId={orgId || ''}
+                      destinationName={assessmentDestination?.name || ''}
+                      onValidationComplete={() => {
+                        toast.success('Dados validados com sucesso!');
+                        setIsPreFillOpen(false);
+                      }}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
+              
               <Button variant="outline" asChild>
                 <Link to={`/importacoes?assessment=${id}`}>
                   <Edit className="mr-2 h-4 w-4" />
@@ -306,11 +367,11 @@ const DiagnosticoDetalhe = () => {
             </div>
 
             <div className="flex flex-wrap gap-6">
-              {destination && (
+              {assessmentDestination && (
                 <div className="flex items-center gap-2 text-sm">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
                   <span>
-                    {destination.name}, {destination.uf}
+                    {assessmentDestination.name}, {assessmentDestination.uf}
                   </span>
                 </div>
               )}
@@ -379,7 +440,7 @@ const DiagnosticoDetalhe = () => {
               </h3>
               <div className="prose prose-sm max-w-none text-muted-foreground">
                 <p>
-                  O destino <strong>{destination?.name}</strong>{' '}
+                  O destino <strong>{assessmentDestination?.name}</strong>{' '}
                   apresenta como <strong>ponto crítico</strong> o pilar{' '}
                   <strong className="text-severity-critical">
                     {criticalPillar?.pillar === 'RA'
