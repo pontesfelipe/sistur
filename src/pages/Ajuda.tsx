@@ -73,16 +73,22 @@ export default function Ajuda() {
           <CardContent>
             <ol className="list-decimal list-inside space-y-3 text-sm text-muted-foreground">
               <li>
-                <strong className="text-foreground">Cadastre um destino</strong> - Acesse a página de Destinos e adicione o município que será avaliado.
+                <strong className="text-foreground">Cadastre um destino</strong> - Acesse a página de Destinos ou use a Nova Rodada. O código IBGE é essencial para o pré-preenchimento automático.
               </li>
               <li>
-                <strong className="text-foreground">Crie um diagnóstico</strong> - Na página de Diagnósticos, inicie uma nova rodada de avaliação para o destino.
+                <strong className="text-foreground">Crie um diagnóstico</strong> - Na Nova Rodada, configure título e período da avaliação.
               </li>
               <li>
-                <strong className="text-foreground">Importe os dados</strong> - Preencha os valores dos indicadores manualmente ou importe via CSV.
+                <strong className="text-foreground">Pré-preencha com dados oficiais</strong> - O sistema busca automaticamente dados de IBGE, DATASUS, INEP, STN e CADASTUR.
               </li>
               <li>
-                <strong className="text-foreground">Calcule os resultados</strong> - O sistema processará os dados e gerará os scores por pilar.
+                <strong className="text-foreground">Valide os dados</strong> - Revise fonte, ano e confiança de cada indicador. Confirme ou ajuste valores.
+              </li>
+              <li>
+                <strong className="text-foreground">Complete manualmente</strong> - Preencha indicadores não cobertos pelas fontes oficiais.
+              </li>
+              <li>
+                <strong className="text-foreground">Calcule os resultados</strong> - O sistema processará os dados validados e gerará os scores por pilar.
               </li>
               <li>
                 <strong className="text-foreground">Gere relatórios</strong> - Acesse a página de Relatórios para obter análises detalhadas e recomendações.

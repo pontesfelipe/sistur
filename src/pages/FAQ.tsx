@@ -18,6 +18,18 @@ const faqItems = [
     answer: 'Os três pilares do SISTUR são: RA (Relações Ambientais) - aspectos ambientais e sustentabilidade; OE (Organização Estrutural) - infraestrutura e organização do destino; AO (Ações Operacionais) - operações e serviços turísticos.',
   },
   {
+    question: 'Como funciona o pré-preenchimento de dados oficiais?',
+    answer: 'O sistema busca automaticamente dados de bases públicas nacionais (IBGE, DATASUS, INEP, Tesouro Nacional, CADASTUR) usando o código IBGE do município. Todos os dados são exibidos com fonte, ano e nível de confiança, e DEVEM ser validados pelo usuário antes do cálculo.',
+  },
+  {
+    question: 'Por que preciso validar os dados pré-preenchidos?',
+    answer: 'A validação humana é obrigatória para garantir legitimidade institucional e evitar questionamentos políticos. Nenhum dado automático é "verdade absoluta". O diagnóstico só é calculado após o usuário confirmar ou ajustar cada valor.',
+  },
+  {
+    question: 'Quais são as fontes de dados oficiais?',
+    answer: 'O SISTUR utiliza dados de: IBGE (dados demográficos e econômicos), DATASUS (saúde), INEP (educação), STN/Tesouro Nacional (gestão fiscal) e CADASTUR (oferta turística). O código IBGE do município é a chave de integração.',
+  },
+  {
     question: 'Como funciona o diagnóstico?',
     answer: 'O diagnóstico coleta valores de indicadores que são normalizados em uma escala de 0 a 1. Cada indicador recebe um status automático (Adequado, Atenção ou Crítico) baseado no score normalizado. O sistema então identifica problemas e prescreve capacitações específicas.',
   },
@@ -40,6 +52,10 @@ const faqItems = [
   {
     question: 'Quem são os agentes-alvo dos cursos?',
     answer: 'Os cursos são direcionados a três perfis: Gestores Públicos (responsáveis por políticas), Técnicos (profissionais de planejamento) e Trade Turístico (empresários e operadores do setor).',
+  },
+  {
+    question: 'O que acontece com os dados após a validação?',
+    answer: 'Após a validação, os dados são "congelados" em um snapshot (diagnosis_data_snapshots) que preserva exatamente os valores usados em cada diagnóstico. O histórico nunca é sobrescrito, garantindo rastreabilidade completa.',
   },
 ];
 

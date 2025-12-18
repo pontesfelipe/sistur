@@ -231,6 +231,111 @@ export default function Configuracoes() {
                       </div>
                     </AccordionContent>
                   </AccordionItem>
+
+                  <AccordionItem value="prefill">
+                    <AccordionTrigger className="text-left">
+                      <div className="flex items-center gap-3">
+                        <Database className="h-4 w-4 text-primary" />
+                        Pré-preenchimento de Dados Oficiais
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground space-y-4">
+                      <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
+                        <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                          <Shield className="h-4 w-4 text-primary" />
+                          Princípio Fundamental (Não Negociável)
+                        </p>
+                        <p className="text-sm mt-2">
+                          O SISTUR <strong>não "calcula automaticamente um diagnóstico"</strong>. O SISTUR:
+                        </p>
+                        <ul className="text-sm mt-2 space-y-1 ml-4 list-disc list-inside">
+                          <li>Pré-preenche dados oficiais</li>
+                          <li>Explicita fonte, ano e confiança</li>
+                          <li>Exige validação humana</li>
+                          <li>Só depois executa normalização e diagnóstico</li>
+                        </ul>
+                        <p className="text-xs mt-2 p-2 bg-background/50 rounded">
+                          Isso garante <strong>legitimidade institucional</strong> e evita questionamentos políticos.
+                        </p>
+                      </div>
+
+                      <p className="font-medium text-foreground">Fontes Oficiais Suportadas:</p>
+                      <div className="grid gap-2">
+                        <div className="flex items-center gap-3 p-2 bg-muted/30 rounded">
+                          <span className="text-lg">📊</span>
+                          <div>
+                            <p className="font-medium text-sm">IBGE</p>
+                            <p className="text-xs text-muted-foreground">Base estrutural e chave de integração (código IBGE)</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 p-2 bg-muted/30 rounded">
+                          <span className="text-lg">🏥</span>
+                          <div>
+                            <p className="font-medium text-sm">DATASUS</p>
+                            <p className="text-xs text-muted-foreground">Saúde e bem-estar</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 p-2 bg-muted/30 rounded">
+                          <span className="text-lg">📚</span>
+                          <div>
+                            <p className="font-medium text-sm">INEP</p>
+                            <p className="text-xs text-muted-foreground">Educação (IDEB, matrículas, infraestrutura)</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 p-2 bg-muted/30 rounded">
+                          <span className="text-lg">💰</span>
+                          <div>
+                            <p className="font-medium text-sm">STN / Tesouro Nacional</p>
+                            <p className="text-xs text-muted-foreground">Gestão fiscal (receitas, despesas, dívida)</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 p-2 bg-muted/30 rounded">
+                          <span className="text-lg">🏨</span>
+                          <div>
+                            <p className="font-medium text-sm">CADASTUR</p>
+                            <p className="text-xs text-muted-foreground">Oferta turística (estabelecimentos, guias)</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="font-medium text-foreground mt-4">Fluxo de Validação:</p>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Badge variant="outline">1</Badge>
+                          <span>Usuário seleciona município (código IBGE)</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Badge variant="outline">2</Badge>
+                          <span>Sistema busca dados de todas as fontes</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Badge variant="outline">3</Badge>
+                          <span>Usuário visualiza: Indicador, Valor, Fonte, Ano, Confiança</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Badge variant="outline">4</Badge>
+                          <span>Usuário confirma, ajusta ou insere manualmente</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Badge variant="outline">5</Badge>
+                          <span>Dados congelados em snapshot para diagnóstico</span>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 mt-4">
+                        <p className="font-medium text-foreground flex items-center gap-2 text-sm">
+                          <AlertTriangle className="h-4 w-4 text-amber-500" />
+                          Regras de Governança
+                        </p>
+                        <ul className="text-xs mt-2 space-y-1 ml-4 list-disc list-inside">
+                          <li>Nenhum dado automático é "verdade absoluta"</li>
+                          <li>Sempre mostrar fonte, ano e nível de confiança</li>
+                          <li>Dados manuais devem ser visíveis e justificados</li>
+                          <li>Histórico nunca é sobrescrito</li>
+                        </ul>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
                   
                   <AccordionItem value="weights">
                     <AccordionTrigger className="text-left">
