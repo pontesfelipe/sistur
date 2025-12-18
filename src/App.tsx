@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { AdminRoute } from "@/components/layout/AdminRoute";
+import { SplashScreen } from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Destinos from "./pages/Destinos";
@@ -29,174 +31,181 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/destinos"
-              element={
-                <ProtectedRoute>
-                  <Destinos />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/diagnosticos"
-              element={
-                <ProtectedRoute>
-                  <Diagnosticos />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/diagnosticos/:id"
-              element={
-                <ProtectedRoute>
-                  <DiagnosticoDetalhe />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/indicadores"
-              element={
-                <ProtectedRoute>
-                  <Indicadores />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/importacoes"
-              element={
-                <ProtectedRoute>
-                  <Importacoes />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cursos"
-              element={
-                <ProtectedRoute>
-                  <Cursos />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/cursos"
-              element={
-                <ProtectedRoute>
-                  <AdminCursos />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/edu"
-              element={
-                <ProtectedRoute>
-                  <EduCatalogo />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/edu/trilhas"
-              element={
-                <ProtectedRoute>
-                  <EduTrilhas />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/edu/trilha/:id"
-              element={
-                <ProtectedRoute>
-                  <EduTrilhaDetalhe />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/edu/curso/:id"
-              element={
-                <ProtectedRoute>
-                  <EduCursoDetalhe />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/edu/training/:id"
-              element={
-                <ProtectedRoute>
-                  <EduTrainingDetalhe />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/learning"
-              element={
-                <ProtectedRoute>
-                  <Learning />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/configuracoes"
-              element={
-                <AdminRoute>
-                  <Configuracoes />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/relatorios"
-              element={
-                <ProtectedRoute>
-                  <Relatorios />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/nova-rodada"
-              element={
-                <ProtectedRoute>
-                  <NovaRodada />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/faq"
-              element={
-                <ProtectedRoute>
-                  <FAQ />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/ajuda"
-              element={
-                <ProtectedRoute>
-                  <Ajuda />
-                </ProtectedRoute>
-              }
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [showSplash, setShowSplash] = useState(true);
+
+  return (
+    <>
+      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Index />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/destinos"
+                  element={
+                    <ProtectedRoute>
+                      <Destinos />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/diagnosticos"
+                  element={
+                    <ProtectedRoute>
+                      <Diagnosticos />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/diagnosticos/:id"
+                  element={
+                    <ProtectedRoute>
+                      <DiagnosticoDetalhe />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/indicadores"
+                  element={
+                    <ProtectedRoute>
+                      <Indicadores />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/importacoes"
+                  element={
+                    <ProtectedRoute>
+                      <Importacoes />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/cursos"
+                  element={
+                    <ProtectedRoute>
+                      <Cursos />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/cursos"
+                  element={
+                    <ProtectedRoute>
+                      <AdminCursos />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/edu"
+                  element={
+                    <ProtectedRoute>
+                      <EduCatalogo />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/edu/trilhas"
+                  element={
+                    <ProtectedRoute>
+                      <EduTrilhas />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/edu/trilha/:id"
+                  element={
+                    <ProtectedRoute>
+                      <EduTrilhaDetalhe />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/edu/curso/:id"
+                  element={
+                    <ProtectedRoute>
+                      <EduCursoDetalhe />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/edu/training/:id"
+                  element={
+                    <ProtectedRoute>
+                      <EduTrainingDetalhe />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/learning"
+                  element={
+                    <ProtectedRoute>
+                      <Learning />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/configuracoes"
+                  element={
+                    <AdminRoute>
+                      <Configuracoes />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/relatorios"
+                  element={
+                    <ProtectedRoute>
+                      <Relatorios />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/nova-rodada"
+                  element={
+                    <ProtectedRoute>
+                      <NovaRodada />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/faq"
+                  element={
+                    <ProtectedRoute>
+                      <FAQ />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/ajuda"
+                  element={
+                    <ProtectedRoute>
+                      <Ajuda />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </>
+  );
+};
 
 export default App;
