@@ -1429,6 +1429,41 @@ export type Database = {
           },
         ]
       }
+      user_training_progress: {
+        Row: {
+          completed_at: string
+          created_at: string
+          id: string
+          track_id: string
+          training_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          track_id: string
+          training_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          track_id?: string
+          training_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_training_progress_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "edu_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import {
   Dialog,
   DialogContent,
@@ -34,11 +35,21 @@ import {
   ChevronLeft,
   Plus,
   Video,
-  Search
+  Search,
+  CheckCircle2,
+  Circle
 } from 'lucide-react';
-import { useEduTracks, useEduTrack, useEduTrackMutations, useEduTrackWithTrainings } from '@/hooks/useEdu';
+import { 
+  useEduTracks, 
+  useEduTrack, 
+  useEduTrackMutations, 
+  useEduTrackWithTrainings,
+  useUserTrackProgress,
+  useAllUserProgress,
+  useTrainingProgressMutations
+} from '@/hooks/useEdu';
 import { useEduTrainings, EduTraining } from '@/hooks/useEduTrainings';
-import { TARGET_AGENT_INFO, PILLAR_INFO, type TargetAgent } from '@/types/sistur';
+import { TARGET_AGENT_INFO, type TargetAgent } from '@/types/sistur';
 
 // Track colors for visual differentiation
 const TRACK_COLORS = [
@@ -249,10 +260,41 @@ const CreateTrackDialog = ({ trainings, onCreateTrack, isCreating }: CreateTrack
   );
 };
 
+// Progress indicator component for track cards
+interface TrackProgressProps {
+  trackId: string;
+  totalTrainings: number;
+}
+
+const TrackProgress = ({ trackId, totalTrainings }: TrackProgressProps) => {
+  const { data: progress } = useUserTrackProgress(trackId);
+  const completedCount = progress?.length || 0;
+  const percentage = totalTrainings > 0 ? Math.round((completedCount / totalTrainings) * 100) : 0;
+
+  if (totalTrainings === 0) return null;
+
+  return (
+    <div className="mt-3">
+      <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+        <span>Progresso</span>
+        <span>{completedCount}/{totalTrainings} ({percentage}%)</span>
+      </div>
+      <Progress value={percentage} className="h-2" />
+    </div>
+  );
+};
+
 const EduTrilhas = () => {
   const { data: tracks, isLoading } = useEduTracks();
   const { data: trainings } = useEduTrainings();
+  const { data: allProgress } = useAllUserProgress();
   const { createTrackWithTrainings } = useEduTrackMutations();
+
+  // Get track training counts
+  const getTrackTrainingCount = (trackId: string) => {
+    // This is a simplified approach - in production you'd want to fetch this from the server
+    return allProgress?.filter(p => p.track_id === trackId).length || 0;
+  };
 
   return (
     <AppLayout 
@@ -285,57 +327,7 @@ const EduTrilhas = () => {
       ) : tracks && tracks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tracks.map((track, index) => (
-            <Card
-              key={track.id}
-              className={`group hover:shadow-lg transition-all duration-300 animate-fade-in bg-gradient-to-br ${TRACK_COLORS[index % TRACK_COLORS.length]}`}
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <CardHeader>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="p-2 rounded-lg bg-background/80">
-                    <Route className="h-5 w-5 text-primary" />
-                  </div>
-                  {track.audience && (
-                    <Badge variant="secondary" className="text-xs">
-                      <Users className="h-3 w-3 mr-1" />
-                      {TARGET_AGENT_INFO[track.audience].label}
-                    </Badge>
-                  )}
-                </div>
-                <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                  {track.name}
-                </CardTitle>
-                {track.description && (
-                  <CardDescription className="line-clamp-2">
-                    {track.description}
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                {track.objective && (
-                  <div className="mb-4">
-                    <p className="text-sm font-medium text-foreground/80 mb-1">Objetivo</p>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {track.objective}
-                    </p>
-                  </div>
-                )}
-                {track.delivery && (
-                  <div className="flex items-center gap-2 mb-4">
-                    <GraduationCap className="h-4 w-4 text-primary" />
-                    <span className="text-sm text-muted-foreground">
-                      {track.delivery}
-                    </span>
-                  </div>
-                )}
-                <Button className="w-full" asChild>
-                  <Link to={`/edu/trilha/${track.id}`}>
-                    Ver Trilha
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+            <TrackCard key={track.id} track={track} index={index} />
           ))}
         </div>
       ) : (
@@ -358,12 +350,85 @@ const EduTrilhas = () => {
   );
 };
 
+// Separate component to fetch progress for each track
+const TrackCard = ({ track, index }: { track: any; index: number }) => {
+  const { data: trackWithTrainings } = useEduTrackWithTrainings(track.id);
+  const totalTrainings = trackWithTrainings?.trainings?.length || 0;
+
+  return (
+    <Card
+      className={`group hover:shadow-lg transition-all duration-300 animate-fade-in bg-gradient-to-br ${TRACK_COLORS[index % TRACK_COLORS.length]}`}
+      style={{ animationDelay: `${index * 100}ms` }}
+    >
+      <CardHeader>
+        <div className="flex items-center gap-2 mb-2">
+          <div className="p-2 rounded-lg bg-background/80">
+            <Route className="h-5 w-5 text-primary" />
+          </div>
+          {track.audience && (
+            <Badge variant="secondary" className="text-xs">
+              <Users className="h-3 w-3 mr-1" />
+              {TARGET_AGENT_INFO[track.audience].label}
+            </Badge>
+          )}
+        </div>
+        <CardTitle className="text-xl group-hover:text-primary transition-colors">
+          {track.name}
+        </CardTitle>
+        {track.description && (
+          <CardDescription className="line-clamp-2">
+            {track.description}
+          </CardDescription>
+        )}
+      </CardHeader>
+      <CardContent>
+        {track.objective && (
+          <div className="mb-4">
+            <p className="text-sm font-medium text-foreground/80 mb-1">Objetivo</p>
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {track.objective}
+            </p>
+          </div>
+        )}
+        
+        {totalTrainings > 0 && (
+          <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
+            <GraduationCap className="h-4 w-4" />
+            <span>{totalTrainings} treinamentos</span>
+          </div>
+        )}
+        
+        {track.delivery && (
+          <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
+            <CheckCircle2 className="h-4 w-4" />
+            <span>{track.delivery}</span>
+          </div>
+        )}
+
+        {/* Progress indicator */}
+        {totalTrainings > 0 && (
+          <TrackProgress trackId={track.id} totalTrainings={totalTrainings} />
+        )}
+        
+        <Button className="w-full mt-4" asChild>
+          <Link to={`/edu/trilha/${track.id}`}>
+            Ver Trilha
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
 // Track Detail Page
 export const EduTrilhaDetalhe = () => {
   const { id } = useParams<{ id: string }>();
   const { data: track, isLoading: trackLoading } = useEduTrack(id);
   const { data: trackWithTrainings, isLoading: trainingsLoading } = useEduTrackWithTrainings(id);
   const { data: allTrainings } = useEduTrainings();
+  const { data: userProgress } = useUserTrackProgress(id);
+  const { markComplete, markIncomplete } = useTrainingProgressMutations();
 
   const isLoading = trackLoading || trainingsLoading;
 
@@ -371,6 +436,21 @@ export const EduTrilhaDetalhe = () => {
   const trackTrainings = trackWithTrainings?.trainings
     ?.map(tt => allTrainings?.find(t => t.training_id === tt.training_id))
     .filter(Boolean) as EduTraining[] | undefined;
+
+  const completedTrainingIds = new Set(userProgress?.map(p => p.training_id) || []);
+  const totalTrainings = trackTrainings?.length || 0;
+  const completedCount = trackTrainings?.filter(t => completedTrainingIds.has(t.training_id)).length || 0;
+  const progressPercentage = totalTrainings > 0 ? Math.round((completedCount / totalTrainings) * 100) : 0;
+
+  const handleToggleComplete = (trainingId: string) => {
+    if (!id) return;
+    
+    if (completedTrainingIds.has(trainingId)) {
+      markIncomplete.mutate({ trackId: id, trainingId });
+    } else {
+      markComplete.mutate({ trackId: id, trainingId });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -408,10 +488,10 @@ export const EduTrilhaDetalhe = () => {
         </Button>
       </div>
 
-      {/* Track Info */}
+      {/* Track Info with Progress */}
       <Card className="mb-8">
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {track.audience && (
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Público-alvo</p>
@@ -422,8 +502,12 @@ export const EduTrilhaDetalhe = () => {
               </div>
             )}
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Treinamentos na trilha</p>
-              <p className="text-2xl font-bold">{trackTrainings?.length || track.courses?.length || 0}</p>
+              <p className="text-sm text-muted-foreground mb-1">Treinamentos</p>
+              <p className="text-2xl font-bold">{totalTrainings}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Concluídos</p>
+              <p className="text-2xl font-bold text-green-600">{completedCount}</p>
             </div>
             {track.delivery && (
               <div>
@@ -435,6 +519,23 @@ export const EduTrilhaDetalhe = () => {
               </div>
             )}
           </div>
+          
+          {/* Overall Progress Bar */}
+          {totalTrainings > 0 && (
+            <div className="mt-6">
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="font-medium">Seu progresso na trilha</span>
+                <span className="text-muted-foreground">{progressPercentage}% concluído</span>
+              </div>
+              <Progress value={progressPercentage} className="h-3" />
+              {progressPercentage === 100 && (
+                <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Parabéns! Você concluiu todos os treinamentos desta trilha!
+                </p>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -442,50 +543,81 @@ export const EduTrilhaDetalhe = () => {
       <h3 className="text-xl font-semibold mb-4">Treinamentos da Trilha</h3>
       {trackTrainings && trackTrainings.length > 0 ? (
         <div className="space-y-4">
-          {trackTrainings.map((training, index) => (
-            <Card key={training.training_id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge variant={training.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
-                        {training.course_code || training.pillar}
-                      </Badge>
-                      <Badge variant={training.type === 'course' ? 'default' : 'secondary'}>
-                        {training.type === 'course' ? (
-                          <><GraduationCap className="h-3 w-3 mr-1" />Curso</>
-                        ) : (
-                          <><Video className="h-3 w-3 mr-1" />Live</>
-                        )}
-                      </Badge>
+          {trackTrainings.map((training, index) => {
+            const isCompleted = completedTrainingIds.has(training.training_id);
+            
+            return (
+              <Card 
+                key={training.training_id} 
+                className={`hover:shadow-md transition-shadow ${isCompleted ? 'bg-green-50/50 dark:bg-green-950/20 border-green-200 dark:border-green-900' : ''}`}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-4">
+                    {/* Completion toggle */}
+                    <button
+                      onClick={() => handleToggleComplete(training.training_id)}
+                      className="flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full"
+                      title={isCompleted ? 'Marcar como não concluído' : 'Marcar como concluído'}
+                    >
+                      {isCompleted ? (
+                        <CheckCircle2 className="h-8 w-8 text-green-600" />
+                      ) : (
+                        <Circle className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors" />
+                      )}
+                    </button>
+                    
+                    {/* Step number */}
+                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                      isCompleted 
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
+                        : 'bg-primary/10 text-primary'
+                    }`}>
+                      {index + 1}
                     </div>
-                    <h4 className="font-medium truncate">
-                      {training.title}
-                    </h4>
-                    {training.objective && (
-                      <p className="text-sm text-muted-foreground line-clamp-1">
-                        {training.objective}
-                      </p>
-                    )}
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant={training.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
+                          {training.course_code || training.pillar}
+                        </Badge>
+                        <Badge variant={training.type === 'course' ? 'default' : 'secondary'}>
+                          {training.type === 'course' ? (
+                            <><GraduationCap className="h-3 w-3 mr-1" />Curso</>
+                          ) : (
+                            <><Video className="h-3 w-3 mr-1" />Live</>
+                          )}
+                        </Badge>
+                        {isCompleted && (
+                          <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                            Concluído
+                          </Badge>
+                        )}
+                      </div>
+                      <h4 className={`font-medium truncate ${isCompleted ? 'line-through text-muted-foreground' : ''}`}>
+                        {training.title}
+                      </h4>
+                      {training.objective && (
+                        <p className="text-sm text-muted-foreground line-clamp-1">
+                          {training.objective}
+                        </p>
+                      )}
+                    </div>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to={`/edu/training/${training.training_id}`}>
+                        <Target className="mr-2 h-4 w-4" />
+                        Ver
+                      </Link>
+                    </Button>
                   </div>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to={`/edu/training/${training.training_id}`}>
-                      <Target className="mr-2 h-4 w-4" />
-                      Ver
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       ) : track.courses && track.courses.length > 0 ? (
         // Fallback to old courses structure
         <div className="space-y-4">
-          {track.courses.map((tc, index) => (
+          {track.courses.map((tc: any, index: number) => (
             <Card key={tc.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
