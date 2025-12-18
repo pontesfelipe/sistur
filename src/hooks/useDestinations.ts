@@ -40,6 +40,19 @@ export function useDestinations() {
       if (profileError) throw profileError;
       if (!profile) throw new Error('Perfil não encontrado');
 
+      // Check for duplicate destination (same name + UF)
+      const { data: existing } = await supabase
+        .from('destinations')
+        .select('id')
+        .eq('org_id', profile.org_id)
+        .ilike('name', destination.name.trim())
+        .eq('uf', destination.uf)
+        .maybeSingle();
+
+      if (existing) {
+        throw new Error(`Já existe um destino "${destination.name}" no estado ${destination.uf}`);
+      }
+
       const { data, error } = await supabase
         .from('destinations')
         .insert({
@@ -75,6 +88,19 @@ export function useDestinations() {
       latitude?: number | null;
       longitude?: number | null;
     }) => {
+      // Check for duplicate destination (same name + UF, excluding current)
+      const { data: existing } = await supabase
+        .from('destinations')
+        .select('id')
+        .ilike('name', destination.name.trim())
+        .eq('uf', destination.uf)
+        .neq('id', id)
+        .maybeSingle();
+
+      if (existing) {
+        throw new Error(`Já existe um destino "${destination.name}" no estado ${destination.uf}`);
+      }
+
       const { data, error } = await supabase
         .from('destinations')
         .update({
