@@ -11,11 +11,23 @@ import { MessageCircleQuestion } from 'lucide-react';
 const faqItems = [
   {
     question: 'O que é o SISTUR?',
-    answer: 'O SISTUR é um Sistema de Inteligência Territorial para o Turismo que transforma indicadores públicos em decisões estratégicas e capacitação aplicada, fechando o ciclo entre diagnóstico, ação e resultado.',
+    answer: 'O SISTUR é um Sistema de Inteligência Territorial para o Turismo que transforma indicadores públicos em decisões estratégicas e capacitação aplicada, fechando o ciclo entre diagnóstico, ação e resultado. O sistema é baseado nos princípios sistêmicos de Mario Beni.',
   },
   {
     question: 'O que são os três pilares (RA, OE, AO)?',
-    answer: 'Os três pilares do SISTUR são: RA (Relações Ambientais) - aspectos ambientais e sustentabilidade; OE (Organização Estrutural) - infraestrutura e organização do destino; AO (Ações Operacionais) - operações e serviços turísticos.',
+    answer: 'Os três pilares do SISTUR são: RA (Relações Ambientais) - aspectos ambientais e sustentabilidade, é o pilar prioritário; OE (Organização Estrutural) - infraestrutura e organização do destino; AO (Ações Operacionais) - operações, serviços turísticos e governança central do sistema.',
+  },
+  {
+    question: 'O que é o Motor IGMA (Mario Beni)?',
+    answer: 'O Motor IGMA é o núcleo inteligente do SISTUR que aplica 6 regras sistêmicas baseadas na teoria de Mario Beni: (1) Prioridade RA - limitações ambientais bloqueiam expansão estrutural; (2) Ciclo contínuo - revisões programadas por severidade; (3) Externalidades negativas - alerta quando OE melhora mas RA piora; (4) Governança central - AO crítico bloqueia todo o sistema; (5) Marketing bloqueado se RA ou AO críticos; (6) Interdependência setorial identificada.',
+  },
+  {
+    question: 'Por que RA tem prioridade sobre os outros pilares?',
+    answer: 'Segundo Mario Beni, as Relações Ambientais (RA) são a base do sistema turístico. Se o ambiente está degradado, não adianta investir em infraestrutura (OE). Por isso, quando RA está crítico, o sistema bloqueia capacitações de OE até que as questões ambientais sejam resolvidas.',
+  },
+  {
+    question: 'O que significa "Marketing Bloqueado"?',
+    answer: 'O sistema bloqueia ações de marketing/promoção turística quando RA (ambiente) ou AO (operações) estão críticos. Promover um destino com problemas ambientais graves ou falhas operacionais sérias pode gerar externalidades negativas e danos à reputação.',
   },
   {
     question: 'Como funciona o pré-preenchimento de dados oficiais?',
@@ -31,7 +43,7 @@ const faqItems = [
   },
   {
     question: 'Como funciona o diagnóstico?',
-    answer: 'O diagnóstico coleta valores de indicadores que são normalizados em uma escala de 0 a 1. Cada indicador recebe um status automático (Adequado, Atenção ou Crítico) baseado no score normalizado. O sistema então identifica problemas e prescreve capacitações específicas.',
+    answer: 'O diagnóstico coleta valores de indicadores que são normalizados em uma escala de 0 a 1. O Motor IGMA aplica as 6 regras de Mario Beni, gerando alertas sistêmicos, bloqueios e a data de próxima revisão recomendada. Cada indicador recebe um status automático (Adequado, Atenção ou Crítico).',
   },
   {
     question: 'O que é a interpretação territorial?',
@@ -39,11 +51,19 @@ const faqItems = [
   },
   {
     question: 'Como são geradas as prescrições de cursos?',
-    answer: 'As prescrições são geradas automaticamente quando um indicador apresenta status Atenção ou Crítico. O curso prescrito deve corresponder ao pilar do indicador e à interpretação territorial identificada.',
+    answer: 'As prescrições são geradas automaticamente quando um indicador apresenta status Atenção ou Crítico. O Motor IGMA pode bloquear certas prescrições (ex: cursos de OE quando RA está crítico). O curso prescrito deve corresponder ao pilar do indicador e à interpretação territorial identificada.',
   },
   {
     question: 'O que significa cada status?',
-    answer: 'Adequado (verde): score ≥ 0.67, indica bom desempenho. Atenção (amarelo): score entre 0.34 e 0.66, requer monitoramento. Crítico (vermelho): score ≤ 0.33, requer ação imediata.',
+    answer: 'Adequado (verde): score ≥ 0.67, indica bom desempenho. Atenção (amarelo): score entre 0.34 e 0.66, requer monitoramento. Crítico (vermelho): score ≤ 0.33, requer ação imediata e pode ativar bloqueios IGMA.',
+  },
+  {
+    question: 'Quando é recomendada a próxima revisão?',
+    answer: 'O Motor IGMA calcula automaticamente a data de próxima revisão baseado na severidade: pilares críticos = 6 meses, pilares em atenção = 12 meses, todos adequados = 18 meses. Esta data aparece nos alertas do diagnóstico.',
+  },
+  {
+    question: 'O que são externalidades negativas no turismo?',
+    answer: 'Externalidades negativas ocorrem quando o crescimento estrutural (OE) acontece às custas do ambiente (RA). O sistema detecta isso quando OE melhora entre ciclos mas RA piora, gerando um alerta específico de externalidade.',
   },
   {
     question: 'Como funciona o monitoramento de ciclos?',
@@ -56,6 +76,10 @@ const faqItems = [
   {
     question: 'O que acontece com os dados após a validação?',
     answer: 'Após a validação, os dados são "congelados" em um snapshot (diagnosis_data_snapshots) que preserva exatamente os valores usados em cada diagnóstico. O histórico nunca é sobrescrito, garantindo rastreabilidade completa.',
+  },
+  {
+    question: 'O que significa "Dependência Intersetorial"?',
+    answer: 'Alguns indicadores dependem de ações de múltiplos setores (saúde, educação, meio ambiente, etc.). O sistema identifica esses indicadores e sinaliza que a melhoria requer articulação intersetorial, não apenas ações isoladas do turismo.',
   },
 ];
 

@@ -90,19 +90,22 @@ const workflowSteps: WorkflowStep[] = [
   {
     id: 4,
     label: "Cálculo",
-    sublabel: "Normalização",
+    sublabel: "Normalização + IGMA",
     color: "bg-purple-500",
     icon: Calculator,
     details: {
-      title: "Normalização e Cálculo de Scores",
-      description: "Valores validados são convertidos para escala 0-1 usando métodos específicos.",
+      title: "Normalização e Motor IGMA (Mario Beni)",
+      description: "Valores são normalizados e processados pelo motor IGMA que aplica os 6 princípios sistêmicos de Mario Beni.",
       items: [
-        "MIN_MAX: (valor - min) / (max - min)",
-        "BANDS: faixas categóricas predefinidas",
-        "BINARY: 0 ou 1 baseado em critério",
-        "Aplicação de pesos por indicador"
+        "Normalização MIN_MAX, BANDS ou BINARY",
+        "Regra 1: Prioridade RA - limitações ambientais bloqueiam OE",
+        "Regra 2: Ciclo contínuo - revisão programada por severidade",
+        "Regra 3: Externalidades - alerta se OE melhora e RA piora",
+        "Regra 4: Governança central - AO crítico bloqueia expansão",
+        "Regra 5: Marketing bloqueado se RA ou AO críticos",
+        "Regra 6: Interdependência setorial identificada"
       ],
-      example: "Ex: Valor 45.2% → Score 0.52 (normalizado)"
+      example: "Ex: RA crítico → EDU_OE bloqueado, marketing bloqueado"
     }
   },
   {
@@ -118,7 +121,8 @@ const workflowSteps: WorkflowStep[] = [
         "Score ≥ 0.67 → Adequado (verde)",
         "Score 0.34 – 0.66 → Atenção (amarelo)",
         "Score ≤ 0.33 → Crítico (vermelho)",
-        "Interpretação territorial atribuída"
+        "Interpretação territorial atribuída",
+        "Alertas IGMA gerados automaticamente"
       ],
       example: "Ex: Score 0.52 → Status ATENÇÃO"
     }
@@ -131,14 +135,15 @@ const workflowSteps: WorkflowStep[] = [
     icon: GraduationCap,
     details: {
       title: "Prescrição de Capacitação (SISTUR EDU)",
-      description: "Cursos são prescritos automaticamente com base em regras determinísticas, nunca por IA.",
+      description: "Cursos são prescritos automaticamente com base em regras determinísticas e respeitando bloqueios IGMA.",
       items: [
         "Indicador + Pilar + Status + Interpretação → Curso",
+        "Bloqueios IGMA respeitados (ex: EDU_OE bloqueado)",
         "Priorização automática por severidade",
         "Justificativa explícita para cada prescrição",
         "Monitoramento de evolução por ciclo"
       ],
-      example: "Ex: Curso 'Gestão de Qualidade' prescrito para indicador crítico"
+      example: "Ex: Curso 'Gestão Ambiental' prescrito, curso OE bloqueado por IGMA"
     }
   }
 ];
