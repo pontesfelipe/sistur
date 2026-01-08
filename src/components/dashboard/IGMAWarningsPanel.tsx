@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   AlertTriangle, 
   ShieldAlert, 
@@ -9,7 +11,8 @@ import {
   Users,
   Calendar,
   Info,
-  AlertCircle
+  AlertCircle,
+  BookMarked
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -144,12 +147,18 @@ export function IGMAWarningsPanel({
           </div>
         )}
 
-        {/* Legend */}
-        <div className="pt-2 border-t">
+        {/* Legend with link to methodology */}
+        <div className="pt-2 border-t flex items-center justify-between">
           <p className="text-xs text-muted-foreground flex items-center gap-1">
             <Info className="h-3 w-3" />
-            Baseado nos princípios sistêmicos do Prof. Mario Beni para turismo sustentável
+            Baseado nos princípios sistêmicos do Prof. Mario Beni
           </p>
+          <Button variant="ghost" size="sm" asChild className="h-7 text-xs">
+            <Link to="/metodologia" className="flex items-center gap-1">
+              <BookMarked className="h-3 w-3" />
+              Ver metodologia
+            </Link>
+          </Button>
         </div>
       </CardContent>
     </Card>
