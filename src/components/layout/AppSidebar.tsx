@@ -16,6 +16,7 @@ import {
   BookOpen,
   HelpCircle,
   MessageCircleQuestion,
+  BookMarked,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,7 @@ const navigation = [
 ];
 
 const bottomNavigation = [
+  { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
   { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
   { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
   { name: 'Configurações', href: '/configuracoes', icon: Settings },
