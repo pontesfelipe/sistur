@@ -84,7 +84,12 @@ export type Database = {
           calculated_at: string | null
           created_at: string
           destination_id: string
+          externality_warning: boolean | null
           id: string
+          igma_flags: Json | null
+          igma_interpretation: Json | null
+          marketing_blocked: boolean | null
+          next_review_recommended_at: string | null
           org_id: string
           period_end: string | null
           period_start: string | null
@@ -97,7 +102,12 @@ export type Database = {
           calculated_at?: string | null
           created_at?: string
           destination_id: string
+          externality_warning?: boolean | null
           id?: string
+          igma_flags?: Json | null
+          igma_interpretation?: Json | null
+          marketing_blocked?: boolean | null
+          next_review_recommended_at?: string | null
           org_id: string
           period_end?: string | null
           period_start?: string | null
@@ -110,7 +120,12 @@ export type Database = {
           calculated_at?: string | null
           created_at?: string
           destination_id?: string
+          externality_warning?: boolean | null
           id?: string
+          igma_flags?: Json | null
+          igma_interpretation?: Json | null
+          marketing_blocked?: boolean | null
+          next_review_recommended_at?: string | null
           org_id?: string
           period_end?: string | null
           period_start?: string | null
@@ -821,6 +836,60 @@ export type Database = {
           },
         ]
       }
+      igma_interpretation_history: {
+        Row: {
+          allowed_actions: string[]
+          assessment_id: string
+          blocked_actions: string[]
+          created_at: string
+          flags: string[]
+          id: string
+          interpretation_type: string | null
+          org_id: string
+          pillar_context: Json
+          ui_messages: Json
+        }
+        Insert: {
+          allowed_actions?: string[]
+          assessment_id: string
+          blocked_actions?: string[]
+          created_at?: string
+          flags?: string[]
+          id?: string
+          interpretation_type?: string | null
+          org_id: string
+          pillar_context?: Json
+          ui_messages?: Json
+        }
+        Update: {
+          allowed_actions?: string[]
+          assessment_id?: string
+          blocked_actions?: string[]
+          created_at?: string
+          flags?: string[]
+          id?: string
+          interpretation_type?: string | null
+          org_id?: string
+          pillar_context?: Json
+          ui_messages?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "igma_interpretation_history_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "igma_interpretation_history_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       indicator_course_map: {
         Row: {
           course_id: string
@@ -1030,6 +1099,7 @@ export type Database = {
           edu_suggested_titles: Json
           id: string
           igma_dimension: string | null
+          intersectoral_dependency: boolean | null
           max_ref: number | null
           min_ref: number | null
           name: string
@@ -1057,6 +1127,7 @@ export type Database = {
           edu_suggested_titles?: Json
           id?: string
           igma_dimension?: string | null
+          intersectoral_dependency?: boolean | null
           max_ref?: number | null
           min_ref?: number | null
           name: string
@@ -1084,6 +1155,7 @@ export type Database = {
           edu_suggested_titles?: Json
           id?: string
           igma_dimension?: string | null
+          intersectoral_dependency?: boolean | null
           max_ref?: number | null
           min_ref?: number | null
           name?: string
