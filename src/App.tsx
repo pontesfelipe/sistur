@@ -25,6 +25,7 @@ import Configuracoes from "./pages/Configuracoes";
 import Relatorios from "./pages/Relatorios";
 import NovaRodada from "./pages/NovaRodada";
 import FAQ from "./pages/FAQ";
+import Metodologia from "./pages/Metodologia";
 import Ajuda from "./pages/Ajuda";
 import NotFound from "./pages/NotFound";
 
@@ -185,6 +186,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <Ajuda />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/metodologia"
+                  element={
+                    <ProtectedRoute>
+                      <Metodologia />
                     </ProtectedRoute>
                   }
                 />
