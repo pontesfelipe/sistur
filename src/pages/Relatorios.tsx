@@ -82,6 +82,13 @@ export default function Relatorios() {
       return;
     }
 
+    // Get current session for authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      toast.error('Você precisa estar autenticado para gerar relatórios');
+      return;
+    }
+
     setIsGenerating(true);
     setReport('');
 
@@ -95,7 +102,7 @@ export default function Relatorios() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           assessmentId: selectedAssessmentId,
