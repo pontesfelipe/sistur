@@ -8,6 +8,7 @@ import { NormalizationView } from '@/components/dashboard/NormalizationView';
 import { IndicatorScoresView } from '@/components/dashboard/IndicatorScoresView';
 import { IssuesView } from '@/components/dashboard/IssuesView';
 import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendationsPanel';
+import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -432,6 +433,16 @@ const DiagnosticoDetalhe = () => {
                 />
               ))}
             </div>
+
+            {/* IGMA Warnings Panel */}
+            {assessment.igma_interpretation && (
+              <IGMAWarningsPanel 
+                igmaInterpretation={assessment.igma_interpretation as any}
+                nextReviewRecommendedAt={assessment.next_review_recommended_at ?? undefined}
+                marketingBlocked={assessment.marketing_blocked ?? undefined}
+                externalityWarning={assessment.externality_warning ?? undefined}
+              />
+            )}
 
             {/* Summary */}
             <div className="bg-card rounded-xl border p-6">
