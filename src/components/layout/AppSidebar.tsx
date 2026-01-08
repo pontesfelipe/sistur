@@ -32,10 +32,10 @@ const navigation = [
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap },
   { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen },
   { name: 'Relatórios', href: '/relatorios', icon: FileText },
+  { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
 ];
 
 const bottomNavigation = [
-  { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
   { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
   { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
   { name: 'Configurações', href: '/configuracoes', icon: Settings },
