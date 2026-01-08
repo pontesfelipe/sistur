@@ -21,6 +21,7 @@ interface IndicatorValue {
     min_ref: number | null;
     max_ref: number | null;
     weight: number;
+    intersectoral_dependency?: boolean;
   };
 }
 
@@ -32,6 +33,201 @@ interface Course {
 }
 
 type TerritorialInterpretation = "ESTRUTURAL" | "GESTAO" | "ENTREGA";
+type SeverityType = "CRITICO" | "MODERADO" | "BOM";
+type PillarType = "RA" | "OE" | "AO";
+
+// ============================================================
+// MOTOR IGMA - Princípios Sistêmicos de Mario Beni
+// ============================================================
+
+interface PillarContext {
+  pillar: PillarType;
+  score: number;
+  severity: SeverityType;
+  trend?: "UP" | "DOWN" | "STABLE";
+}
+
+interface IGMAFlags {
+  RA_LIMITATION: boolean;
+  GOVERNANCE_BLOCK: boolean;
+  EXTERNALITY_WARNING: boolean;
+  MARKETING_BLOCKED: boolean;
+  INTERSECTORAL_DEPENDENCY: boolean;
+}
+
+interface IGMAUIMessage {
+  type: "warning" | "info" | "critical";
+  flag: keyof IGMAFlags;
+  title: string;
+  message: string;
+  icon?: string;
+}
+
+interface IGMAOutput {
+  flags: IGMAFlags;
+  allowedActions: {
+    EDU_RA: boolean;
+    EDU_AO: boolean;
+    EDU_OE: boolean;
+    MARKETING: boolean;
+  };
+  blockedActions: string[];
+  uiMessages: IGMAUIMessage[];
+  interpretationType: TerritorialInterpretation;
+  nextReviewRecommendedAt: string;
+  criticalPillar?: PillarType;
+}
+
+/**
+ * Motor de Interpretação IGMA
+ * Aplica as 6 regras sistêmicas de Mario Beni
+ */
+function interpretIGMA(
+  pillarScores: PillarContext[],
+  previousPillarScores: PillarContext[] | null,
+  assessmentDate: Date,
+  intersectoralCount: number
+): IGMAOutput {
+  const flags: IGMAFlags = {
+    RA_LIMITATION: false,
+    GOVERNANCE_BLOCK: false,
+    EXTERNALITY_WARNING: false,
+    MARKETING_BLOCKED: false,
+    INTERSECTORAL_DEPENDENCY: false,
+  };
+  
+  const uiMessages: IGMAUIMessage[] = [];
+  const blockedActions: string[] = [];
+  
+  const RA = pillarScores.find(p => p.pillar === "RA");
+  const AO = pillarScores.find(p => p.pillar === "AO");
+  const OE = pillarScores.find(p => p.pillar === "OE");
+  
+  const prevRA = previousPillarScores?.find(p => p.pillar === "RA");
+  const prevOE = previousPillarScores?.find(p => p.pillar === "OE");
+  
+  const criticalPillar = pillarScores.reduce((prev, curr) => 
+    curr.score < prev.score ? curr : prev
+  ).pillar;
+  
+  let interpretationType: TerritorialInterpretation = "GESTAO";
+  if (RA?.severity === "CRITICO") {
+    interpretationType = "ESTRUTURAL";
+  } else if (AO?.severity === "CRITICO") {
+    interpretationType = "GESTAO";
+  } else if (OE?.severity === "CRITICO") {
+    interpretationType = "ENTREGA";
+  }
+
+  // REGRA 1 — LIMITAÇÃO ESTRUTURAL DO TERRITÓRIO
+  if (RA?.severity === "CRITICO") {
+    flags.RA_LIMITATION = true;
+    blockedActions.push("EDU_OE");
+    
+    uiMessages.push({
+      type: "critical",
+      flag: "RA_LIMITATION",
+      title: "Limitação Estrutural do Território",
+      message: "O território apresenta limitações estruturais que comprometem a sustentabilidade do turismo, independentemente de ações de mercado ou gestão isoladas.",
+      icon: "AlertTriangle",
+    });
+  }
+
+  // REGRA 4 — GOVERNANÇA CENTRAL
+  if (AO?.severity === "CRITICO") {
+    flags.GOVERNANCE_BLOCK = true;
+    if (!blockedActions.includes("EDU_OE")) {
+      blockedActions.push("EDU_OE");
+    }
+    
+    uiMessages.push({
+      type: "critical",
+      flag: "GOVERNANCE_BLOCK",
+      title: "Fragilidade de Governança",
+      message: "Fragilidades de governança comprometem a efetividade de ações de mercado e investimento no turismo.",
+      icon: "ShieldAlert",
+    });
+  }
+
+  // REGRA 3 — EXTERNALIDADES NEGATIVAS
+  if (prevRA && prevOE && RA && OE) {
+    const oeTrend = OE.score > prevOE.score ? "UP" : (OE.score < prevOE.score ? "DOWN" : "STABLE");
+    const raTrend = RA.score < prevRA.score ? "DOWN" : (RA.score > prevRA.score ? "UP" : "STABLE");
+    
+    if (oeTrend === "UP" && raTrend === "DOWN") {
+      flags.EXTERNALITY_WARNING = true;
+      
+      uiMessages.push({
+        type: "warning",
+        flag: "EXTERNALITY_WARNING",
+        title: "Alerta de Externalidades Negativas",
+        message: "O crescimento da oferta turística está ocorrendo sem a correspondente sustentabilidade territorial.",
+        icon: "TrendingUp",
+      });
+    }
+  }
+
+  // REGRA 5 — TERRITÓRIO ANTES DO MARKETING
+  if (RA?.severity === "CRITICO" || AO?.severity === "CRITICO") {
+    flags.MARKETING_BLOCKED = true;
+    blockedActions.push("MARKETING");
+    
+    uiMessages.push({
+      type: "warning",
+      flag: "MARKETING_BLOCKED",
+      title: "Marketing Bloqueado",
+      message: "A promoção turística deve ser precedida pela consolidação territorial e institucional.",
+      icon: "Ban",
+    });
+  }
+
+  // REGRA 6 — INTERSETORIALIDADE
+  if (intersectoralCount > 0) {
+    flags.INTERSECTORAL_DEPENDENCY = true;
+    
+    uiMessages.push({
+      type: "info",
+      flag: "INTERSECTORAL_DEPENDENCY",
+      title: "Dependência Intersetorial",
+      message: `${intersectoralCount} indicador(es) dependem de articulação intersetorial (saúde, segurança, educação).`,
+      icon: "Users",
+    });
+  }
+
+  // REGRA 2 — CICLO CONTÍNUO (calcular próxima revisão)
+  let nextReviewMonths = 12;
+  if (RA?.severity === "CRITICO") {
+    nextReviewMonths = 6;
+  } else if (AO?.severity === "CRITICO") {
+    nextReviewMonths = 12;
+  } else if (OE?.severity === "CRITICO") {
+    nextReviewMonths = 9;
+  } else if (RA?.severity === "MODERADO" || AO?.severity === "MODERADO" || OE?.severity === "MODERADO") {
+    nextReviewMonths = 12;
+  } else {
+    nextReviewMonths = 18;
+  }
+  
+  const nextReviewDate = new Date(assessmentDate);
+  nextReviewDate.setMonth(nextReviewDate.getMonth() + nextReviewMonths);
+
+  const allowedActions = {
+    EDU_RA: true,
+    EDU_AO: !flags.RA_LIMITATION,
+    EDU_OE: !flags.RA_LIMITATION && !flags.GOVERNANCE_BLOCK,
+    MARKETING: !flags.MARKETING_BLOCKED,
+  };
+
+  return {
+    flags,
+    allowedActions,
+    blockedActions,
+    uiMessages,
+    interpretationType,
+    nextReviewRecommendedAt: nextReviewDate.toISOString(),
+    criticalPillar,
+  };
+}
 
 // Rules for determining territorial interpretation based on pillar and theme
 function determineInterpretation(
@@ -167,7 +363,7 @@ serve(async (req) => {
 
     const orgId = assessment.org_id;
 
-    // 2. Get all indicator values with indicator details
+    // 2. Get all indicator values with indicator details (including intersectoral_dependency)
     const { data: indicatorValues, error: valuesError } = await supabase
       .from("indicator_values")
       .select(`
@@ -184,7 +380,8 @@ serve(async (req) => {
           normalization,
           min_ref,
           max_ref,
-          weight
+          weight,
+          intersectoral_dependency
         )
       `)
       .eq("assessment_id", assessment_id);
@@ -223,9 +420,17 @@ serve(async (req) => {
       AO: { scores: [], weights: [], themes: new Map() },
     };
 
+    // Count intersectoral indicators (REGRA 6)
+    let intersectoralCount = 0;
+
     for (const iv of indicatorValues as unknown as IndicatorValue[]) {
       const indicator = iv.indicator;
       if (!indicator) continue;
+
+      // Count intersectoral dependencies
+      if (indicator.intersectoral_dependency) {
+        intersectoralCount++;
+      }
 
       const score = normalizeValue(
         iv.value_raw,
@@ -323,14 +528,58 @@ serve(async (req) => {
       }
     }
 
-    // 7. Find critical pillar
+    // 7. Get previous assessment pillar scores for IGMA trend analysis
+    const destinationId = assessment.destination_id;
+    let previousPillarContexts: PillarContext[] | null = null;
+    
+    const { data: previousAssessments } = await supabase
+      .from("assessments")
+      .select("id, calculated_at")
+      .eq("destination_id", destinationId)
+      .eq("status", "CALCULATED")
+      .neq("id", assessment_id)
+      .order("calculated_at", { ascending: false })
+      .limit(1);
+
+    if (previousAssessments && previousAssessments.length > 0) {
+      const { data: prevScores } = await supabase
+        .from("pillar_scores")
+        .select("pillar, score, severity")
+        .eq("assessment_id", previousAssessments[0].id);
+      
+      if (prevScores && prevScores.length > 0) {
+        previousPillarContexts = prevScores.map(ps => ({
+          pillar: ps.pillar as PillarType,
+          score: ps.score,
+          severity: ps.severity as SeverityType,
+        }));
+      }
+    }
+
+    // 8. Apply IGMA interpretation engine (Mario Beni principles)
+    const currentPillarContexts: PillarContext[] = pillarScores.map(ps => ({
+      pillar: ps.pillar as PillarType,
+      score: ps.score,
+      severity: ps.severity as SeverityType,
+    }));
+
+    const igmaResult = interpretIGMA(
+      currentPillarContexts,
+      previousPillarContexts,
+      new Date(),
+      intersectoralCount
+    );
+
+    console.log("IGMA Result:", JSON.stringify(igmaResult, null, 2));
+
+    // Find critical pillar
     const criticalPillar = pillarScores.reduce((prev, curr) => 
       curr.score < prev.score ? curr : prev
     , pillarScores[0]);
 
     console.log(`Critical pillar: ${criticalPillar?.pillar} with score ${criticalPillar?.score}`);
 
-    // 8. Detect issues (low-scoring themes) with territorial interpretation
+    // 9. Detect issues (low-scoring themes) with territorial interpretation
     const issues: Array<{
       org_id: string;
       assessment_id: string;
@@ -392,7 +641,7 @@ serve(async (req) => {
 
     console.log(`Created ${insertedIssues.length} issues`);
 
-    // 9. Get courses for recommendations
+    // 10. Get courses for recommendations
     const { data: courses, error: coursesError } = await supabase
       .from("courses")
       .select("*")
@@ -416,7 +665,7 @@ serve(async (req) => {
       }
     }
 
-    // 10. Generate prescriptions with explicit justification (new prescription engine)
+    // 11. Generate prescriptions with IGMA filtering (Mario Beni rules)
     const prescriptions: Array<{
       org_id: string;
       assessment_id: string;
@@ -452,6 +701,15 @@ serve(async (req) => {
       });
       
       for (const issue of sortedIssues) {
+        // IGMA FILTER: Check if this pillar's EDU is allowed (Mario Beni rules)
+        const pillarActionKey = `EDU_${issue.pillar}` as keyof typeof igmaResult.allowedActions;
+        const isAllowed = igmaResult.allowedActions[pillarActionKey] ?? true;
+        
+        if (!isAllowed) {
+          console.log(`IGMA: Skipping prescriptions for pillar ${issue.pillar} - blocked by systemic rules`);
+          continue;
+        }
+
         // Find matching courses by pillar (new single pillar field first, then tags)
         const matchingCourses = (courses as any[]).filter(course => {
           // Check new pillar field first
@@ -551,12 +809,26 @@ serve(async (req) => {
 
     console.log(`Created ${recommendations.length} recommendations`);
 
-    // 11. Update assessment status
+    // 12. Update assessment with IGMA results
     const { error: updateError } = await supabase
       .from("assessments")
       .update({
         status: "CALCULATED",
         calculated_at: new Date().toISOString(),
+        next_review_recommended_at: igmaResult.nextReviewRecommendedAt,
+        igma_flags: Object.entries(igmaResult.flags)
+          .filter(([_, v]) => v)
+          .map(([k, _]) => k),
+        igma_interpretation: {
+          flags: igmaResult.flags,
+          allowedActions: igmaResult.allowedActions,
+          blockedActions: igmaResult.blockedActions,
+          uiMessages: igmaResult.uiMessages,
+          interpretationType: igmaResult.interpretationType,
+          criticalPillar: igmaResult.criticalPillar,
+        },
+        marketing_blocked: igmaResult.flags.MARKETING_BLOCKED,
+        externality_warning: igmaResult.flags.EXTERNALITY_WARNING,
       })
       .eq("id", assessment_id);
 
@@ -564,12 +836,27 @@ serve(async (req) => {
       console.error("Error updating assessment:", updateError);
     }
 
-    // 12. Detect regression patterns and create alerts
-    const destinationId = assessment.destination_id;
+    // 13. Save IGMA interpretation history
+    await supabase.from("igma_interpretation_history").insert({
+      assessment_id,
+      org_id: orgId,
+      pillar_context: currentPillarContexts,
+      flags: Object.entries(igmaResult.flags)
+        .filter(([_, v]) => v)
+        .map(([k, _]) => k),
+      allowed_actions: Object.entries(igmaResult.allowedActions)
+        .filter(([_, v]) => v)
+        .map(([k, _]) => k),
+      blocked_actions: igmaResult.blockedActions,
+      ui_messages: igmaResult.uiMessages,
+      interpretation_type: igmaResult.interpretationType,
+    });
+
+    // 14. Detect regression patterns and create alerts
     console.log(`Checking regression patterns for destination: ${destinationId}`);
 
     // Get all previous calculated assessments for this destination
-    const { data: previousAssessments } = await supabase
+    const { data: allPreviousAssessments } = await supabase
       .from("assessments")
       .select("id, calculated_at")
       .eq("destination_id", destinationId)
@@ -577,9 +864,9 @@ serve(async (req) => {
       .neq("id", assessment_id)
       .order("calculated_at", { ascending: false });
 
-    if (previousAssessments && previousAssessments.length > 0) {
+    if (allPreviousAssessments && allPreviousAssessments.length > 0) {
       // Get pillar scores for previous assessments
-      const prevAssessmentIds = previousAssessments.map(a => a.id);
+      const prevAssessmentIds = allPreviousAssessments.map(a => a.id);
       const { data: previousPillarScores } = await supabase
         .from("pillar_scores")
         .select("assessment_id, pillar, score")
@@ -608,7 +895,7 @@ serve(async (req) => {
           let lastScore = currentScore;
 
           // Go through previous assessments in order (newest first)
-          for (const prevAssessment of previousAssessments) {
+          for (const prevAssessment of allPreviousAssessments) {
             const prevScoreMap = scoresByAssessment.get(prevAssessment.id);
             if (!prevScoreMap) continue;
 
@@ -678,7 +965,32 @@ serve(async (req) => {
       }
     }
 
-    // 13. Create audit event
+    // 15. Create IGMA-based alerts for Mario Beni rules
+    for (const msg of igmaResult.uiMessages) {
+      if (msg.type === "critical" || msg.type === "warning") {
+        // Check if similar alert already exists
+        const { data: existingIgmaAlert } = await supabase
+          .from("alerts")
+          .select("id")
+          .eq("destination_id", destinationId)
+          .eq("alert_type", `IGMA_${msg.flag}`)
+          .eq("is_dismissed", false)
+          .maybeSingle();
+
+        if (!existingIgmaAlert) {
+          await supabase.from("alerts").insert({
+            org_id: orgId,
+            destination_id: destinationId,
+            pillar: igmaResult.criticalPillar || "RA",
+            alert_type: `IGMA_${msg.flag}`,
+            message: `${msg.title}: ${msg.message}`,
+            assessment_id: assessment_id,
+          });
+        }
+      }
+    }
+
+    // 16. Create audit event
     await supabase.from("audit_events").insert({
       org_id: orgId,
       event_type: "ASSESSMENT_CALCULATED",
@@ -689,6 +1001,9 @@ serve(async (req) => {
         critical_pillar: criticalPillar?.pillar,
         issues_count: insertedIssues.length,
         recommendations_count: recommendations.length,
+        igma_flags: igmaResult.flags,
+        igma_blocked_actions: igmaResult.blockedActions,
+        next_review_at: igmaResult.nextReviewRecommendedAt,
       },
     });
 
@@ -702,6 +1017,13 @@ serve(async (req) => {
         critical_score: criticalPillar?.score,
         issues_created: insertedIssues.length,
         recommendations_created: recommendations.length,
+        igma: {
+          flags: igmaResult.flags,
+          allowedActions: igmaResult.allowedActions,
+          blockedActions: igmaResult.blockedActions,
+          uiMessages: igmaResult.uiMessages,
+          nextReviewRecommendedAt: igmaResult.nextReviewRecommendedAt,
+        },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
