@@ -836,6 +836,36 @@ export type Database = {
           },
         ]
       }
+      generated_reports: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          created_by: string
+          destination_name: string
+          id: string
+          org_id: string
+          report_content: string
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          created_by: string
+          destination_name: string
+          id?: string
+          org_id: string
+          report_content: string
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          created_by?: string
+          destination_name?: string
+          id?: string
+          org_id?: string
+          report_content?: string
+        }
+        Relationships: []
+      }
       igma_interpretation_history: {
         Row: {
           allowed_actions: string[]

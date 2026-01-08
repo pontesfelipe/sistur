@@ -24,10 +24,14 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } }
     });
+
+    // Service role client for saving reports (bypasses RLS)
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
     // Verify user JWT using getUser
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -60,13 +64,15 @@ serve(async (req) => {
       });
     }
 
+    const orgId = profile.org_id;
+
     const { data: assessment } = await supabase
       .from('assessments')
       .select('org_id')
       .eq('id', assessmentId)
       .single();
     
-    if (!assessment || assessment.org_id !== profile.org_id) {
+    if (!assessment || assessment.org_id !== orgId) {
       console.error('User does not have access to this assessment');
       return new Response(JSON.stringify({ error: 'Acesso negado a este diagnóstico' }), {
         status: 403,
@@ -209,7 +215,66 @@ Por favor, gere um relatório completo seguindo a metodologia SISTUR, consideran
 
     console.log('Streaming SISTUR report from AI gateway');
     
-    return new Response(response.body, {
+    // Create a TransformStream to collect content while streaming
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+    let fullContent = '';
+
+    // Process the stream in background
+    (async () => {
+      try {
+        const reader = response.body!.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          // Pass through the chunk to the client
+          await writer.write(value);
+          
+          // Also decode and collect the content
+          const text = decoder.decode(value, { stream: true });
+          for (const line of text.split('\n')) {
+            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+              try {
+                const json = JSON.parse(line.slice(6));
+                const content = json.choices?.[0]?.delta?.content;
+                if (content) {
+                  fullContent += content;
+                }
+              } catch { /* ignore parse errors */ }
+            }
+          }
+        }
+        
+        await writer.close();
+
+        // Save the complete report to database
+        if (fullContent) {
+          const { error: saveError } = await supabaseAdmin
+            .from('generated_reports')
+            .insert({
+              org_id: orgId,
+              assessment_id: assessmentId,
+              destination_name: destinationName,
+              report_content: fullContent,
+              created_by: userId,
+            });
+          
+          if (saveError) {
+            console.error('Error saving report:', saveError);
+          } else {
+            console.log('Report saved successfully');
+          }
+        }
+      } catch (err) {
+        console.error('Stream processing error:', err);
+        await writer.abort(err);
+      }
+    })();
+
+    return new Response(readable, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (error) {
