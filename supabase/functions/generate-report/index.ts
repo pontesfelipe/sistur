@@ -12,8 +12,69 @@ serve(async (req) => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.error('Missing or invalid authorization header');
+      return new Response(JSON.stringify({ error: 'Não autenticado' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    // Verify user JWT
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    
+    if (claimsError || !claimsData?.claims) {
+      console.error('Invalid JWT token:', claimsError);
+      return new Response(JSON.stringify({ error: 'Token inválido' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const userId = claimsData.claims.sub;
+    console.log('Authenticated user:', userId);
+
     const { assessmentId, destinationName, pillarScores, issues, prescriptions } = await req.json();
     
+    // Verify user has access to this assessment via their org
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('org_id')
+      .eq('user_id', userId)
+      .single();
+    
+    if (!profile) {
+      console.error('User profile not found');
+      return new Response(JSON.stringify({ error: 'Perfil de usuário não encontrado' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { data: assessment } = await supabase
+      .from('assessments')
+      .select('org_id')
+      .eq('id', assessmentId)
+      .single();
+    
+    if (!assessment || assessment.org_id !== profile.org_id) {
+      console.error('User does not have access to this assessment');
+      return new Response(JSON.stringify({ error: 'Acesso negado a este diagnóstico' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     console.log('Generating SISTUR report for:', destinationName);
     console.log('Assessment ID:', assessmentId);
     console.log('Pillar scores:', pillarScores);
