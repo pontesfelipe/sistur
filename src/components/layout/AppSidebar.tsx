@@ -17,6 +17,7 @@ import {
   HelpCircle,
   MessageCircleQuestion,
   BookMarked,
+  Activity,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Destinos', href: '/destinos', icon: MapPin },
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList },
+  { name: 'Monitoramento ERP', href: '/erp', icon: Activity },
   { name: 'Indicadores', href: '/indicadores', icon: BarChart3 },
   { name: 'Importações', href: '/importacoes', icon: Upload },
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap },

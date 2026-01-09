@@ -27,6 +27,7 @@ import NovaRodada from "./pages/NovaRodada";
 import FAQ from "./pages/FAQ";
 import Metodologia from "./pages/Metodologia";
 import Ajuda from "./pages/Ajuda";
+import ERPDashboard from "./pages/ERPDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -170,6 +171,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <NovaRodada />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/erp"
+                  element={
+                    <ProtectedRoute>
+                      <ERPDashboard />
                     </ProtectedRoute>
                   }
                 />
