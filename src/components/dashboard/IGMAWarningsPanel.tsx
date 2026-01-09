@@ -50,6 +50,8 @@ interface IGMAWarningsPanelProps {
   nextReviewRecommendedAt?: string;
   marketingBlocked?: boolean;
   externalityWarning?: boolean;
+  raLimitation?: boolean;
+  governanceBlock?: boolean;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -65,9 +67,11 @@ export function IGMAWarningsPanel({
   nextReviewRecommendedAt,
   marketingBlocked,
   externalityWarning,
+  raLimitation,
+  governanceBlock,
 }: IGMAWarningsPanelProps) {
   const messages = igmaInterpretation?.uiMessages || [];
-  const hasWarnings = messages.length > 0 || marketingBlocked || externalityWarning;
+  const hasWarnings = messages.length > 0 || marketingBlocked || externalityWarning || raLimitation || governanceBlock;
 
   if (!hasWarnings && !nextReviewRecommendedAt) {
     return null;

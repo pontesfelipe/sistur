@@ -9,6 +9,7 @@ import { IndicatorScoresView } from '@/components/dashboard/IndicatorScoresView'
 import { IssuesView } from '@/components/dashboard/IssuesView';
 import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendationsPanel';
 import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
+import { ActionPlansView } from '@/components/dashboard/ActionPlansView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +50,7 @@ import {
   RotateCcw,
   PlusCircle,
   Edit,
+  ClipboardList,
   Database,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
@@ -397,7 +399,7 @@ const DiagnosticoDetalhe = () => {
 
       {isCalculated && pillarScores.length > 0 ? (
         <Tabs defaultValue="radiografia" className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-5">
+          <TabsList className="grid w-full max-w-3xl grid-cols-6">
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Radiografia</span>
@@ -417,6 +419,10 @@ const DiagnosticoDetalhe = () => {
             <TabsTrigger value="tratamento" className="gap-2">
               <GraduationCap className="h-4 w-4" />
               <span className="hidden sm:inline">Tratamento</span>
+            </TabsTrigger>
+            <TabsTrigger value="planos" className="gap-2">
+              <ClipboardList className="h-4 w-4" />
+              <span className="hidden sm:inline">Planos</span>
             </TabsTrigger>
           </TabsList>
 
@@ -441,6 +447,8 @@ const DiagnosticoDetalhe = () => {
                 nextReviewRecommendedAt={assessment.next_review_recommended_at ?? undefined}
                 marketingBlocked={assessment.marketing_blocked ?? undefined}
                 externalityWarning={assessment.externality_warning ?? undefined}
+                raLimitation={(assessment as any).ra_limitation ?? undefined}
+                governanceBlock={(assessment as any).governance_block ?? undefined}
               />
             )}
 
@@ -540,6 +548,11 @@ const DiagnosticoDetalhe = () => {
                 />
               </div>
             )}
+          </TabsContent>
+
+          {/* Planos de Ação Tab */}
+          <TabsContent value="planos">
+            <ActionPlansView assessmentId={id!} />
           </TabsContent>
         </Tabs>
       ) : (

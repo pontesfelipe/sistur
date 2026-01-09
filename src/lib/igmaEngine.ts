@@ -2,8 +2,14 @@
  * SISTUR - Motor de Interpretação IGMA
  * Implementação dos Princípios Sistêmicos de Mario Beni
  * 
- * Este motor centraliza a lógica de interpretação territorial e
- * aplicação das regras sistêmicas definidas no documento de princípios.
+ * IMPORTANTE: O backend (calculate-assessment edge function) é a FONTE ÚNICA DE VERDADE
+ * para o cálculo do IGMA. Este módulo frontend é usado apenas para:
+ * 1. Tipagem (interfaces e types)
+ * 2. Helpers de exibição (labels, formatação)
+ * 3. Re-interpretação de dados já calculados pelo backend
+ * 
+ * Qualquer alteração nas regras sistêmicas deve ser feita PRIMEIRO no backend
+ * (supabase/functions/calculate-assessment/index.ts) e depois replicada aqui.
  */
 
 // Types

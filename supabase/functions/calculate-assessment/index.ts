@@ -403,6 +403,13 @@ serve(async (req) => {
 
     console.log(`Processing ${indicatorValues.length} indicator values`);
 
+    // 3.1 Fetch composite rules for I_SEMT calculation
+    const { data: compositeRules } = await supabase
+      .from("igma_composite_rules")
+      .select("composite_code, component_code, weight, transform");
+
+    console.log(`Found ${compositeRules?.length || 0} composite rules`);
+
     // 3. Calculate scores for each indicator
     const indicatorScores: Array<{
       org_id: string;
@@ -467,7 +474,99 @@ serve(async (req) => {
       }
     }
 
-    // 4. Delete existing scores/issues/recommendations/prescriptions for this assessment
+    // 3.2 Calculate composite indicators (e.g., I_SEMT)
+    if (compositeRules && compositeRules.length > 0) {
+      // Group rules by composite_code
+      const rulesByComposite = new Map<string, typeof compositeRules>();
+      for (const rule of compositeRules) {
+        if (!rulesByComposite.has(rule.composite_code)) {
+          rulesByComposite.set(rule.composite_code, []);
+        }
+        rulesByComposite.get(rule.composite_code)!.push(rule);
+      }
+
+      // Calculate each composite indicator
+      for (const [compositeCode, rules] of rulesByComposite) {
+        // Get component scores from already calculated indicator scores
+        const componentScores: { score: number; weight: number }[] = [];
+        
+        for (const rule of rules) {
+          // Find the component indicator value
+          const componentIv = (indicatorValues as unknown as IndicatorValue[]).find(
+            iv => iv.indicator?.code === rule.component_code
+          );
+          
+          if (componentIv && componentIv.value_raw !== null && componentIv.indicator) {
+            let score = normalizeValue(
+              componentIv.value_raw,
+              componentIv.indicator.min_ref,
+              componentIv.indicator.max_ref,
+              componentIv.indicator.direction,
+              componentIv.indicator.normalization
+            );
+            
+            // Apply transform
+            if (rule.transform === "INVERT") {
+              score = 1 - score;
+            } else if (rule.transform === "LOG") {
+              score = Math.log1p(score) / Math.log1p(1);
+            } else if (rule.transform === "SQRT") {
+              score = Math.sqrt(score);
+            }
+            
+            componentScores.push({ score, weight: Number(rule.weight) });
+          }
+        }
+
+        // Calculate weighted average if we have components
+        if (componentScores.length > 0) {
+          const totalWeight = componentScores.reduce((sum, c) => sum + c.weight, 0);
+          const compositeScore = totalWeight > 0
+            ? componentScores.reduce((sum, c) => sum + c.score * c.weight, 0) / totalWeight
+            : 0;
+
+          // Find the composite indicator
+          const { data: compositeIndicator } = await supabase
+            .from("indicators")
+            .select("id, pillar, theme")
+            .eq("code", compositeCode)
+            .single();
+
+          if (compositeIndicator) {
+            // Add to indicator scores
+            indicatorScores.push({
+              org_id: orgId,
+              assessment_id,
+              indicator_id: compositeIndicator.id,
+              score: compositeScore,
+              min_ref_used: 0,
+              max_ref_used: 100,
+              weight_used: 1.5,
+            });
+
+            // Add to pillar data
+            const pillar = compositeIndicator.pillar;
+            if (pillarData[pillar]) {
+              pillarData[pillar].scores.push(compositeScore);
+              pillarData[pillar].weights.push(1.5);
+
+              const theme = compositeIndicator.theme;
+              if (!pillarData[pillar].themes.has(theme)) {
+                pillarData[pillar].themes.set(theme, { scores: [], names: [], codes: [] });
+              }
+              pillarData[pillar].themes.get(theme)!.scores.push(compositeScore);
+              pillarData[pillar].themes.get(theme)!.names.push(`Índice Composto ${compositeCode}`);
+              pillarData[pillar].themes.get(theme)!.codes.push(compositeCode);
+            }
+
+            console.log(`Calculated composite ${compositeCode}: ${compositeScore.toFixed(3)}`);
+          }
+        }
+      }
+    }
+
+    // 4. Delete existing scores/issues/recommendations/prescriptions/action_plans for this assessment
+    await supabase.from("action_plans").delete().eq("assessment_id", assessment_id);
     await supabase.from("prescriptions").delete().eq("assessment_id", assessment_id);
     await supabase.from("recommendations").delete().eq("assessment_id", assessment_id);
     await supabase.from("issues").delete().eq("assessment_id", assessment_id);
@@ -809,7 +908,7 @@ serve(async (req) => {
 
     console.log(`Created ${recommendations.length} recommendations`);
 
-    // 12. Update assessment with IGMA results
+    // 12. Update assessment with IGMA results (including new ra_limitation and governance_block flags)
     const { error: updateError } = await supabase
       .from("assessments")
       .update({
@@ -829,11 +928,89 @@ serve(async (req) => {
         },
         marketing_blocked: igmaResult.flags.MARKETING_BLOCKED,
         externality_warning: igmaResult.flags.EXTERNALITY_WARNING,
+        // NEW: Persist RA_LIMITATION and GOVERNANCE_BLOCK flags for full auditability
+        ra_limitation: igmaResult.flags.RA_LIMITATION,
+        governance_block: igmaResult.flags.GOVERNANCE_BLOCK,
       })
       .eq("id", assessment_id);
 
     if (updateError) {
       console.error("Error updating assessment:", updateError);
+    }
+
+    // 12.1 Generate initial action plans from issues/prescriptions (ERP cycle closure)
+    console.log("Generating initial action plans...");
+    const actionPlans: Array<{
+      org_id: string;
+      assessment_id: string;
+      title: string;
+      description: string;
+      pillar: string;
+      priority: number;
+      linked_issue_id?: string;
+      linked_prescription_id?: string;
+      due_date: string;
+    }> = [];
+
+    // Create action plans based on critical issues
+    for (const issue of insertedIssues) {
+      if (issue.severity === "CRITICO" || issue.severity === "MODERADO") {
+        const pillarNames: Record<string, string> = {
+          RA: "Relações Ambientais",
+          OE: "Organização Estrutural",
+          AO: "Ações Operacionais"
+        };
+        
+        // Calculate due date based on severity
+        const dueDate = new Date();
+        if (issue.severity === "CRITICO") {
+          dueDate.setMonth(dueDate.getMonth() + 3); // 3 months for critical
+        } else {
+          dueDate.setMonth(dueDate.getMonth() + 6); // 6 months for moderate
+        }
+
+        actionPlans.push({
+          org_id: orgId,
+          assessment_id,
+          title: `Plano de Ação: ${issue.theme} (${pillarNames[issue.pillar]})`,
+          description: `Ação corretiva para o gargalo identificado: ${issue.title}. Interpretação territorial: ${issue.interpretation}.`,
+          pillar: issue.pillar,
+          priority: issue.severity === "CRITICO" ? 1 : 2,
+          linked_issue_id: issue.id,
+          due_date: dueDate.toISOString().split('T')[0],
+        });
+      }
+    }
+
+    // Link prescriptions to action plans
+    if (prescriptions.length > 0 && actionPlans.length > 0) {
+      // Get inserted prescriptions to link them
+      const { data: insertedPrescriptions } = await supabase
+        .from("prescriptions")
+        .select("id, issue_id")
+        .eq("assessment_id", assessment_id);
+      
+      if (insertedPrescriptions) {
+        for (const ap of actionPlans) {
+          const matchingPrescription = insertedPrescriptions.find(p => p.issue_id === ap.linked_issue_id);
+          if (matchingPrescription) {
+            ap.linked_prescription_id = matchingPrescription.id;
+          }
+        }
+      }
+    }
+
+    // Insert action plans
+    if (actionPlans.length > 0) {
+      const { error: insertApError } = await supabase
+        .from("action_plans")
+        .insert(actionPlans);
+
+      if (insertApError) {
+        console.error("Error inserting action plans:", insertApError);
+      } else {
+        console.log(`Created ${actionPlans.length} action plans`);
+      }
     }
 
     // 13. Save IGMA interpretation history
