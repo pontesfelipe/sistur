@@ -14,6 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
+      action_plans: {
+        Row: {
+          assessment_id: string
+          completed_at: string | null
+          completion_notes: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          linked_issue_id: string | null
+          linked_prescription_id: string | null
+          org_id: string
+          owner: string | null
+          pillar: string | null
+          priority: number | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assessment_id: string
+          completed_at?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          linked_issue_id?: string | null
+          linked_prescription_id?: string | null
+          org_id: string
+          owner?: string | null
+          pillar?: string | null
+          priority?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assessment_id?: string
+          completed_at?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          linked_issue_id?: string | null
+          linked_prescription_id?: string | null
+          org_id?: string
+          owner?: string | null
+          pillar?: string | null
+          priority?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "action_plans_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "action_plans_linked_issue_id_fkey"
+            columns: ["linked_issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "action_plans_linked_prescription_id_fkey"
+            columns: ["linked_prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "action_plans_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alerts: {
         Row: {
           alert_type: string
@@ -85,6 +171,7 @@ export type Database = {
           created_at: string
           destination_id: string
           externality_warning: boolean | null
+          governance_block: boolean | null
           id: string
           igma_flags: Json | null
           igma_interpretation: Json | null
@@ -93,6 +180,7 @@ export type Database = {
           org_id: string
           period_end: string | null
           period_start: string | null
+          ra_limitation: boolean | null
           status: Database["public"]["Enums"]["assessment_status"]
           title: string
           updated_at: string
@@ -103,6 +191,7 @@ export type Database = {
           created_at?: string
           destination_id: string
           externality_warning?: boolean | null
+          governance_block?: boolean | null
           id?: string
           igma_flags?: Json | null
           igma_interpretation?: Json | null
@@ -111,6 +200,7 @@ export type Database = {
           org_id: string
           period_end?: string | null
           period_start?: string | null
+          ra_limitation?: boolean | null
           status?: Database["public"]["Enums"]["assessment_status"]
           title: string
           updated_at?: string
@@ -121,6 +211,7 @@ export type Database = {
           created_at?: string
           destination_id?: string
           externality_warning?: boolean | null
+          governance_block?: boolean | null
           id?: string
           igma_flags?: Json | null
           igma_interpretation?: Json | null
@@ -129,6 +220,7 @@ export type Database = {
           org_id?: string
           period_end?: string | null
           period_start?: string | null
+          ra_limitation?: boolean | null
           status?: Database["public"]["Enums"]["assessment_status"]
           title?: string
           updated_at?: string
@@ -863,6 +955,33 @@ export type Database = {
           id?: string
           org_id?: string
           report_content?: string
+        }
+        Relationships: []
+      }
+      igma_composite_rules: {
+        Row: {
+          component_code: string
+          composite_code: string
+          created_at: string
+          id: string
+          transform: string
+          weight: number
+        }
+        Insert: {
+          component_code: string
+          composite_code: string
+          created_at?: string
+          id?: string
+          transform?: string
+          weight?: number
+        }
+        Update: {
+          component_code?: string
+          composite_code?: string
+          created_at?: string
+          id?: string
+          transform?: string
+          weight?: number
         }
         Relationships: []
       }
