@@ -15,7 +15,9 @@ import {
   Route,
   Target,
   Video,
-  FileText
+  FileText,
+  CheckCircle,
+  Clock
 } from 'lucide-react';
 import { useEduTrainings, useEduTrainingStats } from '@/hooks/useEduTrainings';
 import { useEduTracks } from '@/hooks/useEdu';
@@ -34,6 +36,7 @@ import {
 const EduCatalogo = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<string>('all');
   
   const { data: trainings, isLoading: trainingsLoading } = useEduTrainings();
@@ -51,8 +54,17 @@ const EduCatalogo = () => {
     
     const matchesType = typeFilter === 'all' || training.type === typeFilter;
     
-    return matchesSearch && matchesPillar && matchesType;
+    const isPublished = training.status === 'published' && training.active;
+    const matchesStatus = statusFilter === 'all' || 
+      (statusFilter === 'published' && isPublished) ||
+      (statusFilter === 'draft' && !isPublished);
+    
+    return matchesSearch && matchesPillar && matchesType && matchesStatus;
   }) || [];
+
+  // Count stats for status filter
+  const publishedCount = trainings?.filter(t => t.status === 'published' && t.active).length || 0;
+  const draftCount = trainings?.filter(t => t.status !== 'published' || !t.active).length || 0;
 
   const isLoading = trainingsLoading || tracksLoading;
 
@@ -88,7 +100,7 @@ const EduCatalogo = () => {
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="all">Todos tipos</SelectItem>
               <SelectItem value="course">
                 <span className="flex items-center gap-2">
                   <GraduationCap className="h-4 w-4" />
@@ -99,6 +111,26 @@ const EduCatalogo = () => {
                 <span className="flex items-center gap-2">
                   <Video className="h-4 w-4" />
                   Lives
+                </span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos status</SelectItem>
+              <SelectItem value="published">
+                <span className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  Publicados ({publishedCount})
+                </span>
+              </SelectItem>
+              <SelectItem value="draft">
+                <span className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-amber-500" />
+                  Em progresso ({draftCount})
                 </span>
               </SelectItem>
             </SelectContent>
@@ -191,7 +223,7 @@ const EduCatalogo = () => {
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <CardHeader className="pb-3">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <Badge variant={training.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
                           {training.course_code || training.pillar}
                         </Badge>
@@ -202,6 +234,17 @@ const EduCatalogo = () => {
                             <><Video className="h-3 w-3 mr-1" />Live</>
                           )}
                         </Badge>
+                        {training.status === 'published' && training.active ? (
+                          <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Ativo
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50">
+                            <Clock className="h-3 w-3 mr-1" />
+                            Em progresso
+                          </Badge>
+                        )}
                       </div>
                       <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-2">
                         {training.title}

@@ -22,6 +22,7 @@ export interface EduTraining {
   aliases: unknown;
   source: string | null;
   active: boolean;
+  status: string | null;
   org_id: string | null;
   created_at: string;
 }
@@ -42,15 +43,19 @@ export interface IndicatorTrainingMapping {
 // ============================================
 // EDU TRAININGS (Unified courses + lives)
 // ============================================
-export function useEduTrainings(type?: 'course' | 'live', pillar?: Pillar) {
+export function useEduTrainings(type?: 'course' | 'live', pillar?: Pillar, includeInactive = true) {
   return useQuery({
-    queryKey: ['edu-trainings', type, pillar],
+    queryKey: ['edu-trainings', type, pillar, includeInactive],
     queryFn: async () => {
       let query = supabase
         .from('edu_trainings')
         .select('*')
-        .eq('active', true)
         .order('title', { ascending: true });
+      
+      // Only filter by active if explicitly requested
+      if (!includeInactive) {
+        query = query.eq('active', true);
+      }
       
       if (type) {
         query = query.eq('type', type);
