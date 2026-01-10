@@ -14,10 +14,13 @@ import {
   BookOpen,
   FileText,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Clock,
+  Eye
 } from 'lucide-react';
 import { useEduTraining, type TrainingModule } from '@/hooks/useEduTrainings';
 import { PILLAR_INFO } from '@/types/sistur';
+import { VideoPlayer } from '@/components/edu/VideoPlayer';
 
 const EduTrainingDetalhe = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,6 +60,11 @@ const EduTrainingDetalhe = () => {
 
   const pillarInfo = PILLAR_INFO[training.pillar as keyof typeof PILLAR_INFO];
   const modules = Array.isArray(training.modules) ? training.modules as TrainingModule[] : [];
+  
+  // Extract video metadata
+  const hasVideo = !!training.video_url;
+  const videoProvider = (training.video_provider as 'youtube' | 'vimeo' | 'supabase' | 'mux') || 'supabase';
+  const ingestionMeta = training.ingestion_metadata as { viewCount?: number; likeCount?: number } | null;
 
   return (
     <AppLayout 
@@ -74,6 +82,34 @@ const EduTrainingDetalhe = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Video Player */}
+          {hasVideo && training.video_url && (
+            <VideoPlayer
+              videoUrl={training.video_url}
+              videoProvider={videoProvider}
+              trainingId={training.training_id}
+            />
+          )}
+
+          {/* Thumbnail fallback when no video */}
+          {!hasVideo && training.thumbnail_url && (
+            <Card className="overflow-hidden">
+              <div className="aspect-video relative">
+                <img 
+                  src={training.thumbnail_url} 
+                  alt={training.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <Video className="h-12 w-12 mx-auto mb-2 opacity-70" />
+                    <p className="text-sm opacity-80">Vídeo em breve</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          )}
+
           {/* Header card */}
           <Card>
             <CardHeader>
@@ -94,6 +130,18 @@ const EduTrainingDetalhe = () => {
                 {pillarInfo && (
                   <Badge variant="outline" style={{ borderColor: pillarInfo.color, color: pillarInfo.color }}>
                     {pillarInfo.name}
+                  </Badge>
+                )}
+                {training.duration_minutes && (
+                  <Badge variant="outline" className="text-muted-foreground">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {training.duration_minutes} min
+                  </Badge>
+                )}
+                {ingestionMeta?.viewCount && (
+                  <Badge variant="outline" className="text-muted-foreground">
+                    <Eye className="h-3 w-3 mr-1" />
+                    {ingestionMeta.viewCount.toLocaleString('pt-BR')}
                   </Badge>
                 )}
               </div>
@@ -221,12 +269,32 @@ const EduTrainingDetalhe = () => {
                   </div>
                 </>
               )}
+              {training.duration_minutes && (
+                <>
+                  <Separator />
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Duração</span>
+                    <span className="font-medium">{training.duration_minutes} min</span>
+                  </div>
+                </>
+              )}
               {training.source && (
                 <>
                   <Separator />
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Fonte</span>
                     <span className="font-medium text-xs">{training.source}</span>
+                  </div>
+                </>
+              )}
+              {training.ingestion_source && (
+                <>
+                  <Separator />
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Origem</span>
+                    <Badge variant="outline" className="text-xs">
+                      {training.ingestion_source === 'youtube_data_api' ? 'YouTube' : training.ingestion_source}
+                    </Badge>
                   </div>
                 </>
               )}
