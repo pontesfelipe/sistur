@@ -25,6 +25,15 @@ export interface EduTraining {
   status: string | null;
   org_id: string | null;
   created_at: string;
+  // Video fields
+  video_url: string | null;
+  video_provider: string | null;
+  thumbnail_url: string | null;
+  duration_minutes: number | null;
+  // Ingestion metadata
+  ingestion_source: string | null;
+  ingestion_metadata: unknown;
+  ingestion_confidence: number | null;
 }
 
 export interface IndicatorTrainingMapping {
