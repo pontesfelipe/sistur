@@ -490,6 +490,82 @@ export type Database = {
           },
         ]
       }
+      edu_enrollments: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          enrolled_at: string
+          id: string
+          status: string
+          trail_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          enrolled_at?: string
+          id?: string
+          status?: string
+          trail_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          enrolled_at?: string
+          id?: string
+          status?: string
+          trail_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_enrollments_trail_id_fkey"
+            columns: ["trail_id"]
+            isOneToOne: false
+            referencedRelation: "edu_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          event_value: Json | null
+          id: string
+          trail_id: string | null
+          training_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          event_value?: Json | null
+          id?: string
+          trail_id?: string | null
+          training_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          event_value?: Json | null
+          id?: string
+          trail_id?: string | null
+          training_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_events_trail_id_fkey"
+            columns: ["trail_id"]
+            isOneToOne: false
+            referencedRelation: "edu_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       edu_indicator_training_map: {
         Row: {
           created_at: string
@@ -652,6 +728,56 @@ export type Database = {
           },
         ]
       }
+      edu_progress: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          last_activity_at: string
+          progress_percent: number
+          started_at: string
+          trail_id: string | null
+          training_id: string
+          user_id: string
+          watch_seconds: number
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_activity_at?: string
+          progress_percent?: number
+          started_at?: string
+          trail_id?: string | null
+          training_id: string
+          user_id: string
+          watch_seconds?: number
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_activity_at?: string
+          progress_percent?: number
+          started_at?: string
+          trail_id?: string | null
+          training_id?: string
+          user_id?: string
+          watch_seconds?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_progress_trail_id_fkey"
+            columns: ["trail_id"]
+            isOneToOne: false
+            referencedRelation: "edu_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       edu_track_courses: {
         Row: {
           course_id: string
@@ -695,23 +821,29 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          required: boolean | null
           sort_order: number
           track_id: string
           training_id: string
+          unlock_rule: Json | null
         }
         Insert: {
           created_at?: string
           id?: string
+          required?: boolean | null
           sort_order?: number
           track_id: string
           training_id: string
+          unlock_rule?: Json | null
         }
         Update: {
           created_at?: string
           id?: string
+          required?: boolean | null
           sort_order?: number
           track_id?: string
           training_id?: string
+          unlock_rule?: Json | null
         }
         Relationships: [
           {
@@ -725,34 +857,55 @@ export type Database = {
       }
       edu_tracks: {
         Row: {
+          active: boolean | null
           audience: Database["public"]["Enums"]["target_agent"] | null
+          cover_image_url: string | null
           created_at: string
+          created_by: string | null
           delivery: string | null
           description: string | null
           id: string
           name: string
           objective: string | null
           org_id: string | null
+          published_at: string | null
+          slug: string | null
+          status: string | null
+          updated_at: string | null
         }
         Insert: {
+          active?: boolean | null
           audience?: Database["public"]["Enums"]["target_agent"] | null
+          cover_image_url?: string | null
           created_at?: string
+          created_by?: string | null
           delivery?: string | null
           description?: string | null
           id?: string
           name: string
           objective?: string | null
           org_id?: string | null
+          published_at?: string | null
+          slug?: string | null
+          status?: string | null
+          updated_at?: string | null
         }
         Update: {
+          active?: boolean | null
           audience?: Database["public"]["Enums"]["target_agent"] | null
+          cover_image_url?: string | null
           created_at?: string
+          created_by?: string | null
           delivery?: string | null
           description?: string | null
           id?: string
           name?: string
           objective?: string | null
           org_id?: string | null
+          published_at?: string | null
+          slug?: string | null
+          status?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -770,48 +923,96 @@ export type Database = {
           aliases: Json
           course_code: string | null
           created_at: string
+          created_by: string | null
+          description: string | null
+          duration_minutes: number | null
+          free_preview_seconds: number | null
+          language: string | null
           level: string | null
+          materials: Json | null
           modules: Json
           objective: string | null
+          objectives: string | null
           org_id: string | null
           pillar: string
+          published_at: string | null
+          slug: string | null
           source: string | null
+          status: string | null
+          tags: Json | null
           target_audience: string | null
+          thumbnail_url: string | null
           title: string
           training_id: string
           type: string
+          updated_at: string | null
+          video_asset: Json | null
+          video_provider: string | null
+          video_url: string | null
         }
         Insert: {
           active?: boolean
           aliases?: Json
           course_code?: string | null
           created_at?: string
+          created_by?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          free_preview_seconds?: number | null
+          language?: string | null
           level?: string | null
+          materials?: Json | null
           modules?: Json
           objective?: string | null
+          objectives?: string | null
           org_id?: string | null
           pillar: string
+          published_at?: string | null
+          slug?: string | null
           source?: string | null
+          status?: string | null
+          tags?: Json | null
           target_audience?: string | null
+          thumbnail_url?: string | null
           title: string
           training_id: string
           type: string
+          updated_at?: string | null
+          video_asset?: Json | null
+          video_provider?: string | null
+          video_url?: string | null
         }
         Update: {
           active?: boolean
           aliases?: Json
           course_code?: string | null
           created_at?: string
+          created_by?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          free_preview_seconds?: number | null
+          language?: string | null
           level?: string | null
+          materials?: Json | null
           modules?: Json
           objective?: string | null
+          objectives?: string | null
           org_id?: string | null
           pillar?: string
+          published_at?: string | null
+          slug?: string | null
           source?: string | null
+          status?: string | null
+          tags?: Json | null
           target_audience?: string | null
+          thumbnail_url?: string | null
           title?: string
           training_id?: string
           type?: string
+          updated_at?: string | null
+          video_asset?: Json | null
+          video_provider?: string | null
+          video_url?: string | null
         }
         Relationships: [
           {
