@@ -42,6 +42,9 @@ import {
   Upload,
   AlertTriangle,
   Sparkles,
+  Clock,
+  Eye,
+  Radio,
 } from 'lucide-react';
 import {
   useImportedTrainings,
@@ -174,11 +177,22 @@ export function ImportReviewQueue() {
         </CardHeader>
         {lastResult && (
           <CardContent>
-            <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-4 text-sm flex-wrap">
               <Badge variant="outline">
                 <Sparkles className="mr-1 h-3 w-3" />
                 Última importação: {lastResult.imported || 0} novos, {lastResult.skipped || 0} existentes
               </Badge>
+              {lastResult.source && (
+                <Badge variant={lastResult.source === 'youtube_data_api' ? 'default' : 'secondary'}>
+                  {lastResult.source === 'youtube_data_api' ? 'Data API' : 'RSS'}
+                </Badge>
+              )}
+              {lastResult.hasEnrichedMetadata && (
+                <Badge variant="outline" className="text-green-600 border-green-300">
+                  <Eye className="mr-1 h-3 w-3" />
+                  Metadados enriquecidos
+                </Badge>
+              )}
               {lastResult.channelId && (
                 <span className="text-muted-foreground">
                   Canal: {lastResult.channelId}
@@ -293,6 +307,8 @@ export function ImportReviewQueue() {
                     />
                   </TableHead>
                   <TableHead>Título</TableHead>
+                  <TableHead>Duração</TableHead>
+                  <TableHead>Views</TableHead>
                   <TableHead>Pilar</TableHead>
                   <TableHead>Confiança</TableHead>
                   <TableHead>Tipo</TableHead>
@@ -314,11 +330,18 @@ export function ImportReviewQueue() {
                     <TableCell>
                       <div className="flex items-start gap-3">
                         {training.thumbnail_url && (
-                          <img 
-                            src={training.thumbnail_url} 
-                            alt="" 
-                            className="w-24 h-14 object-cover rounded"
-                          />
+                          <div className="relative">
+                            <img 
+                              src={training.thumbnail_url} 
+                              alt="" 
+                              className="w-24 h-14 object-cover rounded"
+                            />
+                            {training.ingestion_metadata?.is_live && (
+                              <Badge className="absolute -top-1 -right-1 px-1 py-0.5 text-xs bg-red-500">
+                                <Radio className="h-3 w-3" />
+                              </Badge>
+                            )}
+                          </div>
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{training.title}</p>
@@ -329,8 +352,33 @@ export function ImportReviewQueue() {
                       </div>
                     </TableCell>
                     <TableCell>
+                      {training.ingestion_metadata?.duration_formatted ? (
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          {training.ingestion_metadata.duration_formatted}
+                        </div>
+                      ) : training.duration_minutes ? (
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          {training.duration_minutes}min
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {training.ingestion_metadata?.view_count !== undefined ? (
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Eye className="h-3 w-3" />
+                          {training.ingestion_metadata.view_count.toLocaleString('pt-BR')}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <Badge 
-                        style={{ 
+                        style={{
                           backgroundColor: PILLAR_INFO[training.pillar as keyof typeof PILLAR_INFO]?.color + '20',
                           color: PILLAR_INFO[training.pillar as keyof typeof PILLAR_INFO]?.color,
                           borderColor: PILLAR_INFO[training.pillar as keyof typeof PILLAR_INFO]?.color + '40',
