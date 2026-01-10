@@ -9,6 +9,10 @@ export interface IngestionPreviewItem {
   confidence: number;
   type: 'course' | 'live';
   exists: boolean;
+  duration?: number;
+  durationFormatted?: string;
+  viewCount?: number;
+  isLive?: boolean;
 }
 
 export interface IngestionResult {
@@ -21,6 +25,28 @@ export interface IngestionResult {
   skipped?: number;
   preview?: IngestionPreviewItem[];
   error?: string;
+  source?: 'youtube_data_api' | 'youtube_rss';
+  hasEnrichedMetadata?: boolean;
+}
+
+export interface ImportedTrainingMetadata {
+  youtube_id: string;
+  channel_handle: string;
+  channel_id?: string;
+  channel_title?: string;
+  published_at: string;
+  matched_keywords: string[];
+  imported_at: string;
+  // Enriched metadata from Data API
+  duration_seconds?: number;
+  duration_formatted?: string;
+  view_count?: number;
+  like_count?: number;
+  comment_count?: number;
+  is_live?: boolean;
+  is_upcoming?: boolean;
+  live_broadcast_content?: string;
+  youtube_tags?: string[];
 }
 
 export interface ImportedTraining {
@@ -31,15 +57,10 @@ export interface ImportedTraining {
   status: string;
   video_url: string;
   thumbnail_url: string;
+  duration_minutes: number | null;
   ingestion_source: string;
   ingestion_confidence: number;
-  ingestion_metadata: {
-    youtube_id: string;
-    channel_handle: string;
-    published_at: string;
-    matched_keywords: string[];
-    imported_at: string;
-  };
+  ingestion_metadata: ImportedTrainingMetadata;
   created_at: string;
 }
 
