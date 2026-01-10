@@ -257,26 +257,40 @@ async function fetchYouTubeRSS(channelId: string): Promise<VideoEntry[]> {
 }
 
 async function resolveChannelId(handle: string, apiKey?: string): Promise<string | null> {
-  // Known channels mapping
+  // Known channels mapping - update with correct IDs when found
   const knownChannels: Record<string, string> = {
-    '@ProfessorMarioBeni': 'UC4zMhGxcj5jqNLZz9XZLK0A',
-    '@professormariobeni': 'UC4zMhGxcj5jqNLZz9XZLK0A',
+    // Will be populated dynamically via API
   };
   
   if (knownChannels[handle]) {
     return knownChannels[handle];
   }
   
-  // Try using YouTube Data API to resolve handle
+  // Try using YouTube Data API to resolve handle (most reliable)
   if (apiKey) {
     try {
-      const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${encodeURIComponent(handle)}&maxResults=1&key=${apiKey}`;
-      const response = await fetch(searchUrl);
+      // First try channels.list with forHandle
+      const handleClean = handle.replace('@', '');
+      const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=id,snippet&forHandle=${encodeURIComponent(handleClean)}&key=${apiKey}`;
+      console.log(`Resolving channel via API: ${handleClean}`);
+      
+      const response = await fetch(channelUrl);
       if (response.ok) {
         const data = await response.json();
-        if (data.items?.[0]?.id?.channelId) {
-          console.log(`Resolved ${handle} to ${data.items[0].id.channelId} via API`);
-          return data.items[0].id.channelId;
+        if (data.items?.[0]?.id) {
+          console.log(`Resolved ${handle} to ${data.items[0].id} via forHandle API`);
+          return data.items[0].id;
+        }
+      }
+      
+      // Fallback: search for the channel
+      const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${encodeURIComponent(handle)}&maxResults=1&key=${apiKey}`;
+      const searchResponse = await fetch(searchUrl);
+      if (searchResponse.ok) {
+        const searchData = await searchResponse.json();
+        if (searchData.items?.[0]?.id?.channelId) {
+          console.log(`Resolved ${handle} to ${searchData.items[0].id.channelId} via search API`);
+          return searchData.items[0].id.channelId;
         }
       }
     } catch (error) {
@@ -287,20 +301,36 @@ async function resolveChannelId(handle: string, apiKey?: string): Promise<string
   // Fallback: Try fetching channel page to extract ID
   try {
     const url = `https://www.youtube.com/${handle}`;
-    const response = await fetch(url);
+    console.log(`Resolving channel via page scrape: ${url}`);
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Lovable/1.0)',
+      }
+    });
     const html = await response.text();
     
+    // Look for channel ID in the page
     const channelIdMatch = html.match(/"channelId":"([^"]+)"/);
     if (channelIdMatch) {
+      console.log(`Resolved ${handle} to ${channelIdMatch[1]} via page scrape`);
       return channelIdMatch[1];
     }
     
+    // Alternative pattern
     const altMatch = html.match(/channel_id=([A-Za-z0-9_-]{24})/);
     if (altMatch) {
+      console.log(`Resolved ${handle} to ${altMatch[1]} via alt pattern`);
       return altMatch[1];
     }
+    
+    // Try external ID pattern
+    const externalIdMatch = html.match(/"externalId":"([^"]+)"/);
+    if (externalIdMatch) {
+      console.log(`Resolved ${handle} to ${externalIdMatch[1]} via externalId`);
+      return externalIdMatch[1];
+    }
   } catch (error) {
-    console.error('Error resolving channel ID:', error);
+    console.error('Error resolving channel ID via page:', error);
   }
   
   return null;
