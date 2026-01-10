@@ -927,6 +927,9 @@ export type Database = {
           description: string | null
           duration_minutes: number | null
           free_preview_seconds: number | null
+          ingestion_confidence: number | null
+          ingestion_metadata: Json | null
+          ingestion_source: string | null
           language: string | null
           level: string | null
           materials: Json | null
@@ -959,6 +962,9 @@ export type Database = {
           description?: string | null
           duration_minutes?: number | null
           free_preview_seconds?: number | null
+          ingestion_confidence?: number | null
+          ingestion_metadata?: Json | null
+          ingestion_source?: string | null
           language?: string | null
           level?: string | null
           materials?: Json | null
@@ -991,6 +997,9 @@ export type Database = {
           description?: string | null
           duration_minutes?: number | null
           free_preview_seconds?: number | null
+          ingestion_confidence?: number | null
+          ingestion_metadata?: Json | null
+          ingestion_source?: string | null
           language?: string | null
           level?: string | null
           materials?: Json | null

@@ -41,7 +41,8 @@ import {
   BarChart3,
   Users,
   TrendingUp,
-  Play
+  Play,
+  Youtube,
 } from 'lucide-react';
 import { useAdminTrainings, useAdminTrainingMutations, useVideoUpload, type TrainingFormData } from '@/hooks/useEduAdmin';
 import { useAdminEnrollmentStats, useAdminEventStats } from '@/hooks/useEduEnrollments';
@@ -64,6 +65,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { ImportReviewQueue } from '@/components/edu/ImportReviewQueue';
 
 const defaultFormData: TrainingFormData = {
   training_id: '',
@@ -237,10 +239,14 @@ const AdminEdu = () => {
       subtitle="Gerenciamento de treinamentos, vídeos e analytics"
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full max-w-lg grid-cols-3">
           <TabsTrigger value="trainings" className="gap-2">
             <GraduationCap className="h-4 w-4" />
             Treinamentos
+          </TabsTrigger>
+          <TabsTrigger value="import" className="gap-2">
+            <Youtube className="h-4 w-4" />
+            Importação
           </TabsTrigger>
           <TabsTrigger value="analytics" className="gap-2">
             <BarChart3 className="h-4 w-4" />
@@ -623,6 +629,11 @@ const AdminEdu = () => {
               </Table>
             </Card>
           )}
+        </TabsContent>
+
+        {/* IMPORT TAB */}
+        <TabsContent value="import" className="space-y-6">
+          <ImportReviewQueue />
         </TabsContent>
 
         {/* ANALYTICS TAB */}

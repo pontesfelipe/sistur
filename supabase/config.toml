@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.fetch-official-data]
 verify_jwt = false
+
+[functions.ingest-youtube]
+verify_jwt = false
