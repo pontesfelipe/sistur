@@ -17,6 +17,7 @@ import Indicadores from "./pages/Indicadores";
 import Importacoes from "./pages/Importacoes";
 import Cursos from "./pages/Cursos";
 import AdminCursos from "./pages/AdminCursos";
+import AdminEdu from "./pages/AdminEdu";
 import EduCatalogo from "./pages/EduCatalogo";
 import EduTrilhas, { EduTrilhaDetalhe } from "./pages/EduTrilhas";
 import EduTrainingDetalhe from "./pages/EduTrainingDetalhe";
@@ -108,6 +109,14 @@ const App = () => {
                     <ProtectedRoute>
                       <AdminCursos />
                     </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/edu"
+                  element={
+                    <AdminRoute>
+                      <AdminEdu />
+                    </AdminRoute>
                   }
                 />
                 <Route
