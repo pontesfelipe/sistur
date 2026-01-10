@@ -99,9 +99,10 @@ const EduTrainingDetalhe = () => {
                   src={training.thumbnail_url} 
                   alt={training.title}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <div className="text-center text-white">
+                <div className="absolute inset-0 bg-foreground/60 flex items-center justify-center">
+                  <div className="text-center text-background">
                     <Video className="h-12 w-12 mx-auto mb-2 opacity-70" />
                     <p className="text-sm opacity-80">Vídeo em breve</p>
                   </div>
