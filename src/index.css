@@ -146,6 +146,44 @@
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
+
+  /* Touch-friendly spacing */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Mobile-optimized text */
+  .text-mobile-sm {
+    @apply text-xs sm:text-sm;
+  }
+
+  .text-mobile-base {
+    @apply text-sm sm:text-base;
+  }
+
+  .text-mobile-lg {
+    @apply text-base sm:text-lg;
+  }
+
+  /* Responsive grid gaps */
+  .gap-mobile {
+    @apply gap-2 sm:gap-3 md:gap-4;
+  }
+
+  /* Mobile-friendly padding */
+  .p-mobile {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+
+  /* Hide on mobile, show on desktop */
+  .mobile-hidden {
+    @apply hidden sm:inline;
+  }
+
+  /* Show on mobile, hide on desktop */
+  .mobile-only {
+    @apply inline sm:hidden;
+  }
 }
 
 /* Custom scrollbar */

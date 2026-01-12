@@ -138,7 +138,7 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
         <div>
           <CardTitle className="text-lg font-display flex items-center gap-2">
             <Activity className="h-5 w-5" />
@@ -152,7 +152,7 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
           value={selectedDestination} 
           onValueChange={setSelectedDestination}
         >
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-full sm:w-[200px]">
             <SelectValue placeholder="Selecionar destino" />
           </SelectTrigger>
           <SelectContent>
@@ -170,7 +170,7 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
         ) : trendData && trendData.chartData.length >= 2 ? (
           <>
             {/* Trend indicators */}
-            <div className="flex flex-wrap gap-3 mb-4">
+            <div className="grid grid-cols-1 xs:grid-cols-3 gap-2 sm:gap-3 mb-4">
               {(['RA', 'OE', 'AO'] as const).map(pillar => (
                 <div 
                   key={pillar}
@@ -190,7 +190,7 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
             </div>
 
             {/* Chart */}
-            <ChartContainer config={chartConfig} className="h-[250px] w-full">
+            <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px] w-full">
               <LineChart data={trendData.chartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis 

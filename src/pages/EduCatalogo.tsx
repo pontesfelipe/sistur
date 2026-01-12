@@ -138,7 +138,7 @@ const EduCatalogo = () => {
       </div>
 
       {/* Stats by Pillar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
         {(['RA', 'OE', 'AO'] as Pillar[]).map((pillar) => (
           <Card 
             key={pillar} 
@@ -189,14 +189,14 @@ const EduCatalogo = () => {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <Skeleton key={i} className="h-48" />
           ))}
         </div>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="flex flex-wrap h-auto gap-1">
+          <TabsList className="grid grid-cols-2 sm:flex sm:flex-wrap h-auto gap-1">
             <TabsTrigger value="all" className="gap-2">
               <BookOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Todos</span> ({trainings?.length || 0})
@@ -214,7 +214,7 @@ const EduCatalogo = () => {
 
           <TabsContent value={activeTab} className="space-y-6">
             {filteredTrainings.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {filteredTrainings.map((training, index) => (
                   <Card
                     key={training.training_id}

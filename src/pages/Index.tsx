@@ -126,7 +126,7 @@ const Index = () => {
       subtitle="Painel de controle do sistema de turismo"
     >
       {/* Hero Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
         {statsLoading ? (
           <>
             <Skeleton className="h-28" />
@@ -222,14 +222,14 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               {aggregatedLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                   <Skeleton className="h-32" />
                   <Skeleton className="h-32" />
                   <Skeleton className="h-32" />
                 </div>
               ) : aggregatedData?.pillarScores && aggregatedData.pillarScores.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
                     {aggregatedData.pillarScores.map((pillarScore) => (
                       <PillarGauge
                         key={pillarScore.id}
