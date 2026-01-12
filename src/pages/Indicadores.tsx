@@ -23,6 +23,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useIndicators } from '@/hooks/useIndicators';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Select,
   SelectContent,
@@ -84,6 +85,7 @@ const Indicadores = () => {
   const [editingWeightValue, setEditingWeightValue] = useState<string>('');
   
   const { indicators, isLoading, deleteIndicator, updateIndicator } = useIndicators();
+  const isMobile = useIsMobile();
 
   const directionLabels = {
     HIGH_IS_BETTER: '↑ Maior é melhor',
@@ -187,7 +189,7 @@ const Indicadores = () => {
             />
           </div>
           <Select value={pillarFilter} onValueChange={setPillarFilter}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-full xs:w-32">
               <SelectValue placeholder="Pilar" />
             </SelectTrigger>
             <SelectContent>
@@ -198,7 +200,7 @@ const Indicadores = () => {
             </SelectContent>
           </Select>
           <Select value={sourceFilter} onValueChange={setSourceFilter}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-full xs:w-32">
               <SelectValue placeholder="Fonte" />
             </SelectTrigger>
             <SelectContent>
@@ -208,7 +210,7 @@ const Indicadores = () => {
             </SelectContent>
           </Select>
           <Select value={themeFilter} onValueChange={setThemeFilter}>
-            <SelectTrigger className="w-44">
+            <SelectTrigger className="w-full xs:w-44">
               <SelectValue placeholder="Tema" />
             </SelectTrigger>
             <SelectContent>
@@ -226,7 +228,7 @@ const Indicadores = () => {
       </div>
 
       {/* Summary by Pillar */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
         {(['RA', 'OE', 'AO'] as const).map((pillar) => {
           const pillarIndicators = indicators.filter(i => i.pillar === pillar);
           const totalWeight = pillarIndicators.reduce((sum, i) => sum + i.weight, 0);
@@ -294,11 +296,210 @@ const Indicadores = () => {
         </p>
       </div>
 
-      {/* Indicators Table */}
+      {/* Indicators Table/Cards */}
       <div className="bg-card rounded-xl border overflow-hidden">
         {isLoading ? (
           <div className="p-8 space-y-3">
             {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-12 w-full" />)}
+          </div>
+        ) : isMobile ? (
+          // MOBILE CARD VIEW
+          <div className="divide-y">
+            {filteredIndicators.map((indicator) => {
+              const isIGMA = (indicator as any).source === 'IGMA';
+              const igmaDimension = (indicator as any).igma_dimension;
+              const defaultInterpretation = (indicator as any).default_interpretation;
+              const isPending = isPendingConfirmation(indicator);
+              const isEditingWeight = editingWeightId === indicator.id;
+
+              return (
+                <div key={indicator.id} className={cn("p-4 space-y-3", isPending && 'opacity-60')}>
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-mono text-xs text-muted-foreground">{indicator.code}</span>
+                        {isPending && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <AlertTriangle className="h-3 w-3 text-amber-500" />
+                            </TooltipTrigger>
+                            <TooltipContent>Pendente de confirmação</TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button
+                            className="text-left hover:underline w-full"
+                            onClick={() => setSelectedIndicator(indicator)}
+                          >
+                            <div className="font-medium text-sm">{indicator.name}</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              {directionLabels[indicator.direction]}
+                            </div>
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-lg">
+                          <DialogHeader>
+                            <DialogTitle>{indicator.name}</DialogTitle>
+                            <DialogDescription>Código: {indicator.code}</DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            {isIGMA && (
+                              <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Database className="h-4 w-4 text-primary" />
+                                  <span className="font-medium text-primary">Fonte: IGMA</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                  <div>
+                                    <span className="text-muted-foreground">Dimensão IGMA:</span>
+                                    <p className="font-medium">{igmaDimension || 'N/A'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Pilar SISTUR:</span>
+                                    <p className="font-medium">{indicator.pillar}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Interpretação padrão:</span>
+                                    <p className="font-medium">{defaultInterpretation || 'N/A'}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="text-muted-foreground">Direção:</span>
+                                <p className="font-medium">{directionLabels[indicator.direction]}</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Normalização:</span>
+                                <p className="font-medium">{normLabels[indicator.normalization]}</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Peso:</span>
+                                <p className="font-medium">{(indicator.weight * 100).toFixed(0)}%</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Tema:</span>
+                                <p className="font-medium capitalize">{indicator.theme}</p>
+                              </div>
+                            </div>
+                            {indicator.description && (
+                              <div>
+                                <span className="text-muted-foreground text-sm">Descrição:</span>
+                                <p className="text-sm mt-1">{indicator.description}</p>
+                              </div>
+                            )}
+                            {(indicator as any).notes && (
+                              <div>
+                                <span className="text-muted-foreground text-sm">Notas:</span>
+                                <p className="text-sm mt-1 text-muted-foreground">{(indicator as any).notes}</p>
+                              </div>
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleStartEditWeight(indicator)}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Editar Peso
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => deleteIndicator.mutate(indicator.id)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  {/* Badges */}
+                  <div className="flex flex-wrap gap-2">
+                    {isIGMA && (
+                      <Badge variant="outline" className="border-primary/50 text-primary">
+                        <Database className="h-3 w-3 mr-1" />
+                        IGMA
+                      </Badge>
+                    )}
+                    <Badge variant={indicator.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
+                      {indicator.pillar}
+                    </Badge>
+                    <Badge variant="outline">{normLabels[indicator.normalization]}</Badge>
+                    {defaultInterpretation && (
+                      <Badge variant="secondary" className="text-xs">
+                        {interpretationLabels[defaultInterpretation] || defaultInterpretation}
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Theme */}
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Tema: </span>
+                    <span className="capitalize">{isIGMA && igmaDimension ? igmaDimension : indicator.theme}</span>
+                  </div>
+
+                  {/* Weight Editor */}
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <span className="text-sm text-muted-foreground">Peso:</span>
+                    {isEditingWeight ? (
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="1"
+                          className="w-16 h-8 text-right font-mono text-sm"
+                          value={editingWeightValue}
+                          onChange={(e) => setEditingWeightValue(e.target.value)}
+                          onKeyDown={(e) => handleWeightKeyDown(e, indicator.id)}
+                          autoFocus
+                        />
+                        <span className="text-xs text-muted-foreground">%</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleSaveWeight(indicator.id)}
+                          disabled={updateIndicator.isPending}
+                        >
+                          {updateIndicator.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="h-4 w-4 text-green-500" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={handleCancelEditWeight}
+                        >
+                          <X className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleStartEditWeight(indicator)}
+                        className="font-mono text-sm hover:bg-muted px-3 py-1.5 rounded transition-colors"
+                      >
+                        {(indicator.weight * 100).toFixed(0)}%
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <Table>

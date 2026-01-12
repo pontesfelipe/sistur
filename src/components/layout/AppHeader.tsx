@@ -45,7 +45,7 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
 
   return (
     <header className="h-14 md:h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30">
-      <div className="h-full px-4 md:px-6 flex items-center justify-between">
+      <div className="h-full px-3 sm:px-4 md:px-6 flex items-center justify-between">
         {/* Left: Mobile menu + Title */}
         <div className="flex items-center gap-3">
           {/* Mobile menu trigger */}
