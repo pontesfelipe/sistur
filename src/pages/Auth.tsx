@@ -1,35 +1,48 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, MapPin, BarChart3, GraduationCap } from 'lucide-react';
+import { Loader2, MapPin, BarChart3, GraduationCap, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 
 // Validation schemas
 const emailSchema = z.string().email('Email inválido');
 const passwordSchema = z.string().min(6, 'A senha deve ter pelo menos 6 caracteres');
 
+type AuthMode = 'login' | 'forgot' | 'reset';
+
 const Auth = () => {
   const navigate = useNavigate();
-  const { user, signIn, loading: authLoading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { user, signIn, resetPassword, updatePassword, loading: authLoading } = useAuth();
   
+  const [mode, setMode] = useState<AuthMode>('login');
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
 
-  // Redirect if already logged in
+  // Check URL for reset mode (user clicked email link)
   useEffect(() => {
-    if (user) {
+    const urlMode = searchParams.get('mode');
+    if (urlMode === 'reset') {
+      setMode('reset');
+    }
+  }, [searchParams]);
+
+  // Redirect if already logged in (except when resetting password)
+  useEffect(() => {
+    if (user && mode !== 'reset') {
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, navigate, mode]);
 
-  const validateForm = () => {
+  const validateLoginForm = () => {
     const newErrors: { email?: string; password?: string } = {};
     
     const emailResult = emailSchema.safeParse(email);
@@ -46,10 +59,38 @@ const Auth = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const validateForgotForm = () => {
+    const newErrors: { email?: string } = {};
+    
+    const emailResult = emailSchema.safeParse(email);
+    if (!emailResult.success) {
+      newErrors.email = emailResult.error.errors[0].message;
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateResetForm = () => {
+    const newErrors: { password?: string; confirmPassword?: string } = {};
+    
+    const passwordResult = passwordSchema.safeParse(password);
+    if (!passwordResult.success) {
+      newErrors.password = passwordResult.error.errors[0].message;
+    }
+    
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'As senhas não coincidem';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    if (!validateLoginForm()) return;
     
     setLoading(true);
     const { error } = await signIn(email, password);
@@ -67,6 +108,41 @@ const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForgotForm()) return;
+    
+    setLoading(true);
+    const { error } = await resetPassword(email);
+    setLoading(false);
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('Email de recuperação enviado! Verifique sua caixa de entrada.');
+      setMode('login');
+      setEmail('');
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateResetForm()) return;
+    
+    setLoading(true);
+    const { error } = await updatePassword(password);
+    setLoading(false);
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('Senha alterada com sucesso!');
+      navigate('/');
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -74,6 +150,217 @@ const Auth = () => {
       </div>
     );
   }
+
+  const renderForm = () => {
+    switch (mode) {
+      case 'forgot':
+        return (
+          <Card className="w-full max-w-md border-0 shadow-lg">
+            <CardHeader className="text-center">
+              <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
+                  <span className="text-primary-foreground font-display font-bold text-sm">S</span>
+                </div>
+                <span className="font-display font-bold text-xl">SISTUR</span>
+              </div>
+              <CardTitle className="text-2xl font-display">Recuperar Senha</CardTitle>
+              <CardDescription>
+                Digite seu email para receber o link de recuperação
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="forgot-email">Email</Label>
+                  <Input
+                    id="forgot-email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setErrors((prev) => ({ ...prev, email: undefined }));
+                    }}
+                    className={errors.email ? 'border-destructive' : ''}
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email}</p>
+                  )}
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    'Enviar Link de Recuperação'
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => {
+                    setMode('login');
+                    setErrors({});
+                  }}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Voltar ao login
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        );
+
+      case 'reset':
+        return (
+          <Card className="w-full max-w-md border-0 shadow-lg">
+            <CardHeader className="text-center">
+              <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
+                  <span className="text-primary-foreground font-display font-bold text-sm">S</span>
+                </div>
+                <span className="font-display font-bold text-xl">SISTUR</span>
+              </div>
+              <CardTitle className="text-2xl font-display">Nova Senha</CardTitle>
+              <CardDescription>
+                Digite sua nova senha
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">Nova Senha</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((prev) => ({ ...prev, password: undefined }));
+                    }}
+                    className={errors.password ? 'border-destructive' : ''}
+                  />
+                  {errors.password && (
+                    <p className="text-sm text-destructive">{errors.password}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirmar Senha</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+                    }}
+                    className={errors.confirmPassword ? 'border-destructive' : ''}
+                  />
+                  {errors.confirmPassword && (
+                    <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                  )}
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Atualizando...
+                    </>
+                  ) : (
+                    'Atualizar Senha'
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        );
+
+      default:
+        return (
+          <Card className="w-full max-w-md border-0 shadow-lg">
+            <CardHeader className="text-center">
+              <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
+                  <span className="text-primary-foreground font-display font-bold text-sm">S</span>
+                </div>
+                <span className="font-display font-bold text-xl">SISTUR</span>
+              </div>
+              <CardTitle className="text-2xl font-display">Bem-vindo</CardTitle>
+              <CardDescription>
+                Entre com suas credenciais para acessar o sistema
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="login-email">Email</Label>
+                  <Input
+                    id="login-email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setErrors((prev) => ({ ...prev, email: undefined }));
+                    }}
+                    className={errors.email ? 'border-destructive' : ''}
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="login-password">Senha</Label>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="px-0 h-auto text-sm text-muted-foreground hover:text-primary"
+                      onClick={() => {
+                        setMode('forgot');
+                        setErrors({});
+                        setPassword('');
+                      }}
+                    >
+                      Esqueceu a senha?
+                    </Button>
+                  </div>
+                  <Input
+                    id="login-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((prev) => ({ ...prev, password: undefined }));
+                    }}
+                    className={errors.password ? 'border-destructive' : ''}
+                  />
+                  {errors.password && (
+                    <p className="text-sm text-destructive">{errors.password}</p>
+                  )}
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Entrando...
+                    </>
+                  ) : (
+                    'Entrar'
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -136,70 +423,9 @@ const Auth = () => {
         </p>
       </div>
 
-      {/* Right side - Login form */}
+      {/* Right side - Forms */}
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
-        <Card className="w-full max-w-md border-0 shadow-lg">
-          <CardHeader className="text-center">
-            <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
-              <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
-                <span className="text-primary-foreground font-display font-bold text-sm">S</span>
-              </div>
-              <span className="font-display font-bold text-xl">SISTUR</span>
-            </div>
-            <CardTitle className="text-2xl font-display">Bem-vindo</CardTitle>
-            <CardDescription>
-              Entre com suas credenciais para acessar o sistema
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSignIn} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
-                <Input
-                  id="login-email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setErrors((prev) => ({ ...prev, email: undefined }));
-                  }}
-                  className={errors.email ? 'border-destructive' : ''}
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="login-password">Senha</Label>
-                <Input
-                  id="login-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setErrors((prev) => ({ ...prev, password: undefined }));
-                  }}
-                  className={errors.password ? 'border-destructive' : ''}
-                />
-                {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password}</p>
-                )}
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Entrando...
-                  </>
-                ) : (
-                  'Entrar'
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+        {renderForm()}
       </div>
     </div>
   );
