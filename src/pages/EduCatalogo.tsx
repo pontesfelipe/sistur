@@ -83,19 +83,19 @@ const EduCatalogo = () => {
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between mb-6">
-        <div className="flex gap-3 flex-1">
-          <div className="relative max-w-md flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por nome ou código..."
-              className="pl-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome ou código..."
+            className="pl-9"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-wrap gap-3">
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full sm:w-40">
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
@@ -115,7 +115,7 @@ const EduCatalogo = () => {
             </SelectContent>
           </Select>
           <Select value={contentFilter} onValueChange={setContentFilter}>
-            <SelectTrigger className="w-52">
+            <SelectTrigger className="w-full sm:w-52">
               <SelectValue placeholder="Conteúdo" />
             </SelectTrigger>
             <SelectContent>
@@ -196,10 +196,10 @@ const EduCatalogo = () => {
         </div>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList>
+          <TabsList className="flex flex-wrap h-auto gap-1">
             <TabsTrigger value="all" className="gap-2">
               <BookOpen className="h-4 w-4" />
-              Todos ({trainings?.length || 0})
+              <span className="hidden sm:inline">Todos</span> ({trainings?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="RA" className="gap-2">
               RA ({(stats?.byPillar.RA?.courses || 0) + (stats?.byPillar.RA?.lives || 0)})

@@ -1,4 +1,4 @@
-import { User } from 'lucide-react';
+import { User, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -17,9 +17,10 @@ import { NotificationsDropdown } from './NotificationsDropdown';
 interface AppHeaderProps {
   title: string;
   subtitle?: string;
+  onMobileMenuClick?: () => void;
 }
 
-export function AppHeader({ title, subtitle }: AppHeaderProps) {
+export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -43,18 +44,33 @@ export function AppHeader({ title, subtitle }: AppHeaderProps) {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30">
-      <div className="h-full px-6 flex items-center justify-between">
-        {/* Left: Title */}
-        <div>
-          <h1 className="text-xl font-display font-semibold text-foreground">{title}</h1>
-          {subtitle && (
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
+    <header className="h-14 md:h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30">
+      <div className="h-full px-4 md:px-6 flex items-center justify-between">
+        {/* Left: Mobile menu + Title */}
+        <div className="flex items-center gap-3">
+          {/* Mobile menu trigger */}
+          {onMobileMenuClick && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden h-9 w-9"
+              onClick={onMobileMenuClick}
+              aria-label="Abrir menu"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
           )}
+          
+          <div className="min-w-0">
+            <h1 className="text-lg md:text-xl font-display font-semibold text-foreground truncate">{title}</h1>
+            {subtitle && (
+              <p className="text-xs md:text-sm text-muted-foreground truncate hidden sm:block">{subtitle}</p>
+            )}
+          </div>
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           {/* Notifications */}
           <NotificationsDropdown />
 

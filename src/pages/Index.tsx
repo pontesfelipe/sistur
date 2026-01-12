@@ -169,7 +169,7 @@ const Index = () => {
         <div className="xl:col-span-2 space-y-6">
           {/* Pillar Scores */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
               <div>
                 <CardTitle className="text-lg font-display">
                   Radiografia do Destino
@@ -182,13 +182,13 @@ const Index = () => {
                       : 'Nenhum diagnóstico disponível'}
                 </CardDescription>
               </div>
-              <div className="flex gap-2 items-center">
+              <div className="flex flex-wrap gap-2 items-center">
                 {/* Destination Filter */}
                 <Select 
                   value={selectedDestination ?? "all"} 
                   onValueChange={(value) => setSelectedDestination(value === "all" ? undefined : value)}
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px]">
                     <Filter className="h-4 w-4 mr-2" />
                     <SelectValue placeholder="Filtrar destino" />
                   </SelectTrigger>
@@ -202,20 +202,21 @@ const Index = () => {
                   </SelectContent>
                 </Select>
                 {aggregatedData?.totalAssessments && aggregatedData.totalAssessments > 0 && (
-                  <>
-                    <Button variant="outline" size="sm" asChild>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <Button variant="outline" size="sm" className="flex-1 sm:flex-none" asChild>
                       <Link to="/relatorios">
                         <FileText className="mr-2 h-4 w-4" />
-                        Relatório
+                        <span className="hidden xs:inline">Relatório</span>
                       </Link>
                     </Button>
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="outline" size="sm" className="flex-1 sm:flex-none" asChild>
                       <Link to="/diagnosticos">
-                        Ver diagnósticos
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                        <span className="hidden xs:inline">Ver diagnósticos</span>
+                        <span className="xs:hidden">Ver</span>
+                        <ArrowRight className="ml-1 sm:ml-2 h-4 w-4" />
                       </Link>
                     </Button>
-                  </>
+                  </div>
                 )}
               </div>
             </CardHeader>
