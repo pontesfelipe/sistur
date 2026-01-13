@@ -19,11 +19,18 @@ export function PillarGauge({ pillar, score, severity, isCritical }: PillarGauge
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (score * circumference);
 
-  // Color based on pillar
-  const pillarColors: Record<Pillar, { stroke: string; bg: string }> = {
-    RA: { stroke: 'stroke-pillar-ra', bg: 'bg-pillar-ra' },
-    OE: { stroke: 'stroke-pillar-oe', bg: 'bg-pillar-oe' },
-    AO: { stroke: 'stroke-pillar-ao', bg: 'bg-pillar-ao' },
+  // Color based on severity (traffic light: green=good, yellow=moderate, red=critical)
+  const severityColors: Record<Severity, { stroke: string; bg: string }> = {
+    BOM: { stroke: 'stroke-severity-good', bg: 'bg-severity-good' },
+    MODERADO: { stroke: 'stroke-severity-moderate', bg: 'bg-severity-moderate' },
+    CRITICO: { stroke: 'stroke-severity-critical', bg: 'bg-severity-critical' },
+  };
+
+  // Pillar indicator colors (for the dot)
+  const pillarColors: Record<Pillar, string> = {
+    RA: 'bg-pillar-ra',
+    OE: 'bg-pillar-oe',
+    AO: 'bg-pillar-ao',
   };
 
   return (
@@ -63,7 +70,7 @@ export function PillarGauge({ pillar, score, severity, isCritical }: PillarGauge
               fill="none"
               strokeWidth="8"
               strokeLinecap="round"
-              className={cn(pillarColors[pillar].stroke, 'animate-gauge-fill')}
+              className={cn(severityColors[severity].stroke, 'animate-gauge-fill')}
               style={{
                 strokeDasharray: circumference,
                 strokeDashoffset,
@@ -85,7 +92,7 @@ export function PillarGauge({ pillar, score, severity, isCritical }: PillarGauge
         {/* Info */}
         <div className="mt-4 text-center">
           <div className="flex items-center justify-center gap-2">
-            <div className={cn('h-2 w-2 rounded-full', pillarColors[pillar].bg)} />
+            <div className={cn('h-2 w-2 rounded-full', pillarColors[pillar])} />
             <h3 className="font-display font-semibold text-lg text-foreground">
               {info.name}
             </h3>
