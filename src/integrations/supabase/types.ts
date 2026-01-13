@@ -283,6 +283,95 @@ export type Database = {
           },
         ]
       }
+      community_feedback: {
+        Row: {
+          age_group: string | null
+          assessment_id: string | null
+          community_member_id: string | null
+          concerns: string[] | null
+          created_at: string
+          cultural_preservation_score: number | null
+          destination_id: string
+          environmental_concern_level: number | null
+          id: string
+          neighborhood: string | null
+          occupation_sector: string | null
+          org_id: string
+          priorities: string[] | null
+          quality_of_life_score: number | null
+          submitted_at: string
+          suggestions: string[] | null
+          tourism_impact_perception: string | null
+        }
+        Insert: {
+          age_group?: string | null
+          assessment_id?: string | null
+          community_member_id?: string | null
+          concerns?: string[] | null
+          created_at?: string
+          cultural_preservation_score?: number | null
+          destination_id: string
+          environmental_concern_level?: number | null
+          id?: string
+          neighborhood?: string | null
+          occupation_sector?: string | null
+          org_id: string
+          priorities?: string[] | null
+          quality_of_life_score?: number | null
+          submitted_at?: string
+          suggestions?: string[] | null
+          tourism_impact_perception?: string | null
+        }
+        Update: {
+          age_group?: string | null
+          assessment_id?: string | null
+          community_member_id?: string | null
+          concerns?: string[] | null
+          created_at?: string
+          cultural_preservation_score?: number | null
+          destination_id?: string
+          environmental_concern_level?: number | null
+          id?: string
+          neighborhood?: string | null
+          occupation_sector?: string | null
+          org_id?: string
+          priorities?: string[] | null
+          quality_of_life_score?: number | null
+          submitted_at?: string
+          suggestions?: string[] | null
+          tourism_impact_perception?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_feedback_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_feedback_community_member_id_fkey"
+            columns: ["community_member_id"]
+            isOneToOne: false
+            referencedRelation: "stakeholder_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_feedback_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_feedback_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           created_at: string
@@ -1983,6 +2072,120 @@ export type Database = {
           },
           {
             foreignKeyName: "recommendations_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stakeholder_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          org_id: string
+          profile_data: Json
+          stakeholder_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_id: string
+          profile_data?: Json
+          stakeholder_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_id?: string
+          profile_data?: Json
+          stakeholder_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stakeholder_profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      territorial_impact_scores: {
+        Row: {
+          assessment_id: string
+          calculated_at: string
+          calculation_method: string | null
+          certification_eligible: boolean
+          certification_level: string | null
+          destination_id: string
+          economic_impact: number
+          environmental_impact: number
+          esg_score: number | null
+          id: string
+          institutional_impact: number
+          org_id: string
+          sdg_alignments: number[] | null
+          social_impact: number
+          territorial_impact_index: number
+        }
+        Insert: {
+          assessment_id: string
+          calculated_at?: string
+          calculation_method?: string | null
+          certification_eligible?: boolean
+          certification_level?: string | null
+          destination_id: string
+          economic_impact: number
+          environmental_impact: number
+          esg_score?: number | null
+          id?: string
+          institutional_impact: number
+          org_id: string
+          sdg_alignments?: number[] | null
+          social_impact: number
+          territorial_impact_index: number
+        }
+        Update: {
+          assessment_id?: string
+          calculated_at?: string
+          calculation_method?: string | null
+          certification_eligible?: boolean
+          certification_level?: string | null
+          destination_id?: string
+          economic_impact?: number
+          environmental_impact?: number
+          esg_score?: number | null
+          id?: string
+          institutional_impact?: number
+          org_id?: string
+          sdg_alignments?: number[] | null
+          social_impact?: number
+          territorial_impact_index?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "territorial_impact_scores_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: true
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "territorial_impact_scores_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "territorial_impact_scores_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
