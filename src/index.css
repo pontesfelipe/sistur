@@ -146,6 +146,43 @@
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
+
+  /* Mobile-specific utilities */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  .text-mobile-sm {
+    @apply text-xs sm:text-sm;
+  }
+
+  .text-mobile-base {
+    @apply text-sm sm:text-base;
+  }
+
+  .text-mobile-lg {
+    @apply text-base sm:text-lg;
+  }
+
+  .gap-mobile {
+    @apply gap-2 sm:gap-3 md:gap-4;
+  }
+
+  .p-mobile {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+
+  .mobile-hidden {
+    @apply hidden sm:inline;
+  }
+
+  .mobile-only {
+    @apply inline sm:hidden;
+  }
+
+  .flex-mobile-col {
+    @apply flex flex-col xs:flex-row;
+  }
 }
 
 /* Custom scrollbar */
