@@ -29,6 +29,7 @@ import FAQ from "./pages/FAQ";
 import Metodologia from "./pages/Metodologia";
 import Ajuda from "./pages/Ajuda";
 import ERPDashboard from "./pages/ERPDashboard";
+import PublicDestinations from "./pages/PublicDestinations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -212,6 +213,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <Metodologia />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/destinos-publicos"
+                  element={
+                    <ProtectedRoute>
+                      <PublicDestinations />
                     </ProtectedRoute>
                   }
                 />
