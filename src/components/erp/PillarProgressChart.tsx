@@ -12,9 +12,9 @@ interface PillarProgressChartProps {
 }
 
 const PILLAR_COLORS: Record<string, string> = {
-  RA: 'bg-primary',
-  OE: 'bg-accent',
-  AO: 'bg-[hsl(142_76%_36%)]',
+  RA: 'bg-pillar-ra',
+  OE: 'bg-pillar-oe',
+  AO: 'bg-pillar-ao',
 };
 
 export function PillarProgressChart({ data, isLoading }: PillarProgressChartProps) {
