@@ -78,6 +78,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "action_plans_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
             foreignKeyName: "action_plans_linked_issue_id_fkey"
             columns: ["linked_issue_id"]
             isOneToOne: false
@@ -149,11 +156,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "alerts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
             foreignKeyName: "alerts_destination_id_fkey"
             columns: ["destination_id"]
             isOneToOne: false
             referencedRelation: "destinations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
           },
           {
             foreignKeyName: "alerts_org_id_fkey"
@@ -232,6 +253,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "destinations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessments_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
           },
           {
             foreignKeyName: "assessments_org_id_fkey"
@@ -350,6 +378,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "community_feedback_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
             foreignKeyName: "community_feedback_community_member_id_fkey"
             columns: ["community_member_id"]
             isOneToOne: false
@@ -362,6 +397,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "destinations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_feedback_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
           },
           {
             foreignKeyName: "community_feedback_org_id_fkey"
@@ -421,6 +463,103 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      destination_certifications: {
+        Row: {
+          ao_score: number
+          assessment_id: string
+          badge_url: string | null
+          certification_level: string
+          certified_at: string
+          created_at: string
+          destination_id: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          oe_score: number
+          org_id: string
+          previous_certification_id: string | null
+          ra_score: number
+          territorial_impact_index: number
+        }
+        Insert: {
+          ao_score: number
+          assessment_id: string
+          badge_url?: string | null
+          certification_level: string
+          certified_at?: string
+          created_at?: string
+          destination_id: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          oe_score: number
+          org_id: string
+          previous_certification_id?: string | null
+          ra_score: number
+          territorial_impact_index: number
+        }
+        Update: {
+          ao_score?: number
+          assessment_id?: string
+          badge_url?: string | null
+          certification_level?: string
+          certified_at?: string
+          created_at?: string
+          destination_id?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          oe_score?: number
+          org_id?: string
+          previous_certification_id?: string | null
+          ra_score?: number
+          territorial_impact_index?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "destination_certifications_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "destination_certifications_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
+            foreignKeyName: "destination_certifications_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "destination_certifications_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
+          {
+            foreignKeyName: "destination_certifications_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "destination_certifications_previous_certification_id_fkey"
+            columns: ["previous_certification_id"]
+            isOneToOne: false
+            referencedRelation: "destination_certifications"
             referencedColumns: ["id"]
           },
         ]
@@ -516,6 +655,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "assessments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnosis_data_snapshots_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
           },
           {
             foreignKeyName: "diagnosis_data_snapshots_org_id_fkey"
@@ -1122,6 +1268,66 @@ export type Database = {
           },
         ]
       }
+      entrepreneur_profiles: {
+        Row: {
+          business_description: string | null
+          business_name: string | null
+          business_type: string
+          created_at: string
+          destinations_of_interest: string[] | null
+          expansion_interests: Json | null
+          id: string
+          org_id: string
+          stakeholder_profile_id: string
+          sustainability_commitment: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_description?: string | null
+          business_name?: string | null
+          business_type: string
+          created_at?: string
+          destinations_of_interest?: string[] | null
+          expansion_interests?: Json | null
+          id?: string
+          org_id: string
+          stakeholder_profile_id: string
+          sustainability_commitment?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_description?: string | null
+          business_name?: string | null
+          business_type?: string
+          created_at?: string
+          destinations_of_interest?: string[] | null
+          expansion_interests?: Json | null
+          id?: string
+          org_id?: string
+          stakeholder_profile_id?: string
+          sustainability_commitment?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entrepreneur_profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entrepreneur_profiles_stakeholder_profile_id_fkey"
+            columns: ["stakeholder_profile_id"]
+            isOneToOne: true
+            referencedRelation: "stakeholder_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       external_data_sources: {
         Row: {
           active: boolean
@@ -1330,6 +1536,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "igma_interpretation_history_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
             foreignKeyName: "igma_interpretation_history_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
@@ -1459,6 +1672,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "indicator_scores_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
             foreignKeyName: "indicator_scores_indicator_id_fkey"
             columns: ["indicator_id"]
             isOneToOne: false
@@ -1518,6 +1738,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "assessments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_values_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
           },
           {
             foreignKeyName: "indicator_values_indicator_id_fkey"
@@ -1764,11 +1991,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "investment_opportunities_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
             foreignKeyName: "investment_opportunities_destination_id_fkey"
             columns: ["destination_id"]
             isOneToOne: false
             referencedRelation: "destinations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_opportunities_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
           },
           {
             foreignKeyName: "investment_opportunities_org_id_fkey"
@@ -1900,6 +2141,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "issues_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
             foreignKeyName: "issues_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
@@ -1986,6 +2234,13 @@ export type Database = {
             referencedRelation: "destinations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "learning_runs_territory_id_fkey"
+            columns: ["territory_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
         ]
       }
       orgs: {
@@ -2043,6 +2298,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pillar_scores_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
             foreignKeyName: "pillar_scores_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
@@ -2089,6 +2351,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "assessments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescription_cycles_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
           },
           {
             foreignKeyName: "prescription_cycles_org_id_fkey"
@@ -2168,6 +2437,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "assessments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescriptions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
           },
           {
             foreignKeyName: "prescriptions_course_id_fkey"
@@ -2275,6 +2551,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "assessments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendations_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
           },
           {
             foreignKeyName: "recommendations_course_id_fkey"
@@ -2398,6 +2681,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "territorial_impact_scores_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: true
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
             foreignKeyName: "territorial_impact_scores_destination_id_fkey"
             columns: ["destination_id"]
             isOneToOne: false
@@ -2405,10 +2695,61 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "territorial_impact_scores_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
+          {
             foreignKeyName: "territorial_impact_scores_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_profiles: {
+        Row: {
+          created_at: string
+          destinations_saved: string[] | null
+          destinations_visited: string[] | null
+          id: string
+          stakeholder_profile_id: string
+          sustainability_priorities: string[] | null
+          travel_preferences: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          destinations_saved?: string[] | null
+          destinations_visited?: string[] | null
+          id?: string
+          stakeholder_profile_id: string
+          sustainability_priorities?: string[] | null
+          travel_preferences?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          destinations_saved?: string[] | null
+          destinations_visited?: string[] | null
+          id?: string
+          stakeholder_profile_id?: string
+          sustainability_priorities?: string[] | null
+          travel_preferences?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_profiles_stakeholder_profile_id_fkey"
+            columns: ["stakeholder_profile_id"]
+            isOneToOne: true
+            referencedRelation: "stakeholder_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2482,7 +2823,31 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_destination_summary: {
+        Row: {
+          certification_eligible: boolean | null
+          certification_level: string | null
+          destination_id: string | null
+          economic_impact: number | null
+          environmental_impact: number | null
+          esg_score: number | null
+          ibge_code: string | null
+          indicator_count: number | null
+          institutional_impact: number | null
+          latest_assessment_date: string | null
+          latest_assessment_id: string | null
+          latitude: number | null
+          longitude: number | null
+          name: string | null
+          pillar_scores: Json | null
+          ready_for_visitors: boolean | null
+          sdg_alignments: number[] | null
+          social_impact: number | null
+          territorial_impact_index: number | null
+          uf: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
