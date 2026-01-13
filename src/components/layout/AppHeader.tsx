@@ -1,4 +1,5 @@
-import { User, Menu } from 'lucide-react';
+import { useState } from 'react';
+import { User, Menu, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { NotificationsDropdown } from './NotificationsDropdown';
-
+import { ChangePasswordDialog } from './ChangePasswordDialog';
 interface AppHeaderProps {
   title: string;
   subtitle?: string;
@@ -23,6 +24,7 @@ interface AppHeaderProps {
 export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -100,6 +102,10 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
                 <User className="mr-2 h-4 w-4" />
                 Meu perfil
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPasswordDialogOpen(true)}>
+                <Lock className="mr-2 h-4 w-4" />
+                Alterar Senha
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
                 Configurações
               </DropdownMenuItem>
@@ -111,6 +117,11 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
           </DropdownMenu>
         </div>
       </div>
+
+      <ChangePasswordDialog 
+        open={passwordDialogOpen} 
+        onOpenChange={setPasswordDialogOpen} 
+      />
     </header>
   );
 }
