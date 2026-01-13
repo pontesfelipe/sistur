@@ -57,6 +57,13 @@ const Index = () => {
     ? aggregatedData.pillarScores.reduce((sum, ps) => sum + ps.score, 0) / aggregatedData.pillarScores.length
     : 0;
 
+  // Get severity color based on score (traffic light: green=good, yellow=moderate, red=critical)
+  const getSeverityColor = (score: number) => {
+    if (score >= 0.7) return 'bg-severity-good';
+    if (score >= 0.5) return 'bg-severity-moderate';
+    return 'bg-severity-critical';
+  };
+
   const selectedDestinationName = selectedDestination 
     ? destinations?.find(d => d.id === selectedDestination)?.name 
     : null;
@@ -254,6 +261,7 @@ const Index = () => {
                     <Progress 
                       value={averageScore * 100} 
                       className="h-2"
+                      indicatorClassName={getSeverityColor(averageScore)}
                     />
                   </div>
                 </>
