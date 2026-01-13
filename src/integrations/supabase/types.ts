@@ -1628,6 +1628,226 @@ export type Database = {
           },
         ]
       }
+      investment_interests: {
+        Row: {
+          created_at: string
+          id: string
+          interest_level: string
+          investor_profile_id: string
+          notes: string | null
+          opportunity_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interest_level: string
+          investor_profile_id: string
+          notes?: string | null
+          opportunity_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interest_level?: string
+          investor_profile_id?: string
+          notes?: string | null
+          opportunity_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_interests_investor_profile_id_fkey"
+            columns: ["investor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "investor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_interests_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_opportunities: {
+        Row: {
+          assessment_id: string
+          blocked_by_igma: boolean
+          blocking_reason: string | null
+          completed_at: string | null
+          created_at: string
+          data_package_url: string | null
+          description: string
+          destination_id: string
+          expected_roi: number | null
+          funded_at: string | null
+          id: string
+          igma_approved: boolean
+          impact_focus: string[] | null
+          investment_type: string
+          org_id: string
+          projected_ao_improvement: number | null
+          projected_oe_improvement: number | null
+          projected_ra_improvement: number | null
+          published_at: string | null
+          required_capital: number
+          risk_assessment: Json | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assessment_id: string
+          blocked_by_igma?: boolean
+          blocking_reason?: string | null
+          completed_at?: string | null
+          created_at?: string
+          data_package_url?: string | null
+          description: string
+          destination_id: string
+          expected_roi?: number | null
+          funded_at?: string | null
+          id?: string
+          igma_approved?: boolean
+          impact_focus?: string[] | null
+          investment_type: string
+          org_id: string
+          projected_ao_improvement?: number | null
+          projected_oe_improvement?: number | null
+          projected_ra_improvement?: number | null
+          published_at?: string | null
+          required_capital: number
+          risk_assessment?: Json | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assessment_id?: string
+          blocked_by_igma?: boolean
+          blocking_reason?: string | null
+          completed_at?: string | null
+          created_at?: string
+          data_package_url?: string | null
+          description?: string
+          destination_id?: string
+          expected_roi?: number | null
+          funded_at?: string | null
+          id?: string
+          igma_approved?: boolean
+          impact_focus?: string[] | null
+          investment_type?: string
+          org_id?: string
+          projected_ao_improvement?: number | null
+          projected_oe_improvement?: number | null
+          projected_ra_improvement?: number | null
+          published_at?: string | null
+          required_capital?: number
+          risk_assessment?: Json | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_opportunities_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_opportunities_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_opportunities_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investor_profiles: {
+        Row: {
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          geographic_scope: string[] | null
+          id: string
+          impact_focus: string[] | null
+          investment_thesis: Json | null
+          investor_type: string
+          org_id: string
+          preferred_contact_method: string | null
+          stakeholder_profile_id: string
+          ticket_size_max: number | null
+          ticket_size_min: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          geographic_scope?: string[] | null
+          id?: string
+          impact_focus?: string[] | null
+          investment_thesis?: Json | null
+          investor_type: string
+          org_id: string
+          preferred_contact_method?: string | null
+          stakeholder_profile_id: string
+          ticket_size_max?: number | null
+          ticket_size_min?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          geographic_scope?: string[] | null
+          id?: string
+          impact_focus?: string[] | null
+          investment_thesis?: Json | null
+          investor_type?: string
+          org_id?: string
+          preferred_contact_method?: string | null
+          stakeholder_profile_id?: string
+          ticket_size_max?: number | null
+          ticket_size_min?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investor_profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investor_profiles_stakeholder_profile_id_fkey"
+            columns: ["stakeholder_profile_id"]
+            isOneToOne: true
+            referencedRelation: "stakeholder_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       issues: {
         Row: {
           assessment_id: string
