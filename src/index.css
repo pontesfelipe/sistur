@@ -6,70 +6,72 @@
 
 @layer base {
   :root {
-    /* SISTUR Brand Colors - Ocean Teal + Warm Amber */
-    --background: 210 20% 98%;
-    --foreground: 220 25% 10%;
+    /* Instituto Mario Beni Brand Colors */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 5%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 10%;
+    --card-foreground: 0 0% 5%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 10%;
+    --popover-foreground: 0 0% 5%;
 
-    /* Primary: Deep Ocean Teal */
-    --primary: 187 65% 28%;
+    /* Primary: Pantone Blue 072C - Deep institutional blue */
+    --primary: 221 100% 31%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Warm Sand */
-    --secondary: 35 30% 94%;
-    --secondary-foreground: 220 25% 15%;
+    /* Secondary: Light neutral with blue tint */
+    --secondary: 220 15% 95%;
+    --secondary-foreground: 0 0% 15%;
 
-    --muted: 210 15% 95%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 220 10% 94%;
+    --muted-foreground: 0 0% 40%;
 
-    /* Accent: Warm Amber */
-    --accent: 38 95% 50%;
-    --accent-foreground: 220 25% 10%;
+    /* Accent: Pantone 109C - Vibrant yellow */
+    --accent: 48 100% 50%;
+    --accent-foreground: 0 0% 5%;
 
-    --destructive: 0 72% 51%;
+    /* Destructive: Pantone 2347C - Bold red */
+    --destructive: 3 84% 49%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 90%;
-    --input: 210 20% 90%;
-    --ring: 187 65% 28%;
+    --border: 220 15% 90%;
+    --input: 220 15% 90%;
+    --ring: 221 100% 31%;
 
-    --radius: 0.75rem;
+    --radius: 0.625rem;
 
-    /* Pillar Colors */
-    --pillar-ra: 160 60% 45%;
-    --pillar-oe: 220 70% 50%;
-    --pillar-ao: 38 95% 50%;
+    /* Pillar Colors - Using brand palette */
+    --pillar-ra: 3 84% 49%;
+    --pillar-oe: 221 100% 31%;
+    --pillar-ao: 48 100% 50%;
 
     /* Severity Colors */
-    --severity-critical: 0 72% 51%;
-    --severity-moderate: 38 92% 50%;
-    --severity-good: 160 60% 45%;
+    --severity-critical: 3 84% 49%;
+    --severity-moderate: 48 100% 45%;
+    --severity-good: 145 60% 40%;
 
-    /* Sidebar */
-    --sidebar-background: 220 25% 10%;
-    --sidebar-foreground: 210 20% 85%;
-    --sidebar-primary: 187 65% 45%;
+    /* Sidebar - Dark with brand blue accent */
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 221 100% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 25% 15%;
-    --sidebar-accent-foreground: 210 20% 90%;
-    --sidebar-border: 220 20% 18%;
-    --sidebar-ring: 187 65% 45%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 221 100% 45%;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(187 65% 28%) 0%, hsl(187 50% 20%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 20% 98%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(38 95% 50%) 0%, hsl(25 95% 45%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(221 100% 31%) 0%, hsl(221 100% 20%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 15% 98%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(48 100% 50%) 0%, hsl(45 100% 45%) 100%);
+    --gradient-brand: linear-gradient(135deg, hsl(221 100% 31%) 0%, hsl(3 84% 49%) 100%);
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(220 25% 10% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(220 25% 10% / 0.1), 0 2px 4px -2px hsl(220 25% 10% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(220 25% 10% / 0.1), 0 4px 6px -4px hsl(220 25% 10% / 0.1);
-    --shadow-glow: 0 0 20px hsl(187 65% 45% / 0.3);
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+    --shadow-glow: 0 0 20px hsl(221 100% 45% / 0.25);
 
     /* Fonts */
     --font-display: 'Plus Jakarta Sans', sans-serif;
@@ -77,42 +79,42 @@
   }
 
   .dark {
-    --background: 220 25% 8%;
-    --foreground: 210 20% 95%;
+    --background: 0 0% 6%;
+    --foreground: 0 0% 95%;
 
-    --card: 220 25% 12%;
-    --card-foreground: 210 20% 95%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 220 25% 12%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 187 65% 45%;
-    --primary-foreground: 220 25% 5%;
+    --primary: 221 100% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 210 20% 90%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 210 15% 55%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 38 95% 55%;
-    --accent-foreground: 220 25% 5%;
+    --accent: 48 100% 55%;
+    --accent-foreground: 0 0% 5%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 3 84% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
-    --ring: 187 65% 45%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 221 100% 50%;
 
-    --sidebar-background: 220 25% 6%;
-    --sidebar-foreground: 210 20% 85%;
-    --sidebar-primary: 187 65% 50%;
-    --sidebar-primary-foreground: 220 25% 5%;
-    --sidebar-accent: 220 25% 12%;
-    --sidebar-accent-foreground: 210 20% 90%;
-    --sidebar-border: 220 20% 12%;
-    --sidebar-ring: 187 65% 50%;
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 221 100% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-ring: 221 100% 55%;
   }
 }
 
@@ -143,8 +145,37 @@
     background: var(--gradient-accent);
   }
 
+  .gradient-brand {
+    background: var(--gradient-brand);
+  }
+
   .shadow-glow {
     box-shadow: var(--shadow-glow);
+  }
+
+  /* Brand color utilities */
+  .bg-brand-blue {
+    background-color: hsl(221 100% 31%);
+  }
+
+  .bg-brand-red {
+    background-color: hsl(3 84% 49%);
+  }
+
+  .bg-brand-yellow {
+    background-color: hsl(48 100% 50%);
+  }
+
+  .text-brand-blue {
+    color: hsl(221 100% 31%);
+  }
+
+  .text-brand-red {
+    color: hsl(3 84% 49%);
+  }
+
+  .text-brand-yellow {
+    color: hsl(48 100% 50%);
   }
 
   /* Touch-friendly spacing */
