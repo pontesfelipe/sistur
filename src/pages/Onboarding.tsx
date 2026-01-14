@@ -61,12 +61,8 @@ export default function Onboarding() {
     setSubmitting(false);
 
     if (result.success) {
-      toast.success('Bem-vindo ao SISTUR!');
-      if (systemAccess === 'ERP') {
-        navigate('/');
-      } else {
-        navigate('/edu');
-      }
+      toast.success('Solicitação enviada! Aguarde aprovação do administrador.');
+      navigate('/pending-approval');
     } else {
       toast.error('Erro ao configurar acesso: ' + result.error);
     }
