@@ -120,11 +120,20 @@ export function IGMAWarningsPanel({
               Ações bloqueadas: 
             </span>
             <div className="flex gap-1 flex-wrap">
-              {igmaInterpretation.blockedActions.map(action => (
-                <Badge key={action} variant="outline" className="text-xs">
-                  {action.replace(/_/g, ' ')}
-                </Badge>
-              ))}
+              {igmaInterpretation.blockedActions.map(action => {
+                // Translate blocked actions to Portuguese
+                const actionTranslations: Record<string, string> = {
+                  'EDU_OE': 'Capacitação OE',
+                  'EDU_AO': 'Capacitação AO',
+                  'EDU_RA': 'Capacitação RA',
+                  'MARKETING': 'Marketing',
+                };
+                return (
+                  <Badge key={action} variant="outline" className="text-xs">
+                    {actionTranslations[action] || action.replace(/_/g, ' ')}
+                  </Badge>
+                );
+              })}
             </div>
           </div>
         )}
