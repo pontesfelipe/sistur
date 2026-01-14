@@ -77,12 +77,16 @@ export function PendingApprovalsPanel() {
       }
 
       // Update profile to approve
-      const { error: profileError } = await supabase
+      const { data: approvedProfiles, error: profileError } = await supabase
         .from('profiles')
         .update({ pending_approval: false })
-        .eq('id', profileId);
+        .eq('id', profileId)
+        .select('id');
 
       if (profileError) throw profileError;
+      if (!approvedProfiles || approvedProfiles.length === 0) {
+        throw new Error('Não foi possível aprovar: permissão negada ou usuário não encontrado');
+      }
 
       // Add/update user role (avoid unique constraint errors)
       const { error: roleError } = await supabase
