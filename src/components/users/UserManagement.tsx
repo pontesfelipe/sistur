@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useUserManagement, UserData } from '@/hooks/useUserManagement';
 import { UserPlus, Shield, User, Eye, Loader2, MoreHorizontal, Ban, Trash2, RefreshCw, GraduationCap, Building2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const ROLE_INFO: Record<string, { label: string; color: string; icon: typeof Shield }> = {
   ADMIN: { label: 'Administrador', color: 'bg-red-500/20 text-red-700', icon: Shield },
@@ -59,9 +60,12 @@ export function UserManagement() {
     
     // If role is not PROFESSOR or ESTUDANTE, automatically set system_access to ERP
     if (newRole !== 'PROFESSOR' && newRole !== 'ESTUDANTE') {
-      const user = users.find(u => u.user_id === userId);
-      if (user && user.system_access !== 'ERP') {
+      const targetUser = users.find(u => u.user_id === userId);
+      if (targetUser && targetUser.system_access !== 'ERP') {
         await updateSystemAccess(userId, 'ERP');
+        toast.info('Acesso alterado automaticamente para ERP', {
+          description: `O papel ${ROLE_INFO[newRole]?.label || newRole} requer acesso ERP.`
+        });
       }
     }
     
