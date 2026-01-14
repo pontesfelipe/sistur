@@ -9,9 +9,13 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
-  const { needsOnboarding, awaitingApproval, loading: profileLoading } = useProfile();
+  const { needsOnboarding, awaitingApproval, loading: profileLoading, profile } = useProfile();
 
-  if (loading || profileLoading) {
+  // Only show loading on initial load, not on navigation between routes
+  const isInitialLoad = loading && user === null;
+  const isProfileInitialLoad = profileLoading && profile === null;
+
+  if (isInitialLoad || isProfileInitialLoad) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
