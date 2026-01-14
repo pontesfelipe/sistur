@@ -2878,14 +2878,19 @@ export type Database = {
           user_id: string
         }[]
       }
-      complete_user_onboarding: {
-        Args: {
-          _role?: Database["public"]["Enums"]["app_role"]
-          _system_access: Database["public"]["Enums"]["system_access_type"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      complete_user_onboarding:
+        | {
+            Args: {
+              _role?: Database["public"]["Enums"]["app_role"]
+              _system_access: Database["public"]["Enums"]["system_access_type"]
+              _user_id: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: { _role: string; _system_access: string; _user_id: string }
+            Returns: boolean
+          }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
