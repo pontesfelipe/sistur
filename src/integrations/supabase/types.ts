@@ -2865,6 +2865,7 @@ export type Database = {
       }
     }
     Functions: {
+      admin_approve_user: { Args: { _user_id: string }; Returns: boolean }
       admin_get_all_users: {
         Args: never
         Returns: {
