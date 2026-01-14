@@ -573,11 +573,21 @@ serve(async (req) => {
     await supabase.from("pillar_scores").delete().eq("assessment_id", assessment_id);
     await supabase.from("indicator_scores").delete().eq("assessment_id", assessment_id);
 
-    // 5. Insert indicator scores
+    // 5. Insert indicator scores (deduplicate by indicator_id to avoid unique constraint violations)
     if (indicatorScores.length > 0) {
+      // Deduplicate: keep the last entry for each indicator_id (composite scores take precedence)
+      const deduplicatedScores = Array.from(
+        indicatorScores.reduce((map, score) => {
+          map.set(score.indicator_id, score);
+          return map;
+        }, new Map<string, typeof indicatorScores[0]>()).values()
+      );
+      
+      console.log(`Inserting ${deduplicatedScores.length} indicator scores (deduplicated from ${indicatorScores.length})`);
+      
       const { error: insertScoresError } = await supabase
         .from("indicator_scores")
-        .insert(indicatorScores);
+        .insert(deduplicatedScores);
 
       if (insertScoresError) {
         console.error("Error inserting indicator scores:", insertScoresError);

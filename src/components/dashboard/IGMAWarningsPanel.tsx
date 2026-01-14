@@ -102,14 +102,8 @@ export function IGMAWarningsPanel({
               }
             >
               {IconComponent && <IconComponent className="h-4 w-4" />}
-              <AlertTitle className="flex items-center gap-2">
+              <AlertTitle>
                 {msg.title}
-                <Badge 
-                  variant={msg.type === 'critical' ? 'destructive' : 'secondary'}
-                  className="text-xs"
-                >
-                  {msg.flag.replace(/_/g, ' ')}
-                </Badge>
               </AlertTitle>
               <AlertDescription className="text-sm">
                 {msg.message}
