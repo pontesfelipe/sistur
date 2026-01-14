@@ -2910,7 +2910,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      toggle_demo_mode: { Args: { _enable: boolean }; Returns: boolean }
+      toggle_demo_mode: { Args: { _enable: boolean }; Returns: undefined }
       user_belongs_to_org: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
