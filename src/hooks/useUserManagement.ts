@@ -7,9 +7,11 @@ export interface UserData {
   user_id: string;
   full_name: string | null;
   email: string | null;
-  role: 'ADMIN' | 'ANALYST' | 'VIEWER';
+  role: 'ADMIN' | 'ANALYST' | 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR';
   avatar_url: string | null;
   created_at: string;
+  system_access: 'ERP' | 'EDU' | null;
+  is_blocked: boolean;
 }
 
 export function useUserManagement() {
@@ -106,6 +108,86 @@ export function useUserManagement() {
     }
   };
 
+  const updateSystemAccess = async (userId: string, systemAccess: 'ERP' | 'EDU') => {
+    try {
+      const response = await supabase.functions.invoke('manage-users', {
+        body: { 
+          action: 'update_system_access',
+          user_id: userId,
+          system_access: systemAccess
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      if (response.data.error) {
+        throw new Error(response.data.error);
+      }
+
+      toast.success('Acesso atualizado com sucesso');
+      await fetchUsers();
+      return { success: true };
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao atualizar acesso');
+      return { success: false, error: error.message };
+    }
+  };
+
+  const blockUser = async (userId: string, blocked: boolean) => {
+    try {
+      const response = await supabase.functions.invoke('manage-users', {
+        body: { 
+          action: 'block_user',
+          user_id: userId,
+          blocked
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      if (response.data.error) {
+        throw new Error(response.data.error);
+      }
+
+      toast.success(blocked ? 'Usuário bloqueado' : 'Usuário desbloqueado');
+      await fetchUsers();
+      return { success: true };
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao atualizar status');
+      return { success: false, error: error.message };
+    }
+  };
+
+  const deleteUser = async (userId: string) => {
+    try {
+      const response = await supabase.functions.invoke('manage-users', {
+        body: { 
+          action: 'delete_user',
+          user_id: userId
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      if (response.data.error) {
+        throw new Error(response.data.error);
+      }
+
+      toast.success('Usuário removido com sucesso');
+      await fetchUsers();
+      return { success: true };
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao remover usuário');
+      return { success: false, error: error.message };
+    }
+  };
+
   useEffect(() => {
     if (user) {
       checkAdminStatus().then((admin) => {
@@ -124,6 +206,9 @@ export function useUserManagement() {
     isAdmin,
     createUser,
     updateUserRole,
+    updateSystemAccess,
+    blockUser,
+    deleteUser,
     refetch: fetchUsers
   };
 }
