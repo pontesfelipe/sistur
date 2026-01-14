@@ -10,7 +10,7 @@ interface EduRouteProps {
 
 export function EduRoute({ children, requireProfessor = false }: EduRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasEDUAccess, isProfessor, isAdmin, loading: profileLoading, needsOnboarding } = useProfile();
+  const { hasEDUAccess, isProfessor, isAdmin, loading: profileLoading, needsOnboarding, awaitingApproval } = useProfile();
 
   if (authLoading || profileLoading) {
     return (
@@ -32,6 +32,10 @@ export function EduRoute({ children, requireProfessor = false }: EduRouteProps) 
 
   if (needsOnboarding) {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  if (awaitingApproval) {
+    return <Navigate to="/pending-approval" replace />;
   }
 
   // Admin always has access

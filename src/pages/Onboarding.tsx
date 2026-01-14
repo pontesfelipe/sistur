@@ -7,14 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Loader2, BarChart3, GraduationCap, Users, BookOpen } from 'lucide-react';
+import { Loader2, BarChart3, GraduationCap, Users, BookOpen, ArrowLeft, LogOut } from 'lucide-react';
 
 type SystemAccess = 'ERP' | 'EDU';
 type EduRole = 'ESTUDANTE' | 'PROFESSOR';
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const { profile, loading: profileLoading, needsOnboarding, completeOnboarding } = useProfile();
   
   const [step, setStep] = useState<1 | 2>(1);
@@ -83,6 +83,11 @@ export default function Onboarding() {
     } else {
       handleSubmit();
     }
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
   };
 
   return (
@@ -181,6 +186,15 @@ export default function Onboarding() {
                   'Continuar'
                 )}
               </Button>
+
+              <Button
+                variant="ghost"
+                onClick={handleLogout}
+                className="w-full"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sair e voltar ao login
+              </Button>
             </>
           ) : (
             <>
@@ -250,6 +264,7 @@ export default function Onboarding() {
                   onClick={() => setStep(1)}
                   className="flex-1"
                 >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
                   Voltar
                 </Button>
                 <Button

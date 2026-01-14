@@ -9,7 +9,7 @@ interface ERPRouteProps {
 
 export function ERPRoute({ children }: ERPRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasERPAccess, isAdmin, loading: profileLoading, needsOnboarding } = useProfile();
+  const { hasERPAccess, isAdmin, loading: profileLoading, needsOnboarding, awaitingApproval } = useProfile();
 
   if (authLoading || profileLoading) {
     return (
@@ -31,6 +31,10 @@ export function ERPRoute({ children }: ERPRouteProps) {
 
   if (needsOnboarding) {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  if (awaitingApproval) {
+    return <Navigate to="/pending-approval" replace />;
   }
 
   // Admin always has access
