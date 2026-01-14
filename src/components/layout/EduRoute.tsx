@@ -10,9 +10,13 @@ interface EduRouteProps {
 
 export function EduRoute({ children, requireProfessor = false }: EduRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasEDUAccess, isProfessor, isAdmin, loading: profileLoading, needsOnboarding, awaitingApproval } = useProfile();
+  const { hasEDUAccess, isProfessor, isAdmin, loading: profileLoading, needsOnboarding, awaitingApproval, profile } = useProfile();
 
-  if (authLoading || profileLoading) {
+  // Only show loading on initial load, not on navigation between routes
+  const isInitialLoad = authLoading && user === null;
+  const isProfileInitialLoad = profileLoading && profile === null;
+
+  if (isInitialLoad || isProfileInitialLoad) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">

@@ -34,7 +34,10 @@ export function AdminRoute({ children }: AdminRouteProps) {
     }
   }, [user, authLoading]);
 
-  if (authLoading || checking) {
+  // Only show loading on initial load, not on navigation between routes
+  const isInitialLoad = (authLoading && user === null) || (checking && isAdmin === null);
+
+  if (isInitialLoad) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
