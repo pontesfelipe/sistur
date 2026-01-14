@@ -9,6 +9,7 @@ import { NormalizationCalculator } from '@/components/tools/NormalizationCalcula
 import { CycleMonitor } from '@/components/tools/CycleMonitor';
 import { DataExporter } from '@/components/tools/DataExporter';
 import { InteractiveWorkflowDiagram } from '@/components/tools/InteractiveWorkflowDiagram';
+import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
 import { 
   BookOpen, 
   Wrench, 
@@ -23,7 +24,8 @@ import {
   Database,
   Calculator,
   RefreshCw,
-  Activity
+  Activity,
+  Settings2
 } from 'lucide-react';
 
 export default function Configuracoes() {
@@ -31,8 +33,12 @@ export default function Configuracoes() {
     <AppLayout title="Configurações" subtitle="Documentação, metodologia de cálculo e ferramentas do SISTUR">
       <div className="space-y-6">
 
-        <Tabs defaultValue="usuarios" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+        <Tabs defaultValue="geral" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5 max-w-3xl">
+            <TabsTrigger value="geral" className="flex items-center gap-2">
+              <Settings2 className="h-4 w-4" />
+              Geral
+            </TabsTrigger>
             <TabsTrigger value="usuarios" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               Usuários
@@ -50,6 +56,11 @@ export default function Configuracoes() {
               Ferramentas
             </TabsTrigger>
           </TabsList>
+
+          {/* GERAL TAB */}
+          <TabsContent value="geral" className="space-y-6">
+            <DemoModeToggle />
+          </TabsContent>
 
           {/* USUARIOS TAB */}
           <TabsContent value="usuarios" className="space-y-6">
