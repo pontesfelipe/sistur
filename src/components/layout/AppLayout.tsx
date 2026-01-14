@@ -29,7 +29,7 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
           subtitle={subtitle} 
           onMobileMenuClick={() => setMobileOpen(true)}
         />
-        <main className="p-3 sm:p-4 md:p-6">{children}</main>
+        <main className="p-3 sm:p-4 md:p-6 animate-in fade-in-0 duration-300 ease-out">{children}</main>
       </div>
     </div>
   );
