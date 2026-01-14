@@ -2489,6 +2489,7 @@ export type Database = {
             | null
           updated_at: string
           user_id: string
+          viewing_demo_org_id: string | null
         }
         Insert: {
           approval_requested_at?: string | null
@@ -2503,6 +2504,7 @@ export type Database = {
             | null
           updated_at?: string
           user_id: string
+          viewing_demo_org_id?: string | null
         }
         Update: {
           approval_requested_at?: string | null
@@ -2517,6 +2519,7 @@ export type Database = {
             | null
           updated_at?: string
           user_id?: string
+          viewing_demo_org_id?: string | null
         }
         Relationships: [
           {
@@ -2891,6 +2894,7 @@ export type Database = {
             Args: { _role: string; _system_access: string; _user_id: string }
             Returns: boolean
           }
+      get_effective_org_id: { Args: never; Returns: string }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -2906,6 +2910,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      toggle_demo_mode: { Args: { _enable: boolean }; Returns: boolean }
       user_belongs_to_org: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
