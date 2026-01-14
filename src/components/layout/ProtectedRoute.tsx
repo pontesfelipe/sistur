@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
-  const { needsOnboarding, loading: profileLoading } = useProfile();
+  const { needsOnboarding, awaitingApproval, loading: profileLoading } = useProfile();
 
   if (loading || profileLoading) {
     return (
@@ -31,6 +31,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (needsOnboarding) {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  if (awaitingApproval) {
+    return <Navigate to="/pending-approval" replace />;
   }
 
   return <>{children}</>;

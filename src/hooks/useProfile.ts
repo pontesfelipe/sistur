@@ -96,7 +96,11 @@ export function useProfile() {
   const hasERPAccess = profile?.system_access === 'ERP' || isAdmin;
   const hasEDUAccess = profile?.system_access === 'EDU' || isAdmin || isProfessor || isEstudante;
 
-  const needsOnboarding = profile?.pending_approval === true;
+  // User needs onboarding if they haven't selected a system_access yet
+  const needsOnboarding = profile?.pending_approval === true && profile?.system_access === null;
+  
+  // User is waiting for admin approval if they completed onboarding but are still pending
+  const awaitingApproval = profile?.pending_approval === true && profile?.system_access !== null;
 
   const completeOnboarding = async (
     systemAccess: 'ERP' | 'EDU',
@@ -165,6 +169,7 @@ export function useProfile() {
     hasERPAccess,
     hasEDUAccess,
     needsOnboarding,
+    awaitingApproval,
     completeOnboarding,
   };
 }

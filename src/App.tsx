@@ -13,6 +13,7 @@ import { SplashScreen } from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
+import PendingApproval from "./pages/PendingApproval";
 import Destinos from "./pages/Destinos";
 import Diagnosticos from "./pages/Diagnosticos";
 import DiagnosticoDetalhe from "./pages/DiagnosticoDetalhe";
@@ -52,6 +53,7 @@ const App = () => {
               <Routes>
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/pending-approval" element={<PendingApproval />} />
                 <Route
                   path="/"
                   element={
