@@ -84,14 +84,19 @@ export function PendingApprovalsPanel() {
 
       if (profileError) throw profileError;
 
-      // Add user role
+      // Add/update user role (avoid unique constraint errors)
       const { error: roleError } = await supabase
         .from('user_roles')
-        .insert([{
-          user_id: userId,
-          org_id: profile.org_id,
-          role: role as 'ADMIN' | 'ANALYST' | 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR'
-        }]);
+        .upsert(
+          [
+            {
+              user_id: userId,
+              org_id: profile.org_id,
+              role: role as 'ADMIN' | 'ANALYST' | 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR',
+            },
+          ],
+          { onConflict: 'user_id,org_id' }
+        );
 
       if (roleError) throw roleError;
 
