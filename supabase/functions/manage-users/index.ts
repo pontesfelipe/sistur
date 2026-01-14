@@ -186,6 +186,152 @@ Deno.serve(async (req) => {
       })
     }
 
+    if (action === 'update_system_access') {
+      const { user_id, system_access } = data
+
+      if (!['ERP', 'EDU'].includes(system_access)) {
+        return new Response(JSON.stringify({ error: 'Invalid system_access value' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      const { data: adminProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', requestingUser.id)
+        .single()
+
+      // Verify target user is in the same org
+      const { data: targetProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', user_id)
+        .single()
+
+      if (targetProfile?.org_id !== adminProfile?.org_id) {
+        return new Response(JSON.stringify({ error: 'User not in your organization' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      const { error: updateError } = await supabaseAdmin
+        .from('profiles')
+        .update({ system_access })
+        .eq('user_id', user_id)
+
+      if (updateError) {
+        return new Response(JSON.stringify({ error: updateError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    if (action === 'block_user') {
+      const { user_id, blocked } = data
+
+      const { data: adminProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', requestingUser.id)
+        .single()
+
+      // Verify target user is in the same org
+      const { data: targetProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', user_id)
+        .single()
+
+      if (targetProfile?.org_id !== adminProfile?.org_id) {
+        return new Response(JSON.stringify({ error: 'User not in your organization' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Block by setting pending_approval back to true (effectively blocks access)
+      const { error: updateError } = await supabaseAdmin
+        .from('profiles')
+        .update({ pending_approval: blocked })
+        .eq('user_id', user_id)
+
+      if (updateError) {
+        return new Response(JSON.stringify({ error: updateError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    if (action === 'delete_user') {
+      const { user_id } = data
+
+      const { data: adminProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', requestingUser.id)
+        .single()
+
+      // Verify target user is in the same org
+      const { data: targetProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', user_id)
+        .single()
+
+      if (targetProfile?.org_id !== adminProfile?.org_id) {
+        return new Response(JSON.stringify({ error: 'User not in your organization' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Prevent self-deletion
+      if (user_id === requestingUser.id) {
+        return new Response(JSON.stringify({ error: 'Cannot delete yourself' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Delete user_roles first
+      await supabaseAdmin
+        .from('user_roles')
+        .delete()
+        .eq('user_id', user_id)
+
+      // Delete profile
+      await supabaseAdmin
+        .from('profiles')
+        .delete()
+        .eq('user_id', user_id)
+
+      // Delete auth user
+      const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user_id)
+
+      if (deleteError) {
+        return new Response(JSON.stringify({ error: deleteError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     if (action === 'list') {
       // Get the requesting user's org_id
       const { data: profile } = await supabaseAdmin
@@ -201,16 +347,19 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Get all users in the same org
+      // Get all users in the same org (excluding pending users - they appear in pending panel)
       const { data: profiles, error: profilesError } = await supabaseAdmin
         .from('profiles')
         .select(`
           user_id,
           full_name,
           avatar_url,
-          created_at
+          created_at,
+          system_access,
+          pending_approval
         `)
         .eq('org_id', profile.org_id)
+        .eq('pending_approval', false)
 
       if (profilesError) {
         return new Response(JSON.stringify({ error: profilesError.message }), {
@@ -238,7 +387,9 @@ Deno.serve(async (req) => {
       const users = profiles?.map(p => ({
         ...p,
         email: usersWithEmail.find(u => u.user_id === p.user_id)?.email,
-        role: roles?.find(r => r.user_id === p.user_id)?.role || 'VIEWER'
+        role: roles?.find(r => r.user_id === p.user_id)?.role || 'VIEWER',
+        system_access: p.system_access,
+        is_blocked: p.pending_approval
       }))
 
       return new Response(JSON.stringify({ users }), {
