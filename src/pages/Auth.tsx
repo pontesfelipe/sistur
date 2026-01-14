@@ -40,8 +40,11 @@ const Auth = () => {
   }, [searchParams]);
 
   // Redirect if already logged in (except when resetting password)
+  // Don't navigate directly - let ProtectedRoute handle proper redirects based on profile state
   useEffect(() => {
     if (user && mode !== 'reset') {
+      // Just trigger a navigation to root - ProtectedRoute will handle 
+      // onboarding/pending-approval redirects based on profile state
       navigate('/');
     }
   }, [user, navigate, mode]);
