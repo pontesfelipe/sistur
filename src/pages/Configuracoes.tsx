@@ -10,6 +10,9 @@ import { CycleMonitor } from '@/components/tools/CycleMonitor';
 import { DataExporter } from '@/components/tools/DataExporter';
 import { InteractiveWorkflowDiagram } from '@/components/tools/InteractiveWorkflowDiagram';
 import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
+import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPanel';
+import { ActAsUserPanel } from '@/components/settings/ActAsUserPanel';
+import { useProfile } from '@/hooks/useProfile';
 import { 
   BookOpen, 
   Wrench, 
@@ -29,6 +32,8 @@ import {
 } from 'lucide-react';
 
 export default function Configuracoes() {
+  const { isAdmin } = useProfile();
+
   return (
     <AppLayout title="Configurações" subtitle="Documentação, metodologia de cálculo e ferramentas do SISTUR">
       <div className="space-y-6">
@@ -60,10 +65,12 @@ export default function Configuracoes() {
           {/* GERAL TAB */}
           <TabsContent value="geral" className="space-y-6">
             <DemoModeToggle />
+            {isAdmin && <ActAsUserPanel />}
           </TabsContent>
 
           {/* USUARIOS TAB */}
           <TabsContent value="usuarios" className="space-y-6">
+            {isAdmin && <PendingApprovalsPanel />}
             <UserManagement />
           </TabsContent>
 
