@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { User, Menu, Lock } from 'lucide-react';
+import { User, Menu, Lock, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -15,6 +17,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
+
 interface AppHeaderProps {
   title: string;
   subtitle?: string;
@@ -23,6 +26,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps) {
   const { user, signOut } = useAuth();
+  const { isViewingDemoData } = useProfile();
   const navigate = useNavigate();
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
 
@@ -64,7 +68,15 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
           )}
           
           <div className="min-w-0">
-            <h1 className="text-lg md:text-xl font-display font-semibold text-foreground truncate">{title}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg md:text-xl font-display font-semibold text-foreground truncate">{title}</h1>
+              {isViewingDemoData && (
+                <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300 text-xs shrink-0">
+                  <Database className="h-3 w-3 mr-1" />
+                  Demo
+                </Badge>
+              )}
+            </div>
             {subtitle && (
               <p className="text-xs md:text-sm text-muted-foreground truncate hidden sm:block">{subtitle}</p>
             )}
