@@ -7,9 +7,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { AdminRoute } from "@/components/layout/AdminRoute";
+import { ERPRoute } from "@/components/layout/ERPRoute";
+import { EduRoute } from "@/components/layout/EduRoute";
 import { SplashScreen } from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Onboarding from "./pages/Onboarding";
 import Destinos from "./pages/Destinos";
 import Diagnosticos from "./pages/Diagnosticos";
 import DiagnosticoDetalhe from "./pages/DiagnosticoDetalhe";
@@ -48,6 +51,7 @@ const App = () => {
             <AuthProvider>
               <Routes>
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/onboarding" element={<Onboarding />} />
                 <Route
                   path="/"
                   element={
@@ -59,57 +63,57 @@ const App = () => {
                 <Route
                   path="/destinos"
                   element={
-                    <ProtectedRoute>
+                    <ERPRoute>
                       <Destinos />
-                    </ProtectedRoute>
+                    </ERPRoute>
                   }
                 />
                 <Route
                   path="/diagnosticos"
                   element={
-                    <ProtectedRoute>
+                    <ERPRoute>
                       <Diagnosticos />
-                    </ProtectedRoute>
+                    </ERPRoute>
                   }
                 />
                 <Route
                   path="/diagnosticos/:id"
                   element={
-                    <ProtectedRoute>
+                    <ERPRoute>
                       <DiagnosticoDetalhe />
-                    </ProtectedRoute>
+                    </ERPRoute>
                   }
                 />
                 <Route
                   path="/indicadores"
                   element={
-                    <ProtectedRoute>
+                    <ERPRoute>
                       <Indicadores />
-                    </ProtectedRoute>
+                    </ERPRoute>
                   }
                 />
                 <Route
                   path="/importacoes"
                   element={
-                    <ProtectedRoute>
+                    <ERPRoute>
                       <Importacoes />
-                    </ProtectedRoute>
+                    </ERPRoute>
                   }
                 />
                 <Route
                   path="/cursos"
                   element={
-                    <ProtectedRoute>
+                    <ERPRoute>
                       <Cursos />
-                    </ProtectedRoute>
+                    </ERPRoute>
                   }
                 />
                 <Route
                   path="/admin/cursos"
                   element={
-                    <ProtectedRoute>
+                    <EduRoute requireProfessor>
                       <AdminCursos />
-                    </ProtectedRoute>
+                    </EduRoute>
                   }
                 />
                 <Route
@@ -123,33 +127,33 @@ const App = () => {
                 <Route
                   path="/edu"
                   element={
-                    <ProtectedRoute>
+                    <EduRoute>
                       <EduCatalogo />
-                    </ProtectedRoute>
+                    </EduRoute>
                   }
                 />
                 <Route
                   path="/edu/trilhas"
                   element={
-                    <ProtectedRoute>
+                    <EduRoute>
                       <EduTrilhas />
-                    </ProtectedRoute>
+                    </EduRoute>
                   }
                 />
                 <Route
                   path="/edu/trilha/:id"
                   element={
-                    <ProtectedRoute>
+                    <EduRoute>
                       <EduTrilhaDetalhe />
-                    </ProtectedRoute>
+                    </EduRoute>
                   }
                 />
                 <Route
                   path="/edu/training/:id"
                   element={
-                    <ProtectedRoute>
+                    <EduRoute>
                       <EduTrainingDetalhe />
-                    </ProtectedRoute>
+                    </EduRoute>
                   }
                 />
                 <Route
@@ -171,25 +175,25 @@ const App = () => {
                 <Route
                   path="/relatorios"
                   element={
-                    <ProtectedRoute>
+                    <ERPRoute>
                       <Relatorios />
-                    </ProtectedRoute>
+                    </ERPRoute>
                   }
                 />
                 <Route
                   path="/nova-rodada"
                   element={
-                    <ProtectedRoute>
+                    <ERPRoute>
                       <NovaRodada />
-                    </ProtectedRoute>
+                    </ERPRoute>
                   }
                 />
                 <Route
                   path="/erp"
                   element={
-                    <ProtectedRoute>
+                    <ERPRoute>
                       <ERPDashboard />
-                    </ProtectedRoute>
+                    </ERPRoute>
                   }
                 />
                 <Route

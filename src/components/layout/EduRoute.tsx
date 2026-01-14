@@ -3,15 +3,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Loader2 } from 'lucide-react';
 
-interface ProtectedRouteProps {
+interface EduRouteProps {
   children: React.ReactNode;
+  requireProfessor?: boolean;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
-  const { needsOnboarding, loading: profileLoading } = useProfile();
+export function EduRoute({ children, requireProfessor = false }: EduRouteProps) {
+  const { user, loading: authLoading } = useAuth();
+  const { hasEDUAccess, isProfessor, isAdmin, loading: profileLoading, needsOnboarding } = useProfile();
 
-  if (loading || profileLoading) {
+  if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -31,6 +32,21 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (needsOnboarding) {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  // Admin always has access
+  if (isAdmin) {
+    return <>{children}</>;
+  }
+
+  // Check if requires professor role
+  if (requireProfessor && !isProfessor) {
+    return <Navigate to="/edu" replace />;
+  }
+
+  // Check EDU access
+  if (!hasEDUAccess) {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

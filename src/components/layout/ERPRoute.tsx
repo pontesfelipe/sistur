@@ -3,15 +3,15 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Loader2 } from 'lucide-react';
 
-interface ProtectedRouteProps {
+interface ERPRouteProps {
   children: React.ReactNode;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
-  const { needsOnboarding, loading: profileLoading } = useProfile();
+export function ERPRoute({ children }: ERPRouteProps) {
+  const { user, loading: authLoading } = useAuth();
+  const { hasERPAccess, isAdmin, loading: profileLoading, needsOnboarding } = useProfile();
 
-  if (loading || profileLoading) {
+  if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -31,6 +31,16 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (needsOnboarding) {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  // Admin always has access
+  if (isAdmin) {
+    return <>{children}</>;
+  }
+
+  // Check ERP access
+  if (!hasERPAccess) {
+    return <Navigate to="/edu" replace />;
   }
 
   return <>{children}</>;

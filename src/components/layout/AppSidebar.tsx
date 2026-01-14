@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import {
   LayoutDashboard,
   MapPin,
@@ -24,29 +25,40 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
 
-const navigation = [
+interface NavItem {
+  name: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+  requiresERP?: boolean;
+  requiresEDU?: boolean;
+  requiresProfessor?: boolean;
+  requiresAdmin?: boolean;
+}
+
+const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Destinos', href: '/destinos', icon: MapPin },
-  { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList },
-  { name: 'Monitoramento ERP', href: '/erp', icon: Activity },
-  { name: 'Indicadores', href: '/indicadores', icon: BarChart3 },
-  { name: 'Importações', href: '/importacoes', icon: Upload },
-  { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap },
-  { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen },
-  { name: 'Relatórios', href: '/relatorios', icon: FileText },
+  { name: 'Destinos', href: '/destinos', icon: MapPin, requiresERP: true },
+  { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
+  { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
+  { name: 'Indicadores', href: '/indicadores', icon: BarChart3, requiresERP: true },
+  { name: 'Importações', href: '/importacoes', icon: Upload, requiresERP: true },
+  { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
+  { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen, requiresProfessor: true },
+  { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
 ];
 
-const bottomNavigation = [
+const bottomNavigation: NavItem[] = [
   { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
   { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
-  { name: 'Configurações', href: '/configuracoes', icon: Settings },
+  { name: 'Configurações', href: '/configuracoes', icon: Settings, requiresAdmin: true },
 ];
 
 export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess } = useProfile();
   const [collapsed, setCollapsed] = useState(false);
 
   const handleSignOut = async () => {
@@ -55,7 +67,20 @@ export function AppSidebar() {
     navigate('/auth');
   };
 
-  const NavItem = ({ item }: { item: typeof navigation[0] }) => {
+  const filterNavItems = (items: NavItem[]) => {
+    return items.filter((item) => {
+      if (item.requiresAdmin && !isAdmin) return false;
+      if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
+      if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
+      if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
+      return true;
+    });
+  };
+
+  const filteredNavigation = filterNavItems(navigation);
+  const filteredBottomNavigation = filterNavItems(bottomNavigation);
+
+  const NavItem = ({ item }: { item: NavItem }) => {
     const isActive = location.pathname === item.href || 
       (item.href !== '/' && location.pathname.startsWith(item.href));
     
@@ -119,14 +144,14 @@ export function AppSidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navigation.map((item) => (
+        {filteredNavigation.map((item) => (
           <NavItem key={item.name} item={item} />
         ))}
       </nav>
 
       {/* Bottom navigation */}
       <div className="px-3 py-4 border-t border-sidebar-border space-y-1">
-        {bottomNavigation.map((item) => (
+        {filteredBottomNavigation.map((item) => (
           <NavItem key={item.name} item={item} />
         ))}
         
