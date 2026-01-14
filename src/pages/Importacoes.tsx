@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,9 +50,12 @@ import {
   PenLine,
   Download,
   HelpCircle,
+  Calculator,
+  Loader2,
 } from 'lucide-react';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useAssessments } from '@/hooks/useAssessments';
+import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -83,6 +86,7 @@ const sourceLabels: Record<DataSource, string> = {
 
 const Importacoes = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const assessmentFromUrl = searchParams.get('assessment');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,6 +98,7 @@ const Importacoes = () => {
   const { indicators, isLoading: loadingIndicators } = useIndicators();
   const { assessments, isLoading: loadingAssessments } = useAssessments();
   const { values, isLoading: loadingValues, upsertValue, bulkUpsertValues } = useIndicatorValues(selectedAssessment);
+  const { calculate, loading: calculating } = useCalculateAssessment();
 
   // Pre-select assessment from URL parameter
   useEffect(() => {
@@ -330,11 +335,41 @@ const Importacoes = () => {
                 </div>
               )}
               
-              {fillProgress === 100 && (
-                <p className="text-sm text-severity-good mt-2 flex items-center gap-1">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Todos os indicadores preenchidos! O diagnóstico pode ser calculado.
-                </p>
+              {fillProgress >= 80 && (
+                <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                  <p className={cn(
+                    "text-sm flex items-center gap-1",
+                    fillProgress === 100 ? "text-severity-good" : "text-severity-moderate"
+                  )}>
+                    <CheckCircle2 className="h-4 w-4" />
+                    {fillProgress === 100 
+                      ? "Todos os indicadores preenchidos! O diagnóstico pode ser calculado."
+                      : `${Math.round(fillProgress)}% dos indicadores preenchidos. O diagnóstico pode ser calculado.`
+                    }
+                  </p>
+                  <Button 
+                    onClick={async () => {
+                      const result = await calculate(selectedAssessment);
+                      if (result) {
+                        navigate(`/diagnosticos/${selectedAssessment}`);
+                      }
+                    }}
+                    disabled={calculating || Object.keys(editedValues).length > 0}
+                    className="gap-2"
+                  >
+                    {calculating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Calculando...
+                      </>
+                    ) : (
+                      <>
+                        <Calculator className="h-4 w-4" />
+                        Calcular Diagnóstico
+                      </>
+                    )}
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>
