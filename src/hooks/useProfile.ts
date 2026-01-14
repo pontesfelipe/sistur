@@ -96,7 +96,8 @@ export function useProfile() {
   const isEstudante = hasRole('ESTUDANTE');
 
   const hasERPAccess = profile?.system_access === 'ERP' || isAdmin;
-  const hasEDUAccess = profile?.system_access === 'EDU' || isAdmin || isProfessor || isEstudante;
+  // ERP users also have EDU access (ERP is a superset of EDU)
+  const hasEDUAccess = profile?.system_access === 'EDU' || profile?.system_access === 'ERP' || isAdmin || isProfessor || isEstudante;
 
   // User needs onboarding if they haven't selected a system_access yet
   const needsOnboarding = profile?.pending_approval === true && profile?.system_access === null;
