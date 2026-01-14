@@ -56,6 +56,15 @@ export function UserManagement() {
   const handleRoleChange = async (userId: string, newRole: string) => {
     setProcessingUserId(userId);
     await updateUserRole(userId, newRole);
+    
+    // If role is not PROFESSOR or ESTUDANTE, automatically set system_access to ERP
+    if (newRole !== 'PROFESSOR' && newRole !== 'ESTUDANTE') {
+      const user = users.find(u => u.user_id === userId);
+      if (user && user.system_access !== 'ERP') {
+        await updateSystemAccess(userId, 'ERP');
+      }
+    }
+    
     setProcessingUserId(null);
   };
 
