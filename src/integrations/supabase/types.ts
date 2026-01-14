@@ -2477,29 +2477,44 @@ export type Database = {
       }
       profiles: {
         Row: {
+          approval_requested_at: string | null
           avatar_url: string | null
           created_at: string
           full_name: string | null
           id: string
           org_id: string
+          pending_approval: boolean | null
+          system_access:
+            | Database["public"]["Enums"]["system_access_type"]
+            | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          approval_requested_at?: string | null
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           org_id: string
+          pending_approval?: boolean | null
+          system_access?:
+            | Database["public"]["Enums"]["system_access_type"]
+            | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          approval_requested_at?: string | null
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           org_id?: string
+          pending_approval?: boolean | null
+          system_access?:
+            | Database["public"]["Enums"]["system_access_type"]
+            | null
           updated_at?: string
           user_id?: string
         }
@@ -2850,10 +2865,37 @@ export type Database = {
       }
     }
     Functions: {
+      admin_get_all_users: {
+        Args: never
+        Returns: {
+          email: string
+          full_name: string
+          org_id: string
+          org_name: string
+          role: Database["public"]["Enums"]["app_role"]
+          system_access: Database["public"]["Enums"]["system_access_type"]
+          user_id: string
+        }[]
+      }
+      complete_user_onboarding: {
+        Args: {
+          _role?: Database["public"]["Enums"]["app_role"]
+          _system_access: Database["public"]["Enums"]["system_access_type"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      has_system_access: {
+        Args: {
+          _access: Database["public"]["Enums"]["system_access_type"]
           _user_id: string
         }
         Returns: boolean
@@ -2864,7 +2906,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "ADMIN" | "ANALYST" | "VIEWER"
+      app_role: "ADMIN" | "ANALYST" | "VIEWER" | "ESTUDANTE" | "PROFESSOR"
       assessment_status: "DRAFT" | "DATA_READY" | "CALCULATED"
       collection_type: "AUTOMATICA" | "MANUAL" | "ESTIMADA"
       course_level: "BASICO" | "INTERMEDIARIO" | "AVANCADO"
@@ -2876,6 +2918,7 @@ export type Database = {
       pillar_type: "RA" | "OE" | "AO"
       recommendation_entity_type: "course" | "live" | "track"
       severity_type: "CRITICO" | "MODERADO" | "BOM"
+      system_access_type: "ERP" | "EDU"
       target_agent: "GESTORES" | "TECNICOS" | "TRADE"
       territorial_interpretation: "ESTRUTURAL" | "GESTAO" | "ENTREGA"
     }
@@ -3005,7 +3048,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["ADMIN", "ANALYST", "VIEWER"],
+      app_role: ["ADMIN", "ANALYST", "VIEWER", "ESTUDANTE", "PROFESSOR"],
       assessment_status: ["DRAFT", "DATA_READY", "CALCULATED"],
       collection_type: ["AUTOMATICA", "MANUAL", "ESTIMADA"],
       course_level: ["BASICO", "INTERMEDIARIO", "AVANCADO"],
@@ -3017,6 +3060,7 @@ export const Constants = {
       pillar_type: ["RA", "OE", "AO"],
       recommendation_entity_type: ["course", "live", "track"],
       severity_type: ["CRITICO", "MODERADO", "BOM"],
+      system_access_type: ["ERP", "EDU"],
       target_agent: ["GESTORES", "TECNICOS", "TRADE"],
       territorial_interpretation: ["ESTRUTURAL", "GESTAO", "ENTREGA"],
     },
