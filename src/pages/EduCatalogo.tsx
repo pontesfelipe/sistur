@@ -16,10 +16,14 @@ import {
   Target,
   Video,
   FileText,
-  Clock
+  Clock,
+  Sparkles,
+  UserCircle
 } from 'lucide-react';
 import { useEduTrainings, useEduTrainingStats } from '@/hooks/useEduTrainings';
 import { useEduTracks } from '@/hooks/useEdu';
+import { useStudentProfile } from '@/hooks/useStudentProfile';
+import { PersonalizedRecommendationsPanel } from '@/components/edu/PersonalizedRecommendationsPanel';
 import {
   Select,
   SelectContent,
@@ -41,6 +45,7 @@ const EduCatalogo = () => {
   const { data: trainings, isLoading: trainingsLoading } = useEduTrainings();
   const { data: stats } = useEduTrainingStats();
   const { data: tracks, isLoading: tracksLoading } = useEduTracks();
+  const { hasProfile, isProfileComplete } = useStudentProfile();
 
   // Filter trainings
   const filteredTrainings = trainings?.filter(training => {
@@ -74,6 +79,21 @@ const EduCatalogo = () => {
     >
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-3 mb-6">
+        <Button variant={hasProfile ? "outline" : "default"} asChild>
+          <Link to="/edu/perfil">
+            {hasProfile ? (
+              <>
+                <UserCircle className="mr-2 h-4 w-4" />
+                Meu Perfil
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Preencher Perfil
+              </>
+            )}
+          </Link>
+        </Button>
         <Button variant="outline" asChild>
           <Link to="/edu/trilhas">
             <Route className="mr-2 h-4 w-4" />
