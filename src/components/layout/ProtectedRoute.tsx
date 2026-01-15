@@ -5,11 +5,20 @@ import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  redirectStudentsToEdu?: boolean;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, redirectStudentsToEdu = true }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
-  const { needsOnboarding, awaitingApproval, loading: profileLoading, profile } = useProfile();
+  const { 
+    needsOnboarding, 
+    awaitingApproval, 
+    loading: profileLoading, 
+    profile,
+    isEstudante,
+    hasERPAccess,
+    isAdmin 
+  } = useProfile();
 
   // Only show loading on initial load, not on navigation between routes
   const isInitialLoad = loading && user === null;
@@ -39,6 +48,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (awaitingApproval) {
     return <Navigate to="/pending-approval" replace />;
+  }
+
+  // Redirect students to EDU (they shouldn't see ERP dashboard)
+  // Unless they are admin or have explicit ERP access
+  if (redirectStudentsToEdu && isEstudante && !hasERPAccess && !isAdmin) {
+    return <Navigate to="/edu" replace />;
   }
 
   return <>{children}</>;

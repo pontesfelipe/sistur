@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Menu, Lock, Database } from 'lucide-react';
+import { User, Menu, Lock, Database, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,9 +14,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 interface AppHeaderProps {
   title: string;
@@ -26,9 +35,10 @@ interface AppHeaderProps {
 
 export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps) {
   const { user, signOut } = useAuth();
-  const { isViewingDemoData } = useProfile();
+  const { isViewingDemoData, isAdmin, profile, roles } = useProfile();
   const navigate = useNavigate();
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -47,6 +57,23 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
 
   const getDisplayName = () => {
     return user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário';
+  };
+
+  const getRoleLabel = (role: string) => {
+    const labels: Record<string, string> = {
+      ADMIN: 'Administrador',
+      ANALYST: 'Analista',
+      VIEWER: 'Visualizador',
+      ESTUDANTE: 'Estudante',
+      PROFESSOR: 'Professor',
+    };
+    return labels[role] || role;
+  };
+
+  const getSystemAccessLabel = () => {
+    if (profile?.system_access === 'ERP') return 'ERP (Completo)';
+    if (profile?.system_access === 'EDU') return 'EDU (Educacional)';
+    return 'Não definido';
   };
 
   return (
@@ -110,7 +137,7 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setProfileDialogOpen(true)}>
                 <User className="mr-2 h-4 w-4" />
                 Meu perfil
               </DropdownMenuItem>
@@ -118,9 +145,12 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
                 <Lock className="mr-2 h-4 w-4" />
                 Alterar Senha
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-                Configurações
-              </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Configurações
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                 Sair
@@ -134,6 +164,84 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
         open={passwordDialogOpen} 
         onOpenChange={setPasswordDialogOpen} 
       />
+
+      {/* Profile Dialog */}
+      <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Meu Perfil</DialogTitle>
+            <DialogDescription>
+              Informações da sua conta no SISTUR
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-16 w-16">
+                <AvatarFallback className="bg-primary text-primary-foreground text-xl font-medium">
+                  {getInitials()}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium text-lg">{getDisplayName()}</p>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Nome Completo</Label>
+                <Input 
+                  value={profile?.full_name || user?.user_metadata?.full_name || 'Não informado'} 
+                  readOnly 
+                  className="bg-muted"
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Email</Label>
+                <Input 
+                  value={user?.email || ''} 
+                  readOnly 
+                  className="bg-muted"
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Tipo de Acesso</Label>
+                <Input 
+                  value={getSystemAccessLabel()} 
+                  readOnly 
+                  className="bg-muted"
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Papéis</Label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {roles.length > 0 ? (
+                    roles.map((r, idx) => (
+                      <Badge key={idx} variant="secondary">
+                        {getRoleLabel(r.role)}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Nenhum papel atribuído</span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Membro desde</Label>
+                <Input 
+                  value={profile?.created_at ? new Date(profile.created_at).toLocaleDateString('pt-BR') : 'N/A'} 
+                  readOnly 
+                  className="bg-muted"
+                />
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
