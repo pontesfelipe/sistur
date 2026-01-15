@@ -224,7 +224,7 @@ const App = () => {
                 <Route
                   path="/metodologia"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute redirectStudentsToEdu={false}>
                       <Metodologia />
                     </ProtectedRoute>
                   }
