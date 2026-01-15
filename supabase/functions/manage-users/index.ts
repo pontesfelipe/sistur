@@ -397,6 +397,165 @@ Deno.serve(async (req) => {
       })
     }
 
+    if (action === 'list_by_org') {
+      const { org_id } = data
+
+      if (!org_id) {
+        return new Response(JSON.stringify({ error: 'org_id is required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Get all users in the specified org
+      const { data: profiles, error: profilesError } = await supabaseAdmin
+        .from('profiles')
+        .select('user_id, full_name, avatar_url, created_at, system_access')
+        .eq('org_id', org_id)
+        .eq('pending_approval', false)
+
+      if (profilesError) {
+        return new Response(JSON.stringify({ error: profilesError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Get roles for these users
+      const { data: roles } = await supabaseAdmin
+        .from('user_roles')
+        .select('user_id, role')
+        .eq('org_id', org_id)
+
+      // Get emails from auth.users
+      const userIds = profiles?.map(p => p.user_id) || []
+      const usersWithEmail = await Promise.all(
+        userIds.map(async (userId) => {
+          const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(userId)
+          return { user_id: userId, email: user?.email }
+        })
+      )
+
+      // Combine data
+      const users = profiles?.map(p => ({
+        ...p,
+        email: usersWithEmail.find(u => u.user_id === p.user_id)?.email,
+        role: roles?.find(r => r.user_id === p.user_id)?.role || 'VIEWER',
+      }))
+
+      return new Response(JSON.stringify({ users }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    if (action === 'change_org') {
+      const { user_id, new_org_id } = data
+
+      if (!user_id || !new_org_id) {
+        return new Response(JSON.stringify({ error: 'user_id and new_org_id are required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Update user's profile org
+      const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .update({ org_id: new_org_id })
+        .eq('user_id', user_id)
+
+      if (profileError) {
+        return new Response(JSON.stringify({ error: profileError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Update user's role org
+      const { error: roleError } = await supabaseAdmin
+        .from('user_roles')
+        .update({ org_id: new_org_id })
+        .eq('user_id', user_id)
+
+      if (roleError) {
+        return new Response(JSON.stringify({ error: roleError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    if (action === 'remove_from_org') {
+      const { user_id } = data
+
+      if (!user_id) {
+        return new Response(JSON.stringify({ error: 'user_id is required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Get or create an "unassigned" org
+      let unassignedOrgId: string
+
+      const { data: existingOrg } = await supabaseAdmin
+        .from('orgs')
+        .select('id')
+        .eq('name', 'Não Atribuídos')
+        .single()
+
+      if (existingOrg) {
+        unassignedOrgId = existingOrg.id
+      } else {
+        const { data: newOrg, error: createError } = await supabaseAdmin
+          .from('orgs')
+          .insert({ name: 'Não Atribuídos' })
+          .select('id')
+          .single()
+
+        if (createError || !newOrg) {
+          return new Response(JSON.stringify({ error: 'Failed to create unassigned org' }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+        unassignedOrgId = newOrg.id
+      }
+
+      // Move user to unassigned org
+      const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .update({ org_id: unassignedOrgId })
+        .eq('user_id', user_id)
+
+      if (profileError) {
+        return new Response(JSON.stringify({ error: profileError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      const { error: roleError } = await supabaseAdmin
+        .from('user_roles')
+        .update({ org_id: unassignedOrgId })
+        .eq('user_id', user_id)
+
+      if (roleError) {
+        return new Response(JSON.stringify({ error: roleError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     return new Response(JSON.stringify({ error: 'Invalid action' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

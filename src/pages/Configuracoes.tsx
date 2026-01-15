@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UserManagement } from '@/components/users/UserManagement';
 import { OrganizationManagement } from '@/components/settings/OrganizationManagement';
+import { OrganizationUsersPanel } from '@/components/settings/OrganizationUsersPanel';
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
 import { NormalizationCalculator } from '@/components/tools/NormalizationCalculator';
 import { CycleMonitor } from '@/components/tools/CycleMonitor';
@@ -78,6 +79,7 @@ export default function Configuracoes() {
           <TabsContent value="usuarios" className="space-y-6">
             {isAdmin && <PendingApprovalsPanel />}
             {isAdmin && <OrganizationManagement />}
+            {isAdmin && <OrganizationUsersPanel />}
             <UserManagement />
           </TabsContent>
 
