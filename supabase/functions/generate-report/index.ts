@@ -49,10 +49,10 @@ serve(async (req) => {
 
     const { assessmentId, destinationName, pillarScores, issues, prescriptions } = await req.json();
     
-    // Verify user has access to this assessment via their org
+    // Verify user has access to this assessment via their org (including demo mode)
     const { data: profile } = await supabase
       .from('profiles')
-      .select('org_id')
+      .select('org_id, viewing_demo_org_id')
       .eq('user_id', userId)
       .single();
     
@@ -64,7 +64,9 @@ serve(async (req) => {
       });
     }
 
-    const orgId = profile.org_id;
+    // Use demo org if user is viewing demo data, otherwise use their actual org
+    const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
+    console.log('User org:', profile.org_id, 'Demo org:', profile.viewing_demo_org_id, 'Effective:', effectiveOrgId);
 
     // Fetch full assessment data with IGMA flags
     const { data: assessment } = await supabase
@@ -73,8 +75,8 @@ serve(async (req) => {
       .eq('id', assessmentId)
       .single();
     
-    if (!assessment || assessment.org_id !== orgId) {
-      console.error('User does not have access to this assessment');
+    if (!assessment || assessment.org_id !== effectiveOrgId) {
+      console.error('User does not have access to this assessment. Assessment org:', assessment?.org_id, 'User effective org:', effectiveOrgId);
       return new Response(JSON.stringify({ error: 'Acesso negado a este diagnóstico' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -434,7 +436,7 @@ LEMBRE-SE:
           const { error: saveError } = await supabaseAdmin
             .from('generated_reports')
             .insert({
-              org_id: orgId,
+              org_id: effectiveOrgId,
               assessment_id: assessmentId,
               destination_name: destinationName,
               report_content: fullContent,
