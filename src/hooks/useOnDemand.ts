@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import type { Json } from '@/integrations/supabase/types';
 
 // ============================================
 // TYPES
@@ -41,7 +42,7 @@ export interface OnDemandOutput {
   output_type: OutputType;
   title: string;
   description: string | null;
-  payload: Record<string, unknown>;
+  payload: unknown;
   file_uri: string | null;
   created_at: string;
 }
@@ -299,7 +300,7 @@ export function useOnDemandMutations() {
           output_type: outputType,
           title,
           description,
-          payload,
+          payload: payload as Json,
         }])
         .select()
         .single();

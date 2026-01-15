@@ -15,11 +15,11 @@ export interface QuizQuestion {
   quiz_id: string;
   pillar: 'RA' | 'OE' | 'AO';
   level: number;
-  question_type: 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'ESSAY';
-  stem_text: string;
+  question_type: 'multiple_choice' | 'true_false' | 'essay';
+  stem: string;
   explanation: string | null;
-  difficulty: number; // 1-5 scale
-  is_active: boolean;
+  difficulty: number | null;
+  is_active: boolean | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -79,7 +79,7 @@ export function useQuizQuestions(pillar?: 'RA' | 'OE' | 'AO', level?: number, ac
       return data.map(q => ({
         ...q,
         options: q.quiz_options || [],
-      })) as QuizQuestion[];
+      })) as unknown as QuizQuestion[];
     },
   });
 }
@@ -106,7 +106,7 @@ export function useQuizQuestion(quizId?: string) {
       
       if (optionsError) throw optionsError;
       
-      return { ...quiz, options: options || [] } as QuizQuestion;
+      return { ...quiz, options: options || [] } as unknown as QuizQuestion;
     },
     enabled: !!quizId,
   });
@@ -159,13 +159,13 @@ export function useQuizMutations() {
       question, 
       options 
     }: { 
-      question: { pillar: string; level: number; question_type: string; stem_text: string; explanation?: string; difficulty?: number; is_active?: boolean }; 
-      options: { option_label: string; option_text: string; is_correct: boolean; feedback_text?: string }[];
+      question: { pillar: string; level: number; question_type: 'multiple_choice' | 'short_answer' | 'true_false'; stem: string; explanation?: string; difficulty?: number; is_active?: boolean }; 
+      options: { option_label: string; option_text: string; is_correct: boolean }[];
     }) => {
       // Create question
       const { data: quiz, error: quizError } = await supabase
         .from('quiz_questions')
-        .insert(question)
+        .insert([question])
         .select()
         .single();
       
@@ -204,8 +204,8 @@ export function useQuizMutations() {
       options 
     }: { 
       quizId: string;
-      question: { pillar?: string; level?: number; stem_text?: string; explanation?: string; difficulty?: number; is_active?: boolean }; 
-      options?: { option_label: string; option_text: string; is_correct: boolean; feedback_text?: string }[];
+      question: { pillar?: string; level?: number; stem?: string; explanation?: string; difficulty?: number; is_active?: boolean }; 
+      options?: { option_label: string; option_text: string; is_correct: boolean }[];
     }) => {
       // Update question
       const { error: quizError } = await supabase
