@@ -6,6 +6,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import type { Json } from '@/integrations/supabase/types';
 
 // ============================================
 // TYPES
@@ -17,9 +18,9 @@ export interface LMSAuditLog {
   action: string;
   entity_type: string;
   entity_id: string;
-  old_values: Record<string, unknown> | null;
-  new_values: Record<string, unknown> | null;
-  metadata: Record<string, unknown> | null;
+  old_values: unknown;
+  new_values: unknown;
+  metadata: unknown;
   ip_address: string | null;
   user_agent: string | null;
   created_at: string;
@@ -173,9 +174,9 @@ export function useAuditLogger() {
           action,
           entity_type: entityType,
           entity_id: entityId,
-          old_values: oldValues || null,
-          new_values: newValues || null,
-          metadata: metadata || null,
+          old_values: (oldValues || null) as Json,
+          new_values: (newValues || null) as Json,
+          metadata: (metadata || null) as Json,
           user_agent: navigator.userAgent,
         }])
         .select()

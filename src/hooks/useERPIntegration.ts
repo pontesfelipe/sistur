@@ -6,7 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useAuth } from '@/hooks/useAuth';
+import type { Json } from '@/integrations/supabase/types';
 
 // ============================================
 // TYPES
@@ -18,8 +18,8 @@ export interface ERPDiagnostic {
   entity_ref: string;
   entity_type: 'municipality' | 'government' | 'company' | null;
   pillar_priority: 'RA' | 'OE' | 'AO' | null;
-  indicators_data: Record<string, unknown> | null;
-  igma_warnings: Record<string, unknown>[] | null;
+  indicators_data: unknown;
+  igma_warnings: unknown;
   created_at: string;
 }
 
@@ -100,7 +100,7 @@ export function useERPDiagnosticMutations() {
   const queryClient = useQueryClient();
 
   const receiveDiagnostic = useMutation({
-    mutationFn: async (diagnostic: Omit<ERPDiagnostic, 'diagnostic_id' | 'created_at'>) => {
+    mutationFn: async (diagnostic: { org_id?: string | null; entity_ref: string; entity_type?: string | null; pillar_priority?: string | null; indicators_data?: Json; igma_warnings?: Json }) => {
       // Insert diagnostic
       const { data, error } = await supabase
         .from('erp_diagnostics')
@@ -118,8 +118,8 @@ export function useERPDiagnosticMutations() {
           diagnostic_id: data.diagnostic_id,
           entity_ref: diagnostic.entity_ref,
           pillar_priority: diagnostic.pillar_priority,
-        },
-      });
+        } as Json,
+      }]);
       
       return data as ERPDiagnostic;
     },
