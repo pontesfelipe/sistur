@@ -33,7 +33,14 @@ import FAQ from "./pages/FAQ";
 import Metodologia from "./pages/Metodologia";
 import Ajuda from "./pages/Ajuda";
 import ERPDashboard from "./pages/ERPDashboard";
+import ERPIntegration from "./pages/ERPIntegration";
 import PublicDestinations from "./pages/PublicDestinations";
+import QuizManagement from "./pages/QuizManagement";
+import ExamTaking from "./pages/ExamTaking";
+import Certificates from "./pages/Certificates";
+import VerifyCertificate from "./pages/VerifyCertificate";
+import OnDemandRequests from "./pages/OnDemandRequests";
+import AuditLogs from "./pages/AuditLogs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -228,6 +235,56 @@ const App = () => {
                     <ProtectedRoute>
                       <PublicDestinations />
                     </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/erp/integracao"
+                  element={
+                    <ERPRoute>
+                      <ERPIntegration />
+                    </ERPRoute>
+                  }
+                />
+                <Route
+                  path="/admin/quizzes"
+                  element={
+                    <AdminRoute>
+                      <QuizManagement />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/edu/exam/:examId"
+                  element={
+                    <EduRoute>
+                      <ExamTaking />
+                    </EduRoute>
+                  }
+                />
+                <Route
+                  path="/certificados"
+                  element={
+                    <EduRoute>
+                      <Certificates />
+                    </EduRoute>
+                  }
+                />
+                <Route path="/verificar-certificado" element={<VerifyCertificate />} />
+                <Route path="/verificar-certificado/:certificateId" element={<VerifyCertificate />} />
+                <Route
+                  path="/edu/solicitacoes"
+                  element={
+                    <EduRoute>
+                      <OnDemandRequests />
+                    </EduRoute>
+                  }
+                />
+                <Route
+                  path="/admin/audit"
+                  element={
+                    <AdminRoute>
+                      <AuditLogs />
+                    </AdminRoute>
                   }
                 />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
