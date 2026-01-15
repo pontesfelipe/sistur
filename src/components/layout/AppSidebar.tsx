@@ -36,7 +36,7 @@ interface NavItem {
 }
 
 const navigation: NavItem[] = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
   { name: 'Destinos', href: '/destinos', icon: MapPin, requiresERP: true },
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
   { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
@@ -58,8 +58,11 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess } = useProfile();
+  const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess, isEstudante } = useProfile();
   const [collapsed, setCollapsed] = useState(false);
+
+  // Determine the home route based on user access
+  const homeRoute = (hasERPAccess || isAdmin) ? '/' : '/edu';
 
   const handleSignOut = async () => {
     await signOut();
@@ -128,7 +131,7 @@ export function AppSidebar() {
       {/* Logo */}
       <div className="flex h-16 items-center justify-between px-4 border-b border-sidebar-border">
         {!collapsed && (
-          <Link to="/" className="flex items-center gap-2">
+          <Link to={homeRoute} className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
               <span className="text-primary-foreground font-display font-bold text-sm">S</span>
             </div>
@@ -136,9 +139,9 @@ export function AppSidebar() {
           </Link>
         )}
         {collapsed && (
-          <div className="h-8 w-8 mx-auto rounded-lg gradient-hero flex items-center justify-center">
+          <Link to={homeRoute} className="h-8 w-8 mx-auto rounded-lg gradient-hero flex items-center justify-center">
             <span className="text-primary-foreground font-display font-bold text-sm">S</span>
-          </div>
+          </Link>
         )}
       </div>
 
