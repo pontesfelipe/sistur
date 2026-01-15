@@ -59,8 +59,9 @@ export function PendingApprovalsPanel() {
     }
   };
 
-  const approveUser = async (userId: string, profileId: string) => {
-    const role = selectedRoles[profileId] || 'VIEWER';
+  const approveUser = async (userId: string, profileId: string, systemAccess: 'ERP' | 'EDU' | null) => {
+    const defaultRole = systemAccess === 'EDU' ? 'ESTUDANTE' : 'VIEWER';
+    const role = selectedRoles[profileId] || defaultRole;
     
     try {
       setProcessingId(profileId);
@@ -204,7 +205,7 @@ export function PendingApprovalsPanel() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Select
-                    value={selectedRoles[user.id] || 'VIEWER'}
+                    value={selectedRoles[user.id] || (user.system_access === 'EDU' ? 'ESTUDANTE' : 'VIEWER')}
                     onValueChange={(value) => 
                       setSelectedRoles(prev => ({ ...prev, [user.id]: value }))
                     }
@@ -213,14 +214,23 @@ export function PendingApprovalsPanel() {
                       <SelectValue placeholder="Papel" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="VIEWER">Visualizador</SelectItem>
-                      <SelectItem value="ANALYST">Analista</SelectItem>
-                      <SelectItem value="ADMIN">Administrador</SelectItem>
+                      {user.system_access === 'EDU' ? (
+                        <>
+                          <SelectItem value="ESTUDANTE">Estudante</SelectItem>
+                          <SelectItem value="PROFESSOR">Professor</SelectItem>
+                        </>
+                      ) : (
+                        <>
+                          <SelectItem value="VIEWER">Visualizador</SelectItem>
+                          <SelectItem value="ANALYST">Analista</SelectItem>
+                          <SelectItem value="ADMIN">Administrador</SelectItem>
+                        </>
+                      )}
                     </SelectContent>
                   </Select>
                   <Button
                     size="sm"
-                    onClick={() => approveUser(user.user_id, user.id)}
+                    onClick={() => approveUser(user.user_id, user.id, user.system_access)}
                     disabled={processingId === user.id}
                   >
                     {processingId === user.id ? (
