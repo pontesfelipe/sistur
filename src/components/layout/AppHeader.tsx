@@ -40,6 +40,9 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
+  // Check if user logged in via OAuth (Google, etc.) - they can't change password
+  const isOAuthUser = user?.app_metadata?.provider && user.app_metadata.provider !== 'email';
+
   const handleSignOut = async () => {
     await signOut();
     toast.success('Você saiu da sua conta');
@@ -141,10 +144,12 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
                 <User className="mr-2 h-4 w-4" />
                 Meu perfil
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setPasswordDialogOpen(true)}>
-                <Lock className="mr-2 h-4 w-4" />
-                Alterar Senha
-              </DropdownMenuItem>
+              {!isOAuthUser && (
+                <DropdownMenuItem onClick={() => setPasswordDialogOpen(true)}>
+                  <Lock className="mr-2 h-4 w-4" />
+                  Alterar Senha
+                </DropdownMenuItem>
+              )}
               {isAdmin && (
                 <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
                   <Settings className="mr-2 h-4 w-4" />

@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import {
   LayoutDashboard,
   MapPin,
@@ -17,7 +18,6 @@ import {
   BookMarked,
   Activity,
   Menu,
-  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -26,27 +26,36 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
   SheetClose,
 } from '@/components/ui/sheet';
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Destinos', href: '/destinos', icon: MapPin },
-  { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList },
-  { name: 'Monitoramento ERP', href: '/erp', icon: Activity },
-  { name: 'Indicadores', href: '/indicadores', icon: BarChart3 },
-  { name: 'Importações', href: '/importacoes', icon: Upload },
-  { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap },
-  { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen },
-  { name: 'Relatórios', href: '/relatorios', icon: FileText },
+interface NavItem {
+  name: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+  requiresERP?: boolean;
+  requiresEDU?: boolean;
+  requiresProfessor?: boolean;
+  requiresAdmin?: boolean;
+}
+
+const navigation: NavItem[] = [
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
+  { name: 'Destinos', href: '/destinos', icon: MapPin, requiresERP: true },
+  { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
+  { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
+  { name: 'Indicadores', href: '/indicadores', icon: BarChart3, requiresERP: true },
+  { name: 'Importações', href: '/importacoes', icon: Upload, requiresERP: true },
+  { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
+  { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen, requiresProfessor: true },
+  { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
 ];
 
-const bottomNavigation = [
+const bottomNavigation: NavItem[] = [
   { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
   { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
-  { name: 'Configurações', href: '/configuracoes', icon: Settings },
+  { name: 'Configurações', href: '/configuracoes', icon: Settings, requiresAdmin: true },
 ];
 
 interface MobileSidebarProps {
@@ -58,6 +67,10 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess } = useProfile();
+
+  // Determine the home route based on user access
+  const homeRoute = (hasERPAccess || isAdmin) ? '/' : '/edu';
 
   const handleSignOut = async () => {
     await signOut();
@@ -69,6 +82,19 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const handleNavClick = () => {
     onOpenChange(false);
   };
+
+  const filterNavItems = (items: NavItem[]) => {
+    return items.filter((item) => {
+      if (item.requiresAdmin && !isAdmin) return false;
+      if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
+      if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
+      if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
+      return true;
+    });
+  };
+
+  const filteredNavigation = filterNavItems(navigation);
+  const filteredBottomNavigation = filterNavItems(bottomNavigation);
 
   const NavItem = ({ item }: { item: typeof navigation[0] }) => {
     const isActive = location.pathname === item.href || 
@@ -98,24 +124,26 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
       <SheetContent side="left" className="w-72 p-0 bg-background">
         {/* Logo */}
         <SheetHeader className="flex h-16 items-center px-4 border-b border-border">
-          <SheetTitle className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
-              <span className="text-primary-foreground font-display font-bold text-sm">S</span>
-            </div>
-            <span className="font-display font-bold text-lg">SISTUR</span>
-          </SheetTitle>
+          <SheetClose asChild>
+            <Link to={homeRoute} className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
+                <span className="text-primary-foreground font-display font-bold text-sm">S</span>
+              </div>
+              <span className="font-display font-bold text-lg">SISTUR</span>
+            </Link>
+          </SheetClose>
         </SheetHeader>
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-200px)]">
-          {navigation.map((item) => (
+          {filteredNavigation.map((item) => (
             <NavItem key={item.name} item={item} />
           ))}
         </nav>
 
         {/* Bottom navigation */}
         <div className="px-3 py-4 border-t border-border space-y-1">
-          {bottomNavigation.map((item) => (
+          {filteredBottomNavigation.map((item) => (
             <NavItem key={item.name} item={item} />
           ))}
           
