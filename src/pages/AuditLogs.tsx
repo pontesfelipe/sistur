@@ -53,7 +53,7 @@ const AuditLogs = () => {
   const [actionFilter, setActionFilter] = useState<string>('all');
   const [selectedLog, setSelectedLog] = useState<LMSAuditLog | null>(null);
   
-  const { data: logs, isLoading, refetch } = useLMSAuditLogs(500);
+  const { data: logs, isLoading, refetch } = useLMSAuditLogs({ limit: 500 });
 
   const filteredLogs = logs?.filter(log => {
     const matchesSearch = !searchQuery || 
@@ -355,11 +355,11 @@ const AuditLogs = () => {
                   </div>
                 </div>
                 
-                {selectedLog.details && Object.keys(selectedLog.details as object).length > 0 && (
+                {selectedLog.metadata && Object.keys(selectedLog.metadata as object).length > 0 && (
                   <div>
                     <span className="text-sm text-muted-foreground">Detalhes Adicionais</span>
                     <pre className="mt-2 p-3 bg-muted rounded-lg text-xs overflow-auto max-h-48">
-                      {JSON.stringify(selectedLog.details, null, 2)}
+                      {JSON.stringify(selectedLog.metadata, null, 2)}
                     </pre>
                   </div>
                 )}

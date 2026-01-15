@@ -37,7 +37,7 @@ const Certificates = () => {
   const { data: certificates, isLoading } = useUserCertificates();
 
   const filteredCertificates = certificates?.filter(cert => {
-    const courseName = cert.course?.title || '';
+    const courseName = cert.lms_courses?.title || '';
     return !searchQuery || courseName.toLowerCase().includes(searchQuery.toLowerCase());
   }) || [];
 
@@ -55,8 +55,8 @@ const Certificates = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Certificado - ${cert.course?.title}`,
-          text: `Confira meu certificado de conclusão do curso ${cert.course?.title}`,
+          title: `Certificado - ${cert.lms_courses?.title}`,
+          text: `Confira meu certificado de conclusão do curso ${cert.lms_courses?.title}`,
           url,
         });
       } catch (error) {
@@ -180,8 +180,8 @@ const Certificates = () => {
                       )}
                     </div>
                   </div>
-                  <CardTitle className="text-lg mt-3 group-hover:text-primary transition-colors">
-                    {cert.course?.title || 'Curso'}
+                <CardTitle className="text-lg mt-3 group-hover:text-primary transition-colors">
+                    {cert.lms_courses?.title || 'Curso'}
                   </CardTitle>
                   <CardDescription className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
@@ -240,10 +240,10 @@ const Certificates = () => {
                 <div className="border rounded-lg p-8 bg-gradient-to-br from-primary/5 to-primary/10 text-center space-y-4">
                   <Award className="h-16 w-16 mx-auto text-primary" />
                   <h2 className="text-2xl font-bold">
-                    {selectedCertificate.course?.title}
+                    {selectedCertificate.lms_courses?.title}
                   </h2>
                   <p className="text-muted-foreground">
-                    Certificamos que <strong>{selectedCertificate.profile?.full_name || 'Aluno'}</strong><br />
+                    Certificamos que <strong>{selectedCertificate.profiles?.full_name || 'Aluno'}</strong><br />
                     concluiu com êxito o curso acima
                   </p>
                   <div className="pt-4 border-t">
@@ -269,10 +269,10 @@ const Certificates = () => {
                       )}
                     </p>
                   </div>
-                  {selectedCertificate.score_achieved && (
+                  {selectedCertificate.workload_minutes && (
                     <div>
-                      <span className="text-muted-foreground">Nota Obtida:</span>
-                      <p className="font-semibold">{selectedCertificate.score_achieved}%</p>
+                      <span className="text-muted-foreground">Carga Horária:</span>
+                      <p className="font-semibold">{Math.round(selectedCertificate.workload_minutes / 60)}h</p>
                     </div>
                   )}
                 </div>
