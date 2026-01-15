@@ -4,11 +4,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UserManagement } from '@/components/users/UserManagement';
+import { OrganizationManagement } from '@/components/settings/OrganizationManagement';
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
 import { NormalizationCalculator } from '@/components/tools/NormalizationCalculator';
 import { CycleMonitor } from '@/components/tools/CycleMonitor';
 import { DataExporter } from '@/components/tools/DataExporter';
-import { InteractiveWorkflowDiagram } from '@/components/tools/InteractiveWorkflowDiagram';
+import { SystemHealthMonitor } from '@/components/tools/SystemHealthMonitor';
+import { IBGESearch } from '@/components/tools/IBGESearch';
+import { IndicatorSimulator } from '@/components/tools/IndicatorSimulator';
 import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
 import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPanel';
 import { ActAsUserPanel } from '@/components/settings/ActAsUserPanel';
@@ -20,15 +23,18 @@ import {
   FileText,
   Download,
   Brain,
-  CheckCircle2,
-  Clock,
   Shield,
   BarChart3,
-  Database,
   Calculator,
   RefreshCw,
   Activity,
-  Settings2
+  Settings2,
+  Building2,
+  Search,
+  FlaskConical,
+  Database,
+  Users,
+  Globe
 } from 'lucide-react';
 
 export default function Configuracoes() {
@@ -71,6 +77,7 @@ export default function Configuracoes() {
           {/* USUARIOS TAB */}
           <TabsContent value="usuarios" className="space-y-6">
             {isAdmin && <PendingApprovalsPanel />}
+            {isAdmin && <OrganizationManagement />}
             <UserManagement />
           </TabsContent>
 
@@ -224,107 +231,178 @@ export default function Configuracoes() {
 
           {/* FERRAMENTAS TAB */}
           <TabsContent value="ferramentas" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <GraduationCap className="h-5 w-5 text-primary" />
+            {/* Quick Actions */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="hover:shadow-lg transition-shadow border-primary/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <GraduationCap className="h-4 w-4 text-primary" />
                     SISTUR EDU
                   </CardTitle>
-                  <CardDescription>
-                    Sistema de prescrição de capacitação baseado em diagnóstico
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href="/cursos">Acessar Prescrições</a>
+                  <Button variant="outline" className="w-full" size="sm" asChild>
+                    <a href="/cursos">Acessar</a>
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Calculator className="h-5 w-5 text-primary" />
-                    Calculadora de Normalização
-                  </CardTitle>
-                  <CardDescription>
-                    Simule o cálculo de normalização de indicadores
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <NormalizationCalculator />
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Download className="h-5 w-5 text-primary" />
-                    Exportar Dados
-                  </CardTitle>
-                  <CardDescription>
-                    Exporte diagnósticos e indicadores em CSV/Excel
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <DataExporter />
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <FileText className="h-5 w-5 text-primary" />
+              <Card className="hover:shadow-lg transition-shadow border-primary/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
                     Relatórios IA
                   </CardTitle>
-                  <CardDescription>
-                    Gere planos de desenvolvimento com análise de IA
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href="/relatorios">Gerar Relatório</a>
+                  <Button variant="outline" className="w-full" size="sm" asChild>
+                    <a href="/relatorios">Gerar</a>
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <RefreshCw className="h-5 w-5 text-primary" />
-                    Monitor de Ciclos
+              <Card className="hover:shadow-lg transition-shadow border-primary/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-primary" />
+                    Diagnósticos
                   </CardTitle>
-                  <CardDescription>
-                    Acompanhe evolução, estagnação e regressão de indicadores
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <CycleMonitor />
+                  <Button variant="outline" className="w-full" size="sm" asChild>
+                    <a href="/diagnosticos">Ver</a>
+                  </Button>
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Activity className="h-5 w-5 text-primary" />
-                    Transparência de Cálculo
+              <Card className="hover:shadow-lg transition-shadow border-primary/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-primary" />
+                    Destinos
                   </CardTitle>
-                  <CardDescription>
-                    Visualize como cada score foi calculado
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href="/diagnosticos">Ver Diagnósticos</a>
+                  <Button variant="outline" className="w-full" size="sm" asChild>
+                    <a href="/destinos">Gerenciar</a>
                   </Button>
                 </CardContent>
               </Card>
             </div>
 
+            {/* Tools Grid */}
             <Card>
               <CardHeader>
-                <CardTitle>Integrações de Dados</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Wrench className="h-5 w-5 text-primary" />
+                  Ferramentas de Análise
+                </CardTitle>
+                <CardDescription>
+                  Utilitários para cálculo, simulação e exportação de dados
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Calculator className="h-4 w-4 text-blue-500" />
+                        Calculadora de Normalização
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Simule o cálculo de normalização de indicadores
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <NormalizationCalculator />
+                    </CardContent>
+                  </Card>
+
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <FlaskConical className="h-4 w-4 text-purple-500" />
+                        Simulador de Indicadores
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Simule valores e veja o impacto nos pilares
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <IndicatorSimulator />
+                    </CardContent>
+                  </Card>
+
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Download className="h-4 w-4 text-green-500" />
+                        Exportar Dados
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Exporte diagnósticos e indicadores em CSV
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <DataExporter />
+                    </CardContent>
+                  </Card>
+
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <RefreshCw className="h-4 w-4 text-orange-500" />
+                        Monitor de Ciclos
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Acompanhe evolução entre ciclos
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <CycleMonitor />
+                    </CardContent>
+                  </Card>
+
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Search className="h-4 w-4 text-cyan-500" />
+                        Busca IBGE
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Pesquise municípios na base do IBGE
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <IBGESearch />
+                    </CardContent>
+                  </Card>
+
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Activity className="h-4 w-4 text-red-500" />
+                        Monitor do Sistema
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Visão geral do estado do SISTUR
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <SystemHealthMonitor />
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Data Integrations */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5 text-primary" />
+                  Integrações de Dados
+                </CardTitle>
                 <CardDescription>
                   Fontes oficiais conectadas ao sistema
                 </CardDescription>
