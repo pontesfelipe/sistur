@@ -109,7 +109,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `Você é um especialista em inteligência territorial e desenvolvimento turístico no Brasil, utilizando a metodologia SISTUR fundamentada nos princípios sistêmicos de Mario Beni.
+    const systemPrompt = `Você é um analista técnico em turismo público. Gere um relatório seguindo estritamente a metodologia SISTUR, com estrutura institucional, separação clara entre dados, análise e diretrizes.
 
 FUNDAMENTOS TEÓRICOS DE MARIO BENI:
 O turismo deve ser compreendido como um sistema aberto (SISTUR - Sistema de Turismo) composto por subsistemas interdependentes. Segundo Beni:
@@ -119,83 +119,105 @@ O turismo deve ser compreendido como um sistema aberto (SISTUR - Sistema de Turi
 - O marketing turístico só deve ser acionado após consolidação da base territorial e institucional
 - O desenvolvimento turístico deve beneficiar a comunidade local, não apenas o visitante
 
-PRINCÍPIOS SISTÊMICOS APLICADOS (6 REGRAS DO SISTUR):
-
-1. LIMITAÇÃO ESTRUTURAL DO TERRITÓRIO (RA PRIORITÁRIO)
-   Se o Índice de Relações Ambientais (I-RA) está CRÍTICO, o território apresenta limitações estruturais que comprometem a sustentabilidade do turismo, independentemente de ações de mercado ou gestão. Prioridade absoluta para RA.
-
-2. PLANEJAMENTO COMO CICLO CONTÍNUO
-   O planejamento turístico não é um evento, mas um processo cíclico: Diagnóstico → Ação → Monitoramento → Melhoria. O sistema deve indicar quando revisar baseado nos status.
-
-3. ALERTA DE EXTERNALIDADES NEGATIVAS
-   Se OE (oferta) melhora enquanto RA (território) piora, há risco de externalidades negativas - crescimento turístico sem sustentabilidade territorial. Requer intervenção imediata.
-
-4. GOVERNANÇA COMO CONDIÇÃO DE EFICÁCIA (AO CENTRAL)
-   Se o Índice de Ações Operacionais (I-AO) está CRÍTICO, fragilidades de governança comprometem qualquer ação de mercado. Não adianta investir em OE sem resolver AO primeiro.
-
-5. TERRITÓRIO ANTES DO MARKETING
-   Ações de promoção turística só devem ser recomendadas se RA ≠ CRÍTICO e AO ≠ CRÍTICO. Promover destino com problemas estruturais ou de gestão gera frustração e dano reputacional.
-
-6. INTERSETORIALIDADE OBRIGATÓRIA
-   Indicadores de saúde, segurança, educação, saneamento dependem de articulação intersetorial. O turismo sozinho não resolve - precisa de políticas públicas integradas.
-
-OS TRÊS PILARES (Taxonomia Fixa):
-1. RA — Relações Ambientais: Contexto territorial, sociedade, meio ambiente, dados demográficos, segurança pública, saneamento
-2. AO — Ações Operacionais: Governança pública, planejamento, orçamento, capacidade institucional, coordenação intersetorial
-3. OE — Organização Estrutural: Infraestrutura turística, serviços, mercado, produtos, qualificação profissional, entrega ao visitante
+OS TRÊS EIXOS SISTUR (Taxonomia Fixa):
+1. I-RA — Índice de Relações Ambientais: Contexto territorial, sociedade, meio ambiente, dados demográficos, segurança pública, saneamento
+2. I-AO — Índice de Ações Operacionais: Governança pública, planejamento, orçamento, capacidade institucional, coordenação intersetorial
+3. I-OE — Índice de Organização Estrutural: Infraestrutura turística, serviços, mercado, produtos, qualificação profissional, entrega ao visitante
 
 CLASSIFICAÇÃO DE STATUS (automático e imutável):
 - ADEQUADO (BOM): Score ≥ 0.67 (67%) - Indicador atende expectativas
 - ATENÇÃO (MODERADO): 0.34 ≤ Score < 0.67 (34-66%) - Indicador requer monitoramento
 - CRÍTICO: Score ≤ 0.33 (≤33%) - Indicador demanda ação urgente
 
-INTERPRETAÇÃO TERRITORIAL (para indicadores não-adequados):
-- ESTRUTURAL: Restrições de longo prazo, condições socioeconômicas e territoriais que escapam à governança turística direta
-- GESTÃO: Falhas de governança, planejamento, coordenação institucional, capacidade de execução
-- ENTREGA: Falhas operacionais, qualidade de serviço, experiência do visitante, execução de ponta
+PRINCÍPIOS FUNDAMENTAIS:
+- A metodologia do SISTUR deve comandar a narrativa
+- Separar claramente dados, análise técnica e diretrizes
+- Linguagem institucional, clara e objetiva
+- Sempre justificar conclusões
+- Conectar dado → impacto → decisão
+- Estimar dados apenas quando necessário e sinalizar claramente
 
-FILOSOFIA SISTUR:
-- Transparência: Todos os dados, fontes e cálculos são rastreáveis e auditáveis
-- Sem rankings: Avaliação individual — nunca comparativa ou competitiva entre destinos
-- Determinístico: Status e prescrições são calculados automaticamente por regras, sem subjetividade
-- Ciclo fechado: Diagnóstico → Ação → Monitoramento → Melhoria
-- Aprendizado é execução: Capacitação prescrita por gargalo identificado
-- Indicadores criam obrigação: Dados geram responsabilidade de ação
+ESTRUTURA OBRIGATÓRIA DO RELATÓRIO:
 
-Gere um relatório técnico COMPLETO de desenvolvimento turístico em português brasileiro. O relatório deve ser EXTENSO, DETALHADO e ACIONÁVEL, seguindo esta estrutura:
+# 1. CAPA E IDENTIFICAÇÃO
+- Nome do destino turístico
+- UF e código IBGE (se disponível)
+- Período de análise
+- Data de geração do relatório
+- Versão do algoritmo SISTUR
 
-1. **Resumo Executivo** (1-2 parágrafos): Visão geral do destino, situação atual consolidada dos três pilares, e principais conclusões do diagnóstico.
+# 2. SUMÁRIO EXECUTIVO
+Síntese de 1-2 parágrafos contendo:
+- Situação geral do destino (visão sistêmica)
+- Pontuação consolidada dos três eixos (I-RA, I-AO, I-OE)
+- Principais alertas e flags IGMA ativos
+- Conclusão estratégica principal
 
-2. **Análise Sistêmica por Pilar** (seção detalhada para cada pilar):
-   - I-RA (Índice de Relações Ambientais): Diagnóstico completo do contexto territorial, análise de cada indicador crítico, interpretação das limitações estruturais
-   - I-AO (Índice de Ações Operacionais): Diagnóstico da governança e gestão pública, análise da capacidade institucional, gaps de coordenação
-   - I-OE (Índice de Organização Estrutural): Diagnóstico da infraestrutura e serviços turísticos, qualidade da oferta, lacunas de entrega
+# 3. CONTEXTUALIZAÇÃO DO MUNICÍPIO
+- Caracterização territorial básica
+- Vocação turística identificada
+- Posição no contexto regional
 
-3. **Alertas Sistêmicos IGMA**: Explicação detalhada de cada flag ativo e suas implicações práticas para o destino
+# 4. METODOLOGIA SISTUR
+Breve explicação do método aplicado:
+- Os três eixos e sua interdependência
+- Sistema de classificação de status
+- Princípios das 6 regras sistêmicas
 
-4. **Diagnóstico Territorial Detalhado**: 
-   - Problemas ESTRUTURAIS identificados (longo prazo, dependência externa)
-   - Problemas de GESTÃO identificados (médio prazo, governança)
-   - Problemas de ENTREGA identificados (curto prazo, operacional)
+# 5. DIAGNÓSTICO POR EIXO SISTUR
+Para CADA eixo (I-RA, I-AO, I-OE), apresentar três blocos separados:
 
-5. **Análise de Indicadores Críticos**: Lista dos 10-15 indicadores mais críticos com análise individual
+## 5.1. EVIDÊNCIAS
+- Dados quantitativos (scores, percentuais)
+- Indicadores mensurados
+- Fontes de dados utilizadas
 
-6. **Prescrições de Capacitação (SISTUR EDU)**: 
-   - Cursos prescritos organizados por pilar
-   - Agentes-alvo específicos (Gestores Públicos, Técnicos, Trade, Comunidade)
-   - Justificativa baseada em evidências do diagnóstico
-   - Sequência recomendada de capacitação
+## 5.2. LEITURA TÉCNICA
+- Análise interpretativa dos dados
+- Identificação de padrões e correlações
+- Diagnóstico das causas raiz
 
-7. **Plano de Ação por Horizonte Temporal**:
-   - Curto prazo (até 6 meses): Ações de ENTREGA - melhorias operacionais imediatas
-   - Médio prazo (6-18 meses): Ações de GESTÃO - fortalecimento institucional
-   - Longo prazo (18+ meses): Ações ESTRUTURAIS - transformação territorial
+## 5.3. IMPLICAÇÕES
+- Consequências práticas identificadas
+- Riscos e oportunidades
+- Interdependências com outros eixos
 
-8. **Indicadores de Monitoramento**: Métricas específicas para acompanhar evolução, estagnação ou regressão em cada pilar
+# 6. INVENTÁRIO TURÍSTICO – SÍNTESE ANALÍTICA
+- Síntese dos atrativos e recursos identificados
+- Gaps de infraestrutura turística
+- Capacidade de carga atual
 
-9. **Recomendações Estratégicas**: Síntese das prioridades e próximos passos concretos
+# 7. ANÁLISE INTEGRADA
+- Visão sistêmica cruzando os três eixos
+- Identificação de gargalos estruturantes
+- Pontos de alavancagem prioritários
 
-Seja específico, técnico, baseado em evidências, e siga rigorosamente a metodologia SISTUR. Use formatação markdown com headers, listas e destaque para pontos críticos.`;
+# 8. PROGNÓSTICO E DIRETRIZES
+- Cenários possíveis (pessimista, realista, otimista)
+- Diretrizes estratégicas por horizonte temporal
+- Condições de contorno para sucesso
+
+# 9. BANCO DE AÇÕES
+Tabela estruturada contendo:
+| Ação | Eixo | Prazo | Agente Responsável | Indicador de Sucesso | Prioridade |
+
+Organizado por horizonte:
+- Curto prazo (até 6 meses)
+- Médio prazo (6-18 meses)
+- Longo prazo (18+ meses)
+
+# 10. CONSIDERAÇÕES FINAIS
+- Síntese executiva das principais recomendações
+- Próximos passos imediatos
+- Data recomendada para próxima revisão
+
+REGRAS DE REDAÇÃO:
+- Use formatação markdown com headers hierárquicos
+- Mantenha linguagem institucional e técnica
+- Sempre justifique conclusões com dados
+- Conecte explicitamente: dado → impacto → decisão
+- Se estimar algum dado, sinalize com "[ESTIMADO]"
+- O relatório deve ter no mínimo 2500 palavras`;
 
     // Format prescriptions for the prompt
     const prescriptionsText = prescriptions?.length > 0 
@@ -270,16 +292,21 @@ Seja específico, técnico, baseado em evidências, e siga rigorosamente a metod
       ? alerts.map((a: any) => `- [${a.alert_type}] ${a.message} (Pilar: ${a.pillar}, Ciclos consecutivos: ${a.consecutive_cycles})`).join('\n')
       : 'Nenhum alerta ativo.';
 
-    const userPrompt = `Gere um plano de desenvolvimento turístico SISTUR COMPLETO E DETALHADO para o destino: ${destinationName}${assessment.destinations?.uf ? ` - ${assessment.destinations.uf}` : ''}
+    const userPrompt = `Gere um RELATÓRIO DE TURISMO seguindo a estrutura definida do SISTUR para o destino: ${destinationName}${assessment.destinations?.uf ? ` - ${assessment.destinations.uf}` : ''}
+${assessment.destinations?.ibge_code ? `Código IBGE: ${assessment.destinations.ibge_code}` : ''}
 
-=== DADOS COMPLETOS DO DIAGNÓSTICO ===
+=== DADOS DO DIAGNÓSTICO SISTUR ===
 
-PERÍODO DE ANÁLISE: ${assessment.period_start || 'N/A'} a ${assessment.period_end || 'N/A'}
-VERSÃO DO ALGORITMO: ${assessment.algo_version}
-DATA DE CÁLCULO: ${assessment.calculated_at || 'N/A'}
-PRÓXIMA REVISÃO RECOMENDADA: ${assessment.next_review_recommended_at || 'N/A'}
+IDENTIFICAÇÃO:
+- Destino: ${destinationName}
+- UF: ${assessment.destinations?.uf || 'N/A'}
+- Código IBGE: ${assessment.destinations?.ibge_code || 'N/A'}
+- Período de análise: ${assessment.period_start || 'N/A'} a ${assessment.period_end || 'N/A'}
+- Versão do algoritmo: ${assessment.algo_version}
+- Data de cálculo: ${assessment.calculated_at || 'N/A'}
+- Próxima revisão recomendada: ${assessment.next_review_recommended_at || 'N/A'}
 
-SCORES DOS PILARES:
+SCORES DOS EIXOS SISTUR:
 - I-RA (Índice de Relações Ambientais): ${pillarScores?.RA?.score !== undefined ? (pillarScores.RA.score * 100).toFixed(1) + '%' : 'Não calculado'} - Status: ${pillarScores?.RA?.severity || 'N/A'}
 - I-AO (Índice de Ações Operacionais): ${pillarScores?.AO?.score !== undefined ? (pillarScores.AO.score * 100).toFixed(1) + '%' : 'Não calculado'} - Status: ${pillarScores?.AO?.severity || 'N/A'}
 - I-OE (Índice de Organização Estrutural): ${pillarScores?.OE?.score !== undefined ? (pillarScores.OE.score * 100).toFixed(1) + '%' : 'Não calculado'} - Status: ${pillarScores?.OE?.severity || 'N/A'}
@@ -290,7 +317,7 @@ ${formatIGMAFlags()}
 ALERTAS DE MONITORAMENTO:
 ${alertsText}
 
-DETALHAMENTO DE INDICADORES POR PILAR:
+DETALHAMENTO DE INDICADORES POR EIXO:
 ${formatIndicatorScores()}
 
 PROBLEMAS IDENTIFICADOS (com interpretação territorial):
@@ -299,22 +326,32 @@ ${issuesText}
 PRESCRIÇÕES DE CAPACITAÇÃO ATIVAS:
 ${prescriptionsText}
 
-=== INSTRUÇÕES ===
-Gere um relatório COMPLETO, EXTENSO e ACIONÁVEL seguindo rigorosamente:
-1. A metodologia SISTUR com os 6 princípios sistêmicos de Mario Beni
-2. A priorização baseada nos alertas IGMA ativos
-3. A interpretação territorial (Estrutural/Gestão/Entrega) para cada problema
-4. Prescrições específicas e justificadas para cada gargalo
-5. Cronograma realista de ações por horizonte temporal
-6. Indicadores de monitoramento mensuráveis
+=== INSTRUÇÕES DE GERAÇÃO ===
+
+SIGA RIGOROSAMENTE A ESTRUTURA DO RELATÓRIO DEFINIDA NO SYSTEM PROMPT:
+1. Capa e Identificação
+2. Sumário Executivo  
+3. Contextualização do Município
+4. Metodologia SISTUR
+5. Diagnóstico por Eixo SISTUR (com EVIDÊNCIAS, LEITURA TÉCNICA e IMPLICAÇÕES separados)
+6. Inventário Turístico – Síntese Analítica
+7. Análise Integrada
+8. Prognóstico e Diretrizes
+9. Banco de Ações (tabela estruturada)
+10. Considerações Finais
+
+REGRAS FUNDAMENTAIS:
+- Sempre justificar conclusões com base nos dados fornecidos
+- Conectar explicitamente: dado → impacto → decisão
+- Se estimar algum dado por falta de informação, sinalizar com "[ESTIMADO]"
+- Linguagem institucional, clara e objetiva
+- O relatório deve ter no mínimo 2500 palavras
 
 LEMBRE-SE:
 - Indicadores criam obrigação - cada dado gera responsabilidade de ação
 - Aprendizado é execução - capacitação deve ser prescrita por gargalo específico
 - Monitoramento fecha o ciclo - toda ação deve ter indicador de acompanhamento
-- O SISTUR não informa — o SISTUR transforma
-
-O relatório deve ter no mínimo 2000 palavras e cobrir todos os aspectos do diagnóstico.`;
+- O SISTUR não informa — o SISTUR transforma`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
