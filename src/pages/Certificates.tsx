@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Award, 
   Download, 
@@ -17,8 +18,11 @@ import {
   Share2,
   Copy,
   FileText,
+  Printer,
 } from 'lucide-react';
 import { useUserCertificates, type CertificateWithDetails } from '@/hooks/useCertificates';
+import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -29,11 +33,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { CertificatePDF } from '@/components/edu/CertificatePDF';
 
 const Certificates = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCertificate, setSelectedCertificate] = useState<CertificateWithDetails | null>(null);
+  const [viewMode, setViewMode] = useState<'details' | 'print'>('details');
   
+  const { user } = useAuth();
+  const { profile } = useProfile();
   const { data: certificates, isLoading } = useUserCertificates();
 
   const filteredCertificates = certificates?.filter(cert => {
@@ -223,84 +231,115 @@ const Certificates = () => {
         )}
 
         {/* Certificate Detail Dialog */}
-        <Dialog open={!!selectedCertificate} onOpenChange={() => setSelectedCertificate(null)}>
-          <DialogContent className="max-w-2xl">
+        <Dialog open={!!selectedCertificate} onOpenChange={(open) => {
+          if (!open) {
+            setSelectedCertificate(null);
+            setViewMode('details');
+          }
+        }}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Award className="h-6 w-6 text-primary" />
                 Certificado de Conclusão
               </DialogTitle>
               <DialogDescription>
-                Detalhes do certificado
+                {selectedCertificate?.lms_courses?.title}
               </DialogDescription>
             </DialogHeader>
             {selectedCertificate && (
-              <div className="space-y-6">
-                {/* Certificate Preview */}
-                <div className="border rounded-lg p-8 bg-gradient-to-br from-primary/5 to-primary/10 text-center space-y-4">
-                  <Award className="h-16 w-16 mx-auto text-primary" />
-                  <h2 className="text-2xl font-bold">
-                    {selectedCertificate.lms_courses?.title}
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Certificamos que <strong>{selectedCertificate.profiles?.full_name || 'Aluno'}</strong><br />
-                    concluiu com êxito o curso acima
-                  </p>
-                  <div className="pt-4 border-t">
-                    <p className="text-sm text-muted-foreground">
-                      Data de conclusão: {format(new Date(selectedCertificate.issued_at), "dd/MM/yyyy")}
-                    </p>
-                  </div>
-                </div>
+              <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'details' | 'print')}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="details">Detalhes</TabsTrigger>
+                  <TabsTrigger value="print">
+                    <Printer className="h-4 w-4 mr-2" />
+                    Imprimir / PDF
+                  </TabsTrigger>
+                </TabsList>
 
-                {/* Certificate Details */}
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Código de Verificação:</span>
-                    <p className="font-mono font-medium">{selectedCertificate.verification_code}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Status:</span>
-                    <p>
-                      {selectedCertificate.status === 'active' ? (
-                        <Badge className="bg-green-500/20 text-green-700">Válido</Badge>
-                      ) : (
-                        <Badge variant="destructive">Revogado</Badge>
-                      )}
+                <TabsContent value="details" className="space-y-6 mt-4">
+                  {/* Certificate Preview */}
+                  <div className="border rounded-lg p-8 bg-gradient-to-br from-primary/5 to-primary/10 text-center space-y-4">
+                    <Award className="h-16 w-16 mx-auto text-primary" />
+                    <h2 className="text-2xl font-bold">
+                      {selectedCertificate.lms_courses?.title}
+                    </h2>
+                    <p className="text-muted-foreground">
+                      Certificamos que <strong>{selectedCertificate.profiles?.full_name || profile?.full_name || 'Aluno'}</strong><br />
+                      concluiu com êxito o curso acima
                     </p>
-                  </div>
-                  {selectedCertificate.workload_minutes && (
-                    <div>
-                      <span className="text-muted-foreground">Carga Horária:</span>
-                      <p className="font-semibold">{Math.round(selectedCertificate.workload_minutes / 60)}h</p>
+                    <div className="pt-4 border-t">
+                      <p className="text-sm text-muted-foreground">
+                        Data de conclusão: {format(new Date(selectedCertificate.issued_at), "dd/MM/yyyy")}
+                      </p>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                {/* Actions */}
-                <div className="flex gap-3 justify-end pt-4 border-t">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleCopyVerificationLink(selectedCertificate.verification_code)}
-                  >
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copiar Link
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleShare(selectedCertificate)}
-                  >
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Compartilhar
-                  </Button>
-                  <Button asChild>
-                    <Link to={`/verificar-certificado/${selectedCertificate.verification_code}`} target="_blank">
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      Página Pública
-                    </Link>
-                  </Button>
-                </div>
-              </div>
+                  {/* Certificate Details */}
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Código de Verificação:</span>
+                      <p className="font-mono font-medium">{selectedCertificate.verification_code}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Status:</span>
+                      <p>
+                        {selectedCertificate.status === 'active' ? (
+                          <Badge className="bg-green-500/20 text-green-700">Válido</Badge>
+                        ) : (
+                          <Badge variant="destructive">Revogado</Badge>
+                        )}
+                      </p>
+                    </div>
+                    {selectedCertificate.workload_minutes && (
+                      <div>
+                        <span className="text-muted-foreground">Carga Horária:</span>
+                        <p className="font-semibold">{Math.round(selectedCertificate.workload_minutes / 60)}h</p>
+                      </div>
+                    )}
+                    <div>
+                      <span className="text-muted-foreground">ID do Certificado:</span>
+                      <p className="font-mono text-xs">{selectedCertificate.certificate_id}</p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-3 justify-end pt-4 border-t">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleCopyVerificationLink(selectedCertificate.verification_code)}
+                    >
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copiar Link
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleShare(selectedCertificate)}
+                    >
+                      <Share2 className="mr-2 h-4 w-4" />
+                      Compartilhar
+                    </Button>
+                    <Button asChild>
+                      <Link to={`/verificar-certificado/${selectedCertificate.verification_code}`} target="_blank">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Página Pública
+                      </Link>
+                    </Button>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="print" className="mt-4">
+                  <CertificatePDF
+                    studentName={selectedCertificate.profiles?.full_name || profile?.full_name || 'Aluno'}
+                    courseTitle={selectedCertificate.lms_courses?.title || 'Curso'}
+                    coursePillar={selectedCertificate.pillar_scope || 'RA'}
+                    workloadMinutes={selectedCertificate.workload_minutes || 60}
+                    issuedAt={selectedCertificate.issued_at}
+                    verificationCode={selectedCertificate.verification_code}
+                    certificateId={selectedCertificate.certificate_id}
+                  />
+                </TabsContent>
+              </Tabs>
             )}
           </DialogContent>
         </Dialog>
