@@ -208,7 +208,7 @@ const App = () => {
                 <Route
                   path="/faq"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute redirectStudentsToEdu={false}>
                       <FAQ />
                     </ProtectedRoute>
                   }
@@ -216,7 +216,7 @@ const App = () => {
                 <Route
                   path="/ajuda"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute redirectStudentsToEdu={false}>
                       <Ajuda />
                     </ProtectedRoute>
                   }
