@@ -1113,6 +1113,53 @@ export type Database = {
           },
         ]
       }
+      edu_personalized_recommendations: {
+        Row: {
+          created_at: string
+          entity_id: string
+          id: string
+          is_dismissed: boolean | null
+          is_enrolled: boolean | null
+          match_reasons: Json | null
+          profile_id: string | null
+          recommendation_type: string
+          relevance_score: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          id?: string
+          is_dismissed?: boolean | null
+          is_enrolled?: boolean | null
+          match_reasons?: Json | null
+          profile_id?: string | null
+          recommendation_type: string
+          relevance_score?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          id?: string
+          is_dismissed?: boolean | null
+          is_enrolled?: boolean | null
+          match_reasons?: Json | null
+          profile_id?: string | null
+          recommendation_type?: string
+          relevance_score?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_personalized_recommendations_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "edu_student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       edu_progress: {
         Row: {
           attempts: number
@@ -1160,6 +1207,78 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "edu_tracks"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_student_profiles: {
+        Row: {
+          available_hours_per_week: number | null
+          completed_at: string | null
+          created_at: string
+          destination_id: string | null
+          experience_level: string | null
+          id: string
+          interest_pillars: string[] | null
+          interest_themes: string[] | null
+          is_complete: boolean | null
+          job_role: string | null
+          learning_goals: string[] | null
+          occupation_area: string | null
+          preferred_format: string | null
+          territory_context: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_hours_per_week?: number | null
+          completed_at?: string | null
+          created_at?: string
+          destination_id?: string | null
+          experience_level?: string | null
+          id?: string
+          interest_pillars?: string[] | null
+          interest_themes?: string[] | null
+          is_complete?: boolean | null
+          job_role?: string | null
+          learning_goals?: string[] | null
+          occupation_area?: string | null
+          preferred_format?: string | null
+          territory_context?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_hours_per_week?: number | null
+          completed_at?: string | null
+          created_at?: string
+          destination_id?: string | null
+          experience_level?: string | null
+          id?: string
+          interest_pillars?: string[] | null
+          interest_themes?: string[] | null
+          is_complete?: boolean | null
+          job_role?: string | null
+          learning_goals?: string[] | null
+          occupation_area?: string | null
+          preferred_format?: string | null
+          territory_context?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_student_profiles_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edu_student_profiles_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
           },
         ]
       }
