@@ -14,10 +14,12 @@ import {
   Shield,
   ArrowLeft,
   Clock,
+  QrCode,
 } from 'lucide-react';
 import { useVerifyCertificate } from '@/hooks/useCertificates';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { QRCodeSVG } from 'qrcode.react';
 
 const VerifyCertificate = () => {
   const { code } = useParams<{ code: string }>();
@@ -164,6 +166,22 @@ const VerifyCertificate = () => {
                     <p className="text-xs text-muted-foreground">Carga Horária</p>
                     <p className="font-medium">{certificate.workload_minutes} minutos</p>
                   </div>
+                </div>
+              </div>
+
+              {/* QR Code Section */}
+              <div className="flex flex-col items-center p-4 border rounded-lg bg-muted/30">
+                <div className="bg-white p-3 rounded-lg shadow-sm mb-3">
+                  <QRCodeSVG 
+                    value={window.location.href}
+                    size={100}
+                    level="M"
+                    includeMargin={false}
+                  />
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <QrCode className="h-4 w-4" />
+                  <span>QR Code de verificação</span>
                 </div>
               </div>
 
