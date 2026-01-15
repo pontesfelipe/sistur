@@ -1,0 +1,41 @@
+-- ===========================================
+-- SISTUR EDU: TREINAMENTOS - Trilha 3 (Mercado, Operações e Experiência) - Parte 1
+-- ===========================================
+
+INSERT INTO public.edu_trainings (training_id, title, type, pillar, level, target_audience, objective, video_url, video_provider, active, status)
+VALUES
+  -- Ações Operacionais
+  ('t3-ao-001', 'Especial 3° Aniversário do Programa Troca de Ideias - parte 1', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/SLx1S16mrg4', 'youtube', true, 'published'),
+  ('t3-ao-002', 'Especial 3° Aniversário do Programa Troca de Ideias - parte 2', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/IYlAnjBV6fY', 'youtube', true, 'published'),
+  ('t3-ao-003', 'Especial 3° Aniversário do Programa Troca de Ideias - parte 3', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/watch?v=eTavDgi8-FE', 'youtube', true, 'published'),
+  ('t3-ao-004', '4° Aniversário do Programa Troca de Ideias com Prof. Mario Beni', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/watch?v=K27Arlymb-0', 'youtube', true, 'published'),
+  ('t3-ao-005', 'A busca por burocratas na pesquisa científica', 'live', 'AO', 'Intermediário', 'Professores, estudantes, pesquisadores e coordenadores acadêmicos', 'Ações Operacionais', 'https://www.youtube.com/watch?v=N6klEZT3vNE', 'youtube', true, 'published'),
+  ('t3-ao-006', 'A importância da união da Classe Turismóloga', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/UFocJWh7GY0', 'youtube', true, 'published'),
+  ('t3-ao-007', 'A inteligência humana como ativo essencial da competitividade turística', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://youtube.com/live/3H7836jZ2VE', 'youtube', true, 'published'),
+  ('t3-ao-008', 'Análise das ações da Secretaria do Estado de Turismo em São Paulo', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/watch?v=a43-fqSTiAU', 'youtube', true, 'published'),
+  ('t3-ao-009', 'As tendências do turismo na próxima década', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://youtu.be/eDoqgln3Kx8', 'youtube', true, 'published'),
+  ('t3-ao-010', 'Capacidade de Carga', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/3qzuJ67hsic', 'youtube', true, 'published'),
+  ('t3-ao-011', 'Caravanismo como mobilidade turística entre Brasil e Argentina', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/Z_Ae5pXIn4U', 'youtube', true, 'published'),
+  ('t3-ao-012', 'Cassinos no Brasil', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/JNqFC8Ajo9k', 'youtube', true, 'published'),
+  ('t3-ao-013', 'Como um hotel se torna um destino', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://youtube.com/live/OeRxmPKOvBI', 'youtube', true, 'published'),
+  ('t3-ao-014', 'Criando experiências turísticas', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/watch?v=OXLbl2l6Ki8', 'youtube', true, 'published'),
+  ('t3-ao-015', 'Dark Turismo', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/2kZ_9SdVv7Q', 'youtube', true, 'published'),
+  ('t3-ao-016', 'Desenvolvimento Sustentável', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/watch?v=0rwR5FSLagU', 'youtube', true, 'published'),
+  ('t3-ao-017', 'Desenvolvimento de Talentos: do profissional que temos para o que queremos', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/eVMv1dvOkrA', 'youtube', true, 'published'),
+  ('t3-ao-018', 'Desenvolvimento do Turismo em Bonito e no Pantanal', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/heeVr6nVTUQ', 'youtube', true, 'published'),
+  ('t3-ao-019', 'Direito do Consumidor Aplicado ao Turismo', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/tIm2cQxLDwE', 'youtube', true, 'published'),
+  ('t3-ao-020', 'Do Profissional que temos para o Profissional que queremos', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/ZadxrlJFlbI', 'youtube', true, 'published'),
+  ('t3-ao-021', 'Do Sonho ao Negócio: O Papel das Incubadoras no Turismo Empreendedor', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://youtube.com/live/lIPq7J5MF78', 'youtube', true, 'published'),
+  ('t3-ao-022', 'Do egoevento ao ecoevento', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/watch?v=O-ALKyMaivw', 'youtube', true, 'published'),
+  ('t3-ao-023', 'Estratégias de recuperação e relançamento do Turismo', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/GbGwl6kaFMI', 'youtube', true, 'published'),
+  ('t3-ao-024', 'Eternos Aprendizes', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/zUWZN4j1b84', 'youtube', true, 'published'),
+  ('t3-ao-025', 'Formação e inserção do Bacharel em Turismo no mercado de trabalho', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/52QU2LYAE64', 'youtube', true, 'published'),
+  ('t3-ao-026', 'Geografia dos sabores e Turismo', 'live', 'AO', 'Intermediário', 'Gastronomia, restaurantes, turismo de experiência e empreendedores', 'Ações Operacionais', 'https://youtu.be/qWbhAszPjSg', 'youtube', true, 'published'),
+  ('t3-ao-027', 'Geração Z: educação, habilidades e competências para inserção no mercado', 'live', 'AO', 'Intermediário', 'Professores, estudantes, pesquisadores e coordenadores acadêmicos', 'Ações Operacionais', 'https://www.youtube.com/live/OAEjQErJ45E', 'youtube', true, 'published'),
+  ('t3-ao-028', 'Gestão Municipal de Turismo', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/live/3bA45yttx8Y', 'youtube', true, 'published'),
+  ('t3-ao-029', 'Interação da experiência de empresa privada vida acadêmica e gestão pública', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/watch?v=7DCi4NG88gM', 'youtube', true, 'published'),
+  ('t3-ao-030', 'LGPD - é preciso se adequar', 'live', 'AO', 'Intermediário', 'Profissionais do turismo, gestores e estudantes', 'Ações Operacionais', 'https://www.youtube.com/watch?v=XsmYiMZkNYk', 'youtube', true, 'published')
+ON CONFLICT (training_id) DO UPDATE SET
+  title = EXCLUDED.title, type = EXCLUDED.type, pillar = EXCLUDED.pillar, level = EXCLUDED.level,
+  target_audience = EXCLUDED.target_audience, objective = EXCLUDED.objective, video_url = EXCLUDED.video_url,
+  video_provider = EXCLUDED.video_provider, active = EXCLUDED.active, status = EXCLUDED.status;
