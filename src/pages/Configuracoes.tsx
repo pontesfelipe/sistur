@@ -17,6 +17,7 @@ import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
 import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPanel';
 import { ActAsUserPanel } from '@/components/settings/ActAsUserPanel';
 import { useProfile } from '@/hooks/useProfile';
+import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import { 
   BookOpen, 
   Wrench, 
@@ -35,7 +36,9 @@ import {
   FlaskConical,
   Database,
   Users,
-  Globe
+  Globe,
+  Info,
+  History
 } from 'lucide-react';
 
 export default function Configuracoes() {
@@ -71,6 +74,66 @@ export default function Configuracoes() {
 
           {/* GERAL TAB */}
           <TabsContent value="geral" className="space-y-6">
+            {/* Version Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5 text-primary" />
+                  Versão do Sistema
+                </CardTitle>
+                <CardDescription>
+                  Controle de versão semântico (MAJOR.MINOR.PATCH)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl font-bold text-primary">
+                    v{APP_VERSION.full}
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {VERSION_HISTORY[0]?.date}
+                  </Badge>
+                </div>
+                
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p><strong>MAJOR</strong> (X.0.0): Mudanças incompatíveis ou grandes reformulações</p>
+                  <p><strong>MINOR</strong> (0.X.0): Novas funcionalidades compatíveis</p>
+                  <p><strong>PATCH</strong> (0.0.X): Correções de bugs e micro ajustes</p>
+                </div>
+
+                {/* Version History */}
+                <div className="mt-4 pt-4 border-t">
+                  <div className="flex items-center gap-2 mb-3">
+                    <History className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium text-sm">Histórico de Versões</span>
+                  </div>
+                  <div className="space-y-3 max-h-60 overflow-y-auto">
+                    {VERSION_HISTORY.map((entry, idx) => (
+                      <div key={idx} className="p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge 
+                            variant={entry.type === 'major' ? 'default' : entry.type === 'minor' ? 'secondary' : 'outline'}
+                            className="text-xs"
+                          >
+                            {entry.version}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">{entry.date}</span>
+                          <Badge variant="outline" className="text-xs capitalize">
+                            {entry.type}
+                          </Badge>
+                        </div>
+                        <ul className="text-xs text-muted-foreground space-y-1">
+                          {entry.changes.map((change, cIdx) => (
+                            <li key={cIdx}>• {change}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <DemoModeToggle />
             {isAdmin && <ActAsUserPanel />}
           </TabsContent>
