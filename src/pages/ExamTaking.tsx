@@ -22,8 +22,8 @@ import {
   Timer,
   Award,
 } from 'lucide-react';
-import { useExam, useExamAttempt, useExamMutations } from '@/hooks/useExams';
-import { useQuizOptions } from '@/hooks/useQuizzes';
+import { useExam, useExamAttempt, useExamMutations, useExamAnswerMutations } from '@/hooks/useExams';
+import { useQuizQuestion } from '@/hooks/useQuizzes';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,15 +47,17 @@ const ExamTaking = () => {
 
   const { data: exam, isLoading: examLoading } = useExam(examId);
   const { data: attempt } = useExamAttempt(examId);
-  const { startExam, submitAnswer, submitExam } = useExamMutations();
+  const { startExam } = useExamMutations();
+  const { submitAnswer, submitExam } = useExamAnswerMutations();
 
   // Get options for current question
   const currentQuestionId = exam?.question_ids?.[currentQuestionIndex];
-  const { data: currentOptions } = useQuizOptions(currentQuestionId);
+  const { data: currentQuestion } = useQuizQuestion(currentQuestionId);
+  const currentOptions = currentQuestion?.options || [];
 
   // Timer effect
   useEffect(() => {
-    if (!exam || exam.status !== 'in_progress') return;
+    if (!exam || exam.status !== 'started') return;
     
     const expiresAt = new Date(exam.expires_at).getTime();
     const now = Date.now();
@@ -115,14 +117,11 @@ const ExamTaking = () => {
       }
 
       // Submit the exam
-      const examResult = await submitExam.mutateAsync({
-        examId,
-        attemptId: attempt.attempt_id,
-      });
+      const examResult = await submitExam.mutateAsync(attempt.attempt_id);
       
       setResult({
         score: examResult.score_pct || 0,
-        passed: examResult.result === 'pass',
+        passed: examResult.result === 'passed',
       });
       
       toast.success('Exame enviado com sucesso!');
@@ -167,7 +166,7 @@ const ExamTaking = () => {
   }
 
   // Exam completed - show results
-  if (result || exam.status === 'graded') {
+  if (result || exam.status === 'submitted') {
     const finalScore = result?.score || 0;
     const passed = result?.passed || false;
 
@@ -220,7 +219,7 @@ const ExamTaking = () => {
   }
 
   // Exam not started yet
-  if (exam.status === 'pending') {
+  if (exam.status === 'generated') {
     return (
       <AppLayout title="Iniciar Exame" subtitle="Leia as instruções antes de começar">
         <div className="max-w-2xl mx-auto">

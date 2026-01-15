@@ -61,15 +61,15 @@ const OnDemandRequests = () => {
 
   const filteredRequests = requests?.filter(req => {
     return !searchQuery || 
-      req.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      req.learning_goals?.toLowerCase().includes(searchQuery.toLowerCase());
+      req.topic_text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      req.learning_goals?.join(' ').toLowerCase().includes(searchQuery.toLowerCase());
   }) || [];
 
   const stats = {
     total: requests?.length || 0,
-    pending: requests?.filter(r => r.status === 'pending').length || 0,
-    approved: requests?.filter(r => r.status === 'approved').length || 0,
-    completed: requests?.filter(r => r.status === 'delivered').length || 0,
+    pending: requests?.filter(r => r.status === 'received').length || 0,
+    approved: requests?.filter(r => r.status === 'validated' || r.status === 'generating').length || 0,
+    completed: requests?.filter(r => r.status === 'generated').length || 0,
   };
 
   const handleSubmit = async () => {
@@ -80,10 +80,9 @@ const OnDemandRequests = () => {
     
     try {
       await createRequest.mutateAsync({
-        topic: formData.topic,
-        learning_goals: formData.learning_goals,
-        preferred_format: formData.preferred_format,
-        urgency: formData.urgency,
+        goal_type: 'course',
+        topic_text: formData.topic,
+        learning_goals: formData.learning_goals ? [formData.learning_goals] : undefined,
       });
       toast.success('Solicitação enviada com sucesso!');
       setIsDialogOpen(false);
@@ -100,27 +99,31 @@ const OnDemandRequests = () => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'pending':
+      case 'received':
         return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700"><Clock className="w-3 h-3 mr-1" />Aguardando</Badge>;
-      case 'approved':
+      case 'validated':
+      case 'generating':
         return <Badge variant="outline" className="bg-blue-500/10 text-blue-700"><Loader2 className="w-3 h-3 mr-1" />Em Produção</Badge>;
-      case 'delivered':
+      case 'generated':
         return <Badge className="bg-green-500/20 text-green-700"><CheckCircle className="w-3 h-3 mr-1" />Entregue</Badge>;
       case 'rejected':
+      case 'failed':
         return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Rejeitado</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
-  const getUrgencyBadge = (urgency: string) => {
-    switch (urgency) {
-      case 'high':
-        return <Badge variant="destructive">Urgente</Badge>;
-      case 'low':
-        return <Badge variant="outline">Baixa</Badge>;
+  const getGoalTypeBadge = (goalType: string) => {
+    switch (goalType) {
+      case 'course':
+        return <Badge variant="secondary">Curso</Badge>;
+      case 'track':
+        return <Badge variant="secondary">Trilha</Badge>;
+      case 'lesson_plan':
+        return <Badge variant="outline">Plano de Aula</Badge>;
       default:
-        return <Badge variant="secondary">Normal</Badge>;
+        return <Badge variant="outline">{goalType}</Badge>;
     }
   };
 
@@ -216,36 +219,38 @@ const OnDemandRequests = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
-                        <CardTitle className="text-lg">{request.topic}</CardTitle>
+                        <CardTitle className="text-lg">{request.topic_text}</CardTitle>
                         <CardDescription className="flex items-center gap-2">
                           <Clock className="h-3 w-3" />
                           Solicitado em {format(new Date(request.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                         </CardDescription>
                       </div>
                       <div className="flex gap-2">
-                        {getUrgencyBadge(request.urgency)}
+                        {getGoalTypeBadge(request.goal_type)}
                         {getStatusBadge(request.status)}
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {request.learning_goals && (
+                      {request.learning_goals && request.learning_goals.length > 0 && (
                         <div className="flex items-start gap-2 text-sm">
                           <Target className="h-4 w-4 text-muted-foreground mt-0.5" />
-                          <p className="text-muted-foreground">{request.learning_goals}</p>
+                          <p className="text-muted-foreground">{request.learning_goals.join(', ')}</p>
                         </div>
                       )}
-                      <div className="flex items-center gap-2 text-sm">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">
-                          Formato preferido: {request.preferred_format === 'video' ? 'Vídeo' : request.preferred_format === 'text' ? 'Texto' : 'Misto'}
-                        </span>
-                      </div>
-                      {request.admin_notes && (
+                      {request.desired_pillar && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">
+                            Pilar: {request.desired_pillar}
+                          </span>
+                        </div>
+                      )}
+                      {request.error_message && (
                         <div className="flex items-start gap-2 text-sm p-3 bg-muted rounded-lg">
                           <MessageSquare className="h-4 w-4 text-muted-foreground mt-0.5" />
-                          <p>{request.admin_notes}</p>
+                          <p>{request.error_message}</p>
                         </div>
                       )}
                     </div>

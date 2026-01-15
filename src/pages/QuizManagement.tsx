@@ -39,7 +39,6 @@ import {
 import { 
   useQuizQuestions, 
   useQuizMutations,
-  useQuizOptions,
   type QuizQuestion 
 } from '@/hooks/useQuizzes';
 import { PILLAR_INFO, type Pillar } from '@/types/sistur';
@@ -64,10 +63,10 @@ import {
 
 interface QuestionFormData {
   stem: string;
-  question_type: 'multiple_choice' | 'true_false' | 'short_answer';
+  question_type: 'multiple_choice' | 'true_false' | 'essay';
   pillar: Pillar;
   difficulty: number;
-  points: number;
+  level: number;
   explanation?: string;
   options: { text: string; is_correct: boolean }[];
 }
@@ -77,7 +76,7 @@ const defaultFormData: QuestionFormData = {
   question_type: 'multiple_choice',
   pillar: 'RA',
   difficulty: 1,
-  points: 10,
+  level: 1,
   explanation: '',
   options: [
     { text: '', is_correct: true },
@@ -97,7 +96,7 @@ const QuizManagement = () => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   
   const { data: questions, isLoading } = useQuizQuestions();
-  const { createQuestion, updateQuestion, deleteQuestion, createOption, deleteOption } = useQuizMutations();
+  const { createQuiz, updateQuiz, deleteQuiz } = useQuizMutations();
   
   const filteredQuestions = questions?.filter(q => {
     const matchesSearch = !searchQuery || 
@@ -116,7 +115,7 @@ const QuizManagement = () => {
     byType: {
       multiple_choice: questions?.filter(q => q.question_type === 'multiple_choice').length || 0,
       true_false: questions?.filter(q => q.question_type === 'true_false').length || 0,
-      short_answer: questions?.filter(q => q.question_type === 'short_answer').length || 0,
+      essay: questions?.filter(q => q.question_type === 'essay').length || 0,
     }
   };
 
@@ -132,10 +131,13 @@ const QuizManagement = () => {
       stem: question.stem,
       question_type: question.question_type,
       pillar: question.pillar as Pillar,
-      difficulty: question.difficulty,
-      points: question.points,
+      difficulty: question.difficulty || 1,
+      level: question.level || 1,
       explanation: question.explanation || '',
-      options: [
+      options: question.options?.map(o => ({
+        text: o.option_text,
+        is_correct: o.is_correct,
+      })) || [
         { text: '', is_correct: true },
         { text: '', is_correct: false },
         { text: '', is_correct: false },
@@ -147,37 +149,38 @@ const QuizManagement = () => {
 
   const handleSubmit = async () => {
     try {
+      const optionsFormatted = formData.options
+        .filter(o => o.text.trim())
+        .map((opt, idx) => ({
+          option_label: String.fromCharCode(65 + idx) as 'A' | 'B' | 'C' | 'D' | 'E',
+          option_text: opt.text,
+          is_correct: opt.is_correct,
+        }));
+
       if (editingQuestion) {
-        await updateQuestion.mutateAsync({
+        await updateQuiz.mutateAsync({
           quizId: editingQuestion,
-          data: {
+          question: {
             stem: formData.stem,
             pillar: formData.pillar,
             difficulty: formData.difficulty,
-            points: formData.points,
             explanation: formData.explanation,
           },
+          options: optionsFormatted,
         });
         toast.success('Questão atualizada com sucesso!');
       } else {
-        const newQuestion = await createQuestion.mutateAsync({
-          stem: formData.stem,
-          question_type: formData.question_type,
-          pillar: formData.pillar,
-          difficulty: formData.difficulty,
-          points: formData.points,
-          explanation: formData.explanation,
+        await createQuiz.mutateAsync({
+          question: {
+            stem: formData.stem,
+            question_type: formData.question_type as 'multiple_choice' | 'true_false',
+            pillar: formData.pillar,
+            level: formData.level,
+            difficulty: formData.difficulty,
+            explanation: formData.explanation,
+          },
+          options: optionsFormatted,
         });
-        
-        // Create options for the question
-        for (const opt of formData.options.filter(o => o.text.trim())) {
-          await createOption.mutateAsync({
-            quiz_id: newQuestion.quiz_id,
-            option_text: opt.text,
-            is_correct: opt.is_correct,
-            display_order: formData.options.indexOf(opt),
-          });
-        }
         
         toast.success('Questão criada com sucesso!');
       }
@@ -193,7 +196,7 @@ const QuizManagement = () => {
   const handleDelete = async () => {
     if (!deleteConfirmId) return;
     try {
-      await deleteQuestion.mutateAsync(deleteConfirmId);
+      await deleteQuiz.mutateAsync(deleteConfirmId);
       toast.success('Questão excluída');
       setDeleteConfirmId(null);
     } catch (error) {
@@ -228,8 +231,10 @@ const QuizManagement = () => {
         return <Badge variant="secondary"><ListChecks className="w-3 h-3 mr-1" />Múltipla Escolha</Badge>;
       case 'true_false':
         return <Badge variant="secondary"><CheckCircle className="w-3 h-3 mr-1" />V/F</Badge>;
-      default:
+      case 'essay':
         return <Badge variant="secondary"><FileQuestion className="w-3 h-3 mr-1" />Dissertativa</Badge>;
+      default:
+        return <Badge variant="secondary">{type}</Badge>;
     }
   };
 
@@ -357,12 +362,12 @@ const QuizManagement = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="points">Pontos</Label>
+                      <Label htmlFor="level">Nível</Label>
                       <Input 
-                        id="points" 
+                        id="level" 
                         type="number"
-                        value={formData.points}
-                        onChange={(e) => setFormData(prev => ({ ...prev, points: parseInt(e.target.value) || 10 }))}
+                        value={formData.level}
+                        onChange={(e) => setFormData(prev => ({ ...prev, level: parseInt(e.target.value) || 1 }))}
                       />
                     </div>
                   </div>
@@ -409,7 +414,7 @@ const QuizManagement = () => {
                   </Button>
                   <Button 
                     onClick={handleSubmit}
-                    disabled={!formData.stem || createQuestion.isPending || updateQuestion.isPending}
+                    disabled={!formData.stem || createQuiz.isPending || updateQuiz.isPending}
                   >
                     {editingQuestion ? 'Salvar' : 'Criar Questão'}
                   </Button>
@@ -440,7 +445,7 @@ const QuizManagement = () => {
                       <TableHead>Tipo</TableHead>
                       <TableHead>Pilar</TableHead>
                       <TableHead>Dificuldade</TableHead>
-                      <TableHead>Pts</TableHead>
+                      <TableHead>Nível</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -462,8 +467,8 @@ const QuizManagement = () => {
                             {question.pillar}
                           </Badge>
                         </TableCell>
-                        <TableCell>{getDifficultyBadge(question.difficulty)}</TableCell>
-                        <TableCell>{question.points}</TableCell>
+                        <TableCell>{getDifficultyBadge(question.difficulty || 1)}</TableCell>
+                        <TableCell>{question.level}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button
@@ -545,7 +550,7 @@ const QuizManagement = () => {
                     <FileQuestion className="h-4 w-4" />
                     Dissertativa
                   </span>
-                  <span className="font-semibold">{stats.byType.short_answer}</span>
+                  <span className="font-semibold">{stats.byType.essay}</span>
                 </div>
               </div>
             </CardContent>

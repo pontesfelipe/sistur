@@ -23,7 +23,7 @@ import {
 import { 
   useERPDiagnostics,
   useERPEventLog,
-  useERPMutations,
+  useERPDiagnosticMutations,
 } from '@/hooks/useERPIntegration';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -43,7 +43,7 @@ const ERPIntegration = () => {
   
   const { data: diagnostics, isLoading: diagLoading } = useERPDiagnostics();
   const { data: events, isLoading: eventsLoading } = useERPEventLog(50);
-  const { createDiagnostic, logEvent } = useERPMutations();
+  const { receiveDiagnostic } = useERPDiagnosticMutations();
 
   const stats = {
     totalDiagnostics: diagnostics?.length || 0,
@@ -58,9 +58,11 @@ const ERPIntegration = () => {
   const handleSync = async () => {
     setIsSyncing(true);
     try {
-      await logEvent.mutateAsync({
-        eventType: 'manual_sync',
-        payload: { triggered_at: new Date().toISOString() },
+      // Simulate sync by creating a test diagnostic
+      await receiveDiagnostic.mutateAsync({
+        entity_ref: 'manual_sync_' + Date.now(),
+        entity_type: null,
+        pillar_priority: null,
       });
       toast.success('Sincronização iniciada!');
     } catch (error) {
