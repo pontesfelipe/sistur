@@ -414,6 +414,156 @@ export type Database = {
           },
         ]
       }
+      content_items: {
+        Row: {
+          abstract: string | null
+          author: string
+          content_id: string
+          content_type: Database["public"]["Enums"]["content_type"]
+          created_at: string
+          created_by: string | null
+          doi: string | null
+          isbn: string | null
+          key_concepts: Json | null
+          keywords: string[] | null
+          level: number
+          primary_pillar: string
+          publication_year: number | null
+          published_at: string | null
+          publisher: string | null
+          secondary_pillar: string | null
+          source_uri: string | null
+          status: Database["public"]["Enums"]["content_status"]
+          subtitle: string | null
+          summary: string | null
+          title: string
+          topics: string[] | null
+          transcript_text: string | null
+          updated_at: string
+          validated_by: string | null
+          version: number
+        }
+        Insert: {
+          abstract?: string | null
+          author?: string
+          content_id: string
+          content_type: Database["public"]["Enums"]["content_type"]
+          created_at?: string
+          created_by?: string | null
+          doi?: string | null
+          isbn?: string | null
+          key_concepts?: Json | null
+          keywords?: string[] | null
+          level: number
+          primary_pillar: string
+          publication_year?: number | null
+          published_at?: string | null
+          publisher?: string | null
+          secondary_pillar?: string | null
+          source_uri?: string | null
+          status?: Database["public"]["Enums"]["content_status"]
+          subtitle?: string | null
+          summary?: string | null
+          title: string
+          topics?: string[] | null
+          transcript_text?: string | null
+          updated_at?: string
+          validated_by?: string | null
+          version?: number
+        }
+        Update: {
+          abstract?: string | null
+          author?: string
+          content_id?: string
+          content_type?: Database["public"]["Enums"]["content_type"]
+          created_at?: string
+          created_by?: string | null
+          doi?: string | null
+          isbn?: string | null
+          key_concepts?: Json | null
+          keywords?: string[] | null
+          level?: number
+          primary_pillar?: string
+          publication_year?: number | null
+          published_at?: string | null
+          publisher?: string | null
+          secondary_pillar?: string | null
+          source_uri?: string | null
+          status?: Database["public"]["Enums"]["content_status"]
+          subtitle?: string | null
+          summary?: string | null
+          title?: string
+          topics?: string[] | null
+          transcript_text?: string | null
+          updated_at?: string
+          validated_by?: string | null
+          version?: number
+        }
+        Relationships: []
+      }
+      course_content_sources: {
+        Row: {
+          content_id: string
+          course_id: string
+          usage_type: string | null
+        }
+        Insert: {
+          content_id: string
+          course_id: string
+          usage_type?: string | null
+        }
+        Update: {
+          content_id?: string
+          course_id?: string
+          usage_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_content_sources_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["content_id"]
+          },
+          {
+            foreignKeyName: "course_content_sources_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "lms_courses"
+            referencedColumns: ["course_id"]
+          },
+        ]
+      }
+      course_prerequisites: {
+        Row: {
+          course_id: string
+          required_course_id: string
+        }
+        Insert: {
+          course_id: string
+          required_course_id: string
+        }
+        Update: {
+          course_id?: string
+          required_course_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_prerequisites_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "lms_courses"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "course_prerequisites_required_course_id_fkey"
+            columns: ["required_course_id"]
+            isOneToOne: false
+            referencedRelation: "lms_courses"
+            referencedColumns: ["course_id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           created_at: string
@@ -1328,6 +1478,333 @@ export type Database = {
           },
         ]
       }
+      erp_diagnostics: {
+        Row: {
+          created_at: string
+          diagnostic_id: string
+          entity_ref: string
+          entity_type: string | null
+          igma_warnings: Json | null
+          indicators_data: Json | null
+          org_id: string | null
+          pillar_priority: string | null
+        }
+        Insert: {
+          created_at?: string
+          diagnostic_id?: string
+          entity_ref: string
+          entity_type?: string | null
+          igma_warnings?: Json | null
+          indicators_data?: Json | null
+          org_id?: string | null
+          pillar_priority?: string | null
+        }
+        Update: {
+          created_at?: string
+          diagnostic_id?: string
+          entity_ref?: string
+          entity_type?: string | null
+          igma_warnings?: Json | null
+          indicators_data?: Json | null
+          org_id?: string | null
+          pillar_priority?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "erp_diagnostics_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      erp_event_log: {
+        Row: {
+          created_at: string
+          event_id: string
+          event_type: string
+          org_id: string | null
+          payload: Json
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string
+          event_type: string
+          org_id?: string | null
+          payload: Json
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          event_type?: string
+          org_id?: string | null
+          payload?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "erp_event_log_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_answers: {
+        Row: {
+          answered_at: string | null
+          attempt_id: string
+          awarded_points: number | null
+          free_text_answer: string | null
+          is_correct: boolean | null
+          quiz_id: string
+          selected_option_id: string | null
+        }
+        Insert: {
+          answered_at?: string | null
+          attempt_id: string
+          awarded_points?: number | null
+          free_text_answer?: string | null
+          is_correct?: boolean | null
+          quiz_id: string
+          selected_option_id?: string | null
+        }
+        Update: {
+          answered_at?: string | null
+          attempt_id?: string
+          awarded_points?: number | null
+          free_text_answer?: string | null
+          is_correct?: boolean | null
+          quiz_id?: string
+          selected_option_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_answers_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "exam_attempts"
+            referencedColumns: ["attempt_id"]
+          },
+          {
+            foreignKeyName: "exam_answers_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_questions"
+            referencedColumns: ["quiz_id"]
+          },
+          {
+            foreignKeyName: "exam_answers_selected_option_id_fkey"
+            columns: ["selected_option_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_options"
+            referencedColumns: ["option_id"]
+          },
+        ]
+      }
+      exam_attempts: {
+        Row: {
+          attempt_id: string
+          audit_trail_ref: string | null
+          created_at: string
+          exam_id: string | null
+          grading_mode: Database["public"]["Enums"]["grading_mode_type"] | null
+          ip_address: unknown
+          result: Database["public"]["Enums"]["exam_result_type"] | null
+          score_pct: number | null
+          started_at: string
+          submitted_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attempt_id?: string
+          audit_trail_ref?: string | null
+          created_at?: string
+          exam_id?: string | null
+          grading_mode?: Database["public"]["Enums"]["grading_mode_type"] | null
+          ip_address?: unknown
+          result?: Database["public"]["Enums"]["exam_result_type"] | null
+          score_pct?: number | null
+          started_at?: string
+          submitted_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attempt_id?: string
+          audit_trail_ref?: string | null
+          created_at?: string
+          exam_id?: string | null
+          grading_mode?: Database["public"]["Enums"]["grading_mode_type"] | null
+          ip_address?: unknown
+          result?: Database["public"]["Enums"]["exam_result_type"] | null
+          score_pct?: number | null
+          started_at?: string
+          submitted_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_attempts_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["exam_id"]
+          },
+        ]
+      }
+      exam_questions: {
+        Row: {
+          display_order: number
+          exam_id: string
+          options_shuffle_seed: number | null
+          quiz_id: string
+        }
+        Insert: {
+          display_order: number
+          exam_id: string
+          options_shuffle_seed?: number | null
+          quiz_id: string
+        }
+        Update: {
+          display_order?: number
+          exam_id?: string
+          options_shuffle_seed?: number | null
+          quiz_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_questions_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["exam_id"]
+          },
+          {
+            foreignKeyName: "exam_questions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_questions"
+            referencedColumns: ["quiz_id"]
+          },
+        ]
+      }
+      exam_rulesets: {
+        Row: {
+          allow_retake: boolean | null
+          course_id: string | null
+          created_at: string
+          max_attempts: number | null
+          min_days_between_same_quiz: number | null
+          min_score_pct: number
+          pillar_mix: Json | null
+          question_count: number
+          retake_wait_hours: number | null
+          ruleset_id: string
+          time_limit_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          allow_retake?: boolean | null
+          course_id?: string | null
+          created_at?: string
+          max_attempts?: number | null
+          min_days_between_same_quiz?: number | null
+          min_score_pct: number
+          pillar_mix?: Json | null
+          question_count: number
+          retake_wait_hours?: number | null
+          ruleset_id?: string
+          time_limit_minutes: number
+          updated_at?: string
+        }
+        Update: {
+          allow_retake?: boolean | null
+          course_id?: string | null
+          created_at?: string
+          max_attempts?: number | null
+          min_days_between_same_quiz?: number | null
+          min_score_pct?: number
+          pillar_mix?: Json | null
+          question_count?: number
+          retake_wait_hours?: number | null
+          ruleset_id?: string
+          time_limit_minutes?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_rulesets_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: true
+            referencedRelation: "lms_courses"
+            referencedColumns: ["course_id"]
+          },
+        ]
+      }
+      exams: {
+        Row: {
+          composition_hash: string
+          course_id: string | null
+          course_version: number
+          created_at: string
+          exam_id: string
+          expires_at: string
+          question_ids: string[]
+          ruleset_id: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["exam_status_type"]
+          submitted_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          composition_hash: string
+          course_id?: string | null
+          course_version?: number
+          created_at?: string
+          exam_id?: string
+          expires_at: string
+          question_ids: string[]
+          ruleset_id?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["exam_status_type"]
+          submitted_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          composition_hash?: string
+          course_id?: string | null
+          course_version?: number
+          created_at?: string
+          exam_id?: string
+          expires_at?: string
+          question_ids?: string[]
+          ruleset_id?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["exam_status_type"]
+          submitted_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exams_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "lms_courses"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "exams_ruleset_id_fkey"
+            columns: ["ruleset_id"]
+            isOneToOne: false
+            referencedRelation: "exam_rulesets"
+            referencedColumns: ["ruleset_id"]
+          },
+        ]
+      }
       external_data_sources: {
         Row: {
           active: boolean
@@ -2156,6 +2633,51 @@ export type Database = {
           },
         ]
       }
+      learning_prescriptions_lms: {
+        Row: {
+          created_at: string
+          diagnostic_id: string | null
+          prescription_id: string
+          reasoning: string | null
+          recommended_courses: Json | null
+          recommended_track_id: string | null
+          target_roles: Json | null
+        }
+        Insert: {
+          created_at?: string
+          diagnostic_id?: string | null
+          prescription_id?: string
+          reasoning?: string | null
+          recommended_courses?: Json | null
+          recommended_track_id?: string | null
+          target_roles?: Json | null
+        }
+        Update: {
+          created_at?: string
+          diagnostic_id?: string | null
+          prescription_id?: string
+          reasoning?: string | null
+          recommended_courses?: Json | null
+          recommended_track_id?: string | null
+          target_roles?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_prescriptions_lms_diagnostic_id_fkey"
+            columns: ["diagnostic_id"]
+            isOneToOne: false
+            referencedRelation: "erp_diagnostics"
+            referencedColumns: ["diagnostic_id"]
+          },
+          {
+            foreignKeyName: "learning_prescriptions_lms_recommended_track_id_fkey"
+            columns: ["recommended_track_id"]
+            isOneToOne: false
+            referencedRelation: "lms_tracks"
+            referencedColumns: ["track_id"]
+          },
+        ]
+      }
       learning_recommendations: {
         Row: {
           created_at: string
@@ -2240,6 +2762,720 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_destination_summary"
             referencedColumns: ["destination_id"]
+          },
+        ]
+      }
+      lesson_content_sources: {
+        Row: {
+          citation_text: string | null
+          content_id: string
+          lesson_id: string
+          source_locator: string
+        }
+        Insert: {
+          citation_text?: string | null
+          content_id: string
+          lesson_id: string
+          source_locator: string
+        }
+        Update: {
+          citation_text?: string | null
+          content_id?: string
+          lesson_id?: string
+          source_locator?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_content_sources_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["content_id"]
+          },
+          {
+            foreignKeyName: "lesson_content_sources_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lms_lessons"
+            referencedColumns: ["lesson_id"]
+          },
+        ]
+      }
+      lms_audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          ip_address: unknown
+          log_id: string
+          metadata: Json | null
+          new_values: Json | null
+          old_values: Json | null
+          org_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          ip_address?: unknown
+          log_id?: string
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          org_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          ip_address?: unknown
+          log_id?: string
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          org_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lms_audit_logs_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lms_certificates: {
+        Row: {
+          attempt_id: string | null
+          certificate_id: string
+          course_id: string | null
+          course_version: number
+          created_at: string
+          issued_at: string
+          pdf_generated_at: string | null
+          pdf_uri: string | null
+          pillar_scope: string
+          qr_verify_url: string | null
+          revoked_at: string | null
+          revoked_reason: string | null
+          status: Database["public"]["Enums"]["certificate_status_type"] | null
+          user_id: string | null
+          verification_code: string
+          workload_minutes: number
+        }
+        Insert: {
+          attempt_id?: string | null
+          certificate_id: string
+          course_id?: string | null
+          course_version: number
+          created_at?: string
+          issued_at?: string
+          pdf_generated_at?: string | null
+          pdf_uri?: string | null
+          pillar_scope: string
+          qr_verify_url?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          status?: Database["public"]["Enums"]["certificate_status_type"] | null
+          user_id?: string | null
+          verification_code: string
+          workload_minutes: number
+        }
+        Update: {
+          attempt_id?: string | null
+          certificate_id?: string
+          course_id?: string | null
+          course_version?: number
+          created_at?: string
+          issued_at?: string
+          pdf_generated_at?: string | null
+          pdf_uri?: string | null
+          pillar_scope?: string
+          qr_verify_url?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          status?: Database["public"]["Enums"]["certificate_status_type"] | null
+          user_id?: string | null
+          verification_code?: string
+          workload_minutes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lms_certificates_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "exam_attempts"
+            referencedColumns: ["attempt_id"]
+          },
+          {
+            foreignKeyName: "lms_certificates_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "lms_courses"
+            referencedColumns: ["course_id"]
+          },
+        ]
+      }
+      lms_courses: {
+        Row: {
+          course_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          learning_objectives: string[] | null
+          level: number
+          org_id: string | null
+          prerequisite_text: string | null
+          primary_pillar: string
+          published_at: string | null
+          status: Database["public"]["Enums"]["course_status_type"]
+          title: string
+          updated_at: string
+          version: number
+          workload_minutes: number | null
+        }
+        Insert: {
+          course_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          learning_objectives?: string[] | null
+          level: number
+          org_id?: string | null
+          prerequisite_text?: string | null
+          primary_pillar: string
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["course_status_type"]
+          title: string
+          updated_at?: string
+          version?: number
+          workload_minutes?: number | null
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          learning_objectives?: string[] | null
+          level?: number
+          org_id?: string | null
+          prerequisite_text?: string | null
+          primary_pillar?: string
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["course_status_type"]
+          title?: string
+          updated_at?: string
+          version?: number
+          workload_minutes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lms_courses_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lms_enrollments: {
+        Row: {
+          completed_at: string | null
+          course_id: string | null
+          course_version: number
+          created_at: string
+          enrollment_id: string
+          last_accessed_at: string | null
+          progress_pct: number | null
+          started_at: string
+          status: Database["public"]["Enums"]["enrollment_status_type"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          course_id?: string | null
+          course_version?: number
+          created_at?: string
+          enrollment_id?: string
+          last_accessed_at?: string | null
+          progress_pct?: number | null
+          started_at?: string
+          status?: Database["public"]["Enums"]["enrollment_status_type"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          course_id?: string | null
+          course_version?: number
+          created_at?: string
+          enrollment_id?: string
+          last_accessed_at?: string | null
+          progress_pct?: number | null
+          started_at?: string
+          status?: Database["public"]["Enums"]["enrollment_status_type"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lms_enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "lms_courses"
+            referencedColumns: ["course_id"]
+          },
+        ]
+      }
+      lms_lesson_progress: {
+        Row: {
+          completed_at: string | null
+          last_accessed_at: string | null
+          lesson_id: string
+          progress_pct: number | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["lesson_progress_status"]
+          time_spent_minutes: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          last_accessed_at?: string | null
+          lesson_id: string
+          progress_pct?: number | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["lesson_progress_status"]
+          time_spent_minutes?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          last_accessed_at?: string | null
+          lesson_id?: string
+          progress_pct?: number | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["lesson_progress_status"]
+          time_spent_minutes?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lms_lesson_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lms_lessons"
+            referencedColumns: ["lesson_id"]
+          },
+        ]
+      }
+      lms_lessons: {
+        Row: {
+          content_text: string | null
+          created_at: string
+          description: string | null
+          estimated_minutes: number | null
+          lesson_id: string
+          lesson_type: Database["public"]["Enums"]["lesson_type"]
+          module_id: string | null
+          order_index: number
+          slides_url: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          content_text?: string | null
+          created_at?: string
+          description?: string | null
+          estimated_minutes?: number | null
+          lesson_id?: string
+          lesson_type: Database["public"]["Enums"]["lesson_type"]
+          module_id?: string | null
+          order_index: number
+          slides_url?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          content_text?: string | null
+          created_at?: string
+          description?: string | null
+          estimated_minutes?: number | null
+          lesson_id?: string
+          lesson_type?: Database["public"]["Enums"]["lesson_type"]
+          module_id?: string | null
+          order_index?: number
+          slides_url?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lms_lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "lms_modules"
+            referencedColumns: ["module_id"]
+          },
+        ]
+      }
+      lms_modules: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          description: string | null
+          module_id: string
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          description?: string | null
+          module_id?: string
+          order_index: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          description?: string | null
+          module_id?: string
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lms_modules_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "lms_courses"
+            referencedColumns: ["course_id"]
+          },
+        ]
+      }
+      lms_roles: {
+        Row: {
+          created_at: string
+          default_max_level: number | null
+          description: string | null
+          name: Database["public"]["Enums"]["lms_role_name"]
+          permissions: Json | null
+          role_id: string
+        }
+        Insert: {
+          created_at?: string
+          default_max_level?: number | null
+          description?: string | null
+          name: Database["public"]["Enums"]["lms_role_name"]
+          permissions?: Json | null
+          role_id?: string
+        }
+        Update: {
+          created_at?: string
+          default_max_level?: number | null
+          description?: string | null
+          name?: Database["public"]["Enums"]["lms_role_name"]
+          permissions?: Json | null
+          role_id?: string
+        }
+        Relationships: []
+      }
+      lms_track_courses: {
+        Row: {
+          course_id: string
+          is_optional: boolean | null
+          order_index: number
+          track_id: string
+        }
+        Insert: {
+          course_id: string
+          is_optional?: boolean | null
+          order_index: number
+          track_id: string
+        }
+        Update: {
+          course_id?: string
+          is_optional?: boolean | null
+          order_index?: number
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lms_track_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "lms_courses"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "lms_track_courses_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "lms_tracks"
+            referencedColumns: ["track_id"]
+          },
+        ]
+      }
+      lms_tracks: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          level: number
+          org_id: string | null
+          pillar_scope: Database["public"]["Enums"]["pillar_scope_type"]
+          status: Database["public"]["Enums"]["track_status_type"]
+          title: string
+          total_workload_minutes: number | null
+          track_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          level: number
+          org_id?: string | null
+          pillar_scope: Database["public"]["Enums"]["pillar_scope_type"]
+          status?: Database["public"]["Enums"]["track_status_type"]
+          title: string
+          total_workload_minutes?: number | null
+          track_id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          level?: number
+          org_id?: string | null
+          pillar_scope?: Database["public"]["Enums"]["pillar_scope_type"]
+          status?: Database["public"]["Enums"]["track_status_type"]
+          title?: string
+          total_workload_minutes?: number | null
+          track_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lms_tracks_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lms_user_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          lms_role_id: string | null
+          max_level: number
+          org_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lms_role_id?: string | null
+          max_level?: number
+          org_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lms_role_id?: string | null
+          max_level?: number
+          org_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lms_user_profiles_lms_role_id_fkey"
+            columns: ["lms_role_id"]
+            isOneToOne: false
+            referencedRelation: "lms_roles"
+            referencedColumns: ["role_id"]
+          },
+          {
+            foreignKeyName: "lms_user_profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ondemand_output_sources: {
+        Row: {
+          content_id: string
+          output_id: string
+          source_locator: string
+          usage_context: string | null
+        }
+        Insert: {
+          content_id: string
+          output_id: string
+          source_locator: string
+          usage_context?: string | null
+        }
+        Update: {
+          content_id?: string
+          output_id?: string
+          source_locator?: string
+          usage_context?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ondemand_output_sources_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["content_id"]
+          },
+          {
+            foreignKeyName: "ondemand_output_sources_output_id_fkey"
+            columns: ["output_id"]
+            isOneToOne: false
+            referencedRelation: "ondemand_outputs"
+            referencedColumns: ["output_id"]
+          },
+        ]
+      }
+      ondemand_outputs: {
+        Row: {
+          created_at: string
+          description: string | null
+          file_uri: string | null
+          output_id: string
+          output_type: Database["public"]["Enums"]["ondemand_output_type"]
+          payload: Json
+          request_id: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          file_uri?: string | null
+          output_id?: string
+          output_type: Database["public"]["Enums"]["ondemand_output_type"]
+          payload: Json
+          request_id?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          file_uri?: string | null
+          output_id?: string
+          output_type?: Database["public"]["Enums"]["ondemand_output_type"]
+          payload?: Json
+          request_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ondemand_outputs_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "ondemand_requests"
+            referencedColumns: ["request_id"]
+          },
+        ]
+      }
+      ondemand_requests: {
+        Row: {
+          additional_context: string | null
+          context_type:
+            | Database["public"]["Enums"]["ondemand_context_type"]
+            | null
+          created_at: string
+          desired_level: number | null
+          desired_pillar: string | null
+          error_message: string | null
+          goal_type: Database["public"]["Enums"]["ondemand_goal_type"]
+          learning_goals: string[] | null
+          org_id: string | null
+          processing_time_seconds: number | null
+          request_id: string
+          specific_topics: string[] | null
+          status: Database["public"]["Enums"]["ondemand_status_type"] | null
+          topic_text: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          additional_context?: string | null
+          context_type?:
+            | Database["public"]["Enums"]["ondemand_context_type"]
+            | null
+          created_at?: string
+          desired_level?: number | null
+          desired_pillar?: string | null
+          error_message?: string | null
+          goal_type: Database["public"]["Enums"]["ondemand_goal_type"]
+          learning_goals?: string[] | null
+          org_id?: string | null
+          processing_time_seconds?: number | null
+          request_id?: string
+          specific_topics?: string[] | null
+          status?: Database["public"]["Enums"]["ondemand_status_type"] | null
+          topic_text: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          additional_context?: string | null
+          context_type?:
+            | Database["public"]["Enums"]["ondemand_context_type"]
+            | null
+          created_at?: string
+          desired_level?: number | null
+          desired_pillar?: string | null
+          error_message?: string | null
+          goal_type?: Database["public"]["Enums"]["ondemand_goal_type"]
+          learning_goals?: string[] | null
+          org_id?: string | null
+          processing_time_seconds?: number | null
+          request_id?: string
+          specific_topics?: string[] | null
+          status?: Database["public"]["Enums"]["ondemand_status_type"] | null
+          topic_text?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ondemand_requests_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2531,6 +3767,157 @@ export type Database = {
           },
         ]
       }
+      quiz_content_sources: {
+        Row: {
+          content_id: string
+          quiz_id: string
+          source_locator: string
+        }
+        Insert: {
+          content_id: string
+          quiz_id: string
+          source_locator: string
+        }
+        Update: {
+          content_id?: string
+          quiz_id?: string
+          source_locator?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_content_sources_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["content_id"]
+          },
+          {
+            foreignKeyName: "quiz_content_sources_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_questions"
+            referencedColumns: ["quiz_id"]
+          },
+        ]
+      }
+      quiz_options: {
+        Row: {
+          created_at: string
+          is_correct: boolean
+          option_id: string
+          option_label: string
+          option_text: string
+          quiz_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          is_correct?: boolean
+          option_id?: string
+          option_label: string
+          option_text: string
+          quiz_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          is_correct?: boolean
+          option_id?: string
+          option_label?: string
+          option_text?: string
+          quiz_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_options_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_questions"
+            referencedColumns: ["quiz_id"]
+          },
+        ]
+      }
+      quiz_questions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          difficulty: number | null
+          discrimination_index: number | null
+          explanation: string | null
+          is_active: boolean | null
+          level: number
+          origin: Database["public"]["Enums"]["quiz_origin_type"]
+          pillar: string
+          question_type: Database["public"]["Enums"]["question_type"]
+          quiz_id: string
+          stem: string
+          theme: string | null
+          updated_at: string
+          validated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          difficulty?: number | null
+          discrimination_index?: number | null
+          explanation?: string | null
+          is_active?: boolean | null
+          level: number
+          origin?: Database["public"]["Enums"]["quiz_origin_type"]
+          pillar: string
+          question_type?: Database["public"]["Enums"]["question_type"]
+          quiz_id?: string
+          stem: string
+          theme?: string | null
+          updated_at?: string
+          validated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          difficulty?: number | null
+          discrimination_index?: number | null
+          explanation?: string | null
+          is_active?: boolean | null
+          level?: number
+          origin?: Database["public"]["Enums"]["quiz_origin_type"]
+          pillar?: string
+          question_type?: Database["public"]["Enums"]["question_type"]
+          quiz_id?: string
+          stem?: string
+          theme?: string | null
+          updated_at?: string
+          validated_by?: string | null
+        }
+        Relationships: []
+      }
+      quiz_usage_history: {
+        Row: {
+          last_used_at: string
+          quiz_id: string
+          times_used: number
+          user_id: string
+        }
+        Insert: {
+          last_used_at: string
+          quiz_id: string
+          times_used?: number
+          user_id: string
+        }
+        Update: {
+          last_used_at?: string
+          quiz_id?: string
+          times_used?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_usage_history_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_questions"
+            referencedColumns: ["quiz_id"]
+          },
+        ]
+      }
       recommendations: {
         Row: {
           assessment_id: string
@@ -2728,6 +4115,76 @@ export type Database = {
           },
         ]
       }
+      track_instance_items: {
+        Row: {
+          item_id: string
+          item_type: string
+          order_index: number
+          track_instance_id: string
+        }
+        Insert: {
+          item_id: string
+          item_type: string
+          order_index: number
+          track_instance_id: string
+        }
+        Update: {
+          item_id?: string
+          item_type?: string
+          order_index?: number
+          track_instance_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_instance_items_track_instance_id_fkey"
+            columns: ["track_instance_id"]
+            isOneToOne: false
+            referencedRelation: "track_instances"
+            referencedColumns: ["track_instance_id"]
+          },
+        ]
+      }
+      track_instances: {
+        Row: {
+          created_at: string
+          description: string | null
+          level: number
+          pillar_scope: string
+          request_id: string | null
+          title: string
+          track_instance_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          level: number
+          pillar_scope: string
+          request_id?: string | null
+          title: string
+          track_instance_id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          level?: number
+          pillar_scope?: string
+          request_id?: string | null
+          title?: string
+          track_instance_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_instances_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "ondemand_requests"
+            referencedColumns: ["request_id"]
+          },
+        ]
+      }
       traveler_profiles: {
         Row: {
           created_at: string
@@ -2885,6 +4342,18 @@ export type Database = {
         Args: { _role: string; _system_access: string; _user_id: string }
         Returns: boolean
       }
+      create_lms_audit_log: {
+        Args: {
+          p_action: string
+          p_entity_id: string
+          p_entity_type: string
+          p_metadata?: Json
+          p_new_values?: Json
+          p_old_values?: Json
+        }
+        Returns: string
+      }
+      generate_certificate_id: { Args: never; Returns: string }
       get_effective_org_id: { Args: never; Returns: string }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
@@ -2910,19 +4379,78 @@ export type Database = {
     Enums: {
       app_role: "ADMIN" | "ANALYST" | "VIEWER" | "ESTUDANTE" | "PROFESSOR"
       assessment_status: "DRAFT" | "DATA_READY" | "CALCULATED"
+      certificate_status_type: "active" | "revoked" | "expired"
       collection_type: "AUTOMATICA" | "MANUAL" | "ESTIMADA"
+      content_status: "draft" | "validated" | "published" | "archived"
+      content_type:
+        | "BOOK"
+        | "BOOK_CHAPTER"
+        | "ARTICLE"
+        | "LIVE"
+        | "LECTURE"
+        | "SPEECH"
+        | "VIDEO"
+        | "INTERVIEW"
+        | "THESIS"
       course_level: "BASICO" | "INTERMEDIARIO" | "AVANCADO"
+      course_status_type: "draft" | "published" | "archived"
       data_source: "IBGE" | "CADASTUR" | "PESQUISA_LOCAL" | "MANUAL" | "OUTRO"
+      enrollment_status_type: "active" | "completed" | "dropped" | "suspended"
+      exam_result_type: "passed" | "failed" | "pending"
+      exam_status_type:
+        | "generated"
+        | "started"
+        | "submitted"
+        | "expired"
+        | "voided"
       external_collection_method: "AUTOMATIC" | "BATCH" | "MANUAL"
+      grading_mode_type: "automatic" | "hybrid" | "manual"
       indicator_direction: "HIGH_IS_BETTER" | "LOW_IS_BETTER"
+      lesson_progress_status: "not_started" | "in_progress" | "completed"
+      lesson_type: "video" | "text" | "interactive" | "quiz"
       live_type: "primary" | "case" | "complementary"
+      lms_role_name:
+        | "STUDENT"
+        | "TEACHER"
+        | "RESEARCHER"
+        | "PUBLIC_MANAGER"
+        | "ENTREPRENEUR"
+        | "CONSULTANT"
+        | "INSTITUTIONAL_ADMIN"
+        | "PLATFORM_ADMIN"
       normalization_type: "MIN_MAX" | "BANDS" | "BINARY"
+      ondemand_context_type: "academic" | "institutional" | "professional"
+      ondemand_goal_type:
+        | "course"
+        | "track"
+        | "lesson_plan"
+        | "tcc_outline"
+        | "thesis_outline"
+        | "training_plan"
+      ondemand_output_type:
+        | "track_instance"
+        | "course_instance"
+        | "lesson_plan"
+        | "tcc_outline"
+        | "thesis_outline"
+        | "training_plan"
+      ondemand_status_type:
+        | "received"
+        | "validated"
+        | "generating"
+        | "generated"
+        | "rejected"
+        | "failed"
+      pillar_scope_type: "RA" | "OE" | "AO" | "INTEGRATED"
       pillar_type: "RA" | "OE" | "AO"
+      question_type: "multiple_choice" | "true_false" | "short_answer"
+      quiz_origin_type: "existing" | "generated" | "imported"
       recommendation_entity_type: "course" | "live" | "track"
       severity_type: "CRITICO" | "MODERADO" | "BOM"
       system_access_type: "ERP" | "EDU"
       target_agent: "GESTORES" | "TECNICOS" | "TRADE"
       territorial_interpretation: "ESTRUTURAL" | "GESTAO" | "ENTREGA"
+      track_status_type: "draft" | "published" | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3052,19 +4580,84 @@ export const Constants = {
     Enums: {
       app_role: ["ADMIN", "ANALYST", "VIEWER", "ESTUDANTE", "PROFESSOR"],
       assessment_status: ["DRAFT", "DATA_READY", "CALCULATED"],
+      certificate_status_type: ["active", "revoked", "expired"],
       collection_type: ["AUTOMATICA", "MANUAL", "ESTIMADA"],
+      content_status: ["draft", "validated", "published", "archived"],
+      content_type: [
+        "BOOK",
+        "BOOK_CHAPTER",
+        "ARTICLE",
+        "LIVE",
+        "LECTURE",
+        "SPEECH",
+        "VIDEO",
+        "INTERVIEW",
+        "THESIS",
+      ],
       course_level: ["BASICO", "INTERMEDIARIO", "AVANCADO"],
+      course_status_type: ["draft", "published", "archived"],
       data_source: ["IBGE", "CADASTUR", "PESQUISA_LOCAL", "MANUAL", "OUTRO"],
+      enrollment_status_type: ["active", "completed", "dropped", "suspended"],
+      exam_result_type: ["passed", "failed", "pending"],
+      exam_status_type: [
+        "generated",
+        "started",
+        "submitted",
+        "expired",
+        "voided",
+      ],
       external_collection_method: ["AUTOMATIC", "BATCH", "MANUAL"],
+      grading_mode_type: ["automatic", "hybrid", "manual"],
       indicator_direction: ["HIGH_IS_BETTER", "LOW_IS_BETTER"],
+      lesson_progress_status: ["not_started", "in_progress", "completed"],
+      lesson_type: ["video", "text", "interactive", "quiz"],
       live_type: ["primary", "case", "complementary"],
+      lms_role_name: [
+        "STUDENT",
+        "TEACHER",
+        "RESEARCHER",
+        "PUBLIC_MANAGER",
+        "ENTREPRENEUR",
+        "CONSULTANT",
+        "INSTITUTIONAL_ADMIN",
+        "PLATFORM_ADMIN",
+      ],
       normalization_type: ["MIN_MAX", "BANDS", "BINARY"],
+      ondemand_context_type: ["academic", "institutional", "professional"],
+      ondemand_goal_type: [
+        "course",
+        "track",
+        "lesson_plan",
+        "tcc_outline",
+        "thesis_outline",
+        "training_plan",
+      ],
+      ondemand_output_type: [
+        "track_instance",
+        "course_instance",
+        "lesson_plan",
+        "tcc_outline",
+        "thesis_outline",
+        "training_plan",
+      ],
+      ondemand_status_type: [
+        "received",
+        "validated",
+        "generating",
+        "generated",
+        "rejected",
+        "failed",
+      ],
+      pillar_scope_type: ["RA", "OE", "AO", "INTEGRATED"],
       pillar_type: ["RA", "OE", "AO"],
+      question_type: ["multiple_choice", "true_false", "short_answer"],
+      quiz_origin_type: ["existing", "generated", "imported"],
       recommendation_entity_type: ["course", "live", "track"],
       severity_type: ["CRITICO", "MODERADO", "BOM"],
       system_access_type: ["ERP", "EDU"],
       target_agent: ["GESTORES", "TECNICOS", "TRADE"],
       territorial_interpretation: ["ESTRUTURAL", "GESTAO", "ENTREGA"],
+      track_status_type: ["draft", "published", "archived"],
     },
   },
 } as const
