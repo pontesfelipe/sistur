@@ -67,11 +67,15 @@ import {
   Link as LinkIcon,
   Play,
   Shield,
-  Paperclip
+  Paperclip,
+  ClipboardCheck,
+  Award
 } from 'lucide-react';
 import { useAdminTrainings, useAdminTrainingMutations, TrainingFormData } from '@/hooks/useEduAdmin';
 import { TrainingAccessManager } from '@/components/admin/TrainingAccessManager';
 import { TrainingMaterialsManager, TrainingMaterial } from '@/components/admin/TrainingMaterialsManager';
+import { ExamRulesetManager } from '@/components/admin/ExamRulesetManager';
+import { CertificateStatsPanel } from '@/components/admin/CertificateStatsPanel';
 
 type PillarType = 'RA' | 'OE' | 'AO';
 type TrainingType = 'course' | 'live';
@@ -146,6 +150,7 @@ const defaultFormData: FormData = {
 };
 
 export default function AdminCursos() {
+  const [mainTab, setMainTab] = useState<'trainings' | 'certificates'>('trainings');
   const { data: trainings, isLoading } = useAdminTrainings();
   const { createTraining, updateTraining, archiveTraining, publishTraining, deleteTraining } = useAdminTrainingMutations();
   
@@ -326,9 +331,21 @@ export default function AdminCursos() {
 
   return (
     <AppLayout title="Administração de Treinamentos" subtitle="Gerencie o catálogo SISTUR EDU">
-      <div className="space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as 'trainings' | 'certificates')} className="space-y-6">
+        <TabsList className="w-full max-w-md">
+          <TabsTrigger value="trainings" className="gap-2 flex-1">
+            <GraduationCap className="h-4 w-4" />
+            Treinamentos
+          </TabsTrigger>
+          <TabsTrigger value="certificates" className="gap-2 flex-1">
+            <Award className="h-4 w-4" />
+            Certificados
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="trainings" className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card>
             <CardContent className="p-4">
               <div className="text-2xl font-bold">{stats.total}</div>
@@ -618,13 +635,17 @@ export default function AdminCursos() {
 
             <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto pr-2 space-y-4">
               <Tabs defaultValue="basic" className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="basic">Básico</TabsTrigger>
                   <TabsTrigger value="content">Conteúdo</TabsTrigger>
                   <TabsTrigger value="media">Mídia</TabsTrigger>
                   <TabsTrigger value="materials">
                     <Paperclip className="h-3 w-3 mr-1" />
                     Materiais
+                  </TabsTrigger>
+                  <TabsTrigger value="exam" disabled={!editingTraining}>
+                    <ClipboardCheck className="h-3 w-3 mr-1" />
+                    Avaliação
                   </TabsTrigger>
                   <TabsTrigger value="access" disabled={!editingTraining}>
                     <Shield className="h-3 w-3 mr-1" />
@@ -863,6 +884,20 @@ export default function AdminCursos() {
                   />
                 </TabsContent>
 
+                <TabsContent value="exam" className="space-y-4 mt-4">
+                  {editingTraining ? (
+                    <ExamRulesetManager 
+                      trainingId={editingTraining.training_id} 
+                      trainingTitle={editingTraining.title}
+                      pillar={editingTraining.pillar}
+                    />
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      Salve o treinamento primeiro para configurar regras de exame.
+                    </div>
+                  )}
+                </TabsContent>
+
                 <TabsContent value="access" className="space-y-4 mt-4">
                   {editingTraining ? (
                     <TrainingAccessManager 
@@ -943,7 +978,12 @@ export default function AdminCursos() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="certificates" className="space-y-6">
+          <CertificateStatsPanel />
+        </TabsContent>
+      </Tabs>
     </AppLayout>
   );
 }
