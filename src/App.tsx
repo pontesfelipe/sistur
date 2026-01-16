@@ -32,6 +32,7 @@ import Relatorios from "./pages/Relatorios";
 import NovaRodada from "./pages/NovaRodada";
 import FAQ from "./pages/FAQ";
 import Metodologia from "./pages/Metodologia";
+import BeniChat from "./pages/BeniChat";
 import Ajuda from "./pages/Ajuda";
 import ERPDashboard from "./pages/ERPDashboard";
 import ERPIntegration from "./pages/ERPIntegration";
@@ -235,6 +236,14 @@ const App = () => {
                   element={
                     <ProtectedRoute redirectStudentsToEdu={false}>
                       <Metodologia />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/professor-beni"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
+                      <BeniChat />
                     </ProtectedRoute>
                   }
                 />

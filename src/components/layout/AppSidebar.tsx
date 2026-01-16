@@ -20,6 +20,7 @@ import {
   BookMarked,
   Activity,
   FileQuestion,
+  Bot,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,7 @@ const navigation: NavItem[] = [
   { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen, requiresProfessor: true },
   { name: 'Banco de Questões', href: '/admin/quizzes', icon: FileQuestion, requiresAdmin: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
+  { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
 ];
 
