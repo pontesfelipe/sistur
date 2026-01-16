@@ -65,7 +65,7 @@ function useContentItems(pillar?: string, contentType?: string) {
         query = query.or(`primary_pillar.eq.${pillar},secondary_pillar.eq.${pillar}`);
       }
       if (contentType && contentType !== 'all') {
-        query = query.eq('content_type', contentType);
+        query = query.eq('content_type', contentType as 'ARTICLE' | 'BOOK' | 'BOOK_CHAPTER' | 'INTERVIEW' | 'LECTURE' | 'LIVE' | 'SPEECH' | 'THESIS' | 'VIDEO');
       }
       
       const { data, error } = await query;
@@ -223,11 +223,11 @@ const ContentRepository = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os tipos</SelectItem>
-                <SelectItem value="book">Livros</SelectItem>
-                <SelectItem value="paper">Artigos</SelectItem>
-                <SelectItem value="thesis">Teses</SelectItem>
-                <SelectItem value="video">Vídeos</SelectItem>
-                <SelectItem value="lecture">Palestras</SelectItem>
+                <SelectItem value="BOOK">Livros</SelectItem>
+                <SelectItem value="ARTICLE">Artigos</SelectItem>
+                <SelectItem value="THESIS">Teses</SelectItem>
+                <SelectItem value="VIDEO">Vídeos</SelectItem>
+                <SelectItem value="LECTURE">Palestras</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -438,7 +438,7 @@ const ContentRepository = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-3xl font-bold">
-                  {stats?.byType.book || 0}
+                  {stats?.byType.BOOK || 0}
                 </CardTitle>
                 <CardDescription className="flex items-center gap-1">
                   <BookMarked className="h-4 w-4" />
@@ -449,7 +449,7 @@ const ContentRepository = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-3xl font-bold">
-                  {stats?.byType.paper || 0}
+                  {stats?.byType.ARTICLE || 0}
                 </CardTitle>
                 <CardDescription className="flex items-center gap-1">
                   <FileText className="h-4 w-4" />
