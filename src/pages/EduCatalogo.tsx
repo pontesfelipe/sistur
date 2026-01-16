@@ -102,6 +102,13 @@ const EduCatalogo = () => {
         </Button>
       </div>
 
+      {/* Personalized Recommendations Section */}
+      {isProfileComplete && (
+        <div className="mb-8">
+          <PersonalizedRecommendationsPanel limit={6} showHeader showEmptyState />
+        </div>
+      )}
+
       {/* Search and Filters */}
       <div className="flex flex-col gap-4 mb-6">
         <div className="relative flex-1">

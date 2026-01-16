@@ -119,7 +119,7 @@ function RecommendationCard({
               <Link 
                 to={isTrack 
                   ? `/edu/trilhas/${recommendation.entity_id}` 
-                  : `/edu/catalogo/${recommendation.entity_id}`
+                  : `/edu/training/${recommendation.entity_id}`
                 }
               >
                 <Button size="sm" variant="ghost" className="h-7 text-xs">
@@ -306,12 +306,10 @@ export function PersonalizedRecommendationsPanel({
 
       {hasMore && (
         <div className="text-center">
-          <Link to="/edu/recomendacoes">
-            <Button variant="outline">
-              Ver todas as {recommendations?.length} recomendações
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+          <Button variant="outline" onClick={() => {}}>
+            Ver todas as {recommendations?.length} recomendações
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       )}
     </div>
