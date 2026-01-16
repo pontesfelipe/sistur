@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 0,
+  minor: 1,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.1.0",
+    date: "2025-01-16",
+    type: "minor" as const,
+    changes: [
+      "Adicionado escopo de visibilidade em Nova Rodada (Organização ou Pessoal)",
+      "Destinos e diagnósticos podem ser compartilhados com a organização ou mantidos privados",
+      "RLS policies atualizadas para respeitar visibilidade"
+    ]
+  },
   {
     version: "1.0.0",
     date: "2025-01-15",

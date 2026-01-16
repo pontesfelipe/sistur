@@ -25,6 +25,7 @@ export function useAssessments() {
       period_start?: string | null;
       period_end?: string | null;
       status?: 'DRAFT' | 'DATA_READY' | 'CALCULATED';
+      visibility?: 'organization' | 'personal';
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
@@ -46,6 +47,8 @@ export function useAssessments() {
           period_end: assessment.period_end || null,
           status: assessment.status || 'DRAFT',
           org_id: profile.org_id,
+          visibility: assessment.visibility || 'organization',
+          creator_user_id: user.id,
         })
         .select('*, destinations(name)')
         .single();
