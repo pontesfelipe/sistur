@@ -8,6 +8,7 @@ export interface UserFeedback {
   user_id: string;
   org_id: string | null;
   feedback_type: 'feature' | 'bug';
+  category: string | null;
   title: string;
   description: string;
   status: 'pending' | 'reviewing' | 'planned' | 'in_progress' | 'completed' | 'rejected';
@@ -50,7 +51,8 @@ export function useUserFeedback() {
   const submitFeedback = async (
     feedbackType: 'feature' | 'bug',
     title: string,
-    description: string
+    description: string,
+    category?: string
   ) => {
     if (!user) {
       toast.error('Você precisa estar logado para enviar feedback');
@@ -61,6 +63,7 @@ export function useUserFeedback() {
       const { error } = await supabase.from('user_feedback').insert({
         user_id: user.id,
         feedback_type: feedbackType,
+        category,
         title,
         description,
         page_url: window.location.pathname,

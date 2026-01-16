@@ -49,6 +49,27 @@ const priorityConfig: Record<UserFeedback['priority'], { label: string; color: s
   critical: { label: 'Crítica', color: 'bg-red-100 text-red-600' },
 };
 
+const categoryLabels: Record<string, string> = {
+  // Feature categories
+  nova_funcionalidade: 'Nova funcionalidade',
+  melhoria_ux: 'Melhoria de UX',
+  integracao: 'Integração',
+  relatorios: 'Relatórios/Dashboards',
+  performance: 'Performance',
+  documentacao: 'Documentação',
+  mobile: 'Mobile/Responsividade',
+  outro_sugestao: 'Outro',
+  // Bug categories
+  erro_visual: 'Erro visual',
+  erro_dados: 'Dados incorretos',
+  erro_login: 'Login/Auth',
+  erro_carregamento: 'Carregamento',
+  erro_funcionalidade: 'Funcionalidade',
+  erro_calculo: 'Cálculo',
+  erro_exportacao: 'Exportação',
+  outro_bug: 'Outro',
+};
+
 function FeedbackItem({ feedback, onUpdate }: { feedback: UserFeedback; onUpdate: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const [adminNotes, setAdminNotes] = useState(feedback.admin_notes || '');
@@ -92,6 +113,11 @@ function FeedbackItem({ feedback, onUpdate }: { feedback: UserFeedback; onUpdate
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium">{feedback.title}</span>
+              {feedback.category && (
+                <Badge variant="secondary" className="text-xs">
+                  {categoryLabels[feedback.category] || feedback.category}
+                </Badge>
+              )}
               <Badge variant="outline" className={statusConfig[feedback.status].color}>
                 <StatusIcon className={`h-3 w-3 mr-1 ${feedback.status === 'in_progress' ? 'animate-spin' : ''}`} />
                 {statusConfig[feedback.status].label}

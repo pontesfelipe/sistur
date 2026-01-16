@@ -4692,6 +4692,7 @@ export type Database = {
       user_feedback: {
         Row: {
           admin_notes: string | null
+          category: string | null
           created_at: string
           description: string
           feedback_type: string
@@ -4707,6 +4708,7 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
+          category?: string | null
           created_at?: string
           description: string
           feedback_type: string
@@ -4722,6 +4724,7 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
+          category?: string | null
           created_at?: string
           description?: string
           feedback_type?: string
