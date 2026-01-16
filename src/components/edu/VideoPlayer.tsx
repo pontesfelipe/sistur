@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Play, Pause, Volume2, VolumeX, Maximize, SkipBack, SkipForward, Lock, AlertCircle } from 'lucide-react';
 import { useEventMutations } from '@/hooks/useEduEnrollments';
 import { useSecureVideoUrl } from '@/hooks/useSecureVideoUrl';
+import { YouTubePlayer } from './YouTubePlayer';
 
 interface VideoPlayerProps {
   /** Direct video URL (for external providers or legacy) */
@@ -203,100 +204,53 @@ export function VideoPlayer({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
   
-  // For external providers (YouTube, Vimeo), render iframe with protection
-  // Note: External videos cannot be fully protected as they're hosted elsewhere
-  if (videoProvider === 'youtube' || videoProvider === 'vimeo') {
-    let embedUrl = videoUrl;
-    
-    if (videoProvider === 'youtube') {
-      // Convert YouTube URL to embed with privacy-enhanced parameters
-      const videoId = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
-      if (videoId) {
-        // Use privacy-enhanced domain and parameters to reduce YouTube branding
-        embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?` + new URLSearchParams({
-          modestbranding: '1',      // Reduce YouTube branding
-          rel: '0',                  // Don't show related videos from other channels
-          showinfo: '0',             // Hide video title bar (legacy, limited effect)
-          iv_load_policy: '3',       // Hide annotations
-          disablekb: '0',            // Keep keyboard controls
-          fs: '1',                   // Allow fullscreen
-          playsinline: '1',          // Play inline on mobile
-        }).toString();
-      }
-    } else if (videoProvider === 'vimeo') {
-      // Convert Vimeo URL to embed with privacy parameters
-      const videoId = videoUrl.match(/vimeo\.com\/(\d+)/)?.[1];
-      if (videoId) {
-        embedUrl = `https://player.vimeo.com/video/${videoId}?` + new URLSearchParams({
-          title: '0',        // Hide title
-          byline: '0',       // Hide author
-          portrait: '0',     // Hide author portrait
-          badge: '0',        // Hide Vimeo badge
-          dnt: '1',          // Do not track
-        }).toString();
-      }
-    }
+  // For YouTube, use the custom player with external controls
+  if (videoProvider === 'youtube') {
+    return (
+      <YouTubePlayer
+        videoUrl={videoUrl}
+        trainingId={trainingId}
+        trailId={trailId}
+        onProgress={onProgress}
+        onComplete={onComplete}
+      />
+    );
+  }
+  
+  // For Vimeo, use iframe with overlay protection
+  if (videoProvider === 'vimeo') {
+    const videoId = videoUrl.match(/vimeo\.com\/(\d+)/)?.[1];
+    const embedUrl = videoId 
+      ? `https://player.vimeo.com/video/${videoId}?` + new URLSearchParams({
+          title: '0',
+          byline: '0',
+          portrait: '0',
+          badge: '0',
+          dnt: '1',
+        }).toString()
+      : videoUrl;
     
     return (
       <Card className="overflow-hidden">
-        {/* Container with overlays to hide YouTube branding */}
         <div 
           className="aspect-video relative overflow-hidden"
           onContextMenu={(e) => e.preventDefault()}
         >
-          {/* Iframe positioned with negative margins to crop YouTube UI */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <iframe
-              src={embedUrl}
-              className="absolute w-[calc(100%+160px)] h-[calc(100%+120px)] -top-[60px] -left-[80px] pointer-events-auto"
-              style={{
-                transform: 'scale(1)',
-                transformOrigin: 'center center',
-              }}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              referrerPolicy="strict-origin-when-cross-origin"
-            />
-          </div>
-          
-          {/* FULL transparent overlay to block ALL right-clicks */}
+          <iframe
+            src={embedUrl}
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+          {/* Overlay to block right-click */}
           <div 
-            className="absolute inset-0 z-30"
+            className="absolute inset-0 z-10"
             onContextMenu={(e) => {
               e.preventDefault();
               e.stopPropagation();
               return false;
             }}
-            style={{ 
-              pointerEvents: 'auto',
-              background: 'transparent',
-            }}
-          />
-          
-          {/* Top bar overlay - covers title, logo, share buttons */}
-          <div 
-            className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black via-black/80 to-transparent z-40"
-            onContextMenu={(e) => e.preventDefault()}
-            aria-hidden="true"
-          />
-          
-          {/* Bottom bar overlay - covers "Watch on YouTube" button */}
-          <div 
-            className="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-black via-black/80 to-transparent z-40"
-            onContextMenu={(e) => e.preventDefault()}
-            aria-hidden="true"
-          />
-          
-          {/* Left edge overlay */}
-          <div 
-            className="absolute top-0 bottom-0 left-0 w-4 bg-black z-40"
-            aria-hidden="true"
-          />
-          
-          {/* Right edge overlay */}
-          <div 
-            className="absolute top-0 bottom-0 right-0 w-4 bg-black z-40"
-            aria-hidden="true"
+            style={{ pointerEvents: 'auto', background: 'transparent' }}
           />
         </div>
       </Card>
