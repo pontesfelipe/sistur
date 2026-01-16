@@ -8,9 +8,10 @@ interface AppLayoutProps {
   children: ReactNode;
   title: string;
   subtitle?: string;
+  actions?: ReactNode;
 }
 
-export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
+export function AppLayout({ children, title, subtitle, actions }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -28,6 +29,7 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
           title={title} 
           subtitle={subtitle} 
           onMobileMenuClick={() => setMobileOpen(true)}
+          actions={actions}
         />
         <main className="p-3 sm:p-4 md:p-6 animate-in fade-in-0 duration-300 ease-out">{children}</main>
       </div>
