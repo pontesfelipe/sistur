@@ -25,18 +25,26 @@ export function useAssessments() {
       period_start?: string | null;
       period_end?: string | null;
       status?: 'DRAFT' | 'DATA_READY' | 'CALCULATED';
-      visibility?: 'organization' | 'personal';
+      visibility?: 'organization' | 'personal' | 'demo';
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('org_id')
+        .select('org_id, viewing_demo_org_id')
         .eq('user_id', user.id)
         .single();
 
       if (!profile) throw new Error('Perfil não encontrado');
+
+      // Determine which org_id to use based on visibility
+      const targetOrgId = assessment.visibility === 'demo' && profile.viewing_demo_org_id
+        ? profile.viewing_demo_org_id
+        : profile.org_id;
+      
+      // For demo visibility, store as 'organization' in the DB
+      const dbVisibility = assessment.visibility === 'demo' ? 'organization' : (assessment.visibility || 'organization');
 
       const { data, error } = await supabase
         .from('assessments')
@@ -46,8 +54,8 @@ export function useAssessments() {
           period_start: assessment.period_start || null,
           period_end: assessment.period_end || null,
           status: assessment.status || 'DRAFT',
-          org_id: profile.org_id,
-          visibility: assessment.visibility || 'organization',
+          org_id: targetOrgId,
+          visibility: dbVisibility,
           creator_user_id: user.id,
         })
         .select('*, destinations(name)')

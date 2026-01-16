@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   MapPin, 
   ClipboardList, 
-  Database, 
+  Database as DatabaseIcon, 
   FileText, 
   CheckCircle2,
   ArrowRight,
@@ -19,6 +19,7 @@ import {
   Calculator,
   Users,
   User,
+  Eye,
 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
@@ -29,9 +30,12 @@ import { toast } from '@/hooks/use-toast';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { ExternalIndicatorValue, useCreateDataSnapshot } from '@/hooks/useOfficialData';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+
+type VisibilityType = 'organization' | 'personal' | 'demo';
 
 interface WorkflowStep {
   id: number;
@@ -69,7 +73,7 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
     id: 5,
     title: 'Preenchimento',
     description: 'Complementar dados manualmente',
-    icon: Database,
+    icon: DatabaseIcon,
   },
   {
     id: 6,
@@ -88,8 +92,9 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
 export default function NovaRodada() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isViewingDemoData, profile: userProfile } = useProfile();
   const [currentStep, setCurrentStep] = useState(1);
-  const [visibility, setVisibility] = useState<'organization' | 'personal'>('organization');
+  const [visibility, setVisibility] = useState<VisibilityType>('organization');
   const [destinationMode, setDestinationMode] = useState<'select' | 'create'>('select');
   const [selectedDestination, setSelectedDestination] = useState<string>('');
   const [isDestinationFormOpen, setIsDestinationFormOpen] = useState(false);
@@ -364,9 +369,18 @@ export default function NovaRodada() {
                   </p>
                 </div>
                 
+                {isViewingDemoData && (
+                  <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+                    <p className="text-sm text-amber-800 dark:text-amber-200 flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      <strong>Modo Demo ativo:</strong> Você pode criar dados no ambiente de demonstração.
+                    </p>
+                  </div>
+                )}
+                
                 <RadioGroup
                   value={visibility}
-                  onValueChange={(value) => setVisibility(value as 'organization' | 'personal')}
+                  onValueChange={(value) => setVisibility(value as VisibilityType)}
                   className="space-y-4"
                 >
                   <div className={cn(
@@ -406,6 +420,28 @@ export default function NovaRodada() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Demo option - only shown when in demo mode */}
+                  {isViewingDemoData && (
+                    <div className={cn(
+                      "flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all",
+                      visibility === 'demo' 
+                        ? "border-amber-500 bg-amber-50 dark:bg-amber-950/30" 
+                        : "border-amber-200 dark:border-amber-800 hover:border-amber-400"
+                    )}>
+                      <RadioGroupItem value="demo" id="demo" className="mt-1" />
+                      <div className="flex-1">
+                        <Label htmlFor="demo" className="flex items-center gap-2 cursor-pointer font-medium">
+                          <Eye className="h-5 w-5 text-amber-600" />
+                          Ambiente de Demonstração
+                        </Label>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Os dados serão criados no ambiente de demonstração e ficarão disponíveis 
+                          apenas quando o modo demo estiver ativo. Ideal para testes e aprendizado.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </RadioGroup>
               </div>
             )}
