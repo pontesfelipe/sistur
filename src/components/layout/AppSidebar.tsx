@@ -7,7 +7,7 @@ import {
   MapPin,
   ClipboardList,
   BarChart3,
-  Upload,
+  
   GraduationCap,
   FileText,
   Settings,
@@ -42,7 +42,6 @@ const navigation: NavItem[] = [
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
   { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
   { name: 'Indicadores', href: '/indicadores', icon: BarChart3, requiresERP: true },
-  { name: 'Importações', href: '/importacoes', icon: Upload, requiresERP: true },
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
   { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen, requiresProfessor: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
