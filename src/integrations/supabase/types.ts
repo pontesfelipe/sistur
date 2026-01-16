@@ -317,6 +317,122 @@ export type Database = {
           },
         ]
       }
+      certificates: {
+        Row: {
+          certificate_id: string
+          certificate_type: string
+          course_id: string | null
+          created_at: string
+          description: string | null
+          exam_id: string | null
+          expires_at: string | null
+          hours_completed: number | null
+          id: string
+          issued_at: string
+          metadata: Json | null
+          org_id: string | null
+          pdf_url: string | null
+          pillar: string | null
+          qr_data: string | null
+          revoked_at: string | null
+          revoked_reason: string | null
+          score_pct: number | null
+          status: string
+          title: string
+          track_id: string | null
+          training_id: string | null
+          user_email: string | null
+          user_id: string
+          user_name: string
+          verification_code: string
+        }
+        Insert: {
+          certificate_id: string
+          certificate_type?: string
+          course_id?: string | null
+          created_at?: string
+          description?: string | null
+          exam_id?: string | null
+          expires_at?: string | null
+          hours_completed?: number | null
+          id?: string
+          issued_at?: string
+          metadata?: Json | null
+          org_id?: string | null
+          pdf_url?: string | null
+          pillar?: string | null
+          qr_data?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          score_pct?: number | null
+          status?: string
+          title: string
+          track_id?: string | null
+          training_id?: string | null
+          user_email?: string | null
+          user_id: string
+          user_name: string
+          verification_code: string
+        }
+        Update: {
+          certificate_id?: string
+          certificate_type?: string
+          course_id?: string | null
+          created_at?: string
+          description?: string | null
+          exam_id?: string | null
+          expires_at?: string | null
+          hours_completed?: number | null
+          id?: string
+          issued_at?: string
+          metadata?: Json | null
+          org_id?: string | null
+          pdf_url?: string | null
+          pillar?: string | null
+          qr_data?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          score_pct?: number | null
+          status?: string
+          title?: string
+          track_id?: string | null
+          training_id?: string | null
+          user_email?: string | null
+          user_id?: string
+          user_name?: string
+          verification_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "lms_courses"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "certificates_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["exam_id"]
+          },
+          {
+            foreignKeyName: "certificates_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "edu_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_feedback: {
         Row: {
           age_group: string | null
@@ -3891,6 +4007,144 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questionnaire_questions: {
+        Row: {
+          created_at: string
+          mapping_logic: Json | null
+          options: Json | null
+          question_id: string
+          question_text: string
+          question_type: string
+          questionnaire_id: string
+          required: boolean | null
+          sort_order: number | null
+          step_number: number
+        }
+        Insert: {
+          created_at?: string
+          mapping_logic?: Json | null
+          options?: Json | null
+          question_id?: string
+          question_text: string
+          question_type: string
+          questionnaire_id: string
+          required?: boolean | null
+          sort_order?: number | null
+          step_number: number
+        }
+        Update: {
+          created_at?: string
+          mapping_logic?: Json | null
+          options?: Json | null
+          question_id?: string
+          question_text?: string
+          question_type?: string
+          questionnaire_id?: string
+          required?: boolean | null
+          sort_order?: number | null
+          step_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questionnaire_questions_questionnaire_id_fkey"
+            columns: ["questionnaire_id"]
+            isOneToOne: false
+            referencedRelation: "questionnaires"
+            referencedColumns: ["questionnaire_id"]
+          },
+        ]
+      }
+      questionnaire_responses: {
+        Row: {
+          answers: Json
+          computed_recommendations: Json | null
+          created_at: string
+          questionnaire_id: string
+          recommended_course_ids: string[] | null
+          recommended_track_ids: string[] | null
+          response_id: string
+          submitted_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          computed_recommendations?: Json | null
+          created_at?: string
+          questionnaire_id: string
+          recommended_course_ids?: string[] | null
+          recommended_track_ids?: string[] | null
+          response_id?: string
+          submitted_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          computed_recommendations?: Json | null
+          created_at?: string
+          questionnaire_id?: string
+          recommended_course_ids?: string[] | null
+          recommended_track_ids?: string[] | null
+          response_id?: string
+          submitted_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questionnaire_responses_questionnaire_id_fkey"
+            columns: ["questionnaire_id"]
+            isOneToOne: false
+            referencedRelation: "questionnaires"
+            referencedColumns: ["questionnaire_id"]
+          },
+        ]
+      }
+      questionnaires: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          org_id: string | null
+          questionnaire_id: string
+          questionnaire_type: string | null
+          title: string
+          updated_at: string
+          version: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          org_id?: string | null
+          questionnaire_id?: string
+          questionnaire_type?: string | null
+          title: string
+          updated_at?: string
+          version?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          org_id?: string | null
+          questionnaire_id?: string
+          questionnaire_type?: string | null
+          title?: string
+          updated_at?: string
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questionnaires_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
