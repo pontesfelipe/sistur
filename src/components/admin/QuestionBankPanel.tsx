@@ -34,7 +34,9 @@ import {
   FileQuestion,
   BarChart3,
   ListChecks,
+  ClipboardList,
 } from 'lucide-react';
+import { ExamBuilderPanel } from './ExamBuilderPanel';
 import { 
   useQuizQuestions, 
   useQuizMutations,
@@ -240,10 +242,14 @@ export function QuestionBankPanel() {
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full max-w-lg grid-cols-3">
           <TabsTrigger value="questions" className="gap-2">
             <HelpCircle className="h-4 w-4" />
             Questões
+          </TabsTrigger>
+          <TabsTrigger value="builder" className="gap-2">
+            <ClipboardList className="h-4 w-4" />
+            Montar Exame
           </TabsTrigger>
           <TabsTrigger value="stats" className="gap-2">
             <BarChart3 className="h-4 w-4" />
@@ -551,6 +557,11 @@ export function QuestionBankPanel() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* BUILDER TAB */}
+        <TabsContent value="builder" className="space-y-6">
+          <ExamBuilderPanel />
         </TabsContent>
       </Tabs>
 
