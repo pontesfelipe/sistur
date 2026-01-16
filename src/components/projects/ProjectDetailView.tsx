@@ -7,12 +7,18 @@ import {
   useUpdateProject,
   useUpdatePhase,
   useUpdateTask,
+  useDeletePhase,
+  useDeleteTask,
+  useDeleteMilestone,
   PROJECT_STATUS_INFO,
   METHODOLOGY_INFO,
   TASK_STATUS_INFO,
   PRIORITY_INFO,
   ProjectStatus,
   TaskStatus,
+  ProjectPhase,
+  ProjectTask,
+  ProjectMilestone,
 } from '@/hooks/useProjects';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,6 +43,7 @@ import {
   MapPin,
   Milestone,
   Pencil,
+  Plus,
   Target,
   Trash2,
   User,
@@ -46,6 +53,10 @@ import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { EditProjectDialog } from './EditProjectDialog';
 import { DeleteProjectDialog } from './DeleteProjectDialog';
+import { PhaseFormDialog } from './PhaseFormDialog';
+import { TaskFormDialog } from './TaskFormDialog';
+import { MilestoneFormDialog } from './MilestoneFormDialog';
+import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 
 interface ProjectDetailViewProps {
   projectId: string;
@@ -60,10 +71,32 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
   const updateProject = useUpdateProject();
   const updatePhase = useUpdatePhase();
   const updateTask = useUpdateTask();
+  const deletePhase = useDeletePhase();
+  const deleteTask = useDeleteTask();
+  const deleteMilestone = useDeleteMilestone();
 
   const [activeTab, setActiveTab] = useState('overview');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Phase dialogs
+  const [phaseFormOpen, setPhaseFormOpen] = useState(false);
+  const [editingPhase, setEditingPhase] = useState<ProjectPhase | null>(null);
+  const [deletePhaseOpen, setDeletePhaseOpen] = useState(false);
+  const [phaseToDelete, setPhaseToDelete] = useState<ProjectPhase | null>(null);
+
+  // Task dialogs
+  const [taskFormOpen, setTaskFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<ProjectTask | null>(null);
+  const [defaultTaskPhaseId, setDefaultTaskPhaseId] = useState<string | null>(null);
+  const [deleteTaskOpen, setDeleteTaskOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<ProjectTask | null>(null);
+
+  // Milestone dialogs
+  const [milestoneFormOpen, setMilestoneFormOpen] = useState(false);
+  const [editingMilestone, setEditingMilestone] = useState<ProjectMilestone | null>(null);
+  const [deleteMilestoneOpen, setDeleteMilestoneOpen] = useState(false);
+  const [milestoneToDelete, setMilestoneToDelete] = useState<ProjectMilestone | null>(null);
 
   if (loadingProject) {
     return (
@@ -98,6 +131,80 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
 
   const handleTaskStatusChange = (taskId: string, newStatus: TaskStatus) => {
     updateTask.mutate({ id: taskId, updates: { status: newStatus } });
+  };
+
+  // Phase actions
+  const handleAddPhase = () => {
+    setEditingPhase(null);
+    setPhaseFormOpen(true);
+  };
+
+  const handleEditPhase = (phase: ProjectPhase) => {
+    setEditingPhase(phase);
+    setPhaseFormOpen(true);
+  };
+
+  const handleDeletePhaseClick = (phase: ProjectPhase) => {
+    setPhaseToDelete(phase);
+    setDeletePhaseOpen(true);
+  };
+
+  const confirmDeletePhase = async () => {
+    if (phaseToDelete) {
+      await deletePhase.mutateAsync({ id: phaseToDelete.id, projectId });
+      setDeletePhaseOpen(false);
+      setPhaseToDelete(null);
+    }
+  };
+
+  // Task actions
+  const handleAddTask = (phaseId?: string) => {
+    setEditingTask(null);
+    setDefaultTaskPhaseId(phaseId || null);
+    setTaskFormOpen(true);
+  };
+
+  const handleEditTask = (task: ProjectTask) => {
+    setEditingTask(task);
+    setDefaultTaskPhaseId(task.phase_id);
+    setTaskFormOpen(true);
+  };
+
+  const handleDeleteTaskClick = (task: ProjectTask) => {
+    setTaskToDelete(task);
+    setDeleteTaskOpen(true);
+  };
+
+  const confirmDeleteTask = async () => {
+    if (taskToDelete) {
+      await deleteTask.mutateAsync({ id: taskToDelete.id, projectId });
+      setDeleteTaskOpen(false);
+      setTaskToDelete(null);
+    }
+  };
+
+  // Milestone actions
+  const handleAddMilestone = () => {
+    setEditingMilestone(null);
+    setMilestoneFormOpen(true);
+  };
+
+  const handleEditMilestone = (milestone: ProjectMilestone) => {
+    setEditingMilestone(milestone);
+    setMilestoneFormOpen(true);
+  };
+
+  const handleDeleteMilestoneClick = (milestone: ProjectMilestone) => {
+    setMilestoneToDelete(milestone);
+    setDeleteMilestoneOpen(true);
+  };
+
+  const confirmDeleteMilestone = async () => {
+    if (milestoneToDelete) {
+      await deleteMilestone.mutateAsync({ id: milestoneToDelete.id, projectId });
+      setDeleteMilestoneOpen(false);
+      setMilestoneToDelete(null);
+    }
   };
 
   return (
@@ -311,32 +418,51 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
         </TabsContent>
 
         <TabsContent value="phases" className="space-y-4">
+          <div className="flex justify-end">
+            <Button onClick={handleAddPhase}>
+              <Plus className="h-4 w-4 mr-2" />
+              Nova Fase
+            </Button>
+          </div>
           {phases?.map((phase) => (
             <Card key={phase.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <div>
+                  <div className="flex-1">
                     <CardTitle className="text-lg">{phase.name}</CardTitle>
                     {phase.description && (
                       <CardDescription>{phase.description}</CardDescription>
                     )}
                   </div>
-                  <Select
-                    value={phase.status}
-                    onValueChange={(v) =>
-                      updatePhase.mutate({ id: phase.id, updates: { status: v as any } })
-                    }
-                  >
-                    <SelectTrigger className="w-36">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pendente</SelectItem>
-                      <SelectItem value="in_progress">Em Progresso</SelectItem>
-                      <SelectItem value="completed">Concluído</SelectItem>
-                      <SelectItem value="blocked">Bloqueado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={phase.status}
+                      onValueChange={(v) =>
+                        updatePhase.mutate({ id: phase.id, updates: { status: v as any } })
+                      }
+                    >
+                      <SelectTrigger className="w-36">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pendente</SelectItem>
+                        <SelectItem value="in_progress">Em Progresso</SelectItem>
+                        <SelectItem value="completed">Concluído</SelectItem>
+                        <SelectItem value="blocked">Bloqueado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button variant="ghost" size="icon" onClick={() => handleEditPhase(phase)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => handleDeletePhaseClick(phase)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -348,18 +474,46 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                         key={task.id}
                         task={task}
                         onStatusChange={handleTaskStatusChange}
+                        onEdit={() => handleEditTask(task)}
+                        onDelete={() => handleDeleteTaskClick(task)}
                       />
                     ))}
                   {tasks?.filter((t) => t.phase_id === phase.id).length === 0 && (
                     <p className="text-sm text-muted-foreground">Nenhuma tarefa nesta fase</p>
                   )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => handleAddTask(phase.id)}
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    Adicionar Tarefa
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
+          {(!phases || phases.length === 0) && (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <p className="text-muted-foreground">Nenhuma fase criada</p>
+                <Button variant="outline" className="mt-4" onClick={handleAddPhase}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Criar primeira fase
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="tasks" className="space-y-4">
+          <div className="flex justify-end">
+            <Button onClick={() => handleAddTask()}>
+              <Plus className="h-4 w-4 mr-2" />
+              Nova Tarefa
+            </Button>
+          </div>
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Todas as Tarefas</CardTitle>
@@ -371,6 +525,8 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                     key={task.id}
                     task={task}
                     onStatusChange={handleTaskStatusChange}
+                    onEdit={() => handleEditTask(task)}
+                    onDelete={() => handleDeleteTaskClick(task)}
                   />
                 ))}
                 {(!tasks || tasks.length === 0) && (
@@ -384,6 +540,12 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
         </TabsContent>
 
         <TabsContent value="milestones" className="space-y-4">
+          <div className="flex justify-end">
+            <Button onClick={handleAddMilestone}>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Marco
+            </Button>
+          </div>
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Marcos do Projeto</CardTitle>
@@ -397,7 +559,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                   >
                     <div
                       className={cn(
-                        'w-10 h-10 rounded-full flex items-center justify-center',
+                        'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
                         milestone.status === 'completed' && 'bg-green-100 text-green-600',
                         milestone.status === 'pending' && 'bg-blue-100 text-blue-600',
                         milestone.status === 'missed' && 'bg-red-100 text-red-600'
@@ -405,13 +567,13 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                     >
                       <Milestone className="h-5 w-5" />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <p className="font-medium">{milestone.name}</p>
                       {milestone.description && (
-                        <p className="text-sm text-muted-foreground">{milestone.description}</p>
+                        <p className="text-sm text-muted-foreground truncate">{milestone.description}</p>
                       )}
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <p className="text-sm font-medium">
                         {format(new Date(milestone.target_date), 'dd/MM/yyyy', { locale: ptBR })}
                       </p>
@@ -429,6 +591,19 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                         {milestone.status === 'missed' && 'Atrasado'}
                       </Badge>
                     </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button variant="ghost" size="icon" onClick={() => handleEditMilestone(milestone)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteMilestoneClick(milestone)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
                 {(!milestones || milestones.length === 0) && (
@@ -442,38 +617,90 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
         </TabsContent>
       </Tabs>
 
+      {/* Project Dialogs */}
       <EditProjectDialog
         project={project}
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
       />
-
       <DeleteProjectDialog
         project={project}
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onDeleted={onBack}
       />
+
+      {/* Phase Dialogs */}
+      <PhaseFormDialog
+        projectId={projectId}
+        phase={editingPhase}
+        phasesCount={phases?.length || 0}
+        open={phaseFormOpen}
+        onOpenChange={setPhaseFormOpen}
+      />
+      <DeleteConfirmDialog
+        open={deletePhaseOpen}
+        onOpenChange={setDeletePhaseOpen}
+        title="Excluir Fase"
+        description={`Tem certeza que deseja excluir a fase "${phaseToDelete?.name}"? As tarefas associadas também serão removidas.`}
+        onConfirm={confirmDeletePhase}
+        isPending={deletePhase.isPending}
+      />
+
+      {/* Task Dialogs */}
+      <TaskFormDialog
+        projectId={projectId}
+        phases={phases || []}
+        task={editingTask}
+        defaultPhaseId={defaultTaskPhaseId}
+        open={taskFormOpen}
+        onOpenChange={setTaskFormOpen}
+      />
+      <DeleteConfirmDialog
+        open={deleteTaskOpen}
+        onOpenChange={setDeleteTaskOpen}
+        title="Excluir Tarefa"
+        description={`Tem certeza que deseja excluir a tarefa "${taskToDelete?.title}"?`}
+        onConfirm={confirmDeleteTask}
+        isPending={deleteTask.isPending}
+      />
+
+      {/* Milestone Dialogs */}
+      <MilestoneFormDialog
+        projectId={projectId}
+        milestone={editingMilestone}
+        open={milestoneFormOpen}
+        onOpenChange={setMilestoneFormOpen}
+      />
+      <DeleteConfirmDialog
+        open={deleteMilestoneOpen}
+        onOpenChange={setDeleteMilestoneOpen}
+        title="Excluir Marco"
+        description={`Tem certeza que deseja excluir o marco "${milestoneToDelete?.name}"?`}
+        onConfirm={confirmDeleteMilestone}
+        isPending={deleteMilestone.isPending}
+      />
     </div>
   );
 }
 
 interface TaskRowProps {
-  task: ReturnType<typeof useProjectTasks>['data'] extends (infer T)[] | undefined ? T : never;
+  task: ProjectTask;
   onStatusChange: (taskId: string, status: TaskStatus) => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
-function TaskRow({ task, onStatusChange }: TaskRowProps) {
+function TaskRow({ task, onStatusChange, onEdit, onDelete }: TaskRowProps) {
   if (!task) return null;
 
-  const taskStatusInfo = TASK_STATUS_INFO[task.status];
   const priorityInfo = PRIORITY_INFO[task.priority];
 
   return (
     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-      <div className="flex items-center gap-3 flex-1">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
         <div className={cn('w-2 h-2 rounded-full shrink-0', priorityInfo.color)} />
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="font-medium text-sm truncate">{task.title}</p>
           <div className="flex items-center gap-2 mt-1">
             {task.assignee_name && (
@@ -496,21 +723,34 @@ function TaskRow({ task, onStatusChange }: TaskRowProps) {
           </div>
         </div>
       </div>
-      <Select
-        value={task.status}
-        onValueChange={(v) => onStatusChange(task.id, v as TaskStatus)}
-      >
-        <SelectTrigger className="w-32 h-8">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {Object.entries(TASK_STATUS_INFO).map(([key, info]) => (
-            <SelectItem key={key} value={key}>
-              {info.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex items-center gap-2 shrink-0">
+        <Select
+          value={task.status}
+          onValueChange={(v) => onStatusChange(task.id, v as TaskStatus)}
+        >
+          <SelectTrigger className="w-32 h-8">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(TASK_STATUS_INFO).map(([key, info]) => (
+              <SelectItem key={key} value={key}>
+                {info.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+          <Pencil className="h-3 w-3" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-destructive hover:text-destructive"
+          onClick={onDelete}
+        >
+          <Trash2 className="h-3 w-3" />
+        </Button>
+      </div>
     </div>
   );
 }
