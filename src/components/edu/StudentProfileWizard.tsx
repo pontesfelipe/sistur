@@ -420,7 +420,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
                 Explore os cursos e trilhas sugeridos para você!
               </p>
             </div>
-            <Button onClick={() => navigate('/edu/catalogo')} className="mt-4">
+            <Button onClick={() => navigate('/edu')} className="mt-4">
               <Sparkles className="mr-2 h-4 w-4" />
               Ver Minhas Recomendações
             </Button>
