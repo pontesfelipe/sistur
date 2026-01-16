@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,11 +15,15 @@ import {
   Cog,
   Sparkles,
   BookOpen,
-  RefreshCw
+  RefreshCw,
+  Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 type Message = {
+  id?: string;
   role: 'user' | 'assistant';
   content: string;
 };
@@ -58,11 +62,45 @@ const SUGGESTED_QUESTIONS = [
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/beni-chat`;
 
 export function BeniChatBot({ context }: BeniChatBotProps) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Load messages from database on mount
+  const loadMessages = useCallback(async () => {
+    if (!user) {
+      setIsLoadingHistory(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('beni_chat_messages')
+        .select('id, role, content, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      setMessages(data?.map(m => ({
+        id: m.id,
+        role: m.role as 'user' | 'assistant',
+        content: m.content
+      })) || []);
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadMessages();
+  }, [loadMessages]);
 
   useEffect(() => {
     // Scroll to bottom when messages change
@@ -74,11 +112,56 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
     }
   }, [messages]);
 
+  const saveMessage = async (role: 'user' | 'assistant', content: string): Promise<string | null> => {
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from('beni_chat_messages')
+        .insert({ user_id: user.id, role, content })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+      return data.id;
+    } catch (error) {
+      console.error('Error saving message:', error);
+      return null;
+    }
+  };
+
+  const deleteMessage = async (messageId: string) => {
+    if (!user || !messageId) return;
+
+    try {
+      const { error } = await supabase
+        .from('beni_chat_messages')
+        .delete()
+        .eq('id', messageId);
+
+      if (error) throw error;
+
+      setMessages(prev => prev.filter(m => m.id !== messageId));
+      toast.success('Mensagem deletada');
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      toast.error('Erro ao deletar mensagem');
+    }
+  };
+
   const streamChat = async (userMessage: string) => {
     const userMsg: Message = { role: 'user', content: userMessage };
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
     setInput('');
+
+    // Save user message
+    const userMsgId = await saveMessage('user', userMessage);
+    if (userMsgId) {
+      setMessages(prev => prev.map((m, idx) => 
+        idx === prev.length - 1 ? { ...m, id: userMsgId } : m
+      ));
+    }
 
     try {
       const response = await fetch(CHAT_URL, {
@@ -169,6 +252,16 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
         }
       }
 
+      // Save assistant message after complete
+      if (assistantContent) {
+        const assistantMsgId = await saveMessage('assistant', assistantContent);
+        if (assistantMsgId) {
+          setMessages(prev => prev.map((m, idx) => 
+            idx === prev.length - 1 ? { ...m, id: assistantMsgId } : m
+          ));
+        }
+      }
+
     } catch (error) {
       console.error('Chat error:', error);
       toast.error(error instanceof Error ? error.message : 'Erro ao conectar com o Professor Beni');
@@ -191,10 +284,40 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
     streamChat(text);
   };
 
-  const handleClearChat = () => {
-    setMessages([]);
-    setInput('');
+  const handleClearChat = async () => {
+    if (!user) {
+      setMessages([]);
+      setInput('');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('beni_chat_messages')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setMessages([]);
+      setInput('');
+      toast.success('Histórico limpo');
+    } catch (error) {
+      console.error('Error clearing chat:', error);
+      toast.error('Erro ao limpar histórico');
+    }
   };
+
+  if (isLoadingHistory) {
+    return (
+      <Card className="h-[600px] flex items-center justify-center">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          Carregando histórico...
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="h-[600px] flex flex-col">
@@ -265,8 +388,8 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
             <div className="space-y-4">
               {messages.map((message, idx) => (
                 <div
-                  key={idx}
-                  className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  key={message.id || idx}
+                  className={`flex gap-3 group ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   {message.role === 'assistant' && (
                     <Avatar className="h-8 w-8 shrink-0">
@@ -275,21 +398,43 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
                       </AvatarFallback>
                     </Avatar>
                   )}
-                  <div
-                    className={`rounded-2xl px-4 py-3 max-w-[85%] ${
-                      message.role === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                      {message.content || (
-                        <span className="flex items-center gap-2 text-muted-foreground">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Pensando...
-                        </span>
-                      )}
-                    </p>
+                  <div className="flex items-start gap-1 max-w-[85%]">
+                    {message.role === 'user' && message.id && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => deleteMessage(message.id!)}
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    )}
+                    <div
+                      className={`rounded-2xl px-4 py-3 ${
+                        message.role === 'user'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted'
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                        {message.content || (
+                          <span className="flex items-center gap-2 text-muted-foreground">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Pensando...
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    {message.role === 'assistant' && message.id && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => deleteMessage(message.id!)}
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    )}
                   </div>
                   {message.role === 'user' && (
                     <Avatar className="h-8 w-8 shrink-0">
