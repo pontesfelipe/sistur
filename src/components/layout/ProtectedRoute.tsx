@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useProfile } from '@/hooks/useProfile';
+import { useProfileContext } from '@/contexts/ProfileContext';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
@@ -13,18 +13,17 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true }: Prote
   const { 
     needsOnboarding, 
     awaitingApproval, 
-    loading: profileLoading, 
+    initialized,
     profile,
     isEstudante,
     hasERPAccess,
     isAdmin 
-  } = useProfile();
+  } = useProfileContext();
 
   // Only show loading on initial load, not on navigation between routes
-  const isInitialLoad = loading && user === null;
-  const isProfileInitialLoad = profileLoading && profile === null;
+  const isInitialLoad = (loading && user === null) || (!initialized && profile === null);
 
-  if (isInitialLoad || isProfileInitialLoad) {
+  if (isInitialLoad) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">

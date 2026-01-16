@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { useProfileContext } from '@/contexts/ProfileContext';
 import { Loader2 } from 'lucide-react';
 
 interface AdminRouteProps {
@@ -10,32 +9,10 @@ interface AdminRouteProps {
 
 export function AdminRoute({ children }: AdminRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [checking, setChecking] = useState(true);
+  const { isAdmin, loading: profileLoading, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
 
-  useEffect(() => {
-    const checkAdmin = async () => {
-      if (!user) {
-        setChecking(false);
-        return;
-      }
-
-      const { data } = await supabase.rpc('has_role', {
-        _user_id: user.id,
-        _role: 'ADMIN'
-      });
-
-      setIsAdmin(!!data);
-      setChecking(false);
-    };
-
-    if (!authLoading) {
-      checkAdmin();
-    }
-  }, [user, authLoading]);
-
-  // Only show loading on initial load, not on navigation between routes
-  const isInitialLoad = (authLoading && user === null) || (checking && isAdmin === null);
+  // Only show loading on initial load
+  const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null);
 
   if (isInitialLoad) {
     return (
@@ -53,6 +30,14 @@ export function AdminRoute({ children }: AdminRouteProps) {
 
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  if (needsOnboarding) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  if (awaitingApproval) {
+    return <Navigate to="/pending-approval" replace />;
   }
 
   if (!isAdmin) {
