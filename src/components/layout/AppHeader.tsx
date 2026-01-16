@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Menu, Lock, Database, Settings } from 'lucide-react';
+import { User, Menu, Lock, Database, Settings, MessageSquarePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,8 +24,10 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
+import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface AppHeaderProps {
   title: string;
@@ -115,6 +117,24 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2 md:gap-4">
+          {/* Feedback */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <FeedbackDialog 
+                  trigger={
+                    <Button variant="ghost" size="icon" className="h-9 w-9">
+                      <MessageSquarePlus className="h-5 w-5" />
+                    </Button>
+                  } 
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Enviar feedback</p>
+            </TooltipContent>
+          </Tooltip>
+
           {/* Notifications */}
           <NotificationsDropdown />
 
