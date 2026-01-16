@@ -34,6 +34,8 @@ export interface EduTraining {
   ingestion_source: string | null;
   ingestion_metadata: unknown;
   ingestion_confidence: number | null;
+  // Materials
+  materials: unknown;
 }
 
 export interface IndicatorTrainingMapping {

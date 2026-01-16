@@ -66,10 +66,12 @@ import {
   FileText,
   Link as LinkIcon,
   Play,
-  Shield
+  Shield,
+  Paperclip
 } from 'lucide-react';
 import { useAdminTrainings, useAdminTrainingMutations, TrainingFormData } from '@/hooks/useEduAdmin';
 import { TrainingAccessManager } from '@/components/admin/TrainingAccessManager';
+import { TrainingMaterialsManager, TrainingMaterial } from '@/components/admin/TrainingMaterialsManager';
 
 type PillarType = 'RA' | 'OE' | 'AO';
 type TrainingType = 'course' | 'live';
@@ -121,6 +123,7 @@ interface FormData {
   thumbnail_url: string;
   status: TrainingStatus;
   active: boolean;
+  materials: TrainingMaterial[];
 }
 
 const defaultFormData: FormData = {
@@ -139,6 +142,7 @@ const defaultFormData: FormData = {
   thumbnail_url: '',
   status: 'draft',
   active: true,
+  materials: [],
 };
 
 export default function AdminCursos() {
@@ -174,6 +178,10 @@ export default function AdminCursos() {
 
   const handleOpenEdit = (training: NonNullable<typeof trainings>[number]) => {
     setEditingTraining(training);
+    // Parse materials from training data
+    const existingMaterials: TrainingMaterial[] = Array.isArray(training.materials) 
+      ? (training.materials as TrainingMaterial[])
+      : [];
     setFormData({
       training_id: training.training_id,
       title: training.title,
@@ -190,6 +198,7 @@ export default function AdminCursos() {
       thumbnail_url: training.thumbnail_url || '',
       status: (training.status as TrainingStatus) || 'draft',
       active: training.active ?? true,
+      materials: existingMaterials,
     });
     setIsDialogOpen(true);
   };
@@ -229,6 +238,7 @@ export default function AdminCursos() {
       thumbnail_url: formData.thumbnail_url.trim() || undefined,
       status: formData.status,
       active: formData.active,
+      materials: formData.materials,
     };
 
     if (editingTraining) {
@@ -608,10 +618,14 @@ export default function AdminCursos() {
 
             <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto pr-2 space-y-4">
               <Tabs defaultValue="basic" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="basic">Básico</TabsTrigger>
                   <TabsTrigger value="content">Conteúdo</TabsTrigger>
                   <TabsTrigger value="media">Mídia</TabsTrigger>
+                  <TabsTrigger value="materials">
+                    <Paperclip className="h-3 w-3 mr-1" />
+                    Materiais
+                  </TabsTrigger>
                   <TabsTrigger value="access" disabled={!editingTraining}>
                     <Shield className="h-3 w-3 mr-1" />
                     Acesso
@@ -839,6 +853,14 @@ export default function AdminCursos() {
                       </div>
                     )}
                   </div>
+                </TabsContent>
+
+                <TabsContent value="materials" className="space-y-4 mt-4">
+                  <TrainingMaterialsManager
+                    trainingId={formData.training_id}
+                    materials={formData.materials}
+                    onMaterialsChange={(materials) => setFormData({ ...formData, materials })}
+                  />
                 </TabsContent>
 
                 <TabsContent value="access" className="space-y-4 mt-4">
