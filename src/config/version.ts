@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 5,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.5.2",
+    date: "2026-01-16",
+    type: "patch" as const,
+    changes: [
+      "Iframe do YouTube reposicionado com crop para esconder UI nativa",
+      "Overlays sólidos no topo e rodapé cobrem título, logo, Share e Watch on YouTube",
+      "Bordas pretas nas laterais para esconder elementos cortados",
+      "Bloqueio de clique nas áreas de overlay"
+    ]
+  },
   {
     version: "1.5.1",
     date: "2026-01-16",
