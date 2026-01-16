@@ -3,14 +3,14 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ERPStatsCards } from '@/components/erp/ERPStatsCards';
 import { PillarProgressChart } from '@/components/erp/PillarProgressChart';
 import { CycleEvolutionChart } from '@/components/erp/CycleEvolutionChart';
-import { OverduePlansList } from '@/components/erp/OverduePlansList';
+import { OverdueProjectsList } from '@/components/erp/OverdueProjectsList';
 import { RecentPlansList } from '@/components/erp/RecentPlansList';
 import { ProjectsOverviewCard } from '@/components/erp/ProjectsOverviewCard';
 import { 
   useERPStats, 
   usePillarProgress, 
   useCycleEvolution,
-  useOverduePlans,
+  useOverdueProjects,
   useRecentActionPlans,
   useERPRealtimeUpdates,
   useERPQueryInvalidation,
@@ -35,7 +35,7 @@ export default function ERPDashboard() {
   const { data: cycleEvolution, isLoading: cycleLoading } = useCycleEvolution(
     selectedDestination === 'all' ? undefined : selectedDestination
   );
-  const { data: overduePlans, isLoading: overdueLoading } = useOverduePlans();
+  const { data: overdueProjects, isLoading: overdueLoading } = useOverdueProjects();
   const { data: recentPlans, isLoading: recentLoading } = useRecentActionPlans(10);
   const { data: destinations } = useDestinationsWithAssessments();
   const { data: projectStats, isLoading: projectsLoading } = useProjectStats();
@@ -99,9 +99,9 @@ export default function ERPDashboard() {
 
         {/* Lists */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Overdue Plans */}
-          <OverduePlansList 
-            plans={overduePlans}
+          {/* Overdue Projects */}
+          <OverdueProjectsList 
+            projects={overdueProjects}
             isLoading={overdueLoading}
           />
 
