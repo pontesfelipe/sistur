@@ -310,12 +310,23 @@ export function PersonalizedRecommendationsPanel({
         ))}
       </div>
 
-      {hasMore && (
-        <div className="text-center">
-          <Button variant="outline" onClick={() => setAllOpen(true)}>
-            Ver todas as {recommendations?.length} recomendações
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+      {/* Action buttons */}
+      {recommendations && recommendations.length > 0 && (
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {/* Quick create track button */}
+          {(courses.length + lives.length) > 0 && (
+            <Button onClick={() => setCreateTrackOpen(true)}>
+              <GraduationCap className="mr-2 h-4 w-4" />
+              Criar Trilha com Sugestões
+            </Button>
+          )}
+          
+          {hasMore && (
+            <Button variant="outline" onClick={() => setAllOpen(true)}>
+              Ver todas as {recommendations?.length} recomendações
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
         </div>
       )}
 
