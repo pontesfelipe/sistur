@@ -6,7 +6,7 @@ import {
   LayoutDashboard,
   MapPin,
   ClipboardList,
-  BarChart3,
+  
   GraduationCap,
   FileText,
   Settings,
@@ -44,7 +44,6 @@ const navigation: NavItem[] = [
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
   { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
   { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
-  { name: 'Indicadores', href: '/indicadores', icon: BarChart3, requiresERP: true },
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
