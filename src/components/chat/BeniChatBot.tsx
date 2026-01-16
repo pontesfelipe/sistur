@@ -247,16 +247,16 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
                 Sou o Professor Mario Beni. Posso ajudá-lo a entender a teoria sistêmica 
                 do turismo e como ela se aplica ao seu território.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-md">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
                 {SUGGESTED_QUESTIONS.map((q, idx) => (
                   <Button
                     key={idx}
                     variant="outline"
-                    className="justify-start h-auto py-3 px-4 text-left"
+                    className="justify-start h-auto py-3 px-4 text-left whitespace-normal"
                     onClick={() => handleSuggestion(q.text)}
                   >
                     <q.icon className={`h-4 w-4 mr-2 shrink-0 ${q.color}`} />
-                    <span className="text-sm">{q.text}</span>
+                    <span className="text-sm leading-tight">{q.text}</span>
                   </Button>
                 ))}
               </div>
