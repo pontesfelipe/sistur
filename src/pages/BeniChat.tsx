@@ -50,14 +50,14 @@ export default function BeniChat() {
       title="Professor Beni"
       subtitle="Assistente virtual baseado na metodologia sistêmica do turismo"
     >
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Main Chat */}
-        <div className="lg:col-span-2">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
+        {/* Main Chat - takes full width on mobile */}
+        <div className="lg:col-span-2 min-h-0">
           <BeniChatBot />
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-4">
+        {/* Sidebar - hidden on mobile, shown on desktop */}
+        <div className="hidden lg:block space-y-4">
           {/* About Card */}
           <Card>
             <CardHeader className="pb-3">
