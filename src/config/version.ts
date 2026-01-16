@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 5,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.5.3",
+    date: "2026-01-16",
+    type: "patch" as const,
+    changes: [
+      "Novo YouTubePlayer com API IFrame para controle total",
+      "Controles customizados abaixo do vídeo (play, seek, volume)",
+      "Overlay completo bloqueia clique-direito e interações com YouTube",
+      "Clique no vídeo para play/pause funciona normalmente"
+    ]
+  },
   {
     version: "1.5.2",
     date: "2026-01-16",
