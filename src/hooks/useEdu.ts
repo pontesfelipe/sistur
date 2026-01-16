@@ -32,6 +32,7 @@ export interface EduTrack {
   objective?: string;
   delivery?: string;
   org_id?: string;
+  created_by?: string;
   created_at: string;
 }
 
