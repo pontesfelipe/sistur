@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 5,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.5.5",
+    date: "2026-01-16",
+    type: "patch" as const,
+    changes: [
+      "Indicadores movido para dentro de Diagnósticos como aba",
+      "Menu lateral simplificado - Indicadores removido",
+      "Novo componente IndicadoresPanel reutilizável"
+    ]
+  },
   {
     version: "1.5.4",
     date: "2026-01-16",
