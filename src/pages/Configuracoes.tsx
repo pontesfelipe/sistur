@@ -40,8 +40,81 @@ import {
   Globe,
   Info,
   History,
-  MessageSquare
+  MessageSquare,
+  ExternalLink,
+  Clock
 } from 'lucide-react';
+import { toast } from 'sonner';
+
+// Helper component for downloadable documents
+function DocumentDownloadItem({ 
+  title, 
+  description, 
+  version,
+  downloadUrl 
+}: { 
+  title: string; 
+  description: string; 
+  version: string;
+  downloadUrl?: string;
+}) {
+  const handleDownload = () => {
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank');
+    } else {
+      toast.info('Documento em preparação', {
+        description: 'Este documento estará disponível para download em breve.',
+      });
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+      <div className="flex-1">
+        <div className="flex items-center gap-2">
+          <p className="font-medium text-sm">{title}</p>
+          <Badge variant="outline" className="text-xs">{version}</Badge>
+        </div>
+        <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+      </div>
+      <Button 
+        variant="outline" 
+        size="sm" 
+        onClick={handleDownload}
+        className="shrink-0 ml-3"
+      >
+        <Download className="h-4 w-4 mr-1.5" />
+        PDF
+      </Button>
+    </div>
+  );
+}
+
+// Helper component for external reference links
+function ExternalReferenceItem({ 
+  title, 
+  description, 
+  url 
+}: { 
+  title: string; 
+  description: string; 
+  url: string;
+}) {
+  return (
+    <a 
+      href={url} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors group"
+    >
+      <div className="flex-1">
+        <p className="font-medium text-sm group-hover:text-primary transition-colors">{title}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+      </div>
+      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0 ml-3" />
+    </a>
+  );
+}
 
 export default function Configuracoes() {
   const { isAdmin } = useProfile();
@@ -200,51 +273,40 @@ export default function Configuracoes() {
                     <FileText className="h-5 w-5 text-primary" />
                     Guias e Manuais
                   </CardTitle>
+                  <CardDescription>
+                    Documentação técnica e metodológica do SISTUR
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Manual do Usuário</p>
-                      <p className="text-sm text-muted-foreground">Guia completo de uso do sistema</p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      PDF
-                    </Button>
-                  </div>
+                  <DocumentDownloadItem
+                    title="Manual do Usuário SISTUR"
+                    description="Guia completo de navegação e uso do sistema"
+                    version="v1.0"
+                  />
                   
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Metodologia SISTUR</p>
-                      <p className="text-sm text-muted-foreground">Pipeline de 9 etapas e regras de cálculo</p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      PDF
-                    </Button>
-                  </div>
+                  <DocumentDownloadItem
+                    title="Metodologia SISTUR"
+                    description="Pipeline de 9 etapas, normalização e cálculo dos pilares RA, OE e AO"
+                    version="v2.0"
+                  />
                   
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Glossário de Indicadores</p>
-                      <p className="text-sm text-muted-foreground">Definição e fontes de todos os indicadores</p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      PDF
-                    </Button>
-                  </div>
+                  <DocumentDownloadItem
+                    title="Glossário de Indicadores"
+                    description="41 indicadores com definição, fonte oficial e periodicidade"
+                    version="v1.2"
+                  />
 
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Guia SISTUR EDU</p>
-                      <p className="text-sm text-muted-foreground">Sistema de prescrição de capacitação</p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      PDF
-                    </Button>
-                  </div>
+                  <DocumentDownloadItem
+                    title="Guia SISTUR EDU"
+                    description="Sistema de prescrição determinística de capacitação"
+                    version="v1.0"
+                  />
+
+                  <DocumentDownloadItem
+                    title="Manual de Diagnósticos"
+                    description="Como criar, calcular e interpretar diagnósticos territoriais"
+                    version="v1.1"
+                  />
                 </CardContent>
               </Card>
 
@@ -254,66 +316,101 @@ export default function Configuracoes() {
                     <BookOpen className="h-5 w-5 text-primary" />
                     Referências Oficiais
                   </CardTitle>
+                  <CardDescription>
+                    Fontes de dados e frameworks utilizados
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="font-medium">IGMA</p>
-                    <p className="text-sm text-muted-foreground">Índice Geral de Gestão Municipal Aplicado — Backbone de legitimidade</p>
-                  </div>
+                  <ExternalReferenceItem
+                    title="IGMA - Índice de Gestão Municipal"
+                    description="Backbone de legitimidade e governança municipal"
+                    url="https://igma.gov.br"
+                  />
                   
-                  <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="font-medium">Mapa do Turismo Brasileiro</p>
-                    <p className="text-sm text-muted-foreground">Categorização dos Municípios Turísticos</p>
-                  </div>
+                  <ExternalReferenceItem
+                    title="Mapa do Turismo Brasileiro"
+                    description="Categorização A, B, C, D, E dos municípios turísticos"
+                    url="https://mapa.turismo.gov.br"
+                  />
                   
-                  <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="font-medium">IBGE Cidades</p>
-                    <p className="text-sm text-muted-foreground">Dados socioeconômicos municipais</p>
-                  </div>
+                  <ExternalReferenceItem
+                    title="IBGE Cidades"
+                    description="Dados socioeconômicos, demográficos e territoriais"
+                    url="https://cidades.ibge.gov.br"
+                  />
 
-                  <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="font-medium">CADASTUR</p>
-                    <p className="text-sm text-muted-foreground">Cadastro de Prestadores de Serviços Turísticos</p>
-                  </div>
+                  <ExternalReferenceItem
+                    title="CADASTUR"
+                    description="Cadastro nacional de prestadores de serviços turísticos"
+                    url="https://cadastur.turismo.gov.br"
+                  />
+
+                  <ExternalReferenceItem
+                    title="DataSUS"
+                    description="Indicadores de saúde pública municipal"
+                    url="https://datasus.saude.gov.br"
+                  />
+
+                  <ExternalReferenceItem
+                    title="INEP / IDEB"
+                    description="Índice de Desenvolvimento da Educação Básica"
+                    url="https://www.gov.br/inep"
+                  />
                 </CardContent>
               </Card>
             </div>
 
             <Card>
               <CardHeader>
-                <CardTitle>Sobre o SISTUR</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5 text-primary" />
+                  Sobre o SISTUR
+                </CardTitle>
+                <CardDescription>
+                  Sistema de Inteligência Territorial para Sustentabilidade Turística
+                </CardDescription>
               </CardHeader>
               <CardContent className="prose prose-sm max-w-none text-muted-foreground space-y-4">
                 <p>
-                  O Sistema de Inteligência Territorial para Sustentabilidade Turística (SISTUR) é uma 
-                  infraestrutura que transforma indicadores públicos em decisões estratégicas e capacitação aplicada.
+                  O SISTUR é uma infraestrutura de gestão baseada em evidências que transforma 
+                  indicadores públicos em decisões estratégicas e capacitação aplicada para 
+                  destinos turísticos brasileiros.
                 </p>
                 
-                <div>
-                  <p className="font-semibold text-foreground">Princípios Fundamentais:</p>
-                  <ul className="mt-2 space-y-1">
-                    <li><strong>Transparência:</strong> Todos os dados, fontes e cálculos são rastreáveis</li>
-                    <li><strong>Sem rankings:</strong> Avaliação individual — nunca comparativa ou competitiva</li>
-                    <li><strong>Determinístico:</strong> Status e prescrições são calculados automaticamente por regras</li>
-                    <li><strong>Ciclo fechado:</strong> Diagnóstico → Ação → Monitoramento → Melhoria</li>
-                  </ul>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="p-4 bg-muted/30 rounded-lg">
+                    <p className="font-semibold text-foreground mb-2">Princípios Fundamentais</p>
+                    <ul className="space-y-1 text-sm">
+                      <li>• <strong>Transparência:</strong> Dados, fontes e cálculos rastreáveis</li>
+                      <li>• <strong>Sem rankings:</strong> Avaliação individual, não competitiva</li>
+                      <li>• <strong>Determinístico:</strong> Prescrições automáticas por regras</li>
+                      <li>• <strong>Ciclo fechado:</strong> Diagnóstico → Ação → Monitoramento</li>
+                    </ul>
+                  </div>
+
+                  <div className="p-4 bg-muted/30 rounded-lg">
+                    <p className="font-semibold text-foreground mb-2">Estrutura de Pilares</p>
+                    <ul className="space-y-1 text-sm">
+                      <li>• <strong className="text-pillar-ra">RA:</strong> Relações Ambientais (sustentabilidade)</li>
+                      <li>• <strong className="text-pillar-oe">OE:</strong> Organização Estrutural (infraestrutura)</li>
+                      <li>• <strong className="text-pillar-ao">AO:</strong> Ações Operacionais (execução)</li>
+                      <li>• 41 indicadores distribuídos entre os 3 pilares</li>
+                    </ul>
+                  </div>
                 </div>
 
-                <div>
-                  <p className="font-semibold text-foreground">O que o SISTUR NÃO faz:</p>
-                  <ul className="mt-2 space-y-1">
-                    <li>Rankings públicos ou benchmarking entre municípios</li>
-                    <li>Simulação preditiva ou machine learning</li>
-                    <li>Exploração livre de cursos (capacitação é prescrita)</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="font-semibold text-foreground">Prescrições vs. Relatórios:</p>
-                  <ul className="mt-2 space-y-1">
-                    <li><strong>Prescrições (SISTUR EDU):</strong> São 100% determinísticas e baseadas em regras. Cada curso é prescrito automaticamente quando: Indicador + Pilar + Status + Interpretação Territorial atendem os critérios. Nunca há IA envolvida nas prescrições.</li>
-                    <li><strong>Relatórios:</strong> Utilizam IA para síntese e análise dos dados diagnósticos, gerando planos estratégicos descritivos. A IA analisa os resultados, mas não prescreve cursos — apenas descreve e contextualiza.</li>
-                  </ul>
+                <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                  <p className="font-semibold text-foreground mb-2">Prescrições vs. Relatórios</p>
+                  <div className="grid gap-3 md:grid-cols-2 text-sm">
+                    <div>
+                      <p className="font-medium text-foreground">SISTUR EDU (Prescrições)</p>
+                      <p>100% determinísticas, baseadas em regras. Cada capacitação é prescrita quando Indicador + Pilar + Status atendem critérios específicos. Sem IA.</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Relatórios Estratégicos</p>
+                      <p>Utilizam IA para síntese e contextualização dos dados diagnósticos. A IA analisa resultados, mas não prescreve capacitações.</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
