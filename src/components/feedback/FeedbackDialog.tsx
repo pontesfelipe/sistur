@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MessageSquarePlus, Lightbulb, Bug, Loader2 } from 'lucide-react';
 import { useUserFeedback } from '@/hooks/useUserFeedback';
 
@@ -12,9 +13,32 @@ interface FeedbackDialogProps {
   trigger?: React.ReactNode;
 }
 
+const featureCategories = [
+  { value: 'nova_funcionalidade', label: 'Nova funcionalidade' },
+  { value: 'melhoria_ux', label: 'Melhoria de usabilidade (UX)' },
+  { value: 'integracao', label: 'Integração com outros sistemas' },
+  { value: 'relatorios', label: 'Novos relatórios/dashboards' },
+  { value: 'performance', label: 'Melhorias de performance' },
+  { value: 'documentacao', label: 'Documentação/Tutoriais' },
+  { value: 'mobile', label: 'Versão mobile/responsividade' },
+  { value: 'outro_sugestao', label: 'Outro' },
+];
+
+const bugCategories = [
+  { value: 'erro_visual', label: 'Erro visual/layout quebrado' },
+  { value: 'erro_dados', label: 'Dados incorretos/não aparecem' },
+  { value: 'erro_login', label: 'Problema de login/autenticação' },
+  { value: 'erro_carregamento', label: 'Página não carrega/lenta' },
+  { value: 'erro_funcionalidade', label: 'Funcionalidade não funciona' },
+  { value: 'erro_calculo', label: 'Erro de cálculo/processamento' },
+  { value: 'erro_exportacao', label: 'Erro ao exportar/gerar relatório' },
+  { value: 'outro_bug', label: 'Outro' },
+];
+
 export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
   const [open, setOpen] = useState(false);
   const [feedbackType, setFeedbackType] = useState<'feature' | 'bug'>('feature');
+  const [category, setCategory] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -24,15 +48,16 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!title.trim() || !description.trim()) return;
+    if (!title.trim() || !description.trim() || !category) return;
 
     setSubmitting(true);
-    const success = await submitFeedback(feedbackType, title, description);
+    const success = await submitFeedback(feedbackType, title, description, category);
     setSubmitting(false);
 
     if (success) {
       setTitle('');
       setDescription('');
+      setCategory('');
       setFeedbackType('feature');
       setOpen(false);
     }
@@ -41,8 +66,16 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
   const resetForm = () => {
     setTitle('');
     setDescription('');
+    setCategory('');
     setFeedbackType('feature');
   };
+
+  const handleTypeChange = (type: 'feature' | 'bug') => {
+    setFeedbackType(type);
+    setCategory(''); // Reset category when type changes
+  };
+
+  const categories = feedbackType === 'feature' ? featureCategories : bugCategories;
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
@@ -72,7 +105,7 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
             <Label>Tipo de feedback</Label>
             <RadioGroup 
               value={feedbackType} 
-              onValueChange={(v) => setFeedbackType(v as 'feature' | 'bug')}
+              onValueChange={(v) => handleTypeChange(v as 'feature' | 'bug')}
               className="grid grid-cols-2 gap-4"
             >
               <div className="relative">
@@ -98,6 +131,22 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
                 </Label>
               </div>
             </RadioGroup>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Categoria</Label>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -135,7 +184,7 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={submitting || !title.trim() || !description.trim()}>
+            <Button type="submit" disabled={submitting || !title.trim() || !description.trim() || !category}>
               {submitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
