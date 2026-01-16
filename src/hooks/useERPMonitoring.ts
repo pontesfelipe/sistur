@@ -80,6 +80,7 @@ export function useERPQueryInvalidation() {
     queryClient.invalidateQueries({ queryKey: ['erp-pillar-progress'] });
     queryClient.invalidateQueries({ queryKey: ['erp-cycle-evolution'] });
     queryClient.invalidateQueries({ queryKey: ['erp-overdue-plans'] });
+    queryClient.invalidateQueries({ queryKey: ['erp-overdue-projects'] });
     queryClient.invalidateQueries({ queryKey: ['erp-recent-plans'] });
     queryClient.invalidateQueries({ queryKey: ['erp-project-stats'] });
   }, [queryClient]);
@@ -451,6 +452,67 @@ export function useRecentActionPlans(limit: number = 10) {
           daysUntilDue,
           isOverdue,
         } as ActionPlanWithDetails;
+      });
+    },
+    refetchInterval: 60000,
+    staleTime: 30000,
+  });
+}
+
+// Overdue project interface
+export interface OverdueProject {
+  id: string;
+  name: string;
+  status: string;
+  methodology: string;
+  destinationName: string;
+  planned_end_date: string;
+  daysOverdue: number;
+  totalTasks: number;
+  completedTasks: number;
+  completionRate: number;
+}
+
+// Get overdue projects
+export function useOverdueProjects() {
+  return useQuery({
+    queryKey: ['erp-overdue-projects'],
+    queryFn: async () => {
+      const now = new Date().toISOString().split('T')[0];
+      
+      const { data: projects } = await supabase
+        .from('projects')
+        .select(`
+          *,
+          destinations(name),
+          project_tasks(id, status)
+        `)
+        .lt('planned_end_date', now)
+        .neq('status', 'completed')
+        .neq('status', 'cancelled')
+        .order('planned_end_date', { ascending: true });
+
+      if (!projects) return [];
+
+      const nowDate = new Date();
+      return projects.map(project => {
+        const endDate = new Date(project.planned_end_date!);
+        const daysOverdue = Math.ceil((nowDate.getTime() - endDate.getTime()) / (1000 * 60 * 60 * 24));
+        const tasks = (project.project_tasks as any[]) || [];
+        const completedTasks = tasks.filter(t => t.status === 'done').length;
+
+        return {
+          id: project.id,
+          name: project.name,
+          status: project.status,
+          methodology: project.methodology,
+          destinationName: (project.destinations as any)?.name || 'N/A',
+          planned_end_date: project.planned_end_date,
+          daysOverdue,
+          totalTasks: tasks.length,
+          completedTasks,
+          completionRate: tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0,
+        } as OverdueProject;
       });
     },
     refetchInterval: 60000,
