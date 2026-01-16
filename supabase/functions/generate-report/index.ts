@@ -431,22 +431,47 @@ LEMBRE-SE:
         
         await writer.close();
 
-        // Save the complete report to database
+        // Save the complete report to database (upsert to avoid duplicates)
         if (fullContent) {
-          const { error: saveError } = await supabaseAdmin
+          // First try to update existing report, if none exists insert new
+          const { data: existingReport } = await supabaseAdmin
             .from('generated_reports')
-            .insert({
-              org_id: effectiveOrgId,
-              assessment_id: assessmentId,
-              destination_name: destinationName,
-              report_content: fullContent,
-              created_by: userId,
-            });
+            .select('id')
+            .eq('assessment_id', assessmentId)
+            .maybeSingle();
           
-          if (saveError) {
-            console.error('Error saving report:', saveError);
+          if (existingReport) {
+            // Update existing report
+            const { error: updateError } = await supabaseAdmin
+              .from('generated_reports')
+              .update({
+                report_content: fullContent,
+                created_at: new Date().toISOString(),
+              })
+              .eq('id', existingReport.id);
+            
+            if (updateError) {
+              console.error('Error updating report:', updateError);
+            } else {
+              console.log('Report updated successfully');
+            }
           } else {
-            console.log('Report saved successfully');
+            // Insert new report
+            const { error: saveError } = await supabaseAdmin
+              .from('generated_reports')
+              .insert({
+                org_id: effectiveOrgId,
+                assessment_id: assessmentId,
+                destination_name: destinationName,
+                report_content: fullContent,
+                created_by: userId,
+              });
+            
+            if (saveError) {
+              console.error('Error saving report:', saveError);
+            } else {
+              console.log('Report saved successfully');
+            }
           }
         }
       } catch (err) {

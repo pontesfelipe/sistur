@@ -212,8 +212,9 @@ export default function Relatorios() {
       }
 
       toast.success('Relatório gerado e salvo com sucesso!');
-      // Refresh reports list
+      // Refresh reports list and destinations with report data
       queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
+      queryClient.invalidateQueries({ queryKey: ['destinations-with-report-data'] });
     } catch (error) {
       console.error('Error generating report:', error);
       toast.error(error instanceof Error ? error.message : 'Erro ao gerar relatório');
