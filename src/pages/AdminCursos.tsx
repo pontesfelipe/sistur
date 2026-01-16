@@ -69,13 +69,15 @@ import {
   Shield,
   Paperclip,
   ClipboardCheck,
-  Award
+  Award,
+  HelpCircle
 } from 'lucide-react';
 import { useAdminTrainings, useAdminTrainingMutations, TrainingFormData } from '@/hooks/useEduAdmin';
 import { TrainingAccessManager } from '@/components/admin/TrainingAccessManager';
 import { TrainingMaterialsManager, TrainingMaterial } from '@/components/admin/TrainingMaterialsManager';
 import { ExamRulesetManager } from '@/components/admin/ExamRulesetManager';
 import { CertificateStatsPanel } from '@/components/admin/CertificateStatsPanel';
+import { QuestionBankPanel } from '@/components/admin/QuestionBankPanel';
 
 type PillarType = 'RA' | 'OE' | 'AO';
 type TrainingType = 'course' | 'live';
@@ -150,7 +152,7 @@ const defaultFormData: FormData = {
 };
 
 export default function AdminCursos() {
-  const [mainTab, setMainTab] = useState<'trainings' | 'certificates'>('trainings');
+  const [mainTab, setMainTab] = useState<'trainings' | 'certificates' | 'questions'>('trainings');
   const { data: trainings, isLoading } = useAdminTrainings();
   const { createTraining, updateTraining, archiveTraining, publishTraining, deleteTraining } = useAdminTrainingMutations();
   
@@ -331,11 +333,15 @@ export default function AdminCursos() {
 
   return (
     <AppLayout title="Administração de Treinamentos" subtitle="Gerencie o catálogo SISTUR EDU">
-      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as 'trainings' | 'certificates')} className="space-y-6">
-        <TabsList className="w-full max-w-md">
+      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as 'trainings' | 'certificates' | 'questions')} className="space-y-6">
+        <TabsList className="w-full max-w-lg">
           <TabsTrigger value="trainings" className="gap-2 flex-1">
             <GraduationCap className="h-4 w-4" />
             Treinamentos
+          </TabsTrigger>
+          <TabsTrigger value="questions" className="gap-2 flex-1">
+            <HelpCircle className="h-4 w-4" />
+            Questões
           </TabsTrigger>
           <TabsTrigger value="certificates" className="gap-2 flex-1">
             <Award className="h-4 w-4" />
@@ -978,6 +984,10 @@ export default function AdminCursos() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </TabsContent>
+
+        <TabsContent value="questions" className="space-y-6">
+          <QuestionBankPanel />
         </TabsContent>
 
         <TabsContent value="certificates" className="space-y-6">
