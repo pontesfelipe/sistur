@@ -16,11 +16,49 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
-  Eye
+  Eye,
+  Download,
+  File,
+  FileSpreadsheet,
+  FileImage,
+  FileArchive,
+  Paperclip
 } from 'lucide-react';
 import { useEduTraining, type TrainingModule } from '@/hooks/useEduTrainings';
 import { PILLAR_INFO } from '@/types/sistur';
 import { VideoPlayer } from '@/components/edu/VideoPlayer';
+
+interface TrainingMaterial {
+  id: string;
+  name: string;
+  path: string;
+  url: string;
+  size: number;
+  type: string;
+  uploaded_at: string;
+}
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+const getFileIcon = (type: string) => {
+  if (type.includes('pdf')) return <FileText className="h-4 w-4 text-red-500" />;
+  if (type.includes('spreadsheet') || type.includes('excel') || type.includes('csv')) 
+    return <FileSpreadsheet className="h-4 w-4 text-green-500" />;
+  if (type.includes('image')) return <FileImage className="h-4 w-4 text-blue-500" />;
+  if (type.includes('zip') || type.includes('rar') || type.includes('archive')) 
+    return <FileArchive className="h-4 w-4 text-yellow-500" />;
+  return <File className="h-4 w-4 text-muted-foreground" />;
+};
+
+const getFileExtension = (filename: string): string => {
+  return filename.split('.').pop()?.toUpperCase() || 'FILE';
+};
 
 const EduTrainingDetalhe = () => {
   const { id } = useParams<{ id: string }>();
@@ -60,6 +98,11 @@ const EduTrainingDetalhe = () => {
 
   const pillarInfo = PILLAR_INFO[training.pillar as keyof typeof PILLAR_INFO];
   const modules = Array.isArray(training.modules) ? training.modules as TrainingModule[] : [];
+  
+  // Extract materials
+  const materials: TrainingMaterial[] = Array.isArray(training.materials) 
+    ? (training.materials as TrainingMaterial[])
+    : [];
   
   // Extract video metadata
   const hasVideo = !!training.video_url;
@@ -301,6 +344,43 @@ const EduTrainingDetalhe = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Materials card */}
+          {materials.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Paperclip className="h-4 w-4" />
+                  Materiais de Apoio
+                </CardTitle>
+                <CardDescription>
+                  {materials.length} {materials.length === 1 ? 'arquivo disponível' : 'arquivos disponíveis'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {materials.map((material) => (
+                  <a
+                    key={material.id}
+                    href={material.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors group"
+                  >
+                    {getFileIcon(material.type)}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate group-hover:text-primary" title={material.name}>
+                        {material.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {getFileExtension(material.name)} • {formatFileSize(material.size)}
+                      </p>
+                    </div>
+                    <Download className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                  </a>
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </AppLayout>
