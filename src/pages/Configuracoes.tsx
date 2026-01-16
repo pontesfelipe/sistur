@@ -16,6 +16,7 @@ import { IndicatorSimulator } from '@/components/tools/IndicatorSimulator';
 import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
 import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPanel';
 import { ActAsUserPanel } from '@/components/settings/ActAsUserPanel';
+import { FeedbackManagementPanel } from '@/components/settings/FeedbackManagementPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import { 
@@ -38,7 +39,8 @@ import {
   Users,
   Globe,
   Info,
-  History
+  History,
+  MessageSquare
 } from 'lucide-react';
 
 export default function Configuracoes() {
@@ -49,26 +51,30 @@ export default function Configuracoes() {
       <div className="space-y-6">
 
         <Tabs defaultValue="geral" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 max-w-3xl">
+          <TabsList className="grid w-full grid-cols-6 max-w-4xl">
             <TabsTrigger value="geral" className="flex items-center gap-2">
               <Settings2 className="h-4 w-4" />
-              Geral
+              <span className="hidden sm:inline">Geral</span>
             </TabsTrigger>
             <TabsTrigger value="usuarios" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              Usuários
+              <span className="hidden sm:inline">Usuários</span>
+            </TabsTrigger>
+            <TabsTrigger value="feedback" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              <span className="hidden sm:inline">Feedback</span>
             </TabsTrigger>
             <TabsTrigger value="logs" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-              Logs
+              <span className="hidden sm:inline">Logs</span>
             </TabsTrigger>
             <TabsTrigger value="documentacao" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
-              Documentação
+              <span className="hidden sm:inline">Docs</span>
             </TabsTrigger>
             <TabsTrigger value="ferramentas" className="flex items-center gap-2">
               <Wrench className="h-4 w-4" />
-              Ferramentas
+              <span className="hidden sm:inline">Ferramentas</span>
             </TabsTrigger>
           </TabsList>
 
@@ -144,6 +150,25 @@ export default function Configuracoes() {
             {isAdmin && <OrganizationManagement />}
             {isAdmin && <OrganizationUsersPanel />}
             <UserManagement />
+          </TabsContent>
+
+          {/* FEEDBACK TAB */}
+          <TabsContent value="feedback" className="space-y-6">
+            {isAdmin ? (
+              <FeedbackManagementPanel />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5 text-primary" />
+                    Feedback
+                  </CardTitle>
+                  <CardDescription>
+                    Você não tem permissão para gerenciar feedbacks. Use o botão no cabeçalho para enviar sugestões.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            )}
           </TabsContent>
 
           {/* LOGS TAB */}
