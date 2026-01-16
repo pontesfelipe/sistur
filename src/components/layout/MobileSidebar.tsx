@@ -11,14 +11,15 @@ import {
   FileText,
   Settings,
   LogOut,
-  BookOpen,
   HelpCircle,
   MessageCircleQuestion,
   BookMarked,
   Activity,
   Menu,
   Bot,
+  MessageSquarePlus,
 } from 'lucide-react';
+import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
@@ -151,6 +152,19 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
           {filteredBottomNavigation.map((item) => (
             <NavItem key={item.name} item={item} />
           ))}
+          
+          {/* Feedback button */}
+          <FeedbackDialog
+            trigger={
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 px-3 py-3 h-auto text-foreground hover:bg-muted"
+              >
+                <MessageSquarePlus className="h-5 w-5" />
+                <span className="font-medium text-sm">Feedback</span>
+              </Button>
+            }
+          />
           
           {/* Sign Out */}
           <Button
