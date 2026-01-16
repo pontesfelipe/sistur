@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 3,
+  minor: 4,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.4.0",
+    date: "2026-01-16",
+    type: "minor" as const,
+    changes: [
+      "Otimização de navegação do sidebar - elimina 'piscar' ao trocar de página",
+      "Novo ProfileContext centralizado para cache de perfil",
+      "Melhoria de performance com useMemo nos componentes de navegação",
+      "Transições mais suaves entre rotas protegidas"
+    ]
+  },
+  {
     version: "1.3.0",
     date: "2026-01-16",
     type: "minor" as const,
@@ -31,16 +42,6 @@ export const VERSION_HISTORY = [
       "Metodologia 'Waterfall' renomeada para 'Cascata'",
       "Descrições de projetos traduzidas para português",
       "Melhorias gerais de localização e terminologia"
-    ]
-  },
-  {
-    version: "1.2.0",
-    date: "2025-01-16",
-    type: "minor" as const,
-    changes: [
-      "Adicionada opção de criar dados no Modo Demo",
-      "Ao iniciar nova rodada no modo demo, opção 'Ambiente de Demonstração' fica disponível",
-      "Dados criados no modo demo ficam isolados e visíveis apenas nesse modo"
     ]
   },
   {
