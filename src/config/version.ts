@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 2,
+  minor: 3,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.3.0",
+    date: "2026-01-16",
+    type: "minor" as const,
+    changes: [
+      "Tradução completa da interface para português",
+      "Metodologia 'Waterfall' renomeada para 'Cascata'",
+      "Descrições de projetos traduzidas para português",
+      "Melhorias gerais de localização e terminologia"
+    ]
+  },
   {
     version: "1.2.0",
     date: "2025-01-16",
