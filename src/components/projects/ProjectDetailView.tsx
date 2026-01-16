@@ -36,12 +36,16 @@ import {
   Loader2,
   MapPin,
   Milestone,
+  Pencil,
   Target,
+  Trash2,
   User,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { EditProjectDialog } from './EditProjectDialog';
+import { DeleteProjectDialog } from './DeleteProjectDialog';
 
 interface ProjectDetailViewProps {
   projectId: string;
@@ -58,6 +62,8 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
   const updateTask = useUpdateTask();
 
   const [activeTab, setActiveTab] = useState('overview');
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   if (loadingProject) {
     return (
@@ -134,18 +140,26 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
             )}
           </div>
         </div>
-        <Select value={project.status} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(PROJECT_STATUS_INFO).map(([key, info]) => (
-              <SelectItem key={key} value={key}>
-                {info.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={project.status} onValueChange={handleStatusChange}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(PROJECT_STATUS_INFO).map(([key, info]) => (
+                <SelectItem key={key} value={key}>
+                  {info.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="icon" onClick={() => setEditDialogOpen(true)}>
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="icon" className="text-destructive hover:text-destructive" onClick={() => setDeleteDialogOpen(true)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -427,6 +441,19 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           </Card>
         </TabsContent>
       </Tabs>
+
+      <EditProjectDialog
+        project={project}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+
+      <DeleteProjectDialog
+        project={project}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onDeleted={onBack}
+      />
     </div>
   );
 }
