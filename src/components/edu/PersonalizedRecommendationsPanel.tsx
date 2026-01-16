@@ -399,3 +399,6 @@ export function PersonalizedRecommendationsPanel({
         recommendations={recommendations || []}
         defaultName="Minha trilha recomendada"
       />
+    </div>
+  );
+}
