@@ -200,17 +200,18 @@ export function useDestinationsWithReportData() {
   return useQuery({
     queryKey: ["destinations-with-report-data"],
     queryFn: async () => {
-      // Get assessments that are CALCULATED and have reports
+      // Get all reports accessible to the user
       const { data: reports, error: reportsError } = await supabase
         .from("generated_reports")
-        .select("assessment_id, destination_name");
+        .select("id, assessment_id, destination_name");
 
       if (reportsError) throw reportsError;
 
-      const assessmentIds = reports?.map((r) => r.assessment_id) || [];
+      const assessmentIds = reports?.map((r) => r.assessment_id).filter(Boolean) || [];
       
       if (assessmentIds.length === 0) return [];
 
+      // Get assessments that are CALCULATED and have reports
       const { data: assessments, error: assessmentsError } = await supabase
         .from("assessments")
         .select(`
