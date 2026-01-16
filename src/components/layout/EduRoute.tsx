@@ -54,7 +54,9 @@ export function EduRoute({ children, requireProfessor = false }: EduRouteProps) 
 
   // Check EDU access
   if (!hasEDUAccess) {
-    return <Navigate to="/" replace />;
+    // If user is logged in but doesn't have EDU enabled yet,
+    // send them to onboarding to pick access rather than bouncing to home.
+    return <Navigate to="/onboarding" replace />;
   }
 
   return <>{children}</>;
