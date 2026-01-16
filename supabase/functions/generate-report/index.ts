@@ -388,7 +388,7 @@ LEMBRE-SE:
         });
       }
       
-      return new Response(JSON.stringify({ error: "Erro ao gerar relatório com IA" }), {
+      return new Response(JSON.stringify({ error: "Erro ao gerar relatório com Mente Sistur" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

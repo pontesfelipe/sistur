@@ -318,7 +318,7 @@ export default function Relatorios() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary" />
-                  Gerador de Relatórios com IA
+                  Gerador de Relatórios com Mente Sistur
                 </CardTitle>
                 <CardDescription>
                   Selecione um diagnóstico calculado para gerar um plano de desenvolvimento turístico personalizado
@@ -434,7 +434,7 @@ export default function Relatorios() {
                       {selectedDestination && ` - ${selectedDestination.name}`}
                     </CardTitle>
                     <CardDescription>
-                      Relatório gerado por IA com base no diagnóstico
+                      Relatório gerado pela Mente Sistur com base no diagnóstico
                     </CardDescription>
                   </div>
                   {report && !isGenerating && (
@@ -474,7 +474,7 @@ export default function Relatorios() {
                     Nenhum relatório gerado
                   </h3>
                   <p className="text-muted-foreground max-w-md">
-                    Selecione um diagnóstico calculado acima e clique em &quot;Gerar Relatório&quot; para criar um plano de desenvolvimento turístico personalizado com inteligência artificial.
+                    Selecione um diagnóstico calculado acima e clique em &quot;Gerar Relatório&quot; para criar um plano de desenvolvimento turístico personalizado com a Mente Sistur.
                   </p>
                 </CardContent>
               </Card>

@@ -633,7 +633,7 @@ export default function NovaRodada() {
                   <h4 className="font-medium mb-2">Gerar relatório</h4>
                   <p className="text-sm text-muted-foreground">
                     Com o diagnóstico calculado, você poderá gerar um plano de desenvolvimento 
-                    turístico personalizado usando inteligência artificial.
+                    turístico personalizado usando a Mente Sistur.
                   </p>
                 </div>
               </div>
