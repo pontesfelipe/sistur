@@ -706,7 +706,7 @@ export const METHODOLOGY_INFO: Record<ProjectMethodology, {
   phases: { name: string; description: string }[];
 }> = {
   waterfall: {
-    name: 'Waterfall',
+    name: 'Cascata',
     description: 'Metodologia sequencial tradicional com fases bem definidas',
     phases: [
       { name: 'Iniciação', description: 'Definição de escopo, objetivos e stakeholders' },
