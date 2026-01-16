@@ -25,27 +25,35 @@ export function useDestinations() {
       ibge_code?: string | null;
       latitude?: number | null;
       longitude?: number | null;
-      visibility?: 'organization' | 'personal';
+      visibility?: 'organization' | 'personal' | 'demo';
     }) => {
-      // Get the user's org_id
+      // Get the user's org_id and demo org info
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
       if (!user) throw new Error('Usuário não autenticado');
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('org_id')
+        .select('org_id, viewing_demo_org_id')
         .eq('user_id', user.id)
         .single();
 
       if (profileError) throw profileError;
       if (!profile) throw new Error('Perfil não encontrado');
 
+      // Determine which org_id to use based on visibility
+      const targetOrgId = destination.visibility === 'demo' && profile.viewing_demo_org_id
+        ? profile.viewing_demo_org_id
+        : profile.org_id;
+      
+      // For demo visibility, store as 'organization' in the DB (will be accessible when viewing demo)
+      const dbVisibility = destination.visibility === 'demo' ? 'organization' : (destination.visibility || 'organization');
+
       // Check for duplicate destination (same name + UF)
       const { data: existing } = await supabase
         .from('destinations')
         .select('id')
-        .eq('org_id', profile.org_id)
+        .eq('org_id', targetOrgId)
         .ilike('name', destination.name.trim())
         .eq('uf', destination.uf)
         .maybeSingle();
@@ -62,8 +70,8 @@ export function useDestinations() {
           ibge_code: destination.ibge_code || null,
           latitude: destination.latitude,
           longitude: destination.longitude,
-          org_id: profile.org_id,
-          visibility: destination.visibility || 'organization',
+          org_id: targetOrgId,
+          visibility: dbVisibility,
           creator_user_id: user.id,
         })
         .select()

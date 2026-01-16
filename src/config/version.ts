@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 1,
+  minor: 2,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.2.0",
+    date: "2025-01-16",
+    type: "minor" as const,
+    changes: [
+      "Adicionada opção de criar dados no Modo Demo",
+      "Ao iniciar nova rodada no modo demo, opção 'Ambiente de Demonstração' fica disponível",
+      "Dados criados no modo demo ficam isolados e visíveis apenas nesse modo"
+    ]
+  },
   {
     version: "1.1.0",
     date: "2025-01-16",
