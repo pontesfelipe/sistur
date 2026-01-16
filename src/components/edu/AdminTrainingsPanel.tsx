@@ -74,6 +74,7 @@ import {
 import { useAdminTrainings, useAdminTrainingMutations, TrainingFormData } from '@/hooks/useEduAdmin';
 import { TrainingAccessManager } from '@/components/admin/TrainingAccessManager';
 import { TrainingMaterialsManager, TrainingMaterial } from '@/components/admin/TrainingMaterialsManager';
+import { TrainingModulesManager, TrainingModule } from '@/components/admin/TrainingModulesManager';
 import { ExamRulesetManager } from '@/components/admin/ExamRulesetManager';
 import { CertificateStatsPanel } from '@/components/admin/CertificateStatsPanel';
 import { QuestionBankPanel } from '@/components/admin/QuestionBankPanel';
@@ -129,6 +130,7 @@ interface FormData {
   status: TrainingStatus;
   active: boolean;
   materials: TrainingMaterial[];
+  modules: TrainingModule[];
 }
 
 const defaultFormData: FormData = {
@@ -148,6 +150,7 @@ const defaultFormData: FormData = {
   status: 'draft',
   active: true,
   materials: [],
+  modules: [],
 };
 
 export function AdminTrainingsPanel() {
@@ -187,6 +190,9 @@ export function AdminTrainingsPanel() {
     const existingMaterials: TrainingMaterial[] = Array.isArray(training.materials) 
       ? (training.materials as TrainingMaterial[])
       : [];
+    const existingModules: TrainingModule[] = Array.isArray(training.modules)
+      ? (training.modules as TrainingModule[])
+      : [];
     setFormData({
       training_id: training.training_id,
       title: training.title,
@@ -204,6 +210,7 @@ export function AdminTrainingsPanel() {
       status: (training.status as TrainingStatus) || 'draft',
       active: training.active ?? true,
       materials: existingMaterials,
+      modules: existingModules,
     });
     setIsDialogOpen(true);
   };
@@ -244,6 +251,7 @@ export function AdminTrainingsPanel() {
       status: formData.status,
       active: formData.active,
       materials: formData.materials,
+      modules: formData.modules,
     };
 
     if (editingTraining) {
@@ -763,6 +771,13 @@ export function AdminTrainingsPanel() {
                 placeholder="https://..."
               />
             </div>
+
+            {formData.type === 'course' && (
+              <TrainingModulesManager
+                modules={formData.modules}
+                onModulesChange={(modules) => setFormData(prev => ({ ...prev, modules }))}
+              />
+            )}
 
             <div className="space-y-4">
               <Label>Materiais de Apoio</Label>
