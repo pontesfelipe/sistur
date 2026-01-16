@@ -39,25 +39,13 @@ interface NavItem {
   requiresAdmin?: boolean;
 }
 
-interface NavItemWithSub extends NavItem {
-  subItems?: NavItem[];
-}
-
-const navigation: NavItemWithSub[] = [
+const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
   { name: 'Destinos', href: '/destinos', icon: MapPin, requiresERP: true },
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
   { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
   { name: 'Indicadores', href: '/indicadores', icon: BarChart3, requiresERP: true },
-  { 
-    name: 'SISTUR EDU', 
-    href: '/edu', 
-    icon: GraduationCap, 
-    requiresEDU: true,
-    subItems: [
-      { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen, requiresProfessor: true },
-    ]
-  },
+  { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
@@ -94,23 +82,14 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
     onOpenChange(false);
   };
 
-  const filterNavItems = (items: NavItemWithSub[]) => {
+  const filterNavItems = (items: NavItem[]) => {
     return items.filter((item) => {
       if (item.requiresAdmin && !isAdmin) return false;
       if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
       if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
       if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
       return true;
-    }).map(item => ({
-      ...item,
-      subItems: item.subItems?.filter(sub => {
-        if (sub.requiresAdmin && !isAdmin) return false;
-        if (sub.requiresProfessor && !isProfessor && !isAdmin) return false;
-        if (sub.requiresERP && !hasERPAccess && !isAdmin) return false;
-        if (sub.requiresEDU && !hasEDUAccess && !isAdmin) return false;
-        return true;
-      })
-    }));
+    });
   };
 
   const filteredNavigation = filterNavItems(navigation);
@@ -162,25 +141,9 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-200px)]">
-          {filteredNavigation.map((item) => {
-            const isParentActive = location.pathname === item.href || 
-              (item.href !== '/' && location.pathname.startsWith(item.href));
-            const hasVisibleSubItems = item.subItems && item.subItems.length > 0;
-            
-            return (
-              <div key={item.name}>
-                <NavItem item={item} />
-                {/* Show sub-items when parent is active */}
-                {hasVisibleSubItems && isParentActive && (
-                  <div className="ml-4 mt-1 space-y-1 border-l border-border pl-3">
-                    {item.subItems!.map((subItem) => (
-                      <NavItem key={subItem.name} item={subItem} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {filteredNavigation.map((item) => (
+            <NavItem key={item.name} item={item} />
+          ))}
         </nav>
 
         {/* Bottom navigation */}
