@@ -19,6 +19,7 @@ import {
   Activity,
   Bot,
   MessageSquarePlus,
+  FolderKanban,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState } from 'react';
@@ -40,6 +41,7 @@ const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
   { name: 'Destinos', href: '/destinos', icon: MapPin, requiresERP: true },
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
+  { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
   { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
   { name: 'Indicadores', href: '/indicadores', icon: BarChart3, requiresERP: true },
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
