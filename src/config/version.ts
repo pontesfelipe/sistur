@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 4,
+  minor: 5,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.5.0",
+    date: "2026-01-16",
+    type: "minor" as const,
+    changes: [
+      "Proteção de vídeos com URLs assinadas temporárias (5 min de expiração)",
+      "Novo hook useSecureVideoUrl para acesso seguro ao storage",
+      "Auto-refresh de URLs antes da expiração",
+      "Bloqueio de clique-direito no player de vídeo",
+      "Mensagens de erro e loading states aprimorados no VideoPlayer"
+    ]
+  },
   {
     version: "1.4.0",
     date: "2026-01-16",

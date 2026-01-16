@@ -2,11 +2,16 @@ import { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Play, Pause, Volume2, VolumeX, Maximize, SkipBack, SkipForward } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Play, Pause, Volume2, VolumeX, Maximize, SkipBack, SkipForward, Lock, AlertCircle } from 'lucide-react';
 import { useEventMutations } from '@/hooks/useEduEnrollments';
+import { useSecureVideoUrl } from '@/hooks/useSecureVideoUrl';
 
 interface VideoPlayerProps {
+  /** Direct video URL (for external providers or legacy) */
   videoUrl: string;
+  /** Path in Supabase storage (preferred for Supabase videos) */
+  videoPath?: string;
   videoProvider?: 'supabase' | 'youtube' | 'vimeo' | 'mux';
   trainingId?: string;
   trailId?: string;
@@ -18,6 +23,7 @@ interface VideoPlayerProps {
 
 export function VideoPlayer({
   videoUrl,
+  videoPath,
   videoProvider = 'supabase',
   trainingId,
   trailId,
@@ -35,6 +41,19 @@ export function VideoPlayer({
   const [showPreviewBlock, setShowPreviewBlock] = useState(false);
   
   const { trackEvent } = useEventMutations();
+  
+  // Use secure signed URLs for Supabase-hosted videos
+  const { 
+    url: secureUrl, 
+    isLoading: isLoadingUrl, 
+    error: urlError 
+  } = useSecureVideoUrl({
+    videoUrl,
+    videoPath,
+    videoProvider,
+    expiresIn: 300, // 5 minutes - short expiration for security
+    autoRefresh: true, // Auto-refresh before expiration
+  });
   
   useEffect(() => {
     const video = videoRef.current;
@@ -185,6 +204,7 @@ export function VideoPlayer({
   };
   
   // For external providers (YouTube, Vimeo), render iframe
+  // Note: External videos cannot be fully protected as they're hosted elsewhere
   if (videoProvider === 'youtube' || videoProvider === 'vimeo') {
     let embedUrl = videoUrl;
     
@@ -215,16 +235,55 @@ export function VideoPlayer({
       </Card>
     );
   }
+
+  // Loading state for secure URL
+  if (isLoadingUrl) {
+    return (
+      <Card className="overflow-hidden">
+        <div className="aspect-video bg-black flex items-center justify-center">
+          <div className="text-center text-white">
+            <Lock className="h-8 w-8 mx-auto mb-2 animate-pulse" />
+            <p className="text-sm text-gray-300">Preparando vídeo seguro...</p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  // Error state
+  if (urlError && !secureUrl) {
+    return (
+      <Card className="overflow-hidden">
+        <div className="aspect-video bg-black flex items-center justify-center">
+          <div className="text-center text-white p-6">
+            <AlertCircle className="h-10 w-10 mx-auto mb-3 text-destructive" />
+            <h3 className="font-semibold mb-1">Erro ao carregar vídeo</h3>
+            <p className="text-sm text-gray-300 mb-3">
+              {urlError.message || 'Não foi possível acessar o vídeo'}
+            </p>
+            <p className="text-xs text-gray-400">
+              Verifique se você está logado e tem permissão para acessar este conteúdo.
+            </p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  // Determine the URL to use - prefer secure URL for Supabase
+  const effectiveUrl = secureUrl || videoUrl;
   
-  // Native video player for supabase/mux
+  // Native video player for supabase/mux with secure URL
   return (
     <Card className="overflow-hidden relative group">
       <div className="aspect-video bg-black relative">
         <video
           ref={videoRef}
-          src={videoUrl}
+          src={effectiveUrl}
           className="w-full h-full"
           onClick={togglePlay}
+          // Prevent right-click to discourage direct URL copying
+          onContextMenu={(e) => e.preventDefault()}
         />
         
         {/* Preview Block Overlay */}
