@@ -7,20 +7,20 @@ import {
   MapPin,
   ClipboardList,
   BarChart3,
-  
   GraduationCap,
   FileText,
   Settings,
   ChevronLeft,
   ChevronRight,
   LogOut,
-  BookOpen,
   HelpCircle,
   MessageCircleQuestion,
   BookMarked,
   Activity,
   Bot,
+  MessageSquarePlus,
 } from 'lucide-react';
+import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -163,6 +163,42 @@ export function AppSidebar() {
         {filteredBottomNavigation.map((item) => (
           <NavItem key={item.name} item={item} />
         ))}
+        
+        {/* Feedback button */}
+        {collapsed ? (
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <div>
+                <FeedbackDialog
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    >
+                      <MessageSquarePlus className="h-5 w-5" />
+                    </Button>
+                  }
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="font-medium">
+              Feedback
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <FeedbackDialog
+            trigger={
+              <Button
+                variant="ghost"
+                className="w-full justify-start px-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              >
+                <MessageSquarePlus className="h-5 w-5 mr-3" />
+                <span className="text-sm">Feedback</span>
+              </Button>
+            }
+          />
+        )}
         
         {/* Sign out button */}
         {collapsed ? (
