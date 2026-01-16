@@ -14,17 +14,34 @@ import {
   Minus,
   AlertTriangle,
   CheckCircle2,
-  Clock
+  Clock,
+  BarChart3
 } from 'lucide-react';
 
-interface PrescriptionCycle {
-  id: string;
-  prescription_id: string;
+interface PillarScore {
   assessment_id: string;
-  current_score: number | null;
-  previous_score: number | null;
-  evolution_state: string | null;
-  created_at: string;
+  pillar: string;
+  score: number;
+  severity: string;
+}
+
+interface Assessment {
+  id: string;
+  title: string;
+  destination_id: string;
+  calculated_at: string;
+  destination_name: string;
+}
+
+interface EvolutionData {
+  destinationId: string;
+  destinationName: string;
+  pillar: string;
+  currentScore: number;
+  previousScore: number | null;
+  evolutionState: 'EVOLUTION' | 'STAGNATION' | 'REGRESSION' | null;
+  assessmentTitle: string;
+  calculatedAt: string;
 }
 
 interface Destination {
@@ -35,7 +52,7 @@ interface Destination {
 export function CycleMonitor() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [cycles, setCycles] = useState<PrescriptionCycle[]>([]);
+  const [evolutions, setEvolutions] = useState<EvolutionData[]>([]);
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [selectedDestination, setSelectedDestination] = useState<string>('all');
   const [stats, setStats] = useState({
@@ -46,44 +63,142 @@ export function CycleMonitor() {
 
   useEffect(() => {
     if (open) {
-      fetchDestinations();
-      fetchCycles();
+      fetchData();
     }
   }, [open, selectedDestination]);
 
-  const fetchDestinations = async () => {
-    const { data } = await supabase
-      .from('destinations')
-      .select('id, name')
-      .order('name');
-    setDestinations(data || []);
-  };
-
-  const fetchCycles = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       
-      let query = supabase
-        .from('prescription_cycles')
+      // Fetch destinations that have calculated assessments
+      const { data: assessmentsData, error: assessmentsError } = await supabase
+        .from('assessments')
+        .select(`
+          id,
+          title,
+          destination_id,
+          calculated_at,
+          destinations!inner (
+            id,
+            name
+          )
+        `)
+        .eq('status', 'CALCULATED')
+        .order('calculated_at', { ascending: false });
+
+      if (assessmentsError) {
+        console.error('Error fetching assessments:', assessmentsError);
+        return;
+      }
+
+      // Get unique destinations from assessments
+      const uniqueDestinations = new Map<string, Destination>();
+      assessmentsData?.forEach(a => {
+        const dest = a.destinations as unknown as { id: string; name: string };
+        if (dest && !uniqueDestinations.has(dest.id)) {
+          uniqueDestinations.set(dest.id, { id: dest.id, name: dest.name });
+        }
+      });
+      setDestinations(Array.from(uniqueDestinations.values()).sort((a, b) => a.name.localeCompare(b.name)));
+
+      // Filter assessments by selected destination
+      let filteredAssessments = assessmentsData || [];
+      if (selectedDestination !== 'all') {
+        filteredAssessments = filteredAssessments.filter(a => a.destination_id === selectedDestination);
+      }
+
+      // Get all pillar scores for these assessments
+      const assessmentIds = filteredAssessments.map(a => a.id);
+      if (assessmentIds.length === 0) {
+        setEvolutions([]);
+        setStats({ evolution: 0, stagnation: 0, regression: 0 });
+        return;
+      }
+
+      const { data: pillarScores, error: pillarError } = await supabase
+        .from('pillar_scores')
         .select('*')
-        .order('created_at', { ascending: false })
-        .limit(100);
+        .in('assessment_id', assessmentIds);
 
-      const { data } = await query;
+      if (pillarError) {
+        console.error('Error fetching pillar scores:', pillarError);
+        return;
+      }
+
+      // Group assessments by destination to compare cycles
+      const assessmentsByDestination = new Map<string, typeof filteredAssessments>();
+      filteredAssessments.forEach(a => {
+        const existing = assessmentsByDestination.get(a.destination_id) || [];
+        existing.push(a);
+        assessmentsByDestination.set(a.destination_id, existing);
+      });
+
+      // Calculate evolution data
+      const evolutionData: EvolutionData[] = [];
       
-      const cycleData = data || [];
-      setCycles(cycleData);
+      assessmentsByDestination.forEach((assessments, destinationId) => {
+        // Sort by date (newest first)
+        assessments.sort((a, b) => new Date(b.calculated_at).getTime() - new Date(a.calculated_at).getTime());
+        
+        const latestAssessment = assessments[0];
+        const previousAssessment = assessments.length > 1 ? assessments[1] : null;
+        
+        const dest = latestAssessment.destinations as unknown as { id: string; name: string };
+        const destinationName = dest?.name || 'Destino';
 
-      // Calculate stats
-      const evolution = cycleData.filter(c => c.evolution_state === 'EVOLUTION').length;
-      const stagnation = cycleData.filter(c => c.evolution_state === 'STAGNATION').length;
-      const regression = cycleData.filter(c => c.evolution_state === 'REGRESSION').length;
+        // Get pillar scores for latest and previous
+        const latestScores = pillarScores?.filter(ps => ps.assessment_id === latestAssessment.id) || [];
+        const previousScores = previousAssessment 
+          ? pillarScores?.filter(ps => ps.assessment_id === previousAssessment.id) || []
+          : [];
+
+        latestScores.forEach(ls => {
+          const prevScore = previousScores.find(ps => ps.pillar === ls.pillar);
+          
+          let evolutionState: 'EVOLUTION' | 'STAGNATION' | 'REGRESSION' | null = null;
+          if (prevScore) {
+            const diff = ls.score - prevScore.score;
+            if (diff > 0.02) evolutionState = 'EVOLUTION';
+            else if (diff < -0.02) evolutionState = 'REGRESSION';
+            else evolutionState = 'STAGNATION';
+          }
+
+          evolutionData.push({
+            destinationId,
+            destinationName,
+            pillar: ls.pillar,
+            currentScore: ls.score,
+            previousScore: prevScore?.score || null,
+            evolutionState,
+            assessmentTitle: latestAssessment.title,
+            calculatedAt: latestAssessment.calculated_at
+          });
+        });
+      });
+
+      setEvolutions(evolutionData);
+
+      // Calculate stats (only count items that have previous data for comparison)
+      const withComparison = evolutionData.filter(e => e.evolutionState !== null);
+      const evolution = withComparison.filter(e => e.evolutionState === 'EVOLUTION').length;
+      const stagnation = withComparison.filter(e => e.evolutionState === 'STAGNATION').length;
+      const regression = withComparison.filter(e => e.evolutionState === 'REGRESSION').length;
       
       setStats({ evolution, stagnation, regression });
     } catch (error) {
-      console.error('Error fetching cycles:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getPillarLabel = (pillar: string) => {
+    switch (pillar) {
+      case 'RA': return 'Sustentabilidade';
+      case 'AO': return 'Governança';
+      case 'OE': return 'Oferta Turística';
+      default: return pillar;
     }
   };
 
@@ -96,7 +211,7 @@ export function CycleMonitor() {
       case 'STAGNATION':
         return <Minus className="h-4 w-4 text-yellow-500" />;
       default:
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
+        return <BarChart3 className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -109,7 +224,7 @@ export function CycleMonitor() {
       case 'STAGNATION':
         return <Badge className="bg-yellow-500/20 text-yellow-700 border-yellow-500/30">Estagnação</Badge>;
       default:
-        return <Badge variant="outline">Pendente</Badge>;
+        return <Badge variant="outline">Primeira avaliação</Badge>;
     }
   };
 
@@ -117,6 +232,8 @@ export function CycleMonitor() {
     if (score === null) return '-';
     return (score * 100).toFixed(1) + '%';
   };
+
+  const hasEvolutionData = evolutions.some(e => e.evolutionState !== null);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -151,52 +268,54 @@ export function CycleMonitor() {
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" onClick={fetchCycles}>
+            <Button variant="outline" size="sm" onClick={fetchData}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Atualizar
             </Button>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-3 gap-4">
-            <Card className="border-green-500/20 bg-green-500/5">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                  Evolução
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-700">{stats.evolution}</div>
-              </CardContent>
-            </Card>
+          {/* Stats Cards - only show if there's evolution data */}
+          {hasEvolutionData && (
+            <div className="grid grid-cols-3 gap-4">
+              <Card className="border-green-500/20 bg-green-500/5">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-green-500" />
+                    Evolução
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-700">{stats.evolution}</div>
+                </CardContent>
+              </Card>
 
-            <Card className="border-yellow-500/20 bg-yellow-500/5">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Minus className="h-4 w-4 text-yellow-500" />
-                  Estagnação
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-yellow-700">{stats.stagnation}</div>
-              </CardContent>
-            </Card>
+              <Card className="border-yellow-500/20 bg-yellow-500/5">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Minus className="h-4 w-4 text-yellow-500" />
+                    Estagnação
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-700">{stats.stagnation}</div>
+                </CardContent>
+              </Card>
 
-            <Card className="border-red-500/20 bg-red-500/5">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <TrendingDown className="h-4 w-4 text-red-500" />
-                  Regressão
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-700">{stats.regression}</div>
-              </CardContent>
-            </Card>
-          </div>
+              <Card className="border-red-500/20 bg-red-500/5">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <TrendingDown className="h-4 w-4 text-red-500" />
+                    Regressão
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-red-700">{stats.regression}</div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-          {/* Cycles List */}
+          {/* Evolution List */}
           <ScrollArea className="h-[300px]">
             {loading ? (
               <div className="space-y-3">
@@ -204,46 +323,83 @@ export function CycleMonitor() {
                   <Skeleton key={i} className="h-16 w-full" />
                 ))}
               </div>
-            ) : cycles.length === 0 ? (
+            ) : evolutions.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <RefreshCw className="h-12 w-12 mb-4 opacity-20" />
-                <p className="font-medium">Nenhum ciclo registrado</p>
-                <p className="text-sm">Os ciclos aparecerão aqui após múltiplas rodadas de diagnóstico</p>
+                <p className="font-medium">Nenhum diagnóstico calculado</p>
+                <p className="text-sm">Calcule diagnósticos para ver a evolução dos pilares</p>
+              </div>
+            ) : !hasEvolutionData ? (
+              <div className="space-y-4">
+                <div className="flex flex-col items-center justify-center py-6 text-muted-foreground bg-muted/30 rounded-lg">
+                  <BarChart3 className="h-8 w-8 mb-2 opacity-40" />
+                  <p className="font-medium text-sm">Aguardando segundo ciclo</p>
+                  <p className="text-xs text-center px-4">
+                    A comparação de evolução aparecerá após uma segunda rodada de diagnóstico para os destinos.
+                  </p>
+                </div>
+                
+                <p className="text-sm font-medium text-muted-foreground">Scores atuais dos pilares:</p>
+                <div className="space-y-3 pr-4">
+                  {evolutions.map((item, idx) => (
+                    <div 
+                      key={`${item.destinationId}-${item.pillar}-${idx}`}
+                      className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border"
+                    >
+                      <div className="flex items-center gap-3">
+                        {getEvolutionIcon(item.evolutionState)}
+                        <div>
+                          <p className="font-medium text-sm">{item.destinationName}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {getPillarLabel(item.pillar)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">{formatScore(item.currentScore)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(item.calculatedAt).toLocaleDateString('pt-BR')}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="space-y-3 pr-4">
-                {cycles.map((cycle) => (
+                {evolutions.filter(e => e.evolutionState !== null).map((item, idx) => (
                   <div 
-                    key={cycle.id}
+                    key={`${item.destinationId}-${item.pillar}-${idx}`}
                     className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border"
                   >
                     <div className="flex items-center gap-3">
-                      {getEvolutionIcon(cycle.evolution_state)}
+                      {getEvolutionIcon(item.evolutionState)}
                       <div>
                         <div className="flex items-center gap-2">
-                          {getEvolutionBadge(cycle.evolution_state)}
+                          <span className="font-medium text-sm">{item.destinationName}</span>
+                          {getEvolutionBadge(item.evolutionState)}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {new Date(cycle.created_at).toLocaleDateString('pt-BR')}
+                          {getPillarLabel(item.pillar)} • {new Date(item.calculatedAt).toLocaleDateString('pt-BR')}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="text-muted-foreground">{formatScore(cycle.previous_score)}</span>
+                        <span className="text-muted-foreground">{formatScore(item.previousScore)}</span>
                         <span>→</span>
-                        <span className="font-medium">{formatScore(cycle.current_score)}</span>
+                        <span className="font-medium">{formatScore(item.currentScore)}</span>
                       </div>
-                      {cycle.previous_score !== null && cycle.current_score !== null && (
+                      {item.previousScore !== null && item.currentScore !== null && (
                         <p className={`text-xs ${
-                          cycle.current_score > cycle.previous_score 
+                          item.currentScore > item.previousScore 
                             ? 'text-green-600' 
-                            : cycle.current_score < cycle.previous_score 
+                            : item.currentScore < item.previousScore 
                               ? 'text-red-600' 
                               : 'text-yellow-600'
                         }`}>
-                          {cycle.current_score > cycle.previous_score ? '+' : ''}
-                          {((cycle.current_score - cycle.previous_score) * 100).toFixed(1)}%
+                          {item.currentScore > item.previousScore ? '+' : ''}
+                          {((item.currentScore - item.previousScore) * 100).toFixed(1)}%
                         </p>
                       )}
                     </div>
