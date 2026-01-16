@@ -1549,6 +1549,57 @@ export type Database = {
           },
         ]
       }
+      edu_training_access: {
+        Row: {
+          access_type: string
+          created_at: string
+          expires_at: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          org_id: string | null
+          training_id: string
+          user_id: string | null
+        }
+        Insert: {
+          access_type: string
+          created_at?: string
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          org_id?: string | null
+          training_id: string
+          user_id?: string | null
+        }
+        Update: {
+          access_type?: string
+          created_at?: string
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          org_id?: string | null
+          training_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_training_access_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edu_training_access_training_id_fkey"
+            columns: ["training_id"]
+            isOneToOne: false
+            referencedRelation: "edu_trainings"
+            referencedColumns: ["training_id"]
+          },
+        ]
+      }
       edu_trainings: {
         Row: {
           active: boolean
@@ -4758,6 +4809,10 @@ export type Database = {
       toggle_demo_mode: { Args: { _enable: boolean }; Returns: undefined }
       user_belongs_to_org: {
         Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
+      user_has_training_access: {
+        Args: { p_training_id: string; p_user_id: string }
         Returns: boolean
       }
     }

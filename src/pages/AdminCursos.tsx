@@ -65,9 +65,11 @@ import {
   Send,
   FileText,
   Link as LinkIcon,
-  Play
+  Play,
+  Shield
 } from 'lucide-react';
 import { useAdminTrainings, useAdminTrainingMutations, TrainingFormData } from '@/hooks/useEduAdmin';
+import { TrainingAccessManager } from '@/components/admin/TrainingAccessManager';
 
 type PillarType = 'RA' | 'OE' | 'AO';
 type TrainingType = 'course' | 'live';
@@ -145,13 +147,20 @@ export default function AdminCursos() {
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isAccessDialogOpen, setIsAccessDialogOpen] = useState(false);
   const [editingTraining, setEditingTraining] = useState<typeof trainings extends (infer T)[] ? T : never | null>(null);
+  const [accessTraining, setAccessTraining] = useState<typeof trainings extends (infer T)[] ? T : never | null>(null);
   const [deletingTrainingId, setDeletingTrainingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPillar, setFilterPillar] = useState<PillarType | 'all'>('all');
   const [filterType, setFilterType] = useState<TrainingType | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<TrainingStatus | 'all'>('all');
+
+  const handleOpenAccessManager = (training: NonNullable<typeof trainings>[number]) => {
+    setAccessTraining(training);
+    setIsAccessDialogOpen(true);
+  };
 
   const handleOpenCreate = (type: TrainingType = 'course') => {
     setEditingTraining(null);
@@ -541,6 +550,11 @@ export default function AdminCursos() {
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleOpenAccessManager(training)}>
+                                <Shield className="h-4 w-4 mr-2" />
+                                Gerenciar Acesso
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               {training.status !== 'published' && (
                                 <DropdownMenuItem onClick={() => handlePublish(training.training_id)}>
                                   <Send className="h-4 w-4 mr-2" />
@@ -594,10 +608,14 @@ export default function AdminCursos() {
 
             <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto pr-2 space-y-4">
               <Tabs defaultValue="basic" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="basic">Básico</TabsTrigger>
                   <TabsTrigger value="content">Conteúdo</TabsTrigger>
                   <TabsTrigger value="media">Mídia</TabsTrigger>
+                  <TabsTrigger value="access" disabled={!editingTraining}>
+                    <Shield className="h-3 w-3 mr-1" />
+                    Acesso
+                  </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="basic" className="space-y-4 mt-4">
@@ -822,6 +840,19 @@ export default function AdminCursos() {
                     )}
                   </div>
                 </TabsContent>
+
+                <TabsContent value="access" className="space-y-4 mt-4">
+                  {editingTraining ? (
+                    <TrainingAccessManager 
+                      trainingId={editingTraining.training_id} 
+                      trainingTitle={editingTraining.title} 
+                    />
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      Salve o treinamento primeiro para configurar o controle de acesso.
+                    </div>
+                  )}
+                </TabsContent>
               </Tabs>
             </form>
 
@@ -862,6 +893,34 @@ export default function AdminCursos() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Access Management Dialog */}
+        <Dialog open={isAccessDialogOpen} onOpenChange={setIsAccessDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Gerenciar Acesso
+              </DialogTitle>
+              <DialogDescription>
+                Configure quem pode acessar este treinamento
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto">
+              {accessTraining && (
+                <TrainingAccessManager 
+                  trainingId={accessTraining.training_id} 
+                  trainingTitle={accessTraining.title} 
+                />
+              )}
+            </div>
+            <DialogFooter className="flex-shrink-0 pt-4 border-t">
+              <Button onClick={() => setIsAccessDialogOpen(false)}>
+                Fechar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );
