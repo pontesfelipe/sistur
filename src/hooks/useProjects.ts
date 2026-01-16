@@ -503,6 +503,202 @@ export function useCreateMilestones() {
   });
 }
 
+// Hook to create a single phase
+export function useCreatePhase() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (phase: Omit<ProjectPhase, 'id' | 'created_at' | 'updated_at'>) => {
+      const { data, error } = await supabase
+        .from("project_phases")
+        .insert(phase)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["project-phases", data.project_id] });
+      toast({
+        title: "Fase criada",
+        description: "A fase foi adicionada ao projeto",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao criar fase",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+// Hook to delete a phase
+export function useDeletePhase() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, projectId }: { id: string; projectId: string }) => {
+      const { error } = await supabase.from("project_phases").delete().eq("id", id);
+      if (error) throw error;
+      return projectId;
+    },
+    onSuccess: (projectId) => {
+      queryClient.invalidateQueries({ queryKey: ["project-phases", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] });
+      toast({
+        title: "Fase excluída",
+        description: "A fase e suas tarefas foram removidas",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao excluir fase",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+// Hook to create a single task
+export function useCreateTask() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (task: Omit<ProjectTask, 'id' | 'created_at' | 'updated_at'>) => {
+      const { data, error } = await supabase
+        .from("project_tasks")
+        .insert(task)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["project-tasks", data.project_id] });
+      toast({
+        title: "Tarefa criada",
+        description: "A tarefa foi adicionada ao projeto",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao criar tarefa",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+// Hook to create a single milestone
+export function useCreateMilestone() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (milestone: Omit<ProjectMilestone, 'id' | 'created_at'>) => {
+      const { data, error } = await supabase
+        .from("project_milestones")
+        .insert(milestone)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["project-milestones", data.project_id] });
+      toast({
+        title: "Marco criado",
+        description: "O marco foi adicionado ao projeto",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao criar marco",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+// Hook to update a milestone
+export function useUpdateMilestone() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: Partial<Omit<ProjectMilestone, 'id' | 'project_id' | 'created_at'>>;
+    }) => {
+      const { data, error } = await supabase
+        .from("project_milestones")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["project-milestones", data.project_id] });
+      toast({
+        title: "Marco atualizado",
+        description: "As alterações foram salvas",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao atualizar marco",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+// Hook to delete a milestone
+export function useDeleteMilestone() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, projectId }: { id: string; projectId: string }) => {
+      const { error } = await supabase.from("project_milestones").delete().eq("id", id);
+      if (error) throw error;
+      return projectId;
+    },
+    onSuccess: (projectId) => {
+      queryClient.invalidateQueries({ queryKey: ["project-milestones", projectId] });
+      toast({
+        title: "Marco excluído",
+        description: "O marco foi removido do projeto",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao excluir marco",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
 // Methodology info
 export const METHODOLOGY_INFO: Record<ProjectMethodology, {
   name: string;
