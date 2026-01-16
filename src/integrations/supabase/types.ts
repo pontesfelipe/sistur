@@ -4089,6 +4089,345 @@ export type Database = {
           },
         ]
       }
+      project_milestones: {
+        Row: {
+          completed_date: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          project_id: string
+          status: string
+          target_date: string
+        }
+        Insert: {
+          completed_date?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          project_id: string
+          status?: string
+          target_date: string
+        }
+        Update: {
+          completed_date?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          project_id?: string
+          status?: string
+          target_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_milestones_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_phases: {
+        Row: {
+          actual_end_date: string | null
+          actual_start_date: string | null
+          created_at: string
+          deliverables: Json | null
+          description: string | null
+          id: string
+          name: string
+          phase_order: number
+          phase_type: string
+          planned_end_date: string | null
+          planned_start_date: string | null
+          project_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          actual_end_date?: string | null
+          actual_start_date?: string | null
+          created_at?: string
+          deliverables?: Json | null
+          description?: string | null
+          id?: string
+          name: string
+          phase_order: number
+          phase_type: string
+          planned_end_date?: string | null
+          planned_start_date?: string | null
+          project_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          actual_end_date?: string | null
+          actual_start_date?: string | null
+          created_at?: string
+          deliverables?: Json | null
+          description?: string | null
+          id?: string
+          name?: string
+          phase_order?: number
+          phase_type?: string
+          planned_end_date?: string | null
+          planned_start_date?: string | null
+          project_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_phases_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_tasks: {
+        Row: {
+          actual_end_date: string | null
+          actual_hours: number | null
+          actual_start_date: string | null
+          assignee_id: string | null
+          assignee_name: string | null
+          created_at: string
+          description: string | null
+          estimated_hours: number | null
+          id: string
+          linked_action_plan_id: string | null
+          linked_issue_id: string | null
+          linked_prescription_id: string | null
+          parent_task_id: string | null
+          phase_id: string | null
+          planned_end_date: string | null
+          planned_start_date: string | null
+          priority: string | null
+          project_id: string
+          status: string
+          story_points: number | null
+          tags: string[] | null
+          task_type: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          actual_end_date?: string | null
+          actual_hours?: number | null
+          actual_start_date?: string | null
+          assignee_id?: string | null
+          assignee_name?: string | null
+          created_at?: string
+          description?: string | null
+          estimated_hours?: number | null
+          id?: string
+          linked_action_plan_id?: string | null
+          linked_issue_id?: string | null
+          linked_prescription_id?: string | null
+          parent_task_id?: string | null
+          phase_id?: string | null
+          planned_end_date?: string | null
+          planned_start_date?: string | null
+          priority?: string | null
+          project_id: string
+          status?: string
+          story_points?: number | null
+          tags?: string[] | null
+          task_type?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          actual_end_date?: string | null
+          actual_hours?: number | null
+          actual_start_date?: string | null
+          assignee_id?: string | null
+          assignee_name?: string | null
+          created_at?: string
+          description?: string | null
+          estimated_hours?: number | null
+          id?: string
+          linked_action_plan_id?: string | null
+          linked_issue_id?: string | null
+          linked_prescription_id?: string | null
+          parent_task_id?: string | null
+          phase_id?: string | null
+          planned_end_date?: string | null
+          planned_start_date?: string | null
+          priority?: string | null
+          project_id?: string
+          status?: string
+          story_points?: number | null
+          tags?: string[] | null
+          task_type?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_tasks_linked_action_plan_id_fkey"
+            columns: ["linked_action_plan_id"]
+            isOneToOne: false
+            referencedRelation: "action_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tasks_linked_issue_id_fkey"
+            columns: ["linked_issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tasks_linked_prescription_id_fkey"
+            columns: ["linked_prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tasks_parent_task_id_fkey"
+            columns: ["parent_task_id"]
+            isOneToOne: false
+            referencedRelation: "project_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tasks_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "project_phases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          actual_end_date: string | null
+          actual_start_date: string | null
+          assessment_id: string
+          budget_actual: number | null
+          budget_estimated: number | null
+          created_at: string
+          created_by: string
+          description: string | null
+          destination_id: string
+          generated_structure: Json | null
+          id: string
+          methodology: string
+          name: string
+          org_id: string
+          owner_id: string | null
+          planned_end_date: string | null
+          planned_start_date: string | null
+          priority: string | null
+          report_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          actual_end_date?: string | null
+          actual_start_date?: string | null
+          assessment_id: string
+          budget_actual?: number | null
+          budget_estimated?: number | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          destination_id: string
+          generated_structure?: Json | null
+          id?: string
+          methodology: string
+          name: string
+          org_id: string
+          owner_id?: string | null
+          planned_end_date?: string | null
+          planned_start_date?: string | null
+          priority?: string | null
+          report_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          actual_end_date?: string | null
+          actual_start_date?: string | null
+          assessment_id?: string
+          budget_actual?: number | null
+          budget_estimated?: number | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          destination_id?: string
+          generated_structure?: Json | null
+          id?: string
+          methodology?: string
+          name?: string
+          org_id?: string
+          owner_id?: string | null
+          planned_end_date?: string | null
+          planned_start_date?: string | null
+          priority?: string | null
+          report_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
+            foreignKeyName: "projects_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
+          {
+            foreignKeyName: "projects_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "generated_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       questionnaire_questions: {
         Row: {
           created_at: string
