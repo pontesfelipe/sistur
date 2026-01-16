@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -40,7 +41,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { supabase } from '@/integrations/supabase/client';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { 
   Plus, 
@@ -49,34 +56,27 @@ import {
   GraduationCap,
   Clock,
   Users,
-  Layers,
   Search,
-  Filter
+  Filter,
+  Video,
+  MoreVertical,
+  Archive,
+  Eye,
+  Send,
+  FileText,
+  Link as LinkIcon,
+  Play
 } from 'lucide-react';
-import type { Database } from '@/integrations/supabase/types';
+import { useAdminTrainings, useAdminTrainingMutations, TrainingFormData } from '@/hooks/useEduAdmin';
 
-type Course = Database['public']['Tables']['courses']['Row'];
-type CourseInsert = Database['public']['Tables']['courses']['Insert'];
-type PillarType = Database['public']['Enums']['pillar_type'];
-type TargetAgent = Database['public']['Enums']['target_agent'];
-type CourseLevel = Database['public']['Enums']['course_level'];
+type PillarType = 'RA' | 'OE' | 'AO';
+type TrainingType = 'course' | 'live';
+type TrainingStatus = 'draft' | 'published' | 'archived';
 
 const PILLAR_LABELS: Record<PillarType, string> = {
   RA: 'RA - Relações Ambientais',
   AO: 'AO - Ações Operacionais',
   OE: 'OE - Organização Estrutural',
-};
-
-const TARGET_AGENT_LABELS: Record<TargetAgent, string> = {
-  GESTORES: 'Gestores Públicos',
-  TECNICOS: 'Técnicos',
-  TRADE: 'Trade Turístico',
-};
-
-const LEVEL_LABELS: Record<CourseLevel, string> = {
-  BASICO: 'Básico',
-  INTERMEDIARIO: 'Intermediário',
-  AVANCADO: 'Avançado',
 };
 
 const PILLAR_COLORS: Record<PillarType, string> = {
@@ -85,146 +85,110 @@ const PILLAR_COLORS: Record<PillarType, string> = {
   OE: 'bg-green-500/10 text-green-700 border-green-500/20',
 };
 
-interface CourseFormData {
+const STATUS_LABELS: Record<TrainingStatus, { label: string; color: string }> = {
+  draft: { label: 'Rascunho', color: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20' },
+  published: { label: 'Publicado', color: 'bg-green-500/10 text-green-700 border-green-500/20' },
+  archived: { label: 'Arquivado', color: 'bg-gray-500/10 text-gray-700 border-gray-500/20' },
+};
+
+const LEVEL_OPTIONS = [
+  { value: 'Básico', label: 'Básico' },
+  { value: 'Intermediário', label: 'Intermediário' },
+  { value: 'Avançado', label: 'Avançado' },
+];
+
+const TARGET_AUDIENCE_OPTIONS = [
+  { value: 'GESTORES', label: 'Gestores Públicos' },
+  { value: 'TECNICOS', label: 'Técnicos' },
+  { value: 'TRADE', label: 'Trade Turístico' },
+];
+
+interface FormData {
+  training_id: string;
   title: string;
-  description: string;
+  type: TrainingType;
   pillar: PillarType | '';
-  target_agent: TargetAgent;
-  level: CourseLevel;
-  theme: string;
+  level: string;
+  description: string;
+  objective: string;
+  target_audience: string;
+  course_code: string;
   duration_minutes: number | null;
-  url: string;
-  tags: string[];
+  video_url: string;
+  video_provider: string;
+  thumbnail_url: string;
+  status: TrainingStatus;
+  active: boolean;
 }
 
-const defaultFormData: CourseFormData = {
+const defaultFormData: FormData = {
+  training_id: '',
   title: '',
-  description: '',
+  type: 'course',
   pillar: '',
-  target_agent: 'GESTORES',
-  level: 'BASICO',
-  theme: '',
+  level: 'Básico',
+  description: '',
+  objective: '',
+  target_audience: 'GESTORES',
+  course_code: '',
   duration_minutes: null,
-  url: '',
-  tags: [],
+  video_url: '',
+  video_provider: 'youtube',
+  thumbnail_url: '',
+  status: 'draft',
+  active: true,
 };
 
 export default function AdminCursos() {
-  const queryClient = useQueryClient();
+  const { data: trainings, isLoading } = useAdminTrainings();
+  const { createTraining, updateTraining, archiveTraining, publishTraining, deleteTraining } = useAdminTrainingMutations();
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-  const [deletingCourseId, setDeletingCourseId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<CourseFormData>(defaultFormData);
-  const [tagsInput, setTagsInput] = useState('');
+  const [editingTraining, setEditingTraining] = useState<typeof trainings extends (infer T)[] ? T : never | null>(null);
+  const [deletingTrainingId, setDeletingTrainingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPillar, setFilterPillar] = useState<PillarType | 'all'>('all');
+  const [filterType, setFilterType] = useState<TrainingType | 'all'>('all');
+  const [filterStatus, setFilterStatus] = useState<TrainingStatus | 'all'>('all');
 
-  // Fetch courses
-  const { data: courses, isLoading } = useQuery({
-    queryKey: ['admin-courses'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('courses')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data as Course[];
-    },
-  });
-
-  // Create/Update mutation
-  const saveMutation = useMutation({
-    mutationFn: async (data: CourseFormData) => {
-      const courseData: CourseInsert = {
-        title: data.title.trim(),
-        description: data.description.trim() || null,
-        pillar: data.pillar || null,
-        target_agent: data.target_agent,
-        level: data.level,
-        theme: data.theme.trim() || null,
-        duration_minutes: data.duration_minutes,
-        url: data.url.trim() || null,
-        tags: data.tags,
-      };
-
-      if (editingCourse) {
-        const { error } = await supabase
-          .from('courses')
-          .update(courseData)
-          .eq('id', editingCourse.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('courses')
-          .insert(courseData);
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast.success(editingCourse ? 'Curso atualizado!' : 'Curso criado!');
-      handleCloseDialog();
-    },
-    onError: (error) => {
-      console.error('Error saving course:', error);
-      toast.error('Erro ao salvar curso');
-    },
-  });
-
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('courses')
-        .delete()
-        .eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast.success('Curso excluído!');
-      setIsDeleteDialogOpen(false);
-      setDeletingCourseId(null);
-    },
-    onError: (error) => {
-      console.error('Error deleting course:', error);
-      toast.error('Erro ao excluir curso');
-    },
-  });
-
-  const handleOpenCreate = () => {
-    setEditingCourse(null);
-    setFormData(defaultFormData);
-    setTagsInput('');
+  const handleOpenCreate = (type: TrainingType = 'course') => {
+    setEditingTraining(null);
+    setFormData({
+      ...defaultFormData,
+      type,
+      training_id: `${type}-${Date.now().toString(36)}`,
+    });
     setIsDialogOpen(true);
   };
 
-  const handleOpenEdit = (course: Course) => {
-    setEditingCourse(course);
+  const handleOpenEdit = (training: NonNullable<typeof trainings>[number]) => {
+    setEditingTraining(training);
     setFormData({
-      title: course.title,
-      description: course.description || '',
-      pillar: course.pillar || '',
-      target_agent: course.target_agent || 'GESTORES',
-      level: course.level,
-      theme: course.theme || '',
-      duration_minutes: course.duration_minutes,
-      url: course.url || '',
-      tags: Array.isArray(course.tags) ? (course.tags as string[]) : [],
+      training_id: training.training_id,
+      title: training.title,
+      type: (training.type as TrainingType) || 'course',
+      pillar: (training.pillar as PillarType) || '',
+      level: training.level || 'Básico',
+      description: training.description || '',
+      objective: training.objective || '',
+      target_audience: training.target_audience || 'GESTORES',
+      course_code: training.course_code || '',
+      duration_minutes: training.duration_minutes,
+      video_url: training.video_url || '',
+      video_provider: training.video_provider || 'youtube',
+      thumbnail_url: training.thumbnail_url || '',
+      status: (training.status as TrainingStatus) || 'draft',
+      active: training.active ?? true,
     });
-    setTagsInput(Array.isArray(course.tags) ? (course.tags as string[]).join(', ') : '');
     setIsDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
-    setEditingCourse(null);
+    setEditingTraining(null);
     setFormData(defaultFormData);
-    setTagsInput('');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -240,97 +204,228 @@ export default function AdminCursos() {
       return;
     }
 
-    const tags = tagsInput
-      .split(',')
-      .map(t => t.trim())
-      .filter(t => t.length > 0);
+    const trainingData: TrainingFormData = {
+      training_id: formData.training_id,
+      title: formData.title.trim(),
+      type: formData.type,
+      pillar: formData.pillar as PillarType,
+      level: formData.level || undefined,
+      description: formData.description.trim() || undefined,
+      objective: formData.objective.trim() || undefined,
+      target_audience: formData.target_audience || undefined,
+      course_code: formData.course_code.trim() || undefined,
+      duration_minutes: formData.duration_minutes || undefined,
+      video_url: formData.video_url.trim() || undefined,
+      video_provider: formData.video_provider as 'youtube' | 'vimeo' | 'supabase' | 'mux' || undefined,
+      thumbnail_url: formData.thumbnail_url.trim() || undefined,
+      status: formData.status,
+      active: formData.active,
+    };
 
-    saveMutation.mutate({ ...formData, tags });
+    if (editingTraining) {
+      updateTraining.mutate(
+        { trainingId: editingTraining.training_id, data: trainingData },
+        {
+          onSuccess: () => {
+            toast.success('Treinamento atualizado!');
+            handleCloseDialog();
+          },
+          onError: (error) => {
+            toast.error(`Erro ao atualizar: ${error.message}`);
+          },
+        }
+      );
+    } else {
+      createTraining.mutate(trainingData, {
+        onSuccess: () => {
+          toast.success('Treinamento criado!');
+          handleCloseDialog();
+        },
+        onError: (error) => {
+          toast.error(`Erro ao criar: ${error.message}`);
+        },
+      });
+    }
   };
 
   const handleOpenDelete = (id: string) => {
-    setDeletingCourseId(id);
+    setDeletingTrainingId(id);
     setIsDeleteDialogOpen(true);
   };
 
   const handleConfirmDelete = () => {
-    if (deletingCourseId) {
-      deleteMutation.mutate(deletingCourseId);
+    if (deletingTrainingId) {
+      deleteTraining.mutate(deletingTrainingId, {
+        onSuccess: () => {
+          toast.success('Treinamento excluído!');
+          setIsDeleteDialogOpen(false);
+          setDeletingTrainingId(null);
+        },
+        onError: (error) => {
+          toast.error(`Erro ao excluir: ${error.message}`);
+        },
+      });
     }
   };
 
-  // Filtered courses
-  const filteredCourses = courses?.filter(course => {
+  const handlePublish = (trainingId: string) => {
+    publishTraining.mutate(trainingId, {
+      onSuccess: () => toast.success('Treinamento publicado!'),
+      onError: (error) => toast.error(`Erro ao publicar: ${error.message}`),
+    });
+  };
+
+  const handleArchive = (trainingId: string) => {
+    archiveTraining.mutate(trainingId, {
+      onSuccess: () => toast.success('Treinamento arquivado!'),
+      onError: (error) => toast.error(`Erro ao arquivar: ${error.message}`),
+    });
+  };
+
+  // Filtered trainings
+  const filteredTrainings = trainings?.filter(training => {
     const matchesSearch = searchQuery === '' || 
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.theme?.toLowerCase().includes(searchQuery.toLowerCase());
+      training.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      training.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      training.course_code?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesPillar = filterPillar === 'all' || course.pillar === filterPillar;
+    const matchesPillar = filterPillar === 'all' || training.pillar === filterPillar;
+    const matchesType = filterType === 'all' || training.type === filterType;
+    const matchesStatus = filterStatus === 'all' || training.status === filterStatus;
     
-    return matchesSearch && matchesPillar;
+    return matchesSearch && matchesPillar && matchesType && matchesStatus;
   });
 
+  // Stats
+  const stats = {
+    total: trainings?.length || 0,
+    courses: trainings?.filter(t => t.type === 'course').length || 0,
+    lives: trainings?.filter(t => t.type === 'live').length || 0,
+    published: trainings?.filter(t => t.status === 'published').length || 0,
+    draft: trainings?.filter(t => t.status === 'draft').length || 0,
+  };
+
   return (
-    <AppLayout title="Administração de Cursos" subtitle="Gerencie o catálogo SISTUR EDU">
+    <AppLayout title="Administração de Treinamentos" subtitle="Gerencie o catálogo SISTUR EDU">
       <div className="space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold">{stats.total}</div>
+              <p className="text-xs text-muted-foreground">Total</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-primary">{stats.courses}</div>
+              <p className="text-xs text-muted-foreground">Cursos</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-purple-600">{stats.lives}</div>
+              <p className="text-xs text-muted-foreground">Lives</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-green-600">{stats.published}</div>
+              <p className="text-xs text-muted-foreground">Publicados</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-yellow-600">{stats.draft}</div>
+              <p className="text-xs text-muted-foreground">Rascunhos</p>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Actions Bar */}
         <Card>
           <CardContent className="py-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <div className="flex flex-1 gap-3 w-full sm:w-auto">
-                <div className="relative flex-1 sm:max-w-xs">
+            <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+              <div className="flex flex-1 flex-wrap gap-3 w-full lg:w-auto">
+                <div className="relative flex-1 min-w-[200px] max-w-xs">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Buscar cursos..."
+                    placeholder="Buscar treinamentos..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9"
                   />
                 </div>
                 <Select value={filterPillar} onValueChange={(v) => setFilterPillar(v as PillarType | 'all')}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[160px]">
                     <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Filtrar pilar" />
+                    <SelectValue placeholder="Pilar" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos os pilares</SelectItem>
-                    <SelectItem value="RA">RA - Relações Ambientais</SelectItem>
-                    <SelectItem value="AO">AO - Ações Operacionais</SelectItem>
-                    <SelectItem value="OE">OE - Organização Estrutural</SelectItem>
+                    <SelectItem value="RA">RA</SelectItem>
+                    <SelectItem value="AO">AO</SelectItem>
+                    <SelectItem value="OE">OE</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={filterType} onValueChange={(v) => setFilterType(v as TrainingType | 'all')}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="course">Cursos</SelectItem>
+                    <SelectItem value="live">Lives</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as TrainingStatus | 'all')}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="draft">Rascunho</SelectItem>
+                    <SelectItem value="published">Publicado</SelectItem>
+                    <SelectItem value="archived">Arquivado</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleOpenCreate} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Novo Curso
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => handleOpenCreate('course')} className="gap-2">
+                  <GraduationCap className="h-4 w-4" />
+                  Novo Curso
+                </Button>
+                <Button onClick={() => handleOpenCreate('live')} variant="outline" className="gap-2">
+                  <Video className="h-4 w-4" />
+                  Nova Live
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Courses Table */}
+        {/* Trainings Table */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <GraduationCap className="h-5 w-5 text-primary" />
-              Catálogo de Cursos
+              Catálogo de Treinamentos
             </CardTitle>
             <CardDescription>
-              {filteredCourses?.length || 0} curso(s) encontrado(s)
+              {filteredTrainings?.length || 0} treinamento(s) encontrado(s)
             </CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="flex items-center justify-center py-8 text-muted-foreground">
-                Carregando cursos...
+                Carregando treinamentos...
               </div>
-            ) : filteredCourses?.length === 0 ? (
+            ) : filteredTrainings?.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <GraduationCap className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <p className="text-muted-foreground">Nenhum curso encontrado</p>
-                <Button variant="link" onClick={handleOpenCreate}>
-                  Criar primeiro curso
+                <p className="text-muted-foreground">Nenhum treinamento encontrado</p>
+                <Button variant="link" onClick={() => handleOpenCreate('course')}>
+                  Criar primeiro treinamento
                 </Button>
               </div>
             ) : (
@@ -338,83 +433,136 @@ export default function AdminCursos() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Título</TableHead>
+                      <TableHead className="min-w-[250px]">Título</TableHead>
+                      <TableHead>Tipo</TableHead>
                       <TableHead>Pilar</TableHead>
-                      <TableHead>Agente</TableHead>
                       <TableHead>Nível</TableHead>
-                      <TableHead>Tema</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Duração</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredCourses?.map((course) => (
-                      <TableRow key={course.id}>
-                        <TableCell className="font-medium max-w-[250px]">
-                          <div className="truncate" title={course.title}>
-                            {course.title}
+                    {filteredTrainings?.map((training) => (
+                      <TableRow key={training.training_id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-start gap-3">
+                            {training.thumbnail_url ? (
+                              <img 
+                                src={training.thumbnail_url} 
+                                alt="" 
+                                className="w-16 h-10 object-cover rounded"
+                              />
+                            ) : (
+                              <div className="w-16 h-10 bg-muted rounded flex items-center justify-center">
+                                {training.type === 'course' ? (
+                                  <GraduationCap className="h-5 w-5 text-muted-foreground" />
+                                ) : (
+                                  <Video className="h-5 w-5 text-muted-foreground" />
+                                )}
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <div className="truncate font-medium" title={training.title}>
+                                {training.title}
+                              </div>
+                              {training.course_code && (
+                                <p className="text-xs text-muted-foreground">{training.course_code}</p>
+                              )}
+                            </div>
                           </div>
-                          {course.description && (
-                            <p className="text-xs text-muted-foreground truncate mt-0.5" title={course.description}>
-                              {course.description}
-                            </p>
-                          )}
                         </TableCell>
                         <TableCell>
-                          {course.pillar ? (
-                            <Badge variant="outline" className={PILLAR_COLORS[course.pillar]}>
-                              {course.pillar}
+                          <Badge variant={training.type === 'course' ? 'default' : 'secondary'}>
+                            {training.type === 'course' ? (
+                              <><GraduationCap className="h-3 w-3 mr-1" />Curso</>
+                            ) : (
+                              <><Video className="h-3 w-3 mr-1" />Live</>
+                            )}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {training.pillar ? (
+                            <Badge variant="outline" className={PILLAR_COLORS[training.pillar as PillarType]}>
+                              {training.pillar}
                             </Badge>
                           ) : (
                             <span className="text-muted-foreground">-</span>
                           )}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Users className="h-3 w-3 text-muted-foreground" />
-                            <span className="text-sm">
-                              {course.target_agent ? TARGET_AGENT_LABELS[course.target_agent] : '-'}
-                            </span>
-                          </div>
+                          <span className="text-sm">{training.level || '-'}</span>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary">
-                            {LEVEL_LABELS[course.level]}
-                          </Badge>
+                          {training.status ? (
+                            <Badge variant="outline" className={STATUS_LABELS[training.status as TrainingStatus]?.color}>
+                              {STATUS_LABELS[training.status as TrainingStatus]?.label}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className={STATUS_LABELS.draft.color}>
+                              {STATUS_LABELS.draft.label}
+                            </Badge>
+                          )}
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm text-muted-foreground">
-                            {course.theme || '-'}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          {course.duration_minutes ? (
+                          {training.duration_minutes ? (
                             <div className="flex items-center gap-1 text-sm">
                               <Clock className="h-3 w-3 text-muted-foreground" />
-                              {course.duration_minutes} min
+                              {training.duration_minutes} min
                             </div>
                           ) : (
                             <span className="text-muted-foreground">-</span>
                           )}
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleOpenEdit(course)}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleOpenDelete(course.id)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleOpenEdit(training)}>
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <a href={`/edu/training/${training.training_id}`} target="_blank" rel="noopener noreferrer">
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  Visualizar
+                                </a>
+                              </DropdownMenuItem>
+                              {training.video_url && (
+                                <DropdownMenuItem asChild>
+                                  <a href={training.video_url} target="_blank" rel="noopener noreferrer">
+                                    <Play className="h-4 w-4 mr-2" />
+                                    Ver vídeo
+                                  </a>
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuSeparator />
+                              {training.status !== 'published' && (
+                                <DropdownMenuItem onClick={() => handlePublish(training.training_id)}>
+                                  <Send className="h-4 w-4 mr-2" />
+                                  Publicar
+                                </DropdownMenuItem>
+                              )}
+                              {training.status !== 'archived' && (
+                                <DropdownMenuItem onClick={() => handleArchive(training.training_id)}>
+                                  <Archive className="h-4 w-4 mr-2" />
+                                  Arquivar
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => handleOpenDelete(training.training_id)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -427,161 +575,280 @@ export default function AdminCursos() {
 
         {/* Create/Edit Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
             <DialogHeader>
-              <DialogTitle>
-                {editingCourse ? 'Editar Curso' : 'Novo Curso'}
+              <DialogTitle className="flex items-center gap-2">
+                {formData.type === 'course' ? (
+                  <GraduationCap className="h-5 w-5" />
+                ) : (
+                  <Video className="h-5 w-5" />
+                )}
+                {editingTraining ? 'Editar' : 'Novo'} {formData.type === 'course' ? 'Curso' : 'Live'}
               </DialogTitle>
               <DialogDescription>
-                {editingCourse
-                  ? 'Atualize as informações do curso'
-                  : 'Preencha os dados para criar um novo curso no catálogo SISTUR EDU'}
+                {editingTraining
+                  ? 'Atualize as informações do treinamento'
+                  : 'Preencha os dados para criar um novo treinamento no catálogo SISTUR EDU'}
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Título *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Nome do curso"
-                  required
-                />
-              </div>
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto pr-2 space-y-4">
+              <Tabs defaultValue="basic" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="basic">Básico</TabsTrigger>
+                  <TabsTrigger value="content">Conteúdo</TabsTrigger>
+                  <TabsTrigger value="media">Mídia</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="basic" className="space-y-4 mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="title">Título *</Label>
+                      <Input
+                        id="title"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        placeholder="Nome do treinamento"
+                        required
+                      />
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Descrição</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Descrição detalhada do curso"
-                  rows={3}
-                />
-              </div>
+                    <div className="space-y-2">
+                      <Label>Tipo *</Label>
+                      <Select
+                        value={formData.type}
+                        onValueChange={(v) => setFormData({ ...formData, type: v as TrainingType })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="course">
+                            <div className="flex items-center gap-2">
+                              <GraduationCap className="h-4 w-4" />
+                              Curso
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="live">
+                            <div className="flex items-center gap-2">
+                              <Video className="h-4 w-4" />
+                              Live
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="pillar">Pilar *</Label>
-                  <Select
-                    value={formData.pillar}
-                    onValueChange={(v) => setFormData({ ...formData, pillar: v as PillarType })}
-                  >
-                    <SelectTrigger>
-                      <Layers className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Selecione o pilar" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="RA">{PILLAR_LABELS.RA}</SelectItem>
-                      <SelectItem value="AO">{PILLAR_LABELS.AO}</SelectItem>
-                      <SelectItem value="OE">{PILLAR_LABELS.OE}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <div className="space-y-2">
+                      <Label>Pilar *</Label>
+                      <Select
+                        value={formData.pillar}
+                        onValueChange={(v) => setFormData({ ...formData, pillar: v as PillarType })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o pilar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="RA">{PILLAR_LABELS.RA}</SelectItem>
+                          <SelectItem value="AO">{PILLAR_LABELS.AO}</SelectItem>
+                          <SelectItem value="OE">{PILLAR_LABELS.OE}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="target_agent">Agente Alvo *</Label>
-                  <Select
-                    value={formData.target_agent}
-                    onValueChange={(v) => setFormData({ ...formData, target_agent: v as TargetAgent })}
-                  >
-                    <SelectTrigger>
-                      <Users className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Selecione o agente" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="GESTORES">{TARGET_AGENT_LABELS.GESTORES}</SelectItem>
-                      <SelectItem value="TECNICOS">{TARGET_AGENT_LABELS.TECNICOS}</SelectItem>
-                      <SelectItem value="TRADE">{TARGET_AGENT_LABELS.TRADE}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <div className="space-y-2">
+                      <Label>Nível</Label>
+                      <Select
+                        value={formData.level}
+                        onValueChange={(v) => setFormData({ ...formData, level: v })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {LEVEL_OPTIONS.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="level">Nível *</Label>
-                  <Select
-                    value={formData.level}
-                    onValueChange={(v) => setFormData({ ...formData, level: v as CourseLevel })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o nível" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="BASICO">{LEVEL_LABELS.BASICO}</SelectItem>
-                      <SelectItem value="INTERMEDIARIO">{LEVEL_LABELS.INTERMEDIARIO}</SelectItem>
-                      <SelectItem value="AVANCADO">{LEVEL_LABELS.AVANCADO}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <div className="space-y-2">
+                      <Label>Público-alvo</Label>
+                      <Select
+                        value={formData.target_audience}
+                        onValueChange={(v) => setFormData({ ...formData, target_audience: v })}
+                      >
+                        <SelectTrigger>
+                          <Users className="h-4 w-4 mr-2" />
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TARGET_AUDIENCE_OPTIONS.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="theme">Tema</Label>
-                  <Input
-                    id="theme"
-                    value={formData.theme}
-                    onChange={(e) => setFormData({ ...formData, theme: e.target.value })}
-                    placeholder="Ex: Sustentabilidade, Governança"
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="course_code">Código</Label>
+                      <Input
+                        id="course_code"
+                        value={formData.course_code}
+                        onChange={(e) => setFormData({ ...formData, course_code: e.target.value })}
+                        placeholder="Ex: RA-101"
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="duration">Duração (minutos)</Label>
-                  <Input
-                    id="duration"
-                    type="number"
-                    value={formData.duration_minutes || ''}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      duration_minutes: e.target.value ? parseInt(e.target.value) : null 
-                    })}
-                    placeholder="Ex: 60"
-                    min={0}
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="duration">Duração (min)</Label>
+                      <Input
+                        id="duration"
+                        type="number"
+                        min={0}
+                        value={formData.duration_minutes || ''}
+                        onChange={(e) => setFormData({ ...formData, duration_minutes: e.target.value ? parseInt(e.target.value) : null })}
+                        placeholder="60"
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="url">URL do Curso</Label>
-                  <Input
-                    id="url"
-                    type="url"
-                    value={formData.url}
-                    onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                    placeholder="https://..."
-                  />
-                </div>
-              </div>
+                    <div className="space-y-2">
+                      <Label>Status</Label>
+                      <Select
+                        value={formData.status}
+                        onValueChange={(v) => setFormData({ ...formData, status: v as TrainingStatus })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="draft">Rascunho</SelectItem>
+                          <SelectItem value="published">Publicado</SelectItem>
+                          <SelectItem value="archived">Arquivado</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
-                <Input
-                  id="tags"
-                  value={tagsInput}
-                  onChange={(e) => setTagsInput(e.target.value)}
-                  placeholder="Ex: sustentabilidade, ambiental, legislação"
-                />
-              </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="active"
+                      checked={formData.active}
+                      onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
+                    />
+                    <Label htmlFor="active">Ativo (visível no catálogo)</Label>
+                  </div>
+                </TabsContent>
 
-              <DialogFooter className="gap-2">
-                <Button type="button" variant="outline" onClick={handleCloseDialog}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={saveMutation.isPending}>
-                  {saveMutation.isPending ? 'Salvando...' : editingCourse ? 'Atualizar' : 'Criar'}
-                </Button>
-              </DialogFooter>
+                <TabsContent value="content" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Descrição</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Descrição detalhada do treinamento"
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="objective">Objetivo</Label>
+                    <Textarea
+                      id="objective"
+                      value={formData.objective}
+                      onChange={(e) => setFormData({ ...formData, objective: e.target.value })}
+                      placeholder="O que o aluno vai aprender neste treinamento"
+                      rows={3}
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="media" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label>Provedor de Vídeo</Label>
+                    <Select
+                      value={formData.video_provider}
+                      onValueChange={(v) => setFormData({ ...formData, video_provider: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="youtube">YouTube</SelectItem>
+                        <SelectItem value="vimeo">Vimeo</SelectItem>
+                        <SelectItem value="supabase">Upload direto</SelectItem>
+                        <SelectItem value="mux">Mux</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="video_url">URL do Vídeo</Label>
+                    <div className="flex gap-2">
+                      <LinkIcon className="h-4 w-4 mt-3 text-muted-foreground" />
+                      <Input
+                        id="video_url"
+                        value={formData.video_url}
+                        onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="thumbnail_url">URL da Thumbnail</Label>
+                    <div className="flex gap-2">
+                      <FileText className="h-4 w-4 mt-3 text-muted-foreground" />
+                      <Input
+                        id="thumbnail_url"
+                        value={formData.thumbnail_url}
+                        onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
+                        placeholder="https://..."
+                        className="flex-1"
+                      />
+                    </div>
+                    {formData.thumbnail_url && (
+                      <div className="mt-2">
+                        <img 
+                          src={formData.thumbnail_url} 
+                          alt="Preview" 
+                          className="w-32 h-20 object-cover rounded border"
+                          onError={(e) => (e.currentTarget.style.display = 'none')}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
             </form>
+
+            <DialogFooter className="flex-shrink-0 pt-4 border-t">
+              <Button variant="outline" onClick={handleCloseDialog}>
+                Cancelar
+              </Button>
+              <Button 
+                onClick={handleSubmit}
+                disabled={createTraining.isPending || updateTraining.isPending}
+              >
+                {createTraining.isPending || updateTraining.isPending 
+                  ? 'Salvando...' 
+                  : editingTraining ? 'Salvar' : 'Criar'
+                }
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
 
-        {/* Delete Confirmation Dialog */}
+        {/* Delete Confirmation */}
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Excluir Curso</AlertDialogTitle>
+              <AlertDialogTitle>Excluir treinamento?</AlertDialogTitle>
               <AlertDialogDescription>
-                Tem certeza que deseja excluir este curso? Esta ação não pode ser desfeita.
+                Esta ação não pode ser desfeita. O treinamento será permanentemente removido do catálogo.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -590,7 +857,7 @@ export default function AdminCursos() {
                 onClick={handleConfirmDelete}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {deleteMutation.isPending ? 'Excluindo...' : 'Excluir'}
+                {deleteTraining.isPending ? 'Excluindo...' : 'Excluir'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
