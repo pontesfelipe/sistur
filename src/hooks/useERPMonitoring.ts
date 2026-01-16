@@ -18,11 +18,14 @@ export interface ERPStats {
 
 export interface PillarProgress {
   pillar: 'RA' | 'OE' | 'AO';
-  total: number;
-  completed: number;
-  inProgress: number;
-  pending: number;
-  overdue: number;
+  avgScore: number;
+  totalAssessments: number;
+  destinations: {
+    id: string;
+    name: string;
+    score: number;
+    assessmentCount: number;
+  }[];
 }
 
 export interface CycleEvolution {
@@ -279,35 +282,75 @@ export function useProjectStats() {
   });
 }
 
-// Get progress by pillar
+// Get progress by pillar based on assessment pillar_scores
 export function usePillarProgress() {
   return useQuery({
     queryKey: ['erp-pillar-progress'],
     queryFn: async () => {
-      const { data: plans } = await supabase
-        .from('action_plans')
-        .select('*');
+      // Fetch calculated assessments with pillar scores
+      const { data: assessments } = await supabase
+        .from('assessments')
+        .select(`
+          id,
+          destination_id,
+          destinations(id, name),
+          pillar_scores(pillar, score)
+        `)
+        .eq('status', 'CALCULATED');
 
-      if (!plans) return [];
+      if (!assessments || assessments.length === 0) return [];
 
-      const now = new Date();
       const pillars: ('RA' | 'OE' | 'AO')[] = ['RA', 'OE', 'AO'];
 
       return pillars.map(pillar => {
-        const pillarPlans = plans.filter(p => p.pillar === pillar);
-        const overdue = pillarPlans.filter(p => {
-          if (p.status === 'COMPLETED' || p.status === 'CANCELLED') return false;
-          if (!p.due_date) return false;
-          return new Date(p.due_date) < now;
+        // Group scores by destination for this pillar
+        const destinationScores: Record<string, { 
+          id: string; 
+          name: string; 
+          scores: number[]; 
+        }> = {};
+
+        assessments.forEach(assessment => {
+          const destination = assessment.destinations as any;
+          if (!destination) return;
+
+          const pillarScore = (assessment.pillar_scores as any[])?.find(
+            ps => ps.pillar === pillar
+          );
+          
+          if (pillarScore) {
+            if (!destinationScores[destination.id]) {
+              destinationScores[destination.id] = {
+                id: destination.id,
+                name: destination.name,
+                scores: [],
+              };
+            }
+            destinationScores[destination.id].scores.push(pillarScore.score);
+          }
         });
+
+        // Calculate averages per destination
+        const destinations = Object.values(destinationScores).map(dest => ({
+          id: dest.id,
+          name: dest.name,
+          score: dest.scores.reduce((a, b) => a + b, 0) / dest.scores.length,
+          assessmentCount: dest.scores.length,
+        }));
+
+        // Calculate overall average for this pillar
+        const allScores = destinations.flatMap(d => 
+          Array(d.assessmentCount).fill(d.score)
+        );
+        const avgScore = allScores.length > 0 
+          ? allScores.reduce((a, b) => a + b, 0) / allScores.length 
+          : 0;
 
         return {
           pillar,
-          total: pillarPlans.length,
-          completed: pillarPlans.filter(p => p.status === 'COMPLETED').length,
-          inProgress: pillarPlans.filter(p => p.status === 'IN_PROGRESS').length,
-          pending: pillarPlans.filter(p => p.status === 'PENDING').length,
-          overdue: overdue.length,
+          avgScore,
+          totalAssessments: allScores.length,
+          destinations: destinations.sort((a, b) => b.score - a.score),
         } as PillarProgress;
       });
     },
