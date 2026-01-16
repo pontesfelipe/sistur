@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { CreateTrackFromRecommendationsDialog } from '@/components/edu/CreateTrackFromRecommendationsDialog';
 import { 
   Sparkles, 
   BookOpen, 
@@ -118,7 +121,7 @@ function RecommendationCard({
 
               <Link 
                 to={isTrack 
-                  ? `/edu/trilhas/${recommendation.entity_id}` 
+                  ? `/edu/trilha/${recommendation.entity_id}` 
                   : `/edu/training/${recommendation.entity_id}`
                 }
               >
@@ -163,6 +166,9 @@ export function PersonalizedRecommendationsPanel({
   const { data: recommendations, isLoading, error } = usePersonalizedRecommendations();
   const dismissMutation = useDismissRecommendation();
   const generateMutation = useGenerateRecommendations();
+
+  const [allOpen, setAllOpen] = useState(false);
+  const [createTrackOpen, setCreateTrackOpen] = useState(false);
 
   const handleDismiss = (id: string) => {
     dismissMutation.mutate(id);
@@ -306,12 +312,90 @@ export function PersonalizedRecommendationsPanel({
 
       {hasMore && (
         <div className="text-center">
-          <Button variant="outline" onClick={() => {}}>
+          <Button variant="outline" onClick={() => setAllOpen(true)}>
             Ver todas as {recommendations?.length} recomendações
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
       )}
-    </div>
-  );
-}
+
+      <Dialog open={allOpen} onOpenChange={setAllOpen}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Todas as recomendações</DialogTitle>
+            <DialogDescription>
+              {courses.length} cursos • {lives.length} lives • {tracks.length} trilhas
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              onClick={() => setCreateTrackOpen(true)}
+              disabled={courses.length + lives.length === 0}
+            >
+              <GraduationCap className="mr-2 h-4 w-4" />
+              Criar trilha com sugestões
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleRefresh}
+              disabled={generateMutation.isPending}
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${generateMutation.isPending ? 'animate-spin' : ''}`} />
+              Atualizar recomendações
+            </Button>
+          </div>
+
+          <div className="space-y-3 mt-4">
+            {(recommendations || []).map((rec) => {
+              const isTrack = rec.recommendation_type === 'track';
+              const isLive = rec.recommendation_type === 'live';
+              const title = isTrack ? rec.track?.name : rec.training?.title;
+              const pillar = rec.training?.pillar;
+              const href = isTrack ? `/edu/trilha/${rec.entity_id}` : `/edu/training/${rec.entity_id}`;
+              const Icon = isTrack ? GraduationCap : isLive ? Video : BookOpen;
+
+              return (
+                <Card key={rec.id} className="overflow-hidden">
+                  <CardContent className="p-4 flex items-center justify-between gap-4">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="h-9 w-9 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
+                        <Icon className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <Badge variant="outline" className="text-xs">
+                            {isTrack ? 'Trilha' : isLive ? 'Live' : 'Curso'}
+                          </Badge>
+                          {pillar && (
+                            <Badge variant="outline" className={`text-xs ${PILLAR_COLORS[pillar]}`}>
+                              {PILLAR_LABELS[pillar]}
+                            </Badge>
+                          )}
+                          <span className="text-xs text-muted-foreground">
+                            {Math.round(rec.relevance_score)}% match
+                          </span>
+                        </div>
+                        <p className="font-medium truncate">{title}</p>
+                      </div>
+                    </div>
+
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to={href}>
+                        Ver <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <CreateTrackFromRecommendationsDialog
+        open={createTrackOpen}
+        onOpenChange={setCreateTrackOpen}
+        recommendations={recommendations || []}
+        defaultName="Minha trilha recomendada"
+      />
