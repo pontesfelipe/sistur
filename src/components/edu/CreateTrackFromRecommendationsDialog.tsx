@@ -90,7 +90,7 @@ export function CreateTrackFromRecommendationsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Criar trilha com essas sugestões</DialogTitle>
           <DialogDescription>
@@ -98,85 +98,87 @@ export function CreateTrackFromRecommendationsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {trainingRecommendations.length === 0 ? (
-          <div className="rounded-md border p-4 text-sm text-muted-foreground">
-            Nenhuma recomendação de curso/live encontrada para montar uma trilha.
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Nome da trilha</label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Minha trilha personalizada" />
+        <div className="flex-1 overflow-y-auto pr-2">
+          {trainingRecommendations.length === 0 ? (
+            <div className="rounded-md border p-4 text-sm text-muted-foreground">
+              Nenhuma recomendação de curso/live encontrada para montar uma trilha.
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Descrição (opcional)</label>
-              <Input
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Uma trilha baseada nas minhas recomendações"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-medium">
-                  Itens da trilha ({selectedTrainingIds.length}/{trainingRecommendations.length})
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedTrainingIds(initialTrainingIds)}
-                  disabled={trainingRecommendations.length === 0}
-                >
-                  Selecionar tudo
-                </Button>
+          ) : (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Nome da trilha</label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Minha trilha personalizada" />
               </div>
 
-              <div className="rounded-md border overflow-hidden">
-                <div className="max-h-72 overflow-y-auto">
-                  {trainingRecommendations.map((t) => {
-                    const isLive = t.type === "live";
-                    const Icon = isLive ? Video : BookOpen;
-                    const checked = selectedTrainingIds.includes(t.training_id);
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Descrição (opcional)</label>
+                <Input
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Uma trilha baseada nas minhas recomendações"
+                />
+              </div>
 
-                    return (
-                      <button
-                        type="button"
-                        key={t.training_id}
-                        className={`w-full text-left flex items-start gap-3 p-3 border-b last:border-b-0 hover:bg-muted/50 ${
-                          checked ? "bg-primary/5" : ""
-                        }`}
-                        onClick={() => toggleTraining(t.training_id)}
-                      >
-                        <Checkbox checked={checked} className="mt-1" />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <Badge variant="outline" className="text-xs">
-                              {isLive ? "Live" : "Curso"}
-                            </Badge>
-                            {t.pillar && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium">
+                    Itens da trilha ({selectedTrainingIds.length}/{trainingRecommendations.length})
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedTrainingIds(initialTrainingIds)}
+                    disabled={trainingRecommendations.length === 0}
+                  >
+                    Selecionar tudo
+                  </Button>
+                </div>
+
+                <div className="rounded-md border overflow-hidden">
+                  <div className="max-h-56 overflow-y-auto">
+                    {trainingRecommendations.map((t) => {
+                      const isLive = t.type === "live";
+                      const Icon = isLive ? Video : BookOpen;
+                      const checked = selectedTrainingIds.includes(t.training_id);
+
+                      return (
+                        <button
+                          type="button"
+                          key={t.training_id}
+                          className={`w-full text-left flex items-start gap-3 p-3 border-b last:border-b-0 hover:bg-muted/50 ${
+                            checked ? "bg-primary/5" : ""
+                          }`}
+                          onClick={() => toggleTraining(t.training_id)}
+                        >
+                          <Checkbox checked={checked} className="mt-1" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <Badge variant="outline" className="text-xs">
-                                {t.pillar}
+                                {isLive ? "Live" : "Curso"}
                               </Badge>
-                            )}
-                            <span className="text-xs text-muted-foreground">{Math.round(t.relevance_score)}% match</span>
+                              {t.pillar && (
+                                <Badge variant="outline" className="text-xs">
+                                  {t.pillar}
+                                </Badge>
+                              )}
+                              <span className="text-xs text-muted-foreground">{Math.round(t.relevance_score)}% match</span>
+                            </div>
+                            <div className="flex items-center gap-2 min-w-0">
+                              <Icon className="h-4 w-4 text-muted-foreground" />
+                              <p className="font-medium text-sm truncate">{t.title}</p>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Icon className="h-4 w-4 text-muted-foreground" />
-                            <p className="font-medium text-sm truncate">{t.title}</p>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-shrink-0 pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
