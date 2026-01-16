@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { useProfile } from '@/hooks/useProfile';
+import { useProfileContext } from '@/contexts/ProfileContext';
 import {
   LayoutDashboard,
   MapPin,
@@ -30,6 +30,7 @@ import {
   SheetTitle,
   SheetClose,
 } from '@/components/ui/sheet';
+import { useMemo } from 'react';
 
 interface NavItem {
   name: string;
@@ -60,6 +61,15 @@ const bottomNavigation: NavItem[] = [
   { name: 'Configurações', href: '/configuracoes', icon: Settings, requiresAdmin: true },
 ];
 
+// Static items that always show
+const staticNavItems = navigation.filter(item => 
+  !item.requiresERP && !item.requiresEDU && !item.requiresProfessor && !item.requiresAdmin
+);
+
+const staticBottomNavItems = bottomNavigation.filter(item =>
+  !item.requiresERP && !item.requiresEDU && !item.requiresProfessor && !item.requiresAdmin
+);
+
 interface MobileSidebarProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -69,7 +79,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess } = useProfile();
+  const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess, initialized } = useProfileContext();
 
   // Determine the home route based on user access
   const homeRoute = (hasERPAccess || isAdmin) ? '/' : '/edu';
@@ -85,24 +95,29 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
     onOpenChange(false);
   };
 
-  const filterNavItems = (items: NavItem[]) => {
-    return items.filter((item) => {
+  const filteredNavigation = useMemo(() => {
+    if (!initialized) return staticNavItems;
+    
+    return navigation.filter((item) => {
       if (item.requiresAdmin && !isAdmin) return false;
       if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
       if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
       if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
       return true;
     });
-  };
+  }, [initialized, isAdmin, isProfessor, hasERPAccess, hasEDUAccess]);
 
-  const filteredNavigation = filterNavItems(navigation);
-  const filteredBottomNavigation = bottomNavigation.filter((item) => {
-    if (item.requiresAdmin && !isAdmin) return false;
-    if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
-    if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
-    if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
-    return true;
-  });
+  const filteredBottomNavigation = useMemo(() => {
+    if (!initialized) return staticBottomNavItems;
+    
+    return bottomNavigation.filter((item) => {
+      if (item.requiresAdmin && !isAdmin) return false;
+      if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
+      if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
+      if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
+      return true;
+    });
+  }, [initialized, isAdmin, isProfessor, hasERPAccess, hasEDUAccess]);
 
   const NavItem = ({ item }: { item: typeof navigation[0] }) => {
     const isActive = location.pathname === item.href || 

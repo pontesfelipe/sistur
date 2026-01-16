@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useProfile } from '@/hooks/useProfile';
+import { useProfileContext } from '@/contexts/ProfileContext';
 import { Loader2 } from 'lucide-react';
 
 interface ERPRouteProps {
@@ -9,13 +9,12 @@ interface ERPRouteProps {
 
 export function ERPRoute({ children }: ERPRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasERPAccess, isAdmin, loading: profileLoading, needsOnboarding, awaitingApproval, profile } = useProfile();
+  const { hasERPAccess, isAdmin, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
 
   // Only show loading on initial load, not on navigation between routes
-  const isInitialLoad = authLoading && user === null;
-  const isProfileInitialLoad = profileLoading && profile === null;
+  const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null);
 
-  if (isInitialLoad || isProfileInitialLoad) {
+  if (isInitialLoad) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
