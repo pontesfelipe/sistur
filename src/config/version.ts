@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 5,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.5.4",
+    date: "2026-01-16",
+    type: "patch" as const,
+    changes: [
+      "Correção do YouTube player para preencher 100% do frame",
+      "Iframe e container interno forçados a ocupar largura/altura completas"
+    ]
+  },
   {
     version: "1.5.3",
     date: "2026-01-16",
