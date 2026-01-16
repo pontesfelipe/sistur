@@ -239,26 +239,62 @@ export function VideoPlayer({
     
     return (
       <Card className="overflow-hidden">
-        {/* Container with overlay to hide YouTube "Watch on" button */}
+        {/* Container with overlays to hide YouTube branding */}
         <div 
-          className="aspect-video relative"
-          onContextMenu={(e) => e.preventDefault()} // Block right-click
+          className="aspect-video relative overflow-hidden"
+          onContextMenu={(e) => e.preventDefault()}
         >
-          <iframe
-            src={embedUrl}
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            referrerPolicy="strict-origin-when-cross-origin"
-          />
-          {/* Bottom overlay to hide "Watch on YouTube" button */}
+          {/* Iframe positioned with negative margins to crop YouTube UI */}
+          <div className="absolute inset-0 overflow-hidden">
+            <iframe
+              src={embedUrl}
+              className="absolute w-[calc(100%+160px)] h-[calc(100%+120px)] -top-[60px] -left-[80px]"
+              style={{
+                transform: 'scale(1)',
+                transformOrigin: 'center center',
+              }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
+          </div>
+          
+          {/* Full overlay to block right-click - transparent in center for controls */}
           <div 
-            className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/90 to-transparent pointer-events-none"
+            className="absolute inset-0 z-10"
+            onContextMenu={(e) => e.preventDefault()}
+            style={{ pointerEvents: 'none' }}
+          />
+          
+          {/* Top bar overlay - covers title, logo, share buttons */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black via-black/80 to-transparent z-20"
+            style={{ pointerEvents: 'auto' }}
+            onContextMenu={(e) => e.preventDefault()}
+            onClick={(e) => e.stopPropagation()}
             aria-hidden="true"
           />
-          {/* Top-right overlay to hide Share/Watch Later buttons */}
+          
+          {/* Bottom bar overlay - covers "Watch on YouTube" button */}
           <div 
-            className="absolute top-0 right-0 w-32 h-14 bg-gradient-to-bl from-black/80 to-transparent pointer-events-none"
+            className="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-black via-black/80 to-transparent z-20"
+            style={{ pointerEvents: 'auto' }}
+            onContextMenu={(e) => e.preventDefault()}
+            onClick={(e) => e.stopPropagation()}
+            aria-hidden="true"
+          />
+          
+          {/* Left edge overlay */}
+          <div 
+            className="absolute top-0 bottom-0 left-0 w-4 bg-black z-20"
+            style={{ pointerEvents: 'auto' }}
+            aria-hidden="true"
+          />
+          
+          {/* Right edge overlay */}
+          <div 
+            className="absolute top-0 bottom-0 right-0 w-4 bg-black z-20"
+            style={{ pointerEvents: 'auto' }}
             aria-hidden="true"
           />
         </div>
