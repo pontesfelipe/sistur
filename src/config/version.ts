@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 5,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.5.1",
+    date: "2026-01-16",
+    type: "patch" as const,
+    changes: [
+      "YouTube embed usa domínio privado (youtube-nocookie.com)",
+      "Overlay esconde botões 'Watch on YouTube' e 'Share'",
+      "Parâmetros modestbranding e rel=0 para reduzir branding",
+      "Bloqueio de clique-direito no iframe do YouTube/Vimeo",
+      "Vimeo embed com title/byline/badge ocultos"
+    ]
+  },
   {
     version: "1.5.0",
     date: "2026-01-16",
