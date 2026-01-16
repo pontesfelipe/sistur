@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,12 +18,15 @@ import {
   FileText,
   Clock,
   Sparkles,
-  UserCircle
+  UserCircle,
+  Settings
 } from 'lucide-react';
 import { useEduTrainings, useEduTrainingStats } from '@/hooks/useEduTrainings';
 import { useEduTracks } from '@/hooks/useEdu';
 import { useStudentProfile } from '@/hooks/useStudentProfile';
+import { useProfile } from '@/hooks/useProfile';
 import { PersonalizedRecommendationsPanel } from '@/components/edu/PersonalizedRecommendationsPanel';
+import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
 import {
   Select,
   SelectContent,
@@ -37,6 +40,11 @@ import {
 } from '@/types/sistur';
 
 const EduCatalogo = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const [mainView, setMainView] = useState<'catalogo' | 'admin'>(
+    tabFromUrl === 'admin' ? 'admin' : 'catalogo'
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [contentFilter, setContentFilter] = useState<string>('all');
@@ -46,6 +54,19 @@ const EduCatalogo = () => {
   const { data: stats } = useEduTrainingStats();
   const { data: tracks, isLoading: tracksLoading } = useEduTracks();
   const { hasProfile, isProfileComplete } = useStudentProfile();
+  const { isAdmin, isProfessor } = useProfile();
+  
+  const canAccessAdmin = isAdmin || isProfessor;
+
+  const handleMainViewChange = (view: string) => {
+    const newView = view as 'catalogo' | 'admin';
+    setMainView(newView);
+    if (newView === 'admin') {
+      setSearchParams({ tab: 'admin' });
+    } else {
+      setSearchParams({});
+    }
+  };
 
   // Filter trainings
   const filteredTrainings = trainings?.filter(training => {
@@ -77,30 +98,50 @@ const EduCatalogo = () => {
       title="SISTUR EDU" 
       subtitle="Catálogo de cursos e lives baseado em diagnóstico IGMA"
     >
-      {/* Quick Actions */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        <Button variant={hasProfile ? "outline" : "default"} asChild>
-          <Link to="/edu/perfil">
-            {hasProfile ? (
-              <>
-                <UserCircle className="mr-2 h-4 w-4" />
-                Meu Perfil
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-4 w-4" />
-                Preencher Perfil
-              </>
-            )}
-          </Link>
-        </Button>
-        <Button variant="outline" asChild>
-          <Link to="/edu/trilhas">
-            <Route className="mr-2 h-4 w-4" />
-            Ver Trilhas ({tracks?.length || 0})
-          </Link>
-        </Button>
-      </div>
+      {/* Main Tabs - Catálogo vs Admin */}
+      {canAccessAdmin && (
+        <Tabs value={mainView} onValueChange={handleMainViewChange} className="mb-6">
+          <TabsList>
+            <TabsTrigger value="catalogo" className="gap-2">
+              <BookOpen className="h-4 w-4" />
+              Catálogo
+            </TabsTrigger>
+            <TabsTrigger value="admin" className="gap-2">
+              <Settings className="h-4 w-4" />
+              Administração
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      )}
+
+      {mainView === 'admin' && canAccessAdmin ? (
+        <AdminTrainingsPanel />
+      ) : (
+        <>
+          {/* Quick Actions */}
+          <div className="flex flex-wrap gap-3 mb-6">
+            <Button variant={hasProfile ? "outline" : "default"} asChild>
+              <Link to="/edu/perfil">
+                {hasProfile ? (
+                  <>
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    Meu Perfil
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Preencher Perfil
+                  </>
+                )}
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/edu/trilhas">
+                <Route className="mr-2 h-4 w-4" />
+                Ver Trilhas ({tracks?.length || 0})
+              </Link>
+            </Button>
+          </div>
 
       {/* Personalized Recommendations Section */}
       <div className="mb-8">
@@ -326,6 +367,8 @@ const EduCatalogo = () => {
             )}
           </TabsContent>
         </Tabs>
+      )}
+        </>
       )}
     </AppLayout>
   );
