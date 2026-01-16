@@ -325,10 +325,10 @@ export function YouTubePlayer({
         {/* YouTube player container */}
         <div 
           ref={containerRef}
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none [&>div]:!w-full [&>div]:!h-full [&>iframe]:!w-full [&>iframe]:!h-full"
           style={{ 
             // Slightly scale up to hide any YouTube UI that might appear
-            transform: 'scale(1.05)',
+            transform: 'scale(1.02)',
             transformOrigin: 'center center',
           }}
         />
