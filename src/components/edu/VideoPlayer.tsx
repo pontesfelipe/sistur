@@ -203,33 +203,63 @@ export function VideoPlayer({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
   
-  // For external providers (YouTube, Vimeo), render iframe
+  // For external providers (YouTube, Vimeo), render iframe with protection
   // Note: External videos cannot be fully protected as they're hosted elsewhere
   if (videoProvider === 'youtube' || videoProvider === 'vimeo') {
     let embedUrl = videoUrl;
     
     if (videoProvider === 'youtube') {
-      // Convert YouTube URL to embed
+      // Convert YouTube URL to embed with privacy-enhanced parameters
       const videoId = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
       if (videoId) {
-        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        // Use privacy-enhanced domain and parameters to reduce YouTube branding
+        embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?` + new URLSearchParams({
+          modestbranding: '1',      // Reduce YouTube branding
+          rel: '0',                  // Don't show related videos from other channels
+          showinfo: '0',             // Hide video title bar (legacy, limited effect)
+          iv_load_policy: '3',       // Hide annotations
+          disablekb: '0',            // Keep keyboard controls
+          fs: '1',                   // Allow fullscreen
+          playsinline: '1',          // Play inline on mobile
+        }).toString();
       }
     } else if (videoProvider === 'vimeo') {
-      // Convert Vimeo URL to embed
+      // Convert Vimeo URL to embed with privacy parameters
       const videoId = videoUrl.match(/vimeo\.com\/(\d+)/)?.[1];
       if (videoId) {
-        embedUrl = `https://player.vimeo.com/video/${videoId}`;
+        embedUrl = `https://player.vimeo.com/video/${videoId}?` + new URLSearchParams({
+          title: '0',        // Hide title
+          byline: '0',       // Hide author
+          portrait: '0',     // Hide author portrait
+          badge: '0',        // Hide Vimeo badge
+          dnt: '1',          // Do not track
+        }).toString();
       }
     }
     
     return (
       <Card className="overflow-hidden">
-        <div className="aspect-video">
+        {/* Container with overlay to hide YouTube "Watch on" button */}
+        <div 
+          className="aspect-video relative"
+          onContextMenu={(e) => e.preventDefault()} // Block right-click
+        >
           <iframe
             src={embedUrl}
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+          {/* Bottom overlay to hide "Watch on YouTube" button */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/90 to-transparent pointer-events-none"
+            aria-hidden="true"
+          />
+          {/* Top-right overlay to hide Share/Watch Later buttons */}
+          <div 
+            className="absolute top-0 right-0 w-32 h-14 bg-gradient-to-bl from-black/80 to-transparent pointer-events-none"
+            aria-hidden="true"
           />
         </div>
       </Card>
