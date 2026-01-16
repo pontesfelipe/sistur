@@ -310,7 +310,7 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
 
   if (isLoadingHistory) {
     return (
-      <Card className="h-[600px] flex items-center justify-center">
+      <Card className="h-[calc(100vh-12rem)] min-h-[400px] max-h-[700px] flex items-center justify-center">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
           Carregando histórico...
@@ -320,7 +320,7 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
   }
 
   return (
-    <Card className="h-[600px] flex flex-col">
+    <Card className="h-[calc(100vh-12rem)] min-h-[400px] max-h-[700px] flex flex-col">
       <CardHeader className="pb-3 border-b shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
