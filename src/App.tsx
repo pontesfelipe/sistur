@@ -43,6 +43,7 @@ import Certificates from "./pages/Certificates";
 import VerifyCertificate from "./pages/VerifyCertificate";
 import OnDemandRequests from "./pages/OnDemandRequests";
 import AuditLogs from "./pages/AuditLogs";
+import Projetos from "./pages/Projetos";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -303,6 +304,14 @@ const App = () => {
                     <AdminRoute>
                       <AuditLogs />
                     </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/projetos"
+                  element={
+                    <ERPRoute>
+                      <Projetos />
+                    </ERPRoute>
                   }
                 />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
