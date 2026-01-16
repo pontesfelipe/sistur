@@ -19,6 +19,7 @@ import {
   MessageCircleQuestion,
   BookMarked,
   Activity,
+  FileQuestion,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,7 @@ const navigation: NavItem[] = [
   { name: 'Importações', href: '/importacoes', icon: Upload, requiresERP: true },
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
   { name: 'Admin Cursos', href: '/admin/cursos', icon: BookOpen, requiresProfessor: true },
+  { name: 'Banco de Questões', href: '/admin/quizzes', icon: FileQuestion, requiresAdmin: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
 ];
