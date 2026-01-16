@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, ReactNode } from 'react';
 import { User, Menu, Lock, Database, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -32,9 +32,10 @@ interface AppHeaderProps {
   title: string;
   subtitle?: string;
   onMobileMenuClick?: () => void;
+  actions?: ReactNode;
 }
 
-export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps) {
+export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHeaderProps) {
   const { user, signOut } = useAuth();
   const { isViewingDemoData, isAdmin, profile, roles } = useProfile();
   const navigate = useNavigate();
@@ -116,6 +117,9 @@ export function AppHeader({ title, subtitle, onMobileMenuClick }: AppHeaderProps
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2 md:gap-4">
+          {/* Custom page actions */}
+          {actions}
+
           {/* Notifications */}
           <NotificationsDropdown />
 

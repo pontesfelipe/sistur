@@ -6,7 +6,9 @@ import {
   CheckCircle2, 
   AlertTriangle,
   TrendingUp,
-  Timer
+  Timer,
+  FolderKanban,
+  Layers
 } from 'lucide-react';
 import { ERPStats } from '@/hooks/useERPMonitoring';
 
@@ -50,20 +52,20 @@ export function ERPStatsCards({ stats, isLoading }: ERPStatsCardsProps) {
       bgColor: stats?.overdueCount && stats.overdueCount > 0 ? 'bg-severity-critical/10' : 'bg-muted/50',
     },
     {
-      title: 'Pendentes',
-      value: stats?.pendingPlans ?? 0,
-      icon: CheckCircle2,
-      description: 'Aguardando início',
-      color: 'text-muted-foreground',
-      bgColor: 'bg-muted/50',
+      title: 'Projetos Ativos',
+      value: stats?.activeProjects ?? 0,
+      icon: FolderKanban,
+      description: `${stats?.totalProjects ?? 0} total`,
+      color: 'text-accent-foreground',
+      bgColor: 'bg-accent/20',
     },
     {
       title: 'Tempo Médio',
       value: stats?.avgCompletionDays !== null ? `${stats?.avgCompletionDays}d` : '--',
       icon: Timer,
       description: 'Dias para conclusão',
-      color: 'text-accent-foreground',
-      bgColor: 'bg-accent/20',
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted/50',
     },
   ];
 

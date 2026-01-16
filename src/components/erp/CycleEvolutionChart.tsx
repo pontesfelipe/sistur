@@ -13,7 +13,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, Minus, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, BarChart3, FolderKanban } from 'lucide-react';
 import { CycleEvolution } from '@/hooks/useERPMonitoring';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -151,6 +151,12 @@ export function CycleEvolutionChart({
                     <span className="text-xs text-muted-foreground">
                       ({cycle.completionRate}% concluído)
                     </span>
+                    {cycle.hasProject && (
+                      <Badge variant="outline" className="text-xs gap-1">
+                        <FolderKanban className="h-3 w-3" />
+                        Projeto
+                      </Badge>
+                    )}
                   </div>
                 ))}
               </div>
@@ -185,7 +191,11 @@ export function CycleEvolutionChart({
                       }}
                       labelFormatter={(label, payload) => {
                         const data = payload?.[0]?.payload;
-                        return data ? `${data.title} (${data.formattedDate})` : label;
+                        if (data) {
+                          const projectInfo = data.hasProject ? ' 📁' : '';
+                          return `${data.title} (${data.formattedDate})${projectInfo}`;
+                        }
+                        return label;
                       }}
                     />
                   } 

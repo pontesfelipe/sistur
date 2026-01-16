@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useCallback } from 'react';
 
 export interface ERPStats {
   totalPlans: number;
@@ -9,6 +10,10 @@ export interface ERPStats {
   overdueCount: number;
   completionRate: number;
   avgCompletionDays: number | null;
+  // New project stats
+  totalProjects: number;
+  activeProjects: number;
+  projectCompletionRate: number;
 }
 
 export interface PillarProgress {
@@ -30,6 +35,8 @@ export interface CycleEvolution {
   completionRate: number;
   avgPillarScore: number;
   evolutionState: 'EVOLUTION' | 'STAGNATION' | 'REGRESSION' | null;
+  hasProject: boolean;
+  projectStatus?: string;
 }
 
 export interface ActionPlanWithDetails {
@@ -51,22 +58,127 @@ export interface ActionPlanWithDetails {
   isOverdue: boolean;
 }
 
-// Get overall ERP stats
+export interface ProjectStats {
+  id: string;
+  name: string;
+  status: string;
+  methodology: string;
+  destinationName: string;
+  completionRate: number;
+  totalTasks: number;
+  completedTasks: number;
+  overdueTasks: number;
+  planned_end_date: string | null;
+}
+
+// Hook to invalidate all ERP queries - useful for real-time updates
+export function useERPQueryInvalidation() {
+  const queryClient = useQueryClient();
+
+  const invalidateAll = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['erp-stats'] });
+    queryClient.invalidateQueries({ queryKey: ['erp-pillar-progress'] });
+    queryClient.invalidateQueries({ queryKey: ['erp-cycle-evolution'] });
+    queryClient.invalidateQueries({ queryKey: ['erp-overdue-plans'] });
+    queryClient.invalidateQueries({ queryKey: ['erp-recent-plans'] });
+    queryClient.invalidateQueries({ queryKey: ['erp-project-stats'] });
+  }, [queryClient]);
+
+  return { invalidateAll };
+}
+
+// Hook for real-time updates
+export function useERPRealtimeUpdates() {
+  const { invalidateAll } = useERPQueryInvalidation();
+
+  useEffect(() => {
+    // Subscribe to action_plans changes
+    const actionPlansChannel = supabase
+      .channel('erp-action-plans-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'action_plans'
+        },
+        () => {
+          console.log('Action plans changed, invalidating ERP queries...');
+          invalidateAll();
+        }
+      )
+      .subscribe();
+
+    // Subscribe to projects changes
+    const projectsChannel = supabase
+      .channel('erp-projects-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'projects'
+        },
+        () => {
+          console.log('Projects changed, invalidating ERP queries...');
+          invalidateAll();
+        }
+      )
+      .subscribe();
+
+    // Subscribe to project_tasks changes
+    const tasksChannel = supabase
+      .channel('erp-project-tasks-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'project_tasks'
+        },
+        () => {
+          console.log('Project tasks changed, invalidating ERP queries...');
+          invalidateAll();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(actionPlansChannel);
+      supabase.removeChannel(projectsChannel);
+      supabase.removeChannel(tasksChannel);
+    };
+  }, [invalidateAll]);
+}
+
+// Get overall ERP stats including projects
 export function useERPStats() {
   return useQuery({
     queryKey: ['erp-stats'],
     queryFn: async () => {
+      // Fetch action plans
       const { data: plans } = await supabase
         .from('action_plans')
         .select('*');
 
-      if (!plans) return null;
+      // Fetch projects
+      const { data: projects } = await supabase
+        .from('projects')
+        .select('*');
+
+      // Fetch project tasks for project completion calculation
+      const { data: projectTasks } = await supabase
+        .from('project_tasks')
+        .select('*');
 
       const now = new Date();
-      const completed = plans.filter(p => p.status === 'COMPLETED');
-      const inProgress = plans.filter(p => p.status === 'IN_PROGRESS');
-      const pending = plans.filter(p => p.status === 'PENDING');
-      const overdue = plans.filter(p => {
+      
+      // Action plans stats
+      const plansList = plans || [];
+      const completed = plansList.filter(p => p.status === 'COMPLETED');
+      const inProgress = plansList.filter(p => p.status === 'IN_PROGRESS');
+      const pending = plansList.filter(p => p.status === 'PENDING');
+      const overdue = plansList.filter(p => {
         if (p.status === 'COMPLETED' || p.status === 'CANCELLED') return false;
         if (!p.due_date) return false;
         return new Date(p.due_date) < now;
@@ -84,16 +196,85 @@ export function useERPStats() {
         avgCompletionDays = Math.round(totalDays / completedWithDates.length);
       }
 
+      // Project stats
+      const projectsList = projects || [];
+      const activeProjects = projectsList.filter(p => 
+        p.status === 'in_progress' || p.status === 'planning'
+      );
+      const completedProjects = projectsList.filter(p => p.status === 'completed');
+
+      // Calculate project completion rate based on tasks
+      let projectCompletionRate = 0;
+      if (projectTasks && projectTasks.length > 0) {
+        const completedTasks = projectTasks.filter(t => t.status === 'done');
+        projectCompletionRate = Math.round((completedTasks.length / projectTasks.length) * 100);
+      } else if (projectsList.length > 0) {
+        projectCompletionRate = Math.round((completedProjects.length / projectsList.length) * 100);
+      }
+
       return {
-        totalPlans: plans.length,
+        totalPlans: plansList.length,
         completedPlans: completed.length,
         inProgressPlans: inProgress.length,
         pendingPlans: pending.length,
         overdueCount: overdue.length,
-        completionRate: plans.length > 0 ? Math.round((completed.length / plans.length) * 100) : 0,
+        completionRate: plansList.length > 0 ? Math.round((completed.length / plansList.length) * 100) : 0,
         avgCompletionDays,
+        totalProjects: projectsList.length,
+        activeProjects: activeProjects.length,
+        projectCompletionRate,
       } as ERPStats;
     },
+    refetchInterval: 60000, // Refetch every minute
+    staleTime: 30000, // Consider data stale after 30 seconds
+  });
+}
+
+// Get project-level stats
+export function useProjectStats() {
+  return useQuery({
+    queryKey: ['erp-project-stats'],
+    queryFn: async () => {
+      const { data: projects } = await supabase
+        .from('projects')
+        .select(`
+          *,
+          destinations(name),
+          project_tasks(id, status, due_date)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (!projects) return [];
+
+      const now = new Date();
+      
+      return projects.map(project => {
+        const tasks = (project.project_tasks as any[]) || [];
+        const completedTasks = tasks.filter(t => t.status === 'done');
+        const overdueTasks = tasks.filter(t => {
+          if (t.status === 'done') return false;
+          if (!t.due_date) return false;
+          return new Date(t.due_date) < now;
+        });
+
+        return {
+          id: project.id,
+          name: project.name,
+          status: project.status,
+          methodology: project.methodology,
+          destinationName: (project.destinations as any)?.name || 'N/A',
+          completionRate: tasks.length > 0 
+            ? Math.round((completedTasks.length / tasks.length) * 100) 
+            : 0,
+          totalTasks: tasks.length,
+          completedTasks: completedTasks.length,
+          overdueTasks: overdueTasks.length,
+          planned_end_date: project.planned_end_date,
+        } as ProjectStats;
+      });
+    },
+    refetchInterval: 60000,
+    staleTime: 30000,
   });
 }
 
@@ -129,10 +310,12 @@ export function usePillarProgress() {
         } as PillarProgress;
       });
     },
+    refetchInterval: 60000,
+    staleTime: 30000,
   });
 }
 
-// Get cycle evolution data
+// Get cycle evolution data with project info
 export function useCycleEvolution(destinationId?: string) {
   return useQuery({
     queryKey: ['erp-cycle-evolution', destinationId],
@@ -176,6 +359,12 @@ export function useCycleEvolution(destinationId?: string) {
         .select('*')
         .in('assessment_id', assessmentIds);
 
+      // Get projects for assessments
+      const { data: projects } = await supabase
+        .from('projects')
+        .select('assessment_id, status')
+        .in('assessment_id', assessmentIds);
+
       return assessments.map((assessment, index) => {
         const plans = allPlans?.filter(p => p.assessment_id === assessment.id) || [];
         const completedPlans = plans.filter(p => p.status === 'COMPLETED');
@@ -196,6 +385,9 @@ export function useCycleEvolution(destinationId?: string) {
           else evolutionState = 'STAGNATION';
         }
 
+        // Check if assessment has project
+        const project = projects?.find(p => p.assessment_id === assessment.id);
+
         return {
           cycle: index + 1,
           assessmentId: assessment.id,
@@ -206,9 +398,13 @@ export function useCycleEvolution(destinationId?: string) {
           completionRate: plans.length > 0 ? Math.round((completedPlans.length / plans.length) * 100) : 0,
           avgPillarScore: Math.round(avgScore * 100),
           evolutionState,
+          hasProject: !!project,
+          projectStatus: project?.status,
         } as CycleEvolution;
       });
     },
+    refetchInterval: 60000,
+    staleTime: 30000,
   });
 }
 
@@ -257,6 +453,8 @@ export function useRecentActionPlans(limit: number = 10) {
         } as ActionPlanWithDetails;
       });
     },
+    refetchInterval: 60000,
+    staleTime: 30000,
   });
 }
 
@@ -305,5 +503,7 @@ export function useOverduePlans() {
         } as ActionPlanWithDetails;
       });
     },
+    refetchInterval: 60000,
+    staleTime: 30000,
   });
 }
