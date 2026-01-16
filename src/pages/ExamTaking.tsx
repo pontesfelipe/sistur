@@ -243,10 +243,17 @@ const ExamTaking = () => {
                 <CheckCircle className="h-5 w-5 text-green-500" />
                 <span>Responda todas as questões antes de enviar</span>
               </div>
-              <div className="pt-4 border-t">
+              <div className="pt-4 border-t space-y-3">
                 <p className="text-sm text-muted-foreground">
                   Número de questões: <strong>{exam.question_ids?.length || 0}</strong>
                 </p>
+                <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <p className="text-xs text-blue-700 dark:text-blue-300">
+                    <strong>Aviso de Privacidade:</strong> Para fins de integridade acadêmica, 
+                    registramos informações básicas do dispositivo durante o exame. Esses dados 
+                    são automaticamente removidos após 90 dias conforme nossa política de retenção.
+                  </p>
+                </div>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">

@@ -5196,6 +5196,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      cleanup_exam_tracking_data: { Args: never; Returns: undefined }
       complete_user_onboarding: {
         Args: { _role: string; _system_access: string; _user_id: string }
         Returns: boolean
