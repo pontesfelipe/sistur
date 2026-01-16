@@ -25,6 +25,7 @@ export function useDestinations() {
       ibge_code?: string | null;
       latitude?: number | null;
       longitude?: number | null;
+      visibility?: 'organization' | 'personal';
     }) => {
       // Get the user's org_id
       const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -62,6 +63,8 @@ export function useDestinations() {
           latitude: destination.latitude,
           longitude: destination.longitude,
           org_id: profile.org_id,
+          visibility: destination.visibility || 'organization',
+          creator_user_id: user.id,
         })
         .select()
         .single();

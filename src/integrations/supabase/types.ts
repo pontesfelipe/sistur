@@ -190,6 +190,7 @@ export type Database = {
           algo_version: string
           calculated_at: string | null
           created_at: string
+          creator_user_id: string | null
           destination_id: string
           externality_warning: boolean | null
           governance_block: boolean | null
@@ -205,11 +206,13 @@ export type Database = {
           status: Database["public"]["Enums"]["assessment_status"]
           title: string
           updated_at: string
+          visibility: string
         }
         Insert: {
           algo_version?: string
           calculated_at?: string | null
           created_at?: string
+          creator_user_id?: string | null
           destination_id: string
           externality_warning?: boolean | null
           governance_block?: boolean | null
@@ -225,11 +228,13 @@ export type Database = {
           status?: Database["public"]["Enums"]["assessment_status"]
           title: string
           updated_at?: string
+          visibility?: string
         }
         Update: {
           algo_version?: string
           calculated_at?: string | null
           created_at?: string
+          creator_user_id?: string | null
           destination_id?: string
           externality_warning?: boolean | null
           governance_block?: boolean | null
@@ -245,6 +250,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["assessment_status"]
           title?: string
           updated_at?: string
+          visibility?: string
         }
         Relationships: [
           {
@@ -717,6 +723,7 @@ export type Database = {
       destinations: {
         Row: {
           created_at: string
+          creator_user_id: string | null
           ibge_code: string | null
           id: string
           latitude: number | null
@@ -725,9 +732,11 @@ export type Database = {
           org_id: string
           uf: string | null
           updated_at: string
+          visibility: string
         }
         Insert: {
           created_at?: string
+          creator_user_id?: string | null
           ibge_code?: string | null
           id?: string
           latitude?: number | null
@@ -736,9 +745,11 @@ export type Database = {
           org_id: string
           uf?: string | null
           updated_at?: string
+          visibility?: string
         }
         Update: {
           created_at?: string
+          creator_user_id?: string | null
           ibge_code?: string | null
           id?: string
           latitude?: number | null
@@ -747,6 +758,7 @@ export type Database = {
           org_id?: string
           uf?: string | null
           updated_at?: string
+          visibility?: string
         }
         Relationships: [
           {

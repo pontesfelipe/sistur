@@ -17,7 +17,10 @@ import {
   Loader2,
   Shield,
   Calculator,
+  Users,
+  User,
 } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useDestinations } from '@/hooks/useDestinations';
@@ -40,36 +43,42 @@ interface WorkflowStep {
 const WORKFLOW_STEPS: WorkflowStep[] = [
   {
     id: 1,
+    title: 'Escopo',
+    description: 'Definir visibilidade',
+    icon: Users,
+  },
+  {
+    id: 2,
     title: 'Destino',
     description: 'Selecione ou crie um destino',
     icon: MapPin,
   },
   {
-    id: 2,
+    id: 3,
     title: 'Diagnóstico',
     description: 'Configure a rodada de avaliação',
     icon: ClipboardList,
   },
   {
-    id: 3,
+    id: 4,
     title: 'Pré-preenchimento',
     description: 'Validar dados oficiais',
     icon: Shield,
   },
   {
-    id: 4,
+    id: 5,
     title: 'Preenchimento',
     description: 'Complementar dados manualmente',
     icon: Database,
   },
   {
-    id: 5,
+    id: 6,
     title: 'Cálculo',
     description: 'Processar diagnóstico',
     icon: Calculator,
   },
   {
-    id: 6,
+    id: 7,
     title: 'Relatório',
     description: 'Gerar plano de desenvolvimento',
     icon: FileText,
@@ -80,6 +89,7 @@ export default function NovaRodada() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const [visibility, setVisibility] = useState<'organization' | 'personal'>('organization');
   const [destinationMode, setDestinationMode] = useState<'select' | 'create'>('select');
   const [selectedDestination, setSelectedDestination] = useState<string>('');
   const [isDestinationFormOpen, setIsDestinationFormOpen] = useState(false);
@@ -143,13 +153,16 @@ export default function NovaRodada() {
 
   const handleNextStep = async () => {
     if (currentStep === 1) {
+      // Scope selected, proceed to destination
+      setCurrentStep(2);
+    } else if (currentStep === 2) {
       // Validate destination
       if (!selectedDestination) {
         toast({ title: 'Selecione um destino', variant: 'destructive' });
         return;
       }
-      setCurrentStep(2);
-    } else if (currentStep === 2) {
+      setCurrentStep(3);
+    } else if (currentStep === 3) {
       // Create assessment
       if (!assessmentTitle) {
         toast({ title: 'Informe o título do diagnóstico', variant: 'destructive' });
@@ -161,24 +174,25 @@ export default function NovaRodada() {
           destination_id: selectedDestination,
           period_start: periodStart || null,
           period_end: periodEnd || null,
+          visibility,
         });
         setCreatedAssessmentId(result.id);
         toast({ title: 'Diagnóstico criado com sucesso!' });
-        setCurrentStep(3);
+        setCurrentStep(4);
       } catch (error) {
         toast({ title: 'Erro ao criar diagnóstico', variant: 'destructive' });
         return;
       }
-    } else if (currentStep === 3) {
-      // Pre-filling validation complete - proceed to manual data entry
-      setCurrentStep(4);
     } else if (currentStep === 4) {
+      // Pre-filling validation complete - proceed to manual data entry
+      setCurrentStep(5);
+    } else if (currentStep === 5) {
       // Go to data entry page
       navigate(`/importacoes?assessment=${createdAssessmentId}`);
-    } else if (currentStep === 5) {
+    } else if (currentStep === 6) {
       // Go to assessment detail to calculate
       navigate(`/diagnosticos/${createdAssessmentId}`);
-    } else if (currentStep === 6) {
+    } else if (currentStep === 7) {
       // Go to reports
       navigate(`/relatorios?assessment=${createdAssessmentId}`);
     }
@@ -191,7 +205,7 @@ export default function NovaRodada() {
   };
 
   const handleCreateDestination = async (data: { name: string; uf: string; ibge_code?: string | null; latitude?: number | null; longitude?: number | null }) => {
-    const result = await createDestination.mutateAsync(data);
+    const result = await createDestination.mutateAsync({ ...data, visibility });
     setSelectedDestination(result.id);
     setDestinationMode('select');
     toast({ title: 'Destino criado com sucesso!' });
@@ -199,10 +213,14 @@ export default function NovaRodada() {
 
   const canProceed = () => {
     if (currentStep === 1) {
+      // Scope is always selected (default organization)
+      return true;
+    }
+    if (currentStep === 2) {
       return !!selectedDestination;
     }
-    if (currentStep === 2) return !!assessmentTitle && !!selectedDestination;
-    if (currentStep === 3) {
+    if (currentStep === 3) return !!assessmentTitle && !!selectedDestination;
+    if (currentStep === 4) {
       // Can always proceed from validation step (data is optional but encouraged)
       return true;
     }
@@ -269,7 +287,7 @@ export default function NovaRodada() {
       </div>
 
       {/* Step Content */}
-      {currentStep === 3 ? (
+      {currentStep === 4 ? (
         // Full-width validation panel
         <div className="space-y-6">
           {selectedDestinationData?.ibge_code && profile?.org_id ? (
@@ -295,7 +313,7 @@ export default function NovaRodada() {
             </Card>
           )}
 
-          {/* Navigation for step 3 */}
+          {/* Navigation for step 4 */}
           <Card>
             <CardContent className="pt-6">
               <div className="flex justify-between">
@@ -336,8 +354,64 @@ export default function NovaRodada() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Step 1: Destination */}
+            {/* Step 1: Scope */}
             {currentStep === 1 && (
+              <div className="space-y-6">
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    Defina quem poderá visualizar e editar este destino e diagnóstico. 
+                    Isso afetará a visibilidade para outros membros da sua organização.
+                  </p>
+                </div>
+                
+                <RadioGroup
+                  value={visibility}
+                  onValueChange={(value) => setVisibility(value as 'organization' | 'personal')}
+                  className="space-y-4"
+                >
+                  <div className={cn(
+                    "flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all",
+                    visibility === 'organization' 
+                      ? "border-primary bg-primary/5" 
+                      : "border-muted hover:border-muted-foreground/50"
+                  )}>
+                    <RadioGroupItem value="organization" id="organization" className="mt-1" />
+                    <div className="flex-1">
+                      <Label htmlFor="organization" className="flex items-center gap-2 cursor-pointer font-medium">
+                        <Users className="h-5 w-5 text-primary" />
+                        Compartilhado com a Organização
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Todos os membros da sua organização poderão visualizar e colaborar 
+                        com este destino e diagnóstico.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className={cn(
+                    "flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all",
+                    visibility === 'personal' 
+                      ? "border-primary bg-primary/5" 
+                      : "border-muted hover:border-muted-foreground/50"
+                  )}>
+                    <RadioGroupItem value="personal" id="personal" className="mt-1" />
+                    <div className="flex-1">
+                      <Label htmlFor="personal" className="flex items-center gap-2 cursor-pointer font-medium">
+                        <User className="h-5 w-5 text-primary" />
+                        Apenas para mim (Pessoal)
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Somente você terá acesso a este destino e diagnóstico. 
+                        Outros membros da organização não poderão visualizá-lo.
+                      </p>
+                    </div>
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
+
+            {/* Step 2: Destination */}
+            {currentStep === 2 && (
               <>
                 <div className="flex gap-4 mb-4">
                   <Button
@@ -415,8 +489,8 @@ export default function NovaRodada() {
               </>
             )}
 
-            {/* Step 2: Assessment */}
-            {currentStep === 2 && (
+            {/* Step 3: Assessment */}
+            {currentStep === 3 && (
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Título do diagnóstico *</Label>
@@ -458,8 +532,8 @@ export default function NovaRodada() {
               </div>
             )}
 
-            {/* Step 4: Data Entry Info */}
-            {currentStep === 4 && (
+            {/* Step 5: Data Entry Info */}
+            {currentStep === 5 && (
               <div className="space-y-4">
                 <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
                   <h4 className="font-medium mb-2">Próximo passo: Complementar dados</h4>
@@ -497,8 +571,8 @@ export default function NovaRodada() {
               </div>
             )}
 
-            {/* Step 5: Calculate Info */}
-            {currentStep === 5 && (
+            {/* Step 6: Calculate Info */}
+            {currentStep === 6 && (
               <div className="space-y-4">
                 <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
                   <h4 className="font-medium mb-2">Calcular diagnóstico</h4>
@@ -516,8 +590,8 @@ export default function NovaRodada() {
               </div>
             )}
 
-            {/* Step 6: Report Info */}
-            {currentStep === 6 && (
+            {/* Step 7: Report Info */}
+            {currentStep === 7 && (
               <div className="space-y-4">
                 <div className="p-4 bg-severity-good/10 rounded-lg border border-severity-good/20">
                   <h4 className="font-medium mb-2">Gerar relatório</h4>
@@ -546,7 +620,7 @@ export default function NovaRodada() {
                 {(createDestination.isPending || createAssessment.isPending) && (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 )}
-                {currentStep < 4 ? 'Continuar' : 'Ir para ' + WORKFLOW_STEPS[currentStep - 1].title}
+                {currentStep < 5 ? 'Continuar' : 'Ir para ' + WORKFLOW_STEPS[currentStep - 1].title}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </div>
