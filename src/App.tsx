@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,43 +11,54 @@ import { AdminRoute } from "@/components/layout/AdminRoute";
 import { ERPRoute } from "@/components/layout/ERPRoute";
 import { EduRoute } from "@/components/layout/EduRoute";
 import { SplashScreen } from "@/components/SplashScreen";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Onboarding from "./pages/Onboarding";
-import PendingApproval from "./pages/PendingApproval";
-import Destinos from "./pages/Destinos";
-import Diagnosticos from "./pages/Diagnosticos";
-import DiagnosticoDetalhe from "./pages/DiagnosticoDetalhe";
-import Indicadores from "./pages/Indicadores";
-import Importacoes from "./pages/Importacoes";
-import Cursos from "./pages/Cursos";
-import AdminCursos from "./pages/AdminCursos";
-import AdminEdu from "./pages/AdminEdu";
-import EduCatalogo from "./pages/EduCatalogo";
-import EduPerfil from "./pages/EduPerfil";
-import EduTrilhas, { EduTrilhaDetalhe } from "./pages/EduTrilhas";
-import EduTrainingDetalhe from "./pages/EduTrainingDetalhe";
-import Learning from "./pages/Learning";
-import Configuracoes from "./pages/Configuracoes";
-import Relatorios from "./pages/Relatorios";
-import NovaRodada from "./pages/NovaRodada";
-import FAQ from "./pages/FAQ";
-import Metodologia from "./pages/Metodologia";
-import BeniChat from "./pages/BeniChat";
-import Ajuda from "./pages/Ajuda";
-import ERPDashboard from "./pages/ERPDashboard";
-import ERPIntegration from "./pages/ERPIntegration";
-import PublicDestinations from "./pages/PublicDestinations";
-import QuizManagement from "./pages/QuizManagement";
-import ExamTaking from "./pages/ExamTaking";
-import Certificates from "./pages/Certificates";
-import VerifyCertificate from "./pages/VerifyCertificate";
-import OnDemandRequests from "./pages/OnDemandRequests";
-import AuditLogs from "./pages/AuditLogs";
-import Projetos from "./pages/Projetos";
-import NotFound from "./pages/NotFound";
+
+// Lazy load all page components for code splitting
+const Index = lazy(() => import("./pages/Index"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const PendingApproval = lazy(() => import("./pages/PendingApproval"));
+const Destinos = lazy(() => import("./pages/Destinos"));
+const Diagnosticos = lazy(() => import("./pages/Diagnosticos"));
+const DiagnosticoDetalhe = lazy(() => import("./pages/DiagnosticoDetalhe"));
+const Indicadores = lazy(() => import("./pages/Indicadores"));
+const Importacoes = lazy(() => import("./pages/Importacoes"));
+const Cursos = lazy(() => import("./pages/Cursos"));
+const AdminCursos = lazy(() => import("./pages/AdminCursos"));
+const AdminEdu = lazy(() => import("./pages/AdminEdu"));
+const EduCatalogo = lazy(() => import("./pages/EduCatalogo"));
+const EduPerfil = lazy(() => import("./pages/EduPerfil"));
+const EduTrilhas = lazy(() => import("./pages/EduTrilhas"));
+const EduTrilhaDetalhe = lazy(() => import("./pages/EduTrilhas").then(m => ({ default: m.EduTrilhaDetalhe })));
+const EduTrainingDetalhe = lazy(() => import("./pages/EduTrainingDetalhe"));
+const Learning = lazy(() => import("./pages/Learning"));
+const Configuracoes = lazy(() => import("./pages/Configuracoes"));
+const Relatorios = lazy(() => import("./pages/Relatorios"));
+const NovaRodada = lazy(() => import("./pages/NovaRodada"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Metodologia = lazy(() => import("./pages/Metodologia"));
+const BeniChat = lazy(() => import("./pages/BeniChat"));
+const Ajuda = lazy(() => import("./pages/Ajuda"));
+const ERPDashboard = lazy(() => import("./pages/ERPDashboard"));
+const ERPIntegration = lazy(() => import("./pages/ERPIntegration"));
+const PublicDestinations = lazy(() => import("./pages/PublicDestinations"));
+const QuizManagement = lazy(() => import("./pages/QuizManagement"));
+const ExamTaking = lazy(() => import("./pages/ExamTaking"));
+const Certificates = lazy(() => import("./pages/Certificates"));
+const VerifyCertificate = lazy(() => import("./pages/VerifyCertificate"));
+const OnDemandRequests = lazy(() => import("./pages/OnDemandRequests"));
+const AuditLogs = lazy(() => import("./pages/AuditLogs"));
+const Projetos = lazy(() => import("./pages/Projetos"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
+
+// Minimal loading fallback that matches the initial loader
+const PageLoader = () => (
+  <div style={{display:'flex',justifyContent:'center',alignItems:'center',minHeight:'100vh',background:'#0a0e17',flexDirection:'column',gap:'16px'}}>
+    <div style={{width:'40px',height:'40px',border:'3px solid #1e293b',borderTopColor:'#3b82f6',borderRadius:'50%',animation:'spin 1s linear infinite'}}></div>
+    <p style={{color:'#94a3b8',fontFamily:'system-ui,sans-serif',fontSize:'14px',margin:'0'}}>Carregando...</p>
+  </div>
+);
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
@@ -62,6 +73,7 @@ const App = () => {
           <BrowserRouter>
             <AuthProvider>
               <ProfileProvider>
+              <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/onboarding" element={<Onboarding />} />
@@ -319,6 +331,7 @@ const App = () => {
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </Suspense>
               </ProfileProvider>
             </AuthProvider>
           </BrowserRouter>
