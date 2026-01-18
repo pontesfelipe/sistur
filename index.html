@@ -23,7 +23,14 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static loading indicator for faster FCP - replaced when React mounts -->
+      <div id="initial-loader" style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:#0a0e17;flex-direction:column;gap:16px;">
+        <div style="width:40px;height:40px;border:3px solid #1e293b;border-top-color:#3b82f6;border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <p style="color:#94a3b8;font-family:system-ui,sans-serif;font-size:14px;margin:0;">Carregando...</p>
+      </div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
