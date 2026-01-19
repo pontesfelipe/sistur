@@ -5,8 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Voice ID for Bill - a natural conversational voice
-const DEFAULT_VOICE_ID = "pqHfZKP75CvOlQylNhV4";
+// Voice ID for Rachel - default free voice on ElevenLabs
+const DEFAULT_VOICE_ID = "21m00Tcm4TlvDq8ikWAM";
 
 serve(async (req) => {
   // Handle CORS preflight
