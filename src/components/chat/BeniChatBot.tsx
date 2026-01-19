@@ -18,7 +18,10 @@ import {
   RefreshCw,
   Trash2,
   Mic,
-  MicOff
+  MicOff,
+  Volume2,
+  VolumeX,
+  Square
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -71,6 +74,8 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [isListening, setIsListening] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
@@ -266,6 +271,11 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
             idx === prev.length - 1 ? { ...m, id: assistantMsgId } : m
           ));
         }
+        
+        // Speak the response if voice is enabled
+        if (voiceEnabled) {
+          speakText(assistantContent);
+        }
       }
 
     } catch (error) {
@@ -369,10 +379,62 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
     recognition.start();
   }, [isListening]);
 
+  // Text-to-speech function
+  const speakText = useCallback((text: string) => {
+    if (!('speechSynthesis' in window)) {
+      toast.error('Seu navegador não suporta síntese de voz');
+      return;
+    }
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pt-BR';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    // Try to find a Portuguese voice
+    const voices = window.speechSynthesis.getVoices();
+    const ptVoice = voices.find(v => v.lang.startsWith('pt')) || voices[0];
+    if (ptVoice) {
+      utterance.voice = ptVoice;
+    }
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
+  // Stop speaking
+  const stopSpeaking = useCallback(() => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+  }, []);
+
+  // Toggle voice response mode
+  const toggleVoiceResponse = useCallback(() => {
+    if (!('speechSynthesis' in window)) {
+      toast.error('Seu navegador não suporta síntese de voz');
+      return;
+    }
+    
+    const newState = !voiceEnabled;
+    setVoiceEnabled(newState);
+    toast.success(newState ? 'Respostas por voz ativadas' : 'Respostas por voz desativadas');
+    
+    if (!newState) {
+      stopSpeaking();
+    }
+  }, [voiceEnabled, stopSpeaking]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       recognitionRef.current?.stop();
+      window.speechSynthesis?.cancel();
     };
   }, []);
 
@@ -412,17 +474,50 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
               </p>
             </div>
           </div>
-          {messages.length > 0 && (
+          <div className="flex items-center gap-2">
+            {/* Voice response toggle */}
             <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleClearChat}
-              className="text-muted-foreground"
+              variant={voiceEnabled ? "default" : "ghost"}
+              size="sm"
+              onClick={toggleVoiceResponse}
+              className={cn(
+                "text-muted-foreground",
+                voiceEnabled && "text-primary-foreground"
+              )}
+              title={voiceEnabled ? "Desativar respostas por voz" : "Ativar respostas por voz"}
             >
-              <RefreshCw className="h-4 w-4 mr-1" />
-              Nova conversa
+              {voiceEnabled ? (
+                <Volume2 className="h-4 w-4" />
+              ) : (
+                <VolumeX className="h-4 w-4" />
+              )}
             </Button>
-          )}
+            
+            {/* Stop speaking button */}
+            {isSpeaking && (
+              <Button 
+                variant="destructive"
+                size="sm"
+                onClick={stopSpeaking}
+                className="animate-pulse"
+                title="Parar leitura"
+              >
+                <Square className="h-4 w-4" />
+              </Button>
+            )}
+            
+            {messages.length > 0 && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleClearChat}
+                className="text-muted-foreground"
+              >
+                <RefreshCw className="h-4 w-4 mr-1" />
+                Nova conversa
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
 
