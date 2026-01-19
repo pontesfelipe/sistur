@@ -16,11 +16,15 @@ import {
   Sparkles,
   BookOpen,
   RefreshCw,
-  Trash2
+  Trash2,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import '@/types/speech-recognition.d.ts';
 
 type Message = {
   id?: string;
@@ -67,7 +71,10 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [isListening, setIsListening] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Load messages from database on mount
@@ -308,6 +315,68 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
     }
   };
 
+  // Voice input using Web Speech API
+  const toggleVoiceInput = useCallback(() => {
+    // Check browser support - use window properties with type assertion
+    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    if (!SpeechRecognitionAPI) {
+      toast.error('Seu navegador não suporta reconhecimento de voz');
+      return;
+    }
+
+    if (isListening) {
+      // Stop listening
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    // Start listening
+    const recognition = new SpeechRecognitionAPI();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results)
+        .map((result: any) => result[0].transcript)
+        .join('');
+      
+      setInput(transcript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      if (event.error === 'no-speech') {
+        toast.error('Nenhuma fala detectada. Tente novamente.');
+      } else if (event.error === 'not-allowed') {
+        toast.error('Permissão de microfone negada');
+      } else {
+        toast.error('Erro no reconhecimento de voz');
+      }
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  }, [isListening]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
+    };
+  }, []);
+
   if (isLoadingHistory) {
     return (
       <Card className="h-[calc(100vh-12rem)] min-h-[400px] max-h-[700px] flex items-center justify-center">
@@ -455,10 +524,28 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Pergunte sobre turismo sustentável..."
+              placeholder={isListening ? "Ouvindo..." : "Pergunte sobre turismo sustentável..."}
               disabled={isLoading}
               className="flex-1"
             />
+            <Button 
+              type="button" 
+              variant={isListening ? "destructive" : "outline"}
+              size="icon"
+              onClick={toggleVoiceInput}
+              disabled={isLoading}
+              className={cn(
+                "shrink-0 transition-all",
+                isListening && "animate-pulse"
+              )}
+              title={isListening ? "Parar gravação" : "Falar"}
+            >
+              {isListening ? (
+                <MicOff className="h-4 w-4" />
+              ) : (
+                <Mic className="h-4 w-4" />
+              )}
+            </Button>
             <Button type="submit" disabled={isLoading || !input.trim()}>
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
