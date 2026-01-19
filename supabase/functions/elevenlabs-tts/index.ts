@@ -5,8 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Voice ID for a natural Portuguese speaker - using "George" which works well for Portuguese
-const DEFAULT_VOICE_ID = "JBFqnCBsd6RMkjVDRZzb";
+// Voice ID for Bill - a natural conversational voice
+const DEFAULT_VOICE_ID = "pqHfZKP75CvOlQylNhV4";
 
 serve(async (req) => {
   // Handle CORS preflight
