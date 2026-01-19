@@ -76,10 +76,12 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
   const [isListening, setIsListening] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Load messages from database on mount
   const loadMessages = useCallback(async () => {
@@ -404,57 +406,79 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
       .trim();
   };
 
-  // Text-to-speech function
-  const speakText = useCallback((text: string) => {
-    if (!('speechSynthesis' in window)) {
-      toast.error('Seu navegador não suporta síntese de voz');
-      return;
+  // Text-to-speech function using ElevenLabs API
+  const speakText = useCallback(async (text: string) => {
+    // Cancel any ongoing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
     }
-
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
 
     // Clean the text for natural speech
     const cleanText = cleanTextForSpeech(text);
-
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'pt-BR';
-    utterance.rate = 0.95; // Slightly slower for more natural speech
-    utterance.pitch = 1.05; // Slightly higher for warmer tone
-
-    // Try to find a good Portuguese voice
-    const voices = window.speechSynthesis.getVoices();
-    // Prefer Google or Microsoft voices which tend to be more natural
-    const ptVoice = voices.find(v => 
-      v.lang.startsWith('pt') && (v.name.includes('Google') || v.name.includes('Microsoft'))
-    ) || voices.find(v => v.lang.startsWith('pt-BR')) 
-      || voices.find(v => v.lang.startsWith('pt')) 
-      || voices[0];
     
-    if (ptVoice) {
-      utterance.voice = ptVoice;
+    if (!cleanText.trim()) return;
+
+    setIsLoadingAudio(true);
+    setIsSpeaking(true);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text: cleanText }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`TTS request failed: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+      };
+
+      audio.onerror = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+        toast.error('Erro ao reproduzir áudio');
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('TTS error:', error);
+      setIsSpeaking(false);
+      toast.error('Erro ao gerar voz');
+    } finally {
+      setIsLoadingAudio(false);
     }
-
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    window.speechSynthesis.speak(utterance);
   }, []);
 
   // Stop speaking
   const stopSpeaking = useCallback(() => {
-    window.speechSynthesis.cancel();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     setIsSpeaking(false);
   }, []);
 
   // Toggle voice response mode
   const toggleVoiceResponse = useCallback(() => {
-    if (!('speechSynthesis' in window)) {
-      toast.error('Seu navegador não suporta síntese de voz');
-      return;
-    }
-    
     const newState = !voiceEnabled;
     setVoiceEnabled(newState);
     toast.success(newState ? 'Respostas por voz ativadas' : 'Respostas por voz desativadas');
@@ -468,7 +492,10 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
   useEffect(() => {
     return () => {
       recognitionRef.current?.stop();
-      window.speechSynthesis?.cancel();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
     };
   }, []);
 
