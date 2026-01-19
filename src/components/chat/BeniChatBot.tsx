@@ -379,6 +379,31 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
     recognition.start();
   }, [isListening]);
 
+  // Clean text for speech (remove markdown, asterisks, etc.)
+  const cleanTextForSpeech = (text: string): string => {
+    return text
+      // Remove bold/italic markers
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/__([^_]+)__/g, '$1')
+      .replace(/_([^_]+)_/g, '$1')
+      // Remove headers
+      .replace(/^#{1,6}\s+/gm, '')
+      // Remove bullet points and lists
+      .replace(/^[\s]*[-•*]\s+/gm, '')
+      .replace(/^[\s]*\d+\.\s+/gm, '')
+      // Remove code blocks
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`([^`]+)`/g, '$1')
+      // Remove links, keep text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // Remove multiple newlines
+      .replace(/\n{3,}/g, '\n\n')
+      // Clean up extra spaces
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
   // Text-to-speech function
   const speakText = useCallback((text: string) => {
     if (!('speechSynthesis' in window)) {
@@ -389,14 +414,23 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
     // Cancel any ongoing speech
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'pt-BR';
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
+    // Clean the text for natural speech
+    const cleanText = cleanTextForSpeech(text);
 
-    // Try to find a Portuguese voice
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'pt-BR';
+    utterance.rate = 0.95; // Slightly slower for more natural speech
+    utterance.pitch = 1.05; // Slightly higher for warmer tone
+
+    // Try to find a good Portuguese voice
     const voices = window.speechSynthesis.getVoices();
-    const ptVoice = voices.find(v => v.lang.startsWith('pt')) || voices[0];
+    // Prefer Google or Microsoft voices which tend to be more natural
+    const ptVoice = voices.find(v => 
+      v.lang.startsWith('pt') && (v.name.includes('Google') || v.name.includes('Microsoft'))
+    ) || voices.find(v => v.lang.startsWith('pt-BR')) 
+      || voices.find(v => v.lang.startsWith('pt')) 
+      || voices[0];
+    
     if (ptVoice) {
       utterance.voice = ptVoice;
     }
