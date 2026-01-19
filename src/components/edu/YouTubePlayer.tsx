@@ -67,8 +67,10 @@ interface YouTubePlayerProps {
 
 // Extract YouTube video ID from various URL formats
 function extractYouTubeId(url: string): string | null {
+  // Support for: youtube.com/watch?v=, youtube.com/embed/, youtube.com/v/, 
+  // youtu.be/, youtube.com/live/, youtube.com/shorts/
   const match = url.match(
-    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+    /(?:youtube\.com\/(?:live\/|shorts\/|[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
   );
   return match ? match[1] : null;
 }
