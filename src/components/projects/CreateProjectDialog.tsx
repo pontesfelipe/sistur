@@ -117,7 +117,6 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
       setGenerationProgress('Criando projeto...');
 
       // Create the project with effective org_id (supports demo mode)
-      const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
       const project = await createProject.mutateAsync({
         org_id: effectiveOrgId!,
         destination_id: selectedData.destination_id,
