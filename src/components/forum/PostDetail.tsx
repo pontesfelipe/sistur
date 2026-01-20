@@ -38,6 +38,8 @@ import {
   MoreVertical,
   Pencil,
   Trash2,
+  FileText,
+  Download,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -201,6 +203,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
           <h2 className="text-xl font-bold mb-3">{post.title}</h2>
           <p className="whitespace-pre-wrap">{post.content}</p>
 
+          {/* Image attachment */}
           {post.image_url && (
             <div className="mt-4 rounded-lg overflow-hidden">
               <img
@@ -208,6 +211,28 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
                 alt=""
                 className="w-full max-h-96 object-cover"
               />
+            </div>
+          )}
+
+          {/* PDF attachment */}
+          {post.attachment_type === 'application/pdf' && post.attachment_url && (
+            <div className="mt-4">
+              <a
+                href={post.attachment_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <FileText className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-sm">Documento PDF</p>
+                  <p className="text-xs text-muted-foreground">Clique para visualizar</p>
+                </div>
+                <Download className="h-5 w-5 text-muted-foreground" />
+              </a>
             </div>
           )}
         </CardContent>

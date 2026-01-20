@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -29,14 +29,19 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useForum, CreatePostData } from '@/hooks/useForum';
-import { Globe, Building2, Loader2, ImagePlus, X } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { Globe, Building2, Loader2, X, Upload, FileText, Image as ImageIcon } from 'lucide-react';
+import { toast } from 'sonner';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/jpg', 'application/pdf'];
 
 const formSchema = z.object({
-  title: z.string().min(5, 'Título deve ter pelo menos 5 caracteres'),
-  content: z.string().min(10, 'Conteúdo deve ter pelo menos 10 caracteres'),
+  title: z.string().min(5, 'Título deve ter pelo menos 5 caracteres').max(200, 'Título deve ter no máximo 200 caracteres'),
+  content: z.string().min(10, 'Conteúdo deve ter pelo menos 10 caracteres').max(10000, 'Conteúdo deve ter no máximo 10.000 caracteres'),
   visibility: z.enum(['org', 'public']),
   category: z.string(),
-  image_url: z.string().optional(),
 });
 
 const categories = [
@@ -58,12 +63,20 @@ interface CreatePostDialogProps {
     visibility: 'org' | 'public';
     category: string;
     image_url: string | null;
+    attachment_url?: string | null;
+    attachment_type?: string | null;
   };
 }
 
 export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDialogProps) {
   const { createPost, updatePost } = useForum();
-  const [imageUrl, setImageUrl] = useState(editPost?.image_url || '');
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(editPost?.attachment_url || editPost?.image_url || null);
+  const [attachmentType, setAttachmentType] = useState<string | null>(editPost?.attachment_type || null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,33 +85,126 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
       content: editPost?.content || '',
       visibility: editPost?.visibility || 'org',
       category: editPost?.category || 'general',
-      image_url: editPost?.image_url || '',
     },
   });
 
   const isEditing = !!editPost;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const data: CreatePostData = {
-      title: values.title,
-      content: values.content,
-      visibility: values.visibility,
-      category: values.category,
-      image_url: imageUrl || undefined,
-    };
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    if (isEditing) {
-      await updatePost.mutateAsync({ id: editPost.id, ...data });
-    } else {
-      await createPost.mutateAsync(data);
+    // Validate file type
+    if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+      toast.error('Tipo de arquivo não permitido. Use JPEG ou PDF.');
+      return;
     }
 
-    form.reset();
-    setImageUrl('');
-    onOpenChange(false);
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('Arquivo muito grande. Máximo 10MB.');
+      return;
+    }
+
+    setAttachmentFile(file);
+    setAttachmentType(file.type);
+
+    // Create preview for images
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAttachmentPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setAttachmentPreview(null);
+    }
   };
 
-  const isLoading = createPost.isPending || updatePost.isPending;
+  const removeAttachment = () => {
+    setAttachmentFile(null);
+    setAttachmentPreview(null);
+    setAttachmentType(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const uploadFile = async (file: File): Promise<string> => {
+    if (!user) throw new Error('Usuário não autenticado');
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('forum-attachments')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+      .from('forum-attachments')
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setIsUploading(true);
+
+      let attachmentUrl: string | undefined;
+      let imageUrl: string | undefined;
+      let fileType: string | undefined;
+
+      // Upload file if selected
+      if (attachmentFile) {
+        attachmentUrl = await uploadFile(attachmentFile);
+        fileType = attachmentFile.type;
+
+        // If it's an image, also set it as image_url for backwards compatibility
+        if (attachmentFile.type.startsWith('image/')) {
+          imageUrl = attachmentUrl;
+        }
+      } else if (attachmentPreview && !attachmentFile) {
+        // Keep existing attachment if editing
+        attachmentUrl = editPost?.attachment_url || editPost?.image_url || undefined;
+        fileType = editPost?.attachment_type || undefined;
+        if (attachmentUrl?.includes('image') || editPost?.image_url) {
+          imageUrl = attachmentUrl;
+        }
+      }
+
+      const data: CreatePostData = {
+        title: values.title,
+        content: values.content,
+        visibility: values.visibility,
+        category: values.category,
+        image_url: imageUrl,
+        attachment_url: attachmentUrl,
+        attachment_type: fileType,
+      };
+
+      if (isEditing) {
+        await updatePost.mutateAsync({ id: editPost.id, ...data });
+      } else {
+        await createPost.mutateAsync(data);
+      }
+
+      form.reset();
+      removeAttachment();
+      onOpenChange(false);
+    } catch (error: any) {
+      toast.error('Erro ao salvar post: ' + error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const isLoading = createPost.isPending || updatePost.isPending || isUploading;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -201,35 +307,72 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
               />
             </div>
 
-            {/* Image URL Input */}
+            {/* File Upload Section */}
             <div className="space-y-2">
-              <Label>Imagem (opcional)</Label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Cole a URL de uma imagem..."
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  className="flex-1"
-                />
-                {imageUrl && (
+              <Label>Anexo (opcional)</Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                JPEG ou PDF, até 10MB
+              </p>
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".jpg,.jpeg,.pdf"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+
+              {!attachmentFile && !attachmentPreview ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-24 border-dashed"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <Upload className="h-6 w-6 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      Clique para anexar imagem ou PDF
+                    </span>
+                  </div>
+                </Button>
+              ) : (
+                <div className="relative border rounded-lg p-3">
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => setImageUrl('')}
+                    className="absolute top-1 right-1 h-6 w-6"
+                    onClick={removeAttachment}
                   >
                     <X className="h-4 w-4" />
                   </Button>
-                )}
-              </div>
-              {imageUrl && (
-                <div className="relative mt-2 rounded-lg overflow-hidden border">
-                  <img
-                    src={imageUrl}
-                    alt="Preview"
-                    className="w-full h-48 object-cover"
-                    onError={() => setImageUrl('')}
-                  />
+
+                  {attachmentType?.startsWith('image/') || attachmentPreview?.startsWith('data:image') ? (
+                    <div className="rounded-lg overflow-hidden">
+                      <img
+                        src={attachmentPreview || ''}
+                        alt="Preview"
+                        className="w-full h-48 object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3 py-2">
+                      <div className="p-2 bg-muted rounded-lg">
+                        <FileText className="h-6 w-6 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {attachmentFile?.name || 'Documento PDF'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {attachmentFile 
+                            ? `${(attachmentFile.size / 1024 / 1024).toFixed(2)} MB`
+                            : 'PDF anexado'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
