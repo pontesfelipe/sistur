@@ -2327,6 +2327,7 @@ export type Database = {
           id: string
           is_solution: boolean | null
           likes_count: number | null
+          parent_reply_id: string | null
           post_id: string
           updated_at: string
           user_id: string
@@ -2337,6 +2338,7 @@ export type Database = {
           id?: string
           is_solution?: boolean | null
           likes_count?: number | null
+          parent_reply_id?: string | null
           post_id: string
           updated_at?: string
           user_id: string
@@ -2347,11 +2349,19 @@ export type Database = {
           id?: string
           is_solution?: boolean | null
           likes_count?: number | null
+          parent_reply_id?: string | null
           post_id?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "forum_replies_parent_reply_id_fkey"
+            columns: ["parent_reply_id"]
+            isOneToOne: false
+            referencedRelation: "forum_replies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "forum_replies_post_id_fkey"
             columns: ["post_id"]

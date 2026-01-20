@@ -35,6 +35,7 @@ export interface ForumReply {
   content: string;
   is_solution: boolean;
   likes_count: number;
+  parent_reply_id: string | null;
   created_at: string;
   updated_at: string;
   author?: {
@@ -42,6 +43,7 @@ export interface ForumReply {
     avatar_url: string | null;
   };
   user_liked?: boolean;
+  replies?: ForumReply[];
 }
 
 export interface CreatePostData {
@@ -57,6 +59,7 @@ export interface CreatePostData {
 export interface CreateReplyData {
   post_id: string;
   content: string;
+  parent_reply_id?: string;
 }
 
 export function useForum() {
@@ -162,7 +165,7 @@ export function useForum() {
     });
   };
 
-  // Fetch replies for a post
+  // Fetch replies for a post (with nested replies)
   const useReplies = (postId: string) => {
     return useQuery({
       queryKey: ['forum-replies', postId],
@@ -171,7 +174,6 @@ export function useForum() {
           .from('forum_replies')
           .select('*')
           .eq('post_id', postId)
-          .order('is_solution', { ascending: false })
           .order('created_at', { ascending: true });
 
         if (error) throw error;
@@ -203,7 +205,39 @@ export function useForum() {
           })
         );
 
-        return repliesWithAuthors;
+        // Organize into nested structure
+        const topLevelReplies: ForumReply[] = [];
+        const replyMap = new Map<string, ForumReply>();
+
+        // First pass: create map
+        repliesWithAuthors.forEach((reply) => {
+          replyMap.set(reply.id, { ...reply, replies: [] });
+        });
+
+        // Second pass: organize hierarchy
+        repliesWithAuthors.forEach((reply) => {
+          const replyWithChildren = replyMap.get(reply.id)!;
+          if (reply.parent_reply_id) {
+            const parent = replyMap.get(reply.parent_reply_id);
+            if (parent) {
+              parent.replies = parent.replies || [];
+              parent.replies.push(replyWithChildren);
+            } else {
+              topLevelReplies.push(replyWithChildren);
+            }
+          } else {
+            topLevelReplies.push(replyWithChildren);
+          }
+        });
+
+        // Sort: solutions first, then by date
+        topLevelReplies.sort((a, b) => {
+          if (a.is_solution && !b.is_solution) return -1;
+          if (!a.is_solution && b.is_solution) return 1;
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        });
+
+        return topLevelReplies;
       },
       enabled: !!postId && !!user,
     });
@@ -295,6 +329,7 @@ export function useForum() {
           post_id: data.post_id,
           user_id: user.id,
           content: data.content,
+          parent_reply_id: data.parent_reply_id || null,
         })
         .select()
         .single();
