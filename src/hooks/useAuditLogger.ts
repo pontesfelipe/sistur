@@ -54,11 +54,14 @@ export function useAuditLogger() {
       // Get the user's org_id
       const { data: profile } = await supabase
         .from('profiles')
-        .select('org_id')
+        .select('org_id, viewing_demo_org_id')
         .eq('user_id', user.id)
         .single();
 
       if (!profile?.org_id) return;
+
+      // Use effective org_id (supports demo mode)
+      const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
 
       const eventMetadata = {
         ...metadata,
@@ -67,7 +70,7 @@ export function useAuditLogger() {
       };
 
       await supabase.from('audit_events').insert([{
-        org_id: profile.org_id,
+        org_id: effectiveOrgId,
         user_id: user.id,
         event_type: eventType,
         entity_type: entityType || null,

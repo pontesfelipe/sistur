@@ -53,13 +53,14 @@ export interface CommunityFeedbackSummary {
   top_suggestions: string[];
 }
 
-async function getUserOrgId(userId: string): Promise<string | null> {
+async function getEffectiveOrgId(userId: string): Promise<string | null> {
   const { data } = await supabase
     .from('profiles')
-    .select('org_id')
+    .select('org_id, viewing_demo_org_id')
     .eq('user_id', userId)
     .single();
-  return data?.org_id ?? null;
+  // Use effective org_id (supports demo mode)
+  return data?.viewing_demo_org_id ?? data?.org_id ?? null;
 }
 
 export function useCommunityFeedback(destinationId?: string, assessmentId?: string) {
@@ -96,7 +97,7 @@ export function useCommunityFeedback(destinationId?: string, assessmentId?: stri
         throw new Error('Usuário não autenticado');
       }
 
-      const orgId = await getUserOrgId(user.id);
+      const orgId = await getEffectiveOrgId(user.id);
       if (!orgId) {
         throw new Error('Perfil não encontrado');
       }

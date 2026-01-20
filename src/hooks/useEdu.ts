@@ -146,14 +146,17 @@ export function useEduTrackMutations() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('org_id')
+        .select('org_id, viewing_demo_org_id')
         .eq('user_id', user.id)
         .single();
+
+      // Use effective org_id (supports demo mode)
+      const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
 
       // Create track
       const { data: newTrack, error: trackError } = await supabase
         .from('edu_tracks')
-        .insert({ ...track, org_id: profile?.org_id })
+        .insert({ ...track, org_id: effectiveOrgId })
         .select()
         .single();
 

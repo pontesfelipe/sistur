@@ -31,17 +31,20 @@ export function useIndicators() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('org_id')
+        .select('org_id, viewing_demo_org_id')
         .eq('user_id', user.id)
         .single();
 
       if (!profile) throw new Error('Perfil não encontrado');
 
+      // Use effective org_id (supports demo mode)
+      const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
+
       const { data, error } = await supabase
         .from('indicators')
         .insert({
           ...indicator,
-          org_id: profile.org_id,
+          org_id: effectiveOrgId,
         })
         .select()
         .single();
@@ -147,11 +150,14 @@ export function useIndicatorValues(assessmentId?: string) {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('org_id')
+        .select('org_id, viewing_demo_org_id')
         .eq('user_id', user.id)
         .single();
 
       if (!profile) throw new Error('Perfil não encontrado');
+
+      // Use effective org_id (supports demo mode)
+      const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
 
       // Check if value exists
       const { data: existing } = await supabase
@@ -181,7 +187,7 @@ export function useIndicatorValues(assessmentId?: string) {
           .from('indicator_values')
           .insert({
             ...value,
-            org_id: profile.org_id,
+            org_id: effectiveOrgId,
           })
           .select()
           .single();
@@ -211,11 +217,14 @@ export function useIndicatorValues(assessmentId?: string) {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('org_id')
+        .select('org_id, viewing_demo_org_id')
         .eq('user_id', user.id)
         .single();
 
       if (!profile) throw new Error('Perfil não encontrado');
+
+      // Use effective org_id (supports demo mode)
+      const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
 
       // Delete existing values for this assessment
       await supabase
@@ -228,7 +237,7 @@ export function useIndicatorValues(assessmentId?: string) {
         .from('indicator_values')
         .insert(values.map(v => ({
           ...v,
-          org_id: profile.org_id,
+          org_id: effectiveOrgId,
         })))
         .select();
 

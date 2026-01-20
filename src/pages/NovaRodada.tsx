@@ -141,12 +141,13 @@ export default function NovaRodada() {
   const handleValidationComplete = async (validatedValues: ExternalIndicatorValue[]) => {
     setValidatedDataCount(validatedValues.length);
     
-    // Create snapshot if assessment exists
-    if (createdAssessmentId && profile?.org_id) {
+    // Create snapshot if assessment exists (use effective org_id for demo mode)
+    const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
+    if (createdAssessmentId && effectiveOrgId) {
       await createDataSnapshot.mutateAsync({
         assessmentId: createdAssessmentId,
         values: validatedValues,
-        orgId: profile.org_id,
+        orgId: effectiveOrgId,
       });
     }
     
