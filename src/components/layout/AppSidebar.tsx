@@ -122,8 +122,8 @@ export function AppSidebar() {
     const isActive = location.pathname === item.href || 
       (item.href !== '/' && location.pathname.startsWith(item.href));
     
-    // Show badge for forum notifications
-    const showBadge = item.href === '/forum' && forumNotifications?.unreadCount && forumNotifications.unreadCount > 0;
+    // Show badge for forum notifications (only when count > 0)
+    const showBadge = item.href === '/forum' && (forumNotifications?.unreadCount ?? 0) > 0;
     
     const content = (
       <Link
