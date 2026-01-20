@@ -476,7 +476,8 @@ export function useForum() {
     mutationFn: async (data: ReportPostData) => {
       if (!user) throw new Error('Usuário não autenticado');
 
-      const { error } = await supabase
+      // Insert into forum_post_reports
+      const { error: reportError } = await supabase
         .from('forum_post_reports')
         .insert({
           post_id: data.post_id,
@@ -486,7 +487,31 @@ export function useForum() {
           comment: data.comment || null,
         });
 
-      if (error) throw error;
+      if (reportError) throw reportError;
+
+      // Also create a feedback entry for admin visibility
+      const targetType = data.reply_id ? 'comentário' : 'post';
+      const reasonLabels: Record<string, string> = {
+        spam: 'Spam ou propaganda',
+        offensive: 'Conteúdo ofensivo ou inadequado',
+        misinformation: 'Informação falsa ou enganosa',
+        harassment: 'Assédio ou bullying',
+        copyright: 'Violação de direitos autorais',
+        other: 'Outro motivo',
+      };
+
+      const feedbackTitle = `[Denúncia] ${targetType === 'comentário' ? 'Comentário' : 'Post'} denunciado: ${reasonLabels[data.reason] || data.reason}`;
+      const feedbackDescription = `Denúncia de ${targetType} no Social Turismo.\n\nMotivo: ${reasonLabels[data.reason] || data.reason}${data.comment ? `\n\nDetalhes adicionais: ${data.comment}` : ''}\n\nPost ID: ${data.post_id}${data.reply_id ? `\nReply ID: ${data.reply_id}` : ''}`;
+
+      await supabase.from('user_feedback').insert({
+        user_id: user.id,
+        feedback_type: 'bug',
+        category: 'forum_report',
+        title: feedbackTitle,
+        description: feedbackDescription,
+        page_url: '/forum',
+        user_agent: navigator.userAgent,
+      });
     },
     onSuccess: () => {
       toast.success('Denúncia enviada. Nossa equipe irá analisar.');
