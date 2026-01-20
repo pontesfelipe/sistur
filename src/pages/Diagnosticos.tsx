@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,13 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AssessmentCard } from '@/components/dashboard/AssessmentCard';
 import { DataImportPanel } from '@/components/diagnostics/DataImportPanel';
 import { IndicadoresPanel } from '@/components/diagnostics/IndicadoresPanel';
+import { DestinosPanel } from '@/components/diagnostics/DestinosPanel';
 import { 
   Plus, 
   Search, 
   ClipboardList,
   Loader2,
   Upload,
-  BarChart3
+  BarChart3,
+  MapPin
 } from 'lucide-react';
 import {
   Select,
@@ -24,7 +26,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAssessments } from '@/hooks/useAssessments';
-import { AssessmentFormDialog } from '@/components/assessments/AssessmentFormDialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const Diagnosticos = () => {
@@ -32,26 +33,28 @@ const Diagnosticos = () => {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   
   // Get tab and assessment from URL params
   const tabFromUrl = searchParams.get('tab');
   const assessmentFromUrl = searchParams.get('assessment');
-  const [mainTab, setMainTab] = useState<'rodadas' | 'importacao' | 'indicadores'>(
+  const [mainTab, setMainTab] = useState<'rodadas' | 'destinos' | 'importacao' | 'indicadores'>(
+    tabFromUrl === 'destinos' ? 'destinos' :
     tabFromUrl === 'importacao' ? 'importacao' : 
     tabFromUrl === 'indicadores' ? 'indicadores' : 'rodadas'
   );
 
   useEffect(() => {
-    if (tabFromUrl === 'importacao') {
+    if (tabFromUrl === 'destinos') {
+      setMainTab('destinos');
+    } else if (tabFromUrl === 'importacao') {
       setMainTab('importacao');
     } else if (tabFromUrl === 'indicadores') {
       setMainTab('indicadores');
     }
   }, [tabFromUrl]);
   
-  const { assessments, isLoading, createAssessment, deleteAssessment } = useAssessments();
+  const { assessments, isLoading, deleteAssessment } = useAssessments();
 
   const filteredAssessments = assessments?.filter((assessment) => {
     const matchesSearch = assessment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -64,19 +67,6 @@ const Diagnosticos = () => {
     DRAFT: assessments?.filter(a => a.status === 'DRAFT').length ?? 0,
     DATA_READY: assessments?.filter(a => a.status === 'DATA_READY').length ?? 0,
     CALCULATED: assessments?.filter(a => a.status === 'CALCULATED').length ?? 0,
-  };
-
-  const handleCreate = async (data: {
-    title: string;
-    destination_id: string;
-    period_start?: string | null;
-    period_end?: string | null;
-    status: 'DRAFT' | 'DATA_READY' | 'CALCULATED';
-  }) => {
-    const result = await createAssessment.mutateAsync(data);
-    if (result?.id) {
-      navigate(`/diagnosticos/${result.id}`);
-    }
   };
 
   const handleDelete = async (id: string) => {
@@ -94,14 +84,18 @@ const Diagnosticos = () => {
       subtitle="Rodadas de avaliação dos destinos"
     >
       <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as typeof mainTab)} className="space-y-6">
-        <TabsList className="w-full max-w-xl">
+        <TabsList className="w-full max-w-2xl">
           <TabsTrigger value="rodadas" className="gap-2 flex-1">
             <ClipboardList className="h-4 w-4" />
             Rodadas
           </TabsTrigger>
+          <TabsTrigger value="destinos" className="gap-2 flex-1">
+            <MapPin className="h-4 w-4" />
+            Destinos
+          </TabsTrigger>
           <TabsTrigger value="importacao" className="gap-2 flex-1">
             <Upload className="h-4 w-4" />
-            Preenchimento de Dados
+            Preenchimento
           </TabsTrigger>
           <TabsTrigger value="indicadores" className="gap-2 flex-1">
             <BarChart3 className="h-4 w-4" />
@@ -134,9 +128,11 @@ const Diagnosticos = () => {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => setIsFormOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Nova Rodada
+            <Button asChild>
+              <Link to="/nova-rodada">
+                <Plus className="mr-2 h-4 w-4" />
+                Nova Rodada
+              </Link>
             </Button>
           </div>
 
@@ -210,13 +206,19 @@ const Diagnosticos = () => {
                   : 'Crie sua primeira rodada de diagnóstico.'}
               </p>
               {!searchQuery && statusFilter === 'all' && (
-                <Button className="mt-4" onClick={() => setIsFormOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nova Rodada
+                <Button className="mt-4" asChild>
+                  <Link to="/nova-rodada">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Nova Rodada
+                  </Link>
                 </Button>
               )}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="destinos">
+          <DestinosPanel />
         </TabsContent>
 
         <TabsContent value="importacao">
@@ -227,13 +229,6 @@ const Diagnosticos = () => {
           <IndicadoresPanel />
         </TabsContent>
       </Tabs>
-
-      {/* Form Dialog */}
-      <AssessmentFormDialog
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        onSubmit={handleCreate}
-      />
     </AppLayout>
   );
 };
