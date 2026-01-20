@@ -2258,6 +2258,60 @@ export type Database = {
           },
         ]
       }
+      forum_post_reports: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          post_id: string
+          reason: string
+          reply_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          post_id: string
+          reason: string
+          reply_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string
+          reason?: string
+          reply_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_post_reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_post_reports_reply_id_fkey"
+            columns: ["reply_id"]
+            isOneToOne: false
+            referencedRelation: "forum_replies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forum_posts: {
         Row: {
           attachment_type: string | null

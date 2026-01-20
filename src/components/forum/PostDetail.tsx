@@ -25,7 +25,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ForumPost, ForumReply, useForum } from '@/hooks/useForum';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { useHaptic } from '@/hooks/useHaptic';
+import { ReportDialog } from './ReportDialog';
 import {
   ArrowLeft,
   Heart,
@@ -42,6 +44,7 @@ import {
   Download,
   Reply,
   CornerDownRight,
+  Flag,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -58,10 +61,12 @@ interface ReplyCardProps {
   reply: ForumReply;
   postId: string;
   isPostOwner: boolean;
+  isAdmin: boolean;
   onReply: (replyId: string, authorName: string) => void;
   onDelete: (replyId: string) => void;
   onLike: (reply: ForumReply) => void;
   onMarkAsSolution: (replyId: string) => void;
+  onReport: (replyId: string) => void;
   depth: number;
 }
 
@@ -69,14 +74,17 @@ function ReplyCard({
   reply,
   postId,
   isPostOwner,
+  isAdmin,
   onReply,
   onDelete,
   onLike,
   onMarkAsSolution,
+  onReport,
   depth,
 }: ReplyCardProps) {
   const { user } = useAuth();
   const maxDepth = 3;
+  const canDelete = user?.id === reply.user_id || isAdmin;
 
   return (
     <div className={cn(depth > 0 && 'ml-6 border-l-2 border-muted pl-4')}>
@@ -124,7 +132,7 @@ function ReplyCard({
                 </Button>
               )}
 
-              {user?.id === reply.user_id && (
+              {canDelete && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -171,6 +179,15 @@ function ReplyCard({
               Responder
             </Button>
           )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-1 text-muted-foreground hover:text-destructive"
+            onClick={() => onReport(reply.id)}
+          >
+            <Flag className="h-4 w-4" />
+            Denunciar
+          </Button>
         </CardFooter>
       </Card>
 
@@ -183,10 +200,12 @@ function ReplyCard({
               reply={nestedReply}
               postId={postId}
               isPostOwner={isPostOwner}
+              isAdmin={isAdmin}
               onReply={onReply}
               onDelete={onDelete}
               onLike={onLike}
               onMarkAsSolution={onMarkAsSolution}
+              onReport={onReport}
               depth={depth + 1}
             />
           ))}
@@ -205,6 +224,7 @@ interface PostDetailProps {
 
 export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
   const { user } = useAuth();
+  const { isAdmin } = useProfile();
   const {
     togglePostLike,
     toggleReplyLike,
@@ -221,8 +241,11 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
   const [replyToDelete, setReplyToDelete] = useState<{ id: string; postId: string } | null>(null);
   const [editingReply, setEditingReply] = useState<{ id: string; content: string } | null>(null);
   const [replyingTo, setReplyingTo] = useState<{ id: string; authorName: string } | null>(null);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [reportingReplyId, setReportingReplyId] = useState<string | undefined>();
 
   const isOwner = user?.id === post.user_id;
+  const canDeletePost = isOwner || isAdmin;
 
   const handleSubmitReply = async () => {
     if (!replyContent.trim()) return;
@@ -320,7 +343,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
                 )}
               </Badge>
 
-              {isOwner && (
+              {canDeletePost && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -459,15 +482,26 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
               reply={reply}
               postId={post.id}
               isPostOwner={isOwner}
+              isAdmin={isAdmin}
               onReply={(replyId, authorName) => setReplyingTo({ id: replyId, authorName })}
               onDelete={(replyId) => setReplyToDelete({ id: replyId, postId: post.id })}
               onLike={handleLikeReply}
               onMarkAsSolution={handleMarkAsSolution}
+              onReport={(replyId) => { setReportingReplyId(replyId); setShowReportDialog(true); }}
               depth={0}
             />
           ))
         )}
       </div>
+
+      {/* Report Dialog */}
+      <ReportDialog
+        open={showReportDialog}
+        onOpenChange={(open) => { setShowReportDialog(open); if (!open) setReportingReplyId(undefined); }}
+        postId={post.id}
+        replyId={reportingReplyId}
+        targetType={reportingReplyId ? 'reply' : 'post'}
+      />
 
       {/* Delete Post Dialog */}
       <AlertDialog open={showDeletePostDialog} onOpenChange={setShowDeletePostDialog}>
