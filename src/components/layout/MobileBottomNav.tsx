@@ -6,7 +6,7 @@ import {
   LayoutDashboard,
   GraduationCap,
   Bot,
-  Settings,
+  MessageSquare,
   Menu,
 } from 'lucide-react';
 import { useMemo } from 'react';
@@ -24,7 +24,7 @@ const bottomNavItems: NavItem[] = [
   { name: 'Início', href: '/', icon: LayoutDashboard, requiresERP: true },
   { name: 'EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
   { name: 'Beni', href: '/professor-beni', icon: Bot },
-  { name: 'Config', href: '/configuracoes', icon: Settings, requiresAdmin: true },
+  { name: 'Fórum', href: '/forum', icon: MessageSquare },
 ];
 
 interface MobileBottomNavProps {

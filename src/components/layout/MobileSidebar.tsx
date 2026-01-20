@@ -18,6 +18,7 @@ import {
   Menu,
   Bot,
   MessageSquarePlus,
+  MessageSquare,
   FolderKanban,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
@@ -54,6 +55,7 @@ const navigation: NavItem[] = [
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
+  { name: 'Fórum', href: '/forum', icon: MessageSquare },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
 ];
 
