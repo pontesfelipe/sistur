@@ -30,7 +30,9 @@ import {
   SheetTitle,
   SheetClose,
 } from '@/components/ui/sheet';
-import { useMemo } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
+import { useHaptic } from '@/hooks/useHaptic';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 
 interface NavItem {
   name: string;
@@ -80,11 +82,25 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess, initialized } = useProfileContext();
+  const { lightTap, selection } = useHaptic();
 
   // Determine the home route based on user access
   const homeRoute = (hasERPAccess || isAdmin) ? '/' : '/edu';
 
+  // Swipe to close sidebar
+  const handleSwipeClose = useCallback(() => {
+    lightTap();
+    onOpenChange(false);
+  }, [lightTap, onOpenChange]);
+
+  const { bind: swipeBind } = useSwipeGesture({
+    onSwipeLeft: handleSwipeClose,
+    threshold: 50,
+    preventScroll: true,
+  });
+
   const handleSignOut = async () => {
+    lightTap();
     await signOut();
     toast.success('Você saiu da sua conta');
     onOpenChange(false);
@@ -92,6 +108,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   };
 
   const handleNavClick = () => {
+    selection();
     onOpenChange(false);
   };
 
@@ -129,10 +146,10 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
           to={item.href}
           onClick={handleNavClick}
           className={cn(
-            'flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200',
+            'flex items-center gap-3 px-4 py-3.5 rounded-lg transition-all duration-200 touch-target active:scale-[0.98]',
             isActive
               ? 'bg-primary text-primary-foreground'
-              : 'text-foreground hover:bg-muted'
+              : 'text-foreground hover:bg-muted active:bg-muted/80'
           )}
         >
           <item.icon className="h-5 w-5 flex-shrink-0" />
@@ -144,11 +161,15 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="w-72 p-0 bg-background">
+      <SheetContent 
+        side="left" 
+        className="w-72 p-0 bg-background"
+        {...swipeBind()}
+      >
         {/* Logo */}
         <SheetHeader className="flex h-16 items-center px-4 border-b border-border">
           <SheetClose asChild>
-            <Link to={homeRoute} className="flex items-center gap-2">
+            <Link to={homeRoute} className="flex items-center gap-2" onClick={() => selection()}>
               <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
                 <span className="text-primary-foreground font-display font-bold text-sm">S</span>
               </div>
@@ -157,8 +178,8 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
           </SheetClose>
         </SheetHeader>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-200px)]">
+        {/* Navigation - with touch-friendly spacing */}
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-200px)] overscroll-contain">
           {filteredNavigation.map((item) => (
             <NavItem key={item.name} item={item} />
           ))}
