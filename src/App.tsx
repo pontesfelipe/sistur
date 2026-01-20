@@ -48,6 +48,7 @@ const VerifyCertificate = lazy(() => import("./pages/VerifyCertificate"));
 const OnDemandRequests = lazy(() => import("./pages/OnDemandRequests"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
 const Projetos = lazy(() => import("./pages/Projetos"));
+const Forum = lazy(() => import("./pages/Forum"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -326,6 +327,14 @@ const App = () => {
                     <ERPRoute>
                       <Projetos />
                     </ERPRoute>
+                  }
+                />
+                <Route
+                  path="/forum"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
+                      <Forum />
+                    </ProtectedRoute>
                   }
                 />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
