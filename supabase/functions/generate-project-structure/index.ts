@@ -28,33 +28,35 @@ serve(async (req) => {
       kanban: `Kanban methodology with continuous flow, WIP limits, and visual management. Focus on reducing cycle time and improving throughput.`,
     };
 
-    const systemPrompt = `You are a project management expert specialized in tourism destination development. Your task is to analyze diagnostic data and generate a comprehensive project structure.
+    const systemPrompt = `Você é um especialista em gestão de projetos de desenvolvimento turístico. Sua tarefa é analisar dados de diagnóstico e gerar uma estrutura de projeto abrangente.
 
-Based on the methodology "${methodology}":
+Com base na metodologia "${methodology}":
 ${methodologyDescriptions[methodology] || ''}
 
-Generate a project structure that addresses the issues and implements the prescriptions from the diagnostic assessment.
+Gere uma estrutura de projeto que aborde as questões identificadas e implemente as prescrições da avaliação diagnóstica.
 
-IMPORTANT: Respond with ONLY a valid JSON object. Do not include any markdown, code blocks, or explanatory text.`;
+IMPORTANTE: 
+- Responda APENAS com um objeto JSON válido. Não inclua markdown, blocos de código ou texto explicativo.
+- TODO O CONTEÚDO DEVE ESTAR EM PORTUGUÊS BRASILEIRO (pt-BR).`;
 
-    const userPrompt = `Analyze the following diagnostic data for destination "${destinationName}" and generate a project structure:
+    const userPrompt = `Analise os seguintes dados de diagnóstico para o destino "${destinationName}" e gere uma estrutura de projeto em PORTUGUÊS BRASILEIRO:
 
-## Report Summary
-${reportContent?.substring(0, 3000) || 'No report content available'}
+## Resumo do Relatório
+${reportContent?.substring(0, 3000) || 'Conteúdo do relatório não disponível'}
 
-## Issues Identified (${issues?.length || 0})
-${issues?.slice(0, 10).map((i: any) => `- [${i.pillar}] ${i.title || i.description?.substring(0, 100)}`).join('\n') || 'No issues'}
+## Problemas Identificados (${issues?.length || 0})
+${issues?.slice(0, 10).map((i: any) => `- [${i.pillar}] ${i.title || i.description?.substring(0, 100)}`).join('\n') || 'Nenhum problema identificado'}
 
-## Prescriptions (${prescriptions?.length || 0})
-${prescriptions?.slice(0, 10).map((p: any) => `- [${p.pillar}] ${p.what}: ${p.how?.substring(0, 100)}`).join('\n') || 'No prescriptions'}
+## Prescrições (${prescriptions?.length || 0})
+${prescriptions?.slice(0, 10).map((p: any) => `- [${p.pillar}] ${p.what}: ${p.how?.substring(0, 100)}`).join('\n') || 'Nenhuma prescrição'}
 
-Generate a JSON structure with:
-1. "description": A brief project description (2-3 sentences)
-2. "phases": Array of phases appropriate for ${methodology}, each with "name", "description", and "deliverables" array
-3. "tasks": Array of 10-20 initial tasks derived from issues and prescriptions, each with "title", "description", "type" (epic/feature/story/task), "priority" (low/medium/high/critical), "estimatedHours", and "tags" array
-4. "milestones": Array of 3-5 key milestones with "name", "description", and suggested "targetDate" (as ISO date string, starting from today)
+Gere uma estrutura JSON com (TODO O CONTEÚDO EM PORTUGUÊS BRASILEIRO):
+1. "description": Uma breve descrição do projeto (2-3 frases)
+2. "phases": Array de fases apropriadas para ${methodology}, cada uma com "name", "description" e array "deliverables"
+3. "tasks": Array de 10-20 tarefas iniciais derivadas dos problemas e prescrições, cada uma com "title", "description", "type" (epic/feature/story/task), "priority" (low/medium/high/critical), "estimatedHours" e array "tags"
+4. "milestones": Array de 3-5 marcos principais com "name", "description" e "targetDate" sugerida (como string de data ISO, começando a partir de hoje)
 
-Focus on actionable, measurable tasks that address the identified issues.`;
+Foque em tarefas acionáveis e mensuráveis que abordem os problemas identificados.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
