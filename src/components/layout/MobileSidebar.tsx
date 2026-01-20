@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { useForumNotifications, useMarkForumAsSeen } from '@/hooks/useForumNotifications';
 import {
   LayoutDashboard,
   MapPin,
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
   Sheet,
@@ -84,10 +86,19 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess, initialized } = useProfileContext();
+  const { data: forumNotifications } = useForumNotifications();
+  const markForumAsSeen = useMarkForumAsSeen();
   const { lightTap, selection } = useHaptic();
 
   // Determine the home route based on user access
   const homeRoute = (hasERPAccess || isAdmin) ? '/' : '/edu';
+
+  // Mark forum as seen when navigating to it
+  useEffect(() => {
+    if (location.pathname === '/forum') {
+      markForumAsSeen.mutate();
+    }
+  }, [location.pathname]);
 
   // Swipe to close sidebar
   const handleSwipeClose = useCallback(() => {
@@ -142,6 +153,9 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
     const isActive = location.pathname === item.href || 
       (item.href !== '/' && location.pathname.startsWith(item.href));
     
+    // Show badge for forum notifications
+    const showBadge = item.href === '/forum' && forumNotifications?.unreadCount && forumNotifications.unreadCount > 0;
+    
     return (
       <SheetClose asChild>
         <Link
@@ -155,7 +169,12 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
           )}
         >
           <item.icon className="h-5 w-5 flex-shrink-0" />
-          <span className="font-medium text-sm">{item.name}</span>
+          <span className="font-medium text-sm flex-1">{item.name}</span>
+          {showBadge && (
+            <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
+              {forumNotifications.unreadCount > 99 ? '99+' : forumNotifications.unreadCount}
+            </Badge>
+          )}
         </Link>
       </SheetClose>
     );
