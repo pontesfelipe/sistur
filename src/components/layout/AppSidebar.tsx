@@ -5,7 +5,6 @@ import { useProfileContext } from '@/contexts/ProfileContext';
 import { useForumNotifications, useMarkForumAsSeen } from '@/hooks/useForumNotifications';
 import {
   LayoutDashboard,
-  MapPin,
   ClipboardList,
   GraduationCap,
   FileText,
@@ -42,7 +41,6 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
-  { name: 'Destinos', href: '/destinos', icon: MapPin, requiresERP: true },
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
   { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
   { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
