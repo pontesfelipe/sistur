@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { useForumNotifications, useMarkForumAsSeen } from '@/hooks/useForumNotifications';
 import { useHaptic } from '@/hooks/useHaptic';
 import {
   LayoutDashboard,
@@ -9,7 +10,7 @@ import {
   MessageSquare,
   Menu,
 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 
 interface NavItem {
   name: string;
@@ -34,7 +35,16 @@ interface MobileBottomNavProps {
 export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
   const location = useLocation();
   const { isAdmin, hasERPAccess, hasEDUAccess, initialized } = useProfileContext();
+  const { data: forumNotifications } = useForumNotifications();
+  const markForumAsSeen = useMarkForumAsSeen();
   const { selection } = useHaptic();
+
+  // Mark forum as seen when navigating to it
+  useEffect(() => {
+    if (location.pathname === '/forum') {
+      markForumAsSeen.mutate();
+    }
+  }, [location.pathname]);
 
   const filteredItems = useMemo(() => {
     if (!initialized) return bottomNavItems.filter(item => !item.requiresERP && !item.requiresEDU && !item.requiresAdmin);
@@ -66,22 +76,32 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
           const isActive = location.pathname === item.href || 
             (item.href !== '/' && location.pathname.startsWith(item.href));
           
+          // Show badge for forum notifications
+          const showBadge = item.href === '/forum' && forumNotifications?.unreadCount && forumNotifications.unreadCount > 0;
+          
           return (
             <Link
               key={item.href}
               to={item.href}
               onClick={handleNavClick}
               className={cn(
-                'flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 touch-target no-tap-highlight mobile-active',
+                'flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 touch-target no-tap-highlight mobile-active relative',
                 isActive
                   ? 'text-primary'
                   : 'text-muted-foreground'
               )}
             >
-              <item.icon className={cn(
-                'h-5 w-5 transition-transform',
-                isActive && 'scale-110'
-              )} />
+              <div className="relative">
+                <item.icon className={cn(
+                  'h-5 w-5 transition-transform',
+                  isActive && 'scale-110'
+                )} />
+                {showBadge && (
+                  <span className="absolute -top-1 -right-1.5 h-4 min-w-4 flex items-center justify-center bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full px-1">
+                    {forumNotifications.unreadCount > 9 ? '9+' : forumNotifications.unreadCount}
+                  </span>
+                )}
+              </div>
               <span className="text-[10px] font-medium">{item.name}</span>
             </Link>
           );

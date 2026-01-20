@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { useForumNotifications, useMarkForumAsSeen } from '@/hooks/useForumNotifications';
 import {
   LayoutDashboard,
   MapPin,
@@ -22,9 +23,10 @@ import {
   FolderKanban,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -71,10 +73,19 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess, isEstudante, initialized, loading } = useProfileContext();
+  const { data: forumNotifications } = useForumNotifications();
+  const markForumAsSeen = useMarkForumAsSeen();
   const [collapsed, setCollapsed] = useState(false);
 
   // Determine the home route based on user access
   const homeRoute = (hasERPAccess || isAdmin) ? '/' : '/edu';
+
+  // Mark forum as seen when navigating to it
+  useEffect(() => {
+    if (location.pathname === '/forum') {
+      markForumAsSeen.mutate();
+    }
+  }, [location.pathname]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -111,22 +122,35 @@ export function AppSidebar() {
     const isActive = location.pathname === item.href || 
       (item.href !== '/' && location.pathname.startsWith(item.href));
     
+    // Show badge for forum notifications
+    const showBadge = item.href === '/forum' && forumNotifications?.unreadCount && forumNotifications.unreadCount > 0;
+    
     const content = (
       <Link
         to={item.href}
         className={cn(
-          'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group',
+          'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative',
           isActive
             ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-glow'
             : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
         )}
       >
-        <item.icon className={cn(
-          'h-5 w-5 flex-shrink-0 transition-transform',
-          !isActive && 'group-hover:scale-110'
-        )} />
+        <div className="relative">
+          <item.icon className={cn(
+            'h-5 w-5 flex-shrink-0 transition-transform',
+            !isActive && 'group-hover:scale-110'
+          )} />
+          {showBadge && collapsed && (
+            <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full" />
+          )}
+        </div>
         {!collapsed && (
-          <span className="font-medium text-sm truncate">{item.name}</span>
+          <span className="font-medium text-sm truncate flex-1">{item.name}</span>
+        )}
+        {showBadge && !collapsed && (
+          <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
+            {forumNotifications.unreadCount > 99 ? '99+' : forumNotifications.unreadCount}
+          </Badge>
         )}
       </Link>
     );
@@ -135,8 +159,13 @@ export function AppSidebar() {
       return (
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>{content}</TooltipTrigger>
-          <TooltipContent side="right" className="font-medium">
+          <TooltipContent side="right" className="font-medium flex items-center gap-2">
             {item.name}
+            {showBadge && (
+              <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
+                {forumNotifications.unreadCount > 99 ? '99+' : forumNotifications.unreadCount}
+              </Badge>
+            )}
           </TooltipContent>
         </Tooltip>
       );
