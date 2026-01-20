@@ -33,6 +33,8 @@ import {
   Pin,
   Pencil,
   Trash2,
+  FileText,
+  Paperclip,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -168,6 +170,7 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
           <h3 className="font-semibold text-lg mb-2">{post.title}</h3>
           <p className="text-muted-foreground line-clamp-3">{post.content}</p>
 
+          {/* Image attachment */}
           {post.image_url && (
             <div className="mt-3 rounded-lg overflow-hidden">
               <img
@@ -175,6 +178,17 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
                 alt=""
                 className="w-full h-48 object-cover"
               />
+            </div>
+          )}
+
+          {/* PDF attachment indicator */}
+          {post.attachment_type === 'application/pdf' && post.attachment_url && (
+            <div className="mt-3 flex items-center gap-2 p-2 bg-muted rounded-lg">
+              <FileText className="h-5 w-5 text-primary" />
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <Paperclip className="h-3 w-3" />
+                PDF anexado
+              </span>
             </div>
           )}
         </CardContent>

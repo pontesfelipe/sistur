@@ -13,6 +13,8 @@ export interface ForumPost {
   content: string;
   visibility: 'org' | 'public';
   image_url: string | null;
+  attachment_url: string | null;
+  attachment_type: string | null;
   category: string;
   is_pinned: boolean;
   likes_count: number;
@@ -47,6 +49,8 @@ export interface CreatePostData {
   content: string;
   visibility: 'org' | 'public';
   image_url?: string;
+  attachment_url?: string;
+  attachment_type?: string;
   category?: string;
 }
 
@@ -219,6 +223,8 @@ export function useForum() {
           content: data.content,
           visibility: data.visibility,
           image_url: data.image_url || null,
+          attachment_url: data.attachment_url || null,
+          attachment_type: data.attachment_type || null,
           category: data.category || 'general',
         })
         .select()

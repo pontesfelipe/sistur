@@ -2260,6 +2260,8 @@ export type Database = {
       }
       forum_posts: {
         Row: {
+          attachment_type: string | null
+          attachment_url: string | null
           category: string | null
           content: string
           created_at: string
@@ -2275,6 +2277,8 @@ export type Database = {
           visibility: string
         }
         Insert: {
+          attachment_type?: string | null
+          attachment_url?: string | null
           category?: string | null
           content: string
           created_at?: string
@@ -2290,6 +2294,8 @@ export type Database = {
           visibility?: string
         }
         Update: {
+          attachment_type?: string | null
+          attachment_url?: string | null
           category?: string | null
           content?: string
           created_at?: string
