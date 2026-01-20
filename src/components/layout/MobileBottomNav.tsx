@@ -24,7 +24,7 @@ const bottomNavItems: NavItem[] = [
   { name: 'Início', href: '/', icon: LayoutDashboard, requiresERP: true },
   { name: 'EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
   { name: 'Beni', href: '/professor-beni', icon: Bot },
-  { name: 'Fórum', href: '/forum', icon: MessageSquare },
+  { name: 'Social', href: '/forum', icon: MessageSquare },
 ];
 
 interface MobileBottomNavProps {

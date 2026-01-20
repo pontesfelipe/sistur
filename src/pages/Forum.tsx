@@ -76,13 +76,15 @@ export default function Forum() {
   // Show post detail view
   if (selectedPostId && selectedPost) {
     return (
-      <div className="container max-w-3xl mx-auto py-6 px-4">
-        <PostDetail
-          post={selectedPost}
-          replies={replies || []}
-          onBack={handleBack}
-          onEdit={() => handleEditPost(selectedPost)}
-        />
+      <div className="min-h-screen">
+        <div className="container max-w-3xl mx-auto py-6 px-4">
+          <PostDetail
+            post={selectedPost}
+            replies={replies || []}
+            onBack={handleBack}
+            onEdit={() => handleEditPost(selectedPost)}
+          />
+        </div>
       </div>
     );
   }
@@ -92,12 +94,12 @@ export default function Forum() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+        <h1 className="text-2xl font-bold flex items-center gap-2">
             <MessageSquarePlus className="h-6 w-6 text-primary" />
-            Fórum
+            Social Turismo
           </h1>
           <p className="text-muted-foreground">
-            Compartilhe conhecimento e tire dúvidas com a comunidade
+            Compartilhe conhecimento, tire dúvidas e conecte-se com a comunidade
           </p>
         </div>
         <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
