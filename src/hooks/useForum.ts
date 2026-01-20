@@ -5,6 +5,13 @@ import { useAuth } from './useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { toast } from 'sonner';
 
+export interface ReportPostData {
+  post_id: string;
+  reply_id?: string;
+  reason: string;
+  comment?: string;
+}
+
 export interface ForumPost {
   id: string;
   user_id: string;
@@ -461,6 +468,31 @@ export function useForum() {
     },
   });
 
+  // Report a post or reply
+  const reportPost = useMutation({
+    mutationFn: async (data: ReportPostData) => {
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const { error } = await supabase
+        .from('forum_post_reports')
+        .insert({
+          post_id: data.post_id,
+          reply_id: data.reply_id || null,
+          user_id: user.id,
+          reason: data.reason,
+          comment: data.comment || null,
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Denúncia enviada. Nossa equipe irá analisar.');
+    },
+    onError: (error) => {
+      toast.error('Erro ao enviar denúncia: ' + error.message);
+    },
+  });
+
   return {
     posts,
     postsLoading,
@@ -480,5 +512,6 @@ export function useForum() {
     togglePostLike,
     toggleReplyLike,
     markAsSolution,
+    reportPost,
   };
 }
