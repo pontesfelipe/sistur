@@ -255,11 +255,14 @@ export function useForum() {
     mutationFn: async (data: CreatePostData) => {
       if (!user || !profile?.org_id) throw new Error('Usuário não autenticado');
 
+      // Use effective org_id (supports demo mode)
+      const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
+
       const { data: post, error } = await supabase
         .from('forum_posts')
         .insert({
           user_id: user.id,
-          org_id: profile.org_id,
+          org_id: effectiveOrgId,
           title: data.title,
           content: data.content,
           visibility: data.visibility,
