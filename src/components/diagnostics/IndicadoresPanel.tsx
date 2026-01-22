@@ -283,6 +283,81 @@ export function IndicadoresPanel() {
         </Button>
       </div>
 
+      {/* Tier Explanation Card */}
+      <div className="p-4 rounded-lg border bg-gradient-to-br from-primary/5 to-transparent">
+        <div className="flex items-start gap-3 mb-4">
+          <Info className="h-5 w-5 text-primary mt-0.5" />
+          <div>
+            <h3 className="font-semibold text-foreground mb-1">Sobre os Tiers de Diagnóstico</h3>
+            <p className="text-sm text-muted-foreground">
+              Cada indicador pertence a um tier que define em quais níveis de diagnóstico ele será utilizado.
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="h-4 w-4 text-green-600" />
+              <span className="font-medium text-green-700 dark:text-green-400">Tier Pequeno</span>
+              <Badge variant="outline" className="ml-auto text-xs">{tierCounts.SMALL} ind.</Badge>
+            </div>
+            <p className="text-xs text-green-600/80 dark:text-green-400/80">
+              Indicadores essenciais para municípios menores ou análises rápidas. 
+              Ideal para primeira avaliação ou destinos com dados limitados.
+            </p>
+          </div>
+          <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+            <div className="flex items-center gap-2 mb-2">
+              <Gauge className="h-4 w-4 text-amber-600" />
+              <span className="font-medium text-amber-700 dark:text-amber-400">Tier Médio</span>
+              <Badge variant="outline" className="ml-auto text-xs">{tierCounts.MEDIUM} ind.</Badge>
+            </div>
+            <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
+              Adiciona indicadores de profundidade intermediária. 
+              Recomendado para cidades médias ou diagnósticos de acompanhamento.
+            </p>
+          </div>
+          <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="h-4 w-4 text-primary" />
+              <span className="font-medium text-primary">Tier Completo</span>
+              <Badge variant="outline" className="ml-auto text-xs">{tierCounts.COMPLETE} ind.</Badge>
+            </div>
+            <p className="text-xs text-primary/80">
+              Análise mais abrangente com todos os indicadores. 
+              Ideal para capitais, polos turísticos ou planejamento estratégico.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Data Sources Info */}
+      <div className="p-4 rounded-lg border bg-muted/30">
+        <div className="flex items-start gap-3 mb-3">
+          <Database className="h-5 w-5 text-muted-foreground mt-0.5" />
+          <div>
+            <h3 className="font-semibold text-foreground mb-1">Fontes de Dados Oficiais</h3>
+            <p className="text-sm text-muted-foreground">
+              Os indicadores podem ser pré-preenchidos automaticamente de fontes oficiais:
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          {[
+            { name: 'IBGE', desc: 'Dados demográficos e econômicos' },
+            { name: 'CADASTUR', desc: 'Serviços turísticos registrados' },
+            { name: 'DATASUS', desc: 'Indicadores de saúde' },
+            { name: 'INEP', desc: 'Dados educacionais' },
+            { name: 'STN', desc: 'Dados fiscais municipais' },
+          ].map(source => (
+            <div key={source.name} className="p-2 rounded bg-background border text-center">
+              <span className="font-mono text-xs font-medium text-foreground">{source.name}</span>
+              <p className="text-[10px] text-muted-foreground mt-0.5">{source.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Summary by Pillar */}
       <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         {(['RA', 'OE', 'AO'] as const).map((pillar) => {
@@ -345,9 +420,9 @@ export function IndicadoresPanel() {
 
       {/* Inline Edit Info */}
       <div className="p-3 bg-muted/50 rounded-lg border flex items-center gap-3">
-        <Info className="h-4 w-4 text-muted-foreground shrink-0" />
+        <Edit className="h-4 w-4 text-muted-foreground shrink-0" />
         <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">Edição de pesos:</span> Clique no peso de qualquer indicador para editá-lo diretamente. 
+          <span className="font-medium text-foreground">Edição de pesos e tiers:</span> Clique no peso ou tier de qualquer indicador para editá-lo. 
           A soma dos pesos por pilar deve totalizar 100% para um cálculo correto.
         </p>
       </div>
