@@ -171,8 +171,8 @@ Deno.serve(async (req) => {
       ...cadasturData,
     };
 
-    // Prepare values to insert/upsert
-    const valuesToInsert = INDICATOR_SOURCE_MAPPINGS
+    // Prepare values to upsert
+    const valuesToUpsert = INDICATOR_SOURCE_MAPPINGS
       .filter(mapping => {
         // If specific indicators requested, filter by them
         if (indicators && indicators.length > 0) {
@@ -196,13 +196,13 @@ Deno.serve(async (req) => {
         };
       });
 
-    // Delete existing unvalidated values for this municipality and org
+    // Delete ALL existing values for this municipality and org (including validated ones)
+    // This ensures no duplicates when refreshing data
     const { error: deleteError } = await supabaseClient
       .from('external_indicator_values')
       .delete()
       .eq('municipality_ibge_code', ibge_code)
-      .eq('org_id', org_id)
-      .eq('validated', false);
+      .eq('org_id', org_id);
 
     if (deleteError) {
       console.error('Error deleting old values:', deleteError);
@@ -211,7 +211,7 @@ Deno.serve(async (req) => {
     // Insert new values
     const { data: insertedData, error: insertError } = await supabaseClient
       .from('external_indicator_values')
-      .insert(valuesToInsert)
+      .insert(valuesToUpsert)
       .select();
 
     if (insertError) {
@@ -225,7 +225,7 @@ Deno.serve(async (req) => {
     console.log(`Successfully fetched and stored ${insertedData?.length || 0} indicator values`);
 
     // Prepare response with source metadata
-    const responseData = valuesToInsert.map(v => ({
+    const responseData = valuesToUpsert.map(v => ({
       indicator_code: v.indicator_code,
       value: v.raw_value,
       source: v.source_code,
