@@ -20,6 +20,9 @@ import {
   Users,
   User,
   Eye,
+  Zap,
+  Gauge,
+  Target,
 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
@@ -36,6 +39,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 type VisibilityType = 'organization' | 'personal' | 'demo';
+type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 
 interface WorkflowStep {
   id: number;
@@ -89,6 +93,36 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
   },
 ];
 
+const TIER_OPTIONS = [
+  {
+    value: 'COMPLETE' as DiagnosisTier,
+    label: 'Completo',
+    description: 'Todos os indicadores. Ideal para cidades grandes ou com alta relevância estratégica.',
+    icon: Target,
+    color: 'text-primary',
+    bgColor: 'bg-primary/5 border-primary',
+    features: ['Todos os indicadores ativos', 'Coleta completa (integrada + manual)', 'Análise detalhada'],
+  },
+  {
+    value: 'MEDIUM' as DiagnosisTier,
+    label: 'Médio',
+    description: 'Núcleo + indicadores críticos. Para cidades médias ou com limitações de tempo.',
+    icon: Gauge,
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500',
+    features: ['Conjunto reduzido de indicadores', 'Prioriza dados integráveis', 'Mantém comparabilidade'],
+  },
+  {
+    value: 'SMALL' as DiagnosisTier,
+    label: 'Pequeno',
+    description: 'Mínimo viável. Para cidades pequenas ou diagnósticos rápidos.',
+    icon: Zap,
+    color: 'text-green-600',
+    bgColor: 'bg-green-50 dark:bg-green-950/30 border-green-500',
+    features: ['Apenas indicadores essenciais', 'Foco em dados integráveis', 'Ciclo rápido'],
+  },
+];
+
 export default function NovaRodada() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -101,6 +135,7 @@ export default function NovaRodada() {
   const [assessmentTitle, setAssessmentTitle] = useState('');
   const [periodStart, setPeriodStart] = useState('');
   const [periodEnd, setPeriodEnd] = useState('');
+  const [selectedTier, setSelectedTier] = useState<DiagnosisTier>('COMPLETE');
   const [createdAssessmentId, setCreatedAssessmentId] = useState<string | null>(null);
   const [validatedDataCount, setValidatedDataCount] = useState(0);
 
@@ -181,6 +216,7 @@ export default function NovaRodada() {
           period_start: periodStart || null,
           period_end: periodEnd || null,
           visibility,
+          tier: selectedTier,
         });
         setCreatedAssessmentId(result.id);
         toast({ title: 'Diagnóstico criado com sucesso!' });
@@ -528,7 +564,7 @@ export default function NovaRodada() {
 
             {/* Step 3: Assessment */}
             {currentStep === 3 && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="space-y-2">
                   <Label>Título do diagnóstico *</Label>
                   <Input
@@ -537,6 +573,7 @@ export default function NovaRodada() {
                     onChange={(e) => setAssessmentTitle(e.target.value)}
                   />
                 </div>
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Período início (opcional)</Label>
@@ -555,12 +592,67 @@ export default function NovaRodada() {
                     />
                   </div>
                 </div>
+
+                {/* Tier Selection */}
+                <div className="space-y-3">
+                  <Label className="flex items-center gap-2">
+                    <Gauge className="h-4 w-4 text-primary" />
+                    Nível de Diagnóstico
+                  </Label>
+                  <RadioGroup
+                    value={selectedTier}
+                    onValueChange={(value) => setSelectedTier(value as DiagnosisTier)}
+                    className="space-y-3"
+                  >
+                    {TIER_OPTIONS.map((tier) => {
+                      const TierIcon = tier.icon;
+                      const isSelected = selectedTier === tier.value;
+                      return (
+                        <div 
+                          key={tier.value}
+                          className={cn(
+                            "flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all",
+                            isSelected 
+                              ? tier.bgColor
+                              : "border-muted hover:border-muted-foreground/50"
+                          )}
+                        >
+                          <RadioGroupItem value={tier.value} id={tier.value} className="mt-1" />
+                          <div className="flex-1">
+                            <Label 
+                              htmlFor={tier.value} 
+                              className={cn(
+                                "flex items-center gap-2 cursor-pointer font-medium",
+                                isSelected && tier.color
+                              )}
+                            >
+                              <TierIcon className={cn("h-5 w-5", tier.color)} />
+                              {tier.label}
+                            </Label>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {tier.description}
+                            </p>
+                            <ul className="mt-2 space-y-1">
+                              {tier.features.map((feature, idx) => (
+                                <li key={idx} className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                  <CheckCircle2 className="h-3 w-3 text-muted-foreground/60" />
+                                  {feature}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </RadioGroup>
+                </div>
+
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <p className="text-sm text-muted-foreground">
                     <strong>Destino selecionado:</strong>{' '}
                     {selectedDestinationData?.name || 'Novo destino'}
                     {selectedDestinationData?.ibge_code && (
-                      <span className="text-green-600 dark:text-green-400 ml-2">
+                      <span className="text-severity-good ml-2">
                         ✓ Código IBGE disponível
                       </span>
                     )}

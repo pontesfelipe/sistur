@@ -20,6 +20,9 @@ import {
   Check,
   X,
   Loader2,
+  Target,
+  Gauge,
+  Zap,
 } from 'lucide-react';
 import { useIndicators } from '@/hooks/useIndicators';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -61,11 +64,18 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
+type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 
 const reliabilityIcons = {
   AUTOMATICA: { icon: ShieldCheck, color: 'text-severity-good', label: 'Automático' },
   MANUAL: { icon: Shield, color: 'text-severity-moderate', label: 'Manual' },
   ESTIMADA: { icon: ShieldAlert, color: 'text-severity-critical', label: 'Estimado' },
+};
+
+const tierConfig = {
+  COMPLETE: { label: 'Completo', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
+  MEDIUM: { label: 'Médio', icon: Gauge, color: 'text-amber-600', bgClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/30' },
+  SMALL: { label: 'Pequeno', icon: Zap, color: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-950/30 border-green-500/30' },
 };
 
 const interpretationLabels: Record<string, string> = {
@@ -79,9 +89,11 @@ export function IndicadoresPanel() {
   const [pillarFilter, setPillarFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
   const [themeFilter, setThemeFilter] = useState('all');
+  const [tierFilter, setTierFilter] = useState('all');
   const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
   const [editingWeightId, setEditingWeightId] = useState<string | null>(null);
   const [editingWeightValue, setEditingWeightValue] = useState<string>('');
+  const [editingTierId, setEditingTierId] = useState<string | null>(null);
   
   const { indicators, isLoading, deleteIndicator, updateIndicator } = useIndicators();
   const isMobile = useIsMobile();
@@ -116,8 +128,30 @@ export function IndicadoresPanel() {
       (sourceFilter === 'igma' && indicatorSource === 'IGMA') ||
       (sourceFilter === 'other' && indicatorSource !== 'IGMA');
     const matchesTheme = themeFilter === 'all' || i.theme === themeFilter;
-    return matchesSearch && matchesPillar && matchesSource && matchesTheme;
+    const indicatorTier = (i as any).minimum_tier || 'COMPLETE';
+    const matchesTier = tierFilter === 'all' || indicatorTier === tierFilter;
+    return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier;
   });
+
+  // Count by tier
+  const tierCounts = useMemo(() => ({
+    SMALL: indicators.filter(i => (i as any).minimum_tier === 'SMALL').length,
+    MEDIUM: indicators.filter(i => (i as any).minimum_tier === 'MEDIUM').length,
+    COMPLETE: indicators.filter(i => !((i as any).minimum_tier) || (i as any).minimum_tier === 'COMPLETE').length,
+  }), [indicators]);
+
+  const handleUpdateTier = async (indicatorId: string, newTier: DiagnosisTier) => {
+    try {
+      await updateIndicator.mutateAsync({
+        id: indicatorId,
+        minimum_tier: newTier,
+      } as any);
+      toast.success('Tier atualizado com sucesso');
+      setEditingTierId(null);
+    } catch (error) {
+      toast.error('Erro ao atualizar tier');
+    }
+  };
 
   const igmaCount = indicators.filter(i => (i as any).source === 'IGMA').length;
 
@@ -214,6 +248,32 @@ export function IndicadoresPanel() {
               {availableThemes.map(theme => (
                 <SelectItem key={theme} value={theme}>{theme}</SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+          <Select value={tierFilter} onValueChange={setTierFilter}>
+            <SelectTrigger className="w-full xs:w-36">
+              <SelectValue placeholder="Tier" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os tiers</SelectItem>
+              <SelectItem value="SMALL">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-3 w-3 text-green-600" />
+                  Pequeno ({tierCounts.SMALL})
+                </div>
+              </SelectItem>
+              <SelectItem value="MEDIUM">
+                <div className="flex items-center gap-2">
+                  <Gauge className="h-3 w-3 text-amber-600" />
+                  Médio ({tierCounts.MEDIUM})
+                </div>
+              </SelectItem>
+              <SelectItem value="COMPLETE">
+                <div className="flex items-center gap-2">
+                  <Target className="h-3 w-3 text-primary" />
+                  Completo ({tierCounts.COMPLETE})
+                </div>
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>

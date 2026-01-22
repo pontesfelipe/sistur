@@ -204,6 +204,7 @@ export type Database = {
           period_start: string | null
           ra_limitation: boolean | null
           status: Database["public"]["Enums"]["assessment_status"]
+          tier: Database["public"]["Enums"]["diagnosis_tier_type"] | null
           title: string
           updated_at: string
           visibility: string
@@ -226,6 +227,7 @@ export type Database = {
           period_start?: string | null
           ra_limitation?: boolean | null
           status?: Database["public"]["Enums"]["assessment_status"]
+          tier?: Database["public"]["Enums"]["diagnosis_tier_type"] | null
           title: string
           updated_at?: string
           visibility?: string
@@ -248,6 +250,7 @@ export type Database = {
           period_start?: string | null
           ra_limitation?: boolean | null
           status?: Database["public"]["Enums"]["assessment_status"]
+          tier?: Database["public"]["Enums"]["diagnosis_tier_type"] | null
           title?: string
           updated_at?: string
           visibility?: string
@@ -2782,9 +2785,11 @@ export type Database = {
       }
       indicators: {
         Row: {
+          calculation_cost: string | null
           code: string
           collection_type: Database["public"]["Enums"]["collection_type"] | null
           created_at: string
+          criticality: string | null
           data_source: Database["public"]["Enums"]["data_source"] | null
           default_interpretation: string | null
           description: string | null
@@ -2792,9 +2797,13 @@ export type Database = {
           edu_suggested_titles: Json
           id: string
           igma_dimension: string | null
+          integration_available: boolean | null
           intersectoral_dependency: boolean | null
           max_ref: number | null
           min_ref: number | null
+          minimum_tier:
+            | Database["public"]["Enums"]["diagnosis_tier_type"]
+            | null
           name: string
           normalization: Database["public"]["Enums"]["normalization_type"]
           notes: string | null
@@ -2808,11 +2817,13 @@ export type Database = {
           weight: number
         }
         Insert: {
+          calculation_cost?: string | null
           code: string
           collection_type?:
             | Database["public"]["Enums"]["collection_type"]
             | null
           created_at?: string
+          criticality?: string | null
           data_source?: Database["public"]["Enums"]["data_source"] | null
           default_interpretation?: string | null
           description?: string | null
@@ -2820,9 +2831,13 @@ export type Database = {
           edu_suggested_titles?: Json
           id?: string
           igma_dimension?: string | null
+          integration_available?: boolean | null
           intersectoral_dependency?: boolean | null
           max_ref?: number | null
           min_ref?: number | null
+          minimum_tier?:
+            | Database["public"]["Enums"]["diagnosis_tier_type"]
+            | null
           name: string
           normalization?: Database["public"]["Enums"]["normalization_type"]
           notes?: string | null
@@ -2836,11 +2851,13 @@ export type Database = {
           weight?: number
         }
         Update: {
+          calculation_cost?: string | null
           code?: string
           collection_type?:
             | Database["public"]["Enums"]["collection_type"]
             | null
           created_at?: string
+          criticality?: string | null
           data_source?: Database["public"]["Enums"]["data_source"] | null
           default_interpretation?: string | null
           description?: string | null
@@ -2848,9 +2865,13 @@ export type Database = {
           edu_suggested_titles?: Json
           id?: string
           igma_dimension?: string | null
+          integration_available?: boolean | null
           intersectoral_dependency?: boolean | null
           max_ref?: number | null
           min_ref?: number | null
+          minimum_tier?:
+            | Database["public"]["Enums"]["diagnosis_tier_type"]
+            | null
           name?: string
           normalization?: Database["public"]["Enums"]["normalization_type"]
           notes?: string | null
@@ -5477,6 +5498,7 @@ export type Database = {
       course_level: "BASICO" | "INTERMEDIARIO" | "AVANCADO"
       course_status_type: "draft" | "published" | "archived"
       data_source: "IBGE" | "CADASTUR" | "PESQUISA_LOCAL" | "MANUAL" | "OUTRO"
+      diagnosis_tier_type: "COMPLETE" | "MEDIUM" | "SMALL"
       enrollment_status_type: "active" | "completed" | "dropped" | "suspended"
       exam_result_type: "passed" | "failed" | "pending"
       exam_status_type:
@@ -5679,6 +5701,7 @@ export const Constants = {
       course_level: ["BASICO", "INTERMEDIARIO", "AVANCADO"],
       course_status_type: ["draft", "published", "archived"],
       data_source: ["IBGE", "CADASTUR", "PESQUISA_LOCAL", "MANUAL", "OUTRO"],
+      diagnosis_tier_type: ["COMPLETE", "MEDIUM", "SMALL"],
       enrollment_status_type: ["active", "completed", "dropped", "suspended"],
       exam_result_type: ["passed", "failed", "pending"],
       exam_status_type: [
