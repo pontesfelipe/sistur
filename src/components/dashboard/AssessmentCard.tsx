@@ -160,7 +160,11 @@ export function AssessmentCard({ assessment, onDelete, isDeleting }: AssessmentC
           className="w-full justify-between text-primary hover:text-primary"
           asChild
         >
-          <Link to={`/diagnosticos/${assessment.id}`}>
+          <Link to={
+            assessment.status === 'DRAFT'
+              ? `/nova-rodada?resume=${assessment.id}`
+              : `/diagnosticos/${assessment.id}`
+          }>
             {assessment.status === 'CALCULATED'
               ? 'Ver diagnóstico'
               : assessment.status === 'DATA_READY'

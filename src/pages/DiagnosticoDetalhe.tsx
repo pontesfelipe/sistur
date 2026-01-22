@@ -573,11 +573,18 @@ const DiagnosticoDetalhe = () => {
           </p>
           <div className="flex gap-3 justify-center">
             {assessment.status === 'DRAFT' && (
-              <Button variant="outline" asChild>
-                <Link to={`/importacoes?assessment=${id}`}>
-                  Preencher Dados
-                </Link>
-              </Button>
+              <>
+                <Button variant="default" asChild>
+                  <Link to={`/nova-rodada?resume=${id}`}>
+                    Continuar Fluxo Guiado
+                  </Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link to={`/importacoes?assessment=${id}`}>
+                    Ir direto para Preenchimento
+                  </Link>
+                </Button>
+              </>
             )}
             <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
               {calculating ? (
