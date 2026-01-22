@@ -196,33 +196,32 @@ Deno.serve(async (req) => {
         };
       });
 
-    // Delete ALL existing values for this municipality and org (including validated ones)
-    // This ensures no duplicates when refreshing data
-    const { error: deleteError } = await supabaseClient
+    // Upsert values to guarantee idempotency (no duplicates)
+    // NOTE: the DB enforces uniqueness on (org_id, municipality_ibge_code, indicator_code)
+    // so repeated refreshes update the same rows.
+    const { data: upsertedData, error: upsertError } = await supabaseClient
       .from('external_indicator_values')
-      .delete()
-      .eq('municipality_ibge_code', ibge_code)
-      .eq('org_id', org_id);
-
-    if (deleteError) {
-      console.error('Error deleting old values:', deleteError);
-    }
-
-    // Insert new values
-    const { data: insertedData, error: insertError } = await supabaseClient
-      .from('external_indicator_values')
-      .insert(valuesToUpsert)
+      .upsert(
+        valuesToUpsert.map((v) => ({
+          ...v,
+          // Always require re-validation after a refresh
+          validated: false,
+          validated_by: null,
+          validated_at: null,
+        })),
+        { onConflict: 'org_id,municipality_ibge_code,indicator_code' }
+      )
       .select();
 
-    if (insertError) {
-      console.error('Error inserting values:', insertError);
+    if (upsertError) {
+      console.error('Error upserting values:', upsertError);
       return new Response(
-        JSON.stringify({ success: false, error: insertError.message }),
+        JSON.stringify({ success: false, error: upsertError.message }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Successfully fetched and stored ${insertedData?.length || 0} indicator values`);
+    console.log(`Successfully fetched and stored ${upsertedData?.length || 0} indicator values`);
 
     // Prepare response with source metadata
     const responseData = valuesToUpsert.map(v => ({
