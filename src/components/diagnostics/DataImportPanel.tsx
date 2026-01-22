@@ -84,10 +84,33 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string }>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
 
-  const { indicators, isLoading: loadingIndicators } = useIndicators();
+  const { indicators: allIndicators, isLoading: loadingIndicators } = useIndicators();
   const { assessments, isLoading: loadingAssessments } = useAssessments();
   const { values, isLoading: loadingValues, upsertValue, bulkUpsertValues } = useIndicatorValues(selectedAssessment);
   const { calculate, loading: calculating } = useCalculateAssessment();
+
+  // Get the selected assessment's tier
+  const selectedAssessmentData = assessments?.find(a => a.id === selectedAssessment);
+  const assessmentTier = selectedAssessmentData?.tier || 'COMPLETE';
+
+  // Filter indicators by tier
+  const getTierFilter = (tier: string): string[] => {
+    switch (tier) {
+      case 'SMALL':
+        return ['SMALL'];
+      case 'MEDIUM':
+        return ['SMALL', 'MEDIUM'];
+      case 'COMPLETE':
+      default:
+        return ['SMALL', 'MEDIUM', 'COMPLETE'];
+    }
+  };
+
+  const allowedTiers = getTierFilter(assessmentTier);
+  const indicators = allIndicators.filter(ind => {
+    const indicatorTier = (ind as any).minimum_tier || 'COMPLETE';
+    return allowedTiers.includes(indicatorTier);
+  });
 
   useEffect(() => {
     if (preSelectedAssessmentId && assessments?.length) {
@@ -266,6 +289,16 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
               </SelectContent>
             </Select>
           </div>
+          {selectedAssessmentData && (
+            <div className="mt-3 pt-3 border-t flex items-center gap-2 text-sm text-muted-foreground">
+              <Badge variant="outline">
+                Tier: {assessmentTier === 'SMALL' ? 'Pequeno' : assessmentTier === 'MEDIUM' ? 'Médio' : 'Completo'}
+              </Badge>
+              <span>
+                {indicators.length} indicadores para este tier
+              </span>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -307,7 +340,8 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                 </div>
               )}
               
-              {fillProgress >= 80 && (
+              {/* Show calculate button when at least 50% filled */}
+              {fillProgress >= 50 && (
                 <div className="flex items-center justify-between mt-4 pt-4 border-t">
                   <p className={cn(
                     "text-sm flex items-center gap-1",
