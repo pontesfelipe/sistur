@@ -136,6 +136,37 @@ const Diagnosticos = () => {
             </Button>
           </div>
 
+          {/* Tier Explanation */}
+          <div className="p-4 rounded-lg border bg-gradient-to-br from-muted/50 to-transparent">
+            <h3 className="font-semibold mb-3">Níveis de Diagnóstico (Tiers)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+              <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 font-medium text-green-700 dark:text-green-400 mb-1">
+                  <span className="text-lg">⚡</span> Pequeno
+                </div>
+                <p className="text-xs text-green-600/80 dark:text-green-400/80">
+                  ~20 indicadores essenciais. Ideal para municípios menores ou primeira avaliação rápida.
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-center gap-2 font-medium text-amber-700 dark:text-amber-400 mb-1">
+                  <span className="text-lg">📊</span> Médio
+                </div>
+                <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
+                  ~50 indicadores. Análise intermediária para cidades médias ou acompanhamento.
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
+                <div className="flex items-center gap-2 font-medium text-primary mb-1">
+                  <span className="text-lg">🎯</span> Completo
+                </div>
+                <p className="text-xs text-primary/80">
+                  100+ indicadores. Análise completa para capitais, polos turísticos ou planejamento estratégico.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Status Summary */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-lg border bg-card">

@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { MapPin, Calendar, ChevronRight, Trash2, Loader2 } from 'lucide-react';
+import { MapPin, Calendar, ChevronRight, Trash2, Loader2, Zap, Gauge, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Assessment } from '@/types/sistur';
 import { Badge } from '@/components/ui/badge';
@@ -15,13 +15,24 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useState } from 'react';
 
 interface AssessmentCardProps {
-  assessment: Assessment;
+  assessment: Assessment & { tier?: string };
   onDelete?: (id: string) => Promise<void>;
   isDeleting?: boolean;
 }
+
+const tierConfig = {
+  SMALL: { label: 'Pequeno', icon: Zap, color: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-950/30 border-green-500/30' },
+  MEDIUM: { label: 'Médio', icon: Gauge, color: 'text-amber-600', bgClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/30' },
+  COMPLETE: { label: 'Completo', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
+};
 
 export function AssessmentCard({ assessment, onDelete, isDeleting }: AssessmentCardProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -54,16 +65,32 @@ export function AssessmentCard({ assessment, onDelete, isDeleting }: AssessmentC
     }
   };
 
+  const tier = (assessment as any).tier || 'COMPLETE';
+  const TierIcon = tierConfig[tier as keyof typeof tierConfig]?.icon || Target;
+  const tierInfo = tierConfig[tier as keyof typeof tierConfig] || tierConfig.COMPLETE;
+
   return (
     <div className="p-4 rounded-xl border bg-card hover:shadow-lg transition-all duration-300 group">
       <div className="flex items-start justify-between">
-        <div>
+        <div className="flex items-center gap-2 flex-wrap">
           <Badge variant={statusVariants[assessment.status]}>
             {statusLabels[assessment.status]}
           </Badge>
-          <h3 className="mt-3 font-display font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-            {assessment.title}
-          </h3>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className={cn(
+                "flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border",
+                tierInfo.bgClass,
+                tierInfo.color
+              )}>
+                <TierIcon className="h-3 w-3" />
+                {tierInfo.label}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              Diagnóstico executado no tier {tierInfo.label.toLowerCase()}
+            </TooltipContent>
+          </Tooltip>
         </div>
         {onDelete && (
           <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
@@ -103,6 +130,10 @@ export function AssessmentCard({ assessment, onDelete, isDeleting }: AssessmentC
           </AlertDialog>
         )}
       </div>
+
+      <h3 className="mt-3 font-display font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+        {assessment.title}
+      </h3>
 
       {assessment.destination && (
         <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
