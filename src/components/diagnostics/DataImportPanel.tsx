@@ -292,10 +292,10 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
           {selectedAssessmentData && (
             <div className="mt-3 pt-3 border-t flex items-center gap-2 text-sm text-muted-foreground">
               <Badge variant="outline">
-                Tier: {assessmentTier === 'SMALL' ? 'Pequeno' : assessmentTier === 'MEDIUM' ? 'Médio' : 'Completo'}
+                Nível: {assessmentTier === 'SMALL' ? 'Essencial' : assessmentTier === 'MEDIUM' ? 'Estratégico' : 'Integral'}
               </Badge>
               <span>
-                {indicators.length} indicadores para este tier
+                {indicators.length} indicadores para este nível
               </span>
             </div>
           )}

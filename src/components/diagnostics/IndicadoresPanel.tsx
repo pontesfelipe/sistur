@@ -73,9 +73,9 @@ const reliabilityIcons = {
 };
 
 const tierConfig = {
-  COMPLETE: { label: 'Completo', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
-  MEDIUM: { label: 'Médio', icon: Gauge, color: 'text-amber-600', bgClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/30' },
-  SMALL: { label: 'Pequeno', icon: Zap, color: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-950/30 border-green-500/30' },
+  COMPLETE: { label: 'Integral', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
+  MEDIUM: { label: 'Estratégico', icon: Gauge, color: 'text-amber-600', bgClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/30' },
+  SMALL: { label: 'Essencial', icon: Zap, color: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-950/30 border-green-500/30' },
 };
 
 const interpretationLabels: Record<string, string> = {
@@ -255,23 +255,23 @@ export function IndicadoresPanel() {
               <SelectValue placeholder="Tier" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os tiers</SelectItem>
+              <SelectItem value="all">Todos os níveis</SelectItem>
               <SelectItem value="SMALL">
                 <div className="flex items-center gap-2">
                   <Zap className="h-3 w-3 text-green-600" />
-                  Pequeno ({tierCounts.SMALL})
+                  Essencial ({tierCounts.SMALL})
                 </div>
               </SelectItem>
               <SelectItem value="MEDIUM">
                 <div className="flex items-center gap-2">
                   <Gauge className="h-3 w-3 text-amber-600" />
-                  Médio ({tierCounts.MEDIUM})
+                  Estratégico ({tierCounts.MEDIUM})
                 </div>
               </SelectItem>
               <SelectItem value="COMPLETE">
                 <div className="flex items-center gap-2">
                   <Target className="h-3 w-3 text-primary" />
-                  Completo ({tierCounts.COMPLETE})
+                  Integral ({tierCounts.COMPLETE})
                 </div>
               </SelectItem>
             </SelectContent>
@@ -283,14 +283,13 @@ export function IndicadoresPanel() {
         </Button>
       </div>
 
-      {/* Tier Explanation Card */}
       <div className="p-4 rounded-lg border bg-gradient-to-br from-primary/5 to-transparent">
         <div className="flex items-start gap-3 mb-4">
           <Info className="h-5 w-5 text-primary mt-0.5" />
           <div>
-            <h3 className="font-semibold text-foreground mb-1">Sobre os Tiers de Diagnóstico</h3>
+            <h3 className="font-semibold text-foreground mb-1">Sobre os Níveis de Diagnóstico</h3>
             <p className="text-sm text-muted-foreground">
-              Cada indicador pertence a um tier que define em quais níveis de diagnóstico ele será utilizado.
+              Cada indicador pertence a um nível que define em quais diagnósticos ele será utilizado.
             </p>
           </div>
         </div>
@@ -298,7 +297,7 @@ export function IndicadoresPanel() {
           <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
             <div className="flex items-center gap-2 mb-2">
               <Zap className="h-4 w-4 text-green-600" />
-              <span className="font-medium text-green-700 dark:text-green-400">Tier Pequeno</span>
+              <span className="font-medium text-green-700 dark:text-green-400">Essencial</span>
               <Badge variant="outline" className="ml-auto text-xs">{tierCounts.SMALL} ind.</Badge>
             </div>
             <p className="text-xs text-green-600/80 dark:text-green-400/80">
@@ -309,7 +308,7 @@ export function IndicadoresPanel() {
           <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
             <div className="flex items-center gap-2 mb-2">
               <Gauge className="h-4 w-4 text-amber-600" />
-              <span className="font-medium text-amber-700 dark:text-amber-400">Tier Médio</span>
+              <span className="font-medium text-amber-700 dark:text-amber-400">Estratégico</span>
               <Badge variant="outline" className="ml-auto text-xs">{tierCounts.MEDIUM} ind.</Badge>
             </div>
             <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
@@ -320,7 +319,7 @@ export function IndicadoresPanel() {
           <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
             <div className="flex items-center gap-2 mb-2">
               <Target className="h-4 w-4 text-primary" />
-              <span className="font-medium text-primary">Tier Completo</span>
+              <span className="font-medium text-primary">Integral</span>
               <Badge variant="outline" className="ml-auto text-xs">{tierCounts.COMPLETE} ind.</Badge>
             </div>
             <p className="text-xs text-primary/80">
