@@ -362,8 +362,30 @@ serve(async (req) => {
     }
 
     const orgId = assessment.org_id;
+    const assessmentTier = assessment.tier || 'COMPLETE';
+    
+    console.log(`Assessment tier: ${assessmentTier}`);
 
-    // 2. Get all indicator values with indicator details (including intersectoral_dependency)
+    // Build tier filter based on assessment tier
+    // COMPLETE: all indicators
+    // MEDIUM: indicators with minimum_tier in ('SMALL', 'MEDIUM')
+    // SMALL: indicators with minimum_tier = 'SMALL'
+    const getTierFilter = (tier: string) => {
+      switch (tier) {
+        case 'SMALL':
+          return ['SMALL'];
+        case 'MEDIUM':
+          return ['SMALL', 'MEDIUM'];
+        case 'COMPLETE':
+        default:
+          return ['SMALL', 'MEDIUM', 'COMPLETE'];
+      }
+    };
+    
+    const allowedTiers = getTierFilter(assessmentTier);
+    console.log(`Allowed tiers for this assessment: ${allowedTiers.join(', ')}`);
+
+    // 2. Get all indicator values with indicator details (including intersectoral_dependency and minimum_tier)
     const { data: indicatorValues, error: valuesError } = await supabase
       .from("indicator_values")
       .select(`
@@ -381,7 +403,8 @@ serve(async (req) => {
           min_ref,
           max_ref,
           weight,
-          intersectoral_dependency
+          intersectoral_dependency,
+          minimum_tier
         )
       `)
       .eq("assessment_id", assessment_id);
@@ -394,14 +417,22 @@ serve(async (req) => {
       );
     }
 
-    if (!indicatorValues || indicatorValues.length === 0) {
+    // Filter indicator values based on tier
+    const filteredIndicatorValues = (indicatorValues || []).filter((iv: any) => {
+      const indicator = iv.indicator;
+      if (!indicator) return false;
+      const indicatorTier = indicator.minimum_tier || 'COMPLETE';
+      return allowedTiers.includes(indicatorTier);
+    });
+
+    if (!filteredIndicatorValues || filteredIndicatorValues.length === 0) {
       return new Response(
-        JSON.stringify({ error: "No indicator values found for this assessment" }),
+        JSON.stringify({ error: "No indicator values found for this assessment and tier level" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`Processing ${indicatorValues.length} indicator values`);
+    console.log(`Processing ${filteredIndicatorValues.length} indicator values (filtered from ${indicatorValues?.length || 0} by tier ${assessmentTier})`);
 
     // 3.1 Fetch composite rules for I_SEMT calculation
     const { data: compositeRules } = await supabase
@@ -430,7 +461,7 @@ serve(async (req) => {
     // Count intersectoral indicators (REGRA 6)
     let intersectoralCount = 0;
 
-    for (const iv of indicatorValues as unknown as IndicatorValue[]) {
+    for (const iv of filteredIndicatorValues as unknown as IndicatorValue[]) {
       const indicator = iv.indicator;
       if (!indicator) continue;
 
