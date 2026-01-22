@@ -29,9 +29,9 @@ interface AssessmentCardProps {
 }
 
 const tierConfig = {
-  SMALL: { label: 'Pequeno', icon: Zap, color: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-950/30 border-green-500/30' },
-  MEDIUM: { label: 'Médio', icon: Gauge, color: 'text-amber-600', bgClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/30' },
-  COMPLETE: { label: 'Completo', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
+  SMALL: { label: 'Essencial', icon: Zap, color: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-950/30 border-green-500/30' },
+  MEDIUM: { label: 'Estratégico', icon: Gauge, color: 'text-amber-600', bgClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/30' },
+  COMPLETE: { label: 'Integral', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
 };
 
 export function AssessmentCard({ assessment, onDelete, isDeleting }: AssessmentCardProps) {
