@@ -23,10 +23,11 @@ import {
   Zap,
   Gauge,
   Target,
+  RefreshCw,
 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDestinations } from '@/hooks/useDestinations';
 import { useAssessments } from '@/hooks/useAssessments';
 import { toast } from '@/hooks/use-toast';
@@ -34,9 +35,10 @@ import { DestinationFormDialog } from '@/components/destinations/DestinationForm
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
-import { ExternalIndicatorValue, useCreateDataSnapshot } from '@/hooks/useOfficialData';
+import { ExternalIndicatorValue, useCreateDataSnapshot, useExternalIndicatorValues } from '@/hooks/useOfficialData';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@/components/ui/badge';
 
 type VisibilityType = 'organization' | 'personal' | 'demo';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
@@ -125,6 +127,9 @@ const TIER_OPTIONS = [
 
 export default function NovaRodada() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const resumeAssessmentId = searchParams.get('resume');
+  
   const { user } = useAuth();
   const { isViewingDemoData, profile: userProfile } = useProfile();
   const [currentStep, setCurrentStep] = useState(1);
@@ -138,6 +143,8 @@ export default function NovaRodada() {
   const [selectedTier, setSelectedTier] = useState<DiagnosisTier>('COMPLETE');
   const [createdAssessmentId, setCreatedAssessmentId] = useState<string | null>(null);
   const [validatedDataCount, setValidatedDataCount] = useState(0);
+  const [isResuming, setIsResuming] = useState(!!resumeAssessmentId);
+  const [resumeDataLoaded, setResumeDataLoaded] = useState(false);
 
   // Fetch user profile to get org_id
   const { data: profile } = useQuery({
@@ -155,23 +162,84 @@ export default function NovaRodada() {
     enabled: !!user?.id,
   });
 
+  // Fetch assessment to resume if resumeAssessmentId is provided
+  const { data: resumeAssessment, isLoading: resumeLoading } = useQuery({
+    queryKey: ['resume-assessment', resumeAssessmentId],
+    queryFn: async () => {
+      if (!resumeAssessmentId) return null;
+      const { data, error } = await supabase
+        .from('assessments')
+        .select('*, destinations(*)')
+        .eq('id', resumeAssessmentId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!resumeAssessmentId,
+  });
+
   const { destinations = [], isLoading: destinationsLoading, createDestination } = useDestinations();
   const { createAssessment } = useAssessments();
   const createDataSnapshot = useCreateDataSnapshot();
 
   // Get selected destination details
   const selectedDestinationData = destinations.find(d => d.id === selectedDestination);
+  
+  // Get effective org_id for demo mode
+  const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
+  
+  // Check if there are validated indicator values for this assessment's destination
+  const { data: existingValidatedValues } = useExternalIndicatorValues(
+    selectedDestinationData?.ibge_code || undefined,
+    effectiveOrgId || undefined
+  );
+  
+  // Count validated values
+  const validatedValuesCount = existingValidatedValues?.filter(v => v.validated)?.length || 0;
 
-  // Auto-generate assessment title when destination is selected
+  // Load resume data when assessment is fetched
   useEffect(() => {
-    if (selectedDestination) {
+    if (resumeAssessment && !resumeDataLoaded && destinations.length > 0) {
+      // Populate state from the existing assessment
+      setCreatedAssessmentId(resumeAssessment.id);
+      setSelectedDestination(resumeAssessment.destination_id);
+      setAssessmentTitle(resumeAssessment.title);
+      setVisibility(resumeAssessment.visibility as VisibilityType);
+      setSelectedTier((resumeAssessment.tier as DiagnosisTier) || 'COMPLETE');
+      setPeriodStart(resumeAssessment.period_start || '');
+      setPeriodEnd(resumeAssessment.period_end || '');
+      
+      // Determine which step to resume from based on assessment status
+      // DRAFT can be at step 4 (pre-filling), 5 (manual entry), or 6 (calculation)
+      // Since assessment exists, at minimum we're past step 3
+      // Check if there are validated values - if yes, go to step 5, otherwise step 4
+      if (validatedValuesCount > 0) {
+        setCurrentStep(5);
+        setValidatedDataCount(validatedValuesCount);
+      } else {
+        setCurrentStep(4);
+      }
+      
+      setResumeDataLoaded(true);
+      setIsResuming(false);
+      
+      toast({
+        title: 'Diagnóstico carregado',
+        description: `Retomando "${resumeAssessment.title}" de onde você parou.`,
+      });
+    }
+  }, [resumeAssessment, resumeDataLoaded, destinations, validatedValuesCount]);
+
+  // Auto-generate assessment title when destination is selected (only for new assessments)
+  useEffect(() => {
+    if (selectedDestination && !resumeAssessmentId) {
       const dest = destinations.find(d => d.id === selectedDestination);
-      if (dest) {
+      if (dest && !assessmentTitle) {
         const year = new Date().getFullYear();
         setAssessmentTitle(`Diagnóstico ${dest.name} ${year}`);
       }
     }
-  }, [selectedDestination, destinations]);
+  }, [selectedDestination, destinations, resumeAssessmentId, assessmentTitle]);
 
   const handleValidationComplete = async (validatedValues: ExternalIndicatorValue[]) => {
     setValidatedDataCount(validatedValues.length);
@@ -269,11 +337,42 @@ export default function NovaRodada() {
     return true;
   };
 
+  // Show loading state when resuming
+  if (resumeLoading || (isResuming && !resumeDataLoaded)) {
+    return (
+      <AppLayout 
+        title="Carregando Diagnóstico" 
+        subtitle="Preparando para retomar de onde você parou..."
+      >
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground">Carregando dados do diagnóstico...</p>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout 
-      title="Nova Rodada de Diagnóstico" 
-      subtitle="Siga o fluxo para criar uma nova avaliação"
+      title={resumeAssessmentId ? "Retomar Diagnóstico" : "Nova Rodada de Diagnóstico"} 
+      subtitle={resumeAssessmentId ? "Continue de onde você parou" : "Siga o fluxo para criar uma nova avaliação"}
     >
+      {/* Resume Banner */}
+      {resumeAssessmentId && resumeAssessment && (
+        <div className="mb-6 p-4 rounded-lg border bg-primary/5 border-primary/20">
+          <div className="flex items-center gap-3">
+            <RefreshCw className="h-5 w-5 text-primary" />
+            <div className="flex-1">
+              <p className="font-medium text-primary">Retomando diagnóstico em rascunho</p>
+              <p className="text-sm text-muted-foreground">
+                {resumeAssessment.title} • {(resumeAssessment.destinations as any)?.name}
+              </p>
+            </div>
+            <Badge variant="draft">Rascunho</Badge>
+          </div>
+        </div>
+      )}
+
       {/* Visual Stepper */}
       <div className="mb-8 overflow-x-auto pb-4">
         <div className="flex items-center justify-between relative min-w-[700px]">
