@@ -29,9 +29,14 @@ const InterpretationIcon = ({ interpretation }: { interpretation: TerritorialInt
 };
 
 export function IssueCard({ issue, onViewRecommendations }: IssueCardProps) {
-  const pillarInfo = PILLAR_INFO[issue.pillar];
-  const severityInfo = SEVERITY_INFO[issue.severity];
-  const interpretationInfo = issue.interpretation ? INTERPRETATION_INFO[issue.interpretation] : null;
+  // NOTE: Some views (e.g. Enterprise dashboard) may pass a simplified issue shape.
+  // Keep this component defensive to avoid hard crashes (white screen).
+  const pillarInfo = (PILLAR_INFO as any)[issue.pillar] ?? { name: issue.pillar };
+  const severityInfo = (SEVERITY_INFO as any)[issue.severity] ?? { label: issue.severity };
+  const interpretationInfo = issue.interpretation ? (INTERPRETATION_INFO as any)[issue.interpretation] : null;
+
+  const themeLabel = (issue as any)?.theme;
+  const evidenceIndicators = ((issue as any)?.evidence?.indicators ?? []) as Array<{ name: string; score: number }>;
 
   const pillarVariant = issue.pillar.toLowerCase() as 'ra' | 'oe' | 'ao';
   const severityVariant = issue.severity === 'CRITICO' 
@@ -69,9 +74,11 @@ export function IssueCard({ issue, onViewRecommendations }: IssueCardProps) {
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant={pillarVariant}>{pillarInfo.name}</Badge>
             <Badge variant={severityVariant}>{severityInfo.label}</Badge>
-            <Badge variant="outline" className="text-xs">
-              {issue.theme}
-            </Badge>
+            {themeLabel ? (
+              <Badge variant="outline" className="text-xs">
+                {themeLabel}
+              </Badge>
+            ) : null}
             {/* Territorial Interpretation Badge */}
             {interpretationInfo && (
               <Tooltip>
@@ -94,13 +101,13 @@ export function IssueCard({ issue, onViewRecommendations }: IssueCardProps) {
 
           <h4 className="mt-2 font-medium text-foreground">{issue.title}</h4>
 
-          {issue.evidence.indicators.length > 0 && (
+          {evidenceIndicators.length > 0 && (
             <div className="mt-2 text-sm text-muted-foreground">
               <span className="font-medium">Evidências: </span>
-              {issue.evidence.indicators.map((ind, i) => (
+              {evidenceIndicators.map((ind, i) => (
                 <span key={i}>
                   {ind.name} ({Math.round(ind.score * 100)}%)
-                  {i < issue.evidence.indicators.length - 1 && ', '}
+                  {i < evidenceIndicators.length - 1 && ', '}
                 </span>
               ))}
             </div>
