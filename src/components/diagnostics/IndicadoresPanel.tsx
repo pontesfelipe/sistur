@@ -100,6 +100,7 @@ export function IndicadoresPanel() {
   const [sourceFilter, setSourceFilter] = useState('all');
   const [themeFilter, setThemeFilter] = useState('all');
   const [tierFilter, setTierFilter] = useState('all');
+  const [scopeFilter, setScopeFilter] = useState('all');
   const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
   const [editingWeightId, setEditingWeightId] = useState<string | null>(null);
   const [editingWeightValue, setEditingWeightValue] = useState<string>('');
@@ -141,7 +142,9 @@ export function IndicadoresPanel() {
     const matchesTheme = themeFilter === 'all' || i.theme === themeFilter;
     const indicatorTier = (i as any).minimum_tier || 'COMPLETE';
     const matchesTier = tierFilter === 'all' || indicatorTier === tierFilter;
-    return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier;
+    const indicatorScope = (i as any).indicator_scope || 'territorial';
+    const matchesScope = scopeFilter === 'all' || indicatorScope === scopeFilter;
+    return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier && matchesScope;
   });
 
   // Count by tier
@@ -296,6 +299,32 @@ export function IndicadoresPanel() {
                 <div className="flex items-center gap-2">
                   <Target className="h-3 w-3 text-primary" />
                   Integral ({tierCounts.COMPLETE})
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={scopeFilter} onValueChange={setScopeFilter}>
+            <SelectTrigger className="w-full xs:w-36">
+              <SelectValue placeholder="Escopo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos escopos</SelectItem>
+              <SelectItem value="territorial">
+                <div className="flex items-center gap-2">
+                  <Landmark className="h-3 w-3 text-blue-600" />
+                  Territorial
+                </div>
+              </SelectItem>
+              <SelectItem value="enterprise">
+                <div className="flex items-center gap-2">
+                  <Hotel className="h-3 w-3 text-amber-600" />
+                  Enterprise
+                </div>
+              </SelectItem>
+              <SelectItem value="both">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-3 w-3 text-purple-600" />
+                  Ambos
                 </div>
               </SelectItem>
             </SelectContent>
