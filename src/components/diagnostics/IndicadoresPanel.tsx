@@ -579,6 +579,63 @@ export function IndicadoresPanel() {
                     <span className="capitalize">{isIGMA && igmaDimension ? igmaDimension : indicator.theme}</span>
                   </div>
 
+                  {/* Tier Editor - Mobile */}
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <span className="text-sm text-muted-foreground">Tier:</span>
+                    {(() => {
+                      const currentTier = ((indicator as any).minimum_tier || 'COMPLETE') as DiagnosisTier;
+                      const tierInfo = tierConfig[currentTier];
+                      const TierIcon = tierInfo.icon;
+                      const isEditingThisTier = editingTierId === indicator.id;
+
+                      if (isEditingThisTier) {
+                        return (
+                          <Select
+                            defaultValue={currentTier}
+                            onValueChange={(value) => handleUpdateTier(indicator.id, value as DiagnosisTier)}
+                          >
+                            <SelectTrigger className="h-8 w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="SMALL">
+                                <div className="flex items-center gap-2">
+                                  <Zap className="h-3 w-3 text-green-600" />
+                                  Essencial
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="MEDIUM">
+                                <div className="flex items-center gap-2">
+                                  <Gauge className="h-3 w-3 text-amber-600" />
+                                  Estratégico
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="COMPLETE">
+                                <div className="flex items-center gap-2">
+                                  <Target className="h-3 w-3 text-primary" />
+                                  Integral
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        );
+                      }
+
+                      return (
+                        <button
+                          onClick={() => setEditingTierId(indicator.id)}
+                          className={cn(
+                            "flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-medium transition-colors hover:opacity-80 cursor-pointer",
+                            tierInfo.bgClass
+                          )}
+                        >
+                          <TierIcon className={cn("h-3 w-3", tierInfo.color)} />
+                          <span className={tierInfo.color}>{tierInfo.label}</span>
+                        </button>
+                      );
+                    })()}
+                  </div>
+
                   {/* Weight Editor */}
                   <div className="flex items-center justify-between pt-2 border-t">
                     <span className="text-sm text-muted-foreground">Peso:</span>
@@ -641,6 +698,16 @@ export function IndicadoresPanel() {
                 <TableHead>Pilar</TableHead>
                 <TableHead>Dimensão/Tema</TableHead>
                 <TableHead>Interpretação</TableHead>
+                <TableHead>
+                  <Tooltip>
+                    <TooltipTrigger className="cursor-help">
+                      Tier
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Clique para editar o nível mínimo
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
                 <TableHead>Normalização</TableHead>
                 <TableHead className="text-right">
                   <Tooltip>
@@ -801,8 +868,62 @@ export function IndicadoresPanel() {
                           {interpretationLabels[defaultInterpretation] || defaultInterpretation}
                         </Badge>
                       ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
+                      <span className="text-xs text-muted-foreground">—</span>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      {(() => {
+                        const currentTier = ((indicator as any).minimum_tier || 'COMPLETE') as DiagnosisTier;
+                        const tierInfo = tierConfig[currentTier];
+                        const TierIcon = tierInfo.icon;
+                        const isEditingTier = editingTierId === indicator.id;
+
+                        if (isEditingTier) {
+                          return (
+                            <Select
+                              defaultValue={currentTier}
+                              onValueChange={(value) => handleUpdateTier(indicator.id, value as DiagnosisTier)}
+                            >
+                              <SelectTrigger className="h-8 w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="SMALL">
+                                  <div className="flex items-center gap-2">
+                                    <Zap className="h-3 w-3 text-green-600" />
+                                    Essencial
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="MEDIUM">
+                                  <div className="flex items-center gap-2">
+                                    <Gauge className="h-3 w-3 text-amber-600" />
+                                    Estratégico
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="COMPLETE">
+                                  <div className="flex items-center gap-2">
+                                    <Target className="h-3 w-3 text-primary" />
+                                    Integral
+                                  </div>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          );
+                        }
+
+                        return (
+                          <button
+                            onClick={() => setEditingTierId(indicator.id)}
+                            className={cn(
+                              "flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-medium transition-colors hover:opacity-80 cursor-pointer",
+                              tierInfo.bgClass
+                            )}
+                          >
+                            <TierIcon className={cn("h-3 w-3", tierInfo.color)} />
+                            <span className={tierInfo.color}>{tierInfo.label}</span>
+                          </button>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{normLabels[indicator.normalization]}</Badge>
