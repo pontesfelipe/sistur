@@ -2259,6 +2259,13 @@ export type Database = {
             referencedRelation: "forum_posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "forum_post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "public_forum_posts_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       forum_post_reports: {
@@ -2307,10 +2314,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "forum_post_reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "public_forum_posts_view"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "forum_post_reports_reply_id_fkey"
             columns: ["reply_id"]
             isOneToOne: false
             referencedRelation: "forum_replies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_post_reports_reply_id_fkey"
+            columns: ["reply_id"]
+            isOneToOne: false
+            referencedRelation: "public_forum_replies_view"
             referencedColumns: ["id"]
           },
         ]
@@ -2420,10 +2441,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "forum_replies_parent_reply_id_fkey"
+            columns: ["parent_reply_id"]
+            isOneToOne: false
+            referencedRelation: "public_forum_replies_view"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "forum_replies_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_replies_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "public_forum_posts_view"
             referencedColumns: ["id"]
           },
         ]
@@ -2450,6 +2485,13 @@ export type Database = {
             columns: ["reply_id"]
             isOneToOne: false
             referencedRelation: "forum_replies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_reply_likes_reply_id_fkey"
+            columns: ["reply_id"]
+            isOneToOne: false
+            referencedRelation: "public_forum_replies_view"
             referencedColumns: ["id"]
           },
         ]
@@ -4278,6 +4320,7 @@ export type Database = {
           approval_requested_at: string | null
           avatar_url: string | null
           created_at: string
+          forum_show_identity: boolean | null
           full_name: string | null
           id: string
           org_id: string
@@ -4293,6 +4336,7 @@ export type Database = {
           approval_requested_at?: string | null
           avatar_url?: string | null
           created_at?: string
+          forum_show_identity?: boolean | null
           full_name?: string | null
           id?: string
           org_id: string
@@ -4308,6 +4352,7 @@ export type Database = {
           approval_requested_at?: string | null
           avatar_url?: string | null
           created_at?: string
+          forum_show_identity?: boolean | null
           full_name?: string | null
           id?: string
           org_id?: string
@@ -5420,6 +5465,71 @@ export type Database = {
           uf: string | null
         }
         Relationships: []
+      }
+      public_forum_posts_view: {
+        Row: {
+          author_avatar: string | null
+          author_name: string | null
+          category: string | null
+          content: string | null
+          created_at: string | null
+          id: string | null
+          image_url: string | null
+          is_liked: boolean | null
+          is_owner: boolean | null
+          likes_count: number | null
+          replies_count: number | null
+          title: string | null
+          updated_at: string | null
+          visibility: string | null
+        }
+        Relationships: []
+      }
+      public_forum_replies_view: {
+        Row: {
+          author_avatar: string | null
+          author_name: string | null
+          content: string | null
+          created_at: string | null
+          id: string | null
+          is_liked: boolean | null
+          is_owner: boolean | null
+          is_solution: boolean | null
+          likes_count: number | null
+          parent_reply_id: string | null
+          post_id: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_replies_parent_reply_id_fkey"
+            columns: ["parent_reply_id"]
+            isOneToOne: false
+            referencedRelation: "forum_replies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_replies_parent_reply_id_fkey"
+            columns: ["parent_reply_id"]
+            isOneToOne: false
+            referencedRelation: "public_forum_replies_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_replies_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_replies_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "public_forum_posts_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {

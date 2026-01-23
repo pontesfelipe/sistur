@@ -76,10 +76,51 @@ export function useForum() {
   const [filter, setFilter] = useState<'all' | 'org' | 'public'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
-  // Fetch posts
+  // Fetch posts - uses secure view for public posts to hide user_id/org_id
   const { data: posts, isLoading: postsLoading, refetch: refetchPosts } = useQuery({
     queryKey: ['forum-posts', filter, categoryFilter],
     queryFn: async () => {
+      // For public-only filter, use secure view that doesn't expose UUIDs
+      if (filter === 'public') {
+        let query = supabase
+          .from('public_forum_posts_view')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (categoryFilter !== 'all') {
+          query = query.eq('category', categoryFilter);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        // Map to ForumPost format using view fields
+        return (data || []).map((post) => ({
+          id: post.id,
+          user_id: '', // Hidden for security
+          org_id: '', // Hidden for security
+          title: post.title,
+          content: post.content,
+          visibility: post.visibility as 'org' | 'public',
+          image_url: post.image_url,
+          attachment_url: null,
+          attachment_type: null,
+          category: post.category,
+          is_pinned: false,
+          likes_count: post.likes_count,
+          replies_count: post.replies_count,
+          created_at: post.created_at,
+          updated_at: post.updated_at,
+          author: {
+            full_name: post.author_name || 'Usuário Anônimo',
+            avatar_url: post.author_avatar,
+          },
+          user_liked: post.is_liked,
+          is_owner: post.is_owner,
+        } as ForumPost & { is_owner?: boolean }));
+      }
+
+      // For org or all filter, use regular query (authenticated users only)
       let query = supabase
         .from('forum_posts')
         .select('*')
@@ -87,9 +128,8 @@ export function useForum() {
         .order('created_at', { ascending: false });
 
       if (filter === 'org' && profile?.org_id) {
-        query = query.eq('visibility', 'org').eq('org_id', profile.org_id);
-      } else if (filter === 'public') {
-        query = query.eq('visibility', 'public');
+        const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
+        query = query.eq('visibility', 'org').eq('org_id', effectiveOrgId);
       }
 
       if (categoryFilter !== 'all') {
@@ -123,7 +163,8 @@ export function useForum() {
             ...post,
             author: authorData || { full_name: 'Usuário', avatar_url: null },
             user_liked: userLiked,
-          } as ForumPost;
+            is_owner: post.user_id === user?.id,
+          } as ForumPost & { is_owner?: boolean };
         })
       );
 

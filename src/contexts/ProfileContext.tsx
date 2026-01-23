@@ -10,6 +10,7 @@ export interface UserProfile {
   system_access: 'ERP' | 'EDU' | null;
   pending_approval: boolean;
   viewing_demo_org_id: string | null;
+  forum_show_identity: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -37,6 +38,7 @@ interface ProfileContextType {
   effectiveOrgId: string | undefined;
   completeOnboarding: (systemAccess: 'ERP' | 'EDU', role: 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR') => Promise<{ success: boolean; error?: string }>;
   toggleDemoMode: (enable: boolean) => Promise<{ success: boolean; error?: string }>;
+  updateForumPrivacy: (showIdentity: boolean) => Promise<{ success: boolean; error?: string }>;
   refetchProfile: () => Promise<void>;
 }
 
@@ -93,6 +95,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
           system_access: profileResult.data.system_access as 'ERP' | 'EDU' | null,
           pending_approval: profileResult.data.pending_approval ?? false,
           viewing_demo_org_id: profileResult.data.viewing_demo_org_id ?? null,
+          forum_show_identity: profileResult.data.forum_show_identity ?? true,
           created_at: profileResult.data.created_at,
           updated_at: profileResult.data.updated_at,
         });
@@ -191,6 +194,28 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateForumPrivacy = async (showIdentity: boolean) => {
+    if (!user) return { success: false, error: 'No user' };
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ forum_show_identity: showIdentity })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // Force refetch
+      lastUserId.current = null;
+      await fetchProfile();
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error updating forum privacy:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
   const forceRefetch = async () => {
     lastUserId.current = null;
     await fetchProfile();
@@ -215,6 +240,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       effectiveOrgId,
       completeOnboarding,
       toggleDemoMode,
+      updateForumPrivacy,
       refetchProfile: forceRefetch,
     }}>
       {children}
