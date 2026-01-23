@@ -94,6 +94,13 @@ const Index = () => {
 
   // Determine if enterprise mode is available
   const hasEnterpriseAccess = orgSettings?.has_enterprise_access ?? false;
+  
+  // Debug log para investigar toggle Enterprise
+  console.log('[Dashboard Debug]', { 
+    effectiveOrgId, 
+    orgSettings, 
+    hasEnterpriseAccess
+  });
 
   // Select appropriate data based on mode
   const isEnterprise = diagnosticMode === 'enterprise';
