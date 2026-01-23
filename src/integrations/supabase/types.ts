@@ -1776,6 +1776,74 @@ export type Database = {
         }
         Relationships: []
       }
+      enterprise_indicator_scores: {
+        Row: {
+          assessment_id: string
+          computed_at: string | null
+          created_at: string | null
+          id: string
+          indicator_id: string
+          max_ref_used: number | null
+          min_ref_used: number | null
+          org_id: string
+          score: number
+          weight_used: number | null
+        }
+        Insert: {
+          assessment_id: string
+          computed_at?: string | null
+          created_at?: string | null
+          id?: string
+          indicator_id: string
+          max_ref_used?: number | null
+          min_ref_used?: number | null
+          org_id: string
+          score: number
+          weight_used?: number | null
+        }
+        Update: {
+          assessment_id?: string
+          computed_at?: string | null
+          created_at?: string | null
+          id?: string
+          indicator_id?: string
+          max_ref_used?: number | null
+          min_ref_used?: number | null
+          org_id?: string
+          score?: number
+          weight_used?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_indicator_scores_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_indicator_scores_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
+            foreignKeyName: "enterprise_indicator_scores_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_indicator_scores_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       enterprise_indicator_values: {
         Row: {
           assessment_id: string

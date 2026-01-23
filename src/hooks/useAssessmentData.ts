@@ -41,22 +41,119 @@ export function usePillarScores(assessmentId: string | undefined) {
   });
 }
 
-export function useIndicatorScores(assessmentId: string | undefined) {
+// Dynamic indicator scores hook that fetches from the correct table based on diagnostic_type
+export function useIndicatorScores(assessmentId: string | undefined, diagnosticType?: string) {
   return useQuery({
-    queryKey: ['indicator-scores', assessmentId],
+    queryKey: ['indicator-scores', assessmentId, diagnosticType],
     queryFn: async () => {
       if (!assessmentId) return [];
       
-      const { data, error } = await supabase
-        .from('indicator_scores')
-        .select(`
-          *,
-          indicator:indicators(*)
-        `)
+      const isEnterprise = diagnosticType === 'enterprise';
+      
+      if (isEnterprise) {
+        // Fetch from enterprise_indicator_scores with enterprise_indicators join
+        const { data, error } = await supabase
+          .from('enterprise_indicator_scores')
+          .select(`
+            id,
+            org_id,
+            assessment_id,
+            indicator_id,
+            score,
+            min_ref_used,
+            max_ref_used,
+            weight_used,
+            computed_at,
+            indicator:enterprise_indicators(
+              id,
+              code,
+              name,
+              pillar,
+              unit,
+              description,
+              benchmark_min,
+              benchmark_max,
+              benchmark_target,
+              weight,
+              minimum_tier,
+              category:enterprise_indicator_categories(id, code, name)
+            )
+          `)
+          .eq('assessment_id', assessmentId);
+        
+        if (error) throw error;
+        
+        // Transform to match territorial structure for consistent UI rendering
+        return (data || []).map(score => ({
+          ...score,
+          indicator: score.indicator ? {
+            ...score.indicator,
+            theme: (score.indicator.category as any)?.name || 'Enterprise',
+            direction: 'HIGH_IS_BETTER' as const,
+            normalization: 'MIN_MAX' as const,
+            min_ref: score.indicator.benchmark_min,
+            max_ref: score.indicator.benchmark_max,
+          } : null,
+        }));
+      } else {
+        // Fetch from regular indicator_scores
+        const { data, error } = await supabase
+          .from('indicator_scores')
+          .select(`
+            *,
+            indicator:indicators(*)
+          `)
+          .eq('assessment_id', assessmentId);
+        
+        if (error) throw error;
+        return data || [];
+      }
+    },
+    enabled: !!assessmentId,
+  });
+}
+
+// Enterprise-specific indicator values hook
+export function useEnterpriseIndicatorValuesForAssessment(assessmentId: string | undefined) {
+  return useQuery({
+    queryKey: ['enterprise-indicator-values-assessment', assessmentId],
+    queryFn: async () => {
+      if (!assessmentId) return [];
+      
+      const { data: values, error: valuesError } = await supabase
+        .from('enterprise_indicator_values')
+        .select('*')
         .eq('assessment_id', assessmentId);
       
-      if (error) throw error;
-      return data || [];
+      if (valuesError) throw valuesError;
+      
+      if (!values || values.length === 0) return [];
+      
+      const indicatorIds = values.map(v => v.indicator_id);
+      const { data: indicators, error: indicatorsError } = await supabase
+        .from('enterprise_indicators')
+        .select(`
+          *,
+          category:enterprise_indicator_categories(*)
+        `)
+        .in('id', indicatorIds);
+      
+      if (indicatorsError) throw indicatorsError;
+      
+      const indicatorMap = new Map(indicators?.map(i => [i.id, i]) || []);
+      
+      return values.map(v => ({
+        ...v,
+        value_raw: v.value, // Map to common interface
+        indicator: indicatorMap.get(v.indicator_id) ? {
+          ...indicatorMap.get(v.indicator_id),
+          theme: (indicatorMap.get(v.indicator_id) as any)?.category?.name || 'Enterprise',
+          direction: 'HIGH_IS_BETTER' as const,
+          normalization: 'MIN_MAX' as const,
+          min_ref: indicatorMap.get(v.indicator_id)?.benchmark_min,
+          max_ref: indicatorMap.get(v.indicator_id)?.benchmark_max,
+        } : null,
+      }));
     },
     enabled: !!assessmentId,
   });

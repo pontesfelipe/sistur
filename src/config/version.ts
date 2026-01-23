@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 6,
+  patch: 7,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.7",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Criada tabela enterprise_indicator_scores para armazenar scores normalizados",
+      "Edge function calculate-assessment insere scores na tabela correta por tipo",
+      "Hooks useIndicatorScores e useEnterpriseIndicatorValuesForAssessment unificados",
+      "DiagnosticoDetalhe detecta diagnostic_type e busca dados da fonte correta",
+      "NormalizationView e IndicatorScoresView agora funcionam para diagnósticos Enterprise"
+    ]
+  },
   {
     version: "1.7.6",
     date: "2026-01-23",
