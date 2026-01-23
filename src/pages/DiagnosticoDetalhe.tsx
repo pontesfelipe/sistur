@@ -62,6 +62,7 @@ import {
   useIndicatorScores,
   useIssues,
   useRecommendations,
+  useEnterpriseIndicatorValuesForAssessment,
 } from '@/hooks/useAssessmentData';
 import { useIndicatorValues } from '@/hooks/useIndicators';
 import { useFetchOfficialData, useExternalIndicatorValues, useValidateIndicatorValues } from '@/hooks/useOfficialData';
@@ -95,11 +96,18 @@ const DiagnosticoDetalhe = () => {
 
   // Fetch data
   const { data: assessment, isLoading: loadingAssessment, refetch: refetchAssessment } = useAssessment(id);
+  const diagnosticType = (assessment as any)?.diagnostic_type || 'territorial';
+  const isEnterprise = diagnosticType === 'enterprise';
+  
   const { data: pillarScores = [], refetch: refetchPillarScores } = usePillarScores(id);
-  const { data: indicatorScores = [], refetch: refetchIndicatorScores } = useIndicatorScores(id);
+  const { data: indicatorScores = [], refetch: refetchIndicatorScores } = useIndicatorScores(id, diagnosticType);
   const { data: issues = [], refetch: refetchIssues } = useIssues(id);
   const { data: recommendations = [], refetch: refetchRecommendations } = useRecommendations(id);
-  const { values: indicatorValues = [] } = useIndicatorValues(id);
+  
+  // Use appropriate indicator values based on diagnostic type
+  const { values: territorialIndicatorValues = [] } = useIndicatorValues(id);
+  const { data: enterpriseIndicatorValues = [] } = useEnterpriseIndicatorValuesForAssessment(isEnterprise ? id : undefined);
+  const indicatorValues = isEnterprise ? enterpriseIndicatorValues : territorialIndicatorValues;
 
   // Official data hooks - destination info
   const assessmentDestination = assessment?.destination as { name?: string; uf?: string; ibge_code?: string } | null;
@@ -109,8 +117,8 @@ const DiagnosticoDetalhe = () => {
   const fetchOfficialData = useFetchOfficialData();
   const validateIndicatorValues = useValidateIndicatorValues();
 
-  // Calculate data completeness
-  const totalIndicators = indicators.length;
+  // Calculate data completeness based on diagnostic type
+  const totalIndicators = isEnterprise ? enterpriseIndicatorValues.length : indicators.length;
   const filledIndicators = indicatorValues.length;
   const completenessPercentage = totalIndicators > 0 ? (filledIndicators / totalIndicators) * 100 : 0;
   const hasIncompleteData = completenessPercentage < 100 && completenessPercentage > 0;
