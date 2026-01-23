@@ -71,7 +71,7 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
-import { EnterpriseIndicatorsPanel } from '@/components/diagnostics/EnterpriseIndicatorsPanel';
+// EnterpriseIndicatorsPanel removed - unified into single panel
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
@@ -101,7 +101,7 @@ const scopeLabels: Record<IndicatorScope, { label: string; color: string; bgColo
   both: { label: 'Ambos', color: 'text-purple-600', bgColor: 'bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800' },
 };
 
-function TerritorialIndicadoresPanel() {
+export function IndicadoresPanel() {
   const [searchQuery, setSearchQuery] = useState('');
   const [pillarFilter, setPillarFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
@@ -161,6 +161,13 @@ function TerritorialIndicadoresPanel() {
     SMALL: indicators.filter(i => (i as any).minimum_tier === 'SMALL').length,
     MEDIUM: indicators.filter(i => (i as any).minimum_tier === 'MEDIUM').length,
     COMPLETE: indicators.filter(i => !((i as any).minimum_tier) || (i as any).minimum_tier === 'COMPLETE').length,
+  }), [indicators]);
+
+  // Count by scope
+  const scopeCounts = useMemo(() => ({
+    territorial: indicators.filter(i => (i as any).indicator_scope === 'territorial').length,
+    enterprise: indicators.filter(i => (i as any).indicator_scope === 'enterprise').length,
+    both: indicators.filter(i => (i as any).indicator_scope === 'both').length,
   }), [indicators]);
 
   const handleUpdateTier = async (indicatorId: string, newTier: DiagnosisTier) => {
@@ -339,27 +346,27 @@ function TerritorialIndicadoresPanel() {
             </SelectContent>
           </Select>
           <Select value={scopeFilter} onValueChange={setScopeFilter}>
-            <SelectTrigger className="w-full xs:w-36">
+            <SelectTrigger className="w-full xs:w-40">
               <SelectValue placeholder="Escopo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos escopos</SelectItem>
+              <SelectItem value="all">Todos escopos ({indicators.length})</SelectItem>
               <SelectItem value="territorial">
                 <div className="flex items-center gap-2">
                   <Landmark className="h-3 w-3 text-blue-600" />
-                  Territorial
+                  Territorial ({scopeCounts.territorial})
                 </div>
               </SelectItem>
               <SelectItem value="enterprise">
                 <div className="flex items-center gap-2">
                   <Hotel className="h-3 w-3 text-amber-600" />
-                  Enterprise
+                  Enterprise ({scopeCounts.enterprise})
                 </div>
               </SelectItem>
               <SelectItem value="both">
                 <div className="flex items-center gap-2">
                   <Globe className="h-3 w-3 text-purple-600" />
-                  Ambos
+                  Ambos ({scopeCounts.both})
                 </div>
               </SelectItem>
             </SelectContent>
@@ -1250,29 +1257,4 @@ function TerritorialIndicadoresPanel() {
   );
 }
 
-export function IndicadoresPanel() {
-  return (
-    <Tabs defaultValue="territorial" className="space-y-6">
-      <div className="flex items-center justify-between">
-        <TabsList>
-          <TabsTrigger value="territorial" className="gap-2">
-            <Landmark className="h-4 w-4" />
-            Territorial
-          </TabsTrigger>
-          <TabsTrigger value="enterprise" className="gap-2">
-            <Hotel className="h-4 w-4" />
-            Enterprise
-          </TabsTrigger>
-        </TabsList>
-      </div>
-
-      <TabsContent value="territorial" className="mt-0">
-        <TerritorialIndicadoresPanel />
-      </TabsContent>
-
-      <TabsContent value="enterprise" className="mt-0">
-        <EnterpriseIndicatorsPanel />
-      </TabsContent>
-    </Tabs>
-  );
-}
+// Removed wrapper - unified panel is now the main export
