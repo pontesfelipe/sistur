@@ -1,9 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
@@ -21,13 +20,11 @@ import {
   Minus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { 
-  useEnterpriseIndicators, 
-  useEnterpriseIndicatorValues,
-  useBulkSaveEnterpriseIndicatorValues,
-  EnterpriseIndicator,
-} from '@/hooks/useEnterpriseIndicators';
+import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useProfile } from '@/hooks/useProfile';
+import type { Database } from '@/integrations/supabase/types';
+
+type Indicator = Database['public']['Tables']['indicators']['Row'];
 
 interface EnterpriseDataEntryPanelProps {
   assessmentId: string;
@@ -61,20 +58,21 @@ const PILLAR_CONFIG = {
 
 export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: EnterpriseDataEntryPanelProps) {
   const { profile } = useProfile();
-  const { data: indicators, isLoading: indicatorsLoading } = useEnterpriseIndicators(tier);
-  const { data: existingValues, isLoading: valuesLoading } = useEnterpriseIndicatorValues(assessmentId);
-  const bulkSave = useBulkSaveEnterpriseIndicatorValues();
+  
+  // Use unified indicators table with enterprise scope filter
+  const { indicators, isLoading: indicatorsLoading } = useIndicators({ scope: 'enterprise', tier });
+  const { values: existingValues, isLoading: valuesLoading, bulkUpsertValues } = useIndicatorValues(assessmentId);
   
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
   
   // Initialize local values from existing
-  useMemo(() => {
-    if (existingValues && Object.keys(localValues).length === 0) {
+  useEffect(() => {
+    if (existingValues && existingValues.length > 0 && Object.keys(localValues).length === 0) {
       const initial: Record<string, string> = {};
       existingValues.forEach(v => {
-        if (v.value !== null) {
-          initial[v.indicator_id] = v.value.toString();
+        if (v.value_raw !== null) {
+          initial[v.indicator_id] = v.value_raw.toString();
         }
       });
       if (Object.keys(initial).length > 0) {
@@ -83,18 +81,18 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
     }
   }, [existingValues]);
   
-  // Group indicators by pillar and category
+  // Group indicators by pillar and theme (category)
   const groupedIndicators = useMemo(() => {
     if (!indicators) return {};
     
-    const grouped: Record<string, Record<string, EnterpriseIndicator[]>> = {
+    const grouped: Record<string, Record<string, Indicator[]>> = {
       RA: {},
       OE: {},
       AO: {},
     };
     
     indicators.forEach(ind => {
-      const categoryName = ind.category?.name || 'Outros';
+      const categoryName = ind.theme || 'Outros';
       if (!grouped[ind.pillar][categoryName]) {
         grouped[ind.pillar][categoryName] = [];
       }
@@ -145,41 +143,36 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
   const handleSave = async () => {
     if (!profile?.org_id) return;
     
-    const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
-    
     const values = Object.entries(localValues)
       .filter(([_, value]) => value !== '')
       .map(([indicatorId, value]) => ({
-        indicatorId,
-        value: parseFloat(value),
-        source: 'manual',
-        referenceDate: new Date().toISOString().split('T')[0],
+        assessment_id: assessmentId,
+        indicator_id: indicatorId,
+        value_raw: parseFloat(value),
+        source: 'Manual (Enterprise)',
       }));
     
-    await bulkSave.mutateAsync({
-      assessmentId,
-      orgId: effectiveOrgId,
-      values,
-    });
-    
+    await bulkUpsertValues.mutateAsync(values);
     onComplete?.();
   };
   
-  const getBenchmarkStatus = (indicator: EnterpriseIndicator, value: number | null) => {
-    if (value === null || indicator.benchmark_target === null) return null;
+  const getBenchmarkStatus = (indicator: Indicator, value: number | null) => {
+    const benchmarkTarget = (indicator as any).benchmark_target;
+    const benchmarkMin = (indicator as any).benchmark_min;
+    const benchmarkMax = (indicator as any).benchmark_max;
     
-    const { benchmark_min, benchmark_max, benchmark_target } = indicator;
+    if (value === null || benchmarkTarget === null) return null;
     
     // Check if lower is better (e.g., consumption, costs)
-    const lowerIsBetter = benchmark_min !== null && benchmark_max !== null && benchmark_min < benchmark_max;
+    const lowerIsBetter = benchmarkMin !== null && benchmarkMax !== null && benchmarkMin < benchmarkMax;
     
     if (lowerIsBetter) {
-      if (value <= benchmark_target) return 'good';
-      if (value <= benchmark_max!) return 'moderate';
+      if (value <= benchmarkTarget) return 'good';
+      if (value <= benchmarkMax!) return 'moderate';
       return 'bad';
     } else {
-      if (value >= benchmark_target) return 'good';
-      if (benchmark_min !== null && value >= benchmark_min) return 'moderate';
+      if (value >= benchmarkTarget) return 'good';
+      if (benchmarkMin !== null && value >= benchmarkMin) return 'moderate';
       return 'bad';
     }
   };
@@ -289,6 +282,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
                       const currentValue = localValues[indicator.id] || '';
                       const numericValue = currentValue ? parseFloat(currentValue) : null;
                       const benchmarkStatus = getBenchmarkStatus(indicator, numericValue);
+                      const benchmarkTarget = (indicator as any).benchmark_target;
                       
                       return (
                         <div key={indicator.id} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 rounded-lg border bg-muted/20">
@@ -308,10 +302,10 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
                             <p className="text-xs text-muted-foreground mt-1">
                               {indicator.description}
                             </p>
-                            {indicator.benchmark_target !== null && (
+                            {benchmarkTarget !== null && (
                               <p className="text-xs text-muted-foreground mt-1">
                                 <Target className="h-3 w-3 inline mr-1" />
-                                Meta: {indicator.benchmark_target} {indicator.unit}
+                                Meta: {benchmarkTarget} {indicator.unit}
                               </p>
                             )}
                           </div>
@@ -361,8 +355,8 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
                 </>
               )}
             </div>
-            <Button onClick={handleSave} disabled={bulkSave.isPending}>
-              {bulkSave.isPending ? (
+            <Button onClick={handleSave} disabled={bulkUpsertValues.isPending}>
+              {bulkUpsertValues.isPending ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
                 <Save className="h-4 w-4 mr-2" />

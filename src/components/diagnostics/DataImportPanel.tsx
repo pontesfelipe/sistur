@@ -87,33 +87,19 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string }>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
 
-  const { indicators: allIndicators, isLoading: loadingIndicators } = useIndicators();
   const { assessments, isLoading: loadingAssessments } = useAssessments();
   const { values, isLoading: loadingValues, upsertValue, bulkUpsertValues } = useIndicatorValues(selectedAssessment);
   const { calculate, loading: calculating } = useCalculateAssessment();
 
-  // Get the selected assessment's tier and type
+  // Get the selected assessment's tier and type FIRST
   const selectedAssessmentData = assessments?.find(a => a.id === selectedAssessment);
-  const assessmentTier = selectedAssessmentData?.tier || 'COMPLETE';
+  const assessmentTier = (selectedAssessmentData?.tier || 'COMPLETE') as 'SMALL' | 'MEDIUM' | 'COMPLETE';
   const isEnterpriseAssessment = selectedAssessmentData?.diagnostic_type === 'enterprise';
 
-  // Filter indicators by tier
-  const getTierFilter = (tier: string): string[] => {
-    switch (tier) {
-      case 'SMALL':
-        return ['SMALL'];
-      case 'MEDIUM':
-        return ['SMALL', 'MEDIUM'];
-      case 'COMPLETE':
-      default:
-        return ['SMALL', 'MEDIUM', 'COMPLETE'];
-    }
-  };
-
-  const allowedTiers = getTierFilter(assessmentTier);
-  const indicators = allIndicators.filter(ind => {
-    const indicatorTier = (ind as any).minimum_tier || 'COMPLETE';
-    return allowedTiers.includes(indicatorTier);
+  // Use unified indicators with scope filter based on diagnostic type
+  const { indicators, isLoading: loadingIndicators } = useIndicators({
+    scope: isEnterpriseAssessment ? 'enterprise' : 'territorial',
+    tier: assessmentTier,
   });
 
   useEffect(() => {

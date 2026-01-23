@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useEnterpriseCategories, useEnterpriseIndicators } from "@/hooks/useEnterpriseIndicators";
+import { useIndicators } from "@/hooks/useIndicators";
 import { cn } from "@/lib/utils";
 
 type DiagnosisTier = "SMALL" | "MEDIUM" | "COMPLETE";
@@ -36,11 +36,11 @@ export function EnterpriseIndicatorsPanel() {
   const [searchQuery, setSearchQuery] = useState("");
   const [pillarFilter, setPillarFilter] = useState("all");
   const [tierFilter, setTierFilter] = useState<"all" | DiagnosisTier>("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
 
   const isMobile = useIsMobile();
-  const { data: indicators = [], isLoading } = useEnterpriseIndicators();
-  const { data: categories = [] } = useEnterpriseCategories();
+  
+  // Use unified indicators table with enterprise scope
+  const { indicators, isLoading } = useIndicators({ scope: 'enterprise' });
 
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -49,19 +49,20 @@ export function EnterpriseIndicatorsPanel() {
         !q ||
         i.name.toLowerCase().includes(q) ||
         i.code.toLowerCase().includes(q) ||
-        (i.category?.name || "").toLowerCase().includes(q);
+        (i.theme || "").toLowerCase().includes(q);
 
       const matchesPillar = pillarFilter === "all" || i.pillar.toLowerCase() === pillarFilter;
-      const matchesTier = tierFilter === "all" || i.minimum_tier === tierFilter;
-      const matchesCategory = categoryFilter === "all" || i.category_id === categoryFilter;
-      return matchesSearch && matchesPillar && matchesTier && matchesCategory;
+      const indicatorTier = ((i as any).minimum_tier || 'COMPLETE') as DiagnosisTier;
+      const matchesTier = tierFilter === "all" || indicatorTier === tierFilter;
+      return matchesSearch && matchesPillar && matchesTier;
     });
-  }, [indicators, searchQuery, pillarFilter, tierFilter, categoryFilter]);
+  }, [indicators, searchQuery, pillarFilter, tierFilter]);
 
   const tierCounts = useMemo(() => {
     const counts: Record<DiagnosisTier, number> = { SMALL: 0, MEDIUM: 0, COMPLETE: 0 };
     indicators.forEach((i) => {
-      counts[i.minimum_tier] += 1;
+      const tier = ((i as any).minimum_tier || 'COMPLETE') as DiagnosisTier;
+      counts[tier] += 1;
     });
     return counts;
   }, [indicators]);
@@ -114,22 +115,8 @@ export function EnterpriseIndicatorsPanel() {
             <SelectItem value="MEDIUM">Estratégico ({tierCounts.MEDIUM})</SelectItem>
             <SelectItem value="COMPLETE">Integral ({tierCounts.COMPLETE})</SelectItem>
           </SelectContent>
-        </Select>
-
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-64 h-9">
-            <SelectValue placeholder="Categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas as categorias</SelectItem>
-            {categories.map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.code} · {c.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      </Select>
+    </div>
 
       <div className="bg-card rounded-xl border overflow-hidden">
         {isLoading ? (
@@ -140,28 +127,31 @@ export function EnterpriseIndicatorsPanel() {
           </div>
         ) : isMobile ? (
           <div className="divide-y">
-            {filtered.map((i) => (
-              <div key={i.id} className="p-4 space-y-2">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="font-mono text-xs text-muted-foreground">{i.code}</div>
-                    <div className="font-medium text-sm truncate">{i.name}</div>
-                    {i.category?.name && (
-                      <div className="text-xs text-muted-foreground truncate">{i.category.name}</div>
-                    )}
+            {filtered.map((i) => {
+              const indicatorTier = ((i as any).minimum_tier || 'COMPLETE') as DiagnosisTier;
+              return (
+                <div key={i.id} className="p-4 space-y-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="font-mono text-xs text-muted-foreground">{i.code}</div>
+                      <div className="font-medium text-sm truncate">{i.name}</div>
+                      {i.theme && (
+                        <div className="text-xs text-muted-foreground truncate">{i.theme}</div>
+                      )}
+                    </div>
+                    <Badge variant={(i.pillar.toLowerCase() || "ra") as any}>{i.pillar}</Badge>
                   </div>
-                  <Badge variant={(i.pillar.toLowerCase() || "ra") as any}>{i.pillar}</Badge>
-                </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline">{tierLabel[i.minimum_tier]}</Badge>
-                  <Badge variant="outline">Peso {(i.weight * 100).toFixed(0)}%</Badge>
-                  <Badge variant="outline" className={cn(!i.unit && "text-muted-foreground")}>
-                    {i.unit || "—"}
-                  </Badge>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline">{tierLabel[indicatorTier]}</Badge>
+                    <Badge variant="outline">Peso {(i.weight * 100).toFixed(0)}%</Badge>
+                    <Badge variant="outline" className={cn(!i.unit && "text-muted-foreground")}>
+                      {i.unit || "—"}
+                    </Badge>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {filtered.length === 0 && (
               <div className="p-10 text-center text-muted-foreground">
@@ -175,7 +165,7 @@ export function EnterpriseIndicatorsPanel() {
               <TableRow>
                 <TableHead>Código</TableHead>
                 <TableHead>Nome</TableHead>
-                <TableHead>Categoria</TableHead>
+                <TableHead>Tema</TableHead>
                 <TableHead>Pilar</TableHead>
                 <TableHead>Tier</TableHead>
                 <TableHead>Unidade</TableHead>
@@ -183,29 +173,31 @@ export function EnterpriseIndicatorsPanel() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((i) => (
-                <TableRow key={i.id}>
-                  <TableCell className="font-mono text-sm">{i.code}</TableCell>
-                  <TableCell>
-                    <div className="font-medium">{i.name}</div>
-                    {i.description && (
-                      <div className="text-xs text-muted-foreground line-clamp-1">{i.description}</div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">{i.category?.name || "—"}</div>
-                    <div className="text-xs text-muted-foreground">{i.category?.code || ""}</div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={(i.pillar.toLowerCase() || "ra") as any}>{i.pillar}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{tierLabel[i.minimum_tier]}</Badge>
-                  </TableCell>
-                  <TableCell className={cn(!i.unit && "text-muted-foreground")}>{i.unit || "—"}</TableCell>
-                  <TableCell className="text-right font-mono">{(i.weight * 100).toFixed(0)}%</TableCell>
-                </TableRow>
-              ))}
+              {filtered.map((i) => {
+                const indicatorTier = ((i as any).minimum_tier || 'COMPLETE') as DiagnosisTier;
+                return (
+                  <TableRow key={i.id}>
+                    <TableCell className="font-mono text-sm">{i.code}</TableCell>
+                    <TableCell>
+                      <div className="font-medium">{i.name}</div>
+                      {i.description && (
+                        <div className="text-xs text-muted-foreground line-clamp-1">{i.description}</div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">{i.theme || "—"}</div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={(i.pillar.toLowerCase() || "ra") as any}>{i.pillar}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{tierLabel[indicatorTier]}</Badge>
+                    </TableCell>
+                    <TableCell className={cn(!i.unit && "text-muted-foreground")}>{i.unit || "—"}</TableCell>
+                    <TableCell className="text-right font-mono">{(i.weight * 100).toFixed(0)}%</TableCell>
+                  </TableRow>
+                );
+              })}
 
               {filtered.length === 0 && (
                 <TableRow>

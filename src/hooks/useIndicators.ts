@@ -5,18 +5,42 @@ import type { Database } from '@/integrations/supabase/types';
 
 type Indicator = Database['public']['Tables']['indicators']['Row'];
 type IndicatorInsert = Database['public']['Tables']['indicators']['Insert'];
+type IndicatorScope = 'territorial' | 'enterprise' | 'both';
 
-export function useIndicators() {
+interface UseIndicatorsOptions {
+  scope?: IndicatorScope | 'all';
+  tier?: 'SMALL' | 'MEDIUM' | 'COMPLETE';
+}
+
+export function useIndicators(options: UseIndicatorsOptions = {}) {
+  const { scope = 'all', tier } = options;
   const queryClient = useQueryClient();
 
   const { data: indicators = [], isLoading, error } = useQuery({
-    queryKey: ['indicators'],
+    queryKey: ['indicators', scope, tier],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('indicators')
         .select('*')
         .order('pillar', { ascending: true })
         .order('theme', { ascending: true });
+
+      // Filter by scope if specified
+      if (scope !== 'all') {
+        query = query.or(`indicator_scope.eq.${scope},indicator_scope.eq.both`);
+      }
+
+      // Filter by tier if specified
+      if (tier) {
+        const allowedTiers: ('SMALL' | 'MEDIUM' | 'COMPLETE')[] = tier === 'SMALL' 
+          ? ['SMALL'] 
+          : tier === 'MEDIUM' 
+            ? ['SMALL', 'MEDIUM'] 
+            : ['SMALL', 'MEDIUM', 'COMPLETE'];
+        query = query.in('minimum_tier', allowedTiers);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data as Indicator[];
