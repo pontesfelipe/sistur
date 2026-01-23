@@ -93,6 +93,7 @@ const Indicadores = () => {
   const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
   const [editingWeightId, setEditingWeightId] = useState<string | null>(null);
   const [editingWeightValue, setEditingWeightValue] = useState<string>('');
+  const [editingScopeId, setEditingScopeId] = useState<string | null>(null);
   
   const { indicators, isLoading, deleteIndicator, updateIndicator } = useIndicators();
   const isMobile = useIsMobile();
@@ -178,6 +179,20 @@ const Indicadores = () => {
       handleSaveWeight(indicatorId);
     } else if (e.key === 'Escape') {
       handleCancelEditWeight();
+    }
+  };
+
+  // Scope editing handlers
+  const handleSaveScope = async (indicatorId: string, newScope: IndicatorScope) => {
+    try {
+      await updateIndicator.mutateAsync({
+        id: indicatorId,
+        indicator_scope: newScope,
+      });
+      toast.success('Escopo atualizado com sucesso');
+      setEditingScopeId(null);
+    } catch (error) {
+      toast.error('Erro ao atualizar escopo');
     }
   };
 
@@ -301,7 +316,7 @@ const Indicadores = () => {
       <div className="mb-4 p-3 bg-muted/50 rounded-lg border flex items-center gap-3">
         <Info className="h-4 w-4 text-muted-foreground shrink-0" />
         <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">Edição de pesos:</span> Clique no peso de qualquer indicador para editá-lo diretamente. 
+          <span className="font-medium text-foreground">Edição inline:</span> Clique no peso ou no escopo de qualquer indicador para editá-lo diretamente. 
           A soma dos pesos por pilar deve totalizar 100% para um cálculo correto.
         </p>
       </div>
@@ -438,15 +453,56 @@ const Indicadores = () => {
 
                   {/* Badges */}
                   <div className="flex flex-wrap gap-2">
-                    <Badge 
-                      variant="outline" 
-                      className={cn("gap-1 border", scopeInfo.bgColor)}
-                    >
-                      {indicatorScope === 'territorial' && <Landmark className={cn("h-3 w-3", scopeInfo.color)} />}
-                      {indicatorScope === 'enterprise' && <Hotel className={cn("h-3 w-3", scopeInfo.color)} />}
-                      {indicatorScope === 'both' && <Globe className={cn("h-3 w-3", scopeInfo.color)} />}
-                      <span className={scopeInfo.color}>{scopeInfo.label}</span>
-                    </Badge>
+                    {/* Editable Scope Badge on Mobile */}
+                    {editingScopeId === indicator.id ? (
+                      <Select
+                        defaultValue={indicatorScope}
+                        onValueChange={(value) => handleSaveScope(indicator.id, value as IndicatorScope)}
+                        onOpenChange={(open) => {
+                          if (!open) setEditingScopeId(null);
+                        }}
+                        open={true}
+                      >
+                        <SelectTrigger className="h-7 w-32 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="territorial">
+                            <div className="flex items-center gap-2">
+                              <Landmark className="h-3 w-3 text-blue-600" />
+                              <span>Territorial</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="enterprise">
+                            <div className="flex items-center gap-2">
+                              <Hotel className="h-3 w-3 text-amber-600" />
+                              <span>Enterprise</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="both">
+                            <div className="flex items-center gap-2">
+                              <Globe className="h-3 w-3 text-purple-600" />
+                              <span>Ambos</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <button
+                        onClick={() => setEditingScopeId(indicator.id)}
+                        className="rounded transition-colors"
+                      >
+                        <Badge 
+                          variant="outline" 
+                          className={cn("gap-1 border", scopeInfo.bgColor)}
+                        >
+                          {indicatorScope === 'territorial' && <Landmark className={cn("h-3 w-3", scopeInfo.color)} />}
+                          {indicatorScope === 'enterprise' && <Hotel className={cn("h-3 w-3", scopeInfo.color)} />}
+                          {indicatorScope === 'both' && <Globe className={cn("h-3 w-3", scopeInfo.color)} />}
+                          <span className={scopeInfo.color}>{scopeInfo.label}</span>
+                        </Badge>
+                      </button>
+                    )}
                     {isIGMA && (
                       <Badge variant="outline" className="border-primary/50 text-primary">
                         <Database className="h-3 w-3 mr-1" />
@@ -666,15 +722,55 @@ const Indicadores = () => {
                       </Dialog>
                     </TableCell>
                     <TableCell>
-                      <Badge 
-                        variant="outline" 
-                        className={cn("gap-1 border", scopeInfo.bgColor)}
-                      >
-                        {indicatorScope === 'territorial' && <Landmark className={cn("h-3 w-3", scopeInfo.color)} />}
-                        {indicatorScope === 'enterprise' && <Hotel className={cn("h-3 w-3", scopeInfo.color)} />}
-                        {indicatorScope === 'both' && <Globe className={cn("h-3 w-3", scopeInfo.color)} />}
-                        <span className={scopeInfo.color}>{scopeInfo.label}</span>
-                      </Badge>
+                      {editingScopeId === indicator.id ? (
+                        <Select
+                          defaultValue={indicatorScope}
+                          onValueChange={(value) => handleSaveScope(indicator.id, value as IndicatorScope)}
+                          onOpenChange={(open) => {
+                            if (!open) setEditingScopeId(null);
+                          }}
+                          open={true}
+                        >
+                          <SelectTrigger className="h-8 w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="territorial">
+                              <div className="flex items-center gap-2">
+                                <Landmark className="h-3 w-3 text-blue-600" />
+                                <span>Territorial</span>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="enterprise">
+                              <div className="flex items-center gap-2">
+                                <Hotel className="h-3 w-3 text-amber-600" />
+                                <span>Enterprise</span>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="both">
+                              <div className="flex items-center gap-2">
+                                <Globe className="h-3 w-3 text-purple-600" />
+                                <span>Ambos</span>
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <button
+                          onClick={() => setEditingScopeId(indicator.id)}
+                          className="hover:bg-muted px-1 py-0.5 rounded transition-colors cursor-pointer"
+                        >
+                          <Badge 
+                            variant="outline" 
+                            className={cn("gap-1 border", scopeInfo.bgColor)}
+                          >
+                            {indicatorScope === 'territorial' && <Landmark className={cn("h-3 w-3", scopeInfo.color)} />}
+                            {indicatorScope === 'enterprise' && <Hotel className={cn("h-3 w-3", scopeInfo.color)} />}
+                            {indicatorScope === 'both' && <Globe className={cn("h-3 w-3", scopeInfo.color)} />}
+                            <span className={scopeInfo.color}>{scopeInfo.label}</span>
+                          </Badge>
+                        </button>
+                      )}
                     </TableCell>
                     <TableCell>
                       {isIGMA ? (
