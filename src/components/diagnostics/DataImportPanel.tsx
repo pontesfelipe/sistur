@@ -49,12 +49,15 @@ import {
   HelpCircle,
   Calculator,
   Loader2,
+  Hotel,
+  Landmark,
 } from 'lucide-react';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useAssessments } from '@/hooks/useAssessments';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
 
 interface DataImportPanelProps {
   preSelectedAssessmentId?: string;
@@ -89,9 +92,10 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const { values, isLoading: loadingValues, upsertValue, bulkUpsertValues } = useIndicatorValues(selectedAssessment);
   const { calculate, loading: calculating } = useCalculateAssessment();
 
-  // Get the selected assessment's tier
+  // Get the selected assessment's tier and type
   const selectedAssessmentData = assessments?.find(a => a.id === selectedAssessment);
   const assessmentTier = selectedAssessmentData?.tier || 'COMPLETE';
+  const isEnterpriseAssessment = selectedAssessmentData?.diagnostic_type === 'enterprise';
 
   // Filter indicators by tier
   const getTierFilter = (tier: string): string[] => {
@@ -277,32 +281,67 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
               </div>
             </div>
             <Select value={selectedAssessment} onValueChange={setSelectedAssessment}>
-              <SelectTrigger className="w-64">
+              <SelectTrigger className="w-72">
                 <SelectValue placeholder="Selecionar diagnóstico" />
               </SelectTrigger>
               <SelectContent>
-                {assessments?.filter(a => a.status !== 'CALCULATED').map((a) => (
-                  <SelectItem key={a.id} value={a.id}>
-                    {a.title} - {(a.destinations as any)?.name}
-                  </SelectItem>
-                ))}
+                {assessments?.filter(a => a.status !== 'CALCULATED').map((a) => {
+                  const isEnterprise = a.diagnostic_type === 'enterprise';
+                  return (
+                    <SelectItem key={a.id} value={a.id}>
+                      <div className="flex items-center gap-2">
+                        {isEnterprise ? (
+                          <Hotel className="h-4 w-4 text-amber-600" />
+                        ) : (
+                          <Landmark className="h-4 w-4 text-blue-600" />
+                        )}
+                        <span>{a.title} - {(a.destinations as any)?.name}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
           {selectedAssessmentData && (
             <div className="mt-3 pt-3 border-t flex items-center gap-2 text-sm text-muted-foreground">
+              {isEnterpriseAssessment ? (
+                <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+                  <Hotel className="h-3 w-3 mr-1" />
+                  Enterprise
+                </Badge>
+              ) : (
+                <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                  <Landmark className="h-3 w-3 mr-1" />
+                  Territorial
+                </Badge>
+              )}
               <Badge variant="outline">
                 Nível: {assessmentTier === 'SMALL' ? 'Essencial' : assessmentTier === 'MEDIUM' ? 'Estratégico' : 'Integral'}
               </Badge>
-              <span>
-                {indicators.length} indicadores para este nível
-              </span>
+              {!isEnterpriseAssessment && (
+                <span>
+                  {indicators.length} indicadores para este nível
+                </span>
+              )}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {selectedAssessment && (
+      {/* Render Enterprise Panel for Enterprise diagnostics */}
+      {selectedAssessment && isEnterpriseAssessment && (
+        <EnterpriseDataEntryPanel 
+          assessmentId={selectedAssessment} 
+          tier={assessmentTier as 'SMALL' | 'MEDIUM' | 'COMPLETE'}
+          onComplete={() => {
+            navigate(`/diagnosticos/${selectedAssessment}`);
+          }}
+        />
+      )}
+
+      {/* Render Territorial Panel for non-Enterprise diagnostics */}
+      {selectedAssessment && !isEnterpriseAssessment && (
         <>
           {/* Progress */}
           <Card>
