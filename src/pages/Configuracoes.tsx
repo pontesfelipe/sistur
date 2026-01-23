@@ -17,6 +17,7 @@ import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
 import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPanel';
 import { ActAsUserPanel } from '@/components/settings/ActAsUserPanel';
 import { FeedbackManagementPanel } from '@/components/settings/FeedbackManagementPanel';
+import { ForumPrivacySettings } from '@/components/settings/ForumPrivacySettings';
 import { useProfile } from '@/hooks/useProfile';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import { 
@@ -214,6 +215,7 @@ export default function Configuracoes() {
             </Card>
 
             <DemoModeToggle />
+            <ForumPrivacySettings />
             {isAdmin && <ActAsUserPanel />}
           </TabsContent>
 
