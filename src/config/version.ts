@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 10,
+  patch: 11,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.11",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Dashboard principal com toggle Territorial/Enterprise unificado",
+      "KPIs Enterprise no Dashboard: RevPAR, NPS, Taxa Ocupação, Certificações ESG",
+      "Novo hook useEnterpriseDashboardData para métricas hoteleiras",
+      "Componente EnterpriseKPICards com 8 métricas visuais",
+      "Filtro de destinos adaptativo por tipo de diagnóstico"
+    ]
+  },
   {
     version: "1.7.10",
     date: "2026-01-23",
