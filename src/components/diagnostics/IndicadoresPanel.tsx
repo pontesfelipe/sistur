@@ -71,6 +71,8 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
+import { EnterpriseIndicatorsPanel } from '@/components/diagnostics/EnterpriseIndicatorsPanel';
+
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 type IndicatorScope = 'territorial' | 'enterprise' | 'both';
@@ -99,7 +101,7 @@ const scopeLabels: Record<IndicatorScope, { label: string; color: string; bgColo
   both: { label: 'Ambos', color: 'text-purple-600', bgColor: 'bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800' },
 };
 
-export function IndicadoresPanel() {
+function TerritorialIndicadoresPanel() {
   const [searchQuery, setSearchQuery] = useState('');
   const [pillarFilter, setPillarFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
@@ -1244,6 +1246,33 @@ export function IndicadoresPanel() {
         onSubmit={handleCreateIndicator}
         isLoading={isCreating}
       />
+    </Tabs>
+  );
+}
+
+export function IndicadoresPanel() {
+  return (
+    <Tabs defaultValue="territorial" className="space-y-6">
+      <div className="flex items-center justify-between">
+        <TabsList>
+          <TabsTrigger value="territorial" className="gap-2">
+            <Landmark className="h-4 w-4" />
+            Territorial
+          </TabsTrigger>
+          <TabsTrigger value="enterprise" className="gap-2">
+            <Hotel className="h-4 w-4" />
+            Enterprise
+          </TabsTrigger>
+        </TabsList>
+      </div>
+
+      <TabsContent value="territorial" className="mt-0">
+        <TerritorialIndicadoresPanel />
+      </TabsContent>
+
+      <TabsContent value="enterprise" className="mt-0">
+        <EnterpriseIndicatorsPanel />
+      </TabsContent>
     </Tabs>
   );
 }
