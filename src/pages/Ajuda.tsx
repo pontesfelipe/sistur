@@ -281,10 +281,10 @@ export default function Ajuda() {
                         <strong className="text-foreground">Configure a Organização</strong> - Em Configurações, classifique a organização como "Privada" e ative o acesso Enterprise.
                       </li>
                       <li>
-                        <strong className="text-foreground">Acesse os Indicadores Enterprise</strong> - Os 26 indicadores de hospitalidade ficam disponíveis: RevPAR, NPS, Taxa de Ocupação, etc.
+                        <strong className="text-foreground">Acesse os Indicadores Enterprise</strong> - 22 indicadores de hospitalidade ficam disponíveis: RevPAR, NPS, Taxa de Ocupação, etc. 6 deles são compartilhados com diagnósticos territoriais.
                       </li>
                       <li>
-                        <strong className="text-foreground">Crie um Diagnóstico Hoteleiro</strong> - Use a Nova Rodada selecionando indicadores específicos de hospitalidade.
+                        <strong className="text-foreground">Crie um Diagnóstico Hoteleiro</strong> - Use a Nova Rodada selecionando indicadores específicos de hospitalidade. O sistema possui 94 mapeamentos EDU para prescrições automáticas.
                       </li>
                       <li>
                         <strong className="text-foreground">Preencha KPIs Operacionais</strong> - Informe dados de performance financeira, experiência do hóspede e sustentabilidade.

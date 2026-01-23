@@ -147,12 +147,12 @@ const faqItems: FAQItem[] = [
   // Enterprise-specific questions
   {
     question: 'O que é o SISTUR Enterprise?',
-    answer: 'O SISTUR Enterprise é o módulo especializado para organizações do setor privado (hotéis, resorts, redes hoteleiras). Inclui 26 indicadores exclusivos de hospitalidade adaptados da metodologia Mario Beni, como RevPAR, NPS, Taxa de Ocupação, GOP Margin e outros KPIs operacionais.',
+    answer: 'O SISTUR Enterprise é o módulo especializado para organizações do setor privado (hotéis, resorts, redes hoteleiras). Utiliza 22 indicadores de hospitalidade adaptados da metodologia Mario Beni, sendo 6 compartilhados com diagnósticos territoriais (NPS, Reviews Online, Horas de Treinamento, % Funcionários Locais, % Compras Locais e Certificações Ambientais).',
     category: 'enterprise',
   },
   {
     question: 'Quais indicadores estão disponíveis no Enterprise?',
-    answer: 'O Enterprise inclui indicadores em 7 categorias: Performance Financeira (RevPAR, ADR, GOP Margin), Experiência do Hóspede (NPS, CSAT), Operações (Taxa de Ocupação, Tempo de Check-in), Sustentabilidade (Consumo de Água/Energia), RH (Turnover, Produtividade), Marketing (Taxa de Conversão), e Compliance (Índice de Conformidade).',
+    answer: 'O Enterprise inclui indicadores em 7 categorias: Performance Financeira (RevPAR, ADR, GOP Margin), Experiência do Hóspede (NPS, Reviews Online), Operações (Taxa de Ocupação), Sustentabilidade (Consumo de Água/Energia, Certificações), RH (Turnover, Horas de Treinamento), e Impacto Local (% Funcionários Locais, % Compras Locais). 6 destes indicadores também são usados em diagnósticos territoriais.',
     category: 'enterprise',
   },
   {
@@ -162,12 +162,17 @@ const faqItems: FAQItem[] = [
   },
   {
     question: 'Os indicadores Enterprise seguem a mesma metodologia Beni?',
-    answer: 'Sim! Os 26 indicadores Enterprise foram mapeados para os três pilares (RA, OE, AO) da teoria sistêmica de Mario Beni. Por exemplo, indicadores de sustentabilidade pertencem ao RA, infraestrutura ao OE, e operações ao AO. As mesmas 6 regras IGMA são aplicadas.',
+    answer: 'Sim! Os 22 indicadores Enterprise foram mapeados para os três pilares (RA, OE, AO) da teoria sistêmica de Mario Beni. Indicadores de sustentabilidade pertencem ao RA, infraestrutura ao OE, e operações ao AO. As mesmas 6 regras IGMA são aplicadas, e 6 indicadores (NPS, Reviews, Treinamento, Emprego Local, Compras Locais, Certificações) são compartilhados entre módulos.',
+    category: 'enterprise',
+  },
+  {
+    question: 'O que são indicadores de escopo compartilhado?',
+    answer: 'São 6 indicadores que aparecem tanto em diagnósticos territoriais quanto empresariais: NPS, Nota de Reviews Online, Horas de Treinamento por Funcionário, % Funcionários Locais, % Compras Locais e Nº de Certificações Ambientais. Eles medem aspectos relevantes para ambos os contextos (público e privado).',
     category: 'enterprise',
   },
   {
     question: 'Posso usar SISTUR ERP e Enterprise na mesma organização?',
-    answer: 'Uma organização privada com Enterprise habilitado pode usar tanto os indicadores territoriais padrão (quando aplicável) quanto os indicadores específicos de hospitalidade. Organizações públicas não têm acesso ao módulo Enterprise.',
+    answer: 'Uma organização privada com Enterprise habilitado pode usar tanto os indicadores territoriais padrão (quando aplicável) quanto os indicadores específicos de hospitalidade. Os 6 indicadores compartilhados facilitam a integração entre diagnósticos territoriais e empresariais. Organizações públicas não têm acesso ao módulo Enterprise.',
     category: 'enterprise',
   },
 ];

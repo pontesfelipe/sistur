@@ -696,7 +696,9 @@ export default function Metodologia() {
               <p>
                 O <strong>SISTUR Enterprise</strong> estende a teoria sistêmica de Mario Beni para 
                 organizações do setor privado, especialmente hotéis, resorts e redes hoteleiras. 
-                Os <strong>26 indicadores exclusivos</strong> foram mapeados para os três pilares (RA, OE, AO), 
+                O módulo utiliza <strong>22 indicadores especializados</strong> de hospitalidade, sendo que 
+                <strong>6 indicadores são compartilhados</strong> entre os diagnósticos territoriais e empresariais 
+                (NPS, Reviews Online, Horas de Treinamento, % Funcionários Locais, % Compras Locais e Certificações Ambientais), 
                 mantendo a mesma lógica sistêmica e as 6 regras do Motor IGMA.
               </p>
             </div>
@@ -779,7 +781,7 @@ export default function Metodologia() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                    26 indicadores de hospitalidade exclusivos
+                    22 indicadores de hospitalidade (6 compartilhados)
                   </li>
                   <li className="flex items-start gap-2">
                     <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
@@ -792,13 +794,13 @@ export default function Metodologia() {
             <Alert className="border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20">
               <Hotel className="h-4 w-4 text-amber-600" />
               <AlertTitle className="text-amber-700 dark:text-amber-400">
-                Mesma Metodologia, Contexto Diferente
+                Catálogo Unificado com Indicadores Compartilhados
               </AlertTitle>
               <AlertDescription className="text-amber-600 dark:text-amber-300">
-                Os indicadores Enterprise seguem a mesma lógica sistêmica de Mario Beni. Por exemplo, 
-                indicadores de sustentabilidade (consumo de água/energia) pertencem ao pilar RA, 
-                operações ao OE, e experiência do hóspede ao AO. As 6 regras IGMA são aplicadas 
-                normalmente, incluindo bloqueios quando RA está crítico.
+                O SISTUR utiliza um catálogo unificado de indicadores. 6 indicadores possuem escopo "ambos" 
+                e são utilizados tanto em diagnósticos territoriais quanto empresariais: <strong>NPS</strong>, <strong>Nota de Reviews Online</strong>, 
+                <strong>Horas de Treinamento</strong>, <strong>% Funcionários Locais</strong>, <strong>% Compras Locais</strong> e <strong>Certificações Ambientais</strong>. 
+                As 6 regras IGMA são aplicadas normalmente em ambos os contextos, incluindo bloqueios quando RA está crítico.
               </AlertDescription>
             </Alert>
           </CardContent>
