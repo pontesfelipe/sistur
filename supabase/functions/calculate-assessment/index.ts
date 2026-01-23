@@ -469,25 +469,32 @@ serve(async (req) => {
           const indicatorTier = indicator.minimum_tier || 'COMPLETE';
           return allowedTiers.includes(indicatorTier);
         })
-        .map((iv: any) => ({
-          id: iv.id,
-          indicator_id: iv.indicator_id,
-          value_raw: iv.value,
-          indicator: {
-            id: iv.indicator?.id,
-            code: iv.indicator?.code,
-            name: iv.indicator?.name,
-            pillar: iv.indicator?.pillar,
-            theme: iv.indicator?.category_id, // Use category as theme for grouping
-            direction: "HIGH_IS_BETTER" as const, // Enterprise default
-            normalization: "MIN_MAX" as const,
-            min_ref: iv.indicator?.benchmark_min,
-            max_ref: iv.indicator?.benchmark_max,
-            weight: iv.indicator?.weight || 1,
-            intersectoral_dependency: false,
-            minimum_tier: iv.indicator?.minimum_tier,
-          },
-        }));
+        .map((iv: any) => {
+          // Get category name from map for better issue titles
+          const categoryId = iv.indicator?.category_id;
+          const categoryInfo = categoryId ? enterpriseCategoryMap.get(categoryId) : null;
+          const themeName = categoryInfo?.name || categoryInfo?.code || categoryId || 'Enterprise';
+          
+          return {
+            id: iv.id,
+            indicator_id: iv.indicator_id,
+            value_raw: iv.value,
+            indicator: {
+              id: iv.indicator?.id,
+              code: iv.indicator?.code,
+              name: iv.indicator?.name,
+              pillar: iv.indicator?.pillar,
+              theme: themeName, // Use category NAME for readable issues
+              direction: "HIGH_IS_BETTER" as const, // Enterprise default
+              normalization: "MIN_MAX" as const,
+              min_ref: iv.indicator?.benchmark_min,
+              max_ref: iv.indicator?.benchmark_max,
+              weight: iv.indicator?.weight || 1,
+              intersectoral_dependency: false,
+              minimum_tier: iv.indicator?.minimum_tier,
+            },
+          };
+        });
       
       console.log(`Found ${filteredIndicatorValues.length} enterprise indicator values`);
     } else {
