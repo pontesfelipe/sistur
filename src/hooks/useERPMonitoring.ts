@@ -259,24 +259,60 @@ export function useProjectStats() {
     queryFn: async () => {
       if (!effectiveOrgId) return [];
 
-      const { data: projects } = await supabase
+      // IMPORTANT: avoid embedded selects here; they can silently fail if related tables
+      // have different RLS/permissions, which makes the UI show "Nenhum projeto".
+      const { data: projects, error: projectsError } = await supabase
         .from('projects')
-        .select(`
-          *,
-          destinations(name),
-          project_tasks(id, status, due_date)
-        `)
+        .select('id, name, status, methodology, destination_id, planned_end_date, created_at')
         .eq('org_id', effectiveOrgId)
         .order('created_at', { ascending: false });
 
-      if (!projects) return [];
+      if (projectsError) throw projectsError;
+      if (!projects || projects.length === 0) return [];
+
+      const projectIds = projects.map((p) => p.id);
+      const destinationIds = Array.from(
+        new Set(projects.map((p: any) => p.destination_id).filter(Boolean))
+      );
+
+      const [{ data: tasks, error: tasksError }, { data: destinationsData, error: destinationsError }] =
+        await Promise.all([
+          supabase
+            .from('project_tasks')
+            .select('id, project_id, status, due_date')
+            .in('project_id', projectIds),
+          destinationIds.length > 0
+            ? supabase
+                .from('destinations')
+                .select('id, name')
+                .in('id', destinationIds)
+            : Promise.resolve({ data: [], error: null } as any),
+        ]);
+
+      // Don't block rendering projects if related data fails (common with RLS differences).
+      const safeTasks = tasksError ? [] : (tasks || []);
+      const safeDestinations = destinationsError ? [] : (destinationsData || []);
+      if (tasksError) console.warn('useProjectStats: could not load project_tasks', tasksError);
+      if (destinationsError) console.warn('useProjectStats: could not load destinations', destinationsError);
+
+      const tasksByProject = new Map<string, any[]>();
+      safeTasks.forEach((t: any) => {
+        const list = tasksByProject.get(t.project_id) || [];
+        list.push(t);
+        tasksByProject.set(t.project_id, list);
+      });
+
+      const destinationNameById = new Map<string, string>();
+      safeDestinations.forEach((d: any) => {
+        destinationNameById.set(d.id, d.name);
+      });
 
       const now = new Date();
-      
-      return projects.map(project => {
-        const tasks = (project.project_tasks as any[]) || [];
-        const completedTasks = tasks.filter(t => t.status === 'done');
-        const overdueTasks = tasks.filter(t => {
+
+      return projects.map((project: any) => {
+        const tasksForProject = tasksByProject.get(project.id) || [];
+        const completedTasks = tasksForProject.filter((t) => t.status === 'done');
+        const overdueTasks = tasksForProject.filter((t) => {
           if (t.status === 'done') return false;
           if (!t.due_date) return false;
           return new Date(t.due_date) < now;
@@ -287,11 +323,14 @@ export function useProjectStats() {
           name: project.name,
           status: project.status,
           methodology: project.methodology,
-          destinationName: (project.destinations as any)?.name || 'N/A',
-          completionRate: tasks.length > 0 
-            ? Math.round((completedTasks.length / tasks.length) * 100) 
-            : 0,
-          totalTasks: tasks.length,
+          destinationName: project.destination_id
+            ? destinationNameById.get(project.destination_id) || 'N/A'
+            : 'N/A',
+          completionRate:
+            tasksForProject.length > 0
+              ? Math.round((completedTasks.length / tasksForProject.length) * 100)
+              : 0,
+          totalTasks: tasksForProject.length,
           completedTasks: completedTasks.length,
           overdueTasks: overdueTasks.length,
           planned_end_date: project.planned_end_date,
