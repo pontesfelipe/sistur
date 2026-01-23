@@ -369,12 +369,6 @@ export function IndicadoresPanel() {
         </Button>
       </div>
 
-      <IndicatorFormDialog
-        open={isFormDialogOpen}
-        onOpenChange={setIsFormDialogOpen}
-        onSubmit={handleCreateIndicator}
-        isLoading={isCreating}
-      />
 
       <div className="p-4 rounded-lg border bg-gradient-to-br from-primary/5 to-transparent">
         <div className="flex items-start gap-3 mb-4">
@@ -1219,6 +1213,13 @@ export function IndicadoresPanel() {
       <TabsContent value="report" className="mt-0">
         <IndicatorDistributionReport />
       </TabsContent>
+
+      <IndicatorFormDialog
+        open={isFormDialogOpen}
+        onOpenChange={setIsFormDialogOpen}
+        onSubmit={handleCreateIndicator}
+        isLoading={isCreating}
+      />
     </Tabs>
   );
 }
