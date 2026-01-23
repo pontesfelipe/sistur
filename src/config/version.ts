@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,15 +23,14 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.7.3",
+    version: "1.7.4",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
-      "Fluxo Nova Rodada com seletor de tipo (Territorial vs Enterprise)",
-      "Hook useEnterpriseIndicators para buscar indicadores hoteleiros",
-      "Componente EnterpriseDataEntryPanel para preenchimento de KPIs",
-      "Tabela enterprise_indicator_values para armazenar dados de diagnóstico Enterprise",
-      "Coluna diagnostic_type em assessments (territorial/enterprise)"
+      "Seletor de tipo de diagnóstico sempre visível (Territorial/Enterprise)",
+      "Organizações podem executar ambos os tipos se tiverem Acesso Enterprise",
+      "UI atualizada para refletir que org_type (PUBLIC/PRIVATE) é classificação, não restrição",
+      "Enterprise bloqueado apenas se org não tiver has_enterprise_access"
     ]
   },
   {

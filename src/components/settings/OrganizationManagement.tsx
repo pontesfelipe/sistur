@@ -270,21 +270,23 @@ export function OrganizationManagement() {
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground">
-                    {formData.org_type === 'PUBLIC' 
-                      ? 'Organizações públicas usam indicadores territoriais (IGMA, IBGE)' 
-                      : 'Organizações privadas podem usar indicadores enterprise (RevPAR, NPS)'}
+                    Classificação principal da organização. Com "Acesso Enterprise" habilitado, 
+                    qualquer tipo pode executar diagnósticos territoriais e enterprise.
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
                   <div className="flex items-center gap-3">
-                    <Sparkles className="h-5 w-5 text-primary" />
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+                      <Sparkles className="h-5 w-5 text-white" />
+                    </div>
                     <div>
                       <Label htmlFor="enterprise-access" className="font-medium">
                         Acesso Enterprise
                       </Label>
                       <p className="text-xs text-muted-foreground">
-                        Habilita indicadores hoteleiros (RevPAR, NPS, Ocupação)
+                        Habilita diagnósticos com indicadores hoteleiros (RevPAR, NPS, Ocupação).
+                        Funciona tanto para organizações públicas quanto privadas.
                       </p>
                     </div>
                   </div>
