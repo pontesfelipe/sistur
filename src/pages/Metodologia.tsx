@@ -81,32 +81,33 @@ const diagnosticTiers = [
     color: 'bg-teal-500',
     borderColor: 'border-teal-500',
     bgColor: 'bg-teal-50 dark:bg-teal-950/30',
-    indicatorCount: '~9',
+    indicatorCount: '9',
     timeToComplete: '30-45 min',
-    description: 'Diagnóstico rápido focado nos indicadores mais críticos para uma visão geral do destino.',
+    description: 'Diagnóstico rápido focado nos indicadores mais críticos para uma visão geral do destino. Ideal para primeiras avaliações e municípios com recursos limitados.',
     targetAudience: 'Gestores municipais com pouco tempo ou destinos iniciando no SISTUR',
     useCases: [
       'Primeira avaliação de um destino',
       'Avaliações rápidas trimestrais',
       'Municípios com equipe técnica reduzida',
-      'Comparação inicial entre destinos'
+      'Triagem inicial para priorização'
     ],
     outputs: [
       'Score geral por pilar (RA, OE, AO)',
       'Identificação de pilares críticos',
       'Alertas IGMA básicos',
-      'Recomendações prioritárias'
+      '3 recomendações prioritárias por pilar'
     ],
     benefits: [
-      'Implementação rápida',
-      'Baixo custo de coleta',
-      'Visão macro do destino',
-      'Ideal para começar'
+      'Implementação em 1 dia',
+      'Baixo custo de coleta de dados',
+      'Visão macro estratégica do destino',
+      'Perfeito para começar a jornada'
     ],
     limitations: [
-      'Análise menos granular',
+      'Análise menos granular por tema',
       'Menos prescrições específicas',
-      'Sem detalhamento de subindicadores'
+      'Sem análise de tendências históricas',
+      'Não elegível para certificações'
     ]
   },
   {
@@ -116,32 +117,33 @@ const diagnosticTiers = [
     color: 'bg-violet-500',
     borderColor: 'border-violet-500',
     bgColor: 'bg-violet-50 dark:bg-violet-950/30',
-    indicatorCount: '~19',
+    indicatorCount: '19',
     timeToComplete: '2-3 horas',
-    description: 'Diagnóstico intermediário com indicadores estratégicos para planejamento de médio prazo.',
-    targetAudience: 'Secretarias de Turismo estruturadas, destinos em desenvolvimento',
+    description: 'Diagnóstico intermediário com indicadores estratégicos para planejamento de médio prazo. Equilibra profundidade analítica com praticidade operacional.',
+    targetAudience: 'Secretarias de Turismo estruturadas, destinos em fase de desenvolvimento',
     useCases: [
-      'Planejamento anual do turismo',
-      'Elaboração de planos diretores',
-      'Captação de recursos e editais',
+      'Planejamento anual do turismo municipal',
+      'Elaboração de planos diretores de turismo',
+      'Captação de recursos em editais públicos',
       'Monitoramento de políticas públicas'
     ],
     outputs: [
       'Tudo do Essencial +',
       'Análise de tendências por indicador',
-      'Mapeamento de gargalos específicos',
+      'Mapeamento detalhado de gargalos',
       'Prescrições de capacitação direcionadas',
-      'Relatório para captação de recursos'
+      'Relatório técnico para captação de recursos'
     ],
     benefits: [
-      'Equilíbrio custo-benefício',
-      'Profundidade adequada para gestão',
+      'Melhor relação custo-benefício',
+      'Profundidade adequada para gestão ativa',
       'Suporte a decisões estratégicas',
       'Compatível com prazos de editais'
     ],
     limitations: [
-      'Requer mais tempo de coleta',
-      'Algumas áreas sem cobertura total'
+      'Requer 2-3 horas de coleta',
+      'Algumas áreas temáticas simplificadas',
+      'Certificação apenas parcial'
     ]
   },
   {
@@ -151,48 +153,52 @@ const diagnosticTiers = [
     color: 'bg-rose-500',
     borderColor: 'border-rose-500',
     bgColor: 'bg-rose-50 dark:bg-rose-950/30',
-    indicatorCount: '100+',
+    indicatorCount: '96',
     timeToComplete: '1-2 semanas',
-    description: 'Diagnóstico completo com todos os indicadores para análise profunda e projetos de grande porte.',
-    targetAudience: 'Destinos maduros, projetos de financiamento, estudos acadêmicos',
+    description: 'Diagnóstico completo com todos os indicadores IGMA e complementares para análise profunda. Recomendado para projetos de grande porte e certificações.',
+    targetAudience: 'Destinos maduros, projetos de financiamento, estudos acadêmicos, certificações',
     useCases: [
-      'Projetos de grande investimento',
-      'Masterplans de turismo',
+      'Projetos de grande investimento turístico',
+      'Masterplans e planos regionais de turismo',
       'Estudos de impacto territorial',
-      'Certificações de destino',
-      'Pesquisas acadêmicas'
+      'Certificações de destino sustentável',
+      'Pesquisas acadêmicas e benchmarking'
     ],
     outputs: [
       'Tudo do Estratégico +',
       'Análise intersetorial completa',
-      'Cruzamento de todos os indicadores',
-      'Simulações de cenários',
-      'Relatório técnico detalhado',
-      'Trilhas de capacitação personalizadas'
+      'Cruzamento de todos os 96 indicadores',
+      'Simulações de cenários futuros',
+      'Relatório técnico detalhado (50+ páginas)',
+      'Trilhas de capacitação 100% personalizadas'
     ],
     benefits: [
       'Máxima precisão diagnóstica',
-      'Visão 360° do destino',
+      'Visão 360° do ecossistema turístico',
       'Suporte a projetos complexos',
-      'Base para certificações'
+      'Elegível para todas as certificações',
+      'Base científica robusta'
     ],
     limitations: [
-      'Alto investimento de tempo',
+      'Investimento de 1-2 semanas',
       'Requer equipe multidisciplinar',
-      'Coleta de dados pode ser complexa'
+      'Coleta de dados pode exigir múltiplas fontes',
+      'Maior custo operacional'
     ]
   }
 ];
 
 const tierComparison = [
-  { feature: 'Indicadores analisados', essencial: '~9', estrategico: '~19', integral: '100+' },
+  { feature: 'Indicadores analisados', essencial: '9', estrategico: '19', integral: '96' },
   { feature: 'Tempo de preenchimento', essencial: '30-45 min', estrategico: '2-3 horas', integral: '1-2 semanas' },
-  { feature: 'Alertas IGMA', essencial: 'Básicos', estrategico: 'Detalhados', integral: 'Completos' },
-  { feature: 'Prescrições de capacitação', essencial: 'Prioritárias', estrategico: 'Direcionadas', integral: 'Personalizadas' },
-  { feature: 'Análise de tendências', essencial: '—', estrategico: '✓', integral: '✓' },
+  { feature: 'Cobertura temática', essencial: '3 temas/pilar', estrategico: '6 temas/pilar', integral: 'Todos os temas' },
+  { feature: 'Alertas IGMA', essencial: 'Básicos', estrategico: 'Detalhados', integral: 'Completos + Intersetoriais' },
+  { feature: 'Prescrições de capacitação', essencial: '3 prioritárias', estrategico: 'Direcionadas', integral: '100% personalizadas' },
+  { feature: 'Análise de tendências', essencial: '—', estrategico: '✓', integral: '✓ + Projeções' },
   { feature: 'Simulação de cenários', essencial: '—', estrategico: '—', integral: '✓' },
-  { feature: 'Relatório para captação', essencial: 'Simplificado', estrategico: 'Completo', integral: 'Técnico' },
-  { feature: 'Suporte a certificações', essencial: '—', estrategico: 'Parcial', integral: '✓' },
+  { feature: 'Relatório para captação', essencial: 'Simplificado', estrategico: 'Completo', integral: 'Técnico (50+ pág)' },
+  { feature: 'Comparativo entre destinos', essencial: 'Básico', estrategico: '✓', integral: '✓ + Ranking' },
+  { feature: 'Suporte a certificações', essencial: '—', estrategico: 'Parcial', integral: '✓ Completo' },
 ];
 
 const rules = [
