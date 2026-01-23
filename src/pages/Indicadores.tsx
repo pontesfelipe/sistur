@@ -526,17 +526,26 @@ const Indicadores = () => {
                     ) : (
                       <button
                         onClick={() => setEditingScopeId(indicator.id)}
-                        className="rounded transition-colors"
+                        className="rounded transition-colors flex gap-1"
                       >
-                        <Badge 
-                          variant="outline" 
-                          className={cn("gap-1 border", scopeInfo.bgColor)}
-                        >
-                          {indicatorScope === 'territorial' && <Landmark className={cn("h-3 w-3", scopeInfo.color)} />}
-                          {indicatorScope === 'enterprise' && <Hotel className={cn("h-3 w-3", scopeInfo.color)} />}
-                          {indicatorScope === 'both' && <Globe className={cn("h-3 w-3", scopeInfo.color)} />}
-                          <span className={scopeInfo.color}>{scopeInfo.label}</span>
-                        </Badge>
+                        {indicatorScope === 'both' ? (
+                          <>
+                            <Badge variant="outline" className={cn('gap-1 border', scopeLabels.territorial.bgColor)}>
+                              <Landmark className={cn('h-3 w-3', scopeLabels.territorial.color)} />
+                              <span className={scopeLabels.territorial.color}>{scopeLabels.territorial.label}</span>
+                            </Badge>
+                            <Badge variant="outline" className={cn('gap-1 border', scopeLabels.enterprise.bgColor)}>
+                              <Hotel className={cn('h-3 w-3', scopeLabels.enterprise.color)} />
+                              <span className={scopeLabels.enterprise.color}>{scopeLabels.enterprise.label}</span>
+                            </Badge>
+                          </>
+                        ) : (
+                          <Badge variant="outline" className={cn('gap-1 border', scopeInfo.bgColor)}>
+                            {indicatorScope === 'territorial' && <Landmark className={cn('h-3 w-3', scopeInfo.color)} />}
+                            {indicatorScope === 'enterprise' && <Hotel className={cn('h-3 w-3', scopeInfo.color)} />}
+                            <span className={scopeInfo.color}>{scopeInfo.label}</span>
+                          </Badge>
+                        )}
                       </button>
                     )}
                     {isIGMA && (
@@ -794,17 +803,26 @@ const Indicadores = () => {
                       ) : (
                         <button
                           onClick={() => setEditingScopeId(indicator.id)}
-                          className="hover:bg-muted px-1 py-0.5 rounded transition-colors cursor-pointer"
+                          className="hover:bg-muted px-1 py-0.5 rounded transition-colors cursor-pointer flex gap-1"
                         >
-                          <Badge 
-                            variant="outline" 
-                            className={cn("gap-1 border", scopeInfo.bgColor)}
-                          >
-                            {indicatorScope === 'territorial' && <Landmark className={cn("h-3 w-3", scopeInfo.color)} />}
-                            {indicatorScope === 'enterprise' && <Hotel className={cn("h-3 w-3", scopeInfo.color)} />}
-                            {indicatorScope === 'both' && <Globe className={cn("h-3 w-3", scopeInfo.color)} />}
-                            <span className={scopeInfo.color}>{scopeInfo.label}</span>
-                          </Badge>
+                          {indicatorScope === 'both' ? (
+                            <>
+                              <Badge variant="outline" className={cn('gap-1 border', scopeLabels.territorial.bgColor)}>
+                                <Landmark className={cn('h-3 w-3', scopeLabels.territorial.color)} />
+                                <span className={scopeLabels.territorial.color}>{scopeLabels.territorial.label}</span>
+                              </Badge>
+                              <Badge variant="outline" className={cn('gap-1 border', scopeLabels.enterprise.bgColor)}>
+                                <Hotel className={cn('h-3 w-3', scopeLabels.enterprise.color)} />
+                                <span className={scopeLabels.enterprise.color}>{scopeLabels.enterprise.label}</span>
+                              </Badge>
+                            </>
+                          ) : (
+                            <Badge variant="outline" className={cn('gap-1 border', scopeInfo.bgColor)}>
+                              {indicatorScope === 'territorial' && <Landmark className={cn('h-3 w-3', scopeInfo.color)} />}
+                              {indicatorScope === 'enterprise' && <Hotel className={cn('h-3 w-3', scopeInfo.color)} />}
+                              <span className={scopeInfo.color}>{scopeInfo.label}</span>
+                            </Badge>
+                          )}
                         </button>
                       )}
                     </TableCell>
