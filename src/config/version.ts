@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 6,
+  minor: 7,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.0",
+    date: "2026-01-23",
+    type: "minor" as const,
+    changes: [
+      "Novo módulo SISTUR Enterprise para setor privado (hotéis, resorts, pousadas)",
+      "Classificação de organizações: PUBLIC (governo/município) vs PRIVATE (empresas)",
+      "26 indicadores enterprise baseados na metodologia Mario Beni",
+      "15 categorias de indicadores: sustentabilidade, governança, operações",
+      "Benchmarks e metas por indicador (ex: RevPAR, NPS, Taxa de Ocupação)",
+      "Tiers adaptados para contexto enterprise (Essencial, Estratégico, Integral)"
+    ]
+  },
   {
     version: "1.6.0",
     date: "2026-01-23",
