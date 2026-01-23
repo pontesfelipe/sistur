@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 13,
+  patch: 14,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.14",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Correção de 37 mapeamentos EDU órfãos - códigos de indicadores sincronizados",
+      "Total de mapeamentos EDU válidos: 94 (anteriormente 60)",
+      "6 indicadores agora com escopo 'ambos': NPS, Reviews, Treinamento, Emprego Local, Compras Locais, Certificações",
+      "Edge function calculate-assessment corrige nomes de categoria Enterprise nas issues",
+      "Documentação atualizada com catálogo unificado e indicadores compartilhados"
+    ]
+  },
   {
     version: "1.7.13",
     date: "2026-01-23",
