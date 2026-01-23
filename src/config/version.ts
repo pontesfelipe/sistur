@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.1",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "UI de Organizações com seletor de tipo (Pública/Privada)",
+      "Toggle de Acesso Enterprise por organização",
+      "Tabela de organizações exibe tipo e badge Enterprise",
+      "Ícones diferenciados: Landmark (pública) vs Hotel (privada)"
+    ]
+  },
   {
     version: "1.7.0",
     date: "2026-01-23",
