@@ -58,15 +58,19 @@ const Index = () => {
   const [selectedDestination, setSelectedDestination] = useState<string | undefined>(undefined);
 
   // Fetch org settings for enterprise access
-  const { data: orgSettings } = useQuery({
+  const { data: orgSettings, isLoading: orgSettingsLoading, error: orgSettingsError } = useQuery({
     queryKey: ['org-dashboard-settings', effectiveOrgId],
     queryFn: async () => {
       if (!effectiveOrgId) return null;
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('orgs')
         .select('has_enterprise_access, has_territorial_access')
         .eq('id', effectiveOrgId)
         .maybeSingle();
+      if (error) {
+        console.error('[Dashboard] Error fetching org settings:', error);
+        throw error;
+      }
       return data;
     },
     enabled: !!effectiveOrgId,
@@ -98,7 +102,9 @@ const Index = () => {
   // Debug log para investigar toggle Enterprise
   console.log('[Dashboard Debug]', { 
     effectiveOrgId, 
-    orgSettings, 
+    orgSettings,
+    orgSettingsLoading,
+    orgSettingsError,
     hasEnterpriseAccess
   });
 
@@ -196,7 +202,9 @@ const Index = () => {
       title="Dashboard" 
       subtitle={isEnterprise ? "Visão consolidada do setor hoteleiro" : "Painel de controle do sistema de turismo"}
       actions={
-        hasEnterpriseAccess && (
+        (orgSettingsLoading && effectiveOrgId) ? (
+          <Skeleton className="w-48 h-10 rounded-lg" />
+        ) : hasEnterpriseAccess ? (
           <ToggleGroup 
             type="single" 
             value={diagnosticMode} 
@@ -220,7 +228,7 @@ const Index = () => {
               <span className="hidden sm:inline">Enterprise</span>
             </ToggleGroupItem>
           </ToggleGroup>
-        )
+        ) : null
       }
     >
       {/* Hero Stats - different for each mode */}
