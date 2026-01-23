@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,7 +23,18 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.7.2",
+    version: "1.7.3",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Fluxo Nova Rodada com seletor de tipo (Territorial vs Enterprise)",
+      "Hook useEnterpriseIndicators para buscar indicadores hoteleiros",
+      "Componente EnterpriseDataEntryPanel para preenchimento de KPIs",
+      "Tabela enterprise_indicator_values para armazenar dados de diagnóstico Enterprise",
+      "Coluna diagnostic_type em assessments (territorial/enterprise)"
+    ]
+  },
+  {
     date: "2026-01-23",
     type: "patch" as const,
     changes: [

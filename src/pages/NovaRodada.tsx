@@ -24,6 +24,9 @@ import {
   Gauge,
   Target,
   RefreshCw,
+  Landmark,
+  Hotel,
+  Sparkles,
 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
@@ -33,6 +36,7 @@ import { useAssessments } from '@/hooks/useAssessments';
 import { toast } from '@/hooks/use-toast';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
+import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { ExternalIndicatorValue, useCreateDataSnapshot, useExternalIndicatorValues } from '@/hooks/useOfficialData';
@@ -42,6 +46,7 @@ import { Badge } from '@/components/ui/badge';
 
 type VisibilityType = 'organization' | 'personal' | 'demo';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
+type DiagnosticType = 'territorial' | 'enterprise';
 
 interface WorkflowStep {
   id: number;
@@ -133,6 +138,7 @@ export default function NovaRodada() {
   const { user } = useAuth();
   const { isViewingDemoData, profile: userProfile } = useProfile();
   const [currentStep, setCurrentStep] = useState(1);
+  const [diagnosticType, setDiagnosticType] = useState<DiagnosticType>('territorial');
   const [visibility, setVisibility] = useState<VisibilityType>('organization');
   const [destinationMode, setDestinationMode] = useState<'select' | 'create'>('select');
   const [selectedDestination, setSelectedDestination] = useState<string>('');
@@ -145,6 +151,24 @@ export default function NovaRodada() {
   const [validatedDataCount, setValidatedDataCount] = useState(0);
   const [isResuming, setIsResuming] = useState(!!resumeAssessmentId);
   const [resumeDataLoaded, setResumeDataLoaded] = useState(false);
+  
+  // Check if user's org has enterprise access
+  const { data: orgData } = useQuery({
+    queryKey: ['org-enterprise-access', userProfile?.org_id],
+    queryFn: async () => {
+      if (!userProfile?.org_id) return null;
+      const { data, error } = await supabase
+        .from('orgs')
+        .select('org_type, has_enterprise_access')
+        .eq('id', userProfile.org_id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userProfile?.org_id,
+  });
+  
+  const hasEnterpriseAccess = orgData?.has_enterprise_access === true;
 
   // Fetch user profile to get org_id
   const { data: profile } = useQuery({
@@ -285,6 +309,7 @@ export default function NovaRodada() {
           period_end: periodEnd || null,
           visibility,
           tier: selectedTier,
+          diagnostic_type: diagnosticType,
         });
         setCreatedAssessmentId(result.id);
         toast({ title: 'Diagnóstico criado com sucesso!' });
@@ -495,13 +520,80 @@ export default function NovaRodada() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Step 1: Scope */}
+            {/* Step 1: Scope & Type */}
             {currentStep === 1 && (
               <div className="space-y-6">
+                {/* Diagnostic Type Selector - Only show if org has enterprise access */}
+                {hasEnterpriseAccess && (
+                  <>
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        Selecione o tipo de diagnóstico que deseja realizar.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-sm font-medium mb-3 block">Tipo de Diagnóstico</Label>
+                      <RadioGroup
+                        value={diagnosticType}
+                        onValueChange={(value) => setDiagnosticType(value as DiagnosticType)}
+                        className="grid grid-cols-2 gap-4"
+                      >
+                        <div className={cn(
+                          "flex flex-col items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all text-center",
+                          diagnosticType === 'territorial' 
+                            ? "border-primary bg-primary/5" 
+                            : "border-muted hover:border-muted-foreground/50"
+                        )}>
+                          <RadioGroupItem value="territorial" id="territorial" className="sr-only" />
+                          <Label htmlFor="territorial" className="cursor-pointer space-y-3">
+                            <div className="mx-auto w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                              <Landmark className="h-6 w-6 text-blue-600" />
+                            </div>
+                            <div>
+                              <p className="font-medium">Territorial</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Municípios e destinos turísticos. Dados de IBGE, DATASUS, INEP.
+                              </p>
+                            </div>
+                          </Label>
+                        </div>
+                        
+                        <div className={cn(
+                          "flex flex-col items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all text-center",
+                          diagnosticType === 'enterprise' 
+                            ? "border-amber-500 bg-amber-50 dark:bg-amber-950/30" 
+                            : "border-muted hover:border-muted-foreground/50"
+                        )}>
+                          <RadioGroupItem value="enterprise" id="enterprise" className="sr-only" />
+                          <Label htmlFor="enterprise" className="cursor-pointer space-y-3">
+                            <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                              <Hotel className="h-6 w-6 text-amber-600" />
+                            </div>
+                            <div className="flex items-center gap-2 justify-center">
+                              <p className="font-medium">Enterprise</p>
+                              <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs">
+                                <Sparkles className="h-2.5 w-2.5 mr-0.5" />
+                                PRO
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Hotéis e resorts. RevPAR, NPS, Ocupação, KPIs hoteleiros.
+                            </p>
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  </>
+                )}
+                
+                {/* Visibility Selector */}
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <p className="text-sm text-muted-foreground">
-                    Defina quem poderá visualizar e editar este destino e diagnóstico. 
-                    Isso afetará a visibilidade para outros membros da sua organização.
+                    {hasEnterpriseAccess 
+                      ? 'Defina quem poderá visualizar este diagnóstico.'
+                      : 'Defina quem poderá visualizar e editar este destino e diagnóstico. Isso afetará a visibilidade para outros membros da sua organização.'
+                    }
                   </p>
                 </div>
                 
@@ -533,7 +625,7 @@ export default function NovaRodada() {
                       </Label>
                       <p className="text-sm text-muted-foreground mt-1">
                         Todos os membros da sua organização poderão visualizar e colaborar 
-                        com este destino e diagnóstico.
+                        com este diagnóstico.
                       </p>
                     </div>
                   </div>
@@ -551,8 +643,7 @@ export default function NovaRodada() {
                         Apenas para mim (Pessoal)
                       </Label>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Somente você terá acesso a este destino e diagnóstico. 
-                        Outros membros da organização não poderão visualizá-lo.
+                        Somente você terá acesso a este diagnóstico.
                       </p>
                     </div>
                   </div>
@@ -572,8 +663,7 @@ export default function NovaRodada() {
                           Ambiente de Demonstração
                         </Label>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Os dados serão criados no ambiente de demonstração e ficarão disponíveis 
-                          apenas quando o modo demo estiver ativo. Ideal para testes e aprendizado.
+                          Os dados serão criados no ambiente de demonstração.
                         </p>
                       </div>
                     </div>
