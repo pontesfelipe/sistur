@@ -30,7 +30,15 @@ import {
   Users2,
   Lightbulb,
   TrendingDown,
-  Scale
+  Scale,
+  Hotel,
+  Sparkles,
+  DollarSign,
+  Star,
+  Leaf as LeafIcon,
+  UserCheck,
+  BriefcaseBusiness,
+  ShieldCheck
 } from 'lucide-react';
 import { InteractiveWorkflowDiagram } from '@/components/tools/InteractiveWorkflowDiagram';
 
@@ -273,6 +281,87 @@ const rules = [
     trigger: 'Indicador intersetorial presente',
     effect: 'Sinalização de dependência',
     example: 'IDEB baixo → Requer articulação com Educação'
+  }
+];
+
+// Enterprise indicator categories
+const enterpriseCategories = [
+  {
+    id: 'financial',
+    name: 'Performance Financeira',
+    icon: DollarSign,
+    color: 'bg-green-500',
+    borderColor: 'border-green-500',
+    bgColor: 'bg-green-50 dark:bg-green-950/30',
+    pillar: 'AO',
+    indicators: ['RevPAR', 'ADR', 'TRevPAR', 'GOP Margin', 'CPOR'],
+    description: 'KPIs financeiros essenciais para gestão de receita e rentabilidade hoteleira.'
+  },
+  {
+    id: 'guest',
+    name: 'Experiência do Hóspede',
+    icon: Star,
+    color: 'bg-amber-500',
+    borderColor: 'border-amber-500',
+    bgColor: 'bg-amber-50 dark:bg-amber-950/30',
+    pillar: 'AO',
+    indicators: ['NPS', 'CSAT', 'Review Score', 'Repeat Guest Rate'],
+    description: 'Métricas de satisfação e fidelização baseadas em feedback direto dos hóspedes.'
+  },
+  {
+    id: 'operations',
+    name: 'Operações',
+    icon: Cog,
+    color: 'bg-blue-500',
+    borderColor: 'border-blue-500',
+    bgColor: 'bg-blue-50 dark:bg-blue-950/30',
+    pillar: 'OE',
+    indicators: ['Taxa de Ocupação', 'Tempo de Check-in', 'Manutenção Preventiva', 'Eficiência Operacional'],
+    description: 'Indicadores de eficiência operacional e qualidade dos serviços prestados.'
+  },
+  {
+    id: 'sustainability',
+    name: 'Sustentabilidade',
+    icon: LeafIcon,
+    color: 'bg-emerald-500',
+    borderColor: 'border-emerald-500',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950/30',
+    pillar: 'RA',
+    indicators: ['Consumo de Água por Hóspede', 'Consumo de Energia', 'Gestão de Resíduos', 'Pegada de Carbono'],
+    description: 'Métricas ambientais alinhadas ao pilar RA de Relações Ambientais.'
+  },
+  {
+    id: 'hr',
+    name: 'Recursos Humanos',
+    icon: UserCheck,
+    color: 'bg-purple-500',
+    borderColor: 'border-purple-500',
+    bgColor: 'bg-purple-50 dark:bg-purple-950/30',
+    pillar: 'OE',
+    indicators: ['Turnover Rate', 'Produtividade por Colaborador', 'eNPS', 'Treinamento por Colaborador'],
+    description: 'Indicadores de gestão de pessoas e desenvolvimento de equipe.'
+  },
+  {
+    id: 'marketing',
+    name: 'Marketing & Distribuição',
+    icon: BriefcaseBusiness,
+    color: 'bg-pink-500',
+    borderColor: 'border-pink-500',
+    bgColor: 'bg-pink-50 dark:bg-pink-950/30',
+    pillar: 'AO',
+    indicators: ['Taxa de Conversão', 'CAC', 'Mix de Canais', 'Revenue por Canal'],
+    description: 'Métricas de aquisição, distribuição e eficiência de marketing.'
+  },
+  {
+    id: 'compliance',
+    name: 'Compliance & Segurança',
+    icon: ShieldCheck,
+    color: 'bg-slate-500',
+    borderColor: 'border-slate-500',
+    bgColor: 'bg-slate-50 dark:bg-slate-950/30',
+    pillar: 'OE',
+    indicators: ['Índice de Conformidade', 'Acidentes de Trabalho', 'Auditorias Aprovadas'],
+    description: 'Indicadores de conformidade regulatória e segurança operacional.'
   }
 ];
 
@@ -585,7 +674,136 @@ export default function Metodologia() {
           </CardContent>
         </Card>
 
-        {/* Six Rules */}
+        {/* Enterprise Module */}
+        <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+                <Hotel className="h-5 w-5" />
+              </div>
+              <span>SISTUR Enterprise</span>
+              <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white ml-2">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Módulo Hoteleiro
+              </Badge>
+            </CardTitle>
+            <CardDescription>
+              Adaptação da metodologia Mario Beni para o setor privado de hospitalidade
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="prose prose-sm max-w-none dark:prose-invert">
+              <p>
+                O <strong>SISTUR Enterprise</strong> estende a teoria sistêmica de Mario Beni para 
+                organizações do setor privado, especialmente hotéis, resorts e redes hoteleiras. 
+                Os <strong>26 indicadores exclusivos</strong> foram mapeados para os três pilares (RA, OE, AO), 
+                mantendo a mesma lógica sistêmica e as 6 regras do Motor IGMA.
+              </p>
+            </div>
+
+            {/* Enterprise Categories Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {enterpriseCategories.map((category) => (
+                <div 
+                  key={category.id}
+                  className={`rounded-xl border-2 ${category.borderColor} ${category.bgColor} p-4 space-y-3`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className={`p-2 rounded-lg ${category.color} text-white`}>
+                      <category.icon className="h-4 w-4" />
+                    </div>
+                    <Badge variant="outline" className="font-mono text-xs">
+                      Pilar {category.pillar}
+                    </Badge>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-sm">{category.name}</h4>
+                    <p className="text-xs text-muted-foreground mt-1">{category.description}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {category.indicators.slice(0, 3).map(ind => (
+                      <Badge key={ind} variant="secondary" className="text-xs">
+                        {ind}
+                      </Badge>
+                    ))}
+                    {category.indicators.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{category.indicators.length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Enterprise vs Public Comparison */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="rounded-xl border bg-card p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-5 w-5 text-blue-500" />
+                  <h4 className="font-semibold">Organizações Públicas</h4>
+                </div>
+                <ul className="text-sm space-y-2 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                    Secretarias de Turismo e órgãos governamentais
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                    Diagnósticos territoriais de municípios
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                    ~96 indicadores IGMA + oficiais
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                    Fontes: IBGE, DATASUS, INEP, STN, CADASTUR
+                  </li>
+                </ul>
+              </div>
+
+              <div className="rounded-xl border-2 border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10 p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Hotel className="h-5 w-5 text-amber-500" />
+                  <h4 className="font-semibold">Organizações Privadas (Enterprise)</h4>
+                </div>
+                <ul className="text-sm space-y-2 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                    Hotéis, resorts e redes hoteleiras
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                    Diagnósticos de performance hoteleira
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                    26 indicadores de hospitalidade exclusivos
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                    KPIs: RevPAR, NPS, Ocupação, GOP Margin
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <Alert className="border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20">
+              <Hotel className="h-4 w-4 text-amber-600" />
+              <AlertTitle className="text-amber-700 dark:text-amber-400">
+                Mesma Metodologia, Contexto Diferente
+              </AlertTitle>
+              <AlertDescription className="text-amber-600 dark:text-amber-300">
+                Os indicadores Enterprise seguem a mesma lógica sistêmica de Mario Beni. Por exemplo, 
+                indicadores de sustentabilidade (consumo de água/energia) pertencem ao pilar RA, 
+                operações ao OE, e experiência do hóspede ao AO. As 6 regras IGMA são aplicadas 
+                normalmente, incluindo bloqueios quando RA está crítico.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
