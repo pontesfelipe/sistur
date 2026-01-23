@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.2",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Documentação atualizada com módulo Enterprise",
+      "FAQ inclui perguntas sobre Enterprise, org_type e indicadores hoteleiros",
+      "Ajuda inclui guia rápido e seções Enterprise para admins",
+      "Metodologia documenta categorias Enterprise e mapeamento aos 3 pilares"
+    ]
+  },
   {
     version: "1.7.1",
     date: "2026-01-23",

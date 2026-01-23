@@ -8,13 +8,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircleQuestion, GraduationCap, BarChart3 } from 'lucide-react';
+import { MessageCircleQuestion, GraduationCap, BarChart3, Hotel } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 
 interface FAQItem {
   question: string;
   answer: string;
-  category: 'general' | 'edu' | 'erp';
+  category: 'general' | 'edu' | 'erp' | 'enterprise';
 }
 
 const faqItems: FAQItem[] = [
@@ -32,6 +32,11 @@ const faqItems: FAQItem[] = [
   {
     question: 'O que é o Motor IGMA (Mario Beni)?',
     answer: 'O Motor IGMA é o núcleo inteligente do SISTUR que aplica 6 regras sistêmicas baseadas na teoria de Mario Beni: (1) Prioridade RA - limitações ambientais bloqueiam expansão estrutural; (2) Ciclo contínuo - revisões programadas por severidade; (3) Externalidades negativas - alerta quando OE melhora mas RA piora; (4) Governança central - AO crítico bloqueia todo o sistema; (5) Marketing bloqueado se RA ou AO críticos; (6) Interdependência setorial identificada.',
+    category: 'general',
+  },
+  {
+    question: 'Qual a diferença entre Organizações Públicas e Privadas?',
+    answer: 'O SISTUR classifica organizações em dois tipos: PÚBLICAS (secretarias de turismo, órgãos governamentais) com foco em diagnósticos territoriais de municípios, e PRIVADAS (hotéis, resorts, empresas hoteleiras) com acesso opcional ao módulo Enterprise para indicadores específicos de hospitalidade.',
     category: 'general',
   },
 
@@ -138,19 +143,47 @@ const faqItems: FAQItem[] = [
     answer: 'Alguns indicadores dependem de ações de múltiplos setores (saúde, educação, meio ambiente, etc.). O sistema identifica esses indicadores e sinaliza que a melhoria requer articulação intersetorial, não apenas ações isoladas do turismo.',
     category: 'erp',
   },
+
+  // Enterprise-specific questions
+  {
+    question: 'O que é o SISTUR Enterprise?',
+    answer: 'O SISTUR Enterprise é o módulo especializado para organizações do setor privado (hotéis, resorts, redes hoteleiras). Inclui 26 indicadores exclusivos de hospitalidade adaptados da metodologia Mario Beni, como RevPAR, NPS, Taxa de Ocupação, GOP Margin e outros KPIs operacionais.',
+    category: 'enterprise',
+  },
+  {
+    question: 'Quais indicadores estão disponíveis no Enterprise?',
+    answer: 'O Enterprise inclui indicadores em 7 categorias: Performance Financeira (RevPAR, ADR, GOP Margin), Experiência do Hóspede (NPS, CSAT), Operações (Taxa de Ocupação, Tempo de Check-in), Sustentabilidade (Consumo de Água/Energia), RH (Turnover, Produtividade), Marketing (Taxa de Conversão), e Compliance (Índice de Conformidade).',
+    category: 'enterprise',
+  },
+  {
+    question: 'Como ativo o acesso Enterprise para minha organização?',
+    answer: 'O acesso Enterprise é habilitado por administradores nas Configurações > Organizações. Selecione a organização, marque o tipo como "Privada" e ative o toggle "Acesso Enterprise". Isso libera os indicadores e fluxos específicos para hospitalidade.',
+    category: 'enterprise',
+  },
+  {
+    question: 'Os indicadores Enterprise seguem a mesma metodologia Beni?',
+    answer: 'Sim! Os 26 indicadores Enterprise foram mapeados para os três pilares (RA, OE, AO) da teoria sistêmica de Mario Beni. Por exemplo, indicadores de sustentabilidade pertencem ao RA, infraestrutura ao OE, e operações ao AO. As mesmas 6 regras IGMA são aplicadas.',
+    category: 'enterprise',
+  },
+  {
+    question: 'Posso usar SISTUR ERP e Enterprise na mesma organização?',
+    answer: 'Uma organização privada com Enterprise habilitado pode usar tanto os indicadores territoriais padrão (quando aplicável) quanto os indicadores específicos de hospitalidade. Organizações públicas não têm acesso ao módulo Enterprise.',
+    category: 'enterprise',
+  },
 ];
 
 export default function FAQ() {
   const { hasERPAccess, hasEDUAccess, isAdmin } = useProfile();
 
   // Filter items based on user access
-  const getFilteredItems = (category: 'general' | 'edu' | 'erp' | 'all') => {
+  const getFilteredItems = (category: 'general' | 'edu' | 'erp' | 'enterprise' | 'all') => {
     if (category === 'all') {
       // Show all items the user has access to
       return faqItems.filter(item => {
         if (item.category === 'general') return true;
         if (item.category === 'edu' && (hasEDUAccess || isAdmin)) return true;
         if (item.category === 'erp' && (hasERPAccess || isAdmin)) return true;
+        if (item.category === 'enterprise' && isAdmin) return true;
         return false;
       });
     }
@@ -160,10 +193,12 @@ export default function FAQ() {
   const generalItems = getFilteredItems('general');
   const eduItems = getFilteredItems('edu');
   const erpItems = getFilteredItems('erp');
+  const enterpriseItems = getFilteredItems('enterprise');
 
   // Determine which tabs to show
   const showERPTab = hasERPAccess || isAdmin;
   const showEDUTab = hasEDUAccess || isAdmin;
+  const showEnterpriseTab = isAdmin;
   const defaultTab = showERPTab ? 'erp' : 'edu';
 
   const renderFAQList = (items: FAQItem[]) => (
@@ -180,6 +215,8 @@ export default function FAQ() {
       ))}
     </Accordion>
   );
+
+  const tabCount = [showEDUTab, showERPTab, showEnterpriseTab].filter(Boolean).length;
 
   return (
     <AppLayout
@@ -210,19 +247,26 @@ export default function FAQ() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue={defaultTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsList className={`grid w-full mb-4 ${tabCount === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
                 {showEDUTab && (
                   <TabsTrigger value="edu" className="flex items-center gap-2">
                     <GraduationCap className="h-4 w-4" />
-                    SISTUR EDU
+                    <span className="hidden sm:inline">SISTUR</span> EDU
                     <Badge variant="secondary" className="ml-1">{eduItems.length}</Badge>
                   </TabsTrigger>
                 )}
                 {showERPTab && (
                   <TabsTrigger value="erp" className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4" />
-                    SISTUR ERP
+                    <span className="hidden sm:inline">SISTUR</span> ERP
                     <Badge variant="secondary" className="ml-1">{erpItems.length}</Badge>
+                  </TabsTrigger>
+                )}
+                {showEnterpriseTab && (
+                  <TabsTrigger value="enterprise" className="flex items-center gap-2">
+                    <Hotel className="h-4 w-4" />
+                    Enterprise
+                    <Badge variant="secondary" className="ml-1">{enterpriseItems.length}</Badge>
                   </TabsTrigger>
                 )}
               </TabsList>
@@ -243,6 +287,18 @@ export default function FAQ() {
                 <TabsContent value="erp">
                   {erpItems.length > 0 ? (
                     renderFAQList(erpItems)
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      Nenhuma pergunta disponível para este módulo.
+                    </p>
+                  )}
+                </TabsContent>
+              )}
+
+              {showEnterpriseTab && (
+                <TabsContent value="enterprise">
+                  {enterpriseItems.length > 0 ? (
+                    renderFAQList(enterpriseItems)
                   ) : (
                     <p className="text-sm text-muted-foreground text-center py-4">
                       Nenhuma pergunta disponível para este módulo.

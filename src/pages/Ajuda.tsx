@@ -15,16 +15,21 @@ import {
   Award,
   PlayCircle,
   Target,
+  Hotel,
+  Sparkles,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProfile } from '@/hooks/useProfile';
+import { Badge } from '@/components/ui/badge';
 
 interface HelpSection {
   title: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   href: string;
-  system: 'edu' | 'erp' | 'both';
+  system: 'edu' | 'erp' | 'enterprise' | 'both';
 }
 
 const helpSections: HelpSection[] = [
@@ -88,6 +93,29 @@ const helpSections: HelpSection[] = [
     system: 'edu',
   },
 
+  // Enterprise-only sections
+  {
+    title: 'Indicadores de Hospitalidade',
+    description: 'RevPAR, NPS, Taxa de Ocupação e outros KPIs específicos para hotéis e resorts.',
+    icon: Hotel,
+    href: '/indicadores',
+    system: 'enterprise',
+  },
+  {
+    title: 'Performance Hoteleira',
+    description: 'Acompanhe indicadores financeiros, operacionais e de experiência do hóspede.',
+    icon: TrendingUp,
+    href: '/diagnosticos',
+    system: 'enterprise',
+  },
+  {
+    title: 'Gestão de Equipe',
+    description: 'Indicadores de RH: turnover, produtividade e satisfação de colaboradores.',
+    icon: Users,
+    href: '/indicadores',
+    system: 'enterprise',
+  },
+
   // Shared sections
   {
     title: 'Metodologia SISTUR',
@@ -103,9 +131,10 @@ export default function Ajuda() {
 
   const showERPTab = hasERPAccess || isAdmin;
   const showEDUTab = hasEDUAccess || isAdmin;
+  const showEnterpriseTab = isAdmin;
   const defaultTab = showERPTab ? 'erp' : 'edu';
 
-  const filterSections = (system: 'edu' | 'erp' | 'both') => {
+  const filterSections = (system: 'edu' | 'erp' | 'enterprise' | 'both') => {
     return helpSections.filter(section => {
       if (section.system === 'both') return true;
       if (section.system === system) return true;
@@ -115,6 +144,7 @@ export default function Ajuda() {
 
   const eduSections = filterSections('edu');
   const erpSections = filterSections('erp');
+  const enterpriseSections = filterSections('enterprise');
 
   const renderSectionGrid = (sections: HelpSection[]) => (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -135,6 +165,8 @@ export default function Ajuda() {
       ))}
     </div>
   );
+
+  const tabCount = [showEDUTab, showERPTab, showEnterpriseTab].filter(Boolean).length;
 
   return (
     <AppLayout
@@ -160,17 +192,23 @@ export default function Ajuda() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue={defaultTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsList className={`grid w-full mb-4 ${tabCount === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
                 {showEDUTab && (
                   <TabsTrigger value="edu" className="flex items-center gap-2">
                     <GraduationCap className="h-4 w-4" />
-                    SISTUR EDU
+                    <span className="hidden sm:inline">SISTUR</span> EDU
                   </TabsTrigger>
                 )}
                 {showERPTab && (
                   <TabsTrigger value="erp" className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4" />
-                    SISTUR ERP
+                    <span className="hidden sm:inline">SISTUR</span> ERP
+                  </TabsTrigger>
+                )}
+                {showEnterpriseTab && (
+                  <TabsTrigger value="enterprise" className="flex items-center gap-2">
+                    <Hotel className="h-4 w-4" />
+                    Enterprise
                   </TabsTrigger>
                 )}
               </TabsList>
@@ -227,6 +265,40 @@ export default function Ajuda() {
                   </ol>
                 </TabsContent>
               )}
+
+              {showEnterpriseTab && (
+                <TabsContent value="enterprise">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        Módulo Enterprise
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">Para hotéis, resorts e redes hoteleiras</span>
+                    </div>
+                    <ol className="list-decimal list-inside space-y-3 text-sm text-muted-foreground">
+                      <li>
+                        <strong className="text-foreground">Configure a Organização</strong> - Em Configurações, classifique a organização como "Privada" e ative o acesso Enterprise.
+                      </li>
+                      <li>
+                        <strong className="text-foreground">Acesse os Indicadores Enterprise</strong> - Os 26 indicadores de hospitalidade ficam disponíveis: RevPAR, NPS, Taxa de Ocupação, etc.
+                      </li>
+                      <li>
+                        <strong className="text-foreground">Crie um Diagnóstico Hoteleiro</strong> - Use a Nova Rodada selecionando indicadores específicos de hospitalidade.
+                      </li>
+                      <li>
+                        <strong className="text-foreground">Preencha KPIs Operacionais</strong> - Informe dados de performance financeira, experiência do hóspede e sustentabilidade.
+                      </li>
+                      <li>
+                        <strong className="text-foreground">Analise Resultados</strong> - O Motor IGMA aplica as mesmas 6 regras sistêmicas adaptadas ao contexto hoteleiro.
+                      </li>
+                      <li>
+                        <strong className="text-foreground">Implemente Melhorias</strong> - Receba prescrições de capacitação específicas para o trade turístico.
+                      </li>
+                    </ol>
+                  </div>
+                </TabsContent>
+              )}
             </Tabs>
           </CardContent>
         </Card>
@@ -236,17 +308,23 @@ export default function Ajuda() {
           <h2 className="text-lg font-semibold mb-4">Funcionalidades do Sistema</h2>
           
           <Tabs defaultValue={defaultTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsList className={`grid w-full mb-4 ${tabCount === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
               {showEDUTab && (
                 <TabsTrigger value="edu" className="flex items-center gap-2">
                   <GraduationCap className="h-4 w-4" />
-                  SISTUR EDU
+                  <span className="hidden sm:inline">SISTUR</span> EDU
                 </TabsTrigger>
               )}
               {showERPTab && (
                 <TabsTrigger value="erp" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  SISTUR ERP
+                  <span className="hidden sm:inline">SISTUR</span> ERP
+                </TabsTrigger>
+              )}
+              {showEnterpriseTab && (
+                <TabsTrigger value="enterprise" className="flex items-center gap-2">
+                  <Hotel className="h-4 w-4" />
+                  Enterprise
                 </TabsTrigger>
               )}
             </TabsList>
@@ -260,6 +338,12 @@ export default function Ajuda() {
             {showERPTab && (
               <TabsContent value="erp">
                 {renderSectionGrid(erpSections)}
+              </TabsContent>
+            )}
+
+            {showEnterpriseTab && (
+              <TabsContent value="enterprise">
+                {renderSectionGrid(enterpriseSections)}
               </TabsContent>
             )}
           </Tabs>
