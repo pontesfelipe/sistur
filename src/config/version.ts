@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 12,
+  patch: 13,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.13",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Filtro de Escopo (Territorial/Enterprise/Ambos) no painel de Indicadores",
+      "Relatório de distribuição de indicadores por Escopo × Pilar × Tier",
+      "Gráficos de barras e pizza para visualização da distribuição",
+      "Matriz detalhada com contagem de indicadores por combinação",
+      "Botão 'Novo Indicador' funcional com formulário completo de cadastro"
+    ]
+  },
   {
     version: "1.7.12",
     date: "2026-01-23",
