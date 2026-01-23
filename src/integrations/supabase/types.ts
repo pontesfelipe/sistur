@@ -1743,6 +1743,101 @@ export type Database = {
           },
         ]
       }
+      enterprise_indicator_categories: {
+        Row: {
+          code: string
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          pillar: string
+          sort_order: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          pillar: string
+          sort_order?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          pillar?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      enterprise_indicators: {
+        Row: {
+          benchmark_max: number | null
+          benchmark_min: number | null
+          benchmark_target: number | null
+          category_id: string | null
+          code: string
+          collection_frequency: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          minimum_tier: string | null
+          name: string
+          pillar: string
+          unit: string | null
+          updated_at: string | null
+          weight: number | null
+        }
+        Insert: {
+          benchmark_max?: number | null
+          benchmark_min?: number | null
+          benchmark_target?: number | null
+          category_id?: string | null
+          code: string
+          collection_frequency?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          minimum_tier?: string | null
+          name: string
+          pillar: string
+          unit?: string | null
+          updated_at?: string | null
+          weight?: number | null
+        }
+        Update: {
+          benchmark_max?: number | null
+          benchmark_min?: number | null
+          benchmark_target?: number | null
+          category_id?: string | null
+          code?: string
+          collection_frequency?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          minimum_tier?: string | null
+          name?: string
+          pillar?: string
+          unit?: string | null
+          updated_at?: string | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_indicators_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_indicator_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       entrepreneur_profiles: {
         Row: {
           business_description: string | null
@@ -4088,16 +4183,19 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          org_type: Database["public"]["Enums"]["org_type"] | null
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          org_type?: Database["public"]["Enums"]["org_type"] | null
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          org_type?: Database["public"]["Enums"]["org_type"] | null
         }
         Relationships: []
       }
@@ -5655,6 +5753,7 @@ export type Database = {
         | "generated"
         | "rejected"
         | "failed"
+      org_type: "PUBLIC" | "PRIVATE"
       pillar_scope_type: "RA" | "OE" | "AO" | "INTEGRATED"
       pillar_type: "RA" | "OE" | "AO"
       question_type: "multiple_choice" | "true_false" | "short_answer"
@@ -5863,6 +5962,7 @@ export const Constants = {
         "rejected",
         "failed",
       ],
+      org_type: ["PUBLIC", "PRIVATE"],
       pillar_scope_type: ["RA", "OE", "AO", "INTEGRATED"],
       pillar_type: ["RA", "OE", "AO"],
       question_type: ["multiple_choice", "true_false", "short_answer"],
