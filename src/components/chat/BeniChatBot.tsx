@@ -176,7 +176,13 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
       ));
     }
 
+    // Create AbortController with timeout for mobile compatibility
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+
     try {
+      console.log('[BeniChat] Starting request to:', CHAT_URL);
+      
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
@@ -187,7 +193,11 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
           messages: [...messages, userMsg],
           context 
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
+      console.log('[BeniChat] Response status:', response.status);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -200,44 +210,84 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
       const decoder = new TextDecoder();
       let textBuffer = '';
       let assistantContent = '';
+      let lastActivityTime = Date.now();
 
       // Add initial assistant message
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      // Read with activity timeout for iOS/Safari compatibility
+      const readWithTimeout = async (): Promise<ReadableStreamReadResult<Uint8Array>> => {
+        const activityTimeout = setTimeout(() => {
+          console.log('[BeniChat] Activity timeout, closing reader');
+          reader.cancel();
+        }, 30000); // 30 second activity timeout
+        
+        try {
+          const result = await reader.read();
+          clearTimeout(activityTimeout);
+          lastActivityTime = Date.now();
+          return result;
+        } catch (error) {
+          clearTimeout(activityTimeout);
+          throw error;
+        }
+      };
 
-        textBuffer += decoder.decode(value, { stream: true });
+      let readAttempts = 0;
+      const maxAttempts = 1000; // Prevent infinite loops
 
-        let newlineIndex: number;
-        while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
-          let line = textBuffer.slice(0, newlineIndex);
-          textBuffer = textBuffer.slice(newlineIndex + 1);
-
-          if (line.endsWith('\r')) line = line.slice(0, -1);
-          if (line.startsWith(':') || line.trim() === '') continue;
-          if (!line.startsWith('data: ')) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === '[DONE]') break;
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content;
-            if (content) {
-              assistantContent += content;
-              setMessages(prev => {
-                const updated = [...prev];
-                updated[updated.length - 1] = { role: 'assistant', content: assistantContent };
-                return updated;
-              });
-            }
-          } catch {
-            // Incomplete JSON, put it back
-            textBuffer = line + '\n' + textBuffer;
+      while (readAttempts < maxAttempts) {
+        readAttempts++;
+        
+        try {
+          const { done, value } = await readWithTimeout();
+          if (done) {
+            console.log('[BeniChat] Stream complete');
             break;
           }
+
+          textBuffer += decoder.decode(value, { stream: true });
+
+          let newlineIndex: number;
+          while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
+            let line = textBuffer.slice(0, newlineIndex);
+            textBuffer = textBuffer.slice(newlineIndex + 1);
+
+            if (line.endsWith('\r')) line = line.slice(0, -1);
+            if (line.startsWith(':') || line.trim() === '') continue;
+            if (!line.startsWith('data: ')) continue;
+
+            const jsonStr = line.slice(6).trim();
+            if (jsonStr === '[DONE]') {
+              console.log('[BeniChat] Received [DONE] marker');
+              break;
+            }
+
+            try {
+              const parsed = JSON.parse(jsonStr);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                assistantContent += content;
+                setMessages(prev => {
+                  const updated = [...prev];
+                  updated[updated.length - 1] = { role: 'assistant', content: assistantContent };
+                  return updated;
+                });
+              }
+            } catch {
+              // Incomplete JSON, put it back
+              textBuffer = line + '\n' + textBuffer;
+              break;
+            }
+          }
+        } catch (readError) {
+          console.error('[BeniChat] Read error:', readError);
+          // If we have some content, don't throw - use what we have
+          if (assistantContent.length > 0) {
+            console.log('[BeniChat] Partial content received, using it');
+            break;
+          }
+          throw readError;
         }
       }
 
@@ -267,6 +317,7 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
 
       // Save assistant message after complete
       if (assistantContent) {
+        console.log('[BeniChat] Saving assistant message, length:', assistantContent.length);
         const assistantMsgId = await saveMessage('assistant', assistantContent);
         if (assistantMsgId) {
           setMessages(prev => prev.map((m, idx) => 
@@ -278,11 +329,27 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
         if (voiceEnabled) {
           speakText(assistantContent);
         }
+      } else {
+        console.warn('[BeniChat] No content received from assistant');
+        toast.error('Professor Beni não respondeu. Tente novamente.');
+        // Remove the empty assistant message
+        setMessages(prev => prev.filter(m => m.content !== ''));
       }
 
     } catch (error) {
-      console.error('Chat error:', error);
-      toast.error(error instanceof Error ? error.message : 'Erro ao conectar com o Professor Beni');
+      clearTimeout(timeoutId);
+      console.error('[BeniChat] Error:', error);
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          toast.error('Tempo limite excedido. Tente uma pergunta mais curta.');
+        } else {
+          toast.error(error.message || 'Erro ao conectar com o Professor Beni');
+        }
+      } else {
+        toast.error('Erro ao conectar com o Professor Beni');
+      }
+      
       // Remove the empty assistant message if there was an error
       setMessages(prev => prev.filter(m => m.content !== ''));
     } finally {
