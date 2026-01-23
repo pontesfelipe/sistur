@@ -410,10 +410,25 @@ serve(async (req) => {
     let filteredIndicatorValues: any[] = [];
     let isEnterpriseCalc = false;
 
+    // Fetch enterprise categories for better naming (only used if enterprise)
+    let enterpriseCategoryMap = new Map<string, { name: string; code: string; description: string }>();
+
     // 2. Get indicator values based on diagnostic type
     if (isEnterprise) {
       console.log("Using ENTERPRISE indicators from enterprise_indicator_values");
       isEnterpriseCalc = true;
+
+      // Fetch category names for enterprise diagnostics
+      const { data: categories } = await supabase
+        .from("enterprise_indicator_categories")
+        .select("id, name, code, description");
+      
+      if (categories) {
+        for (const cat of categories) {
+          enterpriseCategoryMap.set(cat.id, { name: cat.name, code: cat.code, description: cat.description || '' });
+        }
+      }
+      console.log(`Loaded ${enterpriseCategoryMap.size} enterprise categories`);
       
       // Fetch enterprise indicator values
       const { data: enterpriseValues, error: enterpriseError } = await supabase
@@ -1288,11 +1303,27 @@ serve(async (req) => {
           dueDate.setMonth(dueDate.getMonth() + 6); // 6 months for moderate
         }
 
+        // Get category name for enterprise diagnostics
+        let themeDisplayName = issue.theme;
+        if (isEnterpriseCalc && enterpriseCategoryMap.has(issue.theme)) {
+          themeDisplayName = enterpriseCategoryMap.get(issue.theme)!.name;
+        }
+
+        // Enterprise-specific action plan formatting
+        const isEnterprisePlan = isEnterpriseCalc;
+        const planTitle = isEnterprisePlan
+          ? `Plano de Ação Hoteleiro: ${themeDisplayName}`
+          : `Plano de Ação: ${themeDisplayName} (${pillarNames[issue.pillar]})`;
+        
+        const planDescription = isEnterprisePlan
+          ? `Ação corretiva para o KPI hoteleiro identificado: ${issue.title}. Categoria: ${themeDisplayName}. Interpretação: ${issue.interpretation}. Prioridade baseada em benchmark do setor.`
+          : `Ação corretiva para o gargalo identificado: ${issue.title}. Interpretação territorial: ${issue.interpretation}.`;
+
         actionPlans.push({
           org_id: orgId,
           assessment_id,
-          title: `Plano de Ação: ${issue.theme} (${pillarNames[issue.pillar]})`,
-          description: `Ação corretiva para o gargalo identificado: ${issue.title}. Interpretação territorial: ${issue.interpretation}.`,
+          title: planTitle,
+          description: planDescription,
           pillar: issue.pillar,
           priority: issue.severity === "CRITICO" ? 1 : 2,
           linked_issue_id: issue.id,
