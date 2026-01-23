@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 5,
-  patch: 5,
+  minor: 6,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.6.0",
+    date: "2026-01-23",
+    type: "minor" as const,
+    changes: [
+      "Unificação do motor de recomendações EDU com modelo canônico",
+      "Prescrições agora usam edu_trainings via edu_indicator_training_map",
+      "Justificativas dinâmicas com reason_template por indicador",
+      "Nomenclatura corrigida: I-RA, I-OE, I-AO na página de autenticação",
+      "Fallback para courses legado mantido para compatibilidade"
+    ]
+  },
   {
     version: "1.5.5",
     date: "2026-01-16",
