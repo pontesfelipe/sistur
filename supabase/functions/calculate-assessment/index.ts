@@ -496,6 +496,11 @@ serve(async (req) => {
           };
         });
       
+      // Log sample theme names for debugging
+      if (filteredIndicatorValues.length > 0) {
+        const sampleThemes = filteredIndicatorValues.slice(0, 3).map((iv: any) => iv.indicator?.theme);
+        console.log(`Sample Enterprise themes (should be category names): ${JSON.stringify(sampleThemes)}`);
+      }
       console.log(`Found ${filteredIndicatorValues.length} enterprise indicator values`);
     } else {
       // TERRITORIAL: Use standard indicator_values
@@ -1012,8 +1017,8 @@ serve(async (req) => {
       org_id: string;
       assessment_id: string;
       issue_id: string;
-      course_id: string;
-      indicator_id?: string;
+      course_id?: string;
+      training_id?: string;
       pillar: string;
       status: string;
       interpretation: TerritorialInterpretation;
@@ -1028,7 +1033,8 @@ serve(async (req) => {
       org_id: string;
       assessment_id: string;
       issue_id: string;
-      course_id: string;
+      course_id?: string;
+      training_id?: string;
       reason: string;
       priority: number;
     }> = [];
@@ -1125,8 +1131,8 @@ serve(async (req) => {
             org_id: orgId,
             assessment_id,
             issue_id: issue.id,
-            course_id: training.training_id, // Using training_id as course_id for backward compat
-            indicator_id: indicatorInfo?.code,
+            training_id: training.training_id, // Use training_id for unified EDU model
+            // indicator_id omitted - would need UUID lookup, not critical for prescriptions
             pillar: issue.pillar,
             status: issue.severity,
             interpretation: issue.interpretation,
@@ -1141,7 +1147,7 @@ serve(async (req) => {
             org_id: orgId,
             assessment_id,
             issue_id: issue.id,
-            course_id: training.training_id,
+            training_id: training.training_id, // Use training_id for unified EDU model
             reason: justification,
             priority: priority++,
           });

@@ -4519,6 +4519,7 @@ export type Database = {
           priority: number
           status: Database["public"]["Enums"]["severity_type"]
           target_agent: Database["public"]["Enums"]["target_agent"]
+          training_id: string | null
         }
         Insert: {
           assessment_id: string
@@ -4537,6 +4538,7 @@ export type Database = {
           priority?: number
           status: Database["public"]["Enums"]["severity_type"]
           target_agent?: Database["public"]["Enums"]["target_agent"]
+          training_id?: string | null
         }
         Update: {
           assessment_id?: string
@@ -4555,6 +4557,7 @@ export type Database = {
           priority?: number
           status?: Database["public"]["Enums"]["severity_type"]
           target_agent?: Database["public"]["Enums"]["target_agent"]
+          training_id?: string | null
         }
         Relationships: [
           {
@@ -5298,6 +5301,7 @@ export type Database = {
           org_id: string
           priority: number
           reason: string
+          training_id: string | null
         }
         Insert: {
           assessment_id: string
@@ -5308,6 +5312,7 @@ export type Database = {
           org_id: string
           priority?: number
           reason: string
+          training_id?: string | null
         }
         Update: {
           assessment_id?: string
@@ -5318,6 +5323,7 @@ export type Database = {
           org_id?: string
           priority?: number
           reason?: string
+          training_id?: string | null
         }
         Relationships: [
           {
