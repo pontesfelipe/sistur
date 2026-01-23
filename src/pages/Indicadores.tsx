@@ -90,6 +90,7 @@ const Indicadores = () => {
   const [pillarFilter, setPillarFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
   const [themeFilter, setThemeFilter] = useState('all');
+  const [scopeFilter, setScopeFilter] = useState<'all' | IndicatorScope>('all');
   const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
   const [editingWeightId, setEditingWeightId] = useState<string | null>(null);
   const [editingWeightValue, setEditingWeightValue] = useState<string>('');
@@ -128,7 +129,11 @@ const Indicadores = () => {
       (sourceFilter === 'igma' && indicatorSource === 'IGMA') ||
       (sourceFilter === 'other' && indicatorSource !== 'IGMA');
     const matchesTheme = themeFilter === 'all' || i.theme === themeFilter;
-    return matchesSearch && matchesPillar && matchesSource && matchesTheme;
+    const indicatorScope = ((i as any).indicator_scope || 'territorial') as IndicatorScope;
+    const matchesScope = scopeFilter === 'all' || 
+      indicatorScope === scopeFilter ||
+      indicatorScope === 'both';
+    return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesScope;
   });
 
   const igmaCount = indicators.filter(i => (i as any).source === 'IGMA').length;
@@ -243,6 +248,37 @@ const Indicadores = () => {
               {availableThemes.map(theme => (
                 <SelectItem key={theme} value={theme}>{theme}</SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+          <Select value={scopeFilter} onValueChange={(v) => setScopeFilter(v as 'all' | IndicatorScope)}>
+            <SelectTrigger className="w-full xs:w-40">
+              <SelectValue placeholder="Escopo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-3 w-3 text-muted-foreground" />
+                  <span>Todos</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="territorial">
+                <div className="flex items-center gap-2">
+                  <Landmark className="h-3 w-3 text-blue-600" />
+                  <span>Territorial</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="enterprise">
+                <div className="flex items-center gap-2">
+                  <Hotel className="h-3 w-3 text-amber-600" />
+                  <span>Enterprise</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="both">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-3 w-3 text-purple-600" />
+                  <span>Ambos</span>
+                </div>
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
