@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Plus, 
   Search, 
@@ -26,9 +27,12 @@ import {
   Landmark,
   Hotel,
   Globe,
+  FileBarChart,
+  List,
 } from 'lucide-react';
 import { useIndicators } from '@/hooks/useIndicators';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { IndicatorDistributionReport } from './IndicatorDistributionReport';
 import {
   Select,
   SelectContent,
@@ -232,7 +236,21 @@ export function IndicadoresPanel() {
   };
 
   return (
-    <div className="space-y-6">
+    <Tabs defaultValue="list" className="space-y-6">
+      <div className="flex items-center justify-between">
+        <TabsList>
+          <TabsTrigger value="list" className="gap-2">
+            <List className="h-4 w-4" />
+            Lista
+          </TabsTrigger>
+          <TabsTrigger value="report" className="gap-2">
+            <FileBarChart className="h-4 w-4" />
+            Relatório
+          </TabsTrigger>
+        </TabsList>
+      </div>
+
+      <TabsContent value="list" className="space-y-6 mt-0">
       {/* Header Actions */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div className="flex gap-3 flex-1 flex-wrap">
@@ -1174,6 +1192,11 @@ export function IndicadoresPanel() {
           )}
         </div>
       )}
-    </div>
+      </TabsContent>
+
+      <TabsContent value="report" className="mt-0">
+        <IndicatorDistributionReport />
+      </TabsContent>
+    </Tabs>
   );
 }
