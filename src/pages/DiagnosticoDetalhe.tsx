@@ -10,6 +10,7 @@ import { IssuesView } from '@/components/dashboard/IssuesView';
 import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendationsPanel';
 import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
 import { ActionPlansView } from '@/components/dashboard/ActionPlansView';
+import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +53,8 @@ import {
   Edit,
   ClipboardList,
   Database,
+  Hotel,
+  Layers,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -407,11 +410,20 @@ const DiagnosticoDetalhe = () => {
 
       {isCalculated && pillarScores.length > 0 ? (
         <Tabs defaultValue="radiografia" className="space-y-6">
-          <TabsList className="grid w-full max-w-3xl grid-cols-6">
+          <TabsList className={cn(
+            "grid w-full",
+            isEnterprise ? "max-w-4xl grid-cols-7" : "max-w-3xl grid-cols-6"
+          )}>
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Radiografia</span>
             </TabsTrigger>
+            {isEnterprise && (
+              <TabsTrigger value="categorias" className="gap-2">
+                <Layers className="h-4 w-4" />
+                <span className="hidden sm:inline">Categorias</span>
+              </TabsTrigger>
+            )}
             <TabsTrigger value="normalizacao" className="gap-2">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Normalização</span>
@@ -493,6 +505,28 @@ const DiagnosticoDetalhe = () => {
               </div>
             </div>
           </TabsContent>
+
+          {/* Categorias Enterprise Tab - Only for enterprise diagnostics */}
+          {isEnterprise && (
+            <TabsContent value="categorias" className="space-y-6">
+              <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-xl border border-amber-500/20 p-6 mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-lg bg-amber-500/20">
+                    <Hotel className="h-6 w-6 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-semibold text-foreground">
+                      Categorias Enterprise
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Visão consolidada por categorias: Performance, Sustentabilidade, Governança e mais
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <EnterpriseCategoriesView indicatorScores={indicatorScores as any} />
+            </TabsContent>
+          )}
 
           {/* Normalização Tab - SISTUR Add-on Required */}
           <TabsContent value="normalizacao">
