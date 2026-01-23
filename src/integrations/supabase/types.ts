@@ -4181,18 +4181,21 @@ export type Database = {
       orgs: {
         Row: {
           created_at: string
+          has_enterprise_access: boolean | null
           id: string
           name: string
           org_type: Database["public"]["Enums"]["org_type"] | null
         }
         Insert: {
           created_at?: string
+          has_enterprise_access?: boolean | null
           id?: string
           name: string
           org_type?: Database["public"]["Enums"]["org_type"] | null
         }
         Update: {
           created_at?: string
+          has_enterprise_access?: boolean | null
           id?: string
           name?: string
           org_type?: Database["public"]["Enums"]["org_type"] | null
