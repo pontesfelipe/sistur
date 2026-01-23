@@ -3073,8 +3073,12 @@ export type Database = {
       }
       indicators: {
         Row: {
+          benchmark_max: number | null
+          benchmark_min: number | null
+          benchmark_target: number | null
           calculation_cost: string | null
           code: string
+          collection_frequency: string | null
           collection_type: Database["public"]["Enums"]["collection_type"] | null
           created_at: string
           criticality: string | null
@@ -3083,6 +3087,7 @@ export type Database = {
           description: string | null
           direction: Database["public"]["Enums"]["indicator_direction"]
           edu_suggested_titles: Json
+          enterprise_category_id: string | null
           id: string
           igma_dimension: string | null
           indicator_scope:
@@ -3108,8 +3113,12 @@ export type Database = {
           weight: number
         }
         Insert: {
+          benchmark_max?: number | null
+          benchmark_min?: number | null
+          benchmark_target?: number | null
           calculation_cost?: string | null
           code: string
+          collection_frequency?: string | null
           collection_type?:
             | Database["public"]["Enums"]["collection_type"]
             | null
@@ -3120,6 +3129,7 @@ export type Database = {
           description?: string | null
           direction?: Database["public"]["Enums"]["indicator_direction"]
           edu_suggested_titles?: Json
+          enterprise_category_id?: string | null
           id?: string
           igma_dimension?: string | null
           indicator_scope?:
@@ -3145,8 +3155,12 @@ export type Database = {
           weight?: number
         }
         Update: {
+          benchmark_max?: number | null
+          benchmark_min?: number | null
+          benchmark_target?: number | null
           calculation_cost?: string | null
           code?: string
+          collection_frequency?: string | null
           collection_type?:
             | Database["public"]["Enums"]["collection_type"]
             | null
@@ -3157,6 +3171,7 @@ export type Database = {
           description?: string | null
           direction?: Database["public"]["Enums"]["indicator_direction"]
           edu_suggested_titles?: Json
+          enterprise_category_id?: string | null
           id?: string
           igma_dimension?: string | null
           indicator_scope?:
@@ -3182,6 +3197,13 @@ export type Database = {
           weight?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "indicators_enterprise_category_id_fkey"
+            columns: ["enterprise_category_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_indicator_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "indicators_org_id_fkey"
             columns: ["org_id"]
