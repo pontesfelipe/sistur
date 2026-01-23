@@ -8,7 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { 
@@ -21,16 +20,13 @@ import {
   Loader2,
   Search,
   Landmark,
-  Hotel,
-  Sparkles
+  Hotel
 } from 'lucide-react';
-
-type OrgType = 'PUBLIC' | 'PRIVATE';
 
 interface Organization {
   id: string;
   name: string;
-  org_type: OrgType | null;
+  has_territorial_access: boolean;
   has_enterprise_access: boolean;
   created_at: string;
   user_count: number;
@@ -44,7 +40,7 @@ export function OrganizationManagement() {
   const [editingOrg, setEditingOrg] = useState<Organization | null>(null);
   const [formData, setFormData] = useState({ 
     name: '', 
-    org_type: 'PUBLIC' as OrgType,
+    has_territorial_access: true,
     has_enterprise_access: false 
   });
   const [saving, setSaving] = useState(false);
@@ -54,21 +50,18 @@ export function OrganizationManagement() {
     try {
       setLoading(true);
       
-      // Fetch organizations with counts including new fields
       const { data: orgs, error } = await supabase
         .from('orgs')
-        .select('id, name, org_type, has_enterprise_access, created_at')
+        .select('id, name, has_territorial_access, has_enterprise_access, created_at')
         .order('name');
 
       if (error) throw error;
 
-      // Get user counts per org
       const { data: profiles } = await supabase
         .from('profiles')
         .select('org_id')
         .eq('pending_approval', false);
 
-      // Get destination counts per org
       const { data: destinations } = await supabase
         .from('destinations')
         .select('org_id');
@@ -85,7 +78,7 @@ export function OrganizationManagement() {
 
       const enrichedOrgs = (orgs || []).map(org => ({
         ...org,
-        org_type: (org.org_type as OrgType) || 'PUBLIC',
+        has_territorial_access: org.has_territorial_access ?? true,
         has_enterprise_access: org.has_enterprise_access || false,
         user_count: userCounts[org.id] || 0,
         destination_count: destCounts[org.id] || 0
@@ -115,7 +108,7 @@ export function OrganizationManagement() {
 
       const updateData = {
         name: formData.name.trim(),
-        org_type: formData.org_type,
+        has_territorial_access: formData.has_territorial_access,
         has_enterprise_access: formData.has_enterprise_access
       };
 
@@ -149,14 +142,14 @@ export function OrganizationManagement() {
   };
 
   const resetFormData = () => {
-    setFormData({ name: '', org_type: 'PUBLIC', has_enterprise_access: false });
+    setFormData({ name: '', has_territorial_access: true, has_enterprise_access: false });
   };
 
   const handleEdit = (org: Organization) => {
     setEditingOrg(org);
     setFormData({ 
       name: org.name, 
-      org_type: org.org_type || 'PUBLIC',
+      has_territorial_access: org.has_territorial_access ?? true,
       has_enterprise_access: org.has_enterprise_access || false
     });
     setDialogOpen(true);
@@ -185,11 +178,14 @@ export function OrganizationManagement() {
   if (loading) {
     return (
       <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center gap-2">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Carregando organizações...</span>
-          </div>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5" />
+            Organizações
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     );
@@ -201,8 +197,8 @@ export function OrganizationManagement() {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-primary" />
-              Organizações / Clientes
+              <Building2 className="h-5 w-5" />
+              Organizações
             </CardTitle>
             <CardDescription>
               Gerencie as organizações cadastradas no sistema
@@ -211,8 +207,8 @@ export function OrganizationManagement() {
           <Dialog open={dialogOpen} onOpenChange={(open) => {
             setDialogOpen(open);
             if (!open) {
-              setEditingOrg(null);
               resetFormData();
+              setEditingOrg(null);
             }
           }}>
             <DialogTrigger asChild>
@@ -221,7 +217,7 @@ export function OrganizationManagement() {
                 Nova Organização
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent>
               <DialogHeader>
                 <DialogTitle>
                   {editingOrg ? 'Editar Organização' : 'Nova Organização'}
@@ -243,58 +239,56 @@ export function OrganizationManagement() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Tipo de Organização</Label>
-                  <Select 
-                    value={formData.org_type} 
-                    onValueChange={(v) => setFormData(prev => ({ ...prev, org_type: v as OrgType }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PUBLIC">
-                        <div className="flex items-center gap-2">
-                          <Landmark className="h-4 w-4 text-blue-600" />
-                          <span>Pública</span>
-                          <span className="text-xs text-muted-foreground">(Governo/Município)</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="PRIVATE">
-                        <div className="flex items-center gap-2">
-                          <Hotel className="h-4 w-4 text-amber-600" />
-                          <span>Privada</span>
-                          <span className="text-xs text-muted-foreground">(Hotel/Resort/Empresa)</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Classificação principal da organização. Com "Acesso Enterprise" habilitado, 
-                    qualquer tipo pode executar diagnósticos territoriais e enterprise.
+                <div className="space-y-3">
+                  <Label>Acessos Habilitados</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Configure quais tipos de diagnóstico esta organização pode executar.
+                    Ambos podem ser habilitados simultaneamente.
                   </p>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
-                      <Sparkles className="h-5 w-5 text-white" />
+                  
+                  {/* Toggle Territorial */}
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                        <Landmark className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <Label htmlFor="territorial-access" className="font-medium">
+                          Acesso Territorial
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Diagnósticos públicos com indicadores IGMA para destinos turísticos.
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <Label htmlFor="enterprise-access" className="font-medium">
-                        Acesso Enterprise
-                      </Label>
-                      <p className="text-xs text-muted-foreground">
-                        Habilita diagnósticos com indicadores hoteleiros (RevPAR, NPS, Ocupação).
-                        Funciona tanto para organizações públicas quanto privadas.
-                      </p>
-                    </div>
+                    <Switch
+                      id="territorial-access"
+                      checked={formData.has_territorial_access}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, has_territorial_access: checked }))}
+                    />
                   </div>
-                  <Switch
-                    id="enterprise-access"
-                    checked={formData.has_enterprise_access}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, has_enterprise_access: checked }))}
-                  />
+
+                  {/* Toggle Enterprise */}
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+                        <Hotel className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <Label htmlFor="enterprise-access" className="font-medium">
+                          Acesso Enterprise
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Diagnósticos hoteleiros com indicadores de performance (RevPAR, NPS, etc).
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="enterprise-access"
+                      checked={formData.has_enterprise_access}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, has_enterprise_access: checked }))}
+                    />
+                  </div>
                 </div>
               </div>
               <DialogFooter>
@@ -353,7 +347,7 @@ export function OrganizationManagement() {
           <TableHeader>
             <TableRow>
               <TableHead>Organização</TableHead>
-              <TableHead>Tipo</TableHead>
+              <TableHead>Acessos</TableHead>
               <TableHead className="text-center">Usuários</TableHead>
               <TableHead className="text-center">Destinos</TableHead>
               <TableHead>Criado em</TableHead>
@@ -372,40 +366,30 @@ export function OrganizationManagement() {
                 <TableRow key={org.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                        org.org_type === 'PRIVATE' ? 'bg-amber-500/10' : 'bg-primary/10'
-                      }`}>
-                        {org.org_type === 'PRIVATE' ? (
-                          <Hotel className="h-5 w-5 text-amber-600" />
-                        ) : (
-                          <Landmark className="h-5 w-5 text-primary" />
-                        )}
+                      <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-primary/10">
+                        <Building2 className="h-5 w-5 text-primary" />
                       </div>
-                      <div>
-                        <span className="font-medium">{org.name}</span>
-                        {org.has_enterprise_access && (
-                          <Badge variant="outline" className="ml-2 text-xs gap-1 border-primary/30 text-primary">
-                            <Sparkles className="h-3 w-3" />
-                            Enterprise
-                          </Badge>
-                        )}
-                      </div>
+                      <span className="font-medium">{org.name}</span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={org.org_type === 'PRIVATE' ? 'secondary' : 'outline'} className="gap-1">
-                      {org.org_type === 'PRIVATE' ? (
-                        <>
-                          <Hotel className="h-3 w-3" />
-                          Privada
-                        </>
-                      ) : (
-                        <>
+                    <div className="flex flex-wrap gap-1">
+                      {org.has_territorial_access && (
+                        <Badge variant="outline" className="text-xs gap-1 border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30">
                           <Landmark className="h-3 w-3" />
-                          Pública
-                        </>
+                          Territorial
+                        </Badge>
                       )}
-                    </Badge>
+                      {org.has_enterprise_access && (
+                        <Badge variant="outline" className="text-xs gap-1 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30">
+                          <Hotel className="h-3 w-3" />
+                          Enterprise
+                        </Badge>
+                      )}
+                      {!org.has_territorial_access && !org.has_enterprise_access && (
+                        <span className="text-xs text-muted-foreground">Nenhum</span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-center">
                     <Badge variant="secondary" className="gap-1">

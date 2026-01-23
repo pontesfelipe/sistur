@@ -3017,6 +3017,9 @@ export type Database = {
           edu_suggested_titles: Json
           id: string
           igma_dimension: string | null
+          indicator_scope:
+            | Database["public"]["Enums"]["indicator_scope_type"]
+            | null
           integration_available: boolean | null
           intersectoral_dependency: boolean | null
           max_ref: number | null
@@ -3051,6 +3054,9 @@ export type Database = {
           edu_suggested_titles?: Json
           id?: string
           igma_dimension?: string | null
+          indicator_scope?:
+            | Database["public"]["Enums"]["indicator_scope_type"]
+            | null
           integration_available?: boolean | null
           intersectoral_dependency?: boolean | null
           max_ref?: number | null
@@ -3085,6 +3091,9 @@ export type Database = {
           edu_suggested_titles?: Json
           id?: string
           igma_dimension?: string | null
+          indicator_scope?:
+            | Database["public"]["Enums"]["indicator_scope_type"]
+            | null
           integration_available?: boolean | null
           intersectoral_dependency?: boolean | null
           max_ref?: number | null
@@ -4265,6 +4274,7 @@ export type Database = {
         Row: {
           created_at: string
           has_enterprise_access: boolean | null
+          has_territorial_access: boolean | null
           id: string
           name: string
           org_type: Database["public"]["Enums"]["org_type"] | null
@@ -4272,6 +4282,7 @@ export type Database = {
         Insert: {
           created_at?: string
           has_enterprise_access?: boolean | null
+          has_territorial_access?: boolean | null
           id?: string
           name: string
           org_type?: Database["public"]["Enums"]["org_type"] | null
@@ -4279,6 +4290,7 @@ export type Database = {
         Update: {
           created_at?: string
           has_enterprise_access?: boolean | null
+          has_territorial_access?: boolean | null
           id?: string
           name?: string
           org_type?: Database["public"]["Enums"]["org_type"] | null
@@ -5804,6 +5816,7 @@ export type Database = {
       external_collection_method: "AUTOMATIC" | "BATCH" | "MANUAL"
       grading_mode_type: "automatic" | "hybrid" | "manual"
       indicator_direction: "HIGH_IS_BETTER" | "LOW_IS_BETTER"
+      indicator_scope_type: "territorial" | "enterprise" | "both"
       lesson_progress_status: "not_started" | "in_progress" | "completed"
       lesson_type: "video" | "text" | "interactive" | "quiz"
       live_type: "primary" | "case" | "complementary"
@@ -6009,6 +6022,7 @@ export const Constants = {
       external_collection_method: ["AUTOMATIC", "BATCH", "MANUAL"],
       grading_mode_type: ["automatic", "hybrid", "manual"],
       indicator_direction: ["HIGH_IS_BETTER", "LOW_IS_BETTER"],
+      indicator_scope_type: ["territorial", "enterprise", "both"],
       lesson_progress_status: ["not_started", "in_progress", "completed"],
       lesson_type: ["video", "text", "interactive", "quiz"],
       live_type: ["primary", "case", "complementary"],

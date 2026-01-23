@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.6",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Indicadores agora mostram escopo: Territorial, Enterprise ou Ambos",
+      "Nova coluna 'Escopo' na tabela de indicadores com badges coloridos",
+      "Organizações com dois toggles independentes: Territorial e Enterprise",
+      "Ambos os acessos podem ser habilitados simultaneamente",
+      "UI da tabela de organizações mostra badges de acessos habilitados"
+    ]
+  },
   {
     version: "1.7.5",
     date: "2026-01-23",
