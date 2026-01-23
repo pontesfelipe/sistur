@@ -20,7 +20,17 @@ import {
   BookOpen,
   Info,
   CheckCircle,
-  XCircle
+  XCircle,
+  Zap,
+  Gauge,
+  Target,
+  FileText,
+  BarChart3,
+  Clock,
+  Users2,
+  Lightbulb,
+  TrendingDown,
+  Scale
 } from 'lucide-react';
 import { InteractiveWorkflowDiagram } from '@/components/tools/InteractiveWorkflowDiagram';
 
@@ -61,6 +71,128 @@ const pillars = [
     priority: 3,
     examples: ['Qualificação profissional', 'Marketing turístico', 'Gestão de destino', 'Políticas públicas']
   }
+];
+
+const diagnosticTiers = [
+  {
+    id: 'SMALL',
+    name: 'Essencial',
+    icon: Zap,
+    color: 'bg-teal-500',
+    borderColor: 'border-teal-500',
+    bgColor: 'bg-teal-50 dark:bg-teal-950/30',
+    indicatorCount: '~9',
+    timeToComplete: '30-45 min',
+    description: 'Diagnóstico rápido focado nos indicadores mais críticos para uma visão geral do destino.',
+    targetAudience: 'Gestores municipais com pouco tempo ou destinos iniciando no SISTUR',
+    useCases: [
+      'Primeira avaliação de um destino',
+      'Avaliações rápidas trimestrais',
+      'Municípios com equipe técnica reduzida',
+      'Comparação inicial entre destinos'
+    ],
+    outputs: [
+      'Score geral por pilar (RA, OE, AO)',
+      'Identificação de pilares críticos',
+      'Alertas IGMA básicos',
+      'Recomendações prioritárias'
+    ],
+    benefits: [
+      'Implementação rápida',
+      'Baixo custo de coleta',
+      'Visão macro do destino',
+      'Ideal para começar'
+    ],
+    limitations: [
+      'Análise menos granular',
+      'Menos prescrições específicas',
+      'Sem detalhamento de subindicadores'
+    ]
+  },
+  {
+    id: 'MEDIUM',
+    name: 'Estratégico',
+    icon: Gauge,
+    color: 'bg-violet-500',
+    borderColor: 'border-violet-500',
+    bgColor: 'bg-violet-50 dark:bg-violet-950/30',
+    indicatorCount: '~19',
+    timeToComplete: '2-3 horas',
+    description: 'Diagnóstico intermediário com indicadores estratégicos para planejamento de médio prazo.',
+    targetAudience: 'Secretarias de Turismo estruturadas, destinos em desenvolvimento',
+    useCases: [
+      'Planejamento anual do turismo',
+      'Elaboração de planos diretores',
+      'Captação de recursos e editais',
+      'Monitoramento de políticas públicas'
+    ],
+    outputs: [
+      'Tudo do Essencial +',
+      'Análise de tendências por indicador',
+      'Mapeamento de gargalos específicos',
+      'Prescrições de capacitação direcionadas',
+      'Relatório para captação de recursos'
+    ],
+    benefits: [
+      'Equilíbrio custo-benefício',
+      'Profundidade adequada para gestão',
+      'Suporte a decisões estratégicas',
+      'Compatível com prazos de editais'
+    ],
+    limitations: [
+      'Requer mais tempo de coleta',
+      'Algumas áreas sem cobertura total'
+    ]
+  },
+  {
+    id: 'COMPLETE',
+    name: 'Integral',
+    icon: Target,
+    color: 'bg-rose-500',
+    borderColor: 'border-rose-500',
+    bgColor: 'bg-rose-50 dark:bg-rose-950/30',
+    indicatorCount: '100+',
+    timeToComplete: '1-2 semanas',
+    description: 'Diagnóstico completo com todos os indicadores para análise profunda e projetos de grande porte.',
+    targetAudience: 'Destinos maduros, projetos de financiamento, estudos acadêmicos',
+    useCases: [
+      'Projetos de grande investimento',
+      'Masterplans de turismo',
+      'Estudos de impacto territorial',
+      'Certificações de destino',
+      'Pesquisas acadêmicas'
+    ],
+    outputs: [
+      'Tudo do Estratégico +',
+      'Análise intersetorial completa',
+      'Cruzamento de todos os indicadores',
+      'Simulações de cenários',
+      'Relatório técnico detalhado',
+      'Trilhas de capacitação personalizadas'
+    ],
+    benefits: [
+      'Máxima precisão diagnóstica',
+      'Visão 360° do destino',
+      'Suporte a projetos complexos',
+      'Base para certificações'
+    ],
+    limitations: [
+      'Alto investimento de tempo',
+      'Requer equipe multidisciplinar',
+      'Coleta de dados pode ser complexa'
+    ]
+  }
+];
+
+const tierComparison = [
+  { feature: 'Indicadores analisados', essencial: '~9', estrategico: '~19', integral: '100+' },
+  { feature: 'Tempo de preenchimento', essencial: '30-45 min', estrategico: '2-3 horas', integral: '1-2 semanas' },
+  { feature: 'Alertas IGMA', essencial: 'Básicos', estrategico: 'Detalhados', integral: 'Completos' },
+  { feature: 'Prescrições de capacitação', essencial: 'Prioritárias', estrategico: 'Direcionadas', integral: 'Personalizadas' },
+  { feature: 'Análise de tendências', essencial: '—', estrategico: '✓', integral: '✓' },
+  { feature: 'Simulação de cenários', essencial: '—', estrategico: '—', integral: '✓' },
+  { feature: 'Relatório para captação', essencial: 'Simplificado', estrategico: 'Completo', integral: 'Técnico' },
+  { feature: 'Suporte a certificações', essencial: '—', estrategico: 'Parcial', integral: '✓' },
 ];
 
 const rules = [
@@ -223,6 +355,225 @@ export default function Metodologia() {
               <AlertDescription className="text-emerald-600 dark:text-emerald-300">
                 Segundo Mario Beni, sem um ambiente saudável e recursos naturais preservados, 
                 não há turismo sustentável. Por isso, RA sempre tem prioridade sobre os demais pilares.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+
+        {/* Diagnostic Tiers */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Scale className="h-5 w-5 text-primary" />
+              Os 3 Níveis de Diagnóstico
+            </CardTitle>
+            <CardDescription>
+              Escolha o nível adequado à sua realidade e objetivos
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            {/* Tier Cards */}
+            <div className="grid lg:grid-cols-3 gap-6">
+              {diagnosticTiers.map((tier) => (
+                <div 
+                  key={tier.id}
+                  className={`relative rounded-xl border-2 ${tier.borderColor} ${tier.bgColor} p-6 space-y-4`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className={`p-3 rounded-xl ${tier.color} text-white`}>
+                      <tier.icon className="h-6 w-6" />
+                    </div>
+                    <div className="text-right">
+                      <Badge variant="outline" className="font-mono">
+                        {tier.indicatorCount} indicadores
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-bold text-xl">{tier.name}</h3>
+                    <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                      <Clock className="h-4 w-4" />
+                      {tier.timeToComplete}
+                    </div>
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground">{tier.description}</p>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                        <Users2 className="h-4 w-4 text-primary" />
+                        Público-alvo
+                      </div>
+                      <p className="text-sm text-muted-foreground">{tier.targetAudience}</p>
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                        <Lightbulb className="h-4 w-4 text-primary" />
+                        Casos de uso
+                      </div>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        {tier.useCases.map((useCase, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-primary">•</span>
+                            {useCase}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Detailed Benefits */}
+            <div className="space-y-6">
+              <h4 className="font-semibold text-lg flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                O que cada nível entrega
+              </h4>
+              
+              <div className="grid lg:grid-cols-3 gap-4">
+                {diagnosticTiers.map((tier) => (
+                  <div key={tier.id} className={`rounded-xl border ${tier.borderColor} p-5 space-y-4`}>
+                    <div className="flex items-center gap-2">
+                      <div className={`p-2 rounded-lg ${tier.color} text-white`}>
+                        <tier.icon className="h-4 w-4" />
+                      </div>
+                      <h5 className="font-semibold">{tier.name}</h5>
+                    </div>
+                    
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
+                        Outputs / Relatórios
+                      </p>
+                      <ul className="text-sm space-y-1">
+                        {tier.outputs.map((output, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                            {output}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
+                        Benefícios
+                      </p>
+                      <ul className="text-sm space-y-1">
+                        {tier.benefits.map((benefit, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <TrendingUp className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+                            {benefit}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
+                        Limitações
+                      </p>
+                      <ul className="text-sm space-y-1">
+                        {tier.limitations.map((limitation, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-muted-foreground">
+                            <TrendingDown className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                            {limitation}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Comparison Table */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-lg flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                Tabela Comparativa
+              </h4>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium">Funcionalidade</th>
+                      <th className="text-center py-3 px-4 font-medium">
+                        <div className="flex items-center justify-center gap-2">
+                          <Zap className="h-4 w-4 text-teal-500" />
+                          Essencial
+                        </div>
+                      </th>
+                      <th className="text-center py-3 px-4 font-medium">
+                        <div className="flex items-center justify-center gap-2">
+                          <Gauge className="h-4 w-4 text-violet-500" />
+                          Estratégico
+                        </div>
+                      </th>
+                      <th className="text-center py-3 px-4 font-medium">
+                        <div className="flex items-center justify-center gap-2">
+                          <Target className="h-4 w-4 text-rose-500" />
+                          Integral
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tierComparison.map((row, idx) => (
+                      <tr key={idx} className="border-b last:border-0">
+                        <td className="py-3 px-4 font-medium">{row.feature}</td>
+                        <td className="py-3 px-4 text-center">
+                          {row.essencial === '✓' ? (
+                            <CheckCircle className="h-4 w-4 text-green-500 mx-auto" />
+                          ) : row.essencial === '—' ? (
+                            <span className="text-muted-foreground">—</span>
+                          ) : (
+                            row.essencial
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          {row.estrategico === '✓' ? (
+                            <CheckCircle className="h-4 w-4 text-green-500 mx-auto" />
+                          ) : row.estrategico === '—' ? (
+                            <span className="text-muted-foreground">—</span>
+                          ) : (
+                            row.estrategico
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          {row.integral === '✓' ? (
+                            <CheckCircle className="h-4 w-4 text-green-500 mx-auto" />
+                          ) : row.integral === '—' ? (
+                            <span className="text-muted-foreground">—</span>
+                          ) : (
+                            row.integral
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Recommendation Alert */}
+            <Alert className="border-primary/50 bg-primary/5">
+              <Info className="h-4 w-4" />
+              <AlertTitle>Qual nível escolher?</AlertTitle>
+              <AlertDescription className="space-y-2">
+                <p>
+                  <strong>Comece pelo Essencial</strong> se é seu primeiro diagnóstico ou se precisa de resultados rápidos. 
+                  Use o <strong>Estratégico</strong> para planejamento anual ou captação de recursos. 
+                  Reserve o <strong>Integral</strong> para projetos de grande porte ou certificações de destino.
+                </p>
+                <p className="text-muted-foreground">
+                  Você pode evoluir o nível do diagnóstico a qualquer momento, adicionando mais indicadores conforme a maturidade do destino aumenta.
+                </p>
               </AlertDescription>
             </Alert>
           </CardContent>
