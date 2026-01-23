@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useCallback } from 'react';
+import { useProfileContext } from '@/contexts/ProfileContext';
 
 export interface ERPStats {
   totalPlans: number;
@@ -157,23 +158,37 @@ export function useERPRealtimeUpdates() {
 
 // Get overall ERP stats including projects
 export function useERPStats() {
+  const { effectiveOrgId } = useProfileContext();
+  
   return useQuery({
-    queryKey: ['erp-stats'],
+    queryKey: ['erp-stats', effectiveOrgId],
     queryFn: async () => {
-      // Fetch action plans
+      if (!effectiveOrgId) return null;
+
+      // Fetch action plans filtered by org
       const { data: plans } = await supabase
         .from('action_plans')
-        .select('*');
+        .select('*, assessments!inner(org_id)')
+        .eq('assessments.org_id', effectiveOrgId);
 
-      // Fetch projects
+      // Fetch projects filtered by org
       const { data: projects } = await supabase
         .from('projects')
-        .select('*');
+        .select('*')
+        .eq('org_id', effectiveOrgId);
 
-      // Fetch project tasks for project completion calculation
-      const { data: projectTasks } = await supabase
-        .from('project_tasks')
-        .select('*');
+      // Get project IDs first
+      const projectIds = (projects || []).map(p => p.id);
+
+      // Fetch project tasks for these projects only
+      let projectTasks: any[] = [];
+      if (projectIds.length > 0) {
+        const { data: tasks } = await supabase
+          .from('project_tasks')
+          .select('*')
+          .in('project_id', projectIds);
+        projectTasks = tasks || [];
+      }
 
       const now = new Date();
       
@@ -229,6 +244,7 @@ export function useERPStats() {
         projectCompletionRate,
       } as ERPStats;
     },
+    enabled: !!effectiveOrgId,
     refetchInterval: 60000, // Refetch every minute
     staleTime: 30000, // Consider data stale after 30 seconds
   });
@@ -236,9 +252,13 @@ export function useERPStats() {
 
 // Get project-level stats
 export function useProjectStats() {
+  const { effectiveOrgId } = useProfileContext();
+  
   return useQuery({
-    queryKey: ['erp-project-stats'],
+    queryKey: ['erp-project-stats', effectiveOrgId],
     queryFn: async () => {
+      if (!effectiveOrgId) return [];
+
       const { data: projects } = await supabase
         .from('projects')
         .select(`
@@ -246,6 +266,7 @@ export function useProjectStats() {
           destinations(name),
           project_tasks(id, status, due_date)
         `)
+        .eq('org_id', effectiveOrgId)
         .order('created_at', { ascending: false });
 
       if (!projects) return [];
@@ -277,6 +298,7 @@ export function useProjectStats() {
         } as ProjectStats;
       });
     },
+    enabled: !!effectiveOrgId,
     refetchInterval: 60000,
     staleTime: 30000,
   });
