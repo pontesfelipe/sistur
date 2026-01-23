@@ -20,7 +20,7 @@ const PendingApproval = lazy(() => import("./pages/PendingApproval"));
 const Destinos = lazy(() => import("./pages/Destinos"));
 const Diagnosticos = lazy(() => import("./pages/Diagnosticos"));
 const DiagnosticoDetalhe = lazy(() => import("./pages/DiagnosticoDetalhe"));
-const Indicadores = lazy(() => import("./pages/Indicadores"));
+
 const Importacoes = lazy(() => import("./pages/Importacoes"));
 const Cursos = lazy(() => import("./pages/Cursos"));
 const AdminCursos = lazy(() => import("./pages/AdminCursos"));
@@ -108,14 +108,6 @@ const App = () => {
                   element={
                     <ERPRoute>
                       <DiagnosticoDetalhe />
-                    </ERPRoute>
-                  }
-                />
-                <Route
-                  path="/indicadores"
-                  element={
-                    <ERPRoute>
-                      <Indicadores />
                     </ERPRoute>
                   }
                 />
