@@ -523,69 +523,82 @@ export default function NovaRodada() {
             {/* Step 1: Scope & Type */}
             {currentStep === 1 && (
               <div className="space-y-6">
-                {/* Diagnostic Type Selector - Only show if org has enterprise access */}
-                {hasEnterpriseAccess && (
-                  <>
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground">
-                        Selecione o tipo de diagnóstico que deseja realizar.
-                      </p>
+                {/* Diagnostic Type Selector - Always show, org can run both types if has enterprise access */}
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    Selecione o tipo de diagnóstico que deseja realizar.
+                  </p>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">Tipo de Diagnóstico</Label>
+                  <RadioGroup
+                    value={diagnosticType}
+                    onValueChange={(value) => setDiagnosticType(value as DiagnosticType)}
+                    className="grid grid-cols-2 gap-4"
+                  >
+                    <div className={cn(
+                      "flex flex-col items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all text-center",
+                      diagnosticType === 'territorial' 
+                        ? "border-primary bg-primary/5" 
+                        : "border-muted hover:border-muted-foreground/50"
+                    )}>
+                      <RadioGroupItem value="territorial" id="territorial" className="sr-only" />
+                      <Label htmlFor="territorial" className="cursor-pointer space-y-3">
+                        <div className="mx-auto w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                          <Landmark className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Territorial</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Municípios e destinos turísticos. Dados de IBGE, DATASUS, INEP.
+                          </p>
+                        </div>
+                      </Label>
                     </div>
                     
-                    <div>
-                      <Label className="text-sm font-medium mb-3 block">Tipo de Diagnóstico</Label>
-                      <RadioGroup
-                        value={diagnosticType}
-                        onValueChange={(value) => setDiagnosticType(value as DiagnosticType)}
-                        className="grid grid-cols-2 gap-4"
+                    <div className={cn(
+                      "flex flex-col items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all text-center relative",
+                      !hasEnterpriseAccess && "opacity-50 cursor-not-allowed",
+                      diagnosticType === 'enterprise' 
+                        ? "border-amber-500 bg-amber-50 dark:bg-amber-950/30" 
+                        : "border-muted hover:border-muted-foreground/50"
+                    )}>
+                      <RadioGroupItem 
+                        value="enterprise" 
+                        id="enterprise" 
+                        className="sr-only" 
+                        disabled={!hasEnterpriseAccess}
+                      />
+                      <Label 
+                        htmlFor="enterprise" 
+                        className={cn(
+                          "cursor-pointer space-y-3",
+                          !hasEnterpriseAccess && "cursor-not-allowed"
+                        )}
                       >
-                        <div className={cn(
-                          "flex flex-col items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all text-center",
-                          diagnosticType === 'territorial' 
-                            ? "border-primary bg-primary/5" 
-                            : "border-muted hover:border-muted-foreground/50"
-                        )}>
-                          <RadioGroupItem value="territorial" id="territorial" className="sr-only" />
-                          <Label htmlFor="territorial" className="cursor-pointer space-y-3">
-                            <div className="mx-auto w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                              <Landmark className="h-6 w-6 text-blue-600" />
-                            </div>
-                            <div>
-                              <p className="font-medium">Territorial</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Municípios e destinos turísticos. Dados de IBGE, DATASUS, INEP.
-                              </p>
-                            </div>
-                          </Label>
+                        <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                          <Hotel className="h-6 w-6 text-amber-600" />
                         </div>
-                        
-                        <div className={cn(
-                          "flex flex-col items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all text-center",
-                          diagnosticType === 'enterprise' 
-                            ? "border-amber-500 bg-amber-50 dark:bg-amber-950/30" 
-                            : "border-muted hover:border-muted-foreground/50"
-                        )}>
-                          <RadioGroupItem value="enterprise" id="enterprise" className="sr-only" />
-                          <Label htmlFor="enterprise" className="cursor-pointer space-y-3">
-                            <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                              <Hotel className="h-6 w-6 text-amber-600" />
-                            </div>
-                            <div className="flex items-center gap-2 justify-center">
-                              <p className="font-medium">Enterprise</p>
-                              <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs">
-                                <Sparkles className="h-2.5 w-2.5 mr-0.5" />
-                                PRO
-                              </Badge>
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              Hotéis e resorts. RevPAR, NPS, Ocupação, KPIs hoteleiros.
-                            </p>
-                          </Label>
+                        <div className="flex items-center gap-2 justify-center">
+                          <p className="font-medium">Enterprise</p>
+                          <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs">
+                            <Sparkles className="h-2.5 w-2.5 mr-0.5" />
+                            PRO
+                          </Badge>
                         </div>
-                      </RadioGroup>
+                        <p className="text-xs text-muted-foreground">
+                          Hotéis e resorts. RevPAR, NPS, Ocupação, KPIs hoteleiros.
+                        </p>
+                        {!hasEnterpriseAccess && (
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                            Requer acesso Enterprise habilitado
+                          </p>
+                        )}
+                      </Label>
                     </div>
-                  </>
-                )}
+                  </RadioGroup>
+                </div>
                 
                 {/* Visibility Selector */}
                 <div className="p-4 bg-muted/50 rounded-lg">
