@@ -18,6 +18,9 @@ import {
   Trash2,
   Database,
   AlertTriangle,
+  Landmark,
+  Hotel,
+  Globe,
   Check,
   X,
   Loader2,
@@ -62,6 +65,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
+type IndicatorScope = 'territorial' | 'enterprise' | 'both';
 
 const reliabilityIcons = {
   AUTOMATICA: { icon: ShieldCheck, color: 'text-severity-good', label: 'Automático' },
@@ -73,6 +77,12 @@ const interpretationLabels: Record<string, string> = {
   'Estrutural': 'Estrutural',
   'Gestão': 'Gestão',
   'Entrega': 'Entrega',
+};
+
+const scopeLabels: Record<IndicatorScope, { label: string; color: string; bgColor: string }> = {
+  territorial: { label: 'Territorial', color: 'text-blue-600', bgColor: 'bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800' },
+  enterprise: { label: 'Enterprise', color: 'text-amber-600', bgColor: 'bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800' },
+  both: { label: 'Ambos', color: 'text-purple-600', bgColor: 'bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800' },
 };
 
 const Indicadores = () => {
@@ -311,6 +321,8 @@ const Indicadores = () => {
               const defaultInterpretation = (indicator as any).default_interpretation;
               const isPending = isPendingConfirmation(indicator);
               const isEditingWeight = editingWeightId === indicator.id;
+              const indicatorScope = ((indicator as any).indicator_scope || 'territorial') as IndicatorScope;
+              const scopeInfo = scopeLabels[indicatorScope];
 
               return (
                 <div key={indicator.id} className={cn("p-4 space-y-3", isPending && 'opacity-60')}>
@@ -426,6 +438,15 @@ const Indicadores = () => {
 
                   {/* Badges */}
                   <div className="flex flex-wrap gap-2">
+                    <Badge 
+                      variant="outline" 
+                      className={cn("gap-1 border", scopeInfo.bgColor)}
+                    >
+                      {indicatorScope === 'territorial' && <Landmark className={cn("h-3 w-3", scopeInfo.color)} />}
+                      {indicatorScope === 'enterprise' && <Hotel className={cn("h-3 w-3", scopeInfo.color)} />}
+                      {indicatorScope === 'both' && <Globe className={cn("h-3 w-3", scopeInfo.color)} />}
+                      <span className={scopeInfo.color}>{scopeInfo.label}</span>
+                    </Badge>
                     {isIGMA && (
                       <Badge variant="outline" className="border-primary/50 text-primary">
                         <Database className="h-3 w-3 mr-1" />
@@ -507,6 +528,7 @@ const Indicadores = () => {
               <TableRow>
                 <TableHead>Código</TableHead>
                 <TableHead>Nome</TableHead>
+                <TableHead>Escopo</TableHead>
                 <TableHead>Fonte</TableHead>
                 <TableHead>Pilar</TableHead>
                 <TableHead>Dimensão/Tema</TableHead>
@@ -535,6 +557,8 @@ const Indicadores = () => {
                 const defaultInterpretation = (indicator as any).default_interpretation;
                 const isPending = isPendingConfirmation(indicator);
                 const isEditingWeight = editingWeightId === indicator.id;
+                const indicatorScope = ((indicator as any).indicator_scope || 'territorial') as IndicatorScope;
+                const scopeInfo = scopeLabels[indicatorScope];
 
                 return (
                   <TableRow key={indicator.id} className={cn(isPending && 'opacity-60')}>
@@ -640,6 +664,17 @@ const Indicadores = () => {
                           </div>
                         </DialogContent>
                       </Dialog>
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant="outline" 
+                        className={cn("gap-1 border", scopeInfo.bgColor)}
+                      >
+                        {indicatorScope === 'territorial' && <Landmark className={cn("h-3 w-3", scopeInfo.color)} />}
+                        {indicatorScope === 'enterprise' && <Hotel className={cn("h-3 w-3", scopeInfo.color)} />}
+                        {indicatorScope === 'both' && <Globe className={cn("h-3 w-3", scopeInfo.color)} />}
+                        <span className={scopeInfo.color}>{scopeInfo.label}</span>
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       {isIGMA ? (
