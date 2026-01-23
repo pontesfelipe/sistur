@@ -122,9 +122,11 @@ const Index = () => {
     : aggregatedLoading;
   const activeIssuesLoading = isEnterprise ? enterpriseIssuesLoading : issuesLoading;
 
-  const criticalPillar = activePillarData?.pillarScores?.reduce((prev, current) =>
-    prev.score < current.score ? prev : current
-  , activePillarData.pillarScores[0]);
+  const criticalPillar = activePillarData?.pillarScores?.length
+    ? activePillarData.pillarScores.reduce((prev, current) =>
+        prev.score < current.score ? prev : current
+      , activePillarData.pillarScores[0])
+    : null;
 
   // Calculate average score if pillar scores exist
   const averageScore = activePillarData?.pillarScores?.length 
