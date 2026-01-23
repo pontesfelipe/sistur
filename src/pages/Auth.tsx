@@ -672,7 +672,7 @@ const Auth = () => {
               </div>
               <div>
                 <p className="font-medium">Diagnóstico por Pilares</p>
-                <p className="text-sm text-primary-foreground/70">Análise IRA, IOE e IAO com identificação de gargalos</p>
+                <p className="text-sm text-primary-foreground/70">Análise I-RA, I-OE e I-AO com identificação de gargalos</p>
               </div>
             </div>
 
