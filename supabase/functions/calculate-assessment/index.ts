@@ -781,7 +781,65 @@ serve(async (req) => {
 
     console.log(`Created ${insertedIssues.length} issues`);
 
-    // 10. Get courses for recommendations
+    // 10. Get indicator codes for low-scoring indicators to map to trainings
+    // Collect all indicator codes that have score < 0.67 (Crítico or Atenção)
+    const lowScoreIndicatorCodes: string[] = [];
+    const indicatorScoreMap = new Map<string, { code: string; name: string; score: number; pillar: string }>();
+    
+    for (const iv of filteredIndicatorValues as unknown as IndicatorValue[]) {
+      if (!iv.indicator) continue;
+      const indicatorScore = indicatorScores.find(s => s.indicator_id === iv.indicator_id);
+      if (indicatorScore && indicatorScore.score < 0.67) {
+        lowScoreIndicatorCodes.push(iv.indicator.code);
+        indicatorScoreMap.set(iv.indicator.code, {
+          code: iv.indicator.code,
+          name: iv.indicator.name,
+          score: indicatorScore.score,
+          pillar: iv.indicator.pillar,
+        });
+      }
+    }
+
+    console.log(`Found ${lowScoreIndicatorCodes.length} indicators with low scores for training mapping`);
+
+    // 10.1 Get training mappings from edu_indicator_training_map (unified EDU model)
+    let trainingMappings: any[] = [];
+    let eduTrainings: any[] = [];
+
+    if (lowScoreIndicatorCodes.length > 0) {
+      const { data: mappings, error: mappingsError } = await supabase
+        .from("edu_indicator_training_map")
+        .select("*")
+        .in("indicator_code", lowScoreIndicatorCodes)
+        .order("priority", { ascending: true });
+
+      if (mappingsError) {
+        console.error("Error fetching training mappings:", mappingsError);
+      } else {
+        trainingMappings = mappings || [];
+      }
+
+      // Get unique training IDs
+      const trainingIds = [...new Set((trainingMappings || []).map(m => m.training_id))];
+      
+      if (trainingIds.length > 0) {
+        const { data: trainings, error: trainingsError } = await supabase
+          .from("edu_trainings")
+          .select("*")
+          .in("training_id", trainingIds)
+          .eq("active", true);
+
+        if (trainingsError) {
+          console.error("Error fetching edu trainings:", trainingsError);
+        } else {
+          eduTrainings = trainings || [];
+        }
+      }
+    }
+
+    console.log(`Found ${trainingMappings.length} training mappings and ${eduTrainings.length} active trainings`);
+
+    // 10.2 Fallback: Also get legacy courses for backward compatibility
     const { data: courses, error: coursesError } = await supabase
       .from("courses")
       .select("*")
@@ -806,6 +864,7 @@ serve(async (req) => {
     }
 
     // 11. Generate prescriptions with IGMA filtering (Mario Beni rules)
+    // Using UNIFIED EDU model: edu_indicator_training_map + edu_trainings
     const prescriptions: Array<{
       org_id: string;
       assessment_id: string;
@@ -831,8 +890,125 @@ serve(async (req) => {
       priority: number;
     }> = [];
 
-    if (courses && courses.length > 0 && insertedIssues.length > 0) {
-      let priority = 1;
+    // Label constants for justification
+    const interpretationLabels: Record<string, string> = {
+      ESTRUTURAL: "Estrutural",
+      GESTAO: "Gestão",
+      ENTREGA: "Entrega"
+    };
+    
+    const pillarNames: Record<string, string> = {
+      RA: "Relações Ambientais",
+      OE: "Organização Estrutural",
+      AO: "Ações Operacionais"
+    };
+
+    const severityLabels: Record<string, string> = {
+      CRITICO: "Crítico",
+      MODERADO: "Atenção"
+    };
+
+    let priority = 1;
+    const usedTrainingIds = new Set<string>();
+
+    // STRATEGY A: Use edu_indicator_training_map (preferred - unified model)
+    if (trainingMappings.length > 0 && eduTrainings.length > 0 && insertedIssues.length > 0) {
+      console.log("Using unified EDU model for prescriptions");
+
+      // Group mappings by indicator code
+      const mappingsByIndicator = new Map<string, typeof trainingMappings>();
+      for (const mapping of trainingMappings) {
+        if (!mappingsByIndicator.has(mapping.indicator_code)) {
+          mappingsByIndicator.set(mapping.indicator_code, []);
+        }
+        mappingsByIndicator.get(mapping.indicator_code)!.push(mapping);
+      }
+
+      // For each issue, find trainings mapped to indicators in that issue's evidence
+      for (const issue of insertedIssues) {
+        // IGMA FILTER: Check if this pillar's EDU is allowed (Mario Beni rules)
+        const pillarActionKey = `EDU_${issue.pillar}` as keyof typeof igmaResult.allowedActions;
+        const isAllowed = igmaResult.allowedActions[pillarActionKey] ?? true;
+        
+        if (!isAllowed) {
+          console.log(`IGMA: Skipping prescriptions for pillar ${issue.pillar} - blocked by systemic rules`);
+          continue;
+        }
+
+        // Get indicator codes from issue evidence
+        const evidenceIndicators = (issue.evidence as any)?.indicators || [];
+        const issueIndicatorCodes = evidenceIndicators.map((i: any) => i.code).filter(Boolean);
+
+        // Find matching trainings via mappings
+        const matchedTrainings: Array<{ training: any; mapping: any; indicatorInfo: any }> = [];
+
+        for (const code of issueIndicatorCodes) {
+          const mappings = mappingsByIndicator.get(code) || [];
+          const indicatorInfo = indicatorScoreMap.get(code);
+          
+          for (const mapping of mappings) {
+            // Only include if pillar matches
+            if (mapping.pillar !== issue.pillar) continue;
+            
+            const training = eduTrainings.find(t => t.training_id === mapping.training_id);
+            if (training && !usedTrainingIds.has(training.training_id)) {
+              matchedTrainings.push({ training, mapping, indicatorInfo });
+            }
+          }
+        }
+
+        // Sort by mapping priority and take top 3
+        matchedTrainings.sort((a, b) => a.mapping.priority - b.mapping.priority);
+        
+        const targetAgent = determineTargetAgent(issue.interpretation);
+        const interpretationLabel = interpretationLabels[issue.interpretation] || issue.interpretation;
+        const pillarName = pillarNames[issue.pillar] || issue.pillar;
+        const severityLabel = severityLabels[issue.severity] || issue.severity;
+
+        for (const { training, mapping, indicatorInfo } of matchedTrainings.slice(0, 3)) {
+          // Build justification using the mapping's reason_template or default format
+          let justification = mapping.reason_template || 
+            `Esta capacitação foi prescrita porque o indicador {indicator} está {status} no pilar {pillar}.`;
+          
+          justification = justification
+            .replace('{indicator}', indicatorInfo?.name || issue.theme)
+            .replace('{status}', severityLabel)
+            .replace('{pillar}', pillarName);
+
+          // Mark as used to avoid duplicates
+          usedTrainingIds.add(training.training_id);
+
+          prescriptions.push({
+            org_id: orgId,
+            assessment_id,
+            issue_id: issue.id,
+            course_id: training.training_id, // Using training_id as course_id for backward compat
+            indicator_id: indicatorInfo?.code,
+            pillar: issue.pillar,
+            status: issue.severity,
+            interpretation: issue.interpretation,
+            justification,
+            target_agent: targetAgent,
+            priority: priority,
+            cycle_number: 1,
+          });
+
+          // Also add to recommendations for backward compatibility
+          recommendations.push({
+            org_id: orgId,
+            assessment_id,
+            issue_id: issue.id,
+            course_id: training.training_id,
+            reason: justification,
+            priority: priority++,
+          });
+        }
+      }
+    }
+
+    // STRATEGY B: Fallback to legacy courses table if no EDU mappings found
+    if (prescriptions.length === 0 && courses && courses.length > 0 && insertedIssues.length > 0) {
+      console.log("Falling back to legacy courses table for prescriptions");
       
       // Sort issues by severity (CRITICO first)
       const sortedIssues = [...insertedIssues].sort((a, b) => {
@@ -867,28 +1043,9 @@ serve(async (req) => {
           return (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99);
         });
 
-        // Get interpretation labels for justification
-        const interpretationLabels: Record<string, string> = {
-          ESTRUTURAL: "Estrutural",
-          GESTAO: "Gestão",
-          ENTREGA: "Entrega"
-        };
         const interpretationLabel = interpretationLabels[issue.interpretation] || issue.interpretation;
-        
-        const pillarNames: Record<string, string> = {
-          RA: "Relações Ambientais",
-          OE: "Organização Estrutural",
-          AO: "Ações Operacionais"
-        };
         const pillarName = pillarNames[issue.pillar] || issue.pillar;
-
-        const severityLabels: Record<string, string> = {
-          CRITICO: "Crítico",
-          MODERADO: "Atenção"
-        };
         const severityLabel = severityLabels[issue.severity] || issue.severity;
-
-        // Determine target agent based on interpretation
         const targetAgent = determineTargetAgent(issue.interpretation);
 
         // Add top 2 matching courses as prescriptions
