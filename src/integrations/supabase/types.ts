@@ -5827,6 +5827,14 @@ export type Database = {
         Returns: string
       }
       generate_certificate_id: { Args: never; Returns: string }
+      get_dashboard_org_access_flags: {
+        Args: never
+        Returns: {
+          has_enterprise_access: boolean
+          has_territorial_access: boolean
+          org_id: string
+        }[]
+      }
       get_effective_org_id: { Args: never; Returns: string }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
       has_role: {

@@ -62,11 +62,13 @@ const Index = () => {
     queryKey: ['org-dashboard-settings', effectiveOrgId],
     queryFn: async () => {
       if (!effectiveOrgId) return null;
+
+      // IMPORTANT: In demo mode, the user may not belong to the demo org, so a direct SELECT on `orgs`
+      // can be blocked by RLS. We fetch these flags via a secure backend function instead.
       const { data, error } = await supabase
-        .from('orgs')
-        .select('has_enterprise_access, has_territorial_access')
-        .eq('id', effectiveOrgId)
+        .rpc('get_dashboard_org_access_flags')
         .maybeSingle();
+
       if (error) {
         console.error('[Dashboard] Error fetching org settings:', error);
         throw error;
@@ -100,13 +102,15 @@ const Index = () => {
   const hasEnterpriseAccess = orgSettings?.has_enterprise_access ?? false;
   
   // Debug log para investigar toggle Enterprise
-  console.log('[Dashboard Debug]', { 
-    effectiveOrgId, 
-    orgSettings,
-    orgSettingsLoading,
-    orgSettingsError,
-    hasEnterpriseAccess
-  });
+  if (import.meta.env.DEV) {
+    console.log('[Dashboard Debug]', {
+      effectiveOrgId,
+      orgSettings,
+      orgSettingsLoading,
+      orgSettingsError,
+      hasEnterpriseAccess,
+    });
+  }
 
   // Select appropriate data based on mode
   const isEnterprise = diagnosticMode === 'enterprise';
