@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,13 +47,46 @@ const COLORS = [
   'hsl(280 65% 60%)', // purple
 ];
 
+const STORAGE_KEY = 'sistur-destination-comparison-selection';
+
 export function DestinationComparison({ 
   destinations, 
   getDestinationData,
   isLoading 
 }: DestinationComparisonProps) {
-  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>(() => {
+    // Initialize from localStorage
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error('Error reading from localStorage:', e);
+    }
+    return [];
+  });
   const [open, setOpen] = useState(false);
+
+  // Filter out invalid destination IDs (destinations that no longer exist)
+  useEffect(() => {
+    if (destinations.length > 0) {
+      const validIds = destinations.map(d => d.id);
+      const filtered = selectedDestinations.filter(id => validIds.includes(id));
+      if (filtered.length !== selectedDestinations.length) {
+        setSelectedDestinations(filtered);
+      }
+    }
+  }, [destinations]);
+
+  // Persist selection to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedDestinations));
+    } catch (e) {
+      console.error('Error saving to localStorage:', e);
+    }
+  }, [selectedDestinations]);
 
   const toggleDestination = (destId: string) => {
     setSelectedDestinations(prev => 

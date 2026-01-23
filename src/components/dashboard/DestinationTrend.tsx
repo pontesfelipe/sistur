@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -32,10 +32,44 @@ const PILLAR_COLORS: Record<string, string> = {
   AO: 'hsl(142 76% 36%)',
 };
 
+const STORAGE_KEY = 'sistur-destination-trend-selection';
+
 export function DestinationTrend({ destinations }: DestinationTrendProps) {
-  const [selectedDestination, setSelectedDestination] = useState<string | undefined>(
-    destinations[0]?.id
-  );
+  const [selectedDestination, setSelectedDestination] = useState<string | undefined>(() => {
+    // Initialize from localStorage, fallback to first destination
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return saved;
+      }
+    } catch (e) {
+      console.error('Error reading from localStorage:', e);
+    }
+    return destinations[0]?.id;
+  });
+
+  // Validate that selected destination still exists
+  useEffect(() => {
+    if (destinations.length > 0) {
+      const validIds = destinations.map(d => d.id);
+      if (selectedDestination && !validIds.includes(selectedDestination)) {
+        setSelectedDestination(destinations[0]?.id);
+      } else if (!selectedDestination) {
+        setSelectedDestination(destinations[0]?.id);
+      }
+    }
+  }, [destinations]);
+
+  // Persist selection to localStorage
+  useEffect(() => {
+    if (selectedDestination) {
+      try {
+        localStorage.setItem(STORAGE_KEY, selectedDestination);
+      } catch (e) {
+        console.error('Error saving to localStorage:', e);
+      }
+    }
+  }, [selectedDestination]);
 
   // Fetch historical data for selected destination
   const { data: trendData, isLoading } = useQuery({
