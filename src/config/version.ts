@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 11,
+  patch: 12,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.12",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Debug logging para investigar toggle Enterprise no Dashboard",
+      "Verificação de has_enterprise_access nas organizações SISTUR e Demo"
+    ]
+  },
   {
     version: "1.7.11",
     date: "2026-01-23",
