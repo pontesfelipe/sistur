@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 7,
+  patch: 10,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.10",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Adicionado filtro de escopo (Territorial/Enterprise/Ambos) na página de Indicadores",
+      "Dashboard ERP atualizado com toggle Territorial/Enterprise para segregar dados",
+      "Hooks usePillarProgress e useCycleEvolution agora filtram por diagnostic_type",
+      "Badges de escopo visíveis e editáveis inline na tabela de indicadores"
+    ]
+  },
   {
     version: "1.7.7",
     date: "2026-01-23",

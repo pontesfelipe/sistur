@@ -18,22 +18,27 @@ import {
 } from '@/hooks/useERPMonitoring';
 import { useDestinationsWithAssessments } from '@/hooks/useDashboardData';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Wifi } from 'lucide-react';
+import { RefreshCw, Wifi, Landmark, Hotel } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+
+type DiagnosticType = 'territorial' | 'enterprise';
 
 export default function ERPDashboard() {
   const [selectedDestination, setSelectedDestination] = useState<string | undefined>(undefined);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [diagnosticType, setDiagnosticType] = useState<DiagnosticType>('territorial');
 
   // Enable real-time updates
   useERPRealtimeUpdates();
 
   const { invalidateAll } = useERPQueryInvalidation();
   const { data: stats, isLoading: statsLoading } = useERPStats();
-  const { data: pillarProgress, isLoading: pillarLoading } = usePillarProgress();
+  const { data: pillarProgress, isLoading: pillarLoading } = usePillarProgress(diagnosticType);
   const { data: cycleEvolution, isLoading: cycleLoading } = useCycleEvolution(
-    selectedDestination === 'all' ? undefined : selectedDestination
+    selectedDestination === 'all' ? undefined : selectedDestination,
+    diagnosticType
   );
   const { data: overdueProjects, isLoading: overdueLoading } = useOverdueProjects();
   const { data: recentPlans, isLoading: recentLoading } = useRecentActionPlans(10);
@@ -53,6 +58,29 @@ export default function ERPDashboard() {
       subtitle="Dashboard de acompanhamento do ciclo Estruturação, Resultados e Processos"
       actions={
         <div className="flex items-center gap-3">
+          <ToggleGroup 
+            type="single" 
+            value={diagnosticType} 
+            onValueChange={(value) => value && setDiagnosticType(value as DiagnosticType)}
+            className="bg-muted rounded-lg p-1"
+          >
+            <ToggleGroupItem 
+              value="territorial" 
+              aria-label="Ver diagnósticos territoriais"
+              className="gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
+            >
+              <Landmark className="h-4 w-4" />
+              <span className="hidden sm:inline">Territorial</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem 
+              value="enterprise" 
+              aria-label="Ver diagnósticos enterprise"
+              className="gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
+            >
+              <Hotel className="h-4 w-4" />
+              <span className="hidden sm:inline">Enterprise</span>
+            </ToggleGroupItem>
+          </ToggleGroup>
           <Badge variant="outline" className="gap-1.5 text-xs">
             <Wifi className="h-3 w-3 text-severity-good animate-pulse" />
             Tempo real

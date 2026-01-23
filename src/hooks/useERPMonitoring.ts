@@ -344,20 +344,28 @@ export function useProjectStats() {
 }
 
 // Get progress by pillar based on assessment pillar_scores
-export function usePillarProgress() {
+export function usePillarProgress(diagnosticType?: 'territorial' | 'enterprise') {
   return useQuery({
-    queryKey: ['erp-pillar-progress'],
+    queryKey: ['erp-pillar-progress', diagnosticType],
     queryFn: async () => {
       // Fetch calculated assessments with pillar scores
-      const { data: assessments } = await supabase
+      let query = supabase
         .from('assessments')
         .select(`
           id,
           destination_id,
+          diagnostic_type,
           destinations(id, name),
           pillar_scores(pillar, score)
         `)
         .eq('status', 'CALCULATED');
+
+      // Filter by diagnostic type if specified
+      if (diagnosticType) {
+        query = query.eq('diagnostic_type', diagnosticType);
+      }
+
+      const { data: assessments } = await query;
 
       if (!assessments || assessments.length === 0) return [];
 
@@ -421,9 +429,9 @@ export function usePillarProgress() {
 }
 
 // Get cycle evolution data with project info
-export function useCycleEvolution(destinationId?: string) {
+export function useCycleEvolution(destinationId?: string, diagnosticType?: 'territorial' | 'enterprise') {
   return useQuery({
-    queryKey: ['erp-cycle-evolution', destinationId],
+    queryKey: ['erp-cycle-evolution', destinationId, diagnosticType],
     queryFn: async () => {
       let query = supabase
         .from('assessments')
@@ -433,6 +441,7 @@ export function useCycleEvolution(destinationId?: string) {
           calculated_at,
           created_at,
           destination_id,
+          diagnostic_type,
           destinations(name)
         `)
         .eq('status', 'CALCULATED')
@@ -440,6 +449,11 @@ export function useCycleEvolution(destinationId?: string) {
 
       if (destinationId) {
         query = query.eq('destination_id', destinationId);
+      }
+
+      // Filter by diagnostic type if specified
+      if (diagnosticType) {
+        query = query.eq('diagnostic_type', diagnosticType);
       }
 
       const { data: assessments } = await query;
