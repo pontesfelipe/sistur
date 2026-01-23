@@ -33,6 +33,7 @@ import {
 import { useIndicators } from '@/hooks/useIndicators';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { IndicatorDistributionReport } from './IndicatorDistributionReport';
+import { IndicatorFormDialog } from './IndicatorFormDialog';
 import {
   Select,
   SelectContent,
@@ -110,8 +111,10 @@ export function IndicadoresPanel() {
   const [editingWeightValue, setEditingWeightValue] = useState<string>('');
   const [editingTierId, setEditingTierId] = useState<string | null>(null);
   const [editingScopeId, setEditingScopeId] = useState<string | null>(null);
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   
-  const { indicators, isLoading, deleteIndicator, updateIndicator } = useIndicators();
+  const { indicators, isLoading, deleteIndicator, updateIndicator, createIndicator } = useIndicators();
   const isMobile = useIsMobile();
 
   const directionLabels = {
@@ -235,6 +238,18 @@ export function IndicadoresPanel() {
     }
   };
 
+  const handleCreateIndicator = async (data: any) => {
+    setIsCreating(true);
+    try {
+      await createIndicator.mutateAsync(data);
+      setIsFormDialogOpen(false);
+    } catch (error) {
+      console.error('Error creating indicator:', error);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   return (
     <Tabs defaultValue="list" className="space-y-6">
       <div className="flex items-center justify-between">
@@ -348,11 +363,18 @@ export function IndicadoresPanel() {
             </SelectContent>
           </Select>
         </div>
-        <Button>
+        <Button onClick={() => setIsFormDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Novo Indicador
         </Button>
       </div>
+
+      <IndicatorFormDialog
+        open={isFormDialogOpen}
+        onOpenChange={setIsFormDialogOpen}
+        onSubmit={handleCreateIndicator}
+        isLoading={isCreating}
+      />
 
       <div className="p-4 rounded-lg border bg-gradient-to-br from-primary/5 to-transparent">
         <div className="flex items-start gap-3 mb-4">
