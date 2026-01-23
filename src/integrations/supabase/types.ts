@@ -192,6 +192,7 @@ export type Database = {
           created_at: string
           creator_user_id: string | null
           destination_id: string
+          diagnostic_type: string | null
           externality_warning: boolean | null
           governance_block: boolean | null
           id: string
@@ -215,6 +216,7 @@ export type Database = {
           created_at?: string
           creator_user_id?: string | null
           destination_id: string
+          diagnostic_type?: string | null
           externality_warning?: boolean | null
           governance_block?: boolean | null
           id?: string
@@ -238,6 +240,7 @@ export type Database = {
           created_at?: string
           creator_user_id?: string | null
           destination_id?: string
+          diagnostic_type?: string | null
           externality_warning?: boolean | null
           governance_block?: boolean | null
           id?: string
@@ -1772,6 +1775,86 @@ export type Database = {
           sort_order?: number | null
         }
         Relationships: []
+      }
+      enterprise_indicator_values: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          id: string
+          indicator_id: string
+          notes: string | null
+          org_id: string
+          reference_date: string | null
+          source: string | null
+          updated_at: string
+          validated: boolean | null
+          validated_at: string | null
+          validated_by: string | null
+          value: number | null
+          value_text: string | null
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          id?: string
+          indicator_id: string
+          notes?: string | null
+          org_id: string
+          reference_date?: string | null
+          source?: string | null
+          updated_at?: string
+          validated?: boolean | null
+          validated_at?: string | null
+          validated_by?: string | null
+          value?: number | null
+          value_text?: string | null
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          id?: string
+          indicator_id?: string
+          notes?: string | null
+          org_id?: string
+          reference_date?: string | null
+          source?: string | null
+          updated_at?: string
+          validated?: boolean | null
+          validated_at?: string | null
+          validated_by?: string | null
+          value?: number | null
+          value_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_indicator_values_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_indicator_values_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
+            foreignKeyName: "enterprise_indicator_values_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_indicator_values_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       enterprise_indicators: {
         Row: {
