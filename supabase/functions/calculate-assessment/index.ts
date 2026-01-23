@@ -363,8 +363,10 @@ serve(async (req) => {
 
     const orgId = assessment.org_id;
     const assessmentTier = assessment.tier || 'COMPLETE';
+    const diagnosticType = assessment.diagnostic_type || 'territorial';
+    const isEnterprise = diagnosticType === 'enterprise';
     
-    console.log(`Assessment tier: ${assessmentTier}`);
+    console.log(`Assessment tier: ${assessmentTier}, diagnostic_type: ${diagnosticType}`);
 
     // Build tier filter based on assessment tier
     // COMPLETE: all indicators
@@ -385,54 +387,144 @@ serve(async (req) => {
     const allowedTiers = getTierFilter(assessmentTier);
     console.log(`Allowed tiers for this assessment: ${allowedTiers.join(', ')}`);
 
-    // 2. Get all indicator values with indicator details (including intersectoral_dependency and minimum_tier)
-    const { data: indicatorValues, error: valuesError } = await supabase
-      .from("indicator_values")
-      .select(`
-        id,
-        indicator_id,
-        value_raw,
-        indicator:indicators(
-          id,
-          code,
-          name,
-          pillar,
-          theme,
-          direction,
-          normalization,
-          min_ref,
-          max_ref,
-          weight,
-          intersectoral_dependency,
-          minimum_tier
-        )
-      `)
-      .eq("assessment_id", assessment_id);
-
-    if (valuesError) {
-      console.error("Error fetching indicator values:", valuesError);
-      return new Response(
-        JSON.stringify({ error: "Failed to fetch indicator values" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Define interfaces for Enterprise indicators
+    interface EnterpriseIndicatorValue {
+      id: string;
+      indicator_id: string;
+      value: number | null;
+      indicator: {
+        id: string;
+        code: string;
+        name: string;
+        pillar: "RA" | "OE" | "AO";
+        category_id: string;
+        benchmark_min: number | null;
+        benchmark_max: number | null;
+        benchmark_target: number | null;
+        weight: number;
+        minimum_tier: string;
+        unit: string;
+      };
     }
 
-    // Filter indicator values based on tier
-    const filteredIndicatorValues = (indicatorValues || []).filter((iv: any) => {
-      const indicator = iv.indicator;
-      if (!indicator) return false;
-      const indicatorTier = indicator.minimum_tier || 'COMPLETE';
-      return allowedTiers.includes(indicatorTier);
-    });
+    let filteredIndicatorValues: any[] = [];
+    let isEnterpriseCalc = false;
+
+    // 2. Get indicator values based on diagnostic type
+    if (isEnterprise) {
+      console.log("Using ENTERPRISE indicators from enterprise_indicator_values");
+      isEnterpriseCalc = true;
+      
+      // Fetch enterprise indicator values
+      const { data: enterpriseValues, error: enterpriseError } = await supabase
+        .from("enterprise_indicator_values")
+        .select(`
+          id,
+          indicator_id,
+          value,
+          indicator:enterprise_indicators(
+            id,
+            code,
+            name,
+            pillar,
+            category_id,
+            benchmark_min,
+            benchmark_max,
+            benchmark_target,
+            weight,
+            minimum_tier,
+            unit
+          )
+        `)
+        .eq("assessment_id", assessment_id);
+
+      if (enterpriseError) {
+        console.error("Error fetching enterprise indicator values:", enterpriseError);
+        return new Response(
+          JSON.stringify({ error: "Failed to fetch enterprise indicator values" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Transform to common structure and filter by tier
+      filteredIndicatorValues = (enterpriseValues || [])
+        .filter((iv: any) => {
+          const indicator = iv.indicator;
+          if (!indicator) return false;
+          const indicatorTier = indicator.minimum_tier || 'COMPLETE';
+          return allowedTiers.includes(indicatorTier);
+        })
+        .map((iv: any) => ({
+          id: iv.id,
+          indicator_id: iv.indicator_id,
+          value_raw: iv.value,
+          indicator: {
+            id: iv.indicator?.id,
+            code: iv.indicator?.code,
+            name: iv.indicator?.name,
+            pillar: iv.indicator?.pillar,
+            theme: iv.indicator?.category_id, // Use category as theme for grouping
+            direction: "HIGH_IS_BETTER" as const, // Enterprise default
+            normalization: "MIN_MAX" as const,
+            min_ref: iv.indicator?.benchmark_min,
+            max_ref: iv.indicator?.benchmark_max,
+            weight: iv.indicator?.weight || 1,
+            intersectoral_dependency: false,
+            minimum_tier: iv.indicator?.minimum_tier,
+          },
+        }));
+      
+      console.log(`Found ${filteredIndicatorValues.length} enterprise indicator values`);
+    } else {
+      // TERRITORIAL: Use standard indicator_values
+      const { data: indicatorValues, error: valuesError } = await supabase
+        .from("indicator_values")
+        .select(`
+          id,
+          indicator_id,
+          value_raw,
+          indicator:indicators(
+            id,
+            code,
+            name,
+            pillar,
+            theme,
+            direction,
+            normalization,
+            min_ref,
+            max_ref,
+            weight,
+            intersectoral_dependency,
+            minimum_tier
+          )
+        `)
+        .eq("assessment_id", assessment_id);
+
+      if (valuesError) {
+        console.error("Error fetching indicator values:", valuesError);
+        return new Response(
+          JSON.stringify({ error: "Failed to fetch indicator values" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Filter indicator values based on tier
+      filteredIndicatorValues = (indicatorValues || []).filter((iv: any) => {
+        const indicator = iv.indicator;
+        if (!indicator) return false;
+        const indicatorTier = indicator.minimum_tier || 'COMPLETE';
+        return allowedTiers.includes(indicatorTier);
+      });
+    }
 
     if (!filteredIndicatorValues || filteredIndicatorValues.length === 0) {
       return new Response(
-        JSON.stringify({ error: "No indicator values found for this assessment and tier level" }),
+        JSON.stringify({ error: `No indicator values found for this ${isEnterprise ? 'enterprise' : 'territorial'} assessment and tier level` }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`Processing ${filteredIndicatorValues.length} indicator values (filtered from ${indicatorValues?.length || 0} by tier ${assessmentTier})`);
+    console.log(`Processing ${filteredIndicatorValues.length} ${isEnterprise ? 'enterprise' : 'territorial'} indicator values (tier: ${assessmentTier})`);
 
     // 3.1 Fetch composite rules for I_SEMT calculation
     const { data: compositeRules } = await supabase
@@ -523,7 +615,7 @@ serve(async (req) => {
         
         for (const rule of rules) {
           // Find the component indicator value
-          const componentIv = (indicatorValues as unknown as IndicatorValue[]).find(
+          const componentIv = (filteredIndicatorValues as unknown as IndicatorValue[]).find(
             iv => iv.indicator?.code === rule.component_code
           );
           

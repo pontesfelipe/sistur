@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,14 +23,15 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.7.4",
+    version: "1.7.5",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
-      "Seletor de tipo de diagnóstico sempre visível (Territorial/Enterprise)",
-      "Organizações podem executar ambos os tipos se tiverem Acesso Enterprise",
-      "UI atualizada para refletir que org_type (PUBLIC/PRIVATE) é classificação, não restrição",
-      "Enterprise bloqueado apenas se org não tiver has_enterprise_access"
+      "Demo Mode agora tem acesso Enterprise habilitado",
+      "Diagnóstico demo Enterprise criado (Hotel Gramado 2026) com 25 indicadores",
+      "Mapeamento de 23 indicadores Enterprise para treinamentos EDU",
+      "Edge function calculate-assessment suporta diagnostic_type = 'enterprise'",
+      "Cálculo IGMA unificado para diagnósticos territoriais e enterprise"
     ]
   },
   {
