@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
@@ -7,11 +7,13 @@ import { IssueCard } from '@/components/dashboard/IssueCard';
 import { RecommendationCard } from '@/components/dashboard/RecommendationCard';
 import { DestinationComparison } from '@/components/dashboard/DestinationComparison';
 import { DestinationTrend } from '@/components/dashboard/DestinationTrend';
+import { EnterpriseKPICards } from '@/components/dashboard/EnterpriseKPICards';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { 
   MapPin, 
   ClipboardList, 
@@ -24,6 +26,8 @@ import {
   CheckCircle2,
   Clock,
   Filter,
+  Landmark,
+  Hotel,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -34,13 +38,46 @@ import {
   useRecentAssessments,
   useTopRecommendations,
 } from '@/hooks/useDashboardData';
+import {
+  useEnterpriseKPIs,
+  useAggregatedEnterprisePillarScores,
+  useEnterpriseIssues,
+  useEnterpriseDashboardStats,
+  useEnterpriseDestinations,
+} from '@/hooks/useEnterpriseDashboardData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useProfileContext } from '@/contexts/ProfileContext';
+
+type DiagnosticMode = 'territorial' | 'enterprise';
 
 const Index = () => {
+  const { profile, effectiveOrgId } = useProfileContext();
+  const [diagnosticMode, setDiagnosticMode] = useState<DiagnosticMode>('territorial');
   const [selectedDestination, setSelectedDestination] = useState<string | undefined>(undefined);
+
+  // Fetch org settings for enterprise access
+  const { data: orgSettings } = useQuery({
+    queryKey: ['org-dashboard-settings', effectiveOrgId],
+    queryFn: async () => {
+      if (!effectiveOrgId) return null;
+      const { data } = await supabase
+        .from('orgs')
+        .select('has_enterprise_access, has_territorial_access')
+        .eq('id', effectiveOrgId)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!effectiveOrgId,
+  });
+
+  // Reset destination filter when switching modes
+  useEffect(() => {
+    setSelectedDestination(undefined);
+  }, [diagnosticMode]);
   
+  // Territorial hooks
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: destinations, isLoading: destinationsLoading } = useDestinationsWithAssessments();
   const { data: aggregatedData, isLoading: aggregatedLoading } = useAggregatedPillarScores(selectedDestination);
@@ -48,13 +85,33 @@ const Index = () => {
   const { data: recentAssessments, isLoading: recentLoading } = useRecentAssessments();
   const { data: recommendations, isLoading: recsLoading } = useTopRecommendations();
 
-  const criticalPillar = aggregatedData?.pillarScores?.reduce((prev, current) =>
+  // Enterprise hooks
+  const { data: enterpriseKPIs, isLoading: enterpriseKPIsLoading } = useEnterpriseKPIs(selectedDestination);
+  const { data: enterpriseStats, isLoading: enterpriseStatsLoading } = useEnterpriseDashboardStats();
+  const { data: enterprisePillarData, isLoading: enterprisePillarLoading } = useAggregatedEnterprisePillarScores(selectedDestination);
+  const { data: enterpriseIssues, isLoading: enterpriseIssuesLoading } = useEnterpriseIssues(selectedDestination);
+  const { data: enterpriseDestinations } = useEnterpriseDestinations();
+
+  // Determine if enterprise mode is available
+  const hasEnterpriseAccess = orgSettings?.has_enterprise_access ?? false;
+
+  // Select appropriate data based on mode
+  const isEnterprise = diagnosticMode === 'enterprise';
+  const activeDestinations = isEnterprise ? enterpriseDestinations : destinations;
+  const activePillarData = isEnterprise ? enterprisePillarData : aggregatedData;
+  const activeIssues = isEnterprise ? enterpriseIssues : aggregatedIssues;
+  const activeLoading = isEnterprise 
+    ? enterprisePillarLoading 
+    : aggregatedLoading;
+  const activeIssuesLoading = isEnterprise ? enterpriseIssuesLoading : issuesLoading;
+
+  const criticalPillar = activePillarData?.pillarScores?.reduce((prev, current) =>
     prev.score < current.score ? prev : current
-  , aggregatedData.pillarScores[0]);
+  , activePillarData.pillarScores[0]);
 
   // Calculate average score if pillar scores exist
-  const averageScore = aggregatedData?.pillarScores?.length 
-    ? aggregatedData.pillarScores.reduce((sum, ps) => sum + ps.score, 0) / aggregatedData.pillarScores.length
+  const averageScore = activePillarData?.pillarScores?.length 
+    ? activePillarData.pillarScores.reduce((sum, ps) => sum + ps.score, 0) / activePillarData.pillarScores.length
     : 0;
 
   // Get severity color based on score (traffic light: green=good, yellow=moderate, red=critical)
@@ -65,7 +122,7 @@ const Index = () => {
   };
 
   const selectedDestinationName = selectedDestination 
-    ? destinations?.find(d => d.id === selectedDestination)?.name 
+    ? activeDestinations?.find(d => d.id === selectedDestination)?.name 
     : null;
 
   // Query for all destinations' pillar scores (for comparison)
@@ -130,45 +187,82 @@ const Index = () => {
   return (
     <AppLayout 
       title="Dashboard" 
-      subtitle="Painel de controle do sistema de turismo"
+      subtitle={isEnterprise ? "Visão consolidada do setor hoteleiro" : "Painel de controle do sistema de turismo"}
+      actions={
+        hasEnterpriseAccess && (
+          <ToggleGroup 
+            type="single" 
+            value={diagnosticMode} 
+            onValueChange={(value) => value && setDiagnosticMode(value as DiagnosticMode)}
+            className="bg-muted rounded-lg p-1"
+          >
+            <ToggleGroupItem 
+              value="territorial" 
+              aria-label="Ver diagnósticos territoriais"
+              className="gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
+            >
+              <Landmark className="h-4 w-4" />
+              <span className="hidden sm:inline">Territorial</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem 
+              value="enterprise" 
+              aria-label="Ver diagnósticos enterprise"
+              className="gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
+            >
+              <Hotel className="h-4 w-4" />
+              <span className="hidden sm:inline">Enterprise</span>
+            </ToggleGroupItem>
+          </ToggleGroup>
+        )
+      }
     >
-      {/* Hero Stats */}
-      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
-        {statsLoading ? (
-          <>
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-          </>
-        ) : (
-          <>
-            <StatCard
-              title="Destinos Cadastrados"
-              value={stats?.totalDestinations ?? 0}
-              icon={MapPin}
-              variant="primary"
-            />
-            <StatCard
-              title="Diagnósticos"
-              value={stats?.activeAssessments ?? 0}
-              icon={ClipboardList}
-            />
-            <StatCard
-              title="Gargalos Críticos"
-              value={stats?.criticalIssues ?? 0}
-              icon={AlertTriangle}
-              variant="warning"
-            />
-            <StatCard
-              title="Capacitações"
-              value={stats?.pendingRecommendations ?? 0}
-              icon={GraduationCap}
-              variant="success"
-            />
-          </>
-        )}
-      </div>
+      {/* Hero Stats - different for each mode */}
+      {isEnterprise ? (
+        <div className="mb-8">
+          <EnterpriseKPICards 
+            kpis={enterpriseKPIs}
+            stats={enterpriseStats}
+            isLoading={enterpriseKPIsLoading || enterpriseStatsLoading}
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
+          {statsLoading ? (
+            <>
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+            </>
+          ) : (
+            <>
+              <StatCard
+                title="Destinos Cadastrados"
+                value={stats?.totalDestinations ?? 0}
+                icon={MapPin}
+                variant="primary"
+              />
+              <StatCard
+                title="Diagnósticos"
+                value={stats?.activeAssessments ?? 0}
+                icon={ClipboardList}
+              />
+              <StatCard
+                title="Gargalos Críticos"
+                value={stats?.criticalIssues ?? 0}
+                icon={AlertTriangle}
+                variant="warning"
+              />
+              <StatCard
+                title="Capacitações"
+                value={stats?.pendingRecommendations ?? 0}
+                icon={GraduationCap}
+                variant="success"
+              />
+            </>
+          )}
+        </div>
+      )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -178,14 +272,15 @@ const Index = () => {
           <Card>
             <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
               <div>
-                <CardTitle className="text-lg font-display">
-                  Radiografia do Destino
+                <CardTitle className="text-lg font-display flex items-center gap-2">
+                  {isEnterprise && <Hotel className="h-5 w-5 text-amber-600" />}
+                  {isEnterprise ? 'Performance Hoteleira' : 'Radiografia do Destino'}
                 </CardTitle>
                 <CardDescription>
                   {selectedDestinationName 
-                    ? `Dados de ${selectedDestinationName} (${aggregatedData?.totalAssessments ?? 0} diagnóstico(s))`
-                    : aggregatedData?.totalAssessments 
-                      ? `Resumo de ${aggregatedData.totalAssessments} diagnóstico(s) calculado(s)`
+                    ? `Dados de ${selectedDestinationName} (${activePillarData?.totalAssessments ?? 0} diagnóstico(s))`
+                    : activePillarData?.totalAssessments 
+                      ? `Resumo de ${activePillarData.totalAssessments} diagnóstico(s) ${isEnterprise ? 'enterprise' : 'territorial'}(s)`
                       : 'Nenhum diagnóstico disponível'}
                 </CardDescription>
               </div>
@@ -197,18 +292,18 @@ const Index = () => {
                 >
                   <SelectTrigger className="w-full sm:w-[180px]">
                     <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Filtrar destino" />
+                    <SelectValue placeholder={isEnterprise ? "Filtrar unidade" : "Filtrar destino"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todos os destinos</SelectItem>
-                    {destinations?.map((dest) => (
+                    <SelectItem value="all">{isEnterprise ? 'Todas as unidades' : 'Todos os destinos'}</SelectItem>
+                    {activeDestinations?.map((dest) => (
                       <SelectItem key={dest.id} value={dest.id}>
                         {dest.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {aggregatedData?.totalAssessments && aggregatedData.totalAssessments > 0 && (
+                {activePillarData?.totalAssessments && activePillarData.totalAssessments > 0 && (
                   <div className="flex gap-2 w-full sm:w-auto">
                     <Button variant="outline" size="sm" className="flex-1 sm:flex-none" asChild>
                       <Link to="/relatorios">
@@ -228,16 +323,16 @@ const Index = () => {
               </div>
             </CardHeader>
             <CardContent>
-              {aggregatedLoading ? (
+              {activeLoading ? (
                 <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                   <Skeleton className="h-32" />
                   <Skeleton className="h-32" />
                   <Skeleton className="h-32" />
                 </div>
-              ) : aggregatedData?.pillarScores && aggregatedData.pillarScores.length > 0 ? (
+              ) : activePillarData?.pillarScores && activePillarData.pillarScores.length > 0 ? (
                 <>
                   <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
-                    {aggregatedData.pillarScores.map((pillarScore) => (
+                    {activePillarData.pillarScores.map((pillarScore) => (
                       <PillarGauge
                         key={pillarScore.id}
                         pillar={pillarScore.pillar}
@@ -252,7 +347,9 @@ const Index = () => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-primary" />
-                        <span className="font-medium text-sm">Índice Geral SISTUR (média)</span>
+                        <span className="font-medium text-sm">
+                          {isEnterprise ? 'Índice Geral Enterprise' : 'Índice Geral SISTUR'} (média)
+                        </span>
                       </div>
                       <span className="font-mono font-semibold">
                         {Math.round(averageScore * 100)}%
@@ -276,8 +373,9 @@ const Index = () => {
           {/* Issues */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg font-display">
-                Gargalos Identificados
+              <CardTitle className="text-lg font-display flex items-center gap-2">
+                {isEnterprise && <Hotel className="h-5 w-5 text-amber-600" />}
+                {isEnterprise ? 'Pontos de Atenção' : 'Gargalos Identificados'}
               </CardTitle>
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/diagnosticos">
@@ -287,36 +385,36 @@ const Index = () => {
               </Button>
             </CardHeader>
             <CardContent>
-              {issuesLoading ? (
+              {activeIssuesLoading ? (
                 <div className="space-y-3">
                   <Skeleton className="h-16" />
                   <Skeleton className="h-16" />
                   <Skeleton className="h-16" />
                 </div>
-              ) : aggregatedIssues && aggregatedIssues.length > 0 ? (
+              ) : activeIssues && activeIssues.length > 0 ? (
                 <div className="space-y-3">
-                  {aggregatedIssues.map((issue) => (
-                    <IssueCard key={issue.id} issue={issue as any} />
+                  {activeIssues.map((issue: any) => (
+                    <IssueCard key={issue.id} issue={issue} />
                   ))}
                 </div>
               ) : (
                 <p className="text-muted-foreground text-center py-4">
-                  Nenhum gargalo identificado.
+                  {isEnterprise ? 'Nenhum ponto de atenção identificado.' : 'Nenhum gargalo identificado.'}
                 </p>
               )}
             </CardContent>
           </Card>
 
-          {/* Destination Comparison */}
-          {destinations && destinations.length >= 2 && (
+          {/* Destination Comparison - only for territorial */}
+          {!isEnterprise && destinations && destinations.length >= 2 && (
             <DestinationComparison 
               destinations={destinations}
               getDestinationData={getDestinationData}
             />
           )}
 
-          {/* Destination Trend */}
-          {destinations && destinations.length > 0 && (
+          {/* Destination Trend - only for territorial */}
+          {!isEnterprise && destinations && destinations.length > 0 && (
             <DestinationTrend destinations={destinations} />
           )}
         </div>
@@ -324,13 +422,16 @@ const Index = () => {
         {/* Right Column */}
         <div className="space-y-6">
           {/* Quick Actions */}
-          <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground border-0">
+          <Card className={`bg-gradient-to-br ${isEnterprise ? 'from-amber-500 to-amber-600' : 'from-primary to-primary/80'} text-primary-foreground border-0`}>
             <CardContent className="p-6">
-              <h3 className="font-display font-semibold text-lg mb-2">
-                Iniciar Novo Diagnóstico
+              <h3 className="font-display font-semibold text-lg mb-2 flex items-center gap-2">
+                {isEnterprise && <Hotel className="h-5 w-5" />}
+                {isEnterprise ? 'Novo Diagnóstico Hoteleiro' : 'Iniciar Novo Diagnóstico'}
               </h3>
               <p className="text-primary-foreground/80 text-sm mb-4">
-                Crie uma nova rodada de avaliação para um destino turístico.
+                {isEnterprise 
+                  ? 'Avalie a performance e sustentabilidade do seu empreendimento.'
+                  : 'Crie uma nova rodada de avaliação para um destino turístico.'}
               </p>
               <Button 
                 variant="secondary" 
