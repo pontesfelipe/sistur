@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 7,
-  patch: 15,
+  patch: 16,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,27 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.7.16",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Fix: Recomendações agora buscam treinamentos de edu_trainings via training_id",
+      "RecommendationCard exibe título, descrição e duração do modelo unificado",
+      "Tipos Recommendation e Prescription atualizados com training_id e training",
+      "Fallback para legacy courses mantido para compatibilidade"
+    ]
+  },
+  {
+    version: "1.7.15",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
+      "Fix: Issues Enterprise agora mostram nome da categoria (não UUID)",
+      "Coluna training_id (TEXT) adicionada em prescriptions e recommendations",
+      "Edge function calculate-assessment usa enterpriseCategoryMap para nomes legíveis"
+    ]
+  },
   {
     version: "1.7.14",
     date: "2026-01-23",

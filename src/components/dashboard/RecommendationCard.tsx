@@ -28,8 +28,18 @@ const InterpretationIcon = ({ interpretation }: { interpretation: TerritorialInt
 };
 
 export function RecommendationCard({ recommendation }: RecommendationCardProps) {
+  // Use training from unified model, fallback to legacy course
+  const training = recommendation.training;
   const course = recommendation.course;
   const issue = recommendation.issue;
+
+  // Get display data from training or course
+  const title = training?.title || course?.title;
+  const description = training?.description || course?.description;
+  const durationMinutes = training?.duration_minutes || course?.duration_minutes;
+  const level = training?.level || course?.level;
+  const url = training?.video_url || course?.url;
+  const tags = training?.tags || course?.tags;
 
   const formatDuration = (minutes?: number) => {
     if (!minutes) return null;
@@ -38,16 +48,22 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
     return hours > 0 ? `${hours}h${mins > 0 ? ` ${mins}min` : ''}` : `${mins}min`;
   };
 
-  const levelLabels = {
+  const levelLabels: Record<string, string> = {
     BASICO: 'Básico',
     INTERMEDIARIO: 'Intermediário',
     AVANCADO: 'Avançado',
+    iniciante: 'Iniciante',
+    intermediario: 'Intermediário',
+    avancado: 'Avançado',
   };
 
-  const levelColors = {
+  const levelColors: Record<string, string> = {
     BASICO: 'bg-severity-good/10 text-severity-good border-severity-good/20',
     INTERMEDIARIO: 'bg-severity-moderate/10 text-severity-moderate border-severity-moderate/20',
     AVANCADO: 'bg-severity-critical/10 text-severity-critical border-severity-critical/20',
+    iniciante: 'bg-severity-good/10 text-severity-good border-severity-good/20',
+    intermediario: 'bg-severity-moderate/10 text-severity-moderate border-severity-moderate/20',
+    avancado: 'bg-severity-critical/10 text-severity-critical border-severity-critical/20',
   };
 
   const interpretationInfo = issue?.interpretation ? INTERPRETATION_INFO[issue.interpretation as TerritorialInterpretation] : null;
@@ -64,26 +80,26 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             <Badge variant="outline" className="text-xs">
               #{recommendation.priority}
             </Badge>
-            {course && (
-              <Badge className={cn('text-xs border', levelColors[course.level])}>
-                {levelLabels[course.level]}
+            {level && (
+              <Badge className={cn('text-xs border', levelColors[level] || levelColors['BASICO'])}>
+                {levelLabels[level] || level}
               </Badge>
             )}
-            {course?.duration_minutes && (
+            {durationMinutes && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock className="h-3 w-3" />
-                {formatDuration(course.duration_minutes)}
+                {formatDuration(durationMinutes)}
               </span>
             )}
           </div>
 
           <h4 className="mt-2 font-medium text-foreground">
-            {course?.title || 'Curso não especificado'}
+            {title || 'Curso não especificado'}
           </h4>
 
-          {course?.description && (
+          {description && (
             <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-              {course.description}
+              {description}
             </p>
           )}
 
@@ -168,25 +184,25 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             )}
           </div>
 
-          {/* Course Tags */}
-          {course?.tags && Array.isArray(course.tags) && course.tags.length > 0 && (
+          {/* Course/Training Tags */}
+          {tags && Array.isArray(tags) && tags.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1">
-              {course.tags.slice(0, 4).map((tag, idx) => (
+              {tags.slice(0, 4).map((tag: any, idx: number) => (
                 <Badge key={idx} variant="secondary" className="text-xs font-normal h-5">
-                  {typeof tag === 'string' ? tag : tag.theme}
+                  {typeof tag === 'string' ? tag : tag.theme || tag.name}
                 </Badge>
               ))}
             </div>
           )}
 
-          {course?.url && (
+          {url && (
             <Button
               variant="outline"
               size="sm"
               className="mt-3"
               asChild
             >
-              <a href={course.url} target="_blank" rel="noopener noreferrer">
+              <a href={url} target="_blank" rel="noopener noreferrer">
                 Acessar curso
                 <ExternalLink className="ml-2 h-3 w-3" />
               </a>

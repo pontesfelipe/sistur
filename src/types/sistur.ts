@@ -132,6 +132,22 @@ export interface Course {
   created_at: string;
 }
 
+export interface EduTraining {
+  training_id: string;
+  title: string;
+  description?: string;
+  type: 'course' | 'live';
+  pillar: string;
+  level?: string;
+  duration_minutes?: number;
+  video_url?: string;
+  thumbnail_url?: string;
+  target_audience?: string;
+  active: boolean;
+  modules?: any;
+  tags?: any;
+}
+
 export interface Recommendation {
   id: string;
   org_id: string;
@@ -140,6 +156,8 @@ export interface Recommendation {
   issue?: Issue;
   course_id?: string;
   course?: Course;
+  training_id?: string;
+  training?: EduTraining;
   reason: string;
   priority: number;
   created_at: string;
@@ -153,6 +171,8 @@ export interface Prescription {
   issue?: Issue;
   course_id?: string;
   course?: Course;
+  training_id?: string;
+  training?: EduTraining;
   indicator_id?: string;
   indicator?: Indicator;
   pillar: Pillar;

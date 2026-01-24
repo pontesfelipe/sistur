@@ -184,18 +184,54 @@ export function useRecommendations(assessmentId: string | undefined) {
     queryFn: async () => {
       if (!assessmentId) return [];
       
-      const { data, error } = await supabase
+      // First fetch recommendations with issues
+      const { data: recs, error } = await supabase
         .from('recommendations')
         .select(`
           *,
-          issue:issues(*),
-          course:courses(*)
+          issue:issues(*)
         `)
         .eq('assessment_id', assessmentId)
         .order('priority', { ascending: true });
       
       if (error) throw error;
-      return data || [];
+      if (!recs || recs.length === 0) return [];
+
+      // Get unique training_ids to fetch from edu_trainings
+      const trainingIds = [...new Set(recs.map(r => r.training_id).filter(Boolean))];
+      
+      let trainingsMap: Record<string, any> = {};
+      if (trainingIds.length > 0) {
+        const { data: trainings } = await supabase
+          .from('edu_trainings')
+          .select('*')
+          .in('training_id', trainingIds);
+        
+        if (trainings) {
+          trainingsMap = Object.fromEntries(trainings.map(t => [t.training_id, t]));
+        }
+      }
+
+      // Also try legacy course_ids for backward compatibility
+      const courseIds = [...new Set(recs.map(r => r.course_id).filter(Boolean))];
+      let coursesMap: Record<string, any> = {};
+      if (courseIds.length > 0) {
+        const { data: courses } = await supabase
+          .from('courses')
+          .select('*')
+          .in('id', courseIds);
+        
+        if (courses) {
+          coursesMap = Object.fromEntries(courses.map(c => [c.id, c]));
+        }
+      }
+
+      // Enrich recommendations with training/course data
+      return recs.map(rec => ({
+        ...rec,
+        training: rec.training_id ? trainingsMap[rec.training_id] : undefined,
+        course: rec.course_id ? coursesMap[rec.course_id] : undefined,
+      }));
     },
     enabled: !!assessmentId,
   });
