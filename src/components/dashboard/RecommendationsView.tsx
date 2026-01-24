@@ -33,7 +33,9 @@ export function RecommendationsView({ recommendations }: RecommendationsViewProp
       if (rec.issue?.pillar) pillarsSet.add(rec.issue.pillar);
       if (rec.issue?.severity) severitiesSet.add(rec.issue.severity);
       if (rec.issue?.interpretation) interpretationsSet.add(rec.issue.interpretation);
-      if (rec.course?.level) levelsSet.add(rec.course.level);
+      // Check both training and course for level
+      const level = rec.training?.level || rec.course?.level;
+      if (level) levelsSet.add(level);
     });
 
     return {
@@ -49,8 +51,10 @@ export function RecommendationsView({ recommendations }: RecommendationsViewProp
     return recommendations.filter(rec => {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
+        // Check both training and course for title
+        const title = rec.training?.title || rec.course?.title;
         const matchesSearch = 
-          rec.course?.title?.toLowerCase().includes(query) ||
+          title?.toLowerCase().includes(query) ||
           rec.issue?.title?.toLowerCase().includes(query) ||
           rec.reason?.toLowerCase().includes(query);
         if (!matchesSearch) return false;
@@ -68,8 +72,9 @@ export function RecommendationsView({ recommendations }: RecommendationsViewProp
         return false;
       }
 
-      if (levelFilter !== 'all' && rec.course?.level !== levelFilter) {
-        return false;
+      if (levelFilter !== 'all') {
+        const level = rec.training?.level || rec.course?.level;
+        if (level !== levelFilter) return false;
       }
 
       return true;
