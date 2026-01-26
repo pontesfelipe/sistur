@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Plus, 
   Search, 
@@ -9,15 +11,20 @@ import {
   Edit,
   Trash2,
   Eye,
-  Loader2
+  Loader2,
+  Hotel
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDestinations } from '@/hooks/useDestinations';
+import { useEnterpriseProfiles } from '@/hooks/useEnterpriseProfiles';
+import { useProfile } from '@/hooks/useProfile';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
+import { EnterpriseProfilePanel } from '@/components/enterprise/EnterpriseProfilePanel';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -30,6 +37,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
 
 import type { Destination } from '@/components/destinations/DestinationFormDialog';
 
@@ -38,8 +49,33 @@ export function DestinosPanel() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingDestination, setEditingDestination] = useState<Destination | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [enterpriseProfileDestination, setEnterpriseProfileDestination] = useState<Destination | null>(null);
+  const [hasEnterpriseAccess, setHasEnterpriseAccess] = useState(false);
   
+  const { effectiveOrgId } = useProfile();
   const { destinations, isLoading, createDestination, updateDestination, deleteDestination } = useDestinations();
+  const { profiles: enterpriseProfiles } = useEnterpriseProfiles();
+  
+  // Check if organization has enterprise access
+  useEffect(() => {
+    if (!effectiveOrgId) return;
+    
+    const fetchOrgAccess = async () => {
+      const { data } = await supabase
+        .from('orgs')
+        .select('has_enterprise_access')
+        .eq('id', effectiveOrgId)
+        .single();
+      
+      setHasEnterpriseAccess(data?.has_enterprise_access ?? false);
+    };
+    
+    fetchOrgAccess();
+  }, [effectiveOrgId]);
+  
+  // Helper to check if destination has enterprise profile
+  const hasEnterpriseProfile = (destId: string) => 
+    enterpriseProfiles?.some(p => p.destination_id === destId) ?? false;
 
   const filteredDestinations = destinations?.filter((dest) =>
     dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -123,30 +159,48 @@ export function DestinosPanel() {
                   </div>
                 </div>
                 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Eye className="mr-2 h-4 w-4" />
-                      Ver detalhes
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleEdit(destination)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="text-destructive"
-                      onClick={() => setDeleteId(destination.id)}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-2">
+                  {hasEnterpriseProfile(destination.id) && (
+                    <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                      <Hotel className="h-3 w-3 mr-1" />
+                      Enterprise
+                    </Badge>
+                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                        <Eye className="mr-2 h-4 w-4" />
+                        Ver detalhes
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEdit(destination)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Editar
+                      </DropdownMenuItem>
+                      {hasEnterpriseAccess && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => setEnterpriseProfileDestination(destination)}>
+                            <Hotel className="mr-2 h-4 w-4 text-amber-600" />
+                            Perfil Enterprise
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        className="text-destructive"
+                        onClick={() => setDeleteId(destination.id)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
 
               <div className="mt-4 pt-4 border-t border-border">
@@ -220,6 +274,22 @@ export function DestinosPanel() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Enterprise Profile Dialog */}
+      <Dialog 
+        open={!!enterpriseProfileDestination} 
+        onOpenChange={(open) => !open && setEnterpriseProfileDestination(null)}
+      >
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          {enterpriseProfileDestination && (
+            <EnterpriseProfilePanel
+              destinationId={enterpriseProfileDestination.id}
+              destinationName={enterpriseProfileDestination.name}
+              onClose={() => setEnterpriseProfileDestination(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
