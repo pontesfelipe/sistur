@@ -415,93 +415,167 @@ serve(async (req) => {
 
     // 2. Get indicator values based on diagnostic type
     if (isEnterprise) {
-      console.log("Using ENTERPRISE indicators from enterprise_indicator_values");
+      console.log("Using ENTERPRISE indicators");
       isEnterpriseCalc = true;
 
-      // Fetch category names for enterprise diagnostics
-      const { data: categories } = await supabase
-        .from("enterprise_indicator_categories")
-        .select("id, name, code, description");
-      
-      if (categories) {
-        for (const cat of categories) {
-          enterpriseCategoryMap.set(cat.id, { name: cat.name, code: cat.code, description: cat.description || '' });
-        }
-      }
-      console.log(`Loaded ${enterpriseCategoryMap.size} enterprise categories`);
-      
-      // Fetch enterprise indicator values
-      const { data: enterpriseValues, error: enterpriseError } = await supabase
-        .from("enterprise_indicator_values")
+      // First, try to get values from the unified indicator_values table (new approach)
+      // The EnterpriseDataEntryPanel saves to indicator_values with enterprise-scope indicators
+      const { data: unifiedValues, error: unifiedError } = await supabase
+        .from("indicator_values")
         .select(`
           id,
           indicator_id,
-          value,
-          indicator:enterprise_indicators(
+          value_raw,
+          indicator:indicators(
             id,
             code,
             name,
             pillar,
-            category_id,
-            benchmark_min,
-            benchmark_max,
-            benchmark_target,
+            theme,
+            direction,
+            normalization,
+            min_ref,
+            max_ref,
             weight,
+            intersectoral_dependency,
             minimum_tier,
-            unit
+            indicator_scope
           )
         `)
         .eq("assessment_id", assessment_id);
 
-      if (enterpriseError) {
-        console.error("Error fetching enterprise indicator values:", enterpriseError);
-        return new Response(
-          JSON.stringify({ error: "Failed to fetch enterprise indicator values" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      if (unifiedError) {
+        console.error("Error fetching unified indicator values:", unifiedError);
       }
 
-      // Transform to common structure and filter by tier
-      filteredIndicatorValues = (enterpriseValues || [])
-        .filter((iv: any) => {
-          const indicator = iv.indicator;
-          if (!indicator) return false;
-          const indicatorTier = indicator.minimum_tier || 'COMPLETE';
-          return allowedTiers.includes(indicatorTier);
-        })
-        .map((iv: any) => {
-          // Get category name from map for better issue titles
-          const categoryId = iv.indicator?.category_id;
-          const categoryInfo = categoryId ? enterpriseCategoryMap.get(categoryId) : null;
-          const themeName = categoryInfo?.name || categoryInfo?.code || categoryId || 'Enterprise';
-          
-          return {
+      // Filter for enterprise-scope indicators
+      const enterpriseUnifiedValues = (unifiedValues || []).filter((iv: any) => {
+        const scope = iv.indicator?.indicator_scope;
+        return scope === 'enterprise' || scope === 'both';
+      });
+
+      console.log(`Found ${enterpriseUnifiedValues.length} enterprise values in unified indicator_values table`);
+
+      // If we found values in unified table, use them
+      if (enterpriseUnifiedValues.length > 0) {
+        filteredIndicatorValues = enterpriseUnifiedValues
+          .filter((iv: any) => {
+            const indicator = iv.indicator;
+            if (!indicator) return false;
+            const indicatorTier = indicator.minimum_tier || 'COMPLETE';
+            return allowedTiers.includes(indicatorTier);
+          })
+          .map((iv: any) => ({
             id: iv.id,
             indicator_id: iv.indicator_id,
-            value_raw: iv.value,
+            value_raw: iv.value_raw,
             indicator: {
               id: iv.indicator?.id,
               code: iv.indicator?.code,
               name: iv.indicator?.name,
               pillar: iv.indicator?.pillar,
-              theme: themeName, // Use category NAME for readable issues
-              direction: "HIGH_IS_BETTER" as const, // Enterprise default
-              normalization: "MIN_MAX" as const,
-              min_ref: iv.indicator?.benchmark_min,
-              max_ref: iv.indicator?.benchmark_max,
+              theme: iv.indicator?.theme || 'Enterprise',
+              direction: iv.indicator?.direction || "HIGH_IS_BETTER",
+              normalization: iv.indicator?.normalization || "MIN_MAX",
+              min_ref: iv.indicator?.min_ref,
+              max_ref: iv.indicator?.max_ref,
               weight: iv.indicator?.weight || 1,
-              intersectoral_dependency: false,
+              intersectoral_dependency: iv.indicator?.intersectoral_dependency || false,
               minimum_tier: iv.indicator?.minimum_tier,
             },
-          };
-        });
+          }));
+
+        console.log(`Using ${filteredIndicatorValues.length} enterprise indicator values from unified table`);
+      } else {
+        // Fallback: Try legacy enterprise_indicator_values table
+        console.log("Fallback: Checking legacy enterprise_indicator_values table");
+
+        // Fetch category names for enterprise diagnostics
+        const { data: categories } = await supabase
+          .from("enterprise_indicator_categories")
+          .select("id, name, code, description");
+        
+        if (categories) {
+          for (const cat of categories) {
+            enterpriseCategoryMap.set(cat.id, { name: cat.name, code: cat.code, description: cat.description || '' });
+          }
+        }
+        console.log(`Loaded ${enterpriseCategoryMap.size} enterprise categories`);
+        
+        // Fetch enterprise indicator values
+        const { data: enterpriseValues, error: enterpriseError } = await supabase
+          .from("enterprise_indicator_values")
+          .select(`
+            id,
+            indicator_id,
+            value,
+            indicator:enterprise_indicators(
+              id,
+              code,
+              name,
+              pillar,
+              category_id,
+              benchmark_min,
+              benchmark_max,
+              benchmark_target,
+              weight,
+              minimum_tier,
+              unit
+            )
+          `)
+          .eq("assessment_id", assessment_id);
+
+        if (enterpriseError) {
+          console.error("Error fetching enterprise indicator values:", enterpriseError);
+          return new Response(
+            JSON.stringify({ error: "Failed to fetch enterprise indicator values" }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Transform to common structure and filter by tier
+        filteredIndicatorValues = (enterpriseValues || [])
+          .filter((iv: any) => {
+            const indicator = iv.indicator;
+            if (!indicator) return false;
+            const indicatorTier = indicator.minimum_tier || 'COMPLETE';
+            return allowedTiers.includes(indicatorTier);
+          })
+          .map((iv: any) => {
+            // Get category name from map for better issue titles
+            const categoryId = iv.indicator?.category_id;
+            const categoryInfo = categoryId ? enterpriseCategoryMap.get(categoryId) : null;
+            const themeName = categoryInfo?.name || categoryInfo?.code || categoryId || 'Enterprise';
+            
+            return {
+              id: iv.id,
+              indicator_id: iv.indicator_id,
+              value_raw: iv.value,
+              indicator: {
+                id: iv.indicator?.id,
+                code: iv.indicator?.code,
+                name: iv.indicator?.name,
+                pillar: iv.indicator?.pillar,
+                theme: themeName, // Use category NAME for readable issues
+                direction: "HIGH_IS_BETTER" as const, // Enterprise default
+                normalization: "MIN_MAX" as const,
+                min_ref: iv.indicator?.benchmark_min,
+                max_ref: iv.indicator?.benchmark_max,
+                weight: iv.indicator?.weight || 1,
+                intersectoral_dependency: false,
+                minimum_tier: iv.indicator?.minimum_tier,
+              },
+            };
+          });
+        
+        console.log(`Found ${filteredIndicatorValues.length} enterprise indicator values from legacy table`);
+      }
       
       // Log sample theme names for debugging
       if (filteredIndicatorValues.length > 0) {
         const sampleThemes = filteredIndicatorValues.slice(0, 3).map((iv: any) => iv.indicator?.theme);
-        console.log(`Sample Enterprise themes (should be category names): ${JSON.stringify(sampleThemes)}`);
+        console.log(`Sample Enterprise themes: ${JSON.stringify(sampleThemes)}`);
       }
-      console.log(`Found ${filteredIndicatorValues.length} enterprise indicator values`);
     } else {
       // TERRITORIAL: Use standard indicator_values
       const { data: indicatorValues, error: valuesError } = await supabase
