@@ -2,8 +2,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
 import { IssueCard } from '@/components/dashboard/IssueCard';
-import { RecommendationCard } from '@/components/dashboard/RecommendationCard';
-import { RecommendationsView } from '@/components/dashboard/RecommendationsView';
 import { NormalizationView } from '@/components/dashboard/NormalizationView';
 import { IndicatorScoresView } from '@/components/dashboard/IndicatorScoresView';
 import { IssuesView } from '@/components/dashboard/IssuesView';
@@ -564,32 +562,8 @@ const DiagnosticoDetalhe = () => {
               </div>
             </div>
 
-            {/* EDU Recommendations Panel - New */}
-            <EduRecommendationsPanel indicatorScores={indicatorScores as any} />
-
-            {/* Legacy Recommendations View */}
-            {recommendations.length > 0 && (
-              <div className="mt-8">
-                <h3 className="text-lg font-semibold mb-4">Recomendações Adicionais</h3>
-                <RecommendationsView 
-                  recommendations={recommendations.map((rec) => ({
-                    ...rec,
-                    issue: rec.issue ? {
-                      ...rec.issue,
-                      pillar: (rec.issue as any).pillar as Pillar,
-                      severity: (rec.issue as any).severity as Severity,
-                      interpretation: (rec.issue as any).interpretation as TerritorialInterpretation | undefined,
-                      evidence: (rec.issue as any).evidence || { indicators: [] },
-                    } : undefined,
-                    course: rec.course ? {
-                      ...rec.course,
-                      level: (rec.course as any).level as 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO',
-                      tags: (rec.course as any).tags || [],
-                    } : undefined,
-                  }))}
-                />
-              </div>
-            )}
+            {/* EDU Recommendations Panel - Now uses prescriptions from DB */}
+            <EduRecommendationsPanel indicatorScores={indicatorScores as any} assessmentId={id} />
           </TabsContent>
 
           {/* Planos de Ação Tab */}

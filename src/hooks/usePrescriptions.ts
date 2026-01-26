@@ -8,6 +8,7 @@ export interface PrescriptionData {
   assessment_id: string;
   issue_id?: string;
   course_id?: string;
+  training_id?: string;
   indicator_id?: string;
   pillar: Pillar;
   status: Severity;
@@ -23,6 +24,14 @@ export interface PrescriptionData {
     level: string;
     url?: string;
     duration_minutes?: number;
+  };
+  training?: {
+    training_id: string;
+    title: string;
+    level?: string;
+    duration_minutes?: number;
+    type?: string;
+    pillar?: string;
   };
   issue?: {
     id: string;
@@ -44,6 +53,7 @@ export function usePrescriptions(assessmentId?: string) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Fetch prescriptions with course relation
       let query = supabase
         .from('prescriptions')
         .select(`
@@ -58,9 +68,32 @@ export function usePrescriptions(assessmentId?: string) {
         query = query.eq('assessment_id', assessmentId);
       }
 
-      const { data, error } = await query;
+      const { data: prescriptions, error } = await query;
       if (error) throw error;
-      return data as PrescriptionData[];
+
+      // For prescriptions with training_id, fetch from edu_trainings
+      const trainingIds = (prescriptions || [])
+        .filter(p => p.training_id && !p.course_id)
+        .map(p => p.training_id);
+
+      let trainingsMap: Record<string, any> = {};
+      if (trainingIds.length > 0) {
+        const { data: trainings } = await supabase
+          .from('edu_trainings')
+          .select('training_id, title, level, duration_minutes, type, pillar')
+          .in('training_id', trainingIds);
+        
+        trainingsMap = (trainings || []).reduce((acc, t) => {
+          acc[t.training_id] = t;
+          return acc;
+        }, {} as Record<string, any>);
+      }
+
+      // Merge training data into prescriptions
+      return (prescriptions || []).map(p => ({
+        ...p,
+        training: p.training_id ? trainingsMap[p.training_id] : undefined,
+      })) as PrescriptionData[];
     },
     enabled: !!assessmentId,
   });
