@@ -63,7 +63,6 @@ import {
   useIndicatorScores,
   useIssues,
   useRecommendations,
-  useEnterpriseIndicatorValuesForAssessment,
 } from '@/hooks/useAssessmentData';
 import { useIndicatorValues } from '@/hooks/useIndicators';
 import { useFetchOfficialData, useExternalIndicatorValues, useValidateIndicatorValues } from '@/hooks/useOfficialData';
@@ -81,6 +80,7 @@ const DiagnosticoDetalhe = () => {
   const { calculate, loading: calculating } = useCalculateAssessment();
   const { updateAssessment } = useAssessments();
   const { indicators } = useIndicators();
+  const { indicators: enterpriseIndicators = [] } = useIndicators({ scope: 'enterprise' });
   const { user } = useAuth();
   const [isPreFillOpen, setIsPreFillOpen] = useState(false);
   const [orgId, setOrgId] = useState<string | undefined>();
@@ -107,8 +107,8 @@ const DiagnosticoDetalhe = () => {
   
   // Use appropriate indicator values based on diagnostic type
   const { values: territorialIndicatorValues = [] } = useIndicatorValues(id);
-  const { data: enterpriseIndicatorValues = [] } = useEnterpriseIndicatorValuesForAssessment(isEnterprise ? id : undefined);
-  const indicatorValues = isEnterprise ? enterpriseIndicatorValues : territorialIndicatorValues;
+  // Enterprise values are stored in the unified `indicator_values` table as well.
+  const indicatorValues = territorialIndicatorValues;
 
   // Official data hooks - destination info
   const assessmentDestination = assessment?.destination as { name?: string; uf?: string; ibge_code?: string } | null;
@@ -119,7 +119,9 @@ const DiagnosticoDetalhe = () => {
   const validateIndicatorValues = useValidateIndicatorValues();
 
   // Calculate data completeness based on diagnostic type
-  const totalIndicators = isEnterprise ? enterpriseIndicatorValues.length : indicators.length;
+  const totalIndicators = isEnterprise
+    ? (enterpriseIndicators.length || indicators.length)
+    : indicators.length;
   const filledIndicators = indicatorValues.length;
   const completenessPercentage = totalIndicators > 0 ? (filledIndicators / totalIndicators) * 100 : 0;
   const hasIncompleteData = completenessPercentage < 100 && completenessPercentage > 0;

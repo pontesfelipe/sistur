@@ -40,6 +40,7 @@ interface EnterpriseIndicatorScore {
     code: string;
     name: string;
     pillar: string;
+    theme?: string;
     unit?: string;
     description?: string;
     benchmark_min?: number;
@@ -59,6 +60,23 @@ interface EnterpriseCategoriesViewProps {
 
 // Category icons mapping
 const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  // New (unified indicators): group by `theme` (pt-BR)
+  'Eficiência Energética': Zap,
+  'Gestão Hídrica': Droplets,
+  'Gestão de Resíduos': Recycle,
+  'Impacto na Comunidade': Users,
+  'Certificações Ambientais': Award,
+  'Governança Corporativa': Building2,
+  'Qualidade da Infraestrutura': Cog,
+  'Maturidade Tecnológica': Cpu,
+  'Rede de Parcerias': Handshake,
+  'Saúde Financeira': DollarSign,
+  'Taxa de Ocupação': BedDouble,
+  'Satisfação do Hóspede': Smile,
+  'Qualidade de Serviço': Star,
+  'Capacitação da Equipe': GraduationCap,
+  'Efetividade de Marketing': Megaphone,
+
   'RA_SUST_ENERGIA': Zap,
   'RA_SUST_AGUA': Droplets,
   'RA_SUST_RESIDUOS': Recycle,
@@ -104,8 +122,11 @@ export function EnterpriseCategoriesView({ indicatorScores }: EnterpriseCategori
 
     indicatorScores.forEach(score => {
       const pillar = score.indicator?.pillar || 'unknown';
-      const categoryCode = (score.indicator?.category as any)?.code || 'other';
-      const categoryName = (score.indicator?.category as any)?.name || 'Outros';
+
+      // Unified indicators: Enterprise categories are represented by `indicator.theme`.
+      // Legacy fallback: `indicator.category`.
+      const categoryName = (score.indicator as any)?.theme || (score.indicator?.category as any)?.name || 'Outros';
+      const categoryCode = (score.indicator as any)?.theme || (score.indicator?.category as any)?.code || categoryName;
 
       if (!pillars[pillar]) {
         pillars[pillar] = { pillar, categories: new Map(), avgScore: 0 };

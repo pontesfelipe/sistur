@@ -796,12 +796,11 @@ serve(async (req) => {
     await supabase.from("issues").delete().eq("assessment_id", assessment_id);
     await supabase.from("pillar_scores").delete().eq("assessment_id", assessment_id);
     
-    // Delete from the correct indicator_scores table based on diagnostic type
-    if (isEnterpriseCalc) {
-      await supabase.from("enterprise_indicator_scores").delete().eq("assessment_id", assessment_id);
-    } else {
-      await supabase.from("indicator_scores").delete().eq("assessment_id", assessment_id);
-    }
+     // Delete indicator scores for this assessment.
+     // IMPORTANT: Indicators are now unified in the `indicators` catalog, so Enterprise scores must be stored
+     // in `indicator_scores` (FK -> indicators). The legacy `enterprise_indicator_scores` references
+     // `enterprise_indicators` and will fail with FK violations.
+     await supabase.from("indicator_scores").delete().eq("assessment_id", assessment_id);
 
     // 5. Insert indicator scores (deduplicate by indicator_id to avoid unique constraint violations)
     if (indicatorScores.length > 0) {
@@ -815,36 +814,20 @@ serve(async (req) => {
       
       console.log(`Inserting ${deduplicatedScores.length} ${isEnterpriseCalc ? 'enterprise ' : ''}indicator scores (deduplicated from ${indicatorScores.length})`);
       
-      // Insert into the correct table based on diagnostic type
-      if (isEnterpriseCalc) {
-        const enterpriseScoresForInsert = deduplicatedScores.map(score => ({
-          org_id: score.org_id,
-          assessment_id: score.assessment_id,
-          indicator_id: score.indicator_id,
-          score: score.score,
-          min_ref_used: score.min_ref_used,
-          max_ref_used: score.max_ref_used,
-          weight_used: score.weight_used,
-        }));
-        
-        const { error: insertScoresError } = await supabase
-          .from("enterprise_indicator_scores")
-          .insert(enterpriseScoresForInsert);
+       // Insert into unified indicator_scores (works for both territorial and enterprise).
+       // Ensure computed_at is present (indicator_scores has NOT NULL computed_at).
+       const scoresForInsert = deduplicatedScores.map((s) => ({
+         ...s,
+         computed_at: (s as any).computed_at ?? new Date().toISOString(),
+       }));
 
-        if (insertScoresError) {
-          console.error("Error inserting enterprise indicator scores:", insertScoresError);
-        } else {
-          console.log(`Successfully inserted ${enterpriseScoresForInsert.length} enterprise indicator scores`);
-        }
-      } else {
-        const { error: insertScoresError } = await supabase
-          .from("indicator_scores")
-          .insert(deduplicatedScores);
+       const { error: insertScoresError } = await supabase
+         .from("indicator_scores")
+         .insert(scoresForInsert);
 
-        if (insertScoresError) {
-          console.error("Error inserting indicator scores:", insertScoresError);
-        }
-      }
+       if (insertScoresError) {
+         console.error("Error inserting indicator scores:", insertScoresError);
+       }
     }
 
     // 6. Calculate pillar scores
