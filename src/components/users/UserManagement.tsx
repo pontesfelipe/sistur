@@ -445,11 +445,18 @@ export function UserManagement() {
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="ADMIN">Administrador</SelectItem>
-                          <SelectItem value="ANALYST">Analista</SelectItem>
-                          <SelectItem value="VIEWER">Visualizador</SelectItem>
-                          <SelectItem value="ESTUDANTE">Estudante</SelectItem>
-                          <SelectItem value="PROFESSOR">Professor</SelectItem>
+                          {user.system_access === 'EDU' ? (
+                            <>
+                              <SelectItem value="ESTUDANTE">Estudante</SelectItem>
+                              <SelectItem value="PROFESSOR">Professor</SelectItem>
+                            </>
+                          ) : (
+                            <>
+                              <SelectItem value="ADMIN">Administrador</SelectItem>
+                              <SelectItem value="ANALYST">Analista</SelectItem>
+                              <SelectItem value="VIEWER">Visualizador</SelectItem>
+                            </>
+                          )}
                         </SelectContent>
                       </Select>
                     </TableCell>
