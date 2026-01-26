@@ -109,7 +109,33 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'create') {
-      const { email, password, full_name, role } = data
+      const { email, password, full_name, role, org_id, system_access } = data
+
+      // Validate required fields
+      if (!email || !password || !full_name || !role || !org_id || !system_access) {
+        return new Response(JSON.stringify({ error: 'Missing required fields: email, password, full_name, role, org_id, system_access' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Validate role based on system access
+      const eduRoles = ['ESTUDANTE', 'PROFESSOR']
+      const erpRoles = ['ADMIN', 'ANALYST', 'VIEWER']
+      
+      if (system_access === 'EDU' && !eduRoles.includes(role)) {
+        return new Response(JSON.stringify({ error: 'EDU users must have role ESTUDANTE or PROFESSOR' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      
+      if (system_access === 'ERP' && !erpRoles.includes(role)) {
+        return new Response(JSON.stringify({ error: 'ERP users must have role ADMIN, ANALYST, or VIEWER' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
 
       // Create the user
       const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -126,31 +152,37 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Get the requesting user's org_id
-      const { data: profile } = await supabaseAdmin
-        .from('profiles')
-        .select('org_id')
-        .eq('user_id', requestingUser.id)
-        .single()
-
-      if (profile && newUser.user) {
-        // Update the new user's profile to be in the same org
-        await supabaseAdmin
+      if (newUser.user) {
+        // Update the new user's profile with org_id and system_access
+        const { error: profileError } = await supabaseAdmin
           .from('profiles')
-          .update({ org_id: profile.org_id })
+          .update({ 
+            org_id: org_id,
+            system_access: system_access,
+            pending_approval: false
+          })
           .eq('user_id', newUser.user.id)
 
-        // Update user role if not ADMIN (default is ADMIN from trigger)
-        if (role && role !== 'ADMIN') {
+        if (profileError) {
+          console.error('Profile update error:', profileError)
+        }
+
+        // Update or insert user role
+        const { data: existingRole } = await supabaseAdmin
+          .from('user_roles')
+          .select('user_id')
+          .eq('user_id', newUser.user.id)
+          .single()
+
+        if (existingRole) {
           await supabaseAdmin
             .from('user_roles')
-            .update({ role, org_id: profile.org_id })
+            .update({ role, org_id: org_id })
             .eq('user_id', newUser.user.id)
         } else {
           await supabaseAdmin
             .from('user_roles')
-            .update({ org_id: profile.org_id })
-            .eq('user_id', newUser.user.id)
+            .insert({ user_id: newUser.user.id, role, org_id: org_id })
         }
       }
 
