@@ -47,67 +47,19 @@ export function useIndicatorScores(assessmentId: string | undefined, diagnosticT
     queryKey: ['indicator-scores', assessmentId, diagnosticType],
     queryFn: async () => {
       if (!assessmentId) return [];
+
+      // Unified indicator catalog: both Territorial and Enterprise scores are persisted in `indicator_scores`
+      // with indicator metadata coming from `indicators`.
+      const { data, error } = await supabase
+        .from('indicator_scores')
+        .select(`
+          *,
+          indicator:indicators(*)
+        `)
+        .eq('assessment_id', assessmentId);
       
-      const isEnterprise = diagnosticType === 'enterprise';
-      
-      if (isEnterprise) {
-        // Fetch from enterprise_indicator_scores with enterprise_indicators join
-        const { data, error } = await supabase
-          .from('enterprise_indicator_scores')
-          .select(`
-            id,
-            org_id,
-            assessment_id,
-            indicator_id,
-            score,
-            min_ref_used,
-            max_ref_used,
-            weight_used,
-            computed_at,
-            indicator:enterprise_indicators(
-              id,
-              code,
-              name,
-              pillar,
-              unit,
-              description,
-              benchmark_min,
-              benchmark_max,
-              benchmark_target,
-              weight,
-              minimum_tier,
-              category:enterprise_indicator_categories(id, code, name)
-            )
-          `)
-          .eq('assessment_id', assessmentId);
-        
-        if (error) throw error;
-        
-        // Transform to match territorial structure for consistent UI rendering
-        return (data || []).map(score => ({
-          ...score,
-          indicator: score.indicator ? {
-            ...score.indicator,
-            theme: (score.indicator.category as any)?.name || 'Enterprise',
-            direction: 'HIGH_IS_BETTER' as const,
-            normalization: 'MIN_MAX' as const,
-            min_ref: score.indicator.benchmark_min,
-            max_ref: score.indicator.benchmark_max,
-          } : null,
-        }));
-      } else {
-        // Fetch from regular indicator_scores
-        const { data, error } = await supabase
-          .from('indicator_scores')
-          .select(`
-            *,
-            indicator:indicators(*)
-          `)
-          .eq('assessment_id', assessmentId);
-        
-        if (error) throw error;
-        return data || [];
-      }
+      if (error) throw error;
+      return data || [];
     },
     enabled: !!assessmentId,
   });
