@@ -22,6 +22,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useProfile } from '@/hooks/useProfile';
+import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 
 type Indicator = Database['public']['Tables']['indicators']['Row'];
@@ -140,7 +141,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
     }));
   };
   
-  const handleSave = async () => {
+  const handleSave = async (proceedToCalculation: boolean = false) => {
     if (!profile?.org_id) return;
     
     const values = Object.entries(localValues)
@@ -153,7 +154,18 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
       }));
     
     await bulkUpsertValues.mutateAsync(values);
-    onComplete?.();
+    
+    // Update assessment status to DATA_READY if enough data is filled
+    if (progress.percent >= 50) {
+      await supabase
+        .from('assessments')
+        .update({ status: 'DATA_READY' })
+        .eq('id', assessmentId);
+    }
+    
+    if (proceedToCalculation && onComplete) {
+      onComplete();
+    }
   };
   
   const getBenchmarkStatus = (indicator: Indicator, value: number | null) => {
@@ -341,28 +353,45 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
       {/* Save Button */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               {progress.percent >= 50 ? (
                 <>
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  Dados suficientes para cálculo do diagnóstico
+                  Dados suficientes para cálculo do diagnóstico ({progress.filled}/{progress.total} preenchidos)
                 </>
               ) : (
                 <>
                   <AlertCircle className="h-4 w-4 text-amber-500" />
-                  Preencha ao menos 50% dos indicadores ({Math.ceil(progress.total * 0.5)} mínimo)
+                  Preencha ao menos 50% dos indicadores ({progress.filled}/{Math.ceil(progress.total * 0.5)} mínimo)
                 </>
               )}
             </div>
-            <Button onClick={handleSave} disabled={bulkUpsertValues.isPending}>
-              {bulkUpsertValues.isPending ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4 mr-2" />
-              )}
-              Salvar Indicadores
-            </Button>
+            <div className="flex items-center justify-end gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => handleSave(false)} 
+                disabled={bulkUpsertValues.isPending || progress.filled === 0}
+              >
+                {bulkUpsertValues.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                Salvar Rascunho
+              </Button>
+              <Button 
+                onClick={() => handleSave(true)} 
+                disabled={bulkUpsertValues.isPending || progress.percent < 50}
+              >
+                {bulkUpsertValues.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                )}
+                Salvar e Calcular Índices
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

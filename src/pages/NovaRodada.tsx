@@ -454,51 +454,75 @@ export default function NovaRodada() {
 
       {/* Step Content */}
       {currentStep === 4 ? (
-        // Full-width validation panel
+        // Full-width validation/data entry panel
         <div className="space-y-6">
-          {selectedDestinationData?.ibge_code && profile?.org_id ? (
-            <DataValidationPanel
-              ibgeCode={selectedDestinationData.ibge_code}
-              orgId={profile.org_id}
-              destinationName={selectedDestinationData.name}
-              onValidationComplete={handleValidationComplete}
-            />
+          {diagnosticType === 'enterprise' ? (
+            // Enterprise: Show enterprise data entry panel directly
+            createdAssessmentId ? (
+              <EnterpriseDataEntryPanel
+                assessmentId={createdAssessmentId}
+                tier={selectedTier}
+                onComplete={() => {
+                  // When save completes, go to calculation step
+                  setCurrentStep(6);
+                }}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
+                  <p className="text-muted-foreground">Carregando diagnóstico...</p>
+                </CardContent>
+              </Card>
+            )
           ) : (
+            // Territorial: Show IBGE data validation panel
+            selectedDestinationData?.ibge_code && profile?.org_id ? (
+              <DataValidationPanel
+                ibgeCode={selectedDestinationData.ibge_code}
+                orgId={profile.org_id}
+                destinationName={selectedDestinationData.name}
+                onValidationComplete={handleValidationComplete}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h4 className="font-medium mb-2">Código IBGE não disponível</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    O destino selecionado não possui código IBGE cadastrado. 
+                    O pré-preenchimento automático requer o código IBGE para buscar dados oficiais.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Você pode prosseguir para preenchimento manual ou editar o destino para adicionar o código IBGE.
+                  </p>
+                </CardContent>
+              </Card>
+            )
+          )}
+
+          {/* Navigation for step 4 - only show for territorial (enterprise has its own save button) */}
+          {diagnosticType !== 'enterprise' && (
             <Card>
-              <CardContent className="py-12 text-center">
-                <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h4 className="font-medium mb-2">Código IBGE não disponível</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  O destino selecionado não possui código IBGE cadastrado. 
-                  O pré-preenchimento automático requer o código IBGE para buscar dados oficiais.
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Você pode prosseguir para preenchimento manual ou editar o destino para adicionar o código IBGE.
-                </p>
+              <CardContent className="pt-6">
+                <div className="flex justify-between">
+                  <Button
+                    variant="outline"
+                    onClick={handlePreviousStep}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Voltar
+                  </Button>
+                  <Button onClick={handleNextStep}>
+                    {validatedDataCount > 0 
+                      ? `Continuar (${validatedDataCount} validados)` 
+                      : 'Pular para Preenchimento Manual'}
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
-
-          {/* Navigation for step 4 */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-between">
-                <Button
-                  variant="outline"
-                  onClick={handlePreviousStep}
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Voltar
-                </Button>
-                <Button onClick={handleNextStep}>
-                  {validatedDataCount > 0 
-                    ? `Continuar (${validatedDataCount} validados)` 
-                    : 'Pular para Preenchimento Manual'}
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       ) : (
         <Card className="max-w-2xl mx-auto">
@@ -906,10 +930,12 @@ export default function NovaRodada() {
             {currentStep === 6 && (
               <div className="space-y-4">
                 <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
-                  <h4 className="font-medium mb-2">Calcular diagnóstico</h4>
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-severity-good" />
+                    Dados preenchidos com sucesso!
+                  </h4>
                   <p className="text-sm text-muted-foreground">
-                    Após preencher os dados, você poderá calcular o diagnóstico na página de detalhes.
-                    O sistema irá:
+                    Agora você pode calcular o diagnóstico. O sistema irá:
                   </p>
                   <ul className="text-sm text-muted-foreground mt-2 space-y-1">
                     <li>• Normalizar os indicadores</li>
@@ -918,6 +944,22 @@ export default function NovaRodada() {
                     <li>• Gerar prescrições de capacitação</li>
                   </ul>
                 </div>
+                
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm">
+                    <strong>Diagnóstico:</strong> {assessmentTitle}
+                  </p>
+                </div>
+                
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => navigate(`/diagnosticos/${createdAssessmentId}`)}
+                >
+                  <Calculator className="h-4 w-4 mr-2" />
+                  Ir para Cálculo do Diagnóstico
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
               </div>
             )}
 
