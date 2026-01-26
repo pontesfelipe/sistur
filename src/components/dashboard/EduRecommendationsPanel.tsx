@@ -14,8 +14,31 @@ import {
   ChevronRight,
   Filter
 } from 'lucide-react';
-import { useEduRecommendationsForAssessment, type EduRecommendation } from '@/hooks/useEduRecommendationsForAssessment';
+import { useEduRecommendationsForAssessment } from '@/hooks/useEduRecommendationsForAssessment';
+import { usePrescriptions } from '@/hooks/usePrescriptions';
 import { PILLAR_INFO } from '@/types/sistur';
+
+// Internal type for display - simplified training structure
+interface DisplayRecommendation {
+  training: {
+    training_id: string;
+    title: string;
+    description?: string;
+    type: 'course' | 'live';
+    pillar: string;
+    level?: string;
+    duration_minutes?: number;
+    video_url?: string;
+    target_audience?: string;
+    course_code?: string;
+  };
+  indicatorCode: string;
+  indicatorName: string;
+  pillar: string;
+  priority: number;
+  reasonTemplate: string;
+  status: string;
+}
 
 interface IndicatorScore {
   id: string;
@@ -31,16 +54,74 @@ interface IndicatorScore {
 
 interface EduRecommendationsPanelProps {
   indicatorScores: IndicatorScore[];
+  assessmentId?: string;
 }
 
-export function EduRecommendationsPanel({ indicatorScores }: EduRecommendationsPanelProps) {
+export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRecommendationsPanelProps) {
   const [pillarFilter, setPillarFilter] = useState<string>('all');
-  const { data: recommendations, isLoading, error } = useEduRecommendationsForAssessment(indicatorScores);
+  const { data: dynamicRecommendations, isLoading: loadingDynamic } = useEduRecommendationsForAssessment(indicatorScores);
+  const { data: prescriptions, isLoading: loadingPrescriptions } = usePrescriptions(assessmentId);
+
+  const isLoading = loadingDynamic || loadingPrescriptions;
+
+  // Convert prescriptions to recommendation-like format for display
+  const prescriptionRecommendations = (prescriptions || []).map(p => {
+    // Use training from edu_trainings if available, otherwise fall back to course
+    const trainingTitle = p.training?.title || p.course?.title || `Capacitação ${p.pillar}`;
+    const trainingId = p.training?.training_id || p.training_id || p.course_id || p.id;
+    const trainingLevel = p.training?.level || p.course?.level;
+    const trainingDuration = p.training?.duration_minutes || p.course?.duration_minutes;
+    
+    return {
+      training: {
+        training_id: trainingId,
+        title: trainingTitle,
+        description: '',
+        type: (p.training?.type as 'course' | 'live') || 'course',
+        pillar: p.pillar,
+        level: trainingLevel,
+        duration_minutes: trainingDuration,
+        video_url: p.course?.url,
+        target_audience: undefined,
+        course_code: undefined,
+      },
+      indicatorCode: p.indicator?.code || '',
+      indicatorName: p.indicator?.name || '',
+      pillar: p.pillar,
+      priority: p.priority,
+      reasonTemplate: p.justification,
+      status: p.status === 'CRITICO' ? 'CRÍTICO' : 'ATENÇÃO',
+    };
+  });
+
+  // Use prescriptions as primary source, fall back to dynamic recommendations
+  const recommendations: DisplayRecommendation[] = prescriptionRecommendations.length > 0 
+    ? prescriptionRecommendations 
+    : (dynamicRecommendations || []).map(r => ({
+        training: {
+          training_id: r.training.training_id,
+          title: r.training.title,
+          description: (r.training as any).description || '',
+          type: (r.training.type as 'course' | 'live') || 'course',
+          pillar: r.training.pillar,
+          level: r.training.level,
+          duration_minutes: r.training.duration_minutes,
+          video_url: r.training.video_url,
+          target_audience: r.training.target_audience,
+          course_code: (r.training as any).course_code,
+        },
+        indicatorCode: r.indicatorCode,
+        indicatorName: r.indicatorName,
+        pillar: r.pillar,
+        priority: r.priority,
+        reasonTemplate: r.reasonTemplate,
+        status: r.status,
+      }));
 
   // Filter recommendations by pillar
-  const filteredRecommendations = recommendations?.filter(rec => 
+  const filteredRecommendations = recommendations.filter(rec => 
     pillarFilter === 'all' || rec.pillar === pillarFilter
-  ) || [];
+  );
 
   if (isLoading) {
     return (
@@ -58,7 +139,7 @@ export function EduRecommendationsPanel({ indicatorScores }: EduRecommendationsP
     );
   }
 
-  if (error || !recommendations || recommendations.length === 0) {
+  if (recommendations.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -74,9 +155,7 @@ export function EduRecommendationsPanel({ indicatorScores }: EduRecommendationsP
           <div className="text-center py-8">
             <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
             <p className="text-muted-foreground text-sm">
-              {error 
-                ? 'Erro ao carregar recomendações'
-                : 'Nenhuma prescrição encontrada para os indicadores atuais.'}
+              Nenhuma prescrição encontrada para os indicadores atuais.
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               Isso pode ocorrer se não houver mapeamentos configurados ou se todos os indicadores estão adequados.
@@ -248,7 +327,7 @@ export function EduRecommendationsPanel({ indicatorScores }: EduRecommendationsP
   );
 }
 
-function RecommendationItem({ rec, index }: { rec: EduRecommendation; index: number }) {
+function RecommendationItem({ rec, index }: { rec: DisplayRecommendation; index: number }) {
   return (
     <div className="flex items-start gap-4 p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
