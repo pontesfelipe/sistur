@@ -616,6 +616,81 @@ serve(async (req) => {
         const indicatorTier = indicator.minimum_tier || 'COMPLETE';
         return allowedTiers.includes(indicatorTier);
       });
+
+      // ============================================================
+      // MESCLAR DADOS DE INTEGRAÇÃO VALIDADOS (external_indicator_values)
+      // ============================================================
+      // Use the destination's IBGE code from the assessment join
+      const destinationIbgeCode = assessment.destination?.ibge_code;
+
+      if (destinationIbgeCode) {
+        console.log(`Fetching validated external data for IBGE code: ${destinationIbgeCode}`);
+        
+        // Fetch validated external indicator values
+        const { data: externalValues, error: externalError } = await supabase
+          .from("external_indicator_values")
+          .select("indicator_code, raw_value, source_code, reference_year")
+          .eq("municipality_ibge_code", destinationIbgeCode)
+          .eq("org_id", orgId)
+          .eq("validated", true);
+
+        if (externalError) {
+          console.error("Error fetching external indicator values:", externalError);
+        } else if (externalValues && externalValues.length > 0) {
+          console.log(`Found ${externalValues.length} validated external indicator values`);
+          
+          // Get indicator IDs by code for mapping
+          const externalCodes = externalValues.map((ev: any) => ev.indicator_code);
+          const { data: indicatorsByCode } = await supabase
+            .from("indicators")
+            .select(`
+              id,
+              code,
+              name,
+              pillar,
+              theme,
+              direction,
+              normalization,
+              min_ref,
+              max_ref,
+              weight,
+              intersectoral_dependency,
+              minimum_tier
+            `)
+            .in("code", externalCodes);
+
+          if (indicatorsByCode && indicatorsByCode.length > 0) {
+            // Create a map from code to indicator
+            const codeToIndicator = new Map(indicatorsByCode.map((ind: any) => [ind.code, ind]));
+            
+            // Create a set of already present indicator IDs (from indicator_values)
+            const existingIndicatorIds = new Set(filteredIndicatorValues.map((iv: any) => iv.indicator_id));
+            
+            // Add external values that are not already in indicator_values
+            let addedCount = 0;
+            for (const extVal of externalValues) {
+              const indicator = codeToIndicator.get(extVal.indicator_code);
+              if (indicator && !existingIndicatorIds.has(indicator.id)) {
+                // Check tier compatibility
+                const indicatorTier = indicator.minimum_tier || 'COMPLETE';
+                if (allowedTiers.includes(indicatorTier)) {
+                  filteredIndicatorValues.push({
+                    id: `external-${extVal.indicator_code}`,
+                    indicator_id: indicator.id,
+                    value_raw: extVal.raw_value,
+                    indicator: indicator,
+                    _source: 'external', // Mark as external for logging
+                    _external_source: extVal.source_code,
+                    _reference_year: extVal.reference_year,
+                  });
+                  addedCount++;
+                }
+              }
+            }
+            console.log(`Added ${addedCount} validated external indicators to calculation (merged with ${existingIndicatorIds.size} manual entries)`);
+          }
+        }
+      }
     }
 
     if (!filteredIndicatorValues || filteredIndicatorValues.length === 0) {
