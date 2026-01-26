@@ -1989,6 +1989,103 @@ export type Database = {
           },
         ]
       }
+      enterprise_profiles: {
+        Row: {
+          accessibility_features: string[] | null
+          average_daily_rate: number | null
+          average_occupancy_rate: number | null
+          certifications: string[] | null
+          created_at: string
+          destination_id: string
+          employee_count: number | null
+          id: string
+          notes: string | null
+          org_id: string
+          peak_months: string[] | null
+          primary_source_markets: string[] | null
+          property_type: string
+          room_count: number | null
+          seasonality: string | null
+          star_rating: number | null
+          suite_count: number | null
+          sustainability_initiatives: string[] | null
+          target_market: string[] | null
+          total_capacity: number | null
+          updated_at: string
+          years_in_operation: number | null
+        }
+        Insert: {
+          accessibility_features?: string[] | null
+          average_daily_rate?: number | null
+          average_occupancy_rate?: number | null
+          certifications?: string[] | null
+          created_at?: string
+          destination_id: string
+          employee_count?: number | null
+          id?: string
+          notes?: string | null
+          org_id: string
+          peak_months?: string[] | null
+          primary_source_markets?: string[] | null
+          property_type?: string
+          room_count?: number | null
+          seasonality?: string | null
+          star_rating?: number | null
+          suite_count?: number | null
+          sustainability_initiatives?: string[] | null
+          target_market?: string[] | null
+          total_capacity?: number | null
+          updated_at?: string
+          years_in_operation?: number | null
+        }
+        Update: {
+          accessibility_features?: string[] | null
+          average_daily_rate?: number | null
+          average_occupancy_rate?: number | null
+          certifications?: string[] | null
+          created_at?: string
+          destination_id?: string
+          employee_count?: number | null
+          id?: string
+          notes?: string | null
+          org_id?: string
+          peak_months?: string[] | null
+          primary_source_markets?: string[] | null
+          property_type?: string
+          room_count?: number | null
+          seasonality?: string | null
+          star_rating?: number | null
+          suite_count?: number | null
+          sustainability_initiatives?: string[] | null
+          target_market?: string[] | null
+          total_capacity?: number | null
+          updated_at?: string
+          years_in_operation?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_profiles_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: true
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_profiles_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: true
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
+          {
+            foreignKeyName: "enterprise_profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       entrepreneur_profiles: {
         Row: {
           business_description: string | null
