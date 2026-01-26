@@ -83,10 +83,14 @@ serve(async (req) => {
       });
     }
 
+    // Determine if this is an Enterprise diagnostic
+    const isEnterprise = assessment.diagnostic_type === 'enterprise';
+    console.log('Diagnostic type:', assessment.diagnostic_type, 'isEnterprise:', isEnterprise);
+
     // Fetch indicator scores with indicator details
     const { data: indicatorScores } = await supabase
       .from('indicator_scores')
-      .select('*, indicators(code, name, pillar, theme, description, direction)')
+      .select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target)')
       .eq('assessment_id', assessmentId)
       .order('score', { ascending: true });
 
@@ -97,12 +101,27 @@ serve(async (req) => {
       .eq('assessment_id', assessmentId)
       .eq('is_dismissed', false);
 
-    console.log('Generating SISTUR report for:', destinationName);
+    // Fetch action plans for this assessment
+    const { data: actionPlans } = await supabase
+      .from('action_plans')
+      .select('*')
+      .eq('assessment_id', assessmentId)
+      .order('priority', { ascending: true });
+
+    // Fetch indicator values (raw data) for more context
+    const { data: indicatorValues } = await supabase
+      .from('indicator_values')
+      .select('*, indicators(code, name, pillar, theme, unit)')
+      .eq('assessment_id', assessmentId);
+
+    console.log('Generating report for:', destinationName, isEnterprise ? '(ENTERPRISE)' : '(TERRITORIAL)');
     console.log('Assessment ID:', assessmentId);
     console.log('Pillar scores:', pillarScores);
     console.log('Issues count:', issues?.length || 0);
     console.log('Prescriptions count:', prescriptions?.length || 0);
     console.log('Indicator scores count:', indicatorScores?.length || 0);
+    console.log('Action plans count:', actionPlans?.length || 0);
+    console.log('Indicator values count:', indicatorValues?.length || 0);
     console.log('IGMA flags:', assessment.igma_flags);
     console.log('Alerts count:', alerts?.length || 0);
 
@@ -111,7 +130,9 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `Você é um analista técnico em turismo público. Gere um relatório seguindo estritamente a metodologia SISTUR, com estrutura institucional, separação clara entre dados, análise e diretrizes.
+    // ========== SYSTEM PROMPTS ==========
+    
+    const territorialSystemPrompt = `Você é um analista técnico em turismo público. Gere um relatório seguindo estritamente a metodologia SISTUR, com estrutura institucional, separação clara entre dados, análise e diretrizes.
 
 FUNDAMENTOS TEÓRICOS DE MARIO BENI:
 O turismo deve ser compreendido como um sistema aberto (SISTUR - Sistema de Turismo) composto por subsistemas interdependentes. Segundo Beni:
@@ -139,79 +160,18 @@ PRINCÍPIOS FUNDAMENTAIS:
 - Conectar dado → impacto → decisão
 - Estimar dados apenas quando necessário e sinalizar claramente
 
-ESTRUTURA OBRIGATÓRIA DO RELATÓRIO:
+ESTRUTURA OBRIGATÓRIA DO RELATÓRIO TERRITORIAL:
 
 # 1. CAPA E IDENTIFICAÇÃO
-- Nome do destino turístico
-- UF e código IBGE (se disponível)
-- Período de análise
-- Data de geração do relatório
-- Versão do algoritmo SISTUR
-
 # 2. SUMÁRIO EXECUTIVO
-Síntese de 1-2 parágrafos contendo:
-- Situação geral do destino (visão sistêmica)
-- Pontuação consolidada dos três eixos (I-RA, I-AO, I-OE)
-- Principais alertas e flags IGMA ativos
-- Conclusão estratégica principal
-
 # 3. CONTEXTUALIZAÇÃO DO MUNICÍPIO
-- Caracterização territorial básica
-- Vocação turística identificada
-- Posição no contexto regional
-
 # 4. METODOLOGIA SISTUR
-Breve explicação do método aplicado:
-- Os três eixos e sua interdependência
-- Sistema de classificação de status
-- Princípios das 6 regras sistêmicas
-
-# 5. DIAGNÓSTICO POR EIXO SISTUR
-Para CADA eixo (I-RA, I-AO, I-OE), apresentar três blocos separados:
-
-## 5.1. EVIDÊNCIAS
-- Dados quantitativos (scores, percentuais)
-- Indicadores mensurados
-- Fontes de dados utilizadas
-
-## 5.2. LEITURA TÉCNICA
-- Análise interpretativa dos dados
-- Identificação de padrões e correlações
-- Diagnóstico das causas raiz
-
-## 5.3. IMPLICAÇÕES
-- Consequências práticas identificadas
-- Riscos e oportunidades
-- Interdependências com outros eixos
-
+# 5. DIAGNÓSTICO POR EIXO SISTUR (com EVIDÊNCIAS, LEITURA TÉCNICA e IMPLICAÇÕES)
 # 6. INVENTÁRIO TURÍSTICO – SÍNTESE ANALÍTICA
-- Síntese dos atrativos e recursos identificados
-- Gaps de infraestrutura turística
-- Capacidade de carga atual
-
 # 7. ANÁLISE INTEGRADA
-- Visão sistêmica cruzando os três eixos
-- Identificação de gargalos estruturantes
-- Pontos de alavancagem prioritários
-
 # 8. PROGNÓSTICO E DIRETRIZES
-- Cenários possíveis (pessimista, realista, otimista)
-- Diretrizes estratégicas por horizonte temporal
-- Condições de contorno para sucesso
-
-# 9. BANCO DE AÇÕES
-Tabela estruturada contendo:
-| Ação | Eixo | Prazo | Agente Responsável | Indicador de Sucesso | Prioridade |
-
-Organizado por horizonte:
-- Curto prazo (até 6 meses)
-- Médio prazo (6-18 meses)
-- Longo prazo (18+ meses)
-
+# 9. BANCO DE AÇÕES (tabela estruturada)
 # 10. CONSIDERAÇÕES FINAIS
-- Síntese executiva das principais recomendações
-- Próximos passos imediatos
-- Data recomendada para próxima revisão
 
 REGRAS DE REDAÇÃO:
 - Use formatação markdown com headers hierárquicos
@@ -220,6 +180,115 @@ REGRAS DE REDAÇÃO:
 - Conecte explicitamente: dado → impacto → decisão
 - Se estimar algum dado, sinalize com "[ESTIMADO]"
 - O relatório deve ter no mínimo 2500 palavras`;
+
+    const enterpriseSystemPrompt = `Você é um consultor estratégico especializado em gestão hoteleira e empreendimentos turísticos. Gere um relatório executivo focado em ORIENTAÇÃO ESTRATÉGICA PARA O EMPREENDIMENTO, utilizando a metodologia SISTUR adaptada para o setor privado.
+
+CONTEXTO ENTERPRISE:
+Este diagnóstico analisa um EMPREENDIMENTO TURÍSTICO PRIVADO (hotel, resort, pousada) — não um destino público. O foco é ajudar a gestão a:
+- Identificar gaps operacionais e de performance
+- Otimizar KPIs de negócio (RevPAR, ocupação, NPS, etc.)
+- Alinhar práticas de sustentabilidade com rentabilidade
+- Definir prioridades de investimento e capacitação
+
+OS TRÊS EIXOS SISTUR ENTERPRISE:
+1. I-RA — Responsabilidade Ambiental: Eficiência energética, gestão hídrica, resíduos, certificações ESG, impacto na comunidade local
+2. I-AO — Ações Operacionais: Governança corporativa, saúde financeira, maturidade tecnológica, rede de parcerias
+3. I-OE — Organização Estrutural: Qualidade de serviço, satisfação do hóspede, ocupação, infraestrutura, capacitação da equipe
+
+CATEGORIAS FUNCIONAIS ENTERPRISE:
+- Eficiência Energética: Consumo kWh/UH, fontes renováveis
+- Gestão Hídrica: Consumo litros/hóspede, reuso
+- Gestão de Resíduos: Taxa reciclagem, compostagem
+- Certificações Ambientais: Selos ESG ativos
+- Impacto na Comunidade: Emprego local, fornecedores regionais
+- Governança Corporativa: Políticas formalizadas, compliance
+- Saúde Financeira: RevPAR, ADR, margem operacional
+- Maturidade Tecnológica: Sistemas integrados, automação
+- Rede de Parcerias: Acordos B2B, OTAs
+- Qualidade de Serviço: NPS, review score, reclamações
+- Satisfação do Hóspede: Retorno, recomendação
+- Taxa de Ocupação: Ocupação anual, sazonalidade
+- Qualidade da Infraestrutura: Estado conservação, acessibilidade
+- Capacitação da Equipe: Horas treinamento, turnover
+- Efetividade de Marketing: CAC, conversão direta
+
+CLASSIFICAÇÃO DE STATUS:
+- BOM: Score ≥ 0.67 (67%) - KPI atende benchmark do setor
+- ATENÇÃO: 0.34 ≤ Score < 0.67 - KPI requer melhoria
+- CRÍTICO: Score ≤ 0.33 - KPI demanda ação urgente
+
+ESTRUTURA OBRIGATÓRIA DO RELATÓRIO ENTERPRISE:
+
+# 1. CAPA E IDENTIFICAÇÃO DO EMPREENDIMENTO
+- Nome do empreendimento
+- Localização (destino vinculado)
+- Período de análise
+- Data do diagnóstico
+
+# 2. SUMÁRIO EXECUTIVO PARA GESTÃO
+- Visão geral da performance do empreendimento
+- Score consolidado dos três eixos
+- Top 3 prioridades de ação imediata
+- ROI estimado das melhorias sugeridas
+
+# 3. PERFIL DO EMPREENDIMENTO
+- Caracterização do negócio
+- Posicionamento de mercado
+- Principais segmentos atendidos
+
+# 4. METODOLOGIA SISTUR ENTERPRISE
+- Adaptação da metodologia para setor privado
+- KPIs e benchmarks utilizados
+
+# 5. DIAGNÓSTICO POR CATEGORIA FUNCIONAL
+Para CADA categoria com dados, apresentar:
+## 5.X. [NOME DA CATEGORIA]
+### Métricas Atuais
+- Valores dos KPIs medidos
+- Comparação com benchmarks do setor
+### Análise de Performance
+- Interpretação dos resultados
+- Gaps identificados
+### Impacto no Negócio
+- Consequências financeiras/operacionais
+- Oportunidades de melhoria
+
+# 6. ANÁLISE DE GARGALOS OPERACIONAIS
+- Problemas críticos identificados
+- Causas raiz
+- Impacto na operação e receita
+
+# 7. PLANOS DE AÇÃO EM ANDAMENTO
+- Status dos planos já criados
+- Responsáveis e prazos
+- Progresso atual
+
+# 8. RECOMENDAÇÕES ESTRATÉGICAS
+- Ações prioritárias por horizonte (curto/médio/longo prazo)
+- Investimentos recomendados
+- Quick wins vs projetos estruturantes
+
+# 9. PRESCRIÇÕES DE CAPACITAÇÃO
+- Treinamentos recomendados para equipe
+- Gaps de competência identificados
+
+# 10. ROADMAP DE IMPLEMENTAÇÃO
+Tabela estruturada:
+| Ação | Categoria | Investimento Est. | Prazo | Responsável | KPI de Sucesso |
+
+# 11. CONSIDERAÇÕES FINAIS
+- Síntese das prioridades
+- Próximos passos imediatos
+- Data recomendada para próxima avaliação
+
+REGRAS DE REDAÇÃO ENTERPRISE:
+- Linguagem executiva, direta e orientada a resultados
+- Foco em ROI e impacto no negócio
+- Sempre conectar: métrica → gap → ação → resultado esperado
+- Use formatação markdown com headers hierárquicos
+- O relatório deve ter no mínimo 2500 palavras`;
+
+    const systemPrompt = isEnterprise ? enterpriseSystemPrompt : territorialSystemPrompt;
 
     // Format prescriptions for the prompt
     const prescriptionsText = prescriptions?.length > 0 
@@ -257,15 +326,74 @@ REGRAS DE REDAÇÃO:
         result += `\n${pillar} (${scores.length} indicadores, média: ${(avg * 100).toFixed(1)}%):\n`;
         result += `  - Críticos: ${critical.length}, Atenção: ${moderate.length}, Adequados: ${scores.length - critical.length - moderate.length}\n`;
         
-        // List critical indicators
-        if (critical.length > 0) {
-          result += '  - Indicadores Críticos:\n';
-          critical.slice(0, 10).forEach((s: any) => {
-            result += `    * ${s.indicators?.name || s.indicators?.code}: ${(s.score * 100).toFixed(1)}% (${s.indicators?.theme || 'N/A'})\n`;
-          });
-        }
+        // List all indicators with scores
+        scores.forEach((s: any) => {
+          const status = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
+          const benchmark = s.indicators?.benchmark_target ? ` (benchmark: ${s.indicators.benchmark_target})` : '';
+          result += `    * ${s.indicators?.name || s.indicators?.code}: ${(s.score * 100).toFixed(1)}% [${status}] - Tema: ${s.indicators?.theme || 'N/A'}${benchmark}\n`;
+        });
       }
       return result;
+    };
+
+    // Format indicator scores grouped by category/theme (for Enterprise)
+    const formatIndicatorsByCategory = () => {
+      if (!indicatorScores || indicatorScores.length === 0) return 'Nenhum indicador calculado.';
+      
+      const byTheme: Record<string, any[]> = {};
+      indicatorScores.forEach((is: any) => {
+        const theme = is.indicators?.theme || 'Outros';
+        if (!byTheme[theme]) byTheme[theme] = [];
+        byTheme[theme].push(is);
+      });
+
+      let result = '';
+      for (const [theme, scores] of Object.entries(byTheme)) {
+        if (scores.length === 0) continue;
+        const avg = scores.reduce((sum, s) => sum + s.score, 0) / scores.length;
+        const status = avg <= 0.33 ? 'CRÍTICO' : avg <= 0.66 ? 'ATENÇÃO' : 'BOM';
+        
+        result += `\n## ${theme} (Status: ${status}, Média: ${(avg * 100).toFixed(1)}%)\n`;
+        
+        scores.forEach((s: any) => {
+          const kpiStatus = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
+          const benchmarkMin = s.indicators?.benchmark_min !== null ? s.indicators.benchmark_min : 'N/A';
+          const benchmarkMax = s.indicators?.benchmark_max !== null ? s.indicators.benchmark_max : 'N/A';
+          const benchmarkTarget = s.indicators?.benchmark_target !== null ? s.indicators.benchmark_target : 'N/A';
+          result += `  - ${s.indicators?.name || s.indicators?.code}: ${(s.score * 100).toFixed(1)}% [${kpiStatus}]\n`;
+          result += `    Benchmark: min=${benchmarkMin}, target=${benchmarkTarget}, max=${benchmarkMax}\n`;
+        });
+      }
+      return result;
+    };
+
+    // Format raw indicator values
+    const formatIndicatorValues = () => {
+      if (!indicatorValues || indicatorValues.length === 0) return 'Nenhum valor bruto disponível.';
+      
+      return indicatorValues.map((iv: any) => {
+        const value = iv.value !== null ? iv.value : 'N/A';
+        const unit = iv.indicators?.unit || '';
+        return `- ${iv.indicators?.name || iv.indicators?.code}: ${value}${unit ? ` ${unit}` : ''} (Pilar: ${iv.indicators?.pillar || 'N/A'}, Tema: ${iv.indicators?.theme || 'N/A'})`;
+      }).join('\n');
+    };
+
+    // Format action plans
+    const formatActionPlans = () => {
+      if (!actionPlans || actionPlans.length === 0) return 'Nenhum plano de ação criado.';
+      
+      const statusMap: Record<string, string> = {
+        'pending': 'Pendente',
+        'in_progress': 'Em Andamento',
+        'completed': 'Concluído',
+        'cancelled': 'Cancelado'
+      };
+      
+      return actionPlans.map((ap: any) => {
+        const status = statusMap[ap.status] || ap.status;
+        const dueDate = ap.due_date ? new Date(ap.due_date).toLocaleDateString('pt-BR') : 'Sem prazo';
+        return `- [${status}] ${ap.title}\n  Descrição: ${ap.description || 'N/A'}\n  Pilar: ${ap.pillar || 'N/A'} | Responsável: ${ap.owner || 'N/A'} | Prazo: ${dueDate} | Prioridade: ${ap.priority || 'N/A'}`;
+      }).join('\n\n');
     };
 
     // Format IGMA flags
@@ -294,10 +422,12 @@ REGRAS DE REDAÇÃO:
       ? alerts.map((a: any) => `- [${a.alert_type}] ${a.message} (Pilar: ${a.pillar}, Ciclos consecutivos: ${a.consecutive_cycles})`).join('\n')
       : 'Nenhum alerta ativo.';
 
-    const userPrompt = `Gere um RELATÓRIO DE TURISMO seguindo a estrutura definida do SISTUR para o destino: ${destinationName}${assessment.destinations?.uf ? ` - ${assessment.destinations.uf}` : ''}
+    // ========== USER PROMPTS ==========
+
+    const territorialUserPrompt = `Gere um RELATÓRIO DE TURISMO TERRITORIAL seguindo a estrutura definida do SISTUR para o destino: ${destinationName}${assessment.destinations?.uf ? ` - ${assessment.destinations.uf}` : ''}
 ${assessment.destinations?.ibge_code ? `Código IBGE: ${assessment.destinations.ibge_code}` : ''}
 
-=== DADOS DO DIAGNÓSTICO SISTUR ===
+=== DADOS DO DIAGNÓSTICO SISTUR TERRITORIAL ===
 
 IDENTIFICAÇÃO:
 - Destino: ${destinationName}
@@ -322,25 +452,21 @@ ${alertsText}
 DETALHAMENTO DE INDICADORES POR EIXO:
 ${formatIndicatorScores()}
 
-PROBLEMAS IDENTIFICADOS (com interpretação territorial):
+VALORES BRUTOS DOS INDICADORES:
+${formatIndicatorValues()}
+
+PROBLEMAS/GARGALOS IDENTIFICADOS:
 ${issuesText}
 
 PRESCRIÇÕES DE CAPACITAÇÃO ATIVAS:
 ${prescriptionsText}
 
+PLANOS DE AÇÃO CRIADOS:
+${formatActionPlans()}
+
 === INSTRUÇÕES DE GERAÇÃO ===
 
-SIGA RIGOROSAMENTE A ESTRUTURA DO RELATÓRIO DEFINIDA NO SYSTEM PROMPT:
-1. Capa e Identificação
-2. Sumário Executivo  
-3. Contextualização do Município
-4. Metodologia SISTUR
-5. Diagnóstico por Eixo SISTUR (com EVIDÊNCIAS, LEITURA TÉCNICA e IMPLICAÇÕES separados)
-6. Inventário Turístico – Síntese Analítica
-7. Análise Integrada
-8. Prognóstico e Diretrizes
-9. Banco de Ações (tabela estruturada)
-10. Considerações Finais
+SIGA RIGOROSAMENTE A ESTRUTURA DO RELATÓRIO DEFINIDA NO SYSTEM PROMPT.
 
 REGRAS FUNDAMENTAIS:
 - Sempre justificar conclusões com base nos dados fornecidos
@@ -354,6 +480,73 @@ LEMBRE-SE:
 - Aprendizado é execução - capacitação deve ser prescrita por gargalo específico
 - Monitoramento fecha o ciclo - toda ação deve ter indicador de acompanhamento
 - O SISTUR não informa — o SISTUR transforma`;
+
+    const enterpriseUserPrompt = `Gere um RELATÓRIO EXECUTIVO ENTERPRISE para o empreendimento: ${destinationName}${assessment.destinations?.uf ? ` - ${assessment.destinations.uf}` : ''}
+
+=== DADOS DO DIAGNÓSTICO SISTUR ENTERPRISE ===
+
+IDENTIFICAÇÃO DO EMPREENDIMENTO:
+- Nome: ${destinationName}
+- Localização: ${assessment.destinations?.uf || 'N/A'}
+- Período de análise: ${assessment.period_start || 'N/A'} a ${assessment.period_end || 'N/A'}
+- Versão do algoritmo: ${assessment.algo_version}
+- Data de cálculo: ${assessment.calculated_at || 'N/A'}
+
+PERFORMANCE POR EIXO SISTUR ENTERPRISE:
+- I-RA (Responsabilidade Ambiental): ${pillarScores?.RA?.score !== undefined ? (pillarScores.RA.score * 100).toFixed(1) + '%' : 'Não calculado'} - Status: ${pillarScores?.RA?.severity || 'N/A'}
+- I-AO (Ações Operacionais): ${pillarScores?.AO?.score !== undefined ? (pillarScores.AO.score * 100).toFixed(1) + '%' : 'Não calculado'} - Status: ${pillarScores?.AO?.severity || 'N/A'}
+- I-OE (Organização Estrutural): ${pillarScores?.OE?.score !== undefined ? (pillarScores.OE.score * 100).toFixed(1) + '%' : 'Não calculado'} - Status: ${pillarScores?.OE?.severity || 'N/A'}
+
+ALERTAS OPERACIONAIS:
+${alertsText}
+
+DETALHAMENTO POR CATEGORIA FUNCIONAL:
+${formatIndicatorsByCategory()}
+
+VALORES DOS KPIs (DADOS BRUTOS):
+${formatIndicatorValues()}
+
+GARGALOS OPERACIONAIS IDENTIFICADOS:
+${issuesText}
+
+PRESCRIÇÕES DE CAPACITAÇÃO:
+${prescriptionsText}
+
+PLANOS DE AÇÃO EM ANDAMENTO:
+${formatActionPlans()}
+
+=== INSTRUÇÕES DE GERAÇÃO ===
+
+ESTE É UM RELATÓRIO PARA GESTÃO DE EMPREENDIMENTO TURÍSTICO PRIVADO.
+Foco em: direção estratégica, otimização de performance, ROI de melhorias.
+
+SIGA RIGOROSAMENTE A ESTRUTURA DO RELATÓRIO ENTERPRISE DEFINIDA NO SYSTEM PROMPT:
+1. Capa e Identificação do Empreendimento
+2. Sumário Executivo para Gestão
+3. Perfil do Empreendimento
+4. Metodologia SISTUR Enterprise
+5. Diagnóstico por Categoria Funcional
+6. Análise de Gargalos Operacionais
+7. Planos de Ação em Andamento
+8. Recomendações Estratégicas
+9. Prescrições de Capacitação
+10. Roadmap de Implementação
+11. Considerações Finais
+
+REGRAS ENTERPRISE:
+- Linguagem executiva e orientada a resultados
+- Foco em impacto financeiro e operacional
+- Conectar: métrica → gap → ação → resultado esperado
+- Priorizar quick wins com alto ROI
+- O relatório deve ter no mínimo 2500 palavras
+
+LEMBRE-SE:
+- O empreendimento busca DIREÇÃO para otimizar operação e rentabilidade
+- Cada KPI abaixo do benchmark representa oportunidade de melhoria
+- Recomendações devem ser acionáveis com investimento/prazo estimado
+- O SISTUR Enterprise transforma dados em decisões de negócio`;
+
+    const userPrompt = isEnterprise ? enterpriseUserPrompt : territorialUserPrompt;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
