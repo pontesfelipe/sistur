@@ -56,7 +56,14 @@ export function useUserManagement() {
     }
   };
 
-  const createUser = async (email: string, password: string, fullName: string, role: string) => {
+  const createUser = async (
+    email: string, 
+    password: string, 
+    fullName: string, 
+    role: string,
+    orgId: string,
+    systemAccess: 'ERP' | 'EDU'
+  ) => {
     try {
       const response = await supabase.functions.invoke('manage-users', {
         body: { 
@@ -64,7 +71,9 @@ export function useUserManagement() {
           email,
           password,
           full_name: fullName,
-          role
+          role,
+          org_id: orgId,
+          system_access: systemAccess
         }
       });
 

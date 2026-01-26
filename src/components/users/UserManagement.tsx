@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { useUserManagement, UserData } from '@/hooks/useUserManagement';
 import { UserPlus, Shield, User, Eye, Loader2, MoreHorizontal, Ban, Trash2, RefreshCw, GraduationCap, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+
+interface OrgOption {
+  id: string;
+  name: string;
+}
 
 const ROLE_INFO: Record<string, { label: string; color: string; icon: typeof Shield }> = {
   ADMIN: { label: 'Administrador', color: 'bg-red-500/20 text-red-700', icon: Shield },
@@ -27,30 +33,81 @@ const SYSTEM_ACCESS_INFO: Record<string, { label: string; color: string }> = {
   EDU: { label: 'EDU', color: 'bg-emerald-500/20 text-emerald-700' },
 };
 
+// Roles for ERP system
+const ERP_ROLES = ['ADMIN', 'ANALYST', 'VIEWER'];
+// Roles for EDU system
+const EDU_ROLES = ['ESTUDANTE', 'PROFESSOR'];
+
 export function UserManagement() {
   const { users, loading, isAdmin, createUser, updateUserRole, updateSystemAccess, blockUser, deleteUser } = useUserManagement();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [processingUserId, setProcessingUserId] = useState<string | null>(null);
+  const [orgs, setOrgs] = useState<OrgOption[]>([]);
+  const [loadingOrgs, setLoadingOrgs] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     fullName: '',
-    role: 'VIEWER' as string
+    orgId: '',
+    systemAccess: '' as 'ERP' | 'EDU' | '',
+    role: ''
   });
 
+  // Load organizations when dialog opens
+  useEffect(() => {
+    if (dialogOpen && orgs.length === 0) {
+      loadOrganizations();
+    }
+  }, [dialogOpen]);
+
+  // Reset role when system access changes
+  useEffect(() => {
+    if (formData.systemAccess === 'EDU') {
+      setFormData(prev => ({ ...prev, role: 'ESTUDANTE' }));
+    } else if (formData.systemAccess === 'ERP') {
+      setFormData(prev => ({ ...prev, role: 'VIEWER' }));
+    }
+  }, [formData.systemAccess]);
+
+  const loadOrganizations = async () => {
+    setLoadingOrgs(true);
+    try {
+      const { data, error } = await supabase
+        .from('orgs')
+        .select('id, name')
+        .order('name');
+      
+      if (error) throw error;
+      setOrgs(data || []);
+    } catch (error) {
+      console.error('Error loading orgs:', error);
+      toast.error('Erro ao carregar organizações');
+    } finally {
+      setLoadingOrgs(false);
+    }
+  };
+
   const handleCreateUser = async () => {
-    if (!formData.email || !formData.password || !formData.fullName) {
+    if (!formData.email || !formData.password || !formData.fullName || !formData.orgId || !formData.systemAccess || !formData.role) {
+      toast.error('Preencha todos os campos obrigatórios');
       return;
     }
 
     setCreating(true);
-    const result = await createUser(formData.email, formData.password, formData.fullName, formData.role);
+    const result = await createUser(
+      formData.email, 
+      formData.password, 
+      formData.fullName, 
+      formData.role,
+      formData.orgId,
+      formData.systemAccess
+    );
     setCreating(false);
 
     if (result.success) {
       setDialogOpen(false);
-      setFormData({ email: '', password: '', fullName: '', role: 'VIEWER' });
+      setFormData({ email: '', password: '', fullName: '', orgId: '', systemAccess: '', role: '' });
     }
   };
 
@@ -150,7 +207,7 @@ export function UserManagement() {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Nome Completo</Label>
+                    <Label htmlFor="fullName">Nome Completo *</Label>
                     <Input
                       id="fullName"
                       value={formData.fullName}
@@ -159,7 +216,7 @@ export function UserManagement() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Email *</Label>
                     <Input
                       id="email"
                       type="email"
@@ -169,34 +226,132 @@ export function UserManagement() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Senha</Label>
+                    <Label htmlFor="password">Senha *</Label>
                     <Input
                       id="password"
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                      placeholder="Senha inicial"
+                      placeholder="Senha inicial (mínimo 6 caracteres)"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="role">Papel</Label>
-                    <Select value={formData.role} onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}>
+                    <Label htmlFor="org">Organização *</Label>
+                    <Select 
+                      value={formData.orgId} 
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, orgId: value }))}
+                      disabled={loadingOrgs}
+                    >
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder={loadingOrgs ? "Carregando..." : "Selecione uma organização"} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="ADMIN">Administrador</SelectItem>
-                        <SelectItem value="ANALYST">Analista</SelectItem>
-                        <SelectItem value="VIEWER">Visualizador</SelectItem>
+                        {orgs.map(org => (
+                          <SelectItem key={org.id} value={org.id}>
+                            {org.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="systemAccess">Sistema de Acesso *</Label>
+                    <Select 
+                      value={formData.systemAccess} 
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, systemAccess: value as 'ERP' | 'EDU' }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o sistema" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ERP">
+                          <div className="flex items-center gap-2">
+                            <Building2 className="h-4 w-4" />
+                            ERP - Sistema Territorial
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="EDU">
+                          <div className="flex items-center gap-2">
+                            <GraduationCap className="h-4 w-4" />
+                            EDU - Plataforma Educacional
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      {formData.systemAccess === 'ERP' 
+                        ? 'Acesso ao sistema de diagnóstico territorial' 
+                        : formData.systemAccess === 'EDU' 
+                          ? 'Acesso à plataforma de capacitação' 
+                          : 'Escolha qual sistema o usuário terá acesso'}
+                    </p>
+                  </div>
+                  {formData.systemAccess && (
+                    <div className="space-y-2">
+                      <Label htmlFor="role">Papel *</Label>
+                      <Select 
+                        value={formData.role} 
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o papel" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {formData.systemAccess === 'EDU' ? (
+                            <>
+                              <SelectItem value="ESTUDANTE">
+                                <div className="flex items-center gap-2">
+                                  <GraduationCap className="h-4 w-4" />
+                                  Estudante
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="PROFESSOR">
+                                <div className="flex items-center gap-2">
+                                  <GraduationCap className="h-4 w-4" />
+                                  Professor
+                                </div>
+                              </SelectItem>
+                            </>
+                          ) : (
+                            <>
+                              <SelectItem value="ADMIN">
+                                <div className="flex items-center gap-2">
+                                  <Shield className="h-4 w-4" />
+                                  Administrador
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="ANALYST">
+                                <div className="flex items-center gap-2">
+                                  <User className="h-4 w-4" />
+                                  Analista
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="VIEWER">
+                                <div className="flex items-center gap-2">
+                                  <Eye className="h-4 w-4" />
+                                  Visualizador
+                                </div>
+                              </SelectItem>
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        {formData.systemAccess === 'EDU' 
+                          ? 'Estudante: acesso a cursos e trilhas. Professor: pode criar e gerenciar conteúdo.'
+                          : 'Admin: acesso total. Analista: diagnósticos. Visualizador: apenas leitura.'}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setDialogOpen(false)}>
                     Cancelar
                   </Button>
-                  <Button onClick={handleCreateUser} disabled={creating}>
+                  <Button 
+                    onClick={handleCreateUser} 
+                    disabled={creating || !formData.email || !formData.password || !formData.fullName || !formData.orgId || !formData.systemAccess || !formData.role}
+                  >
                     {creating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                     Criar Usuário
                   </Button>
