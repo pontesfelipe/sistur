@@ -1064,7 +1064,7 @@ serve(async (req) => {
     // 10. Get indicator codes for low-scoring indicators to map to trainings
     // Collect all indicator codes that have score < 0.67 (Crítico or Atenção)
     const lowScoreIndicatorCodes: string[] = [];
-    const indicatorScoreMap = new Map<string, { code: string; name: string; score: number; pillar: string }>();
+    const indicatorScoreMap = new Map<string, { code: string; name: string; score: number; pillar: string; indicator_id: string }>();
     
     for (const iv of filteredIndicatorValues as unknown as IndicatorValue[]) {
       if (!iv.indicator) continue;
@@ -1076,6 +1076,7 @@ serve(async (req) => {
           name: iv.indicator.name,
           score: indicatorScore.score,
           pillar: iv.indicator.pillar,
+          indicator_id: iv.indicator_id, // Include indicator UUID for prescription linking
         });
       }
     }
@@ -1151,6 +1152,7 @@ serve(async (req) => {
       issue_id: string;
       course_id?: string;
       training_id?: string;
+      indicator_id?: string | null;
       pillar: string;
       status: string;
       interpretation: TerritorialInterpretation;
@@ -1264,7 +1266,7 @@ serve(async (req) => {
             assessment_id,
             issue_id: issue.id,
             training_id: training.training_id, // Use training_id for unified EDU model
-            // indicator_id omitted - would need UUID lookup, not critical for prescriptions
+            indicator_id: indicatorInfo?.indicator_id || null, // Link to indicator UUID
             pillar: issue.pillar,
             status: issue.severity,
             interpretation: issue.interpretation,
