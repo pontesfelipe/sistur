@@ -27,13 +27,14 @@ import {
 } from "@/components/ui/select";
 import { useAssessments } from '@/hooks/useAssessments';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useQueryClient } from '@tanstack/react-query';
 
 const Diagnosticos = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   
   // Get tab and assessment from URL params
   const tabFromUrl = searchParams.get('tab');
@@ -69,13 +70,10 @@ const Diagnosticos = () => {
     CALCULATED: assessments?.filter(a => a.status === 'CALCULATED').length ?? 0,
   };
 
-  const handleDelete = async (id: string) => {
-    setDeletingId(id);
-    try {
-      await deleteAssessment.mutateAsync(id);
-    } finally {
-      setDeletingId(null);
-    }
+  const handleDelete = () => {
+    // Invalidation is handled by DeleteAssessmentDialog
+    // This callback just triggers a refetch if needed
+    queryClient.invalidateQueries({ queryKey: ['assessments'] });
   };
 
   return (
@@ -217,7 +215,6 @@ const Diagnosticos = () => {
                   <AssessmentCard 
                     assessment={assessment as any} 
                     onDelete={handleDelete}
-                    isDeleting={deletingId === assessment.id}
                   />
                 </div>
               ))}
