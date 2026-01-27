@@ -37,6 +37,7 @@ import { toast } from '@/hooks/use-toast';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
+import { EnterpriseProfileStep } from '@/components/enterprise/EnterpriseProfileStep';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { ExternalIndicatorValue, useCreateDataSnapshot, useExternalIndicatorValues } from '@/hooks/useOfficialData';
@@ -453,25 +454,26 @@ export default function NovaRodada() {
       </div>
 
       {/* Step Content */}
-      {currentStep === 4 ? (
+      {currentStep === 4 || (currentStep === 5 && diagnosticType === 'enterprise') ? (
         // Full-width validation/data entry panel
         <div className="space-y-6">
           {diagnosticType === 'enterprise' ? (
-            // Enterprise: Show enterprise data entry panel directly
-            createdAssessmentId ? (
-              <EnterpriseDataEntryPanel
-                assessmentId={createdAssessmentId}
-                tier={selectedTier}
+            // Enterprise: Show enterprise profile step first
+            selectedDestinationData ? (
+              <EnterpriseProfileStep
+                destinationId={selectedDestinationData.id}
+                destinationName={selectedDestinationData.name}
                 onComplete={() => {
-                  // When save completes, go to calculation step
-                  setCurrentStep(6);
+                  // After profile, go to step 5 for KPI data entry
+                  setCurrentStep(5);
                 }}
+                onBack={handlePreviousStep}
               />
             ) : (
               <Card>
                 <CardContent className="py-12 text-center">
                   <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
-                  <p className="text-muted-foreground">Carregando diagnóstico...</p>
+                  <p className="text-muted-foreground">Carregando destino...</p>
                 </CardContent>
               </Card>
             )
@@ -501,8 +503,29 @@ export default function NovaRodada() {
             )
           )}
 
-          {/* Navigation for step 4 - only show for territorial (enterprise has its own save button) */}
-          {diagnosticType !== 'enterprise' && (
+          {/* Step 5 Enterprise: KPI Data Entry - render inline */}
+          {currentStep === 5 && diagnosticType === 'enterprise' && (
+            createdAssessmentId ? (
+              <EnterpriseDataEntryPanel
+                assessmentId={createdAssessmentId}
+                tier={selectedTier}
+                onComplete={() => {
+                  // When save completes, go to calculation step
+                  setCurrentStep(6);
+                }}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
+                  <p className="text-muted-foreground">Carregando diagnóstico...</p>
+                </CardContent>
+              </Card>
+            )
+          )}
+
+          {/* Navigation for step 4 - only show for territorial (enterprise has its own save/continue buttons) */}
+          {currentStep === 4 && diagnosticType !== 'enterprise' && (
             <Card>
               <CardContent className="pt-6">
                 <div className="flex justify-between">
