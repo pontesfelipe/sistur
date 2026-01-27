@@ -1,31 +1,20 @@
 import { cn } from '@/lib/utils';
-import { MapPin, Calendar, ChevronRight, Trash2, Loader2, Zap, Gauge, Target } from 'lucide-react';
+import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Assessment } from '@/types/sistur';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useState } from 'react';
+import { DeleteAssessmentDialog } from './DeleteAssessmentDialog';
 
 interface AssessmentCardProps {
   assessment: Assessment & { tier?: string };
-  onDelete?: (id: string) => Promise<void>;
-  isDeleting?: boolean;
+  onDelete?: () => void;
 }
 
 const tierConfig = {
@@ -34,7 +23,7 @@ const tierConfig = {
   COMPLETE: { label: 'Integral', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
 };
 
-export function AssessmentCard({ assessment, onDelete, isDeleting }: AssessmentCardProps) {
+export function AssessmentCard({ assessment, onDelete }: AssessmentCardProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const statusLabels = {
@@ -56,13 +45,6 @@ export function AssessmentCard({ assessment, onDelete, isDeleting }: AssessmentC
       month: 'short',
       year: 'numeric',
     });
-  };
-
-  const handleDelete = async () => {
-    if (onDelete) {
-      await onDelete(assessment.id);
-      setIsDeleteOpen(false);
-    }
   };
 
   const tier = (assessment as any).tier || 'COMPLETE';
@@ -93,41 +75,23 @@ export function AssessmentCard({ assessment, onDelete, isDeleting }: AssessmentC
           </Tooltip>
         </div>
         {onDelete && (
-          <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Excluir diagnóstico?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Esta ação não pode ser desfeita. O diagnóstico "{assessment.title}" 
-                  e todos os dados associados serão permanentemente excluídos.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4 mr-2" />
-                  )}
-                  Excluir
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+              onClick={() => setIsDeleteOpen(true)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+            <DeleteAssessmentDialog
+              assessmentId={assessment.id}
+              assessmentTitle={assessment.title}
+              open={isDeleteOpen}
+              onOpenChange={setIsDeleteOpen}
+              onDeleted={onDelete}
+            />
+          </>
         )}
       </div>
 
