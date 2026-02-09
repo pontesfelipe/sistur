@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { destinationName, methodology, reportContent, issues, prescriptions } = await req.json();
+    const { destinationName, methodology, reportContent, issues, prescriptions, actionPlans, pillarScores, indicatorScores } = await req.json();
 
     console.log(`Generating project structure for ${destinationName} using ${methodology}`);
 
@@ -39,24 +39,56 @@ IMPORTANTE:
 - Responda APENAS com um objeto JSON válido. Não inclua markdown, blocos de código ou texto explicativo.
 - TODO O CONTEÚDO DEVE ESTAR EM PORTUGUÊS BRASILEIRO (pt-BR).`;
 
+    // Format pillar scores for context
+    const pillarScoresText = pillarScores 
+      ? Object.entries(pillarScores).map(([pillar, data]: [string, any]) => 
+          `- ${pillar}: ${data.score !== undefined ? (data.score * 100).toFixed(1) + '%' : 'N/A'} (${data.severity || 'N/A'})`
+        ).join('\n')
+      : 'Scores não disponíveis';
+
+    // Format action plans
+    const actionPlansText = actionPlans?.length > 0
+      ? actionPlans.slice(0, 10).map((ap: any) => `- [${ap.status}] ${ap.title} (Pilar: ${ap.pillar || 'N/A'}, Prazo: ${ap.due_date || 'N/A'})`).join('\n')
+      : 'Nenhum plano de ação';
+
+    // Format indicator scores (top critical ones)
+    const indicatorScoresText = indicatorScores?.length > 0
+      ? indicatorScores
+          .filter((is: any) => is.score <= 0.66)
+          .slice(0, 15)
+          .map((is: any) => {
+            const status = is.score <= 0.33 ? 'CRÍTICO' : 'ATENÇÃO';
+            return `- ${is.indicator?.name || is.indicator?.code || 'N/A'}: ${(is.score * 100).toFixed(1)}% [${status}] (Pilar: ${is.indicator?.pillar || 'N/A'})`;
+          }).join('\n')
+      : 'Nenhum indicador crítico';
+
     const userPrompt = `Analise os seguintes dados de diagnóstico para o destino "${destinationName}" e gere uma estrutura de projeto em PORTUGUÊS BRASILEIRO:
 
 ## Resumo do Relatório
 ${reportContent?.substring(0, 3000) || 'Conteúdo do relatório não disponível'}
 
-## Problemas Identificados (${issues?.length || 0})
-${issues?.slice(0, 10).map((i: any) => `- [${i.pillar}] ${i.title || i.description?.substring(0, 100)}`).join('\n') || 'Nenhum problema identificado'}
+## Scores dos Eixos SISTUR
+${pillarScoresText}
 
-## Prescrições (${prescriptions?.length || 0})
-${prescriptions?.slice(0, 10).map((p: any) => `- [${p.pillar}] ${p.what}: ${p.how?.substring(0, 100)}`).join('\n') || 'Nenhuma prescrição'}
+## Indicadores Críticos e de Atenção
+${indicatorScoresText}
+
+## Problemas/Gargalos Identificados (${issues?.length || 0})
+${issues?.slice(0, 10).map((i: any) => `- [${i.pillar}] ${i.title || i.description?.substring(0, 100)} (Severidade: ${i.severity}, Interpretação: ${i.interpretation || 'N/A'})`).join('\n') || 'Nenhum problema identificado'}
+
+## Prescrições de Capacitação (${prescriptions?.length || 0})
+${prescriptions?.slice(0, 10).map((p: any) => `- [${p.pillar}] ${p.justification?.substring(0, 150) || p.what || 'N/A'} (Agente: ${p.target_agent || 'N/A'})`).join('\n') || 'Nenhuma prescrição'}
+
+## Planos de Ação Existentes (${actionPlans?.length || 0})
+${actionPlansText}
 
 Gere uma estrutura JSON com (TODO O CONTEÚDO EM PORTUGUÊS BRASILEIRO):
-1. "description": Uma breve descrição do projeto (2-3 frases)
-2. "phases": Array de fases apropriadas para ${methodology}, cada uma com "name", "description" e array "deliverables"
-3. "tasks": Array de 10-20 tarefas iniciais derivadas dos problemas e prescrições, cada uma com "title", "description", "type" (epic/feature/story/task), "priority" (low/medium/high/critical), "estimatedHours" e array "tags"
+1. "description": Uma breve descrição do projeto (2-3 frases), considerando os scores dos eixos e problemas identificados
+2. "phases": Array de fases apropriadas para ${methodology}, cada uma com "name", "description" e array "deliverables". As fases devem refletir a priorização sistêmica (RA antes de OE, governança antes de marketing)
+3. "tasks": Array de 10-20 tarefas iniciais derivadas dos problemas, prescrições, indicadores críticos e planos de ação, cada uma com "title", "description", "type" (epic/feature/story/task), "priority" (low/medium/high/critical), "estimatedHours" e array "tags"
 4. "milestones": Array de 3-5 marcos principais com "name", "description" e "targetDate" sugerida (como string de data ISO, começando a partir de hoje)
 
-Foque em tarefas acionáveis e mensuráveis que abordem os problemas identificados.`;
+Foque em tarefas acionáveis e mensuráveis que abordem os problemas identificados. Conecte cada tarefa a um indicador ou gargalo específico quando possível.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
