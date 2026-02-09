@@ -91,11 +91,20 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
         .eq('assessment_id', selectedAssessment)
         .single();
 
-      // Fetch issues and prescriptions
-      const [issuesRes, prescriptionsRes] = await Promise.all([
+      // Fetch issues, prescriptions, action plans, pillar scores, and indicator scores
+      const [issuesRes, prescriptionsRes, actionPlansRes, pillarScoresRes, indicatorScoresRes] = await Promise.all([
         supabase.from('issues').select('*').eq('assessment_id', selectedAssessment),
         supabase.from('prescriptions').select('*').eq('assessment_id', selectedAssessment),
+        supabase.from('action_plans').select('*').eq('assessment_id', selectedAssessment).order('priority', { ascending: true }),
+        supabase.from('pillar_scores').select('*').eq('assessment_id', selectedAssessment),
+        supabase.from('indicator_scores').select('*, indicator:indicators(code, name, pillar, theme)').eq('assessment_id', selectedAssessment).order('score', { ascending: true }),
       ]);
+
+      // Build pillar scores map
+      const pillarScoresMap: Record<string, any> = {};
+      (pillarScoresRes.data || []).forEach((ps: any) => {
+        pillarScoresMap[ps.pillar] = { score: ps.score, severity: ps.severity };
+      });
 
       setGenerationProgress('Gerando estrutura do projeto com IA...');
 
@@ -107,6 +116,9 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
           reportContent: report?.report_content || '',
           issues: issuesRes.data || [],
           prescriptions: prescriptionsRes.data || [],
+          actionPlans: actionPlansRes.data || [],
+          pillarScores: pillarScoresMap,
+          indicatorScores: indicatorScoresRes.data || [],
         },
       });
 
