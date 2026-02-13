@@ -49,6 +49,7 @@ const OnDemandRequests = lazy(() => import("./pages/OnDemandRequests"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
 const Projetos = lazy(() => import("./pages/Projetos"));
 const Forum = lazy(() => import("./pages/Forum"));
+const Game = lazy(() => import("./pages/Game"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -326,6 +327,14 @@ const App = () => {
                   element={
                     <ProtectedRoute redirectStudentsToEdu={false}>
                       <Forum />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/game"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
+                      <Game />
                     </ProtectedRoute>
                   }
                 />

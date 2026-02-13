@@ -21,6 +21,7 @@ import {
   MessageSquarePlus,
   MessageSquare,
   FolderKanban,
+  Gamepad2,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState, useMemo, useEffect } from 'react';
@@ -50,6 +51,7 @@ const navigation: NavItem[] = [
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
   { name: 'Social Turismo', href: '/forum', icon: MessageSquare },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
+  { name: 'Mapa do Tesouro', href: '/game', icon: Gamepad2 },
 ];
 
 const bottomNavigation: NavItem[] = [
