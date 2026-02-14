@@ -12,7 +12,7 @@ import { GameTutorial } from '@/game/components/GameTutorial';
 import { MobileGameDrawer } from '@/game/components/MobileGameDrawer';
 import { SessionPicker } from '@/game/components/SessionPicker';
 import type { AvatarConfig, BiomeType } from '@/game/types';
-import { BIOME_INFO, PROFILE_INFO } from '@/game/types';
+import { BIOME_INFO, PROFILE_INFO, VICTORY_CONDITIONS } from '@/game/types';
 import { ArrowLeft, BarChart3, Hammer, HelpCircle, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -360,7 +360,7 @@ export default function Game() {
       {showTutorial && <GameTutorial onComplete={handleTutorialComplete} />}
 
       {/* Game Over Overlay */}
-      {game.state.isGameOver && (
+      {game.state.isGameOver && !game.state.isVictory && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-background rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300">
             <div className="text-6xl">💀</div>
@@ -380,18 +380,43 @@ export default function Game() {
               })()}
             </div>
             <div className="flex gap-3">
-              <button
-                onClick={handleBackToPicker}
-                className="flex-1 py-3 rounded-xl border border-border text-sm font-bold hover:bg-accent transition-colors"
-              >
-                📋 Sessões
-              </button>
-              <button
-                onClick={handleNewGame}
-                className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors"
-              >
-                🔄 Nova Aventura
-              </button>
+              <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-border text-sm font-bold hover:bg-accent transition-colors">📋 Sessões</button>
+              <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors">🔄 Nova Aventura</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Victory Overlay */}
+      {game.state.isVictory && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-amber-50 to-yellow-100 dark:from-amber-950 dark:to-yellow-950 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300 border-2 border-amber-400">
+            <div className="text-7xl animate-bounce">🏆</div>
+            <h2 className="text-2xl font-bold text-amber-700 dark:text-amber-300">Parabéns! Você Venceu!</h2>
+            <p className="text-sm text-amber-600 dark:text-amber-400">{game.state.victoryReason}</p>
+            <div className="bg-white/60 dark:bg-black/20 rounded-xl p-3 space-y-2 text-xs text-left">
+              <p className="font-bold text-center mb-2">📋 Objetivos Cumpridos</p>
+              {VICTORY_CONDITIONS.map(vc => (
+                <div key={vc.id} className="flex items-center gap-2">
+                  <span className="text-green-500">✅</span>
+                  <span>{vc.emoji} {vc.description}</span>
+                </div>
+              ))}
+              <hr className="my-2 border-amber-300" />
+              <p><strong>Turnos jogados:</strong> {game.state.turn}</p>
+              <p><strong>Equilíbrio final:</strong> {Math.round(game.getEquilibrium())}%</p>
+              <p><strong>Visitantes:</strong> {game.state.visitors}</p>
+              <p><strong>Desastres sobrevividos:</strong> {game.state.disasterCount}</p>
+              {(() => {
+                const dp = game.getDominantProfile();
+                return (
+                  <p><strong>Perfil final:</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
+                );
+              })()}
+            </div>
+            <div className="flex gap-3">
+              <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-border text-sm font-bold hover:bg-accent transition-colors">📋 Sessões</button>
+              <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors">🌟 Nova Aventura</button>
             </div>
           </div>
         </div>
