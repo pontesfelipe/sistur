@@ -101,6 +101,14 @@ export interface CouncilDecision {
   }[];
 }
 
+export interface VictoryCondition {
+  id: string;
+  label: string;
+  emoji: string;
+  description: string;
+  check: (state: GameState) => boolean;
+}
+
 export interface GameState {
   bars: GameBars;
   coins: number;
@@ -117,9 +125,18 @@ export interface GameState {
   eventLog: string[];
   isGameOver: boolean;
   gameOverReason: string | null;
+  isVictory: boolean;
+  victoryReason: string | null;
   disasterCount: number;
   profileScores: ProfileScores;
 }
+
+export const VICTORY_CONDITIONS: Omit<VictoryCondition, 'check'>[] = [
+  { id: 'level5', label: 'Nível 5', emoji: '⭐', description: 'Alcançar o nível "Cidade do Futuro"' },
+  { id: 'equilibrium', label: 'Equilíbrio ≥ 70', emoji: '⚖️', description: 'Manter equilíbrio acima de 70%' },
+  { id: 'bars', label: 'Barras ≥ 50', emoji: '📊', description: 'Todas as barras acima de 50' },
+  { id: 'visitors', label: '200+ Visitantes', emoji: '👥', description: 'Atrair pelo menos 200 visitantes' },
+];
 
 export const LEVEL_NAMES: Record<GameLevel, string> = {
   1: 'Vila Inicial',

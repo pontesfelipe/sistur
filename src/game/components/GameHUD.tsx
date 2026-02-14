@@ -173,6 +173,26 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
         </div>
       </div>
 
+      {/* Victory Objectives */}
+      <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/50 dark:to-yellow-950/50 rounded-xl p-3 shadow-lg border border-amber-200 dark:border-amber-700">
+        <p className="text-xs font-bold mb-2 text-amber-800 dark:text-amber-200">🎯 Objetivo: Cidade do Futuro</p>
+        <div className="space-y-1.5">
+          {[
+            { done: level >= 5, label: 'Nível 5', emoji: '⭐' },
+            { done: equilibrium >= 70, label: `Equilíbrio ≥ 70 (${Math.round(equilibrium)})`, emoji: '⚖️' },
+            { done: bars.ra >= 50 && bars.oe >= 50 && bars.ao >= 50, label: 'Barras ≥ 50', emoji: '📊' },
+            { done: visitors >= 200, label: `200+ Visitantes (${visitors})`, emoji: '👥' },
+          ].map((obj, i) => (
+            <div key={i} className="flex items-center gap-1.5 text-xs">
+              <span>{obj.done ? '✅' : '⬜'}</span>
+              <span className={cn(obj.done ? 'text-green-700 dark:text-green-400 line-through' : 'text-amber-700 dark:text-amber-300')}>
+                {obj.emoji} {obj.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Alerts */}
       {alerts.length > 0 && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 space-y-1">

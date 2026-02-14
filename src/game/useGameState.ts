@@ -32,6 +32,8 @@ const createInitialState = (): GameState => ({
   eventLog: [],
   isGameOver: false,
   gameOverReason: null,
+  isVictory: false,
+  victoryReason: null,
   disasterCount: 0,
   profileScores: { ...INITIAL_PROFILE },
 });
@@ -324,7 +326,7 @@ export function useGameState() {
 
   const endTurn = useCallback(() => {
     setState(prev => {
-      if (prev.isGameOver) return prev;
+      if (prev.isGameOver || prev.isVictory) return prev;
 
       const newTurn = prev.turn + 1;
       const logs = [...prev.eventLog];
@@ -437,6 +439,19 @@ export function useGameState() {
         logs.push(`☠️ FIM DE JOGO: ${gameOverReason}`);
       }
 
+      // Victory check
+      let isVictory = false;
+      let victoryReason: string | null = null;
+      if (!isGameOver) {
+        const eq = decay.ra * 0.4 + decay.oe * 0.3 + decay.ao * 0.3;
+        const newVisitors = Math.max(0, Math.round(eq * 1.5));
+        if (prev.level >= 5 && eq >= 70 && decay.ra >= 50 && decay.oe >= 50 && decay.ao >= 50 && newVisitors >= 200) {
+          isVictory = true;
+          victoryReason = '🏆 Sua cidade alcançou a excelência! Nível máximo, equilíbrio perfeito e uma comunidade próspera!';
+          logs.push(`🎉 VITÓRIA: ${victoryReason}`);
+        }
+      }
+
       return {
         ...prev,
         grid: newGrid,
@@ -448,11 +463,13 @@ export function useGameState() {
         disasterCount,
         isGameOver,
         gameOverReason,
+        isVictory,
+        victoryReason,
       };
     });
 
     // Random events every few turns
-    if ((state.turn + 1) % 3 === 0 && !state.isGameOver) {
+    if ((state.turn + 1) % 3 === 0 && !state.isGameOver && !state.isVictory) {
       if (Math.random() > 0.5) {
         triggerRandomEvent();
       } else {
