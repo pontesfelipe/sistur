@@ -248,6 +248,7 @@ export default function Game() {
               onSelect={setSelectedBuilding}
               coins={game.state.coins}
               level={game.state.level}
+              grid={game.state.grid}
               onEndTurn={game.endTurn}
               onEvent={game.triggerRandomEvent}
               onCouncil={game.triggerCouncil}
@@ -337,6 +338,7 @@ export default function Game() {
           }}
           coins={game.state.coins}
           level={game.state.level}
+          grid={game.state.grid}
           onEndTurn={game.endTurn}
           onEvent={game.triggerRandomEvent}
           onCouncil={game.triggerCouncil}
@@ -345,6 +347,37 @@ export default function Game() {
 
       {/* Tutorial */}
       {showTutorial && <GameTutorial onComplete={handleTutorialComplete} />}
+
+      {/* Game Over Overlay */}
+      {game.state.isGameOver && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-background rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300">
+            <div className="text-6xl">💀</div>
+            <h2 className="text-2xl font-bold text-destructive">Fim de Jogo!</h2>
+            <p className="text-sm text-muted-foreground">{game.state.gameOverReason}</p>
+            <div className="bg-muted/50 rounded-xl p-3 space-y-1 text-xs text-left">
+              <p><strong>Turnos jogados:</strong> {game.state.turn}</p>
+              <p><strong>Nível alcançado:</strong> {game.state.level}</p>
+              <p><strong>Equilíbrio final:</strong> {Math.round(game.getEquilibrium())}%</p>
+              <p><strong>Desastres sofridos:</strong> {game.state.disasterCount}</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleBackToPicker}
+                className="flex-1 py-3 rounded-xl border border-border text-sm font-bold hover:bg-accent transition-colors"
+              >
+                📋 Sessões
+              </button>
+              <button
+                onClick={handleNewGame}
+                className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors"
+              >
+                🔄 Nova Aventura
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dialogs */}
       <EventDialog event={game.state.currentEvent} onResolve={handleResolveEvent} />
