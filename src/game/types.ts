@@ -6,6 +6,13 @@ export type GameLevel = 1 | 2 | 3 | 4 | 5;
 export type BiomeType = 'floresta' | 'praia' | 'montanha' | 'cerrado' | 'lagoa' | 'cidade';
 export type AvatarPreset = 'explorador' | 'construtor' | 'guardiao' | 'cientista';
 
+export interface ProfileScores {
+  explorador: number;
+  construtor: number;
+  guardiao: number;
+  cientista: number;
+}
+
 export interface GameBars {
   ra: number; // 0-100 Natureza
   oe: number; // 0-100 Infraestrutura
@@ -76,6 +83,13 @@ export interface AvatarConfig {
   shirtColor: string;
 }
 
+export const PROFILE_INFO: Record<AvatarPreset, { name: string; emoji: string; description: string }> = {
+  explorador: { name: 'Explorador(a)', emoji: '🧭', description: 'Descobre novos caminhos na natureza' },
+  construtor: { name: 'Construtor(a)', emoji: '🔨', description: 'Cria infraestrutura para todos' },
+  guardiao: { name: 'Guardião(ã)', emoji: '🛡️', description: 'Protege e organiza a comunidade' },
+  cientista: { name: 'Cientista', emoji: '🔬', description: 'Mantém o equilíbrio perfeito' },
+};
+
 export interface CouncilDecision {
   id: string;
   question: string;
@@ -104,6 +118,7 @@ export interface GameState {
   isGameOver: boolean;
   gameOverReason: string | null;
   disasterCount: number;
+  profileScores: ProfileScores;
 }
 
 export const LEVEL_NAMES: Record<GameLevel, string> = {

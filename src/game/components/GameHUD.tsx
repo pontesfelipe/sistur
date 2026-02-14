@@ -1,5 +1,5 @@
-import type { GameBars, GameLevel, BiomeType } from '../types';
-import { LEVEL_NAMES, LEVEL_XP, BIOME_INFO } from '../types';
+import type { GameBars, GameLevel, BiomeType, AvatarPreset, ProfileScores } from '../types';
+import { LEVEL_NAMES, LEVEL_XP, BIOME_INFO, PROFILE_INFO } from '../types';
 import { cn } from '@/lib/utils';
 
 interface GameHUDProps {
@@ -12,6 +12,8 @@ interface GameHUDProps {
   biome: BiomeType;
   alerts: string[];
   equilibrium: number;
+  dominantProfile?: AvatarPreset;
+  profileScores?: ProfileScores;
 }
 
 function BarDisplay({ label, emoji, value, color }: { label: string; emoji: string; value: number; color: string }) {
@@ -36,13 +38,76 @@ function BarDisplay({ label, emoji, value, color }: { label: string; emoji: stri
   );
 }
 
-export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts, equilibrium }: GameHUDProps) {
+const PROFILE_COLORS: Record<AvatarPreset, string> = {
+  explorador: '#22c55e',
+  construtor: '#3b82f6',
+  guardiao: '#a855f7',
+  cientista: '#f59e0b',
+};
+
+export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts, equilibrium, dominantProfile, profileScores }: GameHUDProps) {
   const nextLevel = Math.min(5, level + 1) as GameLevel;
   const xpForNext = LEVEL_XP[nextLevel];
   const xpProgress = xpForNext > 0 ? Math.min(100, (xp / xpForNext) * 100) : 100;
 
+  const totalScore = profileScores
+    ? profileScores.explorador + profileScores.construtor + profileScores.guardiao + profileScores.cientista
+    : 0;
+
   return (
     <div className="flex flex-col gap-3">
+      {/* Dynamic Profile Badge */}
+      {dominantProfile && profileScores && totalScore > 0 && (
+        <div
+          className="rounded-xl p-3 shadow-lg backdrop-blur-sm text-white"
+          style={{
+            background: `linear-gradient(135deg, ${PROFILE_COLORS[dominantProfile]}dd, ${PROFILE_COLORS[dominantProfile]}88)`,
+          }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-2xl">{PROFILE_INFO[dominantProfile].emoji}</span>
+            <div>
+              <div className="text-sm font-bold">{PROFILE_INFO[dominantProfile].name}</div>
+              <div className="text-[10px] opacity-80">{PROFILE_INFO[dominantProfile].description}</div>
+            </div>
+          </div>
+          {/* Profile breakdown bars */}
+          <div className="space-y-1">
+            {(Object.entries(PROFILE_INFO) as [AvatarPreset, typeof PROFILE_INFO.explorador][]).map(([key, info]) => {
+              const score = profileScores[key];
+              const pct = totalScore > 0 ? (score / totalScore) * 100 : 0;
+              return (
+                <div key={key} className="flex items-center gap-1.5">
+                  <span className="text-xs w-4 text-center">{info.emoji}</span>
+                  <div className="flex-1 h-2 rounded-full bg-white/20 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: `${pct}%`,
+                        backgroundColor: key === dominantProfile ? '#fff' : 'rgba(255,255,255,0.5)',
+                      }}
+                    />
+                  </div>
+                  <span className="text-[10px] w-8 text-right opacity-80">{Math.round(pct)}%</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Hint before any actions */}
+      {(!profileScores || totalScore === 0) && (
+        <div className="bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-xl p-3 shadow-lg border border-amber-200 dark:border-amber-700">
+          <p className="text-xs font-medium text-amber-800 dark:text-amber-200 text-center">
+            🧭 Jogue para descobrir seu perfil!
+          </p>
+          <p className="text-[10px] text-amber-600 dark:text-amber-300 text-center mt-0.5">
+            Suas ações definem quem você é.
+          </p>
+        </div>
+      )}
+
       {/* Level & XP */}
       <div className="bg-gradient-to-r from-purple-600/90 to-indigo-600/90 rounded-xl p-3 text-white shadow-lg backdrop-blur-sm">
         <div className="flex items-center justify-between mb-1">
