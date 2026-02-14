@@ -7,21 +7,36 @@ import { BuildingMenu } from '@/game/components/BuildingMenu';
 import { EventDialog, CouncilDialog } from '@/game/components/EventDialog';
 import { SetupScreen } from '@/game/components/SetupScreen';
 import { EventLog } from '@/game/components/EventLog';
+import { GameTutorial } from '@/game/components/GameTutorial';
+import { MobileGameDrawer } from '@/game/components/MobileGameDrawer';
 import type { AvatarConfig, BiomeType } from '@/game/types';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, BarChart3, Hammer, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function Game() {
   const navigate = useNavigate();
   const game = useGameState();
+  const isMobile = useIsMobile();
   const [selectedBuilding, setSelectedBuilding] = useState<string | null>(null);
   const [lastFeedback, setLastFeedback] = useState<string | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialSeen, setTutorialSeen] = useState(false);
+  const [mobilePanel, setMobilePanel] = useState<'stats' | 'build' | null>(null);
 
   const handleStart = useCallback((avatar: AvatarConfig, biome: BiomeType) => {
     game.setAvatar(avatar);
     game.setBiome(biome);
     game.startGame();
-  }, [game]);
+    if (!tutorialSeen) {
+      setShowTutorial(true);
+    }
+  }, [game, tutorialSeen]);
+
+  const handleTutorialComplete = useCallback(() => {
+    setShowTutorial(false);
+    setTutorialSeen(true);
+  }, []);
 
   const handleTileClick = useCallback((x: number, y: number) => {
     if (selectedBuilding) {
@@ -34,18 +49,18 @@ export default function Game() {
       if (success) {
         toast.success('Construção colocada! 🎉');
         setSelectedBuilding(null);
+        if (isMobile) setMobilePanel(null);
       } else {
         toast.error('Moedas insuficientes!');
       }
     } else {
-      // Click on existing building to remove
       const placed = game.state.grid[y]?.[x];
       if (placed) {
         game.removeBuilding(x, y);
-        toast.info('Construção removida. Parte das moedas devolvida.');
+        toast.info('Construção removida.');
       }
     }
-  }, [selectedBuilding, game]);
+  }, [selectedBuilding, game, isMobile]);
 
   const handleResolveEvent = useCallback((index: number) => {
     const event = game.state.currentEvent;
@@ -72,27 +87,44 @@ export default function Game() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-100 to-emerald-50 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-b from-sky-100 to-emerald-50 dark:from-slate-900 dark:to-slate-800 flex flex-col">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-b">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Voltar
+      <div className="flex items-center justify-between px-3 py-2 bg-background/80 backdrop-blur-sm border-b border-border flex-shrink-0">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground min-h-[44px] px-1">
+          <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Voltar</span>
         </button>
-        <h1 className="text-lg font-bold">🌍 Mapa do Tesouro</h1>
-        <div className="w-16" />
+        <h1 className="text-base sm:text-lg font-bold">🌍 Mapa do Tesouro</h1>
+        <button onClick={() => setShowTutorial(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground">
+          <HelpCircle className="h-5 w-5" />
+        </button>
       </div>
+
+      {/* Mobile stats bar (compact) */}
+      {isMobile && (
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-background/90 border-b border-border text-xs overflow-x-auto flex-shrink-0">
+          <span className="font-bold whitespace-nowrap">💰{game.state.coins}</span>
+          <span className="whitespace-nowrap">🌳{Math.round(game.state.bars.ra)}</span>
+          <span className="whitespace-nowrap">🏗️{Math.round(game.state.bars.oe)}</span>
+          <span className="whitespace-nowrap">🤝{Math.round(game.state.bars.ao)}</span>
+          <span className={`whitespace-nowrap font-bold ${game.getEquilibrium() >= 60 ? 'text-green-600' : game.getEquilibrium() >= 40 ? 'text-yellow-600' : 'text-red-600'}`}>
+            ⚖️{Math.round(game.getEquilibrium())}%
+          </span>
+          <span className="whitespace-nowrap">👥{game.state.visitors}</span>
+          <span className="ml-auto whitespace-nowrap text-muted-foreground">T{game.state.turn}</span>
+        </div>
+      )}
 
       {/* Feedback toast */}
       {lastFeedback && (
-        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-40 bg-white dark:bg-slate-700 rounded-xl shadow-2xl px-6 py-3 animate-in slide-in-from-top-4 duration-300 max-w-sm text-center">
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-40 bg-background rounded-xl shadow-2xl px-5 py-3 animate-in slide-in-from-top-4 duration-300 max-w-sm text-center border border-border">
           <p className="text-sm font-medium">{lastFeedback}</p>
         </div>
       )}
 
       {/* Main layout */}
-      <div className="flex flex-col lg:flex-row gap-3 p-3 max-w-[1400px] mx-auto" style={{ height: 'calc(100vh - 52px)' }}>
-        {/* Left panel - HUD */}
-        <div className="lg:w-64 flex-shrink-0 overflow-y-auto space-y-3">
+      <div className="flex-1 flex flex-col lg:flex-row gap-2 sm:gap-3 p-2 sm:p-3 max-w-[1400px] mx-auto w-full min-h-0">
+        {/* Left panel - HUD (desktop only) */}
+        <div className="hidden lg:block lg:w-64 flex-shrink-0 overflow-y-auto space-y-3">
           <GameHUD
             bars={game.state.bars}
             coins={game.state.coins}
@@ -108,7 +140,7 @@ export default function Game() {
         </div>
 
         {/* Center - 3D World */}
-        <div className="flex-1 min-h-[300px] lg:min-h-0">
+        <div className="flex-1 min-h-[250px] sm:min-h-[300px] lg:min-h-0">
           <GameWorld
             grid={game.state.grid}
             biome={game.state.biome}
@@ -118,8 +150,8 @@ export default function Game() {
           />
         </div>
 
-        {/* Right panel - Buildings */}
-        <div className="lg:w-64 flex-shrink-0 overflow-y-auto">
+        {/* Right panel - Buildings (desktop only) */}
+        <div className="hidden lg:block lg:w-64 flex-shrink-0 overflow-y-auto">
           <div className="bg-card/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
             <BuildingMenu
               selectedBuilding={selectedBuilding}
@@ -133,6 +165,96 @@ export default function Game() {
           </div>
         </div>
       </div>
+
+      {/* Mobile bottom action bar */}
+      {isMobile && (
+        <div className="flex-shrink-0 bg-background/95 backdrop-blur-lg border-t border-border px-2 py-2 safe-bottom">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setMobilePanel(mobilePanel === 'stats' ? null : 'stats')}
+              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
+            >
+              <BarChart3 className="h-5 w-5 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground">Status</span>
+            </button>
+            <button
+              onClick={game.endTurn}
+              className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold rounded-xl shadow-lg active:scale-[0.97] transition-transform min-h-[48px]"
+            >
+              ⏭️ Passar Turno
+            </button>
+            <button
+              onClick={game.triggerRandomEvent}
+              className="min-h-[48px] min-w-[48px] flex items-center justify-center bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold rounded-xl shadow-lg active:scale-[0.97] transition-transform"
+            >
+              🎲
+            </button>
+            <button
+              onClick={game.triggerCouncil}
+              className="min-h-[48px] min-w-[48px] flex items-center justify-center bg-gradient-to-r from-violet-500 to-purple-500 text-white font-bold rounded-xl shadow-lg active:scale-[0.97] transition-transform"
+            >
+              🤝
+            </button>
+            <button
+              onClick={() => setMobilePanel(mobilePanel === 'build' ? null : 'build')}
+              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
+            >
+              <Hammer className="h-5 w-5 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground">Construir</span>
+            </button>
+          </div>
+
+          {selectedBuilding && (
+            <p className="text-xs text-center text-muted-foreground animate-pulse mt-1">
+              👆 Toque no mapa para construir!
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Mobile drawers */}
+      <MobileGameDrawer
+        open={mobilePanel === 'stats'}
+        onClose={() => setMobilePanel(null)}
+        title="📊 Status do Mundo"
+      >
+        <GameHUD
+          bars={game.state.bars}
+          coins={game.state.coins}
+          level={game.state.level}
+          xp={game.state.xp}
+          turn={game.state.turn}
+          visitors={game.state.visitors}
+          biome={game.state.biome}
+          alerts={game.getAlerts()}
+          equilibrium={game.getEquilibrium()}
+        />
+        <div className="mt-3">
+          <EventLog log={game.state.eventLog} />
+        </div>
+      </MobileGameDrawer>
+
+      <MobileGameDrawer
+        open={mobilePanel === 'build'}
+        onClose={() => setMobilePanel(null)}
+        title="🏗️ Construções"
+      >
+        <BuildingMenu
+          selectedBuilding={selectedBuilding}
+          onSelect={(id) => {
+            setSelectedBuilding(id);
+            if (id) setMobilePanel(null);
+          }}
+          coins={game.state.coins}
+          level={game.state.level}
+          onEndTurn={game.endTurn}
+          onEvent={game.triggerRandomEvent}
+          onCouncil={game.triggerCouncil}
+        />
+      </MobileGameDrawer>
+
+      {/* Tutorial */}
+      {showTutorial && <GameTutorial onComplete={handleTutorialComplete} />}
 
       {/* Dialogs */}
       <EventDialog event={game.state.currentEvent} onResolve={handleResolveEvent} />
