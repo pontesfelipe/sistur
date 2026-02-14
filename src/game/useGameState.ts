@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
-import type { GameState, GameBars, PlacedBuilding, AvatarConfig, BiomeType, GameLevel } from './types';
+import type { GameState, GameBars, PlacedBuilding, AvatarConfig, BiomeType, GameLevel, ProfileScores, AvatarPreset } from './types';
 import { LEVEL_XP } from './types';
 import { BUILDINGS, EVENTS, COUNCIL_DECISIONS, GRID_SIZE, DISASTERS, checkBuildingRequirements, checkSynergies } from './constants';
 
 const INITIAL_BARS: GameBars = { ra: 50, oe: 30, ao: 30 };
+const INITIAL_PROFILE: ProfileScores = { explorador: 0, construtor: 0, guardiao: 0, cientista: 0 };
 
 const createEmptyGrid = (): (PlacedBuilding | null)[][] =>
   Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(null));
@@ -32,7 +33,57 @@ const createInitialState = (): GameState => ({
   isGameOver: false,
   gameOverReason: null,
   disasterCount: 0,
+  profileScores: { ...INITIAL_PROFILE },
 });
+
+/** Calculate profile score adjustments based on a building */
+function buildingProfileScores(buildingId: string): Partial<ProfileScores> {
+  const b = BUILDINGS.find(bd => bd.id === buildingId);
+  if (!b) return {};
+  const scores: Partial<ProfileScores> = {};
+  // Explorador: nature/trail buildings
+  if (['tree', 'trail', 'park', 'reserve', 'garden'].includes(buildingId)) {
+    scores.explorador = (scores.explorador || 0) + 3;
+  }
+  // Construtor: infrastructure buildings
+  if (b.category === 'OE') {
+    scores.construtor = (scores.construtor || 0) + 3;
+  }
+  // Guardião: organization buildings
+  if (b.category === 'AO') {
+    scores.guardiao = (scores.guardiao || 0) + 3;
+  }
+  // Cientista: balanced building that doesn't heavily damage any bar
+  if (b.effects.ra >= 0 && b.effects.oe >= 0 && b.effects.ao >= 0) {
+    scores.cientista = (scores.cientista || 0) + 2;
+  }
+  return scores;
+}
+
+/** Calculate profile adjustments from event/council choices */
+function choiceProfileScores(effects: { ra: number; oe: number; ao: number }, choiceType?: string): Partial<ProfileScores> {
+  const scores: Partial<ProfileScores> = {};
+  if (effects.ra > 5) scores.explorador = (scores.explorador || 0) + 2;
+  if (effects.oe > 5) scores.construtor = (scores.construtor || 0) + 2;
+  if (effects.ao > 5) scores.guardiao = (scores.guardiao || 0) + 2;
+  if (choiceType === 'smart') scores.cientista = (scores.cientista || 0) + 3;
+  // Balance bonus for scientist
+  const avg = (effects.ra + effects.oe + effects.ao) / 3;
+  const variance = Math.abs(effects.ra - avg) + Math.abs(effects.oe - avg) + Math.abs(effects.ao - avg);
+  if (variance < 10 && effects.ra >= 0 && effects.oe >= 0 && effects.ao >= 0) {
+    scores.cientista = (scores.cientista || 0) + 2;
+  }
+  return scores;
+}
+
+function mergeProfileScores(current: ProfileScores, delta: Partial<ProfileScores>): ProfileScores {
+  return {
+    explorador: current.explorador + (delta.explorador || 0),
+    construtor: current.construtor + (delta.construtor || 0),
+    guardiao: current.guardiao + (delta.guardiao || 0),
+    cientista: current.cientista + (delta.cientista || 0),
+  };
+}
 
 export function useGameState() {
   const [state, setState] = useState<GameState>(createInitialState());
@@ -131,6 +182,14 @@ export function useGameState() {
         logs.push(`✨ Sinergia: ${synergy.descriptions.join(', ')}`);
       }
 
+      // Profile scoring
+      const profileDelta = buildingProfileScores(buildingId);
+      // Synergy bonus for scientist
+      if (synergy.descriptions.length > 0) {
+        profileDelta.cientista = (profileDelta.cientista || 0) + 2;
+      }
+      const newProfileScores = mergeProfileScores(prev.profileScores, profileDelta);
+
       success = true;
       return {
         ...prev,
@@ -142,6 +201,7 @@ export function useGameState() {
         visitors: Math.max(0, Math.round(equilibrium * 1.5)),
         turn: prev.turn + 1,
         eventLog: logs,
+        profileScores: newProfileScores,
       };
     });
 
@@ -209,6 +269,9 @@ export function useGameState() {
         ao: clamp(prev.bars.ao + effects.ao),
       };
 
+      const profileDelta = choiceProfileScores(effects, choice.type);
+      const newProfileScores = mergeProfileScores(prev.profileScores, profileDelta);
+
       return {
         ...prev,
         bars: newBars,
@@ -216,6 +279,7 @@ export function useGameState() {
         currentEvent: null,
         turn: prev.turn + 1,
         eventLog: [...prev.eventLog, `${prev.currentEvent.emoji} ${choice.message}`],
+        profileScores: newProfileScores,
       };
     });
   }, []);
@@ -232,12 +296,16 @@ export function useGameState() {
         ao: clamp(prev.bars.ao + option.effects.ao),
       };
 
+      const profileDelta = choiceProfileScores(option.effects);
+      const newProfileScores = mergeProfileScores(prev.profileScores, profileDelta);
+
       return {
         ...prev,
         bars: newBars,
         currentCouncil: null,
         turn: prev.turn + 1,
         eventLog: [...prev.eventLog, `🤝 ${option.feedback}`],
+        profileScores: newProfileScores,
       };
     });
   }, []);
@@ -439,6 +507,22 @@ export function useGameState() {
     setState(createInitialState());
   }, []);
 
+  const getDominantProfile = (): { preset: AvatarPreset; scores: ProfileScores } => {
+    const s = state.profileScores;
+    const entries: [AvatarPreset, number][] = [
+      ['explorador', s.explorador],
+      ['construtor', s.construtor],
+      ['guardiao', s.guardiao],
+      ['cientista', s.cientista],
+    ];
+    // Check for balance bonus for scientist
+    const eq = getEquilibrium();
+    const balanceBonus = eq >= 50 ? Math.round(eq / 10) : 0;
+    const adjusted = entries.map(([k, v]) => [k, k === 'cientista' ? v + balanceBonus : v] as [AvatarPreset, number]);
+    adjusted.sort((a, b) => b[1] - a[1]);
+    return { preset: adjusted[0][0], scores: { explorador: adjusted[0][0] === 'explorador' ? adjusted[0][1] : s.explorador, construtor: s.construtor, guardiao: s.guardiao, cientista: s.cientista + balanceBonus } };
+  };
+
   return {
     state,
     setState,
@@ -458,5 +542,6 @@ export function useGameState() {
     applyEffects,
     loadState,
     resetState,
+    getDominantProfile,
   };
 }

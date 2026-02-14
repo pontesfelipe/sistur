@@ -67,6 +67,7 @@ export function useGameSessions() {
             isGameOver: gameState.isGameOver,
             gameOverReason: gameState.gameOverReason,
             disasterCount: gameState.disasterCount,
+            profileScores: gameState.profileScores,
           } as any,
           turn: gameState.turn,
           level: gameState.level,
@@ -106,6 +107,7 @@ export function useGameSessions() {
             isGameOver: gameState.isGameOver,
             gameOverReason: gameState.gameOverReason,
             disasterCount: gameState.disasterCount,
+            profileScores: gameState.profileScores,
           } as any,
           turn: gameState.turn,
           level: gameState.level,
@@ -153,6 +155,7 @@ export function useGameSessions() {
         isGameOver: gs.isGameOver || false,
         gameOverReason: gs.gameOverReason || null,
         disasterCount: gs.disasterCount || 0,
+        profileScores: gs.profileScores || { explorador: 0, construtor: 0, guardiao: 0, cientista: 0 },
       };
     } catch (err) {
       console.error('Error loading session:', err);

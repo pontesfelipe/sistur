@@ -12,7 +12,7 @@ import { GameTutorial } from '@/game/components/GameTutorial';
 import { MobileGameDrawer } from '@/game/components/MobileGameDrawer';
 import { SessionPicker } from '@/game/components/SessionPicker';
 import type { AvatarConfig, BiomeType } from '@/game/types';
-import { BIOME_INFO } from '@/game/types';
+import { BIOME_INFO, PROFILE_INFO } from '@/game/types';
 import { ArrowLeft, BarChart3, Hammer, HelpCircle, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -199,6 +199,13 @@ export default function Game() {
           <span className={`whitespace-nowrap font-bold ${game.getEquilibrium() >= 60 ? 'text-green-600' : game.getEquilibrium() >= 40 ? 'text-yellow-600' : 'text-red-600'}`}>
             ⚖️{Math.round(game.getEquilibrium())}%
           </span>
+          {(() => {
+            const dp = game.getDominantProfile();
+            const total = dp.scores.explorador + dp.scores.construtor + dp.scores.guardiao + dp.scores.cientista;
+            return total > 0 ? (
+              <span className="whitespace-nowrap font-bold">{PROFILE_INFO[dp.preset].emoji}</span>
+            ) : null;
+          })()}
           <span className="whitespace-nowrap">👥{game.state.visitors}</span>
           <span className="ml-auto whitespace-nowrap text-muted-foreground">T{game.state.turn}</span>
         </div>
@@ -225,6 +232,8 @@ export default function Game() {
             biome={game.state.biome}
             alerts={game.getAlerts()}
             equilibrium={game.getEquilibrium()}
+            dominantProfile={game.getDominantProfile().preset}
+            profileScores={game.state.profileScores}
           />
           <EventLog log={game.state.eventLog} />
         </div>
@@ -319,6 +328,8 @@ export default function Game() {
           biome={game.state.biome}
           alerts={game.getAlerts()}
           equilibrium={game.getEquilibrium()}
+          dominantProfile={game.getDominantProfile().preset}
+          profileScores={game.state.profileScores}
         />
         <div className="mt-3">
           <EventLog log={game.state.eventLog} />
@@ -360,6 +371,13 @@ export default function Game() {
               <p><strong>Nível alcançado:</strong> {game.state.level}</p>
               <p><strong>Equilíbrio final:</strong> {Math.round(game.getEquilibrium())}%</p>
               <p><strong>Desastres sofridos:</strong> {game.state.disasterCount}</p>
+              {(() => {
+                const dp = game.getDominantProfile();
+                const total = dp.scores.explorador + dp.scores.construtor + dp.scores.guardiao + dp.scores.cientista;
+                return total > 0 ? (
+                  <p><strong>Perfil dominante:</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
+                ) : null;
+              })()}
             </div>
             <div className="flex gap-3">
               <button

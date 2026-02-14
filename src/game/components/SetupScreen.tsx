@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import type { AvatarConfig, AvatarPreset, BiomeType } from '../types';
+import type { AvatarConfig, BiomeType } from '../types';
 import { BIOME_INFO } from '../types';
-import { AVATAR_PRESETS, SKIN_COLORS, HAIR_COLORS, SHIRT_COLORS } from '../constants';
+import { SKIN_COLORS, HAIR_COLORS, SHIRT_COLORS } from '../constants';
 import { cn } from '@/lib/utils';
 
 interface SetupScreenProps {
@@ -11,7 +11,7 @@ interface SetupScreenProps {
 export function SetupScreen({ onStart }: SetupScreenProps) {
   const [step, setStep] = useState<'avatar' | 'biome'>('avatar');
   const [avatar, setAvatar] = useState<AvatarConfig>({
-    preset: 'explorador',
+    preset: 'explorador', // default, will be overridden dynamically
     skinColor: SKIN_COLORS[0],
     hairColor: HAIR_COLORS[0],
     shirtColor: SHIRT_COLORS[0],
@@ -30,37 +30,24 @@ export function SetupScreen({ onStart }: SetupScreenProps) {
           <>
             <h2 className="text-lg font-bold mb-4 text-center">👤 Crie seu Personagem</h2>
 
-            {/* Preset */}
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {(Object.entries(AVATAR_PRESETS) as [AvatarPreset, typeof AVATAR_PRESETS.explorador][]).map(([key, val]) => (
-                <button
-                  key={key}
-                  onClick={() => setAvatar(prev => ({ ...prev, preset: key }))}
-                  className={cn(
-                    'p-3 rounded-xl border-2 text-left transition-all',
-                    avatar.preset === key ? 'border-primary bg-primary/10 scale-[1.02]' : 'border-transparent bg-accent/50'
-                  )}
-                >
-                  <span className="text-2xl">{val.emoji}</span>
-                  <div className="text-sm font-bold mt-1">{val.name}</div>
-                  <div className="text-xs text-muted-foreground">{val.description}</div>
-                </button>
-              ))}
+            {/* Info box about dynamic profile */}
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-3 mb-4">
+              <p className="text-xs text-amber-800 dark:text-amber-200 font-medium text-center">
+                🧭 Seu perfil será definido pelas suas ações!
+              </p>
+              <p className="text-[10px] text-amber-600 dark:text-amber-300 text-center mt-1">
+                Construa, explore e organize — e descubra se você é Explorador, Construtor, Guardião ou Cientista!
+              </p>
             </div>
 
             {/* Avatar preview */}
             <div className="flex justify-center mb-4">
               <div className="relative w-24 h-24">
-                {/* Body */}
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-12 rounded-t-xl" style={{ backgroundColor: avatar.shirtColor }} />
-                {/* Head */}
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full" style={{ backgroundColor: avatar.skinColor }}>
-                  {/* Hair */}
                   <div className="absolute top-0 left-1 right-1 h-5 rounded-t-full" style={{ backgroundColor: avatar.hairColor }} />
-                  {/* Eyes */}
                   <div className="absolute top-6 left-3 w-1.5 h-1.5 rounded-full bg-slate-800" />
                   <div className="absolute top-6 right-3 w-1.5 h-1.5 rounded-full bg-slate-800" />
-                  {/* Smile */}
                   <div className="absolute top-8 left-1/2 -translate-x-1/2 w-4 h-1.5 border-b-2 border-slate-700 rounded-b-full" />
                 </div>
               </div>
