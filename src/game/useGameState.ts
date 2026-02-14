@@ -517,15 +517,30 @@ export function useGameState() {
       };
     });
 
-    // Random events every few turns
-    if ((state.turn + 1) % 3 === 0 && !state.isGameOver && !state.isVictory) {
-      if (Math.random() > 0.5) {
-        triggerRandomEvent();
-      } else {
-        triggerCouncil();
+    // Auto-trigger random events every 2-3 turns
+    setState(prev => {
+      if (prev.isGameOver || prev.isVictory) return prev;
+      const shouldTrigger = prev.turn % 2 === 0 || (prev.turn % 3 === 0);
+      if (shouldTrigger) {
+        // Decide event type
+        if (Math.random() > 0.4) {
+          // Trigger random event
+          const biomeEvts = BIOME_EVENTS[prev.biome] || [];
+          const allEvents = [...EVENTS, ...biomeEvts];
+          const eligible = allEvents.filter(e => !e.condition || e.condition(prev.bars));
+          if (eligible.length > 0) {
+            const event = eligible[Math.floor(Math.random() * eligible.length)];
+            return { ...prev, currentEvent: event };
+          }
+        } else {
+          // Trigger council
+          const decision = COUNCIL_DECISIONS[Math.floor(Math.random() * COUNCIL_DECISIONS.length)];
+          return { ...prev, currentCouncil: decision };
+        }
       }
-    }
-  }, [state.turn, state.isGameOver, triggerRandomEvent, triggerCouncil]);
+      return prev;
+    });
+  }, [state.turn, state.isGameOver]);
 
   const getEquilibrium = () => {
     return state.bars.ra * 0.4 + state.bars.oe * 0.3 + state.bars.ao * 0.3;

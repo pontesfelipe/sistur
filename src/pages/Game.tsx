@@ -14,7 +14,7 @@ import { SessionPicker } from '@/game/components/SessionPicker';
 import { EduReport } from '@/game/components/EduReport';
 import type { AvatarConfig, BiomeType } from '@/game/types';
 import { BIOME_INFO, PROFILE_INFO, VICTORY_CONDITIONS, UNLOCKABLE_SKINS } from '@/game/types';
-import { ArrowLeft, BarChart3, Hammer, HelpCircle, Save, GraduationCap } from 'lucide-react';
+import { ArrowLeft, BarChart3, Hammer, HelpCircle, Save, GraduationCap, ChevronLeft, ChevronRight, ScrollText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -33,6 +33,8 @@ export default function Game() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<'stats' | 'build' | 'edu' | null>(null);
+  const [leftOpen, setLeftOpen] = useState(true);
+  const [rightOpen, setRightOpen] = useState(true);
 
   // Auto-save every 5 turns
   const lastSavedTurn = useRef(0);
@@ -222,34 +224,51 @@ export default function Game() {
       )}
 
       {/* Main layout */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-2 sm:gap-3 p-2 sm:p-3 max-w-[1400px] mx-auto w-full min-h-0">
-        {/* Left panel - HUD (desktop only) */}
-        <div className="hidden lg:block lg:w-64 flex-shrink-0 overflow-y-auto space-y-3">
-          <GameHUD
-            bars={game.state.bars}
-            coins={game.state.coins}
-            level={game.state.level}
-            xp={game.state.xp}
-            turn={game.state.turn}
-            visitors={game.state.visitors}
-            biome={game.state.biome}
-            alerts={game.getAlerts()}
-            equilibrium={game.getEquilibrium()}
-            dominantProfile={game.getDominantProfile().preset}
-            profileScores={game.state.profileScores}
-          />
-          <EventLog log={game.state.eventLog} />
-          <div className="mt-3 bg-card/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
-            <h3 className="text-sm font-bold mb-2">📊 Relatório Educacional</h3>
-            <EduReport
-              metrics={game.state.eduMetrics}
-              profileScores={game.state.profileScores}
-              dominantProfile={game.getDominantProfile().preset}
-              turn={game.state.turn}
-              unlockedSkins={game.state.unlockedSkins}
-              state={game.state}
-            />
-          </div>
+      <div className="flex-1 flex flex-col lg:flex-row gap-0 p-2 sm:p-3 max-w-[1600px] mx-auto w-full min-h-0">
+        {/* Left panel - HUD (desktop only, collapsible) */}
+        <div className={`hidden lg:flex flex-shrink-0 transition-all duration-300 ${leftOpen ? 'w-64' : 'w-8'}`}>
+          {leftOpen ? (
+            <div className="w-full overflow-y-auto space-y-3 pr-2 relative">
+              <button
+                onClick={() => setLeftOpen(false)}
+                className="absolute top-0 right-0 z-10 p-1 rounded-md hover:bg-accent text-muted-foreground"
+                title="Minimizar"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <GameHUD
+                bars={game.state.bars}
+                coins={game.state.coins}
+                level={game.state.level}
+                xp={game.state.xp}
+                turn={game.state.turn}
+                visitors={game.state.visitors}
+                biome={game.state.biome}
+                alerts={game.getAlerts()}
+                equilibrium={game.getEquilibrium()}
+                dominantProfile={game.getDominantProfile().preset}
+                profileScores={game.state.profileScores}
+              />
+              <EventLog log={game.state.eventLog} />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 pt-2">
+              <button
+                onClick={() => setLeftOpen(true)}
+                className="p-1.5 rounded-lg bg-card shadow-md hover:bg-accent transition-colors"
+                title="Expandir Status"
+              >
+                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              </button>
+              <button
+                onClick={() => setLeftOpen(true)}
+                className="p-1.5 rounded-lg bg-card shadow-md hover:bg-accent transition-colors"
+                title="Expandir Log"
+              >
+                <ScrollText className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Center - 2D Isometric World */}
@@ -263,20 +282,56 @@ export default function Game() {
           />
         </div>
 
-        {/* Right panel - Buildings (desktop only) */}
-        <div className="hidden lg:block lg:w-64 flex-shrink-0 overflow-y-auto">
-          <div className="bg-card/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
-            <BuildingMenu
-              selectedBuilding={selectedBuilding}
-              onSelect={setSelectedBuilding}
-              coins={game.state.coins}
-              level={game.state.level}
-              grid={game.state.grid}
-              onEndTurn={game.endTurn}
-              onEvent={game.triggerRandomEvent}
-              onCouncil={game.triggerCouncil}
-            />
-          </div>
+        {/* Right panel - Buildings (desktop only, collapsible) */}
+        <div className={`hidden lg:flex flex-shrink-0 transition-all duration-300 ${rightOpen ? 'w-64' : 'w-8'}`}>
+          {rightOpen ? (
+            <div className="w-full overflow-y-auto pl-2 relative">
+              <button
+                onClick={() => setRightOpen(false)}
+                className="absolute top-0 left-0 z-10 p-1 rounded-md hover:bg-accent text-muted-foreground"
+                title="Minimizar"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              <div className="bg-card/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+                <BuildingMenu
+                  selectedBuilding={selectedBuilding}
+                  onSelect={setSelectedBuilding}
+                  coins={game.state.coins}
+                  level={game.state.level}
+                  grid={game.state.grid}
+                />
+              </div>
+              <div className="mt-3 bg-card/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+                <h3 className="text-sm font-bold mb-2">📊 Relatório Educacional</h3>
+                <EduReport
+                  metrics={game.state.eduMetrics}
+                  profileScores={game.state.profileScores}
+                  dominantProfile={game.getDominantProfile().preset}
+                  turn={game.state.turn}
+                  unlockedSkins={game.state.unlockedSkins}
+                  state={game.state}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 pt-2">
+              <button
+                onClick={() => setRightOpen(true)}
+                className="p-1.5 rounded-lg bg-card shadow-md hover:bg-accent transition-colors"
+                title="Expandir Construções"
+              >
+                <Hammer className="h-4 w-4 text-muted-foreground" />
+              </button>
+              <button
+                onClick={() => setRightOpen(true)}
+                className="p-1.5 rounded-lg bg-card shadow-md hover:bg-accent transition-colors"
+                title="Expandir Relatório"
+              >
+                <GraduationCap className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -292,36 +347,24 @@ export default function Game() {
               <span className="text-[10px] text-muted-foreground">Status</span>
             </button>
             <button
+              onClick={() => setMobilePanel(mobilePanel === 'build' ? null : 'build')}
+              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
+            >
+              <Hammer className="h-5 w-5 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground">Construir</span>
+            </button>
+            <button
               onClick={game.endTurn}
               className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold rounded-xl shadow-lg active:scale-[0.97] transition-transform min-h-[48px]"
             >
               ⏭️ Passar Turno
             </button>
             <button
-              onClick={game.triggerRandomEvent}
-              className="min-h-[48px] min-w-[48px] flex items-center justify-center bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold rounded-xl shadow-lg active:scale-[0.97] transition-transform"
-            >
-              🎲
-            </button>
-            <button
-              onClick={game.triggerCouncil}
-              className="min-h-[48px] min-w-[48px] flex items-center justify-center bg-gradient-to-r from-violet-500 to-purple-500 text-white font-bold rounded-xl shadow-lg active:scale-[0.97] transition-transform"
-            >
-              🤝
-            </button>
-            <button
               onClick={() => setMobilePanel(mobilePanel === 'edu' ? null : 'edu')}
-              className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
+              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
             >
               <GraduationCap className="h-5 w-5 text-muted-foreground" />
               <span className="text-[10px] text-muted-foreground">Relatório</span>
-            </button>
-            <button
-              onClick={() => setMobilePanel(mobilePanel === 'build' ? null : 'build')}
-              className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
-            >
-              <Hammer className="h-5 w-5 text-muted-foreground" />
-              <span className="text-[10px] text-muted-foreground">Construir</span>
             </button>
           </div>
 
@@ -371,9 +414,6 @@ export default function Game() {
           coins={game.state.coins}
           level={game.state.level}
           grid={game.state.grid}
-          onEndTurn={game.endTurn}
-          onEvent={game.triggerRandomEvent}
-          onCouncil={game.triggerCouncil}
         />
       </MobileGameDrawer>
 
