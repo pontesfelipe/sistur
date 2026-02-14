@@ -11,9 +11,10 @@ import { EventLog } from '@/game/components/EventLog';
 import { GameTutorial } from '@/game/components/GameTutorial';
 import { MobileGameDrawer } from '@/game/components/MobileGameDrawer';
 import { SessionPicker } from '@/game/components/SessionPicker';
+import { EduReport } from '@/game/components/EduReport';
 import type { AvatarConfig, BiomeType } from '@/game/types';
-import { BIOME_INFO, PROFILE_INFO, VICTORY_CONDITIONS } from '@/game/types';
-import { ArrowLeft, BarChart3, Hammer, HelpCircle, Save } from 'lucide-react';
+import { BIOME_INFO, PROFILE_INFO, VICTORY_CONDITIONS, UNLOCKABLE_SKINS } from '@/game/types';
+import { ArrowLeft, BarChart3, Hammer, HelpCircle, Save, GraduationCap } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -31,7 +32,7 @@ export default function Game() {
   const [lastFeedback, setLastFeedback] = useState<string | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
-  const [mobilePanel, setMobilePanel] = useState<'stats' | 'build' | null>(null);
+  const [mobilePanel, setMobilePanel] = useState<'stats' | 'build' | 'edu' | null>(null);
 
   // Auto-save every 5 turns
   const lastSavedTurn = useRef(0);
@@ -63,6 +64,8 @@ export default function Game() {
   }, [sessions]);
 
   const handleStart = useCallback(async (avatar: AvatarConfig, biome: BiomeType) => {
+    // Reset with biome-specific starting values
+    game.resetState(biome);
     game.setAvatar(avatar);
     game.setBiome(biome);
     game.startGame();
@@ -236,6 +239,17 @@ export default function Game() {
             profileScores={game.state.profileScores}
           />
           <EventLog log={game.state.eventLog} />
+          <div className="mt-3 bg-card/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+            <h3 className="text-sm font-bold mb-2">📊 Relatório Educacional</h3>
+            <EduReport
+              metrics={game.state.eduMetrics}
+              profileScores={game.state.profileScores}
+              dominantProfile={game.getDominantProfile().preset}
+              turn={game.state.turn}
+              unlockedSkins={game.state.unlockedSkins}
+              state={game.state}
+            />
+          </div>
         </div>
 
         {/* Center - 3D World */}
@@ -296,8 +310,15 @@ export default function Game() {
               🤝
             </button>
             <button
+              onClick={() => setMobilePanel(mobilePanel === 'edu' ? null : 'edu')}
+              className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
+            >
+              <GraduationCap className="h-5 w-5 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground">Relatório</span>
+            </button>
+            <button
               onClick={() => setMobilePanel(mobilePanel === 'build' ? null : 'build')}
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
+              className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
             >
               <Hammer className="h-5 w-5 text-muted-foreground" />
               <span className="text-[10px] text-muted-foreground">Construir</span>
@@ -356,6 +377,21 @@ export default function Game() {
         />
       </MobileGameDrawer>
 
+      <MobileGameDrawer
+        open={mobilePanel === 'edu'}
+        onClose={() => setMobilePanel(null)}
+        title="📊 Relatório Educacional"
+      >
+        <EduReport
+          metrics={game.state.eduMetrics}
+          profileScores={game.state.profileScores}
+          dominantProfile={game.getDominantProfile().preset}
+          turn={game.state.turn}
+          unlockedSkins={game.state.unlockedSkins}
+          state={game.state}
+        />
+      </MobileGameDrawer>
+
       {/* Tutorial */}
       {showTutorial && <GameTutorial onComplete={handleTutorialComplete} />}
 
@@ -371,6 +407,7 @@ export default function Game() {
               <p><strong>Nível alcançado:</strong> {game.state.level}</p>
               <p><strong>Equilíbrio final:</strong> {Math.round(game.getEquilibrium())}%</p>
               <p><strong>Desastres sofridos:</strong> {game.state.disasterCount}</p>
+              <p><strong>Escolhas inteligentes:</strong> {game.state.eduMetrics.smartChoices}</p>
               {(() => {
                 const dp = game.getDominantProfile();
                 const total = dp.scores.explorador + dp.scores.construtor + dp.scores.guardiao + dp.scores.cientista;
@@ -407,6 +444,9 @@ export default function Game() {
               <p><strong>Equilíbrio final:</strong> {Math.round(game.getEquilibrium())}%</p>
               <p><strong>Visitantes:</strong> {game.state.visitors}</p>
               <p><strong>Desastres sobrevividos:</strong> {game.state.disasterCount}</p>
+              <p><strong>Escolhas inteligentes:</strong> {game.state.eduMetrics.smartChoices}</p>
+              <p><strong>Turnos no verde:</strong> {game.state.eduMetrics.turnsInGreen}</p>
+              <p><strong>Skins desbloqueadas:</strong> {game.state.unlockedSkins.length}/{UNLOCKABLE_SKINS.length}</p>
               {(() => {
                 const dp = game.getDominantProfile();
                 return (

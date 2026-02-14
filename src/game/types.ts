@@ -13,6 +13,21 @@ export interface ProfileScores {
   cientista: number;
 }
 
+/** Educational metrics tracked throughout gameplay */
+export interface EduMetrics {
+  proNatureDecisions: number;
+  proInfraDecisions: number;
+  proGovDecisions: number;
+  excessiveBuilding: number; // times OE > RA+30
+  turnsInGreen: number; // turns with equilibrium >= 60
+  turnsInRed: number; // turns with equilibrium < 30
+  totalBuildings: number;
+  totalEventsResolved: number;
+  smartChoices: number;
+  riskyChoices: number;
+  quickChoices: number;
+}
+
 export interface GameBars {
   ra: number; // 0-100 Natureza
   oe: number; // 0-100 Infraestrutura
@@ -129,6 +144,8 @@ export interface GameState {
   victoryReason: string | null;
   disasterCount: number;
   profileScores: ProfileScores;
+  eduMetrics: EduMetrics;
+  unlockedSkins: string[];
 }
 
 export const VICTORY_CONDITIONS: Omit<VictoryCondition, 'check'>[] = [
@@ -136,6 +153,29 @@ export const VICTORY_CONDITIONS: Omit<VictoryCondition, 'check'>[] = [
   { id: 'equilibrium', label: 'Equilíbrio ≥ 70', emoji: '⚖️', description: 'Manter equilíbrio acima de 70%' },
   { id: 'bars', label: 'Barras ≥ 50', emoji: '📊', description: 'Todas as barras acima de 50' },
   { id: 'visitors', label: '200+ Visitantes', emoji: '👥', description: 'Atrair pelo menos 200 visitantes' },
+];
+
+/** Biome starting bonuses and risks */
+export const BIOME_MODIFIERS: Record<BiomeType, { startBars: Partial<GameBars>; startCoins: number; risk: string; bonus: string }> = {
+  floresta: { startBars: { ra: 65, oe: 20, ao: 30 }, startCoins: 40, risk: 'Incêndios florestais', bonus: '+15 RA inicial' },
+  praia: { startBars: { ra: 45, oe: 35, ao: 25 }, startCoins: 55, risk: 'Erosão costeira', bonus: '+5 moedas iniciais' },
+  montanha: { startBars: { ra: 55, oe: 15, ao: 35 }, startCoins: 35, risk: 'Deslizamentos', bonus: '+5 AO inicial' },
+  cerrado: { startBars: { ra: 50, oe: 25, ao: 30 }, startCoins: 45, risk: 'Secas severas', bonus: 'Equilíbrio balanceado' },
+  lagoa: { startBars: { ra: 60, oe: 20, ao: 30 }, startCoins: 45, risk: 'Poluição da água', bonus: '+10 RA inicial' },
+  cidade: { startBars: { ra: 25, oe: 50, ao: 35 }, startCoins: 70, risk: 'Poluição urbana', bonus: '+20 moedas iniciais' },
+};
+
+/** Unlockable skins earned through gameplay */
+export const UNLOCKABLE_SKINS: { id: string; name: string; emoji: string; condition: string; check: (state: GameState) => boolean }[] = [
+  { id: 'eco_hero', name: 'Herói Ecológico', emoji: '🌿', condition: 'RA ≥ 80 por 3 turnos', check: (s) => s.bars.ra >= 80 && s.eduMetrics.turnsInGreen >= 3 },
+  { id: 'master_builder', name: 'Mestre Construtor', emoji: '🏗️', condition: '10+ construções', check: (s) => s.eduMetrics.totalBuildings >= 10 },
+  { id: 'wise_leader', name: 'Líder Sábio', emoji: '👑', condition: 'AO ≥ 70 e 5+ decisões smart', check: (s) => s.bars.ao >= 70 && s.eduMetrics.smartChoices >= 5 },
+  { id: 'survivor', name: 'Sobrevivente', emoji: '🛡️', condition: 'Sobreviver a 3+ desastres', check: (s) => s.disasterCount >= 3 && !s.isGameOver },
+  { id: 'balanced', name: 'Equilibrista', emoji: '⚖️', condition: '10+ turnos no verde', check: (s) => s.eduMetrics.turnsInGreen >= 10 },
+  { id: 'scientist', name: 'Cientista Mirim', emoji: '🔬', condition: 'Perfil Cientista dominante', check: (s) => {
+    const scores = s.profileScores;
+    return scores.cientista >= scores.explorador && scores.cientista >= scores.construtor && scores.cientista >= scores.guardiao && scores.cientista > 10;
+  }},
 ];
 
 export const LEVEL_NAMES: Record<GameLevel, string> = {

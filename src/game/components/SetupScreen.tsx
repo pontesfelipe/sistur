@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { AvatarConfig, BiomeType } from '../types';
-import { BIOME_INFO } from '../types';
+import { BIOME_INFO, BIOME_MODIFIERS } from '../types';
 import { SKIN_COLORS, HAIR_COLORS, SHIRT_COLORS } from '../constants';
 import { cn } from '@/lib/utils';
 
@@ -94,21 +94,28 @@ export function SetupScreen({ onStart }: SetupScreenProps) {
         ) : (
           <>
             <h2 className="text-lg font-bold mb-4 text-center">🌎 Escolha seu Bioma</h2>
-            <div className="grid grid-cols-2 gap-2 mb-6">
-              {(Object.entries(BIOME_INFO) as [BiomeType, typeof BIOME_INFO.floresta][]).map(([key, val]) => (
-                <button
-                  key={key}
-                  onClick={() => setBiome(key as BiomeType)}
-                  className={cn(
-                    'p-3 rounded-xl border-2 text-left transition-all',
-                    biome === key ? 'border-primary bg-primary/10 scale-[1.02]' : 'border-transparent bg-accent/50'
-                  )}
-                >
-                  <span className="text-2xl">{val.emoji}</span>
-                  <div className="text-sm font-bold mt-1">{val.name}</div>
-                  <div className="text-xs text-muted-foreground">{val.description}</div>
-                </button>
-              ))}
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {(Object.entries(BIOME_INFO) as [BiomeType, typeof BIOME_INFO.floresta][]).map(([key, val]) => {
+                const mod = BIOME_MODIFIERS[key as BiomeType];
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setBiome(key as BiomeType)}
+                    className={cn(
+                      'p-3 rounded-xl border-2 text-left transition-all',
+                      biome === key ? 'border-primary bg-primary/10 scale-[1.02]' : 'border-transparent bg-accent/50'
+                    )}
+                  >
+                    <span className="text-2xl">{val.emoji}</span>
+                    <div className="text-sm font-bold mt-1">{val.name}</div>
+                    <div className="text-xs text-muted-foreground">{val.description}</div>
+                    <div className="mt-1.5 space-y-0.5">
+                      <p className="text-[10px] text-green-600 dark:text-green-400">✅ {mod.bonus}</p>
+                      <p className="text-[10px] text-red-500 dark:text-red-400">⚠️ {mod.risk}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="flex gap-2">

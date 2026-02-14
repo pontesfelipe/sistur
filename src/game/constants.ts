@@ -131,6 +131,63 @@ export function checkSynergies(buildingId: string, x: number, y: number, grid: (
   return { ...bonus, descriptions };
 }
 
+export const BIOME_EVENTS: Record<string, GameEvent[]> = {
+  floresta: [{
+    id: 'biome_floresta_fire', name: 'Queimada na Floresta', emoji: '🔥',
+    description: 'Uma queimada se espalha pela floresta! O que fazer?',
+    choices: [
+      { label: 'Aceiro e brigada voluntária', type: 'smart', emoji: '🧑‍🚒', effects: { ra: 5, oe: 0, ao: 10 }, message: 'Comunidade se uniu e salvou a floresta!' },
+      { label: 'Chamar helicóptero de água', type: 'quick', emoji: '🚁', effects: { ra: -3, oe: 3, ao: 0, coins: -20 }, message: 'Caro mas eficiente...' },
+      { label: 'Esperar a chuva', type: 'risky', emoji: '🌧️', effects: { ra: -15, oe: -5, ao: -5 }, message: 'A chuva não veio a tempo...' },
+    ],
+  }],
+  praia: [{
+    id: 'biome_praia_erosion', name: 'Erosão Costeira', emoji: '🌊',
+    description: 'O mar está avançando sobre a praia! Ação necessária!',
+    choices: [
+      { label: 'Replantio de mangue', type: 'smart', emoji: '🌱', effects: { ra: 12, oe: 0, ao: 5 }, message: 'Mangue protege a costa naturalmente!' },
+      { label: 'Muro de contenção', type: 'quick', emoji: '🧱', effects: { ra: -5, oe: 10, ao: 2, coins: -15 }, message: 'Segurou por agora, mas não é sustentável...' },
+      { label: 'Nada, é natural', type: 'risky', emoji: '🤷', effects: { ra: -8, oe: -10, ao: -3 }, message: 'A praia perdeu muito espaço!' },
+    ],
+  }],
+  montanha: [{
+    id: 'biome_montanha_slide', name: 'Deslizamento de Terra', emoji: '⛰️',
+    description: 'Chuvas causaram deslizamentos na montanha!',
+    choices: [
+      { label: 'Reflorestamento de encostas', type: 'smart', emoji: '🌳', effects: { ra: 10, oe: 2, ao: 8 }, message: 'Raízes seguram o solo! Solução duradoura!' },
+      { label: 'Evacuar área de risco', type: 'quick', emoji: '🚨', effects: { ra: 0, oe: -5, ao: 8, coins: -10 }, message: 'Todos seguros, mas perderam casas...' },
+      { label: 'Construir muro de arrimo', type: 'risky', emoji: '🏗️', effects: { ra: -3, oe: 8, ao: 0, coins: -15 }, message: 'O muro pode não aguentar...' },
+    ],
+  }],
+  cerrado: [{
+    id: 'biome_cerrado_drought', name: 'Seca Extrema', emoji: '🏜️',
+    description: 'O cerrado está passando por uma seca terrível!',
+    choices: [
+      { label: 'Cisterna + plantio nativo', type: 'smart', emoji: '💧', effects: { ra: 10, oe: 3, ao: 8 }, message: 'Água guardada e plantas resistentes!' },
+      { label: 'Poço artesiano', type: 'quick', emoji: '🕳️', effects: { ra: -3, oe: 8, ao: 2, coins: -15 }, message: 'Água no curto prazo, mas seca os rios...' },
+      { label: 'Pedir caminhão-pipa', type: 'risky', emoji: '🚛', effects: { ra: 0, oe: 2, ao: -3, coins: -20 }, message: 'Solução cara e temporária...' },
+    ],
+  }],
+  lagoa: [{
+    id: 'biome_lagoa_pollution', name: 'Poluição na Lagoa', emoji: '🏞️',
+    description: 'A lagoa está ficando poluída! Peixes morrendo!',
+    choices: [
+      { label: 'Tratamento biológico', type: 'smart', emoji: '🧪', effects: { ra: 12, oe: 2, ao: 8 }, message: 'Plantas aquáticas limpam a água naturalmente!' },
+      { label: 'Estação de tratamento', type: 'quick', emoji: '🏭', effects: { ra: 3, oe: 8, ao: 3, coins: -20 }, message: 'Funciona mas é caro manter...' },
+      { label: 'Proibir pesca por um mês', type: 'risky', emoji: '🚫', effects: { ra: 5, oe: -5, ao: 5, coins: -10 }, message: 'Pescadores ficaram revoltados...' },
+    ],
+  }],
+  cidade: [{
+    id: 'biome_cidade_traffic', name: 'Congestionamento Urbano', emoji: '🚗',
+    description: 'Trânsito parado! Poluição do ar subindo!',
+    choices: [
+      { label: 'Ciclovia + metrô leve', type: 'smart', emoji: '🚇', effects: { ra: 8, oe: 8, ao: 8, coins: -15 }, message: 'Transporte limpo e eficiente!' },
+      { label: 'Ampliar estradas', type: 'quick', emoji: '🛣️', effects: { ra: -10, oe: 10, ao: 2, coins: -10 }, message: 'Mais carros vieram preencher...' },
+      { label: 'Rodízio de placas', type: 'risky', emoji: '🔢', effects: { ra: 3, oe: -3, ao: 5 }, message: 'Ajudou um pouco, mas não resolve...' },
+    ],
+  }],
+};
+
 export const EVENTS: GameEvent[] = [
   {
     id: 'storm',

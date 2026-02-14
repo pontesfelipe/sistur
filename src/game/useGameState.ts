@@ -1,10 +1,16 @@
 import { useState, useCallback } from 'react';
-import type { GameState, GameBars, PlacedBuilding, AvatarConfig, BiomeType, GameLevel, ProfileScores, AvatarPreset } from './types';
-import { LEVEL_XP } from './types';
-import { BUILDINGS, EVENTS, COUNCIL_DECISIONS, GRID_SIZE, DISASTERS, checkBuildingRequirements, checkSynergies } from './constants';
+import type { GameState, GameBars, PlacedBuilding, AvatarConfig, BiomeType, GameLevel, ProfileScores, AvatarPreset, EduMetrics } from './types';
+import { LEVEL_XP, BIOME_MODIFIERS, UNLOCKABLE_SKINS } from './types';
+import { BUILDINGS, EVENTS, COUNCIL_DECISIONS, GRID_SIZE, DISASTERS, BIOME_EVENTS, checkBuildingRequirements, checkSynergies } from './constants';
 
 const INITIAL_BARS: GameBars = { ra: 50, oe: 30, ao: 30 };
 const INITIAL_PROFILE: ProfileScores = { explorador: 0, construtor: 0, guardiao: 0, cientista: 0 };
+const INITIAL_EDU_METRICS: EduMetrics = {
+  proNatureDecisions: 0, proInfraDecisions: 0, proGovDecisions: 0,
+  excessiveBuilding: 0, turnsInGreen: 0, turnsInRed: 0,
+  totalBuildings: 0, totalEventsResolved: 0,
+  smartChoices: 0, riskyChoices: 0, quickChoices: 0,
+};
 
 const createEmptyGrid = (): (PlacedBuilding | null)[][] =>
   Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(null));
@@ -16,27 +22,32 @@ const DEFAULT_AVATAR: AvatarConfig = {
   shirtColor: '#3498DB',
 };
 
-const createInitialState = (): GameState => ({
-  bars: { ...INITIAL_BARS },
-  coins: 50,
-  level: 1,
-  xp: 0,
-  grid: createEmptyGrid(),
-  avatar: DEFAULT_AVATAR,
-  biome: 'floresta',
-  currentEvent: null,
-  currentCouncil: null,
-  turn: 0,
-  visitors: 10,
-  isSetup: false,
-  eventLog: [],
-  isGameOver: false,
-  gameOverReason: null,
-  isVictory: false,
-  victoryReason: null,
-  disasterCount: 0,
-  profileScores: { ...INITIAL_PROFILE },
-});
+const createInitialState = (biome: BiomeType = 'floresta'): GameState => {
+  const mod = BIOME_MODIFIERS[biome];
+  return {
+    bars: { ra: mod.startBars.ra ?? 50, oe: mod.startBars.oe ?? 30, ao: mod.startBars.ao ?? 30 },
+    coins: mod.startCoins,
+    level: 1,
+    xp: 0,
+    grid: createEmptyGrid(),
+    avatar: DEFAULT_AVATAR,
+    biome,
+    currentEvent: null,
+    currentCouncil: null,
+    turn: 0,
+    visitors: 10,
+    isSetup: false,
+    eventLog: [],
+    isGameOver: false,
+    gameOverReason: null,
+    isVictory: false,
+    victoryReason: null,
+    disasterCount: 0,
+    profileScores: { ...INITIAL_PROFILE },
+    eduMetrics: { ...INITIAL_EDU_METRICS },
+    unlockedSkins: [],
+  };
+};
 
 /** Calculate profile score adjustments based on a building */
 function buildingProfileScores(buildingId: string): Partial<ProfileScores> {
@@ -192,6 +203,13 @@ export function useGameState() {
       }
       const newProfileScores = mergeProfileScores(prev.profileScores, profileDelta);
 
+      // Edu metrics
+      const newEduMetrics = { ...prev.eduMetrics, totalBuildings: prev.eduMetrics.totalBuildings + 1 };
+      if (building.category === 'RA') newEduMetrics.proNatureDecisions++;
+      if (building.category === 'OE') newEduMetrics.proInfraDecisions++;
+      if (building.category === 'AO') newEduMetrics.proGovDecisions++;
+      if (newBars.oe > newBars.ra + 30) newEduMetrics.excessiveBuilding++;
+
       success = true;
       return {
         ...prev,
@@ -204,6 +222,7 @@ export function useGameState() {
         turn: prev.turn + 1,
         eventLog: logs,
         profileScores: newProfileScores,
+        eduMetrics: newEduMetrics,
       };
     });
 
@@ -237,11 +256,14 @@ export function useGameState() {
   }, []);
 
   const triggerRandomEvent = useCallback(() => {
-    const eligible = EVENTS.filter(e => !e.condition || e.condition(state.bars));
+    // Include biome-specific events
+    const biomeEvents = BIOME_EVENTS[state.biome] || [];
+    const allEvents = [...EVENTS, ...biomeEvents];
+    const eligible = allEvents.filter(e => !e.condition || e.condition(state.bars));
     if (eligible.length === 0) return;
     const event = eligible[Math.floor(Math.random() * eligible.length)];
     setState(prev => ({ ...prev, currentEvent: event }));
-  }, [state.bars]);
+  }, [state.bars, state.biome]);
 
   const triggerCouncil = useCallback(() => {
     const decision = COUNCIL_DECISIONS[Math.floor(Math.random() * COUNCIL_DECISIONS.length)];
@@ -274,6 +296,14 @@ export function useGameState() {
       const profileDelta = choiceProfileScores(effects, choice.type);
       const newProfileScores = mergeProfileScores(prev.profileScores, profileDelta);
 
+      // Edu metrics for events
+      const newEduMetrics = { ...prev.eduMetrics, totalEventsResolved: prev.eduMetrics.totalEventsResolved + 1 };
+      if (choice.type === 'smart') newEduMetrics.smartChoices++;
+      if (choice.type === 'risky') newEduMetrics.riskyChoices++;
+      if (choice.type === 'quick') newEduMetrics.quickChoices++;
+      if (effects.ra > 0) newEduMetrics.proNatureDecisions++;
+      if (effects.ao > 0) newEduMetrics.proGovDecisions++;
+
       return {
         ...prev,
         bars: newBars,
@@ -282,6 +312,7 @@ export function useGameState() {
         turn: prev.turn + 1,
         eventLog: [...prev.eventLog, `${prev.currentEvent.emoji} ${choice.message}`],
         profileScores: newProfileScores,
+        eduMetrics: newEduMetrics,
       };
     });
   }, []);
@@ -452,6 +483,22 @@ export function useGameState() {
         }
       }
 
+      // Edu metrics for turn tracking
+      const newEduMetrics = { ...prev.eduMetrics };
+      if (equilibrium >= 60) newEduMetrics.turnsInGreen++;
+      if (equilibrium < 30) newEduMetrics.turnsInRed++;
+      if (decay.oe > decay.ra + 30) newEduMetrics.excessiveBuilding++;
+
+      // Check for newly unlocked skins
+      const tempState = { ...prev, bars: decay, disasterCount, eduMetrics: newEduMetrics, isGameOver };
+      const newUnlocked = [...prev.unlockedSkins];
+      for (const skin of UNLOCKABLE_SKINS) {
+        if (!newUnlocked.includes(skin.id) && skin.check(tempState as GameState)) {
+          newUnlocked.push(skin.id);
+          logs.push(`🎨 Skin desbloqueada: ${skin.emoji} ${skin.name}!`);
+        }
+      }
+
       return {
         ...prev,
         grid: newGrid,
@@ -465,6 +512,8 @@ export function useGameState() {
         gameOverReason,
         isVictory,
         victoryReason,
+        eduMetrics: newEduMetrics,
+        unlockedSkins: newUnlocked,
       };
     });
 
@@ -520,8 +569,8 @@ export function useGameState() {
     setState(prev => ({ ...prev, ...partial }));
   }, []);
 
-  const resetState = useCallback(() => {
-    setState(createInitialState());
+  const resetState = useCallback((biome?: BiomeType) => {
+    setState(createInitialState(biome || 'floresta'));
   }, []);
 
   const getDominantProfile = (): { preset: AvatarPreset; scores: ProfileScores } => {
