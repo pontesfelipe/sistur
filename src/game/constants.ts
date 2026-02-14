@@ -1,30 +1,135 @@
-import type { Building, GameEvent, CouncilDecision } from './types';
+import type { Building, GameEvent, CouncilDecision, Disaster } from './types';
 
 export const GRID_SIZE = 6;
 
 export const BUILDINGS: Building[] = [
   // RA - Natureza
-  { id: 'tree', name: 'Árvore', emoji: '🌳', category: 'RA', effects: { ra: 8, oe: 0, ao: 0 }, cost: 5, description: 'Plante uma árvore!', color: '#2d8a4e', height: 1.2, unlockLevel: 1 },
-  { id: 'park', name: 'Parque', emoji: '🌿', category: 'RA', effects: { ra: 12, oe: 2, ao: 2 }, cost: 15, description: 'Área verde para todos', color: '#3cb371', height: 0.5, unlockLevel: 1 },
-  { id: 'reserve', name: 'Área Protegida', emoji: '🦜', category: 'RA', effects: { ra: 18, oe: -2, ao: 3 }, cost: 25, description: 'Protege a natureza!', color: '#228b22', height: 1.5, unlockLevel: 2 },
-  { id: 'trail', name: 'Trilha', emoji: '🥾', category: 'RA', effects: { ra: 6, oe: 4, ao: 1 }, cost: 10, description: 'Caminho na natureza', color: '#8b6914', height: 0.2, unlockLevel: 1 },
-  { id: 'garden', name: 'Jardim', emoji: '🌻', category: 'RA', effects: { ra: 10, oe: 3, ao: 1 }, cost: 12, description: 'Flores e borboletas', color: '#90ee90', height: 0.6, unlockLevel: 2 },
+  { id: 'tree', name: 'Árvore', emoji: '🌳', category: 'RA', effects: { ra: 8, oe: 0, ao: 0 }, cost: 5, description: 'Plante uma árvore!', color: '#2d8a4e', height: 1.2, unlockLevel: 1, maintenance: 0 },
+  { id: 'park', name: 'Parque', emoji: '🌿', category: 'RA', effects: { ra: 12, oe: 2, ao: 2 }, cost: 15, description: 'Área verde para todos', color: '#3cb371', height: 0.5, unlockLevel: 1, requires: ['tree'], maintenance: 1,
+    synergies: [{ withId: 'tree', bonus: { ra: 3, oe: 0, ao: 1 }, description: 'Árvores fortalecem o parque!' }] },
+  { id: 'reserve', name: 'Área Protegida', emoji: '🦜', category: 'RA', effects: { ra: 18, oe: -2, ao: 3 }, cost: 25, description: 'Protege a natureza!', color: '#228b22', height: 1.5, unlockLevel: 2, requires: ['park', 'signs'], maintenance: 2,
+    synergies: [{ withId: 'park', bonus: { ra: 5, oe: 0, ao: 2 }, description: 'Parque + reserva = ecossistema!' }] },
+  { id: 'trail', name: 'Trilha', emoji: '🥾', category: 'RA', effects: { ra: 6, oe: 4, ao: 1 }, cost: 10, description: 'Caminho na natureza', color: '#8b6914', height: 0.2, unlockLevel: 1, requires: ['tree'], maintenance: 0 },
+  { id: 'garden', name: 'Jardim', emoji: '🌻', category: 'RA', effects: { ra: 10, oe: 3, ao: 1 }, cost: 12, description: 'Flores e borboletas', color: '#90ee90', height: 0.6, unlockLevel: 2, requires: ['park'], maintenance: 1,
+    synergies: [{ withId: 'school', bonus: { ra: 2, oe: 2, ao: 3 }, description: 'Horta escolar!' }] },
 
   // OE - Infraestrutura
-  { id: 'house', name: 'Casa', emoji: '🏠', category: 'OE', effects: { ra: -2, oe: 8, ao: 1 }, cost: 10, description: 'Moradia para famílias', color: '#d4a574', height: 1.5, unlockLevel: 1 },
-  { id: 'school', name: 'Escola', emoji: '🏫', category: 'OE', effects: { ra: 0, oe: 10, ao: 5 }, cost: 20, description: 'Educação para todos', color: '#ffd700', height: 2.0, unlockLevel: 1 },
-  { id: 'hotel', name: 'Hotel', emoji: '🏨', category: 'OE', effects: { ra: -5, oe: 15, ao: 2 }, cost: 30, description: 'Hospedagem para visitantes', color: '#4169e1', height: 2.5, unlockLevel: 2 },
-  { id: 'clean_transport', name: 'Transporte Limpo', emoji: '🚲', category: 'OE', effects: { ra: 3, oe: 8, ao: 2 }, cost: 15, description: 'Ciclovias e bondinhos', color: '#87ceeb', height: 0.8, unlockLevel: 2 },
-  { id: 'dirty_transport', name: 'Transporte Poluente', emoji: '🚗', category: 'OE', effects: { ra: -8, oe: 12, ao: 1 }, cost: 10, description: 'Cuidado com a poluição!', color: '#696969', height: 1.0, unlockLevel: 1 },
-  { id: 'hospital', name: 'Hospital', emoji: '🏥', category: 'OE', effects: { ra: 0, oe: 12, ao: 4 }, cost: 35, description: 'Saúde para todos', color: '#ff6b6b', height: 2.2, unlockLevel: 3 },
+  { id: 'house', name: 'Casa', emoji: '🏠', category: 'OE', effects: { ra: -2, oe: 8, ao: 1 }, cost: 10, description: 'Moradia para famílias', color: '#d4a574', height: 1.5, unlockLevel: 1, maintenance: 1 },
+  { id: 'school', name: 'Escola', emoji: '🏫', category: 'OE', effects: { ra: 0, oe: 10, ao: 5 }, cost: 20, description: 'Educação para todos', color: '#ffd700', height: 2.0, unlockLevel: 1, requires: ['house'], maintenance: 2,
+    synergies: [{ withId: 'council', bonus: { ra: 0, oe: 3, ao: 5 }, description: 'Educação + governança!' }] },
+  { id: 'hotel', name: 'Hotel', emoji: '🏨', category: 'OE', effects: { ra: -5, oe: 15, ao: 2 }, cost: 30, description: 'Hospedagem para visitantes', color: '#4169e1', height: 2.5, unlockLevel: 2, requires: ['house', 'clean_transport'], maintenance: 3,
+    synergies: [{ withId: 'trail', bonus: { ra: 2, oe: 5, ao: 3 }, description: 'Ecoturismo!' }] },
+  { id: 'clean_transport', name: 'Transporte Limpo', emoji: '🚲', category: 'OE', effects: { ra: 3, oe: 8, ao: 2 }, cost: 15, description: 'Ciclovias e bondinhos', color: '#87ceeb', height: 0.8, unlockLevel: 2, requires: ['house'], maintenance: 1 },
+  { id: 'dirty_transport', name: 'Transporte Poluente', emoji: '🚗', category: 'OE', effects: { ra: -8, oe: 12, ao: 1 }, cost: 10, description: '⚠️ Polui! Requer limpeza!', color: '#696969', height: 1.0, unlockLevel: 1, maintenance: 2 },
+  { id: 'hospital', name: 'Hospital', emoji: '🏥', category: 'OE', effects: { ra: 0, oe: 12, ao: 4 }, cost: 35, description: 'Saúde para todos', color: '#ff6b6b', height: 2.2, unlockLevel: 3, requires: ['school', 'house'], maintenance: 4,
+    synergies: [{ withId: 'community_center', bonus: { ra: 0, oe: 4, ao: 5 }, description: 'Saúde comunitária!' }] },
 
-  // AO - Organização
-  { id: 'council', name: 'Conselho Mirim', emoji: '🤝', category: 'AO', effects: { ra: 2, oe: 2, ao: 15 }, cost: 20, description: 'Decisões em grupo!', color: '#9b59b6', height: 1.8, unlockLevel: 1 },
-  { id: 'cleanup', name: 'Programa de Limpeza', emoji: '🧹', category: 'AO', effects: { ra: 5, oe: 3, ao: 10 }, cost: 12, description: 'Cidade limpa e bonita', color: '#1abc9c', height: 0.4, unlockLevel: 1 },
-  { id: 'signs', name: 'Placas Educativas', emoji: '🪧', category: 'AO', effects: { ra: 3, oe: 1, ao: 8 }, cost: 8, description: 'Informação para todos', color: '#e67e22', height: 1.0, unlockLevel: 1 },
-  { id: 'community_center', name: 'Centro Comunitário', emoji: '🏛️', category: 'AO', effects: { ra: 1, oe: 5, ao: 12 }, cost: 25, description: 'Lugar de encontro', color: '#e74c3c', height: 2.0, unlockLevel: 2 },
-  { id: 'recycling', name: 'Reciclagem', emoji: '♻️', category: 'AO', effects: { ra: 8, oe: 2, ao: 8 }, cost: 15, description: 'Cuide do lixo!', color: '#27ae60', height: 0.6, unlockLevel: 3 },
+  // AO - Organização  
+  { id: 'council', name: 'Conselho Mirim', emoji: '🤝', category: 'AO', effects: { ra: 2, oe: 2, ao: 15 }, cost: 20, description: 'Decisões em grupo!', color: '#9b59b6', height: 1.8, unlockLevel: 1, maintenance: 2 },
+  { id: 'cleanup', name: 'Programa de Limpeza', emoji: '🧹', category: 'AO', effects: { ra: 5, oe: 3, ao: 10 }, cost: 12, description: 'Cidade limpa e bonita', color: '#1abc9c', height: 0.4, unlockLevel: 1, maintenance: 1,
+    synergies: [{ withId: 'recycling', bonus: { ra: 5, oe: 2, ao: 3 }, description: 'Limpeza + reciclagem = lixo zero!' }] },
+  { id: 'signs', name: 'Placas Educativas', emoji: '🪧', category: 'AO', effects: { ra: 3, oe: 1, ao: 8 }, cost: 8, description: 'Informação para todos', color: '#e67e22', height: 1.0, unlockLevel: 1, maintenance: 0 },
+  { id: 'community_center', name: 'Centro Comunitário', emoji: '🏛️', category: 'AO', effects: { ra: 1, oe: 5, ao: 12 }, cost: 25, description: 'Lugar de encontro', color: '#e74c3c', height: 2.0, unlockLevel: 2, requires: ['council', 'school'], maintenance: 3,
+    synergies: [{ withId: 'signs', bonus: { ra: 2, oe: 1, ao: 4 }, description: 'Centro informativo!' }] },
+  { id: 'recycling', name: 'Reciclagem', emoji: '♻️', category: 'AO', effects: { ra: 8, oe: 2, ao: 8 }, cost: 15, description: 'Cuide do lixo!', color: '#27ae60', height: 0.6, unlockLevel: 3, requires: ['cleanup', 'signs'], maintenance: 1 },
 ];
+
+export const DISASTERS: Disaster[] = [
+  {
+    id: 'flood',
+    name: 'Enchente Devastadora',
+    emoji: '🌊',
+    description: 'A falta de árvores causou uma enchente! Construções foram destruídas!',
+    trigger: { bar: 'ra', threshold: 20 },
+    destroys: 2,
+    effects: { ra: -5, oe: -10, ao: -5, coins: -15 },
+    targetCategory: 'OE',
+  },
+  {
+    id: 'collapse',
+    name: 'Colapso Estrutural',
+    emoji: '💥',
+    description: 'Sem organização, estruturas entraram em colapso!',
+    trigger: { bar: 'ao', threshold: 15 },
+    destroys: 2,
+    effects: { ra: -3, oe: -15, ao: -5, coins: -20 },
+    targetCategory: 'OE',
+  },
+  {
+    id: 'exodus',
+    name: 'Êxodo dos Moradores',
+    emoji: '🏚️',
+    description: 'Sem infraestrutura, os moradores estão abandonando a cidade!',
+    trigger: { bar: 'oe', threshold: 15 },
+    destroys: 1,
+    effects: { ra: 0, oe: -5, ao: -10, coins: -25 },
+    targetCategory: 'AO',
+  },
+  {
+    id: 'pollution_crisis',
+    name: 'Crise de Poluição',
+    emoji: '☠️',
+    description: 'A poluição ficou crítica! Natureza colapsando!',
+    trigger: { bar: 'ra', threshold: 10 },
+    destroys: 3,
+    effects: { ra: -10, oe: -5, ao: -5, coins: -10 },
+  },
+  {
+    id: 'anarchy',
+    name: 'Desordem Total',
+    emoji: '🔥',
+    description: 'Sem nenhuma organização, o caos tomou conta!',
+    trigger: { bar: 'ao', threshold: 8 },
+    destroys: 3,
+    effects: { ra: -5, oe: -10, ao: -10, coins: -30 },
+  },
+];
+
+/** Check if building dependencies are met on the grid */
+export function checkBuildingRequirements(buildingId: string, grid: (any | null)[][]): { met: boolean; missing: string[] } {
+  const building = BUILDINGS.find(b => b.id === buildingId);
+  if (!building || !building.requires || building.requires.length === 0) {
+    return { met: true, missing: [] };
+  }
+
+  const placedIds = new Set<string>();
+  for (const row of grid) {
+    for (const cell of row) {
+      if (cell) placedIds.add(cell.buildingId);
+    }
+  }
+
+  const missing = building.requires.filter(reqId => !placedIds.has(reqId));
+  return { met: missing.length === 0, missing };
+}
+
+/** Check if a placed building is adjacent to synergy partners */
+export function checkSynergies(buildingId: string, x: number, y: number, grid: (any | null)[][]): { ra: number; oe: number; ao: number; descriptions: string[] } {
+  const building = BUILDINGS.find(b => b.id === buildingId);
+  if (!building || !building.synergies) return { ra: 0, oe: 0, ao: 0, descriptions: [] };
+
+  const bonus = { ra: 0, oe: 0, ao: 0 };
+  const descriptions: string[] = [];
+  const adjacentPositions = [
+    [x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1],
+    [x - 1, y - 1], [x + 1, y - 1], [x - 1, y + 1], [x + 1, y + 1],
+  ];
+
+  for (const synergy of building.synergies) {
+    for (const [ax, ay] of adjacentPositions) {
+      const cell = grid[ay]?.[ax];
+      if (cell && cell.buildingId === synergy.withId) {
+        bonus.ra += synergy.bonus.ra;
+        bonus.oe += synergy.bonus.oe;
+        bonus.ao += synergy.bonus.ao;
+        descriptions.push(synergy.description);
+        break; // only count once per synergy type
+      }
+    }
+  }
+
+  return { ...bonus, descriptions };
+}
 
 export const EVENTS: GameEvent[] = [
   {
@@ -105,6 +210,30 @@ export const EVENTS: GameEvent[] = [
       { label: 'Fechar a vila por uma semana', type: 'risky', emoji: '🚫', effects: { ra: 5, oe: -5, ao: 5, coins: -10 }, message: 'Descansou, mas perdeu visitantes...' },
     ],
     condition: (bars) => bars.oe > 40,
+  },
+  {
+    id: 'fire',
+    name: 'Incêndio Florestal',
+    emoji: '🔥',
+    description: 'Um incêndio ameaça a vegetação! Aja rápido!',
+    choices: [
+      { label: 'Brigada comunitária de combate', type: 'smart', emoji: '🧑‍🚒', effects: { ra: -3, oe: 2, ao: 12 }, message: 'A comunidade se uniu e controlou o fogo! 💪' },
+      { label: 'Chamar bombeiros de outra cidade', type: 'quick', emoji: '🚒', effects: { ra: -8, oe: 5, ao: 0, coins: -20 }, message: 'Controlou, mas custou caro e demorou...' },
+      { label: 'Não fazer nada e torcer', type: 'risky', emoji: '🙏', effects: { ra: -20, oe: -5, ao: -8 }, message: 'O fogo destruiu muita vegetação! 😭' },
+    ],
+    condition: (bars) => bars.ra < 50,
+  },
+  {
+    id: 'epidemic',
+    name: 'Surto de Doença',
+    emoji: '🦠',
+    description: 'Uma doença está se espalhando! Precisamos agir!',
+    choices: [
+      { label: 'Campanha de prevenção comunitária', type: 'smart', emoji: '💊', effects: { ra: 2, oe: 5, ao: 10 }, message: 'A comunidade se protegeu com informação! 🏥' },
+      { label: 'Fechar tudo e isolar', type: 'quick', emoji: '🚫', effects: { ra: 0, oe: -8, ao: -5, coins: -15 }, message: 'Controlou, mas a economia parou...' },
+      { label: 'Ignorar e seguir normalmente', type: 'risky', emoji: '🤷', effects: { ra: 0, oe: -12, ao: -15, coins: -25 }, message: 'A doença se espalhou muito! Grave! 💀' },
+    ],
+    condition: (bars) => bars.ao < 40,
   },
 ];
 

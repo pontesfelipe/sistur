@@ -64,6 +64,9 @@ export function useGameSessions() {
             turn: gameState.turn,
             visitors: gameState.visitors,
             eventLog: gameState.eventLog,
+            isGameOver: gameState.isGameOver,
+            gameOverReason: gameState.gameOverReason,
+            disasterCount: gameState.disasterCount,
           } as any,
           turn: gameState.turn,
           level: gameState.level,
@@ -100,6 +103,9 @@ export function useGameSessions() {
             turn: gameState.turn,
             visitors: gameState.visitors,
             eventLog: gameState.eventLog,
+            isGameOver: gameState.isGameOver,
+            gameOverReason: gameState.gameOverReason,
+            disasterCount: gameState.disasterCount,
           } as any,
           turn: gameState.turn,
           level: gameState.level,
@@ -144,6 +150,9 @@ export function useGameSessions() {
         isSetup: true,
         currentEvent: null,
         currentCouncil: null,
+        isGameOver: gs.isGameOver || false,
+        gameOverReason: gs.gameOverReason || null,
+        disasterCount: gs.disasterCount || 0,
       };
     } catch (err) {
       console.error('Error loading session:', err);

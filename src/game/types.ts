@@ -23,6 +23,27 @@ export interface Building {
   color: string;
   height: number;
   unlockLevel: GameLevel;
+  /** IDs of buildings that must exist on the grid before this can be placed */
+  requires?: string[];
+  /** Bonus effects when placed adjacent to specific buildings */
+  synergies?: { withId: string; bonus: { ra: number; oe: number; ao: number }; description: string }[];
+  /** Maintenance cost per turn (deducted from coins) */
+  maintenance?: number;
+}
+
+export interface Disaster {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  /** Which bar triggers this disaster when too low */
+  trigger: { bar: keyof GameBars; threshold: number };
+  /** Number of buildings destroyed */
+  destroys: number;
+  /** Bar penalties */
+  effects: { ra: number; oe: number; ao: number; coins?: number };
+  /** Priority categories to destroy first */
+  targetCategory?: BuildingCategory;
 }
 
 export interface PlacedBuilding {
@@ -80,6 +101,9 @@ export interface GameState {
   visitors: number;
   isSetup: boolean;
   eventLog: string[];
+  isGameOver: boolean;
+  gameOverReason: string | null;
+  disasterCount: number;
 }
 
 export const LEVEL_NAMES: Record<GameLevel, string> = {

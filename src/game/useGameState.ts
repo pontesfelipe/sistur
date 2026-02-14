@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { GameState, GameBars, PlacedBuilding, AvatarConfig, BiomeType, GameLevel } from './types';
 import { LEVEL_XP } from './types';
-import { BUILDINGS, EVENTS, COUNCIL_DECISIONS, GRID_SIZE } from './constants';
+import { BUILDINGS, EVENTS, COUNCIL_DECISIONS, GRID_SIZE, DISASTERS, checkBuildingRequirements, checkSynergies } from './constants';
 
 const INITIAL_BARS: GameBars = { ra: 50, oe: 30, ao: 30 };
 
@@ -29,6 +29,9 @@ const createInitialState = (): GameState => ({
   visitors: 10,
   isSetup: false,
   eventLog: [],
+  isGameOver: false,
+  gameOverReason: null,
+  disasterCount: 0,
 });
 
 export function useGameState() {
@@ -82,19 +85,32 @@ export function useGameState() {
     const building = BUILDINGS.find(b => b.id === buildingId);
     if (!building) return false;
 
+    let success = false;
     setState(prev => {
+      if (prev.isGameOver) return prev;
       if (prev.grid[y][x] !== null) return prev;
       if (prev.coins < building.cost) return prev;
       if (building.unlockLevel > prev.level) return prev;
 
+      // Check dependencies
+      const reqs = checkBuildingRequirements(buildingId, prev.grid);
+      if (!reqs.met) return prev;
+
       const newGrid = prev.grid.map(row => [...row]);
       newGrid[y][x] = { buildingId, x, y };
 
+      // Base effects
       const newBars: GameBars = {
         ra: clamp(prev.bars.ra + building.effects.ra),
         oe: clamp(prev.bars.oe + building.effects.oe),
         ao: clamp(prev.bars.ao + building.effects.ao),
       };
+
+      // Synergy bonus
+      const synergy = checkSynergies(buildingId, x, y, newGrid);
+      newBars.ra = clamp(newBars.ra + synergy.ra);
+      newBars.oe = clamp(newBars.oe + synergy.oe);
+      newBars.ao = clamp(newBars.ao + synergy.ao);
 
       if (newBars.oe > newBars.ra + 30) {
         newBars.ra = clamp(newBars.ra - 3);
@@ -110,6 +126,12 @@ export function useGameState() {
         if (newXp >= LEVEL_XP[l]) { newLevel = l; break; }
       }
 
+      const logs = [...prev.eventLog, `Construiu: ${building.emoji} ${building.name}`];
+      if (synergy.descriptions.length > 0) {
+        logs.push(`✨ Sinergia: ${synergy.descriptions.join(', ')}`);
+      }
+
+      success = true;
       return {
         ...prev,
         grid: newGrid,
@@ -119,11 +141,11 @@ export function useGameState() {
         level: newLevel,
         visitors: Math.max(0, Math.round(equilibrium * 1.5)),
         turn: prev.turn + 1,
-        eventLog: [...prev.eventLog, `Construiu: ${building.emoji} ${building.name}`],
+        eventLog: logs,
       };
     });
 
-    return true;
+    return success;
   }, []);
 
   const removeBuilding = useCallback((x: number, y: number) => {
@@ -233,33 +255,143 @@ export function useGameState() {
   }, []);
 
   const endTurn = useCallback(() => {
-    // Every 3 turns, trigger event or council
     setState(prev => {
+      if (prev.isGameOver) return prev;
+
       const newTurn = prev.turn + 1;
+      const logs = [...prev.eventLog];
+
+      // Maintenance costs
+      let maintenanceCost = 0;
+      for (const row of prev.grid) {
+        for (const cell of row) {
+          if (cell) {
+            const b = BUILDINGS.find(bd => bd.id === cell.buildingId);
+            if (b?.maintenance) maintenanceCost += b.maintenance;
+          }
+        }
+      }
+      if (maintenanceCost > 0) {
+        logs.push(`🔧 Manutenção: -${maintenanceCost} moedas`);
+      }
+
       // AO < 30 → chance of negative event
       let coinPenalty = 0;
       if (prev.bars.ao < 30 && Math.random() < 0.3) {
         coinPenalty = -5;
+        logs.push('⚠️ Desorganização causou prejuízo!');
       }
+
+      // Decay: bars slowly decrease each turn if no action
+      const decay: GameBars = {
+        ra: clamp(prev.bars.ra - 1),
+        oe: clamp(prev.bars.oe - 0.5),
+        ao: clamp(prev.bars.ao - 0.5),
+      };
+
+      // OE > RA + 30 → pollution
+      if (decay.oe > decay.ra + 30) {
+        decay.ra = clamp(decay.ra - 3);
+        logs.push('🏭 Poluição! Natureza diminuindo!');
+      }
+
       // Income from visitors
       const income = Math.round(prev.visitors / 10);
+      const newCoins = Math.max(0, prev.coins + income + coinPenalty - maintenanceCost);
+
+      // Check for disasters
+      let disasterCount = prev.disasterCount;
+      let destroyedBuildings: string[] = [];
+      const newGrid = prev.grid.map(row => [...row]);
+
+      for (const disaster of DISASTERS) {
+        if (decay[disaster.trigger.bar] <= disaster.trigger.threshold) {
+          // Disaster strikes!
+          disasterCount++;
+          logs.push(`💀 ${disaster.emoji} ${disaster.name}: ${disaster.description}`);
+          
+          decay.ra = clamp(decay.ra + disaster.effects.ra);
+          decay.oe = clamp(decay.oe + disaster.effects.oe);
+          decay.ao = clamp(decay.ao + disaster.effects.ao);
+
+          // Destroy buildings
+          let toDestroy = disaster.destroys;
+          const allBuildings: { x: number; y: number; id: string }[] = [];
+          for (let y2 = 0; y2 < GRID_SIZE; y2++) {
+            for (let x2 = 0; x2 < GRID_SIZE; x2++) {
+              const c = newGrid[y2][x2];
+              if (c) {
+                const bd = BUILDINGS.find(b => b.id === c.buildingId);
+                if (!disaster.targetCategory || bd?.category === disaster.targetCategory) {
+                  allBuildings.push({ x: x2, y: y2, id: c.buildingId });
+                }
+              }
+            }
+          }
+          // Shuffle and destroy
+          const shuffled = allBuildings.sort(() => Math.random() - 0.5);
+          for (let i = 0; i < Math.min(toDestroy, shuffled.length); i++) {
+            const target = shuffled[i];
+            const bd = BUILDINGS.find(b => b.id === target.id);
+            newGrid[target.y][target.x] = null;
+            if (bd) {
+              destroyedBuildings.push(`${bd.emoji} ${bd.name}`);
+            }
+          }
+          break; // Only one disaster per turn
+        }
+      }
+
+      if (destroyedBuildings.length > 0) {
+        logs.push(`🏚️ Destruído: ${destroyedBuildings.join(', ')}`);
+      }
+
+      // Game over conditions
+      const equilibrium = decay.ra * 0.4 + decay.oe * 0.3 + decay.ao * 0.3;
+      let isGameOver = false;
+      let gameOverReason: string | null = null;
+
+      if (equilibrium <= 10) {
+        isGameOver = true;
+        gameOverReason = '💀 Equilíbrio crítico! Sua cidade entrou em colapso total. Todas as barras caíram demais.';
+      } else if (decay.ra <= 5 && decay.oe <= 5) {
+        isGameOver = true;
+        gameOverReason = '🏚️ Cidade abandonada! Sem natureza e sem infraestrutura, todos foram embora.';
+      } else if (disasterCount >= 5) {
+        isGameOver = true;
+        gameOverReason = '🔥 Muitas catástrofes! Após 5 desastres, a cidade não se recuperou.';
+      } else if (newCoins <= 0 && decay.ra <= 15 && decay.ao <= 15) {
+        isGameOver = true;
+        gameOverReason = '💸 Falência total! Sem moedas, sem natureza e sem organização.';
+      }
+
+      if (isGameOver) {
+        logs.push(`☠️ FIM DE JOGO: ${gameOverReason}`);
+      }
 
       return {
         ...prev,
+        grid: newGrid,
+        bars: decay,
         turn: newTurn,
-        coins: Math.max(0, prev.coins + income + coinPenalty),
+        coins: newCoins,
+        eventLog: logs,
+        visitors: Math.max(0, Math.round(equilibrium * 1.5)),
+        disasterCount,
+        isGameOver,
+        gameOverReason,
       };
     });
 
     // Random events every few turns
-    if ((state.turn + 1) % 3 === 0) {
+    if ((state.turn + 1) % 3 === 0 && !state.isGameOver) {
       if (Math.random() > 0.5) {
         triggerRandomEvent();
       } else {
         triggerCouncil();
       }
     }
-  }, [state.turn, triggerRandomEvent, triggerCouncil]);
+  }, [state.turn, state.isGameOver, triggerRandomEvent, triggerCouncil]);
 
   const getEquilibrium = () => {
     return state.bars.ra * 0.4 + state.bars.oe * 0.3 + state.bars.ao * 0.3;
@@ -273,9 +405,29 @@ export function useGameState() {
 
   const getAlerts = (): string[] => {
     const alerts: string[] = [];
-    if (state.bars.ra < 40) alerts.push('🔴 Natureza em perigo! Plante árvores!');
+    if (state.isGameOver) {
+      alerts.push(`☠️ ${state.gameOverReason}`);
+      return alerts;
+    }
+    if (state.bars.ra < 20) alerts.push('🚨 PERIGO EXTREMO: Natureza quase destruída!');
+    else if (state.bars.ra < 40) alerts.push('🔴 Natureza em perigo! Plante árvores!');
     if (state.bars.oe > state.bars.ra + 30) alerts.push('🏭 Muita construção! A poluição aumentou!');
-    if (state.bars.ao < 30) alerts.push('⚠️ Falta organização! Problemas podem acontecer!');
+    if (state.bars.ao < 15) alerts.push('🚨 CAOS: Sem organização, desastres iminentes!');
+    else if (state.bars.ao < 30) alerts.push('⚠️ Falta organização! Problemas podem acontecer!');
+    if (state.disasterCount >= 3) alerts.push(`💀 ${state.disasterCount} desastres! Mais 2 e a cidade acaba!`);
+    
+    // Maintenance warning
+    let maintenance = 0;
+    for (const row of state.grid) {
+      for (const cell of row) {
+        if (cell) {
+          const b = BUILDINGS.find(bd => bd.id === cell.buildingId);
+          if (b?.maintenance) maintenance += b.maintenance;
+        }
+      }
+    }
+    if (maintenance > state.coins * 0.5) alerts.push(`🔧 Manutenção alta: ${maintenance}/turno`);
+    
     return alerts;
   };
 
