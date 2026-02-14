@@ -1,10 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGameState } from '@/game/useGameState';
+import { useCardGame } from '@/game/useCardGame';
 import { useGameSessions } from '@/hooks/useGameSessions';
-import { GameWorld2D } from '@/game/components/GameWorld2D';
 import { GameHUD } from '@/game/components/GameHUD';
-import { BuildingMenu } from '@/game/components/BuildingMenu';
 import { EventDialog, CouncilDialog } from '@/game/components/EventDialog';
 import { SetupScreen } from '@/game/components/SetupScreen';
 import { EventLog } from '@/game/components/EventLog';
@@ -12,36 +10,39 @@ import { GameTutorial } from '@/game/components/GameTutorial';
 import { MobileGameDrawer } from '@/game/components/MobileGameDrawer';
 import { SessionPicker } from '@/game/components/SessionPicker';
 import { EduReport } from '@/game/components/EduReport';
+import { CardHand } from '@/game/components/CardHand';
+import { DeckInfo } from '@/game/components/DeckInfo';
+import { RewardPicker } from '@/game/components/RewardPicker';
 import type { AvatarConfig, BiomeType } from '@/game/types';
 import { BIOME_INFO, PROFILE_INFO, VICTORY_CONDITIONS, UNLOCKABLE_SKINS } from '@/game/types';
-import { ArrowLeft, BarChart3, Hammer, HelpCircle, Save, GraduationCap, ChevronLeft, ChevronRight, ScrollText } from 'lucide-react';
+import { ArrowLeft, BarChart3, HelpCircle, Save, GraduationCap, ScrollText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 type GamePhase = 'picker' | 'setup' | 'playing';
 
 export default function Game() {
   const navigate = useNavigate();
-  const game = useGameState();
+  const game = useCardGame();
   const sessions = useGameSessions();
   const isMobile = useIsMobile();
 
   const [phase, setPhase] = useState<GamePhase>('picker');
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
-  const [selectedBuilding, setSelectedBuilding] = useState<string | null>(null);
   const [lastFeedback, setLastFeedback] = useState<string | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
-  const [mobilePanel, setMobilePanel] = useState<'stats' | 'build' | 'edu' | null>(null);
-  const [leftOpen, setLeftOpen] = useState(true);
-  const [rightOpen, setRightOpen] = useState(true);
+  const [mobilePanel, setMobilePanel] = useState<'stats' | 'log' | 'edu' | null>(null);
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   // Auto-save every 5 turns
   const lastSavedTurn = useRef(0);
   useEffect(() => {
     if (activeSessionId && game.state.isSetup && game.state.turn > 0 && game.state.turn % 5 === 0 && game.state.turn !== lastSavedTurn.current) {
       lastSavedTurn.current = game.state.turn;
-      sessions.saveSession(activeSessionId, game.state);
+      sessions.saveSession(activeSessionId, game.toLegacyState() as any);
     }
   }, [game.state.turn, activeSessionId, game.state.isSetup]);
 
@@ -54,10 +55,13 @@ export default function Game() {
   const handleLoadSession = useCallback(async (sessionId: string) => {
     const loaded = await sessions.loadSession(sessionId);
     if (loaded) {
-      game.loadState(loaded);
+      // For legacy sessions, just start a new card game with the same biome
+      game.resetState(loaded.biome || 'floresta');
+      game.setAvatar(loaded.avatar || { preset: 'explorador', skinColor: '#FDDBB4', hairColor: '#2C1B18', shirtColor: '#3498DB' });
+      game.startGame();
       setActiveSessionId(sessionId);
       setPhase('playing');
-      toast.success('Sessão carregada! 🎮');
+      toast.success('Nova aventura carregada! 🎮');
     }
   }, [sessions, game]);
 
@@ -66,7 +70,6 @@ export default function Game() {
   }, [sessions]);
 
   const handleStart = useCallback(async (avatar: AvatarConfig, biome: BiomeType) => {
-    // Reset with biome-specific starting values
     game.resetState(biome);
     game.setAvatar(avatar);
     game.setBiome(biome);
@@ -75,14 +78,8 @@ export default function Game() {
     const biomeInfo = BIOME_INFO[biome];
     const sessionName = `${biomeInfo.emoji} ${biomeInfo.name} - Aventura`;
 
-    // We need a small delay to let state update
     setTimeout(async () => {
-      const id = await sessions.createSession(sessionName, {
-        ...game.state,
-        avatar,
-        biome,
-        isSetup: true,
-      });
+      const id = await sessions.createSession(sessionName, game.toLegacyState() as any);
       if (id) setActiveSessionId(id);
     }, 100);
 
@@ -99,13 +96,13 @@ export default function Game() {
 
   const handleManualSave = useCallback(async () => {
     if (!activeSessionId) return;
-    await sessions.saveSession(activeSessionId, game.state);
+    await sessions.saveSession(activeSessionId, game.toLegacyState() as any);
     toast.success('Jogo salvo! 💾');
-  }, [activeSessionId, sessions, game.state]);
+  }, [activeSessionId, sessions, game]);
 
   const handleBackToPicker = useCallback(async () => {
     if (activeSessionId && game.state.isSetup) {
-      await sessions.saveSession(activeSessionId, game.state);
+      await sessions.saveSession(activeSessionId, game.toLegacyState() as any);
     }
     game.resetState();
     setActiveSessionId(null);
@@ -113,29 +110,17 @@ export default function Game() {
     await sessions.fetchSessions();
   }, [activeSessionId, game, sessions]);
 
-  const handleTileClick = useCallback((x: number, y: number) => {
-    if (selectedBuilding) {
-      const placed = game.state.grid[y]?.[x];
-      if (placed) {
-        toast.error('Já tem algo aqui! Escolha outro lugar.');
-        return;
-      }
-      const success = game.placeBuilding(selectedBuilding, x, y);
-      if (success) {
-        toast.success('Construção colocada! 🎉');
-        setSelectedBuilding(null);
-        if (isMobile) setMobilePanel(null);
-      } else {
-        toast.error('Moedas insuficientes!');
-      }
-    } else {
-      const placed = game.state.grid[y]?.[x];
-      if (placed) {
-        game.removeBuilding(x, y);
-        toast.info('Construção removida.');
-      }
-    }
-  }, [selectedBuilding, game, isMobile]);
+  const handlePlayCard = useCallback((index: number) => {
+    game.playCard(index);
+    setSelectedCardIndex(null);
+    toast.success('Carta jogada! 🃏');
+  }, [game]);
+
+  const handleDiscardCard = useCallback((index: number) => {
+    game.discardCard(index);
+    setSelectedCardIndex(null);
+    toast.info('Carta descartada (+1💰)');
+  }, [game]);
 
   const handleResolveEvent = useCallback((index: number) => {
     const event = game.state.currentEvent;
@@ -157,6 +142,12 @@ export default function Game() {
     }
   }, [game]);
 
+  const handleEndTurn = useCallback(() => {
+    game.endTurn();
+    setSelectedCardIndex(null);
+    toast('⏭️ Novo turno!');
+  }, [game]);
+
   // Phase: Session picker
   if (phase === 'picker') {
     return (
@@ -170,10 +161,17 @@ export default function Game() {
     );
   }
 
-  // Phase: Setup (new game)
+  // Phase: Setup
   if (phase === 'setup') {
     return <SetupScreen onStart={handleStart} />;
   }
+
+  const canPlayCards = game.state.cardsPlayedThisTurn < game.state.maxPlaysPerTurn
+    && !game.state.currentEvent && !game.state.currentCouncil && !game.state.rewardCards
+    && !game.state.isGameOver && !game.state.isVictory;
+
+  const equilibrium = game.getEquilibrium();
+  const dp = game.getDominantProfile();
 
   // Phase: Playing
   return (
@@ -183,7 +181,7 @@ export default function Game() {
         <button onClick={() => navigate('/')} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground min-h-[44px] px-1">
           <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">SISTUR</span>
         </button>
-        <h1 className="text-base sm:text-lg font-bold">🌍 Mapa do Tesouro</h1>
+        <h1 className="text-base sm:text-lg font-bold">🃏 Mapa do Tesouro</h1>
         <div className="flex items-center gap-1">
           <button onClick={handleManualSave} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground" title="Salvar">
             <Save className="h-5 w-5" />
@@ -194,27 +192,27 @@ export default function Game() {
         </div>
       </div>
 
-      {/* Mobile stats bar */}
-      {isMobile && (
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-background/90 border-b border-border text-xs overflow-x-auto flex-shrink-0">
-          <span className="font-bold whitespace-nowrap">💰{game.state.coins}</span>
-          <span className="whitespace-nowrap">🌳{Math.round(game.state.bars.ra)}</span>
-          <span className="whitespace-nowrap">🏗️{Math.round(game.state.bars.oe)}</span>
-          <span className="whitespace-nowrap">🤝{Math.round(game.state.bars.ao)}</span>
-          <span className={`whitespace-nowrap font-bold ${game.getEquilibrium() >= 60 ? 'text-green-600' : game.getEquilibrium() >= 40 ? 'text-yellow-600' : 'text-red-600'}`}>
-            ⚖️{Math.round(game.getEquilibrium())}%
-          </span>
-          {(() => {
-            const dp = game.getDominantProfile();
-            const total = dp.scores.explorador + dp.scores.construtor + dp.scores.guardiao + dp.scores.cientista;
-            return total > 0 ? (
-              <span className="whitespace-nowrap font-bold">{PROFILE_INFO[dp.preset].emoji}</span>
-            ) : null;
-          })()}
-          <span className="whitespace-nowrap">👥{game.state.visitors}</span>
-          <span className="ml-auto whitespace-nowrap text-muted-foreground">T{game.state.turn}</span>
-        </div>
-      )}
+      {/* Stats bar */}
+      <div className="flex items-center gap-2 sm:gap-3 px-3 py-1.5 bg-background/90 border-b border-border text-xs overflow-x-auto flex-shrink-0">
+        <span className="font-bold whitespace-nowrap">💰{game.state.coins}</span>
+        <span className="whitespace-nowrap">🌳{Math.round(game.state.bars.ra)}</span>
+        <span className="whitespace-nowrap">🏗️{Math.round(game.state.bars.oe)}</span>
+        <span className="whitespace-nowrap">🤝{Math.round(game.state.bars.ao)}</span>
+        <span className={cn('whitespace-nowrap font-bold',
+          equilibrium >= 60 ? 'text-green-600' : equilibrium >= 40 ? 'text-yellow-600' : 'text-red-600'
+        )}>
+          ⚖️{Math.round(equilibrium)}%
+        </span>
+        {dp.scores.explorador + dp.scores.construtor + dp.scores.guardiao + dp.scores.cientista > 0 && (
+          <span className="whitespace-nowrap font-bold">{PROFILE_INFO[dp.preset].emoji}</span>
+        )}
+        <span className="whitespace-nowrap">👥{game.state.visitors}</span>
+        <span className="whitespace-nowrap">⭐Nv{game.state.level}</span>
+        <span className="ml-auto whitespace-nowrap text-muted-foreground">T{game.state.turn}</span>
+        <span className="whitespace-nowrap text-muted-foreground">
+          🃏{game.state.cardsPlayedThisTurn}/{game.state.maxPlaysPerTurn}
+        </span>
+      </div>
 
       {/* Feedback toast */}
       {lastFeedback && (
@@ -224,17 +222,19 @@ export default function Game() {
       )}
 
       {/* Main layout */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-0 p-2 sm:p-3 max-w-[1600px] mx-auto w-full min-h-0">
-        {/* Left panel - HUD (desktop only, collapsible) */}
-        <div className={`hidden lg:flex flex-shrink-0 transition-all duration-300 ${leftOpen ? 'w-64' : 'w-8'}`}>
-          {leftOpen ? (
-            <div className="w-full overflow-y-auto space-y-3 pr-2 relative">
+      <div className="flex-1 flex flex-col lg:flex-row gap-0 p-2 sm:p-3 max-w-[1400px] mx-auto w-full min-h-0">
+        {/* Left sidebar (desktop) */}
+        <div className={cn(
+          'hidden lg:flex flex-shrink-0 transition-all duration-300',
+          showSidebar ? 'w-64' : 'w-8'
+        )}>
+          {showSidebar ? (
+            <div className="w-full overflow-y-auto space-y-3 pr-2">
               <button
-                onClick={() => setLeftOpen(false)}
-                className="absolute top-0 right-0 z-10 p-1 rounded-md hover:bg-accent text-muted-foreground"
-                title="Minimizar"
+                onClick={() => setShowSidebar(false)}
+                className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
               >
-                <ChevronLeft className="h-4 w-4" />
+                ◀ Minimizar
               </button>
               <GameHUD
                 bars={game.state.bars}
@@ -245,134 +245,115 @@ export default function Game() {
                 visitors={game.state.visitors}
                 biome={game.state.biome}
                 alerts={game.getAlerts()}
-                equilibrium={game.getEquilibrium()}
-                dominantProfile={game.getDominantProfile().preset}
+                equilibrium={equilibrium}
+                dominantProfile={dp.preset}
                 profileScores={game.state.profileScores}
               />
               <EventLog log={game.state.eventLog} />
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-2 pt-2">
-              <button
-                onClick={() => setLeftOpen(true)}
-                className="p-1.5 rounded-lg bg-card shadow-md hover:bg-accent transition-colors"
-                title="Expandir Status"
-              >
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              </button>
-              <button
-                onClick={() => setLeftOpen(true)}
-                className="p-1.5 rounded-lg bg-card shadow-md hover:bg-accent transition-colors"
-                title="Expandir Log"
-              >
-                <ScrollText className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Center - 2D Isometric World */}
-        <div className="flex-1 min-h-[250px] sm:min-h-[300px] lg:min-h-0">
-          <GameWorld2D
-            grid={game.state.grid}
-            biome={game.state.biome}
-            selectedBuilding={selectedBuilding}
-            onTileClick={handleTileClick}
-            raValue={game.state.bars.ra}
-          />
-        </div>
-
-        {/* Right panel - Buildings (desktop only, collapsible) */}
-        <div className={`hidden lg:flex flex-shrink-0 transition-all duration-300 ${rightOpen ? 'w-64' : 'w-8'}`}>
-          {rightOpen ? (
-            <div className="w-full overflow-y-auto pl-2 relative">
-              <button
-                onClick={() => setRightOpen(false)}
-                className="absolute top-0 left-0 z-10 p-1 rounded-md hover:bg-accent text-muted-foreground"
-                title="Minimizar"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
               <div className="bg-card/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
-                <BuildingMenu
-                  selectedBuilding={selectedBuilding}
-                  onSelect={setSelectedBuilding}
-                  coins={game.state.coins}
-                  level={game.state.level}
-                  grid={game.state.grid}
-                />
-              </div>
-              <div className="mt-3 bg-card/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
                 <h3 className="text-sm font-bold mb-2">📊 Relatório Educacional</h3>
                 <EduReport
                   metrics={game.state.eduMetrics}
                   profileScores={game.state.profileScores}
-                  dominantProfile={game.getDominantProfile().preset}
+                  dominantProfile={dp.preset}
                   turn={game.state.turn}
                   unlockedSkins={game.state.unlockedSkins}
-                  state={game.state}
+                  state={game.state as any}
                 />
               </div>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 pt-2">
               <button
-                onClick={() => setRightOpen(true)}
+                onClick={() => setShowSidebar(true)}
                 className="p-1.5 rounded-lg bg-card shadow-md hover:bg-accent transition-colors"
-                title="Expandir Construções"
+                title="Expandir"
               >
-                <Hammer className="h-4 w-4 text-muted-foreground" />
-              </button>
-              <button
-                onClick={() => setRightOpen(true)}
-                className="p-1.5 rounded-lg bg-card shadow-md hover:bg-accent transition-colors"
-                title="Expandir Relatório"
-              >
-                <GraduationCap className="h-4 w-4 text-muted-foreground" />
+                <BarChart3 className="h-4 w-4 text-muted-foreground" />
               </button>
             </div>
           )}
         </div>
+
+        {/* Center: Card game area */}
+        <div className="flex-1 flex flex-col min-h-0 gap-3">
+          {/* Played cards this turn */}
+          {game.state.playedThisTurn.length > 0 && (
+            <div className="bg-card/60 backdrop-blur-sm rounded-xl p-3 shadow-sm">
+              <p className="text-xs font-bold text-muted-foreground mb-2">🎯 Jogadas deste turno:</p>
+              <div className="flex flex-wrap gap-2">
+                {game.state.playedThisTurn.map((card, i) => (
+                  <div key={i} className="flex items-center gap-1 bg-accent/50 rounded-lg px-2 py-1 text-xs">
+                    <span>{card.emoji}</span>
+                    <span className="font-medium">{card.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Deck info bar */}
+          <div className="bg-card/60 backdrop-blur-sm rounded-xl px-4 py-2 shadow-sm">
+            <DeckInfo deck={game.state.deck} totalPlayed={game.state.totalCardsPlayed} />
+          </div>
+
+          {/* Card hand */}
+          <div className="flex-1 flex flex-col justify-center">
+            <CardHand
+              hand={game.state.deck.hand}
+              coins={game.state.coins}
+              onPlay={handlePlayCard}
+              onDiscard={handleDiscardCard}
+              canPlay={canPlayCards}
+              selectedIndex={selectedCardIndex}
+              onSelect={setSelectedCardIndex}
+            />
+          </div>
+
+          {/* End turn button */}
+          <div className="flex items-center justify-center gap-3 pb-2">
+            <button
+              onClick={handleEndTurn}
+              disabled={game.state.isGameOver || game.state.isVictory || !!game.state.currentEvent || !!game.state.currentCouncil}
+              className={cn(
+                'px-8 py-3 text-sm font-bold rounded-xl shadow-lg transition-all min-h-[48px]',
+                'bg-gradient-to-r from-amber-500 to-orange-500 text-white',
+                'hover:scale-105 active:scale-[0.97]',
+                'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100'
+              )}
+            >
+              ⏭️ Passar Turno ({game.state.cardsPlayedThisTurn}/{game.state.maxPlaysPerTurn} jogadas)
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Mobile bottom action bar */}
+      {/* Mobile bottom nav */}
       {isMobile && (
-        <div className="flex-shrink-0 bg-background/95 backdrop-blur-lg border-t border-border px-2 py-2 safe-bottom">
-          <div className="flex items-center gap-2">
+        <div className="flex-shrink-0 bg-background/95 backdrop-blur-lg border-t border-border px-2 py-1 safe-bottom">
+          <div className="flex items-center gap-1">
             <button
               onClick={() => setMobilePanel(mobilePanel === 'stats' ? null : 'stats')}
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
+              className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-accent transition-colors min-h-[44px] justify-center"
             >
-              <BarChart3 className="h-5 w-5 text-muted-foreground" />
-              <span className="text-[10px] text-muted-foreground">Status</span>
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              <span className="text-[9px] text-muted-foreground">Status</span>
             </button>
             <button
-              onClick={() => setMobilePanel(mobilePanel === 'build' ? null : 'build')}
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
+              onClick={() => setMobilePanel(mobilePanel === 'log' ? null : 'log')}
+              className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-accent transition-colors min-h-[44px] justify-center"
             >
-              <Hammer className="h-5 w-5 text-muted-foreground" />
-              <span className="text-[10px] text-muted-foreground">Construir</span>
-            </button>
-            <button
-              onClick={game.endTurn}
-              className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold rounded-xl shadow-lg active:scale-[0.97] transition-transform min-h-[48px]"
-            >
-              ⏭️ Passar Turno
+              <ScrollText className="h-4 w-4 text-muted-foreground" />
+              <span className="text-[9px] text-muted-foreground">Log</span>
             </button>
             <button
               onClick={() => setMobilePanel(mobilePanel === 'edu' ? null : 'edu')}
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg hover:bg-accent transition-colors min-h-[48px] justify-center"
+              className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-accent transition-colors min-h-[44px] justify-center"
             >
-              <GraduationCap className="h-5 w-5 text-muted-foreground" />
-              <span className="text-[10px] text-muted-foreground">Relatório</span>
+              <GraduationCap className="h-4 w-4 text-muted-foreground" />
+              <span className="text-[9px] text-muted-foreground">Relatório</span>
             </button>
           </div>
-
-          {selectedBuilding && (
-            <p className="text-xs text-center text-muted-foreground animate-pulse mt-1">
-              👆 Toque no mapa para construir!
-            </p>
-          )}
         </div>
       )}
 
@@ -391,30 +372,18 @@ export default function Game() {
           visitors={game.state.visitors}
           biome={game.state.biome}
           alerts={game.getAlerts()}
-          equilibrium={game.getEquilibrium()}
-          dominantProfile={game.getDominantProfile().preset}
+          equilibrium={equilibrium}
+          dominantProfile={dp.preset}
           profileScores={game.state.profileScores}
         />
-        <div className="mt-3">
-          <EventLog log={game.state.eventLog} />
-        </div>
       </MobileGameDrawer>
 
       <MobileGameDrawer
-        open={mobilePanel === 'build'}
+        open={mobilePanel === 'log'}
         onClose={() => setMobilePanel(null)}
-        title="🏗️ Construções"
+        title="📜 Log de Eventos"
       >
-        <BuildingMenu
-          selectedBuilding={selectedBuilding}
-          onSelect={(id) => {
-            setSelectedBuilding(id);
-            if (id) setMobilePanel(null);
-          }}
-          coins={game.state.coins}
-          level={game.state.level}
-          grid={game.state.grid}
-        />
+        <EventLog log={game.state.eventLog} />
       </MobileGameDrawer>
 
       <MobileGameDrawer
@@ -425,10 +394,10 @@ export default function Game() {
         <EduReport
           metrics={game.state.eduMetrics}
           profileScores={game.state.profileScores}
-          dominantProfile={game.getDominantProfile().preset}
+          dominantProfile={dp.preset}
           turn={game.state.turn}
           unlockedSkins={game.state.unlockedSkins}
-          state={game.state}
+          state={game.state as any}
         />
       </MobileGameDrawer>
 
@@ -445,16 +414,12 @@ export default function Game() {
             <div className="bg-muted/50 rounded-xl p-3 space-y-1 text-xs text-left">
               <p><strong>Turnos jogados:</strong> {game.state.turn}</p>
               <p><strong>Nível alcançado:</strong> {game.state.level}</p>
-              <p><strong>Equilíbrio final:</strong> {Math.round(game.getEquilibrium())}%</p>
+              <p><strong>Equilíbrio final:</strong> {Math.round(equilibrium)}%</p>
+              <p><strong>Cartas jogadas:</strong> {game.state.totalCardsPlayed}</p>
               <p><strong>Desastres sofridos:</strong> {game.state.disasterCount}</p>
-              <p><strong>Escolhas inteligentes:</strong> {game.state.eduMetrics.smartChoices}</p>
-              {(() => {
-                const dp = game.getDominantProfile();
-                const total = dp.scores.explorador + dp.scores.construtor + dp.scores.guardiao + dp.scores.cientista;
-                return total > 0 ? (
-                  <p><strong>Perfil dominante:</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
-                ) : null;
-              })()}
+              {dp.scores.explorador + dp.scores.construtor + dp.scores.guardiao + dp.scores.cientista > 0 && (
+                <p><strong>Perfil:</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
+              )}
             </div>
             <div className="flex gap-3">
               <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-border text-sm font-bold hover:bg-accent transition-colors">📋 Sessões</button>
@@ -480,19 +445,12 @@ export default function Game() {
                 </div>
               ))}
               <hr className="my-2 border-amber-300" />
-              <p><strong>Turnos jogados:</strong> {game.state.turn}</p>
-              <p><strong>Equilíbrio final:</strong> {Math.round(game.getEquilibrium())}%</p>
+              <p><strong>Turnos:</strong> {game.state.turn}</p>
+              <p><strong>Cartas jogadas:</strong> {game.state.totalCardsPlayed}</p>
+              <p><strong>Equilíbrio:</strong> {Math.round(equilibrium)}%</p>
               <p><strong>Visitantes:</strong> {game.state.visitors}</p>
-              <p><strong>Desastres sobrevividos:</strong> {game.state.disasterCount}</p>
-              <p><strong>Escolhas inteligentes:</strong> {game.state.eduMetrics.smartChoices}</p>
-              <p><strong>Turnos no verde:</strong> {game.state.eduMetrics.turnsInGreen}</p>
-              <p><strong>Skins desbloqueadas:</strong> {game.state.unlockedSkins.length}/{UNLOCKABLE_SKINS.length}</p>
-              {(() => {
-                const dp = game.getDominantProfile();
-                return (
-                  <p><strong>Perfil final:</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
-                );
-              })()}
+              <p><strong>Skins:</strong> {game.state.unlockedSkins.length}/{UNLOCKABLE_SKINS.length}</p>
+              <p><strong>Perfil:</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
             </div>
             <div className="flex gap-3">
               <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-border text-sm font-bold hover:bg-accent transition-colors">📋 Sessões</button>
@@ -500,6 +458,15 @@ export default function Game() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Reward Picker */}
+      {game.state.rewardCards && (
+        <RewardPicker
+          cards={game.state.rewardCards}
+          onPick={game.pickReward}
+          onSkip={game.skipReward}
+        />
       )}
 
       {/* Dialogs */}
