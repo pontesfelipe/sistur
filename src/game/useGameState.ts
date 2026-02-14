@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import type { GameState, GameBars, PlacedBuilding, AvatarConfig, BiomeType, GameLevel } from './types';
 import { LEVEL_XP } from './types';
 import { BUILDINGS, EVENTS, COUNCIL_DECISIONS, GRID_SIZE } from './constants';
@@ -15,22 +15,24 @@ const DEFAULT_AVATAR: AvatarConfig = {
   shirtColor: '#3498DB',
 };
 
+const createInitialState = (): GameState => ({
+  bars: { ...INITIAL_BARS },
+  coins: 50,
+  level: 1,
+  xp: 0,
+  grid: createEmptyGrid(),
+  avatar: DEFAULT_AVATAR,
+  biome: 'floresta',
+  currentEvent: null,
+  currentCouncil: null,
+  turn: 0,
+  visitors: 10,
+  isSetup: false,
+  eventLog: [],
+});
+
 export function useGameState() {
-  const [state, setState] = useState<GameState>({
-    bars: { ...INITIAL_BARS },
-    coins: 50,
-    level: 1,
-    xp: 0,
-    grid: createEmptyGrid(),
-    avatar: DEFAULT_AVATAR,
-    biome: 'floresta',
-    currentEvent: null,
-    currentCouncil: null,
-    turn: 0,
-    visitors: 10,
-    isSetup: false,
-    eventLog: [],
-  });
+  const [state, setState] = useState<GameState>(createInitialState());
 
   const clamp = (v: number) => Math.max(0, Math.min(100, v));
 
@@ -277,8 +279,17 @@ export function useGameState() {
     return alerts;
   };
 
+  const loadState = useCallback((partial: Partial<GameState>) => {
+    setState(prev => ({ ...prev, ...partial }));
+  }, []);
+
+  const resetState = useCallback(() => {
+    setState(createInitialState());
+  }, []);
+
   return {
     state,
+    setState,
     placeBuilding,
     removeBuilding,
     triggerRandomEvent,
@@ -293,5 +304,7 @@ export function useGameState() {
     getTileStatus,
     getAlerts,
     applyEffects,
+    loadState,
+    resetState,
   };
 }

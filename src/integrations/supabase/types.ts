@@ -2839,6 +2839,51 @@ export type Database = {
           },
         ]
       }
+      game_sessions: {
+        Row: {
+          avatar: Json
+          biome: string
+          created_at: string
+          equilibrium: number
+          game_state: Json
+          id: string
+          is_active: boolean
+          level: number
+          session_name: string
+          turn: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar?: Json
+          biome?: string
+          created_at?: string
+          equilibrium?: number
+          game_state?: Json
+          id?: string
+          is_active?: boolean
+          level?: number
+          session_name?: string
+          turn?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar?: Json
+          biome?: string
+          created_at?: string
+          equilibrium?: number
+          game_state?: Json
+          id?: string
+          is_active?: boolean
+          level?: number
+          session_name?: string
+          turn?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       generated_reports: {
         Row: {
           assessment_id: string

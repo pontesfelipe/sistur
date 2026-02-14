@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameState } from '@/game/useGameState';
+import { useGameSessions } from '@/hooks/useGameSessions';
 import { GameWorld } from '@/game/components/GameWorld';
 import { GameHUD } from '@/game/components/GameHUD';
 import { BuildingMenu } from '@/game/components/BuildingMenu';
@@ -9,34 +10,103 @@ import { SetupScreen } from '@/game/components/SetupScreen';
 import { EventLog } from '@/game/components/EventLog';
 import { GameTutorial } from '@/game/components/GameTutorial';
 import { MobileGameDrawer } from '@/game/components/MobileGameDrawer';
+import { SessionPicker } from '@/game/components/SessionPicker';
 import type { AvatarConfig, BiomeType } from '@/game/types';
-import { ArrowLeft, BarChart3, Hammer, HelpCircle } from 'lucide-react';
+import { BIOME_INFO } from '@/game/types';
+import { ArrowLeft, BarChart3, Hammer, HelpCircle, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
+
+type GamePhase = 'picker' | 'setup' | 'playing';
 
 export default function Game() {
   const navigate = useNavigate();
   const game = useGameState();
+  const sessions = useGameSessions();
   const isMobile = useIsMobile();
+
+  const [phase, setPhase] = useState<GamePhase>('picker');
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [selectedBuilding, setSelectedBuilding] = useState<string | null>(null);
   const [lastFeedback, setLastFeedback] = useState<string | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<'stats' | 'build' | null>(null);
 
-  const handleStart = useCallback((avatar: AvatarConfig, biome: BiomeType) => {
+  // Auto-save every 5 turns
+  const lastSavedTurn = useRef(0);
+  useEffect(() => {
+    if (activeSessionId && game.state.isSetup && game.state.turn > 0 && game.state.turn % 5 === 0 && game.state.turn !== lastSavedTurn.current) {
+      lastSavedTurn.current = game.state.turn;
+      sessions.saveSession(activeSessionId, game.state);
+    }
+  }, [game.state.turn, activeSessionId, game.state.isSetup]);
+
+  const handleNewGame = useCallback(() => {
+    game.resetState();
+    setActiveSessionId(null);
+    setPhase('setup');
+  }, [game]);
+
+  const handleLoadSession = useCallback(async (sessionId: string) => {
+    const loaded = await sessions.loadSession(sessionId);
+    if (loaded) {
+      game.loadState(loaded);
+      setActiveSessionId(sessionId);
+      setPhase('playing');
+      toast.success('Sessão carregada! 🎮');
+    }
+  }, [sessions, game]);
+
+  const handleDeleteSession = useCallback(async (sessionId: string) => {
+    await sessions.deleteSession(sessionId);
+  }, [sessions]);
+
+  const handleStart = useCallback(async (avatar: AvatarConfig, biome: BiomeType) => {
     game.setAvatar(avatar);
     game.setBiome(biome);
     game.startGame();
+
+    const biomeInfo = BIOME_INFO[biome];
+    const sessionName = `${biomeInfo.emoji} ${biomeInfo.name} - Aventura`;
+
+    // We need a small delay to let state update
+    setTimeout(async () => {
+      const id = await sessions.createSession(sessionName, {
+        ...game.state,
+        avatar,
+        biome,
+        isSetup: true,
+      });
+      if (id) setActiveSessionId(id);
+    }, 100);
+
+    setPhase('playing');
     if (!tutorialSeen) {
       setShowTutorial(true);
     }
-  }, [game, tutorialSeen]);
+  }, [game, sessions, tutorialSeen]);
 
   const handleTutorialComplete = useCallback(() => {
     setShowTutorial(false);
     setTutorialSeen(true);
   }, []);
+
+  const handleManualSave = useCallback(async () => {
+    if (!activeSessionId) return;
+    await sessions.saveSession(activeSessionId, game.state);
+    toast.success('Jogo salvo! 💾');
+  }, [activeSessionId, sessions, game.state]);
+
+  const handleBackToPicker = useCallback(async () => {
+    if (activeSessionId && game.state.isSetup) {
+      await sessions.saveSession(activeSessionId, game.state);
+    }
+    game.resetState();
+    setActiveSessionId(null);
+    setPhase('picker');
+    await sessions.fetchSessions();
+  }, [activeSessionId, game, sessions]);
 
   const handleTileClick = useCallback((x: number, y: number) => {
     if (selectedBuilding) {
@@ -82,24 +152,44 @@ export default function Game() {
     }
   }, [game]);
 
-  if (!game.state.isSetup) {
+  // Phase: Session picker
+  if (phase === 'picker') {
+    return (
+      <SessionPicker
+        sessions={sessions.sessions}
+        loading={sessions.loading}
+        onNewGame={handleNewGame}
+        onLoadSession={handleLoadSession}
+        onDeleteSession={handleDeleteSession}
+      />
+    );
+  }
+
+  // Phase: Setup (new game)
+  if (phase === 'setup') {
     return <SetupScreen onStart={handleStart} />;
   }
 
+  // Phase: Playing
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-100 to-emerald-50 dark:from-slate-900 dark:to-slate-800 flex flex-col">
       {/* Top bar */}
       <div className="flex items-center justify-between px-3 py-2 bg-background/80 backdrop-blur-sm border-b border-border flex-shrink-0">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground min-h-[44px] px-1">
-          <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Voltar</span>
+        <button onClick={handleBackToPicker} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground min-h-[44px] px-1">
+          <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Sessões</span>
         </button>
         <h1 className="text-base sm:text-lg font-bold">🌍 Mapa do Tesouro</h1>
-        <button onClick={() => setShowTutorial(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground">
-          <HelpCircle className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button onClick={handleManualSave} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground" title="Salvar">
+            <Save className="h-5 w-5" />
+          </button>
+          <button onClick={() => setShowTutorial(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground">
+            <HelpCircle className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
-      {/* Mobile stats bar (compact) */}
+      {/* Mobile stats bar */}
       {isMobile && (
         <div className="flex items-center gap-2 px-3 py-1.5 bg-background/90 border-b border-border text-xs overflow-x-auto flex-shrink-0">
           <span className="font-bold whitespace-nowrap">💰{game.state.coins}</span>
