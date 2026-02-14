@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameState } from '@/game/useGameState';
 import { useGameSessions } from '@/hooks/useGameSessions';
-import { GameWorld } from '@/game/components/GameWorld';
+import { GameWorld2D } from '@/game/components/GameWorld2D';
 import { GameHUD } from '@/game/components/GameHUD';
 import { BuildingMenu } from '@/game/components/BuildingMenu';
 import { EventDialog, CouncilDialog } from '@/game/components/EventDialog';
@@ -252,9 +252,9 @@ export default function Game() {
           </div>
         </div>
 
-        {/* Center - 3D World */}
+        {/* Center - 2D Isometric World */}
         <div className="flex-1 min-h-[250px] sm:min-h-[300px] lg:min-h-0">
-          <GameWorld
+          <GameWorld2D
             grid={game.state.grid}
             biome={game.state.biome}
             selectedBuilding={selectedBuilding}
