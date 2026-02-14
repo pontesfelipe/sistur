@@ -175,8 +175,8 @@ export default function Game() {
     <div className="min-h-screen bg-gradient-to-b from-sky-100 to-emerald-50 dark:from-slate-900 dark:to-slate-800 flex flex-col">
       {/* Top bar */}
       <div className="flex items-center justify-between px-3 py-2 bg-background/80 backdrop-blur-sm border-b border-border flex-shrink-0">
-        <button onClick={handleBackToPicker} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground min-h-[44px] px-1">
-          <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Sessões</span>
+        <button onClick={() => navigate('/')} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground min-h-[44px] px-1">
+          <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">SISTUR</span>
         </button>
         <h1 className="text-base sm:text-lg font-bold">🌍 Mapa do Tesouro</h1>
         <div className="flex items-center gap-1">

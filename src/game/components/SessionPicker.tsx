@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Play, Trash2, Clock, MapPin, TrendingUp } from 'lucide-react';
+import { Plus, Play, Trash2, Clock, MapPin, TrendingUp, ArrowLeft } from 'lucide-react';
 import { BIOME_INFO } from '@/game/types';
 import type { GameSessionSummary } from '@/hooks/useGameSessions';
 import { formatDistanceToNow } from 'date-fns';
@@ -18,6 +19,7 @@ interface SessionPickerProps {
 }
 
 export function SessionPicker({ sessions, loading, onNewGame, onLoadSession, onDeleteSession }: SessionPickerProps) {
+  const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = (id: string) => {
@@ -39,6 +41,15 @@ export function SessionPicker({ sessions, loading, onNewGame, onLoadSession, onD
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-100 to-emerald-50 dark:from-slate-900 dark:to-slate-800 flex flex-col items-center justify-center p-4">
       <div className="max-w-lg w-full space-y-6">
+        {/* Back to SISTUR */}
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar ao SISTUR
+        </button>
+
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold">🌍 Mapa do Tesouro</h1>
           <p className="text-sm text-muted-foreground">Escolha uma sessão ou inicie uma nova aventura!</p>
