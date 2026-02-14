@@ -9,12 +9,9 @@ interface BuildingMenuProps {
   coins: number;
   level: GameLevel;
   grid: (PlacedBuilding | null)[][];
-  onEndTurn: () => void;
-  onEvent: () => void;
-  onCouncil: () => void;
 }
 
-export function BuildingMenu({ selectedBuilding, onSelect, coins, level, grid, onEndTurn, onEvent, onCouncil }: BuildingMenuProps) {
+export function BuildingMenu({ selectedBuilding, onSelect, coins, level, grid }: BuildingMenuProps) {
   const categories = [
     { key: 'RA' as const, label: '🌳 Natureza', color: 'border-green-500' },
     { key: 'OE' as const, label: '🏗️ Conforto', color: 'border-blue-500' },
@@ -23,27 +20,6 @@ export function BuildingMenu({ selectedBuilding, onSelect, coins, level, grid, o
 
   return (
     <div className="space-y-3">
-      {/* Action buttons */}
-      <div className="flex gap-2">
-        <button
-          onClick={onEndTurn}
-          className="flex-1 px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold rounded-xl shadow-lg hover:scale-105 transition-transform"
-        >
-          ⏭️ Passar Turno
-        </button>
-        <button
-          onClick={onEvent}
-          className="px-3 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-bold rounded-xl shadow-lg hover:scale-105 transition-transform"
-        >
-          🎲
-        </button>
-        <button
-          onClick={onCouncil}
-          className="px-3 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white text-sm font-bold rounded-xl shadow-lg hover:scale-105 transition-transform"
-        >
-          🤝
-        </button>
-      </div>
 
       {/* Building categories */}
       {categories.map(cat => {
