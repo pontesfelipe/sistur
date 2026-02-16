@@ -33,15 +33,20 @@ export function generateMap(themeId: string): { map: MapCell[][]; playerStart: P
     }
   }
 
-  // Exit at bottom-right area
-  map[GRID_SIZE - 1][GRID_SIZE - 1] = { type: 'exit', revealed: false };
+  // Exit at a random position (not near start)
+  let exitRow: number, exitCol: number;
+  do {
+    exitRow = Math.floor(Math.random() * GRID_SIZE);
+    exitCol = Math.floor(Math.random() * GRID_SIZE);
+  } while ((exitRow + exitCol) < 4); // ensure exit is far from start
+  map[exitRow][exitCol] = { type: 'exit', revealed: false };
 
   // Place walls (obstacles) — 6-8
   const wallCount = 6 + Math.floor(Math.random() * 3);
   const allPositions: Position[] = [];
   for (let r = 0; r < GRID_SIZE; r++) {
     for (let c = 0; c < GRID_SIZE; c++) {
-      if ((r === 0 && c === 0) || (r === GRID_SIZE - 1 && c === GRID_SIZE - 1)) continue;
+      if ((r === 0 && c === 0) || (r === exitRow && c === exitCol)) continue;
       allPositions.push({ row: r, col: c });
     }
   }
@@ -81,10 +86,10 @@ export function generateMap(themeId: string): { map: MapCell[][]; playerStart: P
     }
   }
 
-  // Riddles — 3
-  const riddles = shuffle(RIDDLES).slice(0, 3);
+  // Riddles — 7
+  const riddles = shuffle(RIDDLES).slice(0, 7);
   let rPlaced = 0;
-  while (rPlaced < 3 && idx < shuffled.length) {
+  while (rPlaced < 7 && idx < shuffled.length) {
     const pos = shuffled[idx++];
     if (map[pos.row][pos.col].type === 'fog') {
       map[pos.row][pos.col] = { type: 'riddle', revealed: false, riddle: riddles[rPlaced] };
