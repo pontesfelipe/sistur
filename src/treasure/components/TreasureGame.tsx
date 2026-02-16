@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { generateMap, GRID } from '../mapGenerator';
+import { generateMap, floodReveal, GRID } from '../mapGenerator';
 import { MAP_THEMES, type TreasureGameState, type Position, type MapTheme } from '../types';
 import { RiddleDialog } from './RiddleDialog';
 import { TreasureTutorial } from './TreasureTutorial';
@@ -13,8 +13,10 @@ const MAX_RIDDLE_ERRORS = 4;
 
 function createGameState(theme: MapTheme): TreasureGameState {
   const { map, playerStart, totalTreasures } = generateMap(theme.id);
+  // Flood-fill from start position to reveal connected empty cells
+  const revealedMap = floodReveal(map, playerStart.row, playerStart.col);
   return {
-    map, player: playerStart, score: 0, health: 100, maxHealth: 100,
+    map: revealedMap, player: playerStart, score: 0, health: 100, maxHealth: 100,
     moves: 0, treasuresCollected: 0, totalTreasures, riddlesSolved: 0,
     riddleErrors: 0, maxRiddleErrors: MAX_RIDDLE_ERRORS,
     trapsHit: 0, isGameOver: false, isVictory: false, currentRiddle: null,
@@ -197,8 +199,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
       const cell = prev.map[row][col];
       if (cell.type === 'wall') return prev;
 
-      const newMap = prev.map.map(r => r.map(c => ({ ...c })));
-      // Minesweeper-style: only reveal the cell you step on
+      let newMap = prev.map.map(r => r.map(c => ({ ...c })));
       newMap[row][col].revealed = true;
 
       let newState = { ...prev, map: newMap, player: { row, col }, moves: prev.moves + 1 };
@@ -207,11 +208,15 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         newState.score += cell.item.points;
         newState.treasuresCollected += 1;
         newMap[row][col] = { type: 'empty', revealed: true };
+        // Flood-fill from this now-empty cell
+        newState.map = floodReveal(newMap, row, col);
         setTimeout(() => showMessage(`${cell.item!.name} coletado! +${cell.item!.points}pts`, cell.item!.emoji), 50);
       } else if (cell.type === 'trap' && cell.trap) {
         newState.health = Math.max(0, newState.health - cell.trap.damage);
         newState.trapsHit += 1;
         newMap[row][col] = { type: 'empty', revealed: true };
+        // Flood-fill from this now-empty cell
+        newState.map = floodReveal(newMap, row, col);
         setTimeout(() => showMessage(`${cell.trap!.name}! -${cell.trap!.damage} saúde`, cell.trap!.emoji), 50);
         if (newState.health <= 0) newState.isGameOver = true;
       } else if (cell.type === 'riddle' && cell.riddle) {
@@ -221,6 +226,9 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         newState.isVictory = true;
         const timeBonus = Math.floor(newState.timeRemaining / 3);
         newState.score += newState.health + timeBonus;
+      } else if (cell.type === 'empty') {
+        // Flood-fill cascade for empty cells
+        newState.map = floodReveal(newMap, row, col);
       }
 
       return newState;
@@ -230,8 +238,10 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
   const handleRiddleAnswer = useCallback((correct: boolean, reward: number) => {
     setState(prev => {
       if (!prev || !prev.riddlePosition) return prev;
-      const newMap = prev.map.map(r => r.map(c => ({ ...c })));
+      let newMap = prev.map.map(r => r.map(c => ({ ...c })));
       newMap[prev.riddlePosition.row][prev.riddlePosition.col] = { type: 'empty', revealed: true };
+      // Flood-fill from resolved riddle cell
+      newMap = floodReveal(newMap, prev.riddlePosition.row, prev.riddlePosition.col);
       const newErrors = correct ? prev.riddleErrors : prev.riddleErrors + 1;
       const isGameOver = newErrors >= prev.maxRiddleErrors;
       return {
