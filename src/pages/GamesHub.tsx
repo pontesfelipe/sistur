@@ -29,9 +29,9 @@ export default function GamesHub() {
     },
     {
       id: 'treasure',
-      title: 'Caça ao Tesouro Ecológico',
-      description: 'Explore mapas, colete tesouros sustentáveis, evite armadilhas de poluição e resolva enigmas ambientais!',
-      emoji: '🗺️',
+      title: 'Memória Ecológica',
+      description: 'Jogo da memória ambiental! Associe imagens a descrições sobre fauna, flora e sustentabilidade dos biomas brasileiros.',
+      emoji: '🧠',
       icon: Map,
       gradient: 'from-amber-900 via-orange-800 to-yellow-900',
       href: '/game/treasure',
