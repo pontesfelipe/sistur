@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
-import type { GameState, GameBars, GameLevel, BiomeType, AvatarConfig, ProfileScores, EduMetrics, AvatarPreset } from './types';
+import type { GameBars, GameLevel, BiomeType, AvatarConfig, ProfileScores, EduMetrics, AvatarPreset } from './types';
 import { LEVEL_XP, BIOME_MODIFIERS, UNLOCKABLE_SKINS } from './types';
-import { EVENTS, COUNCIL_DECISIONS, DISASTERS, BIOME_EVENTS, BUILDINGS } from './constants';
+import { EVENTS, COUNCIL_DECISIONS, DISASTERS, BIOME_EVENTS } from './constants';
 import type { GameCard, DeckState } from './cardTypes';
+import type { ThreatCard } from './threatCards';
 import { createStartingDeck, getRewardPool, pickRandomCards, shuffle } from './cardTypes';
+import { generateThreats } from './threatCards';
 
 const INITIAL_PROFILE: ProfileScores = { explorador: 0, construtor: 0, guardiao: 0, cientista: 0 };
 const INITIAL_EDU_METRICS: EduMetrics = {
@@ -21,7 +23,6 @@ const DEFAULT_AVATAR: AvatarConfig = {
 };
 
 export interface CardGameState {
-  // Core game state (same as before)
   bars: GameBars;
   coins: number;
   level: GameLevel;
@@ -40,29 +41,33 @@ export interface CardGameState {
   profileScores: ProfileScores;
   eduMetrics: EduMetrics;
   unlockedSkins: string[];
-  // Card-specific
+  // Card deck
   deck: DeckState;
   cardsPlayedThisTurn: number;
   maxPlaysPerTurn: number;
-  /** Pending event card the player must resolve */
+  // TCG board state
+  boardRA: GameCard[];
+  boardOE: GameCard[];
+  boardAO: GameCard[];
+  activeThreats: ThreatCard[];
+  /** Pending event/council dialogs */
   currentEvent: any | null;
   currentCouncil: any | null;
-  /** Cards offered as rewards after events */
   rewardCards: GameCard[] | null;
-  /** Played cards history for display */
   playedThisTurn: GameCard[];
-  /** Total cards played across all turns */
   totalCardsPlayed: number;
+  /** Cumulative score for victory */
+  totalScore: number;
+  victoryTarget: number;
 }
 
 const GRID_SIZE = 6;
 const createEmptyGrid = () => Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(null));
+const VICTORY_SCORE = 500;
 
 function createInitialCardState(biome: BiomeType = 'floresta'): CardGameState {
   const mod = BIOME_MODIFIERS[biome];
   const startingDeck = shuffle(createStartingDeck(biome));
-
-  // Draw initial hand of 5
   const hand = startingDeck.slice(0, 5);
   const drawPile = startingDeck.slice(5);
 
@@ -85,21 +90,20 @@ function createInitialCardState(biome: BiomeType = 'floresta'): CardGameState {
     profileScores: { ...INITIAL_PROFILE },
     eduMetrics: { ...INITIAL_EDU_METRICS },
     unlockedSkins: [],
-    deck: {
-      drawPile,
-      hand,
-      discardPile: [],
-      exhaustPile: [],
-      drawCount: 5,
-      maxHand: 7,
-    },
+    deck: { drawPile, hand, discardPile: [], exhaustPile: [], drawCount: 5, maxHand: 7 },
     cardsPlayedThisTurn: 0,
     maxPlaysPerTurn: 3,
-    playedThisTurn: [],
+    boardRA: [],
+    boardOE: [],
+    boardAO: [],
+    activeThreats: [],
     currentEvent: null,
     currentCouncil: null,
     rewardCards: null,
+    playedThisTurn: [],
     totalCardsPlayed: 0,
+    totalScore: 0,
+    victoryTarget: VICTORY_SCORE,
   };
 }
 
@@ -118,14 +122,13 @@ export function useCardGame() {
       if (!card) return prev;
       if (card.cost > prev.coins) return prev;
 
-      // Apply effects
+      // Apply effects to bars
       const newBars: GameBars = {
         ra: clamp(prev.bars.ra + card.effects.ra),
         oe: clamp(prev.bars.oe + card.effects.oe),
         ao: clamp(prev.bars.ao + card.effects.ao),
       };
 
-      // Pollution penalty
       if (newBars.oe > newBars.ra + 30) {
         newBars.ra = clamp(newBars.ra - 3);
       }
@@ -140,11 +143,10 @@ export function useCardGame() {
         if (newXp >= LEVEL_XP[l]) { newLevel = l; break; }
       }
 
-      // Move card from hand
+      // Remove from hand
       const newHand = [...prev.deck.hand];
       newHand.splice(cardIndex, 1);
 
-      // Put in discard or exhaust
       const newDiscard = [...prev.deck.discardPile];
       const newExhaust = [...prev.deck.exhaustPile];
       if (card.exhaust) {
@@ -152,6 +154,17 @@ export function useCardGame() {
       } else {
         newDiscard.push(card);
       }
+
+      // Place card on the board row
+      const boardRA = [...prev.boardRA];
+      const boardOE = [...prev.boardOE];
+      const boardAO = [...prev.boardAO];
+      if (card.category === 'RA') boardRA.push(card);
+      else if (card.category === 'OE') boardOE.push(card);
+      else boardAO.push(card);
+
+      // Score: sum of positive effects from this card
+      const cardScore = Math.max(0, card.effects.ra) + Math.max(0, card.effects.oe) + Math.max(0, card.effects.ao);
 
       // Profile scoring
       const profileDelta: Partial<ProfileScores> = {};
@@ -169,7 +182,6 @@ export function useCardGame() {
         cientista: prev.profileScores.cientista + (profileDelta.cientista || 0),
       };
 
-      // Edu metrics
       const newEduMetrics = { ...prev.eduMetrics, totalBuildings: prev.eduMetrics.totalBuildings + (card.type === 'build' ? 1 : 0) };
       if (card.category === 'RA') newEduMetrics.proNatureDecisions++;
       if (card.category === 'OE') newEduMetrics.proInfraDecisions++;
@@ -188,7 +200,9 @@ export function useCardGame() {
         cardsPlayedThisTurn: prev.cardsPlayedThisTurn + 1,
         playedThisTurn: [...prev.playedThisTurn, card],
         totalCardsPlayed: prev.totalCardsPlayed + 1,
-        eventLog: [...prev.eventLog, `🃏 Jogou: ${card.emoji} ${card.name}`],
+        totalScore: prev.totalScore + cardScore,
+        boardRA, boardOE, boardAO,
+        eventLog: [...prev.eventLog, `🃏 Jogou: ${card.emoji} ${card.name} (+${cardScore} pts)`],
         profileScores: newProfileScores,
         eduMetrics: newEduMetrics,
       };
@@ -206,7 +220,7 @@ export function useCardGame() {
 
       return {
         ...prev,
-        coins: prev.coins + 1, // small coin reward for discarding
+        coins: prev.coins + 1,
         deck: { ...prev.deck, hand: newHand, discardPile: newDiscard },
         eventLog: [...prev.eventLog, `🗑️ Descartou: ${card.emoji} ${card.name} (+1💰)`],
       };
@@ -220,24 +234,41 @@ export function useCardGame() {
       const newTurn = prev.turn + 1;
       const logs = [...prev.eventLog];
 
-      // Decay
-      const decay: GameBars = {
-        ra: clamp(prev.bars.ra - 1),
-        oe: clamp(prev.bars.oe - 0.5),
-        ao: clamp(prev.bars.ao - 0.5),
-      };
+      // 1. Generate threats (opponent's turn)
+      const newThreats = generateThreats(prev.biome, newTurn, prev.bars);
+      const allThreats = [...prev.activeThreats, ...newThreats];
+      
+      // Log threats
+      for (const t of newThreats) {
+        logs.push(`⚔️ Ameaça: ${t.emoji} ${t.name} (poder ${t.power})`);
+      }
+
+      // 2. Apply threat damage
+      const decay: GameBars = { ...prev.bars };
+      let threatDamage = 0;
+      for (const t of allThreats) {
+        decay.ra = clamp(decay.ra + t.effects.ra);
+        decay.oe = clamp(decay.oe + t.effects.oe);
+        decay.ao = clamp(decay.ao + t.effects.ao);
+        threatDamage += t.power;
+      }
+
+      // 3. Natural decay
+      decay.ra = clamp(decay.ra - 1);
+      decay.oe = clamp(decay.oe - 0.5);
+      decay.ao = clamp(decay.ao - 0.5);
 
       if (decay.oe > decay.ra + 30) {
         decay.ra = clamp(decay.ra - 3);
         logs.push('🏭 Poluição! Natureza diminuindo!');
       }
 
-      // Income from visitors
-      const income = Math.round(prev.visitors / 10) + 3; // base income of 3
+      // 4. Income
+      const income = Math.round(prev.visitors / 10) + 3;
       const newCoins = Math.max(0, prev.coins + income);
       logs.push(`💰 Renda: +${income} moedas`);
 
-      // Check disasters
+      // 5. Disasters check
       let disasterCount = prev.disasterCount;
       for (const disaster of DISASTERS) {
         if (decay[disaster.trigger.bar] <= disaster.trigger.threshold) {
@@ -250,11 +281,10 @@ export function useCardGame() {
         }
       }
 
-      // Draw new hand
+      // 6. Draw new hand
       let drawPile = [...prev.deck.drawPile];
       let discardPile = [...prev.deck.discardPile];
 
-      // Reshuffle discard into draw if needed
       if (drawPile.length < prev.deck.drawCount) {
         drawPile = shuffle([...drawPile, ...discardPile]);
         discardPile = [];
@@ -263,7 +293,7 @@ export function useCardGame() {
 
       const newHand = drawPile.splice(0, prev.deck.drawCount);
 
-      // Game over checks
+      // 7. Game over checks
       const equilibrium = decay.ra * 0.4 + decay.oe * 0.3 + decay.ao * 0.3;
       let isGameOver = false;
       let gameOverReason: string | null = null;
@@ -276,22 +306,24 @@ export function useCardGame() {
         gameOverReason = '🔥 Muitas catástrofes! A cidade não se recuperou.';
       }
 
-      // Victory check
+      // 8. Victory check
+      const visitors = Math.max(0, Math.round(equilibrium * 1.5));
       let isVictory = false;
       let victoryReason: string | null = null;
-      const visitors = Math.max(0, Math.round(equilibrium * 1.5));
-      if (!isGameOver && prev.level >= 5 && equilibrium >= 70 && decay.ra >= 50 && decay.oe >= 50 && decay.ao >= 50 && visitors >= 200) {
+      const newScore = prev.totalScore - Math.round(threatDamage * 0.5); // Threats reduce score
+
+      if (!isGameOver && newScore >= VICTORY_SCORE && equilibrium >= 60) {
         isVictory = true;
-        victoryReason = '🏆 Sua cidade alcançou a excelência!';
+        victoryReason = '🏆 Você alcançou a pontuação máxima com equilíbrio! Parabéns!';
         logs.push(`🎉 VITÓRIA: ${victoryReason}`);
       }
 
-      // Edu metrics
+      // 9. Edu metrics
       const newEduMetrics = { ...prev.eduMetrics };
       if (equilibrium >= 60) newEduMetrics.turnsInGreen++;
       if (equilibrium < 30) newEduMetrics.turnsInRed++;
 
-      // Skin unlocks
+      // 10. Skin unlocks
       const tempState = { ...prev, bars: decay, disasterCount, eduMetrics: newEduMetrics, isGameOver } as any;
       const newUnlocked = [...prev.unlockedSkins];
       for (const skin of UNLOCKABLE_SKINS) {
@@ -301,12 +333,10 @@ export function useCardGame() {
         }
       }
 
-      // Auto-trigger event every 2-3 turns
+      // 11. Auto-trigger event occasionally
       let currentEvent = null;
       let currentCouncil = null;
-      const shouldTrigger = newTurn % 2 === 0 || newTurn % 3 === 0;
-
-      if (shouldTrigger && !isGameOver && !isVictory) {
+      if (newTurn % 3 === 0 && !isGameOver && !isVictory) {
         if (Math.random() > 0.4) {
           const biomeEvts = BIOME_EVENTS[prev.biome] || [];
           const allEvents = [...EVENTS, ...biomeEvts];
@@ -318,6 +348,9 @@ export function useCardGame() {
           currentCouncil = COUNCIL_DECISIONS[Math.floor(Math.random() * COUNCIL_DECISIONS.length)];
         }
       }
+
+      // Keep only recent threats (max 5 on field, oldest fall off)
+      const keptThreats = allThreats.slice(-5);
 
       return {
         ...prev,
@@ -336,9 +369,11 @@ export function useCardGame() {
         deck: { ...prev.deck, drawPile, hand: newHand, discardPile },
         cardsPlayedThisTurn: 0,
         playedThisTurn: [],
+        activeThreats: keptThreats,
         currentEvent,
         currentCouncil,
         rewardCards: null,
+        totalScore: Math.max(0, newScore),
       };
     });
   }, []);
@@ -371,7 +406,9 @@ export function useCardGame() {
       if (choice.type === 'risky') newEduMetrics.riskyChoices++;
       if (choice.type === 'quick') newEduMetrics.quickChoices++;
 
-      // Offer reward cards after events
+      // Remove one threat when resolving an event (reward)
+      const activeThreats = prev.activeThreats.length > 0 ? prev.activeThreats.slice(1) : [];
+
       const rewardPool = getRewardPool(prev.biome, prev.level);
       const rewardCards = pickRandomCards(rewardPool, 3);
 
@@ -382,6 +419,7 @@ export function useCardGame() {
         currentEvent: null,
         eventLog: [...prev.eventLog, `${prev.currentEvent.emoji} ${choice.message}`],
         eduMetrics: newEduMetrics,
+        activeThreats,
         rewardCards,
       };
     });
@@ -399,6 +437,8 @@ export function useCardGame() {
         ao: clamp(prev.bars.ao + option.effects.ao),
       };
 
+      const activeThreats = prev.activeThreats.length > 0 ? prev.activeThreats.slice(1) : [];
+
       const rewardPool = getRewardPool(prev.biome, prev.level);
       const rewardCards = pickRandomCards(rewardPool, 3);
 
@@ -407,6 +447,7 @@ export function useCardGame() {
         bars: newBars,
         currentCouncil: null,
         eventLog: [...prev.eventLog, `🤝 ${option.feedback}`],
+        activeThreats,
         rewardCards,
       };
     });
@@ -418,9 +459,7 @@ export function useCardGame() {
       const card = prev.rewardCards[cardIndex];
       if (!card) return { ...prev, rewardCards: null };
 
-      // Add to discard (will be drawn next reshuffle)
       const newDiscard = [...prev.deck.discardPile, card];
-
       return {
         ...prev,
         deck: { ...prev.deck, discardPile: newDiscard },
@@ -481,8 +520,8 @@ export function useCardGame() {
     return { preset: adjusted[0][0], scores: { ...s, cientista: s.cientista + bonus } };
   };
 
-  // Convert to legacy-compatible GameState for session saving
-  const toLegacyState = (): Partial<GameState> => ({
+  // Legacy compat
+  const toLegacyState = () => ({
     bars: state.bars,
     coins: state.coins,
     level: state.level,
@@ -508,7 +547,6 @@ export function useCardGame() {
 
   return {
     state,
-    setState,
     playCard,
     discardCard,
     endTurn,
