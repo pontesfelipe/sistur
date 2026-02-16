@@ -49,7 +49,9 @@ const OnDemandRequests = lazy(() => import("./pages/OnDemandRequests"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
 const Projetos = lazy(() => import("./pages/Projetos"));
 const Forum = lazy(() => import("./pages/Forum"));
+const GamesHub = lazy(() => import("./pages/GamesHub"));
 const Game = lazy(() => import("./pages/Game"));
+const RPGGame = lazy(() => import("./pages/RPGGame"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -334,7 +336,23 @@ const App = () => {
                   path="/game"
                   element={
                     <ProtectedRoute redirectStudentsToEdu={false}>
+                      <GamesHub />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/game/tcg"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
                       <Game />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/game/rpg"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
+                      <RPGGame />
                     </ProtectedRoute>
                   }
                 />
