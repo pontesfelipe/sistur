@@ -133,8 +133,13 @@ export default function Game() {
     const event = game.state.currentEvent;
     if (event) {
       const choice = event.choices[index];
+      const category = choice.type === 'smart' ? 'RA' : choice.type === 'quick' ? 'OE' : 'AO';
       setLastFeedback(choice.message);
       game.resolveEvent(index);
+      setScreenFlash(true);
+      setPlayEffect(category as 'RA' | 'OE' | 'AO');
+      setTimeout(() => setScreenFlash(false), 400);
+      setTimeout(() => setPlayEffect(null), 600);
       setTimeout(() => setLastFeedback(null), 3000);
     }
   }, [game]);
@@ -145,6 +150,10 @@ export default function Game() {
       const option = decision.options[index];
       setLastFeedback(option.feedback);
       game.resolveCouncil(index);
+      setScreenFlash(true);
+      setPlayEffect('AO');
+      setTimeout(() => setScreenFlash(false), 400);
+      setTimeout(() => setPlayEffect(null), 600);
       setTimeout(() => setLastFeedback(null), 3000);
     }
   }, [game]);
