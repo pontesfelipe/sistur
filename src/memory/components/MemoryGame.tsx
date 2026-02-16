@@ -7,9 +7,9 @@ import { generateMemoryCards, getGridColumns } from '../cardGenerator';
 import { MEMORY_THEMES, type MemoryGameState, type MemoryTheme } from '../types';
 import { MemoryTutorial } from './MemoryTutorial';
 
-const MAX_TIME = 240;
-const MAX_ERRORS = 8;
-const PAIR_COUNT = 12;
+const MAX_TIME = 180;
+const MAX_ERRORS = 6;
+const PAIR_COUNT = 8;
 
 function createGameState(theme: MemoryTheme): MemoryGameState {
   const cards = generateMemoryCards(theme.id, PAIR_COUNT);
