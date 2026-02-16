@@ -170,6 +170,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
   const handleCardClick = useCallback((index: number) => {
     setState(prev => {
       if (!prev || prev.isGameOver || prev.isVictory || prev.isChecking) return prev;
+      if (prev.errors >= prev.maxErrors) return { ...prev, isGameOver: true };
       const card = prev.cards[index];
       if (!card || card.flipped || card.matched) return prev;
       if (prev.flippedIndices.length >= 2) return prev;
