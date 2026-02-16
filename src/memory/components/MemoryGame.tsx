@@ -9,6 +9,7 @@ import { MemoryTutorial } from './MemoryTutorial';
 import { fireVictoryConfetti, fireMatchBurst, fireDefeatEffect } from '@/game/vfx/confetti';
 import { LottieOverlay } from '@/game/vfx/LottieOverlay';
 import { ScreenFlash } from '@/game/vfx/ScreenFlash';
+import { getEmojiSprite } from '@/game/spriteMap';
 
 // AI-generated biome images
 import florestaImg from '@/assets/biomes/floresta.jpg';
@@ -417,7 +418,11 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
                   >
                     {card.side === 'image' ? (
                       <>
-                        <span className="text-3xl sm:text-4xl drop-shadow-lg">{card.data.emoji}</span>
+                        {getEmojiSprite(card.data.emoji) ? (
+                          <img src={getEmojiSprite(card.data.emoji)!} alt={card.data.name} className="w-12 h-12 sm:w-14 sm:h-14 object-contain rounded-lg drop-shadow-lg" />
+                        ) : (
+                          <span className="text-3xl sm:text-4xl drop-shadow-lg">{card.data.emoji}</span>
+                        )}
                         <p className="text-[10px] sm:text-xs font-bold text-center leading-tight mt-1 text-white/90">{card.data.name}</p>
                         <span className={cn('text-[8px] px-1.5 py-0.5 rounded-full border mt-0.5', catColor)}>
                           {card.data.category}

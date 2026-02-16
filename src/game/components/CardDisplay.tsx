@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import type { GameCard } from '../cardTypes';
 import { RARITY_COLORS, CATEGORY_COLORS, TYPE_LABELS } from '../cardTypes';
+import { getCardSprite } from '../spriteMap';
 
 interface CardDisplayProps {
   card: GameCard;
@@ -17,6 +18,7 @@ export function CardDisplay({ card, onClick, onDiscard, disabled, tooExpensive, 
   const rarity = RARITY_COLORS[card.rarity];
   const cat = CATEGORY_COLORS[card.category];
   const typeInfo = TYPE_LABELS[card.type];
+  const sprite = getCardSprite(card.id);
 
   return (
     <div
@@ -41,8 +43,19 @@ export function CardDisplay({ card, onClick, onDiscard, disabled, tooExpensive, 
 
       {/* Card body */}
       <div className={cn('flex-1 flex flex-col items-center justify-between p-2', rarity.bg)}>
-        {/* Emoji icon */}
-        <div className={cn(small ? 'text-2xl' : 'text-3xl sm:text-4xl', 'my-1')}>{card.emoji}</div>
+        {/* Sprite or emoji icon */}
+        {sprite ? (
+          <img
+            src={sprite}
+            alt={card.name}
+            className={cn(
+              'object-contain rounded-lg drop-shadow-lg',
+              small ? 'w-12 h-12 my-0.5' : 'w-16 h-16 sm:w-20 sm:h-20 my-1',
+            )}
+          />
+        ) : (
+          <div className={cn(small ? 'text-2xl' : 'text-3xl sm:text-4xl', 'my-1')}>{card.emoji}</div>
+        )}
 
         {/* Name */}
         <div className={cn('font-bold text-center leading-tight', small ? 'text-[10px]' : 'text-xs')}>
