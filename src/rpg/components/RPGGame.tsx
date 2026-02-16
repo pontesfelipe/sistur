@@ -142,27 +142,48 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
           onChoice={handleChoice}
           biomeName={biomeInfo.name}
           biomeGradient={biomeInfo.gradient}
+          biomeId={state.biome}
         />
 
-        {/* History breadcrumb */}
+        {/* Narrative History — always visible below */}
         {state.history.length > 0 && (
-          <div className="mt-8 pt-4 border-t border-border/50">
-            <p className="text-xs text-muted-foreground mb-2">📖 Sua jornada:</p>
-            <div className="flex flex-wrap gap-1.5">
+          <div className="mt-8 space-y-4">
+            <p className="text-sm font-bold text-muted-foreground flex items-center gap-2">
+              📜 Diário da Jornada
+            </p>
+            <div className="space-y-3">
               {state.history.map((sceneId, i) => {
                 const histScene = story.scenes.find(s => s.id === sceneId);
+                if (!histScene) return null;
                 return (
-                  <span
+                  <motion.div
                     key={i}
-                    className="text-xs bg-muted/50 px-2 py-1 rounded-full text-muted-foreground"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="bg-muted/30 border border-border/50 rounded-xl p-4 relative overflow-hidden"
                   >
-                    {histScene?.emoji} {histScene?.title}
-                  </span>
+                    <div className="absolute top-0 left-0 w-1 h-full bg-primary/30 rounded-l-xl" />
+                    <div className="pl-3">
+                      <p className="text-xs font-bold text-primary/70 uppercase tracking-wider mb-1">
+                        Capítulo {histScene.chapter} — {histScene.emoji} {histScene.title}
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {histScene.narrative}
+                      </p>
+                    </div>
+                  </motion.div>
                 );
               })}
-              <span className="text-xs bg-primary/20 px-2 py-1 rounded-full text-primary font-medium">
-                {currentScene.emoji} {currentScene.title}
+            </div>
+
+            {/* Current scene indicator */}
+            <div className="flex items-center gap-2 pt-2">
+              <div className="h-px flex-1 bg-border/50" />
+              <span className="text-xs bg-primary/20 px-3 py-1 rounded-full text-primary font-medium">
+                {currentScene.emoji} Agora: {currentScene.title}
               </span>
+              <div className="h-px flex-1 bg-border/50" />
             </div>
           </div>
         )}

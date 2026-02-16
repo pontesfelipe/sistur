@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { StoryScene as StorySceneType, StoryChoice, BiomeStats } from '../types';
-import { Button } from '@/components/ui/button';
+import type { StoryScene as StorySceneType, StoryChoice } from '../types';
+import { StoryIllustration } from './StoryIllustration';
+import type { BiomeId } from '../types';
 
 interface StorySceneProps {
   scene: StorySceneType;
@@ -9,6 +10,7 @@ interface StorySceneProps {
   onChoice: (choice: StoryChoice) => void;
   biomeName: string;
   biomeGradient: string;
+  biomeId: BiomeId;
 }
 
 const choiceIcons = ['🅰️', '🅱️', '🅲'] as const;
@@ -46,7 +48,7 @@ const choiceTypeConfig = {
   },
 };
 
-export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient }: StorySceneProps) {
+export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient, biomeId }: StorySceneProps) {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
@@ -73,8 +75,11 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient 
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -60 }}
         transition={{ duration: 0.5 }}
-        className="space-y-6"
+        className="space-y-5"
       >
+        {/* Animated Illustration */}
+        <StoryIllustration sceneId={scene.id} biomeId={biomeId} biomeGradient={biomeGradient} />
+
         {/* Chapter & Title */}
         <div>
           <motion.span
@@ -100,17 +105,16 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient 
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className={`relative rounded-2xl p-6 bg-gradient-to-br ${biomeGradient} text-white overflow-hidden`}
+          className="relative rounded-2xl p-6 bg-card border border-border overflow-hidden"
         >
-          <div className="absolute inset-0 bg-black/40" />
           {/* Ambient shimmer */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent"
             initial={{ x: '-100%' }}
             animate={{ x: '200%' }}
             transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: 'linear' }}
           />
-          <p className="relative z-10 text-base md:text-lg leading-relaxed font-medium">
+          <p className="relative z-10 text-base md:text-lg leading-relaxed font-medium text-foreground">
             {scene.narrative}
           </p>
         </motion.div>
@@ -125,30 +129,18 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient 
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               className="relative bg-primary/10 border border-primary/30 rounded-xl p-5 text-center overflow-hidden"
             >
-              {/* Ripple effect */}
               <motion.div
                 className="absolute inset-0 rounded-xl bg-primary/5"
                 initial={{ scale: 0, opacity: 0.8 }}
                 animate={{ scale: 2.5, opacity: 0 }}
                 transition={{ duration: 1.2, ease: 'easeOut' }}
               />
-              {/* Floating particles */}
               {[...Array(6)].map((_, i) => (
                 <motion.div
                   key={i}
                   className={`absolute w-1.5 h-1.5 rounded-full ${choiceTypeConfig[scene.choices[selectedIdx]?.type || 'neutro'].particleColor}`}
-                  initial={{
-                    x: '50%',
-                    y: '50%',
-                    opacity: 1,
-                    scale: 0,
-                  }}
-                  animate={{
-                    x: `${20 + Math.random() * 60}%`,
-                    y: `${Math.random() * 100}%`,
-                    opacity: 0,
-                    scale: 1.5,
-                  }}
+                  initial={{ x: '50%', y: '50%', opacity: 1, scale: 0 }}
+                  animate={{ x: `${20 + Math.random() * 60}%`, y: `${Math.random() * 100}%`, opacity: 0, scale: 1.5 }}
                   transition={{ duration: 1.5, delay: i * 0.1, ease: 'easeOut' }}
                 />
               ))}
@@ -194,18 +186,11 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient 
                   key={idx}
                   initial={{ opacity: 0, x: -30, rotateY: -15 }}
                   animate={{
-                    opacity: 1,
-                    x: 0,
-                    rotateY: 0,
+                    opacity: 1, x: 0, rotateY: 0,
                     scale: isSelected ? 1.03 : 1,
                     boxShadow: isSelected ? cfg.glow : isHovered ? cfg.glow.replace('0.3', '0.15') : 'none',
                   }}
-                  transition={{
-                    delay: 0.4 + idx * 0.12,
-                    type: 'spring',
-                    stiffness: 200,
-                    damping: 18,
-                  }}
+                  transition={{ delay: 0.4 + idx * 0.12, type: 'spring', stiffness: 200, damping: 18 }}
                   whileHover={!isDisabled ? { scale: 1.02, x: 6 } : {}}
                   whileTap={!isDisabled ? { scale: 0.97 } : {}}
                   disabled={isDisabled}
@@ -218,7 +203,6 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient 
                       : `bg-card/50 ${cfg.border} ${cfg.hoverBorder} ${cfg.hoverBg}`
                   } disabled:opacity-60`}
                 >
-                  {/* Selection pulse ring */}
                   {isSelected && (
                     <motion.div
                       className="absolute inset-0 rounded-xl border-2 border-current opacity-30"
@@ -227,7 +211,6 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient 
                       transition={{ duration: 0.8, repeat: 2 }}
                     />
                   )}
-                  {/* Hover shine sweep */}
                   {isHovered && !isDisabled && (
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
@@ -253,7 +236,6 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient 
                         {cfg.label}
                       </motion.span>
                     </div>
-                    {/* Arrow indicator on hover */}
                     <motion.span
                       className="text-muted-foreground/50 self-center"
                       initial={{ opacity: 0, x: -5 }}
@@ -283,18 +265,12 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient 
                 : 'border-yellow-500/50 bg-yellow-500/10'
             }`}
           >
-            {/* Celebration particles for restored ending */}
             {scene.endingType === 'restaurado' && [...Array(8)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute w-2 h-2 rounded-full bg-green-400/60"
                 initial={{ x: '50%', y: '80%', scale: 0 }}
-                animate={{
-                  x: `${10 + Math.random() * 80}%`,
-                  y: `${Math.random() * 60}%`,
-                  scale: [0, 1.5, 0],
-                  opacity: [0, 1, 0],
-                }}
+                animate={{ x: `${10 + Math.random() * 80}%`, y: `${Math.random() * 60}%`, scale: [0, 1.5, 0], opacity: [0, 1, 0] }}
                 transition={{ duration: 2, delay: 0.5 + i * 0.15, ease: 'easeOut' }}
               />
             ))}
