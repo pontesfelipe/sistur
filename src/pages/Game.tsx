@@ -2,20 +2,20 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCardGame } from '@/game/useCardGame';
 import { useGameSessions } from '@/hooks/useGameSessions';
-import { GameHUD } from '@/game/components/GameHUD';
 import { EventDialog, CouncilDialog } from '@/game/components/EventDialog';
 import { SetupScreen } from '@/game/components/SetupScreen';
-import { EventLog } from '@/game/components/EventLog';
 import { GameTutorial } from '@/game/components/GameTutorial';
 import { MobileGameDrawer } from '@/game/components/MobileGameDrawer';
 import { SessionPicker } from '@/game/components/SessionPicker';
 import { EduReport } from '@/game/components/EduReport';
-import { CardHand } from '@/game/components/CardHand';
+import { EventLog } from '@/game/components/EventLog';
 import { DeckInfo } from '@/game/components/DeckInfo';
 import { RewardPicker } from '@/game/components/RewardPicker';
+import { BattleBoard } from '@/game/components/BattleBoard';
+import { TCGHand } from '@/game/components/TCGHand';
 import type { AvatarConfig, BiomeType } from '@/game/types';
 import { BIOME_INFO, PROFILE_INFO, VICTORY_CONDITIONS, UNLOCKABLE_SKINS } from '@/game/types';
-import { ArrowLeft, BarChart3, HelpCircle, Save, GraduationCap, ScrollText } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Save, ScrollText, GraduationCap, Swords } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -33,9 +33,8 @@ export default function Game() {
   const [lastFeedback, setLastFeedback] = useState<string | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
-  const [mobilePanel, setMobilePanel] = useState<'stats' | 'log' | 'edu' | null>(null);
+  const [mobilePanel, setMobilePanel] = useState<'log' | 'edu' | null>(null);
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
-  const [showSidebar, setShowSidebar] = useState(true);
 
   // Auto-save every 5 turns
   const lastSavedTurn = useRef(0);
@@ -55,13 +54,12 @@ export default function Game() {
   const handleLoadSession = useCallback(async (sessionId: string) => {
     const loaded = await sessions.loadSession(sessionId);
     if (loaded) {
-      // For legacy sessions, just start a new card game with the same biome
       game.resetState(loaded.biome || 'floresta');
       game.setAvatar(loaded.avatar || { preset: 'explorador', skinColor: '#FDDBB4', hairColor: '#2C1B18', shirtColor: '#3498DB' });
       game.startGame();
       setActiveSessionId(sessionId);
       setPhase('playing');
-      toast.success('Nova aventura carregada! 🎮');
+      toast.success('Aventura carregada! 🎮');
     }
   }, [sessions, game]);
 
@@ -76,7 +74,7 @@ export default function Game() {
     game.startGame();
 
     const biomeInfo = BIOME_INFO[biome];
-    const sessionName = `${biomeInfo.emoji} ${biomeInfo.name} - Aventura`;
+    const sessionName = `${biomeInfo.emoji} ${biomeInfo.name} - Batalha`;
 
     setTimeout(async () => {
       const id = await sessions.createSession(sessionName, game.toLegacyState() as any);
@@ -145,7 +143,7 @@ export default function Game() {
   const handleEndTurn = useCallback(() => {
     game.endTurn();
     setSelectedCardIndex(null);
-    toast('⏭️ Novo turno!');
+    toast('⚔️ Novo turno — ameaças surgem!', { icon: '🎴' });
   }, [game]);
 
   // Phase: Session picker
@@ -173,211 +171,139 @@ export default function Game() {
   const equilibrium = game.getEquilibrium();
   const dp = game.getDominantProfile();
 
+  const boardScores = {
+    ra: game.state.bars.ra,
+    oe: game.state.bars.oe,
+    ao: game.state.bars.ao,
+    total: game.state.totalScore,
+    target: game.state.victoryTarget,
+  };
+
   // Phase: Playing
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-100 to-emerald-50 dark:from-slate-900 dark:to-slate-800 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col text-foreground">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-3 py-2 bg-background/80 backdrop-blur-sm border-b border-border flex-shrink-0">
-        <button onClick={() => navigate('/')} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground min-h-[44px] px-1">
-          <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">SISTUR</span>
+      <div className="flex items-center justify-between px-3 py-2 bg-slate-900/90 backdrop-blur-sm border-b border-slate-700/50 flex-shrink-0">
+        <button onClick={() => navigate('/')} className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200 min-h-[44px] px-1 transition-colors">
+          <ArrowLeft className="h-4 w-4" />
         </button>
-        <h1 className="text-base sm:text-lg font-bold">🃏 Mapa do Tesouro</h1>
+        <div className="flex items-center gap-2">
+          <Swords className="h-4 w-4 text-amber-400" />
+          <h1 className="text-sm sm:text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-500">
+            MAPA DO TESOURO
+          </h1>
+        </div>
         <div className="flex items-center gap-1">
-          <button onClick={handleManualSave} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground" title="Salvar">
-            <Save className="h-5 w-5" />
+          <span className="text-xs text-slate-400 font-bold mr-1">💰{game.state.coins}</span>
+          <span className="text-xs text-slate-400">T{game.state.turn}</span>
+          <button onClick={handleManualSave} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors" title="Salvar">
+            <Save className="h-4 w-4" />
           </button>
-          <button onClick={() => setShowTutorial(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground">
-            <HelpCircle className="h-5 w-5" />
+          <button onClick={() => setShowTutorial(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors">
+            <HelpCircle className="h-4 w-4" />
           </button>
         </div>
-      </div>
-
-      {/* Stats bar */}
-      <div className="flex items-center gap-2 sm:gap-3 px-3 py-1.5 bg-background/90 border-b border-border text-xs overflow-x-auto flex-shrink-0">
-        <span className="font-bold whitespace-nowrap">💰{game.state.coins}</span>
-        <span className="whitespace-nowrap">🌳{Math.round(game.state.bars.ra)}</span>
-        <span className="whitespace-nowrap">🏗️{Math.round(game.state.bars.oe)}</span>
-        <span className="whitespace-nowrap">🤝{Math.round(game.state.bars.ao)}</span>
-        <span className={cn('whitespace-nowrap font-bold',
-          equilibrium >= 60 ? 'text-green-600' : equilibrium >= 40 ? 'text-yellow-600' : 'text-red-600'
-        )}>
-          ⚖️{Math.round(equilibrium)}%
-        </span>
-        {dp.scores.explorador + dp.scores.construtor + dp.scores.guardiao + dp.scores.cientista > 0 && (
-          <span className="whitespace-nowrap font-bold">{PROFILE_INFO[dp.preset].emoji}</span>
-        )}
-        <span className="whitespace-nowrap">👥{game.state.visitors}</span>
-        <span className="whitespace-nowrap">⭐Nv{game.state.level}</span>
-        <span className="ml-auto whitespace-nowrap text-muted-foreground">T{game.state.turn}</span>
-        <span className="whitespace-nowrap text-muted-foreground">
-          🃏{game.state.cardsPlayedThisTurn}/{game.state.maxPlaysPerTurn}
-        </span>
       </div>
 
       {/* Feedback toast */}
       {lastFeedback && (
-        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-40 bg-background rounded-xl shadow-2xl px-5 py-3 animate-in slide-in-from-top-4 duration-300 max-w-sm text-center border border-border">
-          <p className="text-sm font-medium">{lastFeedback}</p>
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-40 bg-slate-800 rounded-xl shadow-2xl px-5 py-3 animate-in slide-in-from-top-4 duration-300 max-w-sm text-center border border-amber-500/30">
+          <p className="text-sm font-medium text-slate-200">{lastFeedback}</p>
         </div>
       )}
 
-      {/* Main layout */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-0 p-2 sm:p-3 max-w-[1400px] mx-auto w-full min-h-0">
-        {/* Left sidebar (desktop) */}
-        <div className={cn(
-          'hidden lg:flex flex-shrink-0 transition-all duration-300',
-          showSidebar ? 'w-64' : 'w-8'
-        )}>
-          {showSidebar ? (
-            <div className="w-full overflow-y-auto space-y-3 pr-2">
-              <button
-                onClick={() => setShowSidebar(false)}
-                className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
-              >
-                ◀ Minimizar
-              </button>
-              <GameHUD
-                bars={game.state.bars}
-                coins={game.state.coins}
-                level={game.state.level}
-                xp={game.state.xp}
-                turn={game.state.turn}
-                visitors={game.state.visitors}
-                biome={game.state.biome}
-                alerts={game.getAlerts()}
-                equilibrium={equilibrium}
-                dominantProfile={dp.preset}
-                profileScores={game.state.profileScores}
-              />
-              <EventLog log={game.state.eventLog} />
-              <div className="bg-card/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
-                <h3 className="text-sm font-bold mb-2">📊 Relatório Educacional</h3>
-                <EduReport
-                  metrics={game.state.eduMetrics}
-                  profileScores={game.state.profileScores}
-                  dominantProfile={dp.preset}
-                  turn={game.state.turn}
-                  unlockedSkins={game.state.unlockedSkins}
-                  state={game.state as any}
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-2 pt-2">
-              <button
-                onClick={() => setShowSidebar(true)}
-                className="p-1.5 rounded-lg bg-card shadow-md hover:bg-accent transition-colors"
-                title="Expandir"
-              >
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </div>
-          )}
+      {/* Main game area */}
+      <div className="flex-1 flex flex-col gap-2 p-2 sm:p-3 max-w-[1200px] mx-auto w-full min-h-0 overflow-y-auto">
+        {/* Battle Board */}
+        <BattleBoard
+          playerBoard={{
+            RA: game.state.boardRA,
+            OE: game.state.boardOE,
+            AO: game.state.boardAO,
+          }}
+          threats={game.state.activeThreats}
+          scores={boardScores}
+          equilibrium={equilibrium}
+          turn={game.state.turn}
+        />
+
+        {/* Deck info */}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-2 border border-slate-700/50">
+          <DeckInfo deck={game.state.deck} totalPlayed={game.state.totalCardsPlayed} />
         </div>
 
-        {/* Center: Card game area */}
-        <div className="flex-1 flex flex-col min-h-0 gap-3">
-          {/* Played cards this turn */}
-          {game.state.playedThisTurn.length > 0 && (
-            <div className="bg-card/60 backdrop-blur-sm rounded-xl p-3 shadow-sm">
-              <p className="text-xs font-bold text-muted-foreground mb-2">🎯 Jogadas deste turno:</p>
-              <div className="flex flex-wrap gap-2">
-                {game.state.playedThisTurn.map((card, i) => (
-                  <div key={i} className="flex items-center gap-1 bg-accent/50 rounded-lg px-2 py-1 text-xs">
-                    <span>{card.emoji}</span>
-                    <span className="font-medium">{card.name}</span>
-                  </div>
-                ))}
-              </div>
+        {/* Player hand */}
+        <div className="bg-slate-800/30 backdrop-blur-sm rounded-xl p-3 border border-slate-700/30">
+          <TCGHand
+            hand={game.state.deck.hand}
+            coins={game.state.coins}
+            onPlay={handlePlayCard}
+            onDiscard={handleDiscardCard}
+            canPlay={canPlayCards}
+            selectedIndex={selectedCardIndex}
+            onSelect={setSelectedCardIndex}
+            cardsPlayed={game.state.cardsPlayedThisTurn}
+            maxPlays={game.state.maxPlaysPerTurn}
+          />
+        </div>
+
+        {/* End turn button */}
+        <div className="flex items-center justify-center gap-3 py-2">
+          <button
+            onClick={handleEndTurn}
+            disabled={game.state.isGameOver || game.state.isVictory || !!game.state.currentEvent || !!game.state.currentCouncil}
+            className={cn(
+              'px-8 py-3 text-sm font-black rounded-xl shadow-lg transition-all min-h-[48px]',
+              'bg-gradient-to-r from-amber-500 to-orange-500 text-white',
+              'hover:scale-105 hover:shadow-amber-500/30 hover:shadow-xl active:scale-[0.97]',
+              'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100',
+            )}
+          >
+            ⚔️ Passar Turno ({game.state.cardsPlayedThisTurn}/{game.state.maxPlaysPerTurn})
+          </button>
+          
+          {!isMobile && (
+            <div className="flex gap-1">
+              <button
+                onClick={() => setMobilePanel(mobilePanel === 'log' ? null : 'log')}
+                className="px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-slate-100 text-xs transition-colors border border-slate-700/50"
+              >
+                <ScrollText className="h-4 w-4 inline mr-1" /> Log
+              </button>
+              <button
+                onClick={() => setMobilePanel(mobilePanel === 'edu' ? null : 'edu')}
+                className="px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-slate-100 text-xs transition-colors border border-slate-700/50"
+              >
+                <GraduationCap className="h-4 w-4 inline mr-1" /> Relatório
+              </button>
             </div>
           )}
-
-          {/* Deck info bar */}
-          <div className="bg-card/60 backdrop-blur-sm rounded-xl px-4 py-2 shadow-sm">
-            <DeckInfo deck={game.state.deck} totalPlayed={game.state.totalCardsPlayed} />
-          </div>
-
-          {/* Card hand */}
-          <div className="flex-1 flex flex-col justify-center">
-            <CardHand
-              hand={game.state.deck.hand}
-              coins={game.state.coins}
-              onPlay={handlePlayCard}
-              onDiscard={handleDiscardCard}
-              canPlay={canPlayCards}
-              selectedIndex={selectedCardIndex}
-              onSelect={setSelectedCardIndex}
-            />
-          </div>
-
-          {/* End turn button */}
-          <div className="flex items-center justify-center gap-3 pb-2">
-            <button
-              onClick={handleEndTurn}
-              disabled={game.state.isGameOver || game.state.isVictory || !!game.state.currentEvent || !!game.state.currentCouncil}
-              className={cn(
-                'px-8 py-3 text-sm font-bold rounded-xl shadow-lg transition-all min-h-[48px]',
-                'bg-gradient-to-r from-amber-500 to-orange-500 text-white',
-                'hover:scale-105 active:scale-[0.97]',
-                'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100'
-              )}
-            >
-              ⏭️ Passar Turno ({game.state.cardsPlayedThisTurn}/{game.state.maxPlaysPerTurn} jogadas)
-            </button>
-          </div>
         </div>
       </div>
 
       {/* Mobile bottom nav */}
       {isMobile && (
-        <div className="flex-shrink-0 bg-background/95 backdrop-blur-lg border-t border-border px-2 py-1 safe-bottom">
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setMobilePanel(mobilePanel === 'stats' ? null : 'stats')}
-              className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-accent transition-colors min-h-[44px] justify-center"
-            >
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              <span className="text-[9px] text-muted-foreground">Status</span>
-            </button>
+        <div className="flex-shrink-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700/50 px-2 py-1 safe-bottom">
+          <div className="flex items-center justify-center gap-4">
             <button
               onClick={() => setMobilePanel(mobilePanel === 'log' ? null : 'log')}
-              className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-accent transition-colors min-h-[44px] justify-center"
+              className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg hover:bg-slate-800 transition-colors min-h-[44px] justify-center"
             >
-              <ScrollText className="h-4 w-4 text-muted-foreground" />
-              <span className="text-[9px] text-muted-foreground">Log</span>
+              <ScrollText className="h-4 w-4 text-slate-400" />
+              <span className="text-[9px] text-slate-400">Log</span>
             </button>
             <button
               onClick={() => setMobilePanel(mobilePanel === 'edu' ? null : 'edu')}
-              className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-accent transition-colors min-h-[44px] justify-center"
+              className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg hover:bg-slate-800 transition-colors min-h-[44px] justify-center"
             >
-              <GraduationCap className="h-4 w-4 text-muted-foreground" />
-              <span className="text-[9px] text-muted-foreground">Relatório</span>
+              <GraduationCap className="h-4 w-4 text-slate-400" />
+              <span className="text-[9px] text-slate-400">Relatório</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* Mobile drawers */}
-      <MobileGameDrawer
-        open={mobilePanel === 'stats'}
-        onClose={() => setMobilePanel(null)}
-        title="📊 Status do Mundo"
-      >
-        <GameHUD
-          bars={game.state.bars}
-          coins={game.state.coins}
-          level={game.state.level}
-          xp={game.state.xp}
-          turn={game.state.turn}
-          visitors={game.state.visitors}
-          biome={game.state.biome}
-          alerts={game.getAlerts()}
-          equilibrium={equilibrium}
-          dominantProfile={dp.preset}
-          profileScores={game.state.profileScores}
-        />
-      </MobileGameDrawer>
-
+      {/* Drawers */}
       <MobileGameDrawer
         open={mobilePanel === 'log'}
         onClose={() => setMobilePanel(null)}
@@ -406,24 +332,21 @@ export default function Game() {
 
       {/* Game Over Overlay */}
       {game.state.isGameOver && !game.state.isVictory && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-background rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300 border border-red-800/50">
             <div className="text-6xl">💀</div>
-            <h2 className="text-2xl font-bold text-destructive">Fim de Jogo!</h2>
-            <p className="text-sm text-muted-foreground">{game.state.gameOverReason}</p>
-            <div className="bg-muted/50 rounded-xl p-3 space-y-1 text-xs text-left">
-              <p><strong>Turnos jogados:</strong> {game.state.turn}</p>
-              <p><strong>Nível alcançado:</strong> {game.state.level}</p>
-              <p><strong>Equilíbrio final:</strong> {Math.round(equilibrium)}%</p>
+            <h2 className="text-2xl font-black text-red-400">Fim de Jogo!</h2>
+            <p className="text-sm text-slate-400">{game.state.gameOverReason}</p>
+            <div className="bg-slate-800/50 rounded-xl p-3 space-y-1 text-xs text-left text-slate-300">
+              <p><strong>Turnos:</strong> {game.state.turn}</p>
+              <p><strong>Pontuação:</strong> {game.state.totalScore}/{game.state.victoryTarget}</p>
+              <p><strong>Equilíbrio:</strong> {Math.round(equilibrium)}%</p>
               <p><strong>Cartas jogadas:</strong> {game.state.totalCardsPlayed}</p>
-              <p><strong>Desastres sofridos:</strong> {game.state.disasterCount}</p>
-              {dp.scores.explorador + dp.scores.construtor + dp.scores.guardiao + dp.scores.cientista > 0 && (
-                <p><strong>Perfil:</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
-              )}
+              <p><strong>Ameaças enfrentadas:</strong> {game.state.activeThreats.length}</p>
             </div>
             <div className="flex gap-3">
-              <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-border text-sm font-bold hover:bg-accent transition-colors">📋 Sessões</button>
-              <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors">🔄 Nova Aventura</button>
+              <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors">📋 Sessões</button>
+              <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:opacity-90 transition-opacity">🔄 Nova Batalha</button>
             </div>
           </div>
         </div>
@@ -431,30 +354,21 @@ export default function Game() {
 
       {/* Victory Overlay */}
       {game.state.isVictory && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-gradient-to-b from-amber-50 to-yellow-100 dark:from-amber-950 dark:to-yellow-950 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300 border-2 border-amber-400">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-amber-950 to-yellow-950 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300 border-2 border-amber-400">
             <div className="text-7xl animate-bounce">🏆</div>
-            <h2 className="text-2xl font-bold text-amber-700 dark:text-amber-300">Parabéns! Você Venceu!</h2>
-            <p className="text-sm text-amber-600 dark:text-amber-400">{game.state.victoryReason}</p>
-            <div className="bg-white/60 dark:bg-black/20 rounded-xl p-3 space-y-2 text-xs text-left">
-              <p className="font-bold text-center mb-2">📋 Objetivos Cumpridos</p>
-              {VICTORY_CONDITIONS.map(vc => (
-                <div key={vc.id} className="flex items-center gap-2">
-                  <span className="text-green-500">✅</span>
-                  <span>{vc.emoji} {vc.description}</span>
-                </div>
-              ))}
-              <hr className="my-2 border-amber-300" />
+            <h2 className="text-2xl font-black text-amber-300">Você Venceu!</h2>
+            <p className="text-sm text-amber-400">{game.state.victoryReason}</p>
+            <div className="bg-black/20 rounded-xl p-3 space-y-2 text-xs text-left text-amber-200">
+              <p><strong>Pontuação final:</strong> {game.state.totalScore}</p>
               <p><strong>Turnos:</strong> {game.state.turn}</p>
-              <p><strong>Cartas jogadas:</strong> {game.state.totalCardsPlayed}</p>
               <p><strong>Equilíbrio:</strong> {Math.round(equilibrium)}%</p>
-              <p><strong>Visitantes:</strong> {game.state.visitors}</p>
-              <p><strong>Skins:</strong> {game.state.unlockedSkins.length}/{UNLOCKABLE_SKINS.length}</p>
+              <p><strong>Cartas jogadas:</strong> {game.state.totalCardsPlayed}</p>
               <p><strong>Perfil:</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
             </div>
             <div className="flex gap-3">
-              <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-border text-sm font-bold hover:bg-accent transition-colors">📋 Sessões</button>
-              <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors">🌟 Nova Aventura</button>
+              <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-amber-600 text-sm font-bold text-amber-300 hover:bg-amber-900/50 transition-colors">📋 Sessões</button>
+              <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors">🌟 Nova Batalha</button>
             </div>
           </div>
         </div>
