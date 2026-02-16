@@ -5,76 +5,61 @@ interface TutorialStep {
   title: string;
   emoji: string;
   text: string;
-  highlight?: 'hud' | 'world' | 'buildings' | 'actions';
   tip?: string;
 }
 
 const TUTORIAL_STEPS: TutorialStep[] = [
   {
-    title: 'Bem-vindo ao Guardião do Território!',
-    emoji: '⚔️',
-    text: 'Você é o guardião de um território! Defenda-o de ameaças jogando cartas estratégicas e mantendo o equilíbrio entre os 3 pilares.',
-    tip: 'É um jogo de cartas estilo TCG — pense antes de jogar!',
+    title: 'Bem-vindo à Missão Bioma!',
+    emoji: '🌿',
+    text: 'Você é um agente de restauração ambiental! Sua missão é restaurar o bioma escolhido tomando as melhores decisões ao longo da jornada.',
+    tip: 'Cada bioma tem sua própria história e desafios únicos!',
   },
   {
-    title: 'Os 3 Pilares',
+    title: 'Escolha seu Bioma',
+    emoji: '🗺️',
+    text: 'Existem 5 biomas para explorar:\n🌳 Amazônia — floresta tropical\n🏖️ Litoral — ecossistema costeiro\n🌾 Cerrado — savana brasileira\n⛰️ Serra — região montanhosa\n🌵 Caatinga — semiárido nordestino',
+    tip: 'Cada bioma tem desafios e histórias completamente diferentes!',
+  },
+  {
+    title: 'As 4 Barras Vitais',
     emoji: '📊',
-    text: '🌳 RA (Recursos Ambientais) — natureza e meio ambiente\n🏗️ OE (Oferta & Estrutura) — infraestrutura e conforto\n🤝 AO (Articulação & Organização) — governança e cooperação',
-    highlight: 'hud',
-    tip: 'Se qualquer pilar cair a zero, você perde!',
+    text: '🦎 Biodiversidade — saúde dos ecossistemas\n🏭 Poluição — quanto menor, melhor!\n👥 Comunidade — bem-estar das pessoas\n💎 Recursos — materiais disponíveis',
+    tip: 'Mantenha as barras equilibradas para um final feliz!',
   },
   {
-    title: 'Suas Cartas',
-    emoji: '🃏',
-    text: 'Você recebe 5 cartas por turno e pode jogar até 3. Cada carta tem custo em moedas 💰 e fortalece um pilar do seu território.',
-    highlight: 'buildings',
-    tip: 'Descarte cartas que não precisa para ganhar +1 moeda!',
+    title: 'Tipos de Escolha',
+    emoji: '🎭',
+    text: '🌱 Sustentável — protege o bioma a longo prazo\n⚡ Arriscado — ganho rápido, mas pode prejudicar\n⚖️ Neutro — caminho seguro, sem extremos',
+    tip: 'Escolhas sustentáveis nem sempre são as mais fáceis, mas valem a pena!',
   },
   {
-    title: 'O Campo de Batalha',
-    emoji: '🏟️',
-    text: 'O tabuleiro tem 3 fileiras (RA, OE, AO) para suas cartas e uma Zona de Ameaça no topo com os perigos ativos.',
-    highlight: 'hud',
-    tip: 'Cartas jogadas ficam no campo — planeje sua formação!',
+    title: 'Finais da História',
+    emoji: '🏁',
+    text: 'Suas decisões determinam o destino do bioma:\n🌟 Restaurado — você salvou o bioma!\n💀 Degradado — o bioma não resistiu\n😐 Neutro — sobreviveu, mas poderia ser melhor',
+    tip: 'Tente alcançar o final "Restaurado" em todos os biomas! 🏆',
   },
   {
-    title: 'Ameaças & Eventos',
-    emoji: '🎲',
-    text: 'A cada turno, novas ameaças surgem! Eventos aleatórios e o Conselho Mirim testam suas decisões estratégicas.',
-    highlight: 'actions',
-    tip: 'Ameaças causam dano real aos seus pilares — não ignore!',
-  },
-  {
-    title: 'Recompensas',
-    emoji: '🎁',
-    text: 'Ao derrotar ameaças ou fazer boas escolhas, você ganha recompensas: cartas raras, moedas extras e pontos de vitória!',
-    highlight: 'actions',
-    tip: 'Cartas lendárias são poderosas — escolha com sabedoria!',
-  },
-  {
-    title: 'Vitória',
-    emoji: '🏆',
-    text: 'Alcance 300 pontos de vitória mantendo equilíbrio ≥ 50% entre os pilares. O segredo não é força bruta — é estratégia!',
-    tip: 'Boa sorte, guardião! ⚔️🌟',
+    title: 'Pronto para a missão!',
+    emoji: '🚀',
+    text: 'Leia cada capítulo com atenção, pense nas consequências e escolha com sabedoria. O futuro do bioma está nas suas mãos!',
+    tip: 'Boa sorte, agente restaurador! 🌍',
   },
 ];
 
-interface GameTutorialProps {
+interface RPGTutorialProps {
   onComplete: () => void;
 }
 
-export function GameTutorial({ onComplete }: GameTutorialProps) {
+export function RPGTutorial({ onComplete }: RPGTutorialProps) {
   const [step, setStep] = useState(0);
   const current = TUTORIAL_STEPS[step];
   const isLast = step === TUTORIAL_STEPS.length - 1;
   const isFirst = step === 0;
 
   const next = useCallback(() => {
-    if (isLast) {
-      onComplete();
-    } else {
-      setStep(s => s + 1);
-    }
+    if (isLast) onComplete();
+    else setStep(s => s + 1);
   }, [isLast, onComplete]);
 
   const prev = useCallback(() => {
@@ -91,7 +76,7 @@ export function GameTutorial({ onComplete }: GameTutorialProps) {
               key={i}
               className={cn(
                 'h-2 rounded-full transition-all duration-300',
-                i === step ? 'w-6 bg-primary' : i < step ? 'w-2 bg-primary/40' : 'w-2 bg-muted'
+                i === step ? 'w-6 bg-emerald-500' : i < step ? 'w-2 bg-emerald-500/40' : 'w-2 bg-muted'
               )}
             />
           ))}
@@ -103,8 +88,8 @@ export function GameTutorial({ onComplete }: GameTutorialProps) {
           <h2 className="text-xl font-bold text-foreground mb-2">{current.title}</h2>
           <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">{current.text}</p>
           {current.tip && (
-            <div className="mt-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-2.5">
-              <p className="text-xs font-medium text-amber-800 dark:text-amber-200">💡 {current.tip}</p>
+            <div className="mt-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl px-4 py-2.5">
+              <p className="text-xs font-medium text-emerald-800 dark:text-emerald-200">💡 {current.tip}</p>
             </div>
           )}
         </div>
@@ -125,10 +110,10 @@ export function GameTutorial({ onComplete }: GameTutorialProps) {
               'flex-1 py-3 font-bold rounded-xl text-white text-sm shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform min-h-[48px]',
               isLast
                 ? 'bg-gradient-to-r from-emerald-500 to-green-600'
-                : 'bg-gradient-to-r from-primary to-blue-600'
+                : 'bg-gradient-to-r from-emerald-500 to-teal-600'
             )}
           >
-            {isLast ? '🎮 Jogar!' : 'Próximo ➡️'}
+            {isLast ? '🌿 Começar!' : 'Próximo ➡️'}
           </button>
         </div>
 

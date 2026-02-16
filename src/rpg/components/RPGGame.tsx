@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
+import { ArrowLeft, RotateCcw, BookOpen, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BiomeSelector } from './BiomeSelector';
 import { StoryScene } from './StoryScene';
 import { RPGStatusBar } from './RPGStatusBar';
+import { RPGTutorial } from './RPGTutorial';
 import { BIOME_STORIES } from '../stories';
 import { BIOME_INFO, INITIAL_STATS, type BiomeId, type RPGState, type StoryChoice, type BiomeStats } from '../types';
 
@@ -20,6 +21,8 @@ const initialState: RPGState = {
 
 export function RPGGame({ onBack }: { onBack: () => void }) {
   const [state, setState] = useState<RPGState>(initialState);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialSeen, setTutorialSeen] = useState(false);
 
   const handleSelectBiome = useCallback((biome: BiomeId) => {
     setState({
@@ -27,7 +30,10 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
       biome,
       started: true,
     });
-  }, []);
+    if (!tutorialSeen) {
+      setShowTutorial(true);
+    }
+  }, [tutorialSeen]);
 
   const handleChoice = useCallback((choice: StoryChoice) => {
     setState(prev => {
@@ -119,6 +125,9 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
               <Button variant="outline" size="sm" onClick={handleRestart} className="gap-1.5 text-xs">
                 <RotateCcw className="h-3.5 w-3.5" /> Reiniciar
               </Button>
+              <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} className="h-8 w-8">
+                <HelpCircle className="h-4 w-4" />
+              </Button>
             </div>
           </div>
           <RPGStatusBar stats={state.stats} />
@@ -158,6 +167,9 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
+      {showTutorial && (
+        <RPGTutorial onComplete={() => { setShowTutorial(false); setTutorialSeen(true); }} />
+      )}
     </div>
   );
 }
