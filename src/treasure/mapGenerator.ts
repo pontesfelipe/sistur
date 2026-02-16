@@ -21,17 +21,7 @@ export function generateMap(themeId: string): { map: MapCell[][]; playerStart: P
   const playerStart: Position = { row: 0, col: 0 };
   map[0][0] = { type: 'empty', revealed: true };
 
-  // Reveal cells around player
-  for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-      const r = playerStart.row + dr;
-      const c = playerStart.col + dc;
-      if (r >= 0 && r < GRID_SIZE && c >= 0 && c < GRID_SIZE) {
-        map[r][c].revealed = true;
-        if (map[r][c].type === 'fog') map[r][c].type = 'empty';
-      }
-    }
-  }
+  // Only reveal the starting cell (minesweeper-style)
 
   // Exit at a random position (not near start)
   let exitRow: number, exitCol: number;
@@ -86,10 +76,10 @@ export function generateMap(themeId: string): { map: MapCell[][]; playerStart: P
     }
   }
 
-  // Riddles — 7
-  const riddles = shuffle(RIDDLES).slice(0, 7);
+  // Riddles — 14
+  const riddles = shuffle(RIDDLES).slice(0, 14);
   let rPlaced = 0;
-  while (rPlaced < 7 && idx < shuffled.length) {
+  while (rPlaced < 14 && idx < shuffled.length) {
     const pos = shuffled[idx++];
     if (map[pos.row][pos.col].type === 'fog') {
       map[pos.row][pos.col] = { type: 'riddle', revealed: false, riddle: riddles[rPlaced] };

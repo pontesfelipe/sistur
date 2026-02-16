@@ -198,14 +198,8 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
       if (cell.type === 'wall') return prev;
 
       const newMap = prev.map.map(r => r.map(c => ({ ...c })));
-      for (let rr = -1; rr <= 1; rr++) {
-        for (let cc = -1; cc <= 1; cc++) {
-          const nr = row + rr, nc = col + cc;
-          if (nr >= 0 && nr < GRID && nc >= 0 && nc < GRID) {
-            newMap[nr][nc].revealed = true;
-          }
-        }
-      }
+      // Minesweeper-style: only reveal the cell you step on
+      newMap[row][col].revealed = true;
 
       let newState = { ...prev, map: newMap, player: { row, col }, moves: prev.moves + 1 };
 
