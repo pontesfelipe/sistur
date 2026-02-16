@@ -119,27 +119,32 @@ function FloatingParticles({ emojis, color }: { emojis: string[]; color: string 
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
       <div className="absolute top-1/4 left-1/4 w-40 h-40 rounded-full blur-3xl" style={{ background: color }} />
       <div className="absolute bottom-1/3 right-1/4 w-32 h-32 rounded-full blur-3xl" style={{ background: color }} />
-      {particles.map(p => (
-        <motion.span
-          key={p.id}
-          className="absolute select-none"
-          style={{ left: `${p.x}%`, top: `${p.y}%`, fontSize: p.size }}
-          animate={{
-            y: [0, -30, -15, -40, 0],
-            x: [0, 10, -8, 5, 0],
-            opacity: [0, 0.7, 0.5, 0.8, 0],
-            rotate: [0, 15, -10, 20, 0],
-          }}
-          transition={{
-            duration: p.duration,
-            delay: p.delay,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        >
-          {p.emoji}
-        </motion.span>
-      ))}
+      {particles.map(p => {
+        const sprite = getEmojiSprite(p.emoji);
+        return (
+          <motion.span
+            key={p.id}
+            className="absolute select-none"
+            style={{ left: `${p.x}%`, top: `${p.y}%`, fontSize: sprite ? undefined : p.size }}
+            animate={{
+              y: [0, -30, -15, -40, 0],
+              x: [0, 10, -8, 5, 0],
+              opacity: [0, 0.7, 0.5, 0.8, 0],
+              rotate: [0, 15, -10, 20, 0],
+            }}
+            transition={{
+              duration: p.duration,
+              delay: p.delay,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          >
+            {sprite ? (
+              <img src={sprite} alt="" className="object-contain drop-shadow" style={{ width: p.size, height: p.size }} draggable={false} />
+            ) : p.emoji}
+          </motion.span>
+        );
+      })}
     </div>
   );
 }
@@ -402,9 +407,13 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
             animate={{ opacity: 0, scale: 3, y: -120 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2, ease: 'easeOut' }}
-            className="fixed top-1/3 left-1/2 -translate-x-1/2 z-50 pointer-events-none text-5xl"
+            className="fixed top-1/3 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
           >
-            {collectAnim}
+            {getEmojiSprite(collectAnim) ? (
+              <img src={getEmojiSprite(collectAnim)!} alt="" className="w-12 h-12 object-contain drop-shadow-xl" draggable={false} />
+            ) : (
+              <span className="text-5xl">{collectAnim}</span>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
