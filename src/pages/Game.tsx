@@ -190,7 +190,7 @@ export default function Game() {
         <div className="flex items-center gap-2">
           <Swords className="h-4 w-4 text-amber-400" />
           <h1 className="text-sm sm:text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-500">
-            MAPA DO TESOURO
+            GUARDIÃO DO TERRITÓRIO
           </h1>
         </div>
         <div className="flex items-center gap-1">

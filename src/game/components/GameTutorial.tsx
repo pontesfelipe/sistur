@@ -11,7 +11,7 @@ interface TutorialStep {
 
 const TUTORIAL_STEPS: TutorialStep[] = [
   {
-    title: 'Bem-vindo ao Mapa do Tesouro!',
+    title: 'Bem-vindo ao Guardião do Território!',
     emoji: '🌍',
     text: 'Você vai construir seu próprio mundo! Cuide da natureza, das pessoas e da organização para ter um lugar incrível.',
     tip: 'Dica: o segredo é o equilíbrio!',

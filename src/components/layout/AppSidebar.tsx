@@ -51,7 +51,7 @@ const navigation: NavItem[] = [
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
   { name: 'Social Turismo', href: '/forum', icon: MessageSquare },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
-  { name: 'Mapa do Tesouro', href: '/game', icon: Gamepad2 },
+  { name: 'Jogos Educacionais', href: '/game', icon: Gamepad2 },
 ];
 
 const bottomNavigation: NavItem[] = [
