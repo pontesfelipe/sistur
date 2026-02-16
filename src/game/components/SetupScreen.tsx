@@ -22,8 +22,8 @@ export function SetupScreen({ onStart }: SetupScreenProps) {
     <div className="min-h-screen bg-gradient-to-br from-sky-400 via-emerald-400 to-teal-500 flex items-center justify-center p-4">
       <div className="bg-white/95 dark:bg-slate-800/95 rounded-3xl shadow-2xl max-w-lg w-full p-8 backdrop-blur-sm">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold">🌍 Mapa do Tesouro</h1>
-          <p className="text-sm text-muted-foreground mt-1">Construa Seu Mundo</p>
+          <h1 className="text-3xl font-bold">⚔️ Guardião do Território</h1>
+          <p className="text-sm text-muted-foreground mt-1">Escolha seu bioma e proteja seu destino!</p>
         </div>
 
         {step === 'avatar' ? (

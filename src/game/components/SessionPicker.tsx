@@ -51,8 +51,8 @@ export function SessionPicker({ sessions, loading, onNewGame, onLoadSession, onD
         </button>
 
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">🌍 Mapa do Tesouro</h1>
-          <p className="text-sm text-muted-foreground">Escolha uma sessão ou inicie uma nova aventura!</p>
+          <h1 className="text-3xl font-bold">⚔️ Guardião do Território</h1>
+          <p className="text-sm text-muted-foreground">Defenda seu destino turístico com cartas estratégicas!</p>
         </div>
 
         {/* New Game Button */}
