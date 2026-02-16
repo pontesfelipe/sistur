@@ -38,36 +38,52 @@ export function TCGHand({ hand, coins, onPlay, onDiscard, canPlay, selectedIndex
         </span>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 px-2">
+      {/* Card fan with perspective */}
+      <div className="flex flex-wrap justify-center gap-1 sm:gap-1.5 px-2 tcg-card-hand">
         {hand.map((card, i) => {
           const tooExpensive = card.cost > coins;
           const isSelected = selectedIndex === i;
+          // Calculate slight rotation for fan effect
+          const totalCards = hand.length;
+          const mid = (totalCards - 1) / 2;
+          const rotation = totalCards > 3 ? (i - mid) * 3 : 0;
+          
           return (
-            <TCGPlayerCard
+            <div
               key={`${card.id}-hand-${i}`}
-              card={card}
-              inHand
-              selected={isSelected}
-              tooExpensive={tooExpensive}
-              disabled={!canPlay}
-              onClick={() => {
-                if (isSelected) {
-                  onPlay(i);
-                } else {
-                  onSelect(i);
-                }
+              style={{
+                transform: isSelected ? 'none' : `rotate(${rotation}deg)`,
+                transformOrigin: 'bottom center',
+                transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                zIndex: isSelected ? 20 : i,
               }}
-              onDiscard={() => onDiscard(i)}
-              animateIn
-            />
+            >
+              <TCGPlayerCard
+                card={card}
+                inHand
+                selected={isSelected}
+                tooExpensive={tooExpensive}
+                disabled={!canPlay}
+                onClick={() => {
+                  if (isSelected) {
+                    onPlay(i);
+                  } else {
+                    onSelect(i);
+                  }
+                }}
+                onDiscard={() => onDiscard(i)}
+                animateIn
+                animationDelay={i * 100}
+              />
+            </div>
           );
         })}
       </div>
 
       {selectedIndex !== null && (
         <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <span className="text-xs text-yellow-500 font-bold animate-pulse">
-            👆 Toque novamente para jogar!
+          <span className="text-xs text-yellow-500 font-bold animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]">
+            ⚡ Toque novamente para jogar!
           </span>
           <button
             onClick={() => onSelect(null)}

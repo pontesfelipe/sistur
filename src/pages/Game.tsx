@@ -35,6 +35,8 @@ export default function Game() {
   const [tutorialSeen, setTutorialSeen] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<'log' | 'edu' | null>(null);
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
+  const [playEffect, setPlayEffect] = useState<'RA' | 'OE' | 'AO' | null>(null);
+  const [screenFlash, setScreenFlash] = useState(false);
 
   // Auto-save every 5 turns
   const lastSavedTurn = useRef(0);
@@ -109,8 +111,15 @@ export default function Game() {
   }, [activeSessionId, game, sessions]);
 
   const handlePlayCard = useCallback((index: number) => {
+    const card = game.state.deck.hand[index];
+    const category = card?.category as 'RA' | 'OE' | 'AO';
     game.playCard(index);
     setSelectedCardIndex(null);
+    // Trigger screen flash + row ripple
+    setScreenFlash(true);
+    setPlayEffect(category);
+    setTimeout(() => setScreenFlash(false), 400);
+    setTimeout(() => setPlayEffect(null), 600);
     toast.success('Carta jogada! 🃏');
   }, [game]);
 
@@ -225,7 +234,13 @@ export default function Game() {
           scores={boardScores}
           equilibrium={equilibrium}
           turn={game.state.turn}
+          showPlayEffect={playEffect}
         />
+
+        {/* Screen flash VFX */}
+        {screenFlash && (
+          <div className="fixed inset-0 z-50 bg-amber-400/20 tcg-screen-flash" />
+        )}
 
         {/* Deck info */}
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-2 border border-slate-700/50">
