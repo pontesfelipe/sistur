@@ -8,6 +8,7 @@ import { RPGStatusBar } from './RPGStatusBar';
 import { RPGTutorial } from './RPGTutorial';
 import { BIOME_STORIES } from '../stories';
 import { BIOME_INFO, INITIAL_STATS, type BiomeId, type RPGState, type StoryChoice, type BiomeStats } from '../types';
+import { getEmojiSprite } from '@/game/spriteMap';
 
 const initialState: RPGState = {
   biome: null,
@@ -109,7 +110,10 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
               </Button>
               <div>
                 <h1 className="text-sm font-bold flex items-center gap-1.5">
-                  {biomeInfo.emoji} {biomeInfo.name}
+                  {getEmojiSprite(biomeInfo.emoji) ? (
+                    <img src={getEmojiSprite(biomeInfo.emoji)!} alt="" className="w-4 h-4 object-contain" draggable={false} />
+                  ) : biomeInfo.emoji}
+                  {' '}{biomeInfo.name}
                 </h1>
                 <p className="text-xs text-muted-foreground">
                   Capítulo {currentScene.chapter} • {state.choicesMade} decisões
@@ -165,8 +169,10 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
                   >
                     <div className="absolute top-0 left-0 w-1 h-full bg-primary/30 rounded-l-xl" />
                     <div className="pl-3">
-                      <p className="text-xs font-bold text-primary/70 uppercase tracking-wider mb-1">
-                        Capítulo {histScene.chapter} — {histScene.emoji} {histScene.title}
+                      <p className="text-xs font-bold text-primary/70 uppercase tracking-wider mb-1 flex items-center gap-1">
+                        Capítulo {histScene.chapter} — {getEmojiSprite(histScene.emoji) ? (
+                          <img src={getEmojiSprite(histScene.emoji)!} alt="" className="w-3.5 h-3.5 object-contain inline-block" draggable={false} />
+                        ) : histScene.emoji} {histScene.title}
                       </p>
                       <p className="text-sm text-muted-foreground leading-relaxed">
                         {histScene.narrative}
@@ -180,8 +186,10 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
             {/* Current scene indicator */}
             <div className="flex items-center gap-2 pt-2">
               <div className="h-px flex-1 bg-border/50" />
-              <span className="text-xs bg-primary/20 px-3 py-1 rounded-full text-primary font-medium">
-                {currentScene.emoji} Agora: {currentScene.title}
+              <span className="text-xs bg-primary/20 px-3 py-1 rounded-full text-primary font-medium flex items-center gap-1">
+                {getEmojiSprite(currentScene.emoji) ? (
+                  <img src={getEmojiSprite(currentScene.emoji)!} alt="" className="w-3.5 h-3.5 object-contain" draggable={false} />
+                ) : currentScene.emoji} Agora: {currentScene.title}
               </span>
               <div className="h-px flex-1 bg-border/50" />
             </div>
