@@ -69,7 +69,7 @@ export interface TreasureGameState {
 export const MAP_THEMES: MapTheme[] = [
   { id: 'floresta', name: 'Floresta Tropical', emoji: '🌳', description: 'Explore a densa floresta tropical coletando sementes raras', gradient: 'from-green-900 via-emerald-800 to-green-950', bgEmoji: '🌿' },
   { id: 'oceano', name: 'Fundo do Oceano', emoji: '🌊', description: 'Mergulhe no oceano e resgate tesouros marinhos', gradient: 'from-blue-900 via-cyan-800 to-blue-950', bgEmoji: '🐚' },
-  { id: 'montanha', name: 'Trilha da Montanha', emoji: '⛰️', description: 'Escale as montanhas e encontre cristais ecológicos', gradient: 'from-stone-800 via-amber-900 to-stone-900', bgEmoji: '🪨' },
+  { id: 'montanha', name: 'Trilha da Montanha', emoji: '⛰️', description: 'Escale as montanhas e encontre cristais ecológicos', gradient: 'from-slate-800 via-indigo-900 to-slate-900', bgEmoji: '🪨' },
   { id: 'mangue', name: 'Manguezal', emoji: '🦀', description: 'Navegue pelo mangue protegendo espécies ameaçadas', gradient: 'from-teal-900 via-emerald-900 to-lime-950', bgEmoji: '🌴' },
 ];
 
