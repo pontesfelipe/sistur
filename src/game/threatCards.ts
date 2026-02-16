@@ -123,11 +123,11 @@ export function generateThreats(
 ): ThreatCard[] {
   const pool = getThreatPool(biome);
   
-  // Determine how many threats to generate (1-3 based on turn)
-  const baseCount = turn <= 3 ? 1 : turn <= 8 ? 2 : Math.min(3, 1 + Math.floor(turn / 5));
+  // Determine how many threats to generate (1-2 based on turn, easier)
+  const baseCount = turn <= 5 ? 1 : Math.min(2, 1 + Math.floor(turn / 8));
   
-  // Determine max tier based on turn
-  const maxTier = turn <= 4 ? 1 : turn <= 10 ? 2 : 3;
+  // Determine max tier based on turn (slower escalation)
+  const maxTier = turn <= 6 ? 1 : turn <= 15 ? 2 : 3;
   
   // Filter by tier
   const eligible = pool.filter(t => t.tier <= maxTier);
@@ -135,12 +135,12 @@ export function generateThreats(
   // Weight towards threats that target low pillars (smarter AI)
   const weighted = eligible.map(t => {
     let weight = 1;
-    if (t.target === 'RA' && bars.ra < 40) weight += 2;
-    if (t.target === 'OE' && bars.oe < 40) weight += 2;
-    if (t.target === 'AO' && bars.ao < 40) weight += 2;
-    // Higher tier = less frequent
-    if (t.tier === 2) weight *= 0.6;
-    if (t.tier === 3) weight *= 0.3;
+    if (t.target === 'RA' && bars.ra < 30) weight += 1;
+    if (t.target === 'OE' && bars.oe < 30) weight += 1;
+    if (t.target === 'AO' && bars.ao < 30) weight += 1;
+    // Higher tier = much less frequent
+    if (t.tier === 2) weight *= 0.4;
+    if (t.tier === 3) weight *= 0.15;
     return { threat: t, weight };
   });
   

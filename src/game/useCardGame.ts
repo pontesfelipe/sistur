@@ -63,7 +63,7 @@ export interface CardGameState {
 
 const GRID_SIZE = 6;
 const createEmptyGrid = () => Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(null));
-const VICTORY_SCORE = 500;
+const VICTORY_SCORE = 300;
 
 function createInitialCardState(biome: BiomeType = 'floresta'): CardGameState {
   const mod = BIOME_MODIFIERS[biome];
@@ -253,18 +253,18 @@ export function useCardGame() {
         threatDamage += t.power;
       }
 
-      // 3. Natural decay
-      decay.ra = clamp(decay.ra - 1);
-      decay.oe = clamp(decay.oe - 0.5);
-      decay.ao = clamp(decay.ao - 0.5);
+      // 3. Natural decay (reduced for easier gameplay)
+      decay.ra = clamp(decay.ra - 0.5);
+      decay.oe = clamp(decay.oe - 0.3);
+      decay.ao = clamp(decay.ao - 0.3);
 
-      if (decay.oe > decay.ra + 30) {
-        decay.ra = clamp(decay.ra - 3);
+      if (decay.oe > decay.ra + 40) {
+        decay.ra = clamp(decay.ra - 2);
         logs.push('🏭 Poluição! Natureza diminuindo!');
       }
 
-      // 4. Income
-      const income = Math.round(prev.visitors / 10) + 3;
+      // 4. Income (increased)
+      const income = Math.round(prev.visitors / 8) + 5;
       const newCoins = Math.max(0, prev.coins + income);
       logs.push(`💰 Renda: +${income} moedas`);
 
@@ -298,10 +298,10 @@ export function useCardGame() {
       let isGameOver = false;
       let gameOverReason: string | null = null;
 
-      if (equilibrium <= 10) {
+      if (equilibrium <= 5) {
         isGameOver = true;
         gameOverReason = '💀 Equilíbrio crítico! Colapso total!';
-      } else if (disasterCount >= 5) {
+      } else if (disasterCount >= 7) {
         isGameOver = true;
         gameOverReason = '🔥 Muitas catástrofes! A cidade não se recuperou.';
       }
@@ -310,9 +310,9 @@ export function useCardGame() {
       const visitors = Math.max(0, Math.round(equilibrium * 1.5));
       let isVictory = false;
       let victoryReason: string | null = null;
-      const newScore = prev.totalScore - Math.round(threatDamage * 0.5); // Threats reduce score
+      const newScore = prev.totalScore - Math.round(threatDamage * 0.2); // Threats reduce score (mild)
 
-      if (!isGameOver && newScore >= VICTORY_SCORE && equilibrium >= 60) {
+      if (!isGameOver && newScore >= VICTORY_SCORE && equilibrium >= 50) {
         isVictory = true;
         victoryReason = '🏆 Você alcançou a pontuação máxima com equilíbrio! Parabéns!';
         logs.push(`🎉 VITÓRIA: ${victoryReason}`);
@@ -412,6 +412,29 @@ export function useCardGame() {
       const rewardPool = getRewardPool(prev.biome, prev.level);
       const rewardCards = pickRandomCards(rewardPool, 3);
 
+      // Generate a visible card on the board from the event choice
+      const eventCard: GameCard = {
+        id: `event_${prev.currentEvent.id}_${Date.now()}`,
+        name: choice.label,
+        emoji: choice.emoji,
+        category: choice.type === 'smart' ? 'RA' : choice.type === 'quick' ? 'OE' : 'AO',
+        type: 'event',
+        rarity: choice.type === 'smart' ? 'rare' : 'common',
+        cost: 0,
+        effects: { ra: effects.ra, oe: effects.oe, ao: effects.ao, coins: effects.coins, xp: 5 },
+        description: choice.message,
+        flavor: `Evento: ${prev.currentEvent.name}`,
+      };
+
+      const boardRA = [...prev.boardRA];
+      const boardOE = [...prev.boardOE];
+      const boardAO = [...prev.boardAO];
+      if (eventCard.category === 'RA') boardRA.push(eventCard);
+      else if (eventCard.category === 'OE') boardOE.push(eventCard);
+      else boardAO.push(eventCard);
+
+      const cardScore = Math.max(0, effects.ra) + Math.max(0, effects.oe) + Math.max(0, effects.ao);
+
       return {
         ...prev,
         bars: newBars,
@@ -421,6 +444,8 @@ export function useCardGame() {
         eduMetrics: newEduMetrics,
         activeThreats,
         rewardCards,
+        boardRA, boardOE, boardAO,
+        totalScore: prev.totalScore + cardScore,
       };
     });
   }, []);
@@ -442,6 +467,27 @@ export function useCardGame() {
       const rewardPool = getRewardPool(prev.biome, prev.level);
       const rewardCards = pickRandomCards(rewardPool, 3);
 
+      // Generate a visible card on the board from the council choice
+      const councilCard: GameCard = {
+        id: `council_${Date.now()}`,
+        name: option.label,
+        emoji: prev.currentCouncil.emoji || '🤝',
+        category: 'AO',
+        type: 'policy',
+        rarity: 'uncommon',
+        cost: 0,
+        effects: { ra: option.effects.ra, oe: option.effects.oe, ao: option.effects.ao, xp: 5 },
+        description: option.feedback,
+        flavor: `Conselho: ${prev.currentCouncil.question}`,
+      };
+
+      const boardRA = [...prev.boardRA];
+      const boardOE = [...prev.boardOE];
+      const boardAO = [...prev.boardAO];
+      boardAO.push(councilCard);
+
+      const cardScore = Math.max(0, option.effects.ra) + Math.max(0, option.effects.oe) + Math.max(0, option.effects.ao);
+
       return {
         ...prev,
         bars: newBars,
@@ -449,6 +495,8 @@ export function useCardGame() {
         eventLog: [...prev.eventLog, `🤝 ${option.feedback}`],
         activeThreats,
         rewardCards,
+        boardRA, boardOE, boardAO,
+        totalScore: prev.totalScore + cardScore,
       };
     });
   }, []);
