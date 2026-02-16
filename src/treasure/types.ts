@@ -1,41 +1,18 @@
-export type CellType = 'empty' | 'player' | 'treasure' | 'trap' | 'riddle' | 'exit' | 'wall' | 'fog';
-
-export interface Position {
-  row: number;
-  col: number;
-}
-
-export interface TreasureItem {
+export interface MemoryCardData {
   id: string;
-  name: string;
   emoji: string;
-  description: string;
-  points: number;
-}
-
-export interface Trap {
-  id: string;
   name: string;
-  emoji: string;
   description: string;
-  damage: number;
+  category: 'fauna' | 'flora' | 'clima' | 'sustentabilidade' | 'bioma' | 'recurso';
 }
 
-export interface Riddle {
-  id: string;
-  question: string;
-  options: string[];
-  correctIndex: number;
-  explanation: string;
-  reward: number;
-}
-
-export interface MapCell {
-  type: CellType;
-  revealed: boolean;
-  item?: TreasureItem;
-  trap?: Trap;
-  riddle?: Riddle;
+export interface MemoryCard {
+  uid: string;
+  pairId: string;
+  side: 'image' | 'text';
+  data: MemoryCardData;
+  flipped: boolean;
+  matched: boolean;
 }
 
 export interface MapTheme {
@@ -47,121 +24,87 @@ export interface MapTheme {
   bgEmoji: string;
 }
 
-export interface TreasureGameState {
-  map: MapCell[][];
-  player: Position;
-  score: number;
-  health: number;
-  maxHealth: number;
+export interface MemoryGameState {
+  cards: MemoryCard[];
+  columns: number;
+  flippedIndices: number[];
+  matchedPairs: number;
+  totalPairs: number;
+  errors: number;
+  maxErrors: number;
   moves: number;
-  treasuresCollected: number;
-  totalTreasures: number;
-  riddlesSolved: number;
-  riddleErrors: number;
-  maxRiddleErrors: number;
-  trapsHit: number;
+  score: number;
   isGameOver: boolean;
   isVictory: boolean;
-  currentRiddle: Riddle | null;
-  riddlePosition: Position | null;
   theme: MapTheme;
-  message: string | null;
   timeRemaining: number;
   maxTime: number;
+  message: string | null;
+  isChecking: boolean;
 }
 
 export const MAP_THEMES: MapTheme[] = [
-  { id: 'floresta', name: 'Floresta Tropical', emoji: '🌳', description: 'Explore a densa floresta tropical coletando sementes raras', gradient: 'from-green-900 via-emerald-800 to-green-950', bgEmoji: '🌿' },
-  { id: 'oceano', name: 'Fundo do Oceano', emoji: '🌊', description: 'Mergulhe no oceano e resgate tesouros marinhos', gradient: 'from-blue-900 via-cyan-800 to-blue-950', bgEmoji: '🐚' },
-  { id: 'montanha', name: 'Trilha da Montanha', emoji: '⛰️', description: 'Escale as montanhas e encontre cristais ecológicos', gradient: 'from-slate-800 via-indigo-900 to-slate-900', bgEmoji: '🪨' },
-  { id: 'mangue', name: 'Manguezal', emoji: '🦀', description: 'Navegue pelo mangue protegendo espécies ameaçadas', gradient: 'from-teal-900 via-emerald-900 to-lime-950', bgEmoji: '🌴' },
+  { id: 'floresta', name: 'Floresta Tropical', emoji: '🌳', description: 'Descubra os segredos da fauna e flora tropical', gradient: 'from-green-900 via-emerald-800 to-green-950', bgEmoji: '🌿' },
+  { id: 'oceano', name: 'Fundo do Oceano', emoji: '🌊', description: 'Associe criaturas marinhas e seus habitats', gradient: 'from-blue-900 via-cyan-800 to-blue-950', bgEmoji: '🐚' },
+  { id: 'montanha', name: 'Trilha da Montanha', emoji: '⛰️', description: 'Conecte fenômenos naturais e ecossistemas', gradient: 'from-slate-800 via-indigo-900 to-slate-900', bgEmoji: '🪨' },
+  { id: 'mangue', name: 'Manguezal', emoji: '🦀', description: 'Identifique espécies e conceitos da zona costeira', gradient: 'from-teal-900 via-emerald-900 to-lime-950', bgEmoji: '🌴' },
 ];
 
-export const TREASURES: Record<string, TreasureItem[]> = {
+export const MEMORY_PAIRS: Record<string, MemoryCardData[]> = {
   floresta: [
-    { id: 't1', name: 'Semente Rara', emoji: '🌱', description: 'Uma semente de espécie nativa ameaçada', points: 15 },
-    { id: 't2', name: 'Orquídea Especial', emoji: '🌺', description: 'Orquídea endêmica da mata atlântica', points: 20 },
-    { id: 't3', name: 'Mel Silvestre', emoji: '🍯', description: 'Mel de abelhas nativas sem ferrão', points: 10 },
-    { id: 't4', name: 'Fruto do Cerrado', emoji: '🫐', description: 'Fruto nutritivo e medicinal', points: 12 },
-    { id: 't5', name: 'Madeira Certificada', emoji: '🪵', description: 'Amostra de manejo sustentável', points: 18 },
+    { id: 'f1', emoji: '🌳', name: 'Árvore Nativa', description: 'Absorve CO₂ e produz oxigênio pela fotossíntese', category: 'flora' },
+    { id: 'f2', emoji: '🦜', name: 'Arara-azul', description: 'Ave ameaçada de extinção que depende de palmeiras', category: 'fauna' },
+    { id: 'f3', emoji: '🌱', name: 'Reflorestamento', description: 'Plantio de espécies nativas para restaurar ecossistemas', category: 'sustentabilidade' },
+    { id: 'f4', emoji: '🐆', name: 'Onça-pintada', description: 'Maior felino das Américas, topo da cadeia alimentar', category: 'fauna' },
+    { id: 'f5', emoji: '🍯', name: 'Abelha Nativa', description: 'Polinizadora essencial para 75% das culturas agrícolas', category: 'fauna' },
+    { id: 'f6', emoji: '🌺', name: 'Orquídea', description: 'Planta epífita indicadora de floresta preservada', category: 'flora' },
+    { id: 'f7', emoji: '♻️', name: 'Reciclagem', description: 'Processo de transformar resíduos em novos produtos', category: 'sustentabilidade' },
+    { id: 'f8', emoji: '🌍', name: 'Biodiversidade', description: 'Variedade de seres vivos em um ecossistema', category: 'bioma' },
+    { id: 'f9', emoji: '💧', name: 'Nascente', description: 'Ponto onde a água subterrânea brota na superfície', category: 'recurso' },
+    { id: 'f10', emoji: '🐒', name: 'Macaco-muriqui', description: 'Primata endêmico da Mata Atlântica em risco crítico', category: 'fauna' },
+    { id: 'f11', emoji: '🪵', name: 'Manejo Florestal', description: 'Uso sustentável da madeira sem destruir a floresta', category: 'sustentabilidade' },
+    { id: 'f12', emoji: '🦋', name: 'Borboleta-morpho', description: 'Inseto polinizador e bioindicador de saúde ambiental', category: 'fauna' },
   ],
   oceano: [
-    { id: 't1', name: 'Coral Restaurado', emoji: '🪸', description: 'Fragmento de recife em recuperação', points: 20 },
-    { id: 't2', name: 'Pérola Natural', emoji: '🫧', description: 'Pérola formada naturalmente', points: 15 },
-    { id: 't3', name: 'Concha Rara', emoji: '🐚', description: 'Concha de espécie protegida', points: 12 },
-    { id: 't4', name: 'Alga Medicinal', emoji: '🌿', description: 'Alga com propriedades curativas', points: 10 },
-    { id: 't5', name: 'Estrela do Mar', emoji: '⭐', description: 'Espécie indicadora de saúde marinha', points: 18 },
+    { id: 'o1', emoji: '🐋', name: 'Baleia-jubarte', description: 'Mamífero marinho migratório que se reproduz na costa brasileira', category: 'fauna' },
+    { id: 'o2', emoji: '🪸', name: 'Recife de Coral', description: 'Ecossistema marinho que abriga 25% das espécies oceânicas', category: 'bioma' },
+    { id: 'o3', emoji: '🐢', name: 'Tartaruga Marinha', description: 'Réptil ameaçado por plástico e perda de habitat costeiro', category: 'fauna' },
+    { id: 'o4', emoji: '🌊', name: 'Corrente Marinha', description: 'Movimento de água que regula o clima global do planeta', category: 'clima' },
+    { id: 'o5', emoji: '🦈', name: 'Tubarão', description: 'Predador de topo essencial para o equilíbrio marinho', category: 'fauna' },
+    { id: 'o6', emoji: '🫧', name: 'Fitoplâncton', description: 'Produz mais de 50% do oxigênio da atmosfera terrestre', category: 'flora' },
+    { id: 'o7', emoji: '🐙', name: 'Polvo', description: 'Molusco inteligente indicador de saúde do ecossistema', category: 'fauna' },
+    { id: 'o8', emoji: '🥤', name: 'Poluição Plástica', description: '8 milhões de toneladas de plástico vão ao oceano por ano', category: 'sustentabilidade' },
+    { id: 'o9', emoji: '🐠', name: 'Peixe-palhaço', description: 'Vive em simbiose com anêmonas nos recifes de coral', category: 'fauna' },
+    { id: 'o10', emoji: '🦑', name: 'Lula Gigante', description: 'Espécie das profundezas essencial na cadeia alimentar', category: 'fauna' },
+    { id: 'o11', emoji: '🏖️', name: 'Zona Costeira', description: 'Área de transição entre terra e mar, rica em vida', category: 'bioma' },
+    { id: 'o12', emoji: '⚓', name: 'Pesca Sustentável', description: 'Captura que respeita limites de reprodução das espécies', category: 'sustentabilidade' },
   ],
   montanha: [
-    { id: 't1', name: 'Cristal Quartzo', emoji: '💎', description: 'Cristal formado ao longo de milênios', points: 20 },
-    { id: 't2', name: 'Nascente Pura', emoji: '💧', description: 'Água de nascente protegida', points: 15 },
-    { id: 't3', name: 'Líquen Ancestral', emoji: '🍃', description: 'Líquen centenário bioindicador', points: 12 },
-    { id: 't4', name: 'Fóssil Vegetal', emoji: '🪨', description: 'Fóssil de planta antiga', points: 18 },
-    { id: 't5', name: 'Erva Medicinal', emoji: '🌿', description: 'Planta medicinal de altitude', points: 10 },
+    { id: 'm1', emoji: '🦅', name: 'Águia', description: 'Ave de rapina que controla populações de roedores', category: 'fauna' },
+    { id: 'm2', emoji: '❄️', name: 'Geleira', description: 'Reservatório natural de água doce em derretimento acelerado', category: 'clima' },
+    { id: 'm3', emoji: '🌿', name: 'Líquen', description: 'Bioindicador que só cresce em ambientes não poluídos', category: 'flora' },
+    { id: 'm4', emoji: '🏔️', name: 'Nascente de Rio', description: 'Origem dos rios protegida por APPs — Áreas Preservadas', category: 'recurso' },
+    { id: 'm5', emoji: '🌬️', name: 'Energia Eólica', description: 'Fonte renovável que usa a força do vento sem poluir', category: 'sustentabilidade' },
+    { id: 'm6', emoji: '🦎', name: 'Lagarto de Altitude', description: 'Réptil endêmico que vive apenas em altitudes elevadas', category: 'fauna' },
+    { id: 'm7', emoji: '🪨', name: 'Erosão do Solo', description: 'Desgaste causado por desmatamento e chuvas intensas', category: 'clima' },
+    { id: 'm8', emoji: '☀️', name: 'Energia Solar', description: 'Captação de luz do sol para gerar eletricidade limpa', category: 'sustentabilidade' },
+    { id: 'm9', emoji: '🌲', name: 'Araucária', description: 'Árvore símbolo do Sul, ameaçada de extinção', category: 'flora' },
+    { id: 'm10', emoji: '💎', name: 'Mineração', description: 'Extração de recursos que pode degradar ecossistemas', category: 'recurso' },
+    { id: 'm11', emoji: '🐻', name: 'Lobo-guará', description: 'Maior canídeo da América do Sul, símbolo do Cerrado', category: 'fauna' },
+    { id: 'm12', emoji: '🌡️', name: 'Aquecimento Global', description: 'Aumento da temperatura média da Terra por gases estufa', category: 'clima' },
   ],
   mangue: [
-    { id: 't1', name: 'Muda de Mangue', emoji: '🌱', description: 'Muda para reflorestamento costeiro', points: 20 },
-    { id: 't2', name: 'Ostra Nativa', emoji: '🦪', description: 'Ostra filtro natural da água', points: 12 },
-    { id: 't3', name: 'Caranguejo Azul', emoji: '🦀', description: 'Espécie rara do manguezal', points: 18 },
-    { id: 't4', name: 'Cavalho-marinho', emoji: '🐴', description: 'Espécie ameaçada de extinção', points: 15 },
-    { id: 't5', name: 'Siri Ornamental', emoji: '🦞', description: 'Crustáceo indicador ambiental', points: 10 },
+    { id: 'g1', emoji: '🦀', name: 'Caranguejo-uçá', description: 'Crustáceo essencial para a cadeia alimentar do mangue', category: 'fauna' },
+    { id: 'g2', emoji: '🌴', name: 'Mangue-vermelho', description: 'Árvore com raízes aéreas que filtra sal da água', category: 'flora' },
+    { id: 'g3', emoji: '🐟', name: 'Berçário Marinho', description: 'Manguezais são locais de reprodução de 80% dos peixes', category: 'bioma' },
+    { id: 'g4', emoji: '🦪', name: 'Ostra de Mangue', description: 'Molusco que filtra até 200 litros de água por dia', category: 'fauna' },
+    { id: 'g5', emoji: '🌱', name: 'Carbono Azul', description: 'Manguezais armazenam até 10x mais carbono que florestas', category: 'clima' },
+    { id: 'g6', emoji: '🐊', name: 'Jacaré-do-papo-amarelo', description: 'Réptil que ajuda a controlar populações de peixes', category: 'fauna' },
+    { id: 'g7', emoji: '🚰', name: 'Esgoto in natura', description: 'Principal ameaça aos manguezais: poluição por esgoto', category: 'sustentabilidade' },
+    { id: 'g8', emoji: '🦩', name: 'Guará-vermelho', description: 'Ave icônica dos mangues cuja cor vem dos crustáceos', category: 'fauna' },
+    { id: 'g9', emoji: '🏗️', name: 'Aterramento', description: 'Destruição ilegal de mangues para construção urbana', category: 'sustentabilidade' },
+    { id: 'g10', emoji: '🐴', name: 'Cavalo-marinho', description: 'Peixe ameaçado que se camufla entre raízes do mangue', category: 'fauna' },
+    { id: 'g11', emoji: '🌊', name: 'Proteção Costeira', description: 'Manguezais protegem a costa contra tsunamis e erosão', category: 'bioma' },
+    { id: 'g12', emoji: '🤝', name: 'Comunidade Ribeirinha', description: 'Populações tradicionais que dependem do manguezal', category: 'sustentabilidade' },
   ],
 };
-
-export const TRAPS: Record<string, Trap[]> = {
-  floresta: [
-    { id: 'p1', name: 'Área Desmatada', emoji: '🪓', description: 'Desmatamento ilegal!', damage: 20 },
-    { id: 'p2', name: 'Queimada', emoji: '🔥', description: 'Incêndio florestal!', damage: 25 },
-    { id: 'p3', name: 'Lixo Tóxico', emoji: '☠️', description: 'Descarte irregular de resíduos!', damage: 15 },
-  ],
-  oceano: [
-    { id: 'p1', name: 'Rede de Pesca', emoji: '🪤', description: 'Rede de arrasto ilegal!', damage: 20 },
-    { id: 'p2', name: 'Derrame de Óleo', emoji: '🛢️', description: 'Vazamento de petróleo!', damage: 25 },
-    { id: 'p3', name: 'Plástico', emoji: '🥤', description: 'Poluição plástica no oceano!', damage: 15 },
-  ],
-  montanha: [
-    { id: 'p1', name: 'Mineração Ilegal', emoji: '⛏️', description: 'Garimpo sem licença!', damage: 25 },
-    { id: 'p2', name: 'Deslizamento', emoji: '🏔️', description: 'Erosão por desmatamento!', damage: 20 },
-    { id: 'p3', name: 'Agrotóxico', emoji: '💀', description: 'Contaminação química!', damage: 15 },
-  ],
-  mangue: [
-    { id: 'p1', name: 'Aterramento', emoji: '🏗️', description: 'Destruição do mangue para construção!', damage: 25 },
-    { id: 'p2', name: 'Esgoto', emoji: '🚰', description: 'Esgoto in natura no mangue!', damage: 20 },
-    { id: 'p3', name: 'Pesca Predatória', emoji: '🎣', description: 'Pesca com explosivos!', damage: 15 },
-  ],
-};
-
-export const RIDDLES: Riddle[] = [
-  { id: 'r1', question: 'Qual gás as árvores absorvem da atmosfera?', options: ['Oxigênio', 'Gás Carbônico', 'Nitrogênio', 'Hélio'], correctIndex: 1, explanation: 'Árvores absorvem CO₂ no processo de fotossíntese!', reward: 25 },
-  { id: 'r2', question: 'O que significa a sigla ESG?', options: ['Energia Solar Global', 'Environmental Social Governance', 'Estratégia Sustentável Geral', 'Ecologia e Saúde Global'], correctIndex: 1, explanation: 'ESG se refere a práticas Ambientais, Sociais e de Governança.', reward: 20 },
-  { id: 'r3', question: 'Qual é o maior bioma brasileiro?', options: ['Cerrado', 'Mata Atlântica', 'Amazônia', 'Pantanal'], correctIndex: 2, explanation: 'A Amazônia ocupa cerca de 49% do território brasileiro!', reward: 15 },
-  { id: 'r4', question: 'O que são espécies endêmicas?', options: ['Espécies extintas', 'Espécies invasoras', 'Espécies que só existem em uma região', 'Espécies migratórias'], correctIndex: 2, explanation: 'Endêmicas são exclusivas de uma região geográfica específica.', reward: 20 },
-  { id: 'r5', question: 'Qual prática reduz a pegada de carbono?', options: ['Usar carro diesel', 'Queimar lixo', 'Usar transporte público', 'Consumir mais plástico'], correctIndex: 2, explanation: 'O transporte público reduz emissões per capita significativamente.', reward: 15 },
-  { id: 'r6', question: 'O que é economia circular?', options: ['Economia que cresce em círculos', 'Sistema onde tudo é reutilizado e reciclado', 'Economia baseada em moedas redondas', 'Comércio entre países vizinhos'], correctIndex: 1, explanation: 'Economia circular elimina o conceito de "lixo", tudo é recurso!', reward: 25 },
-  { id: 'r7', question: 'Qual é a principal causa de extinção de espécies?', options: ['Mudança climática', 'Perda de habitat', 'Caça ilegal', 'Poluição'], correctIndex: 1, explanation: 'A destruição de habitats é a principal ameaça à biodiversidade.', reward: 20 },
-  { id: 'r8', question: 'O que são Unidades de Conservação?', options: ['Fábricas verdes', 'Áreas protegidas por lei', 'Usinas de reciclagem', 'Centros de pesquisa'], correctIndex: 1, explanation: 'São áreas naturais protegidas legalmente para conservação.', reward: 15 },
-  { id: 'r9', question: 'Qual é o papel dos manguezais?', options: ['Produzir madeira', 'Berçário de espécies marinhas', 'Gerar energia eólica', 'Filtrar poluição do ar'], correctIndex: 1, explanation: 'Manguezais são berçários naturais para peixes e crustáceos.', reward: 20 },
-  { id: 'r10', question: 'O que é pegada hídrica?', options: ['Marca de chuva no solo', 'Volume de água para produzir um bem', 'Caminho de rios no mapa', 'Nível do mar'], correctIndex: 1, explanation: 'A pegada hídrica mede o consumo total de água em cadeias produtivas.', reward: 20 },
-  { id: 'r11', question: 'Qual gás é o principal causador do efeito estufa?', options: ['Oxigênio', 'Metano', 'Dióxido de carbono', 'Hidrogênio'], correctIndex: 2, explanation: 'O CO₂ é responsável por cerca de 75% do efeito estufa.', reward: 15 },
-  { id: 'r12', question: 'O que significa biodiversidade?', options: ['Diversidade de biomas', 'Variedade de seres vivos', 'Tipos de solo', 'Variedade de climas'], correctIndex: 1, explanation: 'Biodiversidade é a variedade de formas de vida em um ecossistema.', reward: 20 },
-  { id: 'r13', question: 'Qual material leva mais tempo para se decompor?', options: ['Papel', 'Vidro', 'Madeira', 'Tecido de algodão'], correctIndex: 1, explanation: 'O vidro pode levar mais de 1 milhão de anos para se decompor!', reward: 25 },
-  { id: 'r14', question: 'O que é turismo sustentável?', options: ['Turismo barato', 'Turismo que preserva o ambiente e a cultura local', 'Turismo de aventura', 'Turismo internacional'], correctIndex: 1, explanation: 'Turismo sustentável minimiza impactos e beneficia comunidades locais.', reward: 20 },
-  { id: 'r15', question: 'Qual é a função da camada de ozônio?', options: ['Produzir chuva', 'Filtrar radiação ultravioleta', 'Regular marés', 'Gerar ventos'], correctIndex: 1, explanation: 'A camada de ozônio protege a vida na Terra dos raios UV nocivos.', reward: 15 },
-  { id: 'r16', question: 'O que são energias renováveis?', options: ['Energia nuclear', 'Fontes que se regeneram naturalmente', 'Combustíveis fósseis', 'Energia importada'], correctIndex: 1, explanation: 'Solar, eólica e hidrelétrica são fontes renováveis de energia.', reward: 20 },
-  { id: 'r17', question: 'O que é compostagem?', options: ['Queima de lixo', 'Transformação de resíduos orgânicos em adubo', 'Reciclagem de plástico', 'Tratamento de esgoto'], correctIndex: 1, explanation: 'A compostagem transforma restos orgânicos em fertilizante natural.', reward: 15 },
-  { id: 'r18', question: 'Qual bioma brasileiro é considerado berço das águas?', options: ['Amazônia', 'Cerrado', 'Pantanal', 'Caatinga'], correctIndex: 1, explanation: 'O Cerrado abriga nascentes de grandes bacias hidrográficas brasileiras.', reward: 20 },
-  { id: 'r19', question: 'O que é aquecimento global?', options: ['Aumento da temperatura dos oceanos', 'Aumento médio da temperatura da Terra', 'Derretimento das geleiras', 'Aumento das chuvas'], correctIndex: 1, explanation: 'É o aumento da temperatura média do planeta causado por gases de efeito estufa.', reward: 15 },
-  { id: 'r20', question: 'Qual animal é considerado polinizador essencial?', options: ['Gato', 'Abelha', 'Cachorro', 'Cobra'], correctIndex: 1, explanation: 'As abelhas são responsáveis pela polinização de cerca de 75% das culturas agrícolas.', reward: 20 },
-  { id: 'r21', question: 'O que é desertificação?', options: ['Criação de desertos artificiais', 'Degradação do solo em regiões áridas', 'Plantio no deserto', 'Irrigação excessiva'], correctIndex: 1, explanation: 'Desertificação é o processo de degradação do solo que o torna improdutivo.', reward: 25 },
-  { id: 'r22', question: 'Qual é a principal fonte de energia do Brasil?', options: ['Petróleo', 'Hidrelétrica', 'Nuclear', 'Carvão'], correctIndex: 1, explanation: 'A energia hidrelétrica representa mais de 60% da matriz elétrica brasileira.', reward: 15 },
-  { id: 'r23', question: 'O que são créditos de carbono?', options: ['Dinheiro para plantar árvores', 'Certificados que representam redução de emissões', 'Impostos sobre poluição', 'Multas ambientais'], correctIndex: 1, explanation: 'Créditos de carbono são instrumentos de mercado para compensar emissões de CO₂.', reward: 25 },
-  { id: 'r24', question: 'Qual é o maior recife de coral do mundo?', options: ['Recife de Abrolhos', 'Grande Barreira de Coral', 'Recife do Caribe', 'Atol das Rocas'], correctIndex: 1, explanation: 'A Grande Barreira de Coral na Austrália tem mais de 2.300 km de extensão.', reward: 20 },
-  { id: 'r25', question: 'O que significa "desenvolvimento sustentável"?', options: ['Crescimento econômico rápido', 'Desenvolvimento que atende o presente sem comprometer o futuro', 'Preservação total sem desenvolvimento', 'Industrialização verde'], correctIndex: 1, explanation: 'Busca equilibrar crescimento econômico, justiça social e preservação ambiental.', reward: 20 },
-  { id: 'r26', question: 'Qual é o efeito do desmatamento nos rios?', options: ['Aumenta o volume de água', 'Causa assoreamento e seca', 'Melhora a qualidade da água', 'Não tem efeito'], correctIndex: 1, explanation: 'O desmatamento causa erosão e assoreamento, reduzindo a capacidade dos rios.', reward: 15 },
-  { id: 'r27', question: 'O que são Objetivos de Desenvolvimento Sustentável (ODS)?', options: ['Metas do governo brasileiro', 'Agenda global da ONU com 17 objetivos', 'Regras de comércio internacional', 'Leis ambientais europeias'], correctIndex: 1, explanation: 'Os 17 ODS da ONU são uma agenda global para 2030 envolvendo todos os países.', reward: 25 },
-  { id: 'r28', question: 'Qual a importância das áreas de preservação permanente (APP)?', options: ['São áreas para construção', 'Protegem recursos hídricos e biodiversidade', 'São reservas de madeira', 'São áreas de mineração'], correctIndex: 1, explanation: 'APPs protegem margens de rios, nascentes, topos de morros e encostas.', reward: 20 },
-  { id: 'r29', question: 'O que é lixo eletrônico?', options: ['Spam na internet', 'Equipamentos eletrônicos descartados', 'Energia desperdiçada', 'Dados deletados'], correctIndex: 1, explanation: 'Lixo eletrônico contém metais pesados tóxicos e exige descarte especial.', reward: 15 },
-  { id: 'r30', question: 'Qual prática agrícola preserva o solo?', options: ['Queimada', 'Monocultura', 'Plantio direto', 'Uso intensivo de agrotóxicos'], correctIndex: 2, explanation: 'O plantio direto mantém a cobertura vegetal e protege o solo da erosão.', reward: 20 },
-  { id: 'r31', question: 'O que é a Mata Atlântica?', options: ['Floresta do norte do Brasil', 'Bioma costeiro com alta biodiversidade', 'Savana tropical', 'Floresta de pinheiros'], correctIndex: 1, explanation: 'A Mata Atlântica é um dos biomas mais ameaçados, restando cerca de 12% da área original.', reward: 25 },
-  { id: 'r32', question: 'Qual é a função dos corredores ecológicos?', options: ['Estradas para animais', 'Conectar fragmentos de habitat', 'Trilhas para turistas', 'Canais de irrigação'], correctIndex: 1, explanation: 'Corredores ecológicos permitem o fluxo genético entre populações isoladas.', reward: 20 },
-];
