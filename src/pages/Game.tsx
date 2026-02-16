@@ -19,6 +19,7 @@ import { ArrowLeft, HelpCircle, Save, ScrollText, GraduationCap, Swords } from '
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { fireVictoryConfetti, fireDefeatEffect } from '@/game/vfx/confetti';
 
 type GamePhase = 'picker' | 'setup' | 'playing';
 
@@ -37,6 +38,22 @@ export default function Game() {
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
   const [playEffect, setPlayEffect] = useState<'RA' | 'OE' | 'AO' | null>(null);
   const [screenFlash, setScreenFlash] = useState(false);
+
+  // VFX: victory/defeat confetti
+  const prevVictory = useRef(false);
+  const prevGameOver = useRef(false);
+  useEffect(() => {
+    if (game.state.isVictory && !prevVictory.current) {
+      fireVictoryConfetti();
+      prevVictory.current = true;
+    }
+    if (game.state.isGameOver && !game.state.isVictory && !prevGameOver.current) {
+      fireDefeatEffect();
+      prevGameOver.current = true;
+    }
+    if (!game.state.isVictory) prevVictory.current = false;
+    if (!game.state.isGameOver) prevGameOver.current = false;
+  }, [game.state.isVictory, game.state.isGameOver]);
 
   // Auto-save every 5 turns
   const lastSavedTurn = useRef(0);

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { StoryScene as StorySceneType, StoryChoice } from '../types';
 import { StoryIllustration } from './StoryIllustration';
 import type { BiomeId } from '../types';
+import { fireVictoryConfetti, fireDefeatEffect } from '@/game/vfx/confetti';
+import { ScreenFlash } from '@/game/vfx/ScreenFlash';
 
 interface StorySceneProps {
   scene: StorySceneType;
@@ -53,6 +55,23 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [showEndingFlash, setShowEndingFlash] = useState(false);
+  const endingTriggered = useRef(false);
+
+  // VFX: ending confetti
+  useEffect(() => {
+    if (scene.isEnding && !endingTriggered.current) {
+      endingTriggered.current = true;
+      setShowEndingFlash(true);
+      setTimeout(() => setShowEndingFlash(false), 500);
+      if (scene.endingType === 'restaurado') {
+        fireVictoryConfetti();
+      } else if (scene.endingType === 'degradado') {
+        fireDefeatEffect();
+      }
+    }
+    if (!scene.isEnding) endingTriggered.current = false;
+  }, [scene.isEnding, scene.endingType]);
 
   const handleChoice = (choice: StoryChoice, idx: number) => {
     setSelectedIdx(idx);
@@ -77,6 +96,11 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
         transition={{ duration: 0.5 }}
         className="space-y-5"
       >
+        {/* Ending flash */}
+        <ScreenFlash
+          show={showEndingFlash}
+          color={scene.endingType === 'restaurado' ? 'rgba(34,197,94,0.25)' : scene.endingType === 'degradado' ? 'rgba(239,68,68,0.25)' : 'rgba(250,204,21,0.2)'}
+        />
         {/* Animated Illustration */}
         <StoryIllustration sceneId={scene.id} biomeId={biomeId} biomeGradient={biomeGradient} />
 
