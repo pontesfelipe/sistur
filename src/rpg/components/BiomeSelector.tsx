@@ -1,6 +1,20 @@
 import { motion } from 'framer-motion';
 import { BIOME_INFO, type BiomeId } from '../types';
 
+import florestaImg from '@/assets/biomes/floresta.jpg';
+import praiaImg from '@/assets/biomes/praia.jpg';
+import cerradoImg from '@/assets/biomes/cerrado.jpg';
+import montanhaImg from '@/assets/biomes/montanha.jpg';
+import caatingaImg from '@/assets/biomes/caatinga.jpg';
+
+const BIOME_IMAGES: Record<string, string> = {
+  floresta: florestaImg,
+  praia: praiaImg,
+  cerrado: cerradoImg,
+  montanha: montanhaImg,
+  caatinga: caatingaImg,
+};
+
 interface BiomeSelectorProps {
   onSelect: (biome: BiomeId) => void;
 }
@@ -35,16 +49,14 @@ export function BiomeSelector({ onSelect }: BiomeSelectorProps) {
               whileHover={{ scale: 1.03, y: -4 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => onSelect(biomeId)}
-              className={`relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br ${info.gradient} p-6 text-left text-white shadow-lg hover:shadow-xl transition-shadow group`}
+              className="relative overflow-hidden rounded-2xl border border-border/50 p-6 text-left text-white shadow-lg hover:shadow-xl transition-shadow group min-h-[180px]"
             >
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-              <div className="relative z-10">
-                <span className="text-4xl mb-3 block">{info.emoji}</span>
-                <h3 className="text-xl font-bold mb-1">{info.name}</h3>
-                <p className="text-sm text-white/80 leading-relaxed">{info.description}</p>
-              </div>
-              <div className="absolute -bottom-2 -right-2 text-8xl opacity-10 group-hover:opacity-20 transition-opacity">
-                {info.emoji}
+              <img src={BIOME_IMAGES[biomeId]} alt={info.name} className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10 group-hover:from-black/60 group-hover:via-black/20 transition-colors" />
+              <div className="relative z-10 flex flex-col justify-end h-full">
+                <span className="text-4xl mb-2 block drop-shadow-lg">{info.emoji}</span>
+                <h3 className="text-xl font-bold mb-1 drop-shadow-lg">{info.name}</h3>
+                <p className="text-sm text-white/90 leading-relaxed drop-shadow">{info.description}</p>
               </div>
             </motion.button>
           );

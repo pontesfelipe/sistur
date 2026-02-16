@@ -10,6 +10,19 @@ import { TreasureTutorial } from './TreasureTutorial';
 import { fireVictoryConfetti, fireEcoBurst, fireDefeatEffect } from '@/game/vfx/confetti';
 import { ScreenFlash, ImpactPulse } from '@/game/vfx/ScreenFlash';
 
+// AI-generated biome images
+import florestaImg from '@/assets/biomes/floresta.jpg';
+import oceanoImg from '@/assets/biomes/oceano.jpg';
+import montanhaImg from '@/assets/biomes/montanha.jpg';
+import mangueImg from '@/assets/biomes/mangue.jpg';
+
+const BIOME_BG_IMAGES: Record<string, string> = {
+  floresta: florestaImg,
+  oceano: oceanoImg,
+  montanha: montanhaImg,
+  mangue: mangueImg,
+};
+
 const MAX_TIME = 180; // 3 minutes
 const MAX_RIDDLE_ERRORS = 4;
 
@@ -297,16 +310,20 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                 whileHover={{ scale: 1.04, y: -4 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => handleSelectTheme(theme)}
-                className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${theme.gradient} p-6 text-left text-white shadow-2xl border border-white/10 group`}
+                className="relative overflow-hidden rounded-2xl p-6 text-left text-white shadow-2xl border border-white/10 group min-h-[160px]"
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                {BIOME_BG_IMAGES[theme.id] ? (
+                  <img src={BIOME_BG_IMAGES[theme.id]} alt={theme.name} className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient}`} />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
-                <div className="relative z-10">
-                  <span className="text-5xl block mb-3 drop-shadow-lg">{theme.emoji}</span>
+                <div className="relative z-10 flex flex-col justify-end h-full">
+                  <span className="text-4xl block mb-2 drop-shadow-lg">{theme.emoji}</span>
                   <h3 className="text-lg font-bold drop-shadow">{theme.name}</h3>
-                  <p className="text-xs text-white/70 mt-1 leading-relaxed">{theme.description}</p>
+                  <p className="text-xs text-white/80 mt-1 leading-relaxed">{theme.description}</p>
                 </div>
-                <div className="absolute -bottom-4 -right-4 text-[100px] opacity-[0.07] group-hover:opacity-[0.12] transition-opacity">{theme.emoji}</div>
               </motion.button>
             ))}
           </div>

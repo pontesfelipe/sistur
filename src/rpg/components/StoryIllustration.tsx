@@ -1,6 +1,21 @@
 import { motion } from 'framer-motion';
 import type { BiomeId } from '../types';
 
+// AI-generated biome background images
+import florestaImg from '@/assets/biomes/floresta.jpg';
+import praiaImg from '@/assets/biomes/praia.jpg';
+import cerradoImg from '@/assets/biomes/cerrado.jpg';
+import montanhaImg from '@/assets/biomes/montanha.jpg';
+import caatingaImg from '@/assets/biomes/caatinga.jpg';
+
+const BIOME_IMAGES: Record<string, string> = {
+  floresta: florestaImg,
+  praia: praiaImg,
+  cerrado: cerradoImg,
+  montanha: montanhaImg,
+  caatinga: caatingaImg,
+};
+
 // Biome landscape configs - layered parallax scenes instead of random stickers
 const BIOME_LANDSCAPES: Record<string, {
   sky: string;
@@ -246,6 +261,8 @@ export function StoryIllustration({ sceneId, biomeId, biomeGradient }: StoryIllu
   const landscape = BIOME_LANDSCAPES[biomeId] || BIOME_LANDSCAPES.floresta;
   const overlay = SCENE_OVERLAYS[sceneId];
 
+  const bgImage = BIOME_IMAGES[biomeId];
+
   return (
     <motion.div
       key={sceneId}
@@ -254,8 +271,22 @@ export function StoryIllustration({ sceneId, biomeId, biomeGradient }: StoryIllu
       transition={{ duration: 0.8 }}
       className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden"
     >
-      {/* Sky gradient */}
-      <div className={`absolute inset-0 bg-gradient-to-b ${landscape.sky}`} />
+      {/* AI-generated biome background image */}
+      {bgImage ? (
+        <motion.img
+          src={bgImage}
+          alt={`Bioma ${biomeId}`}
+          className="absolute inset-0 w-full h-full object-cover"
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5, ease: 'easeOut' }}
+        />
+      ) : (
+        <div className={`absolute inset-0 bg-gradient-to-b ${landscape.sky}`} />
+      )}
+
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
 
       {/* Sun/Moon with glow */}
       <motion.div
