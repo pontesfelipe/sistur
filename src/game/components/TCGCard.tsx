@@ -3,6 +3,7 @@ import type { GameCard } from '../cardTypes';
 import type { ThreatCard } from '../threatCards';
 import { RARITY_COLORS, CATEGORY_COLORS, TYPE_LABELS } from '../cardTypes';
 import { THREAT_TARGET_COLORS, THREAT_TYPE_ICONS } from '../threatCards';
+import { getCardSprite, getThreatSprite } from '../spriteMap';
 import { useState } from 'react';
 
 // ── PLAYER CARD ──────────────────────────────────────
@@ -28,6 +29,7 @@ export function TCGPlayerCard({
   const rarity = RARITY_COLORS[card.rarity];
   const cat = CATEGORY_COLORS[card.category];
   const typeInfo = TYPE_LABELS[card.type];
+  const sprite = getCardSprite(card.id);
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -82,14 +84,26 @@ export function TCGPlayerCard({
 
       {/* Card body */}
       <div className={cn('flex-1 flex flex-col items-center justify-center p-1.5 gap-1 relative z-[1]', rarity.bg)}>
-        {/* Big emoji with hover bounce */}
-        <div className={cn(
-          'transition-all duration-300',
-          inHand ? 'text-3xl sm:text-4xl' : 'text-xl sm:text-2xl',
-          isHovered && !disabled ? 'scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : '',
-        )}>
-          {card.emoji}
-        </div>
+        {/* Sprite or emoji with hover bounce */}
+        {sprite ? (
+          <img
+            src={sprite}
+            alt={card.name}
+            className={cn(
+              'object-contain rounded-md drop-shadow-lg transition-all duration-300',
+              inHand ? 'w-12 h-12 sm:w-14 sm:h-14' : 'w-8 h-8 sm:w-10 sm:h-10',
+              isHovered && !disabled ? 'scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : '',
+            )}
+          />
+        ) : (
+          <div className={cn(
+            'transition-all duration-300',
+            inHand ? 'text-3xl sm:text-4xl' : 'text-xl sm:text-2xl',
+            isHovered && !disabled ? 'scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : '',
+          )}>
+            {card.emoji}
+          </div>
+        )}
 
         {/* Name */}
         <div className={cn(
@@ -171,6 +185,7 @@ interface TCGThreatCardProps {
 export function TCGThreatCard({ threat, animateIn, animationDelay = 0, className }: TCGThreatCardProps) {
   const targetColor = THREAT_TARGET_COLORS[threat.target];
   const typeIcon = THREAT_TYPE_ICONS[threat.type];
+  const sprite = getThreatSprite(threat.id);
 
   return (
     <div
@@ -203,7 +218,11 @@ export function TCGThreatCard({ threat, animateIn, animationDelay = 0, className
 
       {/* Body */}
       <div className="flex-1 flex flex-col items-center justify-center p-1.5 gap-1 relative z-[1]">
-        <div className="text-2xl sm:text-3xl drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]">{threat.emoji}</div>
+        {sprite ? (
+          <img src={sprite} alt={threat.name} className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-md drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+        ) : (
+          <div className="text-2xl sm:text-3xl drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]">{threat.emoji}</div>
+        )}
         <div className="text-[8px] sm:text-[9px] font-bold text-red-200 text-center leading-tight">
           {threat.name}
         </div>

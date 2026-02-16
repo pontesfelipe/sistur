@@ -9,6 +9,7 @@ import { RiddleDialog } from './RiddleDialog';
 import { TreasureTutorial } from './TreasureTutorial';
 import { fireVictoryConfetti, fireEcoBurst, fireDefeatEffect } from '@/game/vfx/confetti';
 import { ScreenFlash, ImpactPulse } from '@/game/vfx/ScreenFlash';
+import { getEmojiSprite } from '@/game/spriteMap';
 
 // AI-generated biome images
 import florestaImg from '@/assets/biomes/floresta.jpg';
@@ -519,14 +520,32 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                       ✨
                     </motion.div>
                   )}
-                  <span className={cn(
-                    'relative z-10 select-none',
-                    isPlayer ? 'text-xl' : 'text-lg',
-                    decorOpacity,
-                    !cell.revealed && 'text-base opacity-40',
-                  )}>
-                    {content}
-                  </span>
+                  {(() => {
+                    const spriteUrl = content ? getEmojiSprite(content) : null;
+                    if (spriteUrl && cell.revealed && cell.type !== 'empty') {
+                      return (
+                        <img
+                          src={spriteUrl}
+                          alt=""
+                          className={cn(
+                            'relative z-10 select-none object-contain rounded-sm',
+                            isPlayer ? 'w-6 h-6' : 'w-5 h-5',
+                            decorOpacity,
+                          )}
+                        />
+                      );
+                    }
+                    return (
+                      <span className={cn(
+                        'relative z-10 select-none',
+                        isPlayer ? 'text-xl' : 'text-lg',
+                        decorOpacity,
+                        !cell.revealed && 'text-base opacity-40',
+                      )}>
+                        {content}
+                      </span>
+                    );
+                  })()}
                 </motion.button>
               );
             })
