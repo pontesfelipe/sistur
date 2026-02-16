@@ -39,6 +39,6 @@ export function generateMemoryCards(themeId: string, pairCount: number = 12): Me
 
 export function getGridColumns(cardCount: number): number {
   if (cardCount <= 16) return 4;
-  if (cardCount <= 24) return 4;
+  if (cardCount <= 24) return 6;
   return 6;
 }
