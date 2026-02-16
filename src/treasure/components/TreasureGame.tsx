@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { generateMap, GRID } from '../mapGenerator';
@@ -18,11 +18,138 @@ function createGameState(theme: MapTheme): TreasureGameState {
   };
 }
 
+// Biome visual config
+const BIOME_VISUALS: Record<string, {
+  bgGradient: string;
+  cellBase: string;
+  cellRevealed: string;
+  fogColor: string;
+  fogEmoji: string;
+  wallEmoji: string;
+  emptyDecor: string[];
+  playerGlow: string;
+  particleEmojis: string[];
+  ambientColor: string;
+}> = {
+  floresta: {
+    bgGradient: 'from-green-950 via-emerald-950 to-green-950',
+    cellBase: 'bg-green-900/60 border-green-700/30',
+    cellRevealed: 'bg-gradient-to-br from-green-800/50 to-emerald-900/50 border-green-600/20',
+    fogColor: 'bg-gradient-to-br from-green-900/90 to-emerald-950/90',
+    fogEmoji: '🌿',
+    wallEmoji: '🌳',
+    emptyDecor: ['🍃', '🌾', '🪺', '', '', ''],
+    playerGlow: 'shadow-[0_0_20px_rgba(34,197,94,0.5)]',
+    particleEmojis: ['🍂', '🦋', '🌿', '✨', '🍃'],
+    ambientColor: 'rgba(34,197,94,0.15)',
+  },
+  oceano: {
+    bgGradient: 'from-blue-950 via-cyan-950 to-blue-950',
+    cellBase: 'bg-blue-900/60 border-blue-700/30',
+    cellRevealed: 'bg-gradient-to-br from-blue-800/50 to-cyan-900/50 border-blue-600/20',
+    fogColor: 'bg-gradient-to-br from-blue-900/90 to-blue-950/90',
+    fogEmoji: '🌊',
+    wallEmoji: '🪸',
+    emptyDecor: ['🫧', '🐟', '🌊', '', '', ''],
+    playerGlow: 'shadow-[0_0_20px_rgba(56,189,248,0.5)]',
+    particleEmojis: ['🫧', '🐠', '🫧', '✨', '🐟'],
+    ambientColor: 'rgba(56,189,248,0.15)',
+  },
+  montanha: {
+    bgGradient: 'from-stone-950 via-amber-950 to-stone-950',
+    cellBase: 'bg-stone-800/60 border-stone-600/30',
+    cellRevealed: 'bg-gradient-to-br from-stone-700/50 to-amber-900/50 border-stone-500/20',
+    fogColor: 'bg-gradient-to-br from-stone-800/90 to-stone-950/90',
+    fogEmoji: '⛰️',
+    wallEmoji: '🏔️',
+    emptyDecor: ['🪨', '🌄', '🦅', '', '', ''],
+    playerGlow: 'shadow-[0_0_20px_rgba(245,158,11,0.5)]',
+    particleEmojis: ['🍂', '🦅', '☁️', '✨', '🌬️'],
+    ambientColor: 'rgba(245,158,11,0.15)',
+  },
+  mangue: {
+    bgGradient: 'from-teal-950 via-emerald-950 to-lime-950',
+    cellBase: 'bg-teal-900/60 border-teal-700/30',
+    cellRevealed: 'bg-gradient-to-br from-teal-800/50 to-emerald-900/50 border-teal-600/20',
+    fogColor: 'bg-gradient-to-br from-teal-900/90 to-teal-950/90',
+    fogEmoji: '🌴',
+    wallEmoji: '🌴',
+    emptyDecor: ['🦀', '🐚', '🌿', '', '', ''],
+    playerGlow: 'shadow-[0_0_20px_rgba(20,184,166,0.5)]',
+    particleEmojis: ['🦀', '🐚', '🌿', '✨', '🫧'],
+    ambientColor: 'rgba(20,184,166,0.15)',
+  },
+};
+
+// Floating particle component
+function FloatingParticles({ emojis, color }: { emojis: string[]; color: string }) {
+  const particles = useMemo(() =>
+    Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      emoji: emojis[i % emojis.length],
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      duration: 8 + Math.random() * 12,
+      delay: Math.random() * 5,
+      size: 10 + Math.random() * 14,
+    })), [emojis]
+  );
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      {/* Ambient glow spots */}
+      <div className="absolute top-1/4 left-1/4 w-40 h-40 rounded-full blur-3xl" style={{ background: color }} />
+      <div className="absolute bottom-1/3 right-1/4 w-32 h-32 rounded-full blur-3xl" style={{ background: color }} />
+      {particles.map(p => (
+        <motion.span
+          key={p.id}
+          className="absolute select-none"
+          style={{ left: `${p.x}%`, top: `${p.y}%`, fontSize: p.size }}
+          animate={{
+            y: [0, -30, -15, -40, 0],
+            x: [0, 10, -8, 5, 0],
+            opacity: [0, 0.7, 0.5, 0.8, 0],
+            rotate: [0, 15, -10, 20, 0],
+          }}
+          transition={{
+            duration: p.duration,
+            delay: p.delay,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        >
+          {p.emoji}
+        </motion.span>
+      ))}
+    </div>
+  );
+}
+
+// Animated health bar
+function HealthBar({ health, maxHealth }: { health: number; maxHealth: number }) {
+  const pct = (health / maxHealth) * 100;
+  const color = pct > 60 ? 'from-emerald-500 to-green-400' : pct > 30 ? 'from-amber-500 to-yellow-400' : 'from-red-500 to-rose-400';
+  return (
+    <div className="flex items-center gap-2 flex-1">
+      <Heart className="h-4 w-4 text-red-400 flex-shrink-0" />
+      <div className="flex-1 h-3 bg-black/40 rounded-full overflow-hidden border border-white/10">
+        <motion.div
+          className={`h-full rounded-full bg-gradient-to-r ${color}`}
+          animate={{ width: `${pct}%` }}
+          transition={{ type: 'spring', stiffness: 200 }}
+        />
+      </div>
+      <span className={cn('text-xs font-bold tabular-nums w-7 text-right', pct <= 30 && 'text-red-400')}>{health}</span>
+    </div>
+  );
+}
+
 export function TreasureGame({ onBack }: { onBack: () => void }) {
   const [selectedTheme, setSelectedTheme] = useState<MapTheme | null>(null);
   const [state, setState] = useState<TreasureGameState | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
+  const [collectAnim, setCollectAnim] = useState<string | null>(null);
 
   const handleSelectTheme = useCallback((theme: MapTheme) => {
     setSelectedTheme(theme);
@@ -34,9 +161,10 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
     if (selectedTheme) setState(createGameState(selectedTheme));
   }, [selectedTheme]);
 
-  const showMessage = useCallback((msg: string) => {
+  const showMessage = useCallback((msg: string, emoji?: string) => {
     setState(prev => prev ? { ...prev, message: msg } : prev);
-    setTimeout(() => setState(prev => prev ? { ...prev, message: null } : prev), 2000);
+    if (emoji) { setCollectAnim(emoji); setTimeout(() => setCollectAnim(null), 1200); }
+    setTimeout(() => setState(prev => prev ? { ...prev, message: null } : prev), 2500);
   }, []);
 
   const handleMove = useCallback((row: number, col: number) => {
@@ -44,12 +172,11 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
       if (!prev || prev.isGameOver || prev.isVictory || prev.currentRiddle) return prev;
       const dr = Math.abs(row - prev.player.row);
       const dc = Math.abs(col - prev.player.col);
-      if ((dr + dc) !== 1) return prev; // Only adjacent orthogonal
+      if ((dr + dc) !== 1) return prev;
       const cell = prev.map[row][col];
       if (cell.type === 'wall') return prev;
 
       const newMap = prev.map.map(r => r.map(c => ({ ...c })));
-      // Reveal surrounding cells
       for (let rr = -1; rr <= 1; rr++) {
         for (let cc = -1; cc <= 1; cc++) {
           const nr = row + rr, nc = col + cc;
@@ -65,21 +192,19 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         newState.score += cell.item.points;
         newState.treasuresCollected += 1;
         newMap[row][col] = { type: 'empty', revealed: true };
-        setTimeout(() => showMessage(`${cell.item!.emoji} ${cell.item!.name} coletado! +${cell.item!.points}pts`), 50);
+        setTimeout(() => showMessage(`${cell.item!.name} coletado! +${cell.item!.points}pts`, cell.item!.emoji), 50);
       } else if (cell.type === 'trap' && cell.trap) {
         newState.health = Math.max(0, newState.health - cell.trap.damage);
         newState.trapsHit += 1;
         newMap[row][col] = { type: 'empty', revealed: true };
-        setTimeout(() => showMessage(`${cell.trap!.emoji} ${cell.trap!.name}! -${cell.trap!.damage} saúde`), 50);
-        if (newState.health <= 0) {
-          newState.isGameOver = true;
-        }
+        setTimeout(() => showMessage(`${cell.trap!.name}! -${cell.trap!.damage} saúde`, cell.trap!.emoji), 50);
+        if (newState.health <= 0) newState.isGameOver = true;
       } else if (cell.type === 'riddle' && cell.riddle) {
         newState.currentRiddle = cell.riddle;
         newState.riddlePosition = { row, col };
       } else if (cell.type === 'exit') {
         newState.isVictory = true;
-        newState.score += newState.health; // Bonus for remaining health
+        newState.score += newState.health;
       }
 
       return newState;
@@ -110,23 +235,33 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
           <h1 className="text-lg font-bold text-amber-300">🗺️ Caça ao Tesouro Ecológico</h1>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full">
-          <p className="text-slate-400 mb-6 text-center">Escolha um bioma para explorar:</p>
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-slate-300 mb-6 text-center text-base font-medium"
+          >
+            ✨ Escolha um bioma para explorar:
+          </motion.p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
             {MAP_THEMES.map((theme, i) => (
               <motion.button
                 key={theme.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: i * 0.12, type: 'spring', stiffness: 200 }}
+                whileHover={{ scale: 1.04, y: -4 }}
+                whileTap={{ scale: 0.96 }}
                 onClick={() => handleSelectTheme(theme)}
-                className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${theme.gradient} p-6 text-left text-white shadow-xl border border-white/10`}
+                className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${theme.gradient} p-6 text-left text-white shadow-2xl border border-white/10 group`}
               >
-                <span className="text-4xl block mb-2">{theme.emoji}</span>
-                <h3 className="text-lg font-bold">{theme.name}</h3>
-                <p className="text-xs text-white/70 mt-1">{theme.description}</p>
-                <div className="absolute -bottom-2 -right-2 text-[80px] opacity-10">{theme.emoji}</div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
+                <div className="relative z-10">
+                  <span className="text-5xl block mb-3 drop-shadow-lg">{theme.emoji}</span>
+                  <h3 className="text-lg font-bold drop-shadow">{theme.name}</h3>
+                  <p className="text-xs text-white/70 mt-1 leading-relaxed">{theme.description}</p>
+                </div>
+                <div className="absolute -bottom-4 -right-4 text-[100px] opacity-[0.07] group-hover:opacity-[0.12] transition-opacity">{theme.emoji}</div>
               </motion.button>
             ))}
           </div>
@@ -135,18 +270,28 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
     );
   }
 
-  const cellSize = 'min(calc((100vw - 48px) / 8), 56px)';
+  const visuals = BIOME_VISUALS[state.theme.id] || BIOME_VISUALS.floresta;
+  const cellSize = 'min(calc((100vw - 40px) / 8), 52px)';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col text-white">
+    <div className={`min-h-screen bg-gradient-to-b ${visuals.bgGradient} flex flex-col text-white relative`}>
+      {/* Floating particles */}
+      <FloatingParticles emojis={visuals.particleEmojis} color={visuals.ambientColor} />
+
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 bg-slate-900/90 backdrop-blur border-b border-slate-700/50 flex-shrink-0">
+      <div className="relative z-10 flex items-center justify-between px-3 py-2 bg-black/40 backdrop-blur-xl border-b border-white/5 flex-shrink-0">
         <button onClick={onBack} className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200 min-h-[44px] px-1">
           <ArrowLeft className="h-4 w-4" />
         </button>
         <div className="flex items-center gap-2">
-          <span className="text-lg">{state.theme.emoji}</span>
-          <h1 className="text-sm font-bold text-amber-300">{state.theme.name}</h1>
+          <motion.span
+            className="text-xl"
+            animate={{ rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            {state.theme.emoji}
+          </motion.span>
+          <h1 className="text-sm font-bold text-amber-300 drop-shadow">{state.theme.name}</h1>
         </div>
         <button onClick={() => setShowTutorial(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-200">
           <HelpCircle className="h-4 w-4" />
@@ -154,30 +299,59 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* HUD */}
-      <div className="flex items-center justify-around px-3 py-2 bg-slate-800/50 border-b border-slate-700/30 text-xs">
-        <div className="flex items-center gap-1"><Heart className="h-3.5 w-3.5 text-red-400" /> <span className={cn(state.health <= 30 && 'text-red-400 font-bold')}>{state.health}</span></div>
-        <div className="flex items-center gap-1"><Trophy className="h-3.5 w-3.5 text-amber-400" /> {state.score}</div>
-        <div className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-emerald-400" /> {state.treasuresCollected}/{state.totalTreasures}</div>
-        <div className="flex items-center gap-1"><Footprints className="h-3.5 w-3.5 text-blue-400" /> {state.moves}</div>
+      <div className="relative z-10 flex items-center gap-3 px-3 py-2.5 bg-black/30 backdrop-blur-sm border-b border-white/5 text-xs">
+        <HealthBar health={state.health} maxHealth={state.maxHealth} />
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1">
+            <Trophy className="h-3.5 w-3.5 text-amber-400" />
+            <motion.span key={state.score} animate={{ scale: [1.3, 1] }} className="font-bold tabular-nums">{state.score}</motion.span>
+          </div>
+          <div className="flex items-center gap-1">
+            <MapPin className="h-3.5 w-3.5 text-emerald-400" />
+            <span className="font-medium tabular-nums">{state.treasuresCollected}/{state.totalTreasures}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Footprints className="h-3.5 w-3.5 text-blue-400" />
+            <span className="font-medium tabular-nums">{state.moves}</span>
+          </div>
+        </div>
       </div>
+
+      {/* Collect animation */}
+      <AnimatePresence>
+        {collectAnim && (
+          <motion.div
+            initial={{ opacity: 1, scale: 0.5, y: 0 }}
+            animate={{ opacity: 0, scale: 3, y: -120 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: 'easeOut' }}
+            className="fixed top-1/3 left-1/2 -translate-x-1/2 z-50 pointer-events-none text-5xl"
+          >
+            {collectAnim}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Message toast */}
       <AnimatePresence>
         {state.message && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-40 bg-slate-800 rounded-xl shadow-2xl px-5 py-3 max-w-sm text-center border border-amber-500/30"
+            initial={{ opacity: 0, y: -30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.9 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-40 bg-black/80 backdrop-blur-xl rounded-2xl shadow-2xl px-6 py-3 max-w-sm text-center border border-amber-500/30"
           >
-            <p className="text-sm font-medium">{state.message}</p>
+            <p className="text-sm font-semibold">{state.message}</p>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Grid Map */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${GRID}, ${cellSize})` }}>
+      <div className="flex-1 flex items-center justify-center p-3 relative z-10">
+        <div
+          className="grid gap-[3px] p-2 rounded-2xl bg-black/20 backdrop-blur-sm border border-white/5 shadow-2xl"
+          style={{ gridTemplateColumns: `repeat(${GRID}, ${cellSize})` }}
+        >
           {state.map.map((row, r) =>
             row.map((cell, c) => {
               const isPlayer = r === state.player.row && c === state.player.col;
@@ -185,45 +359,123 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                 (Math.abs(r - state.player.row) + Math.abs(c - state.player.col)) === 1 &&
                 cell.type !== 'wall';
 
+              // Determine cell visual
               let content = '';
-              let bg = 'bg-slate-700/30';
+              let cellClass = '';
+              let glowClass = '';
 
               if (!cell.revealed) {
-                bg = 'bg-slate-600/50';
-                content = '🌫️';
+                cellClass = visuals.fogColor;
+                content = visuals.fogEmoji;
               } else if (isPlayer) {
-                bg = 'bg-amber-500/30 ring-2 ring-amber-400';
+                cellClass = `${visuals.cellRevealed} ${visuals.playerGlow}`;
                 content = '🧭';
+                glowClass = 'ring-2 ring-amber-400/60';
               } else {
+                cellClass = visuals.cellRevealed;
                 switch (cell.type) {
-                  case 'empty': bg = 'bg-slate-800/40'; content = ''; break;
-                  case 'treasure': bg = 'bg-yellow-900/30'; content = cell.item?.emoji || '💎'; break;
-                  case 'trap': bg = 'bg-red-900/30'; content = cell.trap?.emoji || '☠️'; break;
-                  case 'riddle': bg = 'bg-purple-900/30'; content = '🧩'; break;
-                  case 'exit': bg = 'bg-emerald-900/30'; content = '🚪'; break;
-                  case 'wall': bg = 'bg-slate-600/60'; content = '🪨'; break;
+                  case 'empty': {
+                    // Random subtle decoration
+                    const decor = visuals.emptyDecor[(r * GRID + c) % visuals.emptyDecor.length];
+                    content = decor;
+                    break;
+                  }
+                  case 'treasure':
+                    content = cell.item?.emoji || '💎';
+                    glowClass = 'ring-1 ring-amber-400/30 shadow-[0_0_12px_rgba(234,179,8,0.25)]';
+                    break;
+                  case 'trap':
+                    content = cell.trap?.emoji || '☠️';
+                    glowClass = 'ring-1 ring-red-500/30 shadow-[0_0_12px_rgba(239,68,68,0.2)]';
+                    break;
+                  case 'riddle':
+                    content = '🧩';
+                    glowClass = 'ring-1 ring-purple-400/30 shadow-[0_0_12px_rgba(168,85,247,0.25)]';
+                    break;
+                  case 'exit':
+                    content = '🚪';
+                    glowClass = 'ring-1 ring-emerald-400/40 shadow-[0_0_16px_rgba(52,211,153,0.3)]';
+                    break;
+                  case 'wall':
+                    content = visuals.wallEmoji;
+                    cellClass = `${visuals.cellBase} opacity-80`;
+                    break;
                 }
               }
+
+              const decorOpacity = cell.revealed && cell.type === 'empty' && content ? 'opacity-20' : '';
 
               return (
                 <motion.button
                   key={`${r}-${c}`}
-                  whileTap={isAdjacent ? { scale: 0.9 } : undefined}
+                  whileTap={isAdjacent ? { scale: 0.85 } : undefined}
+                  whileHover={isAdjacent ? { scale: 1.08, y: -2 } : undefined}
                   onClick={() => isAdjacent && handleMove(r, c)}
                   className={cn(
-                    'rounded-lg flex items-center justify-center text-lg transition-all border',
-                    bg,
-                    isAdjacent ? 'cursor-pointer border-amber-500/40 hover:border-amber-400 hover:bg-amber-500/10' : 'cursor-default border-transparent',
+                    'rounded-xl flex items-center justify-center transition-all border relative overflow-hidden',
+                    cellClass,
+                    glowClass,
+                    isAdjacent
+                      ? 'cursor-pointer border-amber-400/40 hover:border-amber-300/60 hover:bg-amber-500/10 z-10'
+                      : 'cursor-default',
+                    !cell.revealed && 'border-white/5',
                   )}
                   style={{ width: cellSize, height: cellSize }}
                 >
-                  {content}
+                  {/* Shimmer on adjacent cells */}
+                  {isAdjacent && (
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent"
+                      animate={{ x: ['-100%', '200%'] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                    />
+                  )}
+                  {/* Player pulse ring */}
+                  {isPlayer && (
+                    <motion.div
+                      className="absolute inset-0 rounded-xl border-2 border-amber-400/50"
+                      animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0, 0.6] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  )}
+                  {/* Treasure sparkle */}
+                  {cell.revealed && cell.type === 'treasure' && (
+                    <motion.div
+                      className="absolute top-0 right-0 text-[8px]"
+                      animate={{ opacity: [0, 1, 0], rotate: [0, 180, 360] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      ✨
+                    </motion.div>
+                  )}
+                  <span className={cn(
+                    'relative z-10 select-none',
+                    isPlayer ? 'text-xl' : 'text-lg',
+                    decorOpacity,
+                    !cell.revealed && 'text-base opacity-40',
+                  )}>
+                    {content}
+                  </span>
                 </motion.button>
               );
             })
           )}
         </div>
       </div>
+
+      {/* Bottom hint removed - not applicable */}
+
+      {/* Mini compass hint at bottom */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+        className="relative z-10 pb-safe-bottom pb-3 flex justify-center"
+      >
+        <p className="text-[10px] text-white/30 flex items-center gap-1">
+          <Sparkles className="h-3 w-3" /> Toque nas células brilhantes para explorar
+        </p>
+      </motion.div>
 
       {/* Riddle Dialog */}
       {state.currentRiddle && (
@@ -235,20 +487,30 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
 
       {/* Game Over */}
       {state.isGameOver && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="bg-slate-900 rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-3 border border-red-800/50">
-            <div className="text-5xl">💀</div>
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-gradient-to-b from-slate-900 to-red-950/50 rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border border-red-800/40"
+          >
+            <motion.div
+              className="text-6xl"
+              animate={{ rotate: [0, -10, 10, 0] }}
+              transition={{ duration: 0.5, repeat: 2 }}
+            >
+              💀
+            </motion.div>
             <h2 className="text-xl font-bold text-red-400">Missão Falhou!</h2>
             <p className="text-sm text-slate-400">Sua saúde chegou a zero pelas armadilhas ambientais.</p>
-            <div className="bg-slate-800/50 rounded-xl p-3 text-xs text-left text-slate-300 space-y-1">
-              <p><strong>Pontuação:</strong> {state.score}</p>
-              <p><strong>Tesouros:</strong> {state.treasuresCollected}/{state.totalTreasures}</p>
-              <p><strong>Enigmas:</strong> {state.riddlesSolved}</p>
-              <p><strong>Movimentos:</strong> {state.moves}</p>
+            <div className="bg-black/30 rounded-2xl p-4 text-xs text-left text-slate-300 space-y-1.5 border border-white/5">
+              <p><strong className="text-slate-200">Pontuação:</strong> {state.score}</p>
+              <p><strong className="text-slate-200">Tesouros:</strong> {state.treasuresCollected}/{state.totalTreasures}</p>
+              <p><strong className="text-slate-200">Enigmas:</strong> {state.riddlesSolved}</p>
+              <p><strong className="text-slate-200">Movimentos:</strong> {state.moves}</p>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-800">🗺️ Biomas</button>
-              <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold">🔄 Tentar novamente</button>
+              <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors">🗺️ Biomas</button>
+              <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-500/20">🔄 Tentar</button>
             </div>
           </motion.div>
         </div>
@@ -256,16 +518,27 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
 
       {/* Victory */}
       {state.isVictory && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="bg-gradient-to-b from-amber-950 to-yellow-950 rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-3 border-2 border-amber-400">
-            <div className="text-6xl animate-bounce">🏆</div>
-            <h2 className="text-xl font-bold text-amber-300">Exploração Completa!</h2>
-            <p className="text-sm text-amber-400">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0, y: 30 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 200 }}
+            className="bg-gradient-to-b from-amber-950 to-yellow-950 rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border-2 border-amber-400/60"
+          >
+            <motion.div
+              className="text-7xl"
+              animate={{ y: [0, -15, 0], rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              🏆
+            </motion.div>
+            <h2 className="text-xl font-bold text-amber-300 drop-shadow">Exploração Completa!</h2>
+            <p className="text-sm text-amber-400/80">
               {state.treasuresCollected === state.totalTreasures
-                ? 'Você coletou todos os tesouros! Incrível!'
+                ? '🌟 Você coletou todos os tesouros! Incrível!'
                 : `Você chegou à saída com ${state.treasuresCollected} de ${state.totalTreasures} tesouros.`}
             </p>
-            <div className="bg-black/20 rounded-xl p-3 text-xs text-left text-amber-200 space-y-1">
+            <div className="bg-black/20 rounded-2xl p-4 text-xs text-left text-amber-200 space-y-1.5 border border-amber-600/20">
               <p><strong>Pontuação:</strong> {state.score}</p>
               <p><strong>Tesouros:</strong> {state.treasuresCollected}/{state.totalTreasures}</p>
               <p><strong>Enigmas:</strong> {state.riddlesSolved}</p>
@@ -273,8 +546,8 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
               <p><strong>Movimentos:</strong> {state.moves}</p>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-amber-600 text-sm font-bold text-amber-300 hover:bg-amber-900/50">🗺️ Biomas</button>
-              <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600">🌟 Jogar novamente</button>
+              <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-amber-600 text-sm font-bold text-amber-300 hover:bg-amber-900/50 transition-colors">🗺️ Biomas</button>
+              <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-400/20">🌟 Jogar</button>
             </div>
           </motion.div>
         </div>
