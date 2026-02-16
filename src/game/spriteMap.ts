@@ -39,6 +39,7 @@ import turtleImg from '@/assets/game/turtle.png';
 import crabImg from '@/assets/game/crab.png';
 import coralImg from '@/assets/game/coral.png';
 import crystalImg from '@/assets/game/crystal.png';
+import cisternImg from '@/assets/game/cistern.png';
 import orchidImg from '@/assets/game/orchid.png';
 import seedlingImg from '@/assets/game/seedling.png';
 import beeImg from '@/assets/game/bee.png';
@@ -79,7 +80,7 @@ export const CARD_SPRITES: Record<string, string> = {
   beach_cleanup: cleanupImg,
   slope_reforest: reforestationImg,
   mountain_lodge: hotelImg,
-  cistern: crystalImg,
+  cistern: cisternImg,
   native_seeds: seedlingImg,
   bio_treatment: coralImg,
   floating_garden: gardenImg,
