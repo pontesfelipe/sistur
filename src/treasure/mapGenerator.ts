@@ -1,7 +1,7 @@
 import type { MapCell, Position, TreasureItem, Trap, Riddle } from './types';
 import { TREASURES, TRAPS, RIDDLES } from './types';
 
-const GRID_SIZE = 8;
+const GRID_SIZE = 10;
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -76,10 +76,10 @@ export function generateMap(themeId: string): { map: MapCell[][]; playerStart: P
     }
   }
 
-  // Riddles — 14
-  const riddles = shuffle(RIDDLES).slice(0, 14);
+  // Riddles — 28
+  const riddles = shuffle(RIDDLES).slice(0, 28);
   let rPlaced = 0;
-  while (rPlaced < 14 && idx < shuffled.length) {
+  while (rPlaced < 28 && idx < shuffled.length) {
     const pos = shuffled[idx++];
     if (map[pos.row][pos.col].type === 'fog') {
       map[pos.row][pos.col] = { type: 'riddle', revealed: false, riddle: riddles[rPlaced] };
