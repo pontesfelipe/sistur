@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import type { BiomeId } from '../types';
+import { getEmojiSprite } from '@/game/spriteMap';
 
 // AI-generated biome background images
 import florestaImg from '@/assets/biomes/floresta.jpg';
@@ -300,7 +301,11 @@ export function StoryIllustration({ sceneId, biomeId, biomeGradient }: StoryIllu
           className="absolute inset-0 rounded-full blur-2xl -m-6"
           style={{ background: landscape.sunMoon.glow, width: 80, height: 80 }}
         />
-        <span className="text-3xl relative z-10 block">{landscape.sunMoon.emoji}</span>
+        {getEmojiSprite(landscape.sunMoon.emoji) ? (
+          <img src={getEmojiSprite(landscape.sunMoon.emoji)!} alt="" className="w-8 h-8 relative z-10 block object-contain drop-shadow-lg" draggable={false} />
+        ) : (
+          <span className="text-3xl relative z-10 block">{landscape.sunMoon.emoji}</span>
+        )}
       </motion.div>
 
       {/* Floating particles (clouds, leaves, etc.) */}
@@ -316,7 +321,9 @@ export function StoryIllustration({ sceneId, biomeId, biomeGradient }: StoryIllu
           }}
           transition={{ duration: 8 + i * 2, repeat: Infinity, ease: 'easeInOut', delay: i * 1.5 }}
         >
-          {landscape.particles.emoji}
+          {getEmojiSprite(landscape.particles.emoji) ? (
+            <img src={getEmojiSprite(landscape.particles.emoji)!} alt="" className="w-4 h-4 object-contain drop-shadow" draggable={false} />
+          ) : landscape.particles.emoji}
         </motion.span>
       ))}
 
@@ -377,7 +384,9 @@ export function StoryIllustration({ sceneId, biomeId, biomeGradient }: StoryIllu
             animate={f.sway ? { rotate: [0, -3, 3, -2, 0] } : undefined}
             transition={f.sway ? { duration: 4 + i * 0.5, repeat: Infinity, ease: 'easeInOut' } : undefined}
           >
-            {f.emoji}
+            {getEmojiSprite(f.emoji) ? (
+              <img src={getEmojiSprite(f.emoji)!} alt="" className="object-contain drop-shadow-lg" style={{ width: `${f.scale * 1.8}rem`, height: `${f.scale * 1.8}rem` }} draggable={false} />
+            ) : f.emoji}
           </motion.span>
         </motion.span>
       ))}
@@ -397,7 +406,9 @@ export function StoryIllustration({ sceneId, biomeId, biomeGradient }: StoryIllu
             animate={a.float ? { y: [0, -8, 0], x: [0, 5, -3, 0] } : undefined}
             transition={a.float ? { duration: 4 + i, repeat: Infinity, ease: 'easeInOut' } : undefined}
           >
-            {a.emoji}
+            {getEmojiSprite(a.emoji) ? (
+              <img src={getEmojiSprite(a.emoji)!} alt="" className="w-6 h-6 object-contain drop-shadow-lg" draggable={false} />
+            ) : a.emoji}
           </motion.span>
         </motion.span>
       ))}
@@ -433,7 +444,9 @@ export function StoryIllustration({ sceneId, biomeId, biomeGradient }: StoryIllu
             variants={animVariants}
             animate={el.anim || undefined}
           >
-            {el.emoji}
+            {getEmojiSprite(el.emoji) ? (
+              <img src={getEmojiSprite(el.emoji)!} alt="" className="object-contain drop-shadow-lg" style={{ width: `${el.scale * 1.5}rem`, height: `${el.scale * 1.5}rem` }} draggable={false} />
+            ) : el.emoji}
           </motion.span>
         </motion.span>
       ))}
