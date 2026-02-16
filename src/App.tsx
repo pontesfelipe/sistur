@@ -53,6 +53,7 @@ const GamesHub = lazy(() => import("./pages/GamesHub"));
 const Game = lazy(() => import("./pages/Game"));
 const RPGGame = lazy(() => import("./pages/RPGGame"));
 const TreasureGame = lazy(() => import("./pages/TreasureGame"));
+const MemoryGame = lazy(() => import("./pages/MemoryGame"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -362,6 +363,14 @@ const App = () => {
                   element={
                     <ProtectedRoute redirectStudentsToEdu={false}>
                       <TreasureGame />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/game/memory"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
+                      <MemoryGame />
                     </ProtectedRoute>
                   }
                 />

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Swords, BookOpen, Map } from 'lucide-react';
+import { ArrowLeft, Swords, BookOpen, Map, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppLayout } from '@/components/layout/AppLayout';
 
@@ -29,12 +29,21 @@ export default function GamesHub() {
     },
     {
       id: 'treasure',
-      title: 'Memória Ecológica',
-      description: 'Jogo da memória ambiental! Associe imagens a descrições sobre fauna, flora e sustentabilidade dos biomas brasileiros.',
-      emoji: '🧠',
+      title: 'Caça ao Tesouro Ecológico',
+      description: 'Explore mapas estilo campo minado, colete tesouros sustentáveis, evite armadilhas e resolva enigmas ambientais!',
+      emoji: '🗺️',
       icon: Map,
       gradient: 'from-amber-900 via-orange-800 to-yellow-900',
       href: '/game/treasure',
+    },
+    {
+      id: 'memory',
+      title: 'Memória Ecológica',
+      description: 'Jogo da memória ambiental! Associe imagens a descrições sobre fauna, flora e sustentabilidade dos biomas brasileiros.',
+      emoji: '🧠',
+      icon: Brain,
+      gradient: 'from-pink-900 via-rose-800 to-fuchsia-900',
+      href: '/game/memory',
     },
   ];
 

@@ -10,44 +10,38 @@ interface TutorialStep {
 
 const STEPS: TutorialStep[] = [
   {
-    title: 'Caça ao Tesouro Ecológico!',
-    emoji: '🗺️',
-    text: 'Explore o mapa, colete tesouros sustentáveis, evite armadilhas de poluição e resolva enigmas ambientais!',
-    tip: 'Cada bioma tem seus próprios tesouros e perigos!',
+    title: 'Jogo da Memória Ecológico!',
+    emoji: '🧠',
+    text: 'Encontre os pares entre imagens e suas descrições ambientais! Cada carta-imagem tem uma carta-texto correspondente.',
+    tip: 'Exercite a memória enquanto aprende sobre ecologia!',
   },
   {
-    title: 'Exploração',
-    emoji: '🧭',
-    text: 'Toque nas células adjacentes para se mover. Células não exploradas ficam cobertas por névoa — revele o mapa passo a passo!',
-    tip: 'Você só pode andar para cima, baixo, esquerda ou direita.',
+    title: 'Como Jogar',
+    emoji: '👆',
+    text: 'Toque em uma carta para virá-la. Depois toque em outra carta. Se a imagem e a descrição combinarem, o par é revelado!',
+    tip: 'Você só pode virar 2 cartas por vez.',
   },
   {
-    title: 'Tesouros',
-    emoji: '💎',
-    text: 'Colete todos os 5 tesouros ecológicos escondidos no mapa! Cada um representa um recurso natural valioso do bioma.',
-    tip: 'Tesouros valem pontos — colete todos para a pontuação máxima!',
+    title: 'Pares',
+    emoji: '🔗',
+    text: 'Cada par tem uma carta com emoji/nome e outra com a explicação sobre o tema ambiental. Associe a imagem ao conceito correto!',
+    tip: 'Preste atenção ao virar — memorize as posições!',
   },
   {
-    title: 'Armadilhas',
-    emoji: '☠️',
-    text: 'Cuidado com armadilhas ambientais! Desmatamento, poluição e mineração ilegal causam dano à sua saúde.',
-    tip: 'Se sua saúde chegar a zero, a missão falha!',
-  },
-  {
-    title: 'Enigmas',
-    emoji: '🧩',
-    text: 'Ao encontrar um enigma, responda corretamente para ganhar pontos bônus! Errar não tira vida, mas você perde a recompensa.',
-    tip: 'Os enigmas ensinam sobre sustentabilidade e ecologia!',
+    title: 'Erros',
+    emoji: '❌',
+    text: 'Você tem um número limitado de erros. Se errar demais, o jogo acaba! Pense bem antes de virar a segunda carta.',
+    tip: 'Concentre-se e vá com calma!',
   },
   {
     title: 'Objetivo',
-    emoji: '🏁',
-    text: 'Colete o máximo de tesouros e chegue à saída 🚪 no canto inferior direito do mapa. Quanto mais tesouros, melhor sua pontuação!',
-    tip: 'Boa sorte, explorador ecológico! 🌍',
+    emoji: '🏆',
+    text: 'Encontre todos os pares antes do tempo acabar e sem exceder o limite de erros. Quanto menos erros e mais rápido, maior a pontuação!',
+    tip: 'Boa sorte, ecologista! 🌍',
   },
 ];
 
-export function TreasureTutorial({ onComplete }: { onComplete: () => void }) {
+export function MemoryTutorial({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(0);
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
@@ -83,7 +77,7 @@ export function TreasureTutorial({ onComplete }: { onComplete: () => void }) {
             </button>
           )}
           <button onClick={next} className={cn('flex-1 py-3 font-bold rounded-xl text-white text-sm shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform min-h-[48px]', isLast ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-gradient-to-r from-amber-500 to-yellow-600')}>
-            {isLast ? '🗺️ Explorar!' : 'Próximo ➡️'}
+            {isLast ? '🧠 Jogar!' : 'Próximo ➡️'}
           </button>
         </div>
         {!isLast && (
