@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,8 @@ import { generateMap, floodReveal, GRID } from '../mapGenerator';
 import { MAP_THEMES, type TreasureGameState, type Position, type MapTheme } from '../types';
 import { RiddleDialog } from './RiddleDialog';
 import { TreasureTutorial } from './TreasureTutorial';
+import { fireVictoryConfetti, fireEcoBurst, fireDefeatEffect } from '@/game/vfx/confetti';
+import { ScreenFlash, ImpactPulse } from '@/game/vfx/ScreenFlash';
 
 const MAX_TIME = 180; // 3 minutes
 const MAX_RIDDLE_ERRORS = 4;
@@ -152,6 +154,10 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
   const [collectAnim, setCollectAnim] = useState<string | null>(null);
+  const [showTrapFlash, setShowTrapFlash] = useState(false);
+  const [showCollectPulse, setShowCollectPulse] = useState(false);
+  const prevVictory = useRef(false);
+  const prevGameOver = useRef(false);
 
   const handleSelectTheme = useCallback((theme: MapTheme) => {
     setSelectedTheme(theme);
@@ -201,12 +207,19 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         newState.treasuresCollected += 1;
         newMap[row][col] = { type: 'empty', revealed: true };
         newState.map = floodReveal(newMap, row, col);
+        // VFX: treasure collect
+        setShowCollectPulse(true);
+        setTimeout(() => setShowCollectPulse(false), 600);
+        fireEcoBurst(0.5, 0.5);
         setTimeout(() => showMessage(`${cell.item!.name} coletado! +${cell.item!.points}pts`, cell.item!.emoji), 50);
       } else if (cell.type === 'trap' && cell.trap) {
         newState.health = Math.max(0, newState.health - cell.trap.damage);
         newState.trapsHit += 1;
         newMap[row][col] = { type: 'empty', revealed: true };
         newState.map = floodReveal(newMap, row, col);
+        // VFX: trap hit
+        setShowTrapFlash(true);
+        setTimeout(() => setShowTrapFlash(false), 400);
         setTimeout(() => showMessage(`${cell.trap!.name}! -${cell.trap!.damage} saúde`, cell.trap!.emoji), 50);
         if (newState.health <= 0) newState.isGameOver = true;
       } else if (cell.type === 'riddle' && cell.riddle) {
@@ -241,6 +254,20 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
       };
     });
   }, []);
+
+  // VFX: victory/defeat triggers
+  useEffect(() => {
+    if (state?.isVictory && !prevVictory.current) {
+      fireVictoryConfetti();
+      prevVictory.current = true;
+    }
+    if (state?.isGameOver && !prevGameOver.current) {
+      fireDefeatEffect();
+      prevGameOver.current = true;
+    }
+    if (!state?.isVictory) prevVictory.current = false;
+    if (!state?.isGameOver) prevGameOver.current = false;
+  }, [state?.isVictory, state?.isGameOver]);
 
   // Theme selector
   if (!selectedTheme || !state) {
@@ -294,6 +321,8 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
   return (
     <div className={`min-h-screen bg-gradient-to-b ${visuals.bgGradient} flex flex-col text-white relative`}>
       <FloatingParticles emojis={visuals.particleEmojis} color={visuals.ambientColor} />
+      <ScreenFlash show={showTrapFlash} color="rgba(239,68,68,0.3)" />
+      <ImpactPulse show={showCollectPulse} color="rgba(250,204,21,0.4)" />
 
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between px-3 py-2 bg-black/40 backdrop-blur-xl border-b border-white/5 flex-shrink-0">

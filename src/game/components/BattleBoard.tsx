@@ -1,8 +1,11 @@
+import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import type { GameCard } from '../cardTypes';
 import type { ThreatCard } from '../threatCards';
 import { TCGPlayerCard, TCGThreatCard } from './TCGCard';
 import { CATEGORY_COLORS } from '../cardTypes';
+import { fireMatchBurst } from '../vfx/confetti';
+import { ImpactPulse } from '../vfx/ScreenFlash';
 
 interface BattleBoardProps {
   playerBoard: { RA: GameCard[]; OE: GameCard[]; AO: GameCard[] };
@@ -14,8 +17,20 @@ interface BattleBoardProps {
 }
 
 export function BattleBoard({ playerBoard, threats, scores, equilibrium, turn, showPlayEffect }: BattleBoardProps) {
+  const prevTurn = useRef(turn);
+
+  // VFX: card played burst
+  useEffect(() => {
+    if (showPlayEffect && turn !== prevTurn.current) {
+      const colors = showPlayEffect === 'RA' ? ['#22c55e', '#4ade80'] : showPlayEffect === 'OE' ? ['#3b82f6', '#60a5fa'] : ['#a855f7', '#c084fc'];
+      fireMatchBurst(0.5, 0.6, colors);
+      prevTurn.current = turn;
+    }
+  }, [showPlayEffect, turn]);
+
   return (
     <div className="flex flex-col gap-2 w-full">
+      <ImpactPulse show={!!showPlayEffect} color={showPlayEffect === 'RA' ? 'rgba(34,197,94,0.3)' : showPlayEffect === 'OE' ? 'rgba(59,130,246,0.3)' : 'rgba(168,85,247,0.3)'} />
       {/* ── THREAT ZONE (top) ── */}
       <div className="relative">
         <div className="flex items-center gap-2 mb-1.5">

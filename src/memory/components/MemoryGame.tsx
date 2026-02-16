@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, HelpCircle, Trophy, XCircle, Clock, Sparkles, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,9 @@ import { cn } from '@/lib/utils';
 import { generateMemoryCards, getGridColumns } from '../cardGenerator';
 import { MEMORY_THEMES, type MemoryGameState, type MemoryTheme } from '../types';
 import { MemoryTutorial } from './MemoryTutorial';
+import { fireVictoryConfetti, fireMatchBurst, fireDefeatEffect } from '@/game/vfx/confetti';
+import { LottieOverlay } from '@/game/vfx/LottieOverlay';
+import { ScreenFlash } from '@/game/vfx/ScreenFlash';
 
 const MAX_TIME = 180;
 const MAX_ERRORS = 6;
@@ -121,6 +124,10 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
   const [state, setState] = useState<MemoryGameState | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
+  const [showMatchFlash, setShowMatchFlash] = useState(false);
+  const [showMatchLottie, setShowMatchLottie] = useState(false);
+  const prevVictory = useRef(false);
+  const prevGameOver = useRef(false);
 
   const handleSelectTheme = useCallback((theme: MemoryTheme) => {
     setSelectedTheme(theme);
@@ -167,6 +174,12 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
           const matchBonus = Math.max(10, 30 - prev.moves);
           const isVictory = newMatchedPairs >= prev.totalPairs;
 
+          // VFX: match burst
+          setShowMatchFlash(true);
+          setShowMatchLottie(true);
+          setTimeout(() => setShowMatchFlash(false), 400);
+          fireMatchBurst(0.5, 0.5, ['#22c55e', '#34d399', '#6ee7b7']);
+
           return {
             ...prev, cards: matched, flippedIndices: [], matchedPairs: newMatchedPairs,
             moves: prev.moves + 1, score: prev.score + matchBonus + (isVictory ? prev.timeRemaining : 0),
@@ -202,6 +215,20 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
     const timer = setTimeout(() => setState(prev => prev ? { ...prev, message: null } : prev), 1800);
     return () => clearTimeout(timer);
   }, [state?.message]);
+
+  // VFX: victory/defeat confetti triggers
+  useEffect(() => {
+    if (state?.isVictory && !prevVictory.current) {
+      fireVictoryConfetti();
+      prevVictory.current = true;
+    }
+    if (state?.isGameOver && !prevGameOver.current) {
+      fireDefeatEffect();
+      prevGameOver.current = true;
+    }
+    if (!state?.isVictory) prevVictory.current = false;
+    if (!state?.isGameOver) prevGameOver.current = false;
+  }, [state?.isVictory, state?.isGameOver]);
 
   // Theme selector
   if (!selectedTheme || !state) {
@@ -250,6 +277,8 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
   return (
     <div className={`min-h-screen bg-gradient-to-b ${visuals.bgGradient} flex flex-col text-white relative`}>
       <FloatingParticles emojis={visuals.particleEmojis} color={visuals.ambientColor} />
+      <ScreenFlash show={showMatchFlash} color="rgba(52,211,153,0.25)" />
+      <LottieOverlay type="match" show={showMatchLottie} onComplete={() => setShowMatchLottie(false)} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" size={100} />
 
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between px-3 py-2 bg-black/40 backdrop-blur-xl border-b border-white/5 flex-shrink-0">
