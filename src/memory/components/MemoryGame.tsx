@@ -25,7 +25,7 @@ const BIOME_BG_IMAGES: Record<string, string> = {
 };
 
 const MAX_TIME = 180;
-const MAX_ERRORS = 6;
+const MAX_ERRORS = 32;
 const PAIR_COUNT = 8;
 
 function createGameState(theme: MemoryTheme): MemoryGameState {
