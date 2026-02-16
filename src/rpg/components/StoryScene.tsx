@@ -5,6 +5,7 @@ import { StoryIllustration } from './StoryIllustration';
 import type { BiomeId } from '../types';
 import { fireVictoryConfetti, fireDefeatEffect } from '@/game/vfx/confetti';
 import { ScreenFlash } from '@/game/vfx/ScreenFlash';
+import { getEmojiSprite } from '@/game/spriteMap';
 
 interface StorySceneProps {
   scene: StorySceneType;
@@ -118,9 +119,14 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="text-2xl md:text-3xl font-display font-bold text-foreground mt-1"
+            className="text-2xl md:text-3xl font-display font-bold text-foreground mt-1 flex items-center gap-2"
           >
-            {scene.emoji} {scene.title}
+            {getEmojiSprite(scene.emoji) ? (
+              <img src={getEmojiSprite(scene.emoji)!} alt="" className="w-8 h-8 object-contain inline-block" draggable={false} />
+            ) : (
+              <span>{scene.emoji}</span>
+            )}
+            {scene.title}
           </motion.h2>
         </div>
 
@@ -304,7 +310,13 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
             >
-              {scene.endingType === 'restaurado' ? '🏆' : scene.endingType === 'degradado' ? '💔' : '⚖️'}
+              {(() => {
+                const endEmoji = scene.endingType === 'restaurado' ? '🏆' : scene.endingType === 'degradado' ? '💔' : '⚖️';
+                const endSprite = getEmojiSprite(endEmoji);
+                return endSprite
+                  ? <img src={endSprite} alt="" className="w-12 h-12 mx-auto object-contain drop-shadow-lg" draggable={false} />
+                  : endEmoji;
+              })()}
             </motion.span>
             <motion.h3
               className="text-xl font-bold text-foreground mb-2"

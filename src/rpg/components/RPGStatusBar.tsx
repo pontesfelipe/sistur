@@ -1,4 +1,5 @@
 import { Progress } from '@/components/ui/progress';
+import { getEmojiSprite } from '@/game/spriteMap';
 import type { BiomeStats } from '../types';
 
 interface RPGStatusBarProps {
@@ -22,10 +23,16 @@ export function RPGStatusBar({ stats }: RPGStatusBarProps) {
           ? value > 60 ? 'bg-red-500' : value > 30 ? 'bg-yellow-500' : 'bg-green-500'
           : value > 60 ? 'bg-green-500' : value > 30 ? 'bg-yellow-500' : 'bg-red-500';
 
+        const sprite = getEmojiSprite(emoji);
+
         return (
           <div key={key} className="bg-card/60 backdrop-blur rounded-xl p-3 border border-border/50">
             <div className="flex items-center gap-1.5 mb-1.5">
-              <span className="text-sm">{emoji}</span>
+              {sprite ? (
+                <img src={sprite} alt="" className="w-4 h-4 object-contain" draggable={false} />
+              ) : (
+                <span className="text-sm">{emoji}</span>
+              )}
               <span className="text-xs font-medium text-muted-foreground truncate">{label}</span>
               <span className="text-xs font-bold ml-auto">{Math.round(inverted ? 100 - value : value)}%</span>
             </div>
