@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Swords, BookOpen } from 'lucide-react';
+import { ArrowLeft, Swords, BookOpen, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppLayout } from '@/components/layout/AppLayout';
 
@@ -26,6 +26,15 @@ export default function GamesHub() {
       icon: BookOpen,
       gradient: 'from-emerald-900 via-green-800 to-teal-900',
       href: '/game/rpg',
+    },
+    {
+      id: 'treasure',
+      title: 'Caça ao Tesouro Ecológico',
+      description: 'Explore mapas, colete tesouros sustentáveis, evite armadilhas de poluição e resolva enigmas ambientais!',
+      emoji: '🗺️',
+      icon: Map,
+      gradient: 'from-amber-900 via-orange-800 to-yellow-900',
+      href: '/game/treasure',
     },
   ];
 
