@@ -57,6 +57,8 @@ export interface TreasureGameState {
   treasuresCollected: number;
   totalTreasures: number;
   riddlesSolved: number;
+  riddleErrors: number;
+  maxRiddleErrors: number;
   trapsHit: number;
   isGameOver: boolean;
   isVictory: boolean;
@@ -64,6 +66,8 @@ export interface TreasureGameState {
   riddlePosition: Position | null;
   theme: MapTheme;
   message: string | null;
+  timeRemaining: number;
+  maxTime: number;
 }
 
 export const MAP_THEMES: MapTheme[] = [

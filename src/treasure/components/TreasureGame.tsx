@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { generateMap, GRID } from '../mapGenerator';
@@ -8,13 +8,18 @@ import { MAP_THEMES, type TreasureGameState, type Position, type MapTheme } from
 import { RiddleDialog } from './RiddleDialog';
 import { TreasureTutorial } from './TreasureTutorial';
 
+const MAX_TIME = 180; // 3 minutes
+const MAX_RIDDLE_ERRORS = 4;
+
 function createGameState(theme: MapTheme): TreasureGameState {
   const { map, playerStart, totalTreasures } = generateMap(theme.id);
   return {
     map, player: playerStart, score: 0, health: 100, maxHealth: 100,
     moves: 0, treasuresCollected: 0, totalTreasures, riddlesSolved: 0,
+    riddleErrors: 0, maxRiddleErrors: MAX_RIDDLE_ERRORS,
     trapsHit: 0, isGameOver: false, isVictory: false, currentRiddle: null,
     riddlePosition: null, theme, message: null,
+    timeRemaining: MAX_TIME, maxTime: MAX_TIME,
   };
 }
 
@@ -161,6 +166,22 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
     if (selectedTheme) setState(createGameState(selectedTheme));
   }, [selectedTheme]);
 
+  // Countdown timer
+  useEffect(() => {
+    if (!state || state.isGameOver || state.isVictory || !selectedTheme) return;
+    const interval = setInterval(() => {
+      setState(prev => {
+        if (!prev || prev.isGameOver || prev.isVictory) return prev;
+        const newTime = prev.timeRemaining - 1;
+        if (newTime <= 0) {
+          return { ...prev, timeRemaining: 0, isGameOver: true };
+        }
+        return { ...prev, timeRemaining: newTime };
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [state?.isGameOver, state?.isVictory, selectedTheme]);
+
   const showMessage = useCallback((msg: string, emoji?: string) => {
     setState(prev => prev ? { ...prev, message: msg } : prev);
     if (emoji) { setCollectAnim(emoji); setTimeout(() => setCollectAnim(null), 1200); }
@@ -204,7 +225,8 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         newState.riddlePosition = { row, col };
       } else if (cell.type === 'exit') {
         newState.isVictory = true;
-        newState.score += newState.health;
+        const timeBonus = Math.floor(newState.timeRemaining / 3);
+        newState.score += newState.health + timeBonus;
       }
 
       return newState;
@@ -216,10 +238,14 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
       if (!prev || !prev.riddlePosition) return prev;
       const newMap = prev.map.map(r => r.map(c => ({ ...c })));
       newMap[prev.riddlePosition.row][prev.riddlePosition.col] = { type: 'empty', revealed: true };
+      const newErrors = correct ? prev.riddleErrors : prev.riddleErrors + 1;
+      const isGameOver = newErrors >= prev.maxRiddleErrors;
       return {
         ...prev, map: newMap, currentRiddle: null, riddlePosition: null,
         score: prev.score + reward,
         riddlesSolved: correct ? prev.riddlesSolved + 1 : prev.riddlesSolved,
+        riddleErrors: newErrors,
+        isGameOver,
       };
     });
   }, []);
@@ -299,17 +325,37 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* HUD */}
-      <div className="relative z-10 flex items-center gap-3 px-3 py-2.5 bg-black/30 backdrop-blur-sm border-b border-white/5 text-xs">
-        <HealthBar health={state.health} maxHealth={state.maxHealth} />
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <div className="flex items-center gap-1">
-            <Trophy className="h-3.5 w-3.5 text-amber-400" />
-            <motion.span key={state.score} animate={{ scale: [1.3, 1] }} className="font-bold tabular-nums">{state.score}</motion.span>
+      <div className="relative z-10 flex flex-col gap-1.5 px-3 py-2 bg-black/30 backdrop-blur-sm border-b border-white/5 text-xs">
+        <div className="flex items-center gap-3">
+          <HealthBar health={state.health} maxHealth={state.maxHealth} />
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex items-center gap-1">
+              <Trophy className="h-3.5 w-3.5 text-amber-400" />
+              <motion.span key={state.score} animate={{ scale: [1.3, 1] }} className="font-bold tabular-nums">{state.score}</motion.span>
+            </div>
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5 text-emerald-400" />
+              <span className="font-medium tabular-nums">{state.treasuresCollected}/{state.totalTreasures}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5 text-emerald-400" />
-            <span className="font-medium tabular-nums">{state.treasuresCollected}/{state.totalTreasures}</span>
+        </div>
+        <div className="flex items-center gap-3 justify-between">
+          {/* Timer */}
+          <div className={cn('flex items-center gap-1', state.timeRemaining <= 30 && 'text-red-400')}>
+            <Clock className="h-3.5 w-3.5" />
+            <span className="font-bold tabular-nums">
+              {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')}
+            </span>
+            {state.timeRemaining <= 30 && (
+              <motion.span animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="text-[10px]">⚠️</motion.span>
+            )}
           </div>
+          {/* Riddle errors */}
+          <div className={cn('flex items-center gap-1', state.riddleErrors >= state.maxRiddleErrors - 1 && 'text-red-400')}>
+            <XCircle className="h-3.5 w-3.5" />
+            <span className="font-medium tabular-nums">{state.riddleErrors}/{state.maxRiddleErrors} erros</span>
+          </div>
+          {/* Moves */}
           <div className="flex items-center gap-1">
             <Footprints className="h-3.5 w-3.5 text-blue-400" />
             <span className="font-medium tabular-nums">{state.moves}</span>
@@ -501,11 +547,18 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
               💀
             </motion.div>
             <h2 className="text-xl font-bold text-red-400">Missão Falhou!</h2>
-            <p className="text-sm text-slate-400">Sua saúde chegou a zero pelas armadilhas ambientais.</p>
+            <p className="text-sm text-slate-400">
+              {state.timeRemaining <= 0
+                ? '⏰ O tempo acabou! Você não encontrou a saída a tempo.'
+                : state.riddleErrors >= state.maxRiddleErrors
+                ? '🧩 Muitos erros nos enigmas! O conhecimento é sua melhor ferramenta.'
+                : 'Sua saúde chegou a zero pelas armadilhas ambientais.'}
+            </p>
             <div className="bg-black/30 rounded-2xl p-4 text-xs text-left text-slate-300 space-y-1.5 border border-white/5">
               <p><strong className="text-slate-200">Pontuação:</strong> {state.score}</p>
               <p><strong className="text-slate-200">Tesouros:</strong> {state.treasuresCollected}/{state.totalTreasures}</p>
               <p><strong className="text-slate-200">Enigmas:</strong> {state.riddlesSolved}</p>
+              <p><strong className="text-slate-200">Erros:</strong> {state.riddleErrors}/{state.maxRiddleErrors}</p>
               <p><strong className="text-slate-200">Movimentos:</strong> {state.moves}</p>
             </div>
             <div className="flex gap-3">
@@ -541,7 +594,8 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
             <div className="bg-black/20 rounded-2xl p-4 text-xs text-left text-amber-200 space-y-1.5 border border-amber-600/20">
               <p><strong>Pontuação:</strong> {state.score}</p>
               <p><strong>Tesouros:</strong> {state.treasuresCollected}/{state.totalTreasures}</p>
-              <p><strong>Enigmas:</strong> {state.riddlesSolved}</p>
+              <p><strong>Enigmas:</strong> {state.riddlesSolved} (erros: {state.riddleErrors})</p>
+              <p><strong>Tempo restante:</strong> {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')} (+bônus)</p>
               <p><strong>Saúde restante:</strong> {state.health} (+bônus)</p>
               <p><strong>Movimentos:</strong> {state.moves}</p>
             </div>
