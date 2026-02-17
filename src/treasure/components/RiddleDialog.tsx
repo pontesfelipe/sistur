@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Riddle } from '../types';
 import { cn } from '@/lib/utils';
+import { getEmojiSprite } from '@/game/spriteMap';
 
 interface RiddleDialogProps {
   riddle: Riddle;
@@ -32,13 +33,17 @@ export function RiddleDialog({ riddle, onAnswer }: RiddleDialogProps) {
       >
         {/* Header */}
         <div className="text-center mb-5">
-          <motion.span
-            className="text-5xl block mb-3"
+          <motion.div
+            className="block mb-3 flex justify-center"
             animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
             transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
           >
-            🧩
-          </motion.span>
+            {getEmojiSprite('🧩') ? (
+              <img src={getEmojiSprite('🧩')!} alt="" className="w-14 h-14 object-contain drop-shadow-lg" draggable={false} />
+            ) : (
+              <span className="text-5xl">🧩</span>
+            )}
+          </motion.div>
           <h2 className="text-lg font-bold text-purple-200">Enigma Ambiental</h2>
           <div className="mt-1 flex items-center justify-center gap-1.5">
             <span className="text-[10px] text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">

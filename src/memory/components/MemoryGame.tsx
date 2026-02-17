@@ -283,7 +283,11 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
                 <div className="relative z-10 flex flex-col justify-end h-full">
-                  <span className="text-4xl block mb-2 drop-shadow-lg">{theme.emoji}</span>
+                  {getEmojiSprite(theme.emoji) ? (
+                    <img src={getEmojiSprite(theme.emoji)!} alt="" className="w-12 h-12 object-contain drop-shadow-lg mb-2" draggable={false} />
+                  ) : (
+                    <span className="text-4xl block mb-2 drop-shadow-lg">{theme.emoji}</span>
+                  )}
                   <h3 className="text-lg font-bold drop-shadow">{theme.name}</h3>
                   <p className="text-xs text-white/80 mt-1 leading-relaxed">{theme.description}</p>
                 </div>
@@ -405,7 +409,11 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
                     style={{ backfaceVisibility: 'hidden' }}
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <span className="text-2xl sm:text-3xl opacity-60">🌍</span>
+                      {getEmojiSprite('🌍') ? (
+                        <img src={getEmojiSprite('🌍')!} alt="" className="w-8 h-8 sm:w-10 sm:h-10 object-contain opacity-60" draggable={false} />
+                      ) : (
+                        <span className="text-2xl sm:text-3xl opacity-60">🌍</span>
+                      )}
                       <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider">ECO</span>
                     </div>
                     <div className="absolute inset-0 opacity-[0.08]" style={{

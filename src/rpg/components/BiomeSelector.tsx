@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { BIOME_INFO, type BiomeId } from '../types';
+import { getEmojiSprite } from '@/game/spriteMap';
 
 import florestaImg from '@/assets/biomes/floresta.jpg';
 import praiaImg from '@/assets/biomes/praia.jpg';
@@ -29,8 +30,11 @@ export function BiomeSelector({ onSelect }: BiomeSelectorProps) {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-8"
       >
-        <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
-          🌍 Missão Bioma
+        <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2 flex items-center justify-center gap-3">
+          {getEmojiSprite('🌍') ? (
+            <img src={getEmojiSprite('🌍')!} alt="" className="w-9 h-9 object-contain" draggable={false} />
+          ) : '🌍'}
+          Missão Bioma
         </h1>
         <p className="text-muted-foreground text-lg max-w-md mx-auto">
           Escolha um bioma para iniciar sua missão de restauração
@@ -40,6 +44,7 @@ export function BiomeSelector({ onSelect }: BiomeSelectorProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl w-full">
         {biomes.map((biomeId, i) => {
           const info = BIOME_INFO[biomeId];
+          const sprite = getEmojiSprite(info.emoji);
           return (
             <motion.button
               key={biomeId}
@@ -54,7 +59,13 @@ export function BiomeSelector({ onSelect }: BiomeSelectorProps) {
               <img src={BIOME_IMAGES[biomeId]} alt={info.name} className="absolute inset-0 w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10 group-hover:from-black/60 group-hover:via-black/20 transition-colors" />
               <div className="relative z-10 flex flex-col justify-end h-full">
-                <span className="text-4xl mb-2 block drop-shadow-lg">{info.emoji}</span>
+                <div className="mb-2">
+                  {sprite ? (
+                    <img src={sprite} alt="" className="w-12 h-12 object-contain drop-shadow-lg" draggable={false} />
+                  ) : (
+                    <span className="text-4xl block drop-shadow-lg">{info.emoji}</span>
+                  )}
+                </div>
                 <h3 className="text-xl font-bold mb-1 drop-shadow-lg">{info.name}</h3>
                 <p className="text-sm text-white/90 leading-relaxed drop-shadow">{info.description}</p>
               </div>
