@@ -261,7 +261,6 @@ interface StoryIllustrationProps {
 export function StoryIllustration({ sceneId, biomeId, biomeGradient }: StoryIllustrationProps) {
   const landscape = BIOME_LANDSCAPES[biomeId] || BIOME_LANDSCAPES.floresta;
   const overlay = SCENE_OVERLAYS[sceneId];
-
   const bgImage = BIOME_IMAGES[biomeId];
 
   return (
@@ -286,183 +285,52 @@ export function StoryIllustration({ sceneId, biomeId, biomeGradient }: StoryIllu
         <div className={`absolute inset-0 bg-gradient-to-b ${landscape.sky}`} />
       )}
 
-      {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-
-      {/* Sun/Moon with glow */}
-      <motion.div
-        className="absolute left-1/2 -translate-x-1/2 z-[1]"
-        style={{ top: landscape.sunMoon.y }}
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2, duration: 0.6 }}
-      >
-        <div
-          className="absolute inset-0 rounded-full blur-2xl -m-6"
-          style={{ background: landscape.sunMoon.glow, width: 80, height: 80 }}
-        />
-        {getEmojiSprite(landscape.sunMoon.emoji) ? (
-          <img src={getEmojiSprite(landscape.sunMoon.emoji)!} alt="" className="w-8 h-8 relative z-10 block object-contain drop-shadow-lg" draggable={false} />
-        ) : (
-          <span className="text-3xl relative z-10 block">{landscape.sunMoon.emoji}</span>
-        )}
-      </motion.div>
-
-      {/* Floating particles (clouds, leaves, etc.) */}
-      {Array.from({ length: landscape.particles.count }, (_, i) => (
-        <motion.span
-          key={`p-${i}`}
-          className="absolute text-sm opacity-40 select-none z-[2]"
-          style={{ left: `${15 + i * (70 / landscape.particles.count)}%`, top: `${10 + i * 8}%` }}
-          animate={{
-            x: [0, 20 + i * 5, -10, 0],
-            y: [0, -5, 5, 0],
-            opacity: [0.2, 0.5, 0.3, 0.2],
-          }}
-          transition={{ duration: 8 + i * 2, repeat: Infinity, ease: 'easeInOut', delay: i * 1.5 }}
-        >
-          {getEmojiSprite(landscape.particles.emoji) ? (
-            <img src={getEmojiSprite(landscape.particles.emoji)!} alt="" className="w-4 h-4 object-contain drop-shadow" draggable={false} />
-          ) : landscape.particles.emoji}
-        </motion.span>
-      ))}
-
-      {/* Far mountains/hills — SVG layer */}
-      <svg className="absolute bottom-0 left-0 w-full h-full z-[3]" viewBox="0 0 600 200" preserveAspectRatio="none">
-        {landscape.farBg.shapes.map((s, i) => (
-          <motion.path
-            key={`far-${i}`}
-            d={s.d}
-            fill={s.fill}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 0.8, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.8 }}
-          />
-        ))}
-      </svg>
-
-      {/* Mid-ground hills — SVG layer */}
-      <svg className="absolute bottom-0 left-0 w-full h-full z-[4]" viewBox="0 0 600 200" preserveAspectRatio="none">
-        {landscape.midBg.shapes.map((s, i) => (
-          <motion.path
-            key={`mid-${i}`}
-            d={s.d}
-            fill={s.fill}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 0.9, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.7 }}
-          />
-        ))}
-      </svg>
-
-      {/* Ground */}
-      <motion.div
-        className="absolute bottom-0 left-0 right-0 h-[25%] z-[5]"
-        style={{ background: `linear-gradient(to top, ${landscape.ground.color}, ${landscape.ground.highlight})` }}
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.6 }}
-      />
-
-      {/* Flora — trees, plants along the ground line */}
-      {landscape.flora.map((f, i) => (
-        <motion.span
-          key={`flora-${i}`}
-          className="absolute z-[6] select-none"
-          style={{
-            left: `${f.x}%`,
-            bottom: '18%',
-            fontSize: `${f.scale * 1.5}rem`,
-            transformOrigin: 'bottom center',
-          }}
-          initial={{ opacity: 0, scale: 0, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 0.4 + i * 0.08, type: 'spring', stiffness: 200, damping: 15 }}
-        >
-          <motion.span
-            className="block"
-            animate={f.sway ? { rotate: [0, -3, 3, -2, 0] } : undefined}
-            transition={f.sway ? { duration: 4 + i * 0.5, repeat: Infinity, ease: 'easeInOut' } : undefined}
-          >
-            {getEmojiSprite(f.emoji) ? (
-              <img src={getEmojiSprite(f.emoji)!} alt="" className="object-contain drop-shadow-lg" style={{ width: `${f.scale * 1.8}rem`, height: `${f.scale * 1.8}rem` }} draggable={false} />
-            ) : f.emoji}
-          </motion.span>
-        </motion.span>
-      ))}
-
-      {/* Fauna — animals */}
-      {landscape.fauna.map((a, i) => (
-        <motion.span
-          key={`fauna-${i}`}
-          className="absolute z-[7] select-none"
-          style={{ left: `${a.x}%`, top: `${a.y}%`, fontSize: '1.3rem' }}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.8 + i * 0.15, type: 'spring', stiffness: 200 }}
-        >
-          <motion.span
-            className="block"
-            animate={a.float ? { y: [0, -8, 0], x: [0, 5, -3, 0] } : undefined}
-            transition={a.float ? { duration: 4 + i, repeat: Infinity, ease: 'easeInOut' } : undefined}
-          >
-            {getEmojiSprite(a.emoji) ? (
-              <img src={getEmojiSprite(a.emoji)!} alt="" className="w-6 h-6 object-contain drop-shadow-lg" draggable={false} />
-            ) : a.emoji}
-          </motion.span>
-        </motion.span>
-      ))}
+      {/* Cinematic gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/5" />
 
       {/* Scene-specific tint */}
       {overlay?.tint && (
         <motion.div
-          className="absolute inset-0 z-[8]"
+          className="absolute inset-0 z-[2]"
           style={{ background: overlay.tint }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.3 }}
         />
       )}
 
-      {/* Scene-specific overlay elements */}
-      {overlay?.elements.map((el, i) => (
-        <motion.span
-          key={`overlay-${i}`}
-          className="absolute z-[9] select-none drop-shadow-lg"
+      {/* Subtle animated atmosphere particles (no sprites, just CSS dots) */}
+      {Array.from({ length: 4 }, (_, i) => (
+        <motion.div
+          key={`particle-${i}`}
+          className="absolute rounded-full bg-white/20 z-[3]"
           style={{
-            left: `${el.x}%`,
-            top: `${el.y}%`,
-            fontSize: `${el.scale * 1.5}rem`,
-            transform: 'translate(-50%, -50%)',
+            width: 3 + i,
+            height: 3 + i,
+            left: `${15 + i * 20}%`,
+            top: `${20 + i * 12}%`,
           }}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6 + i * 0.12, type: 'spring', stiffness: 250, damping: 18 }}
-        >
-          <motion.span
-            className="block"
-            variants={animVariants}
-            animate={el.anim || undefined}
-          >
-            {getEmojiSprite(el.emoji) ? (
-              <img src={getEmojiSprite(el.emoji)!} alt="" className="object-contain drop-shadow-lg" style={{ width: `${el.scale * 1.5}rem`, height: `${el.scale * 1.5}rem` }} draggable={false} />
-            ) : el.emoji}
-          </motion.span>
-        </motion.span>
+          animate={{
+            x: [0, 15 + i * 5, -8, 0],
+            y: [0, -6, 4, 0],
+            opacity: [0.15, 0.35, 0.2, 0.15],
+          }}
+          transition={{ duration: 7 + i * 2, repeat: Infinity, ease: 'easeInOut', delay: i * 1.2 }}
+        />
       ))}
 
       {/* Atmosphere glow */}
       <div
-        className="absolute inset-0 z-[10] pointer-events-none"
+        className="absolute inset-0 z-[4] pointer-events-none"
         style={{ background: `radial-gradient(ellipse at 50% 80%, ${landscape.atmosphere}, transparent 70%)` }}
       />
 
       {/* Vignette */}
-      <div className="absolute inset-0 z-[11] pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.3)] rounded-2xl" />
+      <div className="absolute inset-0 z-[5] pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.3)] rounded-2xl" />
 
       {/* Scene transition sweep */}
       <motion.div
-        className="absolute inset-0 z-[12] bg-gradient-to-r from-white/15 via-white/25 to-transparent pointer-events-none"
+        className="absolute inset-0 z-[6] bg-gradient-to-r from-white/10 via-white/20 to-transparent pointer-events-none"
         initial={{ x: '-100%' }}
         animate={{ x: '200%' }}
         transition={{ duration: 1.8, ease: 'easeInOut' }}
