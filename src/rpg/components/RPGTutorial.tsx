@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { getEmojiSprite } from '@/game/spriteMap';
 
 interface TutorialStep {
   title: string;
@@ -24,7 +25,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     title: 'As 4 Barras Vitais',
     emoji: '📊',
-    text: '🦎 Biodiversidade — saúde dos ecossistemas\n🏭 Poluição — quanto menor, melhor!\n👥 Comunidade — bem-estar das pessoas\n💎 Recursos — materiais disponíveis',
+    text: '🦜 Biodiversidade — saúde dos ecossistemas\n🏭 Poluição — quanto menor, melhor!\n👥 Comunidade — bem-estar das pessoas\n💎 Recursos — materiais disponíveis',
     tip: 'Mantenha as barras equilibradas para um final feliz!',
   },
   {
@@ -66,6 +67,8 @@ export function RPGTutorial({ onComplete }: RPGTutorialProps) {
     setStep(s => Math.max(0, s - 1));
   }, []);
 
+  const sprite = getEmojiSprite(current.emoji);
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4">
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300">
@@ -84,7 +87,13 @@ export function RPGTutorial({ onComplete }: RPGTutorialProps) {
 
         {/* Content */}
         <div className="text-center mb-5">
-          <span className="text-5xl block mb-3">{current.emoji}</span>
+          <div className="block mb-3 flex justify-center">
+            {sprite ? (
+              <img src={sprite} alt="" className="w-14 h-14 object-contain drop-shadow-lg" draggable={false} />
+            ) : (
+              <span className="text-5xl">{current.emoji}</span>
+            )}
+          </div>
           <h2 className="text-xl font-bold text-foreground mb-2">{current.title}</h2>
           <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">{current.text}</p>
           {current.tip && (

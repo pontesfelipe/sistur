@@ -4,6 +4,16 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Swords, BookOpen, Map, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { getEmojiSprite } from '@/game/spriteMap';
+
+function SpriteOrEmoji({ emoji, className = 'w-12 h-12' }: { emoji: string; className?: string }) {
+  const sprite = getEmojiSprite(emoji);
+  return sprite ? (
+    <img src={sprite} alt="" className={`${className} object-contain drop-shadow-lg`} draggable={false} />
+  ) : (
+    <span className="text-5xl">{emoji}</span>
+  );
+}
 
 export default function GamesHub() {
   const navigate = useNavigate();
@@ -52,7 +62,7 @@ export default function GamesHub() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-display font-bold text-foreground flex items-center gap-3">
-            🎮 Jogos Educacionais
+            <SpriteOrEmoji emoji="🎮" className="w-8 h-8" /> Jogos Educacionais
           </h1>
           <p className="text-muted-foreground mt-2">
             Aprenda sobre sustentabilidade e gestão territorial de forma divertida
@@ -73,7 +83,9 @@ export default function GamesHub() {
             >
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
               <div className="relative z-10">
-                <span className="text-5xl mb-4 block">{game.emoji}</span>
+                <div className="mb-4">
+                  <SpriteOrEmoji emoji={game.emoji} className="w-14 h-14" />
+                </div>
                 <h3 className="text-2xl font-bold mb-2">{game.title}</h3>
                 <p className="text-sm text-white/80 leading-relaxed">{game.description}</p>
                 <div className="mt-4 inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-sm font-medium backdrop-blur">
@@ -81,8 +93,12 @@ export default function GamesHub() {
                   Jogar
                 </div>
               </div>
-              <div className="absolute -bottom-4 -right-4 text-[120px] opacity-10 group-hover:opacity-20 transition-opacity">
-                {game.emoji}
+              <div className="absolute -bottom-4 -right-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                {getEmojiSprite(game.emoji) ? (
+                  <img src={getEmojiSprite(game.emoji)!} alt="" className="w-32 h-32 object-contain" draggable={false} />
+                ) : (
+                  <span className="text-[120px]">{game.emoji}</span>
+                )}
               </div>
             </motion.button>
           ))}

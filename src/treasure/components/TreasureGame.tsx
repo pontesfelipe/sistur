@@ -326,7 +326,11 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
                 <div className="relative z-10 flex flex-col justify-end h-full">
-                  <span className="text-4xl block mb-2 drop-shadow-lg">{theme.emoji}</span>
+                  {getEmojiSprite(theme.emoji) ? (
+                    <img src={getEmojiSprite(theme.emoji)!} alt="" className="w-12 h-12 object-contain drop-shadow-lg mb-2" draggable={false} />
+                  ) : (
+                    <span className="text-4xl block mb-2 drop-shadow-lg">{theme.emoji}</span>
+                  )}
                   <h3 className="text-lg font-bold drop-shadow">{theme.name}</h3>
                   <p className="text-xs text-white/80 mt-1 leading-relaxed">{theme.description}</p>
                 </div>
@@ -354,7 +358,9 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         </button>
         <div className="flex items-center gap-2">
           <motion.span className="text-xl" animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-            {state.theme.emoji}
+            {getEmojiSprite(state.theme.emoji) ? (
+              <img src={getEmojiSprite(state.theme.emoji)!} alt="" className="w-6 h-6 object-contain" draggable={false} />
+            ) : state.theme.emoji}
           </motion.span>
           <h1 className="text-sm font-bold text-amber-300 drop-shadow">{state.theme.name}</h1>
         </div>
@@ -531,16 +537,18 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                   )}
                   {(() => {
                     const spriteUrl = content ? getEmojiSprite(content) : null;
-                    if (spriteUrl && cell.revealed && cell.type !== 'empty') {
+                    if (spriteUrl) {
                       return (
                         <img
                           src={spriteUrl}
                           alt=""
                           className={cn(
                             'relative z-10 select-none object-contain rounded-sm',
-                            isPlayer ? 'w-6 h-6' : 'w-5 h-5',
+                            isPlayer ? 'w-6 h-6' : cell.revealed && cell.type === 'empty' ? 'w-4 h-4' : 'w-5 h-5',
                             decorOpacity,
+                            !cell.revealed && 'w-4 h-4 opacity-40',
                           )}
+                          draggable={false}
                         />
                       );
                     }
