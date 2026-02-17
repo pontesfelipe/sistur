@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -102,49 +102,35 @@ const BIOME_VISUALS: Record<string, {
   },
 };
 
-function FloatingParticles({ emojis, color }: { emojis: string[]; color: string }) {
-  const particles = useMemo(() =>
-    Array.from({ length: 12 }, (_, i) => ({
-      id: i,
-      emoji: emojis[i % emojis.length],
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      duration: 8 + Math.random() * 12,
-      delay: Math.random() * 5,
-      size: 10 + Math.random() * 14,
-    })), [emojis]
-  );
+function BiomeBackground({ themeId }: { themeId: string }) {
+  const bgImage = BIOME_BG_IMAGES[themeId];
+  if (!bgImage) return null;
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-      <div className="absolute top-1/4 left-1/4 w-40 h-40 rounded-full blur-3xl" style={{ background: color }} />
-      <div className="absolute bottom-1/3 right-1/4 w-32 h-32 rounded-full blur-3xl" style={{ background: color }} />
-      {particles.map(p => {
-        const sprite = getEmojiSprite(p.emoji);
-        return (
-          <motion.span
-            key={p.id}
-            className="absolute select-none"
-            style={{ left: `${p.x}%`, top: `${p.y}%`, fontSize: sprite ? undefined : p.size }}
-            animate={{
-              y: [0, -30, -15, -40, 0],
-              x: [0, 10, -8, 5, 0],
-              opacity: [0, 0.7, 0.5, 0.8, 0],
-              rotate: [0, 15, -10, 20, 0],
-            }}
-            transition={{
-              duration: p.duration,
-              delay: p.delay,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          >
-            {sprite ? (
-              <img src={sprite} alt="" className="object-contain drop-shadow" style={{ width: p.size, height: p.size }} draggable={false} />
-            ) : p.emoji}
-          </motion.span>
-        );
-      })}
+    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+      <motion.img
+        src={bgImage}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+        initial={{ scale: 1.1, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1.5, ease: 'easeOut' }}
+        draggable={false}
+      />
+      {/* Cinematic overlays */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
+      <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.5)]" />
+      {/* Subtle animated particles (CSS only, no emojis) */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 rounded-full bg-white/20"
+          style={{ left: `${10 + Math.random() * 80}%`, top: `${10 + Math.random() * 80}%` }}
+          animate={{ y: [0, -20, 0], opacity: [0, 0.6, 0] }}
+          transition={{ duration: 4 + Math.random() * 4, delay: Math.random() * 3, repeat: Infinity }}
+        />
+      ))}
     </div>
   );
 }
@@ -210,16 +196,24 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
   const handleMove = useCallback((row: number, col: number) => {
     setState(prev => {
       if (!prev || prev.isGameOver || prev.isVictory || prev.currentRiddle) return prev;
+      const cell = prev.map[row][col];
+      if (!cell.revealed && cell.type === 'wall') return prev;
+      if (cell.revealed && cell.type === 'wall') return prev;
+
+      // Allow clicking adjacent cells (movement) OR any unrevealed cell (minesweeper explore)
       const dr = Math.abs(row - prev.player.row);
       const dc = Math.abs(col - prev.player.col);
-      if ((dr + dc) !== 1) return prev;
-      const cell = prev.map[row][col];
-      if (cell.type === 'wall') return prev;
+      const isAdjacent = (dr + dc) === 1;
+      const isUnrevealedExplore = !cell.revealed;
+
+      if (!isAdjacent && !isUnrevealedExplore) return prev;
 
       let newMap = prev.map.map(r => r.map(c => ({ ...c })));
       newMap[row][col].revealed = true;
 
-      let newState = { ...prev, map: newMap, player: { row, col }, moves: prev.moves + 1 };
+      // Only move player if adjacent, otherwise just reveal (minesweeper style)
+      const newPlayer = isAdjacent ? { row, col } : prev.player;
+      let newState = { ...prev, map: newMap, player: newPlayer, moves: prev.moves + 1 };
 
       if (cell.type === 'treasure' && cell.item) {
         newState.score += cell.item.points;
@@ -346,8 +340,8 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
   const cellSize = 'min(calc((100vw - 40px) / 8), 52px)';
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b ${visuals.bgGradient} flex flex-col text-white relative`}>
-      <FloatingParticles emojis={visuals.particleEmojis} color={visuals.ambientColor} />
+    <div className="min-h-screen flex flex-col text-white relative bg-black">
+      <BiomeBackground themeId={state.theme.id} />
       <ScreenFlash show={showTrapFlash} color="rgba(239,68,68,0.3)" />
       <ImpactPulse show={showCollectPulse} color="rgba(250,204,21,0.4)" />
 
@@ -447,9 +441,13 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
           {state.map.map((row, r) =>
             row.map((cell, c) => {
               const isPlayer = r === state.player.row && c === state.player.col;
+              const adjDist = Math.abs(r - state.player.row) + Math.abs(c - state.player.col);
               const isAdjacent = !state.isGameOver && !state.isVictory && !state.currentRiddle &&
-                (Math.abs(r - state.player.row) + Math.abs(c - state.player.col)) === 1 &&
-                cell.type !== 'wall';
+                adjDist === 1 && cell.type !== 'wall';
+              // Minesweeper: allow clicking any unrevealed non-wall cell
+              const isExplorable = !state.isGameOver && !state.isVictory && !state.currentRiddle &&
+                !cell.revealed && cell.type !== 'wall' && !isPlayer;
+              const isClickable = isAdjacent || isExplorable;
 
               let content = '';
               let cellClass = '';
@@ -500,19 +498,20 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                   key={`${r}-${c}`}
                   whileTap={isAdjacent ? { scale: 0.85 } : undefined}
                   whileHover={isAdjacent ? { scale: 1.08, y: -2 } : undefined}
-                  onClick={() => isAdjacent && handleMove(r, c)}
+                  onClick={() => isClickable && handleMove(r, c)}
                   className={cn(
                     'rounded-xl flex items-center justify-center transition-all border relative overflow-hidden',
                     cellClass,
                     glowClass,
-                    isAdjacent
+                    isClickable
                       ? 'cursor-pointer border-amber-400/40 hover:border-amber-300/60 hover:bg-amber-500/10 z-10'
                       : 'cursor-default',
-                    !cell.revealed && 'border-white/5',
+                    !cell.revealed && isExplorable && 'hover:brightness-125',
+                    !cell.revealed && !isExplorable && 'border-white/5',
                   )}
                   style={{ width: cellSize, height: cellSize }}
                 >
-                  {isAdjacent && (
+                  {isClickable && (
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent"
                       animate={{ x: ['-100%', '200%'] }}
