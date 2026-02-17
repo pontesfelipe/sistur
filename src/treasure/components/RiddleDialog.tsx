@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Riddle } from '../types';
 import { cn } from '@/lib/utils';
@@ -12,14 +12,24 @@ interface RiddleDialogProps {
 const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
 export function RiddleDialog({ riddle, onAnswer }: RiddleDialogProps) {
+  // Shuffle option order so the correct answer isn't always in the same position
+  const shuffledOptions = useMemo(() => {
+    const indices = riddle.options.map((_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return indices.map(i => ({ text: riddle.options[i], originalIndex: i }));
+  }, [riddle.id]);
+
   const [selected, setSelected] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
 
-  const handleSelect = (index: number) => {
+  const handleSelect = (displayIndex: number) => {
     if (answered) return;
-    setSelected(index);
+    setSelected(displayIndex);
     setAnswered(true);
-    const correct = index === riddle.correctIndex;
+    const correct = shuffledOptions[displayIndex].originalIndex === riddle.correctIndex;
     setTimeout(() => onAnswer(correct, correct ? riddle.reward : 0), 2200);
   };
 
@@ -59,8 +69,8 @@ export function RiddleDialog({ riddle, onAnswer }: RiddleDialogProps) {
 
         {/* Options */}
         <div className="space-y-2.5">
-          {riddle.options.map((opt, i) => {
-            const isCorrect = i === riddle.correctIndex;
+          {shuffledOptions.map((opt, i) => {
+            const isCorrect = opt.originalIndex === riddle.correctIndex;
             const isSelected = i === selected;
             return (
               <motion.button
@@ -93,7 +103,7 @@ export function RiddleDialog({ riddle, onAnswer }: RiddleDialogProps) {
                 )}>
                   {answered && isCorrect ? '✓' : answered && isSelected && !isCorrect ? '✗' : OPTION_LABELS[i]}
                 </span>
-                <span className="leading-snug">{opt}</span>
+                <span className="leading-snug">{opt.text}</span>
               </motion.button>
             );
           })}
@@ -108,16 +118,16 @@ export function RiddleDialog({ riddle, onAnswer }: RiddleDialogProps) {
               transition={{ delay: 0.3 }}
               className={cn(
                 'mt-4 p-4 rounded-2xl text-xs border',
-                selected === riddle.correctIndex
+                selected !== null && shuffledOptions[selected].originalIndex === riddle.correctIndex
                   ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-200'
                   : 'bg-red-500/10 border-red-500/20 text-red-200'
               )}
             >
               <p className="font-bold mb-1 text-sm">
-                {selected === riddle.correctIndex ? '✅ Correto!' : '❌ Errado!'}
+                {selected !== null && shuffledOptions[selected].originalIndex === riddle.correctIndex ? '✅ Correto!' : '❌ Errado!'}
               </p>
               <p className="leading-relaxed text-white/70">{riddle.explanation}</p>
-              {selected === riddle.correctIndex && (
+              {selected !== null && shuffledOptions[selected].originalIndex === riddle.correctIndex && (
                 <motion.p
                   initial={{ scale: 0.8 }}
                   animate={{ scale: 1 }}
