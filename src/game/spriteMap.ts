@@ -282,6 +282,18 @@ export const EMOJI_SPRITES: Record<string, string> = {
   '😔': communityImg,
   '🤔': communityImg,
   '👆': signsImg,
+
+  // RPG-specific missing mappings
+  '🏭': pollutionImg,
+  '💰': crystalImg,
+  '⚡': stormImg,
+  '🏃': communityImg,
+  '📚': schoolImg,
+  '📝': lawImg,
+  '🔍': signsImg,
+  '🅰️': governanceImg,
+  '🅱️': governanceImg,
+  '🅲': governanceImg,
 };
 
 /**
