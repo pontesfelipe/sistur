@@ -99,7 +99,6 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
     );
   }
 
-  const [diaryOpen, setDiaryOpen] = useState(false);
 
   // Progress bar based on story scenes visited
   const totalScenes = story.scenes.filter(s => !s.isEnding).length;
