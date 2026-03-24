@@ -24,6 +24,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
   const [state, setState] = useState<RPGState>(initialState);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
+  const [diaryOpen, setDiaryOpen] = useState(false);
 
   const handleSelectBiome = useCallback((biome: BiomeId) => {
     setState({
@@ -98,7 +99,6 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
     );
   }
 
-  const [diaryOpen, setDiaryOpen] = useState(false);
 
   // Progress bar based on story scenes visited
   const totalScenes = story.scenes.filter(s => !s.isEnding).length;

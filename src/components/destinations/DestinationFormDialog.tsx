@@ -95,7 +95,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
   const [showResults, setShowResults] = useState(false);
   const [selectedIBGE, setSelectedIBGE] = useState<IBGEResult | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [searchTimeout, setSearchTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   const isEditing = !!destination;
 
   const form = useForm<DestinationFormValues>({
