@@ -3,6 +3,7 @@ import { AppSidebar } from './AppSidebar';
 import { AppHeader } from './AppHeader';
 import { MobileSidebar } from './MobileSidebar';
 import { MobileBottomNav } from './MobileBottomNav';
+import { TrialBanner } from '@/components/TrialBanner';
 import { cn } from '@/lib/utils';
 
 interface AppLayoutProps {
@@ -26,9 +27,10 @@ export function AppLayout({ children, title, subtitle, actions }: AppLayoutProps
       <MobileSidebar open={mobileOpen} onOpenChange={setMobileOpen} />
       
       <div className="md:pl-64 transition-all duration-300">
-        <AppHeader 
-          title={title} 
-          subtitle={subtitle} 
+        <TrialBanner />
+        <AppHeader
+          title={title}
+          subtitle={subtitle}
           onMobileMenuClick={() => setMobileOpen(true)}
           actions={actions}
         />

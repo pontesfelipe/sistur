@@ -6,10 +6,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProfileProvider } from "@/contexts/ProfileContext";
+import { LicenseProvider } from "@/contexts/LicenseContext";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { AdminRoute } from "@/components/layout/AdminRoute";
 import { ERPRoute } from "@/components/layout/ERPRoute";
 import { EduRoute } from "@/components/layout/EduRoute";
+import { LicenseRoute } from "@/components/layout/LicenseRoute";
 import { SplashScreen } from "@/components/SplashScreen";
 
 // Lazy load all page components for code splitting
@@ -54,6 +56,8 @@ const Game = lazy(() => import("./pages/Game"));
 const RPGGame = lazy(() => import("./pages/RPGGame"));
 const TreasureGame = lazy(() => import("./pages/TreasureGame"));
 const MemoryGame = lazy(() => import("./pages/MemoryGame"));
+const Subscription = lazy(() => import("./pages/Subscription"));
+const AdminLicenses = lazy(() => import("./pages/AdminLicenses"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -79,6 +83,7 @@ const App = () => {
           <BrowserRouter>
             <AuthProvider>
               <ProfileProvider>
+              <LicenseProvider>
               <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/auth" element={<Auth />} />
@@ -208,7 +213,9 @@ const App = () => {
                   path="/relatorios"
                   element={
                     <ERPRoute>
-                      <Relatorios />
+                      <LicenseRoute requiredFeature="reports">
+                        <Relatorios />
+                      </LicenseRoute>
                     </ERPRoute>
                   }
                 />
@@ -272,7 +279,9 @@ const App = () => {
                   path="/erp/integracao"
                   element={
                     <ERPRoute>
-                      <ERPIntegration />
+                      <LicenseRoute requiredFeature="integrations">
+                        <ERPIntegration />
+                      </LicenseRoute>
                     </ERPRoute>
                   }
                 />
@@ -374,10 +383,27 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/assinatura"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
+                      <Subscription />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/licencas"
+                  element={
+                    <AdminRoute>
+                      <AdminLicenses />
+                    </AdminRoute>
+                  }
+                />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
               </Suspense>
+              </LicenseProvider>
               </ProfileProvider>
             </AuthProvider>
           </BrowserRouter>
