@@ -588,6 +588,28 @@ Deno.serve(async (req) => {
       })
     }
 
+    if (action === 'get_emails') {
+      const { user_ids } = data
+
+      if (!user_ids || !Array.isArray(user_ids) || user_ids.length === 0) {
+        return new Response(JSON.stringify({ error: 'user_ids array is required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      const usersWithEmail = await Promise.all(
+        user_ids.map(async (userId: string) => {
+          const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(userId)
+          return { user_id: userId, email: user?.email || null }
+        })
+      )
+
+      return new Response(JSON.stringify({ users: usersWithEmail }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     return new Response(JSON.stringify({ error: 'Invalid action' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
