@@ -25,33 +25,18 @@ export function PendingApprovalsPanel() {
   const fetchPendingUsers = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, user_id, full_name, system_access, approval_requested_at')
-        .eq('pending_approval', true);
+      const response = await supabase.functions.invoke('manage-users', {
+        body: { action: 'list_pending' }
+      });
 
-      if (error) throw error;
+      if (response.error) throw response.error;
 
-      // Get emails from auth.users via edge function
-      if (data && data.length > 0) {
-        const userIds = data.map((p: any) => p.user_id);
-        const response = await supabase.functions.invoke('manage-users', {
-          body: { action: 'get_emails', user_ids: userIds }
-        });
+      const users = (response.data?.users || []).map((user: PendingUser & { email: string | null }) => ({
+        ...user,
+        email: user.email || 'Email não disponível'
+      }));
 
-        const usersMap = new Map(
-          (response.data?.users || []).map((u: any) => [u.user_id, u.email])
-        );
-
-        const enrichedData = data.map(p => ({
-          ...p,
-          email: usersMap.get(p.user_id) || 'Email não disponível'
-        }));
-
-        setPendingUsers(enrichedData as PendingUser[]);
-      } else {
-        setPendingUsers([]);
-      }
+      setPendingUsers(users);
     } catch (error) {
       console.error('Error fetching pending users:', error);
       toast.error('Erro ao carregar usuários pendentes');
