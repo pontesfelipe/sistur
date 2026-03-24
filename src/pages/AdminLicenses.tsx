@@ -67,7 +67,7 @@ export default function AdminLicenses() {
   const fetchLicenses = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('licenses')
         .select('*, profiles:user_id(full_name, org_id)')
         .order('created_at', { ascending: false });
@@ -116,7 +116,7 @@ export default function AdminLicenses() {
   const handleSave = async (license: LicenseRow) => {
     try {
       const features = DEFAULT_FEATURES[editPlan];
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('licenses')
         .update({
           plan: editPlan,
@@ -140,7 +140,7 @@ export default function AdminLicenses() {
 
   const handleExpireTrials = async () => {
     try {
-      const { error } = await supabase.rpc('expire_trial_licenses');
+      const { error } = await (supabase as any).rpc('expire_trial_licenses');
       if (error) throw error;
       toast.success('Trials expirados atualizados');
       fetchLicenses();
