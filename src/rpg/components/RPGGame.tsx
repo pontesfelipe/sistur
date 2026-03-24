@@ -24,6 +24,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
   const [state, setState] = useState<RPGState>(initialState);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
+  const [diaryOpen, setDiaryOpen] = useState(false);
 
   const handleSelectBiome = useCallback((biome: BiomeId) => {
     setState({
