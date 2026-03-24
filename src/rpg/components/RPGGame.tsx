@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, RotateCcw, BookOpen, HelpCircle } from 'lucide-react';
+import { ArrowLeft, RotateCcw, BookOpen, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BiomeSelector } from './BiomeSelector';
 import { StoryScene } from './StoryScene';
@@ -98,8 +98,17 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
     );
   }
 
+  const [diaryOpen, setDiaryOpen] = useState(false);
+
+  // Progress bar based on story scenes visited
+  const totalScenes = story.scenes.filter(s => !s.isEnding).length;
+  const progressPct = Math.min(100, Math.round((state.history.length / Math.max(1, totalScenes)) * 100));
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Subtle biome-themed ambient gradient */}
+      <div className={`fixed inset-0 pointer-events-none z-0 bg-gradient-to-b ${biomeInfo.gradient} opacity-[0.04]`} />
+
       {/* Header */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border">
         <div className="max-w-3xl mx-auto px-4 py-3">
@@ -135,11 +144,22 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
             </div>
           </div>
           <RPGStatusBar stats={state.stats} />
+          {/* Story progress bar */}
+          <div className="mt-2 flex items-center gap-2">
+            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-primary/60 rounded-full"
+                animate={{ width: `${progressPct}%` }}
+                transition={{ type: 'spring', stiffness: 100 }}
+              />
+            </div>
+            <span className="text-[10px] text-muted-foreground tabular-nums">{progressPct}%</span>
+          </div>
         </div>
       </div>
 
       {/* Story Content */}
-      <div className="max-w-3xl mx-auto px-4 py-6">
+      <div className="max-w-3xl mx-auto px-4 py-6 relative z-10">
         <StoryScene
           scene={currentScene}
           chapter={currentScene.chapter}
@@ -149,39 +169,62 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
           biomeId={state.biome}
         />
 
-        {/* Narrative History — always visible below */}
+        {/* Collapsible Narrative History */}
         {state.history.length > 0 && (
-          <div className="mt-8 space-y-4">
-            <p className="text-sm font-bold text-muted-foreground flex items-center gap-2">
-              📜 Diário da Jornada
-            </p>
-            <div className="space-y-3">
-              {state.history.map((sceneId, i) => {
-                const histScene = story.scenes.find(s => s.id === sceneId);
-                if (!histScene) return null;
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="bg-muted/30 border border-border/50 rounded-xl p-4 relative overflow-hidden"
-                  >
-                    <div className="absolute top-0 left-0 w-1 h-full bg-primary/30 rounded-l-xl" />
-                    <div className="pl-3">
-                      <p className="text-xs font-bold text-primary/70 uppercase tracking-wider mb-1 flex items-center gap-1">
-                        Capítulo {histScene.chapter} — {getEmojiSprite(histScene.emoji) ? (
-                          <img src={getEmojiSprite(histScene.emoji)!} alt="" className="w-3.5 h-3.5 object-contain inline-block" draggable={false} />
-                        ) : histScene.emoji} {histScene.title}
-                      </p>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {histScene.narrative}
-                      </p>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
+          <div className="mt-8 space-y-3">
+            <button
+              onClick={() => setDiaryOpen(!diaryOpen)}
+              className="w-full flex items-center justify-between text-sm font-bold text-muted-foreground hover:text-foreground transition-colors group"
+            >
+              <span className="flex items-center gap-2">
+                📜 Diário da Jornada
+                <span className="text-xs font-normal text-muted-foreground/60">({state.history.length} capítulos)</span>
+              </span>
+              {diaryOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+
+            <AnimatePresence>
+              {diaryOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-0 relative">
+                    {/* Timeline connector line */}
+                    <div className="absolute left-[7px] top-4 bottom-4 w-0.5 bg-border/50 z-0" />
+                    {state.history.map((sceneId, i) => {
+                      const histScene = story.scenes.find(s => s.id === sceneId);
+                      if (!histScene) return null;
+                      return (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.03 }}
+                          className="flex gap-3 py-2 relative"
+                        >
+                          {/* Timeline dot */}
+                          <div className="flex-shrink-0 w-4 h-4 mt-1 rounded-full bg-primary/30 border-2 border-primary/50 z-10" />
+                          <div className="flex-1 bg-muted/30 border border-border/50 rounded-xl p-3">
+                            <p className="text-xs font-bold text-primary/70 uppercase tracking-wider mb-1 flex items-center gap-1">
+                              Cap. {histScene.chapter} — {getEmojiSprite(histScene.emoji) ? (
+                                <img src={getEmojiSprite(histScene.emoji)!} alt="" className="w-3.5 h-3.5 object-contain inline-block" draggable={false} />
+                              ) : histScene.emoji} {histScene.title}
+                            </p>
+                            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                              {histScene.narrative}
+                            </p>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Current scene indicator */}
             <div className="flex items-center gap-2 pt-2">
