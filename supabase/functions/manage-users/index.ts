@@ -364,6 +364,40 @@ Deno.serve(async (req) => {
       })
     }
 
+    if (action === 'list_pending') {
+      const { data: pendingProfiles, error: pendingProfilesError } = await supabaseAdmin
+        .from('profiles')
+        .select('id, user_id, full_name, system_access, approval_requested_at')
+        .eq('pending_approval', true)
+        .order('approval_requested_at', { ascending: false })
+
+      if (pendingProfilesError) {
+        return new Response(JSON.stringify({ error: pendingProfilesError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      const users = await Promise.all(
+        (pendingProfiles || []).map(async (profile) => {
+          const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(profile.user_id)
+
+          if (userError) {
+            console.error(`Error fetching email for pending user ${profile.user_id}:`, userError)
+          }
+
+          return {
+            ...profile,
+            email: userData.user?.email ?? null,
+          }
+        })
+      )
+
+      return new Response(JSON.stringify({ users }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     if (action === 'list') {
       // Get the requesting user's org_id
       const { data: profile } = await supabaseAdmin
