@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 import type { GameCard } from '../cardTypes';
 import { TCGPlayerCard } from './TCGCard';
 
@@ -15,10 +16,19 @@ interface TCGHandProps {
 }
 
 export function TCGHand({ hand, coins, onPlay, onDiscard, canPlay, selectedIndex, onSelect, cardsPlayed, maxPlays }: TCGHandProps) {
+  const playsLeft = maxPlays - cardsPlayed;
+  const affordable = hand.filter(c => c.cost <= coins).length;
+
   if (hand.length === 0) {
     return (
       <div className="flex items-center justify-center py-4 text-muted-foreground">
-        <p className="text-sm">🃏 Sem cartas. Passe o turno para comprar!</p>
+        <motion.p
+          className="text-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          🃏 Sem cartas. Passe o turno para comprar!
+        </motion.p>
       </div>
     );
   }
@@ -26,13 +36,18 @@ export function TCGHand({ hand, coins, onPlay, onDiscard, canPlay, selectedIndex
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-        <span>🎴 Mão ({hand.length})</span>
+        <span className="flex items-center gap-1">
+          🎴 <span className="font-bold text-foreground">{hand.length}</span>
+          {affordable > 0 && <span className="text-emerald-500">({affordable} jogáveis)</span>}
+        </span>
         <span>•</span>
-        <span>💰 {coins} moedas</span>
+        <span className={cn('flex items-center gap-1', coins <= 1 && 'text-amber-500')}>
+          💰 <span className="font-bold">{coins}</span>
+        </span>
         <span>•</span>
         <span className={cn(
           'font-bold',
-          cardsPlayed >= maxPlays ? 'text-red-500' : 'text-emerald-500'
+          playsLeft === 0 ? 'text-red-500' : playsLeft === 1 ? 'text-amber-500' : 'text-emerald-500'
         )}>
           {cardsPlayed}/{maxPlays} jogadas
         </span>

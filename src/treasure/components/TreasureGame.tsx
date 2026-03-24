@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle, Compass, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { generateMap, floodReveal, GRID } from '../mapGenerator';
@@ -132,6 +132,77 @@ function BiomeBackground({ themeId }: { themeId: string }) {
         />
       ))}
     </div>
+  );
+}
+
+function ExitCompass({ playerRow, playerCol, map }: { playerRow: number; playerCol: number; map: { type: string; revealed: boolean }[][] }) {
+  // Find exit position
+  const exitPos = useMemo(() => {
+    for (let r = 0; r < map.length; r++) {
+      for (let c = 0; c < map[r].length; c++) {
+        if (map[r][c].type === 'exit') return { row: r, col: c };
+      }
+    }
+    return null;
+  }, [map]);
+
+  if (!exitPos) return null;
+
+  const dr = exitPos.row - playerRow;
+  const dc = exitPos.col - playerCol;
+  const dist = Math.abs(dr) + Math.abs(dc);
+  const angle = Math.atan2(dr, dc) * (180 / Math.PI);
+
+  const distLabel = dist <= 3 ? 'Muito perto!' : dist <= 6 ? 'Perto' : 'Longe';
+  const distColor = dist <= 3 ? 'text-emerald-400' : dist <= 6 ? 'text-amber-400' : 'text-slate-400';
+
+  return (
+    <div className="flex items-center gap-2">
+      <motion.div
+        animate={{ rotate: angle - 90 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+        className="relative"
+      >
+        <Compass className={cn('h-5 w-5', distColor)} />
+      </motion.div>
+      <div className="flex flex-col">
+        <span className={cn('text-[10px] font-bold', distColor)}>🚪 {distLabel}</span>
+      </div>
+    </div>
+  );
+}
+
+function DangerWarning({ playerRow, playerCol, map }: { playerRow: number; playerCol: number; map: { type: string; revealed: boolean }[][] }) {
+  const nearbyTraps = useMemo(() => {
+    let count = 0;
+    for (let dr = -2; dr <= 2; dr++) {
+      for (let dc = -2; dc <= 2; dc++) {
+        const r = playerRow + dr;
+        const c = playerCol + dc;
+        if (r >= 0 && r < map.length && c >= 0 && c < map[0].length) {
+          if (map[r][c].type === 'trap' && !map[r][c].revealed) count++;
+        }
+      }
+    }
+    return count;
+  }, [playerRow, playerCol, map]);
+
+  if (nearbyTraps === 0) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={cn(
+        'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold',
+        nearbyTraps >= 2 ? 'bg-red-500/30 text-red-300' : 'bg-amber-500/30 text-amber-300',
+      )}
+    >
+      <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity }}>
+        <AlertTriangle className="h-3 w-3" />
+      </motion.div>
+      {nearbyTraps >= 2 ? 'Perigo!' : 'Cuidado!'}
+    </motion.div>
   );
 }
 
@@ -388,9 +459,13 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
               <motion.span animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="text-[10px]">⚠️</motion.span>
             )}
           </div>
+          {/* Compass to exit */}
+          <ExitCompass playerRow={state.player.row} playerCol={state.player.col} map={state.map} />
+          {/* Danger proximity warning */}
+          <DangerWarning playerRow={state.player.row} playerCol={state.player.col} map={state.map} />
           <div className={cn('flex items-center gap-1', state.riddleErrors >= state.maxRiddleErrors - 1 && 'text-red-400')}>
             <XCircle className="h-3.5 w-3.5" />
-            <span className="font-medium tabular-nums">{state.riddleErrors}/{state.maxRiddleErrors} erros</span>
+            <span className="font-medium tabular-nums">{state.riddleErrors}/{state.maxRiddleErrors}</span>
           </div>
           <div className="flex items-center gap-1">
             <Footprints className="h-3.5 w-3.5 text-blue-400" />
