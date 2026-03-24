@@ -34,8 +34,9 @@ export function PendingApprovalsPanel() {
 
       // Get emails from auth.users via edge function
       if (data && data.length > 0) {
+        const userIds = data.map((p: any) => p.user_id);
         const response = await supabase.functions.invoke('manage-users', {
-          body: { action: 'list' }
+          body: { action: 'get_emails', user_ids: userIds }
         });
 
         const usersMap = new Map(
