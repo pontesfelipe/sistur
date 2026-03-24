@@ -67,7 +67,7 @@ export default function AdminLicenses() {
   const fetchLicenses = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('licenses')
         .select('*, profiles:user_id(full_name, org_id)')
         .order('created_at', { ascending: false });
