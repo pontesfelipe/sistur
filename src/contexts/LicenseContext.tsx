@@ -73,7 +73,7 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('licenses')
         .select('*')
         .eq('user_id', user.id)
