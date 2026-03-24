@@ -116,7 +116,7 @@ export default function AdminLicenses() {
   const handleSave = async (license: LicenseRow) => {
     try {
       const features = DEFAULT_FEATURES[editPlan];
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('licenses')
         .update({
           plan: editPlan,
