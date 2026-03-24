@@ -140,7 +140,7 @@ export default function AdminLicenses() {
 
   const handleExpireTrials = async () => {
     try {
-      const { error } = await supabase.rpc('expire_trial_licenses');
+      const { error } = await (supabase as any).rpc('expire_trial_licenses');
       if (error) throw error;
       toast.success('Trials expirados atualizados');
       fetchLicenses();
