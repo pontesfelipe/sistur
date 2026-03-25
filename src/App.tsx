@@ -61,6 +61,21 @@ const AdminLicenses = lazy(() => import("./pages/AdminLicenses"));
 const TermsAcceptance = lazy(() => import("./pages/TermsAcceptance"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
+// Preload frequently visited pages after initial render
+const preloadPages = () => {
+  requestIdleCallback?.(() => {
+    import("./pages/Index");
+    import("./pages/EduCatalogo");
+    import("./pages/Configuracoes");
+    import("./pages/Subscription");
+  }) ?? setTimeout(() => {
+    import("./pages/Index");
+    import("./pages/EduCatalogo");
+    import("./pages/Configuracoes");
+    import("./pages/Subscription");
+  }, 3000);
+};
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
