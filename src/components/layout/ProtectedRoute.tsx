@@ -25,10 +25,13 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true, skipLic
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const { isLicenseValid, initialized: licenseInit, loading: licenseLoading } = useLicense();
 
-  // Only show loading on initial load, not on navigation between routes
+  // Only show full-screen loading on truly initial app load (no data yet), not on navigation
   const isInitialLoad = (loading && user === null) || (!initialized && profile === null);
+  const isWaitingForData = !!user && !initialized;
+  const isWaitingForTerms = !!user && termsLoading && !hasAcceptedTerms;
+  const isWaitingForLicense = !!user && !skipLicenseCheck && !licenseInit;
 
-  if (isInitialLoad || (user && termsLoading) || (user && !skipLicenseCheck && !licenseInit)) {
+  if (isInitialLoad || isWaitingForData || isWaitingForTerms || isWaitingForLicense) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
