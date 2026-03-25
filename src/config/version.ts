@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 7,
-  patch: 16,
+  minor: 8,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,10 +23,20 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.7.16",
-    date: "2026-01-23",
-    type: "patch" as const,
+    version: "1.8.0",
+    date: "2026-03-25",
+    type: "minor" as const,
     changes: [
+      "Sistema de Licenciamento completo (trial, estudante, professor, basic, pro, enterprise)",
+      "Termos e condições obrigatórios na primeira utilização",
+      "Exportação CSV de usuários com status, licença, termos e acessos",
+      "Auditoria e correção de dados: licenças criadas para 15 usuários pendentes",
+      "Otimização de performance: QueryClient com staleTime/gcTime, useMemo em contexts",
+      "Planos de assinatura EDU (Estudante R$19, Professor R$39) na página de assinatura",
+      "Coluna de aceite de termos no gerenciamento de usuários"
+    ]
+  },
+  {
       "Fix: Recomendações agora buscam treinamentos de edu_trainings via training_id",
       "RecommendationCard exibe título, descrição e duração do modelo unificado",
       "Tipos Recommendation e Prescription atualizados com training_id e training",
