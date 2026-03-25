@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { Loader2 } from 'lucide-react';
 
 interface EduRouteProps {
@@ -11,9 +12,9 @@ interface EduRouteProps {
 export function EduRoute({ children, requireProfessor = false }: EduRouteProps) {
   const { user, loading: authLoading } = useAuth();
   const { hasEDUAccess, isProfessor, isAdmin, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
+  const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
 
-  // Only show loading on initial load, not on navigation between routes
-  const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null);
+  const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null) || (!!user && termsLoading);
 
   if (isInitialLoad) {
     return (
@@ -29,34 +30,13 @@ export function EduRoute({ children, requireProfessor = false }: EduRouteProps) 
     );
   }
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  if (needsOnboarding) {
-    return <Navigate to="/onboarding" replace />;
-  }
-
-  if (awaitingApproval) {
-    return <Navigate to="/pending-approval" replace />;
-  }
-
-  // Admin always has access
-  if (isAdmin) {
-    return <>{children}</>;
-  }
-
-  // Check if requires professor role
-  if (requireProfessor && !isProfessor) {
-    return <Navigate to="/edu" replace />;
-  }
-
-  // Check EDU access
-  if (!hasEDUAccess) {
-    // If user is logged in but doesn't have EDU enabled yet,
-    // send them to onboarding to pick access rather than bouncing to home.
-    return <Navigate to="/onboarding" replace />;
-  }
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
+  if (needsOnboarding) return <Navigate to="/onboarding" replace />;
+  if (awaitingApproval) return <Navigate to="/pending-approval" replace />;
+  if (isAdmin) return <>{children}</>;
+  if (requireProfessor && !isProfessor) return <Navigate to="/edu" replace />;
+  if (!hasEDUAccess) return <Navigate to="/onboarding" replace />;
 
   return <>{children}</>;
 }
