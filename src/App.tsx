@@ -253,10 +253,10 @@ const App = () => {
                 />
                 <Route
                   path="/metodologia"
-                  element={
-                    <ProtectedRoute redirectStudentsToEdu={false}>
+                   element={
+                    <AdminRoute>
                       <Metodologia />
-                    </ProtectedRoute>
+                    </AdminRoute>
                   }
                 />
                 <Route
