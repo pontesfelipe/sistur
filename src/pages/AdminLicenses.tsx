@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Search, UserCheck, Clock, AlertTriangle, Crown, X, Check, RefreshCw, Plus, Building2, Users, ArrowRightLeft } from 'lucide-react';
+import { Shield, Search, UserCheck, Clock, AlertTriangle, Crown, X, Check, RefreshCw, Plus, Building2, Users, ArrowRightLeft, FlaskConical } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import type { LicensePlan, LicenseStatus } from '@/contexts/LicenseContext';
+import { TrialControlPanel } from '@/components/admin/TrialControlPanel';
 
 interface LicenseRow {
   id: string;
@@ -398,6 +399,7 @@ export default function AdminLicenses() {
         <Tabs defaultValue="licenses">
           <TabsList>
             <TabsTrigger value="licenses" className="gap-1.5"><Users className="h-4 w-4" /> Licenças</TabsTrigger>
+            <TabsTrigger value="trials" className="gap-1.5"><FlaskConical className="h-4 w-4" /> Controle de Trials</TabsTrigger>
             <TabsTrigger value="quotas" className="gap-1.5"><Building2 className="h-4 w-4" /> Cotas por Organização</TabsTrigger>
           </TabsList>
 
@@ -519,6 +521,10 @@ export default function AdminLicenses() {
                 </table>
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="trials" className="mt-4">
+            <TrialControlPanel />
           </TabsContent>
 
           <TabsContent value="quotas" className="space-y-4 mt-4">

@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 8,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.8.4",
+    date: "2026-03-25",
+    type: "patch" as const,
+    changes: [
+      "Auto-expiração de trials via cron job diário (3h UTC)",
+      "Notificações in-app de expiração do trial (3 dias, 1 dia, expirado)",
+      "Bloqueio visual de funcionalidades restritas no menu (ícone de cadeado)",
+      "Relatórios bloqueados para plano trial com redirecionamento para Planos",
+      "Novo painel admin 'Controle de Trials' com métricas e funil de conversão",
+      "Lista de trials recentes com status visual (saudável, atenção, crítico, expirado)"
+    ]
+  },
   {
     version: "1.8.3",
     date: "2026-03-25",

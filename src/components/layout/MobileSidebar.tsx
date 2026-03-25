@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { useLicense } from '@/contexts/LicenseContext';
 import { useForumNotifications, useMarkForumAsSeen } from '@/hooks/useForumNotifications';
 import {
   LayoutDashboard,
@@ -22,6 +23,7 @@ import {
   FolderKanban,
   Gamepad2,
   CreditCard,
+  Lock,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { Button } from '@/components/ui/button';
@@ -46,6 +48,7 @@ interface NavItem {
   requiresEDU?: boolean;
   requiresProfessor?: boolean;
   requiresAdmin?: boolean;
+  requiredFeature?: string;
 }
 
 const navigation: NavItem[] = [
@@ -54,7 +57,7 @@ const navigation: NavItem[] = [
   { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
   { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
-  { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
+  { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
   { name: 'Social Turismo', href: '/forum', icon: MessageSquare },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked, requiresAdmin: true },
@@ -87,6 +90,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess, initialized } = useProfileContext();
+  const { hasFeature } = useLicense();
   const { data: forumNotifications } = useForumNotifications();
   const markForumAsSeen = useMarkForumAsSeen();
   const { lightTap, selection } = useHaptic();
@@ -154,24 +158,31 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
     const isActive = location.pathname === item.href || 
       (item.href !== '/' && location.pathname.startsWith(item.href));
     
+    const isLocked = !isAdmin && item.requiredFeature && !hasFeature(item.requiredFeature);
+    
     // Show badge for forum notifications (only when count > 0)
     const showBadge = item.href === '/forum' && (forumNotifications?.unreadCount ?? 0) > 0;
     
     return (
       <SheetClose asChild>
         <Link
-          to={item.href}
+          to={isLocked ? '/assinatura' : item.href}
           onClick={handleNavClick}
           className={cn(
             'flex items-center gap-3 px-4 py-3.5 rounded-lg transition-all duration-200 touch-target active:scale-[0.98]',
-            isActive
+            isLocked
+              ? 'text-muted-foreground/50'
+              : isActive
               ? 'bg-primary text-primary-foreground'
               : 'text-foreground hover:bg-muted active:bg-muted/80'
           )}
         >
           <item.icon className="h-5 w-5 flex-shrink-0" />
           <span className="font-medium text-sm flex-1">{item.name}</span>
-          {showBadge && (
+          {isLocked && (
+            <Lock className="h-3.5 w-3.5 text-muted-foreground/50 flex-shrink-0" />
+          )}
+          {showBadge && !isLocked && (
             <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
               {forumNotifications.unreadCount > 99 ? '99+' : forumNotifications.unreadCount}
             </Badge>
