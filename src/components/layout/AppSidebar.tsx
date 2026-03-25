@@ -52,7 +52,7 @@ const navigation: NavItem[] = [
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
   { name: 'Social Turismo', href: '/forum', icon: MessageSquare },
-  { name: 'Metodologia', href: '/metodologia', icon: BookMarked },
+  { name: 'Metodologia', href: '/metodologia', icon: BookMarked, requiresAdmin: true },
   { name: 'Jogos Educacionais', href: '/game', icon: Gamepad2 },
 ];
 
