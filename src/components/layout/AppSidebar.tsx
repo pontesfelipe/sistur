@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { useLicense } from '@/contexts/LicenseContext';
 import { useForumNotifications, useMarkForumAsSeen } from '@/hooks/useForumNotifications';
 import {
   LayoutDashboard,
@@ -24,6 +25,7 @@ import {
   Gamepad2,
   Shield,
   CreditCard,
+  Lock,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState, useMemo, useEffect } from 'react';
@@ -41,6 +43,7 @@ interface NavItem {
   requiresEDU?: boolean;
   requiresProfessor?: boolean;
   requiresAdmin?: boolean;
+  requiredFeature?: string;
 }
 
 const navigation: NavItem[] = [
@@ -49,7 +52,7 @@ const navigation: NavItem[] = [
   { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
   { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
-  { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true },
+  { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
   { name: 'Social Turismo', href: '/forum', icon: MessageSquare },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked, requiresAdmin: true },
@@ -78,6 +81,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess, isEstudante, initialized, loading } = useProfileContext();
+  const { hasFeature, isTrialActive } = useLicense();
   const { data: forumNotifications } = useForumNotifications();
   const markForumAsSeen = useMarkForumAsSeen();
   const [collapsed, setCollapsed] = useState(false);
@@ -127,15 +131,19 @@ export function AppSidebar() {
     const isActive = location.pathname === item.href || 
       (item.href !== '/' && location.pathname.startsWith(item.href));
     
+    const isLocked = !isAdmin && item.requiredFeature && !hasFeature(item.requiredFeature);
+    
     // Show badge for forum notifications (only when count > 0)
     const showBadge = item.href === '/forum' && (forumNotifications?.unreadCount ?? 0) > 0;
     
     const content = (
       <Link
-        to={item.href}
+        to={isLocked ? '/assinatura' : item.href}
         className={cn(
           'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative',
-          isActive
+          isLocked
+            ? 'text-muted-foreground/50 hover:bg-muted/30 cursor-not-allowed'
+            : isActive
             ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-glow'
             : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
         )}
@@ -143,7 +151,7 @@ export function AppSidebar() {
         <div className="relative">
           <item.icon className={cn(
             'h-5 w-5 flex-shrink-0 transition-transform',
-            !isActive && 'group-hover:scale-110'
+            !isActive && !isLocked && 'group-hover:scale-110'
           )} />
           {showBadge && collapsed && (
             <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full" />
@@ -152,7 +160,10 @@ export function AppSidebar() {
         {!collapsed && (
           <span className="font-medium text-sm truncate flex-1">{item.name}</span>
         )}
-        {showBadge && !collapsed && (
+        {isLocked && !collapsed && (
+          <Lock className="h-3.5 w-3.5 text-muted-foreground/50 flex-shrink-0" />
+        )}
+        {showBadge && !collapsed && !isLocked && (
           <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
             {forumNotifications.unreadCount > 99 ? '99+' : forumNotifications.unreadCount}
           </Badge>
