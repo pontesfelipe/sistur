@@ -60,6 +60,7 @@ const Subscription = lazy(() => import("./pages/Subscription"));
 const AdminLicenses = lazy(() => import("./pages/AdminLicenses"));
 const TermsAcceptance = lazy(() => import("./pages/TermsAcceptance"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
@@ -426,6 +427,7 @@ const App = () => {
                   }
                 />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               </Suspense>
