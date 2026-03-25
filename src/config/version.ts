@@ -150,6 +150,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
+    version: "1.7.4",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
