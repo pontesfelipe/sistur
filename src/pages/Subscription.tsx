@@ -89,6 +89,45 @@ const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.R
 export default function Subscription() {
   const { license, isTrialActive, isTrialExpired, isPaidPlan, isLicenseValid, trialDaysRemaining, trialProgress, plan, planLabel } = useLicense();
   const { profile } = useProfileContext();
+  const { refetchLicense } = useLicense();
+  const [activatingTrial, setActivatingTrial] = useState(false);
+
+  const noLicense = !license;
+
+  const handleActivateTrial = async () => {
+    try {
+      setActivatingTrial(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !profile?.org_id) {
+        toast.error('Erro ao identificar usuário');
+        return;
+      }
+
+      const { error } = await (supabase as any)
+        .from('licenses')
+        .upsert({
+          user_id: user.id,
+          org_id: profile.org_id,
+          plan: 'trial',
+          status: 'active',
+          trial_started_at: new Date().toISOString(),
+          trial_ends_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          features: { erp: true, edu: true, games: true, reports: false, integrations: false },
+          activated_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+
+      if (error) throw error;
+
+      toast.success('Trial de 7 dias ativado com sucesso!');
+      await refetchLicense();
+    } catch (err: any) {
+      console.error('Error activating trial:', err);
+      toast.error('Erro ao ativar trial: ' + (err.message || 'Tente novamente'));
+    } finally {
+      setActivatingTrial(false);
+    }
+  };
 
   return (
     <AppLayout title="Assinatura" subtitle="Gerencie seu plano e licença">
