@@ -91,8 +91,8 @@ export function TrialControlPanel() {
       return daysLeft <= 3;
     });
 
-    // Conversion: users who had trial and now have a paid plan
-    const trialUserIds = new Set(trials.map(t => t.user_id));
+    // Conversion: users who had trial and now have a paid plan (exclude SISTUR internal)
+    const externalTrials = trials.filter(t => t.org_name !== 'SISTUR');
     const convertedCount = allLicenses.filter(l =>
       l.plan !== 'trial' && l.status === 'active'
     ).length;
