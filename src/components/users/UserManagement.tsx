@@ -11,7 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useUserManagement, UserData } from '@/hooks/useUserManagement';
-import { UserPlus, Shield, User, Eye, Loader2, MoreHorizontal, Ban, Trash2, RefreshCw, GraduationCap, Building2 } from 'lucide-react';
+import { UserPlus, Shield, User, Eye, Loader2, MoreHorizontal, Ban, Trash2, RefreshCw, GraduationCap, Building2, FileCheck, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
