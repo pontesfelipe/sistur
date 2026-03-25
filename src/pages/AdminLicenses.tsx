@@ -114,25 +114,40 @@ export default function AdminLicenses() {
     try {
       const { data, error } = await (supabase as any)
         .from('licenses')
-        .select('*, profiles:user_id(full_name, org_id)')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
+      const rows = data || [];
+
+      // Fetch profiles for all user_ids
+      const userIds = [...new Set(rows.map((l: any) => l.user_id).filter(Boolean))] as string[];
+      let profileMap: Record<string, { full_name: string | null; org_id: string }> = {};
+      if (userIds.length > 0) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, org_id')
+          .in('user_id', userIds);
+        for (const p of profileData || []) {
+          profileMap[p.user_id] = { full_name: p.full_name, org_id: p.org_id };
+        }
+      }
+
       // Fetch org names
-      const orgIds = [...new Set((data || []).map((l: any) => l.org_id).filter(Boolean))] as string[];
+      const orgIds = [...new Set(rows.map((l: any) => l.org_id).filter(Boolean))] as string[];
       let orgMap: Record<string, string> = {};
       if (orgIds.length > 0) {
         const { data: orgData } = await supabase.from('orgs').select('id, name').in('id', orgIds);
         for (const o of orgData || []) orgMap[o.id] = o.name;
       }
 
-      setLicenses((data || []).map((l: any) => ({
+      setLicenses(rows.map((l: any) => ({
         ...l,
         plan: l.plan as LicensePlan,
         status: l.status as LicenseStatus,
         features: (l.features as Record<string, boolean>) ?? {},
-        profile: l.profiles as any,
+        profile: profileMap[l.user_id] || null,
         org_name: l.org_id ? orgMap[l.org_id] : undefined,
       })));
     } catch (err: any) {
