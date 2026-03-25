@@ -4,6 +4,7 @@ import { AppHeader } from './AppHeader';
 import { MobileSidebar } from './MobileSidebar';
 import { MobileBottomNav } from './MobileBottomNav';
 import { TrialBanner } from '@/components/TrialBanner';
+import { useTrialNotifications } from '@/hooks/useTrialNotifications';
 import { cn } from '@/lib/utils';
 
 interface AppLayoutProps {
@@ -15,6 +16,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, title, subtitle, actions }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  useTrialNotifications();
 
   return (
     <div className="min-h-screen bg-background">
