@@ -25,6 +25,7 @@ export default function TermsAcceptance() {
     try {
       await acceptTerms.mutateAsync();
       toast.success('Termos aceitos com sucesso');
+      navigate('/', { replace: true });
     } catch {
       toast.error('Erro ao aceitar termos. Tente novamente.');
     }
