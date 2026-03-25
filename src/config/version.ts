@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 8,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.8.1",
+    date: "2026-03-25",
+    type: "patch" as const,
+    changes: [
+      "E-mail automático de notificação quando o acesso do usuário é aprovado",
+      "Infraestrutura de e-mail transacional com fila durável e retries",
+      "Página de cancelamento de inscrição (/unsubscribe)",
+      "Template de e-mail com identidade visual do Instituto Mario Beni"
+    ]
+  },
   {
     version: "1.8.0",
     date: "2026-03-25",
