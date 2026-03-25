@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 8,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.8.3",
+    date: "2026-03-25",
+    type: "patch" as const,
+    changes: [
+      "Menu mobile agora exibe a opção Planos para usuários como Renata",
+      "Correção do preload para Safari/iPhone sem requestIdleCallback",
+      "Fluxo Autônomo restaurado ao remover licença indevida da Renata",
+      "Renata volta a ser redirecionada para Planos com opção de ativar trial"
+    ]
+  },
   {
     version: "1.8.2",
     date: "2026-03-25",

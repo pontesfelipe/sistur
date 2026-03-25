@@ -21,6 +21,7 @@ import {
   MessageSquare,
   FolderKanban,
   Gamepad2,
+  CreditCard,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { Button } from '@/components/ui/button';
@@ -61,6 +62,7 @@ const navigation: NavItem[] = [
 ];
 
 const bottomNavigation: NavItem[] = [
+  { name: 'Planos', href: '/assinatura', icon: CreditCard },
   { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
   { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
   { name: 'Configurações', href: '/configuracoes', icon: Settings, requiresAdmin: true },
