@@ -19,7 +19,7 @@ interface TrialLicense {
 
 export function TrialControlPanel() {
   const [trials, setTrials] = useState<TrialLicense[]>([]);
-  const [allLicenses, setAllLicenses] = useState<{ plan: string; status: string }[]>([]);
+  const [allLicenses, setAllLicenses] = useState<{ plan: string; status: string; org_id: string | null; org_name?: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,11 +37,24 @@ export function TrialControlPanel() {
           .order('created_at', { ascending: false }),
         (supabase as any)
           .from('licenses')
-          .select('plan, status'),
+          .select('plan, status, org_id'),
       ]);
 
       const trialData = trialsRes.data || [];
-      setAllLicenses(allRes.data || []);
+      const allData = allRes.data || [];
+
+      // Fetch org names for allLicenses to filter SISTUR
+      const allOrgIds = [...new Set(allData.map((l: any) => l.org_id).filter(Boolean))] as string[];
+      let allOrgMap: Record<string, string> = {};
+      if (allOrgIds.length > 0) {
+        const { data: orgData } = await supabase.from('orgs').select('id, name').in('id', allOrgIds);
+        for (const o of orgData || []) allOrgMap[o.id] = o.name;
+      }
+
+      setAllLicenses(allData.map((l: any) => ({
+        ...l,
+        org_name: l.org_id ? allOrgMap[l.org_id] : undefined,
+      })));
 
       // Fetch user names
       const userIds = trialData.map((t: any) => t.user_id);
@@ -91,14 +104,14 @@ export function TrialControlPanel() {
       return daysLeft <= 3;
     });
 
-    // Conversion: users who had trial and now have a paid plan
-    const trialUserIds = new Set(trials.map(t => t.user_id));
+    // Conversion: users who had trial and now have a paid plan (exclude SISTUR internal)
+    const externalTrials = trials.filter(t => t.org_name !== 'SISTUR');
     const convertedCount = allLicenses.filter(l =>
-      l.plan !== 'trial' && l.status === 'active'
+      l.plan !== 'trial' && l.status === 'active' && l.org_name !== 'SISTUR'
     ).length;
 
-    const conversionRate = trials.length > 0
-      ? Math.round((convertedCount / trials.length) * 100)
+    const conversionRate = externalTrials.length > 0
+      ? Math.round((convertedCount / externalTrials.length) * 100)
       : 0;
 
     return {

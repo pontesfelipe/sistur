@@ -367,12 +367,15 @@ export default function AdminLicenses() {
     return true;
   });
 
+  // Exclude SISTUR internal org from external-facing stats
+  const externalLicenses = licenses.filter(l => l.org_name !== 'SISTUR');
+
   const stats = {
-    total: licenses.length,
-    active: licenses.filter(l => l.status === 'active').length,
-    trial: licenses.filter(l => l.plan === 'trial' && l.status === 'active').length,
-    expired: licenses.filter(l => l.status === 'expired').length,
-    paid: licenses.filter(l => l.plan !== 'trial' && l.status === 'active').length,
+    total: externalLicenses.length,
+    active: externalLicenses.filter(l => l.status === 'active').length,
+    trial: externalLicenses.filter(l => l.plan === 'trial' && l.status === 'active').length,
+    expired: externalLicenses.filter(l => l.status === 'expired').length,
+    paid: externalLicenses.filter(l => l.plan !== 'trial' && l.status === 'active').length,
   };
 
   return (
