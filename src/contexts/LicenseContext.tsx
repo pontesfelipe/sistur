@@ -2,7 +2,7 @@ import { useState, useEffect, createContext, useContext, ReactNode, useCallback,
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-export type LicensePlan = 'trial' | 'basic' | 'pro' | 'enterprise';
+export type LicensePlan = 'trial' | 'estudante' | 'professor' | 'basic' | 'pro' | 'enterprise';
 export type LicenseStatus = 'active' | 'expired' | 'cancelled' | 'suspended';
 
 export interface License {
@@ -18,6 +18,7 @@ export interface License {
   max_users: number;
   features: Record<string, boolean>;
   notes: string | null;
+  assigned_by: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -26,19 +27,16 @@ interface LicenseContextType {
   license: License | null;
   loading: boolean;
   initialized: boolean;
-  // Computed helpers
   isTrialActive: boolean;
   isTrialExpired: boolean;
   isPaidPlan: boolean;
   isLicenseValid: boolean;
   trialDaysRemaining: number;
   trialDaysTotal: number;
-  trialProgress: number; // 0-100
+  trialProgress: number;
   plan: LicensePlan | null;
   planLabel: string;
-  // Feature access
   hasFeature: (feature: string) => boolean;
-  // Actions
   refetchLicense: () => Promise<void>;
 }
 
@@ -46,6 +44,8 @@ const LicenseContext = createContext<LicenseContextType | undefined>(undefined);
 
 const PLAN_LABELS: Record<LicensePlan, string> = {
   trial: 'Avaliação Gratuita',
+  estudante: 'Estudante',
+  professor: 'Professor',
   basic: 'Básico',
   pro: 'Profissional',
   enterprise: 'Empresarial',
@@ -97,6 +97,7 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
           max_users: data.max_users ?? 1,
           features: (data.features as Record<string, boolean>) ?? {},
           notes: data.notes,
+          assigned_by: data.assigned_by,
           created_at: data.created_at,
           updated_at: data.updated_at,
         });
@@ -120,7 +121,6 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.id, fetchLicense]);
 
-  // Computed values
   const now = new Date();
 
   const isTrialActive = Boolean(
@@ -139,8 +139,9 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
 
   const isPaidPlan = Boolean(
     license &&
-    ['basic', 'pro', 'enterprise'].includes(license.plan) &&
-    license.status === 'active'
+    ['estudante', 'professor', 'basic', 'pro', 'enterprise'].includes(license.plan) &&
+    license.status === 'active' &&
+    (license.expires_at === null || new Date(license.expires_at) > now)
   );
 
   const isLicenseValid = isTrialActive || isPaidPlan;
@@ -164,7 +165,6 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
   const hasFeature = useCallback((feature: string) => {
     if (!license) return false;
     if (!isLicenseValid) return false;
-    // Enterprise has all features
     if (license.plan === 'enterprise') return true;
     return license.features[feature] === true;
   }, [license, isLicenseValid]);
