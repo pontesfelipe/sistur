@@ -12,6 +12,7 @@ export interface UserData {
   created_at: string;
   system_access: 'ERP' | 'EDU' | null;
   is_blocked: boolean;
+  terms_accepted_at: string | null;
 }
 
 export function useUserManagement() {

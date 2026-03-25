@@ -11,7 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useUserManagement, UserData } from '@/hooks/useUserManagement';
-import { UserPlus, Shield, User, Eye, Loader2, MoreHorizontal, Ban, Trash2, RefreshCw, GraduationCap, Building2 } from 'lucide-react';
+import { UserPlus, Shield, User, Eye, Loader2, MoreHorizontal, Ban, Trash2, RefreshCw, GraduationCap, Building2, FileCheck, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -368,6 +368,7 @@ export function UserManagement() {
                 <TableHead>Email</TableHead>
                 <TableHead>Acesso</TableHead>
                 <TableHead>Papel</TableHead>
+                <TableHead>Termos</TableHead>
                 <TableHead>Data de Criação</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
@@ -459,6 +460,21 @@ export function UserManagement() {
                           )}
                         </SelectContent>
                       </Select>
+                    </TableCell>
+                    <TableCell>
+                      {user.terms_accepted_at ? (
+                        <div className="flex items-center gap-1.5 text-emerald-600">
+                          <FileCheck className="h-4 w-4" />
+                          <span className="text-xs">{new Date(user.terms_accepted_at).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                      ) : user.role === 'ADMIN' ? (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-amber-600">
+                          <AlertCircle className="h-4 w-4" />
+                          <span className="text-xs">Pendente</span>
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {new Date(user.created_at).toLocaleDateString('pt-BR')}

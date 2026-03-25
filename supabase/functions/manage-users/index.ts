@@ -449,13 +449,20 @@ Deno.serve(async (req) => {
         })
       )
 
+      // Get terms acceptance data
+      const { data: termsAcceptances } = await supabaseAdmin
+        .from('terms_acceptance')
+        .select('user_id, accepted_at')
+        .in('user_id', userIds)
+
       // Combine data
       const users = profiles?.map(p => ({
         ...p,
         email: usersWithEmail.find(u => u.user_id === p.user_id)?.email,
         role: roles?.find(r => r.user_id === p.user_id)?.role || 'VIEWER',
         system_access: p.system_access,
-        is_blocked: p.pending_approval
+        is_blocked: p.pending_approval,
+        terms_accepted_at: termsAcceptances?.find(t => t.user_id === p.user_id)?.accepted_at || null
       }))
 
       return new Response(JSON.stringify({ users }), {
