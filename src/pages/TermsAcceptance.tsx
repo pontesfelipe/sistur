@@ -9,6 +9,7 @@ import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { toast } from 'sonner';
 
 export default function TermsAcceptance() {
+  const navigate = useNavigate();
   const { acceptTerms } = useTermsAcceptance();
   const [checked, setChecked] = useState(false);
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
