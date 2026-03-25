@@ -164,23 +164,26 @@ export default function Subscription() {
                   ) : (
                     <AlertTriangle className="h-6 w-6 text-red-400" />
                   )}
-                  )}
-                  <h2 className="text-xl font-bold">{planLabel}</h2>
-                  <span className={cn(
-                    'text-xs font-bold px-2.5 py-1 rounded-full',
-                    isLicenseValid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400',
-                  )}>
-                    {isLicenseValid ? 'Ativo' : 'Inativo'}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground max-w-md">
-                  {isTrialActive
-                    ? `Sua avaliação gratuita de 7 dias está ativa. Restam ${trialDaysRemaining} dia${trialDaysRemaining !== 1 ? 's' : ''} para explorar todas as funcionalidades.`
-                    : isPaidPlan
-                    ? `Você tem acesso completo ao plano ${planLabel}. ${license?.expires_at ? `Válido até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''}`
-                    : isTrialExpired
-                    ? 'Sua avaliação gratuita expirou. Escolha um plano para continuar usando o SISTUR.'
-                    : 'Nenhuma licença ativa encontrada. Entre em contato com o administrador.'
+                   <h2 className="text-xl font-bold">{noLicense ? 'Bem-vindo ao SISTUR!' : planLabel}</h2>
+                   {!noLicense && (
+                   <span className={cn(
+                     'text-xs font-bold px-2.5 py-1 rounded-full',
+                     isLicenseValid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400',
+                   )}>
+                     {isLicenseValid ? 'Ativo' : 'Inativo'}
+                   </span>
+                   )}
+                 </div>
+                 <p className="text-sm text-muted-foreground max-w-md">
+                   {noLicense
+                     ? 'Sua conta foi aprovada! Ative seu trial gratuito de 7 dias para explorar todas as funcionalidades ou escolha um plano abaixo.'
+                     : isTrialActive
+                     ? `Sua avaliação gratuita de 7 dias está ativa. Restam ${trialDaysRemaining} dia${trialDaysRemaining !== 1 ? 's' : ''} para explorar todas as funcionalidades.`
+                     : isPaidPlan
+                     ? `Você tem acesso completo ao plano ${planLabel}. ${license?.expires_at ? `Válido até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''}`
+                     : isTrialExpired
+                     ? 'Sua avaliação gratuita expirou. Escolha um plano para continuar usando o SISTUR.'
+                     : 'Nenhuma licença ativa encontrada. Ative um trial ou escolha um plano.'
                   }
                 </p>
               </div>
