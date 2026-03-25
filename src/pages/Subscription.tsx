@@ -159,8 +159,11 @@ export default function Subscription() {
                     <Clock className="h-6 w-6 text-amber-400" />
                   ) : isPaidPlan ? (
                     <Crown className="h-6 w-6 text-emerald-400" />
+                  ) : noLicense ? (
+                    <Sparkles className="h-6 w-6 text-primary" />
                   ) : (
                     <AlertTriangle className="h-6 w-6 text-red-400" />
+                  )}
                   )}
                   <h2 className="text-xl font-bold">{planLabel}</h2>
                   <span className={cn(
