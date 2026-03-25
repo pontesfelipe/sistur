@@ -10,10 +10,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { 
-  Building2, 
-  Plus, 
-  Users, 
+import {
+  Building2,
+  Plus,
+  Users,
   MapPin,
   Edit,
   Trash2,
@@ -22,6 +22,7 @@ import {
   Landmark,
   Hotel
 } from 'lucide-react';
+import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
 
 interface Organization {
   id: string;
@@ -38,10 +39,10 @@ export function OrganizationManagement() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingOrg, setEditingOrg] = useState<Organization | null>(null);
-  const [formData, setFormData] = useState({ 
-    name: '', 
+  const [formData, setFormData] = useState({
+    name: '',
     has_territorial_access: true,
-    has_enterprise_access: false 
+    has_enterprise_access: false
   });
   const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,7 +50,7 @@ export function OrganizationManagement() {
   const fetchOrganizations = async () => {
     try {
       setLoading(true);
-      
+
       const { data: orgs, error } = await supabase
         .from('orgs')
         .select('id, name, has_territorial_access, has_enterprise_access, created_at')
@@ -66,23 +67,25 @@ export function OrganizationManagement() {
         .from('destinations')
         .select('org_id');
 
-      const userCounts = (profiles || []).reduce((acc, p) => {
-        acc[p.org_id] = (acc[p.org_id] || 0) + 1;
+      const userCounts = (profiles || []).reduce((acc, profile) => {
+        acc[profile.org_id] = (acc[profile.org_id] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
 
-      const destCounts = (destinations || []).reduce((acc, d) => {
-        acc[d.org_id] = (acc[d.org_id] || 0) + 1;
+      const destCounts = (destinations || []).reduce((acc, destination) => {
+        acc[destination.org_id] = (acc[destination.org_id] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
 
-      const enrichedOrgs = (orgs || []).map(org => ({
-        ...org,
-        has_territorial_access: org.has_territorial_access ?? true,
-        has_enterprise_access: org.has_enterprise_access || false,
-        user_count: userCounts[org.id] || 0,
-        destination_count: destCounts[org.id] || 0
-      }));
+      const enrichedOrgs = filterBusinessOrganizations(
+        (orgs || []).map((org) => ({
+          ...org,
+          has_territorial_access: org.has_territorial_access ?? true,
+          has_enterprise_access: org.has_enterprise_access || false,
+          user_count: userCounts[org.id] || 0,
+          destination_count: destCounts[org.id] || 0
+        }))
+      );
 
       setOrganizations(enrichedOrgs);
     } catch (error) {
@@ -147,8 +150,8 @@ export function OrganizationManagement() {
 
   const handleEdit = (org: Organization) => {
     setEditingOrg(org);
-    setFormData({ 
-      name: org.name, 
+    setFormData({
+      name: org.name,
       has_territorial_access: org.has_territorial_access ?? true,
       has_enterprise_access: org.has_enterprise_access || false
     });
@@ -171,7 +174,7 @@ export function OrganizationManagement() {
     }
   };
 
-  const filteredOrgs = organizations.filter(org =>
+  const filteredOrgs = organizations.filter((org) =>
     org.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

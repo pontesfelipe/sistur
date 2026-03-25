@@ -7,22 +7,21 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { 
-  Users, 
+import {
+  Users,
   Building2,
   Search,
   UserPlus,
   UserMinus,
   Loader2,
-  ArrowLeftRight,
   Mail,
   Shield,
-  X
 } from 'lucide-react';
 import { useAuditLogger } from '@/hooks/useAuditLogger';
+import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
 
 interface Organization {
   id: string;
@@ -68,7 +67,6 @@ export function OrganizationUsersPanel() {
   const [processing, setProcessing] = useState<string | null>(null);
   const { logOrgAction } = useAuditLogger();
 
-  // Fetch organizations
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
@@ -78,11 +76,19 @@ export function OrganizationUsersPanel() {
           .order('name');
 
         if (error) throw error;
-        setOrganizations(data || []);
-        
-        if (data && data.length > 0 && !selectedOrg) {
-          setSelectedOrg(data[0].id);
-        }
+
+        const visibleOrganizations = filterBusinessOrganizations(data || []);
+        const defaultOrgId =
+          visibleOrganizations.find((organization) => organization.name === 'SISTUR')?.id ||
+          visibleOrganizations[0]?.id ||
+          null;
+
+        setOrganizations(visibleOrganizations);
+        setSelectedOrg((currentSelectedOrg) =>
+          visibleOrganizations.some((organization) => organization.id === currentSelectedOrg)
+            ? currentSelectedOrg
+            : defaultOrgId
+        );
       } catch (error) {
         console.error('Error fetching organizations:', error);
         toast.error('Erro ao carregar organizações');
@@ -94,7 +100,6 @@ export function OrganizationUsersPanel() {
     fetchOrganizations();
   }, []);
 
-  // Fetch users for selected organization
   useEffect(() => {
     const fetchOrgUsers = async () => {
       if (!selectedOrg) return;
@@ -102,7 +107,6 @@ export function OrganizationUsersPanel() {
       try {
         setUsersLoading(true);
 
-        // Get users in this org
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('user_id, full_name, avatar_url, created_at, system_access')
@@ -111,30 +115,28 @@ export function OrganizationUsersPanel() {
 
         if (profilesError) throw profilesError;
 
-        // Get roles
-        const userIds = profiles?.map(p => p.user_id) || [];
+        const userIds = profiles?.map((profile) => profile.user_id) || [];
         const { data: roles } = await supabase
           .from('user_roles')
           .select('user_id, role')
           .in('user_id', userIds);
 
-        // Fetch emails using edge function
         const { data: response } = await supabase.functions.invoke('manage-users', {
           body: { action: 'list_by_org', org_id: selectedOrg }
         });
 
         const emailMap = new Map<string, string>(
-          (response?.users || []).map((u: { user_id: string; email: string }) => [u.user_id, u.email])
+          (response?.users || []).map((user: { user_id: string; email: string }) => [user.user_id, user.email])
         );
 
-        const enrichedUsers: OrganizationUser[] = (profiles || []).map(p => ({
-          user_id: p.user_id,
-          full_name: p.full_name,
-          avatar_url: p.avatar_url,
-          created_at: p.created_at,
-          system_access: p.system_access,
-          email: emailMap.get(p.user_id) || null,
-          role: roles?.find(r => r.user_id === p.user_id)?.role || 'VIEWER',
+        const enrichedUsers: OrganizationUser[] = (profiles || []).map((profile) => ({
+          user_id: profile.user_id,
+          full_name: profile.full_name,
+          avatar_url: profile.avatar_url,
+          created_at: profile.created_at,
+          system_access: profile.system_access,
+          email: emailMap.get(profile.user_id) || null,
+          role: roles?.find((role) => role.user_id === profile.user_id)?.role || 'VIEWER',
         }));
 
         setUsers(enrichedUsers);
@@ -148,19 +150,22 @@ export function OrganizationUsersPanel() {
     fetchOrgUsers();
   }, [selectedOrg]);
 
-  // Fetch all users for adding
   const fetchAllUsers = async () => {
     try {
+      const visibleOrgIds = new Set(organizations.map((organization) => organization.id));
       const { data: profiles } = await supabase
         .from('profiles')
         .select('user_id, full_name, avatar_url, created_at, system_access, org_id')
         .eq('pending_approval', false);
 
-      // Filter out users already in the selected org
       const availableUsers = (profiles || [])
-        .filter(p => p.org_id !== selectedOrg)
-        .map(p => ({
-          ...p,
+        .filter((profile) => visibleOrgIds.has(profile.org_id) && profile.org_id !== selectedOrg)
+        .map((profile) => ({
+          user_id: profile.user_id,
+          full_name: profile.full_name,
+          avatar_url: profile.avatar_url,
+          created_at: profile.created_at,
+          system_access: profile.system_access,
           email: null,
           role: 'VIEWER',
         }));
