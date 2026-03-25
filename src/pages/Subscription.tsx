@@ -138,9 +138,10 @@ export default function Subscription() {
           animate={{ opacity: 1, y: 0 }}
           className={cn(
             'rounded-2xl border-2 p-6 relative overflow-hidden',
-            isTrialActive ? 'border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-orange-950/20' :
-            isPaidPlan ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/30 to-teal-950/20' :
-            isTrialExpired ? 'border-red-500/50 bg-gradient-to-br from-red-950/30 to-rose-950/20' :
+                    isTrialActive ? 'border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-orange-950/20' :
+                    isPaidPlan ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/30 to-teal-950/20' :
+                    noLicense ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-blue-950/20' :
+                    isTrialExpired ? 'border-red-500/50 bg-gradient-to-br from-red-950/30 to-rose-950/20' :
             'border-border bg-card',
           )}
         >
