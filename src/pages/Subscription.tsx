@@ -235,6 +235,28 @@ export default function Subscription() {
                 </div>
               </motion.div>
             )}
+
+            {/* Trial activation CTA for new users */}
+            {noLicense && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 flex flex-col items-center gap-3"
+              >
+                <Button
+                  size="lg"
+                  onClick={handleActivateTrial}
+                  disabled={activatingTrial}
+                  className="gap-2 text-base px-8"
+                >
+                  <Sparkles className="h-5 w-5" />
+                  {activatingTrial ? 'Ativando...' : 'Ativar Trial Gratuito de 7 Dias'}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Sem compromisso. Acesso completo por 7 dias.
+                </p>
+              </motion.div>
+            )}
           </div>
         </motion.div>
 
