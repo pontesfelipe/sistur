@@ -130,7 +130,7 @@ export default function Subscription() {
   };
 
   return (
-    <AppLayout title="Assinatura" subtitle="Gerencie seu plano e licença">
+    <AppLayout title="Planos" subtitle="Gerencie seu plano e licença">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Current plan status */}
         <motion.div
