@@ -90,6 +90,7 @@ const App = () => {
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/pending-approval" element={<PendingApproval />} />
+                <Route path="/termos" element={<TermsAcceptance />} />
                 <Route
                   path="/"
                   element={
