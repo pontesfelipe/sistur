@@ -19,7 +19,7 @@ interface TrialLicense {
 
 export function TrialControlPanel() {
   const [trials, setTrials] = useState<TrialLicense[]>([]);
-  const [allLicenses, setAllLicenses] = useState<{ plan: string; status: string }[]>([]);
+  const [allLicenses, setAllLicenses] = useState<{ plan: string; status: string; org_id: string | null; org_name?: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,11 +37,24 @@ export function TrialControlPanel() {
           .order('created_at', { ascending: false }),
         (supabase as any)
           .from('licenses')
-          .select('plan, status'),
+          .select('plan, status, org_id'),
       ]);
 
       const trialData = trialsRes.data || [];
-      setAllLicenses(allRes.data || []);
+      const allData = allRes.data || [];
+
+      // Fetch org names for allLicenses to filter SISTUR
+      const allOrgIds = [...new Set(allData.map((l: any) => l.org_id).filter(Boolean))] as string[];
+      let allOrgMap: Record<string, string> = {};
+      if (allOrgIds.length > 0) {
+        const { data: orgData } = await supabase.from('orgs').select('id, name').in('id', allOrgIds);
+        for (const o of orgData || []) allOrgMap[o.id] = o.name;
+      }
+
+      setAllLicenses(allData.map((l: any) => ({
+        ...l,
+        org_name: l.org_id ? allOrgMap[l.org_id] : undefined,
+      })));
 
       // Fetch user names
       const userIds = trialData.map((t: any) => t.user_id);
