@@ -37,6 +37,10 @@ export const VERSION_HISTORY = [
     ]
   },
   {
+    version: "1.7.16",
+    date: "2026-01-23",
+    type: "patch" as const,
+    changes: [
       "Fix: Recomendações agora buscam treinamentos de edu_trainings via training_id",
       "RecommendationCard exibe título, descrição e duração do modelo unificado",
       "Tipos Recommendation e Prescription atualizados com training_id e training",
