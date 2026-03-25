@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail } from 'lucide-react';
+import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail, GraduationCap, BookOpen } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useLicense, type LicensePlan } from '@/contexts/LicenseContext';
