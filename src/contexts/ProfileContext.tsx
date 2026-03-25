@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode, useCallback, useRef } from 'react';
+import { useState, useEffect, createContext, useContext, ReactNode, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -129,23 +129,20 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.id, fetchProfile]);
 
-  const hasRole = useCallback((role: UserRole['role']) => {
-    return roles.some(r => r.role === role);
-  }, [roles]);
-
-  const isAdmin = hasRole('ADMIN');
-  const isAnalyst = hasRole('ANALYST') || isAdmin;
-  const isProfessor = hasRole('PROFESSOR');
-  const isEstudante = hasRole('ESTUDANTE');
-
-  const hasERPAccess = profile?.system_access === 'ERP' || isAdmin;
-  const hasEDUAccess = profile?.system_access === 'EDU' || profile?.system_access === 'ERP' || isAdmin || isProfessor || isEstudante;
-
-  const needsOnboarding = profile?.pending_approval === true && profile?.system_access === null;
-  const awaitingApproval = profile?.pending_approval === true && profile?.system_access !== null;
-
-  const isViewingDemoData = profile?.viewing_demo_org_id !== null;
-  const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
+  const derived = useMemo(() => {
+    const hasRoleFn = (role: UserRole['role']) => roles.some(r => r.role === role);
+    const isAdmin = hasRoleFn('ADMIN');
+    const isAnalyst = hasRoleFn('ANALYST') || isAdmin;
+    const isProfessor = hasRoleFn('PROFESSOR');
+    const isEstudante = hasRoleFn('ESTUDANTE');
+    const hasERPAccess = profile?.system_access === 'ERP' || isAdmin;
+    const hasEDUAccess = profile?.system_access === 'EDU' || profile?.system_access === 'ERP' || isAdmin || isProfessor || isEstudante;
+    const needsOnboarding = profile?.pending_approval === true && profile?.system_access === null;
+    const awaitingApproval = profile?.pending_approval === true && profile?.system_access !== null;
+    const isViewingDemoData = profile?.viewing_demo_org_id !== null;
+    const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
+    return { hasRoleFn, isAdmin, isAnalyst, isProfessor, isEstudante, hasERPAccess, hasEDUAccess, needsOnboarding, awaitingApproval, isViewingDemoData, effectiveOrgId };
+  }, [roles, profile]);
 
   const completeOnboarding = async (
     systemAccess: 'ERP' | 'EDU',
@@ -227,17 +224,17 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       roles,
       loading,
       initialized,
-      hasRole,
-      isAdmin,
-      isAnalyst,
-      isProfessor,
-      isEstudante,
-      hasERPAccess,
-      hasEDUAccess,
-      needsOnboarding,
-      awaitingApproval,
-      isViewingDemoData,
-      effectiveOrgId,
+      hasRole: derived.hasRoleFn,
+      isAdmin: derived.isAdmin,
+      isAnalyst: derived.isAnalyst,
+      isProfessor: derived.isProfessor,
+      isEstudante: derived.isEstudante,
+      hasERPAccess: derived.hasERPAccess,
+      hasEDUAccess: derived.hasEDUAccess,
+      needsOnboarding: derived.needsOnboarding,
+      awaitingApproval: derived.awaitingApproval,
+      isViewingDemoData: derived.isViewingDemoData,
+      effectiveOrgId: derived.effectiveOrgId,
       completeOnboarding,
       toggleDemoMode,
       updateForumPrivacy,

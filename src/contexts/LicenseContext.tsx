@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode, useCallback, useRef } from 'react';
+import { useState, useEffect, createContext, useContext, ReactNode, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -121,53 +121,57 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.id, fetchLicense]);
 
-  const now = new Date();
+  const computed = useMemo(() => {
+    const now = new Date();
 
-  const isTrialActive = Boolean(
-    license &&
-    license.plan === 'trial' &&
-    license.status === 'active' &&
-    license.trial_ends_at &&
-    new Date(license.trial_ends_at) > now
-  );
+    const isTrialActive = Boolean(
+      license &&
+      license.plan === 'trial' &&
+      license.status === 'active' &&
+      license.trial_ends_at &&
+      new Date(license.trial_ends_at) > now
+    );
 
-  const isTrialExpired = Boolean(
-    license &&
-    license.plan === 'trial' &&
-    (license.status === 'expired' || (license.trial_ends_at && new Date(license.trial_ends_at) <= now))
-  );
+    const isTrialExpired = Boolean(
+      license &&
+      license.plan === 'trial' &&
+      (license.status === 'expired' || (license.trial_ends_at && new Date(license.trial_ends_at) <= now))
+    );
 
-  const isPaidPlan = Boolean(
-    license &&
-    ['estudante', 'professor', 'basic', 'pro', 'enterprise'].includes(license.plan) &&
-    license.status === 'active' &&
-    (license.expires_at === null || new Date(license.expires_at) > now)
-  );
+    const isPaidPlan = Boolean(
+      license &&
+      ['estudante', 'professor', 'basic', 'pro', 'enterprise'].includes(license.plan) &&
+      license.status === 'active' &&
+      (license.expires_at === null || new Date(license.expires_at) > now)
+    );
 
-  const isLicenseValid = isTrialActive || isPaidPlan;
+    const isLicenseValid = isTrialActive || isPaidPlan;
 
-  const trialDaysRemaining = (() => {
-    if (!license?.trial_ends_at) return 0;
-    const end = new Date(license.trial_ends_at);
-    const diff = end.getTime() - now.getTime();
-    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-  })();
+    const trialDaysRemaining = (() => {
+      if (!license?.trial_ends_at) return 0;
+      const end = new Date(license.trial_ends_at);
+      const diff = end.getTime() - now.getTime();
+      return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+    })();
 
-  const trialDaysTotal = 7;
+    const trialDaysTotal = 7;
 
-  const trialProgress = license?.plan === 'trial'
-    ? Math.min(100, Math.max(0, ((trialDaysTotal - trialDaysRemaining) / trialDaysTotal) * 100))
-    : 0;
+    const trialProgress = license?.plan === 'trial'
+      ? Math.min(100, Math.max(0, ((trialDaysTotal - trialDaysRemaining) / trialDaysTotal) * 100))
+      : 0;
 
-  const plan = license?.plan ?? null;
-  const planLabel = plan ? PLAN_LABELS[plan] : 'Sem Licença';
+    const plan = license?.plan ?? null;
+    const planLabel = plan ? PLAN_LABELS[plan] : 'Sem Licença';
+
+    return { isTrialActive, isTrialExpired, isPaidPlan, isLicenseValid, trialDaysRemaining, trialDaysTotal, trialProgress, plan, planLabel };
+  }, [license]);
 
   const hasFeature = useCallback((feature: string) => {
     if (!license) return false;
-    if (!isLicenseValid) return false;
+    if (!computed.isLicenseValid) return false;
     if (license.plan === 'enterprise') return true;
     return license.features[feature] === true;
-  }, [license, isLicenseValid]);
+  }, [license, computed.isLicenseValid]);
 
   const forceRefetch = async () => {
     lastUserId.current = null;
@@ -179,15 +183,15 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
       license,
       loading,
       initialized,
-      isTrialActive,
-      isTrialExpired,
-      isPaidPlan,
-      isLicenseValid,
-      trialDaysRemaining,
-      trialDaysTotal,
-      trialProgress,
-      plan,
-      planLabel,
+      isTrialActive: computed.isTrialActive,
+      isTrialExpired: computed.isTrialExpired,
+      isPaidPlan: computed.isPaidPlan,
+      isLicenseValid: computed.isLicenseValid,
+      trialDaysRemaining: computed.trialDaysRemaining,
+      trialDaysTotal: computed.trialDaysTotal,
+      trialProgress: computed.trialProgress,
+      plan: computed.plan,
+      planLabel: computed.planLabel,
       hasFeature,
       refetchLicense: forceRefetch,
     }}>
