@@ -461,6 +461,21 @@ export function UserManagement() {
                         </SelectContent>
                       </Select>
                     </TableCell>
+                    <TableCell>
+                      {user.terms_accepted_at ? (
+                        <div className="flex items-center gap-1.5 text-emerald-600">
+                          <FileCheck className="h-4 w-4" />
+                          <span className="text-xs">{new Date(user.terms_accepted_at).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                      ) : user.role === 'ADMIN' ? (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-amber-600">
+                          <AlertCircle className="h-4 w-4" />
+                          <span className="text-xs">Pendente</span>
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell className="text-muted-foreground">
                       {new Date(user.created_at).toLocaleDateString('pt-BR')}
                     </TableCell>
