@@ -668,7 +668,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <main className="min-h-screen flex">
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 gradient-hero p-12 flex-col justify-between">
         <div>
@@ -732,7 +732,7 @@ const Auth = () => {
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
         {renderForm()}
       </div>
-    </div>
+    </main>
   );
 };
 
