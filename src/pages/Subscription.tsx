@@ -225,17 +225,86 @@ export default function Subscription() {
           </div>
         )}
 
-        {/* Pricing plans */}
+        {/* EDU Plans */}
         <div>
-          <h3 className="text-lg font-bold mb-1">Escolha seu plano</h3>
+          <div className="flex items-center gap-2 mb-1">
+            <GraduationCap className="h-5 w-5 text-sky-400" />
+            <h3 className="text-lg font-bold">Planos EDU</h3>
+          </div>
+          <p className="text-sm text-muted-foreground mb-6">
+            Ideal para estudantes e professores da área de turismo.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
+            {EDU_PLANS.map((p, i) => {
+              const isCurrentPlan = plan === p.plan && isPaidPlan;
+              return (
+                <motion.div
+                  key={p.plan}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className={cn(
+                    'relative rounded-2xl border-2 p-6 flex flex-col transition-shadow',
+                    p.highlight ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-border',
+                    isCurrentPlan && 'ring-2 ring-emerald-500/50',
+                  )}
+                >
+                  {p.highlight && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                      Recomendado
+                    </span>
+                  )}
+                  {isCurrentPlan && (
+                    <span className="absolute -top-3 right-4 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                      Seu plano
+                    </span>
+                  )}
+
+                  <div className="mb-4">
+                    {p.icon}
+                    <h4 className="text-lg font-bold mt-2">{p.name}</h4>
+                    <p className="text-2xl font-black mt-1">{p.price}</p>
+                  </div>
+
+                  <ul className="space-y-2.5 flex-1 mb-6">
+                    {p.features.map(f => (
+                      <li key={f} className="flex items-start gap-2 text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                        <span className="text-muted-foreground">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {isCurrentPlan ? (
+                    <Button disabled className="w-full" variant="outline">
+                      Plano atual
+                    </Button>
+                  ) : (
+                    <Button className={cn('w-full', p.highlight && 'bg-amber-600 hover:bg-amber-700')}>
+                      {isTrialActive ? 'Atualizar agora' : 'Começar'}
+                    </Button>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ERP/Organization Plans */}
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Building2 className="h-5 w-5 text-purple-400" />
+            <h3 className="text-lg font-bold">Planos Organizacionais</h3>
+          </div>
           <p className="text-sm text-muted-foreground mb-6">
             {isTrialActive
               ? 'Atualize antes do fim do trial para não perder o acesso.'
-              : 'Selecione o plano ideal para sua organização.'}
+              : 'Para gestores, analistas e organizações de turismo.'}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {PLAN_FEATURES.map((p, i) => {
+            {ERP_PLANS.map((p, i) => {
               const isCurrentPlan = plan === p.plan && isPaidPlan;
               return (
                 <motion.div
