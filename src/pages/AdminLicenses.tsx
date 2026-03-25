@@ -121,18 +121,23 @@ export default function AdminLicenses() {
 
       const rows = data || [];
 
-      // Fetch profiles for all user_ids
+      // Fetch profiles for all user_ids (including pending_approval status)
       const userIds = [...new Set(rows.map((l: any) => l.user_id).filter(Boolean))] as string[];
-      let profileMap: Record<string, { full_name: string | null; org_id: string }> = {};
+      let profileMap: Record<string, { full_name: string | null; org_id: string; pending_approval: boolean }> = {};
+      const pendingUserIds = new Set<string>();
       if (userIds.length > 0) {
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('user_id, full_name, org_id')
+          .select('user_id, full_name, org_id, pending_approval')
           .in('user_id', userIds);
         for (const p of profileData || []) {
-          profileMap[p.user_id] = { full_name: p.full_name, org_id: p.org_id };
+          profileMap[p.user_id] = { full_name: p.full_name, org_id: p.org_id, pending_approval: !!p.pending_approval };
+          if (p.pending_approval) pendingUserIds.add(p.user_id);
         }
       }
+
+      // Filter out licenses belonging to users still pending approval
+      const approvedRows = rows.filter((l: any) => !pendingUserIds.has(l.user_id));
 
       // Fetch org names
       const orgIds = [...new Set(rows.map((l: any) => l.org_id).filter(Boolean))] as string[];
