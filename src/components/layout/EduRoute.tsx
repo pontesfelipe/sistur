@@ -16,7 +16,7 @@ export function EduRoute({ children, requireProfessor = false }: EduRouteProps) 
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const { isLicenseValid, initialized: licenseInit } = useLicense();
 
-  const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null) || (!!user && termsLoading) || (!!user && !licenseInit);
+  const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null) || (!!user && termsLoading && !hasAcceptedTerms) || (!!user && !licenseInit);
 
   if (isInitialLoad) {
     return (
