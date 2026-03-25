@@ -4,7 +4,6 @@ import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTrian
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useLicense, type LicensePlan } from '@/contexts/LicenseContext';
-import { useProfileContext } from '@/contexts/ProfileContext';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -88,7 +87,6 @@ const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.R
 
 export default function Subscription() {
   const { license, isTrialActive, isTrialExpired, isPaidPlan, isLicenseValid, trialDaysRemaining, trialProgress, plan, planLabel } = useLicense();
-  const { profile } = useProfileContext();
   const { refetchLicense } = useLicense();
   const [activatingTrial, setActivatingTrial] = useState(false);
 
@@ -97,25 +95,7 @@ export default function Subscription() {
   const handleActivateTrial = async () => {
     try {
       setActivatingTrial(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user || !profile?.org_id) {
-        toast.error('Erro ao identificar usuário');
-        return;
-      }
-
-      const { error } = await (supabase as any)
-        .from('licenses')
-        .upsert({
-          user_id: user.id,
-          org_id: profile.org_id,
-          plan: 'trial',
-          status: 'active',
-          trial_started_at: new Date().toISOString(),
-          trial_ends_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          features: { erp: true, edu: true, games: true, reports: false, integrations: false },
-          activated_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+      const { error } = await supabase.rpc('activate_my_trial');
 
       if (error) throw error;
 
@@ -123,7 +103,17 @@ export default function Subscription() {
       await refetchLicense();
     } catch (err: any) {
       console.error('Error activating trial:', err);
-      toast.error('Erro ao ativar trial: ' + (err.message || 'Tente novamente'));
+      const errorMessage = String(err?.message || '');
+
+      if (errorMessage.includes('trial_already_used')) {
+        toast.error('Seu período de trial já foi utilizado.');
+      } else if (errorMessage.includes('paid_license_exists')) {
+        toast.error('Sua conta já possui um plano ativo.');
+      } else if (errorMessage.includes('profile_not_found') || errorMessage.includes('not_authenticated')) {
+        toast.error('Erro ao identificar usuário.');
+      } else {
+        toast.error('Erro ao ativar trial: ' + (err.message || 'Tente novamente'));
+      }
     } finally {
       setActivatingTrial(false);
     }
