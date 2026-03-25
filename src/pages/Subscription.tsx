@@ -6,7 +6,39 @@ import { useLicense, type LicensePlan } from '@/contexts/LicenseContext';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { cn } from '@/lib/utils';
 
-const PLAN_FEATURES: { plan: LicensePlan; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
+const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
+  {
+    plan: 'estudante',
+    name: 'Estudante',
+    price: 'R$ 19/mês',
+    icon: <GraduationCap className="h-6 w-6 text-sky-400" />,
+    features: [
+      'Acesso à plataforma EDU',
+      'Trilhas de aprendizagem',
+      'Jogos educacionais',
+      'Certificados de conclusão',
+      'Professor Beni (IA)',
+      'Social Turismo',
+    ],
+  },
+  {
+    plan: 'professor',
+    name: 'Professor',
+    price: 'R$ 39/mês',
+    icon: <BookOpen className="h-6 w-6 text-amber-400" />,
+    highlight: true,
+    features: [
+      'Tudo do Estudante',
+      'Criar e gerenciar trilhas',
+      'Banco de questões e exames',
+      'Painel de desempenho dos alunos',
+      'Emissão de certificados',
+      'Suporte prioritário',
+    ],
+  },
+];
+
+const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
   {
     plan: 'basic',
     name: 'Básico',
