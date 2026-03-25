@@ -3824,6 +3824,68 @@ export type Database = {
           },
         ]
       }
+      licenses: {
+        Row: {
+          activated_at: string
+          assigned_by: string | null
+          created_at: string
+          expires_at: string | null
+          features: Json
+          id: string
+          max_users: number
+          notes: string | null
+          org_id: string | null
+          plan: Database["public"]["Enums"]["license_plan_type"]
+          status: Database["public"]["Enums"]["license_status_type"]
+          trial_ends_at: string | null
+          trial_started_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          expires_at?: string | null
+          features?: Json
+          id?: string
+          max_users?: number
+          notes?: string | null
+          org_id?: string | null
+          plan?: Database["public"]["Enums"]["license_plan_type"]
+          status?: Database["public"]["Enums"]["license_status_type"]
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activated_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          expires_at?: string | null
+          features?: Json
+          id?: string
+          max_users?: number
+          notes?: string | null
+          org_id?: string | null
+          plan?: Database["public"]["Enums"]["license_plan_type"]
+          status?: Database["public"]["Enums"]["license_status_type"]
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lms_audit_logs: {
         Row: {
           action: string
@@ -4495,6 +4557,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "ondemand_requests_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_license_quotas: {
+        Row: {
+          created_at: string
+          id: string
+          max_licenses: number
+          notes: string | null
+          org_id: string
+          plan: Database["public"]["Enums"]["license_plan_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          max_licenses?: number
+          notes?: string | null
+          org_id: string
+          plan: Database["public"]["Enums"]["license_plan_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          max_licenses?: number
+          notes?: string | null
+          org_id?: string
+          plan?: Database["public"]["Enums"]["license_plan_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_license_quotas_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
@@ -5996,6 +6096,7 @@ export type Database = {
         }
         Returns: string
       }
+      expire_trial_licenses: { Args: never; Returns: undefined }
       generate_certificate_id: { Args: never; Returns: string }
       get_dashboard_org_access_flags: {
         Args: never
@@ -6006,6 +6107,17 @@ export type Database = {
         }[]
       }
       get_effective_org_id: { Args: never; Returns: string }
+      get_org_license_usage: {
+        Args: {
+          p_org_id: string
+          p_plan: Database["public"]["Enums"]["license_plan_type"]
+        }
+        Returns: {
+          available: number
+          quota: number
+          used: number
+        }[]
+      }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -6065,6 +6177,14 @@ export type Database = {
       indicator_scope_type: "territorial" | "enterprise" | "both"
       lesson_progress_status: "not_started" | "in_progress" | "completed"
       lesson_type: "video" | "text" | "interactive" | "quiz"
+      license_plan_type:
+        | "trial"
+        | "estudante"
+        | "professor"
+        | "basic"
+        | "pro"
+        | "enterprise"
+      license_status_type: "active" | "expired" | "cancelled" | "suspended"
       live_type: "primary" | "case" | "complementary"
       lms_role_name:
         | "STUDENT"
@@ -6271,6 +6391,15 @@ export const Constants = {
       indicator_scope_type: ["territorial", "enterprise", "both"],
       lesson_progress_status: ["not_started", "in_progress", "completed"],
       lesson_type: ["video", "text", "interactive", "quiz"],
+      license_plan_type: [
+        "trial",
+        "estudante",
+        "professor",
+        "basic",
+        "pro",
+        "enterprise",
+      ],
+      license_status_type: ["active", "expired", "cancelled", "suspended"],
       live_type: ["primary", "case", "complementary"],
       lms_role_name: [
         "STUDENT",
