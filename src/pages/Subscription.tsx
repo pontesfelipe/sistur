@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail, GraduationCap, BookOpen } from 'lucide-react';
+import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail, GraduationCap, BookOpen, Sparkles } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useLicense, type LicensePlan } from '@/contexts/LicenseContext';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
   {
