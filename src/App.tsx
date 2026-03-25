@@ -64,17 +64,19 @@ const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
-  requestIdleCallback?.(() => {
+  const preload = () => {
     import("./pages/Index");
     import("./pages/EduCatalogo");
     import("./pages/Configuracoes");
     import("./pages/Subscription");
-  }) ?? setTimeout(() => {
-    import("./pages/Index");
-    import("./pages/EduCatalogo");
-    import("./pages/Configuracoes");
-    import("./pages/Subscription");
-  }, 3000);
+  };
+
+  if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(preload);
+    return;
+  }
+
+  window.setTimeout(preload, 3000);
 };
 
 const queryClient = new QueryClient({
