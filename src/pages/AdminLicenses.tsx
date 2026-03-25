@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import type { LicensePlan, LicenseStatus } from '@/contexts/LicenseContext';
 import { TrialControlPanel } from '@/components/admin/TrialControlPanel';
+import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
 
 interface LicenseRow {
   id: string;
@@ -536,7 +537,7 @@ export default function AdminLicenses() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {orgs.filter(o => o.name !== 'Demo SISTUR').map(org => {
+{filterBusinessOrganizations(orgs).map(org => {
                 const orgQuotas = quotas.filter(q => q.org_id === org.id);
                 const orgLicenses = licenses.filter(l => l.org_id === org.id && l.status === 'active');
 
