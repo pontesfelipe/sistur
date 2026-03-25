@@ -34,12 +34,15 @@ export function useTermsAcceptance() {
       if (!user) throw new Error('Not authenticated');
       const { error } = await (supabase as any)
         .from('terms_acceptance')
-        .insert({
+        .upsert({
           user_id: user.id,
           terms_version: CURRENT_TERMS_VERSION,
           user_agent: navigator.userAgent,
-        });
-      if (error) throw error;
+        }, { onConflict: 'user_id,terms_version' });
+      if (error) {
+        console.error('Terms acceptance error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.setQueryData(['terms-acceptance', user?.id], true);
