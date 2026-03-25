@@ -2,6 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
+import { useLicense } from '@/contexts/LicenseContext';
 import { Loader2 } from 'lucide-react';
 
 interface ERPRouteProps {
@@ -12,8 +13,9 @@ export function ERPRoute({ children }: ERPRouteProps) {
   const { user, loading: authLoading } = useAuth();
   const { hasERPAccess, isAdmin, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
+  const { isLicenseValid, initialized: licenseInit } = useLicense();
 
-  const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null) || (!!user && termsLoading);
+  const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null) || (!!user && termsLoading) || (!!user && !licenseInit);
 
   if (isInitialLoad) {
     return (
@@ -34,6 +36,7 @@ export function ERPRoute({ children }: ERPRouteProps) {
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
   if (awaitingApproval) return <Navigate to="/pending-approval" replace />;
   if (isAdmin) return <>{children}</>;
+  if (!isLicenseValid) return <Navigate to="/assinatura" replace />;
   if (!hasERPAccess) return <Navigate to="/edu" replace />;
 
   return <>{children}</>;

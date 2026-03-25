@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail, GraduationCap, BookOpen } from 'lucide-react';
+import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail, GraduationCap, BookOpen, Sparkles } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useLicense, type LicensePlan } from '@/contexts/LicenseContext';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
   {
@@ -86,6 +89,45 @@ const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.R
 export default function Subscription() {
   const { license, isTrialActive, isTrialExpired, isPaidPlan, isLicenseValid, trialDaysRemaining, trialProgress, plan, planLabel } = useLicense();
   const { profile } = useProfileContext();
+  const { refetchLicense } = useLicense();
+  const [activatingTrial, setActivatingTrial] = useState(false);
+
+  const noLicense = !license;
+
+  const handleActivateTrial = async () => {
+    try {
+      setActivatingTrial(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !profile?.org_id) {
+        toast.error('Erro ao identificar usuário');
+        return;
+      }
+
+      const { error } = await (supabase as any)
+        .from('licenses')
+        .upsert({
+          user_id: user.id,
+          org_id: profile.org_id,
+          plan: 'trial',
+          status: 'active',
+          trial_started_at: new Date().toISOString(),
+          trial_ends_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          features: { erp: true, edu: true, games: true, reports: false, integrations: false },
+          activated_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+
+      if (error) throw error;
+
+      toast.success('Trial de 7 dias ativado com sucesso!');
+      await refetchLicense();
+    } catch (err: any) {
+      console.error('Error activating trial:', err);
+      toast.error('Erro ao ativar trial: ' + (err.message || 'Tente novamente'));
+    } finally {
+      setActivatingTrial(false);
+    }
+  };
 
   return (
     <AppLayout title="Assinatura" subtitle="Gerencie seu plano e licença">
@@ -96,9 +138,10 @@ export default function Subscription() {
           animate={{ opacity: 1, y: 0 }}
           className={cn(
             'rounded-2xl border-2 p-6 relative overflow-hidden',
-            isTrialActive ? 'border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-orange-950/20' :
-            isPaidPlan ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/30 to-teal-950/20' :
-            isTrialExpired ? 'border-red-500/50 bg-gradient-to-br from-red-950/30 to-rose-950/20' :
+                    isTrialActive ? 'border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-orange-950/20' :
+                    isPaidPlan ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/30 to-teal-950/20' :
+                    noLicense ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-blue-950/20' :
+                    isTrialExpired ? 'border-red-500/50 bg-gradient-to-br from-red-950/30 to-rose-950/20' :
             'border-border bg-card',
           )}
         >
@@ -116,25 +159,31 @@ export default function Subscription() {
                     <Clock className="h-6 w-6 text-amber-400" />
                   ) : isPaidPlan ? (
                     <Crown className="h-6 w-6 text-emerald-400" />
+                  ) : noLicense ? (
+                    <Sparkles className="h-6 w-6 text-primary" />
                   ) : (
                     <AlertTriangle className="h-6 w-6 text-red-400" />
                   )}
-                  <h2 className="text-xl font-bold">{planLabel}</h2>
-                  <span className={cn(
-                    'text-xs font-bold px-2.5 py-1 rounded-full',
-                    isLicenseValid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400',
-                  )}>
-                    {isLicenseValid ? 'Ativo' : 'Inativo'}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground max-w-md">
-                  {isTrialActive
-                    ? `Sua avaliação gratuita de 7 dias está ativa. Restam ${trialDaysRemaining} dia${trialDaysRemaining !== 1 ? 's' : ''} para explorar todas as funcionalidades.`
-                    : isPaidPlan
-                    ? `Você tem acesso completo ao plano ${planLabel}. ${license?.expires_at ? `Válido até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''}`
-                    : isTrialExpired
-                    ? 'Sua avaliação gratuita expirou. Escolha um plano para continuar usando o SISTUR.'
-                    : 'Nenhuma licença ativa encontrada. Entre em contato com o administrador.'
+                   <h2 className="text-xl font-bold">{noLicense ? 'Bem-vindo ao SISTUR!' : planLabel}</h2>
+                   {!noLicense && (
+                   <span className={cn(
+                     'text-xs font-bold px-2.5 py-1 rounded-full',
+                     isLicenseValid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400',
+                   )}>
+                     {isLicenseValid ? 'Ativo' : 'Inativo'}
+                   </span>
+                   )}
+                 </div>
+                 <p className="text-sm text-muted-foreground max-w-md">
+                   {noLicense
+                     ? 'Sua conta foi aprovada! Ative seu trial gratuito de 7 dias para explorar todas as funcionalidades ou escolha um plano abaixo.'
+                     : isTrialActive
+                     ? `Sua avaliação gratuita de 7 dias está ativa. Restam ${trialDaysRemaining} dia${trialDaysRemaining !== 1 ? 's' : ''} para explorar todas as funcionalidades.`
+                     : isPaidPlan
+                     ? `Você tem acesso completo ao plano ${planLabel}. ${license?.expires_at ? `Válido até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''}`
+                     : isTrialExpired
+                     ? 'Sua avaliação gratuita expirou. Escolha um plano para continuar usando o SISTUR.'
+                     : 'Nenhuma licença ativa encontrada. Ative um trial ou escolha um plano.'
                   }
                 </p>
               </div>
@@ -184,6 +233,28 @@ export default function Subscription() {
                     Para continuar acessando o SISTUR, escolha um plano abaixo ou entre em contato com nossa equipe comercial.
                   </p>
                 </div>
+              </motion.div>
+            )}
+
+            {/* Trial activation CTA for new users */}
+            {noLicense && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 flex flex-col items-center gap-3"
+              >
+                <Button
+                  size="lg"
+                  onClick={handleActivateTrial}
+                  disabled={activatingTrial}
+                  className="gap-2 text-base px-8"
+                >
+                  <Sparkles className="h-5 w-5" />
+                  {activatingTrial ? 'Ativando...' : 'Ativar Trial Gratuito de 7 Dias'}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Sem compromisso. Acesso completo por 7 dias.
+                </p>
               </motion.div>
             )}
           </div>

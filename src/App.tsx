@@ -397,7 +397,7 @@ const App = () => {
                 <Route
                   path="/assinatura"
                   element={
-                    <ProtectedRoute redirectStudentsToEdu={false}>
+                    <ProtectedRoute redirectStudentsToEdu={false} skipLicenseCheck>
                       <Subscription />
                     </ProtectedRoute>
                   }
