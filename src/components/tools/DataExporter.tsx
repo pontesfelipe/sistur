@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { 
   Download, 
@@ -14,17 +13,60 @@ import {
   Calculator,
   GraduationCap,
   AlertTriangle,
-  Loader2
+  Loader2,
+  Users
 } from 'lucide-react';
 
-type ExportType = 'assessments' | 'destinations' | 'indicators' | 'courses' | 'issues';
+type ExportType = 'assessments' | 'destinations' | 'indicators' | 'courses' | 'issues' | 'users';
+
+function downloadCsv(data: Record<string, unknown>[], filename: string) {
+  if (data.length === 0) {
+    toast.error('Nenhum dado encontrado para exportar');
+    return;
+  }
+
+  const headers = Object.keys(data[0]);
+  const csvContent = [
+    headers.join(';'),
+    ...data.map(row => 
+      headers.map(h => {
+        const val = row[h];
+        if (val === null || val === undefined) return '';
+        const str = String(val);
+        if (str.includes(';') || str.includes('"') || str.includes('\n')) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      }).join(';')
+    )
+  ].join('\n');
+
+  const BOM = '\uFEFF';
+  const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `sistur_${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  toast.success(`${data.length} registros exportados com sucesso`);
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: 'Administrador',
+  ANALYST: 'Analista',
+  VIEWER: 'Visualizador',
+  ESTUDANTE: 'Estudante',
+  PROFESSOR: 'Professor',
+};
 
 export function DataExporter() {
   const [open, setOpen] = useState(false);
   const [exportType, setExportType] = useState<ExportType>('assessments');
   const [loading, setLoading] = useState(false);
-  const [includeScores, setIncludeScores] = useState(true);
-  const [includeMetadata, setIncludeMetadata] = useState(false);
 
   const exportData = async () => {
     try {
@@ -33,6 +75,69 @@ export function DataExporter() {
       let filename = '';
 
       switch (exportType) {
+        case 'users': {
+          // Fetch active users
+          const [activeRes, pendingRes, licensesRes, termsRes] = await Promise.all([
+            supabase.functions.invoke('manage-users', { body: { action: 'list' } }),
+            supabase.functions.invoke('manage-users', { body: { action: 'list_pending' } }),
+            supabase.from('licenses').select('user_id, plan, status, trial_ends_at, expires_at, created_at'),
+            supabase.from('terms_acceptance' as any).select('user_id, accepted_at, terms_version'),
+          ]);
+
+          const activeUsers = activeRes.data?.users || [];
+          const pendingUsers = pendingRes.data?.users || [];
+
+          const licensesMap = new Map<string, any>();
+          (licensesRes.data || []).forEach((l: any) => licensesMap.set(l.user_id, l));
+
+          const termsMap = new Map<string, any>();
+          (termsRes.data || []).forEach((t: any) => termsMap.set(t.user_id, t));
+
+          const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString('pt-BR') : '';
+
+          const rows = activeUsers.map((u: any) => {
+            const license = licensesMap.get(u.user_id);
+            const terms = termsMap.get(u.user_id);
+            return {
+              'Nome': u.full_name || '',
+              'Email': u.email || '',
+              'Status': 'Ativo',
+              'Acesso': u.system_access || '—',
+              'Papel': ROLE_LABELS[u.role] || u.role || '',
+              'Plano Licença': license?.plan || '—',
+              'Status Licença': license?.status || '—',
+              'Expiração Licença': formatDate(license?.expires_at || license?.trial_ends_at),
+              'Termos Aceitos': terms ? 'Sim' : 'Não',
+              'Data Aceite Termos': formatDate(terms?.accepted_at),
+              'Versão Termos': terms?.terms_version || '',
+              'Criado em': formatDate(u.created_at),
+            };
+          });
+
+          const pendingRows = pendingUsers.map((u: any) => {
+            const license = licensesMap.get(u.user_id);
+            const terms = termsMap.get(u.user_id);
+            return {
+              'Nome': u.full_name || '',
+              'Email': u.email || '',
+              'Status': 'Aguardando Aprovação',
+              'Acesso': u.system_access || '—',
+              'Papel': '—',
+              'Plano Licença': license?.plan || '—',
+              'Status Licença': license?.status || '—',
+              'Expiração Licença': formatDate(license?.expires_at || license?.trial_ends_at),
+              'Termos Aceitos': terms ? 'Sim' : 'Não',
+              'Data Aceite Termos': formatDate(terms?.accepted_at),
+              'Versão Termos': terms?.terms_version || '',
+              'Criado em': formatDate(u.approval_requested_at || u.created_at),
+            };
+          });
+
+          data = [...rows, ...pendingRows];
+          filename = 'usuarios';
+          break;
+        }
+
         case 'assessments': {
           const { data: assessments, error } = await supabase
             .from('assessments')
@@ -161,42 +266,7 @@ export function DataExporter() {
         }
       }
 
-      if (data.length === 0) {
-        toast.error('Nenhum dado encontrado para exportar');
-        return;
-      }
-
-      // Convert to CSV
-      const headers = Object.keys(data[0]);
-      const csvContent = [
-        headers.join(';'),
-        ...data.map(row => 
-          headers.map(h => {
-            const val = row[h];
-            if (val === null || val === undefined) return '';
-            const str = String(val);
-            // Escape quotes and wrap in quotes if contains separator or newline
-            if (str.includes(';') || str.includes('"') || str.includes('\n')) {
-              return `"${str.replace(/"/g, '""')}"`;
-            }
-            return str;
-          }).join(';')
-        )
-      ].join('\n');
-
-      // Add BOM for Excel UTF-8 compatibility
-      const BOM = '\uFEFF';
-      const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `sistur_${filename}_${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast.success(`${data.length} registros exportados com sucesso`);
+      downloadCsv(data, filename);
     } catch (error) {
       console.error('Export error:', error);
       toast.error('Erro ao exportar dados');
@@ -217,7 +287,27 @@ export function DataExporter() {
         return <GraduationCap className="h-4 w-4" />;
       case 'issues':
         return <AlertTriangle className="h-4 w-4" />;
+      case 'users':
+        return <Users className="h-4 w-4" />;
     }
+  };
+
+  const TYPE_LABELS: Record<ExportType, string> = {
+    users: 'Usuários',
+    assessments: 'Diagnósticos',
+    destinations: 'Destinos',
+    indicators: 'Indicadores',
+    courses: 'Cursos',
+    issues: 'Gargalos',
+  };
+
+  const TYPE_DESCRIPTIONS: Record<ExportType, string> = {
+    users: 'Exporta todos os usuários (ativos e pendentes) com status, papel, licença, termos aceitos e acessos.',
+    assessments: 'Exporta todas as rodadas de diagnóstico com status, datas e destino associado.',
+    destinations: 'Exporta todos os destinos cadastrados com coordenadas e código IBGE.',
+    indicators: 'Exporta a matriz completa de indicadores com pesos, referências e metadados.',
+    courses: 'Exporta o catálogo de cursos SISTUR EDU com pilares e agentes-alvo.',
+    issues: 'Exporta todos os gargalos detectados com severidade e interpretação territorial.',
   };
 
   return (
@@ -247,6 +337,12 @@ export function DataExporter() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="users">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Usuários
+                  </div>
+                </SelectItem>
                 <SelectItem value="assessments">
                   <div className="flex items-center gap-2">
                     <Calculator className="h-4 w-4" />
@@ -285,20 +381,12 @@ export function DataExporter() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 {getTypeIcon(exportType)}
-                {exportType === 'assessments' && 'Diagnósticos'}
-                {exportType === 'destinations' && 'Destinos'}
-                {exportType === 'indicators' && 'Indicadores'}
-                {exportType === 'courses' && 'Cursos'}
-                {exportType === 'issues' && 'Gargalos'}
+                {TYPE_LABELS[exportType]}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="text-xs">
-                {exportType === 'assessments' && 'Exporta todas as rodadas de diagnóstico com status, datas e destino associado.'}
-                {exportType === 'destinations' && 'Exporta todos os destinos cadastrados com coordenadas e código IBGE.'}
-                {exportType === 'indicators' && 'Exporta a matriz completa de indicadores com pesos, referências e metadados.'}
-                {exportType === 'courses' && 'Exporta o catálogo de cursos SISTUR EDU com pilares e agentes-alvo.'}
-                {exportType === 'issues' && 'Exporta todos os gargalos detectados com severidade e interpretação territorial.'}
+                {TYPE_DESCRIPTIONS[exportType]}
               </CardDescription>
             </CardContent>
           </Card>
