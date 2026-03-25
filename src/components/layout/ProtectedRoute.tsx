@@ -2,14 +2,16 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
+import { useLicense } from '@/contexts/LicenseContext';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   redirectStudentsToEdu?: boolean;
+  skipLicenseCheck?: boolean;
 }
 
-export function ProtectedRoute({ children, redirectStudentsToEdu = true }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, redirectStudentsToEdu = true, skipLicenseCheck = false }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const { 
     needsOnboarding, 
@@ -21,11 +23,12 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true }: Prote
     isAdmin 
   } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
+  const { isLicenseValid, initialized: licenseInit, loading: licenseLoading } = useLicense();
 
   // Only show loading on initial load, not on navigation between routes
   const isInitialLoad = (loading && user === null) || (!initialized && profile === null);
 
-  if (isInitialLoad || (user && termsLoading)) {
+  if (isInitialLoad || (user && termsLoading) || (user && !skipLicenseCheck && !licenseInit)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -54,6 +57,11 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true }: Prote
 
   if (awaitingApproval) {
     return <Navigate to="/pending-approval" replace />;
+  }
+
+  // Check license - redirect to subscription if no valid license (admins bypass)
+  if (!skipLicenseCheck && !isAdmin && !isLicenseValid) {
+    return <Navigate to="/assinatura" replace />;
   }
 
   // Redirect students to EDU (they shouldn't see ERP dashboard)
