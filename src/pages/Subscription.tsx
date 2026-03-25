@@ -241,8 +241,21 @@ export default function Subscription() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-6 flex flex-col items-center gap-3"
+                className="mt-6 bg-primary/5 border border-primary/20 rounded-xl p-6"
               >
+                <h3 className="text-base font-bold mb-2">🎉 Experimente o SISTUR gratuitamente</h3>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Ative seu trial gratuito de <strong>7 dias</strong> e tenha acesso completo a todas as funcionalidades:
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-1 mb-4 list-disc list-inside">
+                  <li>Plataforma EDU com trilhas e cursos</li>
+                  <li>Jogos educacionais (TCG, RPG, Memória, Caça ao Tesouro)</li>
+                  <li>Professor Beni (IA) e Social Turismo</li>
+                  <li>ERP de diagnósticos turísticos</li>
+                </ul>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Sem compromisso — ao final dos 7 dias, escolha um plano para continuar.
+                </p>
                 <Button
                   size="lg"
                   onClick={handleActivateTrial}
@@ -252,9 +265,6 @@ export default function Subscription() {
                   <Sparkles className="h-5 w-5" />
                   {activatingTrial ? 'Ativando...' : 'Ativar Trial Gratuito de 7 Dias'}
                 </Button>
-                <p className="text-xs text-muted-foreground">
-                  Sem compromisso. Acesso completo por 7 dias.
-                </p>
               </motion.div>
             )}
           </div>
