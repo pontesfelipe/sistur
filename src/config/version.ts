@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 8,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.8.2",
+    date: "2026-03-25",
+    type: "patch" as const,
+    changes: [
+      "Metodologia oculta do menu para usuários não-admin",
+      "Renomeado 'Assinatura' para 'Planos' no menu e comunicações",
+      "Página de Planos com explicação detalhada do trial para novos usuários",
+      "Admin pode estender duração do trial na gestão de licenças",
+      "Correção do fluxo Autônomo: termos → planos → ativação trial"
+    ]
+  },
   {
     version: "1.8.1",
     date: "2026-03-25",
