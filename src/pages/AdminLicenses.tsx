@@ -484,7 +484,6 @@ export default function AdminLicenses() {
                                 </div>
                               );
                             })()}
-                            )}
                           </td>
                           <td className="px-4 py-3 text-right">
                             {isEditing ? (
