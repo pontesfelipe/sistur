@@ -368,6 +368,7 @@ export function UserManagement() {
                 <TableHead>Email</TableHead>
                 <TableHead>Acesso</TableHead>
                 <TableHead>Papel</TableHead>
+                <TableHead>Termos</TableHead>
                 <TableHead>Data de Criação</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
