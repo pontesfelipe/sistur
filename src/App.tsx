@@ -100,7 +100,7 @@ const App = () => {
 
   return (
     <>
-      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+      {showSplash && <SplashScreen onComplete={() => { setShowSplash(false); preloadPages(); }} />}
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
