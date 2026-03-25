@@ -531,7 +531,7 @@ const Auth = () => {
                 </div>
                 <span className="font-display font-bold text-xl">SISTUR</span>
               </div>
-              <CardTitle className="text-2xl font-display">Bem-vindo</CardTitle>
+              <h1 className="text-2xl font-semibold leading-none tracking-tight font-display">Bem-vindo</h1>
               <CardDescription>
                 Entre com suas credenciais para acessar o sistema
               </CardDescription>
