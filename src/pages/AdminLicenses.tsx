@@ -147,7 +147,7 @@ export default function AdminLicenses() {
         for (const o of orgData || []) orgMap[o.id] = o.name;
       }
 
-      setLicenses(rows.map((l: any) => ({
+      setLicenses(approvedRows.map((l: any) => ({
         ...l,
         plan: l.plan as LicensePlan,
         status: l.status as LicenseStatus,
