@@ -6205,6 +6205,32 @@ export type Database = {
       }
     }
     Functions: {
+      activate_my_trial: {
+        Args: never
+        Returns: {
+          activated_at: string
+          assigned_by: string | null
+          created_at: string
+          expires_at: string | null
+          features: Json
+          id: string
+          max_users: number
+          notes: string | null
+          org_id: string | null
+          plan: Database["public"]["Enums"]["license_plan_type"]
+          status: Database["public"]["Enums"]["license_status_type"]
+          trial_ends_at: string | null
+          trial_started_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "licenses"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_approve_user: { Args: { _user_id: string }; Returns: boolean }
       admin_get_all_users: {
         Args: never
