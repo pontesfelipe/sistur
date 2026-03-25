@@ -455,17 +455,35 @@ export default function AdminLicenses() {
                                 {Object.entries(STATUS_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                               </select>
                             ) : (
-                              <span className={cn('text-xs font-medium px-2 py-1 rounded-full', statusCfg.color)}>
-                                {statusCfg.label}
-                              </span>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className={cn('text-xs font-medium px-2 py-1 rounded-full', statusCfg.color)}>
+                                  {statusCfg.label}
+                                </span>
+                                {license.plan === 'trial' && license.status === 'active' && (
+                                  <span className="text-xs font-medium px-2 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                                    ⏳ Trial
+                                  </span>
+                                )}
+                              </div>
                             )}
                           </td>
                           <td className="px-4 py-3 text-xs text-muted-foreground">
                             {isEditing ? (
                               <input type="date" value={editExpires} onChange={e => setEditExpires(e.target.value)} className="h-8 rounded border border-border bg-background px-2 text-xs" />
-                            ) : (
-                              license.expires_at ? new Date(license.expires_at).toLocaleDateString('pt-BR') : <span className="text-emerald-400 font-medium">Sem expiração</span>
-                            )}
+                            ) : (() => {
+                              const expDate = license.trial_ends_at || license.expires_at;
+                              if (!expDate) return <span className="text-emerald-400 font-medium">Sem expiração</span>;
+                              const remaining = Math.ceil((new Date(expDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                              return (
+                                <div>
+                                  <span>{new Date(expDate).toLocaleDateString('pt-BR')}</span>
+                                  {license.plan === 'trial' && license.status === 'active' && remaining > 0 && (
+                                    <span className="block text-amber-400 font-medium">{remaining} dia{remaining !== 1 ? 's' : ''} restante{remaining !== 1 ? 's' : ''}</span>
+                                  )}
+                                  {remaining <= 0 && <span className="block text-destructive font-medium">Vencido</span>}
+                                </div>
+                              );
+                            })()}
                           </td>
                           <td className="px-4 py-3 text-right">
                             {isEditing ? (
