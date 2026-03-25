@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { toast } from 'sonner';
 
 export default function TermsAcceptance() {
+  const navigate = useNavigate();
   const { acceptTerms } = useTermsAcceptance();
   const [checked, setChecked] = useState(false);
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
@@ -23,6 +25,7 @@ export default function TermsAcceptance() {
     try {
       await acceptTerms.mutateAsync();
       toast.success('Termos aceitos com sucesso');
+      navigate('/', { replace: true });
     } catch {
       toast.error('Erro ao aceitar termos. Tente novamente.');
     }
