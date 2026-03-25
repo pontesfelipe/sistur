@@ -2,13 +2,12 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { useLicense } from '@/contexts/LicenseContext';
+import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { Loader2 } from 'lucide-react';
 
 interface LicenseRouteProps {
   children: React.ReactNode;
-  /** Optional feature key to check (e.g. 'reports', 'integrations') */
   requiredFeature?: string;
-  /** If true, allows access even with expired trial (for pages like subscription) */
   allowExpired?: boolean;
 }
 
@@ -16,8 +15,9 @@ export function LicenseRoute({ children, requiredFeature, allowExpired = false }
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, initialized: profileInit } = useProfileContext();
   const { loading: licenseLoading, initialized: licenseInit, isLicenseValid, hasFeature } = useLicense();
+  const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
 
-  const isInitialLoad = (authLoading && user === null) || !profileInit || !licenseInit;
+  const isInitialLoad = (authLoading && user === null) || !profileInit || !licenseInit || (!!user && termsLoading);
 
   if (isInitialLoad) {
     return (
@@ -30,24 +30,11 @@ export function LicenseRoute({ children, requiredFeature, allowExpired = false }
     );
   }
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  // Admins always have access
-  if (isAdmin) {
-    return <>{children}</>;
-  }
-
-  // If license is expired and not allowExpired, redirect to subscription page
-  if (!isLicenseValid && !allowExpired) {
-    return <Navigate to="/assinatura" replace />;
-  }
-
-  // Check specific feature access
-  if (requiredFeature && !hasFeature(requiredFeature)) {
-    return <Navigate to="/assinatura" replace />;
-  }
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
+  if (isAdmin) return <>{children}</>;
+  if (!isLicenseValid && !allowExpired) return <Navigate to="/assinatura" replace />;
+  if (requiredFeature && !hasFeature(requiredFeature)) return <Navigate to="/assinatura" replace />;
 
   return <>{children}</>;
 }

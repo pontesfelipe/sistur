@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { Loader2 } from 'lucide-react';
 
 interface ERPRouteProps {
@@ -10,9 +11,9 @@ interface ERPRouteProps {
 export function ERPRoute({ children }: ERPRouteProps) {
   const { user, loading: authLoading } = useAuth();
   const { hasERPAccess, isAdmin, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
+  const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
 
-  // Only show loading on initial load, not on navigation between routes
-  const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null);
+  const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null) || (!!user && termsLoading);
 
   if (isInitialLoad) {
     return (
@@ -28,27 +29,12 @@ export function ERPRoute({ children }: ERPRouteProps) {
     );
   }
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  if (needsOnboarding) {
-    return <Navigate to="/onboarding" replace />;
-  }
-
-  if (awaitingApproval) {
-    return <Navigate to="/pending-approval" replace />;
-  }
-
-  // Admin always has access
-  if (isAdmin) {
-    return <>{children}</>;
-  }
-
-  // Check ERP access
-  if (!hasERPAccess) {
-    return <Navigate to="/edu" replace />;
-  }
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
+  if (needsOnboarding) return <Navigate to="/onboarding" replace />;
+  if (awaitingApproval) return <Navigate to="/pending-approval" replace />;
+  if (isAdmin) return <>{children}</>;
+  if (!hasERPAccess) return <Navigate to="/edu" replace />;
 
   return <>{children}</>;
 }

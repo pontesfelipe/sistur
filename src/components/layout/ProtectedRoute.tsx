@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
@@ -19,11 +20,12 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true }: Prote
     hasERPAccess,
     isAdmin 
   } = useProfileContext();
+  const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
 
   // Only show loading on initial load, not on navigation between routes
   const isInitialLoad = (loading && user === null) || (!initialized && profile === null);
 
-  if (isInitialLoad) {
+  if (isInitialLoad || (user && termsLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -41,6 +43,11 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true }: Prote
     return <Navigate to="/auth" replace />;
   }
 
+  // Check terms acceptance before anything else
+  if (!hasAcceptedTerms) {
+    return <Navigate to="/termos" replace />;
+  }
+
   if (needsOnboarding) {
     return <Navigate to="/onboarding" replace />;
   }
@@ -50,7 +57,6 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true }: Prote
   }
 
   // Redirect students to EDU (they shouldn't see ERP dashboard)
-  // Unless they are admin or have explicit ERP access
   if (redirectStudentsToEdu && isEstudante && !hasERPAccess && !isAdmin) {
     return <Navigate to="/edu" replace />;
   }
