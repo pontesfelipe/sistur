@@ -58,6 +58,7 @@ const TreasureGame = lazy(() => import("./pages/TreasureGame"));
 const MemoryGame = lazy(() => import("./pages/MemoryGame"));
 const Subscription = lazy(() => import("./pages/Subscription"));
 const AdminLicenses = lazy(() => import("./pages/AdminLicenses"));
+const TermsAcceptance = lazy(() => import("./pages/TermsAcceptance"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
