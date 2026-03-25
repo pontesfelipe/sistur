@@ -107,11 +107,11 @@ export function TrialControlPanel() {
     // Conversion: users who had trial and now have a paid plan (exclude SISTUR internal)
     const externalTrials = trials.filter(t => t.org_name !== 'SISTUR');
     const convertedCount = allLicenses.filter(l =>
-      l.plan !== 'trial' && l.status === 'active'
+      l.plan !== 'trial' && l.status === 'active' && l.org_name !== 'SISTUR'
     ).length;
 
-    const conversionRate = trials.length > 0
-      ? Math.round((convertedCount / trials.length) * 100)
+    const conversionRate = externalTrials.length > 0
+      ? Math.round((convertedCount / externalTrials.length) * 100)
       : 0;
 
     return {
