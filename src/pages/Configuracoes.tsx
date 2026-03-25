@@ -529,7 +529,7 @@ export default function Configuracoes() {
                         Exportar Dados
                       </CardTitle>
                       <CardDescription className="text-xs">
-                        Exporte diagnósticos e indicadores em CSV
+                        Exporte diagnósticos, indicadores, planos de ação e outros dados do sistema
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
