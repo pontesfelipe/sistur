@@ -91,6 +91,24 @@ export function PendingApprovalsPanel() {
 
       if (roleError) throw roleError;
 
+      // Send approval notification email
+      try {
+        await supabase.functions.invoke('send-transactional-email', {
+          body: {
+            templateName: 'access-approved',
+            recipientEmail: pendingUsers.find(u => u.id === profileId)?.email,
+            idempotencyKey: `access-approved-${profileId}`,
+            templateData: {
+              userName: pendingUsers.find(u => u.id === profileId)?.full_name || undefined,
+              role: role,
+              systemAccess: systemAccess || undefined,
+            },
+          },
+        });
+      } catch (emailError) {
+        console.warn('Failed to send approval email:', emailError);
+      }
+
       toast.success('Usuário aprovado com sucesso');
       await fetchPendingUsers();
     } catch (error: any) {
