@@ -185,24 +185,41 @@ export default function AdminLicenses() {
     setEditingId(license.id);
     setEditPlan(license.plan);
     setEditStatus(license.status);
-    setEditExpires(license.expires_at ? new Date(license.expires_at).toISOString().split('T')[0] : '');
+    // For trials, use trial_ends_at; for paid plans, use expires_at
+    const expDate = license.plan === 'trial' ? license.trial_ends_at : license.expires_at;
+    setEditExpires(expDate ? new Date(expDate).toISOString().split('T')[0] : '');
     setEditNotes(license.notes || '');
   };
 
   const handleSave = async (license: LicenseRow) => {
     try {
       const features = DEFAULT_FEATURES[editPlan];
+      const updateData: Record<string, any> = {
+        plan: editPlan,
+        status: editStatus,
+        features,
+        notes: editNotes || null,
+        activated_at: editPlan !== license.plan ? new Date().toISOString() : license.activated_at,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Handle trial_ends_at for trial plans, expires_at for paid plans
+      if (editPlan === 'trial') {
+        updateData.trial_ends_at = editExpires ? new Date(editExpires + 'T23:59:59').toISOString() : null;
+        // Reactivate if extending an expired trial
+        if (editExpires && editStatus === 'active') {
+          const newEnd = new Date(editExpires + 'T23:59:59');
+          if (newEnd > new Date() && license.status === 'expired') {
+            updateData.status = 'active';
+          }
+        }
+      } else {
+        updateData.expires_at = editExpires ? new Date(editExpires).toISOString() : null;
+      }
+
       const { error } = await (supabase as any)
         .from('licenses')
-        .update({
-          plan: editPlan,
-          status: editStatus,
-          expires_at: editExpires ? new Date(editExpires).toISOString() : null,
-          features,
-          notes: editNotes || null,
-          activated_at: editPlan !== license.plan ? new Date().toISOString() : license.activated_at,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', license.id);
 
       if (error) throw error;

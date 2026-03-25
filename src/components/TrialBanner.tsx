@@ -57,7 +57,7 @@ export function TrialBanner() {
                   : 'bg-amber-500 hover:bg-amber-600 text-amber-950',
               )}
             >
-              Ver planos <ArrowRight className="h-3 w-3" />
+              Ver Planos <ArrowRight className="h-3 w-3" />
             </button>
             {!isTrialExpired && (
               <button
