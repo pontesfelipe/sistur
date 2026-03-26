@@ -107,6 +107,9 @@ export default function AdminLicenses() {
   const [quotaPlan, setQuotaPlan] = useState<LicensePlan>('basic');
   const [quotaMax, setQuotaMax] = useState(10);
 
+  // Cancel dialog
+  const [cancelTarget, setCancelTarget] = useState<LicenseRow | null>(null);
+
   const fetchOrgs = async () => {
     const { data } = await supabase.from('orgs').select('id, name').order('name');
     setOrgs(data || []);
