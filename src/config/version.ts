@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 8,
-  patch: 5,
+  minor: 9,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,23 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.9.0",
+    date: "2026-03-26",
+    type: "minor" as const,
+    changes: [
+      "Sistema de referência professor → aluno com código único e link de convite",
+      "Isenção automática de mensalidade para professor com 5+ alunos ativos",
+      "Campo opcional de código de professor no onboarding de estudantes",
+      "Painel do Professor com gestão de salas/turmas (CRUD completo)",
+      "Turmas com nome, disciplina, período de início/fim",
+      "Matrícula de alunos em salas e gestão individual",
+      "Atribuição de atividades (trilhas, testes, conteúdo próprio) com prazos",
+      "Nova rota /professor no sidebar para professores EDU",
+      "Tabelas: professor_referral_codes, student_referrals, classrooms, classroom_students, classroom_assignments",
+      "RLS policies completas com funções de segurança (owns_classroom, professor_qualifies_free_license)"
+    ]
+  },
   {
     version: "1.8.5",
     date: "2026-03-26",
