@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 8,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,21 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.8.5",
+    date: "2026-03-26",
+    type: "patch" as const,
+    changes: [
+      "Fluxo de cancelamento de plano com motivo obrigatório e confirmação",
+      "Usuários cancelam seu próprio plano mantendo acesso até o fim do período",
+      "Admins podem cancelar licença de qualquer usuário via painel de gestão",
+      "Estado 'Cancelado' exibido na página de Planos com mensagem informativa",
+      "Licenças canceladas com data futura mantêm acesso até expiração",
+      "Exclusão de usuários SISTUR das métricas de licenças externas",
+      "Consistência de organizações na aba Cotas por Organização",
+      "Correção RLS para ativação de trial por usuários não-admin"
+    ]
+  },
   {
     version: "1.8.4",
     date: "2026-03-25",
