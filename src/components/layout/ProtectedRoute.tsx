@@ -1,9 +1,11 @@
+import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { useLicense } from '@/contexts/LicenseContext';
 import { Loader2 } from 'lucide-react';
+import { TutorialWizard } from '@/components/tutorial/TutorialWizard';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -24,6 +26,18 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true, skipLic
   } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const { isLicenseValid, initialized: licenseInit, loading: licenseLoading } = useLicense();
+
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  // Show tutorial wizard on first access (after all guards pass)
+  useEffect(() => {
+    if (user && initialized && !needsOnboarding && !awaitingApproval && hasAcceptedTerms) {
+      const seen = localStorage.getItem('sistur_tutorial_seen');
+      if (!seen) {
+        setShowTutorial(true);
+      }
+    }
+  }, [user, initialized, needsOnboarding, awaitingApproval, hasAcceptedTerms]);
 
   // Only show full-screen loading on truly initial app load (no data yet), not on navigation
   const isInitialLoad = (loading && user === null) || (!initialized && profile === null);
@@ -72,5 +86,10 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true, skipLic
     return <Navigate to="/edu" replace />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <TutorialWizard open={showTutorial} onClose={() => setShowTutorial(false)} />
+    </>
+  );
 }
