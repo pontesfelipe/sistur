@@ -61,6 +61,7 @@ const AdminLicenses = lazy(() => import("./pages/AdminLicenses"));
 const TermsAcceptance = lazy(() => import("./pages/TermsAcceptance"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const ProfessorDashboard = lazy(() => import("./pages/ProfessorDashboard"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
@@ -426,6 +427,14 @@ const App = () => {
                     <AdminRoute>
                       <AdminLicenses />
                     </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/professor"
+                  element={
+                    <EduRoute requireProfessor>
+                      <ProfessorDashboard />
+                    </EduRoute>
                   }
                 />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
