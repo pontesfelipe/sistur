@@ -455,7 +455,7 @@ function ClassroomsPanel() {
 // ─── Main Page ───
 export default function ProfessorDashboard() {
   return (
-    <AppLayout>
+    <AppLayout title="Painel do Professor">
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-display font-bold">Painel do Professor</h1>
