@@ -62,6 +62,7 @@ const TermsAcceptance = lazy(() => import("./pages/TermsAcceptance"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const ProfessorDashboard = lazy(() => import("./pages/ProfessorDashboard"));
+const Tutorial = lazy(() => import("./pages/Tutorial"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
