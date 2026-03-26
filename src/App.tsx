@@ -62,6 +62,7 @@ const TermsAcceptance = lazy(() => import("./pages/TermsAcceptance"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const ProfessorDashboard = lazy(() => import("./pages/ProfessorDashboard"));
+const Tutorial = lazy(() => import("./pages/Tutorial"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
@@ -435,6 +436,14 @@ const App = () => {
                     <EduRoute requireProfessor>
                       <ProfessorDashboard />
                     </EduRoute>
+                  }
+                />
+                <Route
+                  path="/tutorial"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
+                      <Tutorial />
+                    </ProtectedRoute>
                   }
                 />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

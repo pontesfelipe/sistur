@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 9,
+  minor: 10,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.10.0",
+    date: "2026-03-26",
+    type: "minor" as const,
+    changes: [
+      "Sistema de Tutorial com conteúdo personalizado por perfil (Admin, Professor, Estudante, ERP)",
+      "Wizard de primeiro acesso: aparece automaticamente após onboarding",
+      "Página /tutorial permanente com categorias, progresso e marcação de etapas concluídas",
+      "Admin pode visualizar tutoriais de todos os perfis via abas",
+      "Item 'Tutorial' adicionado ao menu lateral (acessível para todos)",
+      "Progresso do tutorial salvo localmente com indicador de percentual"
+    ]
+  },
   {
     version: "1.9.0",
     date: "2026-03-26",
