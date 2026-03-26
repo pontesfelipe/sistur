@@ -154,6 +154,8 @@ export default function Subscription() {
                     <Crown className="h-6 w-6 text-emerald-400" />
                   ) : noLicense ? (
                     <Sparkles className="h-6 w-6 text-primary" />
+                  ) : isCancelled ? (
+                    <Ban className="h-6 w-6 text-muted-foreground" />
                   ) : (
                     <AlertTriangle className="h-6 w-6 text-red-400" />
                   )}
@@ -161,9 +163,10 @@ export default function Subscription() {
                    {!noLicense && (
                    <span className={cn(
                      'text-xs font-bold px-2.5 py-1 rounded-full',
+                     isCancelled ? 'bg-muted text-muted-foreground' :
                      isLicenseValid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400',
                    )}>
-                     {isLicenseValid ? 'Ativo' : 'Inativo'}
+                     {isCancelled ? 'Cancelado' : isLicenseValid ? 'Ativo' : 'Inativo'}
                    </span>
                    )}
                  </div>
