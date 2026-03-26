@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail, GraduationCap, BookOpen, Sparkles } from 'lucide-react';
+import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail, GraduationCap, BookOpen, Sparkles, Ban } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useLicense, type LicensePlan } from '@/contexts/LicenseContext';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { CancelSubscriptionDialog } from '@/components/subscription/CancelSubscriptionDialog';
 
 const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
   {
@@ -89,6 +90,8 @@ export default function Subscription() {
   const { license, isTrialActive, isTrialExpired, isPaidPlan, isLicenseValid, trialDaysRemaining, trialProgress, plan, planLabel } = useLicense();
   const { refetchLicense } = useLicense();
   const [activatingTrial, setActivatingTrial] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const isCancelled = license?.status === 'cancelled';
 
   const noLicense = !license;
 
