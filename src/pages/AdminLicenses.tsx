@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Search, UserCheck, Clock, AlertTriangle, Crown, X, Check, RefreshCw, Plus, Building2, Users, ArrowRightLeft, FlaskConical } from 'lucide-react';
+import { Shield, Search, UserCheck, Clock, AlertTriangle, Crown, X, Check, RefreshCw, Plus, Building2, Users, ArrowRightLeft, FlaskConical, Ban } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import type { LicensePlan, LicenseStatus } from '@/contexts/LicenseContext';
 import { TrialControlPanel } from '@/components/admin/TrialControlPanel';
 import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
+import { AdminCancelLicenseDialog } from '@/components/admin/AdminCancelLicenseDialog';
 
 interface LicenseRow {
   id: string;
