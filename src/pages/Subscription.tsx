@@ -134,6 +134,7 @@ export default function Subscription() {
                     isTrialActive ? 'border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-orange-950/20' :
                     isPaidPlan ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/30 to-teal-950/20' :
                     noLicense ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-blue-950/20' :
+                    isCancelled ? 'border-muted bg-gradient-to-br from-muted/30 to-muted/10' :
                     isTrialExpired ? 'border-red-500/50 bg-gradient-to-br from-red-950/30 to-rose-950/20' :
             'border-border bg-card',
           )}
