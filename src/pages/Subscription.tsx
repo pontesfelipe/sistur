@@ -173,6 +173,8 @@ export default function Subscription() {
                  <p className="text-sm text-muted-foreground max-w-md">
                    {noLicense
                      ? 'Sua conta foi aprovada! Ative seu trial gratuito de 7 dias para explorar todas as funcionalidades ou escolha um plano abaixo.'
+                     : isCancelled
+                     ? `Seu plano ${planLabel} foi cancelado.${license?.expires_at ? ` Acesso mantido até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''} Escolha um novo plano abaixo.`
                      : isTrialActive
                      ? `Sua avaliação gratuita de 7 dias está ativa. Restam ${trialDaysRemaining} dia${trialDaysRemaining !== 1 ? 's' : ''} para explorar todas as funcionalidades.`
                      : isPaidPlan
