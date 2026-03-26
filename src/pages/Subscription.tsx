@@ -265,8 +265,32 @@ export default function Subscription() {
                 </Button>
               </motion.div>
             )}
+
+            {/* Cancel button for active licenses */}
+            {(isTrialActive || isPaidPlan) && !isCancelled && (
+              <div className="mt-4 pt-4 border-t border-border/50">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowCancelDialog(true)}
+                  className="text-muted-foreground hover:text-destructive gap-1.5"
+                >
+                  <Ban className="h-3.5 w-3.5" />
+                  Cancelar plano
+                </Button>
+              </div>
+            )}
           </div>
         </motion.div>
+
+        <CancelSubscriptionDialog
+          open={showCancelDialog}
+          onOpenChange={setShowCancelDialog}
+          planLabel={planLabel}
+          expiresAt={license?.expires_at || null}
+          isTrial={license?.plan === 'trial'}
+          onCancelled={() => refetchLicense()}
+        />
 
         {/* Feature access */}
         {license && (
