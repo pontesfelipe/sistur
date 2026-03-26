@@ -3915,6 +3915,8 @@ export type Database = {
         Row: {
           activated_at: string
           assigned_by: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
           created_at: string
           expires_at: string | null
           features: Json
@@ -3932,6 +3934,8 @@ export type Database = {
         Insert: {
           activated_at?: string
           assigned_by?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           created_at?: string
           expires_at?: string | null
           features?: Json
@@ -3949,6 +3953,8 @@ export type Database = {
         Update: {
           activated_at?: string
           assigned_by?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           created_at?: string
           expires_at?: string | null
           features?: Json
@@ -6210,6 +6216,8 @@ export type Database = {
         Returns: {
           activated_at: string
           assigned_by: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
           created_at: string
           expires_at: string | null
           features: Json
@@ -6232,6 +6240,10 @@ export type Database = {
         }
       }
       admin_approve_user: { Args: { _user_id: string }; Returns: boolean }
+      admin_cancel_license: {
+        Args: { p_license_id: string; p_reason: string }
+        Returns: undefined
+      }
       admin_get_all_users: {
         Args: never
         Returns: {
@@ -6244,6 +6256,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      cancel_my_license: { Args: { p_reason: string }; Returns: undefined }
       cleanup_exam_tracking_data: { Args: never; Returns: undefined }
       complete_user_onboarding: {
         Args: { _role: string; _system_access: string; _user_id: string }

@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail, GraduationCap, BookOpen, Sparkles } from 'lucide-react';
+import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail, GraduationCap, BookOpen, Sparkles, Ban } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useLicense, type LicensePlan } from '@/contexts/LicenseContext';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { CancelSubscriptionDialog } from '@/components/subscription/CancelSubscriptionDialog';
 
 const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
   {
@@ -89,6 +90,8 @@ export default function Subscription() {
   const { license, isTrialActive, isTrialExpired, isPaidPlan, isLicenseValid, trialDaysRemaining, trialProgress, plan, planLabel } = useLicense();
   const { refetchLicense } = useLicense();
   const [activatingTrial, setActivatingTrial] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const isCancelled = license?.status === 'cancelled';
 
   const noLicense = !license;
 
@@ -131,6 +134,7 @@ export default function Subscription() {
                     isTrialActive ? 'border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-orange-950/20' :
                     isPaidPlan ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/30 to-teal-950/20' :
                     noLicense ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-blue-950/20' :
+                    isCancelled ? 'border-muted bg-gradient-to-br from-muted/30 to-muted/10' :
                     isTrialExpired ? 'border-red-500/50 bg-gradient-to-br from-red-950/30 to-rose-950/20' :
             'border-border bg-card',
           )}
@@ -151,6 +155,8 @@ export default function Subscription() {
                     <Crown className="h-6 w-6 text-emerald-400" />
                   ) : noLicense ? (
                     <Sparkles className="h-6 w-6 text-primary" />
+                  ) : isCancelled ? (
+                    <Ban className="h-6 w-6 text-muted-foreground" />
                   ) : (
                     <AlertTriangle className="h-6 w-6 text-red-400" />
                   )}
@@ -158,15 +164,18 @@ export default function Subscription() {
                    {!noLicense && (
                    <span className={cn(
                      'text-xs font-bold px-2.5 py-1 rounded-full',
+                     isCancelled ? 'bg-muted text-muted-foreground' :
                      isLicenseValid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400',
                    )}>
-                     {isLicenseValid ? 'Ativo' : 'Inativo'}
+                     {isCancelled ? 'Cancelado' : isLicenseValid ? 'Ativo' : 'Inativo'}
                    </span>
                    )}
                  </div>
                  <p className="text-sm text-muted-foreground max-w-md">
                    {noLicense
                      ? 'Sua conta foi aprovada! Ative seu trial gratuito de 7 dias para explorar todas as funcionalidades ou escolha um plano abaixo.'
+                     : isCancelled
+                     ? `Seu plano ${planLabel} foi cancelado.${license?.expires_at ? ` Acesso mantido até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''} Escolha um novo plano abaixo.`
                      : isTrialActive
                      ? `Sua avaliação gratuita de 7 dias está ativa. Restam ${trialDaysRemaining} dia${trialDaysRemaining !== 1 ? 's' : ''} para explorar todas as funcionalidades.`
                      : isPaidPlan
@@ -257,8 +266,32 @@ export default function Subscription() {
                 </Button>
               </motion.div>
             )}
+
+            {/* Cancel button for active licenses */}
+            {(isTrialActive || isPaidPlan) && !isCancelled && (
+              <div className="mt-4 pt-4 border-t border-border/50">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowCancelDialog(true)}
+                  className="text-muted-foreground hover:text-destructive gap-1.5"
+                >
+                  <Ban className="h-3.5 w-3.5" />
+                  Cancelar plano
+                </Button>
+              </div>
+            )}
           </div>
         </motion.div>
+
+        <CancelSubscriptionDialog
+          open={showCancelDialog}
+          onOpenChange={setShowCancelDialog}
+          planLabel={planLabel}
+          expiresAt={license?.expires_at || null}
+          isTrial={license?.plan === 'trial'}
+          onCancelled={() => refetchLicense()}
+        />
 
         {/* Feature access */}
         {license && (

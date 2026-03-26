@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Search, UserCheck, Clock, AlertTriangle, Crown, X, Check, RefreshCw, Plus, Building2, Users, ArrowRightLeft, FlaskConical } from 'lucide-react';
+import { Shield, Search, UserCheck, Clock, AlertTriangle, Crown, X, Check, RefreshCw, Plus, Building2, Users, ArrowRightLeft, FlaskConical, Ban } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import type { LicensePlan, LicenseStatus } from '@/contexts/LicenseContext';
 import { TrialControlPanel } from '@/components/admin/TrialControlPanel';
 import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
+import { AdminCancelLicenseDialog } from '@/components/admin/AdminCancelLicenseDialog';
 
 interface LicenseRow {
   id: string;
@@ -105,6 +106,9 @@ export default function AdminLicenses() {
   const [quotaOrgId, setQuotaOrgId] = useState('');
   const [quotaPlan, setQuotaPlan] = useState<LicensePlan>('basic');
   const [quotaMax, setQuotaMax] = useState(10);
+
+  // Cancel dialog
+  const [cancelTarget, setCancelTarget] = useState<LicenseRow | null>(null);
 
   const fetchOrgs = async () => {
     const { data } = await supabase.from('orgs').select('id, name').order('name');
@@ -515,7 +519,14 @@ export default function AdminLicenses() {
                                 <Button size="sm" onClick={() => handleSave(license)} className="h-7 gap-1 text-xs"><Check className="h-3.5 w-3.5" /> Salvar</Button>
                               </div>
                             ) : (
-                              <Button size="sm" variant="outline" onClick={() => handleStartEdit(license)} className="h-7 text-xs">Editar</Button>
+                              <div className="flex items-center gap-1 justify-end">
+                                <Button size="sm" variant="outline" onClick={() => handleStartEdit(license)} className="h-7 text-xs">Editar</Button>
+                                {license.status === 'active' && (
+                                  <Button size="sm" variant="ghost" onClick={() => setCancelTarget(license)} className="h-7 text-xs text-muted-foreground hover:text-destructive gap-1">
+                                    <Ban className="h-3 w-3" /> Cancelar
+                                  </Button>
+                                )}
+                              </div>
                             )}
                           </td>
                         </tr>
@@ -673,6 +684,17 @@ export default function AdminLicenses() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {cancelTarget && (
+        <AdminCancelLicenseDialog
+          open={!!cancelTarget}
+          onOpenChange={open => { if (!open) setCancelTarget(null); }}
+          licenseId={cancelTarget.id}
+          userName={cancelTarget.profile?.full_name || cancelTarget.email || 'Usuário'}
+          planLabel={PLAN_CONFIG[cancelTarget.plan].label}
+          onCancelled={() => { setCancelTarget(null); fetchLicenses(); }}
+        />
+      )}
     </AppLayout>
   );
 }
