@@ -438,6 +438,14 @@ const App = () => {
                     </EduRoute>
                   }
                 />
+                <Route
+                  path="/tutorial"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
+                      <Tutorial />
+                    </ProtectedRoute>
+                  }
+                />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
