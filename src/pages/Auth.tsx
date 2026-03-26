@@ -158,7 +158,8 @@ const Auth = () => {
       }
     } else {
       toast.success('Conta criada com sucesso!');
-      navigate('/onboarding');
+      const ref = searchParams.get('ref');
+      navigate(ref ? `/onboarding?ref=${ref}` : '/onboarding');
     }
   };
 
