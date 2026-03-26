@@ -463,6 +463,143 @@ export type Database = {
           },
         ]
       }
+      classroom_assignments: {
+        Row: {
+          assignment_type: string
+          available_from: string | null
+          classroom_id: string
+          created_at: string
+          custom_content: Json | null
+          description: string | null
+          due_date: string | null
+          exam_ruleset_id: string | null
+          id: string
+          professor_id: string
+          status: string
+          title: string
+          track_id: string | null
+          training_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          assignment_type: string
+          available_from?: string | null
+          classroom_id: string
+          created_at?: string
+          custom_content?: Json | null
+          description?: string | null
+          due_date?: string | null
+          exam_ruleset_id?: string | null
+          id?: string
+          professor_id: string
+          status?: string
+          title: string
+          track_id?: string | null
+          training_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assignment_type?: string
+          available_from?: string | null
+          classroom_id?: string
+          created_at?: string
+          custom_content?: Json | null
+          description?: string | null
+          due_date?: string | null
+          exam_ruleset_id?: string | null
+          id?: string
+          professor_id?: string
+          status?: string
+          title?: string
+          track_id?: string | null
+          training_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_assignments_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classroom_assignments_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "edu_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classroom_students: {
+        Row: {
+          classroom_id: string
+          enrolled_at: string
+          id: string
+          student_id: string
+        }
+        Insert: {
+          classroom_id: string
+          enrolled_at?: string
+          id?: string
+          student_id: string
+        }
+        Update: {
+          classroom_id?: string
+          enrolled_at?: string
+          id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_students_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classrooms: {
+        Row: {
+          created_at: string
+          description: string | null
+          discipline: string | null
+          id: string
+          name: string
+          period_end: string | null
+          period_start: string | null
+          professor_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          discipline?: string | null
+          id?: string
+          name: string
+          period_end?: string | null
+          period_start?: string | null
+          professor_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          discipline?: string | null
+          id?: string
+          name?: string
+          period_end?: string | null
+          period_start?: string | null
+          professor_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       community_feedback: {
         Row: {
           age_group: string | null
@@ -4939,6 +5076,27 @@ export type Database = {
           },
         ]
       }
+      professor_referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          professor_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          professor_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          professor_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           approval_requested_at: string | null
@@ -5736,6 +5894,41 @@ export type Database = {
           },
         ]
       }
+      student_referrals: {
+        Row: {
+          created_at: string
+          id: string
+          professor_id: string
+          referral_code_id: string | null
+          status: string
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          professor_id: string
+          referral_code_id?: string | null
+          status?: string
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          professor_id?: string
+          referral_code_id?: string | null
+          status?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_referrals_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "professor_referral_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -6303,6 +6496,10 @@ export type Database = {
           used: number
         }[]
       }
+      get_professor_referral_count: {
+        Args: { p_professor_id: string }
+        Returns: number
+      }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -6318,6 +6515,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      link_student_referral: {
+        Args: { p_referral_code: string }
+        Returns: boolean
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -6326,6 +6527,14 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      owns_classroom: {
+        Args: { p_classroom_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      professor_qualifies_free_license: {
+        Args: { p_professor_id: string }
+        Returns: boolean
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
