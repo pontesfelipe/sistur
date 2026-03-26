@@ -141,9 +141,11 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
     const isPaidPlan = Boolean(
       license &&
       ['estudante', 'professor', 'basic', 'pro', 'enterprise'].includes(license.plan) &&
-      license.status === 'active' &&
+      (license.status === 'active' || license.status === 'cancelled') &&
       (license.expires_at === null || new Date(license.expires_at) > now)
     );
+
+    const isCancelled = Boolean(license && license.status === 'cancelled');
 
     const isLicenseValid = isTrialActive || isPaidPlan;
 
