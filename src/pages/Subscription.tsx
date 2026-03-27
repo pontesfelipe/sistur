@@ -43,40 +43,11 @@ const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon
 
 const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
   {
-    plan: 'basic',
-    name: 'Básico',
-    price: 'R$ 49/mês',
-    icon: <Shield className="h-6 w-6 text-blue-400" />,
-    features: [
-      'Acesso ao ERP completo',
-      'Plataforma EDU',
-      'Jogos educacionais',
-      'Relatórios básicos',
-      'Suporte por email',
-    ],
-  },
-  {
     plan: 'pro',
     name: 'Profissional',
-    price: 'R$ 149/mês',
-    icon: <Zap className="h-6 w-6 text-purple-400" />,
-    highlight: true,
-    features: [
-      'Tudo do Básico',
-      'Relatórios avançados',
-      'Integrações (IBGE, APIs)',
-      'Certificados personalizados',
-      'Suporte prioritário',
-      'Até 10 usuários',
-    ],
-  },
-  {
-    plan: 'enterprise',
-    name: 'Empresarial',
     price: 'Sob consulta',
-    icon: <Building2 className="h-6 w-6 text-emerald-400" />,
+    icon: <Zap className="h-6 w-6 text-purple-400" />,
     features: [
-      'Tudo do Pro',
       'Usuários ilimitados',
       'API dedicada',
       'Customização de marca',
@@ -84,8 +55,23 @@ const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.R
       'SLA garantido',
     ],
   },
+  {
+    plan: 'enterprise',
+    name: 'Empresarial',
+    price: 'R$ 149/mês',
+    icon: <Building2 className="h-6 w-6 text-emerald-400" />,
+    highlight: true,
+    features: [
+      'Acesso ao ERP completo',
+      'Plataforma EDU',
+      'Relatórios avançados',
+      'Integrações (IBGE, APIs)',
+      'Certificados personalizados',
+      'Suporte prioritário',
+      'Até 10 usuários',
+    ],
+  },
 ];
-
 export default function Subscription() {
   const { license, isTrialActive, isTrialExpired, isPaidPlan, isLicenseValid, trialDaysRemaining, trialProgress, plan, planLabel } = useLicense();
   const { refetchLicense } = useLicense();
@@ -407,7 +393,7 @@ export default function Subscription() {
               : 'Para gestores, analistas e organizações de turismo.'}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
             {ERP_PLANS.map((p, i) => {
               const isCurrentPlan = plan === p.plan && isPaidPlan;
               return (
