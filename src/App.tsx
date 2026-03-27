@@ -441,12 +441,9 @@ const App = () => {
                 />
                 <Route
                   path="/tutorial"
-                  element={
-                    <ProtectedRoute redirectStudentsToEdu={false}>
-                      <Tutorial />
-                    </ProtectedRoute>
-                  }
+                  element={<Navigate to="/ajuda" replace />}
                 />
+
                 <Route
                   path="/tutorial/:topicId"
                   element={
