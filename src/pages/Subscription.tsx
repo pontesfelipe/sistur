@@ -43,32 +43,35 @@ const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon
 
 const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
   {
-    plan: 'pro',
-    name: 'Gestor Público',
-    price: 'Sob consulta',
-    icon: <Zap className="h-6 w-6 text-purple-400" />,
-    features: [
-      'Usuários ilimitados',
-      'API dedicada',
-      'Customização de marca',
-      'Gerente de conta dedicado',
-      'SLA garantido',
-    ],
-  },
-  {
     plan: 'enterprise',
     name: 'Empresarial',
     price: 'R$ 149/mês',
     icon: <Building2 className="h-6 w-6 text-emerald-400" />,
     highlight: true,
     features: [
-      'Acesso ao ERP completo',
+      'Diagnóstico Enterprise (hotéis/resorts)',
+      'Indicadores de hospitalidade (ENT_*)',
       'Plataforma EDU',
-      'Relatórios avançados',
-      'Integrações (IBGE, APIs)',
+      'Relatórios Enterprise',
       'Certificados personalizados',
       'Suporte prioritário',
       'Até 10 usuários',
+    ],
+  },
+  {
+    plan: 'pro',
+    name: 'Gestor Público',
+    price: 'Sob consulta',
+    icon: <Zap className="h-6 w-6 text-purple-400" />,
+    features: [
+      'Acesso completo Territorial + Enterprise',
+      'Diagnósticos RA/OE/AO',
+      'Integrações (IBGE, APIs)',
+      'Usuários ilimitados',
+      'API dedicada',
+      'Customização de marca',
+      'Gerente de conta dedicado',
+      'SLA garantido',
     ],
   },
 ];
