@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -58,8 +58,8 @@ export default function Ajuda() {
 
   return (
     <AppLayout
-      title="Central de Ajuda"
-      subtitle="Tutoriais, guias e funcionalidades do SISTUR"
+      title="Ajuda & Tutorial"
+      subtitle="Aprenda a usar o SISTUR passo a passo"
     >
       <div className="space-y-6">
             {/* Header & progress */}
