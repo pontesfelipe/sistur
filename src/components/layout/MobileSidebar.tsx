@@ -67,7 +67,7 @@ const navigation: NavItem[] = [
 const bottomNavigation: NavItem[] = [
   { name: 'Planos', href: '/assinatura', icon: CreditCard },
   { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
-  { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
+  { name: 'Ajuda & Tutorial', href: '/ajuda', icon: HelpCircle },
   { name: 'Configurações', href: '/configuracoes', icon: Settings, requiresAdmin: true },
 ];
 
