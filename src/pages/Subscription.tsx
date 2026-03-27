@@ -393,7 +393,7 @@ export default function Subscription() {
               : 'Para gestores, analistas e organizações de turismo.'}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
             {ERP_PLANS.map((p, i) => {
               const isCurrentPlan = plan === p.plan && isPaidPlan;
               return (
