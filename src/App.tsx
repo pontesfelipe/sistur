@@ -63,6 +63,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const ProfessorDashboard = lazy(() => import("./pages/ProfessorDashboard"));
 const Tutorial = lazy(() => import("./pages/Tutorial"));
+const TutorialDetail = lazy(() => import("./pages/TutorialDetail"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
@@ -443,6 +444,14 @@ const App = () => {
                   element={
                     <ProtectedRoute redirectStudentsToEdu={false}>
                       <Tutorial />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/tutorial/:topicId"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
+                      <TutorialDetail />
                     </ProtectedRoute>
                   }
                 />
