@@ -7,8 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { ExternalLink, CheckCircle2, BookOpen } from 'lucide-react';
+import { ExternalLink, CheckCircle2, BookOpen, ChevronRight, Clock } from 'lucide-react';
 import { tutorialCategories, getTutorialForRole, getUserTutorialRole, type TutorialRole, type TutorialCategory } from '@/data/tutorialData';
+import { getDetailedTopicIds, getTopicDetail } from '@/data/tutorialSteps';
 
 const ROLE_LABELS: Record<TutorialRole, string> = {
   ADMIN: 'Administrador',
@@ -29,6 +30,7 @@ export default function Tutorial() {
   });
 
   const categories = useMemo(() => getTutorialForRole(viewRole), [viewRole]);
+  const detailedIds = useMemo(() => new Set(getDetailedTopicIds()), []);
 
   const toggleStep = (stepId: string) => {
     setCompletedSteps(prev => {
