@@ -44,7 +44,7 @@ const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon
 const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
   {
     plan: 'pro',
-    name: 'Profissional',
+    name: 'Gestor Público',
     price: 'Sob consulta',
     icon: <Zap className="h-6 w-6 text-purple-400" />,
     features: [
