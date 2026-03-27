@@ -27,7 +27,6 @@ import {
   Shield,
   CreditCard,
   Lock,
-  Compass,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState, useMemo, useEffect } from 'react';
@@ -63,10 +62,9 @@ const navigation: NavItem[] = [
 ];
 
 const bottomNavigation: NavItem[] = [
-  { name: 'Tutorial', href: '/tutorial', icon: Compass },
   { name: 'Planos', href: '/assinatura', icon: CreditCard },
   { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
-  { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
+  { name: 'Ajuda & Tutorial', href: '/ajuda', icon: HelpCircle },
   { name: 'Licenças', href: '/admin/licencas', icon: Shield, requiresAdmin: true },
   { name: 'Configurações', href: '/configuracoes', icon: Settings, requiresAdmin: true },
 ];
