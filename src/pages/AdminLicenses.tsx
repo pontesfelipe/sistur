@@ -371,8 +371,9 @@ export default function AdminLicenses() {
     return true;
   });
 
-  // Exclude SISTUR internal org from external-facing stats
-  const externalLicenses = licenses.filter(l => l.org_name !== 'SISTUR');
+  // Exclude SISTUR internal org and Demo org from external-facing stats
+  const INTERNAL_ORG_NAMES = ['SISTUR', 'Demo SISTUR'];
+  const externalLicenses = licenses.filter(l => !INTERNAL_ORG_NAMES.includes(l.org_name || ''));
 
   const stats = {
     total: externalLicenses.length,
