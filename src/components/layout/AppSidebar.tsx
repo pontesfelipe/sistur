@@ -27,7 +27,6 @@ import {
   Shield,
   CreditCard,
   Lock,
-  Compass,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState, useMemo, useEffect } from 'react';
