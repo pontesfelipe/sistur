@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 11,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.11.1",
+    date: "2026-03-27",
+    type: "patch" as const,
+    changes: [
+      "Tutorial integrado à Central de Ajuda como aba 'Tutoriais'",
+      "Central de Ajuda reorganizada em 3 abas: Tutoriais, Guia Rápido e Funcionalidades",
+      "Novas funcionalidades adicionadas ao mapa de ajuda: Projetos, Monitoramento ERP, Jogos, Professor Beni, Social Turismo",
+      "Menu lateral atualizado: 'Ajuda & Tutorial' substitui itens separados",
+      "Rota /tutorial redireciona automaticamente para /ajuda"
+    ]
+  },
   {
     version: "1.11.0",
     date: "2026-03-27",
