@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 10,
+  minor: 11,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,21 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.11.0",
+    date: "2026-03-27",
+    type: "minor" as const,
+    changes: [
+      "Tutorial detalhado com navegação passo-a-passo por tópico",
+      "Cada tópico agora tem sub-passos numerados com instruções detalhadas e dicas",
+      "Imagens ilustrativas geradas para passos-chave do tutorial",
+      "Barra de progresso por tópico com marcação individual de conclusão",
+      "Sidebar de navegação lateral nos tutoriais detalhados (desktop)",
+      "Rota /tutorial/:topicId para acesso direto a qualquer tópico",
+      "Cards do tutorial principal agora mostram tempo estimado e contagem de passos",
+      "Seção de dicas expansível em cada passo do tutorial"
+    ]
+  },
   {
     version: "1.10.0",
     date: "2026-03-26",

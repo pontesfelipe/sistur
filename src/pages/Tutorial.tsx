@@ -7,8 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { ExternalLink, CheckCircle2, BookOpen } from 'lucide-react';
+import { ExternalLink, CheckCircle2, BookOpen, ChevronRight, Clock } from 'lucide-react';
 import { tutorialCategories, getTutorialForRole, getUserTutorialRole, type TutorialRole, type TutorialCategory } from '@/data/tutorialData';
+import { getDetailedTopicIds, getTopicDetail } from '@/data/tutorialSteps';
 
 const ROLE_LABELS: Record<TutorialRole, string> = {
   ADMIN: 'Administrador',
@@ -29,6 +30,7 @@ export default function Tutorial() {
   });
 
   const categories = useMemo(() => getTutorialForRole(viewRole), [viewRole]);
+  const detailedIds = useMemo(() => new Set(getDetailedTopicIds()), []);
 
   const toggleStep = (stepId: string) => {
     setCompletedSteps(prev => {
@@ -105,14 +107,15 @@ export default function Tutorial() {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {cat.steps.map((step) => {
                   const done = completedSteps.has(step.id);
+                  const hasDetail = detailedIds.has(step.id);
+                  const detail = hasDetail ? getTopicDetail(step.id) : null;
                   return (
                     <Card
                       key={step.id}
                       className={cn(
-                        'transition-all duration-200 hover:shadow-md cursor-pointer',
+                        'transition-all duration-200 hover:shadow-md',
                         done && 'border-primary/30 bg-primary/5'
                       )}
-                      onClick={() => toggleStep(step.id)}
                     >
                       <CardHeader className="pb-2">
                         <div className="flex items-start justify-between">
@@ -125,27 +128,64 @@ export default function Tutorial() {
                             </div>
                             <CardTitle className="text-sm">{step.title}</CardTitle>
                           </div>
-                          {done && <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />}
+                          <div className="flex items-center gap-1">
+                            {detail && (
+                              <Badge variant="outline" className="text-[10px] flex items-center gap-0.5">
+                                <Clock className="h-2.5 w-2.5" />
+                                {detail.estimatedMinutes}min
+                              </Badge>
+                            )}
+                            {done && <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />}
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent>
                         <CardDescription className="text-xs leading-relaxed">
                           {step.description}
                         </CardDescription>
-                        {step.route && (
-                          <Button
-                            variant="link"
-                            size="sm"
-                            className="px-0 mt-2 h-auto text-xs"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(step.route!);
-                            }}
-                          >
-                            <ExternalLink className="h-3 w-3 mr-1" />
-                            Ir para {step.title}
-                          </Button>
+                        {detail && (
+                          <p className="text-[10px] text-muted-foreground mt-1">
+                            {detail.subSteps.length} passos detalhados
+                          </p>
                         )}
+                        <div className="flex items-center gap-2 mt-3">
+                          {hasDetail && (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              className="flex-1 text-xs h-8"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/tutorial/${step.id}`);
+                              }}
+                            >
+                              Ver tutorial completo
+                              <ChevronRight className="h-3 w-3 ml-1" />
+                            </Button>
+                          )}
+                          {step.route && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-8"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(step.route!);
+                              }}
+                            >
+                              <ExternalLink className="h-3 w-3 mr-1" />
+                              Acessar
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 shrink-0"
+                            onClick={() => toggleStep(step.id)}
+                          >
+                            <CheckCircle2 className={cn('h-4 w-4', done ? 'text-primary' : 'text-muted-foreground/40')} />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   );
