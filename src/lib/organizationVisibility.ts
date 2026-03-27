@@ -1,8 +1,9 @@
-export const BUSINESS_ORG_NAMES = ['SISTUR', 'Autônomo'] as const;
+export const BUSINESS_ORG_NAMES = ['SISTUR', 'Autônomo', 'Demo SISTUR'] as const;
 
 const BUSINESS_ORG_ORDER = new Map<string, number>([
   ['SISTUR', 0],
   ['Autônomo', 1],
+  ['Demo SISTUR', 2],
 ]);
 
 type NamedOrganization = {
