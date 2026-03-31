@@ -9,6 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -21,8 +22,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { ForumPost, useForum } from '@/hooks/useForum';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { useHaptic } from '@/hooks/useHaptic';
 import {
   Heart,
@@ -35,6 +42,7 @@ import {
   Trash2,
   FileText,
   Paperclip,
+  Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -64,11 +72,15 @@ interface PostCardProps {
 
 export function PostCard({ post, onClick, onEdit }: PostCardProps) {
   const { user } = useAuth();
-  const { togglePostLike, deletePost } = useForum();
+  const { isAdmin } = useProfile();
+  const { togglePostLike, deletePost, togglePin } = useForum();
   const { lightTap, mediumTap } = useHaptic();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const isOwner = user?.id === post.user_id;
+  const canEdit = isOwner;
+  const canDelete = isOwner || isAdmin;
+  const canPin = isAdmin;
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -80,6 +92,12 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
     mediumTap();
     deletePost.mutate(post.id);
     setShowDeleteDialog(false);
+  };
+
+  const handleTogglePin = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    lightTap();
+    togglePin.mutate({ postId: post.id, isPinned: post.is_pinned });
   };
 
   return (
@@ -113,7 +131,10 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
 
             <div className="flex items-center gap-2">
               {post.is_pinned && (
-                <Pin className="h-4 w-4 text-primary" />
+                <Badge variant="default" className="gap-1 text-xs">
+                  <Pin className="h-3 w-3" />
+                  Fixado
+                </Badge>
               )}
               <Badge variant="secondary" className={categoryColors[post.category]}>
                 {categoryLabels[post.category] || post.category}
@@ -132,7 +153,30 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
                 )}
               </Badge>
 
-              {isOwner && (
+              {/* Admin pin button */}
+              {canPin && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={cn(
+                        'h-8 w-8',
+                        post.is_pinned ? 'text-primary' : 'text-muted-foreground hover:text-primary'
+                      )}
+                      onClick={handleTogglePin}
+                    >
+                      <Pin className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {post.is_pinned ? 'Desafixar post' : 'Fixar post'}
+                  </TooltipContent>
+                </Tooltip>
+              )}
+
+              {/* Actions dropdown */}
+              {(canEdit || canDelete) && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -140,25 +184,38 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit?.();
-                      }}
-                    >
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowDeleteDialog(true);
-                      }}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
-                    </DropdownMenuItem>
+                    {canEdit && (
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit?.();
+                        }}
+                      >
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Editar
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete && (
+                      <>
+                        {canEdit && <DropdownMenuSeparator />}
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowDeleteDialog(true);
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Excluir
+                          {isAdmin && !isOwner && (
+                            <Badge variant="outline" className="ml-2 text-xs gap-1">
+                              <Shield className="h-3 w-3" />
+                              Admin
+                            </Badge>
+                          )}
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}

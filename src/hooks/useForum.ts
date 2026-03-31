@@ -562,6 +562,26 @@ export function useForum() {
     },
   });
 
+  // Toggle pin (admin only)
+  const togglePin = useMutation({
+    mutationFn: async ({ postId, isPinned }: { postId: string; isPinned: boolean }) => {
+      const { error } = await supabase
+        .from('forum_posts')
+        .update({ is_pinned: !isPinned })
+        .eq('id', postId);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['forum-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['forum-post', variables.postId] });
+      toast.success(variables.isPinned ? 'Post desafixado!' : 'Post fixado!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao fixar/desafixar post: ' + error.message);
+    },
+  });
+
   return {
     posts,
     postsLoading,
@@ -582,5 +602,6 @@ export function useForum() {
     toggleReplyLike,
     markAsSolution,
     reportPost,
+    togglePin,
   };
 }
