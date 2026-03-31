@@ -179,6 +179,18 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
     
     await bulkUpsertValues.mutateAsync(values);
     
+    // Save ignored state for each ignored indicator
+    for (const indicatorId of ignoredIds) {
+      await upsertValue.mutateAsync({
+        assessment_id: assessmentId,
+        indicator_id: indicatorId,
+        value_raw: null,
+        source: 'Manual (Enterprise)',
+        is_ignored: true,
+        ignore_reason: 'Marcado como não aplicável pelo usuário',
+      });
+    }
+    
     // Update assessment status to DATA_READY if enough data is filled
     if (progress.percent >= 50) {
       await supabase
