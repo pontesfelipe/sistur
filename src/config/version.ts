@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 11,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,8 +23,20 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.11.1",
-    date: "2026-03-27",
+    version: "1.11.2",
+    date: "2026-03-31",
+    type: "patch" as const,
+    changes: [
+      "Correção: indicadores ignorados agora excluídos de gargalos, recomendações e normalização",
+      "Fix: dados externos não reintroduzem indicadores marcados como ignorados no cálculo",
+      "Banner de indicadores ignorados com listagem e aviso de impacto na análise",
+      "Moderação de conteúdo no fórum com termômetro de restrição (admin)",
+      "Suporte a até 6 imagens por post com carrossel e moderação automática via IA",
+      "Guardrails no Professor Beni: respostas limitadas a temas de turismo",
+      "Admin pode fixar, editar e excluir qualquer post/resposta no fórum"
+    ]
+  },
+  {
     type: "patch" as const,
     changes: [
       "Tutorial integrado à Central de Ajuda como aba 'Tutoriais'",
