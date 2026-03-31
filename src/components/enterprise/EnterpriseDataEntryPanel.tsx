@@ -64,7 +64,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
   
   // Use unified indicators table with enterprise scope filter
   const { indicators, isLoading: indicatorsLoading } = useIndicators({ scope: 'enterprise', tier });
-  const { values: existingValues, isLoading: valuesLoading, bulkUpsertValues } = useIndicatorValues(assessmentId);
+  const { values: existingValues, isLoading: valuesLoading, bulkUpsertValues, upsertValue } = useIndicatorValues(assessmentId);
   
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
