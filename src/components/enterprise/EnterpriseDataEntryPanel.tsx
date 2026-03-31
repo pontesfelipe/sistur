@@ -125,25 +125,27 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
     return grouped;
   }, [indicators]);
   
-  // Calculate progress
+  // Calculate progress (exclude ignored)
   const progress = useMemo(() => {
-    if (!indicators) return { filled: 0, total: 0, percent: 0 };
+    if (!indicators) return { filled: 0, total: 0, percent: 0, ignored: 0 };
     
-    const total = indicators.length;
-    const filled = Object.keys(localValues).filter(k => localValues[k] && localValues[k] !== '').length;
+    const ignored = ignoredIds.size;
+    const active = indicators.filter(i => !ignoredIds.has(i.id));
+    const total = active.length;
+    const filled = active.filter(i => localValues[i.id] && localValues[i.id] !== '').length;
     const percent = total > 0 ? Math.round((filled / total) * 100) : 0;
     
-    return { filled, total, percent };
-  }, [indicators, localValues]);
+    return { filled, total, percent, ignored };
+  }, [indicators, localValues, ignoredIds]);
   
-  // Progress by pillar
+  // Progress by pillar (exclude ignored)
   const pillarProgress = useMemo(() => {
     if (!indicators) return {};
     
     const result: Record<string, { filled: number; total: number; percent: number }> = {};
     
     ['RA', 'OE', 'AO'].forEach(pillar => {
-      const pillarIndicators = indicators.filter(i => i.pillar === pillar);
+      const pillarIndicators = indicators.filter(i => i.pillar === pillar && !ignoredIds.has(i.id));
       const total = pillarIndicators.length;
       const filled = pillarIndicators.filter(i => localValues[i.id] && localValues[i.id] !== '').length;
       result[pillar] = {
@@ -154,7 +156,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
     });
     
     return result;
-  }, [indicators, localValues]);
+  }, [indicators, localValues, ignoredIds]);
   
   const handleValueChange = (indicatorId: string, value: string) => {
     setLocalValues(prev => ({
