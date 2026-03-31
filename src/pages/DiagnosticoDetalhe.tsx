@@ -617,7 +617,7 @@ const DiagnosticoDetalhe = () => {
           <TabsContent value="normalizacao">
             <NormalizationView 
               indicatorScores={indicatorScores as any} 
-              indicatorValues={indicatorValues}
+              indicatorValues={activeIndicatorValues}
             />
           </TabsContent>
 
