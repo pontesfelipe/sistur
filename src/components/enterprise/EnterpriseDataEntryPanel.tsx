@@ -331,26 +331,39 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
                       const numericValue = currentValue ? parseFloat(currentValue) : null;
                       const benchmarkStatus = getBenchmarkStatus(indicator, numericValue);
                       const benchmarkTarget = (indicator as any).benchmark_target;
+                      const isIgnored = ignoredIds.has(indicator.id);
                       
                       return (
-                        <div key={indicator.id} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 rounded-lg border bg-muted/20">
+                        <div key={indicator.id} className={cn(
+                          "grid grid-cols-1 md:grid-cols-2 gap-4 p-3 rounded-lg border bg-muted/20",
+                          isIgnored && "opacity-50"
+                        )}>
                           <div>
-                            <label className="text-sm font-medium flex items-center gap-2">
+                            <label className={cn(
+                              "text-sm font-medium flex items-center gap-2",
+                              isIgnored && "line-through"
+                            )}>
                               {indicator.name}
-                              {benchmarkStatus === 'good' && (
+                              {isIgnored && (
+                                <Badge variant="outline" className="text-xs border-destructive/50 text-destructive">
+                                  <EyeOff className="h-3 w-3 mr-1" />
+                                  Ignorado
+                                </Badge>
+                              )}
+                              {!isIgnored && benchmarkStatus === 'good' && (
                                 <TrendingUp className="h-4 w-4 text-green-500" />
                               )}
-                              {benchmarkStatus === 'moderate' && (
+                              {!isIgnored && benchmarkStatus === 'moderate' && (
                                 <Minus className="h-4 w-4 text-amber-500" />
                               )}
-                              {benchmarkStatus === 'bad' && (
+                              {!isIgnored && benchmarkStatus === 'bad' && (
                                 <TrendingDown className="h-4 w-4 text-red-500" />
                               )}
                             </label>
                             <p className="text-xs text-muted-foreground mt-1">
                               {indicator.description}
                             </p>
-                            {benchmarkTarget !== null && (
+                            {!isIgnored && benchmarkTarget !== null && (
                               <p className="text-xs text-muted-foreground mt-1">
                                 <Target className="h-3 w-3 inline mr-1" />
                                 Meta: {benchmarkTarget} {indicator.unit}
@@ -361,19 +374,36 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
                             <Input
                               type="number"
                               step="any"
-                              placeholder="Valor"
+                              placeholder={isIgnored ? 'Ignorado' : 'Valor'}
                               value={currentValue}
                               onChange={(e) => handleValueChange(indicator.id, e.target.value)}
+                              disabled={isIgnored}
                               className={cn(
                                 "flex-1",
-                                benchmarkStatus === 'good' && "border-green-500",
-                                benchmarkStatus === 'moderate' && "border-amber-500",
-                                benchmarkStatus === 'bad' && "border-red-500"
+                                isIgnored && "bg-muted cursor-not-allowed",
+                                !isIgnored && benchmarkStatus === 'good' && "border-green-500",
+                                !isIgnored && benchmarkStatus === 'moderate' && "border-amber-500",
+                                !isIgnored && benchmarkStatus === 'bad' && "border-red-500"
                               )}
                             />
-                            <span className="text-sm text-muted-foreground min-w-[60px]">
+                            <span className="text-sm text-muted-foreground min-w-[40px]">
                               {indicator.unit}
                             </span>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant={isIgnored ? "destructive" : "ghost"}
+                                  className="h-8 w-8 p-0 shrink-0"
+                                  onClick={() => handleToggleIgnore(indicator.id)}
+                                >
+                                  <EyeOff className="h-3.5 w-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {isIgnored ? 'Reativar indicador' : 'Ignorar (não será considerado no cálculo)'}
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                       );
