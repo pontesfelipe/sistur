@@ -90,6 +90,34 @@ serve(async (req) => {
     const isEnterprise = assessment.diagnostic_type === 'enterprise';
     console.log('Diagnostic type:', assessment.diagnostic_type, 'isEnterprise:', isEnterprise);
 
+    // Check if data has changed since last report generation
+    const { data: existingReport } = await supabaseAdmin
+      .from('generated_reports')
+      .select('id, created_at')
+      .eq('assessment_id', assessmentId)
+      .maybeSingle();
+
+    const forceRegenerate = (await req.clone().json()).forceRegenerate;
+
+    if (existingReport && !forceRegenerate) {
+      const reportDate = new Date(existingReport.created_at);
+      const calcDate = assessment.calculated_at ? new Date(assessment.calculated_at) : null;
+      const updatedDate = new Date(assessment.updated_at);
+      
+      // If report was generated after the last calculation AND after last update, skip
+      if (calcDate && reportDate > calcDate && reportDate > updatedDate) {
+        console.log('No new data since last report. Skipping generation.');
+        return new Response(JSON.stringify({ 
+          skipped: true, 
+          message: 'Não há dados novos desde o último relatório gerado.',
+          reportId: existingReport.id 
+        }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     // Fetch indicator scores with indicator details
     const { data: indicatorScores } = await supabase
       .from('indicator_scores')
