@@ -135,26 +135,35 @@ const DiagnosticoDetalhe = () => {
     return rawIndicatorScores.filter((s: any) => !ignoredIndicatorIds.has(s.indicator_id));
   }, [rawIndicatorScores, ignoredIndicatorIds]);
 
-  // Filter issues: remove issues whose theme+pillar are entirely from ignored indicators
-  const ignoredThemePillars = useMemo(() => {
-    const set = new Set<string>();
-    ignoredIndicators.forEach(i => {
-      if (i.pillar) set.add(`${i.pillar}::${i.code}`);
-    });
-    return set;
+  // Build set of ignored indicator codes for filtering issues/recommendations
+  const ignoredIndicatorCodes = useMemo(() => {
+    return new Set(ignoredIndicators.map(i => i.code));
   }, [ignoredIndicators]);
 
+  // Filter issues: remove issues whose evidence indicators are ALL ignored
   const issues = useMemo(() => {
-    if (ignoredIndicatorIds.size === 0) return rawIssues;
-    // Issues reference theme+pillar. Filter those where indicator_id is in ignored set
-    // Issues don't have indicator_id, so we filter by checking if the issue title references an ignored indicator
-    return rawIssues;
-  }, [rawIssues, ignoredIndicatorIds]);
+    if (ignoredIndicatorCodes.size === 0) return rawIssues;
+    return rawIssues.filter((issue: any) => {
+      const evidence = issue.evidence;
+      if (!evidence?.indicators || !Array.isArray(evidence.indicators)) return true;
+      // Keep the issue if at least one indicator in its evidence is NOT ignored
+      const hasActiveIndicator = evidence.indicators.some(
+        (ind: any) => !ignoredIndicatorCodes.has(ind.code)
+      );
+      return hasActiveIndicator;
+    });
+  }, [rawIssues, ignoredIndicatorCodes]);
 
+  // Filter recommendations: remove those linked to filtered-out issues
+  const filteredIssueIds = useMemo(() => new Set(issues.map((i: any) => i.id)), [issues]);
   const recommendations = useMemo(() => {
-    if (ignoredIndicatorIds.size === 0) return rawRecommendations;
-    return rawRecommendations;
-  }, [rawRecommendations, ignoredIndicatorIds]);
+    if (ignoredIndicatorCodes.size === 0) return rawRecommendations;
+    return rawRecommendations.filter((rec: any) => {
+      // Keep if no linked issue, or if linked issue is still in the filtered set
+      if (!rec.issue?.id) return true;
+      return filteredIssueIds.has(rec.issue.id);
+    });
+  }, [rawRecommendations, ignoredIndicatorCodes, filteredIssueIds]);
 
   // Official data hooks - destination info
   const assessmentDestination = assessment?.destination as { name?: string; uf?: string; ibge_code?: string } | null;
@@ -608,7 +617,7 @@ const DiagnosticoDetalhe = () => {
           <TabsContent value="normalizacao">
             <NormalizationView 
               indicatorScores={indicatorScores as any} 
-              indicatorValues={indicatorValues}
+              indicatorValues={activeIndicatorValues}
             />
           </TabsContent>
 
