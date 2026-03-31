@@ -358,10 +358,21 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!input.trim() || isLoading) return;
     streamChat(input.trim());
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      // Shift+Enter sends, plain Enter adds new line (default behavior)
+      return;
+    }
+    if (e.key === 'Enter' && e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
   };
 
   const handleSuggestion = (text: string) => {
