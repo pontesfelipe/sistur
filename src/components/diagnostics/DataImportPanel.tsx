@@ -256,13 +256,20 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     return acc;
   }, {} as Record<string, typeof indicators>);
 
-  const filledCount = indicators.filter(ind => {
+  const ignoredCount = values.filter(v => v.is_ignored === true).length;
+  const activeIndicators = indicators.filter(ind => {
+    const existing = values.find(v => v.indicator_id === ind.id);
+    return existing?.is_ignored !== true;
+  });
+  
+  const filledCount = activeIndicators.filter(ind => {
     const value = getValueForIndicator(ind.id);
     return value !== null && value !== undefined;
   }).length;
-  const fillProgress = indicators.length > 0 ? (filledCount / indicators.length) * 100 : 0;
+  const fillProgress = activeIndicators.length > 0 ? (filledCount / activeIndicators.length) * 100 : 0;
 
   const preFilledCount = values.filter(v => {
+    if (v.is_ignored) return false;
     const source = v.source || '';
     return officialSources.some(s => source.toUpperCase().includes(s.toUpperCase()));
   }).length;
