@@ -484,7 +484,7 @@ const DiagnosticoDetalhe = () => {
         </Card>
       )}
 
-
+      {isCalculated && pillarScores.length > 0 ? (
         <Tabs defaultValue="radiografia" className="space-y-6">
           <TabsList className={cn(
             "grid w-full",
