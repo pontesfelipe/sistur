@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { DeleteAssessmentDialog } from './DeleteAssessmentDialog';
 
 interface AssessmentCardProps {
-  assessment: Assessment & { tier?: string };
+  assessment: Assessment & { tier?: string; creator?: { full_name: string } | null };
   onDelete?: () => void;
 }
 
