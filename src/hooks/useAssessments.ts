@@ -10,11 +10,28 @@ export function useAssessments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('assessments')
-        .select('*, destinations(name), creator:profiles!assessments_creator_user_id_fkey(full_name)')
+        .select('*, destinations(name)')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+
+      // Fetch creator names
+      const creatorIds = [...new Set(data?.map(a => a.creator_user_id).filter(Boolean) as string[])];
+      let creatorMap: Record<string, string> = {};
+      if (creatorIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, full_name')
+          .in('user_id', creatorIds);
+        if (profiles) {
+          creatorMap = Object.fromEntries(profiles.map(p => [p.user_id, p.full_name]));
+        }
+      }
+
+      return data?.map(a => ({
+        ...a,
+        creator: a.creator_user_id ? { full_name: creatorMap[a.creator_user_id] || null } : null,
+      })) ?? [];
     },
   });
 
