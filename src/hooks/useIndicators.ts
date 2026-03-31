@@ -222,7 +222,7 @@ export function useIndicatorValues(assessmentId?: string) {
 
         const { data, error } = await supabase
           .from('indicator_values')
-          .insert(insertData)
+          .insert(insertData as any)
           .select()
           .single();
 
