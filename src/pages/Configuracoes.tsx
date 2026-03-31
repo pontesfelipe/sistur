@@ -18,6 +18,7 @@ import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPan
 import { ActAsUserPanel } from '@/components/settings/ActAsUserPanel';
 import { FeedbackManagementPanel } from '@/components/settings/FeedbackManagementPanel';
 import { ForumPrivacySettings } from '@/components/settings/ForumPrivacySettings';
+import { ContentModerationPanel } from '@/components/settings/ContentModerationPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import { 
