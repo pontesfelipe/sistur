@@ -51,6 +51,7 @@ import {
   Loader2,
   Hotel,
   Landmark,
+  EyeOff,
 } from 'lucide-react';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -84,7 +85,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedAssessment, setSelectedAssessment] = useState<string>(preSelectedAssessmentId || '');
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
-  const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string }>>({});
+  const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean }>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
 
   const { assessments, isLoading: loadingAssessments } = useAssessments();
@@ -170,8 +171,39 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         ...prev[indicatorId],
         value: value === '' ? null : parseFloat(value),
         source: prev[indicatorId]?.source || 'Manual',
+        is_ignored: prev[indicatorId]?.is_ignored ?? false,
       },
     }));
+  };
+
+  const handleToggleIgnore = async (indicatorId: string) => {
+    if (!selectedAssessment) return;
+    
+    const existingValue = values.find(v => v.indicator_id === indicatorId);
+    const currentIgnored = existingValue?.is_ignored ?? false;
+    const newIgnored = !currentIgnored;
+    
+    // If there's already a saved value, update it directly
+    if (existingValue) {
+      await upsertValue.mutateAsync({
+        assessment_id: selectedAssessment,
+        indicator_id: indicatorId,
+        value_raw: existingValue.value_raw,
+        source: existingValue.source,
+        is_ignored: newIgnored,
+        ignore_reason: newIgnored ? 'Marcado como não aplicável pelo usuário' : null,
+      });
+    } else {
+      // Create a new entry marked as ignored (with null value)
+      await upsertValue.mutateAsync({
+        assessment_id: selectedAssessment,
+        indicator_id: indicatorId,
+        value_raw: null,
+        source: 'Manual',
+        is_ignored: newIgnored,
+        ignore_reason: newIgnored ? 'Marcado como não aplicável pelo usuário' : null,
+      });
+    }
   };
 
   const handleSaveValue = async (indicatorId: string) => {
@@ -224,13 +256,20 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     return acc;
   }, {} as Record<string, typeof indicators>);
 
-  const filledCount = indicators.filter(ind => {
+  const ignoredCount = values.filter(v => v.is_ignored === true).length;
+  const activeIndicators = indicators.filter(ind => {
+    const existing = values.find(v => v.indicator_id === ind.id);
+    return existing?.is_ignored !== true;
+  });
+  
+  const filledCount = activeIndicators.filter(ind => {
     const value = getValueForIndicator(ind.id);
     return value !== null && value !== undefined;
   }).length;
-  const fillProgress = indicators.length > 0 ? (filledCount / indicators.length) * 100 : 0;
+  const fillProgress = activeIndicators.length > 0 ? (filledCount / activeIndicators.length) * 100 : 0;
 
   const preFilledCount = values.filter(v => {
+    if (v.is_ignored) return false;
     const source = v.source || '';
     return officialSources.some(s => source.toUpperCase().includes(s.toUpperCase()));
   }).length;
@@ -335,7 +374,10 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">Progresso do Preenchimento</span>
                 <span className="text-sm text-muted-foreground">
-                  {filledCount} de {indicators.length} indicadores
+                  {filledCount} de {activeIndicators.length} indicadores
+                  {ignoredCount > 0 && (
+                    <span className="text-destructive ml-1">({ignoredCount} ignorado{ignoredCount > 1 ? 's' : ''})</span>
+                  )}
                 </span>
               </div>
               <Progress value={fillProgress} className="h-2" />
@@ -464,12 +506,19 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                             const isPreFilled = existingValue?.source && officialSources.some(s => 
                               existingValue.source?.toUpperCase().includes(s.toUpperCase())
                             );
+                            const isIgnored = existingValue?.is_ignored === true;
                             
                             return (
-                              <div key={indicator.id} className="grid grid-cols-12 gap-3 items-center py-3 border-b last:border-0">
-                                <div className="col-span-6">
+                              <div key={indicator.id} className={cn(
+                                "grid grid-cols-12 gap-3 items-center py-3 border-b last:border-0",
+                                isIgnored && "opacity-50"
+                              )}>
+                                <div className="col-span-5">
                                   <div className="flex items-start gap-2">
-                                    <span className="font-medium text-sm leading-tight">{indicator.name}</span>
+                                    <span className={cn(
+                                      "font-medium text-sm leading-tight",
+                                      isIgnored && "line-through"
+                                    )}>{indicator.name}</span>
                                     {indicator.description && (
                                       <Tooltip>
                                         <TooltipTrigger>
@@ -492,6 +541,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                         {indicator.unit}
                                       </span>
                                     )}
+                                    {isIgnored && (
+                                      <Badge variant="outline" className="text-xs px-1.5 py-0 border-destructive/50 text-destructive">
+                                        <EyeOff className="h-3 w-3 mr-1" />
+                                        Ignorado
+                                      </Badge>
+                                    )}
                                   </div>
                                 </div>
                                 <div className="col-span-3">
@@ -500,15 +555,32 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                     step="any"
                                     value={currentValue ?? ''}
                                     onChange={(e) => handleValueChange(indicator.id, e.target.value)}
+                                    disabled={isIgnored}
                                     className={cn(
                                       'w-full',
-                                      hasUnsavedChanges && 'border-accent ring-1 ring-accent'
+                                      hasUnsavedChanges && 'border-accent ring-1 ring-accent',
+                                      isIgnored && 'bg-muted cursor-not-allowed'
                                     )}
-                                    placeholder="Valor"
+                                    placeholder={isIgnored ? 'Ignorado' : 'Valor'}
                                   />
                                 </div>
-                                <div className="col-span-3 flex justify-end items-center gap-2">
-                                  {existingValue?.source && !hasUnsavedChanges && (
+                                <div className="col-span-4 flex justify-end items-center gap-1.5">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        size="sm"
+                                        variant={isIgnored ? "destructive" : "ghost"}
+                                        className="h-8 w-8 p-0"
+                                        onClick={() => handleToggleIgnore(indicator.id)}
+                                      >
+                                        <EyeOff className="h-3.5 w-3.5" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {isIgnored ? 'Reativar indicador' : 'Ignorar indicador (não será considerado no cálculo)'}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                  {existingValue?.source && !hasUnsavedChanges && !isIgnored && (
                                     <Tooltip>
                                       <TooltipTrigger>
                                         <Badge 
@@ -545,7 +617,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       <Save className="h-3 w-3" />
                                     </Button>
                                   )}
-                                  {!hasUnsavedChanges && currentValue !== null && (
+                                  {!hasUnsavedChanges && currentValue !== null && !isIgnored && (
                                     <CheckCircle2 className="h-5 w-5 text-severity-good" />
                                   )}
                                 </div>

@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Hotel, 
   Leaf, 
@@ -18,6 +19,7 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  EyeOff,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
@@ -62,25 +64,45 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
   
   // Use unified indicators table with enterprise scope filter
   const { indicators, isLoading: indicatorsLoading } = useIndicators({ scope: 'enterprise', tier });
-  const { values: existingValues, isLoading: valuesLoading, bulkUpsertValues } = useIndicatorValues(assessmentId);
+  const { values: existingValues, isLoading: valuesLoading, bulkUpsertValues, upsertValue } = useIndicatorValues(assessmentId);
   
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
+  const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
   
-  // Initialize local values from existing
+  // Initialize local values and ignored state from existing
   useEffect(() => {
     if (existingValues && existingValues.length > 0 && Object.keys(localValues).length === 0) {
       const initial: Record<string, string> = {};
+      const ignored = new Set<string>();
       existingValues.forEach(v => {
         if (v.value_raw !== null) {
           initial[v.indicator_id] = v.value_raw.toString();
+        }
+        if (v.is_ignored) {
+          ignored.add(v.indicator_id);
         }
       });
       if (Object.keys(initial).length > 0) {
         setLocalValues(initial);
       }
+      if (ignored.size > 0) {
+        setIgnoredIds(ignored);
+      }
     }
   }, [existingValues]);
+  
+  const handleToggleIgnore = useCallback((indicatorId: string) => {
+    setIgnoredIds(prev => {
+      const next = new Set(prev);
+      if (next.has(indicatorId)) {
+        next.delete(indicatorId);
+      } else {
+        next.add(indicatorId);
+      }
+      return next;
+    });
+  }, []);
   
   // Group indicators by pillar and theme (category)
   const groupedIndicators = useMemo(() => {
@@ -103,25 +125,27 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
     return grouped;
   }, [indicators]);
   
-  // Calculate progress
+  // Calculate progress (exclude ignored)
   const progress = useMemo(() => {
-    if (!indicators) return { filled: 0, total: 0, percent: 0 };
+    if (!indicators) return { filled: 0, total: 0, percent: 0, ignored: 0 };
     
-    const total = indicators.length;
-    const filled = Object.keys(localValues).filter(k => localValues[k] && localValues[k] !== '').length;
+    const ignored = ignoredIds.size;
+    const active = indicators.filter(i => !ignoredIds.has(i.id));
+    const total = active.length;
+    const filled = active.filter(i => localValues[i.id] && localValues[i.id] !== '').length;
     const percent = total > 0 ? Math.round((filled / total) * 100) : 0;
     
-    return { filled, total, percent };
-  }, [indicators, localValues]);
+    return { filled, total, percent, ignored };
+  }, [indicators, localValues, ignoredIds]);
   
-  // Progress by pillar
+  // Progress by pillar (exclude ignored)
   const pillarProgress = useMemo(() => {
     if (!indicators) return {};
     
     const result: Record<string, { filled: number; total: number; percent: number }> = {};
     
     ['RA', 'OE', 'AO'].forEach(pillar => {
-      const pillarIndicators = indicators.filter(i => i.pillar === pillar);
+      const pillarIndicators = indicators.filter(i => i.pillar === pillar && !ignoredIds.has(i.id));
       const total = pillarIndicators.length;
       const filled = pillarIndicators.filter(i => localValues[i.id] && localValues[i.id] !== '').length;
       result[pillar] = {
@@ -132,7 +156,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
     });
     
     return result;
-  }, [indicators, localValues]);
+  }, [indicators, localValues, ignoredIds]);
   
   const handleValueChange = (indicatorId: string, value: string) => {
     setLocalValues(prev => ({
@@ -154,6 +178,18 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
       }));
     
     await bulkUpsertValues.mutateAsync(values);
+    
+    // Save ignored state for each ignored indicator
+    for (const indicatorId of ignoredIds) {
+      await upsertValue.mutateAsync({
+        assessment_id: assessmentId,
+        indicator_id: indicatorId,
+        value_raw: null,
+        source: 'Manual (Enterprise)',
+        is_ignored: true,
+        ignore_reason: 'Marcado como não aplicável pelo usuário',
+      });
+    }
     
     // Update assessment status to DATA_READY if enough data is filled
     if (progress.percent >= 50) {
@@ -219,7 +255,12 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-muted-foreground">Progresso geral</span>
-              <span className="font-medium">{progress.filled} / {progress.total} indicadores</span>
+              <span className="font-medium">
+                {progress.filled} / {progress.total} indicadores
+                {progress.ignored > 0 && (
+                  <span className="text-destructive ml-1">({progress.ignored} ignorado{progress.ignored > 1 ? 's' : ''})</span>
+                )}
+              </span>
             </div>
             <Progress value={progress.percent} className="h-2" />
           </div>
@@ -295,26 +336,39 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
                       const numericValue = currentValue ? parseFloat(currentValue) : null;
                       const benchmarkStatus = getBenchmarkStatus(indicator, numericValue);
                       const benchmarkTarget = (indicator as any).benchmark_target;
+                      const isIgnored = ignoredIds.has(indicator.id);
                       
                       return (
-                        <div key={indicator.id} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 rounded-lg border bg-muted/20">
+                        <div key={indicator.id} className={cn(
+                          "grid grid-cols-1 md:grid-cols-2 gap-4 p-3 rounded-lg border bg-muted/20",
+                          isIgnored && "opacity-50"
+                        )}>
                           <div>
-                            <label className="text-sm font-medium flex items-center gap-2">
+                            <label className={cn(
+                              "text-sm font-medium flex items-center gap-2",
+                              isIgnored && "line-through"
+                            )}>
                               {indicator.name}
-                              {benchmarkStatus === 'good' && (
+                              {isIgnored && (
+                                <Badge variant="outline" className="text-xs border-destructive/50 text-destructive">
+                                  <EyeOff className="h-3 w-3 mr-1" />
+                                  Ignorado
+                                </Badge>
+                              )}
+                              {!isIgnored && benchmarkStatus === 'good' && (
                                 <TrendingUp className="h-4 w-4 text-green-500" />
                               )}
-                              {benchmarkStatus === 'moderate' && (
+                              {!isIgnored && benchmarkStatus === 'moderate' && (
                                 <Minus className="h-4 w-4 text-amber-500" />
                               )}
-                              {benchmarkStatus === 'bad' && (
+                              {!isIgnored && benchmarkStatus === 'bad' && (
                                 <TrendingDown className="h-4 w-4 text-red-500" />
                               )}
                             </label>
                             <p className="text-xs text-muted-foreground mt-1">
                               {indicator.description}
                             </p>
-                            {benchmarkTarget !== null && (
+                            {!isIgnored && benchmarkTarget !== null && (
                               <p className="text-xs text-muted-foreground mt-1">
                                 <Target className="h-3 w-3 inline mr-1" />
                                 Meta: {benchmarkTarget} {indicator.unit}
@@ -325,19 +379,36 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
                             <Input
                               type="number"
                               step="any"
-                              placeholder="Valor"
+                              placeholder={isIgnored ? 'Ignorado' : 'Valor'}
                               value={currentValue}
                               onChange={(e) => handleValueChange(indicator.id, e.target.value)}
+                              disabled={isIgnored}
                               className={cn(
                                 "flex-1",
-                                benchmarkStatus === 'good' && "border-green-500",
-                                benchmarkStatus === 'moderate' && "border-amber-500",
-                                benchmarkStatus === 'bad' && "border-red-500"
+                                isIgnored && "bg-muted cursor-not-allowed",
+                                !isIgnored && benchmarkStatus === 'good' && "border-green-500",
+                                !isIgnored && benchmarkStatus === 'moderate' && "border-amber-500",
+                                !isIgnored && benchmarkStatus === 'bad' && "border-red-500"
                               )}
                             />
-                            <span className="text-sm text-muted-foreground min-w-[60px]">
+                            <span className="text-sm text-muted-foreground min-w-[40px]">
                               {indicator.unit}
                             </span>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant={isIgnored ? "destructive" : "ghost"}
+                                  className="h-8 w-8 p-0 shrink-0"
+                                  onClick={() => handleToggleIgnore(indicator.id)}
+                                >
+                                  <EyeOff className="h-3.5 w-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {isIgnored ? 'Reativar indicador' : 'Ignorar (não será considerado no cálculo)'}
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                       );
