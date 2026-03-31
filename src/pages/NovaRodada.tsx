@@ -509,7 +509,7 @@ export default function NovaRodada() {
       </div>
 
       {/* Step Content */}
-      {currentStep === 4 || (currentStep === 5 && diagnosticType === 'enterprise') ? (
+      {currentStep === 4 || currentStep === 5 ? (
         // Full-width validation/data entry panel
         <div className="space-y-6">
           {diagnosticType === 'enterprise' ? (
