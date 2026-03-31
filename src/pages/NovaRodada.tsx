@@ -379,8 +379,8 @@ export default function NovaRodada() {
       // Pre-filling validation complete - proceed to manual data entry
       setCurrentStep(5);
     } else if (currentStep === 5) {
-      // Go to data entry page
-      navigate(`/importacoes?assessment=${createdAssessmentId}`);
+      // Data entry complete - proceed to calculation
+      setCurrentStep(6);
     } else if (currentStep === 6) {
       // Go to assessment detail to calculate
       navigate(`/diagnosticos/${createdAssessmentId}`);
