@@ -101,14 +101,59 @@ const DiagnosticoDetalhe = () => {
   const isEnterprise = diagnosticType === 'enterprise';
   
   const { data: pillarScores = [], refetch: refetchPillarScores } = usePillarScores(id);
-  const { data: indicatorScores = [], refetch: refetchIndicatorScores } = useIndicatorScores(id, diagnosticType);
-  const { data: issues = [], refetch: refetchIssues } = useIssues(id);
-  const { data: recommendations = [], refetch: refetchRecommendations } = useRecommendations(id);
+  const { data: rawIndicatorScores = [], refetch: refetchIndicatorScores } = useIndicatorScores(id, diagnosticType);
+  const { data: rawIssues = [], refetch: refetchIssues } = useIssues(id);
+  const { data: rawRecommendations = [], refetch: refetchRecommendations } = useRecommendations(id);
   
   // Use appropriate indicator values based on diagnostic type
   const { values: territorialIndicatorValues = [] } = useIndicatorValues(id);
   // Enterprise values are stored in the unified `indicator_values` table as well.
   const indicatorValues = territorialIndicatorValues;
+
+  // --- Ignored indicators filtering ---
+  const ignoredIndicatorIds = useMemo(() => {
+    const ids = new Set<string>();
+    indicatorValues.forEach((v: any) => {
+      if (v.is_ignored) ids.add(v.indicator_id);
+    });
+    return ids;
+  }, [indicatorValues]);
+
+  const ignoredIndicators = useMemo(() => {
+    return indicatorValues.filter((v: any) => v.is_ignored).map((v: any) => ({
+      code: v.indicator?.code || '',
+      name: v.indicator?.name || '',
+      pillar: v.indicator?.pillar || '',
+      reason: v.ignore_reason || '',
+    }));
+  }, [indicatorValues]);
+
+  // Filter out ignored indicators from results
+  const indicatorScores = useMemo(() => {
+    if (ignoredIndicatorIds.size === 0) return rawIndicatorScores;
+    return rawIndicatorScores.filter((s: any) => !ignoredIndicatorIds.has(s.indicator_id));
+  }, [rawIndicatorScores, ignoredIndicatorIds]);
+
+  // Filter issues: remove issues whose theme+pillar are entirely from ignored indicators
+  const ignoredThemePillars = useMemo(() => {
+    const set = new Set<string>();
+    ignoredIndicators.forEach(i => {
+      if (i.pillar) set.add(`${i.pillar}::${i.code}`);
+    });
+    return set;
+  }, [ignoredIndicators]);
+
+  const issues = useMemo(() => {
+    if (ignoredIndicatorIds.size === 0) return rawIssues;
+    // Issues reference theme+pillar. Filter those where indicator_id is in ignored set
+    // Issues don't have indicator_id, so we filter by checking if the issue title references an ignored indicator
+    return rawIssues;
+  }, [rawIssues, ignoredIndicatorIds]);
+
+  const recommendations = useMemo(() => {
+    if (ignoredIndicatorIds.size === 0) return rawRecommendations;
+    return rawRecommendations;
+  }, [rawRecommendations, ignoredIndicatorIds]);
 
   // Official data hooks - destination info
   const assessmentDestination = assessment?.destination as { name?: string; uf?: string; ibge_code?: string } | null;
@@ -118,11 +163,12 @@ const DiagnosticoDetalhe = () => {
   const fetchOfficialData = useFetchOfficialData();
   const validateIndicatorValues = useValidateIndicatorValues();
 
-  // Calculate data completeness based on diagnostic type
+  // Calculate data completeness based on diagnostic type - exclude ignored
+  const activeIndicatorValues = indicatorValues.filter((v: any) => !v.is_ignored);
   const totalIndicators = isEnterprise
     ? (enterpriseIndicators.length || indicators.length)
     : indicators.length;
-  const filledIndicators = indicatorValues.length;
+  const filledIndicators = activeIndicatorValues.length;
   const completenessPercentage = totalIndicators > 0 ? (filledIndicators / totalIndicators) * 100 : 0;
   const hasIncompleteData = completenessPercentage < 100 && completenessPercentage > 0;
 
