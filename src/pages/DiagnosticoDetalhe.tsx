@@ -455,7 +455,36 @@ const DiagnosticoDetalhe = () => {
         </div>
       </div>
 
-      {isCalculated && pillarScores.length > 0 ? (
+      {/* Ignored Indicators Banner */}
+      {ignoredIndicators.length > 0 && isCalculated && (
+        <Card className="mb-6 border-muted bg-muted/30">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-muted">
+                <EyeOff className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-sm">
+                  {ignoredIndicators.length} indicador{ignoredIndicators.length !== 1 ? 'es' : ''} ignorado{ignoredIndicators.length !== 1 ? 's' : ''} nesta análise
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Os seguintes indicadores foram marcados como ignorados e não participam do cálculo dos scores, gargalos ou prescrições. 
+                  Isso pode impactar a abrangência da análise.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {ignoredIndicators.map((ind, idx) => (
+                    <Badge key={idx} variant="outline" className="text-xs font-normal opacity-70">
+                      {ind.code} — {ind.name}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+
         <Tabs defaultValue="radiografia" className="space-y-6">
           <TabsList className={cn(
             "grid w-full",
