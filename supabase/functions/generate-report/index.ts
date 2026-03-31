@@ -64,9 +64,12 @@ serve(async (req) => {
       });
     }
 
-    // Use demo org if user is viewing demo data, otherwise use their actual org
-    const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
-    console.log('User org:', profile.org_id, 'Demo org:', profile.viewing_demo_org_id, 'Effective:', effectiveOrgId);
+    // Check access: user can generate reports for their own org OR for the demo org they're viewing
+    const allowedOrgIds = [profile.org_id];
+    if (profile.viewing_demo_org_id) {
+      allowedOrgIds.push(profile.viewing_demo_org_id);
+    }
+    console.log('User org:', profile.org_id, 'Demo org:', profile.viewing_demo_org_id, 'Allowed orgs:', allowedOrgIds);
 
     // Fetch full assessment data with IGMA flags
     const { data: assessment } = await supabase
@@ -75,8 +78,8 @@ serve(async (req) => {
       .eq('id', assessmentId)
       .single();
     
-    if (!assessment || assessment.org_id !== effectiveOrgId) {
-      console.error('User does not have access to this assessment. Assessment org:', assessment?.org_id, 'User effective org:', effectiveOrgId);
+    if (!assessment || !allowedOrgIds.includes(assessment.org_id)) {
+      console.error('User does not have access to this assessment. Assessment org:', assessment?.org_id, 'Allowed orgs:', allowedOrgIds);
       return new Response(JSON.stringify({ error: 'Acesso negado a este diagnóstico' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
