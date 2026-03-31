@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -358,10 +358,21 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!input.trim() || isLoading) return;
     streamChat(input.trim());
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      // Shift+Enter sends, plain Enter adds new line (default behavior)
+      return;
+    }
+    if (e.key === 'Enter' && e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
   };
 
   const handleSuggestion = (text: string) => {
@@ -741,14 +752,16 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
         </ScrollArea>
 
         <div className="p-4 border-t shrink-0">
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <Input
-              ref={inputRef}
+          <form onSubmit={handleSubmit} className="flex gap-2 items-end">
+            <Textarea
+              ref={inputRef as any}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={isListening ? "Ouvindo..." : "Pergunte sobre turismo sustentável..."}
+              onKeyDown={handleKeyDown}
+              placeholder={isListening ? "Ouvindo..." : "Pergunte sobre turismo sustentável... (Shift+Enter para enviar)"}
               disabled={isLoading}
-              className="flex-1"
+              className="flex-1 min-h-[40px] max-h-[120px] resize-none"
+              rows={1}
             />
             <Button 
               type="button" 
