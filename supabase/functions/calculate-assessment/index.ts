@@ -426,6 +426,7 @@ serve(async (req) => {
           id,
           indicator_id,
           value_raw,
+          is_ignored,
           indicator:indicators(
             id,
             code,
@@ -442,7 +443,8 @@ serve(async (req) => {
             indicator_scope
           )
         `)
-        .eq("assessment_id", assessment_id);
+        .eq("assessment_id", assessment_id)
+        .eq("is_ignored", false);
 
       if (unifiedError) {
         console.error("Error fetching unified indicator values:", unifiedError);
