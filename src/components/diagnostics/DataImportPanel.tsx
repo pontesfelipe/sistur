@@ -374,7 +374,10 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">Progresso do Preenchimento</span>
                 <span className="text-sm text-muted-foreground">
-                  {filledCount} de {indicators.length} indicadores
+                  {filledCount} de {activeIndicators.length} indicadores
+                  {ignoredCount > 0 && (
+                    <span className="text-destructive ml-1">({ignoredCount} ignorado{ignoredCount > 1 ? 's' : ''})</span>
+                  )}
                 </span>
               </div>
               <Progress value={fillProgress} className="h-2" />
