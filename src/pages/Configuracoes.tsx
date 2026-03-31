@@ -217,6 +217,7 @@ export default function Configuracoes() {
 
             <DemoModeToggle />
             <ForumPrivacySettings />
+            {isAdmin && <ContentModerationPanel />}
             {isAdmin && <ActAsUserPanel />}
           </TabsContent>
 
