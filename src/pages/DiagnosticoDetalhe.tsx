@@ -71,7 +71,7 @@ import { cn } from '@/lib/utils';
 import type { Pillar, Severity, TerritorialInterpretation } from '@/types/sistur';
 import { PILLAR_INFO, SEVERITY_INFO } from '@/types/sistur';
 import { toast } from 'sonner';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 const DiagnosticoDetalhe = () => {
