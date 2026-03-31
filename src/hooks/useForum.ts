@@ -309,10 +309,11 @@ export function useForum() {
           content: data.content,
           visibility: data.visibility,
           image_url: data.image_url || null,
+          image_urls: data.image_urls || [],
           attachment_url: data.attachment_url || null,
           attachment_type: data.attachment_type || null,
           category: data.category || 'general',
-        })
+        } as any)
         .select()
         .single();
 
