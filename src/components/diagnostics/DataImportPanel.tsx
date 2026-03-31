@@ -84,7 +84,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedAssessment, setSelectedAssessment] = useState<string>(preSelectedAssessmentId || '');
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
-  const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string }>>({});
+  const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean }>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
 
   const { assessments, isLoading: loadingAssessments } = useAssessments();
