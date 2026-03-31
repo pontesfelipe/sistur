@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target } from 'lucide-react';
+import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Assessment } from '@/types/sistur';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { DeleteAssessmentDialog } from './DeleteAssessmentDialog';
 
 interface AssessmentCardProps {
-  assessment: Assessment & { tier?: string };
+  assessment: Assessment & { tier?: string; creator?: { full_name: string } | null };
   onDelete?: () => void;
 }
 
@@ -115,6 +115,13 @@ export function AssessmentCard({ assessment, onDelete }: AssessmentCardProps) {
             {formatDate(assessment.period_start)}
             {assessment.period_end && ` — ${formatDate(assessment.period_end)}`}
           </span>
+        </div>
+      )}
+
+      {(assessment as any).creator?.full_name && (
+        <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+          <User className="h-4 w-4" />
+          <span>{(assessment as any).creator.full_name}</span>
         </div>
       )}
 
