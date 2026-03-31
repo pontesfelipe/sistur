@@ -20,6 +20,7 @@ export interface ForumPost {
   content: string;
   visibility: 'org' | 'public';
   image_url: string | null;
+  image_urls?: string[] | null;
   attachment_url: string | null;
   attachment_type: string | null;
   category: string;
