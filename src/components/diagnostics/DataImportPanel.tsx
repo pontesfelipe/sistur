@@ -170,8 +170,39 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         ...prev[indicatorId],
         value: value === '' ? null : parseFloat(value),
         source: prev[indicatorId]?.source || 'Manual',
+        is_ignored: prev[indicatorId]?.is_ignored ?? false,
       },
     }));
+  };
+
+  const handleToggleIgnore = async (indicatorId: string) => {
+    if (!selectedAssessment) return;
+    
+    const existingValue = values.find(v => v.indicator_id === indicatorId);
+    const currentIgnored = existingValue?.is_ignored ?? false;
+    const newIgnored = !currentIgnored;
+    
+    // If there's already a saved value, update it directly
+    if (existingValue) {
+      await upsertValue.mutateAsync({
+        assessment_id: selectedAssessment,
+        indicator_id: indicatorId,
+        value_raw: existingValue.value_raw,
+        source: existingValue.source,
+        is_ignored: newIgnored,
+        ignore_reason: newIgnored ? 'Marcado como não aplicável pelo usuário' : null,
+      });
+    } else {
+      // Create a new entry marked as ignored (with null value)
+      await upsertValue.mutateAsync({
+        assessment_id: selectedAssessment,
+        indicator_id: indicatorId,
+        value_raw: null,
+        source: 'Manual',
+        is_ignored: newIgnored,
+        ignore_reason: newIgnored ? 'Marcado como não aplicável pelo usuário' : null,
+      });
+    }
   };
 
   const handleSaveValue = async (indicatorId: string) => {
