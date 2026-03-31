@@ -1,8 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const STRICTNESS_PROMPTS: Record<number, string> = {
+  1: `REJECT only: explicit nudity, graphic sexual content, or extreme gore. Allow everything else.`,
+  2: `REJECT: nudity, sexual content, graphic violence, hate speech symbols. Allow most other content.`,
+  3: `REJECT: nudity, sexual content, violence, hate speech, drug use, spam/memes, personal information (IDs, credit cards). APPROVE: tourism-related content, professional photos, educational content, maps, charts, normal photos.`,
+  4: `REJECT: anything not clearly professional or educational. Only APPROVE: tourism destinations, hotels, landscapes, professional events, maps, charts, diagrams, documents, presentations. Reject selfies, personal photos, memes, unrelated content.`,
+  5: `REJECT: anything not DIRECTLY related to tourism. Only APPROVE: tourism destinations, hotels, landscapes, infrastructure, heritage sites, tourism events, tourism maps/charts, tourism documents. Reject everything else including generic professional content.`,
 };
 
 serve(async (req) => {
@@ -16,13 +25,44 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const { imageUrl } = await req.json();
+    const { imageUrl, orgId } = await req.json();
     if (!imageUrl) {
       return new Response(
         JSON.stringify({ error: "imageUrl is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Get strictness level from org settings
+    let strictnessLevel = 3; // default moderate
+    if (orgId) {
+      try {
+        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+        const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        
+        const { data } = await supabase
+          .from("content_moderation_settings")
+          .select("strictness_level, auto_reject_enabled")
+          .eq("org_id", orgId)
+          .maybeSingle();
+        
+        if (data) {
+          strictnessLevel = data.strictness_level;
+          // If auto-reject is disabled, just approve everything
+          if (!data.auto_reject_enabled) {
+            return new Response(
+              JSON.stringify({ approved: true, reason: "Rejeição automática desabilitada" }),
+              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching moderation settings:", e);
+      }
+    }
+
+    const strictnessPrompt = STRICTNESS_PROMPTS[strictnessLevel] || STRICTNESS_PROMPTS[3];
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -35,36 +75,18 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are an image content moderator. Analyze the image and determine if it's appropriate for a professional tourism community forum.
+            content: `You are an image content moderator for a professional tourism community forum.
 
-REJECT images that contain:
-- Nudity or sexual content
-- Graphic violence or gore
-- Hate speech symbols or extremist content
-- Drug use or illegal activities
-- Spam or irrelevant memes
-- Personal/private information (IDs, credit cards, etc.)
-
-APPROVE images that are:
-- Tourism-related (landscapes, hotels, destinations, events)
-- Professional or educational content
-- Maps, charts, diagrams
-- Normal photos of people in appropriate settings
-- Documents or presentations
+MODERATION POLICY (Strictness Level ${strictnessLevel}/5):
+${strictnessPrompt}
 
 Respond ONLY with a JSON object: {"approved": true/false, "reason": "brief reason in Portuguese"}`
           },
           {
             role: "user",
             content: [
-              {
-                type: "image_url",
-                image_url: { url: imageUrl }
-              },
-              {
-                type: "text",
-                text: "Analise esta imagem para moderação de conteúdo."
-              }
+              { type: "image_url", image_url: { url: imageUrl } },
+              { type: "text", text: "Analise esta imagem para moderação de conteúdo." }
             ]
           }
         ],
@@ -92,7 +114,6 @@ Respond ONLY with a JSON object: {"approved": true/false, "reason": "brief reaso
 
     if (!response.ok) {
       console.error("AI gateway error:", response.status);
-      // On error, allow the image (fail open for availability)
       return new Response(
         JSON.stringify({ approved: true, reason: "Moderação indisponível" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -101,7 +122,6 @@ Respond ONLY with a JSON object: {"approved": true/false, "reason": "brief reaso
 
     const data = await response.json();
     
-    // Extract tool call result
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
     if (toolCall?.function?.arguments) {
       try {
@@ -110,12 +130,10 @@ Respond ONLY with a JSON object: {"approved": true/false, "reason": "brief reaso
           JSON.stringify({ approved: result.approved, reason: result.reason }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
-      } catch {
-        // Parse error, allow
-      }
+      } catch { /* fallthrough */ }
     }
 
-    // Fallback: try parsing content directly
+    // Fallback
     const content = data.choices?.[0]?.message?.content || "";
     try {
       const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -128,7 +146,6 @@ Respond ONLY with a JSON object: {"approved": true/false, "reason": "brief reaso
       }
     } catch { /* ignore */ }
 
-    // Default: allow
     return new Response(
       JSON.stringify({ approved: true, reason: "Aprovado" }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -136,7 +153,6 @@ Respond ONLY with a JSON object: {"approved": true/false, "reason": "brief reaso
 
   } catch (e) {
     console.error("moderate-image error:", e);
-    // Fail open
     return new Response(
       JSON.stringify({ approved: true, reason: "Erro na moderação" }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

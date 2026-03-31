@@ -790,6 +790,50 @@ export type Database = {
         }
         Relationships: []
       }
+      content_moderation_settings: {
+        Row: {
+          allowed_categories: string[]
+          auto_reject_enabled: boolean
+          id: string
+          max_images_per_post: number
+          org_id: string
+          require_image_review: boolean
+          strictness_level: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          allowed_categories?: string[]
+          auto_reject_enabled?: boolean
+          id?: string
+          max_images_per_post?: number
+          org_id: string
+          require_image_review?: boolean
+          strictness_level?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          allowed_categories?: string[]
+          auto_reject_enabled?: boolean
+          id?: string
+          max_images_per_post?: number
+          org_id?: string
+          require_image_review?: boolean
+          strictness_level?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_moderation_settings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_content_sources: {
         Row: {
           content_id: string
@@ -2912,6 +2956,7 @@ export type Database = {
           created_at: string
           id: string
           image_url: string | null
+          image_urls: string[] | null
           is_pinned: boolean | null
           likes_count: number | null
           org_id: string
@@ -2929,6 +2974,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           is_pinned?: boolean | null
           likes_count?: number | null
           org_id: string
@@ -2946,6 +2992,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           is_pinned?: boolean | null
           likes_count?: number | null
           org_id?: string

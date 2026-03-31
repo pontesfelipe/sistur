@@ -20,6 +20,7 @@ export interface ForumPost {
   content: string;
   visibility: 'org' | 'public';
   image_url: string | null;
+  image_urls?: string[] | null;
   attachment_url: string | null;
   attachment_type: string | null;
   category: string;
@@ -58,6 +59,7 @@ export interface CreatePostData {
   content: string;
   visibility: 'org' | 'public';
   image_url?: string;
+  image_urls?: string[];
   attachment_url?: string;
   attachment_type?: string;
   category?: string;
@@ -308,10 +310,11 @@ export function useForum() {
           content: data.content,
           visibility: data.visibility,
           image_url: data.image_url || null,
+          image_urls: data.image_urls || [],
           attachment_url: data.attachment_url || null,
           attachment_type: data.attachment_type || null,
           category: data.category || 'general',
-        })
+        } as any)
         .select()
         .single();
 
@@ -330,9 +333,12 @@ export function useForum() {
   // Update post
   const updatePost = useMutation({
     mutationFn: async ({ id, ...data }: Partial<CreatePostData> & { id: string }) => {
+      const updateData: any = { ...data };
+      if (data.image_urls) updateData.image_urls = data.image_urls;
+      
       const { data: post, error } = await supabase
         .from('forum_posts')
-        .update(data)
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();

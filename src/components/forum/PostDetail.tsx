@@ -48,6 +48,7 @@ import {
   Pin,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ImageCarousel } from '@/components/ui/image-carousel';
 
 const categoryLabels: Record<string, string> = {
   general: 'Geral',
@@ -398,16 +399,17 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
           <h2 className="text-xl font-bold mb-3">{post.title}</h2>
           <p className="whitespace-pre-wrap">{post.content}</p>
 
-          {/* Image attachment */}
-          {post.image_url && (
-            <div className="mt-4 rounded-lg overflow-hidden">
-              <img
-                src={post.image_url}
-                alt=""
-                className="w-full max-h-96 object-cover"
-              />
-            </div>
-          )}
+          {/* Image carousel or single image */}
+          {(() => {
+            const allImages = (post as any).image_urls?.length
+              ? (post as any).image_urls
+              : post.image_url ? [post.image_url] : [];
+            return allImages.length > 0 ? (
+              <div className="mt-4">
+                <ImageCarousel images={allImages} maxHeight="max-h-96" />
+              </div>
+            ) : null;
+          })()}
 
           {/* PDF attachment */}
           {post.attachment_type === 'application/pdf' && post.attachment_url && (
