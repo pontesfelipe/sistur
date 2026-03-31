@@ -67,6 +67,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
   const { values: existingValues, isLoading: valuesLoading, bulkUpsertValues } = useIndicatorValues(assessmentId);
   
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
+  const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
   
   // Initialize local values from existing
