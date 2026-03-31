@@ -45,6 +45,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ImageCarousel } from '@/components/ui/image-carousel';
 
 const categoryLabels: Record<string, string> = {
   general: 'Geral',
