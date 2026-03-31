@@ -70,20 +70,39 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
   
-  // Initialize local values from existing
+  // Initialize local values and ignored state from existing
   useEffect(() => {
     if (existingValues && existingValues.length > 0 && Object.keys(localValues).length === 0) {
       const initial: Record<string, string> = {};
+      const ignored = new Set<string>();
       existingValues.forEach(v => {
         if (v.value_raw !== null) {
           initial[v.indicator_id] = v.value_raw.toString();
+        }
+        if (v.is_ignored) {
+          ignored.add(v.indicator_id);
         }
       });
       if (Object.keys(initial).length > 0) {
         setLocalValues(initial);
       }
+      if (ignored.size > 0) {
+        setIgnoredIds(ignored);
+      }
     }
   }, [existingValues]);
+  
+  const handleToggleIgnore = useCallback((indicatorId: string) => {
+    setIgnoredIds(prev => {
+      const next = new Set(prev);
+      if (next.has(indicatorId)) {
+        next.delete(indicatorId);
+      } else {
+        next.add(indicatorId);
+      }
+      return next;
+    });
+  }, []);
   
   // Group indicators by pillar and theme (category)
   const groupedIndicators = useMemo(() => {
