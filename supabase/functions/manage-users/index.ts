@@ -5,6 +5,77 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Role → License plan mapping
+const ROLE_TO_PLAN: Record<string, string> = {
+  ADMIN: 'enterprise',
+  ANALYST: 'pro',
+  VIEWER: 'basic',
+  ESTUDANTE: 'estudante',
+  PROFESSOR: 'professor',
+}
+
+// Default features per plan
+const DEFAULT_FEATURES: Record<string, Record<string, boolean>> = {
+  trial: { erp: true, edu: true, games: true, reports: false, integrations: false },
+  estudante: { erp: false, edu: true, games: true, reports: false, integrations: false },
+  professor: { erp: false, edu: true, games: true, reports: true, integrations: false },
+  basic: { erp: true, edu: true, games: true, reports: true, integrations: false },
+  pro: { erp: true, edu: true, games: true, reports: true, integrations: true },
+  enterprise: { erp: true, edu: true, games: true, reports: true, integrations: true },
+}
+
+/**
+ * Sync a user's license to match their role.
+ * Creates or updates the license record so Licenses panel stays consistent.
+ */
+async function syncLicense(
+  supabaseAdmin: any,
+  userId: string,
+  orgId: string,
+  role: string
+) {
+  const plan = ROLE_TO_PLAN[role] || 'basic'
+  const features = DEFAULT_FEATURES[plan] || DEFAULT_FEATURES.basic
+  const isAdmin = role === 'ADMIN'
+
+  const { data: existing } = await supabaseAdmin
+    .from('licenses')
+    .select('id, plan, status')
+    .eq('user_id', userId)
+    .single()
+
+  if (existing) {
+    // Update existing license to match role
+    await supabaseAdmin
+      .from('licenses')
+      .update({
+        org_id: orgId,
+        plan,
+        features,
+        // Admin licenses never expire
+        expires_at: isAdmin ? null : existing.expires_at ?? null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', existing.id)
+  } else {
+    // Create new license
+    await supabaseAdmin
+      .from('licenses')
+      .insert({
+        user_id: userId,
+        org_id: orgId,
+        plan,
+        status: 'active',
+        activated_at: new Date().toISOString(),
+        expires_at: null, // Admin assigns — no automatic expiry
+        max_users: 1,
+        features,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -67,6 +138,9 @@ Deno.serve(async (req) => {
           .from('user_roles')
           .update({ role: role || 'VIEWER', org_id })
           .eq('user_id', newUser.user.id)
+
+        // Sync license
+        await syncLicense(supabaseAdmin, newUser.user.id, org_id, role || 'VIEWER')
       }
 
       console.log(`User created successfully: ${newUser.user?.id}`)
@@ -184,6 +258,9 @@ Deno.serve(async (req) => {
             .from('user_roles')
             .insert({ user_id: newUser.user.id, role, org_id: org_id })
         }
+
+        // Sync license to match role
+        await syncLicense(supabaseAdmin, newUser.user.id, org_id, role)
       }
 
       return new Response(JSON.stringify({ success: true, user: newUser.user }), {
@@ -194,7 +271,14 @@ Deno.serve(async (req) => {
     if (action === 'update_role') {
       const { user_id, role } = data
 
-      const { data: profile } = await supabaseAdmin
+      // Get target user's org
+      const { data: targetProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', user_id)
+        .single()
+
+      const { data: adminProfile } = await supabaseAdmin
         .from('profiles')
         .select('org_id')
         .eq('user_id', requestingUser.id)
@@ -204,13 +288,18 @@ Deno.serve(async (req) => {
         .from('user_roles')
         .update({ role })
         .eq('user_id', user_id)
-        .eq('org_id', profile?.org_id)
+        .eq('org_id', adminProfile?.org_id)
 
       if (updateError) {
         return new Response(JSON.stringify({ error: updateError.message }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
+      }
+
+      // Sync license to match new role
+      if (targetProfile?.org_id) {
+        await syncLicense(supabaseAdmin, user_id, targetProfile.org_id, role)
       }
 
       return new Response(JSON.stringify({ success: true }), {
@@ -260,6 +349,17 @@ Deno.serve(async (req) => {
         })
       }
 
+      // Get current role to sync license features
+      const { data: roleData } = await supabaseAdmin
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user_id)
+        .single()
+
+      if (roleData && targetProfile?.org_id) {
+        await syncLicense(supabaseAdmin, user_id, targetProfile.org_id, roleData.role)
+      }
+
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -301,6 +401,21 @@ Deno.serve(async (req) => {
         })
       }
 
+      // If blocking, suspend the license; if unblocking, reactivate
+      if (blocked) {
+        await supabaseAdmin
+          .from('licenses')
+          .update({ status: 'suspended', updated_at: new Date().toISOString() })
+          .eq('user_id', user_id)
+          .eq('status', 'active')
+      } else {
+        await supabaseAdmin
+          .from('licenses')
+          .update({ status: 'active', updated_at: new Date().toISOString() })
+          .eq('user_id', user_id)
+          .eq('status', 'suspended')
+      }
+
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -337,7 +452,13 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Delete user_roles first
+      // Delete license first
+      await supabaseAdmin
+        .from('licenses')
+        .delete()
+        .eq('user_id', user_id)
+
+      // Delete user_roles
       await supabaseAdmin
         .from('user_roles')
         .delete()
@@ -503,7 +624,7 @@ Deno.serve(async (req) => {
       // Get emails from auth.users
       const userIds = profiles?.map(p => p.user_id) || []
       const usersWithEmail = await Promise.all(
-        userIds.map(async (userId) => {
+        userIds.map(async (userId: string) => {
           const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(userId)
           return { user_id: userId, email: user?.email }
         })
@@ -556,6 +677,12 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
+
+      // Update license org
+      await supabaseAdmin
+        .from('licenses')
+        .update({ org_id: new_org_id, updated_at: new Date().toISOString() })
+        .eq('user_id', user_id)
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -623,6 +750,12 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
+
+      // Move license to unassigned org too
+      await supabaseAdmin
+        .from('licenses')
+        .update({ org_id: unassignedOrgId, updated_at: new Date().toISOString() })
+        .eq('user_id', user_id)
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
