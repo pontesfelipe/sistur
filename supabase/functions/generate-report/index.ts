@@ -90,6 +90,34 @@ serve(async (req) => {
     const isEnterprise = assessment.diagnostic_type === 'enterprise';
     console.log('Diagnostic type:', assessment.diagnostic_type, 'isEnterprise:', isEnterprise);
 
+    // Check if data has changed since last report generation
+    const { data: existingReport } = await supabaseAdmin
+      .from('generated_reports')
+      .select('id, created_at')
+      .eq('assessment_id', assessmentId)
+      .maybeSingle();
+
+    const forceRegenerate = (await req.clone().json()).forceRegenerate;
+
+    if (existingReport && !forceRegenerate) {
+      const reportDate = new Date(existingReport.created_at);
+      const calcDate = assessment.calculated_at ? new Date(assessment.calculated_at) : null;
+      const updatedDate = new Date(assessment.updated_at);
+      
+      // If report was generated after the last calculation AND after last update, skip
+      if (calcDate && reportDate > calcDate && reportDate > updatedDate) {
+        console.log('No new data since last report. Skipping generation.');
+        return new Response(JSON.stringify({ 
+          skipped: true, 
+          message: 'Não há dados novos desde o último relatório gerado.',
+          reportId: existingReport.id 
+        }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     // Fetch indicator scores with indicator details
     const { data: indicatorScores } = await supabase
       .from('indicator_scores')
@@ -176,8 +204,13 @@ ESTRUTURA OBRIGATÓRIA DO RELATÓRIO TERRITORIAL:
 # 9. BANCO DE AÇÕES (tabela estruturada)
 # 10. CONSIDERAÇÕES FINAIS
 
-REGRAS DE REDAÇÃO:
+REGRAS DE FORMATAÇÃO (OBRIGATÓRIAS):
 - Use formatação markdown com headers hierárquicos
+- SEMPRE apresente dados comparativos e indicadores em TABELAS MARKDOWN (usando | coluna1 | coluna2 |)
+- NUNCA liste indicadores como texto corrido quando puder usar tabela
+- Para cada eixo, inclua uma tabela com: Indicador | Score | Status | Benchmark | Observação
+- O Banco de Ações DEVE ser uma tabela: Ação | Pilar | Prazo | Responsável | Prioridade
+- Use tabelas para qualquer conjunto de 3+ itens comparáveis
 - Mantenha linguagem institucional e técnica
 - Sempre justifique conclusões com dados
 - Conecte explicitamente: dado → impacto → decisão
@@ -284,11 +317,17 @@ Tabela estruturada:
 - Próximos passos imediatos
 - Data recomendada para próxima avaliação
 
-REGRAS DE REDAÇÃO ENTERPRISE:
+REGRAS DE FORMATAÇÃO (OBRIGATÓRIAS):
 - Linguagem executiva, direta e orientada a resultados
 - Foco em ROI e impacto no negócio
 - Sempre conectar: métrica → gap → ação → resultado esperado
 - Use formatação markdown com headers hierárquicos
+- SEMPRE apresente KPIs e métricas em TABELAS MARKDOWN (usando | coluna1 | coluna2 |)
+- NUNCA liste indicadores/KPIs como texto corrido quando puder usar tabela
+- Para cada categoria funcional, inclua uma tabela: KPI | Valor Atual | Benchmark | Status | Gap
+- O Roadmap DEVE ser uma tabela completa
+- Gargalos operacionais DEVEM ser apresentados em tabela: Gargalo | Severidade | Impacto | Ação Recomendada
+- Use tabelas para qualquer conjunto de 3+ itens comparáveis
 - O relatório deve ter no mínimo 2500 palavras`;
 
     const systemPrompt = isEnterprise ? enterpriseSystemPrompt : territorialSystemPrompt;

@@ -110,7 +110,7 @@ export default function Relatorios() {
 
   const calculatedAssessments = assessments?.filter(a => a.status === 'CALCULATED') || [];
 
-  const generateReport = async () => {
+  const generateReport = async (forceRegenerate = false) => {
     if (!selectedAssessmentId || !selectedDestination) {
       toast.error('Selecione um diagnóstico calculado');
       return;
@@ -144,12 +144,32 @@ export default function Relatorios() {
           pillarScores: pillarScoresMap,
           issues: issues || [],
           prescriptions: prescriptions || [],
+          forceRegenerate,
         }),
       });
 
       if (!resp.ok) {
         const errorData = await resp.json();
         throw new Error(errorData.error || 'Erro ao gerar relatório');
+      }
+
+      // Check if the response is JSON (skipped) or SSE stream
+      const contentType = resp.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await resp.json();
+        if (data.skipped) {
+          toast.info(data.message || 'Não há dados novos. Use "Regenerar" para forçar.', { duration: 5000 });
+          // Load existing report
+          const { data: existing } = await supabase
+            .from('generated_reports')
+            .select('report_content')
+            .eq('assessment_id', selectedAssessmentId)
+            .maybeSingle();
+          if (existing?.report_content) {
+            setReport(existing.report_content);
+          }
+          return;
+        }
       }
 
       if (!resp.body) throw new Error('Resposta sem corpo');
@@ -256,43 +276,117 @@ export default function Relatorios() {
     toast.success('Relatório baixado!');
   };
 
-  // Simple markdown renderer
+  // Improved markdown renderer with table support
   const renderMarkdown = (text: string) => {
-    return text
-      .split('\n')
-      .map((line, i) => {
-        // Headers
-        if (line.startsWith('# ')) {
-          return <h1 key={i} className="text-2xl font-bold mt-6 mb-3 text-foreground">{line.slice(2)}</h1>;
+    const lines = text.split('\n');
+    const elements: JSX.Element[] = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i];
+
+      // Detect markdown table (line with |)
+      if (line.trim().startsWith('|') && line.trim().endsWith('|')) {
+        const tableLines: string[] = [];
+        while (i < lines.length && lines[i].trim().startsWith('|') && lines[i].trim().endsWith('|')) {
+          tableLines.push(lines[i]);
+          i++;
         }
-        if (line.startsWith('## ')) {
-          return <h2 key={i} className="text-xl font-semibold mt-5 mb-2 text-foreground">{line.slice(3)}</h2>;
-        }
-        if (line.startsWith('### ')) {
-          return <h3 key={i} className="text-lg font-medium mt-4 mb-2 text-foreground">{line.slice(4)}</h3>;
-        }
-        // Bold text within lines
-        let processedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        // List items
-        if (line.startsWith('- ')) {
-          return (
-            <li key={i} className="ml-4 text-muted-foreground" dangerouslySetInnerHTML={{ __html: processedLine.slice(2) }} />
+        if (tableLines.length >= 2) {
+          // Parse header
+          const parseRow = (row: string) => row.split('|').slice(1, -1).map(c => c.trim());
+          const headers = parseRow(tableLines[0]);
+          // Skip separator row (row with ---)
+          const startRow = tableLines[1].includes('---') ? 2 : 1;
+          const dataRows = tableLines.slice(startRow).map(parseRow);
+
+          elements.push(
+            <div key={`table-${i}`} className="overflow-x-auto my-4">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-muted/50">
+                    {headers.map((h, hi) => (
+                      <th key={hi} className="border border-border px-3 py-2 text-left font-semibold text-foreground">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {dataRows.map((row, ri) => (
+                    <tr key={ri} className={ri % 2 === 0 ? '' : 'bg-muted/20'}>
+                      {row.map((cell, ci) => (
+                        <td key={ci} className="border border-border px-3 py-2 text-muted-foreground"
+                          dangerouslySetInnerHTML={{ __html: cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
+                        />
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           );
+          continue;
         }
-        // Numbered lists
-        const numberedMatch = line.match(/^(\d+)\.\s/);
-        if (numberedMatch) {
-          return (
-            <li key={i} className="ml-4 text-muted-foreground list-decimal" dangerouslySetInnerHTML={{ __html: processedLine.slice(numberedMatch[0].length) }} />
-          );
-        }
-        // Empty lines
-        if (line.trim() === '') {
-          return <br key={i} />;
-        }
-        // Regular paragraphs
-        return <p key={i} className="text-muted-foreground mb-2" dangerouslySetInnerHTML={{ __html: processedLine }} />;
-      });
+      }
+
+      // Horizontal rule
+      if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
+        elements.push(<hr key={i} className="my-4 border-border" />);
+        i++;
+        continue;
+      }
+
+      // Headers
+      if (line.startsWith('# ')) {
+        elements.push(<h1 key={i} className="text-2xl font-bold mt-6 mb-3 text-foreground">{line.slice(2)}</h1>);
+        i++; continue;
+      }
+      if (line.startsWith('## ')) {
+        elements.push(<h2 key={i} className="text-xl font-semibold mt-5 mb-2 text-foreground">{line.slice(3)}</h2>);
+        i++; continue;
+      }
+      if (line.startsWith('### ')) {
+        elements.push(<h3 key={i} className="text-lg font-medium mt-4 mb-2 text-foreground">{line.slice(4)}</h3>);
+        i++; continue;
+      }
+      if (line.startsWith('#### ')) {
+        elements.push(<h4 key={i} className="text-base font-medium mt-3 mb-1 text-foreground">{line.slice(5)}</h4>);
+        i++; continue;
+      }
+
+      // Bold text processing
+      const processedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+      // List items
+      if (line.startsWith('- ')) {
+        elements.push(
+          <li key={i} className="ml-4 text-muted-foreground list-disc" dangerouslySetInnerHTML={{ __html: processedLine.slice(2) }} />
+        );
+        i++; continue;
+      }
+
+      // Numbered lists
+      const numberedMatch = line.match(/^(\d+)\.\s/);
+      if (numberedMatch) {
+        elements.push(
+          <li key={i} className="ml-4 text-muted-foreground list-decimal" dangerouslySetInnerHTML={{ __html: processedLine.slice(numberedMatch[0].length) }} />
+        );
+        i++; continue;
+      }
+
+      // Empty lines
+      if (line.trim() === '') {
+        elements.push(<br key={i} />);
+        i++; continue;
+      }
+
+      // Regular paragraphs
+      elements.push(<p key={i} className="text-muted-foreground mb-2" dangerouslySetInnerHTML={{ __html: processedLine }} />);
+      i++;
+    }
+
+    return elements;
   };
 
   return (
@@ -360,7 +454,7 @@ export default function Relatorios() {
 
                   <div className="flex items-end gap-2">
                     <Button 
-                      onClick={generateReport} 
+                      onClick={() => generateReport()} 
                       disabled={!selectedAssessmentId || isGenerating}
                       className="gap-2"
                     >
@@ -439,7 +533,7 @@ export default function Relatorios() {
                     </CardDescription>
                   </div>
                   {report && !isGenerating && (
-                    <Button variant="ghost" size="sm" onClick={generateReport} className="gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => generateReport(true)} className="gap-2">
                       <RefreshCw className="h-4 w-4" />
                       Regenerar
                     </Button>
