@@ -232,6 +232,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
     deletePost,
     deleteReply,
     markAsSolution,
+    togglePin,
   } = useForum();
   const { lightTap, mediumTap, success } = useHaptic();
   
