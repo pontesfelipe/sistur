@@ -667,14 +667,22 @@ serve(async (req) => {
             // Create a map from code to indicator
             const codeToIndicator = new Map(indicatorsByCode.map((ind: any) => [ind.code, ind]));
             
-            // Create a set of already present indicator IDs (from indicator_values)
+            // Create a set of already present indicator IDs (from non-ignored indicator_values)
             const existingIndicatorIds = new Set(filteredIndicatorValues.map((iv: any) => iv.indicator_id));
             
-            // Add external values that are not already in indicator_values
+            // Also build a set of IGNORED indicator IDs so external data doesn't re-introduce them
+            const { data: ignoredValues } = await supabase
+              .from("indicator_values")
+              .select("indicator_id")
+              .eq("assessment_id", assessment_id)
+              .eq("is_ignored", true);
+            const ignoredIndicatorIds = new Set((ignoredValues || []).map((iv: any) => iv.indicator_id));
+            
+            // Add external values that are not already in indicator_values AND not ignored
             let addedCount = 0;
             for (const extVal of externalValues) {
               const indicator = codeToIndicator.get(extVal.indicator_code);
-              if (indicator && !existingIndicatorIds.has(indicator.id)) {
+              if (indicator && !existingIndicatorIds.has(indicator.id) && !ignoredIndicatorIds.has(indicator.id)) {
                 // Check tier compatibility
                 const indicatorTier = indicator.minimum_tier || 'COMPLETE';
                 if (allowedTiers.includes(indicatorTier)) {
@@ -691,7 +699,7 @@ serve(async (req) => {
                 }
               }
             }
-            console.log(`Added ${addedCount} validated external indicators to calculation (merged with ${existingIndicatorIds.size} manual entries)`);
+            console.log(`Added ${addedCount} validated external indicators to calculation (merged with ${existingIndicatorIds.size} manual entries, ${ignoredIndicatorIds.size} ignored)`);
           }
         }
       }
