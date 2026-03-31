@@ -579,6 +579,20 @@ export default function NovaRodada() {
             )
           )}
 
+          {/* Step 5 Territorial: Indicator Data Entry - render inline with pre-filled values */}
+          {currentStep === 5 && diagnosticType === 'territorial' && (
+            createdAssessmentId ? (
+              <DataImportPanel preSelectedAssessmentId={createdAssessmentId} />
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
+                  <p className="text-muted-foreground">Carregando diagnóstico...</p>
+                </CardContent>
+              </Card>
+            )
+          )}
+
           {/* Navigation for step 4 - only show for territorial (enterprise has its own save/continue buttons) */}
           {currentStep === 4 && diagnosticType !== 'enterprise' && (
             <Card>
