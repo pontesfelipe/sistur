@@ -496,12 +496,19 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                             const isPreFilled = existingValue?.source && officialSources.some(s => 
                               existingValue.source?.toUpperCase().includes(s.toUpperCase())
                             );
+                            const isIgnored = existingValue?.is_ignored === true;
                             
                             return (
-                              <div key={indicator.id} className="grid grid-cols-12 gap-3 items-center py-3 border-b last:border-0">
-                                <div className="col-span-6">
+                              <div key={indicator.id} className={cn(
+                                "grid grid-cols-12 gap-3 items-center py-3 border-b last:border-0",
+                                isIgnored && "opacity-50"
+                              )}>
+                                <div className="col-span-5">
                                   <div className="flex items-start gap-2">
-                                    <span className="font-medium text-sm leading-tight">{indicator.name}</span>
+                                    <span className={cn(
+                                      "font-medium text-sm leading-tight",
+                                      isIgnored && "line-through"
+                                    )}>{indicator.name}</span>
                                     {indicator.description && (
                                       <Tooltip>
                                         <TooltipTrigger>
@@ -524,6 +531,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                         {indicator.unit}
                                       </span>
                                     )}
+                                    {isIgnored && (
+                                      <Badge variant="outline" className="text-xs px-1.5 py-0 border-destructive/50 text-destructive">
+                                        <EyeOff className="h-3 w-3 mr-1" />
+                                        Ignorado
+                                      </Badge>
+                                    )}
                                   </div>
                                 </div>
                                 <div className="col-span-3">
@@ -532,15 +545,32 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                     step="any"
                                     value={currentValue ?? ''}
                                     onChange={(e) => handleValueChange(indicator.id, e.target.value)}
+                                    disabled={isIgnored}
                                     className={cn(
                                       'w-full',
-                                      hasUnsavedChanges && 'border-accent ring-1 ring-accent'
+                                      hasUnsavedChanges && 'border-accent ring-1 ring-accent',
+                                      isIgnored && 'bg-muted cursor-not-allowed'
                                     )}
-                                    placeholder="Valor"
+                                    placeholder={isIgnored ? 'Ignorado' : 'Valor'}
                                   />
                                 </div>
-                                <div className="col-span-3 flex justify-end items-center gap-2">
-                                  {existingValue?.source && !hasUnsavedChanges && (
+                                <div className="col-span-4 flex justify-end items-center gap-1.5">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        size="sm"
+                                        variant={isIgnored ? "destructive" : "ghost"}
+                                        className="h-8 w-8 p-0"
+                                        onClick={() => handleToggleIgnore(indicator.id)}
+                                      >
+                                        <EyeOff className="h-3.5 w-3.5" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {isIgnored ? 'Reativar indicador' : 'Ignorar indicador (não será considerado no cálculo)'}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                  {existingValue?.source && !hasUnsavedChanges && !isIgnored && (
                                     <Tooltip>
                                       <TooltipTrigger>
                                         <Badge 
@@ -577,7 +607,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       <Save className="h-3 w-3" />
                                     </Button>
                                   )}
-                                  {!hasUnsavedChanges && currentValue !== null && (
+                                  {!hasUnsavedChanges && currentValue !== null && !isIgnored && (
                                     <CheckCircle2 className="h-5 w-5 text-severity-good" />
                                   )}
                                 </div>
