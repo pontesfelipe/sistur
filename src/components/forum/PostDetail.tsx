@@ -45,6 +45,7 @@ import {
   Reply,
   CornerDownRight,
   Flag,
+  Pin,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
