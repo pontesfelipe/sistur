@@ -152,6 +152,26 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
     return data.publicUrl;
   };
 
+  const moderateImage = async (url: string): Promise<{ approved: boolean; reason: string }> => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/moderate-image`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ imageUrl: url }),
+        }
+      );
+      if (!response.ok) return { approved: true, reason: 'Moderação indisponível' };
+      return await response.json();
+    } catch {
+      return { approved: true, reason: 'Erro na moderação' };
+    }
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsUploading(true);
@@ -165,9 +185,23 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
         attachmentUrl = await uploadFile(attachmentFile);
         fileType = attachmentFile.type;
 
-        // If it's an image, also set it as image_url for backwards compatibility
+        // If it's an image, moderate it before allowing post
         if (attachmentFile.type.startsWith('image/')) {
           imageUrl = attachmentUrl;
+          
+          toast.info('Verificando imagem...');
+          const moderation = await moderateImage(attachmentUrl);
+          
+          if (!moderation.approved) {
+            // Delete the uploaded file since it was rejected
+            const filePath = attachmentUrl.split('/forum-attachments/')[1];
+            if (filePath) {
+              await supabase.storage.from('forum-attachments').remove([filePath]);
+            }
+            toast.error(`Imagem rejeitada: ${moderation.reason}`);
+            setIsUploading(false);
+            return;
+          }
         }
       } else if (attachmentPreview && !attachmentFile) {
         // Keep existing attachment if editing
