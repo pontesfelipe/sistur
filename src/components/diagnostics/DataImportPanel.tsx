@@ -51,6 +51,7 @@ import {
   Loader2,
   Hotel,
   Landmark,
+  EyeOff,
 } from 'lucide-react';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useAssessments } from '@/hooks/useAssessments';
