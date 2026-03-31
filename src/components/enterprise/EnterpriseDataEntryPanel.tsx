@@ -18,6 +18,7 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  EyeOff,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
