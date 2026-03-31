@@ -656,7 +656,7 @@ LEMBRE-SE:
             const { error: saveError } = await supabaseAdmin
               .from('generated_reports')
               .insert({
-                org_id: effectiveOrgId,
+                org_id: assessment.org_id,
                 assessment_id: assessmentId,
                 destination_name: destinationName,
                 report_content: fullContent,
