@@ -333,9 +333,12 @@ export function useForum() {
   // Update post
   const updatePost = useMutation({
     mutationFn: async ({ id, ...data }: Partial<CreatePostData> & { id: string }) => {
+      const updateData: any = { ...data };
+      if (data.image_urls) updateData.image_urls = data.image_urls;
+      
       const { data: post, error } = await supabase
         .from('forum_posts')
-        .update(data)
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
