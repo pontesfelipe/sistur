@@ -327,6 +327,12 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
             </div>
 
             <div className="flex items-center gap-2">
+              {post.is_pinned && (
+                <Badge variant="default" className="gap-1 text-xs">
+                  <Pin className="h-3 w-3" />
+                  Fixado
+                </Badge>
+              )}
               <Badge variant="secondary">
                 {categoryLabels[post.category] || post.category}
               </Badge>
@@ -344,6 +350,21 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
                 )}
               </Badge>
 
+              {/* Admin pin button */}
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'h-8 w-8',
+                    post.is_pinned ? 'text-primary' : 'text-muted-foreground hover:text-primary'
+                  )}
+                  onClick={() => togglePin.mutate({ postId: post.id, isPinned: post.is_pinned })}
+                >
+                  <Pin className="h-4 w-4" />
+                </Button>
+              )}
+
               {canDeletePost && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -352,10 +373,12 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={onEdit}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Editar
-                    </DropdownMenuItem>
+                    {(isOwner || isAdmin) && (
+                      <DropdownMenuItem onClick={onEdit}>
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Editar
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => setShowDeletePostDialog(true)}
