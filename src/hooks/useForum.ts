@@ -58,6 +58,7 @@ export interface CreatePostData {
   content: string;
   visibility: 'org' | 'public';
   image_url?: string;
+  image_urls?: string[];
   attachment_url?: string;
   attachment_type?: string;
   category?: string;
