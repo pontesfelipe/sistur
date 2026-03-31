@@ -586,6 +586,7 @@ serve(async (req) => {
           id,
           indicator_id,
           value_raw,
+          is_ignored,
           indicator:indicators(
             id,
             code,
@@ -601,7 +602,8 @@ serve(async (req) => {
             minimum_tier
           )
         `)
-        .eq("assessment_id", assessment_id);
+        .eq("assessment_id", assessment_id)
+        .eq("is_ignored", false);
 
       if (valuesError) {
         console.error("Error fetching indicator values:", valuesError);
