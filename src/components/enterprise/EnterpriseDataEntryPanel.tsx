@@ -255,7 +255,12 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-muted-foreground">Progresso geral</span>
-              <span className="font-medium">{progress.filled} / {progress.total} indicadores</span>
+              <span className="font-medium">
+                {progress.filled} / {progress.total} indicadores
+                {progress.ignored > 0 && (
+                  <span className="text-destructive ml-1">({progress.ignored} ignorado{progress.ignored > 1 ? 's' : ''})</span>
+                )}
+              </span>
             </div>
             <Progress value={progress.percent} className="h-2" />
           </div>
