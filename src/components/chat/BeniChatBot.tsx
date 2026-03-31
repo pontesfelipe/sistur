@@ -752,14 +752,16 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
         </ScrollArea>
 
         <div className="p-4 border-t shrink-0">
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <Input
-              ref={inputRef}
+          <form onSubmit={handleSubmit} className="flex gap-2 items-end">
+            <Textarea
+              ref={inputRef as any}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={isListening ? "Ouvindo..." : "Pergunte sobre turismo sustentável..."}
+              onKeyDown={handleKeyDown}
+              placeholder={isListening ? "Ouvindo..." : "Pergunte sobre turismo sustentável... (Shift+Enter para enviar)"}
               disabled={isLoading}
-              className="flex-1"
+              className="flex-1 min-h-[40px] max-h-[120px] resize-none"
+              rows={1}
             />
             <Button 
               type="button" 
