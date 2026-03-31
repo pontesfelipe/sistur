@@ -37,6 +37,7 @@ import { toast } from '@/hooks/use-toast';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
+import { DataImportPanel } from '@/components/diagnostics/DataImportPanel';
 import { EnterpriseProfileStep } from '@/components/enterprise/EnterpriseProfileStep';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
