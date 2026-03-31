@@ -454,7 +454,7 @@ export default function Relatorios() {
 
                   <div className="flex items-end gap-2">
                     <Button 
-                      onClick={generateReport} 
+                      onClick={() => generateReport()} 
                       disabled={!selectedAssessmentId || isGenerating}
                       className="gap-2"
                     >
