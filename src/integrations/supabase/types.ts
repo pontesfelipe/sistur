@@ -3375,7 +3375,9 @@ export type Database = {
           collected_at: string
           created_at: string
           id: string
+          ignore_reason: string | null
           indicator_id: string
+          is_ignored: boolean
           org_id: string
           reference_date: string | null
           source: string | null
@@ -3387,7 +3389,9 @@ export type Database = {
           collected_at?: string
           created_at?: string
           id?: string
+          ignore_reason?: string | null
           indicator_id: string
+          is_ignored?: boolean
           org_id: string
           reference_date?: string | null
           source?: string | null
@@ -3399,7 +3403,9 @@ export type Database = {
           collected_at?: string
           created_at?: string
           id?: string
+          ignore_reason?: string | null
           indicator_id?: string
+          is_ignored?: boolean
           org_id?: string
           reference_date?: string | null
           source?: string | null
