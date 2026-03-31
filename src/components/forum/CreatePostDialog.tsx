@@ -30,12 +30,14 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useForum, CreatePostData } from '@/hooks/useForum';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfileContext } from '@/contexts/ProfileContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Globe, Building2, Loader2, X, Upload, FileText, Image as ImageIcon } from 'lucide-react';
+import { Globe, Building2, Loader2, X, Upload, FileText, Image as ImageIcon, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/jpg', 'application/pdf'];
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const ACCEPTED_FILE_TYPES = [...ACCEPTED_IMAGE_TYPES, 'application/pdf'];
 
 const formSchema = z.object({
   title: z.string().min(5, 'Título deve ter pelo menos 5 caracteres').max(200, 'Título deve ter no máximo 200 caracteres'),
@@ -63,6 +65,7 @@ interface CreatePostDialogProps {
     visibility: 'org' | 'public';
     category: string;
     image_url: string | null;
+    image_urls?: string[] | null;
     attachment_url?: string | null;
     attachment_type?: string | null;
   };
@@ -71,12 +74,35 @@ interface CreatePostDialogProps {
 export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDialogProps) {
   const { createPost, updatePost } = useForum();
   const { user } = useAuth();
+  const { profile } = useProfileContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
   
-  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
-  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(editPost?.attachment_url || editPost?.image_url || null);
-  const [attachmentType, setAttachmentType] = useState<string | null>(editPost?.attachment_type || null);
+  // Multi-image state
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>(
+    editPost?.image_urls?.length ? editPost.image_urls :
+    editPost?.image_url ? [editPost.image_url] : []
+  );
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(editPost?.attachment_type === 'application/pdf' ? editPost?.attachment_url || null : null);
   const [isUploading, setIsUploading] = useState(false);
+  const [maxImages, setMaxImages] = useState(6);
+
+  // Load org moderation settings for max images
+  useState(() => {
+    const orgId = profile?.viewing_demo_org_id || profile?.org_id;
+    if (orgId) {
+      supabase
+        .from('content_moderation_settings')
+        .select('max_images_per_post')
+        .eq('org_id', orgId)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data?.max_images_per_post) setMaxImages(data.max_images_per_post);
+        });
+    }
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -90,70 +116,87 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
 
   const isEditing = !!editPost;
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
-    // Validate file type
-    if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
-      toast.error('Tipo de arquivo não permitido. Use JPEG ou PDF.');
+    const remainingSlots = maxImages - imagePreviews.length;
+    if (files.length > remainingSlots) {
+      toast.error(`Máximo de ${maxImages} imagens. Você pode adicionar mais ${remainingSlots}.`);
       return;
     }
 
-    // Validate file size
+    for (const file of files) {
+      if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+        toast.error(`Tipo não suportado: ${file.name}. Use JPEG, PNG ou WebP.`);
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name} é muito grande. Máximo 10MB.`);
+        return;
+      }
+    }
+
+    setImageFiles(prev => [...prev, ...files]);
+
+    // Generate previews
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handlePdfSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      toast.error('Apenas arquivos PDF são aceitos.');
+      return;
+    }
     if (file.size > MAX_FILE_SIZE) {
       toast.error('Arquivo muito grande. Máximo 10MB.');
       return;
     }
+    setPdfFile(file);
+    setPdfUrl(null);
+  };
 
-    setAttachmentFile(file);
-    setAttachmentType(file.type);
-
-    // Create preview for images
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAttachmentPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setAttachmentPreview(null);
+  const removeImage = (index: number) => {
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    // Only remove from files if it's a new file (not existing URL)
+    const existingCount = editPost?.image_urls?.length || (editPost?.image_url ? 1 : 0);
+    if (index >= existingCount) {
+      setImageFiles(prev => prev.filter((_, i) => i !== (index - existingCount)));
     }
   };
 
-  const removeAttachment = () => {
-    setAttachmentFile(null);
-    setAttachmentPreview(null);
-    setAttachmentType(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+  const removePdf = () => {
+    setPdfFile(null);
+    setPdfUrl(null);
+    if (pdfInputRef.current) pdfInputRef.current.value = '';
   };
 
   const uploadFile = async (file: File): Promise<string> => {
     if (!user) throw new Error('Usuário não autenticado');
-
     const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-
+    const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
     const { error: uploadError } = await supabase.storage
       .from('forum-attachments')
-      .upload(fileName, file, {
-        cacheControl: '3600',
-        upsert: false,
-      });
-
+      .upload(fileName, file, { cacheControl: '3600', upsert: false });
     if (uploadError) throw uploadError;
-
-    const { data } = supabase.storage
-      .from('forum-attachments')
-      .getPublicUrl(fileName);
-
+    const { data } = supabase.storage.from('forum-attachments').getPublicUrl(fileName);
     return data.publicUrl;
   };
 
   const moderateImage = async (url: string): Promise<{ approved: boolean; reason: string }> => {
     try {
+      const orgId = profile?.viewing_demo_org_id || profile?.org_id;
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/moderate-image`,
         {
@@ -162,7 +205,7 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
             'Content-Type': 'application/json',
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify({ imageUrl: url }),
+          body: JSON.stringify({ imageUrl: url, orgId }),
         }
       );
       if (!response.ok) return { approved: true, reason: 'Moderação indisponível' };
@@ -176,25 +219,32 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
     try {
       setIsUploading(true);
 
-      let attachmentUrl: string | undefined;
-      let imageUrl: string | undefined;
-      let fileType: string | undefined;
+      // Upload new images
+      const uploadedUrls: string[] = [];
+      
+      // Keep existing URLs that weren't removed
+      const existingUrls = editPost?.image_urls?.length 
+        ? editPost.image_urls.filter((_, i) => i < imagePreviews.length)
+        : editPost?.image_url && imagePreviews.length > 0 ? [editPost.image_url] : [];
+      
+      // Only include existing URLs that are still in previews  
+      for (const url of existingUrls) {
+        if (imagePreviews.includes(url)) {
+          uploadedUrls.push(url);
+        }
+      }
 
-      // Upload file if selected
-      if (attachmentFile) {
-        attachmentUrl = await uploadFile(attachmentFile);
-        fileType = attachmentFile.type;
-
-        // If it's an image, moderate it before allowing post
-        if (attachmentFile.type.startsWith('image/')) {
-          imageUrl = attachmentUrl;
-          
-          toast.info('Verificando imagem...');
-          const moderation = await moderateImage(attachmentUrl);
+      // Upload and moderate new files
+      if (imageFiles.length > 0) {
+        toast.info(`Enviando e verificando ${imageFiles.length} imagem(ns)...`);
+        
+        for (const file of imageFiles) {
+          const url = await uploadFile(file);
+          const moderation = await moderateImage(url);
           
           if (!moderation.approved) {
-            // Delete the uploaded file since it was rejected
-            const filePath = attachmentUrl.split('/forum-attachments/')[1];
+            // Delete rejected file
+            const filePath = url.split('/forum-attachments/')[1];
             if (filePath) {
               await supabase.storage.from('forum-attachments').remove([filePath]);
             }
@@ -202,14 +252,19 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
             setIsUploading(false);
             return;
           }
+          uploadedUrls.push(url);
         }
-      } else if (attachmentPreview && !attachmentFile) {
-        // Keep existing attachment if editing
-        attachmentUrl = editPost?.attachment_url || editPost?.image_url || undefined;
-        fileType = editPost?.attachment_type || undefined;
-        if (attachmentUrl?.includes('image') || editPost?.image_url) {
-          imageUrl = attachmentUrl;
-        }
+      }
+
+      // Upload PDF if new
+      let attachmentUrl: string | undefined;
+      let attachmentType: string | undefined;
+      if (pdfFile) {
+        attachmentUrl = await uploadFile(pdfFile);
+        attachmentType = 'application/pdf';
+      } else if (pdfUrl) {
+        attachmentUrl = pdfUrl;
+        attachmentType = 'application/pdf';
       }
 
       const data: CreatePostData = {
@@ -217,9 +272,10 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
         content: values.content,
         visibility: values.visibility,
         category: values.category,
-        image_url: imageUrl,
+        image_url: uploadedUrls[0] || undefined,
+        image_urls: uploadedUrls,
         attachment_url: attachmentUrl,
-        attachment_type: fileType,
+        attachment_type: attachmentType,
       };
 
       if (isEditing) {
@@ -229,7 +285,10 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
       }
 
       form.reset();
-      removeAttachment();
+      setImageFiles([]);
+      setImagePreviews([]);
+      setPdfFile(null);
+      setPdfUrl(null);
       onOpenChange(false);
     } catch (error: any) {
       toast.error('Erro ao salvar post: ' + error.message);
@@ -239,6 +298,7 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
   };
 
   const isLoading = createPost.isPending || updatePost.isPending || isUploading;
+  const canAddMoreImages = imagePreviews.length < maxImages;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -341,72 +401,104 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
               />
             </div>
 
-            {/* File Upload Section */}
+            {/* Multi-Image Upload Section */}
             <div className="space-y-2">
-              <Label>Anexo (opcional)</Label>
-              <p className="text-xs text-muted-foreground mb-2">
-                JPEG ou PDF, até 10MB
-              </p>
+              <Label className="flex items-center gap-2">
+                <ImageIcon className="h-4 w-4" />
+                Imagens ({imagePreviews.length}/{maxImages})
+              </Label>
               
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".jpg,.jpeg,.pdf"
-                onChange={handleFileSelect}
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                multiple
+                onChange={handleImageSelect}
                 className="hidden"
               />
 
-              {!attachmentFile && !attachmentPreview ? (
+              {imagePreviews.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {imagePreviews.map((preview, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border">
+                      <img src={preview} alt="" className="w-full h-full object-cover" />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6"
+                        onClick={() => removeImage(idx)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                  
+                  {canAddMoreImages && (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                    >
+                      <Plus className="h-6 w-6 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">Adicionar</span>
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {imagePreviews.length === 0 && (
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-24 border-dashed"
+                  className="w-full h-20 border-dashed"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <div className="flex flex-col items-center gap-2">
-                    <Upload className="h-6 w-6 text-muted-foreground" />
+                  <div className="flex flex-col items-center gap-1">
+                    <Upload className="h-5 w-5 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">
-                      Clique para anexar imagem ou PDF
+                      Adicionar imagens (até {maxImages})
                     </span>
                   </div>
                 </Button>
-              ) : (
-                <div className="relative border rounded-lg p-3">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-1 right-1 h-6 w-6"
-                    onClick={removeAttachment}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+              )}
+            </div>
 
-                  {attachmentType?.startsWith('image/') || attachmentPreview?.startsWith('data:image') ? (
-                    <div className="rounded-lg overflow-hidden">
-                      <img
-                        src={attachmentPreview || ''}
-                        alt="Preview"
-                        className="w-full h-48 object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-3 py-2">
-                      <div className="p-2 bg-muted rounded-lg">
-                        <FileText className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
-                          {attachmentFile?.name || 'Documento PDF'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {attachmentFile 
-                            ? `${(attachmentFile.size / 1024 / 1024).toFixed(2)} MB`
-                            : 'PDF anexado'}
-                        </p>
-                      </div>
-                    </div>
-                  )}
+            {/* PDF Upload Section */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                PDF (opcional)
+              </Label>
+
+              <input
+                ref={pdfInputRef}
+                type="file"
+                accept=".pdf"
+                onChange={handlePdfSelect}
+                className="hidden"
+              />
+
+              {!pdfFile && !pdfUrl ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => pdfInputRef.current?.click()}
+                  className="gap-2"
+                >
+                  <Upload className="h-4 w-4" />
+                  Anexar PDF
+                </Button>
+              ) : (
+                <div className="flex items-center gap-3 p-2 bg-muted rounded-lg">
+                  <FileText className="h-5 w-5 text-primary" />
+                  <span className="text-sm flex-1 truncate">
+                    {pdfFile?.name || 'PDF anexado'}
+                  </span>
+                  <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={removePdf}>
+                    <X className="h-3 w-3" />
+                  </Button>
                 </div>
               )}
             </div>
