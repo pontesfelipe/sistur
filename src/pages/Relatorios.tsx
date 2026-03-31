@@ -110,7 +110,7 @@ export default function Relatorios() {
 
   const calculatedAssessments = assessments?.filter(a => a.status === 'CALCULATED') || [];
 
-  const generateReport = async () => {
+  const generateReport = async (forceRegenerate = false) => {
     if (!selectedAssessmentId || !selectedDestination) {
       toast.error('Selecione um diagnóstico calculado');
       return;
@@ -144,12 +144,32 @@ export default function Relatorios() {
           pillarScores: pillarScoresMap,
           issues: issues || [],
           prescriptions: prescriptions || [],
+          forceRegenerate,
         }),
       });
 
       if (!resp.ok) {
         const errorData = await resp.json();
         throw new Error(errorData.error || 'Erro ao gerar relatório');
+      }
+
+      // Check if the response is JSON (skipped) or SSE stream
+      const contentType = resp.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await resp.json();
+        if (data.skipped) {
+          toast.info(data.message || 'Não há dados novos. Use "Regenerar" para forçar.', { duration: 5000 });
+          // Load existing report
+          const { data: existing } = await supabase
+            .from('generated_reports')
+            .select('report_content')
+            .eq('assessment_id', selectedAssessmentId)
+            .maybeSingle();
+          if (existing?.report_content) {
+            setReport(existing.report_content);
+          }
+          return;
+        }
       }
 
       if (!resp.body) throw new Error('Resposta sem corpo');
