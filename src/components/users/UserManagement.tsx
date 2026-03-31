@@ -132,6 +132,26 @@ export function UserManagement() {
   const handleSystemAccessChange = async (userId: string, newAccess: 'ERP' | 'EDU') => {
     setProcessingUserId(userId);
     await updateSystemAccess(userId, newAccess);
+    
+    // Auto-adjust role to match system access
+    const targetUser = users.find(u => u.user_id === userId);
+    if (targetUser) {
+      const eduRoles = ['ESTUDANTE', 'PROFESSOR'];
+      const erpRoles = ['ADMIN', 'ANALYST', 'VIEWER'];
+      
+      if (newAccess === 'EDU' && erpRoles.includes(targetUser.role)) {
+        await updateUserRole(userId, 'ESTUDANTE');
+        toast.info('Papel alterado automaticamente para Estudante', {
+          description: 'Acesso EDU requer papel Estudante ou Professor.'
+        });
+      } else if (newAccess === 'ERP' && eduRoles.includes(targetUser.role)) {
+        await updateUserRole(userId, 'VIEWER');
+        toast.info('Papel alterado automaticamente para Visualizador', {
+          description: 'Acesso ERP requer papel Admin, Analista ou Visualizador.'
+        });
+      }
+    }
+    
     setProcessingUserId(null);
   };
 
