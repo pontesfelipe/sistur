@@ -38,6 +38,7 @@ import { cn } from '@/lib/utils';
 interface IndicatorScore {
   id: string;
   score: number;
+  indicator_id?: string;
   min_ref_used: number | null;
   max_ref_used: number | null;
   weight_used: number | null;
@@ -63,6 +64,8 @@ interface IndicatorValue {
   indicator_id: string;
   value_raw: number | null;
   source: string | null;
+  is_ignored?: boolean;
+  ignore_reason?: string;
 }
 
 interface NormalizationViewProps {
