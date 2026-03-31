@@ -10,7 +10,7 @@ export function useAssessments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('assessments')
-        .select('*, destinations(name)')
+        .select('*, destinations(name), creator:profiles!assessments_creator_user_id_fkey(full_name)')
         .order('created_at', { ascending: false });
       
       if (error) throw error;

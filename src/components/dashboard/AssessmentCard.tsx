@@ -118,6 +118,13 @@ export function AssessmentCard({ assessment, onDelete }: AssessmentCardProps) {
         </div>
       )}
 
+      {(assessment as any).creator?.full_name && (
+        <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+          <User className="h-4 w-4" />
+          <span>{(assessment as any).creator.full_name}</span>
+        </div>
+      )}
+
       <div className="mt-4 pt-4 border-t border-border">
         <Button
           variant="ghost"
