@@ -317,11 +317,17 @@ Tabela estruturada:
 - Próximos passos imediatos
 - Data recomendada para próxima avaliação
 
-REGRAS DE REDAÇÃO ENTERPRISE:
+REGRAS DE FORMATAÇÃO (OBRIGATÓRIAS):
 - Linguagem executiva, direta e orientada a resultados
 - Foco em ROI e impacto no negócio
 - Sempre conectar: métrica → gap → ação → resultado esperado
 - Use formatação markdown com headers hierárquicos
+- SEMPRE apresente KPIs e métricas em TABELAS MARKDOWN (usando | coluna1 | coluna2 |)
+- NUNCA liste indicadores/KPIs como texto corrido quando puder usar tabela
+- Para cada categoria funcional, inclua uma tabela: KPI | Valor Atual | Benchmark | Status | Gap
+- O Roadmap DEVE ser uma tabela completa
+- Gargalos operacionais DEVEM ser apresentados em tabela: Gargalo | Severidade | Impacto | Ação Recomendada
+- Use tabelas para qualquer conjunto de 3+ itens comparáveis
 - O relatório deve ter no mínimo 2500 palavras`;
 
     const systemPrompt = isEnterprise ? enterpriseSystemPrompt : territorialSystemPrompt;
