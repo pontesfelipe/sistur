@@ -204,8 +204,13 @@ ESTRUTURA OBRIGATÓRIA DO RELATÓRIO TERRITORIAL:
 # 9. BANCO DE AÇÕES (tabela estruturada)
 # 10. CONSIDERAÇÕES FINAIS
 
-REGRAS DE REDAÇÃO:
+REGRAS DE FORMATAÇÃO (OBRIGATÓRIAS):
 - Use formatação markdown com headers hierárquicos
+- SEMPRE apresente dados comparativos e indicadores em TABELAS MARKDOWN (usando | coluna1 | coluna2 |)
+- NUNCA liste indicadores como texto corrido quando puder usar tabela
+- Para cada eixo, inclua uma tabela com: Indicador | Score | Status | Benchmark | Observação
+- O Banco de Ações DEVE ser uma tabela: Ação | Pilar | Prazo | Responsável | Prioridade
+- Use tabelas para qualquer conjunto de 3+ itens comparáveis
 - Mantenha linguagem institucional e técnica
 - Sempre justifique conclusões com dados
 - Conecte explicitamente: dado → impacto → decisão
