@@ -167,6 +167,8 @@ export function useIndicatorValues(assessmentId?: string) {
       value_text?: string | null;
       source?: string | null;
       reference_date?: string | null;
+      is_ignored?: boolean;
+      ignore_reason?: string | null;
     }) => {
       // Get user's org_id
       const { data: { user } } = await supabase.auth.getUser();
@@ -192,14 +194,20 @@ export function useIndicatorValues(assessmentId?: string) {
         .single();
 
       if (existing) {
+        const updateData: Record<string, any> = {
+          value_raw: value.value_raw,
+          value_text: value.value_text,
+          source: value.source,
+          reference_date: value.reference_date,
+        };
+        if (value.is_ignored !== undefined) {
+          updateData.is_ignored = value.is_ignored;
+          updateData.ignore_reason = value.ignore_reason ?? null;
+        }
+
         const { data, error } = await supabase
           .from('indicator_values')
-          .update({
-            value_raw: value.value_raw,
-            value_text: value.value_text,
-            source: value.source,
-            reference_date: value.reference_date,
-          })
+          .update(updateData)
           .eq('id', existing.id)
           .select()
           .single();
@@ -207,12 +215,14 @@ export function useIndicatorValues(assessmentId?: string) {
         if (error) throw error;
         return data;
       } else {
+        const insertData: Record<string, any> = {
+          ...value,
+          org_id: effectiveOrgId,
+        };
+
         const { data, error } = await supabase
           .from('indicator_values')
-          .insert({
-            ...value,
-            org_id: effectiveOrgId,
-          })
+          .insert(insertData)
           .select()
           .single();
 
