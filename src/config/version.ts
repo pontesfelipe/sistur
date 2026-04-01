@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 13,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.13.1",
+    date: "2026-04-01",
+    type: "patch" as const,
+    changes: [
+      "Nova seção 'Referências Globais' em Configurações > Ferramentas (admin only)",
+      "Documentos de referência (PNT, legislação) são injetados automaticamente nos relatórios gerados por IA",
+      "PNT 2024-2027 adicionado como primeiro documento de referência global",
+      "Relatórios agora contextualizam indicadores com metas e diretrizes nacionais",
+    ]
+  },
   {
     version: "1.13.0",
     date: "2026-04-01",

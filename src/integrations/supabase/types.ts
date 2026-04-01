@@ -3185,6 +3185,51 @@ export type Database = {
         }
         Relationships: []
       }
+      global_reference_files: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          file_name: string
+          file_size_bytes: number
+          file_type: string
+          id: string
+          is_active: boolean | null
+          storage_path: string
+          summary: string | null
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_size_bytes?: number
+          file_type?: string
+          id?: string
+          is_active?: boolean | null
+          storage_path: string
+          summary?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_size_bytes?: number
+          file_type?: string
+          id?: string
+          is_active?: boolean | null
+          storage_path?: string
+          summary?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       igma_composite_rules: {
         Row: {
           component_code: string

@@ -19,6 +19,7 @@ import { ActAsUserPanel } from '@/components/settings/ActAsUserPanel';
 import { FeedbackManagementPanel } from '@/components/settings/FeedbackManagementPanel';
 import { ForumPrivacySettings } from '@/components/settings/ForumPrivacySettings';
 import { ContentModerationPanel } from '@/components/settings/ContentModerationPanel';
+import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import { 
@@ -586,6 +587,9 @@ export default function Configuracoes() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Global References - Admin only */}
+            <GlobalReferencesPanel />
 
             {/* Data Integrations */}
             <Card>

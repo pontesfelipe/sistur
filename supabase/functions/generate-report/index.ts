@@ -463,20 +463,22 @@ serve(async (req) => {
     }
 
     // Fetch all data in parallel
-    const [indicatorScoresRes, alertsRes, actionPlansRes, indicatorValuesRes] = await Promise.all([
+    const [indicatorScoresRes, alertsRes, actionPlansRes, indicatorValuesRes, globalRefsRes] = await Promise.all([
       supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
       supabase.from('indicator_values').select('*, indicators(code, name, pillar, theme, unit)').eq('assessment_id', assessmentId),
+      supabaseAdmin.from('global_reference_files').select('file_name, category, summary, description').eq('is_active', true).not('summary', 'is', null),
     ]);
 
     const indicatorScores = indicatorScoresRes.data || [];
     const alerts = alertsRes.data || [];
     const actionPlans = actionPlansRes.data || [];
     const indicatorValues = indicatorValuesRes.data || [];
+    const globalRefs = globalRefsRes.data || [];
 
     console.log('Report for:', destinationName, isEnterprise ? '(ENTERPRISE)' : '(TERRITORIAL)');
-    console.log('Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 'Prescriptions:', prescriptions?.length || 0);
+    console.log('Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -534,11 +536,26 @@ ${prescriptionsText}
 PLANOS DE AÇÃO:
 ${formatActionPlans(actionPlans)}
 
+${globalRefs.length > 0 ? `=== DOCUMENTOS DE REFERÊNCIA NACIONAL ===
+Os seguintes documentos oficiais devem ser usados como contexto para enriquecer a análise, alinhar recomendações com metas nacionais e fundamentar diretrizes:
+
+${globalRefs.map((ref: any) => `### ${ref.file_name} (${ref.category})
+${ref.description ? `Descrição: ${ref.description}` : ''}
+${ref.summary}
+`).join('\n')}
+
+INSTRUÇÕES SOBRE REFERÊNCIAS:
+- Contextualize os resultados do destino em relação às metas e diretrizes nacionais
+- Nas prescrições, referencie princípios e eixos dos documentos oficiais quando aplicável
+- Aponte alinhamento ou desalinhamento com políticas públicas vigentes
+- Use dados e benchmarks dos documentos para enriquecer comparações
+` : ''}
 === INSTRUÇÕES FINAIS ===
 1. COMECE com o título e IMEDIATAMENTE a tabela de Ficha Técnica fornecida acima — NÃO pule essa tabela
 2. Siga EXATAMENTE a estrutura definida no system prompt para o template "${reportTemplate}"
 3. Use TABELAS MARKDOWN para todos os conjuntos de dados
-4. Justifique todas as conclusões com dados fornecidos`;
+4. Justifique todas as conclusões com dados fornecidos
+${globalRefs.length > 0 ? '5. Referencie documentos oficiais quando contextualizar resultados e prescrições' : ''}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
