@@ -89,6 +89,28 @@ const DiagnosticoDetalhe = () => {
   const [isPreFillOpen, setIsPreFillOpen] = useState(false);
   const [orgId, setOrgId] = useState<string | undefined>();
 
+  // Check if report exists for this assessment
+  const { data: existingReport } = useQuery({
+    queryKey: ['report-exists', id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data } = await supabase.from('generated_reports').select('id').eq('assessment_id', id).maybeSingle();
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  // Check if projects exist for this assessment
+  const { data: existingProjects } = useQuery({
+    queryKey: ['projects-exist', id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data } = await supabase.from('projects').select('id').eq('source_assessment_id', id).limit(1);
+      return data;
+    },
+    enabled: !!id,
+  });
+
   // Fetch org_id for current user
   useEffect(() => {
     const fetchOrgId = async () => {
