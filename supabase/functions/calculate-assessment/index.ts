@@ -1,3 +1,4 @@
+// SISTUR Calculate Assessment Engine v1.11.3
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -1204,11 +1205,12 @@ serve(async (req) => {
     };
 
     let priority = 1;
-    const usedTrainingIds = new Set<string>();
+    const prescribedIndicatorIds = new Set<string>();
 
     // STRATEGY A: Use edu_indicator_training_map (preferred - unified model)
+    // Generate ONE prescription PER INDICATOR (not per issue) to ensure full coverage
     if (trainingMappings.length > 0 && eduTrainings.length > 0 && insertedIssues.length > 0) {
-      console.log("Using unified EDU model for prescriptions");
+      console.log("Using unified EDU model for prescriptions (per-indicator strategy)");
 
       // Group mappings by indicator code
       const mappingsByIndicator = new Map<string, typeof trainingMappings>();
@@ -1219,85 +1221,94 @@ serve(async (req) => {
         mappingsByIndicator.get(mapping.indicator_code)!.push(mapping);
       }
 
-      // For each issue, find trainings mapped to indicators in that issue's evidence
+      // Build a map from indicator code to its parent issue
+      const indicatorToIssue = new Map<string, any>();
       for (const issue of insertedIssues) {
+        const evidenceIndicators = (issue.evidence as any)?.indicators || [];
+        for (const ind of evidenceIndicators) {
+          if (ind.code) {
+            indicatorToIssue.set(ind.code, issue);
+          }
+        }
+      }
+
+      // Sort low-score indicators by score ascending (worst first)
+      const sortedLowScoreIndicators = [...indicatorScoreMap.entries()]
+        .sort((a, b) => a[1].score - b[1].score);
+
+      for (const [code, indicatorInfo] of sortedLowScoreIndicators) {
+        // Skip if already prescribed
+        if (prescribedIndicatorIds.has(indicatorInfo.indicator_id)) continue;
+
+        // Find the parent issue for this indicator
+        const parentIssue = indicatorToIssue.get(code);
+        if (!parentIssue) continue;
+
         // IGMA FILTER: Check if this pillar's EDU is allowed (Mario Beni rules)
-        const pillarActionKey = `EDU_${issue.pillar}` as keyof typeof igmaResult.allowedActions;
+        const pillarActionKey = `EDU_${indicatorInfo.pillar}` as keyof typeof igmaResult.allowedActions;
         const isAllowed = igmaResult.allowedActions[pillarActionKey] ?? true;
         
         if (!isAllowed) {
-          console.log(`IGMA: Skipping prescriptions for pillar ${issue.pillar} - blocked by systemic rules`);
+          console.log(`IGMA: Skipping prescription for ${code} in pillar ${indicatorInfo.pillar} - blocked by systemic rules`);
           continue;
         }
 
-        // Get indicator codes from issue evidence
-        const evidenceIndicators = (issue.evidence as any)?.indicators || [];
-        const issueIndicatorCodes = evidenceIndicators.map((i: any) => i.code).filter(Boolean);
+        // Find training mappings for this indicator
+        const mappings = mappingsByIndicator.get(code) || [];
+        let bestMapping: any = null;
+        let bestTraining: any = null;
 
-        // Find matching trainings via mappings
-        const matchedTrainings: Array<{ training: any; mapping: any; indicatorInfo: any }> = [];
-
-        for (const code of issueIndicatorCodes) {
-          const mappings = mappingsByIndicator.get(code) || [];
-          const indicatorInfo = indicatorScoreMap.get(code);
-          
-          for (const mapping of mappings) {
-            // Only include if pillar matches
-            if (mapping.pillar !== issue.pillar) continue;
-            
-            const training = eduTrainings.find(t => t.training_id === mapping.training_id);
-            if (training && !usedTrainingIds.has(training.training_id)) {
-              matchedTrainings.push({ training, mapping, indicatorInfo });
-            }
+        for (const mapping of mappings) {
+          if (mapping.pillar !== indicatorInfo.pillar) continue;
+          const training = eduTrainings.find(t => t.training_id === mapping.training_id);
+          if (training) {
+            bestMapping = mapping;
+            bestTraining = training;
+            break; // Take highest priority (already sorted)
           }
         }
 
-        // Sort by mapping priority and take top 3
-        matchedTrainings.sort((a, b) => a.mapping.priority - b.mapping.priority);
+        if (!bestMapping || !bestTraining) continue;
+
+        const severity = indicatorInfo.score < 0.34 ? "CRITICO" : "MODERADO";
+        const targetAgent = determineTargetAgent(parentIssue.interpretation);
+        const interpretationLabel = interpretationLabels[parentIssue.interpretation] || parentIssue.interpretation;
+        const pillarName = pillarNames[indicatorInfo.pillar] || indicatorInfo.pillar;
+        const severityLabel = severityLabels[severity] || severity;
+
+        let justification = bestMapping.reason_template || 
+          `Esta capacitação foi prescrita porque o indicador {indicator} está {status} no pilar {pillar}.`;
         
-        const targetAgent = determineTargetAgent(issue.interpretation);
-        const interpretationLabel = interpretationLabels[issue.interpretation] || issue.interpretation;
-        const pillarName = pillarNames[issue.pillar] || issue.pillar;
-        const severityLabel = severityLabels[issue.severity] || issue.severity;
+        justification = justification
+          .replace('{indicator}', indicatorInfo.name)
+          .replace('{status}', severityLabel)
+          .replace('{pillar}', pillarName);
 
-        for (const { training, mapping, indicatorInfo } of matchedTrainings.slice(0, 3)) {
-          // Build justification using the mapping's reason_template or default format
-          let justification = mapping.reason_template || 
-            `Esta capacitação foi prescrita porque o indicador {indicator} está {status} no pilar {pillar}.`;
-          
-          justification = justification
-            .replace('{indicator}', indicatorInfo?.name || issue.theme)
-            .replace('{status}', severityLabel)
-            .replace('{pillar}', pillarName);
+        prescribedIndicatorIds.add(indicatorInfo.indicator_id);
 
-          // Mark as used to avoid duplicates
-          usedTrainingIds.add(training.training_id);
+        prescriptions.push({
+          org_id: orgId,
+          assessment_id,
+          issue_id: parentIssue.id,
+          training_id: bestTraining.training_id,
+          indicator_id: indicatorInfo.indicator_id,
+          pillar: indicatorInfo.pillar,
+          status: severity,
+          interpretation: parentIssue.interpretation,
+          justification,
+          target_agent: targetAgent,
+          priority: priority,
+          cycle_number: 1,
+        });
 
-          prescriptions.push({
-            org_id: orgId,
-            assessment_id,
-            issue_id: issue.id,
-            training_id: training.training_id, // Use training_id for unified EDU model
-            indicator_id: indicatorInfo?.indicator_id || null, // Link to indicator UUID
-            pillar: issue.pillar,
-            status: issue.severity,
-            interpretation: issue.interpretation,
-            justification,
-            target_agent: targetAgent,
-            priority: priority,
-            cycle_number: 1,
-          });
-
-          // Also add to recommendations for backward compatibility
-          recommendations.push({
-            org_id: orgId,
-            assessment_id,
-            issue_id: issue.id,
-            training_id: training.training_id, // Use training_id for unified EDU model
-            reason: justification,
-            priority: priority++,
-          });
-        }
+        recommendations.push({
+          org_id: orgId,
+          assessment_id,
+          issue_id: parentIssue.id,
+          training_id: bestTraining.training_id,
+          reason: justification,
+          priority: priority++,
+        });
       }
     }
 
