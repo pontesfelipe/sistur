@@ -761,11 +761,11 @@ export default function Relatorios() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => downloadReport(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
+                        onClick={() => downloadDocx(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
                         className="gap-2"
                       >
                         <Download className="h-4 w-4" />
-                        Markdown
+                        Word
                       </Button>
                       <Button
                         variant="outline"
@@ -775,6 +775,15 @@ export default function Relatorios() {
                       >
                         <FileText className="h-4 w-4" />
                         PDF
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => downloadReport(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
+                        className="gap-2 text-muted-foreground"
+                      >
+                        <Download className="h-3 w-3" />
+                        MD
                       </Button>
                     </div>
                   )}
