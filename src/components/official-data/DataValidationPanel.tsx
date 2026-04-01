@@ -338,10 +338,17 @@ export function DataValidationPanel({
                           )}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="gap-1">
-                            <span>{sourceInfo?.icon}</span>
-                            {sourceInfo?.name || value.source_code}
-                          </Badge>
+                          <div className="flex items-center gap-1.5">
+                            <Badge variant="outline" className="gap-1">
+                              <span>{sourceInfo?.icon}</span>
+                              {sourceInfo?.name || value.source_code}
+                            </Badge>
+                            {value.collection_method === 'AUTOMATIC' ? (
+                              <Badge className="bg-green-600 text-white text-[10px] px-1.5 py-0">API</Badge>
+                            ) : (
+                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Est.</Badge>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <span className="text-muted-foreground">
