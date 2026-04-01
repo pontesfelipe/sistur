@@ -41,7 +41,7 @@ export default function KnowledgeBase() {
   const [uploadOpen, setUploadOpen] = useState(false);
 
   const { data: files = [], isLoading } = useKnowledgeBaseFiles();
-  const { data: destinations = [] } = useDestinations();
+  const { destinations = [] } = useDestinations();
 
   const filtered = files.filter((f) => {
     const matchSearch = !search || f.file_name.toLowerCase().includes(search.toLowerCase())
