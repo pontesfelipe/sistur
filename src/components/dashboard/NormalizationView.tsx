@@ -64,6 +64,7 @@ interface IndicatorValue {
   indicator_id: string;
   value_raw: number | null;
   source: string | null;
+  reference_date?: string | null;
   is_ignored?: boolean;
   ignore_reason?: string;
 }
