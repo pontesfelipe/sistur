@@ -88,6 +88,7 @@ export default function Relatorios() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('generate');
   const [selectedHistoryReport, setSelectedHistoryReport] = useState<GeneratedReport | null>(null);
+  const [reportTemplate, setReportTemplate] = useState<string>('completo');
   const reportRef = useRef<HTMLDivElement>(null);
 
   // Pre-select assessment from URL parameter
