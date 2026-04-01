@@ -99,9 +99,9 @@ function parseMarkdownTable(lines: string[]): Table | null {
   });
 }
 
-export async function exportReportAsDocx(markdownContent: string, destinationName: string) {
+export async function exportReportAsDocx(markdownContent: string, destinationName: string, customization?: ReportCustomization) {
+  const PRIMARY = customization?.primaryColor?.replace('#', '') || DEFAULT_PRIMARY;
   const lines = markdownContent.split('\n');
-  const children: (Paragraph | Table)[] = [];
   let i = 0;
 
   while (i < lines.length) {
