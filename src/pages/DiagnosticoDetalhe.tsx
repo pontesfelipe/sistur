@@ -195,6 +195,41 @@ const DiagnosticoDetalhe = () => {
     }
   };
 
+  const handleExportCSV = () => {
+    if (!assessment || pillarScores.length === 0) {
+      toast.error('Nenhum dado para exportar');
+      return;
+    }
+
+    const rows: string[] = [];
+    rows.push('Tipo,Pilar,Tema,Score,Severidade');
+
+    // Pillar scores
+    pillarScores.forEach((ps: any) => {
+      rows.push(`Pilar,${ps.pillar},,${ps.score},${ps.severity}`);
+    });
+
+    // Indicator scores
+    indicatorScores.forEach((is: any) => {
+      const ind = is.indicator;
+      rows.push(`Indicador,${ind?.pillar || ''},${ind?.name || ''},${is.score},`);
+    });
+
+    // Issues
+    issues.forEach((issue: any) => {
+      rows.push(`Gargalo,${issue.pillar},${issue.theme},,${issue.severity}`);
+    });
+
+    const csvContent = '\uFEFF' + rows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `diagnostico-${assessment.title.replace(/\s+/g, '-')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('CSV exportado com sucesso!');
+
   const handleResetToDraft = async () => {
     if (!id) return;
     try {
