@@ -212,10 +212,13 @@ function interpretIGMA(
   const nextReviewDate = new Date(assessmentDate);
   nextReviewDate.setMonth(nextReviewDate.getMonth() + nextReviewMonths);
 
+  // EDU prescriptions are NEVER fully blocked — the methodology requires
+  // that every low-scoring indicator receives a training recommendation.
+  // Systemic blocks only affect MARKETING and action plan priorities.
   const allowedActions = {
     EDU_RA: true,
-    EDU_AO: !flags.RA_LIMITATION,
-    EDU_OE: !flags.RA_LIMITATION && !flags.GOVERNANCE_BLOCK,
+    EDU_AO: true,
+    EDU_OE: true,
     MARKETING: !flags.MARKETING_BLOCKED,
   };
 
