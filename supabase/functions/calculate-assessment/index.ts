@@ -684,26 +684,26 @@ serve(async (req) => {
             
             // Add external values that are not already in indicator_values AND not ignored
             let addedCount = 0;
+            let skippedTierCount = 0;
             for (const extVal of externalValues) {
               const indicator = codeToIndicator.get(extVal.indicator_code);
               if (indicator && !existingIndicatorIds.has(indicator.id) && !ignoredIndicatorIds.has(indicator.id)) {
-                // Check tier compatibility
-                const indicatorTier = indicator.minimum_tier || 'COMPLETE';
-                if (allowedTiers.includes(indicatorTier)) {
-                  filteredIndicatorValues.push({
-                    id: `external-${extVal.indicator_code}`,
-                    indicator_id: indicator.id,
-                    value_raw: extVal.raw_value,
-                    indicator: indicator,
-                    _source: 'external', // Mark as external for logging
-                    _external_source: extVal.source_code,
-                    _reference_year: extVal.reference_year,
-                  });
-                  addedCount++;
-                }
+                // External validated data bypasses tier filter — it comes from
+                // automated official sources (IBGE, CADASTUR, DATASUS, etc.)
+                // and should always be included in the calculation.
+                filteredIndicatorValues.push({
+                  id: `external-${extVal.indicator_code}`,
+                  indicator_id: indicator.id,
+                  value_raw: extVal.raw_value,
+                  indicator: indicator,
+                  _source: 'external',
+                  _external_source: extVal.source_code,
+                  _reference_year: extVal.reference_year,
+                });
+                addedCount++;
               }
             }
-            console.log(`Added ${addedCount} validated external indicators to calculation (merged with ${existingIndicatorIds.size} manual entries, ${ignoredIndicatorIds.size} ignored)`);
+            console.log(`Added ${addedCount} validated external indicators to calculation (merged with ${existingIndicatorIds.size} manual entries, ${ignoredIndicatorIds.size} ignored, tier filter bypassed for external data)`);
           }
         }
       }
