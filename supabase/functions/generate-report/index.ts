@@ -97,7 +97,7 @@ serve(async (req) => {
       .eq('assessment_id', assessmentId)
       .maybeSingle();
 
-    const forceRegenerate = (await req.clone().json()).forceRegenerate;
+    // forceRegenerate already extracted from request body above
 
     if (existingReport && !forceRegenerate) {
       const reportDate = new Date(existingReport.created_at);
