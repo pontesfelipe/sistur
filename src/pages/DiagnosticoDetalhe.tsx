@@ -525,9 +525,9 @@ const DiagnosticoDetalhe = () => {
               <GraduationCap className="h-4 w-4" />
               <span className="hidden sm:inline">Tratamento</span>
             </TabsTrigger>
-            <TabsTrigger value="planos" className="gap-2">
-              <ClipboardList className="h-4 w-4" />
-              <span className="hidden sm:inline">Planos</span>
+            <TabsTrigger value="projeto" className="gap-2">
+              <FolderKanban className="h-4 w-4" />
+              <span className="hidden sm:inline">Projeto</span>
             </TabsTrigger>
           </TabsList>
 
