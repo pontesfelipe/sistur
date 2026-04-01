@@ -18,7 +18,6 @@ import {
 import { useDestinationsWithAssessments } from '@/hooks/useDashboardData';
 import { Wifi, Landmark, Hotel } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Badge } from '@/components/ui/badge';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 type DiagnosticType = 'territorial' | 'enterprise';
