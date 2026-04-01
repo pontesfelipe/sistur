@@ -478,7 +478,7 @@ serve(async (req) => {
     const globalRefs = globalRefsRes.data || [];
 
     console.log('Report for:', destinationName, isEnterprise ? '(ENTERPRISE)' : '(TERRITORIAL)');
-    console.log('Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 'Prescriptions:', prescriptions?.length || 0);
+    console.log('Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
