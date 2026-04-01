@@ -84,6 +84,7 @@ const pillarNames = {
 };
 
 export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProps) {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedAssessment, setSelectedAssessment] = useState<string>(preSelectedAssessmentId || '');
