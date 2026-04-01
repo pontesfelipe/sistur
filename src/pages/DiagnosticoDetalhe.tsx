@@ -80,6 +80,41 @@ import { supabase } from '@/integrations/supabase/client';
 
 import { useQuery } from '@tanstack/react-query';
 
+const normalizeDisplayScore = (
+  value: number | null | undefined,
+  minRef: number | null | undefined,
+  maxRef: number | null | undefined,
+  direction: string | null | undefined,
+  normalization: string | null | undefined,
+) => {
+  if (value === null || value === undefined) return 0;
+
+  if (normalization === 'BINARY') {
+    return value > 0 ? 1 : 0;
+  }
+
+  if (normalization === 'BANDS') {
+    if (value <= 0.3) return 0.2;
+    if (value <= 0.5) return 0.5;
+    if (value <= 0.7) return 0.8;
+    return 1;
+  }
+
+  const min = minRef ?? 0;
+  const max = maxRef ?? 100;
+
+  if (max === min) return 0.5;
+
+  let score = (value - min) / (max - min);
+  score = Math.max(0, Math.min(1, score));
+
+  if (direction === 'LOW_IS_BETTER') {
+    score = 1 - score;
+  }
+
+  return score;
+};
+
 const DiagnosticoDetalhe = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -203,24 +238,78 @@ const DiagnosticoDetalhe = () => {
 
   // Calculate data completeness based on diagnostic type - exclude ignored
   const activeIndicatorValues = indicatorValues.filter((v: any) => !v.is_ignored);
-  const normalizationIndicatorValues = diagnosisSnapshots.length > 0
-    ? diagnosisSnapshots
-        .map((snapshot: any) => {
-          const matchedIndicator = indicators.find((ind: any) => ind.code === snapshot.indicator_code)
-            || enterpriseIndicators.find((ind: any) => ind.code === snapshot.indicator_code)
-            || indicatorValues.find((v: any) => v.indicator?.code === snapshot.indicator_code)?.indicator;
+  const indicatorCatalogByCode = useMemo(() => {
+    const catalog = new Map<string, any>();
 
-          return matchedIndicator
-            ? {
-                indicator_id: matchedIndicator.id,
-                value_raw: snapshot.value_used,
-                source: snapshot.source_code,
-                reference_date: snapshot.reference_year ? `${snapshot.reference_year}-01-01` : null,
-              }
-            : null;
-        })
-        .filter(Boolean)
-    : activeIndicatorValues;
+    indicators.forEach((indicator: any) => {
+      if (indicator?.code) catalog.set(indicator.code, indicator);
+    });
+
+    enterpriseIndicators.forEach((indicator: any) => {
+      if (indicator?.code) catalog.set(indicator.code, indicator);
+    });
+
+    indicatorValues.forEach((value: any) => {
+      if (value.indicator?.code) catalog.set(value.indicator.code, value.indicator);
+    });
+
+    return catalog;
+  }, [indicators, enterpriseIndicators, indicatorValues]);
+
+  const normalizationIndicatorValues = useMemo(() => {
+    if (diagnosisSnapshots.length === 0) return activeIndicatorValues;
+
+    return diagnosisSnapshots
+      .map((snapshot: any) => {
+        const matchedIndicator = indicatorCatalogByCode.get(snapshot.indicator_code);
+
+        return matchedIndicator
+          ? {
+              indicator_id: matchedIndicator.id,
+              value_raw: snapshot.value_used,
+              source: snapshot.source_code,
+              reference_date: snapshot.reference_year ? `${snapshot.reference_year}-01-01` : null,
+            }
+          : null;
+      })
+      .filter(Boolean);
+  }, [diagnosisSnapshots, activeIndicatorValues, indicatorCatalogByCode]);
+
+  const normalizationIndicatorScores = useMemo(() => {
+    if (diagnosisSnapshots.length === 0) return indicatorScores;
+
+    const existingScoresByCode = new Map(
+      indicatorScores
+        .filter((score: any) => score.indicator?.code)
+        .map((score: any) => [score.indicator.code, score])
+    );
+
+    return diagnosisSnapshots
+      .map((snapshot: any) => {
+        const existingScore = existingScoresByCode.get(snapshot.indicator_code);
+        if (existingScore) return existingScore;
+
+        const matchedIndicator = indicatorCatalogByCode.get(snapshot.indicator_code);
+        if (!matchedIndicator) return null;
+
+        return {
+          id: `snapshot-${snapshot.indicator_code}`,
+          indicator_id: matchedIndicator.id,
+          score: normalizeDisplayScore(
+            snapshot.value_used,
+            matchedIndicator.min_ref,
+            matchedIndicator.max_ref,
+            matchedIndicator.direction,
+            matchedIndicator.normalization,
+          ),
+          min_ref_used: matchedIndicator.min_ref ?? null,
+          max_ref_used: matchedIndicator.max_ref ?? null,
+          weight_used: matchedIndicator.weight ?? null,
+          indicator: matchedIndicator,
+        };
+      })
+      .filter(Boolean);
+  }, [diagnosisSnapshots, indicatorScores, indicatorCatalogByCode]);
   const totalIndicators = isEnterprise
     ? (enterpriseIndicators.length || indicators.length)
     : indicators.length;
@@ -722,7 +811,7 @@ const DiagnosticoDetalhe = () => {
           {/* Normalização Tab - SISTUR Add-on Required */}
           <TabsContent value="normalizacao">
             <NormalizationView 
-              indicatorScores={indicatorScores as any} 
+              indicatorScores={normalizationIndicatorScores as any} 
               indicatorValues={normalizationIndicatorValues as any}
             />
           </TabsContent>
