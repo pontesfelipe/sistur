@@ -164,6 +164,8 @@ export default function Relatorios() {
           prescriptions: prescriptions || [],
           forceRegenerate,
           reportTemplate,
+          visibility: reportVisibility,
+          environment: runInDemo ? 'demo' : 'production',
         }),
       });
 
