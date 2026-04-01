@@ -131,6 +131,9 @@ export function DataValidationPanel({
   const validatedCount = values.filter(v => v.validated).length;
   const pendingCount = values.length - validatedCount;
 
+  const autoCount = values.filter(v => v.collection_method === 'AUTOMATIC').length;
+  const estimatedCount = values.length - autoCount;
+
   return (
     <div className="space-y-6">
       {/* Institutional banner */}
@@ -141,9 +144,18 @@ export function DataValidationPanel({
             <div className="text-sm">
               <p className="font-medium text-foreground mb-1">Transparência e Governança</p>
               <p className="text-muted-foreground">
-                Este diagnóstico foi parcialmente pré-preenchido com dados oficiais de bases públicas 
-                nacionais (IBGE, DATASUS, INEP, Tesouro Nacional). Todos os dados devem ser validados 
-                pelo usuário responsável antes do cálculo dos indicadores e recomendações.
+                {autoCount > 0 ? (
+                  <>
+                    <strong>{autoCount} indicadores</strong> foram obtidos diretamente de APIs oficiais (IBGE) com alta confiabilidade. 
+                    Os demais <strong>{estimatedCount} indicadores</strong> são estimativas baseadas em médias regionais (UF) e devem ser validados e ajustados pelo operador.
+                  </>
+                ) : (
+                  <>
+                    Este diagnóstico foi parcialmente pré-preenchido com dados oficiais de bases públicas 
+                    nacionais (IBGE, DATASUS, INEP, Tesouro Nacional). Todos os dados devem ser validados 
+                    pelo usuário responsável antes do cálculo.
+                  </>
+                )}
               </p>
             </div>
           </div>
