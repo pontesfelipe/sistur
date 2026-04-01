@@ -32,7 +32,7 @@ export default function ERPDashboard() {
   // Enable real-time updates
   useERPRealtimeUpdates();
 
-  const { invalidateAll } = useERPQueryInvalidation();
+  
   const { data: stats, isLoading: statsLoading } = useERPStats();
   const { data: pillarProgress, isLoading: pillarLoading } = usePillarProgress(diagnosticType);
   const { data: cycleEvolution, isLoading: cycleLoading } = useCycleEvolution(
