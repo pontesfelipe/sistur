@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useActionPlans } from "@/hooks/useActionPlans";
-import { usePrescriptions } from "@/hooks/usePrescriptions";
+import { useIssues } from "@/hooks/useAssessmentData";
 import { useCreateProject, useCreateTasks, type ProjectMethodology, type TaskPriority } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -46,8 +45,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
   const navigate = useNavigate();
   const { user } = useAuth();
   const { profile } = useProfile();
-  const { data: plans, isLoading: plansLoading } = useActionPlans(assessmentId);
-  const { data: prescriptions, isLoading: prescriptionsLoading } = usePrescriptions(assessmentId);
+  const { data: issues, isLoading } = useIssues(assessmentId);
   const createProject = useCreateProject();
   const createTasks = useCreateTasks();
 
@@ -61,21 +59,19 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
   const [plannedEndDate, setPlannedEndDate] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
-  const isLoading = plansLoading || prescriptionsLoading;
-
-  // Merge action plans as selectable items
+  // Use issues (gargalos) as selectable items for project tasks
   const selectableItems = useMemo(() => {
-    if (!plans) return [];
-    return plans.map(plan => ({
-      id: plan.id,
-      title: plan.title,
-      description: plan.description,
-      pillar: plan.pillar,
-      priority: plan.priority,
-      linkedIssueId: plan.linked_issue_id,
-      linkedPrescriptionId: plan.linked_prescription_id,
+    if (!issues) return [];
+    return issues.map(issue => ({
+      id: issue.id,
+      title: issue.title,
+      description: issue.theme ? `Tema: ${issue.theme}` : null,
+      pillar: issue.pillar,
+      priority: issue.severity === 'CRITICO' ? 1 : issue.severity === 'MODERADO' ? 3 : 5,
+      linkedIssueId: issue.id,
+      linkedPrescriptionId: null as string | null,
     }));
-  }, [plans]);
+  }, [issues]);
 
   const toggleItem = (id: string) => {
     setSelectedPlanIds(prev => {
