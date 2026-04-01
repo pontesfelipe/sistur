@@ -620,7 +620,7 @@ Use linguagem persuasiva mas fundamentada em dados. Destaque oportunidades de ne
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
+          { role: "user", content: userPrompt + templateModifier },
         ],
         stream: true,
       }),
