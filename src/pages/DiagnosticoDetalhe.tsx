@@ -229,6 +229,7 @@ const DiagnosticoDetalhe = () => {
     link.click();
     URL.revokeObjectURL(url);
     toast.success('CSV exportado com sucesso!');
+  };
 
   const handleResetToDraft = async () => {
     if (!id) return;
