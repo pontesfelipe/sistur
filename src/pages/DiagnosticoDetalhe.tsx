@@ -127,15 +127,27 @@ const DiagnosticoDetalhe = () => {
   const [isPreFillOpen, setIsPreFillOpen] = useState(false);
   const [orgId, setOrgId] = useState<string | undefined>();
 
-  // Check if report exists for this assessment
+  // Check if report exists for this assessment (including kb_file_ids)
   const { data: existingReport } = useQuery({
     queryKey: ['report-exists', id],
     queryFn: async () => {
       if (!id) return null;
-      const { data } = await supabase.from('generated_reports').select('id').eq('assessment_id', id).maybeSingle();
+      const { data } = await supabase.from('generated_reports').select('id, kb_file_ids').eq('assessment_id', id).maybeSingle();
       return data;
     },
     enabled: !!id,
+  });
+
+  // Fetch KB file names used in this report
+  const reportKbFileIds = (existingReport as any)?.kb_file_ids as string[] | null;
+  const { data: kbFilesUsed = [] } = useQuery({
+    queryKey: ['kb-files-used', reportKbFileIds],
+    queryFn: async () => {
+      if (!reportKbFileIds || reportKbFileIds.length === 0) return [];
+      const { data } = await supabase.from('knowledge_base_files').select('id, file_name, category').in('id', reportKbFileIds);
+      return data || [];
+    },
+    enabled: !!reportKbFileIds && reportKbFileIds.length > 0,
   });
 
   // Check if projects exist for this assessment
