@@ -20,9 +20,10 @@ import {
   PageBreak,
 } from 'docx';
 import { saveAs } from 'file-saver';
+import type { ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
 // Colors
-const PRIMARY = '1E40AF';
+const DEFAULT_PRIMARY = '1E40AF';
 const HEADER_BG = 'EFF6FF';
 const BORDER = 'CBD5E1';
 const MUTED = '64748B';

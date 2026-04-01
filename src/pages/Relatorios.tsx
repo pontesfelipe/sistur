@@ -817,6 +817,12 @@ export default function Relatorios() {
             </div>
           </TabsContent>
         </Tabs>
+
+        <ReportCustomizationDialog
+          open={customizationOpen}
+          onOpenChange={setCustomizationOpen}
+          onApply={setReportCustomization}
+        />
       </div>
     </AppLayout>
   );
