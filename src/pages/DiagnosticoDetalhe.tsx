@@ -374,7 +374,7 @@ const DiagnosticoDetalhe = () => {
                   Gerar Relatório
                 </Link>
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleExportCSV}>
                 <Download className="mr-2 h-4 w-4" />
                 Exportar CSV
               </Button>
