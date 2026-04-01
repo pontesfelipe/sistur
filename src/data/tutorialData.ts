@@ -51,9 +51,8 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'gs-trial',
         title: 'Período de Teste',
-        description: 'Novos usuários recebem 7 dias de trial gratuito com acesso a ERP, EDU e Jogos. Após o período, escolha um plano na página de Planos para continuar.',
+        description: 'Novos usuários recebem 7 dias de trial gratuito com acesso a ERP, EDU e Jogos. O acesso é gerenciado pelo administrador da organização.',
         icon: CreditCard,
-        route: '/assinatura',
         roles: ['ERP', 'ESTUDANTE', 'PROFESSOR', 'ADMIN'],
         category: 'getting-started',
       },
