@@ -351,7 +351,7 @@ export function DataValidationPanel({
                             {value.collection_method === 'AUTOMATIC' ? (
                               <Badge className="bg-green-600 text-white text-[10px] px-1.5 py-0">API</Badge>
                             ) : (
-                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Est.</Badge>
+                              <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Manual</Badge>
                             )}
                           </div>
                         </TableCell>
