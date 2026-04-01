@@ -355,7 +355,7 @@ export default function Relatorios() {
   const downloadDocx = async (content: string, destName: string) => {
     if (!content) return;
     try {
-      await exportReportAsDocx(content, destName);
+      await exportReportAsDocx(content, destName, reportCustomization);
       toast.success('Relatório Word baixado!');
     } catch (err) {
       console.error('Error exporting DOCX:', err);
