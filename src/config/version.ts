@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 12,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,22 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.12.2",
+    date: "2026-04-01",
+    type: "patch" as const,
+    changes: [
+      "Pipeline semi-automático CADASTUR: ingestão de CSVs de Guias e Agências de Turismo do Portal Dados Abertos",
+      "Edge function ingest-cadastur com descoberta automática de URLs via API CKAN do dados.gov.br",
+      "Parsing e agregação de CSV por município (código IBGE) com suporte a múltiplos delimitadores",
+      "Cron job trimestral (1º dia de Jan/Abr/Jul/Out) para atualização automática dos dados CADASTUR",
+      "Badge 'CADASTUR' (ciano) nos indicadores igma_guias_turismo e igma_agencias_turismo",
+      "Quando dados indisponíveis no portal, sistema preserva último valor e mostra aviso ao operador",
+      "Confiança de dados CADASTUR ajustada para 4/5 (dados oficiais via batch) vs 1/5 anterior (manual)",
+      "Integração com fetch-official-data: CADASTUR é disparado em paralelo na busca de dados oficiais",
+      "Scores formatados como porcentagem (67%) em vez de decimal (0.67) no Simulador e Diagrama de Fluxo",
+    ]
+  },
   {
     version: "1.12.1",
     date: "2026-04-01",

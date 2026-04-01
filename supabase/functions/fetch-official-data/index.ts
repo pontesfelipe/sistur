@@ -204,10 +204,8 @@ function generateDefaults(ibgeCode: string, populacao?: number, existingKeys?: S
   const results: Record<string, IndicatorResult> = {};
 
   // Indicators that have NO public API and require manual input.
-  // We provide a zero/placeholder so the UI renders an editable field.
+  // CADASTUR indicators (guias, agencias) are now handled by ingest-cadastur edge function.
   const manualIndicators: Record<string, { year: number; source: string }> = {
-    'igma_guias_turismo':      { year: 0, source: 'MANUAL' },
-    'igma_agencias_turismo':   { year: 0, source: 'MANUAL' },
     'igma_taxa_escolarizacao': { year: 0, source: 'MANUAL' },
   };
 

@@ -81,9 +81,14 @@ const API_FETCHED_CODES = new Set([
   'igma_meios_hospedagem',
 ]);
 
+// Codes fetched semi-automatically from CADASTUR open data (CSV pipeline)
+const CADASTUR_SEMI_AUTO_CODES = new Set([
+  'igma_guias_turismo', 'igma_agencias_turismo',
+]);
+
 // Codes that require manual input (no public API available)
 const MANUAL_ENTRY_CODES = new Set([
-  'igma_guias_turismo', 'igma_agencias_turismo', 'igma_taxa_escolarizacao',
+  'igma_taxa_escolarizacao',
 ]);
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
@@ -167,7 +172,7 @@ export function IndicadoresPanel() {
     const matchesTier = tierFilter === 'all' || indicatorTier === tierFilter;
     const indicatorScope = (i as any).indicator_scope || 'territorial';
     const matchesScope = scopeFilter === 'all' || indicatorScope === scopeFilter;
-    const indicatorCollection = API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : (MANUAL_ENTRY_CODES.has(i.code) ? 'MANUAL' : ((i as any).collection_type || 'MANUAL'));
+    const indicatorCollection = API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : (CADASTUR_SEMI_AUTO_CODES.has(i.code) ? 'AUTOMATICA' : (MANUAL_ENTRY_CODES.has(i.code) ? 'MANUAL' : ((i as any).collection_type || 'MANUAL')));
     const matchesCollection = collectionFilter === 'all' || indicatorCollection === collectionFilter;
     return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier && matchesScope && matchesCollection;
   });
@@ -188,7 +193,7 @@ export function IndicadoresPanel() {
 
   // Count by collection type (using effective type based on API_FETCHED_CODES)
   const getEffectiveCollection = (i: any): CollectionType => 
-    API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : (MANUAL_ENTRY_CODES.has(i.code) ? 'MANUAL' : (i.collection_type || 'MANUAL'));
+    API_FETCHED_CODES.has(i.code) || CADASTUR_SEMI_AUTO_CODES.has(i.code) ? 'AUTOMATICA' : (MANUAL_ENTRY_CODES.has(i.code) ? 'MANUAL' : (i.collection_type || 'MANUAL'));
 
   const collectionCounts = useMemo(() => ({
     AUTOMATICA: indicators.filter(i => getEffectiveCollection(i) === 'AUTOMATICA').length,
@@ -617,7 +622,12 @@ export function IndicadoresPanel() {
                           >
                             <div className="flex items-center gap-1.5">
                               <span className="font-medium text-sm">{indicator.name}</span>
-                              {collectionType === 'AUTOMATICA' && (
+                              {CADASTUR_SEMI_AUTO_CODES.has(indicator.code) ? (
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-cyan-500/50 text-cyan-600 bg-cyan-500/10">
+                                  <Database className="h-2.5 w-2.5 mr-0.5" />
+                                  CADASTUR
+                                </Badge>
+                              ) : collectionType === 'AUTOMATICA' && (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
                                   <Zap className="h-2.5 w-2.5 mr-0.5" />
                                   API
@@ -980,7 +990,12 @@ export function IndicadoresPanel() {
                               {indicator.description && (
                                 <Info className="h-4 w-4 text-muted-foreground" />
                               )}
-                              {collectionType === 'AUTOMATICA' && (
+                              {CADASTUR_SEMI_AUTO_CODES.has(indicator.code) ? (
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-cyan-500/50 text-cyan-600 bg-cyan-500/10">
+                                  <Database className="h-3 w-3 mr-0.5" />
+                                  CADASTUR
+                                </Badge>
+                              ) : collectionType === 'AUTOMATICA' && (
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
                                   <Zap className="h-3 w-3 mr-0.5" />
                                   API
