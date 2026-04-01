@@ -1,0 +1,1 @@
+ALTER TABLE public.generated_reports ADD COLUMN IF NOT EXISTS kb_file_ids UUID[] DEFAULT '{}';

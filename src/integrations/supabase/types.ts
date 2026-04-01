@@ -3162,6 +3162,7 @@ export type Database = {
           created_by: string
           destination_name: string
           id: string
+          kb_file_ids: string[] | null
           org_id: string
           report_content: string
         }
@@ -3171,6 +3172,7 @@ export type Database = {
           created_by: string
           destination_name: string
           id?: string
+          kb_file_ids?: string[] | null
           org_id: string
           report_content: string
         }
@@ -3180,6 +3182,7 @@ export type Database = {
           created_by?: string
           destination_name?: string
           id?: string
+          kb_file_ids?: string[] | null
           org_id?: string
           report_content?: string
         }
