@@ -44,12 +44,6 @@ export default function ERPDashboard() {
   const { data: destinations } = useDestinationsWithAssessments();
   const { data: projectStats, isLoading: projectsLoading } = useProjectStats();
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await invalidateAll();
-    toast.success('Dados atualizados com sucesso!');
-    setTimeout(() => setIsRefreshing(false), 500);
-  };
 
   return (
     <AppLayout 
