@@ -590,6 +590,26 @@ LEMBRE-SE:
 
     const userPrompt = isEnterprise ? enterpriseUserPrompt : territorialUserPrompt;
 
+    // Template-specific modifiers
+    let templateModifier = '';
+    if (reportTemplate === 'executivo') {
+      templateModifier = `\n\nIMPORTANTE: Este relatório deve ser um SUMÁRIO EXECUTIVO CONCISO (máximo 1500 palavras). Foque em:
+- Visão geral dos 3 eixos em 1 parágrafo cada
+- Top 5 prioridades de ação imediata
+- 3 quick wins com maior impacto
+- Próximos passos em formato bullet point
+Elimine seções detalhadas de metodologia e contextualização. Vá direto aos resultados e recomendações.`;
+    } else if (reportTemplate === 'investidor') {
+      templateModifier = `\n\nIMPORTANTE: Este relatório é para APRESENTAÇÃO A INVESTIDORES. Foque em:
+- Potencial turístico e oportunidades de investimento
+- Análise de riscos e mitigações
+- ROI estimado das melhorias sugeridas
+- Comparativos com destinos/empreendimentos benchmark do setor
+- Projeções de crescimento
+- Infraestrutura existente vs. necessária
+Use linguagem persuasiva mas fundamentada em dados. Destaque oportunidades de negócio.`;
+    }
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
