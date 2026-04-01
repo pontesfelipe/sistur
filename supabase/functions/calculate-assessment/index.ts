@@ -1235,9 +1235,15 @@ serve(async (req) => {
         }
       }
 
-      // Sort low-score indicators by score ascending (worst first)
+      // Sort low-score indicators: RA first (structural foundation), then OE, then AO
+      // Within each pillar, sort by score ascending (worst first)
+      const pillarOrder: Record<string, number> = { RA: 0, OE: 1, AO: 2 };
       const sortedLowScoreIndicators = [...indicatorScoreMap.entries()]
-        .sort((a, b) => a[1].score - b[1].score);
+        .sort((a, b) => {
+          const pillarDiff = (pillarOrder[a[1].pillar] ?? 9) - (pillarOrder[b[1].pillar] ?? 9);
+          if (pillarDiff !== 0) return pillarDiff;
+          return a[1].score - b[1].score;
+        });
 
       for (const [code, indicatorInfo] of sortedLowScoreIndicators) {
         // Skip if already prescribed
