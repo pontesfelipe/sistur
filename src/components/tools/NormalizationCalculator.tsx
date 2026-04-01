@@ -194,10 +194,10 @@ export function NormalizationCalculator() {
                 </div>
                 <div className="mt-4 p-3 bg-muted/30 rounded-lg flex items-start gap-2">
                   <Info className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <div className="text-xs text-muted-foreground">
-                    <p><strong>Adequado:</strong> Score ≥ 0.67</p>
-                    <p><strong>Atenção:</strong> 0.34 ≤ Score &lt; 0.67</p>
-                    <p><strong>Crítico:</strong> Score ≤ 0.33</p>
+                   <div className="text-xs text-muted-foreground">
+                    <p><strong>Adequado:</strong> Score ≥ 67%</p>
+                    <p><strong>Atenção:</strong> 34% ≤ Score &lt; 67%</p>
+                    <p><strong>Crítico:</strong> Score ≤ 33%</p>
                   </div>
                 </div>
               </CardContent>
