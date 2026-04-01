@@ -1004,6 +1004,79 @@ export default function Metodologia() {
         {/* Workflow Diagram */}
         <InteractiveWorkflowDiagram />
 
+        {/* Data Sources Transparency */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              Fontes de Dados e Transparência
+            </CardTitle>
+            <CardDescription>
+              Origem e confiabilidade dos dados utilizados nos diagnósticos
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="prose prose-sm max-w-none dark:prose-invert">
+              <p>
+                O SISTUR preza pela <strong>transparência total</strong> na origem dos dados. Cada indicador 
+                é classificado por sua fonte e método de coleta, com níveis de confiabilidade claramente exibidos.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="rounded-xl border-2 border-green-500 bg-green-50 dark:bg-green-950/30 p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-green-600 text-white">API</Badge>
+                  <h4 className="font-semibold">Dados via API Oficial</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">Confiabilidade: 5/5 ⭐ — Obtidos automaticamente de APIs públicas.</p>
+                <ul className="text-sm space-y-1">
+                  <li className="flex items-center gap-2"><span className="text-green-600">📊</span> <strong>IBGE Agregados</strong>: População, PIB per capita, Densidade, Área territorial</li>
+                  <li className="flex items-center gap-2"><span className="text-green-600">📊</span> <strong>IBGE Pesquisas</strong>: IDH, IDEB, Leitos hospitalares, Cobertura de saúde, Meios de hospedagem</li>
+                  <li className="flex items-center gap-2"><span className="text-green-600">💰</span> <strong>STN</strong>: Receita per capita, Despesas municipais</li>
+                </ul>
+              </div>
+
+              <div className="rounded-xl border-2 border-amber-500 bg-amber-50 dark:bg-amber-950/30 p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Badge variant="destructive">Manual</Badge>
+                  <h4 className="font-semibold">Preenchimento Manual</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">Confiabilidade: 1/5 ⭐ — Sem API pública disponível. Requer inserção pelo operador.</p>
+                <ul className="text-sm space-y-1">
+                  <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>Guias de Turismo</strong>: API do CADASTUR restrita a órgãos federais</li>
+                  <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>Agências de Turismo</strong>: API do CADASTUR restrita a órgãos federais</li>
+                  <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>Taxa de Escolarização</strong>: Dados disponíveis via Censo Escolar (coleta manual)</li>
+                </ul>
+              </div>
+            </div>
+
+            <Alert className="border-blue-500/50 bg-blue-50/50 dark:bg-blue-950/20">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-700 dark:text-blue-400">
+                Sobre o CADASTUR
+              </AlertTitle>
+              <AlertDescription className="text-blue-600 dark:text-blue-300">
+                A API oficial do CADASTUR existe (via Conecta Gov/SERPRO), porém é <strong>restrita exclusivamente a 
+                órgãos públicos federais</strong>. O SISTUR não possui acesso programático. Dados de guias e agências 
+                de turismo devem ser obtidos diretamente no site do CADASTUR ou junto ao órgão de turismo estadual, 
+                e inseridos manualmente no sistema. Datasets abertos (CSV) estão disponíveis em dados.gov.br, 
+                atualizados trimestralmente.
+              </AlertDescription>
+            </Alert>
+
+            <div className="rounded-xl border bg-muted/30 p-5 space-y-3">
+              <h4 className="font-semibold">Indicadores de Coleta Local</h4>
+              <p className="text-sm text-muted-foreground">
+                Além dos indicadores acima, o catálogo completo do SISTUR inclui dezenas de indicadores que dependem 
+                de levantamento local (pesquisa de campo, dados da Secretaria de Turismo, Prefeitura, etc.). 
+                Estes são preenchidos pelo operador do diagnóstico e possuem nível de confiança variável conforme 
+                a metodologia de coleta empregada.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* References */}
         <Card>
           <CardHeader>
@@ -1025,6 +1098,14 @@ export default function Metodologia() {
               <li>
                 <strong>BENI, Mario Carlos.</strong> Política e Planejamento de Turismo no Brasil. 
                 São Paulo: Aleph, 2006.
+              </li>
+              <li>
+                <strong>IBGE.</strong> API de Agregados e Pesquisas Municipais. 
+                Disponível em: servicodados.ibge.gov.br
+              </li>
+              <li>
+                <strong>Ministério do Turismo.</strong> CADASTUR — Cadastro de Prestadores de Serviços Turísticos. 
+                Disponível em: cadastur.turismo.gov.br
               </li>
             </ul>
           </CardContent>
