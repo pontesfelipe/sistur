@@ -381,6 +381,32 @@ export function IndicadoresPanel() {
               </SelectItem>
             </SelectContent>
           </Select>
+          <Select value={collectionFilter} onValueChange={setCollectionFilter}>
+            <SelectTrigger className="w-full xs:w-40">
+              <SelectValue placeholder="Coleta" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas coletas</SelectItem>
+              <SelectItem value="AUTOMATICA">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-3 w-3 text-severity-good" />
+                  API/Automático ({collectionCounts.AUTOMATICA})
+                </div>
+              </SelectItem>
+              <SelectItem value="MANUAL">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-3 w-3 text-severity-moderate" />
+                  Manual ({collectionCounts.MANUAL})
+                </div>
+              </SelectItem>
+              <SelectItem value="ESTIMADA">
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="h-3 w-3 text-severity-critical" />
+                  Estimado ({collectionCounts.ESTIMADA})
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <Button onClick={() => setIsFormDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
