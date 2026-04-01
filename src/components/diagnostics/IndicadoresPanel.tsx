@@ -107,6 +107,7 @@ export function IndicadoresPanel() {
   const [sourceFilter, setSourceFilter] = useState('all');
   const [themeFilter, setThemeFilter] = useState('all');
   const [tierFilter, setTierFilter] = useState('all');
+  const [collectionFilter, setCollectionFilter] = useState('all');
   const [scopeFilter, setScopeFilter] = useState('all');
   const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
   const [editingWeightId, setEditingWeightId] = useState<string | null>(null);
