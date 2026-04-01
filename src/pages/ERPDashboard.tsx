@@ -27,7 +27,6 @@ type DiagnosticType = 'territorial' | 'enterprise';
 
 export default function ERPDashboard() {
   const [selectedDestination, setSelectedDestination] = useState<string | undefined>(undefined);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [diagnosticType, setDiagnosticType] = useState<DiagnosticType>('territorial');
 
   // Enable real-time updates
