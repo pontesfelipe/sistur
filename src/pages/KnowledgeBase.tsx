@@ -13,10 +13,11 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import {
   Upload, FileText, Trash2, Download, Search,
   File, FileSpreadsheet, BookOpen, FolderOpen, Plus, MapPin, ChevronDown, Globe,
+  ShieldCheck, Loader2, AlertTriangle,
 } from 'lucide-react';
 import {
   useKnowledgeBaseFiles, useUploadKBFile, useDeleteKBFile, useDownloadKBFile,
-  KB_CATEGORIES, ACCEPTED_EXTENSIONS, KBFile,
+  useModerateKBFile, KB_CATEGORIES, ACCEPTED_EXTENSIONS, KBFile,
 } from '@/hooks/useKnowledgeBase';
 import { useDestinations } from '@/hooks/useDestinations';
 import { format } from 'date-fns';
@@ -92,7 +93,7 @@ export default function KnowledgeBase() {
               <p className="text-lg font-medium">Nenhum arquivo encontrado</p>
               <p className="text-sm">Faça upload de documentos para criar sua base de conhecimento</p>
               <Button variant="outline" className="mt-4" onClick={() => setUploadOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" /> Enviar arquivo
+                <Plus className="h-4 w-4 mr-2" /> Upload de arquivo
               </Button>
             </CardContent>
           </Card>
@@ -216,14 +217,40 @@ function FileCard({ file, destinations }: { file: KBFile; destinations: any[] })
 
 function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onOpenChange: (v: boolean) => void; destinations: any[] }) {
   const uploadFile = useUploadKBFile();
+  const moderateFile = useModerateKBFile();
   const fileRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('geral');
   const [destId, setDestId] = useState<string>('');
+  const [moderationResult, setModerationResult] = useState<{ approved: boolean; reason: string; relevance_score: number } | null>(null);
+  const [moderating, setModerating] = useState(false);
+
+  const handleFileChange = async (selectedFile: File | null) => {
+    setFile(selectedFile);
+    setModerationResult(null);
+
+    if (!selectedFile) return;
+
+    // Auto-trigger moderation
+    setModerating(true);
+    try {
+      const result = await moderateFile.mutateAsync({
+        file: selectedFile,
+        description,
+        category,
+      });
+      setModerationResult(result);
+    } catch {
+      // On error, allow upload (fail-open)
+      setModerationResult({ approved: true, reason: 'Moderação indisponível', relevance_score: 50 });
+    } finally {
+      setModerating(false);
+    }
+  };
 
   const handleSubmit = async () => {
-    if (!file) return;
+    if (!file || !moderationResult?.approved) return;
     await uploadFile.mutateAsync({
       file,
       description: description || undefined,
@@ -234,19 +261,25 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
     setDescription('');
     setCategory('geral');
     setDestId('');
+    setModerationResult(null);
     onOpenChange(false);
   };
 
   const accept = ACCEPTED_EXTENSIONS.join(',');
+  const isRejected = moderationResult && !moderationResult.approved;
+  const isApproved = moderationResult?.approved;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(v) => {
+      if (!v) { setFile(null); setModerationResult(null); }
+      onOpenChange(v);
+    }}>
       <DialogTrigger asChild>
-        <Button><Upload className="h-4 w-4 mr-2" /> Enviar arquivo</Button>
+        <Button><Upload className="h-4 w-4 mr-2" /> Upload de arquivo</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Enviar para Base de Conhecimento</DialogTitle>
+          <DialogTitle>Upload para Base de Conhecimento</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
@@ -255,7 +288,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
               type="file"
               accept={accept}
               className="hidden"
-              onChange={e => setFile(e.target.files?.[0] || null)}
+              onChange={e => handleFileChange(e.target.files?.[0] || null)}
             />
             <Button variant="outline" className="w-full h-24 border-dashed" onClick={() => fileRef.current?.click()}>
               {file ? (
@@ -273,6 +306,30 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
               )}
             </Button>
           </div>
+
+          {/* Moderation status */}
+          {moderating && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Verificando relevância do arquivo...
+            </div>
+          )}
+          {isApproved && !moderating && (
+            <div className="flex items-center gap-2 text-sm bg-primary/5 border border-primary/20 rounded-lg p-3">
+              <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
+              <span className="text-primary">{moderationResult.reason}</span>
+            </div>
+          )}
+          {isRejected && !moderating && (
+            <div className="flex items-start gap-2 text-sm bg-destructive/5 border border-destructive/20 rounded-lg p-3">
+              <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium text-destructive">Arquivo rejeitado</p>
+                <p className="text-destructive/80">{moderationResult.reason}</p>
+              </div>
+            </div>
+          )}
+
           <Select value={destId || 'global'} onValueChange={v => setDestId(v === 'global' ? '' : v)}>
             <SelectTrigger>
               <MapPin className="h-4 w-4 mr-2" />
@@ -293,8 +350,8 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={handleSubmit} disabled={!file || uploadFile.isPending}>
-            {uploadFile.isPending ? 'Enviando...' : 'Enviar'}
+          <Button onClick={handleSubmit} disabled={!file || !isApproved || moderating || uploadFile.isPending}>
+            {uploadFile.isPending ? 'Enviando...' : 'Upload'}
           </Button>
         </DialogFooter>
       </DialogContent>

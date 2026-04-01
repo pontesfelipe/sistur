@@ -70,6 +70,42 @@ export function useKnowledgeBaseFiles(destinationId?: string | null) {
   });
 }
 
+export function useModerateKBFile() {
+  return useMutation({
+    mutationFn: async ({
+      file,
+      description,
+      category,
+    }: {
+      file: File;
+      description?: string;
+      category: string;
+    }): Promise<{ approved: boolean; reason: string; relevance_score: number }> => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('fileName', file.name);
+      formData.append('category', category);
+      if (description) formData.append('description', description);
+
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/moderate-kb-upload`;
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: formData,
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: 'Erro na moderação' }));
+        throw new Error(err.error || 'Erro na moderação');
+      }
+
+      return resp.json();
+    },
+  });
+}
+
 export function useUploadKBFile() {
   const qc = useQueryClient();
   const { effectiveOrgId } = useProfileContext();
