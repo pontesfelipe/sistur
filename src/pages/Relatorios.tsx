@@ -28,7 +28,11 @@ import {
   History,
   Trash2,
   Calendar,
-  Settings2
+  Settings2,
+  Eye,
+  Lock,
+  Users,
+  FlaskConical
 } from 'lucide-react';
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
