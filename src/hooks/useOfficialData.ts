@@ -92,27 +92,90 @@ export function useFetchOfficialData() {
       orgId: string; 
       indicators?: string[];
     }) => {
-      const { data, error } = await supabase.functions.invoke('fetch-official-data', {
-        body: { ibge_code: ibgeCode, org_id: orgId, indicators },
-      });
+      // Fire both in parallel: IBGE + CADASTUR
+      const [officialResult, cadasturResult] = await Promise.allSettled([
+        supabase.functions.invoke('fetch-official-data', {
+          body: { ibge_code: ibgeCode, org_id: orgId, indicators },
+        }),
+        supabase.functions.invoke('ingest-cadastur', {
+          body: { ibge_code: ibgeCode, org_id: orgId },
+        }),
+      ]);
 
-      if (error) throw error;
-      if (!data.success) throw new Error(data.error);
-      return data;
+      const official = officialResult.status === 'fulfilled' ? officialResult.value : null;
+      const cadastur = cadasturResult.status === 'fulfilled' ? cadasturResult.value : null;
+
+      if (official?.error) throw official.error;
+      if (!official?.data?.success) throw new Error(official?.data?.error || 'Erro ao buscar dados oficiais');
+
+      // Merge CADASTUR status into response
+      const cadasturStatus = cadastur?.data?.results || {};
+      return {
+        ...official.data,
+        cadastur_status: cadasturStatus,
+      };
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ 
         queryKey: ['external-indicator-values', variables.ibgeCode, variables.orgId] 
       });
+
+      const cadasturInfo = data.cadastur_status;
+      const cadasturMsg = cadasturInfo
+        ? Object.entries(cadasturInfo).map(([k, v]: [string, any]) => 
+            `${k}: ${v.status === 'success' ? `${v.count} registros` : v.status === 'unavailable' ? 'indisponível' : 'erro'}`
+          ).join('; ')
+        : '';
+
       toast({
         title: 'Dados oficiais carregados',
-        description: data.message,
+        description: `${data.message}${cadasturMsg ? ` | CADASTUR: ${cadasturMsg}` : ''}`,
       });
     },
     onError: (error: Error) => {
       console.error('Error fetching official data:', error);
       toast({
         title: 'Erro ao buscar dados oficiais',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
+// Trigger CADASTUR ingestion independently
+export function useIngestCadastur() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ ibgeCode, orgId }: { ibgeCode: string; orgId: string }) => {
+      const { data, error } = await supabase.functions.invoke('ingest-cadastur', {
+        body: { ibge_code: ibgeCode, org_id: orgId },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ 
+        queryKey: ['external-indicator-values', variables.ibgeCode, variables.orgId] 
+      });
+      const results = data?.results || {};
+      const unavailable = Object.values(results).filter((r: any) => r.status === 'unavailable');
+      if (unavailable.length > 0) {
+        toast({
+          title: 'CADASTUR parcialmente indisponível',
+          description: 'Alguns datasets do CADASTUR não estão acessíveis no momento. Os dados existentes foram preservados.',
+        });
+      } else {
+        toast({
+          title: 'Dados CADASTUR atualizados',
+          description: data.message,
+        });
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Erro ao buscar dados CADASTUR',
         description: error.message,
         variant: 'destructive',
       });
