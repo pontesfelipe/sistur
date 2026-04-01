@@ -38,10 +38,10 @@ export function NormalizationCalculator() {
     if (normType === 'MIN_MAX') {
       if (direction === 'HIGH_IS_BETTER') {
         score = Math.max(0, Math.min(1, (val - min) / (max - min)));
-        formula = `(${val} - ${min}) / (${max} - ${min}) = ${score.toFixed(4)}`;
+        formula = `(${val} - ${min}) / (${max} - ${min}) = ${(score * 100).toFixed(1)}%`;
       } else {
         score = Math.max(0, Math.min(1, (max - val) / (max - min)));
-        formula = `(${max} - ${val}) / (${max} - ${min}) = ${score.toFixed(4)}`;
+        formula = `(${max} - ${val}) / (${max} - ${min}) = ${(score * 100).toFixed(1)}%`;
       }
     } else if (normType === 'BINARY') {
       score = val > 0 ? 1 : 0;
@@ -58,7 +58,7 @@ export function NormalizationCalculator() {
         else if (val <= min + 2 * third) score = 0.5;
         else score = 0.17;
       }
-      formula = `Faixa: ${score.toFixed(2)}`;
+      formula = `Faixa: ${(score * 100).toFixed(0)}%`;
     }
 
     let status: 'CRITICO' | 'MODERADO' | 'BOM';
@@ -187,17 +187,17 @@ export function NormalizationCalculator() {
                   {getStatusBadge(result.status)}
                 </div>
                 <div className="text-4xl font-bold text-center mb-2">
-                  {result.score.toFixed(4)}
+                  {(result.score * 100).toFixed(1)}%
                 </div>
                 <div className="text-xs text-muted-foreground text-center font-mono bg-muted/50 p-2 rounded">
                   {result.formula}
                 </div>
                 <div className="mt-4 p-3 bg-muted/30 rounded-lg flex items-start gap-2">
                   <Info className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <div className="text-xs text-muted-foreground">
-                    <p><strong>Adequado:</strong> Score ≥ 0.67</p>
-                    <p><strong>Atenção:</strong> 0.34 ≤ Score &lt; 0.67</p>
-                    <p><strong>Crítico:</strong> Score ≤ 0.33</p>
+                   <div className="text-xs text-muted-foreground">
+                    <p><strong>Adequado:</strong> Score ≥ 67%</p>
+                    <p><strong>Atenção:</strong> 34% ≤ Score &lt; 67%</p>
+                    <p><strong>Crítico:</strong> Score ≤ 33%</p>
                   </div>
                 </div>
               </CardContent>
