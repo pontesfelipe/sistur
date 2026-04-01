@@ -344,19 +344,26 @@ const DiagnosticoDetalhe = () => {
                   Preencher Dados
                 </Link>
               </Button>
-              <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
-                {calculating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Calculando...
-                  </>
-                ) : (
-                  <>
-                    <Calculator className="mr-2 h-4 w-4" />
-                    Calcular Índices
-                  </>
+              <div className="relative group">
+                <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
+                  {calculating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Calculando...
+                    </>
+                  ) : (
+                    <>
+                      <Calculator className="mr-2 h-4 w-4" />
+                      Calcular Índices
+                    </>
+                  )}
+                </Button>
+                {assessment.status === 'DRAFT' && (
+                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-popover text-popover-foreground border rounded px-2 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    Preencha ao menos um indicador para habilitar o cálculo
+                  </span>
                 )}
-              </Button>
+              </div>
             </>
           )}
           {isCalculated && (
