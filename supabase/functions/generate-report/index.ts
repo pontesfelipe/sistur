@@ -47,7 +47,7 @@ serve(async (req) => {
     const userId = user.id;
     console.log('Authenticated user:', userId);
 
-    const { assessmentId, destinationName, pillarScores, issues, prescriptions } = await req.json();
+    const { assessmentId, destinationName, pillarScores, issues, prescriptions, forceRegenerate } = await req.json();
     
     // Verify user has access to this assessment via their org (including demo mode)
     const { data: profile } = await supabase
