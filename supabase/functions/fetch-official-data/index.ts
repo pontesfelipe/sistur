@@ -301,8 +301,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    const estimatedCount = valuesToUpsert.length - realCount;
-    console.log(`Stored ${upsertedData?.length || 0} values (${realCount} real, ${estimatedCount} estimated)`);
+    const manualCount = valuesToUpsert.filter(v => v.collection_method === 'MANUAL').length;
+    console.log(`Stored ${upsertedData?.length || 0} values (${realCount} real, ${manualCount} manual)`);
 
     const responseData = valuesToUpsert.map(v => ({
       indicator_code: v.indicator_code,
@@ -317,11 +317,11 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: `${realCount} indicadores reais (APIs oficiais) + ${estimatedCount} estimados. Total: ${valuesToUpsert.length}.`,
+        message: `${realCount} indicadores obtidos de APIs oficiais. ${manualCount} indicadores requerem preenchimento manual.`,
         data: responseData,
         sources_used: [...new Set(valuesToUpsert.map(v => v.source_code))],
         real_count: realCount,
-        estimated_count: estimatedCount,
+        manual_count: manualCount,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
