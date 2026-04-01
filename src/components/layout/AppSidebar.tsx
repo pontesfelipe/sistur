@@ -56,7 +56,7 @@ const navigation: NavItem[] = [
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
   { name: 'Painel Professor', href: '/professor', icon: BookOpen, requiresProfessor: true, requiresEDU: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
-  { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library },
+  { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
   { name: 'Social Turismo', href: '/forum', icon: MessageSquare },
   { name: 'Metodologia', href: '/metodologia', icon: BookMarked, requiresAdmin: true },
