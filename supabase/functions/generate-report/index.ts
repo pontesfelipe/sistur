@@ -554,12 +554,23 @@ INSTRUÇÕES SOBRE REFERÊNCIAS:
 - Aponte alinhamento ou desalinhamento com políticas públicas vigentes
 - Use dados e benchmarks dos documentos para enriquecer comparações
 ` : ''}
+${kbFiles.length > 0 ? `=== BASE DE CONHECIMENTO DO DESTINO ===
+Os seguintes documentos foram associados a este destino e devem ser considerados como referência adicional:
+
+${kbFiles.map((f: any) => `- ${f.file_name}${f.description ? ` — ${f.description}` : ''} (Categoria: ${f.category})`).join('\n')}
+
+INSTRUÇÕES SOBRE BASE DE CONHECIMENTO:
+- Use as informações desses documentos para contextualizar e enriquecer a análise
+- Referencie dados e diretrizes presentes nesses documentos quando relevante
+- Esses documentos representam dados locais e diretrizes específicas do destino
+` : ''}
 === INSTRUÇÕES FINAIS ===
 1. COMECE com o título e IMEDIATAMENTE a tabela de Ficha Técnica fornecida acima — NÃO pule essa tabela
 2. Siga EXATAMENTE a estrutura definida no system prompt para o template "${reportTemplate}"
 3. Use TABELAS MARKDOWN para todos os conjuntos de dados
 4. Justifique todas as conclusões com dados fornecidos
-${globalRefs.length > 0 ? '5. Referencie documentos oficiais quando contextualizar resultados e prescrições' : ''}`;
+${globalRefs.length > 0 ? '5. Referencie documentos oficiais quando contextualizar resultados e prescrições' : ''}
+${kbFiles.length > 0 ? `${globalRefs.length > 0 ? '6' : '5'}. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
