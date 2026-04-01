@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 11,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.11.3",
+    date: "2026-04-01",
+    type: "patch" as const,
+    changes: [
+      "Fix: Motor de prescrições agora gera uma prescrição por indicador (não mais por training_id)",
+      "Cobertura completa: todo indicador com score < 0.67 e mapeamento EDU recebe prescrição",
+      "Regras IGMA preservadas: pilares bloqueados continuam sem prescrições",
+      "Prescrições ordenadas por gravidade (score mais baixo primeiro)"
+    ]
+  },
   {
     version: "1.11.2",
     date: "2026-03-31",
