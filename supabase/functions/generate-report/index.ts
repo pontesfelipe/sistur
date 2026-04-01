@@ -154,7 +154,13 @@ OS TRÊS EIXOS SISTUR:
 2. I-AO — Ações Operacionais: Governança pública, planejamento, orçamento, capacidade institucional
 3. I-OE — Organização Estrutural: Infraestrutura turística, serviços, mercado, qualificação profissional
 
-CLASSIFICAÇÃO: ADEQUADO (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)`;
+CLASSIFICAÇÃO: ADEQUADO (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
+
+FONTES DE DADOS — TRANSPARÊNCIA:
+- Dados obtidos via API oficial (IBGE Agregados e Pesquisas): População, PIB per capita, Densidade, Área, IDH, IDEB, Leitos hospitalares, Cobertura de saúde, Receita per capita, Despesas, Meios de hospedagem. Confiabilidade: ALTA (5/5).
+- Dados de preenchimento manual (sem API pública): Guias de turismo, Agências de turismo, Taxa de escolarização. A API do CADASTUR é restrita a órgãos federais e não está disponível para acesso programático.
+- Indicadores locais coletados pelo operador do diagnóstico.
+IMPORTANTE: Ao citar fontes no relatório, especifique se o dado veio de API oficial ou de preenchimento manual.`;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
   if (isEnterprise) {
