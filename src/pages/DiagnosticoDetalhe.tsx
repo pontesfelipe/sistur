@@ -107,7 +107,7 @@ const DiagnosticoDetalhe = () => {
     queryKey: ['projects-exist', id],
     queryFn: async () => {
       if (!id) return null;
-      const { data } = await supabase.from('projects').select('id').eq('source_assessment_id', id as string).limit(1);
+      const { data } = await supabase.from('projects').select('id').eq('assessment_id', id as string).limit(1);
       return data;
     },
     enabled: !!id,
