@@ -593,9 +593,9 @@ export default function Relatorios() {
                           <FileText className="h-4 w-4" />
                           PDF
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => downloadReport(report, selectedDestination?.name || 'destino')} className="gap-2 text-muted-foreground">
-                          <Download className="h-3 w-3" />
-                          MD
+                        <Button variant="outline" onClick={() => setCustomizationOpen(true)} className="gap-2">
+                          <Settings2 className="h-4 w-4" />
+                          Personalizar
                         </Button>
                       </>
                     )}
