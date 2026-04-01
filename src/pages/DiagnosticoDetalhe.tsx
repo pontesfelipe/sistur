@@ -49,7 +49,7 @@ import {
   RotateCcw,
   PlusCircle,
   Edit,
-  ClipboardList,
+  FolderKanban,
   Database,
   Hotel,
   Layers,
