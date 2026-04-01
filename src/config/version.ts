@@ -23,11 +23,17 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.13.0",
+    version: "1.13.1",
     date: "2026-04-01",
-    type: "minor" as const,
+    type: "patch" as const,
     changes: [
-      "Nova seção 'Base de Conhecimento' no menu lateral para upload e gestão de documentos de referência",
+      "Nova seção 'Referências Globais' em Configurações > Ferramentas (admin only)",
+      "Documentos de referência (PNT, legislação) são injetados automaticamente nos relatórios gerados por IA",
+      "PNT 2024-2027 adicionado como primeiro documento de referência global",
+      "Relatórios agora contextualizam indicadores com metas e diretrizes nacionais",
+    ]
+  },
+  {
       "Upload de PDF, DOCX, XLSX, CSV e TXT (até 20MB) com categorização e escopo (global ou por destino)",
       "Filtros por categoria, destino e busca textual para localizar arquivos rapidamente",
       "Download direto e remoção de arquivos com confirmação de segurança",
