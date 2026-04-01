@@ -441,9 +441,18 @@ export default function Relatorios() {
                         ) : (
                           calculatedAssessments.map((assessment) => {
                             const dest = destinations?.find(d => d.id === assessment.destination_id);
+                            const calcDate = assessment.calculated_at 
+                              ? format(new Date(assessment.calculated_at), "dd/MM/yy", { locale: ptBR })
+                              : format(new Date(assessment.created_at), "dd/MM/yy", { locale: ptBR });
+                            const creatorName = (assessment as any).creator?.full_name;
                             return (
                               <SelectItem key={assessment.id} value={assessment.id}>
-                                {assessment.title} - {dest?.name || 'Destino não encontrado'}
+                                <span className="flex items-center gap-2">
+                                  <span>{assessment.title} — {dest?.name || 'Destino'}</span>
+                                  <span className="text-muted-foreground text-xs">
+                                    {calcDate}{creatorName ? ` · ${creatorName}` : ''}
+                                  </span>
+                                </span>
                               </SelectItem>
                             );
                           })
