@@ -193,7 +193,7 @@ export function IndicadoresPanel() {
 
   // Count by collection type (using effective type based on API_FETCHED_CODES)
   const getEffectiveCollection = (i: any): CollectionType => 
-    API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : (MANUAL_ENTRY_CODES.has(i.code) ? 'MANUAL' : (i.collection_type || 'MANUAL'));
+    API_FETCHED_CODES.has(i.code) || CADASTUR_SEMI_AUTO_CODES.has(i.code) ? 'AUTOMATICA' : (MANUAL_ENTRY_CODES.has(i.code) ? 'MANUAL' : (i.collection_type || 'MANUAL'));
 
   const collectionCounts = useMemo(() => ({
     AUTOMATICA: indicators.filter(i => getEffectiveCollection(i) === 'AUTOMATICA').length,
