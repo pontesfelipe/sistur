@@ -73,6 +73,14 @@ import { toast } from 'sonner';
 
 // EnterpriseIndicatorsPanel removed - unified into single panel
 
+// Codes that are auto-fetched via API (fetch-official-data edge function)
+const API_FETCHED_CODES = new Set([
+  'igma_populacao', 'igma_pib_per_capita', 'igma_idh', 'igma_area_territorial',
+  'igma_densidade_demografica', 'igma_leitos_por_habitante', 'igma_cobertura_saude',
+  'igma_ideb', 'igma_taxa_escolarizacao', 'igma_receita_propria', 'igma_despesa_turismo',
+  'igma_meios_hospedagem', 'igma_guias_turismo', 'igma_agencias_turismo',
+]);
+
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 type IndicatorScope = 'territorial' | 'enterprise' | 'both';
@@ -154,7 +162,7 @@ export function IndicadoresPanel() {
     const matchesTier = tierFilter === 'all' || indicatorTier === tierFilter;
     const indicatorScope = (i as any).indicator_scope || 'territorial';
     const matchesScope = scopeFilter === 'all' || indicatorScope === scopeFilter;
-    const indicatorCollection = (i as any).collection_type || 'MANUAL';
+    const indicatorCollection = API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : ((i as any).collection_type || 'MANUAL');
     const matchesCollection = collectionFilter === 'all' || indicatorCollection === collectionFilter;
     return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier && matchesScope && matchesCollection;
   });
@@ -173,11 +181,14 @@ export function IndicadoresPanel() {
     both: indicators.filter(i => (i as any).indicator_scope === 'both').length,
   }), [indicators]);
 
-  // Count by collection type
+  // Count by collection type (using effective type based on API_FETCHED_CODES)
+  const getEffectiveCollection = (i: any): CollectionType => 
+    API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : (i.collection_type || 'MANUAL');
+
   const collectionCounts = useMemo(() => ({
-    AUTOMATICA: indicators.filter(i => (i as any).collection_type === 'AUTOMATICA').length,
-    MANUAL: indicators.filter(i => !((i as any).collection_type) || (i as any).collection_type === 'MANUAL').length,
-    ESTIMADA: indicators.filter(i => (i as any).collection_type === 'ESTIMADA').length,
+    AUTOMATICA: indicators.filter(i => getEffectiveCollection(i) === 'AUTOMATICA').length,
+    MANUAL: indicators.filter(i => getEffectiveCollection(i) === 'MANUAL').length,
+    ESTIMADA: indicators.filter(i => getEffectiveCollection(i) === 'ESTIMADA').length,
   }), [indicators]);
 
   const handleUpdateTier = async (indicatorId: string, newTier: DiagnosisTier) => {
@@ -568,7 +579,7 @@ export function IndicadoresPanel() {
           // MOBILE CARD VIEW
           <div className="divide-y">
             {filteredIndicators.map((indicator) => {
-              const collectionType = (indicator as any).collection_type as CollectionType | undefined;
+              const collectionType = getEffectiveCollection(indicator) as CollectionType;
               const isIGMA = (indicator as any).source === 'IGMA';
               const igmaDimension = (indicator as any).igma_dimension;
               const defaultInterpretation = (indicator as any).default_interpretation;
@@ -924,7 +935,7 @@ export function IndicadoresPanel() {
             </TableHeader>
             <TableBody>
               {filteredIndicators.map((indicator) => {
-                const collectionType = (indicator as any).collection_type as CollectionType | undefined;
+                const collectionType = getEffectiveCollection(indicator) as CollectionType;
                 const reliability = reliabilityIcons[collectionType || 'MANUAL'];
                 const ReliabilityIcon = reliability.icon;
                 const isIGMA = (indicator as any).source === 'IGMA';
