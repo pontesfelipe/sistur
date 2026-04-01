@@ -13,7 +13,6 @@ import {
   useOverdueProjects,
   useRecentActionPlans,
   useERPRealtimeUpdates,
-  useERPQueryInvalidation,
   useProjectStats
 } from '@/hooks/useERPMonitoring';
 import { useDestinationsWithAssessments } from '@/hooks/useDashboardData';
