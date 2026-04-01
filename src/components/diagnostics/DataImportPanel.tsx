@@ -104,6 +104,9 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     tier: assessmentTier,
   });
 
+  const { profile } = useProfile();
+  const [hasAutoInjected, setHasAutoInjected] = useState(false);
+
   useEffect(() => {
     if (preSelectedAssessmentId && assessments?.length) {
       const exists = assessments.some(a => a.id === preSelectedAssessmentId);
@@ -112,6 +115,95 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       }
     }
   }, [preSelectedAssessmentId, assessments]);
+
+  // Auto-inject validated external indicator values into indicator_values
+  // so pre-filled data appears in the form
+  useEffect(() => {
+    if (
+      hasAutoInjected ||
+      !selectedAssessment ||
+      !selectedAssessmentData ||
+      isEnterpriseAssessment ||
+      loadingIndicators ||
+      loadingValues ||
+      !indicators.length
+    ) return;
+
+    const destinationId = selectedAssessmentData.destination_id;
+    if (!destinationId) return;
+
+    const doInject = async () => {
+      try {
+        // Get IBGE code for this destination
+        const { data: dest } = await supabase
+          .from('destinations')
+          .select('ibge_code')
+          .eq('id', destinationId)
+          .single();
+
+        if (!dest?.ibge_code) return;
+
+        const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
+        if (!effectiveOrgId) return;
+
+        // Fetch validated external values
+        const { data: extValues } = await supabase
+          .from('external_indicator_values')
+          .select('*')
+          .eq('municipality_ibge_code', dest.ibge_code)
+          .eq('validated', true);
+
+        if (!extValues?.length) return;
+
+        // Map indicator codes to IDs
+        const codeToIndicator = new Map(indicators.map(ind => [ind.code, ind]));
+
+        // Find which indicators already have values
+        const existingIndicatorIds = new Set(values.map(v => v.indicator_id));
+
+        const toInsert: Array<{
+          assessment_id: string;
+          indicator_id: string;
+          value_raw: number;
+          source: string;
+          org_id: string;
+          reference_date: string | null;
+        }> = [];
+
+        for (const ext of extValues) {
+          const indicator = codeToIndicator.get(ext.indicator_code);
+          if (!indicator) continue;
+          if (existingIndicatorIds.has(indicator.id)) continue;
+          if (ext.raw_value === null) continue;
+
+          toInsert.push({
+            assessment_id: selectedAssessment,
+            indicator_id: indicator.id,
+            value_raw: Number(ext.raw_value),
+            source: `Pré-preenchido (${ext.source_code})`,
+            org_id: effectiveOrgId,
+            reference_date: ext.reference_year ? `${ext.reference_year}-01-01` : null,
+          });
+        }
+
+        if (toInsert.length > 0) {
+          for (const val of toInsert) {
+            await supabase.from('indicator_values').insert(val);
+          }
+          // Refetch values to update the form
+          // Using queryClient would be cleaner but bulkUpsertValues handles cache invalidation
+          window.location.reload(); // Simple approach - values will be fresh on reload
+        }
+
+        setHasAutoInjected(true);
+      } catch (err) {
+        console.error('Error auto-injecting external values:', err);
+        setHasAutoInjected(true);
+      }
+    };
+
+    doInject();
+  }, [selectedAssessment, selectedAssessmentData, isEnterpriseAssessment, loadingIndicators, loadingValues, indicators, values, hasAutoInjected, profile]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
