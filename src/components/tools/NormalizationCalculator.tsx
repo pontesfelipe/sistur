@@ -58,7 +58,7 @@ export function NormalizationCalculator() {
         else if (val <= min + 2 * third) score = 0.5;
         else score = 0.17;
       }
-      formula = `Faixa: ${score.toFixed(2)}`;
+      formula = `Faixa: ${(score * 100).toFixed(0)}%`;
     }
 
     let status: 'CRITICO' | 'MODERADO' | 'BOM';

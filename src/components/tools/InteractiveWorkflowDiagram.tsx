@@ -118,13 +118,13 @@ const workflowSteps: WorkflowStep[] = [
       title: "Determinação Automática de Status",
       description: "Status é calculado automaticamente com base no score normalizado. Nunca é editável manualmente.",
       items: [
-        "Score ≥ 0.67 → Adequado (verde)",
-        "Score 0.34 – 0.66 → Atenção (amarelo)",
-        "Score ≤ 0.33 → Crítico (vermelho)",
+        "Score ≥ 67% → Adequado (verde)",
+        "Score 34% – 66% → Atenção (amarelo)",
+        "Score ≤ 33% → Crítico (vermelho)",
         "Interpretação territorial atribuída",
         "Alertas IGMA gerados automaticamente"
       ],
-      example: "Ex: Score 0.52 → Status ATENÇÃO"
+      example: "Ex: Score 52% → Status ATENÇÃO"
     }
   },
   {
