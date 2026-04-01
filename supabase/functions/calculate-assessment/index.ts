@@ -1549,19 +1549,25 @@ serve(async (req) => {
       interpretation_type: igmaResult.interpretationType,
     });
 
-    // 13.5 Track prescription cycles (evolution/stagnation/regression per indicator)
+    // 13.5 Fetch previous assessments (used for cycles + regression detection)
+    const { data: allPreviousAssessments } = await supabase
+      .from("assessments")
+      .select("id, calculated_at")
+      .eq("destination_id", destinationId)
+      .eq("status", "CALCULATED")
+      .neq("id", assessment_id)
+      .order("calculated_at", { ascending: false });
+
+    // 13.6 Track prescription cycles (evolution/stagnation/regression per indicator)
     console.log("Tracking prescription evolution cycles...");
     if (allPreviousAssessments && allPreviousAssessments.length > 0) {
-      // Get the most recent previous assessment
-      const prevAssessmentId = allPreviousAssessments[0]?.id;
-      if (prevAssessmentId) {
-        // Get previous indicator scores
+      const prevAssessmentIdForCycles = allPreviousAssessments[0]?.id;
+      if (prevAssessmentIdForCycles) {
         const { data: prevIndicatorScores } = await supabase
           .from("indicator_scores")
           .select("indicator_id, score")
-          .eq("assessment_id", prevAssessmentId);
+          .eq("assessment_id", prevAssessmentIdForCycles);
 
-        // Get current inserted prescriptions
         const { data: currentPrescriptions } = await supabase
           .from("prescriptions")
           .select("id, indicator_id")
@@ -1570,7 +1576,6 @@ serve(async (req) => {
         if (prevIndicatorScores && currentPrescriptions) {
           const prevScoreMap = new Map(prevIndicatorScores.map(s => [s.indicator_id, s.score]));
           
-          // Get current indicator scores
           const { data: currentIndicatorScores } = await supabase
             .from("indicator_scores")
             .select("indicator_id, score")
@@ -1628,20 +1633,8 @@ serve(async (req) => {
       }
     }
 
-    // We need allPreviousAssessments for section 14 too, but it was already fetched above in section 13.5
-    // If it wasn't fetched yet (no previous assessments block above), fetch now
-
     // 14. Detect regression patterns and create alerts
     console.log(`Checking regression patterns for destination: ${destinationId}`);
-
-    // Get all previous calculated assessments for this destination
-    const { data: allPreviousAssessments } = await supabase
-      .from("assessments")
-      .select("id, calculated_at")
-      .eq("destination_id", destinationId)
-      .eq("status", "CALCULATED")
-      .neq("id", assessment_id)
-      .order("calculated_at", { ascending: false });
 
     if (allPreviousAssessments && allPreviousAssessments.length > 0) {
       // Get pillar scores for previous assessments
