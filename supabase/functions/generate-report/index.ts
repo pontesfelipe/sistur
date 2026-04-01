@@ -47,7 +47,7 @@ serve(async (req) => {
     const userId = user.id;
     console.log('Authenticated user:', userId);
 
-    const { assessmentId, destinationName, pillarScores, issues, prescriptions } = await req.json();
+    const { assessmentId, destinationName, pillarScores, issues, prescriptions, forceRegenerate } = await req.json();
     
     // Verify user has access to this assessment via their org (including demo mode)
     const { data: profile } = await supabase
@@ -97,7 +97,7 @@ serve(async (req) => {
       .eq('assessment_id', assessmentId)
       .maybeSingle();
 
-    const forceRegenerate = (await req.clone().json()).forceRegenerate;
+    // forceRegenerate already extracted from request body above
 
     if (existingReport && !forceRegenerate) {
       const reportDate = new Date(existingReport.created_at);
