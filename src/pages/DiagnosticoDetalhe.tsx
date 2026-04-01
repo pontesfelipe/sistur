@@ -614,6 +614,36 @@ const DiagnosticoDetalhe = () => {
         </Card>
       )}
 
+      {/* KB Files Used Notice */}
+      {isCalculated && kbFilesUsed.length > 0 && (
+        <Card className="mb-6 border-primary/20 bg-primary/5">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <BookOpen className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium text-sm">Documentos da Base de Conhecimento utilizados</p>
+                <p className="text-xs text-muted-foreground mt-0.5 mb-2">
+                  Os seguintes arquivos foram considerados na geração do relatório deste diagnóstico:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {kbFilesUsed.map((f: any) => (
+                    <Badge key={f.id} variant="outline" className="text-xs">
+                      <FileText className="h-3 w-3 mr-1" />
+                      {f.file_name}
+                    </Badge>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Para atualizar com novos documentos, gere o relatório novamente.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Diagnostic Progress Dashboard */}
       <DiagnosticProgressDashboard
         status={assessment.status}
