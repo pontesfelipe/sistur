@@ -104,7 +104,7 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'erp-monitoring',
         title: 'Monitoramento ERP',
-        description: 'O painel de Monitoramento ERP acompanha evolução dos ciclos, progresso por pilar, projetos atrasados e planos recentes. Ideal para gestores acompanharem KPIs em tempo real.',
+        description: 'O painel de Monitoramento ERP acompanha evolução dos ciclos, progresso por pilar e projetos atrasados. Ideal para gestores acompanharem KPIs em tempo real.',
         icon: Activity,
         route: '/erp',
         roles: ['ERP', 'ADMIN'],
@@ -113,9 +113,18 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'erp-reports',
         title: 'Relatórios',
-        description: 'Gere relatórios detalhados dos diagnósticos com gráficos, comparativos e exportação. Disponível nos planos Pro e Enterprise.',
+        description: 'Gere relatórios personalizados dos diagnósticos com logo, cabeçalho, rodapé e cores customizáveis. Escolha visibilidade pessoal ou organizacional. Exportação em Word e PDF.',
         icon: BarChart3,
         route: '/relatorios',
+        roles: ['ERP', 'ADMIN'],
+        category: 'erp-diagnostics',
+      },
+      {
+        id: 'erp-kb',
+        title: 'Base de Conhecimento',
+        description: 'Faça upload de documentos de referência (PDFs, planilhas) por destino. Os arquivos são usados automaticamente para enriquecer diagnósticos e relatórios com IA.',
+        icon: BookOpen,
+        route: '/base-conhecimento',
         roles: ['ERP', 'ADMIN'],
         category: 'erp-diagnostics',
       },

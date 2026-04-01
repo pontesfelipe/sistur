@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 13,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.13.4",
+    date: "2026-04-01",
+    type: "patch" as const,
+    changes: [
+      "Monitoramento ERP refatorado: foco em Projetos (planos de ação removidos da visão principal)",
+      "KPIs do ERP atualizados: Total de Projetos, Projetos Ativos, Conclusão de Tarefas, Diagnósticos",
+      "Lista de planos recentes removida — projetos atrasados ocupam largura total",
+      "Tutorial atualizado com Base de Conhecimento e descrição de relatórios customizáveis",
+      "Metodologia atualizada com seção sobre Base de Conhecimento e Referências Globais",
+      "Verificação completa de cobertura de indicadores em diagnósticos Territorial e Enterprise",
+    ]
+  },
   {
     version: "1.13.3",
     date: "2026-04-01",
