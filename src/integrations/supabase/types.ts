@@ -3933,6 +3933,79 @@ export type Database = {
           },
         ]
       }
+      knowledge_base_files: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          destination_id: string | null
+          file_name: string
+          file_size_bytes: number
+          file_type: string
+          id: string
+          is_active: boolean
+          org_id: string
+          storage_path: string
+          tags: string[] | null
+          updated_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          destination_id?: string | null
+          file_name: string
+          file_size_bytes?: number
+          file_type: string
+          id?: string
+          is_active?: boolean
+          org_id: string
+          storage_path: string
+          tags?: string[] | null
+          updated_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          destination_id?: string | null
+          file_name?: string
+          file_size_bytes?: number
+          file_type?: string
+          id?: string
+          is_active?: boolean
+          org_id?: string
+          storage_path?: string
+          tags?: string[] | null
+          updated_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_base_files_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_base_files_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
+          {
+            foreignKeyName: "knowledge_base_files_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       learning_prescriptions_lms: {
         Row: {
           created_at: string

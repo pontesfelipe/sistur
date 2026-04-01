@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 12,
-  patch: 3,
+  minor: 13,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,14 +23,17 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.12.3",
+    version: "1.13.0",
     date: "2026-04-01",
-    type: "patch" as const,
+    type: "minor" as const,
     changes: [
+      "Nova seção 'Base de Conhecimento' no menu lateral para upload e gestão de documentos de referência",
+      "Upload de PDF, DOCX, XLSX, CSV e TXT (até 20MB) com categorização e escopo (global ou por destino)",
+      "Filtros por categoria, destino e busca textual para localizar arquivos rapidamente",
+      "Download direto e remoção de arquivos com confirmação de segurança",
+      "Bucket de armazenamento privado com RLS por organização para isolamento multi-tenant",
+      "8 categorias pré-definidas: Plano Diretor, Legislação, Pesquisa, Dados Oficiais, Relatório, etc.",
       "Integração Firecrawl como fallback para descoberta de URLs do CADASTUR quando API CKAN falha",
-      "Pipeline de ingestão CADASTUR agora tenta: 1) API CKAN → 2) Firecrawl scraping da página dados.gov.br",
-      "Extração inteligente de links de download (CSV/XLSX) via scraping com Firecrawl",
-      "Busca em links diretos e também em conteúdo markdown da página para maior cobertura",
     ]
   },
   {

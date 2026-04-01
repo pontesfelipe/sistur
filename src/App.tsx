@@ -64,6 +64,7 @@ const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const ProfessorDashboard = lazy(() => import("./pages/ProfessorDashboard"));
 const Tutorial = lazy(() => import("./pages/Tutorial"));
 const TutorialDetail = lazy(() => import("./pages/TutorialDetail"));
+const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
@@ -249,6 +250,14 @@ const App = () => {
                         <Relatorios />
                       </LicenseRoute>
                     </ERPRoute>
+                  }
+                />
+                <Route
+                  path="/base-conhecimento"
+                  element={
+                    <ProtectedRoute>
+                      <KnowledgeBase />
+                    </ProtectedRoute>
                   }
                 />
                 <Route
