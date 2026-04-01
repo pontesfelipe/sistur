@@ -588,6 +588,9 @@ export default function Configuracoes() {
               </CardContent>
             </Card>
 
+            {/* Global References - Admin only */}
+            <GlobalReferencesPanel />
+
             {/* Data Integrations */}
             <Card>
               <CardHeader>
