@@ -550,19 +550,30 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                   </div>
                                 </div>
                                 <div className="col-span-3">
-                                  <Input
-                                    type="number"
-                                    step="any"
-                                    value={currentValue ?? ''}
-                                    onChange={(e) => handleValueChange(indicator.id, e.target.value)}
-                                    disabled={isIgnored}
-                                    className={cn(
-                                      'w-full',
-                                      hasUnsavedChanges && 'border-accent ring-1 ring-accent',
-                                      isIgnored && 'bg-muted cursor-not-allowed'
+                                  <div className="relative">
+                                    <Input
+                                      type="number"
+                                      step="any"
+                                      value={currentValue ?? ''}
+                                      onChange={(e) => handleValueChange(indicator.id, e.target.value)}
+                                      disabled={isIgnored}
+                                      className={cn(
+                                        'w-full pr-8',
+                                        hasUnsavedChanges && 'border-accent ring-1 ring-accent',
+                                        isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
+                                        isIgnored && 'bg-muted cursor-not-allowed'
+                                      )}
+                                      placeholder={isIgnored ? 'Ignorado' : 'Valor'}
+                                    />
+                                    {isPreFilled && !hasUnsavedChanges && !isIgnored && (
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <PenLine className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-primary/50 pointer-events-auto cursor-pointer" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>Clique no campo para editar o valor pré-preenchido</TooltipContent>
+                                      </Tooltip>
                                     )}
-                                    placeholder={isIgnored ? 'Ignorado' : 'Valor'}
-                                  />
+                                  </div>
                                 </div>
                                 <div className="col-span-4 flex justify-end items-center gap-1.5">
                                   <Tooltip>

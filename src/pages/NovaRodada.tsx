@@ -991,6 +991,10 @@ export default function NovaRodada() {
                   <ul className="text-sm text-muted-foreground space-y-2">
                     <li className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-severity-good" />
+                      Alterar valores pré-preenchidos automaticamente (clique no campo para editar)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-severity-good" />
                       Importar dados adicionais via arquivo CSV
                     </li>
                     <li className="flex items-center gap-2">
