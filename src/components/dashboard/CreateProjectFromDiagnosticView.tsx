@@ -49,6 +49,16 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
   const createProject = useCreateProject();
   const createTasks = useCreateTasks();
 
+  const [step, setStep] = useState<'select' | 'configure'>('select');
+  const [selectedPlanIds, setSelectedPlanIds] = useState<Set<string>>(new Set());
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
+  const [methodology, setMethodology] = useState<ProjectMethodology>("kanban");
+  const [priority, setPriority] = useState<TaskPriority>("medium");
+  const [plannedStartDate, setPlannedStartDate] = useState("");
+  const [plannedEndDate, setPlannedEndDate] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+
   // Use issues (gargalos) as selectable items for project tasks
   const selectableItems = useMemo(() => {
     if (!issues) return [];
