@@ -181,11 +181,14 @@ export function IndicadoresPanel() {
     both: indicators.filter(i => (i as any).indicator_scope === 'both').length,
   }), [indicators]);
 
-  // Count by collection type
+  // Count by collection type (using effective type based on API_FETCHED_CODES)
+  const getEffectiveCollection = (i: any): CollectionType => 
+    API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : (i.collection_type || 'MANUAL');
+
   const collectionCounts = useMemo(() => ({
-    AUTOMATICA: indicators.filter(i => (i as any).collection_type === 'AUTOMATICA').length,
-    MANUAL: indicators.filter(i => !((i as any).collection_type) || (i as any).collection_type === 'MANUAL').length,
-    ESTIMADA: indicators.filter(i => (i as any).collection_type === 'ESTIMADA').length,
+    AUTOMATICA: indicators.filter(i => getEffectiveCollection(i) === 'AUTOMATICA').length,
+    MANUAL: indicators.filter(i => getEffectiveCollection(i) === 'MANUAL').length,
+    ESTIMADA: indicators.filter(i => getEffectiveCollection(i) === 'ESTIMADA').length,
   }), [indicators]);
 
   const handleUpdateTier = async (indicatorId: string, newTier: DiagnosisTier) => {
