@@ -568,6 +568,7 @@ export function IndicadoresPanel() {
           // MOBILE CARD VIEW
           <div className="divide-y">
             {filteredIndicators.map((indicator) => {
+              const collectionType = (indicator as any).collection_type as CollectionType | undefined;
               const isIGMA = (indicator as any).source === 'IGMA';
               const igmaDimension = (indicator as any).igma_dimension;
               const defaultInterpretation = (indicator as any).default_interpretation;
