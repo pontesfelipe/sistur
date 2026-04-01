@@ -66,6 +66,9 @@ interface GeneratedReport {
   destination_name: string;
   report_content: string;
   created_at: string;
+  visibility: string;
+  environment: string;
+  created_by: string;
 }
 
 function useGeneratedReports() {
