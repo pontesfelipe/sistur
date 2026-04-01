@@ -7,7 +7,7 @@ import { IndicatorScoresView } from '@/components/dashboard/IndicatorScoresView'
 import { IssuesView } from '@/components/dashboard/IssuesView';
 import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendationsPanel';
 import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
-import { ActionPlansView } from '@/components/dashboard/ActionPlansView';
+import { CreateProjectFromDiagnosticView } from '@/components/dashboard/CreateProjectFromDiagnosticView';
 import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
