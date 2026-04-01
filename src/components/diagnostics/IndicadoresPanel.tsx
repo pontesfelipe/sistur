@@ -173,6 +173,13 @@ export function IndicadoresPanel() {
     both: indicators.filter(i => (i as any).indicator_scope === 'both').length,
   }), [indicators]);
 
+  // Count by collection type
+  const collectionCounts = useMemo(() => ({
+    AUTOMATICA: indicators.filter(i => (i as any).collection_type === 'AUTOMATICA').length,
+    MANUAL: indicators.filter(i => !((i as any).collection_type) || (i as any).collection_type === 'MANUAL').length,
+    ESTIMADA: indicators.filter(i => (i as any).collection_type === 'ESTIMADA').length,
+  }), [indicators]);
+
   const handleUpdateTier = async (indicatorId: string, newTier: DiagnosisTier) => {
     try {
       await updateIndicator.mutateAsync({
