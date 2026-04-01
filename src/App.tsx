@@ -253,6 +253,14 @@ const App = () => {
                   }
                 />
                 <Route
+                  path="/base-conhecimento"
+                  element={
+                    <ProtectedRoute>
+                      <KnowledgeBase />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/nova-rodada"
                   element={
                     <ERPRoute>
