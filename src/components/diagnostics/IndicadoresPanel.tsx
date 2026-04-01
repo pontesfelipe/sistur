@@ -73,12 +73,17 @@ import { toast } from 'sonner';
 
 // EnterpriseIndicatorsPanel removed - unified into single panel
 
-// Codes that are auto-fetched via API (fetch-official-data edge function)
+// Codes that are auto-fetched via REAL API (fetch-official-data edge function)
 const API_FETCHED_CODES = new Set([
   'igma_populacao', 'igma_pib_per_capita', 'igma_idh', 'igma_area_territorial',
   'igma_densidade_demografica', 'igma_leitos_por_habitante', 'igma_cobertura_saude',
-  'igma_ideb', 'igma_taxa_escolarizacao', 'igma_receita_propria', 'igma_despesa_turismo',
-  'igma_meios_hospedagem', 'igma_guias_turismo', 'igma_agencias_turismo',
+  'igma_ideb', 'igma_receita_propria', 'igma_despesa_turismo',
+  'igma_meios_hospedagem',
+]);
+
+// Codes that require manual input (no public API available)
+const MANUAL_ENTRY_CODES = new Set([
+  'igma_guias_turismo', 'igma_agencias_turismo', 'igma_taxa_escolarizacao',
 ]);
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
@@ -162,7 +167,7 @@ export function IndicadoresPanel() {
     const matchesTier = tierFilter === 'all' || indicatorTier === tierFilter;
     const indicatorScope = (i as any).indicator_scope || 'territorial';
     const matchesScope = scopeFilter === 'all' || indicatorScope === scopeFilter;
-    const indicatorCollection = API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : ((i as any).collection_type || 'MANUAL');
+    const indicatorCollection = API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : (MANUAL_ENTRY_CODES.has(i.code) ? 'MANUAL' : ((i as any).collection_type || 'MANUAL'));
     const matchesCollection = collectionFilter === 'all' || indicatorCollection === collectionFilter;
     return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier && matchesScope && matchesCollection;
   });
@@ -183,7 +188,7 @@ export function IndicadoresPanel() {
 
   // Count by collection type (using effective type based on API_FETCHED_CODES)
   const getEffectiveCollection = (i: any): CollectionType => 
-    API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : (i.collection_type || 'MANUAL');
+    API_FETCHED_CODES.has(i.code) ? 'AUTOMATICA' : (MANUAL_ENTRY_CODES.has(i.code) ? 'MANUAL' : (i.collection_type || 'MANUAL'));
 
   const collectionCounts = useMemo(() => ({
     AUTOMATICA: indicators.filter(i => getEffectiveCollection(i) === 'AUTOMATICA').length,

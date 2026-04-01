@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 12,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,23 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.12.1",
+    date: "2026-04-01",
+    type: "patch" as const,
+    changes: [
+      "Transparência de dados: removidos todos os valores fabricados (estimativas falsas) do sistema",
+      "Integração IBGE expandida: 11 indicadores reais via APIs oficiais (Agregados + Pesquisas)",
+      "CADASTUR: documentação clara de que a API é restrita a órgãos federais — dados são manuais",
+      "Indicadores sem API pública agora aparecem como campos em branco (não mais com valores inventados)",
+      "Badge 'Manual' (vermelho) substitui 'Est.' para indicadores que requerem preenchimento pelo operador",
+      "Confiabilidade de dados manuais ajustada para 1/5 (anteriormente 3/5 — falsa segurança)",
+      "Nova seção 'Fontes de Dados e Transparência' na página de Metodologia",
+      "Relatórios agora incluem informações de proveniência dos dados (API vs Manual)",
+      "Catálogo de indicadores atualizado com distinção API/Manual correta",
+      "Referências bibliográficas incluem IBGE e CADASTUR como fontes oficiais"
+    ]
+  },
   {
     version: "1.12.0",
     date: "2026-04-01",
