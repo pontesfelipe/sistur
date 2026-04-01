@@ -73,6 +73,14 @@ import { toast } from 'sonner';
 
 // EnterpriseIndicatorsPanel removed - unified into single panel
 
+// Codes that are auto-fetched via API (fetch-official-data edge function)
+const API_FETCHED_CODES = new Set([
+  'igma_populacao', 'igma_pib_per_capita', 'igma_idh', 'igma_area_territorial',
+  'igma_densidade_demografica', 'igma_leitos_por_habitante', 'igma_cobertura_saude',
+  'igma_ideb', 'igma_taxa_escolarizacao', 'igma_receita_propria', 'igma_despesa_turismo',
+  'igma_meios_hospedagem', 'igma_guias_turismo', 'igma_agencias_turismo',
+]);
+
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 type IndicatorScope = 'territorial' | 'enterprise' | 'both';
