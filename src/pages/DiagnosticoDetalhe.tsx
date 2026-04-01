@@ -9,6 +9,9 @@ import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendatio
 import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
 import { CreateProjectFromDiagnosticView } from '@/components/dashboard/CreateProjectFromDiagnosticView';
 import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
+import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculationChecklist';
+import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
+import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -75,6 +78,8 @@ import { toast } from 'sonner';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+import { useQuery } from '@tanstack/react-query';
+
 const DiagnosticoDetalhe = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -85,6 +90,28 @@ const DiagnosticoDetalhe = () => {
   const { user } = useAuth();
   const [isPreFillOpen, setIsPreFillOpen] = useState(false);
   const [orgId, setOrgId] = useState<string | undefined>();
+
+  // Check if report exists for this assessment
+  const { data: existingReport } = useQuery({
+    queryKey: ['report-exists', id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data } = await supabase.from('generated_reports').select('id').eq('assessment_id', id).maybeSingle();
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  // Check if projects exist for this assessment
+  const { data: existingProjects } = useQuery({
+    queryKey: ['projects-exist', id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data } = await supabase.from('projects').select('id').eq('assessment_id', id as string).limit(1);
+      return data;
+    },
+    enabled: !!id,
+  });
 
   // Fetch org_id for current user
   useEffect(() => {
@@ -466,6 +493,14 @@ const DiagnosticoDetalhe = () => {
         </Card>
       )}
 
+      {/* Diagnostic Progress Dashboard */}
+      <DiagnosticProgressDashboard
+        status={assessment.status}
+        hasIndicatorValues={indicatorValues.length > 0}
+        hasReport={!!existingReport}
+        hasProjects={!!existingProjects && existingProjects.length > 0}
+      />
+
       {/* Header Card */}
       <div className="bg-card rounded-xl border p-6 mb-6">
         <div className="flex flex-wrap gap-6 items-start justify-between">
@@ -632,6 +667,15 @@ const DiagnosticoDetalhe = () => {
                 </p>
               </div>
             </div>
+
+            {/* Round Comparison */}
+            {assessment.destination_id && (
+              <RoundComparisonView
+                assessmentId={id!}
+                destinationId={assessment.destination_id}
+                currentPillarScores={pillarScores}
+              />
+            )}
           </TabsContent>
 
           {/* Categorias Enterprise Tab - Only for enterprise diagnostics */}
@@ -703,20 +747,21 @@ const DiagnosticoDetalhe = () => {
         </Tabs>
       ) : (
         /* Pre-calculation state */
-        <div className="bg-card rounded-xl border p-8 text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-            <Calculator className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <h3 className="text-lg font-display font-semibold mb-2">
-            {assessment.status === 'DRAFT'
-              ? 'Preencha os dados para calcular'
-              : 'Dados prontos para cálculo'}
-          </h3>
-          <p className="text-muted-foreground max-w-md mx-auto mb-6">
-            {assessment.status === 'DRAFT'
-              ? 'Complete o preenchimento dos indicadores via formulário ou importe um arquivo CSV com os dados.'
-              : 'Todos os dados foram preenchidos. Clique no botão abaixo para calcular os índices e gerar o diagnóstico.'}
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-card rounded-xl border p-8 text-center">
+            <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+              <Calculator className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-display font-semibold mb-2">
+              {assessment.status === 'DRAFT'
+                ? 'Preencha os dados para calcular'
+                : 'Dados prontos para cálculo'}
+            </h3>
+            <p className="text-muted-foreground max-w-md mx-auto mb-6">
+              {assessment.status === 'DRAFT'
+                ? 'Complete o preenchimento dos indicadores via formulário ou importe um arquivo CSV com os dados.'
+                : 'Todos os dados foram preenchidos. Clique no botão abaixo para calcular os índices e gerar o diagnóstico.'}
+            </p>
           <div className="flex gap-3 justify-center">
             {assessment.status === 'DRAFT' && (
               <>
@@ -745,6 +790,17 @@ const DiagnosticoDetalhe = () => {
                 </>
               )}
             </Button>
+          </div>
+          </div>
+          
+          {/* Pre-calculation checklist sidebar */}
+          <div className="lg:col-span-1">
+            <PreCalculationChecklist
+              indicators={isEnterprise ? enterpriseIndicators : indicators}
+              indicatorValues={indicatorValues}
+              tier={(assessment as any).tier}
+              isEnterprise={isEnterprise}
+            />
           </div>
         </div>
       )}

@@ -88,6 +88,7 @@ export default function Relatorios() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('generate');
   const [selectedHistoryReport, setSelectedHistoryReport] = useState<GeneratedReport | null>(null);
+  const [reportTemplate, setReportTemplate] = useState<string>('completo');
   const reportRef = useRef<HTMLDivElement>(null);
 
   // Pre-select assessment from URL parameter
@@ -145,6 +146,7 @@ export default function Relatorios() {
           issues: issues || [],
           prescriptions: prescriptions || [],
           forceRegenerate,
+          reportTemplate,
         }),
       });
 
@@ -274,6 +276,43 @@ export default function Relatorios() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast.success('Relatório baixado!');
+  };
+
+  const downloadPDF = () => {
+    if (!reportRef.current) return;
+    
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast.error('Popup bloqueado. Permita popups para gerar o PDF.');
+      return;
+    }
+
+    const styles = `
+      <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; max-width: 800px; margin: 0 auto; }
+        h1 { font-size: 24px; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-top: 32px; }
+        h2 { font-size: 20px; color: #1e40af; margin-top: 24px; }
+        h3 { font-size: 16px; color: #374151; margin-top: 16px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+        th { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-weight: 600; }
+        td { border: 1px solid #cbd5e1; padding: 8px; }
+        tr:nth-child(even) { background: #f8fafc; }
+        strong { color: #1e40af; }
+        hr { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
+        ul, ol { padding-left: 24px; }
+        li { margin-bottom: 4px; }
+        @media print { body { padding: 20px; } }
+      </style>
+    `;
+
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>Relatório SISTUR</title>${styles}</head><body>${reportRef.current.innerHTML}</body></html>`);
+    printWindow.document.close();
+    
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+    
+    toast.success('PDF preparado! Use "Salvar como PDF" na janela de impressão.');
   };
 
   // Improved markdown renderer with table support
@@ -461,6 +500,22 @@ export default function Relatorios() {
                     </Select>
                   </div>
 
+                  <div className="w-48">
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                      Modelo
+                    </label>
+                    <Select value={reportTemplate} onValueChange={setReportTemplate}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="completo">📋 Completo</SelectItem>
+                        <SelectItem value="executivo">📊 Executivo</SelectItem>
+                        <SelectItem value="investidor">💰 Investidores</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="flex items-end gap-2">
                     <Button 
                       onClick={() => generateReport()} 
@@ -481,10 +536,16 @@ export default function Relatorios() {
                     </Button>
 
                     {report && (
-                      <Button variant="outline" onClick={() => downloadReport(report, selectedDestination?.name || 'destino')} className="gap-2">
-                        <Download className="h-4 w-4" />
-                        Baixar Markdown
-                      </Button>
+                      <>
+                        <Button variant="outline" onClick={() => downloadReport(report, selectedDestination?.name || 'destino')} className="gap-2">
+                          <Download className="h-4 w-4" />
+                          Markdown
+                        </Button>
+                        <Button variant="outline" onClick={downloadPDF} className="gap-2">
+                          <FileText className="h-4 w-4" />
+                          PDF
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -664,15 +725,26 @@ export default function Relatorios() {
                     )}
                   </div>
                   {selectedHistoryReport && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => downloadReport(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
-                      className="gap-2"
-                    >
-                      <Download className="h-4 w-4" />
-                      Baixar Markdown
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => downloadReport(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
+                        className="gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        Markdown
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={downloadPDF}
+                        className="gap-2"
+                      >
+                        <FileText className="h-4 w-4" />
+                        PDF
+                      </Button>
+                    </div>
                   )}
                 </CardHeader>
                 <CardContent>
