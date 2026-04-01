@@ -17,10 +17,12 @@
     <meta name="twitter:site" content="@SISTUR" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
     
-    <!-- DNS prefetch for external origins used after initial load -->
-    <link rel="dns-prefetch" href="https://enexnpmkhvgufcervjsv.supabase.co" />
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <!-- Preconnect for critical origins -->
+    <link rel="preconnect" href="https://enexnpmkhvgufcervjsv.supabase.co" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Load fonts via link instead of CSS @import to avoid render-blocking chain -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" />
   </head>
 
   <body>
