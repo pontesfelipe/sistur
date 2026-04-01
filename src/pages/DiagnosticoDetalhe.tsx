@@ -57,6 +57,7 @@ import {
   Hotel,
   Layers,
   EyeOff,
+  BookOpen,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -126,15 +127,27 @@ const DiagnosticoDetalhe = () => {
   const [isPreFillOpen, setIsPreFillOpen] = useState(false);
   const [orgId, setOrgId] = useState<string | undefined>();
 
-  // Check if report exists for this assessment
+  // Check if report exists for this assessment (including kb_file_ids)
   const { data: existingReport } = useQuery({
     queryKey: ['report-exists', id],
     queryFn: async () => {
       if (!id) return null;
-      const { data } = await supabase.from('generated_reports').select('id').eq('assessment_id', id).maybeSingle();
+      const { data } = await supabase.from('generated_reports').select('id, kb_file_ids').eq('assessment_id', id).maybeSingle();
       return data;
     },
     enabled: !!id,
+  });
+
+  // Fetch KB file names used in this report
+  const reportKbFileIds = (existingReport as any)?.kb_file_ids as string[] | null;
+  const { data: kbFilesUsed = [] } = useQuery({
+    queryKey: ['kb-files-used', reportKbFileIds],
+    queryFn: async () => {
+      if (!reportKbFileIds || reportKbFileIds.length === 0) return [];
+      const { data } = await supabase.from('knowledge_base_files').select('id, file_name, category').in('id', reportKbFileIds);
+      return data || [];
+    },
+    enabled: !!reportKbFileIds && reportKbFileIds.length > 0,
   });
 
   // Check if projects exist for this assessment
@@ -595,6 +608,36 @@ const DiagnosticoDetalhe = () => {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* KB Files Used Notice */}
+      {isCalculated && kbFilesUsed.length > 0 && (
+        <Card className="mb-6 border-primary/20 bg-primary/5">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <BookOpen className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium text-sm">Documentos da Base de Conhecimento utilizados</p>
+                <p className="text-xs text-muted-foreground mt-0.5 mb-2">
+                  Os seguintes arquivos foram considerados na geração do relatório deste diagnóstico:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {kbFilesUsed.map((f: any) => (
+                    <Badge key={f.id} variant="outline" className="text-xs">
+                      <FileText className="h-3 w-3 mr-1" />
+                      {f.file_name}
+                    </Badge>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Para atualizar com novos documentos, gere o relatório novamente.
+                </p>
               </div>
             </div>
           </CardContent>

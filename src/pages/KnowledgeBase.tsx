@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
-  Upload, FileText, Trash2, Download, Search, Filter,
-  File, FileSpreadsheet, BookOpen, FolderOpen, Plus, MapPin,
+  Upload, FileText, Trash2, Download, Search,
+  File, FileSpreadsheet, BookOpen, FolderOpen, Plus, MapPin, ChevronDown, Globe,
 } from 'lucide-react';
 import {
   useKnowledgeBaseFiles, useUploadKBFile, useDeleteKBFile, useDownloadKBFile,
@@ -36,22 +37,27 @@ const formatSize = (bytes: number) => {
 
 export default function KnowledgeBase() {
   const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [destFilter, setDestFilter] = useState<string>('all');
   const [uploadOpen, setUploadOpen] = useState(false);
 
   const { data: files = [], isLoading } = useKnowledgeBaseFiles();
   const { destinations = [] } = useDestinations();
 
   const filtered = files.filter((f) => {
-    const matchSearch = !search || f.file_name.toLowerCase().includes(search.toLowerCase())
+    return !search || f.file_name.toLowerCase().includes(search.toLowerCase())
       || f.description?.toLowerCase().includes(search.toLowerCase());
-    const matchCat = categoryFilter === 'all' || f.category === categoryFilter;
-    const matchDest = destFilter === 'all'
-      || (destFilter === 'global' && !f.destination_id)
-      || f.destination_id === destFilter;
-    return matchSearch && matchCat && matchDest;
   });
+
+  // Group files by destination
+  const globalFiles = filtered.filter(f => !f.destination_id);
+  const filesByDest = new Map<string, KBFile[]>();
+  filtered.filter(f => f.destination_id).forEach(f => {
+    const existing = filesByDest.get(f.destination_id!) || [];
+    existing.push(f);
+    filesByDest.set(f.destination_id!, existing);
+  });
+
+  // Sort destinations that have files
+  const destsWithFiles = (destinations as any[]).filter((d: any) => filesByDest.has(d.id));
 
   return (
     <AppLayout title="Base de Conhecimento">
@@ -63,42 +69,18 @@ export default function KnowledgeBase() {
               Base de Conhecimento
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Documentos e dados de referência para enriquecer diagnósticos e relatórios
+              Documentos de referência organizados por destino — usados automaticamente em diagnósticos e relatórios
             </p>
           </div>
           <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} destinations={destinations} />
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Buscar arquivo..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
-          </div>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-[180px]">
-              <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas categorias</SelectItem>
-              {KB_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={destFilter} onValueChange={setDestFilter}>
-            <SelectTrigger className="w-[200px]">
-              <MapPin className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Destino" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="global">Global (organização)</SelectItem>
-              {destinations.map((d: any) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
-            </SelectContent>
-          </Select>
+        {/* Search */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Buscar arquivo..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
         </div>
 
-        {/* File list */}
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full" />)}
@@ -115,9 +97,28 @@ export default function KnowledgeBase() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-3">
-            {filtered.map(file => (
-              <FileCard key={file.id} file={file} destinations={destinations} />
+          <div className="space-y-4">
+            {/* Global files */}
+            {globalFiles.length > 0 && (
+              <DestinationGroup
+                label="Global (toda organização)"
+                icon={<Globe className="h-4 w-4 text-primary" />}
+                files={globalFiles}
+                destinations={destinations}
+                defaultOpen
+              />
+            )}
+
+            {/* Files grouped by destination */}
+            {destsWithFiles.map((dest: any) => (
+              <DestinationGroup
+                key={dest.id}
+                label={`${dest.name}${dest.uf ? ` — ${dest.uf}` : ''}`}
+                icon={<MapPin className="h-4 w-4 text-primary" />}
+                files={filesByDest.get(dest.id) || []}
+                destinations={destinations}
+                defaultOpen
+              />
             ))}
           </div>
         )}
@@ -131,25 +132,54 @@ export default function KnowledgeBase() {
   );
 }
 
+function DestinationGroup({ label, icon, files, destinations, defaultOpen }: {
+  label: string;
+  icon: React.ReactNode;
+  files: KBFile[];
+  destinations: any[];
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen ?? true);
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger asChild>
+        <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto hover:bg-muted/50">
+          <div className="flex items-center gap-2 font-semibold">
+            {icon}
+            {label}
+            <Badge variant="secondary" className="text-xs ml-1">{files.length}</Badge>
+          </div>
+          <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+        </Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="grid gap-2 pl-2">
+          {files.map(file => (
+            <FileCard key={file.id} file={file} destinations={destinations} />
+          ))}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
 function FileCard({ file, destinations }: { file: KBFile; destinations: any[] }) {
   const deleteFile = useDeleteKBFile();
   const downloadFile = useDownloadKBFile();
-  const dest = destinations.find((d: any) => d.id === file.destination_id);
   const catLabel = KB_CATEGORIES.find(c => c.value === file.category)?.label || file.category;
 
   return (
     <Card className="hover:border-primary/30 transition-colors">
-      <CardContent className="flex items-center gap-4 py-4">
+      <CardContent className="flex items-center gap-4 py-3">
         {fileIcon(file.file_type)}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="font-medium truncate">{file.file_name}</p>
+            <p className="font-medium truncate text-sm">{file.file_name}</p>
             <Badge variant="secondary" className="text-xs shrink-0">{catLabel}</Badge>
-            {dest && <Badge variant="outline" className="text-xs shrink-0"><MapPin className="h-3 w-3 mr-1" />{dest.name}</Badge>}
-            {!file.destination_id && <Badge variant="outline" className="text-xs shrink-0 bg-primary/5">Global</Badge>}
           </div>
-          {file.description && <p className="text-sm text-muted-foreground truncate mt-0.5">{file.description}</p>}
-          <p className="text-xs text-muted-foreground mt-1">
+          {file.description && <p className="text-xs text-muted-foreground truncate mt-0.5">{file.description}</p>}
+          <p className="text-xs text-muted-foreground mt-0.5">
             {formatSize(file.file_size_bytes)} • {format(new Date(file.created_at), "dd MMM yyyy", { locale: ptBR })}
           </p>
         </div>
@@ -243,18 +273,21 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
               )}
             </Button>
           </div>
+          <Select value={destId || 'global'} onValueChange={v => setDestId(v === 'global' ? '' : v)}>
+            <SelectTrigger>
+              <MapPin className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Destino" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="global">Global (toda organização)</SelectItem>
+              {(destinations as any[]).map((d: any) => <SelectItem key={d.id} value={d.id}>{d.name}{d.uf ? ` — ${d.uf}` : ''}</SelectItem>)}
+            </SelectContent>
+          </Select>
           <Textarea placeholder="Descrição (opcional)" value={description} onChange={e => setDescription(e.target.value)} rows={2} />
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger><SelectValue placeholder="Categoria" /></SelectTrigger>
             <SelectContent>
               {KB_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={destId || 'global'} onValueChange={v => setDestId(v === 'global' ? '' : v)}>
-            <SelectTrigger><SelectValue placeholder="Escopo" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="global">Global (toda organização)</SelectItem>
-              {destinations.map((d: any) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>

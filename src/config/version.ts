@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 13,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.13.2",
+    date: "2026-04-01",
+    type: "patch" as const,
+    changes: [
+      "Base de Conhecimento reorganizada por destino (agrupamento visual com collapsible)",
+      "Upload de arquivos agora prioriza seleção de destino (destino-first)",
+      "Relatórios e diagnósticos usam automaticamente arquivos KB do destino + globais",
+      "Aviso visual no diagnóstico calculado mostrando quais arquivos KB foram utilizados",
+      "Coluna kb_file_ids na tabela de relatórios para rastreabilidade",
+      "Removido dropdown de diagnóstico — arquivos são associados a destinos",
+    ]
+  },
   {
     version: "1.13.1",
     date: "2026-04-01",

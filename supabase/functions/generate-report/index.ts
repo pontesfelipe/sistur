@@ -462,13 +462,16 @@ serve(async (req) => {
       }
     }
 
-    // Fetch all data in parallel
-    const [indicatorScoresRes, alertsRes, actionPlansRes, indicatorValuesRes, globalRefsRes] = await Promise.all([
+    // Fetch all data in parallel (including destination-specific KB files)
+    const destinationId = assessment.destination_id;
+    const [indicatorScoresRes, alertsRes, actionPlansRes, indicatorValuesRes, globalRefsRes, kbFilesRes] = await Promise.all([
       supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
       supabase.from('indicator_values').select('*, indicators(code, name, pillar, theme, unit)').eq('assessment_id', assessmentId),
       supabaseAdmin.from('global_reference_files').select('file_name, category, summary, description').eq('is_active', true).not('summary', 'is', null),
+      // Fetch KB files for this destination + global KB files
+      supabase.from('knowledge_base_files').select('id, file_name, description, category').eq('is_active', true).or(destinationId ? `destination_id.eq.${destinationId},destination_id.is.null` : 'destination_id.is.null'),
     ]);
 
     const indicatorScores = indicatorScoresRes.data || [];
@@ -476,9 +479,10 @@ serve(async (req) => {
     const actionPlans = actionPlansRes.data || [];
     const indicatorValues = indicatorValuesRes.data || [];
     const globalRefs = globalRefsRes.data || [];
+    const kbFiles = kbFilesRes.data || [];
 
     console.log('Report for:', destinationName, isEnterprise ? '(ENTERPRISE)' : '(TERRITORIAL)');
-    console.log('Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length);
+    console.log('Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 'KB files:', kbFiles.length);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -550,12 +554,23 @@ INSTRUÇÕES SOBRE REFERÊNCIAS:
 - Aponte alinhamento ou desalinhamento com políticas públicas vigentes
 - Use dados e benchmarks dos documentos para enriquecer comparações
 ` : ''}
+${kbFiles.length > 0 ? `=== BASE DE CONHECIMENTO DO DESTINO ===
+Os seguintes documentos foram associados a este destino e devem ser considerados como referência adicional:
+
+${kbFiles.map((f: any) => `- ${f.file_name}${f.description ? ` — ${f.description}` : ''} (Categoria: ${f.category})`).join('\n')}
+
+INSTRUÇÕES SOBRE BASE DE CONHECIMENTO:
+- Use as informações desses documentos para contextualizar e enriquecer a análise
+- Referencie dados e diretrizes presentes nesses documentos quando relevante
+- Esses documentos representam dados locais e diretrizes específicas do destino
+` : ''}
 === INSTRUÇÕES FINAIS ===
 1. COMECE com o título e IMEDIATAMENTE a tabela de Ficha Técnica fornecida acima — NÃO pule essa tabela
 2. Siga EXATAMENTE a estrutura definida no system prompt para o template "${reportTemplate}"
 3. Use TABELAS MARKDOWN para todos os conjuntos de dados
 4. Justifique todas as conclusões com dados fornecidos
-${globalRefs.length > 0 ? '5. Referencie documentos oficiais quando contextualizar resultados e prescrições' : ''}`;
+${globalRefs.length > 0 ? '5. Referencie documentos oficiais quando contextualizar resultados e prescrições' : ''}
+${kbFiles.length > 0 ? `${globalRefs.length > 0 ? '6' : '5'}. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -629,17 +644,18 @@ ${globalRefs.length > 0 ? '5. Referencie documentos oficiais quando contextualiz
             .eq('assessment_id', assessmentId)
             .maybeSingle();
           
+          const kbFileIds = kbFiles.map((f: any) => f.id);
           if (existing) {
             const { error } = await supabaseAdmin
               .from('generated_reports')
-              .update({ report_content: fullContent, created_at: new Date().toISOString() })
+              .update({ report_content: fullContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds })
               .eq('id', existing.id);
             if (error) console.error('Error updating report:', error);
             else console.log('Report updated successfully');
           } else {
             const { error } = await supabaseAdmin
               .from('generated_reports')
-              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: fullContent, created_by: userId });
+              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: fullContent, created_by: userId, kb_file_ids: kbFileIds });
             if (error) console.error('Error saving report:', error);
             else console.log('Report saved successfully');
           }
