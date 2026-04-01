@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 13,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.13.3",
+    date: "2026-04-01",
+    type: "patch" as const,
+    changes: [
+      "Removida opção de download Markdown dos relatórios",
+      "Novo dialog de personalização de relatório: logo, cabeçalho, rodapé, cor primária, tamanho de fonte",
+      "Personalização aplicada automaticamente nas exportações Word e PDF",
+      "Notas adicionais opcionais incluídas como bloco final no relatório",
+      "Configurações salvas localmente para reutilização entre sessões",
+    ]
+  },
   {
     version: "1.13.2",
     date: "2026-04-01",
