@@ -653,9 +653,9 @@ const DiagnosticoDetalhe = () => {
             <EduRecommendationsPanel indicatorScores={indicatorScores as any} assessmentId={id} />
           </TabsContent>
 
-          {/* Planos de Ação Tab */}
-          <TabsContent value="planos">
-            <ActionPlansView assessmentId={id!} />
+          {/* Projeto Tab */}
+          <TabsContent value="projeto">
+            <CreateProjectFromDiagnosticView assessmentId={id!} destinationId={assessment?.destination_id} />
           </TabsContent>
         </Tabs>
       ) : (
