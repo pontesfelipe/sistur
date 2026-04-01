@@ -1549,10 +1549,7 @@ serve(async (req) => {
       interpretation_type: igmaResult.interpretationType,
     });
 
-    // 14. Detect regression patterns and create alerts
-    console.log(`Checking regression patterns for destination: ${destinationId}`);
-
-    // Get all previous calculated assessments for this destination
+    // 13.5 Fetch previous assessments (used for cycles + regression detection)
     const { data: allPreviousAssessments } = await supabase
       .from("assessments")
       .select("id, calculated_at")
@@ -1560,6 +1557,84 @@ serve(async (req) => {
       .eq("status", "CALCULATED")
       .neq("id", assessment_id)
       .order("calculated_at", { ascending: false });
+
+    // 13.6 Track prescription cycles (evolution/stagnation/regression per indicator)
+    console.log("Tracking prescription evolution cycles...");
+    if (allPreviousAssessments && allPreviousAssessments.length > 0) {
+      const prevAssessmentIdForCycles = allPreviousAssessments[0]?.id;
+      if (prevAssessmentIdForCycles) {
+        const { data: prevIndicatorScores } = await supabase
+          .from("indicator_scores")
+          .select("indicator_id, score")
+          .eq("assessment_id", prevAssessmentIdForCycles);
+
+        const { data: currentPrescriptions } = await supabase
+          .from("prescriptions")
+          .select("id, indicator_id")
+          .eq("assessment_id", assessment_id);
+
+        if (prevIndicatorScores && currentPrescriptions) {
+          const prevScoreMap = new Map(prevIndicatorScores.map(s => [s.indicator_id, s.score]));
+          
+          const { data: currentIndicatorScores } = await supabase
+            .from("indicator_scores")
+            .select("indicator_id, score")
+            .eq("assessment_id", assessment_id);
+
+          const currScoreMap = new Map((currentIndicatorScores || []).map(s => [s.indicator_id, s.score]));
+
+          const cycles: Array<{
+            org_id: string;
+            prescription_id: string;
+            assessment_id: string;
+            previous_score: number | null;
+            current_score: number | null;
+            evolution_state: string;
+          }> = [];
+
+          for (const presc of currentPrescriptions) {
+            if (!presc.indicator_id) continue;
+            
+            const prevScore = prevScoreMap.get(presc.indicator_id) ?? null;
+            const currScore = currScoreMap.get(presc.indicator_id) ?? null;
+
+            let evolutionState = "STAGNATION";
+            if (prevScore !== null && currScore !== null) {
+              const diff = currScore - prevScore;
+              if (diff > 0.02) evolutionState = "EVOLUTION";
+              else if (diff < -0.02) evolutionState = "REGRESSION";
+            }
+
+            cycles.push({
+              org_id: orgId,
+              prescription_id: presc.id,
+              assessment_id,
+              previous_score: prevScore,
+              current_score: currScore,
+              evolution_state: evolutionState,
+            });
+          }
+
+          if (cycles.length > 0) {
+            const { error: cycleError } = await supabase
+              .from("prescription_cycles")
+              .insert(cycles);
+
+            if (cycleError) {
+              console.error("Error inserting prescription cycles:", cycleError);
+            } else {
+              const evo = cycles.filter(c => c.evolution_state === "EVOLUTION").length;
+              const stag = cycles.filter(c => c.evolution_state === "STAGNATION").length;
+              const reg = cycles.filter(c => c.evolution_state === "REGRESSION").length;
+              console.log(`Prescription cycles: ${evo} evolution, ${stag} stagnation, ${reg} regression`);
+            }
+          }
+        }
+      }
+    }
+
+    // 14. Detect regression patterns and create alerts
+    console.log(`Checking regression patterns for destination: ${destinationId}`);
 
     if (allPreviousAssessments && allPreviousAssessments.length > 0) {
       // Get pillar scores for previous assessments
