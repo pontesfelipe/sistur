@@ -463,17 +463,19 @@ serve(async (req) => {
     }
 
     // Fetch all data in parallel
-    const [indicatorScoresRes, alertsRes, actionPlansRes, indicatorValuesRes] = await Promise.all([
+    const [indicatorScoresRes, alertsRes, actionPlansRes, indicatorValuesRes, globalRefsRes] = await Promise.all([
       supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
       supabase.from('indicator_values').select('*, indicators(code, name, pillar, theme, unit)').eq('assessment_id', assessmentId),
+      supabaseAdmin.from('global_reference_files').select('file_name, category, summary, description').eq('is_active', true).not('summary', 'is', null),
     ]);
 
     const indicatorScores = indicatorScoresRes.data || [];
     const alerts = alertsRes.data || [];
     const actionPlans = actionPlansRes.data || [];
     const indicatorValues = indicatorValuesRes.data || [];
+    const globalRefs = globalRefsRes.data || [];
 
     console.log('Report for:', destinationName, isEnterprise ? '(ENTERPRISE)' : '(TERRITORIAL)');
     console.log('Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 'Prescriptions:', prescriptions?.length || 0);
