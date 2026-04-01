@@ -69,7 +69,7 @@ import {
   useRecommendations,
 } from '@/hooks/useAssessmentData';
 import { useIndicatorValues } from '@/hooks/useIndicators';
-import { useFetchOfficialData, useExternalIndicatorValues, useValidateIndicatorValues } from '@/hooks/useOfficialData';
+import { useFetchOfficialData, useExternalIndicatorValues, useValidateIndicatorValues, useDiagnosisDataSnapshots } from '@/hooks/useOfficialData';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import type { Pillar, Severity, TerritorialInterpretation } from '@/types/sistur';
