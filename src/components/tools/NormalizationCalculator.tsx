@@ -187,7 +187,7 @@ export function NormalizationCalculator() {
                   {getStatusBadge(result.status)}
                 </div>
                 <div className="text-4xl font-bold text-center mb-2">
-                  {result.score.toFixed(4)}
+                  {(result.score * 100).toFixed(1)}%
                 </div>
                 <div className="text-xs text-muted-foreground text-center font-mono bg-muted/50 p-2 rounded">
                   {result.formula}
