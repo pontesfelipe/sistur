@@ -193,9 +193,9 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
           for (const val of toInsert) {
             await supabase.from('indicator_values').insert(val);
           }
-          // Refetch values to update the form
-          // Using queryClient would be cleaner but bulkUpsertValues handles cache invalidation
-          window.location.reload(); // Simple approach - values will be fresh on reload
+          // Refetch indicator values to update the form
+          await queryClient.invalidateQueries({ queryKey: ['indicator-values', selectedAssessment] });
+          toast.success(`${toInsert.length} indicadores pré-preenchidos automaticamente`);
         }
 
         setHasAutoInjected(true);
