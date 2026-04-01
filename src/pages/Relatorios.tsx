@@ -796,15 +796,6 @@ export default function Relatorios() {
                         <FileText className="h-4 w-4" />
                         PDF
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => downloadReport(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
-                        className="gap-2 text-muted-foreground"
-                      >
-                        <Download className="h-3 w-3" />
-                        MD
-                      </Button>
                     </div>
                   )}
                 </CardHeader>
