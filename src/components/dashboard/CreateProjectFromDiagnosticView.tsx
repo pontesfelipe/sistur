@@ -45,36 +45,23 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
   const navigate = useNavigate();
   const { user } = useAuth();
   const { profile } = useProfile();
-  const { data: plans, isLoading: plansLoading } = useActionPlans(assessmentId);
-  const { data: prescriptions, isLoading: prescriptionsLoading } = usePrescriptions(assessmentId);
+  const { data: issues, isLoading } = useIssues(assessmentId);
   const createProject = useCreateProject();
   const createTasks = useCreateTasks();
 
-  const [step, setStep] = useState<'select' | 'configure'>('select');
-  const [selectedPlanIds, setSelectedPlanIds] = useState<Set<string>>(new Set());
-  const [projectName, setProjectName] = useState("");
-  const [projectDescription, setProjectDescription] = useState("");
-  const [methodology, setMethodology] = useState<ProjectMethodology>("kanban");
-  const [priority, setPriority] = useState<TaskPriority>("medium");
-  const [plannedStartDate, setPlannedStartDate] = useState("");
-  const [plannedEndDate, setPlannedEndDate] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
-
-  const isLoading = plansLoading || prescriptionsLoading;
-
-  // Merge action plans as selectable items
+  // Use issues (gargalos) as selectable items for project tasks
   const selectableItems = useMemo(() => {
-    if (!plans) return [];
-    return plans.map(plan => ({
-      id: plan.id,
-      title: plan.title,
-      description: plan.description,
-      pillar: plan.pillar,
-      priority: plan.priority,
-      linkedIssueId: plan.linked_issue_id,
-      linkedPrescriptionId: plan.linked_prescription_id,
+    if (!issues) return [];
+    return issues.map(issue => ({
+      id: issue.id,
+      title: issue.title,
+      description: issue.theme ? `Tema: ${issue.theme}` : null,
+      pillar: issue.pillar,
+      priority: issue.severity === 'CRITICO' ? 1 : issue.severity === 'MODERADO' ? 3 : 5,
+      linkedIssueId: issue.id,
+      linkedPrescriptionId: null as string | null,
     }));
-  }, [plans]);
+  }, [issues]);
 
   const toggleItem = (id: string) => {
     setSelectedPlanIds(prev => {
