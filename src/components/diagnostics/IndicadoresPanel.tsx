@@ -81,9 +81,14 @@ const API_FETCHED_CODES = new Set([
   'igma_meios_hospedagem',
 ]);
 
+// Codes fetched semi-automatically from CADASTUR open data (CSV pipeline)
+const CADASTUR_SEMI_AUTO_CODES = new Set([
+  'igma_guias_turismo', 'igma_agencias_turismo',
+]);
+
 // Codes that require manual input (no public API available)
 const MANUAL_ENTRY_CODES = new Set([
-  'igma_guias_turismo', 'igma_agencias_turismo', 'igma_taxa_escolarizacao',
+  'igma_taxa_escolarizacao',
 ]);
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
