@@ -203,6 +203,24 @@ const DiagnosticoDetalhe = () => {
 
   // Calculate data completeness based on diagnostic type - exclude ignored
   const activeIndicatorValues = indicatorValues.filter((v: any) => !v.is_ignored);
+  const normalizationIndicatorValues = diagnosisSnapshots.length > 0
+    ? diagnosisSnapshots
+        .map((snapshot: any) => {
+          const matchedIndicator = indicators.find((ind: any) => ind.code === snapshot.indicator_code)
+            || enterpriseIndicators.find((ind: any) => ind.code === snapshot.indicator_code)
+            || indicatorValues.find((v: any) => v.indicator?.code === snapshot.indicator_code)?.indicator;
+
+          return matchedIndicator
+            ? {
+                indicator_id: matchedIndicator.id,
+                value_raw: snapshot.value_used,
+                source: snapshot.source_code,
+                reference_date: snapshot.reference_year ? `${snapshot.reference_year}-01-01` : null,
+              }
+            : null;
+        })
+        .filter(Boolean)
+    : activeIndicatorValues;
   const totalIndicators = isEnterprise
     ? (enterpriseIndicators.length || indicators.length)
     : indicators.length;
