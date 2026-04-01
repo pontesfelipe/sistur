@@ -13,10 +13,11 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import {
   Upload, FileText, Trash2, Download, Search,
   File, FileSpreadsheet, BookOpen, FolderOpen, Plus, MapPin, ChevronDown, Globe,
+  ShieldCheck, Loader2, AlertTriangle,
 } from 'lucide-react';
 import {
   useKnowledgeBaseFiles, useUploadKBFile, useDeleteKBFile, useDownloadKBFile,
-  KB_CATEGORIES, ACCEPTED_EXTENSIONS, KBFile,
+  useModerateKBFile, KB_CATEGORIES, ACCEPTED_EXTENSIONS, KBFile,
 } from '@/hooks/useKnowledgeBase';
 import { useDestinations } from '@/hooks/useDestinations';
 import { format } from 'date-fns';
