@@ -82,7 +82,7 @@ function parseMarkdownTable(lines: string[]): Table | null {
                   bold: isHeader,
                   font: 'Arial',
                   size: isHeader ? 20 : 20,
-                  color: isHeader ? PRIMARY : undefined,
+                  color: isHeader ? DEFAULT_PRIMARY : undefined,
                 }),
               ],
             }),
