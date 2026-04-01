@@ -667,6 +667,15 @@ const DiagnosticoDetalhe = () => {
                 </p>
               </div>
             </div>
+
+            {/* Round Comparison */}
+            {assessment.destination_id && (
+              <RoundComparisonView
+                assessmentId={id!}
+                destinationId={assessment.destination_id}
+                currentPillarScores={pillarScores}
+              />
+            )}
           </TabsContent>
 
           {/* Categorias Enterprise Tab - Only for enterprise diagnostics */}
