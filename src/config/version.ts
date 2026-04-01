@@ -34,6 +34,11 @@ export const VERSION_HISTORY = [
     ]
   },
   {
+    version: "1.13.0",
+    date: "2026-04-01",
+    type: "minor" as const,
+    changes: [
+      "Nova seção 'Base de Conhecimento' no menu lateral para upload e gestão de documentos de referência",
       "Upload de PDF, DOCX, XLSX, CSV e TXT (até 20MB) com categorização e escopo (global ou por destino)",
       "Filtros por categoria, destino e busca textual para localizar arquivos rapidamente",
       "Download direto e remoção de arquivos com confirmação de segurança",
