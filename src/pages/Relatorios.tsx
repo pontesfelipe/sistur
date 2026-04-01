@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { exportReportAsDocx } from '@/lib/exportReportDocx';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -281,9 +282,20 @@ export default function Relatorios() {
   const downloadPDF = () => {
     if (!reportRef.current) return;
     
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      toast.error('Popup bloqueado. Permita popups para gerar o PDF.');
+    // Use an iframe instead of popup to avoid popup blockers
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentWindow?.document;
+    if (!iframeDoc) {
+      toast.error('Não foi possível preparar o PDF.');
+      document.body.removeChild(iframe);
       return;
     }
 
@@ -301,18 +313,34 @@ export default function Relatorios() {
         hr { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
         ul, ol { padding-left: 24px; }
         li { margin-bottom: 4px; }
-        @media print { body { padding: 20px; } }
+        @media print { body { padding: 20px; } @page { margin: 1.5cm; } }
       </style>
     `;
 
-    printWindow.document.write(`<!DOCTYPE html><html><head><title>Relatório SISTUR</title>${styles}</head><body>${reportRef.current.innerHTML}</body></html>`);
-    printWindow.document.close();
+    iframeDoc.open();
+    iframeDoc.write(`<!DOCTYPE html><html><head><title>Relatório SISTUR</title>${styles}</head><body>${reportRef.current.innerHTML}</body></html>`);
+    iframeDoc.close();
     
     setTimeout(() => {
-      printWindow.print();
+      iframe.contentWindow?.print();
+      // Clean up after print dialog closes
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
     }, 500);
     
-    toast.success('PDF preparado! Use "Salvar como PDF" na janela de impressão.');
+    toast.success('Use "Salvar como PDF" na janela de impressão.');
+  };
+
+  const downloadDocx = async (content: string, destName: string) => {
+    if (!content) return;
+    try {
+      await exportReportAsDocx(content, destName);
+      toast.success('Relatório Word baixado!');
+    } catch (err) {
+      console.error('Error exporting DOCX:', err);
+      toast.error('Erro ao gerar arquivo Word.');
+    }
   };
 
   // Improved markdown renderer with table support
@@ -537,13 +565,17 @@ export default function Relatorios() {
 
                     {report && (
                       <>
-                        <Button variant="outline" onClick={() => downloadReport(report, selectedDestination?.name || 'destino')} className="gap-2">
+                        <Button variant="outline" onClick={() => downloadDocx(report, selectedDestination?.name || 'destino')} className="gap-2">
                           <Download className="h-4 w-4" />
-                          Markdown
+                          Word
                         </Button>
                         <Button variant="outline" onClick={downloadPDF} className="gap-2">
                           <FileText className="h-4 w-4" />
                           PDF
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => downloadReport(report, selectedDestination?.name || 'destino')} className="gap-2 text-muted-foreground">
+                          <Download className="h-3 w-3" />
+                          MD
                         </Button>
                       </>
                     )}
@@ -729,11 +761,11 @@ export default function Relatorios() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => downloadReport(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
+                        onClick={() => downloadDocx(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
                         className="gap-2"
                       >
                         <Download className="h-4 w-4" />
-                        Markdown
+                        Word
                       </Button>
                       <Button
                         variant="outline"
@@ -743,6 +775,15 @@ export default function Relatorios() {
                       >
                         <FileText className="h-4 w-4" />
                         PDF
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => downloadReport(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
+                        className="gap-2 text-muted-foreground"
+                      >
+                        <Download className="h-3 w-3" />
+                        MD
                       </Button>
                     </div>
                   )}
