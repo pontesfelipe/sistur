@@ -536,11 +536,26 @@ ${prescriptionsText}
 PLANOS DE AÇÃO:
 ${formatActionPlans(actionPlans)}
 
+${globalRefs.length > 0 ? `=== DOCUMENTOS DE REFERÊNCIA NACIONAL ===
+Os seguintes documentos oficiais devem ser usados como contexto para enriquecer a análise, alinhar recomendações com metas nacionais e fundamentar diretrizes:
+
+${globalRefs.map((ref: any) => `### ${ref.file_name} (${ref.category})
+${ref.description ? `Descrição: ${ref.description}` : ''}
+${ref.summary}
+`).join('\n')}
+
+INSTRUÇÕES SOBRE REFERÊNCIAS:
+- Contextualize os resultados do destino em relação às metas e diretrizes nacionais
+- Nas prescrições, referencie princípios e eixos dos documentos oficiais quando aplicável
+- Aponte alinhamento ou desalinhamento com políticas públicas vigentes
+- Use dados e benchmarks dos documentos para enriquecer comparações
+` : ''}
 === INSTRUÇÕES FINAIS ===
 1. COMECE com o título e IMEDIATAMENTE a tabela de Ficha Técnica fornecida acima — NÃO pule essa tabela
 2. Siga EXATAMENTE a estrutura definida no system prompt para o template "${reportTemplate}"
 3. Use TABELAS MARKDOWN para todos os conjuntos de dados
-4. Justifique todas as conclusões com dados fornecidos`;
+4. Justifique todas as conclusões com dados fornecidos
+${globalRefs.length > 0 ? '5. Referencie documentos oficiais quando contextualizar resultados e prescrições' : ''}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
