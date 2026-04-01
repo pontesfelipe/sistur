@@ -783,7 +783,13 @@ export default function Relatorios() {
                   ) : savedReports && savedReports.length > 0 ? (
                     <ScrollArea className="h-[500px]">
                       <div className="space-y-2 pr-4">
-                        {savedReports.map((r) => (
+                        {savedReports
+                          .filter(r => {
+                            // Show personal reports only to creator, org reports to all
+                            if (r.visibility === 'org') return true;
+                            return r.created_by === profile?.user_id;
+                          })
+                          .map((r) => (
                           <div
                             key={r.id}
                             className={`p-3 rounded-lg border cursor-pointer transition-colors ${
@@ -795,7 +801,17 @@ export default function Relatorios() {
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div className="min-w-0 flex-1">
-                                <p className="font-medium truncate">{r.destination_name}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="font-medium truncate">{r.destination_name}</p>
+                                  {r.visibility === 'org' ? (
+                                    <Badge variant="outline" className="text-xs gap-1 shrink-0"><Users className="h-2.5 w-2.5" />Org</Badge>
+                                  ) : (
+                                    <Badge variant="secondary" className="text-xs gap-1 shrink-0"><Lock className="h-2.5 w-2.5" />Pessoal</Badge>
+                                  )}
+                                  {r.environment === 'demo' && (
+                                    <Badge variant="outline" className="text-xs gap-1 shrink-0 border-amber-500 text-amber-600"><FlaskConical className="h-2.5 w-2.5" />Demo</Badge>
+                                  )}
+                                </div>
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                                   <Calendar className="h-3 w-3" />
                                   {format(new Date(r.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
