@@ -154,7 +154,9 @@ export function IndicadoresPanel() {
     const matchesTier = tierFilter === 'all' || indicatorTier === tierFilter;
     const indicatorScope = (i as any).indicator_scope || 'territorial';
     const matchesScope = scopeFilter === 'all' || indicatorScope === scopeFilter;
-    return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier && matchesScope;
+    const indicatorCollection = (i as any).collection_type || 'MANUAL';
+    const matchesCollection = collectionFilter === 'all' || indicatorCollection === collectionFilter;
+    return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier && matchesScope && matchesCollection;
   });
 
   // Count by tier
