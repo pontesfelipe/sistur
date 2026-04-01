@@ -256,10 +256,10 @@ Deno.serve(async (req) => {
     const realCount = Object.keys(realData).length;
     console.log(`Total real: ${realCount} indicators`);
 
-    // 4. Fill gaps with estimates
+    // 4. Fill gaps with manual-entry placeholders (NOT estimates)
     const existingKeys = new Set(Object.keys(realData));
-    const estimates = generateEstimates(ibge_code, populacao, existingKeys);
-    const allData: Record<string, IndicatorResult> = { ...estimates, ...realData };
+    const defaults = generateDefaults(ibge_code, populacao, existingKeys);
+    const allData: Record<string, IndicatorResult> = { ...defaults, ...realData };
 
     // 5. Build upsert payload
     const valuesToUpsert = Object.entries(allData)
