@@ -7,7 +7,7 @@ import { IndicatorScoresView } from '@/components/dashboard/IndicatorScoresView'
 import { IssuesView } from '@/components/dashboard/IssuesView';
 import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendationsPanel';
 import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
-import { ActionPlansView } from '@/components/dashboard/ActionPlansView';
+import { CreateProjectFromDiagnosticView } from '@/components/dashboard/CreateProjectFromDiagnosticView';
 import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
@@ -49,7 +49,7 @@ import {
   RotateCcw,
   PlusCircle,
   Edit,
-  ClipboardList,
+  FolderKanban,
   Database,
   Hotel,
   Layers,
@@ -525,9 +525,9 @@ const DiagnosticoDetalhe = () => {
               <GraduationCap className="h-4 w-4" />
               <span className="hidden sm:inline">Tratamento</span>
             </TabsTrigger>
-            <TabsTrigger value="planos" className="gap-2">
-              <ClipboardList className="h-4 w-4" />
-              <span className="hidden sm:inline">Planos</span>
+            <TabsTrigger value="projeto" className="gap-2">
+              <FolderKanban className="h-4 w-4" />
+              <span className="hidden sm:inline">Projeto</span>
             </TabsTrigger>
           </TabsList>
 
@@ -653,9 +653,9 @@ const DiagnosticoDetalhe = () => {
             <EduRecommendationsPanel indicatorScores={indicatorScores as any} assessmentId={id} />
           </TabsContent>
 
-          {/* Planos de Ação Tab */}
-          <TabsContent value="planos">
-            <ActionPlansView assessmentId={id!} />
+          {/* Projeto Tab */}
+          <TabsContent value="projeto">
+            <CreateProjectFromDiagnosticView assessmentId={id!} destinationId={assessment?.destination_id} />
           </TabsContent>
         </Tabs>
       ) : (
