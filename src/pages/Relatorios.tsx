@@ -25,8 +25,10 @@ import {
   RefreshCw,
   History,
   Trash2,
-  Calendar
+  Calendar,
+  Settings2
 } from 'lucide-react';
+import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
 const REPORT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`;
 
@@ -91,6 +93,8 @@ export default function Relatorios() {
   const [selectedHistoryReport, setSelectedHistoryReport] = useState<GeneratedReport | null>(null);
   const [reportTemplate, setReportTemplate] = useState<string>('completo');
   const reportRef = useRef<HTMLDivElement>(null);
+  const [customizationOpen, setCustomizationOpen] = useState(false);
+  const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
 
   // Pre-select assessment from URL parameter
   useEffect(() => {
@@ -264,20 +268,7 @@ export default function Relatorios() {
     }
   };
 
-  const downloadReport = (content: string, destinationName: string) => {
-    if (!content) return;
-    
-    const blob = new Blob([content], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `relatorio-${destinationName.toLowerCase().replace(/\s+/g, '-')}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success('Relatório baixado!');
-  };
+  // MD download removed
 
   const downloadPDF = () => {
     if (!reportRef.current) return;
@@ -331,29 +322,40 @@ export default function Relatorios() {
     toast.success('Use "Salvar como PDF" na janela de impressão.');
   };
 
-  const buildPrintHTML = (bodyContent: string) => `<!DOCTYPE html>
+  const buildPrintHTML = (bodyContent: string) => {
+    const c = reportCustomization;
+    const fontSizeMap = { small: '13px', medium: '15px', large: '17px' };
+    const bodyFontSize = fontSizeMap[c.fontSize] || '15px';
+    const color = c.primaryColor || '#1E40AF';
+    const logoHtml = c.logoUrl ? `<div style="text-align:center;margin-bottom:16px;"><img src="${c.logoUrl}" style="max-height:60px;max-width:200px;" /></div>` : '';
+    const orgHtml = c.organizationName ? `<div style="text-align:center;font-size:14px;color:#64748B;margin-bottom:4px;">${c.organizationName}</div>` : '';
+    const headerHtml = c.headerText ? `<div style="text-align:center;font-size:12px;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:24px;">${c.headerText}</div>` : '';
+    const footerHtml = c.footerText ? `<div style="text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px;margin-top:24px;">${c.footerText}</div>` : '';
+    const notesHtml = c.additionalNotes ? `<div style="margin-top:32px;padding:12px;background:#f8fafc;border-left:3px solid ${color};font-size:12px;color:#64748B;">${c.additionalNotes}</div>` : '';
+    return `<!DOCTYPE html>
 <html><head><title>Relatório SISTUR</title>
 <style>
-  body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; max-width: 800px; margin: 0 auto; }
-  h1 { font-size: 24px; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-top: 32px; }
-  h2 { font-size: 20px; color: #1e40af; margin-top: 24px; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; max-width: 800px; margin: 0 auto; font-size: ${bodyFontSize}; }
+  h1 { font-size: 24px; border-bottom: 2px solid ${color}; padding-bottom: 8px; margin-top: 32px; }
+  h2 { font-size: 20px; color: ${color}; margin-top: 24px; }
   h3 { font-size: 16px; color: #374151; margin-top: 16px; }
   table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
   th { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-weight: 600; }
   td { border: 1px solid #cbd5e1; padding: 8px; }
   tr:nth-child(even) { background: #f8fafc; }
-  strong { color: #1e40af; }
+  strong { color: ${color}; }
   hr { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
   ul, ol { padding-left: 24px; }
   li { margin-bottom: 4px; }
   @media print { body { padding: 20px; } @page { margin: 1.5cm; } }
 </style>
-</head><body>${bodyContent}</body></html>`;
+</head><body>${logoHtml}${orgHtml}${headerHtml}${bodyContent}${notesHtml}${footerHtml}</body></html>`;
+  };
 
   const downloadDocx = async (content: string, destName: string) => {
     if (!content) return;
     try {
-      await exportReportAsDocx(content, destName);
+      await exportReportAsDocx(content, destName, reportCustomization);
       toast.success('Relatório Word baixado!');
     } catch (err) {
       console.error('Error exporting DOCX:', err);
@@ -591,9 +593,9 @@ export default function Relatorios() {
                           <FileText className="h-4 w-4" />
                           PDF
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => downloadReport(report, selectedDestination?.name || 'destino')} className="gap-2 text-muted-foreground">
-                          <Download className="h-3 w-3" />
-                          MD
+                        <Button variant="outline" onClick={() => setCustomizationOpen(true)} className="gap-2">
+                          <Settings2 className="h-4 w-4" />
+                          Personalizar
                         </Button>
                       </>
                     )}
@@ -794,15 +796,6 @@ export default function Relatorios() {
                         <FileText className="h-4 w-4" />
                         PDF
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => downloadReport(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
-                        className="gap-2 text-muted-foreground"
-                      >
-                        <Download className="h-3 w-3" />
-                        MD
-                      </Button>
                     </div>
                   )}
                 </CardHeader>
@@ -824,6 +817,12 @@ export default function Relatorios() {
             </div>
           </TabsContent>
         </Tabs>
+
+        <ReportCustomizationDialog
+          open={customizationOpen}
+          onOpenChange={setCustomizationOpen}
+          onApply={setReportCustomization}
+        />
       </div>
     </AppLayout>
   );

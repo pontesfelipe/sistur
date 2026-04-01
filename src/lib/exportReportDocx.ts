@@ -20,9 +20,10 @@ import {
   PageBreak,
 } from 'docx';
 import { saveAs } from 'file-saver';
+import type { ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
 // Colors
-const PRIMARY = '1E40AF';
+const DEFAULT_PRIMARY = '1E40AF';
 const HEADER_BG = 'EFF6FF';
 const BORDER = 'CBD5E1';
 const MUTED = '64748B';
@@ -81,7 +82,7 @@ function parseMarkdownTable(lines: string[]): Table | null {
                   bold: isHeader,
                   font: 'Arial',
                   size: isHeader ? 20 : 20,
-                  color: isHeader ? PRIMARY : undefined,
+                  color: isHeader ? DEFAULT_PRIMARY : undefined,
                 }),
               ],
             }),
@@ -98,7 +99,8 @@ function parseMarkdownTable(lines: string[]): Table | null {
   });
 }
 
-export async function exportReportAsDocx(markdownContent: string, destinationName: string) {
+export async function exportReportAsDocx(markdownContent: string, destinationName: string, customization?: ReportCustomization) {
+  const PRIMARY = customization?.primaryColor?.replace('#', '') || DEFAULT_PRIMARY;
   const lines = markdownContent.split('\n');
   const children: (Paragraph | Table)[] = [];
   let i = 0;
@@ -213,11 +215,59 @@ export async function exportReportAsDocx(markdownContent: string, destinationNam
     i++;
   }
 
+  const fontSizeMap = { small: 20, medium: 22, large: 24 };
+  const baseSize = fontSizeMap[customization?.fontSize || 'medium'] || 22;
+
+  const headerText = customization?.headerText || 'SISTUR — Relatório de Diagnóstico';
+  const footerText = customization?.footerText || '';
+  const orgName = customization?.organizationName || '';
+
+  const headerChildren: Paragraph[] = [];
+  if (orgName) {
+    headerChildren.push(new Paragraph({
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 40 },
+      children: [new TextRun({ text: orgName, font: 'Arial', size: 16, color: MUTED, bold: true })],
+    }));
+  }
+  headerChildren.push(new Paragraph({
+    alignment: AlignmentType.RIGHT,
+    children: [new TextRun({ text: headerText, font: 'Arial', size: 18, color: MUTED, italics: true })],
+  }));
+
+  const footerChildren: Paragraph[] = [];
+  if (customization?.showPageNumbers !== false) {
+    footerChildren.push(new Paragraph({
+      alignment: AlignmentType.CENTER,
+      children: [
+        new TextRun({ text: 'Página ', font: 'Arial', size: 18, color: MUTED }),
+        new TextRun({ children: [PageNumber.CURRENT], font: 'Arial', size: 18, color: MUTED }),
+      ],
+    }));
+  }
+  if (footerText) {
+    footerChildren.push(new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 40 },
+      children: [new TextRun({ text: footerText, font: 'Arial', size: 16, color: MUTED })],
+    }));
+  }
+
+  // Add additional notes as final block
+  if (customization?.additionalNotes) {
+    children.push(new Paragraph({ spacing: { before: 400 }, children: [] }));
+    children.push(new Paragraph({
+      border: { left: { style: BorderStyle.SINGLE, size: 6, color: PRIMARY, space: 8 } },
+      spacing: { before: 120, after: 120 },
+      children: [new TextRun({ text: customization.additionalNotes, font: 'Arial', size: 20, color: MUTED, italics: true })],
+    }));
+  }
+
   const doc = new Document({
     styles: {
       default: {
         document: {
-          run: { font: 'Arial', size: 22 },
+          run: { font: 'Arial', size: baseSize },
         },
       },
     },
@@ -230,29 +280,10 @@ export async function exportReportAsDocx(markdownContent: string, destinationNam
           },
         },
         headers: {
-          default: new Header({
-            children: [
-              new Paragraph({
-                alignment: AlignmentType.RIGHT,
-                children: [
-                  new TextRun({ text: 'SISTUR — Relatório de Diagnóstico', font: 'Arial', size: 18, color: MUTED, italics: true }),
-                ],
-              }),
-            ],
-          }),
+          default: new Header({ children: headerChildren }),
         },
         footers: {
-          default: new Footer({
-            children: [
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [
-                  new TextRun({ text: 'Página ', font: 'Arial', size: 18, color: MUTED }),
-                  new TextRun({ children: [PageNumber.CURRENT], font: 'Arial', size: 18, color: MUTED }),
-                ],
-              }),
-            ],
-          }),
+          default: new Footer({ children: footerChildren.length > 0 ? footerChildren : [new Paragraph({ children: [] })] }),
         },
         children,
       },
