@@ -22,9 +22,9 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const fileIcon = (type: string) => {
-  if (type.includes('pdf')) return <FileText className="h-5 w-5 text-red-400" />;
+  if (type.includes('pdf')) return <FileText className="h-5 w-5 text-destructive" />;
   if (type.includes('spreadsheet') || type.includes('csv') || type.includes('excel'))
-    return <FileSpreadsheet className="h-5 w-5 text-green-400" />;
+    return <FileSpreadsheet className="h-5 w-5 text-primary" />;
   return <File className="h-5 w-5 text-muted-foreground" />;
 };
 
