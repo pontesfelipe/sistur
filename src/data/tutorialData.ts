@@ -51,9 +51,8 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'gs-trial',
         title: 'Período de Teste',
-        description: 'Novos usuários recebem 7 dias de trial gratuito com acesso a ERP, EDU e Jogos. Após o período, escolha um plano na página de Planos para continuar.',
+        description: 'Novos usuários recebem 7 dias de trial gratuito com acesso a ERP, EDU e Jogos. O acesso é gerenciado pelo administrador da organização.',
         icon: CreditCard,
-        route: '/assinatura',
         roles: ['ERP', 'ESTUDANTE', 'PROFESSOR', 'ADMIN'],
         category: 'getting-started',
       },
@@ -104,7 +103,7 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'erp-monitoring',
         title: 'Monitoramento ERP',
-        description: 'O painel de Monitoramento ERP acompanha evolução dos ciclos, progresso por pilar, projetos atrasados e planos recentes. Ideal para gestores acompanharem KPIs em tempo real.',
+        description: 'O painel de Monitoramento ERP acompanha evolução dos ciclos, progresso por pilar e projetos atrasados. Ideal para gestores acompanharem KPIs em tempo real.',
         icon: Activity,
         route: '/erp',
         roles: ['ERP', 'ADMIN'],
@@ -113,9 +112,18 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'erp-reports',
         title: 'Relatórios',
-        description: 'Gere relatórios detalhados dos diagnósticos com gráficos, comparativos e exportação. Disponível nos planos Pro e Enterprise.',
+        description: 'Gere relatórios personalizados dos diagnósticos com logo, cabeçalho, rodapé e cores customizáveis. Escolha visibilidade pessoal ou organizacional. Exportação em Word e PDF.',
         icon: BarChart3,
         route: '/relatorios',
+        roles: ['ERP', 'ADMIN'],
+        category: 'erp-diagnostics',
+      },
+      {
+        id: 'erp-kb',
+        title: 'Base de Conhecimento',
+        description: 'Faça upload de documentos de referência (PDFs, planilhas) por destino. Os arquivos são usados automaticamente para enriquecer diagnósticos e relatórios com IA.',
+        icon: BookOpen,
+        route: '/base-conhecimento',
         roles: ['ERP', 'ADMIN'],
         category: 'erp-diagnostics',
       },
@@ -253,7 +261,7 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'admin-settings',
         title: 'Configurações do Sistema',
-        description: 'Acesse configurações avançadas: modo demo, privacidade do fórum, aprovações pendentes, feedback dos usuários e logs de auditoria.',
+        description: 'Acesse configurações avançadas: modo demo, privacidade do fórum, aprovações pendentes, feedback dos usuários, referências globais e logs de auditoria.',
         icon: Settings,
         route: '/configuracoes',
         roles: ['ADMIN'],

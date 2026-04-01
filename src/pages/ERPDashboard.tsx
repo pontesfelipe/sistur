@@ -4,14 +4,12 @@ import { ERPStatsCards } from '@/components/erp/ERPStatsCards';
 import { PillarProgressChart } from '@/components/erp/PillarProgressChart';
 import { CycleEvolutionChart } from '@/components/erp/CycleEvolutionChart';
 import { OverdueProjectsList } from '@/components/erp/OverdueProjectsList';
-import { RecentPlansList } from '@/components/erp/RecentPlansList';
 import { ProjectsOverviewCard } from '@/components/erp/ProjectsOverviewCard';
 import { 
   useERPStats, 
   usePillarProgress, 
   useCycleEvolution,
   useOverdueProjects,
-  useRecentActionPlans,
   useERPRealtimeUpdates,
   useProjectStats
 } from '@/hooks/useERPMonitoring';
@@ -37,7 +35,6 @@ export default function ERPDashboard() {
     diagnosticType
   );
   const { data: overdueProjects, isLoading: overdueLoading } = useOverdueProjects();
-  const { data: recentPlans, isLoading: recentLoading } = useRecentActionPlans(10);
   const { data: destinations } = useDestinationsWithAssessments();
   const { data: projectStats, isLoading: projectsLoading } = useProjectStats();
 
@@ -106,20 +103,11 @@ export default function ERPDashboard() {
           />
         </div>
 
-        {/* Lists */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Overdue Projects */}
-          <OverdueProjectsList 
-            projects={overdueProjects}
-            isLoading={overdueLoading}
-          />
-
-          {/* Recent Plans */}
-          <RecentPlansList 
-            plans={recentPlans}
-            isLoading={recentLoading}
-          />
-        </div>
+        {/* Overdue Projects */}
+        <OverdueProjectsList 
+          projects={overdueProjects}
+          isLoading={overdueLoading}
+        />
       </div>
     </AppLayout>
   );
