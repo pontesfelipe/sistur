@@ -414,7 +414,7 @@ serve(async (req) => {
     const userId = user.id;
     console.log('Authenticated user:', userId);
 
-    const { assessmentId, destinationName, pillarScores, issues, prescriptions, forceRegenerate, reportTemplate = 'completo' } = await req.json();
+    const { assessmentId, destinationName, pillarScores, issues, prescriptions, forceRegenerate, reportTemplate = 'completo', visibility = 'personal', environment = 'production' } = await req.json();
     
     // Verify access
     const { data: profile } = await supabase.from('profiles').select('org_id, viewing_demo_org_id').eq('user_id', userId).single();
@@ -648,14 +648,14 @@ ${kbFiles.length > 0 ? `${globalRefs.length > 0 ? '6' : '5'}. Referencie documen
           if (existing) {
             const { error } = await supabaseAdmin
               .from('generated_reports')
-              .update({ report_content: fullContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds })
+              .update({ report_content: fullContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
               .eq('id', existing.id);
             if (error) console.error('Error updating report:', error);
             else console.log('Report updated successfully');
           } else {
             const { error } = await supabaseAdmin
               .from('generated_reports')
-              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: fullContent, created_by: userId, kb_file_ids: kbFileIds });
+              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: fullContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment });
             if (error) console.error('Error saving report:', error);
             else console.log('Report saved successfully');
           }

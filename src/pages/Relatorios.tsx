@@ -9,8 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAssessments } from '@/hooks/useAssessments';
 import { useDestinations } from '@/hooks/useDestinations';
+import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -26,7 +28,11 @@ import {
   History,
   Trash2,
   Calendar,
-  Settings2
+  Settings2,
+  Eye,
+  Lock,
+  Users,
+  FlaskConical
 } from 'lucide-react';
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
@@ -60,6 +66,9 @@ interface GeneratedReport {
   destination_name: string;
   report_content: string;
   created_at: string;
+  visibility: string;
+  environment: string;
+  created_by: string;
 }
 
 function useGeneratedReports() {
@@ -85,6 +94,7 @@ export default function Relatorios() {
   const { assessments, isLoading: assessmentsLoading } = useAssessments();
   const { destinations } = useDestinations();
   const { data: savedReports, isLoading: reportsLoading } = useGeneratedReports();
+  const { isAdmin, isViewingDemoData, profile } = useProfile();
   
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>('');
   const [report, setReport] = useState<string>('');
@@ -92,6 +102,8 @@ export default function Relatorios() {
   const [activeTab, setActiveTab] = useState<string>('generate');
   const [selectedHistoryReport, setSelectedHistoryReport] = useState<GeneratedReport | null>(null);
   const [reportTemplate, setReportTemplate] = useState<string>('completo');
+  const [reportVisibility, setReportVisibility] = useState<string>('personal');
+  const [runInDemo, setRunInDemo] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
   const [customizationOpen, setCustomizationOpen] = useState(false);
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
@@ -152,6 +164,8 @@ export default function Relatorios() {
           prescriptions: prescriptions || [],
           forceRegenerate,
           reportTemplate,
+          visibility: reportVisibility,
+          environment: runInDemo ? 'demo' : 'production',
         }),
       });
 
@@ -564,6 +578,56 @@ export default function Relatorios() {
                     </Select>
                   </div>
 
+                  <div className="w-44">
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                      Visibilidade
+                    </label>
+                    <Select value={reportVisibility} onValueChange={setReportVisibility}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="personal">
+                          <span className="flex items-center gap-1.5">
+                            <Lock className="h-3 w-3" />
+                            Pessoal
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="org">
+                          <span className="flex items-center gap-1.5">
+                            <Users className="h-3 w-3" />
+                            Organização
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {isAdmin && (
+                    <div className="w-36">
+                      <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                        Ambiente
+                      </label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant={runInDemo ? 'secondary' : 'outline'}
+                              className="w-full gap-2"
+                              onClick={() => setRunInDemo(!runInDemo)}
+                            >
+                              <FlaskConical className="h-4 w-4" />
+                              {runInDemo ? 'Demo' : 'Produção'}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {runInDemo ? 'Relatório será gerado no ambiente de demonstração' : 'Relatório será gerado no ambiente de produção'}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  )}
+
                   <div className="flex items-end gap-2">
                     <Button 
                       onClick={() => generateReport()} 
@@ -719,7 +783,13 @@ export default function Relatorios() {
                   ) : savedReports && savedReports.length > 0 ? (
                     <ScrollArea className="h-[500px]">
                       <div className="space-y-2 pr-4">
-                        {savedReports.map((r) => (
+                        {savedReports
+                          .filter(r => {
+                            // Show personal reports only to creator, org reports to all
+                            if (r.visibility === 'org') return true;
+                            return r.created_by === profile?.user_id;
+                          })
+                          .map((r) => (
                           <div
                             key={r.id}
                             className={`p-3 rounded-lg border cursor-pointer transition-colors ${
@@ -731,7 +801,17 @@ export default function Relatorios() {
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div className="min-w-0 flex-1">
-                                <p className="font-medium truncate">{r.destination_name}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="font-medium truncate">{r.destination_name}</p>
+                                  {r.visibility === 'org' ? (
+                                    <Badge variant="outline" className="text-xs gap-1 shrink-0"><Users className="h-2.5 w-2.5" />Org</Badge>
+                                  ) : (
+                                    <Badge variant="secondary" className="text-xs gap-1 shrink-0"><Lock className="h-2.5 w-2.5" />Pessoal</Badge>
+                                  )}
+                                  {r.environment === 'demo' && (
+                                    <Badge variant="outline" className="text-xs gap-1 shrink-0 border-amber-500 text-amber-600"><FlaskConical className="h-2.5 w-2.5" />Demo</Badge>
+                                  )}
+                                </div>
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                                   <Calendar className="h-3 w-3" />
                                   {format(new Date(r.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}

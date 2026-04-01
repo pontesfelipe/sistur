@@ -32,6 +32,10 @@ export const VERSION_HISTORY = [
       "Personalização aplicada automaticamente nas exportações Word e PDF",
       "Notas adicionais opcionais incluídas como bloco final no relatório",
       "Configurações salvas localmente para reutilização entre sessões",
+      "Seletor de visibilidade do relatório: Pessoal (só o criador vê) ou Organização (todos da org veem)",
+      "Admins podem gerar relatórios no ambiente Demo com toggle dedicado",
+      "Badges de visibilidade e ambiente no histórico de relatórios",
+      "Filtro automático: relatórios pessoais aparecem apenas para o criador",
     ]
   },
   {
