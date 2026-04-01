@@ -747,20 +747,21 @@ const DiagnosticoDetalhe = () => {
         </Tabs>
       ) : (
         /* Pre-calculation state */
-        <div className="bg-card rounded-xl border p-8 text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-            <Calculator className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <h3 className="text-lg font-display font-semibold mb-2">
-            {assessment.status === 'DRAFT'
-              ? 'Preencha os dados para calcular'
-              : 'Dados prontos para cálculo'}
-          </h3>
-          <p className="text-muted-foreground max-w-md mx-auto mb-6">
-            {assessment.status === 'DRAFT'
-              ? 'Complete o preenchimento dos indicadores via formulário ou importe um arquivo CSV com os dados.'
-              : 'Todos os dados foram preenchidos. Clique no botão abaixo para calcular os índices e gerar o diagnóstico.'}
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-card rounded-xl border p-8 text-center">
+            <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+              <Calculator className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-display font-semibold mb-2">
+              {assessment.status === 'DRAFT'
+                ? 'Preencha os dados para calcular'
+                : 'Dados prontos para cálculo'}
+            </h3>
+            <p className="text-muted-foreground max-w-md mx-auto mb-6">
+              {assessment.status === 'DRAFT'
+                ? 'Complete o preenchimento dos indicadores via formulário ou importe um arquivo CSV com os dados.'
+                : 'Todos os dados foram preenchidos. Clique no botão abaixo para calcular os índices e gerar o diagnóstico.'}
+            </p>
           <div className="flex gap-3 justify-center">
             {assessment.status === 'DRAFT' && (
               <>
