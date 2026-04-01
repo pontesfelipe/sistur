@@ -38,10 +38,10 @@ export function NormalizationCalculator() {
     if (normType === 'MIN_MAX') {
       if (direction === 'HIGH_IS_BETTER') {
         score = Math.max(0, Math.min(1, (val - min) / (max - min)));
-        formula = `(${val} - ${min}) / (${max} - ${min}) = ${score.toFixed(4)}`;
+        formula = `(${val} - ${min}) / (${max} - ${min}) = ${(score * 100).toFixed(1)}%`;
       } else {
         score = Math.max(0, Math.min(1, (max - val) / (max - min)));
-        formula = `(${max} - ${val}) / (${max} - ${min}) = ${score.toFixed(4)}`;
+        formula = `(${max} - ${val}) / (${max} - ${min}) = ${(score * 100).toFixed(1)}%`;
       }
     } else if (normType === 'BINARY') {
       score = val > 0 ? 1 : 0;
