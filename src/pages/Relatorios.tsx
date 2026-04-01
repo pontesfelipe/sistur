@@ -282,55 +282,73 @@ export default function Relatorios() {
   const downloadPDF = () => {
     if (!reportRef.current) return;
     
-    // Use an iframe instead of popup to avoid popup blockers
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = 'none';
-    document.body.appendChild(iframe);
+    const content = reportRef.current.innerHTML;
+    
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      // Fallback: try iframe approach if popup blocked
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.left = '-9999px';
+      iframe.style.width = '800px';
+      iframe.style.height = '600px';
+      iframe.style.border = 'none';
+      document.body.appendChild(iframe);
 
-    const iframeDoc = iframe.contentWindow?.document;
-    if (!iframeDoc) {
-      toast.error('Não foi possível preparar o PDF.');
-      document.body.removeChild(iframe);
+      const iframeDoc = iframe.contentWindow?.document;
+      if (!iframeDoc) {
+        toast.error('Não foi possível preparar o PDF. Desative o bloqueador de pop-ups.');
+        document.body.removeChild(iframe);
+        return;
+      }
+
+      iframeDoc.open();
+      iframeDoc.write(buildPrintHTML(content));
+      iframeDoc.close();
+
+      iframe.onload = () => {
+        setTimeout(() => {
+          try { iframe.contentWindow?.print(); } catch (e) { /* ignore */ }
+          setTimeout(() => { document.body.removeChild(iframe); }, 2000);
+        }, 300);
+      };
+
+      toast.success('Use "Salvar como PDF" na janela de impressão.');
       return;
     }
 
-    const styles = `
-      <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; max-width: 800px; margin: 0 auto; }
-        h1 { font-size: 24px; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-top: 32px; }
-        h2 { font-size: 20px; color: #1e40af; margin-top: 24px; }
-        h3 { font-size: 16px; color: #374151; margin-top: 16px; }
-        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
-        th { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-weight: 600; }
-        td { border: 1px solid #cbd5e1; padding: 8px; }
-        tr:nth-child(even) { background: #f8fafc; }
-        strong { color: #1e40af; }
-        hr { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
-        ul, ol { padding-left: 24px; }
-        li { margin-bottom: 4px; }
-        @media print { body { padding: 20px; } @page { margin: 1.5cm; } }
-      </style>
-    `;
+    printWindow.document.write(buildPrintHTML(content));
+    printWindow.document.close();
+    printWindow.focus();
 
-    iframeDoc.open();
-    iframeDoc.write(`<!DOCTYPE html><html><head><title>Relatório SISTUR</title>${styles}</head><body>${reportRef.current.innerHTML}</body></html>`);
-    iframeDoc.close();
-    
-    setTimeout(() => {
-      iframe.contentWindow?.print();
-      // Clean up after print dialog closes
+    printWindow.onload = () => {
       setTimeout(() => {
-        document.body.removeChild(iframe);
-      }, 1000);
-    }, 500);
-    
+        printWindow.print();
+        printWindow.close();
+      }, 300);
+    };
+
     toast.success('Use "Salvar como PDF" na janela de impressão.');
   };
+
+  const buildPrintHTML = (bodyContent: string) => `<!DOCTYPE html>
+<html><head><title>Relatório SISTUR</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 24px; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-top: 32px; }
+  h2 { font-size: 20px; color: #1e40af; margin-top: 24px; }
+  h3 { font-size: 16px; color: #374151; margin-top: 16px; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-weight: 600; }
+  td { border: 1px solid #cbd5e1; padding: 8px; }
+  tr:nth-child(even) { background: #f8fafc; }
+  strong { color: #1e40af; }
+  hr { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
+  ul, ol { padding-left: 24px; }
+  li { margin-bottom: 4px; }
+  @media print { body { padding: 20px; } @page { margin: 1.5cm; } }
+</style>
+</head><body>${bodyContent}</body></html>`;
 
   const downloadDocx = async (content: string, destName: string) => {
     if (!content) return;
