@@ -255,9 +255,9 @@ const App = () => {
                 <Route
                   path="/base-conhecimento"
                   element={
-                    <ProtectedRoute>
+                    <ERPRoute>
                       <KnowledgeBase />
-                    </ProtectedRoute>
+                    </ERPRoute>
                   }
                 />
                 <Route
