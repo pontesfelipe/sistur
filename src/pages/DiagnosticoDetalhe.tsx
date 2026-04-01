@@ -493,6 +493,14 @@ const DiagnosticoDetalhe = () => {
         </Card>
       )}
 
+      {/* Diagnostic Progress Dashboard */}
+      <DiagnosticProgressDashboard
+        status={assessment.status}
+        hasIndicatorValues={indicatorValues.length > 0}
+        hasReport={!!existingReport}
+        hasProjects={!!existingProjects && existingProjects.length > 0}
+      />
+
       {/* Header Card */}
       <div className="bg-card rounded-xl border p-6 mb-6">
         <div className="flex flex-wrap gap-6 items-start justify-between">
