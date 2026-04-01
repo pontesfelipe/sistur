@@ -462,13 +462,16 @@ serve(async (req) => {
       }
     }
 
-    // Fetch all data in parallel
-    const [indicatorScoresRes, alertsRes, actionPlansRes, indicatorValuesRes, globalRefsRes] = await Promise.all([
+    // Fetch all data in parallel (including destination-specific KB files)
+    const destinationId = assessment.destination_id;
+    const [indicatorScoresRes, alertsRes, actionPlansRes, indicatorValuesRes, globalRefsRes, kbFilesRes] = await Promise.all([
       supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
       supabase.from('indicator_values').select('*, indicators(code, name, pillar, theme, unit)').eq('assessment_id', assessmentId),
       supabaseAdmin.from('global_reference_files').select('file_name, category, summary, description').eq('is_active', true).not('summary', 'is', null),
+      // Fetch KB files for this destination + global KB files
+      supabase.from('knowledge_base_files').select('id, file_name, description, category').eq('is_active', true).or(destinationId ? `destination_id.eq.${destinationId},destination_id.is.null` : 'destination_id.is.null'),
     ]);
 
     const indicatorScores = indicatorScoresRes.data || [];
@@ -476,9 +479,10 @@ serve(async (req) => {
     const actionPlans = actionPlansRes.data || [];
     const indicatorValues = indicatorValuesRes.data || [];
     const globalRefs = globalRefsRes.data || [];
+    const kbFiles = kbFilesRes.data || [];
 
     console.log('Report for:', destinationName, isEnterprise ? '(ENTERPRISE)' : '(TERRITORIAL)');
-    console.log('Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length);
+    console.log('Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 'KB files:', kbFiles.length);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
