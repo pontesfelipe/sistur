@@ -25,8 +25,10 @@ import {
   RefreshCw,
   History,
   Trash2,
-  Calendar
+  Calendar,
+  Settings2
 } from 'lucide-react';
+import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
 const REPORT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`;
 
