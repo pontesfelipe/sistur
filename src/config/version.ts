@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 11,
-  patch: 3,
+  minor: 12,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,20 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.12.0",
+    date: "2026-04-01",
+    type: "minor" as const,
+    changes: [
+      "Dashboard de progresso do diagnóstico com 5 etapas visuais (criação → projeto)",
+      "Checklist de validação pré-cálculo com breakdown por pilar e indicadores faltantes",
+      "Score de qualidade dos dados: completude, frescor e automação (0-100%)",
+      "Comparativo entre rodadas: evolução dos pilares vs rodada anterior do mesmo destino",
+      "Templates de relatório: Completo, Executivo (resumido) e Investidores (foco ROI)",
+      "Exportação PDF dos relatórios via janela de impressão com formatação profissional",
+      "Edge function generate-report atualizada com suporte a templates"
+    ]
+  },
   {
     version: "1.11.3",
     date: "2026-04-01",
