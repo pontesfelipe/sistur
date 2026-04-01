@@ -144,17 +144,21 @@ export function DataValidationPanel({
             <Shield className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
             <div className="text-sm">
               <p className="font-medium text-foreground mb-1">Transparência e Governança</p>
-              <p className="text-muted-foreground">
+               <p className="text-muted-foreground">
                 {autoCount > 0 ? (
                   <>
-                    <strong>{autoCount} indicadores</strong> foram obtidos diretamente de APIs oficiais (IBGE) com alta confiabilidade. 
-                    Os demais <strong>{estimatedCount} indicadores</strong> são estimativas baseadas em médias regionais (UF) e devem ser validados e ajustados pelo operador.
+                    <strong>{autoCount} indicadores</strong> foram obtidos diretamente de APIs oficiais (IBGE, DATASUS, INEP, STN) com alta confiabilidade. 
+                    {manualCount > 0 && (
+                      <>
+                        {' '}Os demais <strong>{manualCount} indicadores</strong> não possuem API pública disponível e <strong>requerem preenchimento manual</strong> pelo operador.
+                        {' '}A API do CADASTUR é restrita a órgãos federais — dados de guias e agências devem ser inseridos manualmente.
+                      </>
+                    )}
                   </>
                 ) : (
                   <>
-                    Este diagnóstico foi parcialmente pré-preenchido com dados oficiais de bases públicas 
-                    nacionais (IBGE, DATASUS, INEP, Tesouro Nacional). Todos os dados devem ser validados 
-                    pelo usuário responsável antes do cálculo.
+                    Clique em "Buscar Dados" para carregar indicadores de APIs oficiais. 
+                    Indicadores sem API pública (ex: CADASTUR) serão criados como campos em branco para preenchimento manual.
                   </>
                 )}
               </p>
