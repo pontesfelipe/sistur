@@ -16,9 +16,8 @@ import {
   useProjectStats
 } from '@/hooks/useERPMonitoring';
 import { useDestinationsWithAssessments } from '@/hooks/useDashboardData';
-import { Button } from '@/components/ui/button';
 import { Wifi, Landmark, Hotel } from 'lucide-react';
-import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 import { Badge } from '@/components/ui/badge';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
