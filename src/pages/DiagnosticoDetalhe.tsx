@@ -57,6 +57,7 @@ import {
   Hotel,
   Layers,
   EyeOff,
+  BookOpen,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
