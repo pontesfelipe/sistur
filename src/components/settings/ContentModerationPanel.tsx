@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { toast } from 'sonner';
-import { Shield, Thermometer, Eye, ImageIcon, Loader2, Save } from 'lucide-react';
+import { Shield, Thermometer, Eye, ImageIcon, Loader2, Save, Check, Ban } from 'lucide-react';
 
 interface ModerationSettings {
   id?: string;
@@ -20,12 +20,48 @@ interface ModerationSettings {
   max_images_per_post: number;
 }
 
-const STRICTNESS_LABELS: Record<number, { label: string; description: string; color: string }> = {
-  1: { label: 'Muito Permissivo', description: 'Apenas conteúdo explícito é bloqueado', color: 'text-green-600' },
-  2: { label: 'Permissivo', description: 'Bloqueia conteúdo explícito e violento', color: 'text-emerald-600' },
-  3: { label: 'Moderado', description: 'Equilíbrio entre permissividade e restrição', color: 'text-amber-600' },
-  4: { label: 'Restritivo', description: 'Aceita apenas conteúdo claramente profissional', color: 'text-orange-600' },
-  5: { label: 'Muito Restritivo', description: 'Apenas conteúdo diretamente relacionado a turismo', color: 'text-red-600' },
+const STRICTNESS_DETAILS: Record<number, {
+  label: string;
+  description: string;
+  color: string;
+  blocked: string[];
+  allowed: string[];
+}> = {
+  1: {
+    label: 'Muito Permissivo',
+    description: 'Apenas conteúdo explícito é bloqueado',
+    color: 'text-green-600',
+    blocked: ['Nudez explícita', 'Conteúdo sexual gráfico', 'Gore extremo'],
+    allowed: ['Selfies e fotos pessoais', 'Memes e conteúdo informal', 'Fotos genéricas', 'Conteúdo profissional', 'Conteúdo turístico'],
+  },
+  2: {
+    label: 'Permissivo',
+    description: 'Bloqueia conteúdo explícito e violento',
+    color: 'text-emerald-600',
+    blocked: ['Nudez', 'Conteúdo sexual', 'Violência gráfica', 'Símbolos de ódio'],
+    allowed: ['Selfies e fotos pessoais', 'Memes', 'Fotos genéricas', 'Conteúdo profissional', 'Conteúdo turístico'],
+  },
+  3: {
+    label: 'Moderado',
+    description: 'Equilíbrio entre permissividade e restrição',
+    color: 'text-amber-600',
+    blocked: ['Nudez e conteúdo sexual', 'Violência', 'Discurso de ódio', 'Uso de drogas', 'Spam e memes', 'Informações pessoais (RG, cartões)'],
+    allowed: ['Fotos de turismo', 'Fotos profissionais', 'Conteúdo educacional', 'Mapas e gráficos', 'Fotos normais do cotidiano'],
+  },
+  4: {
+    label: 'Restritivo',
+    description: 'Aceita apenas conteúdo claramente profissional',
+    color: 'text-orange-600',
+    blocked: ['Tudo que não é profissional/educacional', 'Selfies e fotos pessoais', 'Memes e conteúdo informal', 'Conteúdo não relacionado'],
+    allowed: ['Destinos turísticos', 'Hotéis e paisagens', 'Eventos profissionais', 'Mapas e diagramas', 'Documentos e apresentações'],
+  },
+  5: {
+    label: 'Muito Restritivo',
+    description: 'Apenas conteúdo diretamente relacionado a turismo',
+    color: 'text-red-600',
+    blocked: ['Tudo não-turístico', 'Conteúdo profissional genérico', 'Fotos pessoais', 'Memes', 'Qualquer conteúdo não-turístico'],
+    allowed: ['Destinos turísticos', 'Hotéis e infraestrutura', 'Patrimônio histórico', 'Eventos de turismo', 'Mapas/gráficos de turismo'],
+  },
 };
 
 export function ContentModerationPanel() {
@@ -113,7 +149,7 @@ export function ContentModerationPanel() {
     }
   };
 
-  const strictnessInfo = STRICTNESS_LABELS[settings.strictness_level];
+  const strictnessInfo = STRICTNESS_DETAILS[settings.strictness_level];
 
   if (isLoading) {
     return (
@@ -171,6 +207,38 @@ export function ContentModerationPanel() {
             />
           </div>
           <p className="text-sm text-muted-foreground">{strictnessInfo.description}</p>
+
+          {/* Blocked & Allowed details */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+            <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 space-y-2">
+              <p className="text-xs font-semibold text-destructive flex items-center gap-1.5">
+                <Ban className="h-3.5 w-3.5" />
+                Bloqueado neste nível
+              </p>
+              <ul className="space-y-1">
+                {strictnessInfo.blocked.map((item, i) => (
+                  <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                    <span className="text-destructive mt-0.5">✕</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-3 space-y-2">
+              <p className="text-xs font-semibold text-green-600 dark:text-green-400 flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5" />
+                Permitido neste nível
+              </p>
+              <ul className="space-y-1">
+                {strictnessInfo.allowed.map((item, i) => (
+                  <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                    <span className="text-green-600 dark:text-green-400 mt-0.5">✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
 
         <Separator />
