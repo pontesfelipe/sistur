@@ -133,7 +133,7 @@ export function DataValidationPanel({
   const pendingCount = values.length - validatedCount;
 
   const autoCount = values.filter(v => v.collection_method === 'AUTOMATIC').length;
-  const estimatedCount = values.length - autoCount;
+  const manualCount = values.filter(v => v.collection_method === 'MANUAL').length;
 
   return (
     <div className="space-y-6">
