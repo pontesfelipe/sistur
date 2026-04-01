@@ -275,7 +275,7 @@ Deno.serve(async (req) => {
         source_code: result.source,
         raw_value: result.value,
         reference_year: result.year,
-        collection_method: result.real ? 'AUTOMATICA' : 'ESTIMADA',
+        collection_method: result.real ? 'AUTOMATIC' : 'MANUAL',
         confidence_level: result.real ? 5 : 3,
         validated: false,
         org_id: org_id,
