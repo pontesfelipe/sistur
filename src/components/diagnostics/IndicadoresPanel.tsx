@@ -935,7 +935,7 @@ export function IndicadoresPanel() {
             </TableHeader>
             <TableBody>
               {filteredIndicators.map((indicator) => {
-                const collectionType = (indicator as any).collection_type as CollectionType | undefined;
+                const collectionType = getEffectiveCollection(indicator) as CollectionType;
                 const reliability = reliabilityIcons[collectionType || 'MANUAL'];
                 const ReliabilityIcon = reliability.icon;
                 const isIGMA = (indicator as any).source === 'IGMA';
