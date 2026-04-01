@@ -82,7 +82,7 @@ export function PerformanceMetricsPanel() {
         supabase.from('edu_enrollments').select('*', { count: 'exact', head: true }),
         supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('pending_approval', true),
         supabase.from('forum_posts').select('*', { count: 'exact', head: true }),
-        supabase.from('knowledge_base_documents').select('*', { count: 'exact', head: true }),
+        supabase.from('kb_documents').select('*', { count: 'exact', head: true }).catch(() => ({ count: 0 })),
       ]);
 
       const queryTime = performance.now() - start;
