@@ -791,6 +791,17 @@ const DiagnosticoDetalhe = () => {
               )}
             </Button>
           </div>
+          </div>
+          
+          {/* Pre-calculation checklist sidebar */}
+          <div className="lg:col-span-1">
+            <PreCalculationChecklist
+              indicators={isEnterprise ? enterpriseIndicators : indicators}
+              indicatorValues={indicatorValues}
+              tier={(assessment as any).tier}
+              isEnterprise={isEnterprise}
+            />
+          </div>
         </div>
       )}
     </AppLayout>
