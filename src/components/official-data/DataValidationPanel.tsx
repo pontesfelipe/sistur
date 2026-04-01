@@ -47,6 +47,7 @@ const SOURCE_INFO: Record<string, { name: string; color: string; icon: string }>
   INEP: { name: 'INEP', color: 'bg-purple-500', icon: '📚' },
   STN: { name: 'Tesouro Nacional', color: 'bg-amber-500', icon: '💰' },
   CADASTUR: { name: 'CADASTUR', color: 'bg-cyan-500', icon: '🏨' },
+  MANUAL: { name: 'Preenchimento Manual', color: 'bg-gray-400', icon: '✏️' },
 };
 
 // Confidence level display
