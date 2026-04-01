@@ -648,14 +648,14 @@ ${kbFiles.length > 0 ? `${globalRefs.length > 0 ? '6' : '5'}. Referencie documen
           if (existing) {
             const { error } = await supabaseAdmin
               .from('generated_reports')
-              .update({ report_content: fullContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds })
+              .update({ report_content: fullContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
               .eq('id', existing.id);
             if (error) console.error('Error updating report:', error);
             else console.log('Report updated successfully');
           } else {
             const { error } = await supabaseAdmin
               .from('generated_reports')
-              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: fullContent, created_by: userId, kb_file_ids: kbFileIds });
+              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: fullContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment });
             if (error) console.error('Error saving report:', error);
             else console.log('Report saved successfully');
           }
