@@ -9,6 +9,9 @@ import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendatio
 import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
 import { CreateProjectFromDiagnosticView } from '@/components/dashboard/CreateProjectFromDiagnosticView';
 import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
+import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculationChecklist';
+import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
+import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
