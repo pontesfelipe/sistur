@@ -23,6 +23,17 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.12.3",
+    date: "2026-04-01",
+    type: "patch" as const,
+    changes: [
+      "Integração Firecrawl como fallback para descoberta de URLs do CADASTUR quando API CKAN falha",
+      "Pipeline de ingestão CADASTUR agora tenta: 1) API CKAN → 2) Firecrawl scraping da página dados.gov.br",
+      "Extração inteligente de links de download (CSV/XLSX) via scraping com Firecrawl",
+      "Busca em links diretos e também em conteúdo markdown da página para maior cobertura",
+    ]
+  },
+  {
     version: "1.12.2",
     date: "2026-04-01",
     type: "patch" as const,
