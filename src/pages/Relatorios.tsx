@@ -94,6 +94,7 @@ export default function Relatorios() {
   const { assessments, isLoading: assessmentsLoading } = useAssessments();
   const { destinations } = useDestinations();
   const { data: savedReports, isLoading: reportsLoading } = useGeneratedReports();
+  const { isAdmin, isViewingDemoData, profile } = useProfile();
   
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>('');
   const [report, setReport] = useState<string>('');
@@ -101,6 +102,8 @@ export default function Relatorios() {
   const [activeTab, setActiveTab] = useState<string>('generate');
   const [selectedHistoryReport, setSelectedHistoryReport] = useState<GeneratedReport | null>(null);
   const [reportTemplate, setReportTemplate] = useState<string>('completo');
+  const [reportVisibility, setReportVisibility] = useState<string>('personal');
+  const [runInDemo, setRunInDemo] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
   const [customizationOpen, setCustomizationOpen] = useState(false);
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
