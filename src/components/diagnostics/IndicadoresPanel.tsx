@@ -107,6 +107,7 @@ export function IndicadoresPanel() {
   const [sourceFilter, setSourceFilter] = useState('all');
   const [themeFilter, setThemeFilter] = useState('all');
   const [tierFilter, setTierFilter] = useState('all');
+  const [collectionFilter, setCollectionFilter] = useState('all');
   const [scopeFilter, setScopeFilter] = useState('all');
   const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
   const [editingWeightId, setEditingWeightId] = useState<string | null>(null);
@@ -153,7 +154,9 @@ export function IndicadoresPanel() {
     const matchesTier = tierFilter === 'all' || indicatorTier === tierFilter;
     const indicatorScope = (i as any).indicator_scope || 'territorial';
     const matchesScope = scopeFilter === 'all' || indicatorScope === scopeFilter;
-    return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier && matchesScope;
+    const indicatorCollection = (i as any).collection_type || 'MANUAL';
+    const matchesCollection = collectionFilter === 'all' || indicatorCollection === collectionFilter;
+    return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier && matchesScope && matchesCollection;
   });
 
   // Count by tier
@@ -168,6 +171,13 @@ export function IndicadoresPanel() {
     territorial: indicators.filter(i => (i as any).indicator_scope === 'territorial').length,
     enterprise: indicators.filter(i => (i as any).indicator_scope === 'enterprise').length,
     both: indicators.filter(i => (i as any).indicator_scope === 'both').length,
+  }), [indicators]);
+
+  // Count by collection type
+  const collectionCounts = useMemo(() => ({
+    AUTOMATICA: indicators.filter(i => (i as any).collection_type === 'AUTOMATICA').length,
+    MANUAL: indicators.filter(i => !((i as any).collection_type) || (i as any).collection_type === 'MANUAL').length,
+    ESTIMADA: indicators.filter(i => (i as any).collection_type === 'ESTIMADA').length,
   }), [indicators]);
 
   const handleUpdateTier = async (indicatorId: string, newTier: DiagnosisTier) => {
@@ -371,6 +381,32 @@ export function IndicadoresPanel() {
               </SelectItem>
             </SelectContent>
           </Select>
+          <Select value={collectionFilter} onValueChange={setCollectionFilter}>
+            <SelectTrigger className="w-full xs:w-40">
+              <SelectValue placeholder="Coleta" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas coletas</SelectItem>
+              <SelectItem value="AUTOMATICA">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-3 w-3 text-severity-good" />
+                  API/Automático ({collectionCounts.AUTOMATICA})
+                </div>
+              </SelectItem>
+              <SelectItem value="MANUAL">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-3 w-3 text-severity-moderate" />
+                  Manual ({collectionCounts.MANUAL})
+                </div>
+              </SelectItem>
+              <SelectItem value="ESTIMADA">
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="h-3 w-3 text-severity-critical" />
+                  Estimado ({collectionCounts.ESTIMADA})
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <Button onClick={() => setIsFormDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -532,6 +568,7 @@ export function IndicadoresPanel() {
           // MOBILE CARD VIEW
           <div className="divide-y">
             {filteredIndicators.map((indicator) => {
+              const collectionType = (indicator as any).collection_type as CollectionType | undefined;
               const isIGMA = (indicator as any).source === 'IGMA';
               const igmaDimension = (indicator as any).igma_dimension;
               const defaultInterpretation = (indicator as any).default_interpretation;
@@ -562,7 +599,15 @@ export function IndicadoresPanel() {
                             className="text-left hover:underline w-full"
                             onClick={() => setSelectedIndicator(indicator)}
                           >
-                            <div className="font-medium text-sm">{indicator.name}</div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-medium text-sm">{indicator.name}</span>
+                              {collectionType === 'AUTOMATICA' && (
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
+                                  <Zap className="h-2.5 w-2.5 mr-0.5" />
+                                  API
+                                </Badge>
+                              )}
+                            </div>
                             <div className="text-xs text-muted-foreground mt-0.5">
                               {directionLabels[indicator.direction]}
                             </div>
@@ -918,6 +963,12 @@ export function IndicadoresPanel() {
                               <span className="font-medium">{indicator.name}</span>
                               {indicator.description && (
                                 <Info className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              {collectionType === 'AUTOMATICA' && (
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
+                                  <Zap className="h-3 w-3 mr-0.5" />
+                                  API
+                                </Badge>
                               )}
                             </div>
                             <span className="text-xs text-muted-foreground">
