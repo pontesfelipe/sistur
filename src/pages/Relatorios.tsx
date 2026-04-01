@@ -578,6 +578,56 @@ export default function Relatorios() {
                     </Select>
                   </div>
 
+                  <div className="w-44">
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                      Visibilidade
+                    </label>
+                    <Select value={reportVisibility} onValueChange={setReportVisibility}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="personal">
+                          <span className="flex items-center gap-1.5">
+                            <Lock className="h-3 w-3" />
+                            Pessoal
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="org">
+                          <span className="flex items-center gap-1.5">
+                            <Users className="h-3 w-3" />
+                            Organização
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {isAdmin && (
+                    <div className="w-36">
+                      <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                        Ambiente
+                      </label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant={runInDemo ? 'secondary' : 'outline'}
+                              className="w-full gap-2"
+                              onClick={() => setRunInDemo(!runInDemo)}
+                            >
+                              <FlaskConical className="h-4 w-4" />
+                              {runInDemo ? 'Demo' : 'Produção'}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {runInDemo ? 'Relatório será gerado no ambiente de demonstração' : 'Relatório será gerado no ambiente de produção'}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  )}
+
                   <div className="flex items-end gap-2">
                     <Button 
                       onClick={() => generateReport()} 
