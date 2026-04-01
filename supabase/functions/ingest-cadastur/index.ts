@@ -31,6 +31,18 @@ const CADASTUR_DATASETS = {
 
 // Try to discover downloadable CSV/XLSX links from dados.gov.br CKAN API
 async function discoverDownloadUrl(datasetSlug: string): Promise<string | null> {
+  // Strategy 1: CKAN API (fast, structured)
+  const ckanUrl = await discoverViaCKAN(datasetSlug);
+  if (ckanUrl) return ckanUrl;
+
+  // Strategy 2: Firecrawl scraping (fallback when CKAN fails)
+  const firecrawlUrl = await discoverViaFirecrawl(datasetSlug);
+  if (firecrawlUrl) return firecrawlUrl;
+
+  return null;
+}
+
+async function discoverViaCKAN(datasetSlug: string): Promise<string | null> {
   const apiUrl = `https://dados.gov.br/api/publico/conjuntos-dados/${datasetSlug}`;
   try {
     const resp = await fetch(apiUrl, { signal: AbortSignal.timeout(10000) });
@@ -41,7 +53,6 @@ async function discoverDownloadUrl(datasetSlug: string): Promise<string | null> 
     const data = await resp.json();
     const resources = data?.recursos || data?.resources || [];
     
-    // Sort by most recent, prefer CSV
     const sorted = resources
       .filter((r: any) => {
         const fmt = (r.formato || r.format || '').toUpperCase();
@@ -55,12 +66,82 @@ async function discoverDownloadUrl(datasetSlug: string): Promise<string | null> 
 
     if (sorted.length > 0) {
       const url = sorted[0].link || sorted[0].url;
-      console.log(`Discovered URL for ${datasetSlug}: ${url}`);
+      console.log(`[CKAN] Discovered URL for ${datasetSlug}: ${url}`);
       return url;
     }
     return null;
   } catch (e) {
-    console.error(`Error discovering URL for ${datasetSlug}:`, e instanceof Error ? e.message : e);
+    console.error(`[CKAN] Error for ${datasetSlug}:`, e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
+// Fallback: use Firecrawl to scrape the dados.gov.br dataset page and extract download links
+async function discoverViaFirecrawl(datasetSlug: string): Promise<string | null> {
+  const apiKey = Deno.env.get('FIRECRAWL_API_KEY');
+  if (!apiKey) {
+    console.log('[Firecrawl] API key not configured, skipping fallback');
+    return null;
+  }
+
+  const pageUrl = `https://dados.gov.br/dados/conjuntos-dados/${datasetSlug}`;
+  console.log(`[Firecrawl] Scraping ${pageUrl} for download links...`);
+
+  try {
+    const resp = await fetch('https://api.firecrawl.dev/v1/scrape', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: pageUrl,
+        formats: ['links', 'markdown'],
+        onlyMainContent: false,
+        waitFor: 3000,
+      }),
+    });
+
+    if (!resp.ok) {
+      console.warn(`[Firecrawl] API returned ${resp.status}`);
+      return null;
+    }
+
+    const result = await resp.json();
+    const links: string[] = result?.data?.links || result?.links || [];
+    const markdown: string = result?.data?.markdown || result?.markdown || '';
+
+    // Find CSV/XLSX download links
+    const downloadLinks = links.filter((link: string) => {
+      const lower = link.toLowerCase();
+      return (lower.endsWith('.csv') || lower.endsWith('.xlsx') || lower.endsWith('.xls'))
+        && (lower.includes('cadastur') || lower.includes('dados.gov') || lower.includes('turismo'));
+    });
+
+    if (downloadLinks.length > 0) {
+      // Prefer most recent (URLs often contain year/quarter)
+      downloadLinks.sort((a, b) => b.localeCompare(a));
+      console.log(`[Firecrawl] Found ${downloadLinks.length} download links, using: ${downloadLinks[0]}`);
+      return downloadLinks[0];
+    }
+
+    // Also try to find download URLs in the markdown content
+    const urlRegex = /https?:\/\/[^\s)]+\.(csv|xlsx|xls)/gi;
+    const markdownUrls = markdown.match(urlRegex) || [];
+    const relevantUrls = markdownUrls.filter((u: string) => 
+      u.toLowerCase().includes('cadastur') || u.toLowerCase().includes('turismo')
+    );
+
+    if (relevantUrls.length > 0) {
+      relevantUrls.sort((a: string, b: string) => b.localeCompare(a));
+      console.log(`[Firecrawl] Found URL in markdown: ${relevantUrls[0]}`);
+      return relevantUrls[0];
+    }
+
+    console.log('[Firecrawl] No download links found on page');
+    return null;
+  } catch (e) {
+    console.error('[Firecrawl] Error:', e instanceof Error ? e.message : e);
     return null;
   }
 }
