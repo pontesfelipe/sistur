@@ -622,7 +622,12 @@ export function IndicadoresPanel() {
                           >
                             <div className="flex items-center gap-1.5">
                               <span className="font-medium text-sm">{indicator.name}</span>
-                              {collectionType === 'AUTOMATICA' && (
+                              {CADASTUR_SEMI_AUTO_CODES.has(indicator.code) ? (
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-cyan-500/50 text-cyan-600 bg-cyan-500/10">
+                                  <Database className="h-2.5 w-2.5 mr-0.5" />
+                                  CADASTUR
+                                </Badge>
+                              ) : collectionType === 'AUTOMATICA' && (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
                                   <Zap className="h-2.5 w-2.5 mr-0.5" />
                                   API
