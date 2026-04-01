@@ -463,6 +463,22 @@ export default function Relatorios() {
                     </Select>
                   </div>
 
+                  <div className="w-48">
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                      Modelo
+                    </label>
+                    <Select value={reportTemplate} onValueChange={setReportTemplate}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="completo">📋 Completo</SelectItem>
+                        <SelectItem value="executivo">📊 Executivo</SelectItem>
+                        <SelectItem value="investidor">💰 Investidores</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="flex items-end gap-2">
                     <Button 
                       onClick={() => generateReport()} 
