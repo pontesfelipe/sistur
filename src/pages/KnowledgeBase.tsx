@@ -93,7 +93,7 @@ export default function KnowledgeBase() {
               <p className="text-lg font-medium">Nenhum arquivo encontrado</p>
               <p className="text-sm">Faça upload de documentos para criar sua base de conhecimento</p>
               <Button variant="outline" className="mt-4" onClick={() => setUploadOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" /> Enviar arquivo
+                <Plus className="h-4 w-4 mr-2" /> Upload de arquivo
               </Button>
             </CardContent>
           </Card>
