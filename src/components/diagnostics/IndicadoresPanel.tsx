@@ -919,6 +919,12 @@ export function IndicadoresPanel() {
                               {indicator.description && (
                                 <Info className="h-4 w-4 text-muted-foreground" />
                               )}
+                              {collectionType === 'AUTOMATICA' && (
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
+                                  <Zap className="h-3 w-3 mr-0.5" />
+                                  API
+                                </Badge>
+                              )}
                             </div>
                             <span className="text-xs text-muted-foreground">
                               {directionLabels[indicator.direction]}
