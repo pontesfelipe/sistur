@@ -3161,30 +3161,36 @@ export type Database = {
           created_at: string
           created_by: string
           destination_name: string
+          environment: string
           id: string
           kb_file_ids: string[] | null
           org_id: string
           report_content: string
+          visibility: string
         }
         Insert: {
           assessment_id: string
           created_at?: string
           created_by: string
           destination_name: string
+          environment?: string
           id?: string
           kb_file_ids?: string[] | null
           org_id: string
           report_content: string
+          visibility?: string
         }
         Update: {
           assessment_id?: string
           created_at?: string
           created_by?: string
           destination_name?: string
+          environment?: string
           id?: string
           kb_file_ids?: string[] | null
           org_id?: string
           report_content?: string
+          visibility?: string
         }
         Relationships: []
       }
