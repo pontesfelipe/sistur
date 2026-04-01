@@ -196,59 +196,24 @@ async function fetchIBGEPesquisas(ibgeCode: string, populacao?: number): Promise
   return results;
 }
 
-// ─── 3. Estimativas para dados não encontrados ───────────────────────
-function generateEstimates(ibgeCode: string, populacao?: number, existingKeys?: Set<string>): Record<string, IndicatorResult> {
+// ─── 3. Valores padrão para indicadores sem API pública ─────────────
+// These are NOT estimates — they are placeholder defaults that MUST be
+// reviewed and replaced by the operator. They exist only so the form
+// pre-populates with something editable instead of being blank.
+function generateDefaults(ibgeCode: string, populacao?: number, existingKeys?: Set<string>): Record<string, IndicatorResult> {
   const results: Record<string, IndicatorResult> = {};
-  const ufCode = ibgeCode.substring(0, 2);
-  const codeNum = parseInt(ibgeCode);
 
-  const ufDefaults: Record<string, Record<string, number>> = {
-    '11': { idh: 0.690, ideb: 4.8, esc: 88, leit: 1.8, cob: 65 },
-    '12': { idh: 0.663, ideb: 4.5, esc: 85, leit: 1.5, cob: 60 },
-    '13': { idh: 0.674, ideb: 4.4, esc: 84, leit: 1.6, cob: 58 },
-    '15': { idh: 0.646, ideb: 4.3, esc: 83, leit: 1.7, cob: 55 },
-    '21': { idh: 0.639, ideb: 4.5, esc: 82, leit: 2.0, cob: 62 },
-    '22': { idh: 0.646, ideb: 4.6, esc: 83, leit: 1.9, cob: 60 },
-    '23': { idh: 0.682, ideb: 5.5, esc: 88, leit: 2.1, cob: 65 },
-    '24': { idh: 0.684, ideb: 4.7, esc: 86, leit: 2.0, cob: 63 },
-    '25': { idh: 0.658, ideb: 4.8, esc: 85, leit: 2.1, cob: 64 },
-    '26': { idh: 0.673, ideb: 4.7, esc: 86, leit: 2.3, cob: 66 },
-    '27': { idh: 0.631, ideb: 4.5, esc: 82, leit: 1.8, cob: 60 },
-    '28': { idh: 0.665, ideb: 4.6, esc: 84, leit: 1.9, cob: 62 },
-    '29': { idh: 0.660, ideb: 4.4, esc: 84, leit: 2.0, cob: 63 },
-    '31': { idh: 0.731, ideb: 5.8, esc: 92, leit: 2.5, cob: 75 },
-    '32': { idh: 0.740, ideb: 5.5, esc: 91, leit: 2.3, cob: 72 },
-    '33': { idh: 0.761, ideb: 5.3, esc: 93, leit: 3.0, cob: 78 },
-    '35': { idh: 0.783, ideb: 6.0, esc: 95, leit: 2.8, cob: 80 },
-    '41': { idh: 0.749, ideb: 5.9, esc: 93, leit: 2.7, cob: 78 },
-    '42': { idh: 0.774, ideb: 6.1, esc: 95, leit: 3.2, cob: 82 },
-    '43': { idh: 0.746, ideb: 5.7, esc: 93, leit: 3.0, cob: 80 },
-    '50': { idh: 0.729, ideb: 5.4, esc: 90, leit: 2.4, cob: 70 },
-    '51': { idh: 0.725, ideb: 5.3, esc: 89, leit: 2.3, cob: 68 },
-    '52': { idh: 0.735, ideb: 5.5, esc: 91, leit: 2.5, cob: 72 },
-    '53': { idh: 0.824, ideb: 5.8, esc: 96, leit: 3.5, cob: 85 },
+  // Indicators that have NO public API and require manual input.
+  // We provide a zero/placeholder so the UI renders an editable field.
+  const manualIndicators: Record<string, { year: number; source: string }> = {
+    'igma_guias_turismo':      { year: 0, source: 'MANUAL' },
+    'igma_agencias_turismo':   { year: 0, source: 'MANUAL' },
+    'igma_taxa_escolarizacao': { year: 0, source: 'MANUAL' },
   };
 
-  const def = ufDefaults[ufCode] || { idh: 0.720, ideb: 5.2, esc: 90, leit: 2.5, cob: 70 };
-  const v = (codeNum % 100) / 1000;
-
-  const estimates: Record<string, { value: number; year: number; source: string }> = {
-    'igma_idh': { value: Math.round((def.idh + v - 0.05) * 1000) / 1000, year: 2010, source: 'IBGE' },
-    'igma_ideb': { value: Math.round((def.ideb + v * 5) * 10) / 10, year: 2021, source: 'INEP' },
-    'igma_taxa_escolarizacao': { value: Math.round(def.esc + v * 50), year: 2022, source: 'INEP' },
-    'igma_leitos_por_habitante': { value: Math.round((def.leit + v * 10) * 10) / 10, year: 2023, source: 'DATASUS' },
-    'igma_cobertura_saude': { value: Math.round(def.cob + v * 100), year: 2023, source: 'DATASUS' },
-    'igma_receita_propria': { value: 20 + (codeNum % 25), year: 2023, source: 'STN' },
-    'igma_despesa_turismo': { value: Math.round((1 + (codeNum % 5) * 0.5) * 10) / 10, year: 2023, source: 'STN' },
-    'igma_guias_turismo': { value: Math.round((3 + (codeNum % 10)) * (populacao && populacao < 20000 ? 0.5 : 1)), year: 2024, source: 'CADASTUR' },
-    'igma_agencias_turismo': { value: Math.round((1 + (codeNum % 8)) * (populacao && populacao < 20000 ? 0.5 : 1)), year: 2024, source: 'CADASTUR' },
-    'igma_meios_hospedagem': { value: Math.round((8 + (codeNum % 20)) * (populacao && populacao < 20000 ? 0.5 : 1)), year: 2024, source: 'CADASTUR' },
-  };
-
-  // Only add estimates for indicators we DON'T already have real data for
-  for (const [key, est] of Object.entries(estimates)) {
+  for (const [key, meta] of Object.entries(manualIndicators)) {
     if (existingKeys && existingKeys.has(key)) continue;
-    results[key] = { ...est, real: false };
+    results[key] = { value: 0, year: meta.year, source: meta.source, real: false };
   }
 
   return results;
