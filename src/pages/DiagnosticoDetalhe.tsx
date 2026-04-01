@@ -197,6 +197,7 @@ const DiagnosticoDetalhe = () => {
   const ibgeCode = assessmentDestination?.ibge_code;
   
   const { data: externalValues = [], isLoading: loadingExternalValues } = useExternalIndicatorValues(ibgeCode, orgId);
+  const { data: diagnosisSnapshots = [] } = useDiagnosisDataSnapshots(id);
   const fetchOfficialData = useFetchOfficialData();
   const validateIndicatorValues = useValidateIndicatorValues();
 
