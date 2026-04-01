@@ -19,6 +19,7 @@ import { ActAsUserPanel } from '@/components/settings/ActAsUserPanel';
 import { FeedbackManagementPanel } from '@/components/settings/FeedbackManagementPanel';
 import { ForumPrivacySettings } from '@/components/settings/ForumPrivacySettings';
 import { ContentModerationPanel } from '@/components/settings/ContentModerationPanel';
+import { PerformanceMetricsPanel } from '@/components/settings/PerformanceMetricsPanel';
 import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
@@ -219,6 +220,7 @@ export default function Configuracoes() {
             <DemoModeToggle />
             <ForumPrivacySettings />
             {isAdmin && <ContentModerationPanel />}
+            {isAdmin && <PerformanceMetricsPanel />}
             {isAdmin && <ActAsUserPanel />}
           </TabsContent>
 

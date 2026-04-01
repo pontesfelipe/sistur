@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 13,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.13.5",
+    date: "2026-04-01",
+    type: "patch" as const,
+    changes: [
+      "Painel de Métricas de Performance para administradores em Configurações",
+      "Monitoramento de latência, uso de banco de dados, conexões e volume de dados",
+      "Alertas automáticos com recomendação de upgrade de instância quando necessário",
+    ],
+  },
   {
     version: "1.13.4",
     date: "2026-04-01",
