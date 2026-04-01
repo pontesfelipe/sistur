@@ -271,10 +271,10 @@ Deno.serve(async (req) => {
         indicator_code: code,
         municipality_ibge_code: ibge_code,
         source_code: result.source,
-        raw_value: result.value,
-        reference_year: result.year,
+        raw_value: result.real ? result.value : null, // Non-real data gets null — operator must fill in
+        reference_year: result.year || null,
         collection_method: result.real ? 'AUTOMATIC' : 'MANUAL',
-        confidence_level: result.real ? 5 : 3,
+        confidence_level: result.real ? 5 : 1,
         validated: false,
         org_id: org_id,
       }));
