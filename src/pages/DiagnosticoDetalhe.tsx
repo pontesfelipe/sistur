@@ -78,6 +78,8 @@ import { toast } from 'sonner';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+import { useQuery } from '@tanstack/react-query';
+
 const DiagnosticoDetalhe = () => {
   const { id } = useParams();
   const navigate = useNavigate();
