@@ -513,49 +513,52 @@ export default function NovaRodada() {
       {currentStep === 4 || currentStep === 5 ? (
         // Full-width validation/data entry panel
         <div className="space-y-6">
-          {diagnosticType === 'enterprise' ? (
-            // Enterprise: Show enterprise profile step first
-            selectedDestinationData ? (
-              <EnterpriseProfileStep
-                destinationId={selectedDestinationData.id}
-                destinationName={selectedDestinationData.name}
-                onComplete={() => {
-                  // After profile, go to step 5 for KPI data entry
-                  setCurrentStep(5);
-                }}
-                onBack={handlePreviousStep}
-              />
+          {/* Step 4: Pre-filling / Enterprise Profile */}
+          {currentStep === 4 && (
+            diagnosticType === 'enterprise' ? (
+              // Enterprise: Show enterprise profile step
+              selectedDestinationData ? (
+                <EnterpriseProfileStep
+                  destinationId={selectedDestinationData.id}
+                  destinationName={selectedDestinationData.name}
+                  onComplete={() => {
+                    // After profile, go to step 5 for KPI data entry
+                    setCurrentStep(5);
+                  }}
+                  onBack={handlePreviousStep}
+                />
+              ) : (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
+                    <p className="text-muted-foreground">Carregando destino...</p>
+                  </CardContent>
+                </Card>
+              )
             ) : (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
-                  <p className="text-muted-foreground">Carregando destino...</p>
-                </CardContent>
-              </Card>
-            )
-          ) : (
-            // Territorial: Show IBGE data validation panel
-            selectedDestinationData?.ibge_code && profile?.org_id ? (
-              <DataValidationPanel
-                ibgeCode={selectedDestinationData.ibge_code}
-                orgId={profile.org_id}
-                destinationName={selectedDestinationData.name}
-                onValidationComplete={handleValidationComplete}
-              />
-            ) : (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h4 className="font-medium mb-2">Código IBGE não disponível</h4>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    O destino selecionado não possui código IBGE cadastrado. 
-                    O pré-preenchimento automático requer o código IBGE para buscar dados oficiais.
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Você pode prosseguir para preenchimento manual ou editar o destino para adicionar o código IBGE.
-                  </p>
-                </CardContent>
-              </Card>
+              // Territorial: Show IBGE data validation panel
+              selectedDestinationData?.ibge_code && profile?.org_id ? (
+                <DataValidationPanel
+                  ibgeCode={selectedDestinationData.ibge_code}
+                  orgId={profile.org_id}
+                  destinationName={selectedDestinationData.name}
+                  onValidationComplete={handleValidationComplete}
+                />
+              ) : (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <h4 className="font-medium mb-2">Código IBGE não disponível</h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      O destino selecionado não possui código IBGE cadastrado. 
+                      O pré-preenchimento automático requer o código IBGE para buscar dados oficiais.
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Você pode prosseguir para preenchimento manual ou editar o destino para adicionar o código IBGE.
+                    </p>
+                  </CardContent>
+                </Card>
+              )
             )
           )}
 

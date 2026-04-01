@@ -195,6 +195,42 @@ const DiagnosticoDetalhe = () => {
     }
   };
 
+  const handleExportCSV = () => {
+    if (!assessment || pillarScores.length === 0) {
+      toast.error('Nenhum dado para exportar');
+      return;
+    }
+
+    const rows: string[] = [];
+    rows.push('Tipo,Pilar,Tema,Score,Severidade');
+
+    // Pillar scores
+    pillarScores.forEach((ps: any) => {
+      rows.push(`Pilar,${ps.pillar},,${ps.score},${ps.severity}`);
+    });
+
+    // Indicator scores
+    indicatorScores.forEach((is: any) => {
+      const ind = is.indicator;
+      rows.push(`Indicador,${ind?.pillar || ''},${ind?.name || ''},${is.score},`);
+    });
+
+    // Issues
+    issues.forEach((issue: any) => {
+      rows.push(`Gargalo,${issue.pillar},${issue.theme},,${issue.severity}`);
+    });
+
+    const csvContent = '\uFEFF' + rows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `diagnostico-${assessment.title.replace(/\s+/g, '-')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('CSV exportado com sucesso!');
+  };
+
   const handleResetToDraft = async () => {
     if (!id) return;
     try {
@@ -344,19 +380,26 @@ const DiagnosticoDetalhe = () => {
                   Preencher Dados
                 </Link>
               </Button>
-              <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
-                {calculating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Calculando...
-                  </>
-                ) : (
-                  <>
-                    <Calculator className="mr-2 h-4 w-4" />
-                    Calcular Índices
-                  </>
+              <div className="relative group">
+                <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
+                  {calculating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Calculando...
+                    </>
+                  ) : (
+                    <>
+                      <Calculator className="mr-2 h-4 w-4" />
+                      Calcular Índices
+                    </>
+                  )}
+                </Button>
+                {assessment.status === 'DRAFT' && (
+                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-popover text-popover-foreground border rounded px-2 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    Preencha ao menos um indicador para habilitar o cálculo
+                  </span>
                 )}
-              </Button>
+              </div>
             </>
           )}
           {isCalculated && (
@@ -367,7 +410,7 @@ const DiagnosticoDetalhe = () => {
                   Gerar Relatório
                 </Link>
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleExportCSV}>
                 <Download className="mr-2 h-4 w-4" />
                 Exportar CSV
               </Button>
