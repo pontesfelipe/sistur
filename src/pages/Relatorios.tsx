@@ -725,15 +725,26 @@ export default function Relatorios() {
                     )}
                   </div>
                   {selectedHistoryReport && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => downloadReport(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
-                      className="gap-2"
-                    >
-                      <Download className="h-4 w-4" />
-                      Baixar Markdown
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => downloadReport(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
+                        className="gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        Markdown
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={downloadPDF}
+                        className="gap-2"
+                      >
+                        <FileText className="h-4 w-4" />
+                        PDF
+                      </Button>
+                    </div>
                   )}
                 </CardHeader>
                 <CardContent>
