@@ -282,9 +282,20 @@ export default function Relatorios() {
   const downloadPDF = () => {
     if (!reportRef.current) return;
     
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      toast.error('Popup bloqueado. Permita popups para gerar o PDF.');
+    // Use an iframe instead of popup to avoid popup blockers
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentWindow?.document;
+    if (!iframeDoc) {
+      toast.error('Não foi possível preparar o PDF.');
+      document.body.removeChild(iframe);
       return;
     }
 
@@ -302,18 +313,34 @@ export default function Relatorios() {
         hr { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
         ul, ol { padding-left: 24px; }
         li { margin-bottom: 4px; }
-        @media print { body { padding: 20px; } }
+        @media print { body { padding: 20px; } @page { margin: 1.5cm; } }
       </style>
     `;
 
-    printWindow.document.write(`<!DOCTYPE html><html><head><title>Relatório SISTUR</title>${styles}</head><body>${reportRef.current.innerHTML}</body></html>`);
-    printWindow.document.close();
+    iframeDoc.open();
+    iframeDoc.write(`<!DOCTYPE html><html><head><title>Relatório SISTUR</title>${styles}</head><body>${reportRef.current.innerHTML}</body></html>`);
+    iframeDoc.close();
     
     setTimeout(() => {
-      printWindow.print();
+      iframe.contentWindow?.print();
+      // Clean up after print dialog closes
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
     }, 500);
     
-    toast.success('PDF preparado! Use "Salvar como PDF" na janela de impressão.');
+    toast.success('Use "Salvar como PDF" na janela de impressão.');
+  };
+
+  const downloadDocx = async (content: string, destName: string) => {
+    if (!content) return;
+    try {
+      await exportReportAsDocx(content, destName);
+      toast.success('Relatório Word baixado!');
+    } catch (err) {
+      console.error('Error exporting DOCX:', err);
+      toast.error('Erro ao gerar arquivo Word.');
+    }
   };
 
   // Improved markdown renderer with table support
