@@ -536,10 +536,16 @@ export default function Relatorios() {
                     </Button>
 
                     {report && (
-                      <Button variant="outline" onClick={() => downloadReport(report, selectedDestination?.name || 'destino')} className="gap-2">
-                        <Download className="h-4 w-4" />
-                        Baixar Markdown
-                      </Button>
+                      <>
+                        <Button variant="outline" onClick={() => downloadReport(report, selectedDestination?.name || 'destino')} className="gap-2">
+                          <Download className="h-4 w-4" />
+                          Markdown
+                        </Button>
+                        <Button variant="outline" onClick={downloadPDF} className="gap-2">
+                          <FileText className="h-4 w-4" />
+                          PDF
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
