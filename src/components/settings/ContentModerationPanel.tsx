@@ -149,7 +149,7 @@ export function ContentModerationPanel() {
     }
   };
 
-  const strictnessInfo = STRICTNESS_LABELS[settings.strictness_level];
+  const strictnessInfo = STRICTNESS_DETAILS[settings.strictness_level];
 
   if (isLoading) {
     return (
@@ -207,6 +207,38 @@ export function ContentModerationPanel() {
             />
           </div>
           <p className="text-sm text-muted-foreground">{strictnessInfo.description}</p>
+
+          {/* Blocked & Allowed details */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+            <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 space-y-2">
+              <p className="text-xs font-semibold text-destructive flex items-center gap-1.5">
+                <Ban className="h-3.5 w-3.5" />
+                Bloqueado neste nível
+              </p>
+              <ul className="space-y-1">
+                {strictnessInfo.blocked.map((item, i) => (
+                  <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                    <span className="text-destructive mt-0.5">✕</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-3 space-y-2">
+              <p className="text-xs font-semibold text-green-600 dark:text-green-400 flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5" />
+                Permitido neste nível
+              </p>
+              <ul className="space-y-1">
+                {strictnessInfo.allowed.map((item, i) => (
+                  <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                    <span className="text-green-600 dark:text-green-400 mt-0.5">✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
 
         <Separator />
