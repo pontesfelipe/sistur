@@ -78,15 +78,6 @@ export default function ERPDashboard() {
             <Wifi className="h-3 w-3 text-severity-good animate-pulse" />
             Tempo real
           </Badge>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Atualizar
-          </Button>
         </div>
       }
     >
