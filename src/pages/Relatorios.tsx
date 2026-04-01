@@ -146,6 +146,7 @@ export default function Relatorios() {
           issues: issues || [],
           prescriptions: prescriptions || [],
           forceRegenerate,
+          reportTemplate,
         }),
       });
 
