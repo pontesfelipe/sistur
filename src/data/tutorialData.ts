@@ -262,7 +262,7 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'admin-settings',
         title: 'Configurações do Sistema',
-        description: 'Acesse configurações avançadas: modo demo, privacidade do fórum, aprovações pendentes, feedback dos usuários e logs de auditoria.',
+        description: 'Acesse configurações avançadas: modo demo, privacidade do fórum, aprovações pendentes, feedback dos usuários, referências globais e logs de auditoria.',
         icon: Settings,
         route: '/configuracoes',
         roles: ['ADMIN'],

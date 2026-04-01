@@ -1077,6 +1077,94 @@ export default function Metodologia() {
           </CardContent>
         </Card>
 
+        {/* Knowledge Base & Global References */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              Base de Conhecimento e Referências Globais
+            </CardTitle>
+            <CardDescription>
+              Documentos de apoio que enriquecem diagnósticos e relatórios
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="prose prose-sm max-w-none dark:prose-invert">
+              <p>
+                O SISTUR permite o upload de <strong>documentos de referência</strong> que são utilizados automaticamente 
+                pela IA na geração de relatórios e na contextualização dos diagnósticos. Existem dois níveis de documentos:
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="rounded-xl border-2 border-blue-500 bg-blue-50 dark:bg-blue-950/30 p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-blue-600 text-white">Por Destino</Badge>
+                  <h4 className="font-semibold">Base de Conhecimento</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Documentos específicos de cada destino: planos diretores, legislação municipal, pesquisas locais, 
+                  dados socioeconômicos. Associados a destinos e usados automaticamente nos diagnósticos daquele município.
+                </p>
+                <ul className="text-sm space-y-1">
+                  <li className="flex items-center gap-2"><span className="text-blue-600">📄</span> PDF, DOCX, XLSX, CSV, TXT (até 20MB)</li>
+                  <li className="flex items-center gap-2"><span className="text-blue-600">🤖</span> Moderação automática por IA antes do upload</li>
+                  <li className="flex items-center gap-2"><span className="text-blue-600">🏷️</span> 8 categorias: Plano Diretor, Legislação, Pesquisa, etc.</li>
+                </ul>
+              </div>
+
+              <div className="rounded-xl border-2 border-purple-500 bg-purple-50 dark:bg-purple-950/30 p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-purple-600 text-white">Global</Badge>
+                  <h4 className="font-semibold">Referências Globais</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Documentos de referência nacional injetados em todos os relatórios: PNT (Plano Nacional de Turismo), 
+                  legislação federal, diretrizes do Ministério do Turismo. Gerenciados exclusivamente por administradores.
+                </p>
+                <ul className="text-sm space-y-1">
+                  <li className="flex items-center gap-2"><span className="text-purple-600">🏛️</span> PNT 2024-2027 como referência padrão</li>
+                  <li className="flex items-center gap-2"><span className="text-purple-600">📋</span> Contextualiza indicadores com metas nacionais</li>
+                  <li className="flex items-center gap-2"><span className="text-purple-600">🔒</span> Somente admins podem adicionar/remover</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Report Customization */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              Personalização de Relatórios
+            </CardTitle>
+            <CardDescription>
+              Relatórios profissionais com identidade visual da organização
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="prose prose-sm max-w-none dark:prose-invert">
+              <p>
+                Os relatórios gerados pelo SISTUR podem ser personalizados com a identidade visual da organização. 
+                As configurações incluem:
+              </p>
+              <ul>
+                <li><strong>Logo da organização</strong> — exibido no topo do relatório</li>
+                <li><strong>Cabeçalho e rodapé</strong> — textos customizáveis para identificação institucional</li>
+                <li><strong>Cor primária</strong> — aplicada em títulos, destaques e bordas</li>
+                <li><strong>Tamanho de fonte</strong> — pequeno, médio ou grande para adequar à audiência</li>
+                <li><strong>Notas adicionais</strong> — bloco final com observações ou disclaimers</li>
+              </ul>
+              <p>
+                Cada relatório pode ter <strong>visibilidade pessoal</strong> (apenas o criador vê) ou 
+                <strong> organizacional</strong> (compartilhado com toda a organização). Administradores podem 
+                gerar relatórios no ambiente Demo para demonstrações.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* References */}
         <Card>
           <CardHeader>
@@ -1106,6 +1194,10 @@ export default function Metodologia() {
               <li>
                 <strong>Ministério do Turismo.</strong> CADASTUR — Cadastro de Prestadores de Serviços Turísticos. 
                 Disponível em: cadastur.turismo.gov.br
+              </li>
+              <li>
+                <strong>Ministério do Turismo.</strong> Plano Nacional de Turismo 2024-2027. 
+                Disponível em: gov.br/turismo
               </li>
             </ul>
           </CardContent>
