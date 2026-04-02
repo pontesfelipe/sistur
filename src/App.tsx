@@ -269,14 +269,6 @@ const App = () => {
                   }
                 />
                 <Route
-                  path="/erp"
-                  element={
-                    <ERPRoute>
-                      <ERPDashboard />
-                    </ERPRoute>
-                  }
-                />
-                <Route
                   path="/faq"
                   element={
                     <ProtectedRoute redirectStudentsToEdu={false}>
