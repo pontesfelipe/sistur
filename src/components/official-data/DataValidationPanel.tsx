@@ -151,9 +151,10 @@ export function DataValidationPanel({
                   </>
                 ) : (
                   <>
-                    Clique em "Buscar Dados" para carregar indicadores de APIs oficiais. 
-                    Indicadores sem API pública (ex: CADASTUR) serão criados como campos em branco para preenchimento manual.
+                    Clique em "Buscar Dados" para carregar indicadores vindos de APIs oficiais.
+                    Indicadores sem API pública ficam disponíveis apenas na etapa de preenchimento manual.
                   </>
+
                 )}
               </p>
             </div>
