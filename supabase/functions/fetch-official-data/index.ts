@@ -124,6 +124,14 @@ async function fetchIBGEPesquisas(ibgeCode: string, populacao?: number): Promise
     { key: 'igma_meios_hospedagem', url: `https://servicodados.ibge.gov.br/api/v1/pesquisas/34/indicadores/62874/resultados/${shortCode}`, source: 'CADASTUR' },
     // Serviços de hospedagem - Leitos/UH (pesquisa 34, indicador 62873)
     { key: '_hospedagem_uh', url: `https://servicodados.ibge.gov.br/api/v1/pesquisas/34/indicadores/62873/resultados/${shortCode}`, source: 'CADASTUR' },
+    // ─── NEW: Taxa de mortalidade infantil (pesquisa 39, indicador 30279)
+    { key: 'igma_taxa_de_mortalidade_infantil', url: `https://servicodados.ibge.gov.br/api/v1/pesquisas/39/indicadores/30279/resultados/${shortCode}`, source: 'DATASUS' },
+    // ─── NEW: Óbitos / Mortalidade geral (pesquisa 17, indicador 15752)
+    { key: 'igma_mortalidade_geral_por_mil_habitantes', url: `https://servicodados.ibge.gov.br/api/v1/pesquisas/17/indicadores/15752/resultados/${shortCode}`, source: 'DATASUS' },
+    // ─── NEW: Índice de Gini (pesquisa 36, indicador 30252)
+    { key: 'igma_indice_de_gini_da_renda_domiciliar_per_capita', url: `https://servicodados.ibge.gov.br/api/v1/pesquisas/36/indicadores/30252/resultados/${shortCode}`, source: 'IBGE' },
+    // ─── NEW: Incidência de pobreza (pesquisa 36, indicador 30246)
+    { key: 'igma_populacao_de_baixa_renda', url: `https://servicodados.ibge.gov.br/api/v1/pesquisas/36/indicadores/30246/resultados/${shortCode}`, source: 'IBGE' },
   ];
 
   const responses = await Promise.allSettled(
@@ -169,22 +177,21 @@ async function fetchIBGEPesquisas(ibgeCode: string, populacao?: number): Promise
         real: true,
       };
     } else if (key === 'igma_despesa_turismo') {
-      // Despesa total in R$ — convert to % of total (approximation using receita)
-      if (results['igma_receita_propria']) {
-        // Store raw despesa for now, but calculate % if we have receita
-        const receita = extracted.value;
-        results[key] = {
-          value: Math.round(extracted.value / 1000000 * 10) / 10, // em milhões
-          year: extracted.year,
-          source,
-          real: true,
-        };
-      } else {
-        results[key] = { ...extracted, source, real: true };
-      }
-    } else if (key === 'igma_cobertura_saude') {
-      // Estabelecimentos de saúde — store as-is
-      results[key] = { ...extracted, source, real: true };
+      // Despesa total in R$ — convert to millions
+      results[key] = {
+        value: Math.round(extracted.value / 1000000 * 10) / 10,
+        year: extracted.year,
+        source,
+        real: true,
+      };
+    } else if (key === 'igma_mortalidade_geral_por_mil_habitantes' && populacao && populacao > 0) {
+      // Convert absolute deaths to per 1000 inhabitants
+      results[key] = {
+        value: Math.round((extracted.value / populacao) * 10000) / 10,
+        year: extracted.year,
+        source,
+        real: true,
+      };
     } else if (key === '_hospedagem_uh') {
       // Skip internal key — used for enrichment only
       continue;
@@ -244,7 +251,7 @@ Deno.serve(async (req) => {
     const agregadosData = await fetchIBGEAgregados(ibge_code);
     console.log(`Agregados: ${Object.keys(agregadosData).length} indicators`);
 
-    // 2. Fetch REAL data from IBGE Pesquisas (IDH, IDEB, saúde, finanças, hospedagem)
+    // 2. Fetch REAL data from IBGE Pesquisas (IDH, IDEB, saúde, finanças, hospedagem, mortalidade, Gini)
     const populacao = agregadosData['igma_populacao']?.value;
     const pesquisasData = await fetchIBGEPesquisas(ibge_code, populacao);
     console.log(`Pesquisas: ${Object.keys(pesquisasData).length} indicators`);
