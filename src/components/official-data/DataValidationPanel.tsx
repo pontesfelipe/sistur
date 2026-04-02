@@ -51,12 +51,12 @@ const SOURCE_INFO: Record<string, { name: string; color: string; icon: string }>
 };
 
 // Confidence level display
-const CONFIDENCE_LABELS: Record<number, { label: string; color: string }> = {
-  1: { label: 'Muito baixa', color: 'text-red-500' },
-  2: { label: 'Baixa', color: 'text-orange-500' },
-  3: { label: 'Média', color: 'text-yellow-500' },
-  4: { label: 'Alta', color: 'text-lime-500' },
-  5: { label: 'Muito alta', color: 'text-green-500' },
+const CONFIDENCE_CRITERIA: Record<number, { label: string; color: string }> = {
+  1: { label: 'Preenchimento manual', color: 'text-destructive' },
+  2: { label: 'Pesquisa local', color: 'text-orange-500' },
+  3: { label: 'Fonte secundária', color: 'text-yellow-600' },
+  4: { label: 'Lote oficial', color: 'text-cyan-600' },
+  5: { label: 'API oficial em tempo real', color: 'text-green-600' },
 };
 
 const OFFICIAL_COLLECTION_METHODS: ExternalIndicatorValue['collection_method'][] = ['AUTOMATIC', 'BATCH'];
@@ -264,14 +264,14 @@ export function DataValidationPanel({
                     <TableHead>Valor</TableHead>
                     <TableHead>Fonte</TableHead>
                     <TableHead>Ano</TableHead>
-                    <TableHead>Confiança</TableHead>
+                    <TableHead>Critério</TableHead>
                     <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {values.map((value) => {
                     const sourceInfo = SOURCE_INFO[value.source_code];
-                    const confidenceInfo = CONFIDENCE_LABELS[value.confidence_level];
+                    const confidenceInfo = CONFIDENCE_CRITERIA[value.confidence_level];
                     const isEdited = editedValues[value.id] !== undefined;
                     const displayValue = isEdited ? editedValues[value.id] : value.raw_value;
 
@@ -335,29 +335,14 @@ export function DataValidationPanel({
                           </span>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1">
-                            {[1, 2, 3, 4, 5].map((level) => (
-                              <Star
-                                key={level}
-                                className={cn(
-                                  'h-3 w-3',
-                                  level <= value.confidence_level
-                                    ? 'fill-amber-400 text-amber-400'
-                                    : 'text-muted-foreground/30'
-                                )}
-                              />
-                            ))}
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Info className="h-3 w-3 text-muted-foreground ml-1" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p className={confidenceInfo?.color}>{confidenceInfo?.label}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
+                          {(() => {
+                            const criteria = CONFIDENCE_CRITERIA[value.confidence_level];
+                            return (
+                              <span className={cn('text-xs font-medium', criteria?.color)}>
+                                {criteria?.label || '—'}
+                              </span>
+                            );
+                          })()}
                         </TableCell>
                         <TableCell>
                           {value.validated ? (
