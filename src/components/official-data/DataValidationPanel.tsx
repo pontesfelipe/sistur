@@ -147,11 +147,10 @@ export function DataValidationPanel({
                <p className="text-muted-foreground">
                 {autoCount > 0 ? (
                   <>
-                    <strong>{autoCount} indicadores</strong> foram obtidos diretamente de APIs oficiais (IBGE, DATASUS, INEP, STN) com alta confiabilidade. 
+                    <strong>{autoCount} indicadores</strong> foram obtidos diretamente de APIs oficiais (IBGE, DATASUS, INEP, STN, CADASTUR) com alta confiabilidade. 
                     {manualCount > 0 && (
                       <>
                         {' '}Os demais <strong>{manualCount} indicadores</strong> não possuem API pública disponível e <strong>requerem preenchimento manual</strong> pelo operador.
-                        {' '}A API do CADASTUR é restrita a órgãos federais — dados de guias e agências devem ser inseridos manualmente.
                       </>
                     )}
                   </>
