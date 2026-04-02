@@ -44,6 +44,7 @@ const ExamTaking = () => {
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState<{ score: number; passed: boolean } | null>(null);
+  const [warnedLowTime, setWarnedLowTime] = useState(false);
 
   const { data: exam, isLoading: examLoading } = useExam(examId);
   const { data: attempt } = useExamAttempt(examId);
@@ -71,6 +72,11 @@ const ExamTaking = () => {
           handleAutoSubmit();
           return 0;
         }
+        // Warn at 2 minutes remaining
+        if (prev === 120 && !warnedLowTime) {
+          setWarnedLowTime(true);
+          toast.warning('Atenção: restam apenas 2 minutos para finalizar o exame!');
+        }
         return prev - 1;
       });
     }, 1000);
@@ -85,6 +91,8 @@ const ExamTaking = () => {
       toast.warning('Tempo esgotado! Exame enviado automaticamente.');
     } catch (error) {
       console.error('Auto-submit error:', error);
+      toast.error('Erro ao enviar exame automaticamente. Por favor, tente enviar manualmente.');
+      setSubmitted(false);
     }
   };
 

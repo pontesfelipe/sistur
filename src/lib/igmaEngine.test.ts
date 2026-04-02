@@ -53,7 +53,8 @@ describe("interpretIGMA", () => {
       );
       expect(result.flags.RA_LIMITATION).toBe(true);
       expect(result.blockedActions).toContain("EDU_OE");
-      expect(result.allowedActions.EDU_OE).toBe(false);
+      // EDU is never blocked — methodology requires all low-score indicators get training
+      expect(result.allowedActions.EDU_OE).toBe(true);
     });
 
     it("does not set RA_LIMITATION when RA is not CRITICO", () => {
@@ -71,7 +72,8 @@ describe("interpretIGMA", () => {
       );
       expect(result.flags.GOVERNANCE_BLOCK).toBe(true);
       expect(result.blockedActions).toContain("EDU_OE");
-      expect(result.allowedActions.EDU_OE).toBe(false);
+      // EDU is never blocked — methodology requires all low-score indicators get training
+      expect(result.allowedActions.EDU_OE).toBe(true);
     });
   });
 
