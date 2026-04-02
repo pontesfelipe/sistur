@@ -9,7 +9,6 @@ import { OrganizationUsersPanel } from '@/components/settings/OrganizationUsersP
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
 import { NormalizationCalculator } from '@/components/tools/NormalizationCalculator';
 import { DataExporter } from '@/components/tools/DataExporter';
-import { IBGESearch } from '@/components/tools/IBGESearch';
 import { IndicatorSimulator } from '@/components/tools/IndicatorSimulator';
 import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
 import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPanel';
@@ -31,7 +30,6 @@ import {
   BarChart3,
   Calculator,
   Settings2,
-  Search,
   FlaskConical,
   Info,
   History,
@@ -210,8 +208,6 @@ export default function Configuracoes() {
 
             <DemoModeToggle />
             <ForumPrivacySettings />
-            {isAdmin && <ContentModerationPanel />}
-            {isAdmin && <PerformanceMetricsPanel />}
             {isAdmin && <ActAsUserPanel />}
           </TabsContent>
 
@@ -473,23 +469,13 @@ export default function Configuracoes() {
                     </CardContent>
                   </Card>
 
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <Search className="h-4 w-4 text-primary" />
-                        Busca IBGE
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        Pesquise municípios na base do IBGE
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <IBGESearch />
-                    </CardContent>
-                  </Card>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Admin tools */}
+            {isAdmin && <ContentModerationPanel />}
+            {isAdmin && <PerformanceMetricsPanel />}
 
             {/* Global References - Admin only */}
             <GlobalReferencesPanel />

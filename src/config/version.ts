@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 14,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.14.2",
+    date: "2026-04-02",
+    type: "patch" as const,
+    changes: [
+      "Busca IBGE removida da aba Ferramentas (funcionalidade disponível na busca de dados oficiais)",
+      "Moderação de Conteúdo movida de Geral para Ferramentas (admin)",
+      "Métricas de Performance movidas de Geral para Ferramentas (admin)",
+    ],
+  },
   {
     version: "1.14.1",
     date: "2026-04-02",
