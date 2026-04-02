@@ -140,7 +140,7 @@ export function DataValidationPanel({
     onValidationComplete(validatedValues);
   };
 
-  const validatedCount = values.filter(v => v.validated).length;
+  const validatedCount = confirmedIds.size;
   const pendingCount = values.length - validatedCount;
   const autoCount = values.length;
 
