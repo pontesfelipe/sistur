@@ -264,7 +264,7 @@ export function DataValidationPanel({
                     <TableHead>Valor</TableHead>
                     <TableHead>Fonte</TableHead>
                     <TableHead>Ano</TableHead>
-                    <TableHead>Confiança</TableHead>
+                    <TableHead>Critério</TableHead>
                     <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
