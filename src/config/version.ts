@@ -23,6 +23,19 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.14.0",
+    date: "2026-04-02",
+    type: "minor" as const,
+    changes: [
+      "Página de Monitoramento ERP removida — funcionalidades consolidadas no Dashboard principal",
+      "Dashboard com sistema de widgets personalizáveis (13 widgets disponíveis)",
+      "Usuário pode ativar/desativar widgets individualmente via botão 'Personalizar'",
+      "Widgets de projetos: KPIs, visão de projetos, progresso por pilar, evolução de ciclos, atrasados",
+      "Preferências de widgets salvas localmente para persistência entre sessões",
+      "Categorização de widgets: Visão Geral, Diagnósticos, Projetos, Capacitação",
+    ],
+  },
+  {
     version: "1.13.5",
     date: "2026-04-01",
     type: "patch" as const,
