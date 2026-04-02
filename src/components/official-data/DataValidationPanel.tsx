@@ -271,7 +271,7 @@ export function DataValidationPanel({
                 <TableBody>
                   {values.map((value) => {
                     const sourceInfo = SOURCE_INFO[value.source_code];
-                    const confidenceInfo = CONFIDENCE_LABELS[value.confidence_level];
+                    const confidenceInfo = CONFIDENCE_CRITERIA[value.confidence_level];
                     const isEdited = editedValues[value.id] !== undefined;
                     const displayValue = isEdited ? editedValues[value.id] : value.raw_value;
 
