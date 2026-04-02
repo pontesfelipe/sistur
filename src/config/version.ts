@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 14,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.14.1",
+    date: "2026-04-02",
+    type: "patch" as const,
+    changes: [
+      "Aba Ferramentas simplificada: removidos Quick Actions redundantes (links já no menu lateral)",
+      "Removido Monitor de Ciclos (disponível na comparação entre rodadas do diagnóstico)",
+      "Removido Monitor do Sistema (já presente em Geral > Métricas de Performance)",
+      "Removido bloco Integrações de Dados (informação duplicada da aba Docs)",
+      "Mantidos: Calculadora de Normalização, Simulador de Indicadores, Exportar Dados, Busca IBGE",
+      "Cores dos ícones das ferramentas padronizadas com tokens do design system",
+    ],
+  },
   {
     version: "1.14.0",
     date: "2026-04-02",
