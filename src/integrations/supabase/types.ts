@@ -6752,7 +6752,15 @@ export type Database = {
         | "THESIS"
       course_level: "BASICO" | "INTERMEDIARIO" | "AVANCADO"
       course_status_type: "draft" | "published" | "archived"
-      data_source: "IBGE" | "CADASTUR" | "PESQUISA_LOCAL" | "MANUAL" | "OUTRO"
+      data_source:
+        | "IBGE"
+        | "CADASTUR"
+        | "PESQUISA_LOCAL"
+        | "MANUAL"
+        | "OUTRO"
+        | "INEP"
+        | "DATASUS"
+        | "STN"
       diagnosis_tier_type: "COMPLETE" | "MEDIUM" | "SMALL"
       enrollment_status_type: "active" | "completed" | "dropped" | "suspended"
       exam_result_type: "passed" | "failed" | "pending"
@@ -6965,7 +6973,16 @@ export const Constants = {
       ],
       course_level: ["BASICO", "INTERMEDIARIO", "AVANCADO"],
       course_status_type: ["draft", "published", "archived"],
-      data_source: ["IBGE", "CADASTUR", "PESQUISA_LOCAL", "MANUAL", "OUTRO"],
+      data_source: [
+        "IBGE",
+        "CADASTUR",
+        "PESQUISA_LOCAL",
+        "MANUAL",
+        "OUTRO",
+        "INEP",
+        "DATASUS",
+        "STN",
+      ],
       diagnosis_tier_type: ["COMPLETE", "MEDIUM", "SMALL"],
       enrollment_status_type: ["active", "completed", "dropped", "suspended"],
       exam_result_type: ["passed", "failed", "pending"],
