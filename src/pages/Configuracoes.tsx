@@ -9,7 +9,6 @@ import { OrganizationUsersPanel } from '@/components/settings/OrganizationUsersP
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
 import { NormalizationCalculator } from '@/components/tools/NormalizationCalculator';
 import { DataExporter } from '@/components/tools/DataExporter';
-import { IBGESearch } from '@/components/tools/IBGESearch';
 import { IndicatorSimulator } from '@/components/tools/IndicatorSimulator';
 import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
 import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPanel';
