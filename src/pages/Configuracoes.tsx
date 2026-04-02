@@ -416,66 +416,6 @@ export default function Configuracoes() {
 
           {/* FERRAMENTAS TAB */}
           <TabsContent value="ferramentas" className="space-y-6">
-            {/* Quick Actions */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card className="hover:shadow-lg transition-shadow border-primary/20">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-primary" />
-                    SISTUR EDU
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full" size="sm" asChild>
-                    <a href="/cursos">Acessar</a>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-shadow border-primary/20">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" />
-                    Relatórios IA
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full" size="sm" asChild>
-                    <a href="/relatorios">Gerar</a>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-shadow border-primary/20">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-primary" />
-                    Diagnósticos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full" size="sm" asChild>
-                    <a href="/diagnosticos">Ver</a>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-shadow border-primary/20">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-primary" />
-                    Destinos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full" size="sm" asChild>
-                    <a href="/destinos">Gerenciar</a>
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Tools Grid */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -487,11 +427,11 @@ export default function Configuracoes() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-2">
                   <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <Calculator className="h-4 w-4 text-blue-500" />
+                        <Calculator className="h-4 w-4 text-primary" />
                         Calculadora de Normalização
                       </CardTitle>
                       <CardDescription className="text-xs">
@@ -506,7 +446,7 @@ export default function Configuracoes() {
                   <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <FlaskConical className="h-4 w-4 text-purple-500" />
+                        <FlaskConical className="h-4 w-4 text-primary" />
                         Simulador de Indicadores
                       </CardTitle>
                       <CardDescription className="text-xs">
@@ -521,7 +461,7 @@ export default function Configuracoes() {
                   <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <Download className="h-4 w-4 text-green-500" />
+                        <Download className="h-4 w-4 text-primary" />
                         Exportar Dados
                       </CardTitle>
                       <CardDescription className="text-xs">
@@ -536,22 +476,7 @@ export default function Configuracoes() {
                   <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <RefreshCw className="h-4 w-4 text-orange-500" />
-                        Monitor de Ciclos
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        Acompanhe evolução entre ciclos
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <CycleMonitor />
-                    </CardContent>
-                  </Card>
-
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <Search className="h-4 w-4 text-cyan-500" />
+                        <Search className="h-4 w-4 text-primary" />
                         Busca IBGE
                       </CardTitle>
                       <CardDescription className="text-xs">
@@ -562,109 +487,12 @@ export default function Configuracoes() {
                       <IBGESearch />
                     </CardContent>
                   </Card>
-
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <Activity className="h-4 w-4 text-red-500" />
-                        Monitor do Sistema
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        Visão geral do estado do SISTUR
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <SystemHealthMonitor />
-                    </CardContent>
-                  </Card>
                 </div>
               </CardContent>
             </Card>
 
             {/* Global References - Admin only */}
             <GlobalReferencesPanel />
-
-            {/* Data Integrations */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Database className="h-5 w-5 text-primary" />
-                  Integrações de Dados
-                </CardTitle>
-                <CardDescription>
-                  Fontes oficiais conectadas ao sistema
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="font-bold text-primary text-xs">IGMA</span>
-                    </div>
-                    <div>
-                      <p className="font-medium">IGMA</p>
-                      <p className="text-sm text-muted-foreground">Backbone de legitimidade</p>
-                      <Badge variant="secondary" className="mt-1">Conectado</Badge>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="font-bold text-primary">IBGE</span>
-                    </div>
-                    <div>
-                      <p className="font-medium">IBGE - API de Dados</p>
-                      <p className="text-sm text-muted-foreground">Dados demográficos</p>
-                      <Badge variant="secondary" className="mt-1">Conectado</Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="font-bold text-primary text-xs">CAD</span>
-                    </div>
-                    <div>
-                      <p className="font-medium">CADASTUR</p>
-                      <p className="text-sm text-muted-foreground">Serviços turísticos</p>
-                      <Badge variant="outline" className="mt-1">Manual</Badge>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="font-bold text-primary text-xs">SUS</span>
-                    </div>
-                    <div>
-                      <p className="font-medium">DATASUS</p>
-                      <p className="text-sm text-muted-foreground">Dados de saúde</p>
-                      <Badge variant="outline" className="mt-1">Manual</Badge>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="font-bold text-primary text-xs">INEP</span>
-                    </div>
-                    <div>
-                      <p className="font-medium">INEP</p>
-                      <p className="text-sm text-muted-foreground">Dados educacionais</p>
-                      <Badge variant="outline" className="mt-1">Manual</Badge>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="font-bold text-primary text-xs">STN</span>
-                    </div>
-                    <div>
-                      <p className="font-medium">Tesouro Nacional</p>
-                      <p className="text-sm text-muted-foreground">Dados fiscais</p>
-                      <Badge variant="outline" className="mt-1">Manual</Badge>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>
