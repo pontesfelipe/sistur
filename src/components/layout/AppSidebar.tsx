@@ -18,7 +18,7 @@ import {
   MessageCircleQuestion,
   BookMarked,
   BookOpen,
-  Activity,
+  
   Bot,
   MessageSquarePlus,
   MessageSquare,

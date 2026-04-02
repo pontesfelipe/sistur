@@ -15,7 +15,7 @@ import {
   HelpCircle,
   MessageCircleQuestion,
   BookMarked,
-  Activity,
+  
   Menu,
   Bot,
   MessageSquarePlus,
