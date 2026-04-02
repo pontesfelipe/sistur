@@ -214,14 +214,16 @@ export default function NovaRodada() {
   // Get effective org_id for demo mode
   const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
   
-  // Check if there are validated indicator values for this assessment's destination
+  // Check if there are validated automatic indicator values for this assessment's destination
   const { data: existingValidatedValues } = useExternalIndicatorValues(
     selectedDestinationData?.ibge_code || undefined,
     effectiveOrgId || undefined
   );
   
-  // Count validated values
-  const validatedValuesCount = existingValidatedValues?.filter(v => v.validated)?.length || 0;
+  // Count only validated automatic values from pre-filling
+  const validatedValuesCount = existingValidatedValues?.filter(
+    v => v.validated && v.collection_method !== 'MANUAL'
+  )?.length || 0;
 
   // Load resume data when assessment is fetched
   useEffect(() => {
