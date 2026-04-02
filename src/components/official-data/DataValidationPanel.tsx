@@ -69,21 +69,19 @@ export function DataValidationPanel({
   const [editedValues, setEditedValues] = useState<Record<string, number | null>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  const { data: values = [], isLoading, refetch } = useExternalIndicatorValues(ibgeCode, orgId);
+  const { data: rawValues = [], isLoading } = useExternalIndicatorValues(ibgeCode, orgId);
   const fetchOfficialData = useFetchOfficialData();
   const validateValues = useValidateIndicatorValues();
 
-  // Group values by source
-  const valuesBySource = useMemo(() => {
-    const grouped: Record<string, ExternalIndicatorValue[]> = {};
-    values.forEach(v => {
-      if (!grouped[v.source_code]) {
-        grouped[v.source_code] = [];
-      }
-      grouped[v.source_code].push(v);
-    });
-    return grouped;
-  }, [values]);
+  const values = useMemo(
+    () => rawValues.filter((value) => value.collection_method !== 'MANUAL'),
+    [rawValues]
+  );
+
+  const manualCount = useMemo(
+    () => rawValues.filter((value) => value.collection_method === 'MANUAL').length,
+    [rawValues]
+  );
 
   const handleFetchData = async () => {
     await fetchOfficialData.mutateAsync({ ibgeCode, orgId });
@@ -124,16 +122,13 @@ export function DataValidationPanel({
 
     await validateValues.mutateAsync({ values: valuesToValidate, userId: user.id });
     
-    // Notify parent with validated values
     const validatedValues = values.filter(v => selectedIds.has(v.id));
     onValidationComplete(validatedValues);
   };
 
   const validatedCount = values.filter(v => v.validated).length;
   const pendingCount = values.length - validatedCount;
-
-  const autoCount = values.filter(v => v.collection_method === 'AUTOMATIC').length;
-  const manualCount = values.filter(v => v.collection_method === 'MANUAL').length;
+  const autoCount = values.length;
 
   return (
     <div className="space-y-6">
