@@ -35,6 +35,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+const LOW_TIME_WARNING_SECONDS = 120; // 2 minutes
+
 const ExamTaking = () => {
   const { examId } = useParams<{ examId: string }>();
   const navigate = useNavigate();
@@ -72,8 +74,8 @@ const ExamTaking = () => {
           handleAutoSubmit();
           return 0;
         }
-        // Warn at 2 minutes remaining
-        if (prev === 120 && !warnedLowTime) {
+        // Warn when low on time
+        if (prev === LOW_TIME_WARNING_SECONDS && !warnedLowTime) {
           setWarnedLowTime(true);
           toast.warning('Atenção: restam apenas 2 minutos para finalizar o exame!');
         }

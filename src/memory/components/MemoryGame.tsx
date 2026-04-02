@@ -26,7 +26,8 @@ const BIOME_BG_IMAGES: Record<string, string> = {
 
 const MAX_TIME = 180;
 const PAIR_COUNT = 8;
-const MAX_ERRORS = Math.ceil(PAIR_COUNT * 1.5); // 12 errors for 8 pairs — challenging but fair
+const ERROR_MULTIPLIER = 1.5;
+const MAX_ERRORS = Math.ceil(PAIR_COUNT * ERROR_MULTIPLIER); // 12 errors for 8 pairs — challenging but fair
 
 function createGameState(theme: MemoryTheme): MemoryGameState {
   const cards = generateMemoryCards(theme.id, PAIR_COUNT);
