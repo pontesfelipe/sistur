@@ -210,8 +210,6 @@ export default function Configuracoes() {
 
             <DemoModeToggle />
             <ForumPrivacySettings />
-            {isAdmin && <ContentModerationPanel />}
-            {isAdmin && <PerformanceMetricsPanel />}
             {isAdmin && <ActAsUserPanel />}
           </TabsContent>
 
