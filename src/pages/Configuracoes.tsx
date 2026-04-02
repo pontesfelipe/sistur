@@ -471,23 +471,13 @@ export default function Configuracoes() {
                     </CardContent>
                   </Card>
 
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <Search className="h-4 w-4 text-primary" />
-                        Busca IBGE
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        Pesquise municípios na base do IBGE
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <IBGESearch />
-                    </CardContent>
-                  </Card>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Admin tools */}
+            {isAdmin && <ContentModerationPanel />}
+            {isAdmin && <PerformanceMetricsPanel />}
 
             {/* Global References - Admin only */}
             <GlobalReferencesPanel />
