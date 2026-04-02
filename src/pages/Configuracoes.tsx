@@ -30,7 +30,6 @@ import {
   BarChart3,
   Calculator,
   Settings2,
-  Search,
   FlaskConical,
   Info,
   History,
