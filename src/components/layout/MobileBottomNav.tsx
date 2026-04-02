@@ -70,7 +70,7 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
   };
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t border-border safe-bottom">
+    <nav aria-label="Navegação principal" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t border-border safe-bottom">
       <div className="flex items-center justify-around h-16 px-2">
         {displayItems.map((item) => {
           const isActive = location.pathname === item.href || 
@@ -84,6 +84,8 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
               key={item.href}
               to={item.href}
               onClick={handleNavClick}
+              aria-label={item.name}
+              aria-current={isActive ? 'page' : undefined}
               className={cn(
                 'flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 touch-target no-tap-highlight mobile-active relative',
                 isActive
@@ -98,11 +100,11 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
                 )} />
                 {showBadge && (
                   <span className="absolute -top-1 -right-1.5 h-4 min-w-4 flex items-center justify-center bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full px-1">
-                    {forumNotifications.unreadCount > 9 ? '9+' : forumNotifications.unreadCount}
+                    {(forumNotifications?.unreadCount ?? 0) > 9 ? '9+' : forumNotifications?.unreadCount}
                   </span>
                 )}
               </div>
-              <span className="text-[10px] font-medium">{item.name}</span>
+              <span className="text-[11px] font-medium">{item.name}</span>
             </Link>
           );
         })}
@@ -110,10 +112,11 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
         {/* Menu button */}
         <button
           onClick={handleMenuClick}
+          aria-label="Abrir menu de navegação"
           className="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 touch-target no-tap-highlight mobile-active text-muted-foreground"
         >
           <Menu className="h-5 w-5" />
-          <span className="text-[10px] font-medium">Menu</span>
+          <span className="text-[11px] font-medium">Menu</span>
         </button>
       </div>
     </nav>

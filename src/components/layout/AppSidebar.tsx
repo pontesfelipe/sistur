@@ -169,7 +169,7 @@ export function AppSidebar() {
         )}
         {showBadge && !collapsed && !isLocked && (
           <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
-            {forumNotifications.unreadCount > 99 ? '99+' : forumNotifications.unreadCount}
+            {(forumNotifications?.unreadCount ?? 0) > 99 ? '99+' : forumNotifications?.unreadCount}
           </Badge>
         )}
       </Link>
@@ -183,7 +183,7 @@ export function AppSidebar() {
             {item.name}
             {showBadge && (
               <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
-                {forumNotifications.unreadCount > 99 ? '99+' : forumNotifications.unreadCount}
+                {(forumNotifications?.unreadCount ?? 0) > 99 ? '99+' : forumNotifications?.unreadCount}
               </Badge>
             )}
           </TooltipContent>

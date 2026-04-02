@@ -183,12 +183,12 @@ const ExamTaking = () => {
     return (
       <AppLayout title="Resultado do Exame" subtitle="Veja seu desempenho">
         <div className="max-w-2xl mx-auto">
-          <Card className={passed ? 'border-green-500/50' : 'border-red-500/50'}>
+          <Card className={passed ? 'border-severity-good/50' : 'border-severity-critical/50'}>
             <CardHeader className="text-center">
               {passed ? (
-                <Award className="h-20 w-20 mx-auto mb-4 text-green-500" />
+                <Award className="h-20 w-20 mx-auto mb-4 text-severity-good" />
               ) : (
-                <XCircle className="h-20 w-20 mx-auto mb-4 text-red-500" />
+                <XCircle className="h-20 w-20 mx-auto mb-4 text-severity-critical" />
               )}
               <CardTitle className="text-3xl">
                 {passed ? 'Parabéns!' : 'Não foi desta vez'}
@@ -246,11 +246,11 @@ const ExamTaking = () => {
                 <span>Você terá tempo limitado para completar o exame</span>
               </div>
               <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                <AlertTriangle className="h-5 w-5 text-severity-moderate" />
                 <span>Uma vez iniciado, o exame não pode ser pausado</span>
               </div>
               <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                <CheckCircle className="h-5 w-5 text-green-500" />
+                <CheckCircle className="h-5 w-5 text-severity-good" />
                 <span>Responda todas as questões antes de enviar</span>
               </div>
               <div className="pt-4 border-t space-y-3">
@@ -294,8 +294,8 @@ const ExamTaking = () => {
         {/* Timer and Progress */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Clock className={`h-5 w-5 ${timeRemaining && timeRemaining < 60 ? 'text-red-500 animate-pulse' : 'text-muted-foreground'}`} />
-            <span className={`font-mono text-lg ${timeRemaining && timeRemaining < 60 ? 'text-red-500 font-bold' : ''}`}>
+            <Clock className={`h-5 w-5 ${timeRemaining && timeRemaining < 60 ? 'text-severity-critical animate-pulse' : 'text-muted-foreground'}`} />
+            <span className={`font-mono text-lg ${timeRemaining && timeRemaining < 60 ? 'text-severity-critical font-bold' : ''}`}>
               {timeRemaining !== null ? formatTime(timeRemaining) : '--:--'}
             </span>
           </div>

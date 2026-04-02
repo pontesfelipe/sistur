@@ -166,30 +166,51 @@ const Index = () => {
     queryKey: ['all-destination-pillar-scores'],
     queryFn: async () => {
       if (!destinations || destinations.length === 0) return {};
+      const destIds = destinations.map(d => d.id);
+
+      // Batch: fetch all calculated assessments for all destinations at once
+      const { data: assessments } = await supabase
+        .from('assessments')
+        .select('id, destination_id')
+        .in('destination_id', destIds)
+        .eq('status', 'CALCULATED');
+
+      if (!assessments || assessments.length === 0) return {};
+
+      const assessmentIds = assessments.map(a => a.id);
+
+      // Batch: fetch all pillar scores for all assessments at once
+      const { data: pillarScores } = await supabase
+        .from('pillar_scores')
+        .select('*')
+        .in('assessment_id', assessmentIds);
+
+      if (!pillarScores || pillarScores.length === 0) return {};
+
+      // Map assessment_id -> destination_id for grouping
+      const assessmentToDestMap = new Map(assessments.map(a => [a.id, a.destination_id]));
+
+      // Group scores by destination
+      const destPillarScores: Record<string, Record<string, number[]>> = {};
+      pillarScores.forEach(ps => {
+        const destId = assessmentToDestMap.get(ps.assessment_id);
+        if (!destId) return;
+        if (!destPillarScores[destId]) destPillarScores[destId] = {};
+        if (!destPillarScores[destId][ps.pillar]) destPillarScores[destId][ps.pillar] = [];
+        destPillarScores[destId][ps.pillar].push(ps.score);
+      });
+
+      // Aggregate into final format with calculated severity
       const scoresMap: Record<string, { pillar: 'RA' | 'OE' | 'AO'; score: number; severity: string }[]> = {};
-      for (const dest of destinations) {
-        const { data: assessments } = await supabase
-          .from('assessments')
-          .select('id')
-          .eq('destination_id', dest.id)
-          .eq('status', 'CALCULATED');
-        if (!assessments || assessments.length === 0) continue;
-        const assessmentIds = assessments.map(a => a.id);
-        const { data: pillarScores } = await supabase
-          .from('pillar_scores')
-          .select('*')
-          .in('assessment_id', assessmentIds);
-        if (!pillarScores || pillarScores.length === 0) continue;
-        const pillarAggregates: Record<string, number[]> = {};
-        pillarScores.forEach(ps => {
-          if (!pillarAggregates[ps.pillar]) pillarAggregates[ps.pillar] = [];
-          pillarAggregates[ps.pillar].push(ps.score);
+      for (const [destId, pillars] of Object.entries(destPillarScores)) {
+        scoresMap[destId] = Object.entries(pillars).map(([pillar, scores]) => {
+          const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+          return {
+            pillar: pillar as 'RA' | 'OE' | 'AO',
+            score: avg,
+            severity: avg <= 0.33 ? 'CRITICO' : avg <= 0.66 ? 'MODERADO' : 'BOM',
+          };
         });
-        scoresMap[dest.id] = Object.entries(pillarAggregates).map(([pillar, scores]) => ({
-          pillar: pillar as 'RA' | 'OE' | 'AO',
-          score: scores.reduce((a, b) => a + b, 0) / scores.length,
-          severity: 'MODERADO',
-        }));
       }
       return scoresMap;
     },
