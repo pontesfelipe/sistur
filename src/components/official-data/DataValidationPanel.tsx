@@ -129,6 +129,13 @@ export function DataValidationPanel({
 
     await validateValues.mutateAsync({ values: valuesToValidate, userId: user.id });
     
+    setConfirmedIds(prev => {
+      const next = new Set(prev);
+      selectedIds.forEach(id => next.add(id));
+      return next;
+    });
+    setSelectedIds(new Set());
+
     const validatedValues = values.filter(v => selectedIds.has(v.id));
     onValidationComplete(validatedValues);
   };
