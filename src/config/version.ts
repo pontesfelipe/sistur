@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 14,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,21 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.14.3",
+    date: "2026-04-02",
+    type: "patch" as const,
+    changes: [
+      "Auditoria completa do catálogo de indicadores: metadados corrigidos para 14+ indicadores",
+      "4 novos indicadores automáticos: mortalidade infantil (DATASUS), mortalidade geral (DATASUS), Gini (IBGE), pobreza (IBGE)",
+      "Total de indicadores auto-preenchidos expandido de 14 para 17+",
+      "Enum data_source expandido com INEP, DATASUS e STN para classificação precisa de fontes",
+      "4 indicadores duplicados removidos (RA005, OE004, OE005, OE006) — versões igma_ são canônicas",
+      "taxa_escolarizacao corrigido de AUTOMATICA para MANUAL (sem API pública disponível)",
+      "PIB per capita, IDEB, cobertura saúde, leitos, receita e despesa com fontes corrigidas",
+      "Flag integration_available ativada para todos os indicadores com coleta automática",
+    ],
+  },
   {
     version: "1.14.2",
     date: "2026-04-02",
