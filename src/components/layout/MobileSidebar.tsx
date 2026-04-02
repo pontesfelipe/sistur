@@ -15,7 +15,7 @@ import {
   HelpCircle,
   MessageCircleQuestion,
   BookMarked,
-  Activity,
+  
   Menu,
   Bot,
   MessageSquarePlus,
@@ -55,7 +55,7 @@ const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
   { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
-  { name: 'Monitoramento ERP', href: '/erp', icon: Activity, requiresERP: true },
+  
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },

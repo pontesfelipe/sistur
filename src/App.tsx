@@ -40,7 +40,7 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const Metodologia = lazy(() => import("./pages/Metodologia"));
 const BeniChat = lazy(() => import("./pages/BeniChat"));
 const Ajuda = lazy(() => import("./pages/Ajuda"));
-const ERPDashboard = lazy(() => import("./pages/ERPDashboard"));
+
 const ERPIntegration = lazy(() => import("./pages/ERPIntegration"));
 const PublicDestinations = lazy(() => import("./pages/PublicDestinations"));
 const QuizManagement = lazy(() => import("./pages/QuizManagement"));
@@ -265,14 +265,6 @@ const App = () => {
                   element={
                     <ERPRoute>
                       <NovaRodada />
-                    </ERPRoute>
-                  }
-                />
-                <Route
-                  path="/erp"
-                  element={
-                    <ERPRoute>
-                      <ERPDashboard />
                     </ERPRoute>
                   }
                 />
