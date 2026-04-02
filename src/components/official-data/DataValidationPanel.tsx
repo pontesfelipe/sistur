@@ -55,7 +55,7 @@ const CONFIDENCE_CRITERIA: Record<number, { label: string; color: string }> = {
   1: { label: 'Preenchimento manual', color: 'text-destructive' },
   2: { label: 'Pesquisa local', color: 'text-orange-500' },
   3: { label: 'Fonte secundária', color: 'text-yellow-600' },
-  4: { label: 'Lote oficial', color: 'text-cyan-600' },
+  4: { label: 'Atualização trimestral', color: 'text-cyan-600' },
   5: { label: 'API oficial em tempo real', color: 'text-green-600' },
 };
 
