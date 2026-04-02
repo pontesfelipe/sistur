@@ -157,8 +157,8 @@ OS TRÊS EIXOS SISTUR:
 CLASSIFICAÇÃO: ADEQUADO (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
 
 FONTES DE DADOS — TRANSPARÊNCIA:
-- Dados obtidos via API oficial (IBGE Agregados e Pesquisas): População, PIB per capita, Densidade, Área, IDH, IDEB, Leitos hospitalares, Cobertura de saúde, Receita per capita, Despesas, Meios de hospedagem. Confiabilidade: ALTA (5/5).
-- Dados de preenchimento manual (sem API pública): Guias de turismo, Agências de turismo, Taxa de escolarização. A API do CADASTUR é restrita a órgãos federais e não está disponível para acesso programático.
+- Dados obtidos automaticamente de bases públicas realmente disponíveis para o município: População, PIB per capita, Densidade, Área, IDH, IDEB, Leitos hospitalares, Cobertura de saúde, Receita própria, Despesa com turismo, Meios de hospedagem e, quando disponível, datasets oficiais abertos do CADASTUR. Confiabilidade: ALTA (5/5).
+- Dados de preenchimento manual: Taxa de escolarização e quaisquer indicadores que não retornem valor oficial válido no momento da coleta.
 - Indicadores locais coletados pelo operador do diagnóstico.
 IMPORTANTE: Ao citar fontes no relatório, especifique se o dado veio de API oficial ou de preenchimento manual.`;
 

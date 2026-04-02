@@ -85,7 +85,7 @@ const faqItems: FAQItem[] = [
   },
   {
     question: 'Como funciona o pré-preenchimento de dados oficiais?',
-    answer: 'O sistema busca automaticamente dados de bases públicas nacionais (IBGE, DATASUS, INEP, Tesouro Nacional, CADASTUR) usando o código IBGE do município. Todos os dados são exibidos com fonte, ano e nível de confiança, e DEVEM ser validados pelo usuário antes do cálculo.',
+    answer: 'O sistema busca apenas dados realmente disponíveis nas bases públicas integradas ao fluxo atual, usando o código IBGE do município. O total pode variar conforme a disponibilidade de cada fonte para o município, e todo dado retornado é exibido com fonte, ano e nível de confiança antes da validação humana obrigatória.',
     category: 'erp',
   },
   {
@@ -95,7 +95,7 @@ const faqItems: FAQItem[] = [
   },
   {
     question: 'Quais são as fontes de dados oficiais?',
-    answer: 'O SISTUR utiliza dados de: IBGE (dados demográficos e econômicos), DATASUS (saúde), INEP (educação), STN/Tesouro Nacional (gestão fiscal) e CADASTUR (oferta turística). O código IBGE do município é a chave de integração.',
+    answer: 'O SISTUR utiliza IBGE, DATASUS, INEP, STN/Tesouro Nacional e dados oficiais abertos do CADASTUR quando disponíveis. Quando uma base não retorna dado válido para o município, o indicador permanece fora do pré-preenchimento e segue para preenchimento manual.',
     category: 'erp',
   },
   {

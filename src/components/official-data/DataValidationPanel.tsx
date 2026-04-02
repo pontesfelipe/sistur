@@ -142,7 +142,7 @@ export function DataValidationPanel({
                <p className="text-muted-foreground">
                 {autoCount > 0 ? (
                   <>
-                    <strong>{autoCount} indicadores</strong> foram obtidos diretamente de APIs oficiais (IBGE, DATASUS, INEP, STN, CADASTUR) com alta confiabilidade. 
+                    <strong>{autoCount} indicadores</strong> foram obtidos diretamente das bases oficiais realmente disponíveis para este município, com alta confiabilidade.
                     {manualCount > 0 && (
                       <>
                         {' '}Os demais <strong>{manualCount} indicadores</strong> não possuem API pública disponível e <strong>requerem preenchimento manual</strong> pelo operador.
