@@ -322,7 +322,7 @@ export function DataValidationPanel({
                             {value.collection_method === 'AUTOMATIC' ? (
                               <Badge className="bg-green-600 text-white text-[10px] px-1.5 py-0">API</Badge>
                             ) : value.collection_method === 'BATCH' ? (
-                              <Badge className="bg-cyan-600 text-white text-[10px] px-1.5 py-0">Lote oficial</Badge>
+                              <Badge className="bg-cyan-600 text-white text-[10px] px-1.5 py-0">Trimestral</Badge>
                             ) : (
                               <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Manual</Badge>
                             )}
