@@ -59,6 +59,12 @@ const CONFIDENCE_LABELS: Record<number, { label: string; color: string }> = {
   5: { label: 'Muito alta', color: 'text-green-500' },
 };
 
+const OFFICIAL_COLLECTION_METHODS: ExternalIndicatorValue['collection_method'][] = ['AUTOMATIC', 'BATCH'];
+
+function isOfficialPreFilledValue(value: ExternalIndicatorValue) {
+  return OFFICIAL_COLLECTION_METHODS.includes(value.collection_method);
+}
+
 export function DataValidationPanel({
   ibgeCode,
   orgId,
@@ -74,12 +80,12 @@ export function DataValidationPanel({
   const validateValues = useValidateIndicatorValues();
 
   const values = useMemo(
-    () => rawValues.filter((value) => value.collection_method !== 'MANUAL'),
+    () => rawValues.filter(isOfficialPreFilledValue),
     [rawValues]
   );
 
   const manualCount = useMemo(
-    () => rawValues.filter((value) => value.collection_method === 'MANUAL').length,
+    () => rawValues.filter((value) => !isOfficialPreFilledValue(value)).length,
     [rawValues]
   );
 
@@ -142,7 +148,7 @@ export function DataValidationPanel({
                <p className="text-muted-foreground">
                 {autoCount > 0 ? (
                   <>
-                    <strong>{autoCount} indicadores</strong> foram obtidos diretamente das bases oficiais realmente disponíveis para este município, com alta confiabilidade.
+                    <strong>{autoCount} indicadores</strong> foram obtidos automaticamente das bases oficiais realmente disponíveis para este município.
                     {manualCount > 0 && (
                       <>
                         {' '}Os demais <strong>{manualCount} indicadores</strong> não possuem API pública disponível e <strong>requerem preenchimento manual</strong> pelo operador.
@@ -345,6 +351,8 @@ export function DataValidationPanel({
                             </Badge>
                             {value.collection_method === 'AUTOMATIC' ? (
                               <Badge className="bg-green-600 text-white text-[10px] px-1.5 py-0">API</Badge>
+                            ) : value.collection_method === 'BATCH' ? (
+                              <Badge className="bg-cyan-600 text-white text-[10px] px-1.5 py-0">Lote oficial</Badge>
                             ) : (
                               <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Manual</Badge>
                             )}
