@@ -1031,9 +1031,9 @@ export default function Metodologia() {
                 </div>
                 <p className="text-sm text-muted-foreground">Confiabilidade: 5/5 ⭐ — Obtidos automaticamente de APIs públicas.</p>
                 <ul className="text-sm space-y-1">
-                  <li className="flex items-center gap-2"><span className="text-green-600">📊</span> <strong>IBGE Agregados</strong>: População, PIB per capita, Densidade, Área territorial</li>
-                  <li className="flex items-center gap-2"><span className="text-green-600">📊</span> <strong>IBGE Pesquisas</strong>: IDH, IDEB, Leitos hospitalares, Cobertura de saúde, Meios de hospedagem</li>
-                  <li className="flex items-center gap-2"><span className="text-green-600">💰</span> <strong>STN</strong>: Receita per capita, Despesas municipais</li>
+                  <li className="flex items-center gap-2"><span className="text-green-600">📊</span> <strong>IBGE Agregados</strong>: População, PIB per capita, Densidade e Área territorial</li>
+                  <li className="flex items-center gap-2"><span className="text-green-600">📊</span> <strong>Bases públicas integradas</strong>: IDH, IDEB, Leitos hospitalares, Cobertura de saúde, Receita própria, Despesa com turismo e Meios de hospedagem, quando houver retorno válido</li>
+                  <li className="flex items-center gap-2"><span className="text-green-600">🏨</span> <strong>CADASTUR / dados.gov.br</strong>: Guias e Agências via datasets oficiais abertos, quando o arquivo trimestral está disponível</li>
                 </ul>
               </div>
 
@@ -1044,8 +1044,6 @@ export default function Metodologia() {
                 </div>
                 <p className="text-sm text-muted-foreground">Confiabilidade: 1/5 ⭐ — Sem API pública disponível. Requer inserção pelo operador.</p>
                 <ul className="text-sm space-y-1">
-                  <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>Guias de Turismo</strong>: API do CADASTUR restrita a órgãos federais</li>
-                  <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>Agências de Turismo</strong>: API do CADASTUR restrita a órgãos federais</li>
                   <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>Taxa de Escolarização</strong>: Dados disponíveis via Censo Escolar (coleta manual)</li>
                 </ul>
               </div>
@@ -1057,11 +1055,10 @@ export default function Metodologia() {
                 Sobre o CADASTUR
               </AlertTitle>
               <AlertDescription className="text-blue-600 dark:text-blue-300">
-                A API oficial do CADASTUR existe (via Conecta Gov/SERPRO), porém é <strong>restrita exclusivamente a 
-                órgãos públicos federais</strong>. O SISTUR não possui acesso programático. Dados de guias e agências 
-                de turismo devem ser obtidos diretamente no site do CADASTUR ou junto ao órgão de turismo estadual, 
-                e inseridos manualmente no sistema. Datasets abertos (CSV) estão disponíveis em dados.gov.br, 
-                atualizados trimestralmente.
+                A API transacional do CADASTUR é <strong>restrita a órgãos públicos federais</strong>, mas o SISTUR 
+                aproveita os <strong>datasets oficiais abertos</strong> publicados em dados.gov.br para ingestão 
+                periódica de guias e agências. Quando o arquivo do trimestre não está acessível ou não contém o 
+                município consultado, o indicador permanece fora do pré-preenchimento automático.
               </AlertDescription>
             </Alert>
 
