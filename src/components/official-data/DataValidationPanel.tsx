@@ -345,15 +345,33 @@ export function DataValidationPanel({
                         </TableCell>
                         <TableCell>
                           {value.validated ? (
-                            <Badge variant="default" className="bg-green-500">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Validado
-                            </Badge>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Badge variant="default" className="bg-green-500 cursor-help">
+                                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                                    Confirmado
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs">Dado já revisado e confirmado pelo operador</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           ) : (
-                            <Badge variant="secondary">
-                              <AlertCircle className="h-3 w-3 mr-1" />
-                              Pendente
-                            </Badge>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Badge variant="secondary" className="cursor-help">
+                                    <AlertCircle className="h-3 w-3 mr-1" />
+                                    Aguardando revisão
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs">Selecione e clique "Validar" para confirmar este dado</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           )}
                         </TableCell>
                       </TableRow>
