@@ -281,14 +281,15 @@ export function DataValidationPanel({
                     const sourceInfo = SOURCE_INFO[value.source_code];
                     const isEdited = editedValues[value.id] !== undefined;
                     const displayValue = isEdited ? editedValues[value.id] : value.raw_value;
+                    const isConfirmed = confirmedIds.has(value.id);
 
                     return (
-                      <TableRow key={value.id} className={cn(value.validated && 'bg-muted/30')}>
+                      <TableRow key={value.id} className={cn(isConfirmed && 'bg-muted/30')}>
                         <TableCell>
                           <Checkbox
                             checked={selectedIds.has(value.id)}
                             onCheckedChange={(checked) => handleSelectOne(value.id, !!checked)}
-                            disabled={value.validated}
+                            disabled={isConfirmed}
                           />
                         </TableCell>
                         <TableCell>
@@ -306,7 +307,7 @@ export function DataValidationPanel({
                           </TooltipProvider>
                         </TableCell>
                         <TableCell>
-                          {value.validated ? (
+                          {isConfirmed ? (
                             <span className="font-mono">{displayValue?.toLocaleString('pt-BR')}</span>
                           ) : (
                             <Input
@@ -352,7 +353,7 @@ export function DataValidationPanel({
                           })()}
                         </TableCell>
                         <TableCell>
-                          {value.validated ? (
+                          {isConfirmed ? (
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -362,7 +363,7 @@ export function DataValidationPanel({
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p className="text-xs">Dado já revisado e confirmado pelo operador</p>
+                                  <p className="text-xs">Dado revisado e confirmado nesta sessão</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
