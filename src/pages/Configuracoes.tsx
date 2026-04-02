@@ -8,9 +8,7 @@ import { OrganizationManagement } from '@/components/settings/OrganizationManage
 import { OrganizationUsersPanel } from '@/components/settings/OrganizationUsersPanel';
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
 import { NormalizationCalculator } from '@/components/tools/NormalizationCalculator';
-import { CycleMonitor } from '@/components/tools/CycleMonitor';
 import { DataExporter } from '@/components/tools/DataExporter';
-import { SystemHealthMonitor } from '@/components/tools/SystemHealthMonitor';
 import { IBGESearch } from '@/components/tools/IBGESearch';
 import { IndicatorSimulator } from '@/components/tools/IndicatorSimulator';
 import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
