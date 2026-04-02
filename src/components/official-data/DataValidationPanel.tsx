@@ -55,7 +55,7 @@ const CONFIDENCE_CRITERIA: Record<number, { label: string; color: string }> = {
   1: { label: 'Preenchimento manual', color: 'text-destructive' },
   2: { label: 'Pesquisa local', color: 'text-orange-500' },
   3: { label: 'Fonte secundária', color: 'text-yellow-600' },
-  4: { label: 'Lote oficial', color: 'text-cyan-600' },
+  4: { label: 'Atualização trimestral', color: 'text-cyan-600' },
   5: { label: 'API oficial em tempo real', color: 'text-green-600' },
 };
 
@@ -322,7 +322,7 @@ export function DataValidationPanel({
                             {value.collection_method === 'AUTOMATIC' ? (
                               <Badge className="bg-green-600 text-white text-[10px] px-1.5 py-0">API</Badge>
                             ) : value.collection_method === 'BATCH' ? (
-                              <Badge className="bg-cyan-600 text-white text-[10px] px-1.5 py-0">Lote oficial</Badge>
+                              <Badge className="bg-cyan-600 text-white text-[10px] px-1.5 py-0">Trimestral</Badge>
                             ) : (
                               <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Manual</Badge>
                             )}
@@ -345,15 +345,33 @@ export function DataValidationPanel({
                         </TableCell>
                         <TableCell>
                           {value.validated ? (
-                            <Badge variant="default" className="bg-green-500">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Validado
-                            </Badge>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Badge variant="default" className="bg-green-500 cursor-help">
+                                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                                    Confirmado
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs">Dado já revisado e confirmado pelo operador</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           ) : (
-                            <Badge variant="secondary">
-                              <AlertCircle className="h-3 w-3 mr-1" />
-                              Pendente
-                            </Badge>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Badge variant="secondary" className="cursor-help">
+                                    <AlertCircle className="h-3 w-3 mr-1" />
+                                    Aguardando revisão
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs">Selecione e clique "Validar" para confirmar este dado</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           )}
                         </TableCell>
                       </TableRow>
