@@ -219,10 +219,13 @@ export function interpretIGMA(input: IGMAInput): IGMAOutput {
   nextReviewRecommendedAt.setMonth(nextReviewRecommendedAt.getMonth() + nextReviewMonths);
 
   // Calculate allowed actions
+  // EDU prescriptions are NEVER fully blocked — the methodology requires
+  // that every low-scoring indicator receives a training recommendation.
+  // Systemic blocks only affect MARKETING and action plan priorities.
   const allowedActions: IGMAAllowedActions = {
-    EDU_RA: true, // Sempre permitido
-    EDU_AO: !flags.RA_LIMITATION, // Bloqueado se RA limitação (priorizar RA primeiro)
-    EDU_OE: !flags.RA_LIMITATION && !flags.GOVERNANCE_BLOCK,
+    EDU_RA: true,
+    EDU_AO: true,
+    EDU_OE: true,
     MARKETING: !flags.MARKETING_BLOCKED,
   };
 

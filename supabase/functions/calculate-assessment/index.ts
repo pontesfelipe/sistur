@@ -295,11 +295,18 @@ function normalizeValue(
   }
 
   if (normalization === "BANDS") {
-    // Simple band normalization
-    if (value <= 0.3) return 0.2;
-    if (value <= 0.5) return 0.5;
-    if (value <= 0.7) return 0.8;
-    return 1;
+    // Band normalization with direction support
+    let score: number;
+    if (value <= 0.3) score = 0.2;
+    else if (value <= 0.5) score = 0.5;
+    else if (value <= 0.7) score = 0.8;
+    else score = 1;
+
+    // Invert if lower is better
+    if (direction === "LOW_IS_BETTER") {
+      score = 1 - score;
+    }
+    return score;
   }
 
   // MIN_MAX normalization

@@ -141,36 +141,38 @@ export function useForum() {
       const { data, error } = await query;
       if (error) throw error;
 
-      // Fetch author info and likes for each post
-      const postsWithAuthors = await Promise.all(
-        (data || []).map(async (post) => {
-          const { data: authorData } = await supabase
-            .from('profiles')
-            .select('full_name, avatar_url')
-            .eq('user_id', post.user_id)
-            .single();
+      const posts = data || [];
+      if (posts.length === 0) return [];
 
-          let userLiked = false;
-          if (user) {
-            const { data: likeData } = await supabase
-              .from('forum_post_likes')
-              .select('post_id')
-              .eq('post_id', post.id)
-              .eq('user_id', user.id)
-              .maybeSingle();
-            userLiked = !!likeData;
-          }
+      // Batch fetch author profiles for all posts at once
+      const uniqueUserIds = [...new Set(posts.map(p => p.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, avatar_url')
+        .in('user_id', uniqueUserIds);
 
-          return {
-            ...post,
-            author: authorData || { full_name: 'Usuário', avatar_url: null },
-            user_liked: userLiked,
-            is_owner: post.user_id === user?.id,
-          } as ForumPost & { is_owner?: boolean };
-        })
+      const profileMap = new Map(
+        (profiles || []).map(p => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }])
       );
 
-      return postsWithAuthors;
+      // Batch fetch user likes for all posts at once
+      let likedPostIds = new Set<string>();
+      if (user) {
+        const postIds = posts.map(p => p.id);
+        const { data: likes } = await supabase
+          .from('forum_post_likes')
+          .select('post_id')
+          .in('post_id', postIds)
+          .eq('user_id', user.id);
+        likedPostIds = new Set((likes || []).map(l => l.post_id));
+      }
+
+      return posts.map(post => ({
+        ...post,
+        author: profileMap.get(post.user_id) || { full_name: 'Usuário', avatar_url: null },
+        user_liked: likedPostIds.has(post.id),
+        is_owner: post.user_id === user?.id,
+      } as ForumPost & { is_owner?: boolean }));
     },
     enabled: !!user,
   });
@@ -228,32 +230,37 @@ export function useForum() {
 
         if (error) throw error;
 
-        const repliesWithAuthors = await Promise.all(
-          (data || []).map(async (reply) => {
-            const { data: authorData } = await supabase
-              .from('profiles')
-              .select('full_name, avatar_url')
-              .eq('user_id', reply.user_id)
-              .single();
+        const replies = data || [];
+        if (replies.length === 0) return [];
 
-            let userLiked = false;
-            if (user) {
-              const { data: likeData } = await supabase
-                .from('forum_reply_likes')
-                .select('reply_id')
-                .eq('reply_id', reply.id)
-                .eq('user_id', user.id)
-                .maybeSingle();
-              userLiked = !!likeData;
-            }
+        // Batch fetch author profiles for all replies at once
+        const uniqueUserIds = [...new Set(replies.map(r => r.user_id))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, avatar_url')
+          .in('user_id', uniqueUserIds);
 
-            return {
-              ...reply,
-              author: authorData || { full_name: 'Usuário', avatar_url: null },
-              user_liked: userLiked,
-            } as ForumReply;
-          })
+        const profileMap = new Map(
+          (profiles || []).map(p => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }])
         );
+
+        // Batch fetch user likes for all replies at once
+        let likedReplyIds = new Set<string>();
+        if (user) {
+          const replyIds = replies.map(r => r.id);
+          const { data: likes } = await supabase
+            .from('forum_reply_likes')
+            .select('reply_id')
+            .in('reply_id', replyIds)
+            .eq('user_id', user.id);
+          likedReplyIds = new Set((likes || []).map(l => l.reply_id));
+        }
+
+        const repliesWithAuthors = replies.map(reply => ({
+          ...reply,
+          author: profileMap.get(reply.user_id) || { full_name: 'Usuário', avatar_url: null },
+          user_liked: likedReplyIds.has(reply.id),
+        } as ForumReply));
 
         // Organize into nested structure
         const topLevelReplies: ForumReply[] = [];

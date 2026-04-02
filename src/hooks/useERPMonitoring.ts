@@ -149,6 +149,9 @@ export function useERPRealtimeUpdates() {
       .subscribe();
 
     return () => {
+      actionPlansChannel.unsubscribe();
+      projectsChannel.unsubscribe();
+      tasksChannel.unsubscribe();
       supabase.removeChannel(actionPlansChannel);
       supabase.removeChannel(projectsChannel);
       supabase.removeChannel(tasksChannel);
