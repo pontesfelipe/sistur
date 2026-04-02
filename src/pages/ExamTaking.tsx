@@ -35,6 +35,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+const LOW_TIME_WARNING_SECONDS = 120; // 2 minutes
+
 const ExamTaking = () => {
   const { examId } = useParams<{ examId: string }>();
   const navigate = useNavigate();
