@@ -50,6 +50,8 @@ type VisibilityType = 'organization' | 'personal' | 'demo';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 type DiagnosticType = 'territorial' | 'enterprise';
 
+const OFFICIAL_COLLECTION_METHODS: ExternalIndicatorValue['collection_method'][] = ['AUTOMATIC', 'BATCH'];
+
 interface WorkflowStep {
   id: number;
   title: string;
@@ -222,7 +224,7 @@ export default function NovaRodada() {
   
   // Count only validated automatic values from pre-filling
   const validatedValuesCount = existingValidatedValues?.filter(
-    v => v.validated && v.collection_method !== 'MANUAL'
+    v => v.validated && OFFICIAL_COLLECTION_METHODS.includes(v.collection_method)
   )?.length || 0;
 
   // Load resume data when assessment is fetched
