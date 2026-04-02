@@ -335,29 +335,14 @@ export function DataValidationPanel({
                           </span>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1">
-                            {[1, 2, 3, 4, 5].map((level) => (
-                              <Star
-                                key={level}
-                                className={cn(
-                                  'h-3 w-3',
-                                  level <= value.confidence_level
-                                    ? 'fill-amber-400 text-amber-400'
-                                    : 'text-muted-foreground/30'
-                                )}
-                              />
-                            ))}
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Info className="h-3 w-3 text-muted-foreground ml-1" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p className={confidenceInfo?.color}>{confidenceInfo?.label}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
+                          {(() => {
+                            const criteria = CONFIDENCE_CRITERIA[value.confidence_level];
+                            return (
+                              <span className={cn('text-xs font-medium', criteria?.color)}>
+                                {criteria?.label || '—'}
+                              </span>
+                            );
+                          })()}
                         </TableCell>
                         <TableCell>
                           {value.validated ? (
