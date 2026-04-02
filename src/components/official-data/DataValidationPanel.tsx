@@ -74,6 +74,7 @@ export function DataValidationPanel({
   const { user } = useAuth();
   const [editedValues, setEditedValues] = useState<Record<string, number | null>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [confirmedIds, setConfirmedIds] = useState<Set<string>>(new Set());
 
   const { data: rawValues = [], isLoading } = useExternalIndicatorValues(ibgeCode, orgId);
   const fetchOfficialData = useFetchOfficialData();
