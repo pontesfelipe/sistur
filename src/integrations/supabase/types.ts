@@ -6668,6 +6668,31 @@ export type Database = {
         }[]
       }
       get_effective_org_id: { Args: never; Returns: string }
+      get_license_status: {
+        Args: never
+        Returns: {
+          activated_at: string
+          assigned_by: string
+          created_at: string
+          expires_at: string
+          features: Json
+          id: string
+          is_paid_plan: boolean
+          is_trial_active: boolean
+          is_trial_expired: boolean
+          is_valid: boolean
+          max_users: number
+          notes: string
+          org_id: string
+          plan: string
+          server_now: string
+          status: string
+          trial_ends_at: string
+          trial_started_at: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       get_org_license_usage: {
         Args: {
           p_org_id: string
