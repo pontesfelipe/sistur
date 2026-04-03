@@ -585,8 +585,9 @@ export function useGameState() {
   }, []);
 
   const resetState = useCallback((biome?: BiomeType) => {
+    clearSavedState();
     setState(createInitialState(biome || 'floresta'));
-  }, []);
+  }, [clearSavedState]);
 
   const getDominantProfile = (): { preset: AvatarPreset; scores: ProfileScores } => {
     const s = state.profileScores;
