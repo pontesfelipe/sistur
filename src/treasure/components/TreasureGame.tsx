@@ -10,6 +10,8 @@ import { TreasureTutorial } from './TreasureTutorial';
 import { fireVictoryConfetti, fireEcoBurst, fireDefeatEffect } from '@/game/vfx/confetti';
 import { ScreenFlash, ImpactPulse } from '@/game/vfx/ScreenFlash';
 import { getEmojiSprite } from '@/game/spriteMap';
+import { useGamePersistence } from '@/hooks/useGamePersistence';
+import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
 
 // AI-generated biome images
 import florestaImg from '@/assets/biomes/floresta.jpg';
