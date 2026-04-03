@@ -182,51 +182,51 @@ export function useCertificateMutations() {
       
       if (courseError || !course) throw new Error('Course not found');
       
-      // Generate unique verification code
-      let verificationCode = generateVerificationCode();
-      let attempts = 0;
-      while (attempts < 5) {
-        const { data: existing } = await supabase
-          .from('lms_certificates')
-          .select('certificate_id')
-          .eq('verification_code', verificationCode)
-          .maybeSingle();
+      // Generate certificate with retry on unique constraint violation
+      const MAX_RETRIES = 3;
+      let lastError: Error | null = null;
+
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        const verificationCode = generateVerificationCode();
         
-        if (!existing) break;
-        verificationCode = generateVerificationCode();
-        attempts++;
+        // Generate certificate ID using database function
+        const { data: certIdResult, error: certIdError } = await supabase
+          .rpc('generate_certificate_id');
+        
+        if (certIdError) throw certIdError;
+        const certificateId = certIdResult || `CERT-${new Date().getFullYear()}-${Date.now()}`;
+        
+        const qrVerifyUrl = `${window.location.origin}/verify/${verificationCode}`;
+        
+        const { data: certificate, error: certError } = await supabase
+          .from('lms_certificates')
+          .insert({
+            certificate_id: certificateId,
+            user_id: user.id,
+            course_id: courseId,
+            course_version: courseVersion,
+            attempt_id: attemptId,
+            workload_minutes: course.workload_minutes || 60,
+            pillar_scope: course.primary_pillar,
+            verification_code: verificationCode,
+            qr_verify_url: qrVerifyUrl,
+            status: 'active',
+          })
+          .select()
+          .single();
+        
+        if (!certError) return certificate;
+        
+        // Check for unique constraint violation (PostgreSQL error code 23505)
+        if (certError.code === '23505') {
+          lastError = certError;
+          continue; // Retry with a new code
+        }
+        
+        throw certError;
       }
       
-      // Generate certificate ID using database function
-      const { data: certIdResult, error: certIdError } = await supabase
-        .rpc('generate_certificate_id');
-      
-      if (certIdError) throw certIdError;
-      const certificateId = certIdResult || `CERT-${new Date().getFullYear()}-${Date.now()}`;
-      
-      // Create certificate
-      const qrVerifyUrl = `${window.location.origin}/verify/${verificationCode}`;
-      
-      const { data: certificate, error: certError } = await supabase
-        .from('lms_certificates')
-        .insert({
-          certificate_id: certificateId,
-          user_id: user.id,
-          course_id: courseId,
-          course_version: courseVersion,
-          attempt_id: attemptId,
-          workload_minutes: course.workload_minutes || 60,
-          pillar_scope: course.primary_pillar,
-          verification_code: verificationCode,
-          qr_verify_url: qrVerifyUrl,
-          status: 'active',
-        })
-        .select()
-        .single();
-      
-      if (certError) throw certError;
-      
-      return certificate;
+      throw lastError || new Error('Falha ao gerar código único após múltiplas tentativas');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-certificates'] });

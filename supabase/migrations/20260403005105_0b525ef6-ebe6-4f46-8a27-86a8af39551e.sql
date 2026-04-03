@@ -1,0 +1,1 @@
+ALTER TABLE public.lms_certificates ADD CONSTRAINT lms_certificates_verification_code_unique UNIQUE (verification_code);
