@@ -334,6 +334,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
   if (!selectedTheme || !state) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col">
+        <ResumeGameDialog open={showResumeDialog} savedAt={resumeSavedAt} onResume={handleResumeGame} onNewGame={handleNewGameFromDialog} />
         <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/50">
           <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-slate-200">
             <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
