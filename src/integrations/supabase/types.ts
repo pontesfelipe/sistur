@@ -950,6 +950,33 @@ export type Database = {
           },
         ]
       }
+      curriculum_levels: {
+        Row: {
+          created_at: string
+          description: string | null
+          level: number
+          name: string
+          ods_alignment: string[] | null
+          target_audience: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          level: number
+          name: string
+          ods_alignment?: string[] | null
+          target_audience?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          level?: number
+          name?: string
+          ods_alignment?: string[] | null
+          target_audience?: string | null
+        }
+        Relationships: []
+      }
       destination_certifications: {
         Row: {
           ao_score: number
@@ -1827,6 +1854,7 @@ export type Database = {
           course_code: string | null
           created_at: string
           created_by: string | null
+          curriculum_level: number | null
           description: string | null
           duration_minutes: number | null
           free_preview_seconds: number | null
@@ -1862,6 +1890,7 @@ export type Database = {
           course_code?: string | null
           created_at?: string
           created_by?: string | null
+          curriculum_level?: number | null
           description?: string | null
           duration_minutes?: number | null
           free_preview_seconds?: number | null
@@ -1897,6 +1926,7 @@ export type Database = {
           course_code?: string | null
           created_at?: string
           created_by?: string | null
+          curriculum_level?: number | null
           description?: string | null
           duration_minutes?: number | null
           free_preview_seconds?: number | null

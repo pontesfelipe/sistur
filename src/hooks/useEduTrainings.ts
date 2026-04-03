@@ -36,6 +36,8 @@ export interface EduTraining {
   ingestion_confidence: number | null;
   // Materials
   materials: unknown;
+  // Curriculum
+  curriculum_level: number | null;
 }
 
 export interface IndicatorTrainingMapping {
