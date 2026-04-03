@@ -9,7 +9,7 @@ interface UseSecureVideoUrlOptions {
   videoUrl?: string;
   /** Provider type to determine if we need signed URLs */
   videoProvider?: 'supabase' | 'youtube' | 'vimeo' | 'mux';
-  /** Expiration time in seconds (default: 300 = 5 minutes) */
+  /** Expiration time in seconds (default: 3600 = 1 hour) */
   expiresIn?: number;
   /** Whether to auto-refresh before expiration */
   autoRefresh?: boolean;
@@ -37,7 +37,7 @@ export function useSecureVideoUrl({
   videoPath,
   videoUrl,
   videoProvider = 'supabase',
-  expiresIn = 300, // 5 minutes default
+  expiresIn = 3600, // 1 hour default
   autoRefresh = true,
 }: UseSecureVideoUrlOptions): SecureVideoUrlResult {
   const { user } = useAuth();
