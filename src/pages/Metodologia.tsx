@@ -345,7 +345,7 @@ const enterpriseCategories = [
     id: 'marketing',
     name: 'Marketing & Distribuição',
     icon: BriefcaseBusiness,
-    color: 'bg-pink-500',
+    color: 'bg-pink-500 dark:bg-pink-600',
     borderColor: 'border-pink-500',
     bgColor: 'bg-pink-50 dark:bg-pink-950/30',
     pillar: 'AO',
