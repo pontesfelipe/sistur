@@ -278,18 +278,21 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
     }
   }, [selectedTheme, clear]);
 
+  // Pause timer when a riddle dialog is open
+  const isRiddlePaused = !!state?.currentRiddle;
+
   useEffect(() => {
     if (!state || state.isGameOver || state.isVictory || !selectedTheme) return;
     const interval = setInterval(() => {
       setState(prev => {
-        if (!prev || prev.isGameOver || prev.isVictory) return prev;
+        if (!prev || prev.isGameOver || prev.isVictory || prev.currentRiddle) return prev;
         const newTime = prev.timeRemaining - 1;
         if (newTime <= 0) return { ...prev, timeRemaining: 0, isGameOver: true };
         return { ...prev, timeRemaining: newTime };
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [state?.isGameOver, state?.isVictory, selectedTheme]);
+  }, [state?.isGameOver, state?.isVictory, state?.currentRiddle, selectedTheme]);
 
   const showMessage = useCallback((msg: string, emoji?: string) => {
     setState(prev => prev ? { ...prev, message: msg } : prev);
