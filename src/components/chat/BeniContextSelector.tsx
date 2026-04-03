@@ -23,7 +23,6 @@ import {
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
 
 export interface BeniContext {
   assessment?: {
@@ -33,6 +32,7 @@ export interface BeniContext {
     status: string;
     pillarScores?: Record<string, number>;
     igmaFlags?: Record<string, boolean>;
+    igmaInterpretation?: any;
     diagnosticType?: string;
   };
   trainings?: Array<{
@@ -56,17 +56,15 @@ interface BeniContextSelectorProps {
 }
 
 export function BeniContextSelector({ context, onContextChange }: BeniContextSelectorProps) {
-  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState('assessments');
 
-  // Fetch calculated assessments
   const { data: assessments, isLoading: loadingAssessments } = useQuery({
     queryKey: ['beni-context-assessments'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('assessments')
-        .select('id, title, status, diagnostic_type, igma_flags, destinations(name)')
+        .select('id, title, status, diagnostic_type, igma_flags, igma_interpretation, destinations(name)')
         .in('status', ['CALCULATED', 'DATA_READY'])
         .order('calculated_at', { ascending: false })
         .limit(20);
@@ -76,7 +74,6 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
     enabled: open,
   });
 
-  // Fetch pillar scores from diagnosis_data_snapshots for selected assessment
   const { data: snapshotScores } = useQuery({
     queryKey: ['beni-context-snapshots', context.assessment?.id],
     queryFn: async () => {
@@ -86,7 +83,6 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
         .select('indicator_code, value_used')
         .eq('assessment_id', context.assessment.id);
       if (error) throw error;
-      // Group by pillar prefix (RA_, OE_, AO_)
       const pillarScores: Record<string, number[]> = { RA: [], OE: [], AO: [] };
       data?.forEach(s => {
         if (s.value_used == null) return;
@@ -106,13 +102,63 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
     enabled: !!context.assessment?.id,
   });
 
-  // Update pillar scores when they load
   if (snapshotScores && context.assessment && !context.assessment.pillarScores) {
     onContextChange({
       ...context,
       assessment: { ...context.assessment, pillarScores: snapshotScores },
     });
   }
+
+  const { data: trainings, isLoading: loadingTrainings } = useQuery({
+    queryKey: ['beni-context-trainings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('edu_trainings')
+        .select('training_id, title, pillar, type')
+        .eq('status', 'published')
+        .order('created_at', { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: open && selectedTab === 'trainings',
+  });
+
+  const { data: projects, isLoading: loadingProjects } = useQuery({
+    queryKey: ['beni-context-projects'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, name, status, methodology, destinations(name)')
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: open && selectedTab === 'projects',
+  });
+
+  const selectAssessment = (a: any) => {
+    const destName = (a.destinations as any)?.name || 'Destino';
+    onContextChange({
+      ...context,
+      assessment: {
+        id: a.id,
+        title: a.title,
+        destinationName: destName,
+        status: a.status,
+        igmaFlags: a.igma_flags as Record<string, boolean> || undefined,
+        igmaInterpretation: a.igma_interpretation || undefined,
+        diagnosticType: a.diagnostic_type || undefined,
+      },
+    });
+  };
+
+  const removeAssessment = () => {
+    const newCtx = { ...context };
+    delete newCtx.assessment;
+    onContextChange(newCtx);
+  };
 
   const toggleTraining = (t: any) => {
     const current = context.trainings || [];
@@ -163,7 +209,6 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {/* Active context badges */}
       {context.assessment && (
         <Badge variant="secondary" className="gap-1 pl-2 pr-1">
           <ClipboardList className="h-3 w-3" />
@@ -223,9 +268,7 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
                     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                   </div>
                 ) : !assessments?.length ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    Nenhum diagnóstico calculado encontrado.
-                  </p>
+                  <p className="text-sm text-muted-foreground text-center py-8">Nenhum diagnóstico calculado encontrado.</p>
                 ) : (
                   <div className="space-y-2 pr-2">
                     {assessments.map(a => {
@@ -270,9 +313,7 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
                     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                   </div>
                 ) : !trainings?.length ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    Nenhum treinamento disponível.
-                  </p>
+                  <p className="text-sm text-muted-foreground text-center py-8">Nenhum treinamento disponível.</p>
                 ) : (
                   <div className="space-y-2 pr-2">
                     {trainings.map(t => {
@@ -309,9 +350,7 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
                     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                   </div>
                 ) : !projects?.length ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    Nenhum projeto encontrado.
-                  </p>
+                  <p className="text-sm text-muted-foreground text-center py-8">Nenhum projeto encontrado.</p>
                 ) : (
                   <div className="space-y-2 pr-2">
                     {projects.map(p => {
