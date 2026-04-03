@@ -83,6 +83,22 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
               Diagnóstico executado no tier {tierInfo.label.toLowerCase()}
             </TooltipContent>
           </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className={cn(
+                "flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border",
+                visInfo.className
+              )}>
+                <VisIcon className="h-3 w-3" />
+                {visInfo.label}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {visibility === 'personal' && 'Visível apenas para você'}
+              {visibility === 'organization' && 'Visível para toda a organização'}
+              {visibility === 'demo' && 'Diagnóstico em ambiente de demonstração'}
+            </TooltipContent>
+          </Tooltip>
         </div>
         {onDelete && (
           <>
