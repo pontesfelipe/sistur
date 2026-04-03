@@ -637,6 +637,11 @@ const AdminEdu = () => {
           )}
         </TabsContent>
 
+        {/* ESSAY GRADING TAB */}
+        <TabsContent value="essays" className="space-y-6">
+          <EssayGradingPanel />
+        </TabsContent>
+
         {/* IMPORT TAB */}
         <TabsContent value="import" className="space-y-6">
           <ImportReviewQueue />
