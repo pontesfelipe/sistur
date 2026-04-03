@@ -219,6 +219,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
   const uploadFile = useUploadKBFile();
   const moderateFile = useModerateKBFile();
   const fileRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('geral');
@@ -226,26 +227,46 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
   const [moderationResult, setModerationResult] = useState<{ approved: boolean; reason: string; relevance_score: number } | null>(null);
   const [moderating, setModerating] = useState(false);
 
+  const cancelModeration = () => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setModerating(false);
+  };
+
   const handleFileChange = async (selectedFile: File | null) => {
     setFile(selectedFile);
     setModerationResult(null);
+    cancelModeration();
 
     if (!selectedFile) return;
 
-    // Auto-trigger moderation
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setModerating(true);
+
+    // Timeout: 15 seconds max for moderation
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
     try {
       const result = await moderateFile.mutateAsync({
         file: selectedFile,
         description,
         category,
       });
-      setModerationResult(result);
+      if (!controller.signal.aborted) {
+        setModerationResult(result);
+      }
     } catch {
-      // On error, allow upload (fail-open)
-      setModerationResult({ approved: true, reason: 'Moderação indisponível', relevance_score: 50 });
+      if (!controller.signal.aborted) {
+        // On error, allow upload (fail-open)
+        setModerationResult({ approved: true, reason: 'Moderação indisponível — upload permitido', relevance_score: 50 });
+      }
     } finally {
-      setModerating(false);
+      clearTimeout(timeout);
+      if (!controller.signal.aborted) {
+        setModerating(false);
+      }
     }
   };
 
