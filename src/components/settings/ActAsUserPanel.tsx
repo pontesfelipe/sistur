@@ -86,11 +86,10 @@ export function ActAsUserPanel() {
         throw new Error('Usuário não encontrado');
       }
 
-      // Update current user's profile to view selected user's org
-      const { error } = await supabase
-        .from('profiles')
-        .update({ viewing_demo_org_id: selectedUser.org_id })
-        .eq('user_id', profile?.user_id);
+      // Use secure RPC to set demo org
+      const { error } = await supabase.rpc('set_demo_org_id', {
+        target_org_id: selectedUser.org_id
+      });
 
       if (error) throw error;
 
@@ -110,10 +109,9 @@ export function ActAsUserPanel() {
     try {
       setSwitching(true);
 
-      const { error } = await supabase
-        .from('profiles')
-        .update({ viewing_demo_org_id: null })
-        .eq('user_id', profile?.user_id);
+      const { error } = await supabase.rpc('set_demo_org_id', {
+        target_org_id: null
+      });
 
       if (error) throw error;
 
