@@ -122,7 +122,7 @@ const diagnosticTiers = [
     id: 'MEDIUM',
     name: 'Estratégico',
     icon: Gauge,
-    color: 'bg-violet-500',
+    color: 'bg-violet-500 dark:bg-violet-600',
     borderColor: 'border-violet-500',
     bgColor: 'bg-violet-50 dark:bg-violet-950/30',
     indicatorCount: '19',
