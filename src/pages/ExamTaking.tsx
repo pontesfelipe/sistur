@@ -45,7 +45,7 @@ const ExamTaking = () => {
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [result, setResult] = useState<{ score: number; passed: boolean } | null>(null);
+  const [result, setResult] = useState<{ score: number; passed: boolean; needsManualGrading?: boolean } | null>(null);
   const [warnedLowTime, setWarnedLowTime] = useState(false);
 
   const { data: exam, isLoading: examLoading } = useExam(examId);
