@@ -76,88 +76,41 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
     enabled: open,
   });
 
-  // Fetch indicator scores for selected assessment
-  const { data: indicatorScores } = useQuery({
-    queryKey: ['beni-context-scores', context.assessment?.id],
+  // Fetch pillar scores from diagnosis_data_snapshots for selected assessment
+  const { data: snapshotScores } = useQuery({
+    queryKey: ['beni-context-snapshots', context.assessment?.id],
     queryFn: async () => {
       if (!context.assessment?.id) return null;
       const { data, error } = await supabase
-        .from('indicator_scores')
-        .select('pillar, score')
+        .from('diagnosis_data_snapshots')
+        .select('indicator_code, value_used')
         .eq('assessment_id', context.assessment.id);
       if (error) throw error;
-      // Aggregate by pillar
-      const pillarScores: Record<string, number[]> = {};
+      // Group by pillar prefix (RA_, OE_, AO_)
+      const pillarScores: Record<string, number[]> = { RA: [], OE: [], AO: [] };
       data?.forEach(s => {
-        if (!pillarScores[s.pillar]) pillarScores[s.pillar] = [];
-        pillarScores[s.pillar].push(s.score);
+        if (s.value_used == null) return;
+        const prefix = s.indicator_code?.split('_')[0];
+        if (prefix && pillarScores[prefix]) {
+          pillarScores[prefix].push(s.value_used);
+        }
       });
       const avg: Record<string, number> = {};
       Object.entries(pillarScores).forEach(([pillar, scores]) => {
-        avg[pillar] = scores.reduce((a, b) => a + b, 0) / scores.length;
+        if (scores.length > 0) {
+          avg[pillar] = scores.reduce((a, b) => a + b, 0) / scores.length;
+        }
       });
-      return avg;
+      return Object.keys(avg).length > 0 ? avg : null;
     },
     enabled: !!context.assessment?.id,
   });
 
-  // Fetch trainings
-  const { data: trainings, isLoading: loadingTrainings } = useQuery({
-    queryKey: ['beni-context-trainings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('edu_trainings')
-        .select('training_id, title, pillar, type')
-        .eq('status', 'published')
-        .order('created_at', { ascending: false })
-        .limit(30);
-      if (error) throw error;
-      return data ?? [];
-    },
-    enabled: open && selectedTab === 'trainings',
-  });
-
-  // Fetch projects
-  const { data: projects, isLoading: loadingProjects } = useQuery({
-    queryKey: ['beni-context-projects'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('id, name, status, methodology, destinations(name)')
-        .order('created_at', { ascending: false })
-        .limit(20);
-      if (error) throw error;
-      return data ?? [];
-    },
-    enabled: open && selectedTab === 'projects',
-  });
-
-  const selectAssessment = (assessment: any) => {
-    const destName = (assessment.destinations as any)?.name || 'Destino';
-    onContextChange({
-      ...context,
-      assessment: {
-        id: assessment.id,
-        title: assessment.title,
-        destinationName: destName,
-        status: assessment.status,
-        igmaFlags: assessment.igma_flags as Record<string, boolean> || undefined,
-        diagnosticType: assessment.diagnostic_type || undefined,
-      },
-    });
-  };
-
-  const removeAssessment = () => {
-    const newCtx = { ...context };
-    delete newCtx.assessment;
-    onContextChange(newCtx);
-  };
-
   // Update pillar scores when they load
-  if (indicatorScores && context.assessment && !context.assessment.pillarScores) {
+  if (snapshotScores && context.assessment && !context.assessment.pillarScores) {
     onContextChange({
       ...context,
-      assessment: { ...context.assessment, pillarScores: indicatorScores },
+      assessment: { ...context.assessment, pillarScores: snapshotScores },
     });
   }
 
