@@ -119,23 +119,32 @@ const ExamTaking = () => {
     
     try {
       // Submit all answers
-      for (const [quizId, optionId] of Object.entries(answers)) {
+      for (const [quizId, value] of Object.entries(answers)) {
+        // Determine if this answer is essay (text) or multiple-choice (option ID)
+        // Essay answers are stored as free text; option IDs are UUIDs
+        const isEssay = value.length > 36 || !value.match(/^[0-9a-f-]{36}$/i);
         await submitAnswer.mutateAsync({
           attemptId: attempt.attempt_id,
           quizId,
-          selectedOptionId: optionId,
+          selectedOptionId: isEssay ? undefined : value,
+          freeTextAnswer: isEssay ? value : undefined,
         });
       }
 
       // Submit the exam
       const examResult = await submitExam.mutateAsync(attempt.attempt_id);
       
+      const needsGrading = examResult.grading_mode === 'hybrid' || examResult.grading_mode === 'manual';
+      
       setResult({
         score: examResult.score_pct || 0,
         passed: examResult.result === 'passed',
+        needsManualGrading: needsGrading,
       });
       
-      toast.success('Exame enviado com sucesso!');
+      toast.success(needsGrading 
+        ? 'Exame enviado! Questões dissertativas aguardam correção manual.' 
+        : 'Exame enviado com sucesso!');
     } catch (error) {
       toast.error('Erro ao enviar exame');
       setSubmitted(false);
