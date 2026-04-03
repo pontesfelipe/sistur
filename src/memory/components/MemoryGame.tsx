@@ -314,19 +314,21 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
     return () => clearTimeout(timer);
   }, [state?.message]);
 
-  // VFX: victory/defeat confetti triggers
+  // VFX: victory/defeat confetti triggers + clear save on completion
   useEffect(() => {
     if (state?.isVictory && !prevVictory.current) {
       fireVictoryConfetti();
+      clear();
       prevVictory.current = true;
     }
     if (state?.isGameOver && !prevGameOver.current) {
       fireDefeatEffect();
+      clear();
       prevGameOver.current = true;
     }
     if (!state?.isVictory) prevVictory.current = false;
     if (!state?.isGameOver) prevGameOver.current = false;
-  }, [state?.isVictory, state?.isGameOver]);
+  }, [state?.isVictory, state?.isGameOver, clear]);
 
   // Theme selector
   if (!selectedTheme || !state) {
