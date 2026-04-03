@@ -6849,7 +6849,7 @@ export type Database = {
       org_type: "PUBLIC" | "PRIVATE"
       pillar_scope_type: "RA" | "OE" | "AO" | "INTEGRATED"
       pillar_type: "RA" | "OE" | "AO"
-      question_type: "multiple_choice" | "true_false" | "short_answer"
+      question_type: "multiple_choice" | "true_false" | "short_answer" | "essay"
       quiz_origin_type: "existing" | "generated" | "imported"
       recommendation_entity_type: "course" | "live" | "track"
       severity_type: "CRITICO" | "MODERADO" | "BOM"
@@ -7077,7 +7077,7 @@ export const Constants = {
       org_type: ["PUBLIC", "PRIVATE"],
       pillar_scope_type: ["RA", "OE", "AO", "INTEGRATED"],
       pillar_type: ["RA", "OE", "AO"],
-      question_type: ["multiple_choice", "true_false", "short_answer"],
+      question_type: ["multiple_choice", "true_false", "short_answer", "essay"],
       quiz_origin_type: ["existing", "generated", "imported"],
       recommendation_entity_type: ["course", "live", "track"],
       severity_type: ["CRITICO", "MODERADO", "BOM"],
