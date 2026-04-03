@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle, Compass, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle, Compass, AlertTriangle, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { generateMap, floodReveal, GRID } from '../mapGenerator';
