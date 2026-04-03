@@ -53,7 +53,7 @@ export function VideoPlayer({
     videoUrl,
     videoPath,
     videoProvider,
-    expiresIn: 300, // 5 minutes - short expiration for security
+    expiresIn: 3600, // 1 hour - enough for any video length
     autoRefresh: true, // Auto-refresh before expiration
   });
   
