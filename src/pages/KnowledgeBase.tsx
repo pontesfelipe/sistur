@@ -330,9 +330,22 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
 
           {/* Moderation status */}
           {moderating && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Verificando relevância do arquivo...
+            <div className="flex items-center justify-between text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Verificando relevância do arquivo...
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => {
+                  cancelModeration();
+                  setModerationResult({ approved: true, reason: 'Moderação cancelada — upload permitido', relevance_score: 50 });
+                }}
+              >
+                Cancelar verificação
+              </Button>
             </div>
           )}
           {isApproved && !moderating && (
