@@ -323,7 +323,7 @@ const enterpriseCategories = [
     id: 'sustainability',
     name: 'Sustentabilidade',
     icon: LeafIcon,
-    color: 'bg-emerald-500',
+    color: 'bg-emerald-500 dark:bg-emerald-600',
     borderColor: 'border-emerald-500',
     bgColor: 'bg-emerald-50 dark:bg-emerald-950/30',
     pillar: 'RA',
