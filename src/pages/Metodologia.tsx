@@ -301,7 +301,7 @@ const enterpriseCategories = [
     id: 'guest',
     name: 'Experiência do Hóspede',
     icon: Star,
-    color: 'bg-amber-500',
+    color: 'bg-amber-500 dark:bg-amber-600',
     borderColor: 'border-amber-500',
     bgColor: 'bg-amber-50 dark:bg-amber-950/30',
     pillar: 'AO',
