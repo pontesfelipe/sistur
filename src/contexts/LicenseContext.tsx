@@ -51,9 +51,25 @@ const PLAN_LABELS: Record<LicensePlan, string> = {
   enterprise: 'Empresarial',
 };
 
+// Server-authoritative validity flags
+interface ServerLicenseFlags {
+  isValid: boolean;
+  isTrialActive: boolean;
+  isTrialExpired: boolean;
+  isPaidPlan: boolean;
+  serverNow: Date;
+}
+
 export function LicenseProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [license, setLicense] = useState<License | null>(null);
+  const [serverFlags, setServerFlags] = useState<ServerLicenseFlags>({
+    isValid: false,
+    isTrialActive: false,
+    isTrialExpired: false,
+    isPaidPlan: false,
+    serverNow: new Date(),
+  });
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
   const lastUserId = useRef<string | null>(null);
@@ -61,6 +77,7 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
   const fetchLicense = useCallback(async () => {
     if (!user) {
       setLicense(null);
+      setServerFlags({ isValid: false, isTrialActive: false, isTrialExpired: false, isPaidPlan: false, serverNow: new Date() });
       setLoading(false);
       setInitialized(true);
       lastUserId.current = null;
@@ -73,36 +90,42 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const { data, error } = await (supabase as any)
-        .from('licenses')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      const { data, error } = await supabase.rpc('get_license_status');
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching license:', error);
+        console.error('Error fetching license status:', error);
       }
 
-      if (data) {
+      const row = Array.isArray(data) ? data[0] : data;
+
+      if (row) {
         setLicense({
-          id: data.id,
-          user_id: data.user_id,
-          org_id: data.org_id,
-          plan: data.plan as LicensePlan,
-          status: data.status as LicenseStatus,
-          trial_started_at: data.trial_started_at,
-          trial_ends_at: data.trial_ends_at,
-          activated_at: data.activated_at,
-          expires_at: data.expires_at,
-          max_users: data.max_users ?? 1,
-          features: (data.features as Record<string, boolean>) ?? {},
-          notes: data.notes,
-          assigned_by: data.assigned_by,
-          created_at: data.created_at,
-          updated_at: data.updated_at,
+          id: row.id,
+          user_id: row.user_id,
+          org_id: row.org_id,
+          plan: row.plan as LicensePlan,
+          status: row.status as LicenseStatus,
+          trial_started_at: row.trial_started_at,
+          trial_ends_at: row.trial_ends_at,
+          activated_at: row.activated_at,
+          expires_at: row.expires_at,
+          max_users: row.max_users ?? 1,
+          features: (row.features as Record<string, boolean>) ?? {},
+          notes: row.notes,
+          assigned_by: row.assigned_by,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+        });
+        setServerFlags({
+          isValid: row.is_valid ?? false,
+          isTrialActive: row.is_trial_active ?? false,
+          isTrialExpired: row.is_trial_expired ?? false,
+          isPaidPlan: row.is_paid_plan ?? false,
+          serverNow: row.server_now ? new Date(row.server_now) : new Date(),
         });
       } else {
         setLicense(null);
+        setServerFlags({ isValid: false, isTrialActive: false, isTrialExpired: false, isPaidPlan: false, serverNow: new Date() });
       }
 
       lastUserId.current = user.id;
