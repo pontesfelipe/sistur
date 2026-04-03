@@ -426,6 +426,9 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
             )}
           </div>
         </div>
+        <div className="mt-2">
+          <BeniContextSelector context={beniContext} onContextChange={setBeniContext} />
+        </div>
       </CardHeader>
 
       <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
