@@ -212,13 +212,16 @@ export default function Game() {
   // Phase: Session picker
   if (phase === 'picker') {
     return (
-      <SessionPicker
-        sessions={sessions.sessions}
-        loading={sessions.loading}
-        onNewGame={handleNewGame}
-        onLoadSession={handleLoadSession}
-        onDeleteSession={handleDeleteSession}
-      />
+      <>
+        <ResumeGameDialog open={showResumeDialog} savedAt={resumeSavedAt} onResume={handleResumeLocalGame} onNewGame={handleDismissResumeDialog} />
+        <SessionPicker
+          sessions={sessions.sessions}
+          loading={sessions.loading}
+          onNewGame={handleNewGame}
+          onLoadSession={handleLoadSession}
+          onDeleteSession={handleDeleteSession}
+        />
+      </>
     );
   }
 
