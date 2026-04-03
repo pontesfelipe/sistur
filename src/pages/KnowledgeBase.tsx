@@ -245,8 +245,13 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
 
     setModerating(true);
 
-    // Timeout: 15 seconds max for moderation
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    // Timeout: 20 seconds max for moderation
+    const timeout = setTimeout(() => {
+      controller.abort();
+      // Fail-open on timeout — don't leave the user stuck
+      setModerating(false);
+      setModerationResult({ approved: true, reason: 'Moderação demorou demais — upload permitido.', relevance_score: 50 });
+    }, 20000);
 
     try {
       const result = await moderateFile.mutateAsync({
@@ -255,16 +260,15 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
         category,
       });
       if (!controller.signal.aborted) {
+        clearTimeout(timeout);
         setModerationResult(result);
+        setModerating(false);
       }
     } catch {
       if (!controller.signal.aborted) {
+        clearTimeout(timeout);
         // On error, allow upload (fail-open)
         setModerationResult({ approved: true, reason: 'Moderação indisponível — upload permitido', relevance_score: 50 });
-      }
-    } finally {
-      clearTimeout(timeout);
-      if (!controller.signal.aborted) {
         setModerating(false);
       }
     }
