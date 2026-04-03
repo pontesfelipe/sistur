@@ -60,7 +60,7 @@ const pillars = [
     name: 'Organização Estrutural',
     abbrev: 'OE / IOE',
     description: 'Infraestrutura de apoio ao turismo. Depende da estabilidade ambiental para expansão sustentável.',
-    color: 'bg-blue-500',
+    color: 'bg-blue-500 dark:bg-blue-600',
     borderColor: 'border-blue-500',
     bgColor: 'bg-blue-50 dark:bg-blue-950/30',
     icon: Building2,
