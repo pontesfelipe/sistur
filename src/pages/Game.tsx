@@ -42,21 +42,46 @@ export default function Game() {
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [resumeSavedAt, setResumeSavedAt] = useState<Date | null>(null);
 
-  // VFX: victory/defeat confetti
+  // VFX: victory/defeat confetti + clear localStorage save
   const prevVictory = useRef(false);
   const prevGameOver = useRef(false);
   useEffect(() => {
     if (game.state.isVictory && !prevVictory.current) {
       fireVictoryConfetti();
+      game.clearSavedState();
       prevVictory.current = true;
     }
     if (game.state.isGameOver && !game.state.isVictory && !prevGameOver.current) {
       fireDefeatEffect();
+      game.clearSavedState();
       prevGameOver.current = true;
     }
     if (!game.state.isVictory) prevVictory.current = false;
     if (!game.state.isGameOver) prevGameOver.current = false;
   }, [game.state.isVictory, game.state.isGameOver]);
+
+  // Check for locally-saved game on mount
+  useEffect(() => {
+    const saved = game.loadSavedState();
+    if (saved && saved.state.isSetup && !saved.state.isGameOver && !saved.state.isVictory) {
+      setResumeSavedAt(saved.savedAt);
+      setShowResumeDialog(true);
+    }
+  }, []);
+
+  const handleResumeLocalGame = useCallback(() => {
+    const saved = game.loadSavedState();
+    if (saved) {
+      game.loadState(saved.state);
+      setPhase('playing');
+    }
+    setShowResumeDialog(false);
+  }, [game]);
+
+  const handleDismissResumeDialog = useCallback(() => {
+    game.clearSavedState();
+    setShowResumeDialog(false);
+  }, [game]);
 
   // Auto-save every 5 turns
   const lastSavedTurn = useRef(0);
