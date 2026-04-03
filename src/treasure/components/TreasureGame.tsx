@@ -234,18 +234,49 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
   const [collectAnim, setCollectAnim] = useState<string | null>(null);
   const [showTrapFlash, setShowTrapFlash] = useState(false);
   const [showCollectPulse, setShowCollectPulse] = useState(false);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [resumeSavedAt, setResumeSavedAt] = useState<Date | null>(null);
   const prevVictory = useRef(false);
   const prevGameOver = useRef(false);
 
+  const isGameActive = !!state && !state.isGameOver && !state.isVictory;
+  const { load, clear } = useGamePersistence('sistur-treasure-state', state, isGameActive);
+
+  useEffect(() => {
+    const saved = load();
+    if (saved) {
+      setResumeSavedAt(saved.savedAt);
+      setShowResumeDialog(true);
+    }
+  }, []);
+
+  const handleResumeGame = useCallback(() => {
+    const saved = load();
+    if (saved) {
+      setSelectedTheme(saved.state.theme);
+      setState(saved.state);
+    }
+    setShowResumeDialog(false);
+  }, [load]);
+
+  const handleNewGameFromDialog = useCallback(() => {
+    clear();
+    setShowResumeDialog(false);
+  }, [clear]);
+
   const handleSelectTheme = useCallback((theme: MapTheme) => {
+    clear();
     setSelectedTheme(theme);
     setState(createGameState(theme));
     if (!tutorialSeen) setShowTutorial(true);
-  }, [tutorialSeen]);
+  }, [tutorialSeen, clear]);
 
   const handleRestart = useCallback(() => {
-    if (selectedTheme) setState(createGameState(selectedTheme));
-  }, [selectedTheme]);
+    if (selectedTheme) {
+      clear();
+      setState(createGameState(selectedTheme));
+    }
+  }, [selectedTheme, clear]);
 
   useEffect(() => {
     if (!state || state.isGameOver || state.isVictory || !selectedTheme) return;
