@@ -239,7 +239,7 @@ const rules = [
     name: 'Externalidades Negativas',
     icon: TrendingUp,
     flag: 'EXTERNALITY_WARNING',
-    color: 'bg-red-500',
+    color: 'bg-red-500 dark:bg-red-600',
     description: 'Alerta quando OE melhora às custas de RA',
     detail: 'Detecta crescimento estrutural que degrada o ambiente. Se OE evoluiu (melhorou) entre ciclos mas RA regrediu (piorou), o sistema gera alerta de externalidade negativa.',
     trigger: 'OE↑ enquanto RA↓',
