@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, RotateCcw, BookOpen, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,8 @@ import { RPGTutorial } from './RPGTutorial';
 import { BIOME_STORIES } from '../stories';
 import { BIOME_INFO, INITIAL_STATS, type BiomeId, type RPGState, type StoryChoice, type BiomeStats } from '../types';
 import { getEmojiSprite } from '@/game/spriteMap';
+import { useGamePersistence } from '@/hooks/useGamePersistence';
+import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
 
 const initialState: RPGState = {
   biome: null,
