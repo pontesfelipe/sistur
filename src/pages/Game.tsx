@@ -39,6 +39,8 @@ export default function Game() {
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
   const [playEffect, setPlayEffect] = useState<'RA' | 'OE' | 'AO' | null>(null);
   const [screenFlash, setScreenFlash] = useState(false);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [resumeSavedAt, setResumeSavedAt] = useState<Date | null>(null);
 
   // VFX: victory/defeat confetti
   const prevVictory = useRef(false);
