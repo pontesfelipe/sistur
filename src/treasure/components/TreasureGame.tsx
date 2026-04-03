@@ -372,19 +372,21 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
     });
   }, []);
 
-  // VFX: victory/defeat triggers
+  // VFX: victory/defeat triggers + clear save
   useEffect(() => {
     if (state?.isVictory && !prevVictory.current) {
       fireVictoryConfetti();
+      clear();
       prevVictory.current = true;
     }
     if (state?.isGameOver && !prevGameOver.current) {
       fireDefeatEffect();
+      clear();
       prevGameOver.current = true;
     }
     if (!state?.isVictory) prevVictory.current = false;
     if (!state?.isGameOver) prevGameOver.current = false;
-  }, [state?.isVictory, state?.isGameOver]);
+  }, [state?.isVictory, state?.isGameOver, clear]);
 
   // Theme selector
   if (!selectedTheme || !state) {
