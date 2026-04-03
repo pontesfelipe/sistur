@@ -240,10 +240,14 @@ const AdminEdu = () => {
       subtitle="Gerenciamento de treinamentos, vídeos e analytics"
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-lg grid-cols-3">
+        <TabsList className="grid w-full max-w-2xl grid-cols-4">
           <TabsTrigger value="trainings" className="gap-2">
             <GraduationCap className="h-4 w-4" />
             Treinamentos
+          </TabsTrigger>
+          <TabsTrigger value="essays" className="gap-2">
+            <FileText className="h-4 w-4" />
+            Dissertativas
           </TabsTrigger>
           <TabsTrigger value="import" className="gap-2">
             <Youtube className="h-4 w-4" />
