@@ -145,37 +145,14 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
   }, [user?.id, fetchLicense]);
 
   const computed = useMemo(() => {
-    const now = new Date();
+    // Use server-authoritative flags for access control
+    const { isTrialActive, isTrialExpired, isPaidPlan, isValid: isLicenseValid, serverNow } = serverFlags;
 
-    const isTrialActive = Boolean(
-      license &&
-      license.plan === 'trial' &&
-      license.status === 'active' &&
-      license.trial_ends_at &&
-      new Date(license.trial_ends_at) > now
-    );
-
-    const isTrialExpired = Boolean(
-      license &&
-      license.plan === 'trial' &&
-      (license.status === 'expired' || (license.trial_ends_at && new Date(license.trial_ends_at) <= now))
-    );
-
-    const isPaidPlan = Boolean(
-      license &&
-      ['estudante', 'professor', 'basic', 'pro', 'enterprise'].includes(license.plan) &&
-      (license.status === 'active' || license.status === 'cancelled') &&
-      (license.expires_at === null || new Date(license.expires_at) > now)
-    );
-
-    const isCancelled = Boolean(license && license.status === 'cancelled');
-
-    const isLicenseValid = isTrialActive || isPaidPlan;
-
+    // Display-only: trial days remaining using server time
     const trialDaysRemaining = (() => {
       if (!license?.trial_ends_at) return 0;
       const end = new Date(license.trial_ends_at);
-      const diff = end.getTime() - now.getTime();
+      const diff = end.getTime() - serverNow.getTime();
       return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
     })();
 
@@ -189,7 +166,7 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
     const planLabel = plan ? PLAN_LABELS[plan] : 'Sem Licença';
 
     return { isTrialActive, isTrialExpired, isPaidPlan, isLicenseValid, trialDaysRemaining, trialDaysTotal, trialProgress, plan, planLabel };
-  }, [license]);
+  }, [license, serverFlags]);
 
   const hasFeature = useCallback((feature: string) => {
     if (!license) return false;
