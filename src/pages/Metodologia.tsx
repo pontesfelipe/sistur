@@ -72,7 +72,7 @@ const pillars = [
     name: 'Ações Operacionais',
     abbrev: 'AO / IAO',
     description: 'Governança central do sistema. Operações, serviços e coordenação entre os agentes do turismo.',
-    color: 'bg-amber-500',
+    color: 'bg-amber-500 dark:bg-amber-600',
     borderColor: 'border-amber-500',
     bgColor: 'bg-amber-50 dark:bg-amber-950/30',
     icon: Cog,
