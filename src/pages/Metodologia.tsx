@@ -227,7 +227,7 @@ const rules = [
     name: 'Ciclo Contínuo',
     icon: Calendar,
     flag: 'CONTINUOUS_CYCLE',
-    color: 'bg-purple-500',
+    color: 'bg-purple-500 dark:bg-purple-600',
     description: 'Revisões programadas baseadas na severidade',
     detail: 'O sistema calcula automaticamente quando o diagnóstico deve ser revisado. Pilares críticos exigem revisão em 6 meses, atenção em 12 meses, e todos adequados em 18 meses.',
     trigger: 'Severidade dos pilares',
