@@ -263,7 +263,7 @@ const rules = [
     name: 'Marketing Bloqueado',
     icon: Megaphone,
     flag: 'MARKETING_BLOCKED',
-    color: 'bg-rose-500',
+    color: 'bg-rose-500 dark:bg-rose-600',
     description: 'Promoção bloqueada se RA ou AO críticos',
     detail: 'Promover um destino com problemas ambientais graves ou falhas operacionais sérias pode gerar danos à reputação e frustrar turistas. Marketing só é liberado quando pilares essenciais estão saudáveis.',
     trigger: 'RA = CRÍTICO ou AO = CRÍTICO',
