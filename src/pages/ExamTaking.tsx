@@ -189,43 +189,60 @@ const ExamTaking = () => {
   if (result || exam.status === 'submitted') {
     const finalScore = result?.score || 0;
     const passed = result?.passed || false;
+    const needsGrading = result?.needsManualGrading || false;
 
     return (
       <AppLayout title="Resultado do Exame" subtitle="Veja seu desempenho">
         <div className="max-w-2xl mx-auto">
-          <Card className={passed ? 'border-severity-good/50' : 'border-severity-critical/50'}>
+          <Card className={needsGrading ? 'border-amber-500/50' : passed ? 'border-severity-good/50' : 'border-severity-critical/50'}>
             <CardHeader className="text-center">
-              {passed ? (
+              {needsGrading ? (
+                <Clock className="h-20 w-20 mx-auto mb-4 text-amber-500" />
+              ) : passed ? (
                 <Award className="h-20 w-20 mx-auto mb-4 text-severity-good" />
               ) : (
                 <XCircle className="h-20 w-20 mx-auto mb-4 text-severity-critical" />
               )}
               <CardTitle className="text-3xl">
-                {passed ? 'Parabéns!' : 'Não foi desta vez'}
+                {needsGrading ? 'Aguardando Correção' : passed ? 'Parabéns!' : 'Não foi desta vez'}
               </CardTitle>
               <CardDescription>
-                {passed 
-                  ? 'Você foi aprovado no exame!' 
-                  : 'Você não atingiu a pontuação mínima'}
+                {needsGrading 
+                  ? 'Questões dissertativas aguardam correção manual do professor' 
+                  : passed 
+                    ? 'Você foi aprovado no exame!' 
+                    : 'Você não atingiu a pontuação mínima'}
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center space-y-6">
-              <div className="text-6xl font-bold">
-                {finalScore.toFixed(0)}%
-              </div>
-              <Progress 
-                value={finalScore} 
-                className={`h-4 ${passed ? '[&>div]:bg-green-500' : '[&>div]:bg-red-500'}`}
-              />
-              <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-                <span>Acertos: {Object.keys(answers).length} / {exam.question_ids?.length || 0}</span>
-              </div>
+              {needsGrading ? (
+                <div className="text-lg text-muted-foreground">
+                  <p>Pontuação parcial (questões objetivas):</p>
+                  <div className="text-4xl font-bold mt-2">{finalScore.toFixed(0)}%</div>
+                  <p className="text-sm mt-3 text-amber-600 dark:text-amber-400">
+                    A nota final será calculada após a correção das questões dissertativas.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="text-6xl font-bold">
+                    {finalScore.toFixed(0)}%
+                  </div>
+                  <Progress 
+                    value={finalScore} 
+                    className={`h-4 ${passed ? '[&>div]:bg-green-500' : '[&>div]:bg-red-500'}`}
+                  />
+                  <div className="flex justify-center gap-4 text-sm text-muted-foreground">
+                    <span>Acertos: {Object.keys(answers).length} / {exam.question_ids?.length || 0}</span>
+                  </div>
+                </>
+              )}
             </CardContent>
             <CardFooter className="flex justify-center gap-4">
               <Button variant="outline" onClick={() => navigate('/edu')}>
                 Voltar ao Catálogo
               </Button>
-              {passed && (
+              {passed && !needsGrading && (
                 <Button onClick={() => navigate('/edu/certificados')}>
                   <Award className="mr-2 h-4 w-4" />
                   Ver Certificados
