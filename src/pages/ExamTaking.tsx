@@ -348,7 +348,33 @@ const ExamTaking = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {currentOptions && currentOptions.length > 0 ? (
+            {isEssayQuestion ? (
+              <div className="space-y-3">
+                <Textarea
+                  placeholder="Digite sua resposta dissertativa..."
+                  value={answers[currentQuestionId || ''] || ''}
+                  onChange={(e) => currentQuestionId && handleAnswerChange(currentQuestionId, e.target.value)}
+                  rows={8}
+                  className="resize-y min-h-[160px]"
+                />
+                {(() => {
+                  const text = answers[currentQuestionId || ''] || '';
+                  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+                  const charCount = text.length;
+                  const isMinMet = wordCount >= 50;
+                  return (
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span className={isMinMet ? 'text-severity-good' : 'text-severity-moderate'}>
+                        {wordCount} {wordCount === 1 ? 'palavra' : 'palavras'}
+                        {!isMinMet && ' (mínimo: 50)'}
+                        {isMinMet && ' ✓'}
+                      </span>
+                      <span>{charCount} caracteres</span>
+                    </div>
+                  );
+                })()}
+              </div>
+            ) : currentOptions && currentOptions.length > 0 ? (
               <RadioGroup
                 value={answers[currentQuestionId || ''] || ''}
                 onValueChange={(value) => currentQuestionId && handleAnswerChange(currentQuestionId, value)}
