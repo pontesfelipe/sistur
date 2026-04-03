@@ -617,6 +617,7 @@ export function useExamAnswerMutations() {
         .update({
           score_pct: earnedPoints,
           result,
+          grading_mode: gradingMode,
           submitted_at: new Date().toISOString(),
         })
         .eq('attempt_id', attemptId)
