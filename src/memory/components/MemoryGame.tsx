@@ -10,6 +10,8 @@ import { fireVictoryConfetti, fireMatchBurst, fireDefeatEffect } from '@/game/vf
 import { LottieOverlay } from '@/game/vfx/LottieOverlay';
 import { ScreenFlash } from '@/game/vfx/ScreenFlash';
 import { getEmojiSprite } from '@/game/spriteMap';
+import { useGamePersistence } from '@/hooks/useGamePersistence';
+import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
 
 // AI-generated biome images
 import florestaImg from '@/assets/biomes/floresta.jpg';
