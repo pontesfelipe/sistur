@@ -52,6 +52,7 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [beniContext, setBeniContext] = useState<BeniContext>(initialContext || {});
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
