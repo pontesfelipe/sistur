@@ -275,7 +275,7 @@ const rules = [
     name: 'Interdependência Setorial',
     icon: Network,
     flag: 'INTERSECTORAL_DEPENDENCY',
-    color: 'bg-indigo-500',
+    color: 'bg-indigo-500 dark:bg-indigo-600',
     description: 'Identifica indicadores que dependem de múltiplos setores',
     detail: 'Alguns indicadores (saúde, educação, saneamento) dependem de ações coordenadas entre secretarias. O sistema sinaliza quando a melhoria requer articulação intersetorial, não apenas ações isoladas do turismo.',
     trigger: 'Indicador intersetorial presente',
