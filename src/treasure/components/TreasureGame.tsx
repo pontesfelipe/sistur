@@ -26,7 +26,7 @@ const BIOME_BG_IMAGES: Record<string, string> = {
   mangue: mangueImg,
 };
 
-const MAX_TIME = 180; // 3 minutes
+const MAX_TIME = 300; // 5 minutes — more accessible for younger players
 const MAX_RIDDLE_ERRORS = 4;
 
 function createGameState(theme: MapTheme): TreasureGameState {
