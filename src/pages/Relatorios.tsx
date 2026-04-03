@@ -336,6 +336,10 @@ export default function Relatorios() {
     toast.success('Use "Salvar como PDF" na janela de impressão.');
   };
 
+  // PDF/print export: hardcoded hex colors are intentional here because PDFs
+  // are rendered in a separate window/iframe and don't support CSS custom
+  // properties or dark mode. The generated HTML must be self-contained with
+  // fixed colors for consistent print output regardless of the user's theme.
   const buildPrintHTML = (bodyContent: string) => {
     const c = reportCustomization;
     const fontSizeMap = { small: '13px', medium: '15px', large: '17px' };

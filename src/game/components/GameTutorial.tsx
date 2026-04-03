@@ -83,7 +83,7 @@ export function GameTutorial({ onComplete }: GameTutorialProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300">
+      <div className="bg-card rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300">
         {/* Progress dots */}
         <div className="flex items-center justify-center gap-1.5 mb-4">
           {TUTORIAL_STEPS.map((_, i) => (
