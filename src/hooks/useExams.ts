@@ -422,7 +422,7 @@ export function useExamMutations() {
           .from('quiz_questions')
           .select('quiz_id, question_type')
           .in('quiz_id', examData.question_ids);
-        hasEssay = questions?.some(q => q.question_type === 'essay') || false;
+        hasEssay = questions?.some(q => (q.question_type as string) === 'essay') || false;
       }
       
       // Update exam status
