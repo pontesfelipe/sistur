@@ -57,6 +57,7 @@ const ExamTaking = () => {
   const currentQuestionId = exam?.question_ids?.[currentQuestionIndex];
   const { data: currentQuestion } = useQuizQuestion(currentQuestionId);
   const currentOptions = currentQuestion?.options || [];
+  const isEssayQuestion = currentQuestion?.question_type === 'essay';
 
   // Timer effect
   useEffect(() => {
