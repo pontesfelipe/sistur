@@ -192,7 +192,7 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
-        body: JSON.stringify({ messages: [...messages, userMsg], context }),
+        body: JSON.stringify({ messages: [...messages, userMsg], context: beniContext }),
         signal: controller.signal,
       });
 
