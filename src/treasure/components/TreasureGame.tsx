@@ -489,12 +489,17 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
           </div>
         </div>
         <div className="flex items-center gap-3 justify-between">
-          <div className={cn('flex items-center gap-1', state.timeRemaining <= 30 && 'text-red-400')}>
+          <div className={cn('flex items-center gap-1', state.timeRemaining <= 30 && !isRiddlePaused && 'text-red-400')}>
             <Clock className="h-3.5 w-3.5" />
             <span className="font-bold tabular-nums">
               {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')}
             </span>
-            {state.timeRemaining <= 30 && (
+            {isRiddlePaused && (
+              <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1.2, repeat: Infinity }} className="text-amber-400">
+                <Pause className="h-3 w-3 inline" />
+              </motion.span>
+            )}
+            {state.timeRemaining <= 30 && !isRiddlePaused && (
               <motion.span animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="text-[10px]">⚠️</motion.span>
             )}
           </div>
