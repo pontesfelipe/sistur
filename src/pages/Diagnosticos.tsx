@@ -217,6 +217,7 @@ const Diagnosticos = () => {
                   <AssessmentCard 
                     assessment={assessment as any} 
                     onDelete={handleDelete}
+                    isDemoContext={isViewingDemoData}
                   />
                 </div>
               ))}
