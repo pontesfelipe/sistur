@@ -28,6 +28,7 @@ import {
 import { useAssessments } from '@/hooks/useAssessments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryClient } from '@tanstack/react-query';
+import { useProfile } from '@/hooks/useProfile';
 
 const Diagnosticos = () => {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ const Diagnosticos = () => {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const { isViewingDemoData } = useProfile();
   
   // Get tab and assessment from URL params
   const tabFromUrl = searchParams.get('tab');
@@ -215,6 +217,7 @@ const Diagnosticos = () => {
                   <AssessmentCard 
                     assessment={assessment as any} 
                     onDelete={handleDelete}
+                    isDemoContext={isViewingDemoData}
                   />
                 </div>
               ))}

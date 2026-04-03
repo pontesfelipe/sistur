@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target, User } from 'lucide-react';
+import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target, User, Eye, Building2, Monitor } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Assessment } from '@/types/sistur';
 import { Badge } from '@/components/ui/badge';
@@ -13,8 +13,9 @@ import { useState } from 'react';
 import { DeleteAssessmentDialog } from './DeleteAssessmentDialog';
 
 interface AssessmentCardProps {
-  assessment: Assessment & { tier?: string; creator?: { full_name: string } | null };
+  assessment: Assessment & { tier?: string; creator?: { full_name: string } | null; visibility?: string; is_demo?: boolean };
   onDelete?: () => void;
+  isDemoContext?: boolean;
 }
 
 const tierConfig = {
@@ -23,8 +24,17 @@ const tierConfig = {
   COMPLETE: { label: 'Integral', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
 };
 
-export function AssessmentCard({ assessment, onDelete }: AssessmentCardProps) {
+export function AssessmentCard({ assessment, onDelete, isDemoContext }: AssessmentCardProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const visibility = isDemoContext ? 'demo' : ((assessment as any).visibility || 'organization');
+  const visibilityConfig = {
+    personal: { label: 'Pessoal', icon: Eye, className: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800' },
+    organization: { label: 'Organização', icon: Building2, className: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800' },
+    demo: { label: 'Demo', icon: Monitor, className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800' },
+  };
+  const visInfo = visibilityConfig[visibility as keyof typeof visibilityConfig] || visibilityConfig.organization;
+  const VisIcon = visInfo.icon;
 
   const statusLabels = {
     DRAFT: 'Rascunho',
@@ -71,6 +81,22 @@ export function AssessmentCard({ assessment, onDelete }: AssessmentCardProps) {
             </TooltipTrigger>
             <TooltipContent>
               Diagnóstico executado no tier {tierInfo.label.toLowerCase()}
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className={cn(
+                "flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border",
+                visInfo.className
+              )}>
+                <VisIcon className="h-3 w-3" />
+                {visInfo.label}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {visibility === 'personal' && 'Visível apenas para você'}
+              {visibility === 'organization' && 'Visível para toda a organização'}
+              {visibility === 'demo' && 'Diagnóstico em ambiente de demonstração'}
             </TooltipContent>
           </Tooltip>
         </div>
