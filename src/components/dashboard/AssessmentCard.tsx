@@ -24,8 +24,17 @@ const tierConfig = {
   COMPLETE: { label: 'Integral', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
 };
 
-export function AssessmentCard({ assessment, onDelete }: AssessmentCardProps) {
+export function AssessmentCard({ assessment, onDelete, isDemoContext }: AssessmentCardProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const visibility = isDemoContext ? 'demo' : ((assessment as any).visibility || 'organization');
+  const visibilityConfig = {
+    personal: { label: 'Pessoal', icon: Eye, className: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800' },
+    organization: { label: 'Organização', icon: Building2, className: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800' },
+    demo: { label: 'Demo', icon: Monitor, className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800' },
+  };
+  const visInfo = visibilityConfig[visibility as keyof typeof visibilityConfig] || visibilityConfig.organization;
+  const VisIcon = visInfo.icon;
 
   const statusLabels = {
     DRAFT: 'Rascunho',
