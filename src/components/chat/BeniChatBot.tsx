@@ -42,7 +42,7 @@ const SUGGESTED_QUESTIONS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/beni-chat`;
 
-export function BeniChatBot({ context }: BeniChatBotProps) {
+export function BeniChatBot({ initialContext }: BeniChatBotProps) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
