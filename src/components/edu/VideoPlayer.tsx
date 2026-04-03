@@ -335,6 +335,7 @@ export function VideoPlayer({
           src={effectiveUrl}
           className="w-full h-full"
           onClick={togglePlay}
+          onError={handleVideoError}
           // Prevent right-click to discourage direct URL copying
           onContextMenu={(e) => e.preventDefault()}
         />
