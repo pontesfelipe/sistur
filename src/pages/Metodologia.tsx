@@ -48,7 +48,7 @@ const pillars = [
     name: 'Relações Ambientais',
     abbrev: 'RA / IRA',
     description: 'Base do sistema turístico. Engloba recursos naturais, patrimônio cultural, qualidade ambiental e sustentabilidade.',
-    color: 'bg-emerald-500',
+    color: 'bg-emerald-500 dark:bg-emerald-600',
     borderColor: 'border-emerald-500',
     bgColor: 'bg-emerald-50 dark:bg-emerald-950/30',
     icon: Leaf,
