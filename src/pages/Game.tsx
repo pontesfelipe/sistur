@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
 import { useNavigate } from 'react-router-dom';
 import { useCardGame } from '@/game/useCardGame';
 import { useGameSessions } from '@/hooks/useGameSessions';
