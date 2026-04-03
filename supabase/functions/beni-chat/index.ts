@@ -45,6 +45,8 @@ Crítico significa score igual ou menor que 33%, situação grave que requer aç
 Como Você Responde:
 Para perguntas sobre teoria, explique usando sua metodologia sistêmica, conectando ao contexto brasileiro. Para diagnósticos, interprete à luz dos três pilares e das 6 regras. Para recomendações, sugira ações respeitando a hierarquia RA, OE e AO. Sempre use linguagem natural e fluida, como em uma conversa.
 
+Quando o usuário fornecer contexto de diagnósticos, treinamentos ou projetos, utilize essas informações para dar respostas personalizadas e específicas. Analise os scores dos pilares, identifique regras IGMA ativadas, sugira treinamentos relevantes e comente sobre o andamento de projetos.
+
 Lembre-se: você é o Professor Beni, não um assistente genérico. Responda como o especialista que desenvolveu essa metodologia ao longo de décadas de pesquisa.
 
 REGRA CRÍTICA DE ESCOPO:
@@ -81,18 +83,50 @@ serve(async (req) => {
     let systemPrompt = BENI_SYSTEM_PROMPT;
     
     if (context) {
-      systemPrompt += `\n\n## Contexto Atual do Usuário\n`;
-      if (context.destination) {
-        systemPrompt += `- Destino em análise: ${context.destination}\n`;
-      }
-      if (context.pillarScores) {
-        systemPrompt += `- Scores dos pilares:\n`;
-        for (const [pillar, score] of Object.entries(context.pillarScores)) {
-          systemPrompt += `  - ${pillar}: ${(Number(score) * 100).toFixed(1)}%\n`;
+      systemPrompt += `\n\nCONTEXTO ATUAL DO USUÁRIO (use estas informações para personalizar suas respostas):\n`;
+      
+      // Assessment context
+      if (context.assessment) {
+        systemPrompt += `\nDIAGNÓSTICO SELECIONADO:\n`;
+        systemPrompt += `- Título: ${context.assessment.title}\n`;
+        systemPrompt += `- Destino: ${context.assessment.destinationName}\n`;
+        systemPrompt += `- Status: ${context.assessment.status}\n`;
+        if (context.assessment.diagnosticType) {
+          systemPrompt += `- Tipo: ${context.assessment.diagnosticType === 'enterprise' ? 'Empresarial' : 'Territorial'}\n`;
+        }
+        if (context.assessment.pillarScores) {
+          systemPrompt += `- Scores dos pilares:\n`;
+          for (const [pillar, score] of Object.entries(context.assessment.pillarScores)) {
+            const pct = (Number(score) * 100).toFixed(1);
+            const severity = Number(score) <= 0.33 ? 'CRÍTICO' : Number(score) <= 0.66 ? 'ATENÇÃO' : 'ADEQUADO';
+            systemPrompt += `  - ${pillar}: ${pct}% (${severity})\n`;
+          }
+        }
+        if (context.assessment.igmaFlags) {
+          const activeFlags = Object.entries(context.assessment.igmaFlags).filter(([_, v]) => v).map(([k]) => k);
+          systemPrompt += `- Regras IGMA ativadas: ${activeFlags.length > 0 ? activeFlags.join(', ') : 'Nenhuma'}\n`;
+        }
+        if (context.assessment.igmaInterpretation) {
+          systemPrompt += `- Interpretação IGMA: ${JSON.stringify(context.assessment.igmaInterpretation)}\n`;
         }
       }
-      if (context.igmaFlags) {
-        systemPrompt += `- Flags IGMA ativos: ${Object.entries(context.igmaFlags).filter(([_, v]) => v).map(([k]) => k).join(', ') || 'Nenhum'}\n`;
+      
+      // Trainings context
+      if (context.trainings && context.trainings.length > 0) {
+        systemPrompt += `\nTREINAMENTOS DISPONÍVEIS (o usuário pode perguntar sobre estes):\n`;
+        context.trainings.forEach((t: any) => {
+          systemPrompt += `- "${t.title}" (Pilar: ${t.pillar}, Tipo: ${t.type === 'course' ? 'Curso' : 'Live'})\n`;
+        });
+      }
+      
+      // Projects context
+      if (context.projects && context.projects.length > 0) {
+        systemPrompt += `\nPROJETOS DO USUÁRIO:\n`;
+        context.projects.forEach((p: any) => {
+          systemPrompt += `- "${p.name}" (Status: ${p.status}, Metodologia: ${p.methodology}`;
+          if (p.destinationName) systemPrompt += `, Destino: ${p.destinationName}`;
+          systemPrompt += `)\n`;
+        });
       }
     }
 

@@ -21,6 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { ChatMessageList } from './ChatMessageList';
 import { ChatInput } from './ChatInput';
+import { BeniContextSelector, type BeniContext } from './BeniContextSelector';
 
 type Message = {
   id?: string;
@@ -29,11 +30,7 @@ type Message = {
 };
 
 interface BeniChatBotProps {
-  context?: {
-    destination?: string;
-    pillarScores?: Record<string, number>;
-    igmaFlags?: Record<string, boolean>;
-  };
+  initialContext?: BeniContext;
 }
 
 const SUGGESTED_QUESTIONS = [
@@ -45,7 +42,7 @@ const SUGGESTED_QUESTIONS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/beni-chat`;
 
-export function BeniChatBot({ context }: BeniChatBotProps) {
+export function BeniChatBot({ initialContext }: BeniChatBotProps) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -55,6 +52,7 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [beniContext, setBeniContext] = useState<BeniContext>(initialContext || {});
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -194,7 +192,7 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
-        body: JSON.stringify({ messages: [...messages, userMsg], context }),
+        body: JSON.stringify({ messages: [...messages, userMsg], context: beniContext }),
         signal: controller.signal,
       });
 
@@ -427,6 +425,9 @@ export function BeniChatBot({ context }: BeniChatBotProps) {
               </Button>
             )}
           </div>
+        </div>
+        <div className="mt-2">
+          <BeniContextSelector context={beniContext} onContextChange={setBeniContext} />
         </div>
       </CardHeader>
 
