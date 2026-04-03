@@ -43,6 +43,7 @@ import {
   TrendingUp,
   Play,
   Youtube,
+  FileText,
 } from 'lucide-react';
 import { useAdminTrainings, useAdminTrainingMutations, useVideoUpload, type TrainingFormData } from '@/hooks/useEduAdmin';
 import { useAdminEnrollmentStats, useAdminEventStats } from '@/hooks/useEduEnrollments';
