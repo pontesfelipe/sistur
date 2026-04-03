@@ -625,5 +625,7 @@ export function useGameState() {
     loadState,
     resetState,
     getDominantProfile,
+    loadSavedState,
+    clearSavedState,
   };
 }
