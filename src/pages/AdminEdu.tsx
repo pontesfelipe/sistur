@@ -66,6 +66,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { ImportReviewQueue } from '@/components/edu/ImportReviewQueue';
+import { EssayGradingPanel } from '@/components/admin/EssayGradingPanel';
 
 const defaultFormData: TrainingFormData = {
   training_id: '',
