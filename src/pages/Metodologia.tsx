@@ -86,7 +86,7 @@ const diagnosticTiers = [
     id: 'SMALL',
     name: 'Essencial',
     icon: Zap,
-    color: 'bg-teal-500',
+    color: 'bg-teal-500 dark:bg-teal-600',
     borderColor: 'border-teal-500',
     bgColor: 'bg-teal-50 dark:bg-teal-950/30',
     indicatorCount: '9',
