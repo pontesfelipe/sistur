@@ -404,7 +404,7 @@ export default function Game() {
 
       {/* Game Over Overlay */}
       {game.state.isGameOver && !game.state.isVictory && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300 border border-red-800/50">
             <div className="text-6xl">💀</div>
             <h2 className="text-2xl font-black text-red-400">Fim de Jogo!</h2>
