@@ -356,7 +356,7 @@ const enterpriseCategories = [
     id: 'compliance',
     name: 'Compliance & Segurança',
     icon: ShieldCheck,
-    color: 'bg-slate-500',
+    color: 'bg-slate-500 dark:bg-slate-600',
     borderColor: 'border-slate-500',
     bgColor: 'bg-slate-50 dark:bg-slate-950/30',
     pillar: 'OE',

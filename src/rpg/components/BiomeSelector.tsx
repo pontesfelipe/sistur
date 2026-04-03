@@ -31,6 +31,7 @@ export function BiomeSelector({ onSelect }: BiomeSelectorProps) {
         className="text-center mb-8"
       >
         <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2 flex items-center justify-center gap-3">
+
           {getEmojiSprite('🌍') ? (
             <img src={getEmojiSprite('🌍')!} alt="" className="w-9 h-9 object-contain" draggable={false} />
           ) : '🌍'}

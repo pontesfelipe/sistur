@@ -426,7 +426,7 @@ export default function Game() {
 
       {/* Victory Overlay */}
       {game.state.isVictory && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-background/90 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-gradient-to-b from-amber-950 to-yellow-950 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300 border-2 border-amber-400">
             <div className="text-7xl animate-bounce">🏆</div>
             <h2 className="text-2xl font-black text-amber-300">Você Venceu!</h2>
