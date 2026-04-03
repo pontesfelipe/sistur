@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle, Compass, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle, Compass, AlertTriangle, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { generateMap, floodReveal, GRID } from '../mapGenerator';
@@ -26,7 +26,7 @@ const BIOME_BG_IMAGES: Record<string, string> = {
   mangue: mangueImg,
 };
 
-const MAX_TIME = 180; // 3 minutes
+const MAX_TIME = 300; // 5 minutes — more accessible for younger players
 const MAX_RIDDLE_ERRORS = 4;
 
 function createGameState(theme: MapTheme): TreasureGameState {
@@ -278,18 +278,21 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
     }
   }, [selectedTheme, clear]);
 
+  // Pause timer when a riddle dialog is open
+  const isRiddlePaused = !!state?.currentRiddle;
+
   useEffect(() => {
     if (!state || state.isGameOver || state.isVictory || !selectedTheme) return;
     const interval = setInterval(() => {
       setState(prev => {
-        if (!prev || prev.isGameOver || prev.isVictory) return prev;
+        if (!prev || prev.isGameOver || prev.isVictory || prev.currentRiddle) return prev;
         const newTime = prev.timeRemaining - 1;
         if (newTime <= 0) return { ...prev, timeRemaining: 0, isGameOver: true };
         return { ...prev, timeRemaining: newTime };
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [state?.isGameOver, state?.isVictory, selectedTheme]);
+  }, [state?.isGameOver, state?.isVictory, state?.currentRiddle, selectedTheme]);
 
   const showMessage = useCallback((msg: string, emoji?: string) => {
     setState(prev => prev ? { ...prev, message: msg } : prev);
@@ -486,12 +489,17 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
           </div>
         </div>
         <div className="flex items-center gap-3 justify-between">
-          <div className={cn('flex items-center gap-1', state.timeRemaining <= 30 && 'text-red-400')}>
+          <div className={cn('flex items-center gap-1', state.timeRemaining <= 30 && !isRiddlePaused && 'text-red-400')}>
             <Clock className="h-3.5 w-3.5" />
             <span className="font-bold tabular-nums">
               {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')}
             </span>
-            {state.timeRemaining <= 30 && (
+            {isRiddlePaused && (
+              <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1.2, repeat: Infinity }} className="text-amber-400">
+                <Pause className="h-3 w-3 inline" />
+              </motion.span>
+            )}
+            {state.timeRemaining <= 30 && !isRiddlePaused && (
               <motion.span animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="text-[10px]">⚠️</motion.span>
             )}
           </div>
