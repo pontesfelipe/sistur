@@ -408,6 +408,22 @@ export function useExamMutations() {
   const startExam = useMutation({
     mutationFn: async (examId: string) => {
       if (!user?.id) throw new Error('Not authenticated');
+
+      // Check if this exam contains essay questions to set grading_mode
+      const { data: examData } = await supabase
+        .from('exams')
+        .select('question_ids')
+        .eq('exam_id', examId)
+        .single();
+
+      let hasEssay = false;
+      if (examData?.question_ids?.length) {
+        const { data: questions } = await supabase
+          .from('quiz_questions')
+          .select('quiz_id, question_type')
+          .in('quiz_id', examData.question_ids);
+        hasEssay = questions?.some(q => (q.question_type as string) === 'essay') || false;
+      }
       
       // Update exam status
       const { error: examError } = await supabase
@@ -418,13 +434,13 @@ export function useExamMutations() {
       
       if (examError) throw examError;
       
-      // Create attempt
+      // Create attempt with appropriate grading_mode
       const { data: attempt, error: attemptError } = await supabase
         .from('exam_attempts')
         .insert({
           exam_id: examId,
           user_id: user.id,
-          grading_mode: 'automatic',
+          grading_mode: hasEssay ? 'hybrid' : 'automatic',
         })
         .select()
         .single();
@@ -531,25 +547,51 @@ export function useExamAnswerMutations() {
         .eq('attempt_id', attemptId);
       
       if (!answers || answers.length === 0) throw new Error('No answers found');
+
+      // Look up question types for all answered questions
+      const quizIds = answers.map(a => a.quiz_id);
+      const { data: questionTypes } = await supabase
+        .from('quiz_questions')
+        .select('quiz_id, question_type')
+        .in('quiz_id', quizIds);
+      const typeMap = new Map(questionTypes?.map(q => [q.quiz_id, q.question_type as string]) || []);
       
       // Grade answers
       let earnedPoints = 0;
+      let hasEssay = false;
+      const autoGradableCount = answers.filter(a => typeMap.get(a.quiz_id) !== 'essay').length;
       const pointsPerQuestion = 100 / answers.length;
       
       for (const answer of answers) {
-        const isCorrect = answer.quiz_options?.is_correct || false;
+        const qType = typeMap.get(answer.quiz_id);
         
-        await supabase
-          .from('exam_answers')
-          .update({
-            is_correct: isCorrect,
-            awarded_points: isCorrect ? pointsPerQuestion : 0,
-          })
-          .eq('attempt_id', attemptId)
-          .eq('quiz_id', answer.quiz_id);
-        
-        if (isCorrect) {
-          earnedPoints += pointsPerQuestion;
+        if (qType === 'essay') {
+          // Essay questions: set pending manual review
+          hasEssay = true;
+          await supabase
+            .from('exam_answers')
+            .update({
+              is_correct: null,
+              awarded_points: 0,
+            })
+            .eq('attempt_id', attemptId)
+            .eq('quiz_id', answer.quiz_id);
+        } else {
+          // Auto-grade multiple choice / true_false / short_answer
+          const isCorrect = answer.quiz_options?.is_correct || false;
+          
+          await supabase
+            .from('exam_answers')
+            .update({
+              is_correct: isCorrect,
+              awarded_points: isCorrect ? pointsPerQuestion : 0,
+            })
+            .eq('attempt_id', attemptId)
+            .eq('quiz_id', answer.quiz_id);
+          
+          if (isCorrect) {
+            earnedPoints += pointsPerQuestion;
+          }
         }
       }
       
@@ -565,7 +607,9 @@ export function useExamAnswerMutations() {
         if (ruleset) minScorePct = ruleset.min_score_pct;
       }
       
-      const result = earnedPoints >= minScorePct ? 'passed' : 'failed';
+      // If has essay, result is 'pending' until manual grading
+      const gradingMode = hasEssay ? 'hybrid' : 'automatic';
+      const result = hasEssay ? 'pending' : (earnedPoints >= minScorePct ? 'passed' : 'failed');
       
       // Update attempt
       const { data: updatedAttempt, error } = await supabase
@@ -573,6 +617,7 @@ export function useExamAnswerMutations() {
         .update({
           score_pct: earnedPoints,
           result,
+          grading_mode: gradingMode,
           submitted_at: new Date().toISOString(),
         })
         .eq('attempt_id', attemptId)

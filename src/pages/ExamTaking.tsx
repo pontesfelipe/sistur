@@ -45,7 +45,7 @@ const ExamTaking = () => {
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [result, setResult] = useState<{ score: number; passed: boolean } | null>(null);
+  const [result, setResult] = useState<{ score: number; passed: boolean; needsManualGrading?: boolean } | null>(null);
   const [warnedLowTime, setWarnedLowTime] = useState(false);
 
   const { data: exam, isLoading: examLoading } = useExam(examId);
@@ -57,6 +57,7 @@ const ExamTaking = () => {
   const currentQuestionId = exam?.question_ids?.[currentQuestionIndex];
   const { data: currentQuestion } = useQuizQuestion(currentQuestionId);
   const currentOptions = currentQuestion?.options || [];
+  const isEssayQuestion = currentQuestion?.question_type === 'essay';
 
   // Timer effect
   useEffect(() => {
@@ -118,23 +119,32 @@ const ExamTaking = () => {
     
     try {
       // Submit all answers
-      for (const [quizId, optionId] of Object.entries(answers)) {
+      for (const [quizId, value] of Object.entries(answers)) {
+        // Determine if this answer is essay (text) or multiple-choice (option ID)
+        // Essay answers are stored as free text; option IDs are UUIDs
+        const isEssay = value.length > 36 || !value.match(/^[0-9a-f-]{36}$/i);
         await submitAnswer.mutateAsync({
           attemptId: attempt.attempt_id,
           quizId,
-          selectedOptionId: optionId,
+          selectedOptionId: isEssay ? undefined : value,
+          freeTextAnswer: isEssay ? value : undefined,
         });
       }
 
       // Submit the exam
       const examResult = await submitExam.mutateAsync(attempt.attempt_id);
       
+      const needsGrading = examResult.grading_mode === 'hybrid' || examResult.grading_mode === 'manual';
+      
       setResult({
         score: examResult.score_pct || 0,
         passed: examResult.result === 'passed',
+        needsManualGrading: needsGrading,
       });
       
-      toast.success('Exame enviado com sucesso!');
+      toast.success(needsGrading 
+        ? 'Exame enviado! Questões dissertativas aguardam correção manual.' 
+        : 'Exame enviado com sucesso!');
     } catch (error) {
       toast.error('Erro ao enviar exame');
       setSubmitted(false);
@@ -179,43 +189,60 @@ const ExamTaking = () => {
   if (result || exam.status === 'submitted') {
     const finalScore = result?.score || 0;
     const passed = result?.passed || false;
+    const needsGrading = result?.needsManualGrading || false;
 
     return (
       <AppLayout title="Resultado do Exame" subtitle="Veja seu desempenho">
         <div className="max-w-2xl mx-auto">
-          <Card className={passed ? 'border-severity-good/50' : 'border-severity-critical/50'}>
+          <Card className={needsGrading ? 'border-amber-500/50' : passed ? 'border-severity-good/50' : 'border-severity-critical/50'}>
             <CardHeader className="text-center">
-              {passed ? (
+              {needsGrading ? (
+                <Clock className="h-20 w-20 mx-auto mb-4 text-amber-500" />
+              ) : passed ? (
                 <Award className="h-20 w-20 mx-auto mb-4 text-severity-good" />
               ) : (
                 <XCircle className="h-20 w-20 mx-auto mb-4 text-severity-critical" />
               )}
               <CardTitle className="text-3xl">
-                {passed ? 'Parabéns!' : 'Não foi desta vez'}
+                {needsGrading ? 'Aguardando Correção' : passed ? 'Parabéns!' : 'Não foi desta vez'}
               </CardTitle>
               <CardDescription>
-                {passed 
-                  ? 'Você foi aprovado no exame!' 
-                  : 'Você não atingiu a pontuação mínima'}
+                {needsGrading 
+                  ? 'Questões dissertativas aguardam correção manual do professor' 
+                  : passed 
+                    ? 'Você foi aprovado no exame!' 
+                    : 'Você não atingiu a pontuação mínima'}
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center space-y-6">
-              <div className="text-6xl font-bold">
-                {finalScore.toFixed(0)}%
-              </div>
-              <Progress 
-                value={finalScore} 
-                className={`h-4 ${passed ? '[&>div]:bg-green-500' : '[&>div]:bg-red-500'}`}
-              />
-              <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-                <span>Acertos: {Object.keys(answers).length} / {exam.question_ids?.length || 0}</span>
-              </div>
+              {needsGrading ? (
+                <div className="text-lg text-muted-foreground">
+                  <p>Pontuação parcial (questões objetivas):</p>
+                  <div className="text-4xl font-bold mt-2">{finalScore.toFixed(0)}%</div>
+                  <p className="text-sm mt-3 text-amber-600 dark:text-amber-400">
+                    A nota final será calculada após a correção das questões dissertativas.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="text-6xl font-bold">
+                    {finalScore.toFixed(0)}%
+                  </div>
+                  <Progress 
+                    value={finalScore} 
+                    className={`h-4 ${passed ? '[&>div]:bg-green-500' : '[&>div]:bg-red-500'}`}
+                  />
+                  <div className="flex justify-center gap-4 text-sm text-muted-foreground">
+                    <span>Acertos: {Object.keys(answers).length} / {exam.question_ids?.length || 0}</span>
+                  </div>
+                </>
+              )}
             </CardContent>
             <CardFooter className="flex justify-center gap-4">
               <Button variant="outline" onClick={() => navigate('/edu')}>
                 Voltar ao Catálogo
               </Button>
-              {passed && (
+              {passed && !needsGrading && (
                 <Button onClick={() => navigate('/edu/certificados')}>
                   <Award className="mr-2 h-4 w-4" />
                   Ver Certificados
@@ -312,14 +339,42 @@ const ExamTaking = () => {
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">
               <Badge variant="outline">Questão {currentQuestionIndex + 1}</Badge>
+              {isEssayQuestion && (
+                <Badge variant="secondary">Dissertativa</Badge>
+              )}
             </div>
             <CardTitle className="text-lg leading-relaxed">
-              {/* Question stem would come from joined data - for now show ID */}
-              Questão #{currentQuestionId?.slice(0, 8)}
+              {currentQuestion?.stem || `Questão #${currentQuestionId?.slice(0, 8)}`}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {currentOptions && currentOptions.length > 0 ? (
+            {isEssayQuestion ? (
+              <div className="space-y-3">
+                <Textarea
+                  placeholder="Digite sua resposta dissertativa..."
+                  value={answers[currentQuestionId || ''] || ''}
+                  onChange={(e) => currentQuestionId && handleAnswerChange(currentQuestionId, e.target.value)}
+                  rows={8}
+                  className="resize-y min-h-[160px]"
+                />
+                {(() => {
+                  const text = answers[currentQuestionId || ''] || '';
+                  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+                  const charCount = text.length;
+                  const isMinMet = wordCount >= 50;
+                  return (
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span className={isMinMet ? 'text-severity-good' : 'text-severity-moderate'}>
+                        {wordCount} {wordCount === 1 ? 'palavra' : 'palavras'}
+                        {!isMinMet && ' (mínimo: 50)'}
+                        {isMinMet && ' ✓'}
+                      </span>
+                      <span>{charCount} caracteres</span>
+                    </div>
+                  );
+                })()}
+              </div>
+            ) : currentOptions && currentOptions.length > 0 ? (
               <RadioGroup
                 value={answers[currentQuestionId || ''] || ''}
                 onValueChange={(value) => currentQuestionId && handleAnswerChange(currentQuestionId, value)}
