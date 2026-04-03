@@ -339,10 +339,12 @@ const ExamTaking = () => {
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">
               <Badge variant="outline">Questão {currentQuestionIndex + 1}</Badge>
+              {isEssayQuestion && (
+                <Badge variant="secondary">Dissertativa</Badge>
+              )}
             </div>
             <CardTitle className="text-lg leading-relaxed">
-              {/* Question stem would come from joined data - for now show ID */}
-              Questão #{currentQuestionId?.slice(0, 8)}
+              {currentQuestion?.stem || `Questão #${currentQuestionId?.slice(0, 8)}`}
             </CardTitle>
           </CardHeader>
           <CardContent>
