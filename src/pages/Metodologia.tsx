@@ -334,7 +334,7 @@ const enterpriseCategories = [
     id: 'hr',
     name: 'Recursos Humanos',
     icon: UserCheck,
-    color: 'bg-purple-500',
+    color: 'bg-purple-500 dark:bg-purple-600',
     borderColor: 'border-purple-500',
     bgColor: 'bg-purple-50 dark:bg-purple-950/30',
     pillar: 'OE',
