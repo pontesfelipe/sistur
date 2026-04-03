@@ -408,6 +408,22 @@ export function useExamMutations() {
   const startExam = useMutation({
     mutationFn: async (examId: string) => {
       if (!user?.id) throw new Error('Not authenticated');
+
+      // Check if this exam contains essay questions to set grading_mode
+      const { data: examData } = await supabase
+        .from('exams')
+        .select('question_ids')
+        .eq('exam_id', examId)
+        .single();
+
+      let hasEssay = false;
+      if (examData?.question_ids?.length) {
+        const { data: questions } = await supabase
+          .from('quiz_questions')
+          .select('quiz_id, question_type')
+          .in('quiz_id', examData.question_ids);
+        hasEssay = questions?.some(q => q.question_type === 'essay') || false;
+      }
       
       // Update exam status
       const { error: examError } = await supabase
@@ -418,13 +434,13 @@ export function useExamMutations() {
       
       if (examError) throw examError;
       
-      // Create attempt
+      // Create attempt with appropriate grading_mode
       const { data: attempt, error: attemptError } = await supabase
         .from('exam_attempts')
         .insert({
           exam_id: examId,
           user_id: user.id,
-          grading_mode: 'automatic',
+          grading_mode: hasEssay ? 'hybrid' : 'automatic',
         })
         .select()
         .single();
