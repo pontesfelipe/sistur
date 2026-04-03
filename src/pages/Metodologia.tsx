@@ -290,7 +290,7 @@ const enterpriseCategories = [
     id: 'financial',
     name: 'Performance Financeira',
     icon: DollarSign,
-    color: 'bg-green-500',
+    color: 'bg-green-500 dark:bg-green-600',
     borderColor: 'border-green-500',
     bgColor: 'bg-green-50 dark:bg-green-950/30',
     pillar: 'AO',
