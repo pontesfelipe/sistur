@@ -5018,6 +5018,7 @@ export type Database = {
           has_enterprise_access: boolean | null
           has_territorial_access: boolean | null
           id: string
+          is_demo: boolean
           name: string
           org_type: Database["public"]["Enums"]["org_type"] | null
         }
@@ -5026,6 +5027,7 @@ export type Database = {
           has_enterprise_access?: boolean | null
           has_territorial_access?: boolean | null
           id?: string
+          is_demo?: boolean
           name: string
           org_type?: Database["public"]["Enums"]["org_type"] | null
         }
@@ -5034,6 +5036,7 @@ export type Database = {
           has_enterprise_access?: boolean | null
           has_territorial_access?: boolean | null
           id?: string
+          is_demo?: boolean
           name?: string
           org_type?: Database["public"]["Enums"]["org_type"] | null
         }
@@ -6724,6 +6727,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      set_demo_org_id: { Args: { target_org_id: string }; Returns: undefined }
       toggle_demo_mode: { Args: { _enable: boolean }; Returns: undefined }
       user_belongs_to_org: {
         Args: { _org_id: string; _user_id: string }
