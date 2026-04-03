@@ -28,6 +28,7 @@ import {
 import { useAssessments } from '@/hooks/useAssessments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryClient } from '@tanstack/react-query';
+import { useProfile } from '@/hooks/useProfile';
 
 const Diagnosticos = () => {
   const navigate = useNavigate();
