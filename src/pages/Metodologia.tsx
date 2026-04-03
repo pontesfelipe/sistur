@@ -251,7 +251,7 @@ const rules = [
     name: 'Governança Central',
     icon: ShieldAlert,
     flag: 'GOVERNANCE_BLOCK',
-    color: 'bg-amber-500',
+    color: 'bg-amber-500 dark:bg-amber-600',
     description: 'AO crítico bloqueia todo o sistema',
     detail: 'Se o pilar AO (governança/operações) está crítico, não há capacidade de gestão para implementar melhorias. O sistema bloqueia expansão de OE até a governança melhorar.',
     trigger: 'AO = CRÍTICO',
