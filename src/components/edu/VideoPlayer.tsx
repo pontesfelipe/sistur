@@ -43,12 +43,14 @@ export function VideoPlayer({
   const [showPreviewBlock, setShowPreviewBlock] = useState(false);
   
   const { trackEvent } = useEventMutations();
+  const savedTimeRef = useRef<number | null>(null);
   
   // Use secure signed URLs for Supabase-hosted videos
   const { 
     url: secureUrl, 
     isLoading: isLoadingUrl, 
-    error: urlError 
+    error: urlError,
+    refresh: refreshUrl,
   } = useSecureVideoUrl({
     videoUrl,
     videoPath,
@@ -56,6 +58,35 @@ export function VideoPlayer({
     expiresIn: 3600, // 1 hour - enough for any video length
     autoRefresh: true, // Auto-refresh before expiration
   });
+
+  // Restore playback position after URL refresh
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video && savedTimeRef.current !== null && secureUrl) {
+      const restoreTime = savedTimeRef.current;
+      savedTimeRef.current = null;
+      const onCanPlay = () => {
+        video.currentTime = restoreTime;
+        video.play().catch(() => {});
+        video.removeEventListener('canplay', onCanPlay);
+      };
+      video.addEventListener('canplay', onCanPlay);
+    }
+  }, [secureUrl]);
+
+  // Handle video errors — recover from expired/403 URLs
+  const handleVideoError = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const err = video.error;
+    // MediaError.MEDIA_ERR_NETWORK (2) or MEDIA_ERR_SRC_NOT_SUPPORTED (4) can indicate 403
+    if (err && (err.code === MediaError.MEDIA_ERR_NETWORK || err.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED)) {
+      savedTimeRef.current = video.currentTime || currentTime;
+      setIsPlaying(false);
+      toast('Recarregando vídeo...');
+      refreshUrl();
+    }
+  }, [currentTime, refreshUrl]);
   
   useEffect(() => {
     const video = videoRef.current;
