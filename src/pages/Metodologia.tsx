@@ -312,7 +312,7 @@ const enterpriseCategories = [
     id: 'operations',
     name: 'Operações',
     icon: Cog,
-    color: 'bg-blue-500',
+    color: 'bg-blue-500 dark:bg-blue-600',
     borderColor: 'border-blue-500',
     bgColor: 'bg-blue-50 dark:bg-blue-950/30',
     pillar: 'OE',
