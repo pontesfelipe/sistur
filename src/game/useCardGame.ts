@@ -571,8 +571,9 @@ export function useCardGame() {
   }, []);
 
   const resetState = useCallback((biome?: BiomeType) => {
+    clearSavedState();
     setState(createInitialCardState(biome || 'floresta'));
-  }, []);
+  }, [clearSavedState]);
 
   const getEquilibrium = () => state.bars.ra * 0.4 + state.bars.oe * 0.3 + state.bars.ao * 0.3;
 
