@@ -215,7 +215,7 @@ const rules = [
     name: 'Prioridade RA',
     icon: Leaf,
     flag: 'RA_LIMITATION',
-    color: 'bg-emerald-500',
+    color: 'bg-emerald-500 dark:bg-emerald-600',
     description: 'Limitações ambientais bloqueiam expansão estrutural',
     detail: 'Se o pilar RA (Relações Ambientais) está crítico, o sistema bloqueia capacitações e investimentos em OE (infraestrutura). Não adianta construir hotéis se o ambiente está degradado.',
     trigger: 'RA = CRÍTICO',
