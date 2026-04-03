@@ -292,7 +292,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
 
   return (
     <Dialog open={open} onOpenChange={(v) => {
-      if (!v) { setFile(null); setModerationResult(null); }
+      if (!v) { cancelModeration(); setFile(null); setModerationResult(null); }
       onOpenChange(v);
     }}>
       <DialogTrigger asChild>
