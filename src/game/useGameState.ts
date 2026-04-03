@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { GameState, GameBars, PlacedBuilding, AvatarConfig, BiomeType, GameLevel, ProfileScores, AvatarPreset, EduMetrics } from './types';
 import { LEVEL_XP, BIOME_MODIFIERS, UNLOCKABLE_SKINS } from './types';
 import { BUILDINGS, EVENTS, COUNCIL_DECISIONS, GRID_SIZE, DISASTERS, BIOME_EVENTS, checkBuildingRequirements, checkSynergies } from './constants';
@@ -100,6 +100,39 @@ function mergeProfileScores(current: ProfileScores, delta: Partial<ProfileScores
 
 export function useGameState() {
   const [state, setState] = useState<GameState>(createInitialState());
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Debounced save to localStorage
+  useEffect(() => {
+    if (!state.isSetup || state.isGameOver || state.isVictory) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      try {
+        localStorage.setItem('sistur-city-state', JSON.stringify({ state, savedAt: Date.now() }));
+      } catch { /* ignore */ }
+    }, 500);
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
+  }, [state]);
+
+  const loadSavedState = useCallback((): { state: GameState; savedAt: Date } | null => {
+    try {
+      const raw = localStorage.getItem('sistur-city-state');
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (Date.now() - data.savedAt > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem('sistur-city-state');
+        return null;
+      }
+      return { state: data.state, savedAt: new Date(data.savedAt) };
+    } catch {
+      localStorage.removeItem('sistur-city-state');
+      return null;
+    }
+  }, []);
+
+  const clearSavedState = useCallback(() => {
+    localStorage.removeItem('sistur-city-state');
+  }, []);
 
   const clamp = (v: number) => Math.max(0, Math.min(100, v));
 
@@ -585,8 +618,9 @@ export function useGameState() {
   }, []);
 
   const resetState = useCallback((biome?: BiomeType) => {
+    clearSavedState();
     setState(createInitialState(biome || 'floresta'));
-  }, []);
+  }, [clearSavedState]);
 
   const getDominantProfile = (): { preset: AvatarPreset; scores: ProfileScores } => {
     const s = state.profileScores;
@@ -624,5 +658,7 @@ export function useGameState() {
     loadState,
     resetState,
     getDominantProfile,
+    loadSavedState,
+    clearSavedState,
   };
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, RotateCcw, BookOpen, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,8 @@ import { RPGTutorial } from './RPGTutorial';
 import { BIOME_STORIES } from '../stories';
 import { BIOME_INFO, INITIAL_STATS, type BiomeId, type RPGState, type StoryChoice, type BiomeStats } from '../types';
 import { getEmojiSprite } from '@/game/spriteMap';
+import { useGamePersistence } from '@/hooks/useGamePersistence';
+import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
 
 const initialState: RPGState = {
   biome: null,
@@ -25,8 +27,33 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
   const [diaryOpen, setDiaryOpen] = useState(false);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [resumeSavedAt, setResumeSavedAt] = useState<Date | null>(null);
+
+  const isGameActive = state.started && !state.finished;
+  const { load, clear } = useGamePersistence('sistur-rpg-state', state, isGameActive);
+
+  useEffect(() => {
+    const saved = load();
+    if (saved && saved.state.started) {
+      setResumeSavedAt(saved.savedAt);
+      setShowResumeDialog(true);
+    }
+  }, []);
+
+  const handleResumeGame = useCallback(() => {
+    const saved = load();
+    if (saved) setState(saved.state);
+    setShowResumeDialog(false);
+  }, [load]);
+
+  const handleNewGameFromDialog = useCallback(() => {
+    clear();
+    setShowResumeDialog(false);
+  }, [clear]);
 
   const handleSelectBiome = useCallback((biome: BiomeId) => {
+    clear();
     setState({
       ...initialState,
       biome,
@@ -35,7 +62,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
     if (!tutorialSeen) {
       setShowTutorial(true);
     }
-  }, [tutorialSeen]);
+  }, [tutorialSeen, clear]);
 
   const handleChoice = useCallback((choice: StoryChoice) => {
     setState(prev => {
@@ -50,6 +77,11 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
       const nextScene = story?.scenes.find(s => s.id === choice.nextScene);
       const finished = nextScene?.isEnding || false;
 
+      if (finished) {
+        // Clear save on game completion
+        localStorage.removeItem('sistur-rpg-state');
+      }
+
       return {
         ...prev,
         currentScene: choice.nextScene,
@@ -62,6 +94,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
   }, []);
 
   const handleRestart = () => {
+    clear();
     setState(prev => ({
       ...initialState,
       biome: prev.biome,
@@ -70,6 +103,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
   };
 
   const handleNewBiome = () => {
+    clear();
     setState(initialState);
   };
 
@@ -77,6 +111,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
   if (!state.started || !state.biome) {
     return (
       <div className="relative">
+        <ResumeGameDialog open={showResumeDialog} savedAt={resumeSavedAt} onResume={handleResumeGame} onNewGame={handleNewGameFromDialog} />
         <div className="absolute top-4 left-4 z-10">
           <Button variant="ghost" size="sm" onClick={onBack} className="gap-2">
             <ArrowLeft className="h-4 w-4" /> Voltar

@@ -10,6 +10,8 @@ import { TreasureTutorial } from './TreasureTutorial';
 import { fireVictoryConfetti, fireEcoBurst, fireDefeatEffect } from '@/game/vfx/confetti';
 import { ScreenFlash, ImpactPulse } from '@/game/vfx/ScreenFlash';
 import { getEmojiSprite } from '@/game/spriteMap';
+import { useGamePersistence } from '@/hooks/useGamePersistence';
+import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
 
 // AI-generated biome images
 import florestaImg from '@/assets/biomes/floresta.jpg';
@@ -232,18 +234,49 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
   const [collectAnim, setCollectAnim] = useState<string | null>(null);
   const [showTrapFlash, setShowTrapFlash] = useState(false);
   const [showCollectPulse, setShowCollectPulse] = useState(false);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [resumeSavedAt, setResumeSavedAt] = useState<Date | null>(null);
   const prevVictory = useRef(false);
   const prevGameOver = useRef(false);
 
+  const isGameActive = !!state && !state.isGameOver && !state.isVictory;
+  const { load, clear } = useGamePersistence('sistur-treasure-state', state, isGameActive);
+
+  useEffect(() => {
+    const saved = load();
+    if (saved) {
+      setResumeSavedAt(saved.savedAt);
+      setShowResumeDialog(true);
+    }
+  }, []);
+
+  const handleResumeGame = useCallback(() => {
+    const saved = load();
+    if (saved) {
+      setSelectedTheme(saved.state.theme);
+      setState(saved.state);
+    }
+    setShowResumeDialog(false);
+  }, [load]);
+
+  const handleNewGameFromDialog = useCallback(() => {
+    clear();
+    setShowResumeDialog(false);
+  }, [clear]);
+
   const handleSelectTheme = useCallback((theme: MapTheme) => {
+    clear();
     setSelectedTheme(theme);
     setState(createGameState(theme));
     if (!tutorialSeen) setShowTutorial(true);
-  }, [tutorialSeen]);
+  }, [tutorialSeen, clear]);
 
   const handleRestart = useCallback(() => {
-    if (selectedTheme) setState(createGameState(selectedTheme));
-  }, [selectedTheme]);
+    if (selectedTheme) {
+      clear();
+      setState(createGameState(selectedTheme));
+    }
+  }, [selectedTheme, clear]);
 
   useEffect(() => {
     if (!state || state.isGameOver || state.isVictory || !selectedTheme) return;
@@ -339,24 +372,27 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
     });
   }, []);
 
-  // VFX: victory/defeat triggers
+  // VFX: victory/defeat triggers + clear save
   useEffect(() => {
     if (state?.isVictory && !prevVictory.current) {
       fireVictoryConfetti();
+      clear();
       prevVictory.current = true;
     }
     if (state?.isGameOver && !prevGameOver.current) {
       fireDefeatEffect();
+      clear();
       prevGameOver.current = true;
     }
     if (!state?.isVictory) prevVictory.current = false;
     if (!state?.isGameOver) prevGameOver.current = false;
-  }, [state?.isVictory, state?.isGameOver]);
+  }, [state?.isVictory, state?.isGameOver, clear]);
 
   // Theme selector
   if (!selectedTheme || !state) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col">
+        <ResumeGameDialog open={showResumeDialog} savedAt={resumeSavedAt} onResume={handleResumeGame} onNewGame={handleNewGameFromDialog} />
         <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/50">
           <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-slate-200">
             <ArrowLeft className="h-4 w-4 mr-1" /> Voltar

@@ -10,6 +10,8 @@ import { fireVictoryConfetti, fireMatchBurst, fireDefeatEffect } from '@/game/vf
 import { LottieOverlay } from '@/game/vfx/LottieOverlay';
 import { ScreenFlash } from '@/game/vfx/ScreenFlash';
 import { getEmojiSprite } from '@/game/spriteMap';
+import { useGamePersistence } from '@/hooks/useGamePersistence';
+import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
 
 // AI-generated biome images
 import florestaImg from '@/assets/biomes/floresta.jpg';
@@ -150,11 +152,41 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
   const [maxCombo, setMaxCombo] = useState(0);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [hintActive, setHintActive] = useState(false);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [resumeSavedAt, setResumeSavedAt] = useState<Date | null>(null);
   const MAX_HINTS = 2;
   const prevVictory = useRef(false);
   const prevGameOver = useRef(false);
 
+  const isGameActive = !!state && !state.isGameOver && !state.isVictory;
+  const { load, clear } = useGamePersistence('sistur-memory-state', state, isGameActive);
+
+  // Check for saved game on mount
+  useEffect(() => {
+    const saved = load();
+    if (saved) {
+      setResumeSavedAt(saved.savedAt);
+      setShowResumeDialog(true);
+    }
+  }, []);
+
+  const handleResumeGame = useCallback(() => {
+    const saved = load();
+    if (saved) {
+      const s = saved.state;
+      setSelectedTheme(s.theme);
+      setState(s);
+    }
+    setShowResumeDialog(false);
+  }, [load]);
+
+  const handleNewGameFromDialog = useCallback(() => {
+    clear();
+    setShowResumeDialog(false);
+  }, [clear]);
+
   const handleSelectTheme = useCallback((theme: MemoryTheme) => {
+    clear();
     setSelectedTheme(theme);
     setState(createGameState(theme));
     setCombo(0);
@@ -162,17 +194,18 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
     setHintsUsed(0);
     setHintActive(false);
     if (!tutorialSeen) setShowTutorial(true);
-  }, [tutorialSeen]);
+  }, [tutorialSeen, clear]);
 
   const handleRestart = useCallback(() => {
     if (selectedTheme) {
+      clear();
       setState(createGameState(selectedTheme));
       setCombo(0);
       setMaxCombo(0);
       setHintsUsed(0);
       setHintActive(false);
     }
-  }, [selectedTheme]);
+  }, [selectedTheme, clear]);
 
   const handleHint = useCallback(() => {
     if (!state || hintActive || hintsUsed >= MAX_HINTS || state.isGameOver || state.isVictory) return;
@@ -281,24 +314,27 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
     return () => clearTimeout(timer);
   }, [state?.message]);
 
-  // VFX: victory/defeat confetti triggers
+  // VFX: victory/defeat confetti triggers + clear save on completion
   useEffect(() => {
     if (state?.isVictory && !prevVictory.current) {
       fireVictoryConfetti();
+      clear();
       prevVictory.current = true;
     }
     if (state?.isGameOver && !prevGameOver.current) {
       fireDefeatEffect();
+      clear();
       prevGameOver.current = true;
     }
     if (!state?.isVictory) prevVictory.current = false;
     if (!state?.isGameOver) prevGameOver.current = false;
-  }, [state?.isVictory, state?.isGameOver]);
+  }, [state?.isVictory, state?.isGameOver, clear]);
 
   // Theme selector
   if (!selectedTheme || !state) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col">
+        <ResumeGameDialog open={showResumeDialog} savedAt={resumeSavedAt} onResume={handleResumeGame} onNewGame={handleNewGameFromDialog} />
         <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/50">
           <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-slate-200">
             <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
