@@ -21,6 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { ChatMessageList } from './ChatMessageList';
 import { ChatInput } from './ChatInput';
+import { BeniContextSelector, type BeniContext } from './BeniContextSelector';
 
 type Message = {
   id?: string;
@@ -29,11 +30,7 @@ type Message = {
 };
 
 interface BeniChatBotProps {
-  context?: {
-    destination?: string;
-    pillarScores?: Record<string, number>;
-    igmaFlags?: Record<string, boolean>;
-  };
+  initialContext?: BeniContext;
 }
 
 const SUGGESTED_QUESTIONS = [
