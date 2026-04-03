@@ -139,6 +139,8 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (user?.id !== lastUserId.current) {
+      // Reset initialized so route guards wait for the new fetch
+      setInitialized(false);
       setLoading(true);
       fetchLicense();
     }
