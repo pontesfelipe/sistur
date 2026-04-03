@@ -158,7 +158,7 @@ const diagnosticTiers = [
     id: 'COMPLETE',
     name: 'Integral',
     icon: Target,
-    color: 'bg-rose-500',
+    color: 'bg-rose-500 dark:bg-rose-600',
     borderColor: 'border-rose-500',
     bgColor: 'bg-rose-50 dark:bg-rose-950/30',
     indicatorCount: '96',
