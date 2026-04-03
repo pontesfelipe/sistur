@@ -37,7 +37,7 @@ export function useSecureVideoUrl({
   videoPath,
   videoUrl,
   videoProvider = 'supabase',
-  expiresIn = 300, // 5 minutes default
+  expiresIn = 3600, // 1 hour default
   autoRefresh = true,
 }: UseSecureVideoUrlOptions): SecureVideoUrlResult {
   const { user } = useAuth();
