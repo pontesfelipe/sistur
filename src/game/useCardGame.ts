@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { GameBars, GameLevel, BiomeType, AvatarConfig, ProfileScores, EduMetrics, AvatarPreset } from './types';
 import { LEVEL_XP, BIOME_MODIFIERS, UNLOCKABLE_SKINS } from './types';
 import { EVENTS, COUNCIL_DECISIONS, DISASTERS, BIOME_EVENTS } from './constants';
