@@ -13,8 +13,9 @@ import { useState } from 'react';
 import { DeleteAssessmentDialog } from './DeleteAssessmentDialog';
 
 interface AssessmentCardProps {
-  assessment: Assessment & { tier?: string; creator?: { full_name: string } | null };
+  assessment: Assessment & { tier?: string; creator?: { full_name: string } | null; visibility?: string; is_demo?: boolean };
   onDelete?: () => void;
+  isDemoContext?: boolean;
 }
 
 const tierConfig = {
