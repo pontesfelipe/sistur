@@ -152,11 +152,41 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
   const [maxCombo, setMaxCombo] = useState(0);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [hintActive, setHintActive] = useState(false);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [resumeSavedAt, setResumeSavedAt] = useState<Date | null>(null);
   const MAX_HINTS = 2;
   const prevVictory = useRef(false);
   const prevGameOver = useRef(false);
 
+  const isGameActive = !!state && !state.isGameOver && !state.isVictory;
+  const { load, clear } = useGamePersistence('sistur-memory-state', state, isGameActive);
+
+  // Check for saved game on mount
+  useEffect(() => {
+    const saved = load();
+    if (saved) {
+      setResumeSavedAt(saved.savedAt);
+      setShowResumeDialog(true);
+    }
+  }, []);
+
+  const handleResumeGame = useCallback(() => {
+    const saved = load();
+    if (saved) {
+      const s = saved.state;
+      setSelectedTheme(s.theme);
+      setState(s);
+    }
+    setShowResumeDialog(false);
+  }, [load]);
+
+  const handleNewGameFromDialog = useCallback(() => {
+    clear();
+    setShowResumeDialog(false);
+  }, [clear]);
+
   const handleSelectTheme = useCallback((theme: MemoryTheme) => {
+    clear();
     setSelectedTheme(theme);
     setState(createGameState(theme));
     setCombo(0);
@@ -164,17 +194,18 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
     setHintsUsed(0);
     setHintActive(false);
     if (!tutorialSeen) setShowTutorial(true);
-  }, [tutorialSeen]);
+  }, [tutorialSeen, clear]);
 
   const handleRestart = useCallback(() => {
     if (selectedTheme) {
+      clear();
       setState(createGameState(selectedTheme));
       setCombo(0);
       setMaxCombo(0);
       setHintsUsed(0);
       setHintActive(false);
     }
-  }, [selectedTheme]);
+  }, [selectedTheme, clear]);
 
   const handleHint = useCallback(() => {
     if (!state || hintActive || hintsUsed >= MAX_HINTS || state.isGameOver || state.isVictory) return;
