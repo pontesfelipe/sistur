@@ -1051,12 +1051,15 @@ export type Database = {
         Row: {
           created_at: string
           creator_user_id: string | null
+          has_pdt: boolean | null
           ibge_code: string | null
           id: string
           latitude: number | null
           longitude: number | null
+          municipality_type: string | null
           name: string
           org_id: string
+          tourism_region: string | null
           uf: string | null
           updated_at: string
           visibility: string
@@ -1064,12 +1067,15 @@ export type Database = {
         Insert: {
           created_at?: string
           creator_user_id?: string | null
+          has_pdt?: boolean | null
           ibge_code?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
+          municipality_type?: string | null
           name: string
           org_id: string
+          tourism_region?: string | null
           uf?: string | null
           updated_at?: string
           visibility?: string
@@ -1077,12 +1083,15 @@ export type Database = {
         Update: {
           created_at?: string
           creator_user_id?: string | null
+          has_pdt?: boolean | null
           ibge_code?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
+          municipality_type?: string | null
           name?: string
           org_id?: string
+          tourism_region?: string | null
           uf?: string | null
           updated_at?: string
           visibility?: string
@@ -3576,8 +3585,11 @@ export type Database = {
           name: string
           normalization: Database["public"]["Enums"]["normalization_type"]
           notes: string | null
+          ods_codes: string[] | null
           org_id: string | null
           pillar: Database["public"]["Enums"]["pillar_type"]
+          pnt_axis: number | null
+          pnt_program: string | null
           reference_date: string | null
           reliability_score: number | null
           source: string | null
@@ -3618,8 +3630,11 @@ export type Database = {
           name: string
           normalization?: Database["public"]["Enums"]["normalization_type"]
           notes?: string | null
+          ods_codes?: string[] | null
           org_id?: string | null
           pillar: Database["public"]["Enums"]["pillar_type"]
+          pnt_axis?: number | null
+          pnt_program?: string | null
           reference_date?: string | null
           reliability_score?: number | null
           source?: string | null
@@ -3660,8 +3675,11 @@ export type Database = {
           name?: string
           normalization?: Database["public"]["Enums"]["normalization_type"]
           notes?: string | null
+          ods_codes?: string[] | null
           org_id?: string | null
           pillar?: Database["public"]["Enums"]["pillar_type"]
+          pnt_axis?: number | null
+          pnt_program?: string | null
           reference_date?: string | null
           reliability_score?: number | null
           source?: string | null
@@ -4825,6 +4843,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ods_targets: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          ods_number: number
+          relevance_for_tourism: string | null
+          title: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          ods_number: number
+          relevance_for_tourism?: string | null
+          title: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          ods_number?: number
+          relevance_for_tourism?: string | null
+          title?: string
+        }
+        Relationships: []
       }
       ondemand_output_sources: {
         Row: {
