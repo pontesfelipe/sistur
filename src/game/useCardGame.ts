@@ -648,5 +648,8 @@ export function useCardGame() {
     getAlerts,
     getDominantProfile,
     toLegacyState,
+    loadSavedState,
+    clearSavedState,
+    loadState,
   };
 }
