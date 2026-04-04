@@ -29,14 +29,28 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
+interface GuestExperienceDimensions {
+  atendimento: number | null;
+  limpeza: number | null;
+  infraestrutura: number | null;
+  gastronomia: number | null;
+  localizacao: number | null;
+  custo_beneficio: number | null;
+}
+
 interface BusinessReviewAnalysis {
   review_score: number | null;
   review_count: number | null;
   digital_maturity: number | null;
   platforms_found: string[];
   sentiment_summary: string;
+  sentiment_score: number | null;
+  guest_experience_dimensions: GuestExperienceDimensions;
+  recurring_themes: string[];
   strengths: string[];
   weaknesses: string[];
+  sample_positive_quotes: string[];
+  sample_negative_quotes: string[];
   recommendation: string;
   sources: { platform: string; url: string; rating: number | null }[];
 }
