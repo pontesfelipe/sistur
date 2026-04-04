@@ -497,6 +497,7 @@ export function useExamAttempt(attemptId?: string) {
 
 export function useExamAnswerMutations() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const submitAnswer = useMutation({
     mutationFn: async ({ 
