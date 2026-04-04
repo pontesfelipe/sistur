@@ -21,7 +21,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { useAuditLogger } from '@/hooks/useAuditLogger';
-import { filterBusinessOrganizations, getOrgDisplayName } from '@/lib/organizationVisibility';
+import { filterBusinessOrganizations, getOrgDisplayName, isPendingOrganizationName } from '@/lib/organizationVisibility';
 
 interface Organization {
   id: string;
@@ -100,55 +100,67 @@ export function OrganizationUsersPanel() {
     fetchOrganizations();
   }, []);
 
+  const selectedOrganization =
+    organizations.find((organization) => organization.id === selectedOrg) ?? null;
+  const isPendingOrganizationSelected = selectedOrganization
+    ? isPendingOrganizationName(selectedOrganization.name)
+    : false;
+
   useEffect(() => {
     const fetchOrgUsers = async () => {
-      if (!selectedOrg) return;
+      if (!selectedOrg || !selectedOrganization) return;
 
       try {
         setUsersLoading(true);
 
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('user_id, full_name, avatar_url, created_at, system_access')
-          .eq('org_id', selectedOrg)
-          .eq('pending_approval', false);
+        if (isPendingOrganizationSelected) {
+          const response = await supabase.functions.invoke('manage-users', {
+            body: { action: 'list_pending' }
+          });
 
-        if (profilesError) throw profilesError;
+          if (response.error) throw response.error;
 
-        const userIds = profiles?.map((profile) => profile.user_id) || [];
-        const { data: roles } = await supabase
-          .from('user_roles')
-          .select('user_id, role')
-          .in('user_id', userIds);
+          const pendingUsers: OrganizationUser[] = (response.data?.users || []).map((user: any) => ({
+            user_id: user.user_id,
+            full_name: user.full_name,
+            email: user.email,
+            avatar_url: null,
+            created_at: user.approval_requested_at,
+            system_access: user.system_access,
+            role: user.role || (user.system_access === 'EDU' ? 'ESTUDANTE' : 'VIEWER'),
+          }));
 
-        const { data: response } = await supabase.functions.invoke('manage-users', {
+          setUsers(pendingUsers);
+          return;
+        }
+
+        const response = await supabase.functions.invoke('manage-users', {
           body: { action: 'list_by_org', org_id: selectedOrg }
         });
 
-        const emailMap = new Map<string, string>(
-          (response?.users || []).map((user: { user_id: string; email: string }) => [user.user_id, user.email])
-        );
+        if (response.error) throw response.error;
 
-        const enrichedUsers: OrganizationUser[] = (profiles || []).map((profile) => ({
-          user_id: profile.user_id,
-          full_name: profile.full_name,
-          avatar_url: profile.avatar_url,
-          created_at: profile.created_at,
-          system_access: profile.system_access,
-          email: emailMap.get(profile.user_id) || null,
-          role: roles?.find((role) => role.user_id === profile.user_id)?.role || 'VIEWER',
+        const orgUsers: OrganizationUser[] = (response.data?.users || []).map((user: any) => ({
+          user_id: user.user_id,
+          full_name: user.full_name,
+          avatar_url: user.avatar_url,
+          created_at: user.created_at,
+          system_access: user.system_access,
+          email: user.email,
+          role: user.role || 'VIEWER',
         }));
 
-        setUsers(enrichedUsers);
+        setUsers(orgUsers);
       } catch (error) {
         console.error('Error fetching org users:', error);
+        toast.error('Erro ao carregar usuários da organização');
       } finally {
         setUsersLoading(false);
       }
     };
 
     fetchOrgUsers();
-  }, [selectedOrg]);
+  }, [isPendingOrganizationSelected, selectedOrg, selectedOrganization]);
 
   const fetchAllUsers = async () => {
     try {
@@ -320,10 +332,10 @@ export function OrganizationUsersPanel() {
           
           <Dialog open={addUserDialogOpen} onOpenChange={(open) => {
             setAddUserDialogOpen(open);
-            if (open) fetchAllUsers();
+            if (open && !isPendingOrganizationSelected) fetchAllUsers();
           }}>
             <DialogTrigger asChild>
-              <Button disabled={!selectedOrg}>
+              <Button disabled={!selectedOrg || isPendingOrganizationSelected}>
                 <UserPlus className="h-4 w-4 mr-2" />
                 Adicionar Usuário
               </Button>
@@ -332,7 +344,9 @@ export function OrganizationUsersPanel() {
               <DialogHeader>
                 <DialogTitle>Adicionar Usuário à Organização</DialogTitle>
                 <DialogDescription>
-                  Selecione um usuário para adicionar a esta organização
+                  {isPendingOrganizationSelected
+                    ? 'Usuários pendentes são gerenciados pelo fluxo de aprovação.'
+                    : 'Selecione um usuário para adicionar a esta organização'}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">

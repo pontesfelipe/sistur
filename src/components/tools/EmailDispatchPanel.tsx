@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { getOrgDisplayName } from '@/lib/organizationVisibility';
+import { filterBusinessOrganizations, getOrgDisplayName, isPendingOrganizationName } from '@/lib/organizationVisibility';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,48 +55,59 @@ export function EmailDispatchPanel() {
   const fetchUsersAndOrgs = async () => {
     setLoading(true);
     try {
-      // Fetch users via admin RPC
-      const { data: usersData } = await supabase.rpc('admin_get_all_users');
+      const [usersResult, pendingResult, orgsResult] = await Promise.all([
+        supabase.rpc('admin_get_all_users'),
+        supabase.functions.invoke('manage-users', { body: { action: 'list_pending' } }),
+        supabase.from('orgs').select('id, name').order('name'),
+      ]);
 
-      // Fetch all profiles (including pending) so Temporário org is visible
-      const { data: allProfiles } = await supabase
-        .from('profiles')
-        .select('user_id, org_id');
+      if (usersResult.error) throw usersResult.error;
+      if (pendingResult.error) throw pendingResult.error;
+      if (orgsResult.error) throw orgsResult.error;
 
-      const allUserIds = new Set((allProfiles || []).map(p => p.user_id));
+      const orgsData = filterBusinessOrganizations(orgsResult.data || []);
+      const pendingOrgId = orgsData.find((org) => isPendingOrganizationName(org.name))?.id || '';
 
-      if (usersData) {
-        // Only include approved users with email
-        setUsers(
-          usersData
-            .filter((u: any) => allUserIds.has(u.user_id))
-            .map((u: any) => ({
-              user_id: u.user_id,
-              full_name: u.full_name,
-              email: u.email,
-              org_id: u.org_id,
-            }))
-        );
-      }
+      const baseUsers: UserOption[] = ((usersResult.data as any[]) || [])
+        .filter((user: any) => user.org_id !== pendingOrgId)
+        .map((user: any) => ({
+          user_id: user.user_id,
+          full_name: user.full_name,
+          email: user.email,
+          org_id: user.org_id,
+        }));
 
-      // Count approved users per org
-      const userCounts = (allProfiles || []).reduce((acc, p) => {
-        acc[p.org_id] = (acc[p.org_id] || 0) + 1;
+      const pendingUsers: UserOption[] = ((pendingResult.data?.users as any[]) || []).map((user: any) => ({
+        user_id: user.user_id,
+        full_name: user.full_name,
+        email: user.email,
+        org_id: pendingOrgId,
+      }));
+
+      const mergedUsers = Array.from(
+        new Map([...baseUsers, ...pendingUsers].map((user) => [user.user_id, user])).values()
+      );
+
+      setUsers(mergedUsers);
+
+      const userCounts = mergedUsers.reduce((acc, user) => {
+        if (!user.email) {
+          return acc;
+        }
+
+        acc[user.org_id] = (acc[user.org_id] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
 
-      // Fetch orgs
-      const { data: orgsData } = await supabase.from('orgs').select('id, name');
-      if (orgsData) {
-        const orgMap = (orgsData || [])
-          .map(org => ({
+      setOrgs(
+        orgsData
+          .map((org) => ({
             id: org.id,
             name: org.name,
             user_count: userCounts[org.id] || 0,
           }))
-          .filter(o => o.user_count > 0);
-        setOrgs(orgMap);
-      }
+          .filter((org) => org.user_count > 0)
+      );
     } catch (err) {
       console.error('Failed to fetch users/orgs:', err);
       toast.error('Erro ao carregar usuários e organizações');

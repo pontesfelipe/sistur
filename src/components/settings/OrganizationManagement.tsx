@@ -22,7 +22,7 @@ import {
   Landmark,
   Hotel
 } from 'lucide-react';
-import { filterBusinessOrganizations, getOrgDisplayName } from '@/lib/organizationVisibility';
+import { filterBusinessOrganizations, getOrgDisplayName, isPendingOrganizationName, shouldIncludeUserInOrganization } from '@/lib/organizationVisibility';
 
 interface Organization {
   id: string;
@@ -51,34 +51,60 @@ export function OrganizationManagement() {
     try {
       setLoading(true);
 
-      const { data: orgs, error } = await supabase
-        .from('orgs')
-        .select('id, name, has_territorial_access, has_enterprise_access, created_at')
-        .order('name');
+      const [orgsResult, profilesResult, pendingResult, destinationsResult] = await Promise.all([
+        supabase
+          .from('orgs')
+          .select('id, name, has_territorial_access, has_enterprise_access, created_at')
+          .order('name'),
+        supabase
+          .from('profiles')
+          .select('org_id, pending_approval'),
+        supabase.functions.invoke('manage-users', {
+          body: { action: 'list_pending' }
+        }),
+        supabase
+          .from('destinations')
+          .select('org_id')
+      ]);
 
-      if (error) throw error;
+      if (orgsResult.error) throw orgsResult.error;
+      if (profilesResult.error) throw profilesResult.error;
+      if (pendingResult.error) throw pendingResult.error;
+      if (destinationsResult.error) throw destinationsResult.error;
 
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('org_id')
-        .eq('pending_approval', false);
+      const orgs = orgsResult.data || [];
+      const profiles = profilesResult.data || [];
+      const pendingUsers = pendingResult.data?.users || [];
+      const destinations = destinationsResult.data || [];
+      const orgNameById = new Map(orgs.map((org) => [org.id, org.name]));
+      const pendingOrgId = orgs.find((org) => isPendingOrganizationName(org.name))?.id;
 
-      const { data: destinations } = await supabase
-        .from('destinations')
-        .select('org_id');
+      const userCounts = profiles.reduce((acc, profile) => {
+        const orgName = orgNameById.get(profile.org_id);
 
-      const userCounts = (profiles || []).reduce((acc, profile) => {
+        if (!orgName) {
+          return acc;
+        }
+
+        if (!shouldIncludeUserInOrganization(orgName, !!profile.pending_approval)) {
+          return acc;
+        }
+
         acc[profile.org_id] = (acc[profile.org_id] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
 
-      const destCounts = (destinations || []).reduce((acc, destination) => {
+      if (pendingOrgId) {
+        userCounts[pendingOrgId] = pendingUsers.length;
+      }
+
+      const destCounts = destinations.reduce((acc, destination) => {
         acc[destination.org_id] = (acc[destination.org_id] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
 
       const enrichedOrgs = filterBusinessOrganizations(
-        (orgs || []).map((org) => ({
+        orgs.map((org) => ({
           ...org,
           has_territorial_access: org.has_territorial_access ?? true,
           has_enterprise_access: org.has_enterprise_access || false,
