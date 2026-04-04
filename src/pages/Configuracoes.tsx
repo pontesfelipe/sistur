@@ -475,6 +475,7 @@ export default function Configuracoes() {
             </Card>
 
             {/* Admin tools */}
+            {isAdmin && <EmailDispatchPanel />}
             {isAdmin && <ContentModerationPanel />}
             {isAdmin && <PerformanceMetricsPanel />}
 
