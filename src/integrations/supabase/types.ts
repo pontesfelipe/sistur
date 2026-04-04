@@ -6837,6 +6837,22 @@ export type Database = {
         Args: { p_training_id: string; p_user_id: string }
         Returns: boolean
       }
+      verify_certificate_by_code: {
+        Args: { p_code: string }
+        Returns: {
+          certificate_id: string
+          certificate_type: string
+          description: string
+          expires_at: string
+          hours_completed: number
+          issued_at: string
+          pillar: string
+          score_pct: number
+          status: string
+          title: string
+          user_name: string
+        }[]
+      }
     }
     Enums: {
       app_role: "ADMIN" | "ANALYST" | "VIEWER" | "ESTUDANTE" | "PROFESSOR"
