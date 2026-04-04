@@ -192,6 +192,15 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
   
   const handleSave = async (proceedToCalculation: boolean = false) => {
     if (!profile?.org_id) return;
+
+    // Check for validation errors before saving
+    const activeErrors = Object.entries(validationErrors).filter(([id, err]) => err && localValues[id]);
+    if (activeErrors.length > 0) {
+      toast.error('Corrija os erros de validação antes de salvar', {
+        description: `${activeErrors.length} indicador(es) com valores inválidos`,
+      });
+      return;
+    }
     
     const values = Object.entries(localValues)
       .filter(([_, value]) => value !== '')
