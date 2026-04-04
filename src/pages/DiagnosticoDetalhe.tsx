@@ -523,7 +523,7 @@ const DiagnosticoDetalhe = () => {
               </Sheet>
               
               <Button variant="outline" asChild>
-                <Link to={`/importacoes?assessment=${id}`}>
+                <Link to={`/diagnosticos?tab=importacao&assessment=${id}`}>
                   <Edit className="mr-2 h-4 w-4" />
                   Preencher Dados
                 </Link>
@@ -922,7 +922,7 @@ const DiagnosticoDetalhe = () => {
                   </Link>
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link to={`/importacoes?assessment=${id}`}>
+                  <Link to={`/diagnosticos?tab=importacao&assessment=${id}`}>
                     Ir direto para Preenchimento
                   </Link>
                 </Button>
