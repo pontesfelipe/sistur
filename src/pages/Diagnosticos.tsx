@@ -40,9 +40,8 @@ const Diagnosticos = () => {
   // Get tab and assessment from URL params
   const tabFromUrl = searchParams.get('tab');
   const assessmentFromUrl = searchParams.get('assessment');
-  const [mainTab, setMainTab] = useState<'rodadas' | 'destinos' | 'importacao' | 'indicadores'>(
+  const [mainTab, setMainTab] = useState<'rodadas' | 'destinos' | 'indicadores'>(
     tabFromUrl === 'destinos' ? 'destinos' :
-    tabFromUrl === 'importacao' ? 'importacao' : 
     tabFromUrl === 'indicadores' ? 'indicadores' : 'rodadas'
   );
 
