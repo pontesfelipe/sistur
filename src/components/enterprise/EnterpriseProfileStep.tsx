@@ -57,7 +57,7 @@ const TARGET_MARKETS = [
 ];
 
 export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack }: EnterpriseProfileStepProps) {
-  const { profile } = useProfile();
+  const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
   const queryClient = useQueryClient();
   
