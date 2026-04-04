@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 15,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.15.1",
+    date: "2026-04-04",
+    type: "patch" as const,
+    changes: [
+      "Tab 'Administração' renomeada para 'Gestão de Treinamento' no SISTUR EDU",
+      "ORG_ADMIN agora tem acesso à aba de gestão de treinamento no catálogo EDU",
+      "Nova aba 'Provas' adicionada ao painel de gestão com ExamBuilder integrado",
+      "Tabs reorganizadas: Treinamentos, Questões, Provas, Certificados",
+    ],
+  },
   {
     version: "1.15.0",
     date: "2026-04-04",

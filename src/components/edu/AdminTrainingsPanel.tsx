@@ -78,6 +78,7 @@ import { TrainingModulesManager, TrainingModule } from '@/components/admin/Train
 import { ExamRulesetManager } from '@/components/admin/ExamRulesetManager';
 import { CertificateStatsPanel } from '@/components/admin/CertificateStatsPanel';
 import { QuestionBankPanel } from '@/components/admin/QuestionBankPanel';
+import { ExamBuilderPanel } from '@/components/admin/ExamBuilderPanel';
 
 type PillarType = 'RA' | 'OE' | 'AO';
 type TrainingType = 'course' | 'live';
@@ -154,7 +155,7 @@ const defaultFormData: FormData = {
 };
 
 export function AdminTrainingsPanel() {
-  const [mainTab, setMainTab] = useState<'trainings' | 'certificates' | 'questions'>('trainings');
+  const [mainTab, setMainTab] = useState<'trainings' | 'certificates' | 'questions' | 'exams'>('trainings');
   const { data: trainings, isLoading } = useAdminTrainings();
   const { createTraining, updateTraining, archiveTraining, publishTraining, deleteTraining } = useAdminTrainingMutations();
   
@@ -337,8 +338,8 @@ export function AdminTrainingsPanel() {
 
   return (
     <div className="space-y-6">
-      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as 'trainings' | 'certificates' | 'questions')}>
-        <TabsList className="w-full max-w-lg">
+      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as typeof mainTab)}>
+        <TabsList className="w-full max-w-2xl">
           <TabsTrigger value="trainings" className="gap-2 flex-1">
             <GraduationCap className="h-4 w-4" />
             Treinamentos
@@ -346,6 +347,10 @@ export function AdminTrainingsPanel() {
           <TabsTrigger value="questions" className="gap-2 flex-1">
             <HelpCircle className="h-4 w-4" />
             Questões
+          </TabsTrigger>
+          <TabsTrigger value="exams" className="gap-2 flex-1">
+            <ClipboardCheck className="h-4 w-4" />
+            Provas
           </TabsTrigger>
           <TabsTrigger value="certificates" className="gap-2 flex-1">
             <Award className="h-4 w-4" />
@@ -568,6 +573,10 @@ export function AdminTrainingsPanel() {
 
         <TabsContent value="questions" className="mt-6">
           <QuestionBankPanel />
+        </TabsContent>
+
+        <TabsContent value="exams" className="mt-6 space-y-6">
+          <ExamBuilderPanel />
         </TabsContent>
 
         <TabsContent value="certificates" className="mt-6">

@@ -71,11 +71,11 @@ const EduCatalogo = () => {
   const { data: stats } = useEduTrainingStats();
   const { data: tracks, isLoading: tracksLoading } = useEduTracks();
   const { hasProfile } = useStudentProfile();
-  const { isAdmin, isProfessor } = useProfile();
+  const { isAdmin, isProfessor, isOrgAdmin } = useProfile();
   const { data: curriculumLevels } = useCurriculumLevels();
   const { data: curriculumProgress } = useUserCurriculumProgress();
   
-  const canAccessAdmin = isAdmin || isProfessor;
+  const canAccessAdmin = isAdmin || isProfessor || isOrgAdmin;
 
   const handleMainViewChange = (view: string) => {
     const newView = view as 'catalogo' | 'admin';
@@ -264,7 +264,7 @@ const EduCatalogo = () => {
             </TabsTrigger>
             <TabsTrigger value="admin" className="gap-2">
               <Settings className="h-4 w-4" />
-              Administração
+              Gestão de Treinamento
             </TabsTrigger>
           </TabsList>
         </Tabs>
