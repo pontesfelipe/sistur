@@ -118,7 +118,7 @@ export function AppSidebar() {
       if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
       return true;
     });
-  }, [initialized, isAdmin, isProfessor, hasERPAccess, hasEDUAccess]);
+  }, [initialized, isAdmin, isAnalyst, isProfessor, hasERPAccess, hasEDUAccess]);
 
   const filteredBottomNavigation = useMemo(() => {
     if (!initialized) return staticBottomNavItems;
