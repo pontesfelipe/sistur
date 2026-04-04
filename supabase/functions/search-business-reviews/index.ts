@@ -47,19 +47,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    const searchQuery = `${businessName} ${location} ${propertyType || 'hotel'} reviews avaliações`;
-
-    // Search for reviews across multiple sources in parallel
+    // Search for reviews across multiple sources - request scrapeOptions to get full content/comments
+    const scrapeOpts = { formats: ['markdown'] };
     const [googleResults, tripAdvisorResults, generalResults] = await Promise.allSettled([
-      searchFirecrawl(firecrawlKey, `${businessName} ${location} site:google.com/maps OR site:google.com reviews rating`, 5),
-      searchFirecrawl(firecrawlKey, `${businessName} ${location} site:tripadvisor.com OR site:tripadvisor.com.br reviews`, 5),
-      searchFirecrawl(firecrawlKey, `${businessName} ${location} reviews avaliações rating booking.com OR expedia OR decolar`, 5),
+      searchFirecrawl(firecrawlKey, `${businessName} ${location} site:google.com/maps OR site:google.com reviews rating`, 5, scrapeOpts),
+      searchFirecrawl(firecrawlKey, `${businessName} ${location} site:tripadvisor.com OR site:tripadvisor.com.br reviews avaliações`, 5, scrapeOpts),
+      searchFirecrawl(firecrawlKey, `${businessName} ${location} reviews avaliações rating booking.com OR expedia OR decolar`, 5, scrapeOpts),
     ]);
 
     // Also try to scrape the business directly on Google
     let googleMapsData = null;
     try {
-      const mapsSearch = await searchFirecrawl(firecrawlKey, `${businessName} ${location} google maps reviews nota`, 3);
+      const mapsSearch = await searchFirecrawl(firecrawlKey, `${businessName} ${location} google maps reviews nota comentários`, 3, scrapeOpts);
       if (mapsSearch?.data?.length > 0) {
         googleMapsData = mapsSearch.data;
       }
