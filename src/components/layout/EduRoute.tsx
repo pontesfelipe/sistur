@@ -12,7 +12,7 @@ interface EduRouteProps {
 
 export function EduRoute({ children, requireProfessor = false }: EduRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasEDUAccess, isProfessor, isAdmin, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
+  const { hasEDUAccess, isProfessor, isAdmin, isOrgAdmin, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const { isLicenseValid, initialized: licenseInit } = useLicense();
 
