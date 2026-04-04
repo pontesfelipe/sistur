@@ -55,11 +55,6 @@ import {
 } from "@/components/ui/tooltip";
 
 const EduCatalogo = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const tabFromUrl = searchParams.get('tab');
-  const [mainView, setMainView] = useState<'catalogo' | 'admin'>(
-    tabFromUrl === 'admin' ? 'admin' : 'catalogo'
-  );
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [contentFilter, setContentFilter] = useState<string>('all');
@@ -73,18 +68,6 @@ const EduCatalogo = () => {
   const { isAdmin, isProfessor, isOrgAdmin } = useProfile();
   const { data: curriculumLevels } = useCurriculumLevels();
   const { data: curriculumProgress } = useUserCurriculumProgress();
-  
-  const canAccessAdmin = isAdmin || isProfessor || isOrgAdmin;
-
-  const handleMainViewChange = (view: string) => {
-    const newView = view as 'catalogo' | 'admin';
-    setMainView(newView);
-    if (newView === 'admin') {
-      setSearchParams({ tab: 'admin' });
-    } else {
-      setSearchParams({});
-    }
-  };
 
   // Filter trainings
   const filteredTrainings = useMemo(() => {
