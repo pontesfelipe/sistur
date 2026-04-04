@@ -18,7 +18,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useEnterpriseProfile, EnterpriseProfileInput } from '@/hooks/useEnterpriseProfiles';
-import { useProfile } from '@/hooks/useProfile';
+import { useProfileContext } from '@/contexts/ProfileContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -57,7 +57,7 @@ const TARGET_MARKETS = [
 ];
 
 export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack }: EnterpriseProfileStepProps) {
-  const { profile } = useProfile();
+  const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
   const queryClient = useQueryClient();
   
@@ -88,12 +88,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
   const saveProfile = useMutation({
     mutationFn: async () => {
-      if (!profile?.org_id) throw new Error('Organização não encontrada');
+      if (!effectiveOrgId) throw new Error('Organização não encontrada');
       
       const payload = {
         ...formData,
         destination_id: destinationId,
-        org_id: profile.org_id,
+        org_id: effectiveOrgId,
       };
       
       const { data, error } = await supabase
