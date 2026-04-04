@@ -21,7 +21,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { useAuditLogger } from '@/hooks/useAuditLogger';
-import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
+import { filterBusinessOrganizations, getOrgDisplayName } from '@/lib/organizationVisibility';
 
 interface Organization {
   id: string;

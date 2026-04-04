@@ -22,7 +22,7 @@ import {
   Landmark,
   Hotel
 } from 'lucide-react';
-import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
+import { filterBusinessOrganizations, getOrgDisplayName } from '@/lib/organizationVisibility';
 
 interface Organization {
   id: string;
