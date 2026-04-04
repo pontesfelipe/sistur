@@ -632,6 +632,57 @@ export function useExamAnswerMutations() {
         .update({ status: 'submitted', submitted_at: new Date().toISOString() })
         .eq('exam_id', attempt.exam_id);
       
+      // Auto-generate certificate if passed (automatic grading only)
+      if (result === 'passed' && !hasEssay && user?.id) {
+        try {
+          // Get course details for certificate
+          const { data: examData } = await supabase
+            .from('exams')
+            .select('course_id, course_version')
+            .eq('exam_id', attempt.exam_id)
+            .single();
+          
+          if (examData) {
+            const { data: course } = await supabase
+              .from('lms_courses')
+              .select('title, primary_pillar, workload_minutes')
+              .eq('course_id', examData.course_id)
+              .single();
+            
+            if (course) {
+              // Generate verification code
+              const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+              let verificationCode = '';
+              for (let i = 0; i < 16; i++) {
+                verificationCode += chars.charAt(Math.floor(Math.random() * chars.length));
+              }
+              
+              const { data: certIdResult } = await supabase.rpc('generate_certificate_id');
+              const certificateId = certIdResult || `CERT-${new Date().getFullYear()}-${Date.now()}`;
+              const qrVerifyUrl = `${window.location.origin}/verify/${verificationCode}`;
+              
+              await supabase
+                .from('lms_certificates')
+                .insert({
+                  certificate_id: certificateId,
+                  user_id: user.id,
+                  course_id: examData.course_id,
+                  course_version: examData.course_version,
+                  attempt_id: attemptId,
+                  workload_minutes: course.workload_minutes || 60,
+                  pillar_scope: course.primary_pillar,
+                  verification_code: verificationCode,
+                  qr_verify_url: qrVerifyUrl,
+                  status: 'active',
+                });
+            }
+          }
+        } catch (certError) {
+          console.error('Auto-certificate generation failed:', certError);
+          // Don't fail the exam submission if certificate generation fails
+        }
+      }
+
       // Update quiz usage history
       for (const answer of answers) {
         await supabase
