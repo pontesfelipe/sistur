@@ -465,7 +465,7 @@ export default function AdminLicenses() {
                             <p className="font-medium">{license.profile?.full_name || 'Sem nome'}</p>
                             <p className="text-xs text-muted-foreground">{license.email || license.user_id.slice(0, 8)}</p>
                           </td>
-                          <td className="px-4 py-3 text-xs text-muted-foreground">{license.org_name || '—'}</td>
+                          <td className="px-4 py-3 text-xs text-muted-foreground">{license.org_name ? getOrgDisplayName(license.org_name) : '—'}</td>
                           <td className="px-4 py-3">
                             {isEditing ? (
                               <select value={editPlan} onChange={e => setEditPlan(e.target.value as LicensePlan)} className="h-8 rounded border border-border bg-background px-2 text-xs">
