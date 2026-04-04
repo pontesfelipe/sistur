@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +50,8 @@ export function NovaRodadaDialogs({
   resumeAssessmentId,
   resumeAssessment,
 }: NovaRodadaDialogsProps) {
+  const [reviewPreFillValues, setReviewPreFillValues] = useState<Record<string, number>>({});
+
   return (
     <div className="space-y-6">
       {/* Resume Banner */}
@@ -63,6 +66,7 @@ export function NovaRodadaDialogs({
               destinationName={selectedDestinationData.name}
               onComplete={() => onSetCurrentStep(5)}
               onBack={onPreviousStep}
+              onReviewAutoFill={(values) => setReviewPreFillValues(prev => ({ ...prev, ...values }))}
             />
           ) : (
             <Card>
@@ -105,6 +109,7 @@ export function NovaRodadaDialogs({
             assessmentId={createdAssessmentId}
             tier={selectedTier}
             onComplete={() => onSetCurrentStep(6)}
+            initialAutoFillValues={reviewPreFillValues}
           />
         ) : (
           <Card>

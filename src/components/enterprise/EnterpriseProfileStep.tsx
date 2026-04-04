@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { 
   Hotel, 
   Users, 
@@ -16,6 +17,8 @@ import {
   Calendar,
   CheckCircle2,
   ArrowRight,
+  Search,
+  Sparkles,
 } from 'lucide-react';
 import { useEnterpriseProfile, EnterpriseProfileInput } from '@/hooks/useEnterpriseProfiles';
 import { useProfileContext } from '@/contexts/ProfileContext';
@@ -23,12 +26,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { BusinessReviewSearch } from './BusinessReviewSearch';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
   destinationName: string;
   onComplete: () => void;
   onBack?: () => void;
+  onReviewAutoFill?: (values: Record<string, number>) => void;
 }
 
 const PROPERTY_TYPES = [
@@ -56,7 +61,13 @@ const TARGET_MARKETS = [
   { value: 'eco', label: 'Ecoturismo' },
 ];
 
-export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack }: EnterpriseProfileStepProps) {
+export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill }: EnterpriseProfileStepProps) {
+  const [reviewAutoFilled, setReviewAutoFilled] = useState(false);
+
+  const handleReviewAutoFill = (values: Record<string, number>) => {
+    setReviewAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
   const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
   const queryClient = useQueryClient();
@@ -298,6 +309,43 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               ))}
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+
+      {/* Business Review Search - Pre-fill */}
+      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Search className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Pré-preenchimento Automático
+                <Badge variant="secondary" className="text-[10px]">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  IA
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Busque reviews online do seu estabelecimento para preencher automaticamente os indicadores de reputação (ENT_REVIEW_SCORE, ENT_TECH_SCORE)
+              </CardDescription>
+            </div>
+            {reviewAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <BusinessReviewSearch
+            onAutoFill={handleReviewAutoFill}
+            defaultBusinessName={destinationName}
+            compact
+          />
         </CardContent>
       </Card>
 

@@ -39,6 +39,8 @@ interface EnterpriseDataEntryPanelProps {
   assessmentId: string;
   tier: 'SMALL' | 'MEDIUM' | 'COMPLETE';
   onComplete?: () => void;
+  /** Pre-filled values from review search in step 4 (code -> value) */
+  initialAutoFillValues?: Record<string, number>;
 }
 
 const PILLAR_CONFIG = {
@@ -65,7 +67,7 @@ const PILLAR_CONFIG = {
   },
 };
 
-export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: EnterpriseDataEntryPanelProps) {
+export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initialAutoFillValues }: EnterpriseDataEntryPanelProps) {
   const { profile } = useProfile();
   
   // Use unified indicators table with enterprise scope filter
@@ -76,7 +78,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
   const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
-  const [showReviewSearch, setShowReviewSearch] = useState(false);
+  const [showReviewSearch, setShowReviewSearch] = useState(!initialAutoFillValues || Object.keys(initialAutoFillValues).length === 0);
 
   // Auto-fill handler from review search
   const handleReviewAutoFill = useCallback((indicatorValues: Record<string, number>) => {
@@ -113,7 +115,25 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
       }
     }
   }, [existingValues]);
-  
+
+  // Apply initial auto-fill values from step 4 review search
+  useEffect(() => {
+    if (!initialAutoFillValues || Object.keys(initialAutoFillValues).length === 0 || !indicators) return;
+    const codeToId = new Map(indicators.map(i => [(i as any).code, i.id]));
+    setLocalValues(prev => {
+      const updated = { ...prev };
+      let applied = false;
+      Object.entries(initialAutoFillValues).forEach(([code, value]) => {
+        const id = codeToId.get(code);
+        if (id && !updated[id]) {
+          updated[id] = value.toString();
+          applied = true;
+        }
+      });
+      return applied ? updated : prev;
+    });
+  }, [initialAutoFillValues, indicators]);
+
   const handleToggleIgnore = useCallback((indicatorId: string) => {
     setIgnoredIds(prev => {
       const next = new Set(prev);
