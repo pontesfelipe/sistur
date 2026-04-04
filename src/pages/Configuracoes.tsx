@@ -37,7 +37,8 @@ import {
   History,
   MessageSquare,
   ExternalLink,
-  Clock
+  Clock,
+  Search,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
