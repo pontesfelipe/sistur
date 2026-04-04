@@ -312,6 +312,43 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardContent>
       </Card>
 
+
+      {/* Business Review Search - Pre-fill */}
+      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Search className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Pré-preenchimento Automático
+                <Badge variant="secondary" className="text-[10px]">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  IA
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Busque reviews online do seu estabelecimento para preencher automaticamente os indicadores de reputação (ENT_REVIEW_SCORE, ENT_TECH_SCORE)
+              </CardDescription>
+            </div>
+            {reviewAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <BusinessReviewSearch
+            onAutoFill={handleReviewAutoFill}
+            defaultBusinessName={destinationName}
+            compact
+          />
+        </CardContent>
+      </Card>
+
       {/* Actions */}
       <Card>
         <CardContent className="pt-6">
