@@ -14,7 +14,6 @@ import { useUserManagement, UserData } from '@/hooks/useUserManagement';
 import { UserPlus, Shield, User, Eye, Loader2, MoreHorizontal, Ban, Trash2, RefreshCw, GraduationCap, Building2, FileCheck, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { filterVisibleOrganizations } from '@/lib/organizationVisibility';
 
 interface OrgOption {
   id: string;
