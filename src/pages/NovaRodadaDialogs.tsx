@@ -130,7 +130,7 @@ export function NovaRodadaDialogs({
         )
       )}
 
-      {/* Navigation for step 4 - only show for territorial */}
+      {/* Navigation for step 4 */}
       {currentStep === 4 && diagnosticType !== 'enterprise' && (
         <Card>
           <CardContent className="pt-6">
@@ -143,6 +143,24 @@ export function NovaRodadaDialogs({
                 {validatedDataCount > 0 
                   ? `Continuar (${validatedDataCount} validados)` 
                   : 'Pular para Preenchimento Manual'}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Navigation for step 5 */}
+      {currentStep === 5 && (
+        <Card className="mt-4">
+          <CardContent className="pt-6">
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={onPreviousStep}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar
+              </Button>
+              <Button onClick={onNextStep}>
+                Continuar para Cálculo
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </div>

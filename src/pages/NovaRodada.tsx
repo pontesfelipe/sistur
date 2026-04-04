@@ -58,7 +58,13 @@ export default function NovaRodada() {
   
   const { user } = useAuth();
   const { isViewingDemoData, profile: userProfile } = useProfile();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStepRaw] = useState(1);
+  const [maxStepReached, setMaxStepReached] = useState(1);
+  
+  const setCurrentStep = (step: number) => {
+    setCurrentStepRaw(step);
+    setMaxStepReached(prev => Math.max(prev, step));
+  };
   const [diagnosticType, setDiagnosticType] = useState<DiagnosticType>(typeParam === 'enterprise' ? 'enterprise' : 'territorial');
   const [visibility, setVisibility] = useState<VisibilityType>('organization');
   const [destinationMode, setDestinationMode] = useState<'select' | 'create'>('select');
@@ -278,21 +284,38 @@ export default function NovaRodada() {
             const isCompleted = step.id < currentStep;
             const isCurrent = step.id === currentStep;
             const isUpcoming = step.id > currentStep;
+            const isClickable = step.id <= maxStepReached && step.id !== currentStep;
             return (
-              <div key={step.id} className="relative flex flex-col items-center z-10">
+              <button
+                key={step.id}
+                type="button"
+                disabled={!isClickable}
+                onClick={() => isClickable && setCurrentStep(step.id)}
+                className={cn(
+                  "relative flex flex-col items-center z-10 bg-transparent border-none p-0",
+                  isClickable && "cursor-pointer group"
+                )}
+              >
                 <div className={cn(
                   'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300',
                   isCompleted && 'bg-primary text-primary-foreground',
                   isCurrent && 'bg-primary text-primary-foreground ring-4 ring-primary/30',
-                  isUpcoming && 'bg-muted text-muted-foreground'
+                  isUpcoming && !isClickable && 'bg-muted text-muted-foreground',
+                  isUpcoming && isClickable && 'bg-muted text-muted-foreground',
+                  isClickable && 'group-hover:ring-2 group-hover:ring-primary/40'
                 )}>
                   {isCompleted ? <CheckCircle2 className="h-6 w-6" /> : <Icon className="h-5 w-5" />}
                 </div>
                 <div className="mt-2 text-center">
-                  <p className={cn('text-sm font-medium', isCurrent && 'text-primary', isUpcoming && 'text-muted-foreground')}>{step.title}</p>
+                  <p className={cn(
+                    'text-sm font-medium',
+                    isCurrent && 'text-primary',
+                    isUpcoming && !isClickable && 'text-muted-foreground',
+                    isClickable && 'group-hover:text-primary transition-colors'
+                  )}>{step.title}</p>
                   <p className="text-xs text-muted-foreground hidden md:block">{step.description}</p>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
