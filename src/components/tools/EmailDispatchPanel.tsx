@@ -394,7 +394,7 @@ export function EmailDispatchPanel() {
                       {orgs.map(o => (
                         <SelectItem key={o.id} value={o.id}>
                           <div className="flex items-center gap-2">
-                            <span>{o.name}</span>
+                            <span>{getOrgDisplayName(o.name)}</span>
                             <Badge variant="secondary" className="text-xs">{o.user_count} usuário(s)</Badge>
                           </div>
                         </SelectItem>
