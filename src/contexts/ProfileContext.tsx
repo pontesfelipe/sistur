@@ -159,6 +159,22 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
+      // Send access-requested confirmation email
+      if (user.email) {
+        supabase.functions.invoke('send-transactional-email', {
+          body: {
+            templateName: 'access-requested',
+            recipientEmail: user.email,
+            idempotencyKey: `access-requested-${user.id}`,
+            templateData: {
+              userName: profile?.full_name || undefined,
+              role,
+              systemAccess,
+            },
+          },
+        }).catch(err => console.error('Failed to send access-requested email:', err));
+      }
+
       // Force refetch
       lastUserId.current = null;
       await fetchProfile();
