@@ -39,6 +39,8 @@ interface EnterpriseDataEntryPanelProps {
   assessmentId: string;
   tier: 'SMALL' | 'MEDIUM' | 'COMPLETE';
   onComplete?: () => void;
+  /** Pre-filled values from review search in step 4 (code -> value) */
+  initialAutoFillValues?: Record<string, number>;
 }
 
 const PILLAR_CONFIG = {
