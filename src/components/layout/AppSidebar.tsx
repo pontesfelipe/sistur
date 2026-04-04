@@ -84,7 +84,7 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const { isAdmin, isProfessor, isAnalyst, hasERPAccess, hasEDUAccess, isEstudante, initialized, loading } = useProfileContext();
+  const { isAdmin, isOrgAdmin, isProfessor, isAnalyst, hasERPAccess, hasEDUAccess, isEstudante, initialized, loading } = useProfileContext();
   const { hasFeature, isTrialActive } = useLicense();
   const { data: forumNotifications } = useForumNotifications();
   const markForumAsSeen = useMarkForumAsSeen();
