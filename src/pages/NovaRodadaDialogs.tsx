@@ -109,6 +109,7 @@ export function NovaRodadaDialogs({
             assessmentId={createdAssessmentId}
             tier={selectedTier}
             onComplete={() => onSetCurrentStep(6)}
+            initialAutoFillValues={reviewPreFillValues}
           />
         ) : (
           <Card>
