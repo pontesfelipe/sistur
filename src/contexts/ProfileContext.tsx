@@ -16,7 +16,7 @@ export interface UserProfile {
 }
 
 export interface UserRole {
-  role: 'ADMIN' | 'ANALYST' | 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR';
+  role: 'ADMIN' | 'ORG_ADMIN' | 'ANALYST' | 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR';
   org_id: string;
 }
 
