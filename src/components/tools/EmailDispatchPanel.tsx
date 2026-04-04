@@ -57,19 +57,18 @@ export function EmailDispatchPanel() {
       // Fetch users via admin RPC
       const { data: usersData } = await supabase.rpc('admin_get_all_users');
 
-      // Fetch approved user org counts (same logic as OrganizationManagement)
-      const { data: approvedProfiles } = await supabase
+      // Fetch all profiles (including pending) so Temporário org is visible
+      const { data: allProfiles } = await supabase
         .from('profiles')
-        .select('user_id, org_id')
-        .eq('pending_approval', false);
+        .select('user_id, org_id');
 
-      const approvedUserIds = new Set((approvedProfiles || []).map(p => p.user_id));
+      const allUserIds = new Set((allProfiles || []).map(p => p.user_id));
 
       if (usersData) {
         // Only include approved users with email
         setUsers(
           usersData
-            .filter((u: any) => approvedUserIds.has(u.user_id))
+            .filter((u: any) => allUserIds.has(u.user_id))
             .map((u: any) => ({
               user_id: u.user_id,
               full_name: u.full_name,
@@ -80,7 +79,7 @@ export function EmailDispatchPanel() {
       }
 
       // Count approved users per org
-      const userCounts = (approvedProfiles || []).reduce((acc, p) => {
+      const userCounts = (allProfiles || []).reduce((acc, p) => {
         acc[p.org_id] = (acc[p.org_id] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
