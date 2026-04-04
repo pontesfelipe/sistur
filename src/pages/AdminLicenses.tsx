@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import type { LicensePlan, LicenseStatus } from '@/contexts/LicenseContext';
 import { TrialControlPanel } from '@/components/admin/TrialControlPanel';
-import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
+import { filterBusinessOrganizations, getOrgDisplayName } from '@/lib/organizationVisibility';
 import { AdminCancelLicenseDialog } from '@/components/admin/AdminCancelLicenseDialog';
 
 interface LicenseRow {
