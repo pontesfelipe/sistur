@@ -61,7 +61,13 @@ const TARGET_MARKETS = [
   { value: 'eco', label: 'Ecoturismo' },
 ];
 
-export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack }: EnterpriseProfileStepProps) {
+export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill }: EnterpriseProfileStepProps) {
+  const [reviewAutoFilled, setReviewAutoFilled] = useState(false);
+
+  const handleReviewAutoFill = (values: Record<string, number>) => {
+    setReviewAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
   const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
   const queryClient = useQueryClient();
