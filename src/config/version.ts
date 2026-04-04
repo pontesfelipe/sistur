@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 15,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.15.2",
+    date: "2026-04-04",
+    type: "patch" as const,
+    changes: [
+      "Gestão de Conteúdo (treinamentos, questões, provas, certificados) movida de /edu para /professor",
+      "Catálogo EDU simplificado: sem aba de administração, foco no conteúdo do aluno",
+      "AdminTrainingsPanel integrado como aba 'Gestão de Conteúdo' no ProfessorDashboard",
+    ],
+  },
   {
     version: "1.15.1",
     date: "2026-04-04",
