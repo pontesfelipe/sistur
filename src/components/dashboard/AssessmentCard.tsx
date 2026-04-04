@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target, User, Eye, Building2, Monitor } from 'lucide-react';
+import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target, User, Eye, Building2, Monitor, Landmark, Hotel } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Assessment } from '@/types/sistur';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { DeleteAssessmentDialog } from './DeleteAssessmentDialog';
 
 interface AssessmentCardProps {
-  assessment: Assessment & { tier?: string; creator?: { full_name: string } | null; visibility?: string; is_demo?: boolean };
+  assessment: Assessment & { tier?: string; creator?: { full_name: string } | null; visibility?: string; is_demo?: boolean; diagnostic_type?: string | null };
   onDelete?: () => void;
   isDemoContext?: boolean;
 }
@@ -61,6 +61,14 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
   const TierIcon = tierConfig[tier as keyof typeof tierConfig]?.icon || Target;
   const tierInfo = tierConfig[tier as keyof typeof tierConfig] || tierConfig.COMPLETE;
 
+  const diagnosticType = (assessment as any).diagnostic_type || 'territorial';
+  const diagnosticTypeConfig = {
+    territorial: { label: 'Territorial', icon: Landmark, className: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800' },
+    enterprise: { label: 'Enterprise', icon: Hotel, className: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800' },
+  };
+  const dtInfo = diagnosticTypeConfig[diagnosticType as keyof typeof diagnosticTypeConfig] || diagnosticTypeConfig.territorial;
+  const DtIcon = dtInfo.icon;
+
   return (
     <div className="p-4 rounded-xl border bg-card hover:shadow-lg transition-all duration-300 group">
       <div className="flex items-start justify-between">
@@ -97,6 +105,20 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
               {visibility === 'personal' && 'Visível apenas para você'}
               {visibility === 'organization' && 'Visível para toda a organização'}
               {visibility === 'demo' && 'Diagnóstico em ambiente de demonstração'}
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className={cn(
+                "flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border",
+                dtInfo.className
+              )}>
+                <DtIcon className="h-3 w-3" />
+                {dtInfo.label}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {diagnosticType === 'territorial' ? 'Diagnóstico territorial (público)' : 'Diagnóstico enterprise (privado)'}
             </TooltipContent>
           </Tooltip>
         </div>
