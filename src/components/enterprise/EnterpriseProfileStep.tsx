@@ -88,12 +88,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
   const saveProfile = useMutation({
     mutationFn: async () => {
-      if (!profile?.org_id) throw new Error('Organização não encontrada');
+      if (!effectiveOrgId) throw new Error('Organização não encontrada');
       
       const payload = {
         ...formData,
         destination_id: destinationId,
-        org_id: profile.org_id,
+        org_id: effectiveOrgId,
       };
       
       const { data, error } = await supabase
