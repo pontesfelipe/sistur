@@ -395,6 +395,23 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
                       )}
                     </div>
 
+                    {/* Sample Quotes */}
+                    {(result.analysis.sample_positive_quotes?.length > 0 || result.analysis.sample_negative_quotes?.length > 0) && (
+                      <div className="space-y-2 pt-1">
+                        <span className="text-xs font-medium">💬 Comentários Representativos</span>
+                        {result.analysis.sample_positive_quotes?.map((q, i) => (
+                          <blockquote key={`p-${i}`} className="text-xs italic text-muted-foreground border-l-2 border-green-400 pl-2">
+                            "{q}"
+                          </blockquote>
+                        ))}
+                        {result.analysis.sample_negative_quotes?.map((q, i) => (
+                          <blockquote key={`n-${i}`} className="text-xs italic text-muted-foreground border-l-2 border-orange-400 pl-2">
+                            "{q}"
+                          </blockquote>
+                        ))}
+                      </div>
+                    )}
+
                     {result.analysis.recommendation && (
                       <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
                         <p className="text-xs font-medium text-primary mb-1">💡 Recomendação</p>
