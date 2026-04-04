@@ -453,7 +453,7 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
                 )}
 
                 {/* Auto-fill Button */}
-                {onAutoFill && (result.analysis.review_score !== null || result.analysis.digital_maturity !== null) && (
+                {onAutoFill && (result.analysis.review_score !== null || result.analysis.digital_maturity !== null || result.analysis.sentiment_score !== null) && (
                   <Button
                     onClick={handleAutoFill}
                     className="w-full gap-2"
@@ -462,7 +462,7 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
                     <ArrowRight className="h-4 w-4" />
                     Preencher Indicadores Automaticamente
                     <Badge variant="secondary" className="ml-1">
-                      {[result.analysis.review_score !== null, result.analysis.digital_maturity !== null].filter(Boolean).length} indicador(es)
+                      {[result.analysis.review_score !== null, result.analysis.digital_maturity !== null, result.analysis.sentiment_score !== null].filter(Boolean).length} indicador(es)
                     </Badge>
                   </Button>
                 )}
