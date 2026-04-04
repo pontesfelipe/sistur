@@ -311,7 +311,7 @@ export function OrganizationUsersPanel() {
               <SelectContent>
                 {organizations.map(org => (
                   <SelectItem key={org.id} value={org.id}>
-                    {org.name}
+                    {getOrgDisplayName(org.name)}
                   </SelectItem>
                 ))}
               </SelectContent>

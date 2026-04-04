@@ -372,7 +372,7 @@ export function OrganizationManagement() {
                       <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-primary/10">
                         <Building2 className="h-5 w-5 text-primary" />
                       </div>
-                      <span className="font-medium">{org.name}</span>
+                      <span className="font-medium">{getOrgDisplayName(org.name)}</span>
                     </div>
                   </TableCell>
                   <TableCell>

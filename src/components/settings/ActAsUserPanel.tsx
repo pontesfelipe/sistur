@@ -200,7 +200,7 @@ export function ActAsUserPanel() {
                     <div className="flex items-center gap-2">
                       <span>{user.full_name || user.email}</span>
                       <Badge variant="outline" className="text-xs">
-                        {user.org_name}
+                        {getOrgDisplayName(user.org_name)}
                       </Badge>
                     </div>
                   </SelectItem>
