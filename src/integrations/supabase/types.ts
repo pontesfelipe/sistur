@@ -6855,7 +6855,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "ADMIN" | "ANALYST" | "VIEWER" | "ESTUDANTE" | "PROFESSOR"
+      app_role:
+        | "ADMIN"
+        | "ANALYST"
+        | "VIEWER"
+        | "ESTUDANTE"
+        | "PROFESSOR"
+        | "ORG_ADMIN"
       assessment_status: "DRAFT" | "DATA_READY" | "CALCULATED"
       certificate_status_type: "active" | "revoked" | "expired"
       collection_type: "AUTOMATICA" | "MANUAL" | "ESTIMADA"
@@ -7075,7 +7081,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["ADMIN", "ANALYST", "VIEWER", "ESTUDANTE", "PROFESSOR"],
+      app_role: [
+        "ADMIN",
+        "ANALYST",
+        "VIEWER",
+        "ESTUDANTE",
+        "PROFESSOR",
+        "ORG_ADMIN",
+      ],
       assessment_status: ["DRAFT", "DATA_READY", "CALCULATED"],
       certificate_status_type: ["active", "revoked", "expired"],
       collection_type: ["AUTOMATICA", "MANUAL", "ESTIMADA"],
