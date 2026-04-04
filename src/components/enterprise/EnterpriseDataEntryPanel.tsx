@@ -72,6 +72,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
   const { values: existingValues, isLoading: valuesLoading, bulkUpsertValues, upsertValue } = useIndicatorValues(assessmentId);
   
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
   const [showReviewSearch, setShowReviewSearch] = useState(false);
