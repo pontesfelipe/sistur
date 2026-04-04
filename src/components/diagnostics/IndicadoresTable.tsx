@@ -231,6 +231,26 @@ export function IndicadoresTable({
               <p className="text-sm mt-1">{indicator.description}</p>
             </div>
           )}
+          {/* Guidance for enterprise indicators */}
+          {INDICATOR_GUIDANCE[indicator.code] && (
+            <div className="p-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
+              <p className="text-sm text-blue-700 dark:text-blue-300 font-medium mb-1">💡 Como obter este dado</p>
+              <p className="text-sm text-blue-700/90 dark:text-blue-300/90">
+                {INDICATOR_GUIDANCE[indicator.code].howToFind}
+              </p>
+              {INDICATOR_GUIDANCE[indicator.code].examples && (
+                <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1 italic">
+                  Exemplo: {INDICATOR_GUIDANCE[indicator.code].examples}
+                </p>
+              )}
+              {INDICATOR_GUIDANCE[indicator.code].validation && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Faixa válida: {INDICATOR_GUIDANCE[indicator.code].validation!.min ?? '—'} a {INDICATOR_GUIDANCE[indicator.code].validation!.max ?? '∞'}
+                  {INDICATOR_GUIDANCE[indicator.code].validation!.integer && ' (inteiro)'}
+                </p>
+              )}
+            </div>
+          )}
           {(indicator as any).notes && (
             <div>
               <span className="text-muted-foreground text-sm">Notas:</span>
