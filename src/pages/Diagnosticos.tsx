@@ -89,12 +89,8 @@ const Diagnosticos = () => {
             <MapPin className="h-4 w-4" />
             Destinos
           </TabsTrigger>
-          <TabsTrigger value="importacao" className="gap-2 flex-1">
-            <Upload className="h-4 w-4" />
-            Preenchimento
-          </TabsTrigger>
           <TabsTrigger value="indicadores" className="gap-2 flex-1">
-            <BarChart3 className="h-4 w-4" />
+            <Upload className="h-4 w-4" />
             Indicadores
           </TabsTrigger>
         </TabsList>
