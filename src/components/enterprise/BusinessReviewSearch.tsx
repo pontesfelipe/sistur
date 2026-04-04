@@ -284,7 +284,7 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
               <>
                 {/* Score Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <Card className="border-amber-200 dark:border-amber-800">
+                   <Card className="border-amber-200 dark:border-amber-800">
                     <CardContent className="p-4 text-center">
                       <p className="text-xs text-muted-foreground mb-1">Nota Média</p>
                       {renderStars(result.analysis.review_score)}
@@ -293,6 +293,14 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
                           ~{result.analysis.review_count} reviews
                         </p>
                       )}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-purple-200 dark:border-purple-800">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground mb-1">Sentimento</p>
+                      {renderStars(result.analysis.sentiment_score)}
+                      <p className="text-xs text-muted-foreground mt-1">baseado nos comentários</p>
                     </CardContent>
                   </Card>
 
@@ -309,15 +317,40 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
                       </div>
                     </CardContent>
                   </Card>
+                </div>
 
-                  <Card className="border-green-200 dark:border-green-800">
-                    <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground mb-1">Plataformas</p>
-                      <span className="font-semibold">{result.analysis.platforms_found.length}</span>
-                      <p className="text-xs text-muted-foreground">encontrada(s)</p>
+                {/* Guest Experience Dimensions */}
+                {result.analysis.guest_experience_dimensions && (
+                  <Card>
+                    <CardContent className="p-4 space-y-3">
+                      <span className="text-xs font-medium">📊 Dimensões da Experiência do Hóspede</span>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {Object.entries(result.analysis.guest_experience_dimensions).map(([key, val]) => (
+                          val !== null && (
+                            <div key={key} className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                              <span className="text-xs text-muted-foreground">{DIMENSION_LABELS[key] || key}</span>
+                              <div className="flex items-center gap-1">
+                                <Star className={cn('h-3 w-3', val >= 4 ? 'fill-amber-400 text-amber-400' : val >= 3 ? 'fill-amber-300 text-amber-300' : 'fill-orange-400 text-orange-400')} />
+                                <span className="text-xs font-semibold">{val.toFixed(1)}</span>
+                              </div>
+                            </div>
+                          )
+                        ))}
+                      </div>
                     </CardContent>
                   </Card>
-                </div>
+                )}
+
+                {/* Recurring Themes */}
+                {result.analysis.recurring_themes?.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {result.analysis.recurring_themes.map((theme, i) => (
+                      <Badge key={i} variant="secondary" className="text-[10px]">
+                        {theme}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
 
                 {/* Sentiment */}
                 <Card>
