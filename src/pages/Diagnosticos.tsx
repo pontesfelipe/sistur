@@ -15,7 +15,6 @@ import {
   ClipboardList,
   Loader2,
   Upload,
-  BarChart3,
   MapPin
 } from 'lucide-react';
 import {
