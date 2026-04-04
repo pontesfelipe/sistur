@@ -27,6 +27,7 @@ interface ProfileContextType {
   initialized: boolean;
   hasRole: (role: UserRole['role']) => boolean;
   isAdmin: boolean;
+  isOrgAdmin: boolean;
   isAnalyst: boolean;
   isProfessor: boolean;
   isEstudante: boolean;
