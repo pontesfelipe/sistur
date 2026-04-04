@@ -10,7 +10,9 @@ export interface TemplateEntry {
 }
 
 import { template as accessApproved } from './access-approved.tsx'
+import { template as accessRequested } from './access-requested.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'access-approved': accessApproved,
+  'access-requested': accessRequested,
 }
