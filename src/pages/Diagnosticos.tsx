@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AssessmentCard } from '@/components/dashboard/AssessmentCard';
-import { DataImportPanel } from '@/components/diagnostics/DataImportPanel';
+
 import { IndicadoresPanel } from '@/components/diagnostics/IndicadoresPanel';
 import { DestinosPanel } from '@/components/diagnostics/DestinosPanel';
 import { 
@@ -15,7 +15,6 @@ import {
   ClipboardList,
   Loader2,
   Upload,
-  BarChart3,
   MapPin
 } from 'lucide-react';
 import {
@@ -41,17 +40,14 @@ const Diagnosticos = () => {
   // Get tab and assessment from URL params
   const tabFromUrl = searchParams.get('tab');
   const assessmentFromUrl = searchParams.get('assessment');
-  const [mainTab, setMainTab] = useState<'rodadas' | 'destinos' | 'importacao' | 'indicadores'>(
+  const [mainTab, setMainTab] = useState<'rodadas' | 'destinos' | 'indicadores'>(
     tabFromUrl === 'destinos' ? 'destinos' :
-    tabFromUrl === 'importacao' ? 'importacao' : 
     tabFromUrl === 'indicadores' ? 'indicadores' : 'rodadas'
   );
 
   useEffect(() => {
     if (tabFromUrl === 'destinos') {
       setMainTab('destinos');
-    } else if (tabFromUrl === 'importacao') {
-      setMainTab('importacao');
     } else if (tabFromUrl === 'indicadores') {
       setMainTab('indicadores');
     }
@@ -93,12 +89,8 @@ const Diagnosticos = () => {
             <MapPin className="h-4 w-4" />
             Destinos
           </TabsTrigger>
-          <TabsTrigger value="importacao" className="gap-2 flex-1">
-            <Upload className="h-4 w-4" />
-            Preenchimento
-          </TabsTrigger>
           <TabsTrigger value="indicadores" className="gap-2 flex-1">
-            <BarChart3 className="h-4 w-4" />
+            <Upload className="h-4 w-4" />
             Indicadores
           </TabsTrigger>
         </TabsList>
@@ -252,9 +244,6 @@ const Diagnosticos = () => {
           <DestinosPanel />
         </TabsContent>
 
-        <TabsContent value="importacao">
-          <DataImportPanel preSelectedAssessmentId={assessmentFromUrl || undefined} />
-        </TabsContent>
 
         <TabsContent value="indicadores">
           <IndicadoresPanel />
