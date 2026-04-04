@@ -236,25 +236,7 @@ const EduCatalogo = () => {
       title="SISTUR EDU" 
       subtitle="Catálogo de cursos e lives baseado em diagnóstico IGMA"
     >
-      {/* Main Tabs - Catálogo vs Admin */}
-      {canAccessAdmin && (
-        <Tabs value={mainView} onValueChange={handleMainViewChange} className="mb-6">
-          <TabsList>
-            <TabsTrigger value="catalogo" className="gap-2">
-              <BookOpen className="h-4 w-4" />
-              Catálogo
-            </TabsTrigger>
-            <TabsTrigger value="admin" className="gap-2">
-              <Settings className="h-4 w-4" />
-              Gestão de Treinamento
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      )}
-
-      {mainView === 'admin' && canAccessAdmin ? (
-        <AdminTrainingsPanel />
-      ) : (
+      {(
         <>
           {/* Curriculum Progression Indicator */}
           <Card className="mb-6 border-primary/20">
