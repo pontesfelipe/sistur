@@ -79,13 +79,18 @@ Deno.serve(async (req) => {
     let analysis = null;
 
     if (lovableKey) {
+      // Include full scraped markdown content (comments/reviews text) when available, truncated to avoid token limits
+      const extractContent = (r: any, source: string) => {
+        const desc = r.description || '';
+        const md = r.markdown ? r.markdown.slice(0, 3000) : '';
+        return `[${source}] ${r.title || ''}\nDescrição: ${desc}\nConteúdo: ${md}`;
+      };
       const allContent = [
-        ...(allResults.google?.data || []).map((r: any) => `[Google] ${r.title}: ${r.description || ''}`),
-        ...(allResults.tripAdvisor?.data || []).map((r: any) => `[TripAdvisor] ${r.title}: ${r.description || ''}`),
-        ...(allResults.general?.data || []).map((r: any) => `[Web] ${r.title}: ${r.description || ''}`),
-        ...(allResults.googleMaps || []).map((r: any) => `[Maps] ${r.title}: ${r.description || ''}`),
-      ].join('\n');
-
+        ...(allResults.google?.data || []).map((r: any) => extractContent(r, 'Google')),
+        ...(allResults.tripAdvisor?.data || []).map((r: any) => extractContent(r, 'TripAdvisor')),
+        ...(allResults.general?.data || []).map((r: any) => extractContent(r, 'Web')),
+        ...(allResults.googleMaps || []).map((r: any) => extractContent(r, 'Maps')),
+      ].join('\n---\n');
       if (allContent.trim()) {
         try {
           const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
