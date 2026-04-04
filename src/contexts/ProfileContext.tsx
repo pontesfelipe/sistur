@@ -244,6 +244,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       initialized,
       hasRole: derived.hasRoleFn,
       isAdmin: derived.isAdmin,
+      isOrgAdmin: derived.isOrgAdmin,
       isAnalyst: derived.isAnalyst,
       isProfessor: derived.isProfessor,
       isEstudante: derived.isEstudante,
