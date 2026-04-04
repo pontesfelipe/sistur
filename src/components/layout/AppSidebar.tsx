@@ -112,7 +112,8 @@ export function AppSidebar() {
     
     return navigation.filter((item) => {
       if (item.requiresAdmin && !isAdmin) return false;
-      if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
+      // "Gestão de Treinamentos" is visible for professors OR ERP analysts/admins
+      if (item.requiresProfessor && !isProfessor && !isAdmin && !(hasERPAccess && isAnalyst)) return false;
       if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
       if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
       return true;
