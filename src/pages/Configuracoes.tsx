@@ -19,6 +19,7 @@ import { ContentModerationPanel } from '@/components/settings/ContentModerationP
 import { PerformanceMetricsPanel } from '@/components/settings/PerformanceMetricsPanel';
 import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel';
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
+import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSearch';
 import { useProfile } from '@/hooks/useProfile';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import { 
