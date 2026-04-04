@@ -23,7 +23,7 @@ const Destinos = lazy(() => import("./pages/Destinos"));
 const Diagnosticos = lazy(() => import("./pages/Diagnosticos"));
 const DiagnosticoDetalhe = lazy(() => import("./pages/DiagnosticoDetalhe"));
 
-const Importacoes = lazy(() => import("./pages/Importacoes"));
+
 const Cursos = lazy(() => import("./pages/Cursos"));
 const AdminCursos = lazy(() => import("./pages/AdminCursos"));
 const AdminEdu = lazy(() => import("./pages/AdminEdu"));

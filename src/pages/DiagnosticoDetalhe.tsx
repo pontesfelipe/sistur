@@ -922,7 +922,7 @@ const DiagnosticoDetalhe = () => {
                   </Link>
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link to={`/importacoes?assessment=${id}`}>
+                  <Link to={`/diagnosticos?tab=importacao&assessment=${id}`}>
                     Ir direto para Preenchimento
                   </Link>
                 </Button>
