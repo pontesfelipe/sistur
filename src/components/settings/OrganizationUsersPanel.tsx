@@ -332,10 +332,10 @@ export function OrganizationUsersPanel() {
           
           <Dialog open={addUserDialogOpen} onOpenChange={(open) => {
             setAddUserDialogOpen(open);
-            if (open) fetchAllUsers();
+            if (open && !isPendingOrganizationSelected) fetchAllUsers();
           }}>
             <DialogTrigger asChild>
-              <Button disabled={!selectedOrg}>
+              <Button disabled={!selectedOrg || isPendingOrganizationSelected}>
                 <UserPlus className="h-4 w-4 mr-2" />
                 Adicionar Usuário
               </Button>
@@ -344,7 +344,9 @@ export function OrganizationUsersPanel() {
               <DialogHeader>
                 <DialogTitle>Adicionar Usuário à Organização</DialogTitle>
                 <DialogDescription>
-                  Selecione um usuário para adicionar a esta organização
+                  {isPendingOrganizationSelected
+                    ? 'Usuários pendentes são gerenciados pelo fluxo de aprovação.'
+                    : 'Selecione um usuário para adicionar a esta organização'}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
