@@ -560,7 +560,7 @@ export default function AdminLicenses() {
                   <div key={org.id} className="bg-card border border-border rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <h4 className="font-bold text-sm">{org.name}</h4>
+                      <h4 className="font-bold text-sm">{getOrgDisplayName(org.name)}</h4>
                       <Badge variant="outline" className="text-xs ml-auto">{orgLicenses.length} licenças ativas</Badge>
                     </div>
                     {orgQuotas.length > 0 ? (
