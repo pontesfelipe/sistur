@@ -1,11 +1,10 @@
-export const HIDDEN_ORG_NAMES = ['Temporário'] as const;
-
-export const BUSINESS_ORG_NAMES = ['SISTUR', 'Autônomo', 'Demo SISTUR'] as const;
+export const BUSINESS_ORG_NAMES = ['SISTUR', 'Autônomo', 'Demo SISTUR', 'Temporário'] as const;
 
 const BUSINESS_ORG_ORDER = new Map<string, number>([
   ['SISTUR', 0],
   ['Autônomo', 1],
   ['Demo SISTUR', 2],
+  ['Temporário', 3],
 ]);
 
 type NamedOrganization = {
@@ -28,9 +27,3 @@ export const filterBusinessOrganizations = <T extends NamedOrganization>(organiz
 
       return a.name.localeCompare(b.name, 'pt-BR');
     });
-
-export const isHiddenOrganization = (organization: NamedOrganization) =>
-  HIDDEN_ORG_NAMES.includes(organization.name as (typeof HIDDEN_ORG_NAMES)[number]);
-
-export const filterVisibleOrganizations = <T extends NamedOrganization>(organizations: T[]) =>
-  organizations.filter(org => !isHiddenOrganization(org));

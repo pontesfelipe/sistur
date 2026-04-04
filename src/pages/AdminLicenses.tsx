@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import type { LicensePlan, LicenseStatus } from '@/contexts/LicenseContext';
 import { TrialControlPanel } from '@/components/admin/TrialControlPanel';
-import { filterBusinessOrganizations, filterVisibleOrganizations } from '@/lib/organizationVisibility';
+import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
 import { AdminCancelLicenseDialog } from '@/components/admin/AdminCancelLicenseDialog';
 
 interface LicenseRow {
@@ -112,7 +112,7 @@ export default function AdminLicenses() {
 
   const fetchOrgs = async () => {
     const { data } = await supabase.from('orgs').select('id, name').order('name');
-    setOrgs(filterVisibleOrganizations(data || []));
+    setOrgs(data || []);
   };
 
   const fetchLicenses = async () => {
