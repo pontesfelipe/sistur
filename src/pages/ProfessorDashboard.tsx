@@ -928,12 +928,13 @@ function ERPGroupDetail({ groupId, onBack, orgMembers }: { groupId: string; onBa
 
 // ─── Main Page ───
 export default function ProfessorDashboard() {
-  const { hasERPAccess, hasEDUAccess, isProfessor, isAdmin, isAnalyst } = useProfileContext();
+  const { hasERPAccess, hasEDUAccess, isProfessor, isAdmin, isAnalyst, isOrgAdmin } = useProfileContext();
   
   // Determine available contexts
   const showEDU = isProfessor || hasEDUAccess || isAdmin;
   const showERP = hasERPAccess || isAdmin || isAnalyst;
-  const defaultTab = showERP && !isProfessor ? 'erp' : 'edu';
+  const canManageContent = isAdmin || isProfessor || isOrgAdmin;
+  const defaultTab = showERP && !isProfessor ? 'erp' : canManageContent ? 'content' : 'edu';
 
   return (
     <AppLayout title="Gestão de Treinamentos">
