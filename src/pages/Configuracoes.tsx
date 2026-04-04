@@ -19,6 +19,7 @@ import { ContentModerationPanel } from '@/components/settings/ContentModerationP
 import { PerformanceMetricsPanel } from '@/components/settings/PerformanceMetricsPanel';
 import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel';
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
+import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSearch';
 import { useProfile } from '@/hooks/useProfile';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import { 
@@ -36,7 +37,8 @@ import {
   History,
   MessageSquare,
   ExternalLink,
-  Clock
+  Clock,
+  Search,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -467,6 +469,21 @@ export default function Configuracoes() {
                     </CardHeader>
                     <CardContent>
                       <DataExporter />
+                    </CardContent>
+                  </Card>
+
+                  <Card className="hover:shadow-md transition-shadow md:col-span-2">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Search className="h-4 w-4 text-primary" />
+                        Busca de Reviews Online
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Pesquise avaliações do estabelecimento no Google, TripAdvisor e outros
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <BusinessReviewSearch />
                     </CardContent>
                   </Card>
 
