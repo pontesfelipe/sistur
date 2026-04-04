@@ -71,7 +71,7 @@ const EduCatalogo = () => {
   const { data: stats } = useEduTrainingStats();
   const { data: tracks, isLoading: tracksLoading } = useEduTracks();
   const { hasProfile } = useStudentProfile();
-  const { isAdmin, isProfessor } = useProfile();
+  const { isAdmin, isProfessor, isOrgAdmin } = useProfile();
   const { data: curriculumLevels } = useCurriculumLevels();
   const { data: curriculumProgress } = useUserCurriculumProgress();
   
