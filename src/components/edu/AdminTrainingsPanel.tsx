@@ -337,8 +337,8 @@ export function AdminTrainingsPanel() {
 
   return (
     <div className="space-y-6">
-      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as 'trainings' | 'certificates' | 'questions')}>
-        <TabsList className="w-full max-w-lg">
+      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as typeof mainTab)}>
+        <TabsList className="w-full max-w-2xl">
           <TabsTrigger value="trainings" className="gap-2 flex-1">
             <GraduationCap className="h-4 w-4" />
             Treinamentos
@@ -346,6 +346,10 @@ export function AdminTrainingsPanel() {
           <TabsTrigger value="questions" className="gap-2 flex-1">
             <HelpCircle className="h-4 w-4" />
             Questões
+          </TabsTrigger>
+          <TabsTrigger value="exams" className="gap-2 flex-1">
+            <ClipboardCheck className="h-4 w-4" />
+            Provas
           </TabsTrigger>
           <TabsTrigger value="certificates" className="gap-2 flex-1">
             <Award className="h-4 w-4" />
