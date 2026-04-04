@@ -79,7 +79,7 @@ export function EmailDispatchPanel() {
       }
 
       // Count approved users per org
-      const userCounts = (approvedProfiles || []).reduce((acc, p) => {
+      const userCounts = (allProfiles || []).reduce((acc, p) => {
         acc[p.org_id] = (acc[p.org_id] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
