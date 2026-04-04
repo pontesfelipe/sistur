@@ -18,6 +18,7 @@ import { ForumPrivacySettings } from '@/components/settings/ForumPrivacySettings
 import { ContentModerationPanel } from '@/components/settings/ContentModerationPanel';
 import { PerformanceMetricsPanel } from '@/components/settings/PerformanceMetricsPanel';
 import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel';
+import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import { 
@@ -474,6 +475,7 @@ export default function Configuracoes() {
             </Card>
 
             {/* Admin tools */}
+            {isAdmin && <EmailDispatchPanel />}
             {isAdmin && <ContentModerationPanel />}
             {isAdmin && <PerformanceMetricsPanel />}
 
