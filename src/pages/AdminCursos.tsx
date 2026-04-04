@@ -5,7 +5,7 @@ export default function AdminCursos() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate('/edu?tab=admin', { replace: true });
+    navigate('/professor', { replace: true });
   }, [navigate]);
 
   return null;
