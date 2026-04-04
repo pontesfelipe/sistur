@@ -48,8 +48,6 @@ const Diagnosticos = () => {
   useEffect(() => {
     if (tabFromUrl === 'destinos') {
       setMainTab('destinos');
-    } else if (tabFromUrl === 'importacao') {
-      setMainTab('importacao');
     } else if (tabFromUrl === 'indicadores') {
       setMainTab('indicadores');
     }
