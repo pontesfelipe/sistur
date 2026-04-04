@@ -29,14 +29,28 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
+interface GuestExperienceDimensions {
+  atendimento: number | null;
+  limpeza: number | null;
+  infraestrutura: number | null;
+  gastronomia: number | null;
+  localizacao: number | null;
+  custo_beneficio: number | null;
+}
+
 interface BusinessReviewAnalysis {
   review_score: number | null;
   review_count: number | null;
   digital_maturity: number | null;
   platforms_found: string[];
   sentiment_summary: string;
+  sentiment_score: number | null;
+  guest_experience_dimensions: GuestExperienceDimensions;
+  recurring_themes: string[];
   strengths: string[];
   weaknesses: string[];
+  sample_positive_quotes: string[];
+  sample_negative_quotes: string[];
   recommendation: string;
   sources: { platform: string; url: string; rating: number | null }[];
 }
@@ -112,6 +126,9 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
     if (result.analysis.digital_maturity !== null) {
       values['ENT_TECH_SCORE'] = result.analysis.digital_maturity;
     }
+    if (result.analysis.sentiment_score !== null) {
+      values['ENT_SENTIMENT_SCORE'] = result.analysis.sentiment_score;
+    }
 
     if (Object.keys(values).length === 0) {
       toast.warning('Nenhum indicador encontrado para auto-preencher');
@@ -120,6 +137,15 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
 
     onAutoFill(values);
     toast.success(`${Object.keys(values).length} indicador(es) preenchido(s) automaticamente`);
+  };
+
+  const DIMENSION_LABELS: Record<string, string> = {
+    atendimento: 'Atendimento',
+    limpeza: 'Limpeza',
+    infraestrutura: 'Infraestrutura',
+    gastronomia: 'Gastronomia',
+    localizacao: 'Localização',
+    custo_beneficio: 'Custo-Benefício',
   };
 
   const renderStars = (score: number | null) => {
@@ -258,7 +284,7 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
               <>
                 {/* Score Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <Card className="border-amber-200 dark:border-amber-800">
+                   <Card className="border-amber-200 dark:border-amber-800">
                     <CardContent className="p-4 text-center">
                       <p className="text-xs text-muted-foreground mb-1">Nota Média</p>
                       {renderStars(result.analysis.review_score)}
@@ -267,6 +293,14 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
                           ~{result.analysis.review_count} reviews
                         </p>
                       )}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-purple-200 dark:border-purple-800">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground mb-1">Sentimento</p>
+                      {renderStars(result.analysis.sentiment_score)}
+                      <p className="text-xs text-muted-foreground mt-1">baseado nos comentários</p>
                     </CardContent>
                   </Card>
 
@@ -283,15 +317,40 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
                       </div>
                     </CardContent>
                   </Card>
+                </div>
 
-                  <Card className="border-green-200 dark:border-green-800">
-                    <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground mb-1">Plataformas</p>
-                      <span className="font-semibold">{result.analysis.platforms_found.length}</span>
-                      <p className="text-xs text-muted-foreground">encontrada(s)</p>
+                {/* Guest Experience Dimensions */}
+                {result.analysis.guest_experience_dimensions && (
+                  <Card>
+                    <CardContent className="p-4 space-y-3">
+                      <span className="text-xs font-medium">📊 Dimensões da Experiência do Hóspede</span>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {Object.entries(result.analysis.guest_experience_dimensions).map(([key, val]) => (
+                          val !== null && (
+                            <div key={key} className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                              <span className="text-xs text-muted-foreground">{DIMENSION_LABELS[key] || key}</span>
+                              <div className="flex items-center gap-1">
+                                <Star className={cn('h-3 w-3', val >= 4 ? 'fill-amber-400 text-amber-400' : val >= 3 ? 'fill-amber-300 text-amber-300' : 'fill-orange-400 text-orange-400')} />
+                                <span className="text-xs font-semibold">{val.toFixed(1)}</span>
+                              </div>
+                            </div>
+                          )
+                        ))}
+                      </div>
                     </CardContent>
                   </Card>
-                </div>
+                )}
+
+                {/* Recurring Themes */}
+                {result.analysis.recurring_themes?.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {result.analysis.recurring_themes.map((theme, i) => (
+                      <Badge key={i} variant="secondary" className="text-[10px]">
+                        {theme}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
 
                 {/* Sentiment */}
                 <Card>
@@ -336,6 +395,23 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
                       )}
                     </div>
 
+                    {/* Sample Quotes */}
+                    {(result.analysis.sample_positive_quotes?.length > 0 || result.analysis.sample_negative_quotes?.length > 0) && (
+                      <div className="space-y-2 pt-1">
+                        <span className="text-xs font-medium">💬 Comentários Representativos</span>
+                        {result.analysis.sample_positive_quotes?.map((q, i) => (
+                          <blockquote key={`p-${i}`} className="text-xs italic text-muted-foreground border-l-2 border-green-400 pl-2">
+                            "{q}"
+                          </blockquote>
+                        ))}
+                        {result.analysis.sample_negative_quotes?.map((q, i) => (
+                          <blockquote key={`n-${i}`} className="text-xs italic text-muted-foreground border-l-2 border-orange-400 pl-2">
+                            "{q}"
+                          </blockquote>
+                        ))}
+                      </div>
+                    )}
+
                     {result.analysis.recommendation && (
                       <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
                         <p className="text-xs font-medium text-primary mb-1">💡 Recomendação</p>
@@ -377,7 +453,7 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
                 )}
 
                 {/* Auto-fill Button */}
-                {onAutoFill && (result.analysis.review_score !== null || result.analysis.digital_maturity !== null) && (
+                {onAutoFill && (result.analysis.review_score !== null || result.analysis.digital_maturity !== null || result.analysis.sentiment_score !== null) && (
                   <Button
                     onClick={handleAutoFill}
                     className="w-full gap-2"
@@ -386,7 +462,7 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
                     <ArrowRight className="h-4 w-4" />
                     Preencher Indicadores Automaticamente
                     <Badge variant="secondary" className="ml-1">
-                      {[result.analysis.review_score !== null, result.analysis.digital_maturity !== null].filter(Boolean).length} indicador(es)
+                      {[result.analysis.review_score !== null, result.analysis.digital_maturity !== null, result.analysis.sentiment_score !== null].filter(Boolean).length} indicador(es)
                     </Badge>
                   </Button>
                 )}

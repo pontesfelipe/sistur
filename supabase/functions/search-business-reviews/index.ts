@@ -47,19 +47,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    const searchQuery = `${businessName} ${location} ${propertyType || 'hotel'} reviews avaliações`;
-
-    // Search for reviews across multiple sources in parallel
+    // Search for reviews across multiple sources - request scrapeOptions to get full content/comments
+    const scrapeOpts = { formats: ['markdown'] };
     const [googleResults, tripAdvisorResults, generalResults] = await Promise.allSettled([
-      searchFirecrawl(firecrawlKey, `${businessName} ${location} site:google.com/maps OR site:google.com reviews rating`, 5),
-      searchFirecrawl(firecrawlKey, `${businessName} ${location} site:tripadvisor.com OR site:tripadvisor.com.br reviews`, 5),
-      searchFirecrawl(firecrawlKey, `${businessName} ${location} reviews avaliações rating booking.com OR expedia OR decolar`, 5),
+      searchFirecrawl(firecrawlKey, `${businessName} ${location} site:google.com/maps OR site:google.com reviews rating`, 5, scrapeOpts),
+      searchFirecrawl(firecrawlKey, `${businessName} ${location} site:tripadvisor.com OR site:tripadvisor.com.br reviews avaliações`, 5, scrapeOpts),
+      searchFirecrawl(firecrawlKey, `${businessName} ${location} reviews avaliações rating booking.com OR expedia OR decolar`, 5, scrapeOpts),
     ]);
 
     // Also try to scrape the business directly on Google
     let googleMapsData = null;
     try {
-      const mapsSearch = await searchFirecrawl(firecrawlKey, `${businessName} ${location} google maps reviews nota`, 3);
+      const mapsSearch = await searchFirecrawl(firecrawlKey, `${businessName} ${location} google maps reviews nota comentários`, 3, scrapeOpts);
       if (mapsSearch?.data?.length > 0) {
         googleMapsData = mapsSearch.data;
       }
@@ -80,13 +79,18 @@ Deno.serve(async (req) => {
     let analysis = null;
 
     if (lovableKey) {
+      // Include full scraped markdown content (comments/reviews text) when available, truncated to avoid token limits
+      const extractContent = (r: any, source: string) => {
+        const desc = r.description || '';
+        const md = r.markdown ? r.markdown.slice(0, 3000) : '';
+        return `[${source}] ${r.title || ''}\nDescrição: ${desc}\nConteúdo: ${md}`;
+      };
       const allContent = [
-        ...(allResults.google?.data || []).map((r: any) => `[Google] ${r.title}: ${r.description || ''}`),
-        ...(allResults.tripAdvisor?.data || []).map((r: any) => `[TripAdvisor] ${r.title}: ${r.description || ''}`),
-        ...(allResults.general?.data || []).map((r: any) => `[Web] ${r.title}: ${r.description || ''}`),
-        ...(allResults.googleMaps || []).map((r: any) => `[Maps] ${r.title}: ${r.description || ''}`),
-      ].join('\n');
-
+        ...(allResults.google?.data || []).map((r: any) => extractContent(r, 'Google')),
+        ...(allResults.tripAdvisor?.data || []).map((r: any) => extractContent(r, 'TripAdvisor')),
+        ...(allResults.general?.data || []).map((r: any) => extractContent(r, 'Web')),
+        ...(allResults.googleMaps || []).map((r: any) => extractContent(r, 'Maps')),
+      ].join('\n---\n');
       if (allContent.trim()) {
         try {
           const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -100,7 +104,13 @@ Deno.serve(async (req) => {
               messages: [
                 {
                   role: 'system',
-                  content: `Você é um analista de reputação digital para o setor de hospitalidade. Analise os resultados de busca e extraia informações sobre avaliações online do estabelecimento.
+                   content: `Você é um analista sênior de reputação digital e experiência do hóspede para o setor de hospitalidade. Analise TODOS os resultados de busca — incluindo o texto completo dos comentários e avaliações — e extraia uma análise profunda da reputação do estabelecimento.
+
+Preste atenção especial a:
+- Comentários textuais dos hóspedes (sentimentos, emoções, experiências relatadas)
+- Padrões recorrentes nos elogios e reclamações
+- Aspectos operacionais mencionados (limpeza, atendimento, infraestrutura, gastronomia, localização, custo-benefício)
+- Tom emocional predominante (encantamento, satisfação, frustração, decepção)
 
 Retorne APENAS um JSON válido com esta estrutura:
 {
@@ -108,10 +118,22 @@ Retorne APENAS um JSON válido com esta estrutura:
   "review_count": number | null, // Quantidade de reviews encontrados
   "digital_maturity": number | null, // Score 1-5 de maturidade digital baseado na presença online
   "platforms_found": string[], // Plataformas onde o negócio foi encontrado
-  "sentiment_summary": string, // Resumo do sentimento geral dos reviews
-  "strengths": string[], // Pontos fortes mencionados
-  "weaknesses": string[], // Pontos fracos mencionados
-  "recommendation": string, // Recomendação para melhorar presença online
+  "sentiment_summary": string, // Resumo detalhado do sentimento geral baseado nos COMENTÁRIOS (não só notas)
+  "sentiment_score": number | null, // Score de sentimento de 1-5 baseado na análise dos textos dos comentários
+  "guest_experience_dimensions": {
+    "atendimento": number | null, // 1-5 baseado nos comentários sobre atendimento/staff
+    "limpeza": number | null, // 1-5 baseado nos comentários sobre limpeza/higiene
+    "infraestrutura": number | null, // 1-5 baseado nos comentários sobre instalações/estrutura
+    "gastronomia": number | null, // 1-5 baseado nos comentários sobre alimentação/café
+    "localizacao": number | null, // 1-5 baseado nos comentários sobre localização/acesso
+    "custo_beneficio": number | null // 1-5 baseado nos comentários sobre valor percebido
+  },
+  "recurring_themes": string[], // Temas/assuntos mais mencionados nos comentários (ex: "café da manhã excelente", "Wi-Fi instável")
+  "strengths": string[], // Pontos fortes extraídos dos COMENTÁRIOS
+  "weaknesses": string[], // Pontos fracos extraídos dos COMENTÁRIOS
+  "sample_positive_quotes": string[], // 2-3 trechos representativos de comentários positivos
+  "sample_negative_quotes": string[], // 2-3 trechos representativos de comentários negativos
+  "recommendation": string, // Recomendação estratégica para melhorar reputação e experiência
   "sources": { "platform": string, "url": string, "rating": number | null }[]
 }`
                 },
@@ -161,14 +183,19 @@ Retorne APENAS um JSON válido com esta estrutura:
   }
 });
 
-async function searchFirecrawl(apiKey: string, query: string, limit: number) {
+async function searchFirecrawl(apiKey: string, query: string, limit: number, scrapeOptions?: any) {
+  const body: any = { query, limit };
+  if (scrapeOptions) {
+    body.scrapeOptions = scrapeOptions;
+  }
+
   const response = await fetch('https://api.firecrawl.dev/v1/search', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ query, limit }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
