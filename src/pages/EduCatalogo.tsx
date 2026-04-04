@@ -75,7 +75,7 @@ const EduCatalogo = () => {
   const { data: curriculumLevels } = useCurriculumLevels();
   const { data: curriculumProgress } = useUserCurriculumProgress();
   
-  const canAccessAdmin = isAdmin || isProfessor;
+  const canAccessAdmin = isAdmin || isProfessor || isOrgAdmin;
 
   const handleMainViewChange = (view: string) => {
     const newView = view as 'catalogo' | 'admin';
