@@ -34,4 +34,3 @@ export const isHiddenOrganization = (organization: NamedOrganization) =>
 
 export const filterVisibleOrganizations = <T extends NamedOrganization>(organizations: T[]) =>
   organizations.filter(org => !isHiddenOrganization(org));
-    });
