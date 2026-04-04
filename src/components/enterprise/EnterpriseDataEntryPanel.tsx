@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { BusinessReviewSearch } from './BusinessReviewSearch';
+import { INDICATOR_GUIDANCE, validateIndicatorValue } from '@/data/enterpriseIndicatorGuidance';
 import type { Database } from '@/integrations/supabase/types';
 
 type Indicator = Database['public']['Tables']['indicators']['Row'];
@@ -71,6 +73,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
   const { values: existingValues, isLoading: valuesLoading, bulkUpsertValues, upsertValue } = useIndicatorValues(assessmentId);
   
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
   const [showReviewSearch, setShowReviewSearch] = useState(false);
@@ -177,15 +180,28 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
     return result;
   }, [indicators, localValues, ignoredIds]);
   
-  const handleValueChange = (indicatorId: string, value: string) => {
-    setLocalValues(prev => ({
-      ...prev,
-      [indicatorId]: value,
-    }));
+  const handleValueChange = (indicatorId: string, value: string, indicator: Indicator) => {
+    // Only allow valid numeric characters
+    if (value !== '' && !/^-?\d*\.?\d*$/.test(value)) return;
+
+    setLocalValues(prev => ({ ...prev, [indicatorId]: value }));
+
+    // Validate
+    const error = validateIndicatorValue(value, indicator as any);
+    setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
   };
   
   const handleSave = async (proceedToCalculation: boolean = false) => {
     if (!profile?.org_id) return;
+
+    // Check for validation errors before saving
+    const activeErrors = Object.entries(validationErrors).filter(([id, err]) => err && localValues[id]);
+    if (activeErrors.length > 0) {
+      toast.error('Corrija os erros de validação antes de salvar', {
+        description: `${activeErrors.length} indicador(es) com valores inválidos`,
+      });
+      return;
+    }
     
     const values = Object.entries(localValues)
       .filter(([_, value]) => value !== '')
@@ -384,11 +400,14 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
                       const benchmarkStatus = getBenchmarkStatus(indicator, numericValue);
                       const benchmarkTarget = (indicator as any).benchmark_target;
                       const isIgnored = ignoredIds.has(indicator.id);
+                      const guidance = INDICATOR_GUIDANCE[(indicator as any).code];
+                      const valError = validationErrors[indicator.id];
                       
                       return (
                         <div key={indicator.id} className={cn(
                           "grid grid-cols-1 md:grid-cols-2 gap-4 p-3 rounded-lg border bg-muted/20",
-                          isIgnored && "opacity-50"
+                          isIgnored && "opacity-50",
+                          valError && "border-destructive/50"
                         )}>
                           <div>
                             <label className={cn(
@@ -421,41 +440,62 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
                                 Meta: {benchmarkTarget} {indicator.unit}
                               </p>
                             )}
+                            {!isIgnored && guidance && (
+                              <div className="mt-2 p-2 rounded bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
+                                <p className="text-xs text-blue-700 dark:text-blue-300">
+                                  <strong>💡 Como obter:</strong> {guidance.howToFind}
+                                </p>
+                                {guidance.examples && (
+                                  <p className="text-xs text-blue-600/80 dark:text-blue-400/80 mt-1">
+                                    <em>Ex: {guidance.examples}</em>
+                                  </p>
+                                )}
+                              </div>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Input
-                              type="number"
-                              step="any"
-                              placeholder={isIgnored ? 'Ignorado' : 'Valor'}
-                              value={currentValue}
-                              onChange={(e) => handleValueChange(indicator.id, e.target.value)}
-                              disabled={isIgnored}
-                              className={cn(
-                                "flex-1",
-                                isIgnored && "bg-muted cursor-not-allowed",
-                                !isIgnored && benchmarkStatus === 'good' && "border-green-500",
-                                !isIgnored && benchmarkStatus === 'moderate' && "border-amber-500",
-                                !isIgnored && benchmarkStatus === 'bad' && "border-red-500"
-                              )}
-                            />
-                            <span className="text-sm text-muted-foreground min-w-[40px]">
-                              {indicator.unit}
-                            </span>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  variant={isIgnored ? "destructive" : "ghost"}
-                                  className="h-8 w-8 p-0 shrink-0"
-                                  onClick={() => handleToggleIgnore(indicator.id)}
-                                >
-                                  <EyeOff className="h-3.5 w-3.5" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {isIgnored ? 'Reativar indicador' : 'Ignorar (não será considerado no cálculo)'}
-                              </TooltipContent>
-                            </Tooltip>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="number"
+                                step="any"
+                                placeholder={isIgnored ? 'Ignorado' : 'Valor'}
+                                value={currentValue}
+                                onChange={(e) => handleValueChange(indicator.id, e.target.value, indicator)}
+                                disabled={isIgnored}
+                                className={cn(
+                                  "flex-1",
+                                  isIgnored && "bg-muted cursor-not-allowed",
+                                  valError && "border-destructive focus-visible:ring-destructive",
+                                  !valError && !isIgnored && benchmarkStatus === 'good' && "border-green-500",
+                                  !valError && !isIgnored && benchmarkStatus === 'moderate' && "border-amber-500",
+                                  !valError && !isIgnored && benchmarkStatus === 'bad' && "border-red-500"
+                                )}
+                              />
+                              <span className="text-sm text-muted-foreground min-w-[40px]">
+                                {indicator.unit}
+                              </span>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    size="sm"
+                                    variant={isIgnored ? "destructive" : "ghost"}
+                                    className="h-8 w-8 p-0 shrink-0"
+                                    onClick={() => handleToggleIgnore(indicator.id)}
+                                  >
+                                    <EyeOff className="h-3.5 w-3.5" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {isIgnored ? 'Reativar indicador' : 'Ignorar (não será considerado no cálculo)'}
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
+                            {valError && (
+                              <p className="text-xs text-destructive flex items-center gap-1">
+                                <AlertCircle className="h-3 w-3" />
+                                {valError}
+                              </p>
+                            )}
                           </div>
                         </div>
                       );
