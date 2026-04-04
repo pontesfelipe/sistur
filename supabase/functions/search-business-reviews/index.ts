@@ -183,14 +183,19 @@ Retorne APENAS um JSON válido com esta estrutura:
   }
 });
 
-async function searchFirecrawl(apiKey: string, query: string, limit: number) {
+async function searchFirecrawl(apiKey: string, query: string, limit: number, scrapeOptions?: any) {
+  const body: any = { query, limit };
+  if (scrapeOptions) {
+    body.scrapeOptions = scrapeOptions;
+  }
+
   const response = await fetch('https://api.firecrawl.dev/v1/search', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ query, limit }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
