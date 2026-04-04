@@ -68,7 +68,7 @@ export function EmailDispatchPanel() {
         // Only include approved users with email
         setUsers(
           usersData
-            .filter((u: any) => approvedUserIds.has(u.user_id))
+            .filter((u: any) => allUserIds.has(u.user_id))
             .map((u: any) => ({
               user_id: u.user_id,
               full_name: u.full_name,
