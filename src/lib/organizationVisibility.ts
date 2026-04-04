@@ -1,3 +1,5 @@
+export const HIDDEN_ORG_NAMES = ['Temporário'] as const;
+
 export const BUSINESS_ORG_NAMES = ['SISTUR', 'Autônomo', 'Demo SISTUR'] as const;
 
 const BUSINESS_ORG_ORDER = new Map<string, number>([
