@@ -236,9 +236,7 @@ const EduCatalogo = () => {
       title="SISTUR EDU" 
       subtitle="Catálogo de cursos e lives baseado em diagnóstico IGMA"
     >
-      {(
-        <>
-
+      
           {/* Curriculum Progression Indicator */}
           <Card className="mb-6 border-primary/20">
             <CardContent className="py-4">
