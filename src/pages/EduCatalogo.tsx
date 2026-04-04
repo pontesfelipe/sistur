@@ -264,7 +264,7 @@ const EduCatalogo = () => {
             </TabsTrigger>
             <TabsTrigger value="admin" className="gap-2">
               <Settings className="h-4 w-4" />
-              Administração
+              Gestão de Treinamento
             </TabsTrigger>
           </TabsList>
         </Tabs>
