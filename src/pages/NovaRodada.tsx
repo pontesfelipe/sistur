@@ -58,7 +58,13 @@ export default function NovaRodada() {
   
   const { user } = useAuth();
   const { isViewingDemoData, profile: userProfile } = useProfile();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStepRaw] = useState(1);
+  const [maxStepReached, setMaxStepReached] = useState(1);
+  
+  const setCurrentStep = (step: number) => {
+    setCurrentStepRaw(step);
+    setMaxStepReached(prev => Math.max(prev, step));
+  };
   const [diagnosticType, setDiagnosticType] = useState<DiagnosticType>(typeParam === 'enterprise' ? 'enterprise' : 'territorial');
   const [visibility, setVisibility] = useState<VisibilityType>('organization');
   const [destinationMode, setDestinationMode] = useState<'select' | 'create'>('select');
