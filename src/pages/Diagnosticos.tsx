@@ -244,9 +244,6 @@ const Diagnosticos = () => {
           <DestinosPanel />
         </TabsContent>
 
-        <TabsContent value="importacao">
-          <DataImportPanel preSelectedAssessmentId={assessmentFromUrl || undefined} />
-        </TabsContent>
 
         <TabsContent value="indicadores">
           <IndicadoresPanel />
