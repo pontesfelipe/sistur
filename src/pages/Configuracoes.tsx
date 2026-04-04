@@ -472,6 +472,21 @@ export default function Configuracoes() {
                     </CardContent>
                   </Card>
 
+                  <Card className="hover:shadow-md transition-shadow md:col-span-2">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Search className="h-4 w-4 text-primary" />
+                        Busca de Reviews Online
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Pesquise avaliações do estabelecimento no Google, TripAdvisor e outros
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <BusinessReviewSearch />
+                    </CardContent>
+                  </Card>
+
                 </div>
               </CardContent>
             </Card>
