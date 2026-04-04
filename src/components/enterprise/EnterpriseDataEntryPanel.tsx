@@ -115,7 +115,25 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
       }
     }
   }, [existingValues]);
-  
+
+  // Apply initial auto-fill values from step 4 review search
+  useEffect(() => {
+    if (!initialAutoFillValues || Object.keys(initialAutoFillValues).length === 0 || !indicators) return;
+    const codeToId = new Map(indicators.map(i => [(i as any).code, i.id]));
+    setLocalValues(prev => {
+      const updated = { ...prev };
+      let applied = false;
+      Object.entries(initialAutoFillValues).forEach(([code, value]) => {
+        const id = codeToId.get(code);
+        if (id && !updated[id]) {
+          updated[id] = value.toString();
+          applied = true;
+        }
+      });
+      return applied ? updated : prev;
+    });
+  }, [initialAutoFillValues, indicators]);
+
   const handleToggleIgnore = useCallback((indicatorId: string) => {
     setIgnoredIds(prev => {
       const next = new Set(prev);
