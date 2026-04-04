@@ -28,3 +28,10 @@ export const filterBusinessOrganizations = <T extends NamedOrganization>(organiz
 
       return a.name.localeCompare(b.name, 'pt-BR');
     });
+
+export const isHiddenOrganization = (organization: NamedOrganization) =>
+  HIDDEN_ORG_NAMES.includes(organization.name as (typeof HIDDEN_ORG_NAMES)[number]);
+
+export const filterVisibleOrganizations = <T extends NamedOrganization>(organizations: T[]) =>
+  organizations.filter(org => !isHiddenOrganization(org));
+    });
