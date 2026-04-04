@@ -1,4 +1,6 @@
 export const BUSINESS_ORG_NAMES = ['SISTUR', 'Autônomo', 'Demo SISTUR', 'Temporário'] as const;
+export const PENDING_ORG_NAME = 'Temporário' as const;
+export const DEFAULT_APPROVED_ORG_NAME = 'Autônomo' as const;
 
 const BUSINESS_ORG_ORDER = new Map<string, number>([
   ['SISTUR', 0],
@@ -13,6 +15,15 @@ const DISPLAY_NAME_MAP = new Map<string, string>([
 
 export const getOrgDisplayName = (name: string): string =>
   DISPLAY_NAME_MAP.get(name) ?? name;
+
+export const isPendingOrganizationName = (name: string): boolean =>
+  name === PENDING_ORG_NAME;
+
+export const shouldIncludeUserInOrganization = (
+  organizationName: string,
+  pendingApproval: boolean,
+): boolean =>
+  isPendingOrganizationName(organizationName) ? pendingApproval : !pendingApproval;
 
 type NamedOrganization = {
   name: string;
