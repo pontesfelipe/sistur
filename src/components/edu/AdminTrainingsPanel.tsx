@@ -78,6 +78,7 @@ import { TrainingModulesManager, TrainingModule } from '@/components/admin/Train
 import { ExamRulesetManager } from '@/components/admin/ExamRulesetManager';
 import { CertificateStatsPanel } from '@/components/admin/CertificateStatsPanel';
 import { QuestionBankPanel } from '@/components/admin/QuestionBankPanel';
+import { ExamBuilderPanel } from '@/components/admin/ExamBuilderPanel';
 
 type PillarType = 'RA' | 'OE' | 'AO';
 type TrainingType = 'course' | 'live';
