@@ -67,7 +67,7 @@ const PILLAR_CONFIG = {
   },
 };
 
-export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: EnterpriseDataEntryPanelProps) {
+export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initialAutoFillValues }: EnterpriseDataEntryPanelProps) {
   const { profile } = useProfile();
   
   // Use unified indicators table with enterprise scope filter
