@@ -6784,6 +6784,7 @@ export type Database = {
         Returns: number
       }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
+      has_org_admin_role: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
