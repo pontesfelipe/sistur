@@ -952,7 +952,12 @@ export default function ProfessorDashboard() {
 
         {showERP && showEDU ? (
           <Tabs defaultValue={defaultTab} className="space-y-6">
-            <TabsList>
+            <TabsList className="flex-wrap">
+              {canManageContent && (
+                <TabsTrigger value="content" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" /> Gestão de Conteúdo
+                </TabsTrigger>
+              )}
               <TabsTrigger value="erp" className="flex items-center gap-2">
                 <Building2 className="h-4 w-4" /> Capacitação ERP
               </TabsTrigger>
@@ -965,6 +970,12 @@ export default function ProfessorDashboard() {
                 </TabsTrigger>
               )}
             </TabsList>
+
+            {canManageContent && (
+              <TabsContent value="content">
+                <AdminTrainingsPanel />
+              </TabsContent>
+            )}
 
             <TabsContent value="erp">
               <ERPTeamTrainingPanel />
