@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 14,
-  patch: 4,
+  minor: 15,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.15.0",
+    date: "2026-04-04",
+    type: "minor" as const,
+    changes: [
+      "Novo papel ORG_ADMIN: administrador limitado à sua organização com acesso a treinamentos, provas e gestão EDU",
+      "Certificação automática ao passar em exame (grading automático): certificado LMS gerado instantaneamente",
+      "ORG_ADMIN pode acessar Gestão de Treinamentos e todas as rotas EDU sem restrição de licença",
+      "Painel de gerenciamento de usuários atualizado com opção ORG_ADMIN para ERP e EDU",
+      "EduRoute e sidebar atualizados para reconhecer o novo papel ORG_ADMIN",
+    ],
+  },
   {
     version: "1.14.4",
     date: "2026-04-02",

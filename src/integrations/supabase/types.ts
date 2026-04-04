@@ -6784,6 +6784,7 @@ export type Database = {
         Returns: number
       }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
+      has_org_admin_role: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -6855,7 +6856,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "ADMIN" | "ANALYST" | "VIEWER" | "ESTUDANTE" | "PROFESSOR"
+      app_role:
+        | "ADMIN"
+        | "ANALYST"
+        | "VIEWER"
+        | "ESTUDANTE"
+        | "PROFESSOR"
+        | "ORG_ADMIN"
       assessment_status: "DRAFT" | "DATA_READY" | "CALCULATED"
       certificate_status_type: "active" | "revoked" | "expired"
       collection_type: "AUTOMATICA" | "MANUAL" | "ESTIMADA"
@@ -7075,7 +7082,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["ADMIN", "ANALYST", "VIEWER", "ESTUDANTE", "PROFESSOR"],
+      app_role: [
+        "ADMIN",
+        "ANALYST",
+        "VIEWER",
+        "ESTUDANTE",
+        "PROFESSOR",
+        "ORG_ADMIN",
+      ],
       assessment_status: ["DRAFT", "DATA_READY", "CALCULATED"],
       certificate_status_type: ["active", "revoked", "expired"],
       collection_type: ["AUTOMATICA", "MANUAL", "ESTIMADA"],

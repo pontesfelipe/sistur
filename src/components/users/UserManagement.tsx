@@ -22,6 +22,7 @@ interface OrgOption {
 
 const ROLE_INFO: Record<string, { label: string; color: string; icon: typeof Shield }> = {
   ADMIN: { label: 'Administrador', color: 'bg-red-500/20 text-red-700', icon: Shield },
+  ORG_ADMIN: { label: 'Admin Org', color: 'bg-orange-500/20 text-orange-700', icon: Building2 },
   ANALYST: { label: 'Analista', color: 'bg-blue-500/20 text-blue-700', icon: User },
   VIEWER: { label: 'Visualizador', color: 'bg-gray-500/20 text-gray-700', icon: Eye },
   ESTUDANTE: { label: 'Estudante', color: 'bg-green-500/20 text-green-700', icon: GraduationCap },
@@ -34,9 +35,9 @@ const SYSTEM_ACCESS_INFO: Record<string, { label: string; color: string }> = {
 };
 
 // Roles for ERP system
-const ERP_ROLES = ['ADMIN', 'ANALYST', 'VIEWER'];
+const ERP_ROLES = ['ADMIN', 'ORG_ADMIN', 'ANALYST', 'VIEWER'];
 // Roles for EDU system
-const EDU_ROLES = ['ESTUDANTE', 'PROFESSOR'];
+const EDU_ROLES = ['ORG_ADMIN', 'ESTUDANTE', 'PROFESSOR'];
 
 export function UserManagement() {
   const { users, loading, isAdmin, createUser, updateUserRole, updateSystemAccess, blockUser, deleteUser } = useUserManagement();

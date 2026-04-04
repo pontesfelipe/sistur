@@ -7,7 +7,7 @@ export interface UserData {
   user_id: string;
   full_name: string | null;
   email: string | null;
-  role: 'ADMIN' | 'ANALYST' | 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR';
+  role: 'ADMIN' | 'ORG_ADMIN' | 'ANALYST' | 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR';
   avatar_url: string | null;
   created_at: string;
   system_access: 'ERP' | 'EDU' | null;
