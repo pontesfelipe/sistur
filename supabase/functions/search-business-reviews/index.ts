@@ -104,7 +104,13 @@ Deno.serve(async (req) => {
               messages: [
                 {
                   role: 'system',
-                  content: `Você é um analista de reputação digital para o setor de hospitalidade. Analise os resultados de busca e extraia informações sobre avaliações online do estabelecimento.
+                   content: `Você é um analista sênior de reputação digital e experiência do hóspede para o setor de hospitalidade. Analise TODOS os resultados de busca — incluindo o texto completo dos comentários e avaliações — e extraia uma análise profunda da reputação do estabelecimento.
+
+Preste atenção especial a:
+- Comentários textuais dos hóspedes (sentimentos, emoções, experiências relatadas)
+- Padrões recorrentes nos elogios e reclamações
+- Aspectos operacionais mencionados (limpeza, atendimento, infraestrutura, gastronomia, localização, custo-benefício)
+- Tom emocional predominante (encantamento, satisfação, frustração, decepção)
 
 Retorne APENAS um JSON válido com esta estrutura:
 {
@@ -112,10 +118,22 @@ Retorne APENAS um JSON válido com esta estrutura:
   "review_count": number | null, // Quantidade de reviews encontrados
   "digital_maturity": number | null, // Score 1-5 de maturidade digital baseado na presença online
   "platforms_found": string[], // Plataformas onde o negócio foi encontrado
-  "sentiment_summary": string, // Resumo do sentimento geral dos reviews
-  "strengths": string[], // Pontos fortes mencionados
-  "weaknesses": string[], // Pontos fracos mencionados
-  "recommendation": string, // Recomendação para melhorar presença online
+  "sentiment_summary": string, // Resumo detalhado do sentimento geral baseado nos COMENTÁRIOS (não só notas)
+  "sentiment_score": number | null, // Score de sentimento de 1-5 baseado na análise dos textos dos comentários
+  "guest_experience_dimensions": {
+    "atendimento": number | null, // 1-5 baseado nos comentários sobre atendimento/staff
+    "limpeza": number | null, // 1-5 baseado nos comentários sobre limpeza/higiene
+    "infraestrutura": number | null, // 1-5 baseado nos comentários sobre instalações/estrutura
+    "gastronomia": number | null, // 1-5 baseado nos comentários sobre alimentação/café
+    "localizacao": number | null, // 1-5 baseado nos comentários sobre localização/acesso
+    "custo_beneficio": number | null // 1-5 baseado nos comentários sobre valor percebido
+  },
+  "recurring_themes": string[], // Temas/assuntos mais mencionados nos comentários (ex: "café da manhã excelente", "Wi-Fi instável")
+  "strengths": string[], // Pontos fortes extraídos dos COMENTÁRIOS
+  "weaknesses": string[], // Pontos fracos extraídos dos COMENTÁRIOS
+  "sample_positive_quotes": string[], // 2-3 trechos representativos de comentários positivos
+  "sample_negative_quotes": string[], // 2-3 trechos representativos de comentários negativos
+  "recommendation": string, // Recomendação estratégica para melhorar reputação e experiência
   "sources": { "platform": string, "url": string, "rating": number | null }[]
 }`
                 },
