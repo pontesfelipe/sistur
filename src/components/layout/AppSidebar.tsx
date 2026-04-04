@@ -112,13 +112,13 @@ export function AppSidebar() {
     
     return navigation.filter((item) => {
       if (item.requiresAdmin && !isAdmin) return false;
-      // "Gestão de Treinamentos" is visible for professors OR ERP analysts/admins
-      if (item.requiresProfessor && !isProfessor && !isAdmin && !(hasERPAccess && isAnalyst)) return false;
+      // "Gestão de Treinamentos" is visible for professors, org admins, OR ERP analysts/admins
+      if (item.requiresProfessor && !isProfessor && !isAdmin && !isOrgAdmin && !(hasERPAccess && isAnalyst)) return false;
       if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
       if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
       return true;
     });
-  }, [initialized, isAdmin, isAnalyst, isProfessor, hasERPAccess, hasEDUAccess]);
+  }, [initialized, isAdmin, isOrgAdmin, isAnalyst, isProfessor, hasERPAccess, hasEDUAccess]);
 
   const filteredBottomNavigation = useMemo(() => {
     if (!initialized) return staticBottomNavItems;

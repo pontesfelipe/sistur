@@ -36,9 +36,9 @@ export function EduRoute({ children, requireProfessor = false }: EduRouteProps) 
   if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
   if (awaitingApproval) return <Navigate to="/pending-approval" replace />;
-  if (isAdmin) return <>{children}</>;
+  if (isAdmin || isOrgAdmin) return <>{children}</>;
   if (!isLicenseValid) return <Navigate to="/assinatura" replace />;
-  if (requireProfessor && !isProfessor) return <Navigate to="/edu" replace />;
+  if (requireProfessor && !isProfessor && !isOrgAdmin) return <Navigate to="/edu" replace />;
   if (!hasEDUAccess) return <Navigate to="/onboarding" replace />;
 
   return <>{children}</>;
