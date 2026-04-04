@@ -155,14 +155,6 @@ const App = () => {
                   }
                 />
                 <Route
-                  path="/importacoes"
-                  element={
-                    <ERPRoute>
-                      <Importacoes />
-                    </ERPRoute>
-                  }
-                />
-                <Route
                   path="/cursos"
                   element={
                     <ERPRoute>
