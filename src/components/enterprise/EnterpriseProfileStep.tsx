@@ -343,7 +343,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <CardContent className="pt-0">
           <BusinessReviewSearch
             onAutoFill={handleReviewAutoFill}
-            defaultBusinessName={destinationName}
+            defaultLocation={destinationName}
             compact
           />
         </CardContent>
