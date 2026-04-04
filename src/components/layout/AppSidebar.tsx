@@ -54,7 +54,7 @@ const navigation: NavItem[] = [
   { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
   
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
-  { name: 'Painel Professor', href: '/professor', icon: BookOpen, requiresProfessor: true, requiresEDU: true },
+  { name: 'Gestão de Treinamentos', href: '/professor', icon: BookOpen, requiresProfessor: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
   { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
@@ -84,7 +84,7 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess, isEstudante, initialized, loading } = useProfileContext();
+  const { isAdmin, isProfessor, isAnalyst, hasERPAccess, hasEDUAccess, isEstudante, initialized, loading } = useProfileContext();
   const { hasFeature, isTrialActive } = useLicense();
   const { data: forumNotifications } = useForumNotifications();
   const markForumAsSeen = useMarkForumAsSeen();
@@ -112,12 +112,13 @@ export function AppSidebar() {
     
     return navigation.filter((item) => {
       if (item.requiresAdmin && !isAdmin) return false;
-      if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
+      // "Gestão de Treinamentos" is visible for professors OR ERP analysts/admins
+      if (item.requiresProfessor && !isProfessor && !isAdmin && !(hasERPAccess && isAnalyst)) return false;
       if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
       if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
       return true;
     });
-  }, [initialized, isAdmin, isProfessor, hasERPAccess, hasEDUAccess]);
+  }, [initialized, isAdmin, isAnalyst, isProfessor, hasERPAccess, hasEDUAccess]);
 
   const filteredBottomNavigation = useMemo(() => {
     if (!initialized) return staticBottomNavItems;
