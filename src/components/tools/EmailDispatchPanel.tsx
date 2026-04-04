@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Mail, Send, Users, Building2, User, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { filterVisibleOrganizations } from '@/lib/organizationVisibility';
 
 interface UserOption {
   user_id: string;
@@ -88,8 +89,7 @@ export function EmailDispatchPanel() {
       // Fetch orgs
       const { data: orgsData } = await supabase.from('orgs').select('id, name');
       if (orgsData) {
-        const orgMap = orgsData
-          .filter(org => org.name !== 'Temporário')
+        const orgMap = filterVisibleOrganizations(orgsData || [])
           .map(org => ({
             id: org.id,
             name: org.name,

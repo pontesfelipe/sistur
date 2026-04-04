@@ -14,6 +14,7 @@ import { useUserManagement, UserData } from '@/hooks/useUserManagement';
 import { UserPlus, Shield, User, Eye, Loader2, MoreHorizontal, Ban, Trash2, RefreshCw, GraduationCap, Building2, FileCheck, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { filterVisibleOrganizations } from '@/lib/organizationVisibility';
 
 interface OrgOption {
   id: string;
@@ -79,7 +80,7 @@ export function UserManagement() {
         .order('name');
       
       if (error) throw error;
-      setOrgs(data || []);
+      setOrgs(filterVisibleOrganizations(data || []));
     } catch (error) {
       console.error('Error loading orgs:', error);
       toast.error('Erro ao carregar organizações');
