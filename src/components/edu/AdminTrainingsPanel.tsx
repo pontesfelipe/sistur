@@ -154,7 +154,7 @@ const defaultFormData: FormData = {
 };
 
 export function AdminTrainingsPanel() {
-  const [mainTab, setMainTab] = useState<'trainings' | 'certificates' | 'questions'>('trainings');
+  const [mainTab, setMainTab] = useState<'trainings' | 'certificates' | 'questions' | 'exams'>('trainings');
   const { data: trainings, isLoading } = useAdminTrainings();
   const { createTraining, updateTraining, archiveTraining, publishTraining, deleteTraining } = useAdminTrainingMutations();
   
