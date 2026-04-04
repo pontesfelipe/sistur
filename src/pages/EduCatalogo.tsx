@@ -507,8 +507,8 @@ const EduCatalogo = () => {
               </TabsContent>
             </Tabs>
           )}
-        </>
-      )}
+
+
     </AppLayout>
   );
 };
