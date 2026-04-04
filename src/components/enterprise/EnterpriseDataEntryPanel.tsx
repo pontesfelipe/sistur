@@ -444,7 +444,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
                               step="any"
                               placeholder={isIgnored ? 'Ignorado' : 'Valor'}
                               value={currentValue}
-                              onChange={(e) => handleValueChange(indicator.id, e.target.value)}
+                              onChange={(e) => handleValueChange(indicator.id, e.target.value, indicator)}
                               disabled={isIgnored}
                               className={cn(
                                 "flex-1",
