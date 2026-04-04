@@ -54,11 +54,12 @@ export default function NovaRodada() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const resumeAssessmentId = searchParams.get('resume');
+  const typeParam = searchParams.get('type');
   
   const { user } = useAuth();
   const { isViewingDemoData, profile: userProfile } = useProfile();
   const [currentStep, setCurrentStep] = useState(1);
-  const [diagnosticType, setDiagnosticType] = useState<DiagnosticType>('territorial');
+  const [diagnosticType, setDiagnosticType] = useState<DiagnosticType>(typeParam === 'enterprise' ? 'enterprise' : 'territorial');
   const [visibility, setVisibility] = useState<VisibilityType>('organization');
   const [destinationMode, setDestinationMode] = useState<'select' | 'create'>('select');
   const [selectedDestination, setSelectedDestination] = useState<string>('');
