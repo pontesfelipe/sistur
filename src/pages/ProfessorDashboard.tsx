@@ -18,8 +18,9 @@ import { toast } from 'sonner';
 import {
   Users, Copy, Gift, Plus, School, BookOpen, ClipboardList,
   Trash2, Calendar, Loader2, Check, X, UserPlus, FileText,
-  Building2, GraduationCap, Target, BarChart3
+  Building2, GraduationCap, Target, BarChart3, Settings
 } from 'lucide-react';
+import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -927,12 +928,13 @@ function ERPGroupDetail({ groupId, onBack, orgMembers }: { groupId: string; onBa
 
 // ─── Main Page ───
 export default function ProfessorDashboard() {
-  const { hasERPAccess, hasEDUAccess, isProfessor, isAdmin, isAnalyst } = useProfileContext();
+  const { hasERPAccess, hasEDUAccess, isProfessor, isAdmin, isAnalyst, isOrgAdmin } = useProfileContext();
   
   // Determine available contexts
   const showEDU = isProfessor || hasEDUAccess || isAdmin;
   const showERP = hasERPAccess || isAdmin || isAnalyst;
-  const defaultTab = showERP && !isProfessor ? 'erp' : 'edu';
+  const canManageContent = isAdmin || isProfessor || isOrgAdmin;
+  const defaultTab = showERP && !isProfessor ? 'erp' : canManageContent ? 'content' : 'edu';
 
   return (
     <AppLayout title="Gestão de Treinamentos">
@@ -950,7 +952,12 @@ export default function ProfessorDashboard() {
 
         {showERP && showEDU ? (
           <Tabs defaultValue={defaultTab} className="space-y-6">
-            <TabsList>
+            <TabsList className="flex-wrap">
+              {canManageContent && (
+                <TabsTrigger value="content" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" /> Gestão de Conteúdo
+                </TabsTrigger>
+              )}
               <TabsTrigger value="erp" className="flex items-center gap-2">
                 <Building2 className="h-4 w-4" /> Capacitação ERP
               </TabsTrigger>
@@ -963,6 +970,12 @@ export default function ProfessorDashboard() {
                 </TabsTrigger>
               )}
             </TabsList>
+
+            {canManageContent && (
+              <TabsContent value="content">
+                <AdminTrainingsPanel />
+              </TabsContent>
+            )}
 
             <TabsContent value="erp">
               <ERPTeamTrainingPanel />
@@ -981,8 +994,13 @@ export default function ProfessorDashboard() {
         ) : showERP ? (
           <ERPTeamTrainingPanel />
         ) : (
-          <Tabs defaultValue="classrooms" className="space-y-6">
+          <Tabs defaultValue={canManageContent ? 'content' : 'classrooms'} className="space-y-6">
             <TabsList>
+              {canManageContent && (
+                <TabsTrigger value="content" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" /> Gestão de Conteúdo
+                </TabsTrigger>
+              )}
               <TabsTrigger value="classrooms" className="flex items-center gap-2">
                 <School className="h-4 w-4" /> Salas
               </TabsTrigger>
@@ -990,6 +1008,12 @@ export default function ProfessorDashboard() {
                 <Gift className="h-4 w-4" /> Referências
               </TabsTrigger>
             </TabsList>
+
+            {canManageContent && (
+              <TabsContent value="content">
+                <AdminTrainingsPanel />
+              </TabsContent>
+            )}
 
             <TabsContent value="classrooms">
               <ClassroomsPanel />

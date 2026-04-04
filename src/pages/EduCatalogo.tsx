@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +29,6 @@ import { useEduTracks } from '@/hooks/useEdu';
 import { useStudentProfile } from '@/hooks/useStudentProfile';
 import { useProfile } from '@/hooks/useProfile';
 import { PersonalizedRecommendationsPanel } from '@/components/edu/PersonalizedRecommendationsPanel';
-import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
 import {
   Select,
   SelectContent,
@@ -56,11 +55,6 @@ import {
 } from "@/components/ui/tooltip";
 
 const EduCatalogo = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const tabFromUrl = searchParams.get('tab');
-  const [mainView, setMainView] = useState<'catalogo' | 'admin'>(
-    tabFromUrl === 'admin' ? 'admin' : 'catalogo'
-  );
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [contentFilter, setContentFilter] = useState<string>('all');
@@ -74,18 +68,6 @@ const EduCatalogo = () => {
   const { isAdmin, isProfessor, isOrgAdmin } = useProfile();
   const { data: curriculumLevels } = useCurriculumLevels();
   const { data: curriculumProgress } = useUserCurriculumProgress();
-  
-  const canAccessAdmin = isAdmin || isProfessor || isOrgAdmin;
-
-  const handleMainViewChange = (view: string) => {
-    const newView = view as 'catalogo' | 'admin';
-    setMainView(newView);
-    if (newView === 'admin') {
-      setSearchParams({ tab: 'admin' });
-    } else {
-      setSearchParams({});
-    }
-  };
 
   // Filter trainings
   const filteredTrainings = useMemo(() => {
@@ -254,26 +236,7 @@ const EduCatalogo = () => {
       title="SISTUR EDU" 
       subtitle="Catálogo de cursos e lives baseado em diagnóstico IGMA"
     >
-      {/* Main Tabs - Catálogo vs Admin */}
-      {canAccessAdmin && (
-        <Tabs value={mainView} onValueChange={handleMainViewChange} className="mb-6">
-          <TabsList>
-            <TabsTrigger value="catalogo" className="gap-2">
-              <BookOpen className="h-4 w-4" />
-              Catálogo
-            </TabsTrigger>
-            <TabsTrigger value="admin" className="gap-2">
-              <Settings className="h-4 w-4" />
-              Gestão de Treinamento
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      )}
-
-      {mainView === 'admin' && canAccessAdmin ? (
-        <AdminTrainingsPanel />
-      ) : (
-        <>
+      
           {/* Curriculum Progression Indicator */}
           <Card className="mb-6 border-primary/20">
             <CardContent className="py-4">
@@ -544,8 +507,8 @@ const EduCatalogo = () => {
               </TabsContent>
             </Tabs>
           )}
-        </>
-      )}
+
+
     </AppLayout>
   );
 };
