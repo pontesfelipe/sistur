@@ -126,6 +126,9 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
     if (result.analysis.digital_maturity !== null) {
       values['ENT_TECH_SCORE'] = result.analysis.digital_maturity;
     }
+    if (result.analysis.sentiment_score !== null) {
+      values['ENT_SENTIMENT_SCORE'] = result.analysis.sentiment_score;
+    }
 
     if (Object.keys(values).length === 0) {
       toast.warning('Nenhum indicador encontrado para auto-preencher');
@@ -134,6 +137,15 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
 
     onAutoFill(values);
     toast.success(`${Object.keys(values).length} indicador(es) preenchido(s) automaticamente`);
+  };
+
+  const DIMENSION_LABELS: Record<string, string> = {
+    atendimento: 'Atendimento',
+    limpeza: 'Limpeza',
+    infraestrutura: 'Infraestrutura',
+    gastronomia: 'Gastronomia',
+    localizacao: 'Localização',
+    custo_beneficio: 'Custo-Benefício',
   };
 
   const renderStars = (score: number | null) => {
