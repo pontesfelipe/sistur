@@ -66,6 +66,7 @@ export function NovaRodadaDialogs({
               destinationName={selectedDestinationData.name}
               onComplete={() => onSetCurrentStep(5)}
               onBack={onPreviousStep}
+              onReviewAutoFill={(values) => setReviewPreFillValues(prev => ({ ...prev, ...values }))}
             />
           ) : (
             <Card>
