@@ -56,24 +56,47 @@ export function EmailDispatchPanel() {
     try {
       // Fetch users via admin RPC
       const { data: usersData } = await supabase.rpc('admin_get_all_users');
+
+      // Fetch approved user org counts (same logic as OrganizationManagement)
+      const { data: approvedProfiles } = await supabase
+        .from('profiles')
+        .select('user_id, org_id')
+        .eq('pending_approval', false);
+
+      const approvedUserIds = new Set((approvedProfiles || []).map(p => p.user_id));
+
       if (usersData) {
-        setUsers(usersData.map((u: any) => ({
-          user_id: u.user_id,
-          full_name: u.full_name,
-          email: u.email,
-          org_id: u.org_id,
-        })));
+        // Only include approved users with email
+        setUsers(
+          usersData
+            .filter((u: any) => approvedUserIds.has(u.user_id))
+            .map((u: any) => ({
+              user_id: u.user_id,
+              full_name: u.full_name,
+              email: u.email,
+              org_id: u.org_id,
+            }))
+        );
       }
+
+      // Count approved users per org
+      const userCounts = (approvedProfiles || []).reduce((acc, p) => {
+        acc[p.org_id] = (acc[p.org_id] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
 
       // Fetch orgs
       const { data: orgsData } = await supabase.from('orgs').select('id, name');
       if (orgsData) {
-        // Count users per org
-        const orgMap = orgsData.map(org => {
-          const count = usersData?.filter((u: any) => u.org_id === org.id).length || 0;
-          return { id: org.id, name: org.name, user_count: count };
-        });
-        setOrgs(orgMap.filter(o => o.user_count > 0));
+        const orgMap = orgsData
+          .filter(org => org.name !== 'Temporário')
+          .map(org => ({
+            id: org.id,
+            name: org.name,
+            user_count: userCounts[org.id] || 0,
+          }))
+          .filter(o => o.user_count > 0);
+        setOrgs(orgMap);
       }
     } catch (err) {
       console.error('Failed to fetch users/orgs:', err);
