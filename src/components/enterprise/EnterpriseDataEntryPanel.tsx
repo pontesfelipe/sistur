@@ -316,6 +316,34 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
           </div>
         </CardContent>
       </Card>
+
+      {/* Business Review Search */}
+      <Collapsible open={showReviewSearch} onOpenChange={setShowReviewSearch}>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Search className="h-4 w-4 text-primary" />
+                  Busca Automática de Reviews Online
+                </CardTitle>
+                <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", showReviewSearch && "rotate-180")} />
+              </div>
+              <CardDescription className="text-xs">
+                Pesquise avaliações do seu estabelecimento e preencha indicadores automaticamente
+              </CardDescription>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent className="pt-0">
+              <BusinessReviewSearch
+                onAutoFill={handleReviewAutoFill}
+                compact
+              />
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
       
       {/* Indicator Entry by Pillar */}
       <Card>
