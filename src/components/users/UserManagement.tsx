@@ -35,9 +35,9 @@ const SYSTEM_ACCESS_INFO: Record<string, { label: string; color: string }> = {
 };
 
 // Roles for ERP system
-const ERP_ROLES = ['ADMIN', 'ANALYST', 'VIEWER'];
+const ERP_ROLES = ['ADMIN', 'ORG_ADMIN', 'ANALYST', 'VIEWER'];
 // Roles for EDU system
-const EDU_ROLES = ['ESTUDANTE', 'PROFESSOR'];
+const EDU_ROLES = ['ORG_ADMIN', 'ESTUDANTE', 'PROFESSOR'];
 
 export function UserManagement() {
   const { users, loading, isAdmin, createUser, updateUserRole, updateSystemAccess, blockUser, deleteUser } = useUserManagement();
