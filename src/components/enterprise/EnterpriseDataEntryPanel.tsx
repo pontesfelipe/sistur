@@ -73,6 +73,21 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
+  const [showReviewSearch, setShowReviewSearch] = useState(false);
+
+  // Auto-fill handler from review search
+  const handleReviewAutoFill = useCallback((indicatorValues: Record<string, number>) => {
+    if (!indicators) return;
+    const codeToId = new Map(indicators.map(i => [(i as any).code, i.id]));
+    const newValues = { ...localValues };
+    Object.entries(indicatorValues).forEach(([code, value]) => {
+      const id = codeToId.get(code);
+      if (id) {
+        newValues[id] = value.toString();
+      }
+    });
+    setLocalValues(newValues);
+  }, [indicators, localValues]);
   
   // Initialize local values and ignored state from existing
   useEffect(() => {
