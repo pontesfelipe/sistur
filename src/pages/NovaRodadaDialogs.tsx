@@ -50,6 +50,8 @@ export function NovaRodadaDialogs({
   resumeAssessmentId,
   resumeAssessment,
 }: NovaRodadaDialogsProps) {
+  const [reviewPreFillValues, setReviewPreFillValues] = useState<Record<string, number>>({});
+
   return (
     <div className="space-y-6">
       {/* Resume Banner */}
