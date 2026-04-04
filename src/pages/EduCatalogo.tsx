@@ -29,7 +29,6 @@ import { useEduTracks } from '@/hooks/useEdu';
 import { useStudentProfile } from '@/hooks/useStudentProfile';
 import { useProfile } from '@/hooks/useProfile';
 import { PersonalizedRecommendationsPanel } from '@/components/edu/PersonalizedRecommendationsPanel';
-import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
 import {
   Select,
   SelectContent,
