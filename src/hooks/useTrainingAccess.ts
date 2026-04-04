@@ -215,7 +215,7 @@ export function useOrgs() {
         .order('name', { ascending: true });
       
       if (error) throw error;
-      return data || [];
+      return filterVisibleOrganizations(data || []);
     },
   });
 }
