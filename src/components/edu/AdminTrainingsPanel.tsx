@@ -577,7 +577,6 @@ export function AdminTrainingsPanel() {
 
         <TabsContent value="exams" className="mt-6 space-y-6">
           <ExamBuilderPanel />
-          <ExamRulesetManager />
         </TabsContent>
 
         <TabsContent value="certificates" className="mt-6">
