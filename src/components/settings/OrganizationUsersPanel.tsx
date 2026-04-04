@@ -21,7 +21,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { useAuditLogger } from '@/hooks/useAuditLogger';
-import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
+import { filterBusinessOrganizations, getOrgDisplayName } from '@/lib/organizationVisibility';
 
 interface Organization {
   id: string;
@@ -311,7 +311,7 @@ export function OrganizationUsersPanel() {
               <SelectContent>
                 {organizations.map(org => (
                   <SelectItem key={org.id} value={org.id}>
-                    {org.name}
+                    {getOrgDisplayName(org.name)}
                   </SelectItem>
                 ))}
               </SelectContent>

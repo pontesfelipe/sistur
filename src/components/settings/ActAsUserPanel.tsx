@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Users, Eye, ArrowLeftRight, Loader2 } from 'lucide-react';
+import { getOrgDisplayName } from '@/lib/organizationVisibility';
 
 interface UserWithOrg {
   user_id: string;
@@ -200,7 +201,7 @@ export function ActAsUserPanel() {
                     <div className="flex items-center gap-2">
                       <span>{user.full_name || user.email}</span>
                       <Badge variant="outline" className="text-xs">
-                        {user.org_name}
+                        {getOrgDisplayName(user.org_name)}
                       </Badge>
                     </div>
                   </SelectItem>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { getOrgDisplayName } from '@/lib/organizationVisibility';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -393,7 +394,7 @@ export function EmailDispatchPanel() {
                       {orgs.map(o => (
                         <SelectItem key={o.id} value={o.id}>
                           <div className="flex items-center gap-2">
-                            <span>{o.name}</span>
+                            <span>{getOrgDisplayName(o.name)}</span>
                             <Badge variant="secondary" className="text-xs">{o.user_count} usuário(s)</Badge>
                           </div>
                         </SelectItem>

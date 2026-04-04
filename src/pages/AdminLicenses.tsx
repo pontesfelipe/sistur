@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import type { LicensePlan, LicenseStatus } from '@/contexts/LicenseContext';
 import { TrialControlPanel } from '@/components/admin/TrialControlPanel';
-import { filterBusinessOrganizations } from '@/lib/organizationVisibility';
+import { filterBusinessOrganizations, getOrgDisplayName } from '@/lib/organizationVisibility';
 import { AdminCancelLicenseDialog } from '@/components/admin/AdminCancelLicenseDialog';
 
 interface LicenseRow {
@@ -465,7 +465,7 @@ export default function AdminLicenses() {
                             <p className="font-medium">{license.profile?.full_name || 'Sem nome'}</p>
                             <p className="text-xs text-muted-foreground">{license.email || license.user_id.slice(0, 8)}</p>
                           </td>
-                          <td className="px-4 py-3 text-xs text-muted-foreground">{license.org_name || '—'}</td>
+                          <td className="px-4 py-3 text-xs text-muted-foreground">{license.org_name ? getOrgDisplayName(license.org_name) : '—'}</td>
                           <td className="px-4 py-3">
                             {isEditing ? (
                               <select value={editPlan} onChange={e => setEditPlan(e.target.value as LicensePlan)} className="h-8 rounded border border-border bg-background px-2 text-xs">
@@ -560,7 +560,7 @@ export default function AdminLicenses() {
                   <div key={org.id} className="bg-card border border-border rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <h4 className="font-bold text-sm">{org.name}</h4>
+                      <h4 className="font-bold text-sm">{getOrgDisplayName(org.name)}</h4>
                       <Badge variant="outline" className="text-xs ml-auto">{orgLicenses.length} licenças ativas</Badge>
                     </div>
                     {orgQuotas.length > 0 ? (
@@ -621,7 +621,7 @@ export default function AdminLicenses() {
               <Label className="text-xs">Organização</Label>
               <select value={assignOrgId} onChange={e => { setAssignOrgId(e.target.value); if (assignMode === 'user') fetchAvailableUsers(e.target.value); }} className="w-full h-10 rounded-lg border border-border bg-background px-3 text-sm mt-1">
                 <option value="">Selecione...</option>
-                {filterBusinessOrganizations(orgs).map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                {filterBusinessOrganizations(orgs).map(o => <option key={o.id} value={o.id}>{getOrgDisplayName(o.name)}</option>)}
               </select>
             </div>
 
@@ -665,7 +665,7 @@ export default function AdminLicenses() {
               <Label className="text-xs">Organização</Label>
               <select value={quotaOrgId} onChange={e => setQuotaOrgId(e.target.value)} className="w-full h-10 rounded-lg border border-border bg-background px-3 text-sm mt-1">
                 <option value="">Selecione...</option>
-                {filterBusinessOrganizations(orgs).map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                {filterBusinessOrganizations(orgs).map(o => <option key={o.id} value={o.id}>{getOrgDisplayName(o.name)}</option>)}
               </select>
             </div>
             <div>

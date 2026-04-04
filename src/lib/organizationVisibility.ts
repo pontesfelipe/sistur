@@ -7,6 +7,13 @@ const BUSINESS_ORG_ORDER = new Map<string, number>([
   ['Temporário', 3],
 ]);
 
+const DISPLAY_NAME_MAP = new Map<string, string>([
+  ['Temporário', 'Pendentes'],
+]);
+
+export const getOrgDisplayName = (name: string): string =>
+  DISPLAY_NAME_MAP.get(name) ?? name;
+
 type NamedOrganization = {
   name: string;
 };
