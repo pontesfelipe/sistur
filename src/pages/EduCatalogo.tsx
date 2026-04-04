@@ -238,6 +238,7 @@ const EduCatalogo = () => {
     >
       {(
         <>
+
           {/* Curriculum Progression Indicator */}
           <Card className="mb-6 border-primary/20">
             <CardContent className="py-4">
