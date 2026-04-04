@@ -179,11 +179,15 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete }: Ent
     return result;
   }, [indicators, localValues, ignoredIds]);
   
-  const handleValueChange = (indicatorId: string, value: string) => {
-    setLocalValues(prev => ({
-      ...prev,
-      [indicatorId]: value,
-    }));
+  const handleValueChange = (indicatorId: string, value: string, indicator: Indicator) => {
+    // Only allow valid numeric characters
+    if (value !== '' && !/^-?\d*\.?\d*$/.test(value)) return;
+
+    setLocalValues(prev => ({ ...prev, [indicatorId]: value }));
+
+    // Validate
+    const error = validateIndicatorValue(value, indicator as any);
+    setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
   };
   
   const handleSave = async (proceedToCalculation: boolean = false) => {
