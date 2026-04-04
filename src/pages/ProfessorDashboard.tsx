@@ -994,8 +994,13 @@ export default function ProfessorDashboard() {
         ) : showERP ? (
           <ERPTeamTrainingPanel />
         ) : (
-          <Tabs defaultValue="classrooms" className="space-y-6">
+          <Tabs defaultValue={canManageContent ? 'content' : 'classrooms'} className="space-y-6">
             <TabsList>
+              {canManageContent && (
+                <TabsTrigger value="content" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" /> Gestão de Conteúdo
+                </TabsTrigger>
+              )}
               <TabsTrigger value="classrooms" className="flex items-center gap-2">
                 <School className="h-4 w-4" /> Salas
               </TabsTrigger>
@@ -1003,6 +1008,12 @@ export default function ProfessorDashboard() {
                 <Gift className="h-4 w-4" /> Referências
               </TabsTrigger>
             </TabsList>
+
+            {canManageContent && (
+              <TabsContent value="content">
+                <AdminTrainingsPanel />
+              </TabsContent>
+            )}
 
             <TabsContent value="classrooms">
               <ClassroomsPanel />
