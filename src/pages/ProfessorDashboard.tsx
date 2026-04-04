@@ -18,8 +18,9 @@ import { toast } from 'sonner';
 import {
   Users, Copy, Gift, Plus, School, BookOpen, ClipboardList,
   Trash2, Calendar, Loader2, Check, X, UserPlus, FileText,
-  Building2, GraduationCap, Target, BarChart3
+  Building2, GraduationCap, Target, BarChart3, Settings
 } from 'lucide-react';
+import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
