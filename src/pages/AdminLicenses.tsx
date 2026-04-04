@@ -621,7 +621,7 @@ export default function AdminLicenses() {
               <Label className="text-xs">Organização</Label>
               <select value={assignOrgId} onChange={e => { setAssignOrgId(e.target.value); if (assignMode === 'user') fetchAvailableUsers(e.target.value); }} className="w-full h-10 rounded-lg border border-border bg-background px-3 text-sm mt-1">
                 <option value="">Selecione...</option>
-                {filterBusinessOrganizations(orgs).map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                {filterBusinessOrganizations(orgs).map(o => <option key={o.id} value={o.id}>{getOrgDisplayName(o.name)}</option>)}
               </select>
             </div>
 
