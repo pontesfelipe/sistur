@@ -78,7 +78,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
-  const [showReviewSearch, setShowReviewSearch] = useState(false);
+  const [showReviewSearch, setShowReviewSearch] = useState(!initialAutoFillValues || Object.keys(initialAutoFillValues).length === 0);
 
   // Auto-fill handler from review search
   const handleReviewAutoFill = useCallback((indicatorValues: Record<string, number>) => {
