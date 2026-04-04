@@ -112,7 +112,7 @@ export default function AdminLicenses() {
 
   const fetchOrgs = async () => {
     const { data } = await supabase.from('orgs').select('id, name').order('name');
-    setOrgs(filterVisibleOrganizations(data || []));
+    setOrgs(data || []);
   };
 
   const fetchLicenses = async () => {

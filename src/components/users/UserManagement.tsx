@@ -79,7 +79,7 @@ export function UserManagement() {
         .order('name');
       
       if (error) throw error;
-      setOrgs(filterVisibleOrganizations(data || []));
+      setOrgs(data || []);
     } catch (error) {
       console.error('Error loading orgs:', error);
       toast.error('Erro ao carregar organizações');

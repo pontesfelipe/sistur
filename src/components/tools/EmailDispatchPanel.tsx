@@ -88,7 +88,7 @@ export function EmailDispatchPanel() {
       // Fetch orgs
       const { data: orgsData } = await supabase.from('orgs').select('id, name');
       if (orgsData) {
-        const orgMap = filterVisibleOrganizations(orgsData || [])
+        const orgMap = (orgsData || [])
           .map(org => ({
             id: org.id,
             name: org.name,
