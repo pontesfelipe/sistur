@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AssessmentCard } from '@/components/dashboard/AssessmentCard';
-import { DataImportPanel } from '@/components/diagnostics/DataImportPanel';
+
 import { IndicadoresPanel } from '@/components/diagnostics/IndicadoresPanel';
 import { DestinosPanel } from '@/components/diagnostics/DestinosPanel';
 import { 
