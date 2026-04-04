@@ -107,6 +107,20 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
               {visibility === 'demo' && 'Diagnóstico em ambiente de demonstração'}
             </TooltipContent>
           </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className={cn(
+                "flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border",
+                dtInfo.className
+              )}>
+                <DtIcon className="h-3 w-3" />
+                {dtInfo.label}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {diagnosticType === 'territorial' ? 'Diagnóstico territorial (público)' : 'Diagnóstico enterprise (privado)'}
+            </TooltipContent>
+          </Tooltip>
         </div>
         {onDelete && (
           <>
