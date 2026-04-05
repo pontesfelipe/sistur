@@ -174,7 +174,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
   const { data: availableTracks } = useQuery({
     queryKey: ['available-tracks'],
     queryFn: async () => {
-      const { data } = await supabase.from('edu_tracks').select('id, name').eq('published', true).order('name');
+      const { data } = await supabase.from('edu_tracks').select('id, name').eq('active', true).order('name');
       return data || [];
     },
   });
@@ -188,8 +188,22 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
   const { data: availableExams } = useQuery({
     queryKey: ['available-exam-rulesets'],
     queryFn: async () => {
-      const { data } = await supabase.from('exam_rulesets').select('id, name').eq('active', true).order('name');
-      return data || [];
+      const { data } = await supabase
+        .from('exam_rulesets')
+        .select('ruleset_id, question_count, min_score_pct, time_limit_minutes, course_id')
+        .order('created_at', { ascending: false });
+      if (!data?.length) return [];
+      // Get course names for display
+      const courseIds = data.map(d => d.course_id).filter(Boolean) as string[];
+      let courseMap = new Map<string, string>();
+      if (courseIds.length) {
+        const { data: courses } = await supabase.from('lms_courses').select('course_id, title').in('course_id', courseIds);
+        courses?.forEach(c => courseMap.set(c.course_id, c.title));
+      }
+      return data.map(r => ({
+        ruleset_id: r.ruleset_id,
+        label: courseMap.get(r.course_id || '') || `Prova (${r.question_count}q, ${r.time_limit_minutes}min)`,
+      }));
     },
   });
 
