@@ -424,7 +424,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                 )}
 
                 <div className="space-y-2">
-                  <Label>{assignmentForm.type === 'custom' ? 'Título *' : 'Título (auto-preenchido)'}</Label>
+                  <Label>Título (auto-preenchido)</Label>
                   <Input value={assignmentForm.title} onChange={e => setAssignmentForm(p => ({ ...p, title: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
