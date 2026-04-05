@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Loader2, BarChart3, GraduationCap, Users, BookOpen, ArrowLeft, LogOut, Tag } from 'lucide-react';
 import { useLinkStudentReferral } from '@/hooks/useProfessorReferral';
+import { useLinkUserToOrg } from '@/hooks/useOrgReferral';
 
 type SystemAccess = 'ERP' | 'EDU';
 type EduRole = 'ESTUDANTE' | 'PROFESSOR';
