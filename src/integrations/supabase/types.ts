@@ -6834,6 +6834,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_sistur_admin: { Args: { _user_id: string }; Returns: boolean }
       link_student_referral: {
         Args: { p_referral_code: string }
         Returns: boolean
