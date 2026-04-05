@@ -770,7 +770,7 @@ function ERPTeamTrainingPanel() {
   const handleSaveEditGroup = () => {
     if (!editingGroup || !editForm.name.trim()) { toast.error('Nome obrigatório'); return; }
     updateClassroom.mutate({
-      classroomId: editingGroup.id,
+      id: editingGroup.id,
       name: editForm.name,
       description: editForm.description || undefined,
       discipline: editForm.focus_area || undefined,
