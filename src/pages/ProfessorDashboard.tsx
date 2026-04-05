@@ -153,21 +153,37 @@ function ReferralPanel() {
   );
 }
 
-// ─── Classroom Detail (EDU) ───
-function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack: () => void }) {
+// ─── Unified Group/Classroom Detail ───
+function ClassroomDetail({ classroomId, onBack, contextLabel }: { classroomId: string; onBack: () => void; contextLabel: string }) {
   const { data: students, isLoading: loadingStudents } = useClassroomStudents(classroomId);
   const { addStudent, removeStudent } = useClassroomStudentActions(classroomId);
   const { data: assignments } = useClassroomAssignments(classroomId);
   const { createAssignment, deleteAssignment } = useClassroomAssignmentActions(classroomId);
   const { data: allStudents } = useProfessorStudents();
+  const { effectiveOrgId } = useProfileContext();
 
-  const [showAddStudent, setShowAddStudent] = useState(false);
+  const [showAddMember, setShowAddMember] = useState(false);
   const [showAddAssignment, setShowAddAssignment] = useState(false);
   const [showDeleteAssignment, setShowDeleteAssignment] = useState(false);
   const [deletingAssignment, setDeletingAssignment] = useState<any>(null);
   const [assignmentForm, setAssignmentForm] = useState({
     type: 'custom' as string, title: '', description: '', due_date: '',
     track_id: '', training_id: '', exam_ruleset_id: '',
+  });
+
+  // Fetch org members for adding
+  const { data: orgMembers } = useQuery({
+    queryKey: ['org-members-for-group', effectiveOrgId],
+    queryFn: async () => {
+      if (!effectiveOrgId) return [];
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .eq('org_id', effectiveOrgId);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!effectiveOrgId,
   });
 
   // Fetch available tracks, trainings, exams
@@ -193,7 +209,6 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
         .select('ruleset_id, question_count, min_score_pct, time_limit_minutes, course_id')
         .order('created_at', { ascending: false });
       if (!data?.length) return [];
-      // Get course names for display
       const courseIds = data.map(d => d.course_id).filter(Boolean) as string[];
       let courseMap = new Map<string, string>();
       if (courseIds.length) {
@@ -208,13 +223,23 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
   });
 
   const enrolledIds = new Set(students?.map(s => s.student_id) || []);
-  const availableStudents = allStudents?.filter(s => !enrolledIds.has(s.student_id)) || [];
+
+  // Combine referral students + org members as available people to add
+  const referralAvailable = allStudents?.filter(s => !enrolledIds.has(s.student_id)) || [];
+  const orgAvailable = orgMembers?.filter(m => !enrolledIds.has(m.user_id)) || [];
+  
+  // Merge and deduplicate
+  const allAvailable = [
+    ...referralAvailable.map(s => ({ id: s.student_id, name: s.student_name, source: 'referral' })),
+    ...orgAvailable
+      .filter(m => !referralAvailable.some(r => r.student_id === m.user_id))
+      .map(m => ({ id: m.user_id, name: m.full_name || 'Sem nome', source: 'org' })),
+  ];
 
   const resetForm = () => setAssignmentForm({ type: 'custom', title: '', description: '', due_date: '', track_id: '', training_id: '', exam_ruleset_id: '' });
 
   const handleAddAssignment = () => {
     let title = assignmentForm.title;
-    // Auto-fill title from selected entity
     if (!title.trim()) {
       if (assignmentForm.type === 'track' && assignmentForm.track_id) {
         title = availableTracks?.find(t => t.id === assignmentForm.track_id)?.name || '';
@@ -246,33 +271,39 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" onClick={onBack}>← Voltar às Salas</Button>
+      <Button variant="ghost" onClick={onBack}>← Voltar</Button>
 
+      {/* Members */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> Alunos</CardTitle>
-            <CardDescription>{students?.length || 0} alunos matriculados</CardDescription>
+            <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> Membros</CardTitle>
+            <CardDescription>{students?.length || 0} membros</CardDescription>
           </div>
-          <Dialog open={showAddStudent} onOpenChange={setShowAddStudent}>
+          <Dialog open={showAddMember} onOpenChange={setShowAddMember}>
             <DialogTrigger asChild>
               <Button size="sm"><UserPlus className="h-4 w-4 mr-2" />Adicionar</Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>Adicionar aluno à sala</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>Adicionar membro</DialogTitle></DialogHeader>
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {availableStudents.length === 0 ? (
+                {allAvailable.length === 0 ? (
                   <p className="text-sm text-muted-foreground py-4 text-center">
-                    Nenhum aluno disponível. Convide alunos com seu código de referência.
+                    Nenhum usuário disponível. Convide pessoas com seu código de referência ou código da organização.
                   </p>
                 ) : (
-                  availableStudents.map(s => (
-                    <div key={s.student_id} className="flex items-center justify-between p-2 rounded hover:bg-muted">
-                      <span className="text-sm font-medium">{s.student_name}</span>
+                  allAvailable.map(p => (
+                    <div key={p.id} className="flex items-center justify-between p-2 rounded hover:bg-muted">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{p.name}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {p.source === 'referral' ? 'Indicado' : 'Organização'}
+                        </Badge>
+                      </div>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => { addStudent.mutate(s.student_id); setShowAddStudent(false); }}
+                        onClick={() => { addStudent.mutate(p.id); setShowAddMember(false); }}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
@@ -286,13 +317,13 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
         <CardContent>
           {loadingStudents ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> :
             !students?.length ? (
-              <p className="text-sm text-muted-foreground text-center py-4">Nenhum aluno nesta sala.</p>
+              <p className="text-sm text-muted-foreground text-center py-4">Nenhum membro.</p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nome</TableHead>
-                    <TableHead>Matriculado em</TableHead>
+                    <TableHead>Adicionado em</TableHead>
                     <TableHead className="w-16" />
                   </TableRow>
                 </TableHeader>
@@ -314,11 +345,12 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
         </CardContent>
       </Card>
 
+      {/* Assignments */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2"><ClipboardList className="h-5 w-5" /> Atividades</CardTitle>
-            <CardDescription>Trilhas, testes e conteúdo atribuído à sala</CardDescription>
+            <CardDescription>Trilhas, treinamentos, provas e conteúdo atribuídos</CardDescription>
           </div>
           <Dialog open={showAddAssignment} onOpenChange={setShowAddAssignment}>
             <DialogTrigger asChild>
@@ -422,6 +454,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                     <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                       {a.assignment_type === 'track' ? <BookOpen className="h-4 w-4 text-primary" /> :
                         a.assignment_type === 'exam' ? <ClipboardList className="h-4 w-4 text-primary" /> :
+                        a.assignment_type === 'training' ? <GraduationCap className="h-4 w-4 text-primary" /> :
                           <FileText className="h-4 w-4 text-primary" />}
                     </div>
                     <div>
@@ -466,7 +499,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
     </div>
   );
 }
-// ─── Classrooms Panel (EDU) ───
+
 function ClassroomsPanel() {
   const { classrooms, isLoading, createClassroom, updateClassroom, deleteClassroom } = useClassrooms();
   const [selectedId, setSelectedId] = useState<string | null>(null);
