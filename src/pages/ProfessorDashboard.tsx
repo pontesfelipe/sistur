@@ -378,13 +378,13 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                   <div className="space-y-2">
                     <Label>Selecionar Prova *</Label>
                     <Select value={assignmentForm.exam_ruleset_id} onValueChange={v => {
-                      const ex = availableExams?.find(e => e.id === v);
-                      setAssignmentForm(p => ({ ...p, exam_ruleset_id: v, title: ex?.name || p.title }));
+                      const ex = availableExams?.find(e => e.ruleset_id === v);
+                      setAssignmentForm(p => ({ ...p, exam_ruleset_id: v, title: ex?.label || p.title }));
                     }}>
                       <SelectTrigger><SelectValue placeholder="Escolha uma prova" /></SelectTrigger>
                       <SelectContent>
                         {availableExams?.map(e => (
-                          <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
+                          <SelectItem key={e.ruleset_id} value={e.ruleset_id}>{e.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
