@@ -922,13 +922,30 @@ function ERPTeamTrainingPanel() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {classrooms.map(c => (
-            <Card key={c.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setSelectedGroupId(c.id)}>
+            <Card key={c.id} className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
-                  <CardTitle className="text-base">{c.name}</CardTitle>
-                  <Badge variant={c.status === 'active' ? 'default' : 'secondary'}>
-                    {c.status === 'active' ? 'Ativo' : 'Arquivado'}
-                  </Badge>
+                  <CardTitle className="text-base cursor-pointer" onClick={() => setSelectedGroupId(c.id)}>{c.name}</CardTitle>
+                  <div className="flex items-center gap-1">
+                    <Badge variant={c.status === 'active' ? 'default' : 'secondary'}>
+                      {c.status === 'active' ? 'Ativo' : 'Arquivado'}
+                    </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => e.stopPropagation()}>
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditGroup(c); }}>
+                          <Pencil className="h-4 w-4 mr-2" /> Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setDeleteGroupId(c.id); }} className="text-destructive">
+                          <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
                 {c.discipline && (
                   <CardDescription className="flex items-center gap-1">
@@ -940,7 +957,7 @@ function ERPTeamTrainingPanel() {
                   </CardDescription>
                 )}
               </CardHeader>
-              <CardContent>
+              <CardContent onClick={() => setSelectedGroupId(c.id)}>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1"><Users className="h-4 w-4" />{c.student_count || 0} membros</span>
                   {c.period_start && (
@@ -956,6 +973,68 @@ function ERPTeamTrainingPanel() {
           ))}
         </div>
       )}
+
+      {/* Edit Group Dialog */}
+      <Dialog open={!!editingGroup} onOpenChange={open => !open && setEditingGroup(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Editar Grupo de Capacitação</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nome do grupo *</Label>
+              <Input value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Área de foco</Label>
+              <Select value={editForm.focus_area} onValueChange={v => setEditForm(p => ({ ...p, focus_area: v }))}>
+                <SelectTrigger><SelectValue placeholder="Selecione a área" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="territorial">Diagnóstico Territorial</SelectItem>
+                  <SelectItem value="enterprise">Diagnóstico Enterprise</SelectItem>
+                  <SelectItem value="metodologia">Metodologia SISTUR</SelectItem>
+                  <SelectItem value="geral">Capacitação Geral</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Descrição</Label>
+              <Textarea value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Início</Label>
+                <Input type="date" value={editForm.period_start} onChange={e => setEditForm(p => ({ ...p, period_start: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Fim</Label>
+                <Input type="date" value={editForm.period_end} onChange={e => setEditForm(p => ({ ...p, period_end: e.target.value }))} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select value={editForm.status} onValueChange={v => setEditForm(p => ({ ...p, status: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Ativo</SelectItem>
+                  <SelectItem value="archived">Arquivado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button className="w-full" onClick={handleSaveEditGroup} disabled={updateClassroom.isPending}>
+              {updateClassroom.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Salvar alterações
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Group Confirmation */}
+      <DeleteConfirmDialog
+        open={!!deleteGroupId}
+        onOpenChange={open => !open && setDeleteGroupId(null)}
+        onConfirm={handleDeleteGroup}
+        title="Excluir grupo"
+        description="Tem certeza que deseja excluir este grupo de capacitação? Todos os membros e atribuições serão removidos."
+      />
 
       {/* Team Members Overview */}
       <Card>
