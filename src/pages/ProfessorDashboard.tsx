@@ -153,21 +153,37 @@ function ReferralPanel() {
   );
 }
 
-// ─── Classroom Detail (EDU) ───
+// ─── Unified Group/Classroom Detail ───
 function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack: () => void }) {
   const { data: students, isLoading: loadingStudents } = useClassroomStudents(classroomId);
   const { addStudent, removeStudent } = useClassroomStudentActions(classroomId);
   const { data: assignments } = useClassroomAssignments(classroomId);
   const { createAssignment, deleteAssignment } = useClassroomAssignmentActions(classroomId);
   const { data: allStudents } = useProfessorStudents();
+  const { effectiveOrgId } = useProfileContext();
 
-  const [showAddStudent, setShowAddStudent] = useState(false);
+  const [showAddMember, setShowAddMember] = useState(false);
   const [showAddAssignment, setShowAddAssignment] = useState(false);
   const [showDeleteAssignment, setShowDeleteAssignment] = useState(false);
   const [deletingAssignment, setDeletingAssignment] = useState<any>(null);
   const [assignmentForm, setAssignmentForm] = useState({
     type: 'custom' as string, title: '', description: '', due_date: '',
     track_id: '', training_id: '', exam_ruleset_id: '',
+  });
+
+  // Fetch org members for adding
+  const { data: orgMembers } = useQuery({
+    queryKey: ['org-members-for-group', effectiveOrgId],
+    queryFn: async () => {
+      if (!effectiveOrgId) return [];
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .eq('org_id', effectiveOrgId);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!effectiveOrgId,
   });
 
   // Fetch available tracks, trainings, exams
@@ -193,7 +209,6 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
         .select('ruleset_id, question_count, min_score_pct, time_limit_minutes, course_id')
         .order('created_at', { ascending: false });
       if (!data?.length) return [];
-      // Get course names for display
       const courseIds = data.map(d => d.course_id).filter(Boolean) as string[];
       let courseMap = new Map<string, string>();
       if (courseIds.length) {
@@ -208,13 +223,23 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
   });
 
   const enrolledIds = new Set(students?.map(s => s.student_id) || []);
-  const availableStudents = allStudents?.filter(s => !enrolledIds.has(s.student_id)) || [];
+
+  // Combine referral students + org members as available people to add
+  const referralAvailable = allStudents?.filter(s => !enrolledIds.has(s.student_id)) || [];
+  const orgAvailable = orgMembers?.filter(m => !enrolledIds.has(m.user_id)) || [];
+  
+  // Merge and deduplicate
+  const allAvailable = [
+    ...referralAvailable.map(s => ({ id: s.student_id, name: s.student_name, source: 'referral' })),
+    ...orgAvailable
+      .filter(m => !referralAvailable.some(r => r.student_id === m.user_id))
+      .map(m => ({ id: m.user_id, name: m.full_name || 'Sem nome', source: 'org' })),
+  ];
 
   const resetForm = () => setAssignmentForm({ type: 'custom', title: '', description: '', due_date: '', track_id: '', training_id: '', exam_ruleset_id: '' });
 
   const handleAddAssignment = () => {
     let title = assignmentForm.title;
-    // Auto-fill title from selected entity
     if (!title.trim()) {
       if (assignmentForm.type === 'track' && assignmentForm.track_id) {
         title = availableTracks?.find(t => t.id === assignmentForm.track_id)?.name || '';
@@ -246,33 +271,39 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" onClick={onBack}>← Voltar às Salas</Button>
+      <Button variant="ghost" onClick={onBack}>← Voltar</Button>
 
+      {/* Members */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> Alunos</CardTitle>
-            <CardDescription>{students?.length || 0} alunos matriculados</CardDescription>
+            <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> Membros</CardTitle>
+            <CardDescription>{students?.length || 0} membros</CardDescription>
           </div>
-          <Dialog open={showAddStudent} onOpenChange={setShowAddStudent}>
+          <Dialog open={showAddMember} onOpenChange={setShowAddMember}>
             <DialogTrigger asChild>
               <Button size="sm"><UserPlus className="h-4 w-4 mr-2" />Adicionar</Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>Adicionar aluno à sala</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>Adicionar membro</DialogTitle></DialogHeader>
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {availableStudents.length === 0 ? (
+                {allAvailable.length === 0 ? (
                   <p className="text-sm text-muted-foreground py-4 text-center">
-                    Nenhum aluno disponível. Convide alunos com seu código de referência.
+                    Nenhum usuário disponível. Convide pessoas com seu código de referência ou código da organização.
                   </p>
                 ) : (
-                  availableStudents.map(s => (
-                    <div key={s.student_id} className="flex items-center justify-between p-2 rounded hover:bg-muted">
-                      <span className="text-sm font-medium">{s.student_name}</span>
+                  allAvailable.map(p => (
+                    <div key={p.id} className="flex items-center justify-between p-2 rounded hover:bg-muted">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{p.name}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {p.source === 'referral' ? 'Indicado' : 'Organização'}
+                        </Badge>
+                      </div>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => { addStudent.mutate(s.student_id); setShowAddStudent(false); }}
+                        onClick={() => { addStudent.mutate(p.id); setShowAddMember(false); }}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
@@ -286,13 +317,13 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
         <CardContent>
           {loadingStudents ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> :
             !students?.length ? (
-              <p className="text-sm text-muted-foreground text-center py-4">Nenhum aluno nesta sala.</p>
+              <p className="text-sm text-muted-foreground text-center py-4">Nenhum membro.</p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nome</TableHead>
-                    <TableHead>Matriculado em</TableHead>
+                    <TableHead>Adicionado em</TableHead>
                     <TableHead className="w-16" />
                   </TableRow>
                 </TableHeader>
@@ -314,11 +345,12 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
         </CardContent>
       </Card>
 
+      {/* Assignments */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2"><ClipboardList className="h-5 w-5" /> Atividades</CardTitle>
-            <CardDescription>Trilhas, testes e conteúdo atribuído à sala</CardDescription>
+            <CardDescription>Trilhas, treinamentos, provas e conteúdo atribuídos</CardDescription>
           </div>
           <Dialog open={showAddAssignment} onOpenChange={setShowAddAssignment}>
             <DialogTrigger asChild>
@@ -422,6 +454,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                     <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                       {a.assignment_type === 'track' ? <BookOpen className="h-4 w-4 text-primary" /> :
                         a.assignment_type === 'exam' ? <ClipboardList className="h-4 w-4 text-primary" /> :
+                        a.assignment_type === 'training' ? <GraduationCap className="h-4 w-4 text-primary" /> :
                           <FileText className="h-4 w-4 text-primary" />}
                     </div>
                     <div>
@@ -466,7 +499,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
     </div>
   );
 }
-// ─── Classrooms Panel (EDU) ───
+
 function ClassroomsPanel() {
   const { classrooms, isLoading, createClassroom, updateClassroom, deleteClassroom } = useClassrooms();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -696,599 +729,13 @@ function ClassroomsPanel() {
   );
 }
 
-// ─── ERP: Team Training Panel ───
-function ERPTeamTrainingPanel() {
-  const { user } = useAuth();
-  const { profile, effectiveOrgId } = useProfileContext();
-
-  // Fetch org members
-  const { data: orgMembers, isLoading: loadingMembers } = useQuery({
-    queryKey: ['org-members', effectiveOrgId],
-    queryFn: async () => {
-      if (!effectiveOrgId) return [];
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, system_access, created_at')
-        .eq('org_id', effectiveOrgId);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!effectiveOrgId,
-  });
-
-  // Fetch org member roles
-  const { data: memberRoles } = useQuery({
-    queryKey: ['org-member-roles', effectiveOrgId],
-    queryFn: async () => {
-      if (!effectiveOrgId) return [];
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('user_id, role')
-        .eq('org_id', effectiveOrgId);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!effectiveOrgId,
-  });
-
-  // Fetch available trainings for ERP context (pillar-based)
-  const { data: trainings } = useQuery({
-    queryKey: ['erp-trainings-available'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('edu_trainings')
-        .select('training_id, title, type, pillar, level, duration_minutes')
-        .eq('active', true)
-        .order('pillar')
-        .order('title');
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  // Fetch classrooms used for ERP training groups  
-  const { classrooms, isLoading: loadingClassrooms, createClassroom, updateClassroom, deleteClassroom } = useClassrooms();
-  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
-  const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', focus_area: '', period_start: '', period_end: '' });
-  const [editingGroup, setEditingGroup] = useState<any | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', description: '', focus_area: '', period_start: '', period_end: '', status: 'active' });
-  const [deleteGroupId, setDeleteGroupId] = useState<string | null>(null);
-
-  const handleEditGroup = (group: any) => {
-    setEditingGroup(group);
-    setEditForm({
-      name: group.name || '',
-      description: group.description || '',
-      focus_area: group.discipline || '',
-      period_start: group.period_start ? group.period_start.split('T')[0] : '',
-      period_end: group.period_end ? group.period_end.split('T')[0] : '',
-      status: group.status || 'active',
-    });
-  };
-
-  const handleSaveEditGroup = () => {
-    if (!editingGroup || !editForm.name.trim()) { toast.error('Nome obrigatório'); return; }
-    updateClassroom.mutate({
-      id: editingGroup.id,
-      name: editForm.name,
-      description: editForm.description || undefined,
-      discipline: editForm.focus_area || undefined,
-      period_start: editForm.period_start || undefined,
-      period_end: editForm.period_end || undefined,
-      status: editForm.status,
-    }, { onSuccess: () => setEditingGroup(null) });
-  };
-
-  const handleDeleteGroup = () => {
-    if (!deleteGroupId) return;
-    deleteClassroom.mutate(deleteGroupId, { onSuccess: () => setDeleteGroupId(null) });
-  };
-
-  if (selectedGroupId) {
-    return <ERPGroupDetail groupId={selectedGroupId} onBack={() => setSelectedGroupId(null)} orgMembers={orgMembers || []} />;
-  }
-
-  const handleCreate = () => {
-    if (!form.name.trim()) { toast.error('Nome obrigatório'); return; }
-    createClassroom.mutate({
-      name: form.name,
-      description: form.description || undefined,
-      discipline: form.focus_area || 'Capacitação ERP',
-      period_start: form.period_start || undefined,
-      period_end: form.period_end || undefined,
-    }, {
-      onSuccess: () => {
-        setShowCreate(false);
-        setForm({ name: '', description: '', focus_area: '', period_start: '', period_end: '' });
-      },
-    });
-  };
-
-  const getRoleLabel = (userId: string) => {
-    const role = memberRoles?.find(r => r.user_id === userId);
-    if (!role) return 'Membro';
-    const labels: Record<string, string> = { ADMIN: 'Administrador', ANALYST: 'Analista', VIEWER: 'Visualizador' };
-    return labels[role.role] || role.role;
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Users className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{orgMembers?.length || 0}</p>
-                <p className="text-sm text-muted-foreground">Membros da Equipe</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{classrooms?.length || 0}</p>
-                <p className="text-sm text-muted-foreground">Grupos de Capacitação</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <GraduationCap className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{trainings?.length || 0}</p>
-                <p className="text-sm text-muted-foreground">Treinamentos Disponíveis</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Training Groups */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold">Grupos de Capacitação</h3>
-          <p className="text-sm text-muted-foreground">Organize equipes e atribua treinamentos de metodologia diagnóstica</p>
-        </div>
-        <Dialog open={showCreate} onOpenChange={setShowCreate}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" />Novo Grupo</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>Criar Grupo de Capacitação</DialogTitle></DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Nome do grupo *</Label>
-                <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Ex: Equipe Diagnóstico Territorial 2026" />
-              </div>
-              <div className="space-y-2">
-                <Label>Área de foco</Label>
-                <Select value={form.focus_area} onValueChange={v => setForm(p => ({ ...p, focus_area: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Selecione a área" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="territorial">Diagnóstico Territorial</SelectItem>
-                    <SelectItem value="enterprise">Diagnóstico Enterprise</SelectItem>
-                    <SelectItem value="metodologia">Metodologia SISTUR</SelectItem>
-                    <SelectItem value="geral">Capacitação Geral</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Descrição</Label>
-                <Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Objetivo do grupo de capacitação..." />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Início</Label>
-                  <Input type="date" value={form.period_start} onChange={e => setForm(p => ({ ...p, period_start: e.target.value }))} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Fim</Label>
-                  <Input type="date" value={form.period_end} onChange={e => setForm(p => ({ ...p, period_end: e.target.value }))} />
-                </div>
-              </div>
-              <Button className="w-full" onClick={handleCreate} disabled={createClassroom.isPending}>
-                {createClassroom.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                Criar Grupo
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {loadingClassrooms ? (
-        <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin" /></div>
-      ) : !classrooms?.length ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">Nenhum grupo de capacitação</p>
-            <p className="text-sm text-muted-foreground">Crie um grupo para organizar a capacitação da equipe em metodologia diagnóstica.</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {classrooms.map(c => (
-            <Card key={c.id} className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-base cursor-pointer" onClick={() => setSelectedGroupId(c.id)}>{c.name}</CardTitle>
-                  <div className="flex items-center gap-1">
-                    <Badge variant={c.status === 'active' ? 'default' : 'secondary'}>
-                      {c.status === 'active' ? 'Ativo' : 'Arquivado'}
-                    </Badge>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => e.stopPropagation()}>
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditGroup(c); }}>
-                          <Pencil className="h-4 w-4 mr-2" /> Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setDeleteGroupId(c.id); }} className="text-destructive">
-                          <Trash2 className="h-4 w-4 mr-2" /> Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-                {c.discipline && (
-                  <CardDescription className="flex items-center gap-1">
-                    <Target className="h-3 w-3" />
-                    {c.discipline === 'territorial' ? 'Diagnóstico Territorial' :
-                     c.discipline === 'enterprise' ? 'Diagnóstico Enterprise' :
-                     c.discipline === 'metodologia' ? 'Metodologia SISTUR' :
-                     c.discipline === 'geral' ? 'Capacitação Geral' : c.discipline}
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent onClick={() => setSelectedGroupId(c.id)}>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1"><Users className="h-4 w-4" />{c.student_count || 0} membros</span>
-                  {c.period_start && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {format(new Date(c.period_start), 'dd/MM/yy')}
-                      {c.period_end && ` - ${format(new Date(c.period_end), 'dd/MM/yy')}`}
-                    </span>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Edit Group Dialog */}
-      <Dialog open={!!editingGroup} onOpenChange={open => !open && setEditingGroup(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Editar Grupo de Capacitação</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Nome do grupo *</Label>
-              <Input value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} />
-            </div>
-            <div className="space-y-2">
-              <Label>Área de foco</Label>
-              <Select value={editForm.focus_area} onValueChange={v => setEditForm(p => ({ ...p, focus_area: v }))}>
-                <SelectTrigger><SelectValue placeholder="Selecione a área" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="territorial">Diagnóstico Territorial</SelectItem>
-                  <SelectItem value="enterprise">Diagnóstico Enterprise</SelectItem>
-                  <SelectItem value="metodologia">Metodologia SISTUR</SelectItem>
-                  <SelectItem value="geral">Capacitação Geral</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Descrição</Label>
-              <Textarea value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Início</Label>
-                <Input type="date" value={editForm.period_start} onChange={e => setEditForm(p => ({ ...p, period_start: e.target.value }))} />
-              </div>
-              <div className="space-y-2">
-                <Label>Fim</Label>
-                <Input type="date" value={editForm.period_end} onChange={e => setEditForm(p => ({ ...p, period_end: e.target.value }))} />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select value={editForm.status} onValueChange={v => setEditForm(p => ({ ...p, status: v }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Ativo</SelectItem>
-                  <SelectItem value="archived">Arquivado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button className="w-full" onClick={handleSaveEditGroup} disabled={updateClassroom.isPending}>
-              {updateClassroom.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-              Salvar alterações
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Group Confirmation */}
-      <DeleteConfirmDialog
-        open={!!deleteGroupId}
-        onOpenChange={open => !open && setDeleteGroupId(null)}
-        onConfirm={handleDeleteGroup}
-        title="Excluir grupo"
-        description="Tem certeza que deseja excluir este grupo de capacitação? Todos os membros e atribuições serão removidos."
-      />
-
-      {/* Team Members Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Membros da Organização
-          </CardTitle>
-          <CardDescription>Equipe disponível para capacitação</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loadingMembers ? (
-            <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-          ) : !orgMembers?.length ? (
-            <p className="text-sm text-muted-foreground text-center py-4">Nenhum membro encontrado.</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Função</TableHead>
-                  <TableHead>Acesso</TableHead>
-                  <TableHead>Desde</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {orgMembers.map(m => (
-                  <TableRow key={m.user_id}>
-                    <TableCell className="font-medium">{m.full_name || 'Sem nome'}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{getRoleLabel(m.user_id)}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="text-xs">
-                        {m.system_access === 'ERP' ? 'ERP' : m.system_access === 'EDU' ? 'EDU' : '—'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {format(new Date(m.created_at), 'dd/MM/yyyy')}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-// ─── ERP Group Detail ───
-function ERPGroupDetail({ groupId, onBack, orgMembers }: { groupId: string; onBack: () => void; orgMembers: any[] }) {
-  const { data: students, isLoading: loadingStudents } = useClassroomStudents(groupId);
-  const { addStudent, removeStudent } = useClassroomStudentActions(groupId);
-  const { data: assignments } = useClassroomAssignments(groupId);
-  const { createAssignment, deleteAssignment } = useClassroomAssignmentActions(groupId);
-
-  const [showAddMember, setShowAddMember] = useState(false);
-  const [showAddTraining, setShowAddTraining] = useState(false);
-  const [trainingForm, setTrainingForm] = useState({ type: 'training' as string, title: '', description: '', due_date: '' });
-
-  const enrolledIds = new Set(students?.map(s => s.student_id) || []);
-  const availableMembers = orgMembers.filter(m => !enrolledIds.has(m.user_id));
-
-  const handleAddTraining = () => {
-    if (!trainingForm.title.trim()) { toast.error('Título obrigatório'); return; }
-    createAssignment.mutate({
-      assignment_type: trainingForm.type,
-      title: trainingForm.title,
-      description: trainingForm.description || undefined,
-      due_date: trainingForm.due_date || undefined,
-    }, {
-      onSuccess: () => {
-        setShowAddTraining(false);
-        setTrainingForm({ type: 'training', title: '', description: '', due_date: '' });
-      },
-    });
-  };
-
-  return (
-    <div className="space-y-6">
-      <Button variant="ghost" onClick={onBack}>← Voltar aos Grupos</Button>
-
-      {/* Members */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> Membros do Grupo</CardTitle>
-            <CardDescription>{students?.length || 0} membros atribuídos</CardDescription>
-          </div>
-          <Dialog open={showAddMember} onOpenChange={setShowAddMember}>
-            <DialogTrigger asChild>
-              <Button size="sm"><UserPlus className="h-4 w-4 mr-2" />Adicionar Membro</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>Adicionar membro ao grupo</DialogTitle></DialogHeader>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {availableMembers.length === 0 ? (
-                  <p className="text-sm text-muted-foreground py-4 text-center">
-                    Todos os membros da organização já estão neste grupo.
-                  </p>
-                ) : (
-                  availableMembers.map(m => (
-                    <div key={m.user_id} className="flex items-center justify-between p-2 rounded hover:bg-muted">
-                      <div>
-                        <span className="text-sm font-medium">{m.full_name || 'Sem nome'}</span>
-                        <span className="text-xs text-muted-foreground ml-2">{m.system_access}</span>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => { addStudent.mutate(m.user_id); setShowAddMember(false); }}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-        <CardContent>
-          {loadingStudents ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> :
-            !students?.length ? (
-              <p className="text-sm text-muted-foreground text-center py-4">Nenhum membro neste grupo.</p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Adicionado em</TableHead>
-                    <TableHead className="w-16" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {students.map(s => (
-                    <TableRow key={s.id}>
-                      <TableCell className="font-medium">{s.student_name}</TableCell>
-                      <TableCell className="text-muted-foreground">{format(new Date(s.enrolled_at), 'dd/MM/yyyy')}</TableCell>
-                      <TableCell>
-                        <Button size="icon" variant="ghost" onClick={() => removeStudent.mutate(s.student_id)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-        </CardContent>
-      </Card>
-
-      {/* Training Assignments */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2"><ClipboardList className="h-5 w-5" /> Treinamentos Atribuídos</CardTitle>
-            <CardDescription>Capacitações e conteúdos de metodologia diagnóstica</CardDescription>
-          </div>
-          <Dialog open={showAddTraining} onOpenChange={setShowAddTraining}>
-            <DialogTrigger asChild>
-              <Button size="sm"><Plus className="h-4 w-4 mr-2" />Atribuir Treinamento</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>Atribuir Treinamento</DialogTitle></DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Tipo</Label>
-                  <select
-                    value={trainingForm.type}
-                    onChange={e => setTrainingForm(p => ({ ...p, type: e.target.value }))}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="training">Treinamento de Metodologia</option>
-                    <option value="track">Trilha de Capacitação</option>
-                    <option value="exam">Avaliação de Conhecimento</option>
-                    <option value="custom">Material Personalizado</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Título *</Label>
-                  <Input value={trainingForm.title} onChange={e => setTrainingForm(p => ({ ...p, title: e.target.value }))} placeholder="Ex: Metodologia de Indicadores RA" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Descrição</Label>
-                  <Textarea value={trainingForm.description} onChange={e => setTrainingForm(p => ({ ...p, description: e.target.value }))} placeholder="Objetivo e escopo do treinamento..." />
-                </div>
-                <div className="space-y-2">
-                  <Label>Prazo de conclusão</Label>
-                  <Input type="date" value={trainingForm.due_date} onChange={e => setTrainingForm(p => ({ ...p, due_date: e.target.value }))} />
-                </div>
-                <Button className="w-full" onClick={handleAddTraining} disabled={createAssignment.isPending}>
-                  {createAssignment.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                  Atribuir
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-        <CardContent>
-          {!assignments?.length ? (
-            <p className="text-sm text-muted-foreground text-center py-4">Nenhum treinamento atribuído.</p>
-          ) : (
-            <div className="space-y-3">
-              {assignments.map(a => (
-                <div key={a.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                      {a.assignment_type === 'track' ? <BookOpen className="h-4 w-4 text-primary" /> :
-                        a.assignment_type === 'exam' ? <ClipboardList className="h-4 w-4 text-primary" /> :
-                        a.assignment_type === 'training' ? <GraduationCap className="h-4 w-4 text-primary" /> :
-                          <FileText className="h-4 w-4 text-primary" />}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{a.title}</p>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          {a.assignment_type === 'track' ? 'Trilha' :
-                            a.assignment_type === 'exam' ? 'Avaliação' :
-                              a.assignment_type === 'training' ? 'Treinamento' : 'Material'}
-                        </Badge>
-                        {a.due_date && (
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {format(new Date(a.due_date), 'dd/MM/yyyy')}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <Button size="icon" variant="ghost" onClick={() => deleteAssignment.mutate(a.id)}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
 // ─── Main Page ───
 export default function ProfessorDashboard() {
-  const { hasERPAccess, hasEDUAccess, isProfessor, isAdmin, isAnalyst, isOrgAdmin } = useProfileContext();
+  const { hasEDUAccess, isProfessor, isAdmin, isOrgAdmin } = useProfileContext();
   
-  // Determine available contexts
-  const showEDU = isProfessor || hasEDUAccess || isAdmin;
-  const showERP = hasERPAccess || isAdmin || isAnalyst;
   const canManageContent = isAdmin || isProfessor || isOrgAdmin;
-  const defaultTab = showERP && !isProfessor ? 'erp' : canManageContent ? 'content' : 'edu';
+  const isEduOnly = !isAdmin && !isOrgAdmin && (isProfessor || hasEDUAccess);
+  const groupLabel = isEduOnly ? 'Salas de Aula' : 'Grupos / Salas';
 
   return (
     <AppLayout title="Gestão de Treinamentos">
@@ -1296,88 +743,43 @@ export default function ProfessorDashboard() {
         <div>
           <h1 className="text-3xl font-display font-bold">Gestão de Treinamentos</h1>
           <p className="text-muted-foreground">
-            {showERP && showEDU
-              ? 'Gerencie capacitação de equipes e salas de aula'
-              : showERP
-              ? 'Gerencie a capacitação da equipe em metodologia diagnóstica'
-              : 'Gerencie alunos, salas e atividades'}
+            Gerencie {isEduOnly ? 'salas de aula, alunos e atividades' : 'grupos de capacitação, salas e atividades'}
           </p>
         </div>
 
-        {showERP && showEDU ? (
-          <Tabs defaultValue={defaultTab} className="space-y-6">
-            <TabsList className="flex-wrap">
-              {canManageContent && (
-                <TabsTrigger value="content" className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" /> Gestão de Conteúdo
-                </TabsTrigger>
-              )}
-              <TabsTrigger value="erp" className="flex items-center gap-2">
-                <Building2 className="h-4 w-4" /> Capacitação ERP
-              </TabsTrigger>
-              <TabsTrigger value="edu" className="flex items-center gap-2">
-                <School className="h-4 w-4" /> Salas de Aula
-              </TabsTrigger>
-              {(isProfessor || isAdmin) && (
-                <TabsTrigger value="referral" className="flex items-center gap-2">
-                  <Gift className="h-4 w-4" /> Referências
-                </TabsTrigger>
-              )}
-            </TabsList>
-
+        <Tabs defaultValue={canManageContent ? 'content' : 'groups'} className="space-y-6">
+          <TabsList className="flex-wrap">
             {canManageContent && (
-              <TabsContent value="content">
-                <AdminTrainingsPanel />
-              </TabsContent>
-            )}
-
-            <TabsContent value="erp">
-              <ERPTeamTrainingPanel />
-            </TabsContent>
-
-            <TabsContent value="edu">
-              <ClassroomsPanel />
-            </TabsContent>
-
-            {(isProfessor || isAdmin) && (
-              <TabsContent value="referral">
-                <ReferralPanel />
-              </TabsContent>
-            )}
-          </Tabs>
-        ) : showERP ? (
-          <ERPTeamTrainingPanel />
-        ) : (
-          <Tabs defaultValue={canManageContent ? 'content' : 'classrooms'} className="space-y-6">
-            <TabsList>
-              {canManageContent && (
-                <TabsTrigger value="content" className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" /> Gestão de Conteúdo
-                </TabsTrigger>
-              )}
-              <TabsTrigger value="classrooms" className="flex items-center gap-2">
-                <School className="h-4 w-4" /> Salas
+              <TabsTrigger value="content" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" /> Gestão de Conteúdo
               </TabsTrigger>
+            )}
+            <TabsTrigger value="groups" className="flex items-center gap-2">
+              <School className="h-4 w-4" /> {groupLabel}
+            </TabsTrigger>
+            {(isProfessor || isAdmin) && (
               <TabsTrigger value="referral" className="flex items-center gap-2">
                 <Gift className="h-4 w-4" /> Referências
               </TabsTrigger>
-            </TabsList>
-
-            {canManageContent && (
-              <TabsContent value="content">
-                <AdminTrainingsPanel />
-              </TabsContent>
             )}
+          </TabsList>
 
-            <TabsContent value="classrooms">
-              <ClassroomsPanel />
+          {canManageContent && (
+            <TabsContent value="content">
+              <AdminTrainingsPanel />
             </TabsContent>
+          )}
 
+          <TabsContent value="groups">
+            <ClassroomsPanel />
+          </TabsContent>
+
+          {(isProfessor || isAdmin) && (
             <TabsContent value="referral">
               <ReferralPanel />
             </TabsContent>
-          </Tabs>
-        )}
+          )}
+        </Tabs>
       </div>
     </AppLayout>
   );
