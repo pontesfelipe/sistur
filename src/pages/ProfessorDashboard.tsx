@@ -163,24 +163,71 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
 
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [showAddAssignment, setShowAddAssignment] = useState(false);
-  const [assignmentForm, setAssignmentForm] = useState({ type: 'custom' as string, title: '', description: '', due_date: '' });
+  const [showDeleteAssignment, setShowDeleteAssignment] = useState(false);
+  const [deletingAssignment, setDeletingAssignment] = useState<any>(null);
+  const [assignmentForm, setAssignmentForm] = useState({
+    type: 'custom' as string, title: '', description: '', due_date: '',
+    track_id: '', training_id: '', exam_ruleset_id: '',
+  });
+
+  // Fetch available tracks, trainings, exams
+  const { data: availableTracks } = useQuery({
+    queryKey: ['available-tracks'],
+    queryFn: async () => {
+      const { data } = await supabase.from('edu_tracks').select('id, name').eq('published', true).order('name');
+      return data || [];
+    },
+  });
+  const { data: availableTrainings } = useQuery({
+    queryKey: ['available-trainings-list'],
+    queryFn: async () => {
+      const { data } = await supabase.from('edu_trainings').select('training_id, title, type').eq('active', true).order('title');
+      return data || [];
+    },
+  });
+  const { data: availableExams } = useQuery({
+    queryKey: ['available-exam-rulesets'],
+    queryFn: async () => {
+      const { data } = await supabase.from('exam_rulesets').select('id, name').eq('active', true).order('name');
+      return data || [];
+    },
+  });
 
   const enrolledIds = new Set(students?.map(s => s.student_id) || []);
   const availableStudents = allStudents?.filter(s => !enrolledIds.has(s.student_id)) || [];
 
+  const resetForm = () => setAssignmentForm({ type: 'custom', title: '', description: '', due_date: '', track_id: '', training_id: '', exam_ruleset_id: '' });
+
   const handleAddAssignment = () => {
-    if (!assignmentForm.title.trim()) { toast.error('Título obrigatório'); return; }
+    let title = assignmentForm.title;
+    // Auto-fill title from selected entity
+    if (!title.trim()) {
+      if (assignmentForm.type === 'track' && assignmentForm.track_id) {
+        title = availableTracks?.find(t => t.id === assignmentForm.track_id)?.name || '';
+      } else if (assignmentForm.type === 'training' && assignmentForm.training_id) {
+        title = availableTrainings?.find(t => t.training_id === assignmentForm.training_id)?.title || '';
+      } else if (assignmentForm.type === 'exam' && assignmentForm.exam_ruleset_id) {
+        title = availableExams?.find(e => e.id === assignmentForm.exam_ruleset_id)?.name || '';
+      }
+    }
+    if (!title.trim()) { toast.error('Título obrigatório'); return; }
+
     createAssignment.mutate({
       assignment_type: assignmentForm.type,
-      title: assignmentForm.title,
+      title,
       description: assignmentForm.description || undefined,
       due_date: assignmentForm.due_date || undefined,
+      track_id: assignmentForm.type === 'track' ? assignmentForm.track_id || undefined : undefined,
+      training_id: assignmentForm.type === 'training' ? assignmentForm.training_id || undefined : undefined,
+      exam_ruleset_id: assignmentForm.type === 'exam' ? assignmentForm.exam_ruleset_id || undefined : undefined,
     }, {
-      onSuccess: () => {
-        setShowAddAssignment(false);
-        setAssignmentForm({ type: 'custom', title: '', description: '', due_date: '' });
-      },
+      onSuccess: () => { setShowAddAssignment(false); resetForm(); },
     });
+  };
+
+  const confirmDeleteAssignment = (a: any) => {
+    setDeletingAssignment(a);
+    setShowDeleteAssignment(true);
   };
 
   return (
@@ -268,19 +315,70 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Tipo</Label>
-                  <select
-                    value={assignmentForm.type}
-                    onChange={e => setAssignmentForm(p => ({ ...p, type: e.target.value }))}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="custom">Conteúdo próprio</option>
-                    <option value="track">Trilha de aprendizado</option>
-                    <option value="training">Treinamento</option>
-                    <option value="exam">Teste/Exame</option>
-                  </select>
+                  <Select value={assignmentForm.type} onValueChange={v => setAssignmentForm(p => ({ ...p, type: v, track_id: '', training_id: '', exam_ruleset_id: '', title: '' }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="custom">Conteúdo próprio</SelectItem>
+                      <SelectItem value="track">Trilha de aprendizado</SelectItem>
+                      <SelectItem value="training">Treinamento</SelectItem>
+                      <SelectItem value="exam">Prova / Exame</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+
+                {assignmentForm.type === 'track' && (
+                  <div className="space-y-2">
+                    <Label>Selecionar Trilha *</Label>
+                    <Select value={assignmentForm.track_id} onValueChange={v => {
+                      const track = availableTracks?.find(t => t.id === v);
+                      setAssignmentForm(p => ({ ...p, track_id: v, title: track?.name || p.title }));
+                    }}>
+                      <SelectTrigger><SelectValue placeholder="Escolha uma trilha" /></SelectTrigger>
+                      <SelectContent>
+                        {availableTracks?.map(t => (
+                          <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {assignmentForm.type === 'training' && (
+                  <div className="space-y-2">
+                    <Label>Selecionar Treinamento *</Label>
+                    <Select value={assignmentForm.training_id} onValueChange={v => {
+                      const tr = availableTrainings?.find(t => t.training_id === v);
+                      setAssignmentForm(p => ({ ...p, training_id: v, title: tr?.title || p.title }));
+                    }}>
+                      <SelectTrigger><SelectValue placeholder="Escolha um treinamento" /></SelectTrigger>
+                      <SelectContent>
+                        {availableTrainings?.map(t => (
+                          <SelectItem key={t.training_id} value={t.training_id}>{t.title}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {assignmentForm.type === 'exam' && (
+                  <div className="space-y-2">
+                    <Label>Selecionar Prova *</Label>
+                    <Select value={assignmentForm.exam_ruleset_id} onValueChange={v => {
+                      const ex = availableExams?.find(e => e.id === v);
+                      setAssignmentForm(p => ({ ...p, exam_ruleset_id: v, title: ex?.name || p.title }));
+                    }}>
+                      <SelectTrigger><SelectValue placeholder="Escolha uma prova" /></SelectTrigger>
+                      <SelectContent>
+                        {availableExams?.map(e => (
+                          <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 <div className="space-y-2">
-                  <Label>Título *</Label>
+                  <Label>{assignmentForm.type === 'custom' ? 'Título *' : 'Título (auto-preenchido)'}</Label>
                   <Input value={assignmentForm.title} onChange={e => setAssignmentForm(p => ({ ...p, title: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
@@ -317,7 +415,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
                           {a.assignment_type === 'track' ? 'Trilha' :
-                            a.assignment_type === 'exam' ? 'Teste' :
+                            a.assignment_type === 'exam' ? 'Prova' :
                               a.assignment_type === 'training' ? 'Treinamento' : 'Conteúdo'}
                         </Badge>
                         {a.due_date && (
@@ -329,7 +427,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                       </div>
                     </div>
                   </div>
-                  <Button size="icon" variant="ghost" onClick={() => deleteAssignment.mutate(a.id)}>
+                  <Button size="icon" variant="ghost" onClick={() => confirmDeleteAssignment(a)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
@@ -338,10 +436,22 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
           )}
         </CardContent>
       </Card>
+
+      <DeleteConfirmDialog
+        open={showDeleteAssignment}
+        onOpenChange={setShowDeleteAssignment}
+        title="Excluir Atividade"
+        description={`Tem certeza que deseja excluir a atividade "${deletingAssignment?.title}"?`}
+        onConfirm={() => {
+          deleteAssignment.mutate(deletingAssignment.id, {
+            onSuccess: () => { setShowDeleteAssignment(false); setDeletingAssignment(null); },
+          });
+        }}
+        isPending={deleteAssignment.isPending}
+      />
     </div>
   );
 }
-
 // ─── Classrooms Panel (EDU) ───
 function ClassroomsPanel() {
   const { classrooms, isLoading, createClassroom, updateClassroom, deleteClassroom } = useClassrooms();
