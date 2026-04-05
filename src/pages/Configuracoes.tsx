@@ -211,6 +211,13 @@ export default function Configuracoes() {
 
             <DemoModeToggle />
             <ForumPrivacySettings />
+
+            {/* Org referral management for ORG_ADMIN / ADMIN */}
+            {(isAdmin || isOrgAdmin) && <OrgReferralManagePanel />}
+
+            {/* Any user can join an org by code */}
+            <JoinOrgByCodePanel />
+
             {isAdmin && <ActAsUserPanel />}
           </TabsContent>
 

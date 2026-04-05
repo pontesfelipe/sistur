@@ -159,7 +159,12 @@ const Auth = () => {
     } else {
       toast.success('Conta criada com sucesso!');
       const ref = searchParams.get('ref');
-      navigate(ref ? `/onboarding?ref=${ref}` : '/onboarding');
+      const orgref = searchParams.get('orgref');
+      const params = new URLSearchParams();
+      if (ref) params.set('ref', ref);
+      if (orgref) params.set('orgref', orgref);
+      const qs = params.toString();
+      navigate(qs ? `/onboarding?${qs}` : '/onboarding');
     }
   };
 
