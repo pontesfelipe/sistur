@@ -113,7 +113,7 @@ function ExternalReferenceItem({
 }
 
 export default function Configuracoes() {
-  const { isAdmin } = useProfile();
+  const { isAdmin, isOrgAdmin } = useProfile();
 
   return (
     <AppLayout title="Configurações" subtitle="Documentação, metodologia de cálculo e ferramentas do SISTUR">
