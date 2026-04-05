@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Loader2, BarChart3, GraduationCap, Users, BookOpen, ArrowLeft, LogOut, Tag } from 'lucide-react';
+import { Loader2, BarChart3, GraduationCap, Users, BookOpen, ArrowLeft, LogOut, Tag, Building2 } from 'lucide-react';
 import { useLinkStudentReferral } from '@/hooks/useProfessorReferral';
 import { useLinkUserToOrg } from '@/hooks/useOrgReferral';
 
