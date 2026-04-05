@@ -36,12 +36,12 @@ import {
   FileQuestion,
   BookOpen,
 } from 'lucide-react';
-import { 
-  useQuizQuestions, 
-  type QuizQuestion 
+import {
+  useQuizQuestions,
+  type QuizQuestion
 } from '@/hooks/useQuizzes';
 import { useLMSCourses } from '@/hooks/useLMSCourses';
-import { useExamRulesetMutations } from '@/hooks/useExams';
+import { useExamRulesets, useExamRulesetMutations } from '@/hooks/useExams';
 import { PILLAR_INFO, type Pillar } from '@/types/sistur';
 import {
   Table,
