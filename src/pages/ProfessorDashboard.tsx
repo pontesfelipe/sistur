@@ -221,7 +221,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
       } else if (assignmentForm.type === 'training' && assignmentForm.training_id) {
         title = availableTrainings?.find(t => t.training_id === assignmentForm.training_id)?.title || '';
       } else if (assignmentForm.type === 'exam' && assignmentForm.exam_ruleset_id) {
-        title = availableExams?.find(e => e.id === assignmentForm.exam_ruleset_id)?.name || '';
+        title = availableExams?.find(e => e.ruleset_id === assignmentForm.exam_ruleset_id)?.label || '';
       }
     }
     if (!title.trim()) { toast.error('Título obrigatório'); return; }
