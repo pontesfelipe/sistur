@@ -236,7 +236,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
       .map(m => ({ id: m.user_id, name: m.full_name || 'Sem nome', source: 'org' })),
   ];
 
-  const resetForm = () => setAssignmentForm({ type: 'custom', title: '', description: '', due_date: '', track_id: '', training_id: '', exam_ruleset_id: '' });
+  const resetForm = () => setAssignmentForm({ type: 'track', title: '', description: '', due_date: '', track_id: '', training_id: '', exam_ruleset_id: '' });
 
   const handleAddAssignment = () => {
     let title = assignmentForm.title;
