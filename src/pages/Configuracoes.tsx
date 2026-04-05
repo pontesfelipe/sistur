@@ -21,6 +21,7 @@ import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel'
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
 import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSearch';
 import { useProfile } from '@/hooks/useProfile';
+import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import { 
   BookOpen, 
@@ -113,7 +114,7 @@ function ExternalReferenceItem({
 }
 
 export default function Configuracoes() {
-  const { isAdmin } = useProfile();
+  const { isAdmin, isOrgAdmin } = useProfile();
 
   return (
     <AppLayout title="Configurações" subtitle="Documentação, metodologia de cálculo e ferramentas do SISTUR">
@@ -211,6 +212,13 @@ export default function Configuracoes() {
 
             <DemoModeToggle />
             <ForumPrivacySettings />
+
+            {/* Org referral management for ORG_ADMIN / ADMIN */}
+            {(isAdmin || isOrgAdmin) && <OrgReferralManagePanel />}
+
+            {/* Any user can join an org by code */}
+            <JoinOrgByCodePanel />
+
             {isAdmin && <ActAsUserPanel />}
           </TabsContent>
 

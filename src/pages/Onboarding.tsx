@@ -8,8 +8,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Loader2, BarChart3, GraduationCap, Users, BookOpen, ArrowLeft, LogOut, Tag } from 'lucide-react';
+import { Loader2, BarChart3, GraduationCap, Users, BookOpen, ArrowLeft, LogOut, Tag, Building2 } from 'lucide-react';
 import { useLinkStudentReferral } from '@/hooks/useProfessorReferral';
+import { useLinkUserToOrg } from '@/hooks/useOrgReferral';
 
 type SystemAccess = 'ERP' | 'EDU';
 type EduRole = 'ESTUDANTE' | 'PROFESSOR';
@@ -20,11 +21,13 @@ export default function Onboarding() {
   const { user, loading: authLoading, signOut } = useAuth();
   const { profile, loading: profileLoading, needsOnboarding, completeOnboarding } = useProfile();
   const linkReferral = useLinkStudentReferral();
+  const linkToOrg = useLinkUserToOrg();
   
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [systemAccess, setSystemAccess] = useState<SystemAccess | null>(null);
   const [eduRole, setEduRole] = useState<EduRole | null>(null);
   const [referralCode, setReferralCode] = useState(searchParams.get('ref') || '');
+  const [orgCode, setOrgCode] = useState(searchParams.get('orgref') || '');
   const [submitting, setSubmitting] = useState(false);
 
   if (authLoading || profileLoading) {
@@ -66,6 +69,11 @@ export default function Onboarding() {
     // If student and has referral code, link it
     if (result.success && eduRole === 'ESTUDANTE' && referralCode.trim()) {
       await linkReferral.mutateAsync(referralCode.trim());
+    }
+
+    // If has org code, link to org
+    if (result.success && orgCode.trim()) {
+      await linkToOrg.mutateAsync(orgCode.trim());
     }
 
     setSubmitting(false);
@@ -179,6 +187,24 @@ export default function Onboarding() {
                   </Label>
                 </div>
               </RadioGroup>
+
+              {/* Org referral code - optional for all users */}
+              <div className="space-y-2 pt-2 border-t">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Building2 className="h-4 w-4" />
+                  <span>Código de Organização (opcional)</span>
+                </div>
+                <Input
+                  value={orgCode}
+                  onChange={e => setOrgCode(e.target.value.toUpperCase())}
+                  placeholder="Ex: ORGAB3XYZ"
+                  maxLength={20}
+                  className="font-mono tracking-widest"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Se recebeu um código de uma organização, insira para ingressar automaticamente.
+                </p>
+              </div>
 
               <Button onClick={handleContinue} disabled={!systemAccess || submitting} className="w-full">
                 {submitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Configurando...</>) : 'Continuar'}
