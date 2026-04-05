@@ -747,10 +747,43 @@ function ERPTeamTrainingPanel() {
   });
 
   // Fetch classrooms used for ERP training groups  
-  const { classrooms, isLoading: loadingClassrooms, createClassroom, deleteClassroom } = useClassrooms();
+  const { classrooms, isLoading: loadingClassrooms, createClassroom, updateClassroom, deleteClassroom } = useClassrooms();
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ name: '', description: '', focus_area: '', period_start: '', period_end: '' });
+  const [editingGroup, setEditingGroup] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', description: '', focus_area: '', period_start: '', period_end: '', status: 'active' });
+  const [deleteGroupId, setDeleteGroupId] = useState<string | null>(null);
+
+  const handleEditGroup = (group: any) => {
+    setEditingGroup(group);
+    setEditForm({
+      name: group.name || '',
+      description: group.description || '',
+      focus_area: group.discipline || '',
+      period_start: group.period_start ? group.period_start.split('T')[0] : '',
+      period_end: group.period_end ? group.period_end.split('T')[0] : '',
+      status: group.status || 'active',
+    });
+  };
+
+  const handleSaveEditGroup = () => {
+    if (!editingGroup || !editForm.name.trim()) { toast.error('Nome obrigatório'); return; }
+    updateClassroom.mutate({
+      classroomId: editingGroup.id,
+      name: editForm.name,
+      description: editForm.description || undefined,
+      discipline: editForm.focus_area || undefined,
+      period_start: editForm.period_start || undefined,
+      period_end: editForm.period_end || undefined,
+      status: editForm.status,
+    }, { onSuccess: () => setEditingGroup(null) });
+  };
+
+  const handleDeleteGroup = () => {
+    if (!deleteGroupId) return;
+    deleteClassroom.mutate(deleteGroupId, { onSuccess: () => setDeleteGroupId(null) });
+  };
 
   if (selectedGroupId) {
     return <ERPGroupDetail groupId={selectedGroupId} onBack={() => setSelectedGroupId(null)} orgMembers={orgMembers || []} />;
