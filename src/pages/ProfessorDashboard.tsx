@@ -364,7 +364,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                   <Select value={assignmentForm.type} onValueChange={v => setAssignmentForm(p => ({ ...p, type: v, track_id: '', training_id: '', exam_ruleset_id: '', title: '' }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="custom">Conteúdo próprio</SelectItem>
+                      
                       <SelectItem value="track">Trilha de aprendizado</SelectItem>
                       <SelectItem value="training">Treinamento</SelectItem>
                       <SelectItem value="exam">Prova / Exame</SelectItem>
