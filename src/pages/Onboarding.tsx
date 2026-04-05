@@ -188,6 +188,24 @@ export default function Onboarding() {
                 </div>
               </RadioGroup>
 
+              {/* Org referral code - optional for all users */}
+              <div className="space-y-2 pt-2 border-t">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Building2 className="h-4 w-4" />
+                  <span>Código de Organização (opcional)</span>
+                </div>
+                <Input
+                  value={orgCode}
+                  onChange={e => setOrgCode(e.target.value.toUpperCase())}
+                  placeholder="Ex: ORGAB3XYZ"
+                  maxLength={20}
+                  className="font-mono tracking-widest"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Se recebeu um código de uma organização, insira para ingressar automaticamente.
+                </p>
+              </div>
+
               <Button onClick={handleContinue} disabled={!systemAccess || submitting} className="w-full">
                 {submitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Configurando...</>) : 'Continuar'}
               </Button>
