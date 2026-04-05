@@ -344,10 +344,14 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
 
 // ─── Classrooms Panel (EDU) ───
 function ClassroomsPanel() {
-  const { classrooms, isLoading, createClassroom, deleteClassroom } = useClassrooms();
+  const { classrooms, isLoading, createClassroom, updateClassroom, deleteClassroom } = useClassrooms();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [editingClassroom, setEditingClassroom] = useState<any>(null);
   const [form, setForm] = useState({ name: '', description: '', discipline: '', period_start: '', period_end: '' });
+  const [editForm, setEditForm] = useState({ name: '', description: '', discipline: '', period_start: '', period_end: '', status: 'active' });
 
   if (selectedId) {
     return <ClassroomDetail classroomId={selectedId} onBack={() => setSelectedId(null)} />;
@@ -366,6 +370,45 @@ function ClassroomsPanel() {
         setShowCreate(false);
         setForm({ name: '', description: '', discipline: '', period_start: '', period_end: '' });
       },
+    });
+  };
+
+  const openEdit = (c: any) => {
+    setEditingClassroom(c);
+    setEditForm({
+      name: c.name || '',
+      description: c.description || '',
+      discipline: c.discipline || '',
+      period_start: c.period_start || '',
+      period_end: c.period_end || '',
+      status: c.status || 'active',
+    });
+    setShowEdit(true);
+  };
+
+  const handleEdit = () => {
+    if (!editForm.name.trim()) { toast.error('Nome obrigatório'); return; }
+    updateClassroom.mutate({
+      id: editingClassroom.id,
+      name: editForm.name,
+      description: editForm.description || undefined,
+      discipline: editForm.discipline || undefined,
+      period_start: editForm.period_start || undefined,
+      period_end: editForm.period_end || undefined,
+      status: editForm.status,
+    }, {
+      onSuccess: () => { setShowEdit(false); setEditingClassroom(null); },
+    });
+  };
+
+  const openDelete = (c: any) => {
+    setEditingClassroom(c);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDelete = () => {
+    deleteClassroom.mutate(editingClassroom.id, {
+      onSuccess: () => { setShowDeleteConfirm(false); setEditingClassroom(null); },
     });
   };
 
@@ -427,17 +470,34 @@ function ClassroomsPanel() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {classrooms.map(c => (
-            <Card key={c.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setSelectedId(c.id)}>
+            <Card key={c.id} className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
-                  <CardTitle className="text-base">{c.name}</CardTitle>
-                  <Badge variant={c.status === 'active' ? 'default' : 'secondary'}>
-                    {c.status === 'active' ? 'Ativa' : 'Arquivada'}
-                  </Badge>
+                  <CardTitle className="text-base flex-1 cursor-pointer" onClick={() => setSelectedId(c.id)}>{c.name}</CardTitle>
+                  <div className="flex items-center gap-1">
+                    <Badge variant={c.status === 'active' ? 'default' : 'secondary'}>
+                      {c.status === 'active' ? 'Ativa' : 'Arquivada'}
+                    </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={e => e.stopPropagation()}>
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openEdit(c); }}>
+                          <Pencil className="h-4 w-4 mr-2" /> Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={(e) => { e.stopPropagation(); openDelete(c); }}>
+                          <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
                 {c.discipline && <CardDescription>{c.discipline}</CardDescription>}
               </CardHeader>
-              <CardContent>
+              <CardContent onClick={() => setSelectedId(c.id)}>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1"><Users className="h-4 w-4" />{c.student_count || 0} alunos</span>
                   {c.period_start && (
@@ -453,6 +513,61 @@ function ClassroomsPanel() {
           ))}
         </div>
       )}
+
+      {/* Edit Dialog */}
+      <Dialog open={showEdit} onOpenChange={setShowEdit}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Editar Sala</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nome da sala *</Label>
+              <Input value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Disciplina</Label>
+              <Input value={editForm.discipline} onChange={e => setEditForm(p => ({ ...p, discipline: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Descrição</Label>
+              <Textarea value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Início do período</Label>
+                <Input type="date" value={editForm.period_start} onChange={e => setEditForm(p => ({ ...p, period_start: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Fim do período</Label>
+                <Input type="date" value={editForm.period_end} onChange={e => setEditForm(p => ({ ...p, period_end: e.target.value }))} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select value={editForm.status} onValueChange={v => setEditForm(p => ({ ...p, status: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Ativa</SelectItem>
+                  <SelectItem value="archived">Arquivada</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button className="w-full" onClick={handleEdit} disabled={updateClassroom.isPending}>
+              {updateClassroom.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Salvar Alterações
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirm */}
+      <DeleteConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="Excluir Sala"
+        description={`Tem certeza que deseja excluir a sala "${editingClassroom?.name}"? Todos os alunos e atividades associados serão removidos.`}
+        onConfirm={handleDelete}
+        isPending={deleteClassroom.isPending}
+      />
     </div>
   );
 }
