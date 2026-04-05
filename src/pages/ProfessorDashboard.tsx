@@ -1318,7 +1318,7 @@ export default function ProfessorDashboard() {
               <TabsTrigger value="edu" className="flex items-center gap-2">
                 <School className="h-4 w-4" /> Salas de Aula
               </TabsTrigger>
-              {isProfessor && (
+              {(isProfessor || isAdmin) && (
                 <TabsTrigger value="referral" className="flex items-center gap-2">
                   <Gift className="h-4 w-4" /> Referências
                 </TabsTrigger>
@@ -1339,7 +1339,7 @@ export default function ProfessorDashboard() {
               <ClassroomsPanel />
             </TabsContent>
 
-            {isProfessor && (
+            {(isProfessor || isAdmin) && (
               <TabsContent value="referral">
                 <ReferralPanel />
               </TabsContent>
