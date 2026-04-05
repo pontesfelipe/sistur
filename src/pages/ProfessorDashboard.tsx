@@ -236,7 +236,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
       .map(m => ({ id: m.user_id, name: m.full_name || 'Sem nome', source: 'org' })),
   ];
 
-  const resetForm = () => setAssignmentForm({ type: 'custom', title: '', description: '', due_date: '', track_id: '', training_id: '', exam_ruleset_id: '' });
+  const resetForm = () => setAssignmentForm({ type: 'track', title: '', description: '', due_date: '', track_id: '', training_id: '', exam_ruleset_id: '' });
 
   const handleAddAssignment = () => {
     let title = assignmentForm.title;
@@ -364,7 +364,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                   <Select value={assignmentForm.type} onValueChange={v => setAssignmentForm(p => ({ ...p, type: v, track_id: '', training_id: '', exam_ruleset_id: '', title: '' }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="custom">Conteúdo próprio</SelectItem>
+                      
                       <SelectItem value="track">Trilha de aprendizado</SelectItem>
                       <SelectItem value="training">Treinamento</SelectItem>
                       <SelectItem value="exam">Prova / Exame</SelectItem>
@@ -424,7 +424,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                 )}
 
                 <div className="space-y-2">
-                  <Label>{assignmentForm.type === 'custom' ? 'Título *' : 'Título (auto-preenchido)'}</Label>
+                  <Label>Título (auto-preenchido)</Label>
                   <Input value={assignmentForm.title} onChange={e => setAssignmentForm(p => ({ ...p, title: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
