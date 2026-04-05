@@ -21,11 +21,13 @@ export default function Onboarding() {
   const { user, loading: authLoading, signOut } = useAuth();
   const { profile, loading: profileLoading, needsOnboarding, completeOnboarding } = useProfile();
   const linkReferral = useLinkStudentReferral();
+  const linkToOrg = useLinkUserToOrg();
   
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [systemAccess, setSystemAccess] = useState<SystemAccess | null>(null);
   const [eduRole, setEduRole] = useState<EduRole | null>(null);
   const [referralCode, setReferralCode] = useState(searchParams.get('ref') || '');
+  const [orgCode, setOrgCode] = useState(searchParams.get('orgref') || '');
   const [submitting, setSubmitting] = useState(false);
 
   if (authLoading || profileLoading) {
