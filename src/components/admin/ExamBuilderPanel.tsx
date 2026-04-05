@@ -21,9 +21,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import { toast } from 'sonner';
-import { 
+import {
   Plus,
   Search,
   HelpCircle,
@@ -36,13 +36,9 @@ import {
   FileQuestion,
   BookOpen,
 } from 'lucide-react';
-import {
-  useQuizQuestions,
-  type QuizQuestion
-} from '@/hooks/useQuizzes';
+import { useQuizQuestions } from '@/hooks/useQuizzes';
 import { useLMSCourses } from '@/hooks/useLMSCourses';
 import { useExamRulesets, useExamRulesetMutations } from '@/hooks/useExams';
-import { PILLAR_INFO, type Pillar } from '@/types/sistur';
 import {
   Table,
   TableBody,
@@ -62,32 +58,30 @@ export function ExamBuilderPanel() {
     min_score_pct: 70,
     time_limit_minutes: 60,
   });
-  
+
   const { data: questions, isLoading } = useQuizQuestions();
   const { data: lmsCourses, isLoading: loadingCourses } = useLMSCourses();
+  const { data: examRulesets, isLoading: loadingRulesets } = useExamRulesets();
   const { createRuleset } = useExamRulesetMutations();
-  
-  const filteredQuestions = questions?.filter(q => {
-    const matchesSearch = !searchQuery || 
-      q.stem.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesPillar = pillarFilter === 'all' || q.pillar === pillarFilter;
-    return matchesSearch && matchesPillar;
-  }) || [];
 
-  const selectedQuestionDetails = questions?.filter(q => 
-    selectedQuestions.includes(q.quiz_id)
-  ) || [];
+  const filteredQuestions =
+    questions?.filter((q) => {
+      const matchesSearch = !searchQuery || q.stem.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesPillar = pillarFilter === 'all' || q.pillar === pillarFilter;
+      return matchesSearch && matchesPillar;
+    }) || [];
+
+  const selectedQuestionDetails =
+    questions?.filter((q) => selectedQuestions.includes(q.quiz_id)) || [];
 
   const toggleQuestion = (quizId: string) => {
-    setSelectedQuestions(prev => 
-      prev.includes(quizId) 
-        ? prev.filter(id => id !== quizId)
-        : [...prev, quizId]
+    setSelectedQuestions((prev) =>
+      prev.includes(quizId) ? prev.filter((id) => id !== quizId) : [...prev, quizId]
     );
   };
 
   const removeQuestion = (quizId: string) => {
-    setSelectedQuestions(prev => prev.filter(id => id !== quizId));
+    setSelectedQuestions((prev) => prev.filter((id) => id !== quizId));
   };
 
   const clearSelection = () => {
@@ -106,9 +100,8 @@ export function ExamBuilderPanel() {
     }
 
     try {
-      // Create pillar mix based on selected questions distribution
       const pillarCounts: Record<string, number> = {};
-      selectedQuestionDetails.forEach(q => {
+      selectedQuestionDetails.forEach((q) => {
         pillarCounts[q.pillar] = (pillarCounts[q.pillar] || 0) + 1;
       });
 
@@ -124,7 +117,7 @@ export function ExamBuilderPanel() {
         pillar_mix: pillarCounts,
       });
 
-      toast.success('Exame configurado com sucesso!');
+      toast.success('Exame criado com sucesso!');
       setIsCreateDialogOpen(false);
       setSelectedCourseId('');
       clearSelection();
@@ -134,42 +127,115 @@ export function ExamBuilderPanel() {
     }
   };
 
-  const getDifficultyBadge = (difficulty: number) => {
-    if (difficulty <= 1) return <Badge variant="outline" className="bg-green-500/10 text-green-700 text-xs">Fácil</Badge>;
-    if (difficulty <= 2) return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 text-xs">Médio</Badge>;
-    return <Badge variant="outline" className="bg-red-500/10 text-red-700 text-xs">Difícil</Badge>;
+  const getDifficultyBadge = (difficulty: number | null | undefined) => {
+    if ((difficulty || 0) <= 0.34) {
+      return <Badge variant="outline" className="text-xs">Fácil</Badge>;
+    }
+
+    if ((difficulty || 0) <= 0.66) {
+      return <Badge variant="secondary" className="text-xs">Médio</Badge>;
+    }
+
+    return <Badge className="text-xs">Difícil</Badge>;
   };
 
   const getTypeBadge = (type: string) => {
     switch (type) {
       case 'multiple_choice':
-        return <Badge variant="secondary" className="text-xs"><ListChecks className="w-3 h-3 mr-1" />ME</Badge>;
+        return (
+          <Badge variant="secondary" className="text-xs">
+            <ListChecks className="mr-1 h-3 w-3" />
+            ME
+          </Badge>
+        );
       case 'true_false':
-        return <Badge variant="secondary" className="text-xs"><CheckCircle className="w-3 h-3 mr-1" />V/F</Badge>;
+        return (
+          <Badge variant="secondary" className="text-xs">
+            <CheckCircle className="mr-1 h-3 w-3" />
+            V/F
+          </Badge>
+        );
       default:
-        return <Badge variant="secondary" className="text-xs"><FileQuestion className="w-3 h-3 mr-1" />Dis</Badge>;
+        return (
+          <Badge variant="secondary" className="text-xs">
+            <FileQuestion className="mr-1 h-3 w-3" />
+            Dis.
+          </Badge>
+        );
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Question Pool */}
-        <div className="lg:col-span-2 space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <ClipboardList className="h-4 w-4 text-primary" />
+            Provas cadastradas
+          </CardTitle>
+          <CardDescription>
+            {examRulesets?.length || 0} prova(s) já configurada(s) no sistema
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loadingRulesets ? (
+            <div className="space-y-2">
+              {[...Array(3)].map((_, index) => (
+                <Skeleton key={index} className="h-12 w-full" />
+              ))}
+            </div>
+          ) : !examRulesets?.length ? (
+            <div className="py-8 text-center text-muted-foreground">
+              <ClipboardList className="mx-auto mb-2 h-8 w-8 opacity-50" />
+              <p className="text-sm">Nenhuma prova cadastrada ainda</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Curso</TableHead>
+                    <TableHead>Questões</TableHead>
+                    <TableHead>Nota mínima</TableHead>
+                    <TableHead>Tempo</TableHead>
+                    <TableHead>Tentativas</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {examRulesets.map((ruleset) => (
+                    <TableRow key={ruleset.ruleset_id}>
+                      <TableCell className="font-medium">
+                        {ruleset.lms_courses?.title || 'Curso sem título'}
+                      </TableCell>
+                      <TableCell>{ruleset.question_count}</TableCell>
+                      <TableCell>{Number(ruleset.min_score_pct)}%</TableCell>
+                      <TableCell>{ruleset.time_limit_minutes} min</TableCell>
+                      <TableCell>{ruleset.max_attempts}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base">
                 <HelpCircle className="h-4 w-4 text-primary" />
                 Banco de Questões
               </CardTitle>
               <CardDescription>
-                Selecione as questões para compor o exame
+                Selecione as questões para compor uma nova prova
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="Buscar questões..."
                     className="pl-9"
@@ -192,9 +258,14 @@ export function ExamBuilderPanel() {
 
               {isLoading ? (
                 <div className="space-y-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className="h-12 w-full" />
+                  {[...Array(5)].map((_, index) => (
+                    <Skeleton key={index} className="h-12 w-full" />
                   ))}
+                </div>
+              ) : filteredQuestions.length === 0 ? (
+                <div className="py-8 text-center text-muted-foreground">
+                  <HelpCircle className="mx-auto mb-2 h-8 w-8 opacity-50" />
+                  <p className="text-sm">Nenhuma questão encontrada</p>
                 </div>
               ) : (
                 <ScrollArea className="h-[400px]">
@@ -205,14 +276,14 @@ export function ExamBuilderPanel() {
                         <TableHead>Enunciado</TableHead>
                         <TableHead className="w-20">Pilar</TableHead>
                         <TableHead className="w-20">Tipo</TableHead>
-                        <TableHead className="w-20">Dif.</TableHead>
+                        <TableHead className="w-24">Dif.</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredQuestions.map((question) => (
-                        <TableRow 
+                        <TableRow
                           key={question.quiz_id}
-                          className={selectedQuestions.includes(question.quiz_id) ? "bg-primary/5" : ""}
+                          className={selectedQuestions.includes(question.quiz_id) ? 'bg-primary/5' : ''}
                         >
                           <TableCell>
                             <Checkbox
@@ -220,22 +291,14 @@ export function ExamBuilderPanel() {
                               onCheckedChange={() => toggleQuestion(question.quiz_id)}
                             />
                           </TableCell>
-                          <TableCell className="font-medium max-w-md">
+                          <TableCell className="max-w-md font-medium">
                             <span className="line-clamp-2">{question.stem}</span>
                           </TableCell>
                           <TableCell>
-                            <Badge 
-                              variant="outline"
-                              style={{ 
-                                backgroundColor: `${PILLAR_INFO[question.pillar as Pillar]?.color}20`,
-                                borderColor: PILLAR_INFO[question.pillar as Pillar]?.color 
-                              }}
-                            >
-                              {question.pillar}
-                            </Badge>
+                            <Badge variant="outline">{question.pillar}</Badge>
                           </TableCell>
                           <TableCell>{getTypeBadge(question.question_type)}</TableCell>
-                          <TableCell>{getDifficultyBadge(question.difficulty || 1)}</TableCell>
+                          <TableCell>{getDifficultyBadge(question.difficulty)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -246,14 +309,13 @@ export function ExamBuilderPanel() {
           </Card>
         </div>
 
-        {/* Selected Questions */}
         <div className="space-y-4">
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-base">
                   <ClipboardList className="h-4 w-4 text-primary" />
-                  Exame ({selectedQuestions.length})
+                  Nova prova ({selectedQuestions.length})
                 </CardTitle>
                 {selectedQuestions.length > 0 && (
                   <Button variant="ghost" size="sm" onClick={clearSelection}>
@@ -262,32 +324,32 @@ export function ExamBuilderPanel() {
                 )}
               </div>
               <CardDescription>
-                Questões selecionadas para o exame
+                Questões selecionadas para a nova prova
               </CardDescription>
             </CardHeader>
             <CardContent>
               {selectedQuestions.length === 0 ? (
                 <div className="py-8 text-center text-muted-foreground">
-                  <ClipboardList className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <ClipboardList className="mx-auto mb-2 h-8 w-8 opacity-50" />
                   <p className="text-sm">Selecione questões ao lado</p>
                 </div>
               ) : (
                 <ScrollArea className="h-[300px]">
                   <div className="space-y-2">
-                    {selectedQuestionDetails.map((question, idx) => (
-                      <div 
+                    {selectedQuestionDetails.map((question, index) => (
+                      <div
                         key={question.quiz_id}
-                        className="flex items-start gap-2 p-2 rounded-lg bg-muted/50 group"
+                        className="group flex items-start gap-2 rounded-lg bg-muted/50 p-2"
                       >
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex shrink-0 items-center gap-2">
                           <GripVertical className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-xs font-medium text-muted-foreground w-5">
-                            {idx + 1}.
+                          <span className="w-5 text-xs font-medium text-muted-foreground">
+                            {index + 1}.
                           </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm line-clamp-2">{question.stem}</p>
-                          <div className="flex gap-1 mt-1">
+                        <div className="min-w-0 flex-1">
+                          <p className="line-clamp-2 text-sm">{question.stem}</p>
+                          <div className="mt-1 flex gap-1">
                             <Badge variant="outline" className="text-xs">
                               {question.pillar}
                             </Badge>
@@ -308,18 +370,14 @@ export function ExamBuilderPanel() {
               )}
 
               {selectedQuestions.length > 0 && (
-                <Button 
-                  className="w-full mt-4" 
-                  onClick={() => setIsCreateDialogOpen(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Atribuir a Curso
+                <Button className="mt-4 w-full" onClick={() => setIsCreateDialogOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Criar prova
                 </Button>
               )}
             </CardContent>
           </Card>
 
-          {/* Stats Summary */}
           {selectedQuestions.length > 0 && (
             <Card>
               <CardHeader className="pb-2">
@@ -333,19 +391,19 @@ export function ExamBuilderPanel() {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Pilar RA:</span>
                   <span className="font-medium">
-                    {selectedQuestionDetails.filter(q => q.pillar === 'RA').length}
+                    {selectedQuestionDetails.filter((q) => q.pillar === 'RA').length}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Pilar OE:</span>
                   <span className="font-medium">
-                    {selectedQuestionDetails.filter(q => q.pillar === 'OE').length}
+                    {selectedQuestionDetails.filter((q) => q.pillar === 'OE').length}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Pilar AO:</span>
                   <span className="font-medium">
-                    {selectedQuestionDetails.filter(q => q.pillar === 'AO').length}
+                    {selectedQuestionDetails.filter((q) => q.pillar === 'AO').length}
                   </span>
                 </div>
               </CardContent>
@@ -354,11 +412,10 @@ export function ExamBuilderPanel() {
         </div>
       </div>
 
-      {/* Create Exam Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Atribuir Exame ao Curso</DialogTitle>
+            <DialogTitle>Criar prova</DialogTitle>
             <DialogDescription>
               Configure as regras e associe a um curso LMS
             </DialogDescription>
@@ -373,15 +430,13 @@ export function ExamBuilderPanel() {
                 </SelectTrigger>
                 <SelectContent>
                   {loadingCourses ? (
-                    <div className="py-4 text-center text-sm text-muted-foreground">
-                      Carregando...
-                    </div>
+                    <div className="py-4 text-center text-sm text-muted-foreground">Carregando...</div>
                   ) : lmsCourses?.length === 0 ? (
                     <div className="py-4 text-center text-sm text-muted-foreground">
                       Nenhum curso disponível
                     </div>
                   ) : (
-                    lmsCourses?.map(course => (
+                    lmsCourses?.map((course) => (
                       <SelectItem key={course.course_id} value={course.course_id}>
                         <div className="flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">
@@ -405,10 +460,12 @@ export function ExamBuilderPanel() {
                   min={0}
                   max={100}
                   value={examSettings.min_score_pct}
-                  onChange={(e) => setExamSettings({ 
-                    ...examSettings, 
-                    min_score_pct: parseInt(e.target.value) || 70 
-                  })}
+                  onChange={(e) =>
+                    setExamSettings({
+                      ...examSettings,
+                      min_score_pct: parseInt(e.target.value) || 70,
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -419,10 +476,12 @@ export function ExamBuilderPanel() {
                   min={5}
                   max={480}
                   value={examSettings.time_limit_minutes}
-                  onChange={(e) => setExamSettings({ 
-                    ...examSettings, 
-                    time_limit_minutes: parseInt(e.target.value) || 60 
-                  })}
+                  onChange={(e) =>
+                    setExamSettings({
+                      ...examSettings,
+                      time_limit_minutes: parseInt(e.target.value) || 60,
+                    })
+                  }
                 />
               </div>
             </div>
@@ -432,7 +491,7 @@ export function ExamBuilderPanel() {
                 <div className="flex items-center gap-2 text-sm">
                   <BookOpen className="h-4 w-4 text-primary" />
                   <span className="font-medium">{selectedQuestions.length} questões</span>
-                  <span className="text-muted-foreground">serão atribuídas ao curso</span>
+                  <span className="text-muted-foreground">serão usadas nesta prova</span>
                 </div>
               </CardContent>
             </Card>
@@ -442,17 +501,17 @@ export function ExamBuilderPanel() {
             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
               Cancelar
             </Button>
-            <Button 
+            <Button
               onClick={handleCreateExam}
               disabled={!selectedCourseId || createRuleset.isPending}
             >
               {createRuleset.isPending ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Salvando...
                 </>
               ) : (
-                'Criar Exame'
+                'Criar prova'
               )}
             </Button>
           </DialogFooter>
