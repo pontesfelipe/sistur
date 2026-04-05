@@ -154,7 +154,7 @@ function ReferralPanel() {
 }
 
 // ─── Unified Group/Classroom Detail ───
-function ClassroomDetail({ classroomId, onBack, contextLabel }: { classroomId: string; onBack: () => void; contextLabel: string }) {
+function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack: () => void }) {
   const { data: students, isLoading: loadingStudents } = useClassroomStudents(classroomId);
   const { addStudent, removeStudent } = useClassroomStudentActions(classroomId);
   const { data: assignments } = useClassroomAssignments(classroomId);
