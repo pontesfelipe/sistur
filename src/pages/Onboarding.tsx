@@ -71,6 +71,11 @@ export default function Onboarding() {
       await linkReferral.mutateAsync(referralCode.trim());
     }
 
+    // If has org code, link to org
+    if (result.success && orgCode.trim()) {
+      await linkToOrg.mutateAsync(orgCode.trim());
+    }
+
     setSubmitting(false);
 
     if (result.success) {
