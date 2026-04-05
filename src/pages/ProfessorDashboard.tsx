@@ -1339,7 +1339,7 @@ export default function ProfessorDashboard() {
               <ClassroomsPanel />
             </TabsContent>
 
-            {isProfessor && (
+            {(isProfessor || isAdmin) && (
               <TabsContent value="referral">
                 <ReferralPanel />
               </TabsContent>
