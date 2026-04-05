@@ -5087,6 +5087,41 @@ export type Database = {
           },
         ]
       }
+      org_referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          org_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          org_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_referral_codes_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orgs: {
         Row: {
           created_at: string
@@ -6803,6 +6838,7 @@ export type Database = {
         Args: { p_referral_code: string }
         Returns: boolean
       }
+      link_user_to_org_by_code: { Args: { p_code: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string
