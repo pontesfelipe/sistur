@@ -24,9 +24,11 @@ const DEFAULT_FEATURES: Record<string, Record<string, boolean>> = {
   enterprise: { erp: true, edu: true, games: true, reports: true, integrations: true },
 }
 
+// Roles that ORG_ADMIN can assign (cannot assign ADMIN or ORG_ADMIN)
+const ORG_ADMIN_ASSIGNABLE_ROLES = ['ANALYST', 'VIEWER', 'ESTUDANTE', 'PROFESSOR']
+
 /**
  * Sync a user's license to match their role.
- * Creates or updates the license record so Licenses panel stays consistent.
  */
 async function syncLicense(
   supabaseAdmin: any,
@@ -45,20 +47,17 @@ async function syncLicense(
     .single()
 
   if (existing) {
-    // Update existing license to match role
     await supabaseAdmin
       .from('licenses')
       .update({
         org_id: orgId,
         plan,
         features,
-        // Admin licenses never expire
         expires_at: isAdmin ? null : existing.expires_at ?? null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', existing.id)
   } else {
-    // Create new license
     await supabaseAdmin
       .from('licenses')
       .insert({
@@ -67,7 +66,7 @@ async function syncLicense(
         plan,
         status: 'active',
         activated_at: new Date().toISOString(),
-        expires_at: null, // Admin assigns — no automatic expiry
+        expires_at: null,
         max_users: 1,
         features,
         created_at: new Date().toISOString(),
@@ -94,12 +93,8 @@ Deno.serve(async (req) => {
     if (action === 'service_create') {
       const { email, password, full_name, role, org_id, service_key } = data
       
-      // Verify setup key
       const setupKey = Deno.env.get('ADMIN_SETUP_KEY')?.trim()
       const providedKey = service_key?.trim()
-      
-      console.log(`Setup key exists: ${!!setupKey}, length: ${setupKey?.length}`)
-      console.log(`Provided key exists: ${!!providedKey}, length: ${providedKey?.length}`)
       
       if (!setupKey || providedKey !== setupKey) {
         return new Response(JSON.stringify({ error: 'Invalid service key' }), {
@@ -108,9 +103,6 @@ Deno.serve(async (req) => {
         })
       }
 
-      console.log(`Creating user: ${email} with role ${role}`)
-
-      // Create the user
       const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
@@ -119,7 +111,6 @@ Deno.serve(async (req) => {
       })
 
       if (createError) {
-        console.error('Create error:', createError)
         return new Response(JSON.stringify({ error: createError.message }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -127,23 +118,19 @@ Deno.serve(async (req) => {
       }
 
       if (newUser.user && org_id) {
-        // Update the new user's profile to be in the specified org
         await supabaseAdmin
           .from('profiles')
           .update({ org_id })
           .eq('user_id', newUser.user.id)
 
-        // Update user role
         await supabaseAdmin
           .from('user_roles')
           .update({ role: role || 'VIEWER', org_id })
           .eq('user_id', newUser.user.id)
 
-        // Sync license
         await syncLicense(supabaseAdmin, newUser.user.id, org_id, role || 'VIEWER')
       }
 
-      console.log(`User created successfully: ${newUser.user?.id}`)
       return new Response(JSON.stringify({ success: true, user: newUser.user }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -158,7 +145,6 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Verify the requesting user is an admin
     const token = authHeader.replace('Bearer ', '')
     const { data: { user: requestingUser }, error: authError } = await supabaseAdmin.auth.getUser(token)
     
@@ -169,33 +155,81 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Check if requesting user is admin
+    // Check if requesting user is ADMIN or ORG_ADMIN
     const { data: isAdmin } = await supabaseAdmin.rpc('has_role', {
       _user_id: requestingUser.id,
       _role: 'ADMIN'
     })
 
-    if (!isAdmin) {
-      return new Response(JSON.stringify({ error: 'Admin access required' }), {
+    const { data: isOrgAdmin } = await supabaseAdmin.rpc('has_org_admin_role', {
+      _user_id: requestingUser.id,
+    })
+
+    const hasManagementAccess = isAdmin || isOrgAdmin
+
+    if (!hasManagementAccess) {
+      return new Response(JSON.stringify({ error: 'Admin or Org Admin access required' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
+    // Get requesting user's profile
+    const { data: requesterProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('org_id')
+      .eq('user_id', requestingUser.id)
+      .single()
+
+    const requesterOrgId = requesterProfile?.org_id
+
+    // Helper: verify ORG_ADMIN can only act on their own org's users
+    const verifyOrgAdminScope = async (targetUserId: string) => {
+      if (isAdmin) return true // ADMIN can do anything
+      
+      const { data: targetProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', targetUserId)
+        .single()
+      
+      if (targetProfile?.org_id !== requesterOrgId) {
+        return false
+      }
+      return true
+    }
+
     if (action === 'create') {
       const { email, password, full_name, role, org_id, system_access } = data
 
-      // Validate required fields
-      if (!email || !password || !full_name || !role || !org_id || !system_access) {
-        return new Response(JSON.stringify({ error: 'Missing required fields: email, password, full_name, role, org_id, system_access' }), {
+      if (!email || !password || !full_name || !role || !system_access) {
+        return new Response(JSON.stringify({ error: 'Missing required fields' }), {
           status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // ORG_ADMIN can only create users in their own org
+      const targetOrgId = isAdmin ? (org_id || requesterOrgId) : requesterOrgId
+      
+      if (!isAdmin && org_id && org_id !== requesterOrgId) {
+        return new Response(JSON.stringify({ error: 'Cannot create users in other organizations' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // ORG_ADMIN cannot assign ADMIN or ORG_ADMIN roles
+      if (!isAdmin && !ORG_ADMIN_ASSIGNABLE_ROLES.includes(role)) {
+        return new Response(JSON.stringify({ error: 'Cannot assign this role' }), {
+          status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
       // Validate role based on system access
       const eduRoles = ['ESTUDANTE', 'PROFESSOR']
-      const erpRoles = ['ADMIN', 'ANALYST', 'VIEWER']
+      const erpRoles = ['ADMIN', 'ORG_ADMIN', 'ANALYST', 'VIEWER']
       
       if (system_access === 'EDU' && !eduRoles.includes(role)) {
         return new Response(JSON.stringify({ error: 'EDU users must have role ESTUDANTE or PROFESSOR' }), {
@@ -205,13 +239,12 @@ Deno.serve(async (req) => {
       }
       
       if (system_access === 'ERP' && !erpRoles.includes(role)) {
-        return new Response(JSON.stringify({ error: 'ERP users must have role ADMIN, ANALYST, or VIEWER' }), {
+        return new Response(JSON.stringify({ error: 'ERP users must have role ADMIN, ORG_ADMIN, ANALYST, or VIEWER' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
-      // Create the user
       const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
@@ -227,11 +260,10 @@ Deno.serve(async (req) => {
       }
 
       if (newUser.user) {
-        // Update the new user's profile with org_id and system_access
         const { error: profileError } = await supabaseAdmin
           .from('profiles')
           .update({ 
-            org_id: org_id,
+            org_id: targetOrgId,
             system_access: system_access,
             pending_approval: false
           })
@@ -241,7 +273,6 @@ Deno.serve(async (req) => {
           console.error('Profile update error:', profileError)
         }
 
-        // Update or insert user role
         const { data: existingRole } = await supabaseAdmin
           .from('user_roles')
           .select('user_id')
@@ -251,16 +282,15 @@ Deno.serve(async (req) => {
         if (existingRole) {
           await supabaseAdmin
             .from('user_roles')
-            .update({ role, org_id: org_id })
+            .update({ role, org_id: targetOrgId })
             .eq('user_id', newUser.user.id)
         } else {
           await supabaseAdmin
             .from('user_roles')
-            .insert({ user_id: newUser.user.id, role, org_id: org_id })
+            .insert({ user_id: newUser.user.id, role, org_id: targetOrgId })
         }
 
-        // Sync license to match role
-        await syncLicense(supabaseAdmin, newUser.user.id, org_id, role)
+        await syncLicense(supabaseAdmin, newUser.user.id, targetOrgId, role)
       }
 
       return new Response(JSON.stringify({ success: true, user: newUser.user }), {
@@ -271,24 +301,49 @@ Deno.serve(async (req) => {
     if (action === 'update_role') {
       const { user_id, role } = data
 
-      // Get target user's org
+      // ORG_ADMIN cannot assign ADMIN or ORG_ADMIN roles
+      if (!isAdmin && !ORG_ADMIN_ASSIGNABLE_ROLES.includes(role)) {
+        return new Response(JSON.stringify({ error: 'Cannot assign this role' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Verify scope
+      if (!(await verifyOrgAdminScope(user_id))) {
+        return new Response(JSON.stringify({ error: 'User not in your organization' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Cannot modify another ADMIN or ORG_ADMIN if you're only ORG_ADMIN
+      if (!isAdmin) {
+        const { data: targetRole } = await supabaseAdmin
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user_id)
+          .single()
+        
+        if (targetRole?.role === 'ADMIN' || targetRole?.role === 'ORG_ADMIN') {
+          return new Response(JSON.stringify({ error: 'Cannot modify admin users' }), {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+      }
+
       const { data: targetProfile } = await supabaseAdmin
         .from('profiles')
         .select('org_id')
         .eq('user_id', user_id)
         .single()
 
-      const { data: adminProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('org_id')
-        .eq('user_id', requestingUser.id)
-        .single()
-
       const { error: updateError } = await supabaseAdmin
         .from('user_roles')
         .update({ role })
         .eq('user_id', user_id)
-        .eq('org_id', adminProfile?.org_id)
+        .eq('org_id', targetProfile?.org_id)
 
       if (updateError) {
         return new Response(JSON.stringify({ error: updateError.message }), {
@@ -297,7 +352,6 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Sync license to match new role
       if (targetProfile?.org_id) {
         await syncLicense(supabaseAdmin, user_id, targetProfile.org_id, role)
       }
@@ -317,25 +371,18 @@ Deno.serve(async (req) => {
         })
       }
 
-      const { data: adminProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('org_id')
-        .eq('user_id', requestingUser.id)
-        .single()
-
-      // Verify target user is in the same org
-      const { data: targetProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('org_id')
-        .eq('user_id', user_id)
-        .single()
-
-      if (targetProfile?.org_id !== adminProfile?.org_id) {
+      if (!(await verifyOrgAdminScope(user_id))) {
         return new Response(JSON.stringify({ error: 'User not in your organization' }), {
           status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
+
+      const { data: targetProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', user_id)
+        .single()
 
       const { error: updateError } = await supabaseAdmin
         .from('profiles')
@@ -349,7 +396,6 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Get current role to sync license features
       const { data: roleData } = await supabaseAdmin
         .from('user_roles')
         .select('role')
@@ -368,27 +414,29 @@ Deno.serve(async (req) => {
     if (action === 'block_user') {
       const { user_id, blocked } = data
 
-      const { data: adminProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('org_id')
-        .eq('user_id', requestingUser.id)
-        .single()
-
-      // Verify target user is in the same org
-      const { data: targetProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('org_id')
-        .eq('user_id', user_id)
-        .single()
-
-      if (targetProfile?.org_id !== adminProfile?.org_id) {
+      if (!(await verifyOrgAdminScope(user_id))) {
         return new Response(JSON.stringify({ error: 'User not in your organization' }), {
           status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
-      // Block by setting pending_approval back to true (effectively blocks access)
+      // ORG_ADMIN cannot block ADMIN or ORG_ADMIN
+      if (!isAdmin) {
+        const { data: targetRole } = await supabaseAdmin
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user_id)
+          .single()
+        
+        if (targetRole?.role === 'ADMIN' || targetRole?.role === 'ORG_ADMIN') {
+          return new Response(JSON.stringify({ error: 'Cannot block admin users' }), {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+      }
+
       const { error: updateError } = await supabaseAdmin
         .from('profiles')
         .update({ pending_approval: blocked })
@@ -401,7 +449,6 @@ Deno.serve(async (req) => {
         })
       }
 
-      // If blocking, suspend the license; if unblocking, reactivate
       if (blocked) {
         await supabaseAdmin
           .from('licenses')
@@ -424,27 +471,6 @@ Deno.serve(async (req) => {
     if (action === 'delete_user') {
       const { user_id } = data
 
-      const { data: adminProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('org_id')
-        .eq('user_id', requestingUser.id)
-        .single()
-
-      // Verify target user is in the same org
-      const { data: targetProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('org_id')
-        .eq('user_id', user_id)
-        .single()
-
-      if (targetProfile?.org_id !== adminProfile?.org_id) {
-        return new Response(JSON.stringify({ error: 'User not in your organization' }), {
-          status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-
-      // Prevent self-deletion
       if (user_id === requestingUser.id) {
         return new Response(JSON.stringify({ error: 'Cannot delete yourself' }), {
           status: 400,
@@ -452,25 +478,33 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Delete license first
-      await supabaseAdmin
-        .from('licenses')
-        .delete()
-        .eq('user_id', user_id)
+      if (!(await verifyOrgAdminScope(user_id))) {
+        return new Response(JSON.stringify({ error: 'User not in your organization' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
 
-      // Delete user_roles
-      await supabaseAdmin
-        .from('user_roles')
-        .delete()
-        .eq('user_id', user_id)
+      // ORG_ADMIN cannot delete ADMIN or ORG_ADMIN
+      if (!isAdmin) {
+        const { data: targetRole } = await supabaseAdmin
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user_id)
+          .single()
+        
+        if (targetRole?.role === 'ADMIN' || targetRole?.role === 'ORG_ADMIN') {
+          return new Response(JSON.stringify({ error: 'Cannot delete admin users' }), {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+      }
 
-      // Delete profile
-      await supabaseAdmin
-        .from('profiles')
-        .delete()
-        .eq('user_id', user_id)
+      await supabaseAdmin.from('licenses').delete().eq('user_id', user_id)
+      await supabaseAdmin.from('user_roles').delete().eq('user_id', user_id)
+      await supabaseAdmin.from('profiles').delete().eq('user_id', user_id)
 
-      // Delete auth user
       const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user_id)
 
       if (deleteError) {
@@ -486,6 +520,14 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'list_pending') {
+      // Only ADMIN can see all pending users
+      if (!isAdmin) {
+        return new Response(JSON.stringify({ error: 'Admin access required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
       const { data: pendingProfiles, error: pendingProfilesError } = await supabaseAdmin
         .from('profiles')
         .select('id, user_id, full_name, system_access, approval_requested_at')
@@ -502,11 +544,9 @@ Deno.serve(async (req) => {
       const users = await Promise.all(
         (pendingProfiles || []).map(async (profile) => {
           const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(profile.user_id)
-
           if (userError) {
             console.error(`Error fetching email for pending user ${profile.user_id}:`, userError)
           }
-
           return {
             ...profile,
             email: userData.user?.email ?? null,
@@ -520,32 +560,20 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'list') {
-      // Get the requesting user's org_id
-      const { data: profile } = await supabaseAdmin
-        .from('profiles')
-        .select('org_id')
-        .eq('user_id', requestingUser.id)
-        .single()
+      // For ORG_ADMIN, always scope to their own org
+      const targetOrgId = requesterOrgId
 
-      if (!profile) {
+      if (!targetOrgId) {
         return new Response(JSON.stringify({ error: 'Profile not found' }), {
           status: 404,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
-      // Get all users in the same org (excluding pending users - they appear in pending panel)
       const { data: profiles, error: profilesError } = await supabaseAdmin
         .from('profiles')
-        .select(`
-          user_id,
-          full_name,
-          avatar_url,
-          created_at,
-          system_access,
-          pending_approval
-        `)
-        .eq('org_id', profile.org_id)
+        .select('user_id, full_name, avatar_url, created_at, system_access, pending_approval')
+        .eq('org_id', targetOrgId)
         .eq('pending_approval', false)
 
       if (profilesError) {
@@ -555,13 +583,11 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Get roles for these users
       const { data: roles } = await supabaseAdmin
         .from('user_roles')
         .select('user_id, role')
-        .eq('org_id', profile.org_id)
+        .eq('org_id', targetOrgId)
 
-      // Get emails from auth.users
       const userIds = profiles?.map(p => p.user_id) || []
       const usersWithEmail = await Promise.all(
         userIds.map(async (userId) => {
@@ -570,13 +596,11 @@ Deno.serve(async (req) => {
         })
       )
 
-      // Get terms acceptance data
       const { data: termsAcceptances } = await supabaseAdmin
         .from('terms_acceptance')
         .select('user_id, accepted_at')
         .in('user_id', userIds)
 
-      // Combine data
       const users = profiles?.map(p => ({
         ...p,
         email: usersWithEmail.find(u => u.user_id === p.user_id)?.email,
@@ -601,7 +625,14 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Get all users in the specified org
+      // ORG_ADMIN can only list their own org
+      if (!isAdmin && org_id !== requesterOrgId) {
+        return new Response(JSON.stringify({ error: 'Cannot list users from other organizations' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
       const { data: profiles, error: profilesError } = await supabaseAdmin
         .from('profiles')
         .select('user_id, full_name, avatar_url, created_at, system_access')
@@ -615,13 +646,11 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Get roles for these users
       const { data: roles } = await supabaseAdmin
         .from('user_roles')
         .select('user_id, role')
         .eq('org_id', org_id)
 
-      // Get emails from auth.users
       const userIds = profiles?.map(p => p.user_id) || []
       const usersWithEmail = await Promise.all(
         userIds.map(async (userId: string) => {
@@ -630,7 +659,6 @@ Deno.serve(async (req) => {
         })
       )
 
-      // Combine data
       const users = profiles?.map(p => ({
         ...p,
         email: usersWithEmail.find(u => u.user_id === p.user_id)?.email,
@@ -643,6 +671,14 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'change_org') {
+      // Only ADMIN can move users between orgs
+      if (!isAdmin) {
+        return new Response(JSON.stringify({ error: 'Admin access required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
       const { user_id, new_org_id } = data
 
       if (!user_id || !new_org_id) {
@@ -652,7 +688,6 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Update user's profile org
       const { error: profileError } = await supabaseAdmin
         .from('profiles')
         .update({ org_id: new_org_id })
@@ -665,7 +700,6 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Update user's role org
       const { error: roleError } = await supabaseAdmin
         .from('user_roles')
         .update({ org_id: new_org_id })
@@ -678,7 +712,6 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Update license org
       await supabaseAdmin
         .from('licenses')
         .update({ org_id: new_org_id, updated_at: new Date().toISOString() })
@@ -699,7 +732,13 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Get or create an "unassigned" org
+      if (!(await verifyOrgAdminScope(user_id))) {
+        return new Response(JSON.stringify({ error: 'User not in your organization' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
       let unassignedOrgId: string
 
       const { data: existingOrg } = await supabaseAdmin
@@ -726,7 +765,6 @@ Deno.serve(async (req) => {
         unassignedOrgId = newOrg.id
       }
 
-      // Move user to unassigned org
       const { error: profileError } = await supabaseAdmin
         .from('profiles')
         .update({ org_id: unassignedOrgId })
@@ -751,7 +789,6 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Move license to unassigned org too
       await supabaseAdmin
         .from('licenses')
         .update({ org_id: unassignedOrgId, updated_at: new Date().toISOString() })
