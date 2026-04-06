@@ -228,7 +228,15 @@ export default function Configuracoes() {
             {isAdmin && <PendingApprovalsPanel />}
             {isAdmin && <OrganizationManagement />}
             {isAdmin && <OrganizationUsersPanel />}
-            <UserManagement />
+            {isAdmin ? <UserManagement /> : isOrgAdmin ? <OrgAdminUsersPanel /> : (
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-center text-muted-foreground">
+                    Acesso restrito a administradores da organização.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* FEEDBACK TAB */}
