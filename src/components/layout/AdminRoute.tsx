@@ -10,7 +10,7 @@ interface AdminRouteProps {
 
 export function AdminRoute({ children }: AdminRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: profileLoading, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
+  const { isAdmin, isOrgAdmin, loading: profileLoading, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
 
   const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null) || (!!user && termsLoading);
@@ -33,7 +33,7 @@ export function AdminRoute({ children }: AdminRouteProps) {
   if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
   if (awaitingApproval) return <Navigate to="/pending-approval" replace />;
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!isAdmin && !isOrgAdmin) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 }
