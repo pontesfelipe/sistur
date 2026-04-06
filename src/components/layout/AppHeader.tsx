@@ -37,7 +37,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHeaderProps) {
   const { user, signOut } = useAuth();
-  const { isViewingDemoData, isAdmin, profile, roles } = useProfile();
+  const { isViewingDemoData, isAdmin, isOrgAdmin, profile, roles } = useProfile();
   const navigate = useNavigate();
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
