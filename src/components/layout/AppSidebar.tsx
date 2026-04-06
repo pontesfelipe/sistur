@@ -68,7 +68,7 @@ const bottomNavigation: NavItem[] = [
   { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
   { name: 'Ajuda & Tutorial', href: '/ajuda', icon: HelpCircle },
   { name: 'Licenças', href: '/admin/licencas', icon: Shield, requiresAdmin: true },
-  { name: 'Configurações', href: '/configuracoes', icon: Settings, requiresAdmin: true },
+  { name: 'Configurações', href: '/configuracoes', icon: Settings },
 ];
 
 // Static items that always show (no permission check needed)
