@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UserManagement } from '@/components/users/UserManagement';
+import { OrgAdminUsersPanel } from '@/components/settings/OrgAdminUsersPanel';
 import { OrganizationManagement } from '@/components/settings/OrganizationManagement';
 import { OrganizationUsersPanel } from '@/components/settings/OrganizationUsersPanel';
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
@@ -227,7 +228,15 @@ export default function Configuracoes() {
             {isAdmin && <PendingApprovalsPanel />}
             {isAdmin && <OrganizationManagement />}
             {isAdmin && <OrganizationUsersPanel />}
-            <UserManagement />
+            {isAdmin ? <UserManagement /> : isOrgAdmin ? <OrgAdminUsersPanel /> : (
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-center text-muted-foreground">
+                    Acesso restrito a administradores da organização.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* FEEDBACK TAB */}
