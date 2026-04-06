@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UserManagement } from '@/components/users/UserManagement';
+import { OrgAdminUsersPanel } from '@/components/settings/OrgAdminUsersPanel';
 import { OrganizationManagement } from '@/components/settings/OrganizationManagement';
 import { OrganizationUsersPanel } from '@/components/settings/OrganizationUsersPanel';
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
