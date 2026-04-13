@@ -331,6 +331,21 @@ const App = () => {
                   }
                 />
                 <Route
+                  path="/edu/historico"
+                  element={
+                    <EduRoute>
+                      <ExamHistory />
+                    </EduRoute>
+                  }
+                />
+                <Route
+                  path="/edu/exam-review/:attemptId"
+                  element={
+                    <EduRoute>
+                      <ExamReview />
+                    </EduRoute>
+                  }
+                />
                   path="/certificados"
                   element={
                     <EduRoute>

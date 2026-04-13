@@ -758,6 +758,11 @@ export default function ProfessorDashboard() {
             <TabsTrigger value="groups" className="flex items-center gap-2">
               <School className="h-4 w-4" /> {groupLabel}
             </TabsTrigger>
+            {canManageContent && (
+              <TabsTrigger value="exams" className="flex items-center gap-2">
+                <ClipboardList className="h-4 w-4" /> Gestão de Provas
+              </TabsTrigger>
+            )}
             {(isProfessor || isAdmin) && (
               <TabsTrigger value="referral" className="flex items-center gap-2">
                 <Gift className="h-4 w-4" /> Referências
