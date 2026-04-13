@@ -31,7 +31,7 @@ function cellBorders() {
   return { top: b, bottom: b, left: b, right: b };
 }
 
-function heading(text: string, level: typeof HeadingLevel.HEADING_1) {
+function heading(text: string, level: (typeof HeadingLevel)[keyof typeof HeadingLevel]) {
   return new Paragraph({
     heading: level,
     spacing: { before: 300, after: 150 },
