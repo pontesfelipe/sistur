@@ -88,6 +88,41 @@ function codeBlock(lines: string[]) {
   });
 }
 
+function flowDiagram(steps: [string, string][]) {
+  const rows = steps.map((step, idx) => {
+    const arrow = idx < steps.length - 1 ? ' →' : '';
+    return new TableRow({
+      children: [
+        new TableCell({
+          borders: cellBorders(),
+          width: { size: 600, type: WidthType.DXA },
+          shading: { fill: HEADER_BG, type: ShadingType.CLEAR },
+          margins: { top: 60, bottom: 60, left: 80, right: 80 },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${idx + 1}`, font: 'Arial', size: 20, bold: true, color: PRIMARY })] })],
+        }),
+        new TableCell({
+          borders: cellBorders(),
+          width: { size: 2800, type: WidthType.DXA },
+          shading: { fill: 'DBEAFE', type: ShadingType.CLEAR },
+          margins: { top: 60, bottom: 60, left: 100, right: 100 },
+          children: [new Paragraph({ children: [new TextRun({ text: step[0] + arrow, font: 'Arial', size: 20, bold: true })] })],
+        }),
+        new TableCell({
+          borders: cellBorders(),
+          width: { size: 5626, type: WidthType.DXA },
+          margins: { top: 60, bottom: 60, left: 100, right: 100 },
+          children: [new Paragraph({ children: [new TextRun({ text: step[1], font: 'Arial', size: 20 })] })],
+        }),
+      ],
+    });
+  });
+  return new Table({
+    width: { size: 9026, type: WidthType.DXA },
+    columnWidths: [600, 2800, 5626],
+    rows,
+  });
+}
+
 function tableRow(cells: { text: string; bold?: boolean; bg?: string; width?: number }[]) {
   return new TableRow({
     children: cells.map(c => new TableCell({
