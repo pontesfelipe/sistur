@@ -82,19 +82,44 @@ export function HealthCheckPanel() {
             Testa banco de dados, edge functions, armazenamento e integridade de dados
           </p>
         </div>
-        <Button onClick={runHealthCheck} disabled={running} size="lg">
-          {running ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Executando...
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4 mr-2" />
-              Executar Verificação
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={syncRegistry} disabled={syncing} size="sm">
+            {syncing ? (
+              <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Sincronizando...</>
+            ) : (
+              <><RotateCcw className="h-4 w-4 mr-1" /> Sincronizar Testes</>
+            )}
+          </Button>
+          <Button onClick={runHealthCheck} disabled={running} size="lg">
+            {running ? (
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Executando...</>
+            ) : (
+              <><Play className="h-4 w-4 mr-2" /> Executar Verificação</>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Registry sync info */}
+      <div className="flex items-center gap-4 p-3 rounded-lg border bg-muted/30 text-sm">
+        <div className="flex items-center gap-2">
+          <GitCommit className="h-4 w-4 text-muted-foreground" />
+          <span className="text-muted-foreground">Registro:</span>
+          <Badge variant="secondary">{registryCount} testes</Badge>
+        </div>
+        {lastSync && (
+          <>
+            <Separator orientation="vertical" className="h-4" />
+            <span className="text-muted-foreground">
+              Última sincronização: {new Date(lastSync.synced_at).toLocaleString('pt-BR')} (v{lastSync.app_version})
+            </span>
+            {lastSync.tests_added > 0 && (
+              <Badge className="bg-green-500/10 text-green-600 border-green-500/30 text-xs">
+                +{lastSync.tests_added} novos
+              </Badge>
+            )}
+          </>
+        )}
       </div>
 
       <Tabs defaultValue="current" className="space-y-4">
