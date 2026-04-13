@@ -8,8 +8,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircleQuestion, GraduationCap, BarChart3, Hotel } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MessageCircleQuestion, GraduationCap, BarChart3, Hotel, Download } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
+import { exportFAQDocx } from '@/lib/exportDocsDocx';
 
 interface FAQItem {
   question: string;
@@ -95,7 +97,12 @@ const faqItems: FAQItem[] = [
   },
   {
     question: 'Quais são as fontes de dados oficiais?',
-    answer: 'O SISTUR utiliza IBGE, DATASUS, INEP, STN/Tesouro Nacional e dados oficiais abertos do CADASTUR quando disponíveis. Quando uma base não retorna dado válido para o município, o indicador permanece fora do pré-preenchimento e segue para preenchimento manual.',
+    answer: 'O SISTUR utiliza IBGE, DATASUS, INEP, STN/Tesouro Nacional, dados oficiais abertos do CADASTUR e a API REST do Mapa do Turismo Brasileiro (mapa.turismo.gov.br). O Mapa do Turismo fornece região turística, categoria (A-E), empregos, estabelecimentos, visitantes nacionais e internacionais, arrecadação e conselho municipal de turismo. Quando uma base não retorna dado válido para o município, o indicador permanece fora do pré-preenchimento e segue para preenchimento manual.',
+    category: 'erp',
+  },
+  {
+    question: 'O que é o Mapa do Turismo Brasileiro integrado ao SISTUR?',
+    answer: 'O Mapa do Turismo Brasileiro é o programa oficial do Ministério do Turismo que classifica municípios em categorias (A a E) e regiões turísticas. O SISTUR se integra diretamente à API REST (mapa.turismo.gov.br) para buscar em tempo real dados como: categoria do município, região turística, quantidade de empregos e estabelecimentos turísticos, estimativas de visitantes nacionais e internacionais, arrecadação do turismo e existência de conselho municipal de turismo.',
     category: 'erp',
   },
   {
@@ -229,7 +236,21 @@ export default function FAQ() {
       subtitle="Tire suas dúvidas sobre o SISTUR"
     >
       <div className="max-w-3xl mx-auto space-y-6">
-        {/* General Questions - Always visible */}
+        {/* Download Button */}
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() => {
+              const allVisible = getFilteredItems('all');
+              exportFAQDocx(allVisible);
+            }}
+          >
+            <Download className="h-4 w-4" />
+            Baixar em Word
+          </Button>
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
