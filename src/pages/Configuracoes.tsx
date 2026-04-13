@@ -20,6 +20,7 @@ import { ContentModerationPanel } from '@/components/settings/ContentModerationP
 import { PerformanceMetricsPanel } from '@/components/settings/PerformanceMetricsPanel';
 import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel';
 import { HealthCheckPanel } from '@/components/tools/HealthCheckPanel';
+import MapaTurismoPanel from '@/components/official-data/MapaTurismoPanel';
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
 import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSearch';
 import { useProfile } from '@/hooks/useProfile';
@@ -42,6 +43,7 @@ import {
   ExternalLink,
   Clock,
   Search,
+  Map,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -514,6 +516,24 @@ export default function Configuracoes() {
               <Card>
                 <CardContent className="pt-6">
                   <HealthCheckPanel />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Mapa do Turismo - Admin only */}
+            {isAdmin && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Map className="h-5 w-5 text-primary" />
+                    Mapa do Turismo Brasileiro
+                  </CardTitle>
+                  <CardDescription>
+                    Dados de regiões turísticas e categorização de municípios do Ministério do Turismo
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <MapaTurismoPanel />
                 </CardContent>
               </Card>
             )}
