@@ -27,6 +27,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import { exportMetodologiaDocx, exportFAQDocx } from '@/lib/exportDocsDocx';
+import { exportTechnicalDocx } from '@/lib/exportTechnicalDocx';
 import { 
   BookOpen, 
   Wrench, 
@@ -342,6 +343,13 @@ export default function Configuracoes() {
                       const { faqItems } = await import('@/pages/FAQ');
                       exportFAQDocx(faqItems);
                     }}
+                  />
+
+                  <DocumentDownloadItem
+                    title="Documento Técnico — Registro de Software"
+                    description="Arquitetura, Motor IGMA, fluxos, modelo de dados e propriedade intelectual"
+                    version={`v${APP_VERSION.full}`}
+                    onDownload={() => exportTechnicalDocx()}
                   />
                 </CardContent>
               </Card>
