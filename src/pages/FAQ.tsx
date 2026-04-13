@@ -95,7 +95,12 @@ const faqItems: FAQItem[] = [
   },
   {
     question: 'Quais são as fontes de dados oficiais?',
-    answer: 'O SISTUR utiliza IBGE, DATASUS, INEP, STN/Tesouro Nacional e dados oficiais abertos do CADASTUR quando disponíveis. Quando uma base não retorna dado válido para o município, o indicador permanece fora do pré-preenchimento e segue para preenchimento manual.',
+    answer: 'O SISTUR utiliza IBGE, DATASUS, INEP, STN/Tesouro Nacional, dados oficiais abertos do CADASTUR e a API REST do Mapa do Turismo Brasileiro (mapa.turismo.gov.br). O Mapa do Turismo fornece região turística, categoria (A-E), empregos, estabelecimentos, visitantes nacionais e internacionais, arrecadação e conselho municipal de turismo. Quando uma base não retorna dado válido para o município, o indicador permanece fora do pré-preenchimento e segue para preenchimento manual.',
+    category: 'erp',
+  },
+  {
+    question: 'O que é o Mapa do Turismo Brasileiro integrado ao SISTUR?',
+    answer: 'O Mapa do Turismo Brasileiro é o programa oficial do Ministério do Turismo que classifica municípios em categorias (A a E) e regiões turísticas. O SISTUR se integra diretamente à API REST (mapa.turismo.gov.br) para buscar em tempo real dados como: categoria do município, região turística, quantidade de empregos e estabelecimentos turísticos, estimativas de visitantes nacionais e internacionais, arrecadação do turismo e existência de conselho municipal de turismo.',
     category: 'erp',
   },
   {
