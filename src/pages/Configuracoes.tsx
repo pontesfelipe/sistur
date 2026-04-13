@@ -312,7 +312,8 @@ export default function Configuracoes() {
                   <DocumentDownloadItem
                     title="Metodologia SISTUR"
                     description="Pipeline de 9 etapas, normalização e cálculo dos pilares RA, OE e AO"
-                    version="v2.0"
+                    version={`v${APP_VERSION.full}`}
+                    onDownload={() => exportMetodologiaDocx()}
                   />
                   
                   <DocumentDownloadItem
@@ -331,6 +332,15 @@ export default function Configuracoes() {
                     title="Manual de Diagnósticos"
                     description="Como criar, calcular e interpretar diagnósticos territoriais"
                     version="v1.1"
+                  />
+
+                  <DocumentDownloadItem
+                    title="FAQ — Perguntas Frequentes"
+                    description="Perguntas e respostas sobre o SISTUR, ERP, EDU e Enterprise"
+                    version={`v${APP_VERSION.full}`}
+                    onDownload={() => {
+                      const { faqItems } = require('@/pages/FAQ');
+                    }}
                   />
                 </CardContent>
               </Card>
