@@ -203,58 +203,155 @@ async function fetchIBGEPesquisas(ibgeCode: string, populacao?: number): Promise
   return results;
 }
 
-// ─── 3. Mapa do Turismo Brasileiro ──────────────────────────────────
+// ─── 3. Mapa do Turismo Brasileiro (REST API + DB fallback) ─────────
 async function fetchMapaTurismo(
   supabaseClient: any,
   ibgeCode: string
 ): Promise<Record<string, IndicatorResult>> {
   const results: Record<string, IndicatorResult> = {};
+  const currentYear = new Date().getFullYear();
 
+  // Strategy 1: Try the live REST API from mapa.turismo.gov.br
   try {
-    // Try lookup by ibge_code first, then by municipality name from IBGE
+    // First get nuUf and nuLocalidade by looking up the IBGE code
+    const ufListResp = await fetchWithTimeout('https://www.mapa.turismo.gov.br/mapa/rest/publico/dne/listaUF');
+    if (ufListResp.ok) {
+      const ufList: any[] = await ufListResp.json();
+
+      // Try each UF to find our municipality by IBGE code
+      for (const uf of ufList) {
+        const locResp = await fetchWithTimeout(
+          `https://www.mapa.turismo.gov.br/mapa/rest/publico/dne/localidadesDaUfSemShape?nuUf=${uf.nuUf}`
+        );
+        if (!locResp.ok) continue;
+        const localidades: any[] = await locResp.json();
+        const match = localidades.find((l: any) => l.nuMunicipioIbge === ibgeCode);
+
+        if (match) {
+          console.log(`Found municipality in API: ${match.noLocalidade} (${uf.sgUf}), nuLocalidade=${match.nuLocalidade}`);
+
+          // Now fetch the full data
+          const searchResp = await fetch('https://www.mapa.turismo.gov.br/mapa/rest/publico/regionalizacao/pesquisar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ nuUf: uf.nuUf, nuLocalidade: match.nuLocalidade }),
+          });
+
+          if (searchResp.ok) {
+            const data: any[] = await searchResp.json();
+            if (data.length > 0) {
+              const d = data[0];
+              console.log('Mapa do Turismo API data:', JSON.stringify(d));
+
+              // Category: 1=Turístico(A), 2=Complementar(B), 3=Apoio(C)
+              if (d.coCluster) {
+                const clusterToValue: Record<string, number> = { '1': 5, '2': 3, '3': 1 };
+                const val = clusterToValue[d.coCluster];
+                if (val) {
+                  results['igma_categoria_mapa_turismo'] = { value: val, year: currentYear, source: 'MAPA_TURISMO', real: true };
+                }
+              }
+
+              // Tourism region
+              results['igma_regiao_turistica'] = {
+                value: d.noRegiaoTuristica ? 1 : 0,
+                year: currentYear,
+                source: 'MAPA_TURISMO',
+                real: true,
+              };
+
+              // Tourism employment
+              if (d.qtEmprego) {
+                const emp = parseFloat(String(d.qtEmprego).replace(/\./g, '').replace(',', '.'));
+                if (!isNaN(emp)) {
+                  results['igma_empregos_turismo'] = { value: emp, year: currentYear, source: 'MAPA_TURISMO', real: true };
+                }
+              }
+
+              // Tourism establishments
+              if (d.qtEstabelecimento) {
+                const est = parseFloat(String(d.qtEstabelecimento).replace(/\./g, '').replace(',', '.'));
+                if (!isNaN(est)) {
+                  results['igma_estabelecimentos_turismo'] = { value: est, year: currentYear, source: 'MAPA_TURISMO', real: true };
+                }
+              }
+
+              // International visitors
+              if (d.qtVisitaInternacionalEstimada) {
+                const vis = parseFloat(String(d.qtVisitaInternacionalEstimada).replace(/\./g, '').replace(',', '.'));
+                if (!isNaN(vis)) {
+                  results['igma_visitantes_internacionais'] = { value: vis, year: currentYear, source: 'MAPA_TURISMO', real: true };
+                }
+              }
+
+              // National visitors
+              if (d.qtVisitaNacionalEstimada) {
+                const vis = parseFloat(String(d.qtVisitaNacionalEstimada).replace(/\./g, '').replace(',', '.'));
+                if (!isNaN(vis)) {
+                  results['igma_visitantes_nacionais'] = { value: vis, year: currentYear, source: 'MAPA_TURISMO', real: true };
+                }
+              }
+
+              // Tourism revenue
+              if (d.arrecadacao) {
+                results['igma_arrecadacao_turismo'] = { value: d.arrecadacao, year: currentYear, source: 'MAPA_TURISMO', real: true };
+              }
+
+              // Municipal tourism council
+              if (d.flSituacaoConselho !== undefined) {
+                results['igma_conselho_municipal_turismo'] = { value: d.flSituacaoConselho ? 1 : 0, year: currentYear, source: 'MAPA_TURISMO', real: true };
+              }
+
+              return results;
+            }
+          }
+          break;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('Mapa Turismo API error, falling back to DB:', e instanceof Error ? e.message : e);
+  }
+
+  // Strategy 2: Fallback to local DB lookup
+  try {
     const { data, error } = await supabaseClient
       .from('mapa_turismo_municipios')
-      .select('categoria, regiao_turistica, ano_referencia, municipality_type')
+      .select('categoria, regiao_turistica, ano_referencia, municipality_type, raw_data')
       .or(`ibge_code.eq.${ibgeCode}`)
       .order('ano_referencia', { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    if (error) {
-      console.error('Mapa Turismo query error:', error);
-      return results;
-    }
+    if (error || !data) return results;
 
-    if (!data) {
-      console.log('No Mapa do Turismo data found for IBGE code:', ibgeCode);
-      return results;
-    }
-
-    console.log('Mapa do Turismo data found:', JSON.stringify(data));
-
-    // Convert category letter to numeric value: A=5, B=4, C=3, D=2, E=1
     if (data.categoria) {
       const catMap: Record<string, number> = { A: 5, B: 4, C: 3, D: 2, E: 1 };
       const catValue = catMap[data.categoria.toUpperCase().trim()];
       if (catValue) {
-        results['igma_categoria_mapa_turismo'] = {
-          value: catValue,
-          year: data.ano_referencia || 0,
-          source: 'MAPA_TURISMO',
-          real: true,
-        };
+        results['igma_categoria_mapa_turismo'] = { value: catValue, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
       }
     }
 
-    // Binary indicator: belongs to a tourism region
-    results['igma_regiao_turistica'] = {
-      value: data.regiao_turistica ? 1 : 0,
-      year: data.ano_referencia || 0,
-      source: 'MAPA_TURISMO',
-      real: true,
-    };
+    results['igma_regiao_turistica'] = { value: data.regiao_turistica ? 1 : 0, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
+
+    // Extract enriched data from raw_data if available
+    const raw = data.raw_data;
+    if (raw) {
+      if (raw.qt_emprego) {
+        const v = parseFloat(String(raw.qt_emprego).replace(/\./g, '').replace(',', '.'));
+        if (!isNaN(v)) results['igma_empregos_turismo'] = { value: v, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
+      }
+      if (raw.qt_estabelecimento) {
+        const v = parseFloat(String(raw.qt_estabelecimento).replace(/\./g, '').replace(',', '.'));
+        if (!isNaN(v)) results['igma_estabelecimentos_turismo'] = { value: v, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
+      }
+      if (raw.arrecadacao) {
+        results['igma_arrecadacao_turismo'] = { value: raw.arrecadacao, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
+      }
+    }
   } catch (e) {
-    console.error('Mapa Turismo error:', e instanceof Error ? e.message : e);
+    console.error('Mapa Turismo DB error:', e instanceof Error ? e.message : e);
   }
 
   return results;
