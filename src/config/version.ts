@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 18,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.18.3",
+    date: "2026-04-13",
+    type: "patch" as const,
+    changes: [
+      "Indicadores do Mapa do Turismo integrados ao pré-preenchimento automático de diagnósticos",
+      "Novo indicador igma_categoria_mapa_turismo: converte categoria A-E para escala numérica 1-5",
+      "Novo indicador igma_regiao_turistica: indica se município pertence a região turística oficial",
+      "Fonte MAPA_TURISMO adicionada ao enum data_source e ao catálogo de fontes externas",
+      "Edge function fetch-official-data agora consulta mapa_turismo_municipios por código IBGE",
+      "Painel de validação exibe dados do Mapa do Turismo com ícone 🗺️ e badge teal",
+    ],
+  },
   {
     version: "1.18.2",
     date: "2026-04-13",

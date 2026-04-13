@@ -19,6 +19,7 @@ const API_FETCHED_CODES = new Set([
   'igma_densidade_demografica', 'igma_leitos_por_habitante', 'igma_cobertura_saude',
   'igma_ideb', 'igma_receita_propria', 'igma_despesa_turismo',
   'igma_meios_hospedagem',
+  'igma_categoria_mapa_turismo', 'igma_regiao_turistica',
 ]);
 
 // Codes fetched semi-automatically from CADASTUR open data (CSV pipeline)

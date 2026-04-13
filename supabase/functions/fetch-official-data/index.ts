@@ -203,7 +203,64 @@ async function fetchIBGEPesquisas(ibgeCode: string, populacao?: number): Promise
   return results;
 }
 
-// ─── 3. Valores padrão para indicadores sem API pública ─────────────
+// ─── 3. Mapa do Turismo Brasileiro ──────────────────────────────────
+async function fetchMapaTurismo(
+  supabaseClient: any,
+  ibgeCode: string
+): Promise<Record<string, IndicatorResult>> {
+  const results: Record<string, IndicatorResult> = {};
+
+  try {
+    // Try lookup by ibge_code first, then by municipality name from IBGE
+    const { data, error } = await supabaseClient
+      .from('mapa_turismo_municipios')
+      .select('categoria, regiao_turistica, ano_referencia, municipality_type')
+      .or(`ibge_code.eq.${ibgeCode}`)
+      .order('ano_referencia', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Mapa Turismo query error:', error);
+      return results;
+    }
+
+    if (!data) {
+      console.log('No Mapa do Turismo data found for IBGE code:', ibgeCode);
+      return results;
+    }
+
+    console.log('Mapa do Turismo data found:', JSON.stringify(data));
+
+    // Convert category letter to numeric value: A=5, B=4, C=3, D=2, E=1
+    if (data.categoria) {
+      const catMap: Record<string, number> = { A: 5, B: 4, C: 3, D: 2, E: 1 };
+      const catValue = catMap[data.categoria.toUpperCase().trim()];
+      if (catValue) {
+        results['igma_categoria_mapa_turismo'] = {
+          value: catValue,
+          year: data.ano_referencia || 0,
+          source: 'MAPA_TURISMO',
+          real: true,
+        };
+      }
+    }
+
+    // Binary indicator: belongs to a tourism region
+    results['igma_regiao_turistica'] = {
+      value: data.regiao_turistica ? 1 : 0,
+      year: data.ano_referencia || 0,
+      source: 'MAPA_TURISMO',
+      real: true,
+    };
+  } catch (e) {
+    console.error('Mapa Turismo error:', e instanceof Error ? e.message : e);
+  }
+
+  return results;
+}
+
+// ─── 4. Valores padrão para indicadores sem API pública ─────────────
 // These are NOT estimates — they are placeholder defaults that MUST be
 // reviewed and replaced by the operator. They exist only so the form
 // pre-populates with something editable instead of being blank.
@@ -256,17 +313,21 @@ Deno.serve(async (req) => {
     const pesquisasData = await fetchIBGEPesquisas(ibge_code, populacao);
     console.log(`Pesquisas: ${Object.keys(pesquisasData).length} indicators`);
 
-    // 3. Merge real data
-    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData };
+    // 3. Fetch Mapa do Turismo data (categoria, região turística)
+    const mapaTurismoData = await fetchMapaTurismo(supabaseClient, ibge_code);
+    console.log(`Mapa Turismo: ${Object.keys(mapaTurismoData).length} indicators`);
+
+    // 4. Merge real data
+    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...mapaTurismoData };
     const realCount = Object.keys(realData).length;
     console.log(`Total real: ${realCount} indicators`);
 
-    // 4. Fill gaps with manual-entry placeholders (NOT estimates)
+    // 5. Fill gaps with manual-entry placeholders (NOT estimates)
     const existingKeys = new Set(Object.keys(realData));
     const defaults = generateDefaults(ibge_code, populacao, existingKeys);
     const allData: Record<string, IndicatorResult> = { ...defaults, ...realData };
 
-    // 5. Build upsert payload
+    // 6. Build upsert payload
     const valuesToUpsert = Object.entries(allData)
       .filter(([code]) => {
         if (indicators && indicators.length > 0) return indicators.includes(code);
@@ -284,7 +345,7 @@ Deno.serve(async (req) => {
         org_id: org_id,
       }));
 
-    // 6. Upsert
+    // 7. Upsert
     const { data: upsertedData, error: upsertError } = await supabaseClient
       .from('external_indicator_values')
       .upsert(
