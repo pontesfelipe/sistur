@@ -24,6 +24,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DeleteConfirmDialog } from '@/components/projects/DeleteConfirmDialog';
 import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
+import { ExamManagementPanel } from '@/components/admin/ExamManagementPanel';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -757,6 +758,11 @@ export default function ProfessorDashboard() {
             <TabsTrigger value="groups" className="flex items-center gap-2">
               <School className="h-4 w-4" /> {groupLabel}
             </TabsTrigger>
+            {canManageContent && (
+              <TabsTrigger value="exams" className="flex items-center gap-2">
+                <ClipboardList className="h-4 w-4" /> Gestão de Provas
+              </TabsTrigger>
+            )}
             {(isProfessor || isAdmin) && (
               <TabsTrigger value="referral" className="flex items-center gap-2">
                 <Gift className="h-4 w-4" /> Referências
@@ -767,6 +773,12 @@ export default function ProfessorDashboard() {
           {canManageContent && (
             <TabsContent value="content">
               <AdminTrainingsPanel />
+            </TabsContent>
+          )}
+
+          {canManageContent && (
+            <TabsContent value="exams">
+              <ExamManagementPanel />
             </TabsContent>
           )}
 

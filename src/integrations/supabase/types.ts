@@ -2579,6 +2579,7 @@ export type Database = {
           attempt_id: string
           awarded_points: number | null
           free_text_answer: string | null
+          grader_comment: string | null
           is_correct: boolean | null
           quiz_id: string
           selected_option_id: string | null
@@ -2588,6 +2589,7 @@ export type Database = {
           attempt_id: string
           awarded_points?: number | null
           free_text_answer?: string | null
+          grader_comment?: string | null
           is_correct?: boolean | null
           quiz_id: string
           selected_option_id?: string | null
@@ -2597,6 +2599,7 @@ export type Database = {
           attempt_id?: string
           awarded_points?: number | null
           free_text_answer?: string | null
+          grader_comment?: string | null
           is_correct?: boolean | null
           quiz_id?: string
           selected_option_id?: string | null
@@ -2622,6 +2625,53 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "quiz_options"
             referencedColumns: ["option_id"]
+          },
+        ]
+      }
+      exam_appeals: {
+        Row: {
+          admin_response: string | null
+          attempt_id: string
+          created_at: string
+          id: string
+          reason: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          attempt_id: string
+          created_at?: string
+          id?: string
+          reason: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          attempt_id?: string
+          created_at?: string
+          id?: string
+          reason?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_appeals_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "exam_attempts"
+            referencedColumns: ["attempt_id"]
           },
         ]
       }
@@ -2717,6 +2767,8 @@ export type Database = {
       exam_rulesets: {
         Row: {
           allow_retake: boolean | null
+          available_from: string | null
+          available_until: string | null
           course_id: string | null
           created_at: string
           max_attempts: number | null
@@ -2731,6 +2783,8 @@ export type Database = {
         }
         Insert: {
           allow_retake?: boolean | null
+          available_from?: string | null
+          available_until?: string | null
           course_id?: string | null
           created_at?: string
           max_attempts?: number | null
@@ -2745,6 +2799,8 @@ export type Database = {
         }
         Update: {
           allow_retake?: boolean | null
+          available_from?: string | null
+          available_until?: string | null
           course_id?: string | null
           created_at?: string
           max_attempts?: number | null

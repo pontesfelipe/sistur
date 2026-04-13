@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 17,
-  patch: 1,
+  minor: 18,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,22 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.18.0",
+    date: "2026-04-13",
+    type: "minor" as const,
+    changes: [
+      "Sistema completo de provas: histórico de tentativas, revisão detalhada e recurso/contestação",
+      "Página 'Minhas Provas' no menu lateral EDU com estatísticas, filtros e histórico completo",
+      "Revisão pós-prova: aluno visualiza respostas corretas/erradas, explicações e feedback do professor",
+      "Sistema de recursos: aluno pode questionar resultado com justificativa detalhada",
+      "Painel de gestão de provas no Dashboard do Professor com visão de todas as tentativas e recursos",
+      "Admin/Professor resolve recursos com resposta e aceita/rejeita o pedido",
+      "Agendamento de provas: campos available_from e available_until nos rulesets",
+      "Campo grader_comment para feedback individualizado em questões dissertativas",
+      "Tabela exam_appeals com RLS por papel (aluno cria, professor/admin gerencia)",
+    ],
+  },
   {
     version: "1.17.1",
     date: "2026-04-13",
