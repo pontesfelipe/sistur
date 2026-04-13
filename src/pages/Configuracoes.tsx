@@ -520,6 +520,24 @@ export default function Configuracoes() {
               </Card>
             )}
 
+            {/* Mapa do Turismo - Admin only */}
+            {isAdmin && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Map className="h-5 w-5 text-primary" />
+                    Mapa do Turismo Brasileiro
+                  </CardTitle>
+                  <CardDescription>
+                    Dados de regiões turísticas e categorização de municípios do Ministério do Turismo
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <MapaTurismoPanel />
+                </CardContent>
+              </Card>
+            )}
+
             {/* Admin tools */}
             {isAdmin && <EmailDispatchPanel />}
             {isAdmin && <ContentModerationPanel />}
