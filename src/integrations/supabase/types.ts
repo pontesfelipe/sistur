@@ -4977,6 +4977,96 @@ export type Database = {
           },
         ]
       }
+      mapa_turismo_municipios: {
+        Row: {
+          ano_referencia: number
+          categoria: string | null
+          created_at: string
+          fonte: string
+          ibge_code: string | null
+          id: string
+          macrorregiao: string | null
+          municipality_type: string | null
+          municipio: string
+          raw_data: Json | null
+          regiao_turistica: string | null
+          uf: string
+          updated_at: string
+        }
+        Insert: {
+          ano_referencia: number
+          categoria?: string | null
+          created_at?: string
+          fonte?: string
+          ibge_code?: string | null
+          id?: string
+          macrorregiao?: string | null
+          municipality_type?: string | null
+          municipio: string
+          raw_data?: Json | null
+          regiao_turistica?: string | null
+          uf: string
+          updated_at?: string
+        }
+        Update: {
+          ano_referencia?: number
+          categoria?: string | null
+          created_at?: string
+          fonte?: string
+          ibge_code?: string | null
+          id?: string
+          macrorregiao?: string | null
+          municipality_type?: string | null
+          municipio?: string
+          raw_data?: Json | null
+          regiao_turistica?: string | null
+          uf?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mapa_turismo_sync_log: {
+        Row: {
+          ano_referencia: number | null
+          completed_at: string | null
+          error_message: string | null
+          id: string
+          records_inserted: number | null
+          records_processed: number | null
+          records_updated: number | null
+          started_at: string
+          status: string
+          sync_type: string
+          triggered_by: string | null
+        }
+        Insert: {
+          ano_referencia?: number | null
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          records_inserted?: number | null
+          records_processed?: number | null
+          records_updated?: number | null
+          started_at?: string
+          status?: string
+          sync_type: string
+          triggered_by?: string | null
+        }
+        Update: {
+          ano_referencia?: number | null
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          records_inserted?: number | null
+          records_processed?: number | null
+          records_updated?: number | null
+          started_at?: string
+          status?: string
+          sync_type?: string
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
       ods_targets: {
         Row: {
           code: string
