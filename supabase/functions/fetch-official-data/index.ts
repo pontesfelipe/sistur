@@ -313,8 +313,12 @@ Deno.serve(async (req) => {
     const pesquisasData = await fetchIBGEPesquisas(ibge_code, populacao);
     console.log(`Pesquisas: ${Object.keys(pesquisasData).length} indicators`);
 
-    // 3. Merge real data
-    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData };
+    // 3. Fetch Mapa do Turismo data (categoria, região turística)
+    const mapaTurismoData = await fetchMapaTurismo(supabaseClient, ibge_code);
+    console.log(`Mapa Turismo: ${Object.keys(mapaTurismoData).length} indicators`);
+
+    // 4. Merge real data
+    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...mapaTurismoData };
     const realCount = Object.keys(realData).length;
     console.log(`Total real: ${realCount} indicators`);
 
