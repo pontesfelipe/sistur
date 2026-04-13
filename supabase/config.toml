@@ -27,3 +27,5 @@ project_id = "enexnpmkhvgufcervjsv"
     verify_jwt = false
   [functions.send-transactional-email]
     verify_jwt = true
+  [functions.run-health-check]
+    verify_jwt = false
