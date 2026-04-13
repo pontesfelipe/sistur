@@ -41,7 +41,6 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { InteractiveWorkflowDiagram } from '@/components/tools/InteractiveWorkflowDiagram';
-import { Download } from 'lucide-react';
 
 const pillars = [
   {
