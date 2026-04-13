@@ -59,7 +59,7 @@ export function useClientErrorMonitor() {
         stack_trace: e.stack_trace?.substring(0, 2000) || null,
         page_url: e.page_url,
         user_agent: navigator.userAgent,
-        metadata: e.metadata || {},
+        metadata: (e.metadata || {}) as Record<string, string | number | boolean | null>,
       }));
 
       await supabase.from('client_error_reports').insert(inserts);
