@@ -203,7 +203,64 @@ async function fetchIBGEPesquisas(ibgeCode: string, populacao?: number): Promise
   return results;
 }
 
-// ─── 3. Valores padrão para indicadores sem API pública ─────────────
+// ─── 3. Mapa do Turismo Brasileiro ──────────────────────────────────
+async function fetchMapaTurismo(
+  supabaseClient: any,
+  ibgeCode: string
+): Promise<Record<string, IndicatorResult>> {
+  const results: Record<string, IndicatorResult> = {};
+
+  try {
+    // Try lookup by ibge_code first, then by municipality name from IBGE
+    const { data, error } = await supabaseClient
+      .from('mapa_turismo_municipios')
+      .select('categoria, regiao_turistica, ano_referencia, municipality_type')
+      .or(`ibge_code.eq.${ibgeCode}`)
+      .order('ano_referencia', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Mapa Turismo query error:', error);
+      return results;
+    }
+
+    if (!data) {
+      console.log('No Mapa do Turismo data found for IBGE code:', ibgeCode);
+      return results;
+    }
+
+    console.log('Mapa do Turismo data found:', JSON.stringify(data));
+
+    // Convert category letter to numeric value: A=5, B=4, C=3, D=2, E=1
+    if (data.categoria) {
+      const catMap: Record<string, number> = { A: 5, B: 4, C: 3, D: 2, E: 1 };
+      const catValue = catMap[data.categoria.toUpperCase().trim()];
+      if (catValue) {
+        results['igma_categoria_mapa_turismo'] = {
+          value: catValue,
+          year: data.ano_referencia || 0,
+          source: 'MAPA_TURISMO',
+          real: true,
+        };
+      }
+    }
+
+    // Binary indicator: belongs to a tourism region
+    results['igma_regiao_turistica'] = {
+      value: data.regiao_turistica ? 1 : 0,
+      year: data.ano_referencia || 0,
+      source: 'MAPA_TURISMO',
+      real: true,
+    };
+  } catch (e) {
+    console.error('Mapa Turismo error:', e instanceof Error ? e.message : e);
+  }
+
+  return results;
+}
+
+// ─── 4. Valores padrão para indicadores sem API pública ─────────────
 // These are NOT estimates — they are placeholder defaults that MUST be
 // reviewed and replaced by the operator. They exist only so the form
 // pre-populates with something editable instead of being blank.
