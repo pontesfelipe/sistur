@@ -776,6 +776,12 @@ export default function ProfessorDashboard() {
             </TabsContent>
           )}
 
+          {canManageContent && (
+            <TabsContent value="exams">
+              <ExamManagementPanel />
+            </TabsContent>
+          )}
+
           <TabsContent value="groups">
             <ClassroomsPanel />
           </TabsContent>
