@@ -29,3 +29,5 @@ project_id = "enexnpmkhvgufcervjsv"
     verify_jwt = true
   [functions.run-health-check]
     verify_jwt = false
+  [functions.sync-test-registry]
+    verify_jwt = false

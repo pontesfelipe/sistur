@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 17,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.17.1",
+    date: "2026-04-13",
+    type: "patch" as const,
+    changes: [
+      "Registro dinâmico de testes (test_flow_registry): testes são auto-descobertos a partir do schema do banco, edge functions e rotas",
+      "Edge function sync-test-registry escaneia tabelas, functions, buckets e rotas e atualiza o registro automaticamente",
+      "Botão 'Sincronizar Testes' na UI para atualizar o registro a cada novo commit/deploy",
+      "Health check agora lê testes do registro ao invés de lista hardcoded — novos componentes são testados automaticamente",
+      "Log de sincronização com versão do app, testes adicionados/removidos e detalhamento por categoria",
+    ],
+  },
   {
     version: "1.17.0",
     date: "2026-04-13",
