@@ -88,6 +88,41 @@ function codeBlock(lines: string[]) {
   });
 }
 
+function flowDiagram(steps: [string, string][]) {
+  const rows = steps.map((step, idx) => {
+    const arrow = idx < steps.length - 1 ? ' →' : '';
+    return new TableRow({
+      children: [
+        new TableCell({
+          borders: cellBorders(),
+          width: { size: 600, type: WidthType.DXA },
+          shading: { fill: HEADER_BG, type: ShadingType.CLEAR },
+          margins: { top: 60, bottom: 60, left: 80, right: 80 },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${idx + 1}`, font: 'Arial', size: 20, bold: true, color: PRIMARY })] })],
+        }),
+        new TableCell({
+          borders: cellBorders(),
+          width: { size: 2800, type: WidthType.DXA },
+          shading: { fill: 'DBEAFE', type: ShadingType.CLEAR },
+          margins: { top: 60, bottom: 60, left: 100, right: 100 },
+          children: [new Paragraph({ children: [new TextRun({ text: step[0] + arrow, font: 'Arial', size: 20, bold: true })] })],
+        }),
+        new TableCell({
+          borders: cellBorders(),
+          width: { size: 5626, type: WidthType.DXA },
+          margins: { top: 60, bottom: 60, left: 100, right: 100 },
+          children: [new Paragraph({ children: [new TextRun({ text: step[1], font: 'Arial', size: 20 })] })],
+        }),
+      ],
+    });
+  });
+  return new Table({
+    width: { size: 9026, type: WidthType.DXA },
+    columnWidths: [600, 2800, 5626],
+    rows,
+  });
+}
+
 function tableRow(cells: { text: string; bold?: boolean; bg?: string; width?: number }[]) {
   return new TableRow({
     children: cells.map(c => new TableCell({
@@ -441,37 +476,165 @@ export async function exportTechnicalDocx() {
 
         new Paragraph({ children: [new PageBreak()] }),
 
-        // ══════════ 7. FLUXOS PRINCIPAIS ══════════
-        heading('7. Fluxos Principais do Sistema', HeadingLevel.HEADING_1),
+        // ══════════ 7. FLUXOS VISUAIS ══════════
+        heading('7. Fluxos Visuais do Sistema', HeadingLevel.HEADING_1),
 
         heading('7.1 Fluxo de Diagnóstico Territorial', HeadingLevel.HEADING_2),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Usuário cria destino turístico (com código IBGE)', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Cria nova rodada de diagnóstico (Essencial/Estratégico/Integral)', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Sistema pré-preenche indicadores via APIs oficiais (IBGE, Mapa do Turismo, CADASTUR)', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Usuário complementa dados manuais e confirma', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Checklist pré-cálculo valida completude (≥60%)', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Edge Function calculate-assessment executa pipeline IGMA', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Resultados: scores RA/OE/AO, flags IGMA, issues, prescrições', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Dashboard exibe gauges, alertas e comparação com rodadas anteriores', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Relatório gerado via IA com contexto do destino + Base de Conhecimento', font: 'Arial', size: 22 })] }),
+        flowDiagram([
+          ['Criar Destino', 'Código IBGE + UF + Região Turística'],
+          ['Nova Rodada', 'Essencial (9) | Estratégico (19) | Integral (96)'],
+          ['Pré-preenchimento', 'APIs: IBGE + Mapa Turismo + CADASTUR'],
+          ['Complemento Manual', 'Dados de campo + Secretarias Municipais'],
+          ['Checklist Pré-Cálculo', 'Validação: ≥60% dos indicadores preenchidos'],
+          ['calculate-assessment', 'Edge Function executa Pipeline IGMA (9 etapas)'],
+          ['Resultados IGMA', 'Scores RA/OE/AO + Flags + Issues + Prescrições'],
+          ['Dashboard', 'Gauges + Alertas + Comparação temporal'],
+          ['Relatório IA', 'Contexto do destino + Base de Conhecimento'],
+        ]),
 
-        heading('7.2 Fluxo de Prescrição EDU', HeadingLevel.HEADING_2),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Diagnóstico calculado identifica indicadores críticos/atenção', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Tabela edu_indicator_training_map mapeia cada indicador para treinamentos', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Sistema gera recomendações com prioridade e razão específica', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Usuário pode criar trilha personalizada a partir das recomendações', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Progresso rastreado com certificação ao completar trilha', font: 'Arial', size: 22 })] }),
+        heading('7.2 Fluxo de Prescrição EDU (Determinístico)', HeadingLevel.HEADING_2),
+        flowDiagram([
+          ['Diagnóstico Calculado', 'Indicadores classificados: Crítico/Atenção/Adequado'],
+          ['Mapeamento', 'edu_indicator_training_map: indicador → treinamento'],
+          ['Priorização', 'Hierarquia RA → OE → AO (Regra 1 e 4)'],
+          ['Recomendações', 'Lista com razão específica + relevância score'],
+          ['Trilha Personalizada', 'Criação automática ou manual pelo gestor'],
+          ['Progresso + Exame', 'Watch tracking + anti-cheat + score mínimo'],
+          ['Certificação', 'QR code + verificação pública + validade'],
+        ]),
 
         heading('7.3 Fluxo de Licenciamento', HeadingLevel.HEADING_2),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Novo usuário recebe Trial gratuito de 7 dias automaticamente', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Feature gating via LicenseContext: funcionalidades bloqueadas por plano', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Planos: Basic (5 destinos), Pro (20 destinos + Enterprise), Enterprise (ilimitado)', font: 'Arial', size: 22 })] }),
-        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Expiração automática via cron job (expire_trial_licenses)', font: 'Arial', size: 22 })] }),
+        flowDiagram([
+          ['Registro', 'Cadastro com e-mail + verificação obrigatória'],
+          ['Onboarding', 'Seleção: ERP ou EDU + Role + Organização'],
+          ['Trial Automático', '7 dias com ERP + EDU + Games habilitados'],
+          ['Feature Gating', 'LicenseContext verifica plano em cada rota'],
+          ['Expiração', 'Cron: expire_trial_licenses() atualiza status'],
+          ['Upgrade', 'Basic (5 destinos) → Pro (20) → Enterprise (∞)'],
+        ]),
+
+        heading('7.4 Fluxo de Autenticação e Acesso', HeadingLevel.HEADING_2),
+        flowDiagram([
+          ['Auth', 'Supabase Auth: email/password + verificação'],
+          ['handle_new_user()', 'Trigger cria profile na org "Temporário"'],
+          ['Onboarding', 'complete_user_onboarding(): define system_access + role'],
+          ['Aprovação', 'Admin aprova → move para org "Autônomo" ou org própria'],
+          ['Route Guards', 'ProtectedRoute → AdminRoute/ERPRoute/EduRoute/LicenseRoute'],
+          ['RLS', 'Row Level Security: get_effective_org_id() em todas as queries'],
+        ]),
 
         new Paragraph({ children: [new PageBreak()] }),
 
-        // ══════════ 8. DIFERENCIAIS COMPETITIVOS ══════════
-        heading('8. Diferenciais Competitivos', HeadingLevel.HEADING_1),
+        // ══════════ 8. METODOLOGIA DE CÁLCULO ══════════
+        heading('8. Metodologia de Cálculo Detalhada', HeadingLevel.HEADING_1),
+
+        heading('8.1 Normalização de Indicadores', HeadingLevel.HEADING_2),
+        para('Cada indicador bruto é normalizado para escala 0-10 usando uma de três funções, conforme a natureza do dado:'),
+
+        heading('Normalização Linear (Positiva)', HeadingLevel.HEADING_3),
+        para('Para indicadores onde maior = melhor (ex: IDH, cobertura de saúde):'),
+        codeBlock([
+          'score = ((valor - benchmark_min) / (benchmark_max - benchmark_min)) * 10',
+          '',
+          'Exemplo: IDH = 0.750',
+          '  benchmark_min = 0.500 (pior município BR)',
+          '  benchmark_max = 0.862 (melhor município BR)',
+          '  score = ((0.750 - 0.500) / (0.862 - 0.500)) * 10 = 6.91',
+        ]),
+
+        heading('Normalização Inversa', HeadingLevel.HEADING_3),
+        para('Para indicadores onde menor = melhor (ex: taxa de homicídios, desmatamento):'),
+        codeBlock([
+          'score = (1 - ((valor - benchmark_min) / (benchmark_max - benchmark_min))) * 10',
+          '',
+          'Exemplo: Homicídios por 100k = 15',
+          '  benchmark_min = 0 (ideal)',
+          '  benchmark_max = 60 (pior cenário)',
+          '  score = (1 - ((15 - 0) / (60 - 0))) * 10 = 7.50',
+        ]),
+
+        heading('Normalização Logarítmica', HeadingLevel.HEADING_3),
+        para('Para indicadores com distribuição assimétrica (ex: PIB per capita, população):'),
+        codeBlock([
+          'score = (log(valor) - log(benchmark_min)) / (log(benchmark_max) - log(benchmark_min)) * 10',
+          '',
+          'Exemplo: PIB per capita = R$ 35.000',
+          '  benchmark_min = R$ 5.000',
+          '  benchmark_max = R$ 150.000',
+          '  score = (log(35000) - log(5000)) / (log(150000) - log(5000)) * 10 = 5.72',
+        ]),
+
+        heading('8.2 Cálculo dos Scores de Pilar', HeadingLevel.HEADING_2),
+        para('Cada pilar (RA, OE, AO) é calculado pela média ponderada dos seus indicadores normalizados:'),
+        codeBlock([
+          'Score_Pilar = Σ(score_i × peso_i) / Σ(peso_i)',
+          '',
+          'Onde:',
+          '  score_i = valor normalizado do indicador i (0-10)',
+          '  peso_i  = peso estratégico do indicador i',
+          '',
+          'Restrição: Σ(peso_i) = 100% por pilar',
+          '',
+          'Pesos são definidos por relevância estratégica:',
+          '  Segurança, Infraestrutura: peso 5-6x maior',
+          '  Métricas secundárias: peso base 1x',
+        ]),
+
+        heading('8.3 Classificação de Severidade', HeadingLevel.HEADING_2),
+        new Table({
+          width: { size: 9026, type: WidthType.DXA },
+          columnWidths: [2000, 2500, 4526],
+          rows: [
+            tableRow([{ text: 'Faixa', bold: true, bg: HEADER_BG, width: 2000 }, { text: 'Classificação', bold: true, bg: HEADER_BG, width: 2500 }, { text: 'Ação', bold: true, bg: HEADER_BG, width: 4526 }]),
+            tableRow([{ text: '0.00 – 3.33', width: 2000 }, { text: 'CRÍTICO', bold: true, width: 2500 }, { text: 'Intervenção imediata. Pode acionar bloqueios IGMA.', width: 4526 }]),
+            tableRow([{ text: '3.34 – 6.66', width: 2000 }, { text: 'ATENÇÃO', bold: true, width: 2500 }, { text: 'Monitoramento ativo. Prescrições educacionais geradas.', width: 4526 }]),
+            tableRow([{ text: '6.67 – 10.0', width: 2000 }, { text: 'ADEQUADO', bold: true, width: 2500 }, { text: 'Manutenção. Revisão em 18 meses.', width: 4526 }]),
+          ],
+        }),
+
+        heading('8.4 Regras IGMA — Fluxo de Decisão', HeadingLevel.HEADING_2),
+        para('As 6 regras são aplicadas sequencialmente. Cada regra pode ativar flags que afetam ações permitidas:'),
+        flowDiagram([
+          ['Regra 1: RA < 3.33?', 'SIM → RA_LIMITATION = true → Bloqueia EDU_OE'],
+          ['Regra 4: AO < 3.33?', 'SIM → GOVERNANCE_BLOCK = true → Bloqueia EDU_OE'],
+          ['Regra 3: OE↑ e RA↓?', 'SIM → EXTERNALITY_WARNING = true → Alerta'],
+          ['Regra 5: RA ou AO < 3.33?', 'SIM → MARKETING_BLOCKED = true'],
+          ['Regra 2: Calcular Revisão', 'Crítico=6m | Atenção=12m | Adequado=18m'],
+          ['Regra 6: Intersetorial?', 'SIM → INTERSECTORAL_DEPENDENCY = true'],
+        ]),
+
+        heading('8.5 Snapshot de Rastreabilidade', HeadingLevel.HEADING_2),
+        para('Cada diagnóstico calculado gera um snapshot imutável (diagnosis_data_snapshots) que registra:'),
+        bullet('Valor usado para cada indicador no momento do cálculo', 'bullets'),
+        bullet('Fonte do dado (source_code): IBGE, CADASTUR, MANUAL, MAPA_TURISMO', 'bullets'),
+        bullet('Nível de confiabilidade (1-5) baseado na origem', 'bullets'),
+        bullet('Ano de referência do dado', 'bullets'),
+        bullet('Flag de ajuste manual (was_manually_adjusted)', 'bullets'),
+        para('Alterações em benchmarks ou pesos NÃO são retroativas. É necessário recalcular manualmente para aplicar novas regras.', { bold: true }),
+
+        heading('8.6 Indicadores — 71 Territoriais + 22 Enterprise', HeadingLevel.HEADING_2),
+        para('Os indicadores estão organizados por dimensão IGMA, cada um mapeado para um pilar:'),
+        new Table({
+          width: { size: 9026, type: WidthType.DXA },
+          columnWidths: [2500, 1200, 2000, 3326],
+          rows: [
+            tableRow([{ text: 'Dimensão IGMA', bold: true, bg: HEADER_BG, width: 2500 }, { text: 'Pilar', bold: true, bg: HEADER_BG, width: 1200 }, { text: 'Qtd', bold: true, bg: HEADER_BG, width: 2000 }, { text: 'Exemplos', bold: true, bg: HEADER_BG, width: 3326 }]),
+            tableRow([{ text: 'Ambiental', width: 2500 }, { text: 'RA', width: 1200 }, { text: '~15', width: 2000 }, { text: 'Saneamento, Desmatamento, Áreas protegidas', width: 3326 }]),
+            tableRow([{ text: 'Socioeconômica', width: 2500 }, { text: 'RA', width: 1200 }, { text: '~12', width: 2000 }, { text: 'IDH, IDEB, Salário médio, Gini', width: 3326 }]),
+            tableRow([{ text: 'Infraestrutura', width: 2500 }, { text: 'OE', width: 1200 }, { text: '~10', width: 2000 }, { text: 'Leitos, Transporte, Sinalização', width: 3326 }]),
+            tableRow([{ text: 'Serviços Turísticos', width: 2500 }, { text: 'OE', width: 1200 }, { text: '~10', width: 2000 }, { text: 'Guias, Agências, Estabelecimentos', width: 3326 }]),
+            tableRow([{ text: 'Governança', width: 2500 }, { text: 'AO', width: 1200 }, { text: '~12', width: 2000 }, { text: 'Conselho municipal, PDT, Receita turismo', width: 3326 }]),
+            tableRow([{ text: 'Marketing', width: 2500 }, { text: 'AO', width: 1200 }, { text: '~8', width: 2000 }, { text: 'Visitantes, NPS, Reviews, Categoria MTur', width: 3326 }]),
+            tableRow([{ text: 'Segurança', width: 2500 }, { text: 'RA', width: 1200 }, { text: '~4', width: 2000 }, { text: 'Homicídios, Furtos, Cobertura policial', width: 3326 }]),
+          ],
+        }),
+
+        new Paragraph({ children: [new PageBreak()] }),
+
+        new Paragraph({ children: [new PageBreak()] }),
+
+        // ══════════ 9. DIFERENCIAIS COMPETITIVOS ══════════
+        heading('9. Diferenciais Competitivos', HeadingLevel.HEADING_1),
 
         new Table({
           width: { size: 9026, type: WidthType.DXA },
@@ -491,10 +654,10 @@ export async function exportTechnicalDocx() {
         }),
 
         // ══════════ 9. CÓDIGO-FONTE — TRECHOS RELEVANTES ══════════
-        heading('9. Código-Fonte — Trechos Relevantes', HeadingLevel.HEADING_1),
+        heading('10. Código-Fonte — Trechos Relevantes', HeadingLevel.HEADING_1),
         para('Os trechos a seguir demonstram a implementação proprietária dos algoritmos centrais do SISTUR. São apresentados em TypeScript (frontend) e SQL (banco de dados).'),
 
-        heading('9.1 Motor IGMA — interpretIGMA() [igmaEngine.ts]', HeadingLevel.HEADING_2),
+        heading('11.1 Motor IGMA — interpretIGMA() [igmaEngine.ts]', HeadingLevel.HEADING_2),
         para('Função principal que aplica as 6 regras sistêmicas de Mario Beni:', { bold: true }),
         codeBlock([
           'export function interpretIGMA(input: IGMAInput): IGMAOutput {',
@@ -548,7 +711,7 @@ export async function exportTechnicalDocx() {
           '}',
         ]),
 
-        heading('9.2 Tipos e Interfaces Centrais [igmaEngine.ts]', HeadingLevel.HEADING_2),
+        heading('11.2 Tipos e Interfaces Centrais [igmaEngine.ts]', HeadingLevel.HEADING_2),
         codeBlock([
           'export type PillarType = "RA" | "OE" | "AO";',
           'export type SeverityType = "CRITICO" | "MODERADO" | "BOM";',
@@ -572,7 +735,7 @@ export async function exportTechnicalDocx() {
           '}',
         ]),
 
-        heading('9.3 Classificação de Severidade [igmaEngine.ts]', HeadingLevel.HEADING_2),
+        heading('11.3 Classificação de Severidade [igmaEngine.ts]', HeadingLevel.HEADING_2),
         codeBlock([
           'export function getSeverityFromScore(score: number): SeverityType {',
           '  if (score <= 0.33) return "CRITICO";   // 0.00 – 3.33',
@@ -584,10 +747,10 @@ export async function exportTechnicalDocx() {
         new Paragraph({ children: [new PageBreak()] }),
 
         // ══════════ 10. FUNÇÕES DE BANCO DE DADOS ══════════
-        heading('10. Funções de Banco de Dados (PostgreSQL)', HeadingLevel.HEADING_1),
+        heading('11. Funções de Banco de Dados (PostgreSQL)', HeadingLevel.HEADING_1),
         para('Funções SQL com SECURITY DEFINER para controle de acesso e lógica de negócio server-side.'),
 
-        heading('10.1 Controle de Acesso — has_role()', HeadingLevel.HEADING_2),
+        heading('11.1 Controle de Acesso — has_role()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.has_role(_user_id uuid, _role app_role)',
           '  RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER AS $$',
@@ -598,7 +761,7 @@ export async function exportTechnicalDocx() {
           '$$;',
         ]),
 
-        heading('10.2 Multi-tenant — get_effective_org_id()', HeadingLevel.HEADING_2),
+        heading('11.2 Multi-tenant — get_effective_org_id()', HeadingLevel.HEADING_2),
         para('Resolve organização efetiva considerando modo demonstração:'),
         codeBlock([
           'CREATE FUNCTION public.get_effective_org_id() RETURNS uuid',
@@ -619,7 +782,7 @@ export async function exportTechnicalDocx() {
           'END; $$;',
         ]),
 
-        heading('10.3 Onboarding — complete_user_onboarding()', HeadingLevel.HEADING_2),
+        heading('11.3 Onboarding — complete_user_onboarding()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.complete_user_onboarding(',
           '  _user_id uuid, _system_access text, _role text',
@@ -638,7 +801,7 @@ export async function exportTechnicalDocx() {
           'END; $$;',
         ]),
 
-        heading('10.4 Licenciamento — activate_my_trial()', HeadingLevel.HEADING_2),
+        heading('11.4 Licenciamento — activate_my_trial()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.activate_my_trial() RETURNS licenses',
           '  LANGUAGE plpgsql SECURITY DEFINER AS $$',
@@ -657,7 +820,7 @@ export async function exportTechnicalDocx() {
           'END; $$;',
         ]),
 
-        heading('10.5 Expiração Automática — expire_trial_licenses()', HeadingLevel.HEADING_2),
+        heading('11.5 Expiração Automática — expire_trial_licenses()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.expire_trial_licenses() RETURNS void',
           '  LANGUAGE plpgsql SECURITY DEFINER AS $$',
@@ -669,7 +832,7 @@ export async function exportTechnicalDocx() {
           'END; $$;',
         ]),
 
-        heading('10.6 Certificação — verify_certificate_by_code()', HeadingLevel.HEADING_2),
+        heading('11.6 Certificação — verify_certificate_by_code()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.verify_certificate_by_code(p_code text)',
           '  RETURNS TABLE(certificate_id text, user_name text, title text,',
@@ -680,7 +843,7 @@ export async function exportTechnicalDocx() {
           '$$;',
         ]),
 
-        heading('10.7 Fila de E-mails — enqueue_email()', HeadingLevel.HEADING_2),
+        heading('11.7 Fila de E-mails — enqueue_email()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.enqueue_email(queue_name text, payload jsonb)',
           '  RETURNS bigint LANGUAGE plpgsql SECURITY DEFINER AS $$',
@@ -692,7 +855,7 @@ export async function exportTechnicalDocx() {
           'END; $$;',
         ]),
 
-        heading('10.8 Auditoria — create_lms_audit_log()', HeadingLevel.HEADING_2),
+        heading('11.8 Auditoria — create_lms_audit_log()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.create_lms_audit_log(',
           '  p_action text, p_entity_type text, p_entity_id text,',
@@ -712,7 +875,7 @@ export async function exportTechnicalDocx() {
         new Paragraph({ children: [new PageBreak()] }),
 
         // ══════════ 11. PROPRIEDADE INTELECTUAL ══════════
-        heading('11. Propriedade Intelectual', HeadingLevel.HEADING_1),
+        heading('12. Propriedade Intelectual', HeadingLevel.HEADING_1),
         para('O SISTUR constitui obra original protegida pela Lei 9.609/1998 (Lei de Software) e Lei 9.610/1998 (Direitos Autorais). Os seguintes elementos são proprietários:'),
         bullet('Motor IGMA: algoritmo de interpretação sistêmica com 6 regras encadeadas', 'bullets'),
         bullet('Pipeline de 9 etapas: fluxo de processamento de dados turísticos', 'bullets'),
@@ -723,7 +886,7 @@ export async function exportTechnicalDocx() {
         bullet('Jogos educacionais: mecânicas, conteúdo e persistência', 'bullets'),
         bullet('30+ funções SQL proprietárias com SECURITY DEFINER', 'bullets'),
 
-        heading('12. Referências Bibliográficas', HeadingLevel.HEADING_1),
+        heading('13. Referências Bibliográficas', HeadingLevel.HEADING_1),
         bullet('BENI, Mario Carlos. Análise Estrutural do Turismo. São Paulo: Editora Senac São Paulo, 2001.', 'bullets'),
         bullet('BENI, Mario Carlos. Globalização do Turismo: Megatendências do Setor e a Realidade Brasileira. São Paulo: Aleph, 2003.', 'bullets'),
         bullet('BENI, Mario Carlos. Política e Planejamento de Turismo no Brasil. São Paulo: Aleph, 2006.', 'bullets'),
