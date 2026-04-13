@@ -26,6 +26,7 @@ import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSear
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
+import { exportMetodologiaDocx, exportFAQDocx } from '@/lib/exportDocsDocx';
 import { 
   BookOpen, 
   Wrench, 
