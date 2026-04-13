@@ -19,6 +19,7 @@ import { ForumPrivacySettings } from '@/components/settings/ForumPrivacySettings
 import { ContentModerationPanel } from '@/components/settings/ContentModerationPanel';
 import { PerformanceMetricsPanel } from '@/components/settings/PerformanceMetricsPanel';
 import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel';
+import { HealthCheckPanel } from '@/components/tools/HealthCheckPanel';
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
 import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSearch';
 import { useProfile } from '@/hooks/useProfile';
@@ -507,6 +508,15 @@ export default function Configuracoes() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Health Check Panel - Admin only */}
+            {isAdmin && (
+              <Card>
+                <CardContent className="pt-6">
+                  <HealthCheckPanel />
+                </CardContent>
+              </Card>
+            )}
 
             {/* Admin tools */}
             {isAdmin && <EmailDispatchPanel />}

@@ -13,6 +13,7 @@ import { ERPRoute } from "@/components/layout/ERPRoute";
 import { EduRoute } from "@/components/layout/EduRoute";
 import { LicenseRoute } from "@/components/layout/LicenseRoute";
 import { SplashScreen } from "@/components/SplashScreen";
+import { ClientErrorMonitor } from "@/components/ClientErrorMonitor";
 
 // Lazy load all page components for code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -114,6 +115,7 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <AuthProvider>
+              <ClientErrorMonitor />
               <ProfileProvider>
               <LicenseProvider>
               <Suspense fallback={<PageLoader />}>
