@@ -6466,6 +6466,78 @@ export type Database = {
           },
         ]
       }
+      test_flow_registry: {
+        Row: {
+          auto_discovered: boolean
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          last_synced_at: string | null
+          test_config: Json
+          test_name: string
+          test_type: string
+          updated_at: string
+        }
+        Insert: {
+          auto_discovered?: boolean
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          test_config?: Json
+          test_name: string
+          test_type: string
+          updated_at?: string
+        }
+        Update: {
+          auto_discovered?: boolean
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          test_config?: Json
+          test_name?: string
+          test_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      test_registry_sync_log: {
+        Row: {
+          app_version: string | null
+          details: Json | null
+          id: string
+          status: string
+          synced_at: string
+          tests_added: number | null
+          tests_removed: number | null
+          total_tests: number | null
+        }
+        Insert: {
+          app_version?: string | null
+          details?: Json | null
+          id?: string
+          status?: string
+          synced_at?: string
+          tests_added?: number | null
+          tests_removed?: number | null
+          total_tests?: number | null
+        }
+        Update: {
+          app_version?: string | null
+          details?: Json | null
+          id?: string
+          status?: string
+          synced_at?: string
+          tests_added?: number | null
+          tests_removed?: number | null
+          total_tests?: number | null
+        }
+        Relationships: []
+      }
       track_instance_items: {
         Row: {
           item_id: string
