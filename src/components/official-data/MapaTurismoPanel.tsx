@@ -6,7 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMapaTurismo, useMapaTurismoStats, useMapaTurismoSyncLogs, useIngestMapaTurismo } from '@/hooks/useMapaTurismo';
-import { Loader2, Download, MapPin, BarChart3, RefreshCw, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { Loader2, Download, MapPin, BarChart3, RefreshCw, CheckCircle2, XCircle, Clock, Flame, Database } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -34,6 +36,7 @@ export default function MapaTurismoPanel() {
   const [filterAno, setFilterAno] = useState<number | undefined>();
   const [syncYear, setSyncYear] = useState<number>(2017);
   const [syncType, setSyncType] = useState<'mapa_turismo' | 'categorizacao'>('mapa_turismo');
+  const [useFirecrawl, setUseFirecrawl] = useState(true);
 
   const { data: municipios, isLoading } = useMapaTurismo({
     uf: filterUF || undefined,
@@ -44,7 +47,7 @@ export default function MapaTurismoPanel() {
   const ingestMutation = useIngestMapaTurismo();
 
   const handleSync = () => {
-    ingestMutation.mutate({ year: syncYear, sync_type: syncType });
+    ingestMutation.mutate({ year: syncYear, sync_type: syncType, use_firecrawl: useFirecrawl });
   };
 
   return (
@@ -220,11 +223,28 @@ export default function MapaTurismoPanel() {
                 Importar do Mapa do Turismo Brasileiro
               </CardTitle>
               <CardDescription>
-                Dados importados diretamente de <strong>dados.turismo.gov.br</strong> (CKAN API).
-                Inclui regiões turísticas, categorização de municípios e classificação por tipo.
+                Dados importados via <strong>Firecrawl</strong> (scraping inteligente) com fallback para <strong>dados.turismo.gov.br</strong> (CKAN API).
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Firecrawl toggle */}
+              <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30">
+                <Flame className="h-5 w-5 text-orange-500 shrink-0" />
+                <div className="flex-1">
+                  <Label htmlFor="firecrawl-toggle" className="font-medium cursor-pointer">
+                    Usar Firecrawl (Scraping Inteligente)
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Busca dados mais recentes via scraping do portal oficial. Se falhar, usa CSVs do CKAN como fallback.
+                  </p>
+                </div>
+                <Switch
+                  id="firecrawl-toggle"
+                  checked={useFirecrawl}
+                  onCheckedChange={setUseFirecrawl}
+                />
+              </div>
+
               <div className="flex gap-3 items-end flex-wrap">
                 <div>
                   <label className="text-sm font-medium block mb-1">Tipo de Dados</label>
@@ -238,49 +258,52 @@ export default function MapaTurismoPanel() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <label className="text-sm font-medium block mb-1">Ano</label>
-                  <Select value={syncYear.toString()} onValueChange={(v) => setSyncYear(Number(v))}>
-                    <SelectTrigger className="w-[120px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {syncType === 'mapa_turismo' ? (
-                        <>
-                          <SelectItem value="2017">2017</SelectItem>
-                          <SelectItem value="2016">2016</SelectItem>
-                          <SelectItem value="2013">2013</SelectItem>
-                        </>
-                      ) : (
-                        <>
-                          <SelectItem value="2017">2017/2018</SelectItem>
-                          <SelectItem value="2014">2014/2015</SelectItem>
-                        </>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
+                {!useFirecrawl && (
+                  <div>
+                    <label className="text-sm font-medium block mb-1">Ano</label>
+                    <Select value={syncYear.toString()} onValueChange={(v) => setSyncYear(Number(v))}>
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {syncType === 'mapa_turismo' ? (
+                          <>
+                            <SelectItem value="2017">2017</SelectItem>
+                            <SelectItem value="2016">2016</SelectItem>
+                            <SelectItem value="2013">2013</SelectItem>
+                          </>
+                        ) : (
+                          <>
+                            <SelectItem value="2017">2017/2018</SelectItem>
+                            <SelectItem value="2014">2014/2015</SelectItem>
+                          </>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 <Button 
                   onClick={handleSync} 
                   disabled={ingestMutation.isPending}
                 >
                   {ingestMutation.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : useFirecrawl ? (
+                    <Flame className="h-4 w-4 mr-2" />
                   ) : (
-                    <RefreshCw className="h-4 w-4 mr-2" />
+                    <Database className="h-4 w-4 mr-2" />
                   )}
-                  Importar Dados
+                  {useFirecrawl ? 'Importar via Firecrawl' : 'Importar via CKAN'}
                 </Button>
               </div>
 
               <div className="text-sm text-muted-foreground space-y-1 bg-muted/50 rounded-lg p-4">
-                <p><strong>Fonte:</strong> Portal de Dados Abertos do Ministério do Turismo</p>
-                <p><strong>Dados disponíveis:</strong></p>
+                <p><strong>Estratégia de coleta:</strong></p>
                 <ul className="list-disc ml-4 space-y-1">
-                  <li><strong>Mapa do Turismo:</strong> UF, Região Turística, Município, Categoria (A-E)</li>
-                  <li><strong>Categorização:</strong> Classificação por desempenho econômico do turismo</li>
+                  <li><strong>🔥 Firecrawl (primário):</strong> Scraping inteligente do portal oficial para dados mais recentes</li>
+                  <li><strong>📊 CKAN (fallback):</strong> CSVs estáticos de dados.turismo.gov.br (2013-2017)</li>
                 </ul>
-                <p className="mt-2">Os dados importados são vinculados automaticamente aos destinos cadastrados no SISTUR (por nome + UF).</p>
+                <p className="mt-2">Os dados importados são vinculados automaticamente aos destinos cadastrados no SISTUR.</p>
               </div>
             </CardContent>
           </Card>

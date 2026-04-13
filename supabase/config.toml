@@ -31,3 +31,5 @@ project_id = "enexnpmkhvgufcervjsv"
     verify_jwt = false
   [functions.sync-test-registry]
     verify_jwt = false
+  [functions.ingest-mapa-turismo]
+    verify_jwt = false

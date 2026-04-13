@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 18,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.18.2",
+    date: "2026-04-13",
+    type: "patch" as const,
+    changes: [
+      "Integração Firecrawl como fonte primária para scraping do Mapa do Turismo Brasileiro",
+      "Estratégia dupla: Firecrawl (scraping inteligente) com fallback automático para CSVs do CKAN",
+      "Firecrawl descobre CSVs atualizados via map/search e extrai dados estruturados via scrape",
+      "Toggle na UI para ativar/desativar Firecrawl — quando desativado, usa apenas CKAN estático",
+      "Seletor de ano exibido apenas no modo CKAN (Firecrawl busca dados mais recentes automaticamente)",
+      "Dados importados via Firecrawl são marcados com ano corrente e fonte rastreável",
+    ],
+  },
   {
     version: "1.18.1",
     date: "2026-04-13",
