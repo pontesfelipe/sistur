@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 18,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.18.1",
+    date: "2026-04-13",
+    type: "patch" as const,
+    changes: [
+      "Integração com Mapa do Turismo Brasileiro (dados.turismo.gov.br) via CKAN API",
+      "Importação de regiões turísticas, categorização de municípios (A-E) e classificação por tipo",
+      "Edge function ingest-mapa-turismo para ingestão de dados abertos do Ministério do Turismo",
+      "Vinculação automática dos dados importados aos destinos cadastrados no SISTUR (por nome + UF)",
+      "Painel de visualização com estatísticas, distribuição por categoria, filtros por UF e histórico de sincronização",
+      "Tabela mapa_turismo_municipios com dados de 3059 municípios em 361 regiões turísticas",
+    ],
+  },
   {
     version: "1.18.0",
     date: "2026-04-13",

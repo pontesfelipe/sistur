@@ -20,6 +20,7 @@ import { ContentModerationPanel } from '@/components/settings/ContentModerationP
 import { PerformanceMetricsPanel } from '@/components/settings/PerformanceMetricsPanel';
 import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel';
 import { HealthCheckPanel } from '@/components/tools/HealthCheckPanel';
+import MapaTurismoPanel from '@/components/official-data/MapaTurismoPanel';
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
 import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSearch';
 import { useProfile } from '@/hooks/useProfile';
@@ -42,6 +43,7 @@ import {
   ExternalLink,
   Clock,
   Search,
+  Map,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
