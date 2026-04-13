@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { useEduSessionTracker } from '@/hooks/useEduSessionTracker';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -63,6 +64,14 @@ const getFileExtension = (filename: string): string => {
 const EduTrainingDetalhe = () => {
   const { id } = useParams<{ id: string }>();
   const { data: training, isLoading, error } = useEduTraining(id);
+
+  // AVA Compliance: session tracking
+  useEduSessionTracker({
+    sessionType: 'training',
+    entityType: 'training',
+    entityId: id,
+    enabled: !!id,
+  });
 
   if (isLoading) {
     return (

@@ -1373,6 +1373,69 @@ export type Database = {
           },
         ]
       }
+      edu_fraud_flags: {
+        Row: {
+          created_at: string
+          description: string
+          evidence: Json | null
+          flag_type: string
+          id: string
+          org_id: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          session_id: string | null
+          severity: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          evidence?: Json | null
+          flag_type: string
+          id?: string
+          org_id?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          session_id?: string | null
+          severity?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          evidence?: Json | null
+          flag_type?: string
+          id?: string
+          org_id?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          session_id?: string | null
+          severity?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_fraud_flags_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edu_fraud_flags_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "edu_learning_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       edu_indicator_training_map: {
         Row: {
           created_at: string
@@ -1414,6 +1477,118 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "edu_trainings"
             referencedColumns: ["training_id"]
+          },
+        ]
+      }
+      edu_interaction_logs: {
+        Row: {
+          element_id: string | null
+          element_label: string | null
+          id: string
+          interaction_type: string
+          metadata: Json | null
+          page_url: string | null
+          session_id: string | null
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          element_id?: string | null
+          element_label?: string | null
+          id?: string
+          interaction_type: string
+          metadata?: Json | null
+          page_url?: string | null
+          session_id?: string | null
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          element_id?: string | null
+          element_label?: string | null
+          id?: string
+          interaction_type?: string
+          metadata?: Json | null
+          page_url?: string | null
+          session_id?: string | null
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_interaction_logs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "edu_learning_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_learning_sessions: {
+        Row: {
+          active_seconds: number | null
+          device_info: Json | null
+          duration_seconds: number | null
+          ended_at: string | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          idle_seconds: number | null
+          ip_address: string | null
+          is_active: boolean
+          last_heartbeat_at: string
+          metadata: Json | null
+          org_id: string | null
+          session_type: string
+          started_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          active_seconds?: number | null
+          device_info?: Json | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          idle_seconds?: number | null
+          ip_address?: string | null
+          is_active?: boolean
+          last_heartbeat_at?: string
+          metadata?: Json | null
+          org_id?: string | null
+          session_type?: string
+          started_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          active_seconds?: number | null
+          device_info?: Json | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          idle_seconds?: number | null
+          ip_address?: string | null
+          is_active?: boolean
+          last_heartbeat_at?: string
+          metadata?: Json | null
+          org_id?: string | null
+          session_type?: string
+          started_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_learning_sessions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -7084,11 +7259,13 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      end_stale_edu_sessions: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
       expire_trial_licenses: { Args: never; Returns: undefined }
+      flag_suspicious_edu_sessions: { Args: never; Returns: undefined }
       generate_certificate_id: { Args: never; Returns: string }
       get_dashboard_org_access_flags: {
         Args: never

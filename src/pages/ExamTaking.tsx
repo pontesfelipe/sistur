@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useExam, useExamAttempt, useExamMutations, useExamAnswerMutations } from '@/hooks/useExams';
 import { useQuizQuestion } from '@/hooks/useQuizzes';
+import { useEduSessionTracker } from '@/hooks/useEduSessionTracker';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +53,14 @@ const ExamTaking = () => {
   const { data: attempt } = useExamAttempt(examId);
   const { startExam } = useExamMutations();
   const { submitAnswer, submitExam } = useExamAnswerMutations();
+
+  // AVA Compliance: session tracking for exams
+  const { logInteraction } = useEduSessionTracker({
+    sessionType: 'exam',
+    entityType: 'exam',
+    entityId: examId,
+    enabled: !!examId,
+  });
 
   // Get options for current question
   const currentQuestionId = exam?.question_ids?.[currentQuestionIndex];
@@ -103,6 +112,7 @@ const ExamTaking = () => {
     if (!examId) return;
     try {
       await startExam.mutateAsync(examId);
+      logInteraction('exam_start', examId, 'Início de prova');
       toast.success('Exame iniciado!');
     } catch (error) {
       toast.error('Erro ao iniciar exame');
@@ -111,6 +121,7 @@ const ExamTaking = () => {
 
   const handleAnswerChange = (questionId: string, answer: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: answer }));
+    logInteraction('answer_select', questionId, `Resposta Q${currentQuestionIndex + 1}`);
   };
 
   const handleSubmit = async () => {
