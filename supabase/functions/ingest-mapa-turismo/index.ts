@@ -5,6 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const MAPA_API_BASE = 'https://www.mapa.turismo.gov.br/mapa/rest/publico';
+
 const CKAN_BASE = 'https://dados.turismo.gov.br';
 
 // Known CSV resources for Mapa do Turismo (by year) — FALLBACK
@@ -19,20 +21,157 @@ const CATEG_RESOURCES: Record<number, string> = {
   2014: '/dataset/bc4166b3-a1ae-4d00-9e1a-05e9c4e1068d/resource/0a960534-a1f0-4035-8b82-34bc724333e6/download/2016-categorizacao.csv',
 };
 
-// Firecrawl target URLs for scraping current data
-const FIRECRAWL_TARGETS = {
-  mapa_turismo: 'https://www.mapa.turismo.gov.br/mapa/init.html#/home',
-  dados_abertos: 'https://dados.turismo.gov.br/dataset/mapa-do-turismo',
-  categorizacao: 'https://dados.turismo.gov.br/dataset/categorizacao-dos-municipios',
-};
-
 interface ParsedRow {
   uf: string;
   regiao_turistica: string;
   municipio: string;
   categoria: string;
+  ibge_code?: string;
+  qt_emprego?: string;
+  qt_estabelecimento?: string;
+  qt_visita_internacional?: string;
+  qt_visita_nacional?: string;
+  arrecadacao?: number;
+  fl_conselho?: boolean;
+  no_instancia?: string;
 }
 
+// ─── REST API: Fetch directly from mapa.turismo.gov.br ───────────────
+async function fetchFromMapaAPI(): Promise<{ rows: ParsedRow[]; source: string; year: number } | null> {
+  console.log('Attempting to fetch from Mapa do Turismo REST API...');
+
+  try {
+    // 1. Get UF list
+    const ufResp = await fetch(`${MAPA_API_BASE}/dne/listaUF`, {
+      headers: { 'Accept': 'application/json' },
+    });
+    if (!ufResp.ok) {
+      console.error('Failed to fetch UF list:', ufResp.status);
+      return null;
+    }
+    const ufList: any[] = await ufResp.json();
+    console.log(`Got ${ufList.length} UFs`);
+
+    // 2. Get summary to know the current year
+    const resumoResp = await fetch(`${MAPA_API_BASE}/regionalizacao/resumo`, {
+      headers: { 'Accept': 'application/json' },
+    });
+    let currentYear = new Date().getFullYear();
+    if (resumoResp.ok) {
+      const resumo = await resumoResp.json();
+      currentYear = parseInt(resumo.ano) || currentYear;
+      console.log(`Mapa do Turismo year: ${currentYear}, total municipalities: ${resumo.totalMunicipios}`);
+    }
+
+    // 3. Fetch all municipalities by searching per UF (API returns all at once too)
+    const allRows: ParsedRow[] = [];
+
+    // Try fetching all at once first
+    const allResp = await fetch(`${MAPA_API_BASE}/regionalizacao/pesquisar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({}),
+    });
+
+    if (allResp.ok) {
+      const data: any[] = await allResp.json();
+      console.log(`Got ${data.length} municipalities from API`);
+
+      for (const d of data) {
+        const clusterMap: Record<string, string> = { '1': 'A', '2': 'B', '3': 'C' };
+        const categoria = clusterMap[d.coCluster] || '';
+
+        allRows.push({
+          uf: d.sgUf || '',
+          regiao_turistica: d.noRegiaoTuristica || '',
+          municipio: d.noMunicipio || '',
+          categoria,
+          ibge_code: d.nuMunicipioIbge || null,
+          qt_emprego: d.qtEmprego || null,
+          qt_estabelecimento: d.qtEstabelecimento || null,
+          qt_visita_internacional: d.qtVisitaInternacionalEstimada || null,
+          qt_visita_nacional: d.qtVisitaNacionalEstimada || null,
+          arrecadacao: d.arrecadacao || null,
+          fl_conselho: d.flSituacaoConselho || false,
+          no_instancia: d.noInstancia || null,
+        });
+      }
+    }
+
+    if (allRows.length > 100) {
+      console.log(`Successfully fetched ${allRows.length} from REST API`);
+      return { rows: allRows, source: 'api:mapa.turismo.gov.br', year: currentYear };
+    }
+
+    // If bulk fetch didn't work, try per UF
+    console.log('Bulk fetch yielded few results, trying per UF...');
+    for (const uf of ufList) {
+      try {
+        const resp = await fetch(`${MAPA_API_BASE}/regionalizacao/pesquisar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ nuUf: uf.nuUf }),
+        });
+
+        if (!resp.ok) continue;
+        const data: any[] = await resp.json();
+
+        for (const d of data) {
+          const clusterMap: Record<string, string> = { '1': 'A', '2': 'B', '3': 'C' };
+          const categoria = clusterMap[d.coCluster] || '';
+
+          allRows.push({
+            uf: d.sgUf || uf.sgUf || '',
+            regiao_turistica: d.noRegiaoTuristica || '',
+            municipio: d.noMunicipio || '',
+            categoria,
+            ibge_code: d.nuMunicipioIbge || null,
+            qt_emprego: d.qtEmprego || null,
+            qt_estabelecimento: d.qtEstabelecimento || null,
+            qt_visita_internacional: d.qtVisitaInternacionalEstimada || null,
+            qt_visita_nacional: d.qtVisitaNacionalEstimada || null,
+            arrecadacao: d.arrecadacao || null,
+            fl_conselho: d.flSituacaoConselho || false,
+            no_instancia: d.noInstancia || null,
+          });
+        }
+
+        // Small delay to be nice to the API
+        await new Promise(r => setTimeout(r, 200));
+      } catch (e) {
+        console.error(`Error fetching UF ${uf.sgUf}:`, e);
+      }
+    }
+
+    if (allRows.length > 0) {
+      console.log(`Fetched ${allRows.length} municipalities via per-UF requests`);
+      return { rows: allRows, source: 'api:mapa.turismo.gov.br', year: currentYear };
+    }
+
+    return null;
+  } catch (error) {
+    console.error('REST API error:', error);
+    return null;
+  }
+}
+
+// ─── REST API: Fetch single municipality data ────────────────────────
+async function fetchSingleMunicipio(nuUf: number, nuLocalidade: number): Promise<any | null> {
+  try {
+    const resp = await fetch(`${MAPA_API_BASE}/regionalizacao/pesquisar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ nuUf, nuLocalidade }),
+    });
+    if (!resp.ok) return null;
+    const data: any[] = await resp.json();
+    return data.length > 0 ? data[0] : null;
+  } catch {
+    return null;
+  }
+}
+
+// ─── CSV parsing (for CKAN fallback) ─────────────────────────────────
 function parseCSV(text: string): ParsedRow[] {
   const lines = text.split(/\r?\n/).filter(l => l.trim());
   if (lines.length < 2) return [];
@@ -62,225 +201,7 @@ function parseCSV(text: string): ParsedRow[] {
   return rows;
 }
 
-// Parse markdown/HTML scraped by Firecrawl into structured rows
-function parseScrapedContent(markdown: string): ParsedRow[] {
-  const rows: ParsedRow[] = [];
-
-  // Try table format (markdown tables)
-  const tableLines = markdown.split('\n').filter(l => l.includes('|'));
-  if (tableLines.length > 2) {
-    const headerLine = tableLines[0];
-    const headers = headerLine.split('|').map(h => h.trim().toUpperCase());
-    
-    const ufIdx = headers.findIndex(h => h === 'UF' || h === 'ESTADO');
-    const munIdx = headers.findIndex(h => h.includes('MUNIC') || h.includes('CIDADE'));
-    const regiaoIdx = headers.findIndex(h => h.includes('REGI') || h.includes('TURÍS'));
-    const catIdx = headers.findIndex(h => h.includes('CATEG') || h.includes('CLASS'));
-
-    if (ufIdx >= 0 && munIdx >= 0) {
-      for (let i = 2; i < tableLines.length; i++) {
-        const cols = tableLines[i].split('|').map(c => c.trim());
-        if (cols.length < 3) continue;
-        const uf = cols[ufIdx] || '';
-        const mun = cols[munIdx] || '';
-        if (uf.length === 2 && mun.length > 1) {
-          rows.push({
-            uf,
-            municipio: mun,
-            regiao_turistica: regiaoIdx >= 0 ? (cols[regiaoIdx] || '') : '',
-            categoria: catIdx >= 0 ? (cols[catIdx] || '') : '',
-          });
-        }
-      }
-    }
-  }
-
-  // Also try line-based patterns: "MUNICIPIO - UF - REGIAO"
-  if (rows.length === 0) {
-    const linePatterns = [
-      /([A-ZÁÉÍÓÚÂÊÔÃÕÇ\s]+)\s*[-–]\s*([A-Z]{2})\s*[-–]\s*(.+?)(?:\s*[-–]\s*([A-E]))?$/gm,
-      /([A-Z]{2})\s*[,;]\s*([A-ZÁÉÍÓÚÂÊÔÃÕÇ\s]+)\s*[,;]\s*(.+?)(?:\s*[,;]\s*([A-E]))?$/gm,
-    ];
-
-    for (const pattern of linePatterns) {
-      let match;
-      while ((match = pattern.exec(markdown)) !== null) {
-        if (match[1].length === 2) {
-          rows.push({
-            uf: match[1].trim(),
-            municipio: match[2].trim(),
-            regiao_turistica: match[3]?.trim() || '',
-            categoria: match[4]?.trim() || '',
-          });
-        } else {
-          rows.push({
-            municipio: match[1].trim(),
-            uf: match[2].trim(),
-            regiao_turistica: match[3]?.trim() || '',
-            categoria: match[4]?.trim() || '',
-          });
-        }
-      }
-      if (rows.length > 0) break;
-    }
-  }
-
-  return rows;
-}
-
-// Try Firecrawl scraping first
-async function tryFirecrawlScrape(syncType: string): Promise<{ rows: ParsedRow[]; source: string } | null> {
-  const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
-  if (!firecrawlKey) {
-    console.log('FIRECRAWL_API_KEY not available, skipping scraping');
-    return null;
-  }
-
-  const targetUrl = syncType === 'categorizacao'
-    ? FIRECRAWL_TARGETS.categorizacao
-    : FIRECRAWL_TARGETS.dados_abertos;
-
-  console.log(`Attempting Firecrawl scrape: ${targetUrl}`);
-
-  try {
-    // First, map the site to find CSV/data download links
-    const mapResponse = await fetch('https://api.firecrawl.dev/v1/map', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${firecrawlKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: targetUrl,
-        search: 'download csv mapa turismo municipio',
-        limit: 50,
-      }),
-    });
-
-    if (!mapResponse.ok) {
-      console.error('Firecrawl map failed:', mapResponse.status);
-      await mapResponse.text();
-      return null;
-    }
-
-    const mapData = await mapResponse.json();
-    const links: string[] = mapData?.links || [];
-    console.log(`Firecrawl found ${links.length} links`);
-
-    // Look for CSV download links
-    const csvLinks = links.filter(l =>
-      l.match(/\.(csv|xlsx?)$/i) ||
-      l.includes('download') ||
-      l.includes('resource')
-    );
-
-    // Try to download CSVs found via Firecrawl
-    for (const csvLink of csvLinks.slice(0, 5)) {
-      console.log(`Trying CSV link: ${csvLink}`);
-      try {
-        const csvResponse = await fetch(csvLink);
-        if (!csvResponse.ok) {
-          await csvResponse.text();
-          continue;
-        }
-
-        const buffer = await csvResponse.arrayBuffer();
-        const decoder = new TextDecoder('iso-8859-1');
-        const csvText = decoder.decode(buffer);
-        const rows = parseCSV(csvText);
-
-        if (rows.length > 10) {
-          console.log(`Successfully parsed ${rows.length} rows from Firecrawl-discovered CSV`);
-          return { rows, source: `firecrawl:${csvLink}` };
-        }
-      } catch (e) {
-        console.error(`Failed to fetch CSV ${csvLink}:`, e);
-      }
-    }
-
-    // Fallback: scrape the page content directly
-    console.log('No CSV links found, scraping page content...');
-    const scrapeResponse = await fetch('https://api.firecrawl.dev/v1/scrape', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${firecrawlKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: FIRECRAWL_TARGETS.mapa_turismo,
-        formats: ['markdown'],
-        waitFor: 5000,
-      }),
-    });
-
-    if (!scrapeResponse.ok) {
-      console.error('Firecrawl scrape failed:', scrapeResponse.status);
-      await scrapeResponse.text();
-      return null;
-    }
-
-    const scrapeData = await scrapeResponse.json();
-    const md = scrapeData?.data?.markdown || scrapeData?.markdown || '';
-
-    if (md.length > 100) {
-      const rows = parseScrapedContent(md);
-      if (rows.length > 10) {
-        console.log(`Parsed ${rows.length} rows from scraped content`);
-        return { rows, source: 'firecrawl:scrape' };
-      }
-    }
-
-    // Try searching for more recent data
-    console.log('Searching for latest data via Firecrawl...');
-    const searchResponse = await fetch('https://api.firecrawl.dev/v1/search', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${firecrawlKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: 'mapa turismo brasileiro municipios categorizacao 2024 2025 csv download site:dados.turismo.gov.br OR site:dados.gov.br',
-        limit: 10,
-        scrapeOptions: { formats: ['markdown', 'links'] },
-      }),
-    });
-
-    if (searchResponse.ok) {
-      const searchData = await searchResponse.json();
-      const results = searchData?.data || [];
-
-      for (const result of results) {
-        // Check for CSV links in search results
-        const resultLinks: string[] = result?.links || [];
-        const csvFound = resultLinks.filter((l: string) => l.match(/\.(csv)$/i));
-
-        for (const csv of csvFound.slice(0, 3)) {
-          try {
-            const r = await fetch(csv);
-            if (!r.ok) { await r.text(); continue; }
-            const buf = await r.arrayBuffer();
-            const txt = new TextDecoder('iso-8859-1').decode(buf);
-            const rows = parseCSV(txt);
-            if (rows.length > 10) {
-              console.log(`Found ${rows.length} rows from search result CSV: ${csv}`);
-              return { rows, source: `firecrawl:search:${csv}` };
-            }
-          } catch (_) { /* skip */ }
-        }
-      }
-    } else {
-      await searchResponse.text();
-    }
-
-    console.log('Firecrawl did not yield usable data');
-    return null;
-  } catch (error) {
-    console.error('Firecrawl error:', error);
-    return null;
-  }
-}
-
-// Fallback: fetch from CKAN static CSVs
+// ─── CKAN fallback ───────────────────────────────────────────────────
 async function fetchFromCKAN(year: number, syncType: string): Promise<{ rows: ParsedRow[]; source: string }> {
   let csvUrl: string;
   if (syncType === 'categorizacao') {
@@ -308,9 +229,9 @@ async function fetchFromCKAN(year: number, syncType: string): Promise<{ rows: Pa
 
 function inferMunicipalityType(categoria: string): string | null {
   const cat = categoria.toUpperCase().trim();
-  if (['A', 'B'].includes(cat)) return 'turistico';
-  if (['C', 'D'].includes(cat)) return 'complementar';
-  if (cat === 'E') return 'apoio';
+  if (['A', '1'].includes(cat)) return 'turistico';
+  if (['B', '2'].includes(cat)) return 'complementar';
+  if (['C', '3'].includes(cat)) return 'apoio';
   if (cat.includes('TURÍST') || cat.includes('TURIST')) return 'turistico';
   if (cat.includes('COMPLEMENT')) return 'complementar';
   if (cat.includes('APOIO')) return 'apoio';
@@ -329,6 +250,13 @@ function ufToMacro(uf: string): string {
   return map[uf.toUpperCase()] || 'DESCONHECIDO';
 }
 
+function parseNumericString(val: string | null | undefined): number | null {
+  if (!val) return null;
+  const cleaned = val.replace(/\./g, '').replace(',', '.').trim();
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? null : num;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -342,7 +270,9 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const year = body.year || 2017;
     const syncType = body.sync_type || 'mapa_turismo';
-    const useFirecrawl = body.use_firecrawl !== false; // default true
+    const useApi = body.use_api !== false; // default true — use REST API
+    const useFirecrawl = body.use_firecrawl === true; // default false now
+    const singleMunicipality = body.municipality; // optional: { nuUf, nuLocalidade }
 
     // Get user ID from JWT
     const authHeader = req.headers.get('Authorization');
@@ -352,6 +282,43 @@ Deno.serve(async (req) => {
       const { data: { user } } = await supabase.auth.getUser(token);
       userId = user?.id || null;
     }
+
+    // ─── Single municipality lookup mode ─────────────────────────────
+    if (singleMunicipality) {
+      const data = await fetchSingleMunicipio(singleMunicipality.nuUf, singleMunicipality.nuLocalidade);
+      if (!data) {
+        return new Response(JSON.stringify({ success: false, error: 'Município não encontrado na API' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      return new Response(JSON.stringify({
+        success: true,
+        data: {
+          municipio: data.noMunicipio,
+          uf: data.sgUf,
+          ibge_code: data.nuMunicipioIbge,
+          regiao_turistica: data.noRegiaoTuristica,
+          macrorregiao: data.noRegiao,
+          categoria: { '1': 'A', '2': 'B', '3': 'C' }[data.coCluster] || null,
+          municipality_type: inferMunicipalityType(data.coCluster || ''),
+          empregos_turismo: parseNumericString(data.qtEmprego),
+          estabelecimentos_turismo: parseNumericString(data.qtEstabelecimento),
+          visitantes_internacionais: parseNumericString(data.qtVisitaInternacionalEstimada),
+          visitantes_nacionais: parseNumericString(data.qtVisitaNacionalEstimada),
+          arrecadacao_turismo: data.arrecadacao,
+          tem_conselho_turismo: data.flSituacaoConselho,
+          nome_instancia: data.noInstancia,
+          latitude: data.nuLatitude,
+          longitude: data.nuLongitude,
+        },
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // ─── Bulk import mode ────────────────────────────────────────────
 
     // Create sync log
     const { data: syncLog } = await supabase
@@ -368,17 +335,19 @@ Deno.serve(async (req) => {
     const logId = syncLog?.id;
     let dataSource = 'ckan';
 
-    // Strategy: try Firecrawl first, then CKAN fallback
+    // Strategy: try REST API first, then CKAN fallback
     let result: { rows: ParsedRow[]; source: string };
+    let recordYear = year;
 
-    if (useFirecrawl) {
-      const firecrawlResult = await tryFirecrawlScrape(syncType);
-      if (firecrawlResult && firecrawlResult.rows.length > 0) {
-        result = firecrawlResult;
-        dataSource = 'firecrawl';
-        console.log(`Using Firecrawl data: ${result.rows.length} rows from ${result.source}`);
+    if (useApi) {
+      const apiResult = await fetchFromMapaAPI();
+      if (apiResult && apiResult.rows.length > 0) {
+        result = apiResult;
+        dataSource = 'api';
+        recordYear = apiResult.year;
+        console.log(`Using REST API data: ${result.rows.length} rows (year ${recordYear})`);
       } else {
-        console.log('Firecrawl yielded no data, falling back to CKAN...');
+        console.log('REST API yielded no data, falling back to CKAN...');
         result = await fetchFromCKAN(year, syncType);
         dataSource = 'ckan';
       }
@@ -389,15 +358,12 @@ Deno.serve(async (req) => {
     const { rows } = result;
     console.log(`Total rows: ${rows.length} (source: ${dataSource})`);
 
-    // Determine year for the records
-    const recordYear = dataSource === 'firecrawl' ? new Date().getFullYear() : year;
-
-    // Delete existing records for this year and source type
+    // Delete existing records for this year and source
     await supabase
       .from('mapa_turismo_municipios')
       .delete()
       .eq('ano_referencia', recordYear)
-      .eq('fonte', result.source.startsWith('firecrawl') ? result.source : `dados.turismo.gov.br/${syncType}`);
+      .eq('fonte', result.source);
 
     // Insert in batches of 500
     const BATCH_SIZE = 500;
@@ -407,13 +373,24 @@ Deno.serve(async (req) => {
       const batch = rows.slice(i, i + BATCH_SIZE).map(row => ({
         municipio: row.municipio,
         uf: row.uf,
+        ibge_code: row.ibge_code || null,
         regiao_turistica: row.regiao_turistica || null,
         macrorregiao: ufToMacro(row.uf),
         categoria: row.categoria || null,
         municipality_type: inferMunicipalityType(row.categoria),
         ano_referencia: recordYear,
-        fonte: result.source.startsWith('firecrawl') ? result.source : `dados.turismo.gov.br/${syncType}`,
-        raw_data: { original_row: row, data_source: dataSource },
+        fonte: result.source,
+        raw_data: {
+          original_row: row,
+          data_source: dataSource,
+          qt_emprego: row.qt_emprego,
+          qt_estabelecimento: row.qt_estabelecimento,
+          qt_visita_internacional: row.qt_visita_internacional,
+          qt_visita_nacional: row.qt_visita_nacional,
+          arrecadacao: row.arrecadacao,
+          fl_conselho: row.fl_conselho,
+          no_instancia: row.no_instancia,
+        },
       }));
 
       const { error } = await supabase
@@ -441,30 +418,32 @@ Deno.serve(async (req) => {
     }
 
     // Link to destinations
-    const uniqueRegions = new Map<string, { regiao: string; type: string | null }>();
+    const uniqueMunicipios = new Map<string, ParsedRow>();
     rows.forEach(r => {
       const key = `${r.municipio.toUpperCase()}|${r.uf.toUpperCase()}`;
-      if (!uniqueRegions.has(key)) {
-        uniqueRegions.set(key, {
-          regiao: r.regiao_turistica,
-          type: inferMunicipalityType(r.categoria),
-        });
-      }
+      if (!uniqueMunicipios.has(key)) uniqueMunicipios.set(key, r);
     });
 
     const { data: destinations } = await supabase
       .from('destinations')
-      .select('id, name, uf, municipality_type, tourism_region');
+      .select('id, name, uf, municipality_type, tourism_region, ibge_code');
 
     let linkedCount = 0;
     if (destinations) {
       for (const dest of destinations) {
+        // Match by name+UF or by IBGE code
         const key = `${(dest.name || '').toUpperCase()}|${(dest.uf || '').toUpperCase()}`;
-        const match = uniqueRegions.get(key);
+        let match = uniqueMunicipios.get(key);
+
+        if (!match && dest.ibge_code) {
+          match = rows.find(r => r.ibge_code === dest.ibge_code) || undefined;
+        }
+
         if (match) {
           const updates: Record<string, any> = {};
-          if (match.regiao && !dest.tourism_region) updates.tourism_region = match.regiao;
-          if (match.type && !dest.municipality_type) updates.municipality_type = match.type;
+          if (match.regiao_turistica && !dest.tourism_region) updates.tourism_region = match.regiao_turistica;
+          if (match.categoria && !dest.municipality_type) updates.municipality_type = inferMunicipalityType(match.categoria);
+          if (match.ibge_code && !dest.ibge_code) updates.ibge_code = match.ibge_code;
           if (Object.keys(updates).length > 0) {
             await supabase.from('destinations').update(updates).eq('id', dest.id);
             linkedCount++;
