@@ -1,6 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -42,8 +41,6 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { InteractiveWorkflowDiagram } from '@/components/tools/InteractiveWorkflowDiagram';
-import { exportMetodologiaDocx } from '@/lib/exportDocsDocx';
-import { Download } from 'lucide-react';
 
 const pillars = [
   {
@@ -375,14 +372,7 @@ export default function Metodologia() {
       subtitle="Princípios sistêmicos do turismo sustentável"
     >
       <div className="space-y-8">
-        {/* Download Button */}
-        <div className="flex justify-end">
-          <Button variant="outline" onClick={() => exportMetodologiaDocx()} className="gap-2">
-            <Download className="h-4 w-4" />
-            Baixar em Word
-          </Button>
-        </div>
-
+        {/* Introduction */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

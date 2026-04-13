@@ -8,10 +8,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { MessageCircleQuestion, GraduationCap, BarChart3, Hotel, Download } from 'lucide-react';
+import { MessageCircleQuestion, GraduationCap, BarChart3, Hotel } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
-import { exportFAQDocx } from '@/lib/exportDocsDocx';
 
 interface FAQItem {
   question: string;
@@ -19,7 +17,7 @@ interface FAQItem {
   category: 'general' | 'edu' | 'erp' | 'enterprise';
 }
 
-const faqItems: FAQItem[] = [
+export const faqItems: FAQItem[] = [
   // General questions (visible to all)
   {
     question: 'O que é o SISTUR?',
@@ -236,21 +234,7 @@ export default function FAQ() {
       subtitle="Tire suas dúvidas sobre o SISTUR"
     >
       <div className="max-w-3xl mx-auto space-y-6">
-        {/* Download Button */}
-        <div className="flex justify-end">
-          <Button
-            variant="outline"
-            className="gap-2"
-            onClick={() => {
-              const allVisible = getFilteredItems('all');
-              exportFAQDocx(allVisible);
-            }}
-          >
-            <Download className="h-4 w-4" />
-            Baixar em Word
-          </Button>
-        </div>
-
+        {/* General Questions - Always visible */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

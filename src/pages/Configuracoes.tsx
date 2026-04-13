@@ -26,6 +26,7 @@ import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSear
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
+import { exportMetodologiaDocx, exportFAQDocx } from '@/lib/exportDocsDocx';
 import { 
   BookOpen, 
   Wrench, 
@@ -52,15 +53,19 @@ function DocumentDownloadItem({
   title, 
   description, 
   version,
-  downloadUrl 
+  downloadUrl,
+  onDownload,
 }: { 
   title: string; 
   description: string; 
   version: string;
   downloadUrl?: string;
+  onDownload?: () => void;
 }) {
   const handleDownload = () => {
-    if (downloadUrl) {
+    if (onDownload) {
+      onDownload();
+    } else if (downloadUrl) {
       window.open(downloadUrl, '_blank');
     } else {
       toast.info('Documento em preparação', {
@@ -69,12 +74,15 @@ function DocumentDownloadItem({
     }
   };
 
+  const isReady = !!downloadUrl || !!onDownload;
+
   return (
     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
       <div className="flex-1">
         <div className="flex items-center gap-2">
           <p className="font-medium text-sm">{title}</p>
           <Badge variant="outline" className="text-xs">{version}</Badge>
+          {isReady && <Badge className="bg-green-600 text-white text-[10px]">DOCX</Badge>}
         </div>
         <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
       </div>
@@ -85,7 +93,7 @@ function DocumentDownloadItem({
         className="shrink-0 ml-3"
       >
         <Download className="h-4 w-4 mr-1.5" />
-        PDF
+        {isReady ? 'Word' : 'PDF'}
       </Button>
     </div>
   );
@@ -304,7 +312,8 @@ export default function Configuracoes() {
                   <DocumentDownloadItem
                     title="Metodologia SISTUR"
                     description="Pipeline de 9 etapas, normalização e cálculo dos pilares RA, OE e AO"
-                    version="v2.0"
+                    version={`v${APP_VERSION.full}`}
+                    onDownload={() => exportMetodologiaDocx()}
                   />
                   
                   <DocumentDownloadItem
@@ -323,6 +332,16 @@ export default function Configuracoes() {
                     title="Manual de Diagnósticos"
                     description="Como criar, calcular e interpretar diagnósticos territoriais"
                     version="v1.1"
+                  />
+
+                  <DocumentDownloadItem
+                    title="FAQ — Perguntas Frequentes"
+                    description="Perguntas e respostas sobre o SISTUR, ERP, EDU e Enterprise"
+                    version={`v${APP_VERSION.full}`}
+                    onDownload={async () => {
+                      const { faqItems } = await import('@/pages/FAQ');
+                      exportFAQDocx(faqItems);
+                    }}
                   />
                 </CardContent>
               </Card>
