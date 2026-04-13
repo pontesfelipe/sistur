@@ -6,7 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMapaTurismo, useMapaTurismoStats, useMapaTurismoSyncLogs, useIngestMapaTurismo } from '@/hooks/useMapaTurismo';
-import { Loader2, Download, MapPin, BarChart3, RefreshCw, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { Loader2, Download, MapPin, BarChart3, RefreshCw, CheckCircle2, XCircle, Clock, Flame, Database } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 

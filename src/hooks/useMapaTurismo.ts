@@ -108,7 +108,7 @@ export function useIngestMapaTurismo() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (params: { year: number; sync_type: 'mapa_turismo' | 'categorizacao' }) => {
+    mutationFn: async (params: { year: number; sync_type: 'mapa_turismo' | 'categorizacao'; use_firecrawl?: boolean }) => {
       const { data, error } = await supabase.functions.invoke('ingest-mapa-turismo', {
         body: params,
       });
@@ -121,7 +121,8 @@ export function useIngestMapaTurismo() {
       queryClient.invalidateQueries({ queryKey: ['mapa-turismo'] });
       queryClient.invalidateQueries({ queryKey: ['mapa-turismo-stats'] });
       queryClient.invalidateQueries({ queryKey: ['mapa-turismo-sync-logs'] });
-      toast.success(`${data.records_inserted} municípios importados (${data.year}). ${data.destinations_linked} destinos vinculados.`);
+      const sourceLabel = data.data_source === 'firecrawl' ? '🔥 Firecrawl' : '📊 CKAN';
+      toast.success(`${data.records_inserted} municípios importados (${data.year}) via ${sourceLabel}. ${data.destinations_linked} destinos vinculados.`);
     },
     onError: (error) => {
       console.error('Ingestion error:', error);
