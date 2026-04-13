@@ -65,6 +65,35 @@ function bullet(text: string, ref: string, level = 0) {
   });
 }
 
+function codeBlock(lines: string[]) {
+  return new Table({
+    width: { size: 9026, type: WidthType.DXA },
+    columnWidths: [9026],
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            borders: cellBorders(),
+            shading: { fill: 'F1F5F9', type: ShadingType.CLEAR },
+            margins: { top: 100, bottom: 100, left: 150, right: 150 },
+            width: { size: 9026, type: WidthType.DXA },
+            children: lines.map(line => new Paragraph({
+              spacing: { after: 20 },
+              children: [new TextRun({ text: line || ' ', font: 'Consolas', size: 18, color: '1E293B' })],
+            })),
+          }),
+        ],
+      }),
+    ],
+  });
+}
+  return new Paragraph({
+    numbering: { reference: ref, level },
+    spacing: { after: 60 },
+    children: [new TextRun({ text, font: 'Arial', size: 22 })],
+  });
+}
+
 function tableRow(cells: { text: string; bold?: boolean; bg?: string; width?: number }[]) {
   return new TableRow({
     children: cells.map(c => new TableCell({
