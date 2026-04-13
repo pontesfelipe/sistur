@@ -223,7 +223,7 @@ export default function MapaTurismoPanel() {
                 Importar do Mapa do Turismo Brasileiro
               </CardTitle>
               <CardDescription>
-                Dados importados via <strong>Firecrawl</strong> (scraping inteligente) com fallback para <strong>dados.turismo.gov.br</strong> (CKAN API).
+                Dados importados via <strong>API REST</strong> (mapa.turismo.gov.br) com fallback para <strong>dados.turismo.gov.br</strong> (CKAN CSV).
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
