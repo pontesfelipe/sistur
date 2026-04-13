@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 15,
-  patch: 2,
+  minor: 16,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.16.0",
+    date: "2026-04-13",
+    type: "minor" as const,
+    changes: [
+      "Novo painel de gestão de usuários para ORG_ADMIN com criação, bloqueio, remoção e troca de papel/sistema",
+      "ORG_ADMIN pode convidar membros diretamente para sua organização via formulário ou código de indicação",
+      "Edge function manage-users atualizada com escopo restrito por org_id para ORG_ADMIN",
+      "Banco de questões expandido para 50 itens distribuídos entre pilares RA, OE e AO",
+      "Opção 'Conteúdo próprio' removida do formulário de nova atividade no painel do Professor",
+      "Navegação e rotas atualizadas para permitir acesso de ORG_ADMIN a Configurações",
+    ],
+  },
   {
     version: "1.15.2",
     date: "2026-04-04",
