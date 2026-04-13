@@ -338,8 +338,9 @@ export default function Configuracoes() {
                     title="FAQ — Perguntas Frequentes"
                     description="Perguntas e respostas sobre o SISTUR, ERP, EDU e Enterprise"
                     version={`v${APP_VERSION.full}`}
-                    onDownload={() => {
-                      const { faqItems } = require('@/pages/FAQ');
+                    onDownload={async () => {
+                      const { faqItems } = await import('@/pages/FAQ');
+                      exportFAQDocx(faqItems);
                     }}
                   />
                 </CardContent>

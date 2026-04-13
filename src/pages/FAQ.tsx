@@ -19,7 +19,7 @@ interface FAQItem {
   category: 'general' | 'edu' | 'erp' | 'enterprise';
 }
 
-const faqItems: FAQItem[] = [
+export const faqItems: FAQItem[] = [
   // General questions (visible to all)
   {
     question: 'O que é o SISTUR?',
