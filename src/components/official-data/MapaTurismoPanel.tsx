@@ -36,6 +36,7 @@ export default function MapaTurismoPanel() {
   const [filterAno, setFilterAno] = useState<number | undefined>();
   const [syncYear, setSyncYear] = useState<number>(2017);
   const [syncType, setSyncType] = useState<'mapa_turismo' | 'categorizacao'>('mapa_turismo');
+  const [useFirecrawl, setUseFirecrawl] = useState(true);
 
   const { data: municipios, isLoading } = useMapaTurismo({
     uf: filterUF || undefined,
@@ -46,7 +47,7 @@ export default function MapaTurismoPanel() {
   const ingestMutation = useIngestMapaTurismo();
 
   const handleSync = () => {
-    ingestMutation.mutate({ year: syncYear, sync_type: syncType });
+    ingestMutation.mutate({ year: syncYear, sync_type: syncType, use_firecrawl: useFirecrawl });
   };
 
   return (
