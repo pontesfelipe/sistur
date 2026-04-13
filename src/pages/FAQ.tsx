@@ -9,9 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MessageCircleQuestion, GraduationCap, BarChart3, Hotel, Download } from 'lucide-react';
+import { MessageCircleQuestion, GraduationCap, BarChart3, Hotel } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
-import { exportFAQDocx } from '@/lib/exportDocsDocx';
 
 interface FAQItem {
   question: string;
