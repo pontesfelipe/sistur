@@ -600,6 +600,53 @@ export type Database = {
         }
         Relationships: []
       }
+      client_error_reports: {
+        Row: {
+          created_at: string
+          error_type: string
+          id: string
+          message: string
+          metadata: Json | null
+          org_id: string | null
+          page_url: string | null
+          stack_trace: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_type: string
+          id?: string
+          message: string
+          metadata?: Json | null
+          org_id?: string | null
+          page_url?: string | null
+          stack_trace?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_type?: string
+          id?: string
+          message?: string
+          metadata?: Json | null
+          org_id?: string | null
+          page_url?: string | null
+          stack_trace?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_error_reports_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_feedback: {
         Row: {
           age_group: string | null
@@ -6245,6 +6292,62 @@ export type Database = {
           reason?: string
         }
         Relationships: []
+      }
+      system_health_checks: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          failed: number | null
+          id: string
+          org_id: string | null
+          passed: number | null
+          results: Json | null
+          run_type: string
+          started_at: string
+          status: string
+          total_checks: number | null
+          triggered_by: string | null
+          warnings: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          failed?: number | null
+          id?: string
+          org_id?: string | null
+          passed?: number | null
+          results?: Json | null
+          run_type?: string
+          started_at?: string
+          status?: string
+          total_checks?: number | null
+          triggered_by?: string | null
+          warnings?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          failed?: number | null
+          id?: string
+          org_id?: string | null
+          passed?: number | null
+          results?: Json | null
+          run_type?: string
+          started_at?: string
+          status?: string
+          total_checks?: number | null
+          triggered_by?: string | null
+          warnings?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_health_checks_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       terms_acceptance: {
         Row: {
