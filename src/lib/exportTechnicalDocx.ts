@@ -654,10 +654,10 @@ export async function exportTechnicalDocx() {
         }),
 
         // ══════════ 9. CÓDIGO-FONTE — TRECHOS RELEVANTES ══════════
-        heading('9. Código-Fonte — Trechos Relevantes', HeadingLevel.HEADING_1),
+        heading('10. Código-Fonte — Trechos Relevantes', HeadingLevel.HEADING_1),
         para('Os trechos a seguir demonstram a implementação proprietária dos algoritmos centrais do SISTUR. São apresentados em TypeScript (frontend) e SQL (banco de dados).'),
 
-        heading('9.1 Motor IGMA — interpretIGMA() [igmaEngine.ts]', HeadingLevel.HEADING_2),
+        heading('11.1 Motor IGMA — interpretIGMA() [igmaEngine.ts]', HeadingLevel.HEADING_2),
         para('Função principal que aplica as 6 regras sistêmicas de Mario Beni:', { bold: true }),
         codeBlock([
           'export function interpretIGMA(input: IGMAInput): IGMAOutput {',
@@ -711,7 +711,7 @@ export async function exportTechnicalDocx() {
           '}',
         ]),
 
-        heading('9.2 Tipos e Interfaces Centrais [igmaEngine.ts]', HeadingLevel.HEADING_2),
+        heading('11.2 Tipos e Interfaces Centrais [igmaEngine.ts]', HeadingLevel.HEADING_2),
         codeBlock([
           'export type PillarType = "RA" | "OE" | "AO";',
           'export type SeverityType = "CRITICO" | "MODERADO" | "BOM";',
@@ -735,7 +735,7 @@ export async function exportTechnicalDocx() {
           '}',
         ]),
 
-        heading('9.3 Classificação de Severidade [igmaEngine.ts]', HeadingLevel.HEADING_2),
+        heading('11.3 Classificação de Severidade [igmaEngine.ts]', HeadingLevel.HEADING_2),
         codeBlock([
           'export function getSeverityFromScore(score: number): SeverityType {',
           '  if (score <= 0.33) return "CRITICO";   // 0.00 – 3.33',
@@ -747,10 +747,10 @@ export async function exportTechnicalDocx() {
         new Paragraph({ children: [new PageBreak()] }),
 
         // ══════════ 10. FUNÇÕES DE BANCO DE DADOS ══════════
-        heading('10. Funções de Banco de Dados (PostgreSQL)', HeadingLevel.HEADING_1),
+        heading('11. Funções de Banco de Dados (PostgreSQL)', HeadingLevel.HEADING_1),
         para('Funções SQL com SECURITY DEFINER para controle de acesso e lógica de negócio server-side.'),
 
-        heading('10.1 Controle de Acesso — has_role()', HeadingLevel.HEADING_2),
+        heading('11.1 Controle de Acesso — has_role()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.has_role(_user_id uuid, _role app_role)',
           '  RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER AS $$',
@@ -761,7 +761,7 @@ export async function exportTechnicalDocx() {
           '$$;',
         ]),
 
-        heading('10.2 Multi-tenant — get_effective_org_id()', HeadingLevel.HEADING_2),
+        heading('11.2 Multi-tenant — get_effective_org_id()', HeadingLevel.HEADING_2),
         para('Resolve organização efetiva considerando modo demonstração:'),
         codeBlock([
           'CREATE FUNCTION public.get_effective_org_id() RETURNS uuid',
@@ -782,7 +782,7 @@ export async function exportTechnicalDocx() {
           'END; $$;',
         ]),
 
-        heading('10.3 Onboarding — complete_user_onboarding()', HeadingLevel.HEADING_2),
+        heading('11.3 Onboarding — complete_user_onboarding()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.complete_user_onboarding(',
           '  _user_id uuid, _system_access text, _role text',
@@ -801,7 +801,7 @@ export async function exportTechnicalDocx() {
           'END; $$;',
         ]),
 
-        heading('10.4 Licenciamento — activate_my_trial()', HeadingLevel.HEADING_2),
+        heading('11.4 Licenciamento — activate_my_trial()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.activate_my_trial() RETURNS licenses',
           '  LANGUAGE plpgsql SECURITY DEFINER AS $$',
@@ -820,7 +820,7 @@ export async function exportTechnicalDocx() {
           'END; $$;',
         ]),
 
-        heading('10.5 Expiração Automática — expire_trial_licenses()', HeadingLevel.HEADING_2),
+        heading('11.5 Expiração Automática — expire_trial_licenses()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.expire_trial_licenses() RETURNS void',
           '  LANGUAGE plpgsql SECURITY DEFINER AS $$',
@@ -832,7 +832,7 @@ export async function exportTechnicalDocx() {
           'END; $$;',
         ]),
 
-        heading('10.6 Certificação — verify_certificate_by_code()', HeadingLevel.HEADING_2),
+        heading('11.6 Certificação — verify_certificate_by_code()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.verify_certificate_by_code(p_code text)',
           '  RETURNS TABLE(certificate_id text, user_name text, title text,',
@@ -843,7 +843,7 @@ export async function exportTechnicalDocx() {
           '$$;',
         ]),
 
-        heading('10.7 Fila de E-mails — enqueue_email()', HeadingLevel.HEADING_2),
+        heading('11.7 Fila de E-mails — enqueue_email()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.enqueue_email(queue_name text, payload jsonb)',
           '  RETURNS bigint LANGUAGE plpgsql SECURITY DEFINER AS $$',
@@ -855,7 +855,7 @@ export async function exportTechnicalDocx() {
           'END; $$;',
         ]),
 
-        heading('10.8 Auditoria — create_lms_audit_log()', HeadingLevel.HEADING_2),
+        heading('11.8 Auditoria — create_lms_audit_log()', HeadingLevel.HEADING_2),
         codeBlock([
           'CREATE FUNCTION public.create_lms_audit_log(',
           '  p_action text, p_entity_type text, p_entity_id text,',
@@ -875,7 +875,7 @@ export async function exportTechnicalDocx() {
         new Paragraph({ children: [new PageBreak()] }),
 
         // ══════════ 11. PROPRIEDADE INTELECTUAL ══════════
-        heading('11. Propriedade Intelectual', HeadingLevel.HEADING_1),
+        heading('12. Propriedade Intelectual', HeadingLevel.HEADING_1),
         para('O SISTUR constitui obra original protegida pela Lei 9.609/1998 (Lei de Software) e Lei 9.610/1998 (Direitos Autorais). Os seguintes elementos são proprietários:'),
         bullet('Motor IGMA: algoritmo de interpretação sistêmica com 6 regras encadeadas', 'bullets'),
         bullet('Pipeline de 9 etapas: fluxo de processamento de dados turísticos', 'bullets'),
@@ -886,7 +886,7 @@ export async function exportTechnicalDocx() {
         bullet('Jogos educacionais: mecânicas, conteúdo e persistência', 'bullets'),
         bullet('30+ funções SQL proprietárias com SECURITY DEFINER', 'bullets'),
 
-        heading('12. Referências Bibliográficas', HeadingLevel.HEADING_1),
+        heading('13. Referências Bibliográficas', HeadingLevel.HEADING_1),
         bullet('BENI, Mario Carlos. Análise Estrutural do Turismo. São Paulo: Editora Senac São Paulo, 2001.', 'bullets'),
         bullet('BENI, Mario Carlos. Globalização do Turismo: Megatendências do Setor e a Realidade Brasileira. São Paulo: Aleph, 2003.', 'bullets'),
         bullet('BENI, Mario Carlos. Política e Planejamento de Turismo no Brasil. São Paulo: Aleph, 2006.', 'bullets'),
