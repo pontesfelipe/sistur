@@ -54,6 +54,7 @@ const navigation: NavItem[] = [
   { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
   
   { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
+  { name: 'Minhas Provas', href: '/edu/historico', icon: ClipboardList, requiresEDU: true },
   { name: 'Gestão de Treinamentos', href: '/professor', icon: BookOpen, requiresProfessor: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
   { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
