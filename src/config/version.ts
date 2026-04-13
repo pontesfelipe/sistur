@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 18,
-  patch: 6,
+  minor: 19,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,23 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.19.0",
+    date: "2026-04-13",
+    type: "minor" as const,
+    changes: [
+      "Sistema de rastreamento de sessões EDU para compliance AVA (certificação MEC)",
+      "Heartbeat a cada 30s: presença ativa, tempo de atividade e inatividade por sessão",
+      "Log granular de interações: cliques, scrolls, play/pause vídeo, troca de aba, respostas em prova",
+      "Detecção automática de inatividade (2 min sem interação) e encerramento de sessões ociosas (5 min)",
+      "Flags automáticas de comportamento suspeito: sessões longas sem cliques, >80% inatividade, padrões de bot",
+      "Painel de Compliance no Dashboard do Professor com estatísticas por aluno e drill-down de sessões",
+      "Visualização detalhada de cada sessão com timeline completa de interações",
+      "Workflow de revisão de alertas: professor pode confirmar fraude ou descartar com justificativa",
+      "Tabelas edu_learning_sessions, edu_interaction_logs e edu_fraud_flags com RLS por papel",
+      "Integração automática nas páginas de treinamento e prova (ExamTaking, EduTrainingDetalhe)",
+    ],
+  },
   {
     version: "1.18.6",
     date: "2026-04-13",
