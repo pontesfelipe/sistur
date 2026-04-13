@@ -64,6 +64,10 @@ const EduTrainingDetalhe = () => {
   const { id } = useParams<{ id: string }>();
   const { data: training, isLoading, error } = useEduTraining(id);
 
+  // Session tracking for AVA compliance
+  const { useEduSessionTracker } = require('@/hooks/useEduSessionTracker');
+  // We import dynamically via a top-level import below
+
   if (isLoading) {
     return (
       <AppLayout title="Carregando..." subtitle="Buscando detalhes do treinamento">
