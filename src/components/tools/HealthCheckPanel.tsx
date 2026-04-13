@@ -5,10 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import { 
   Activity, Play, CheckCircle2, XCircle, AlertTriangle, 
   Clock, Database, Zap, HardDrive, Monitor, RefreshCw,
-  Loader2, ChevronDown, ChevronUp
+  Loader2, ChevronDown, ChevronUp, GitCommit, RotateCcw
 } from 'lucide-react';
 import { useHealthCheck } from '@/hooks/useHealthCheck';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -34,7 +35,7 @@ const statusIcons: Record<string, React.ReactNode> = {
 };
 
 export function HealthCheckPanel() {
-  const { running, latestRun, history, loadingHistory, runHealthCheck, fetchHistory } = useHealthCheck();
+  const { running, syncing, latestRun, history, lastSync, registryCount, loadingHistory, runHealthCheck, syncRegistry, fetchHistory } = useHealthCheck();
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   useEffect(() => {
