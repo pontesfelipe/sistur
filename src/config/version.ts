@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 18,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,27 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.18.5",
+    date: "2026-04-13",
+    type: "patch" as const,
+    changes: [
+      "Metodologia atualizada com fonte Mapa do Turismo Brasileiro (API REST mapa.turismo.gov.br)",
+      "Novos indicadores documentados: empregos, estabelecimentos, visitantes, arrecadação e conselho municipal",
+      "Referência bibliográfica do Mapa do Turismo adicionada às referências da metodologia",
+    ],
+  },
+  {
+    version: "1.18.4",
+    date: "2026-04-13",
+    type: "patch" as const,
+    changes: [
+      "API REST do Mapa do Turismo integrada como fonte primária para ingestão de dados (3059 municípios)",
+      "6 novos indicadores do Mapa do Turismo no pré-preenchimento: empregos, estabelecimentos, visitantes, arrecadação e conselho",
+      "Edge function fetch-official-data com lookup em tempo real via API do Ministério do Turismo",
+      "Fallback automático de API REST para CKAN CSV quando API não responde",
+    ],
+  },
   {
     version: "1.18.3",
     date: "2026-04-13",

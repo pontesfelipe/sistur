@@ -1034,6 +1034,7 @@ export default function Metodologia() {
                   <li className="flex items-center gap-2"><span className="text-green-600">📊</span> <strong>IBGE Agregados</strong>: População, PIB per capita, Densidade e Área territorial</li>
                   <li className="flex items-center gap-2"><span className="text-green-600">📊</span> <strong>Bases públicas integradas</strong>: IDH, IDEB, Leitos hospitalares, Cobertura de saúde, Receita própria, Despesa com turismo e Meios de hospedagem, quando houver retorno válido</li>
                   <li className="flex items-center gap-2"><span className="text-green-600">🏨</span> <strong>CADASTUR / dados.gov.br</strong>: Guias e Agências via datasets oficiais abertos, quando o arquivo trimestral está disponível</li>
+                  <li className="flex items-center gap-2"><span className="text-green-600">🗺️</span> <strong>Mapa do Turismo Brasileiro</strong>: Região turística, categoria (A-E), empregos, estabelecimentos, visitantes (nacionais e internacionais), arrecadação e conselho municipal de turismo — via API REST do Ministério do Turismo (mapa.turismo.gov.br)</li>
                 </ul>
               </div>
 
@@ -1195,6 +1196,10 @@ export default function Metodologia() {
               <li>
                 <strong>Ministério do Turismo.</strong> Plano Nacional de Turismo 2024-2027. 
                 Disponível em: gov.br/turismo
+              </li>
+              <li>
+                <strong>Ministério do Turismo.</strong> Mapa do Turismo Brasileiro — API REST de Regionalização. 
+                Disponível em: mapa.turismo.gov.br
               </li>
             </ul>
           </CardContent>
