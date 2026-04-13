@@ -346,6 +346,7 @@ const App = () => {
                     </EduRoute>
                   }
                 />
+                <Route
                   path="/certificados"
                   element={
                     <EduRoute>
