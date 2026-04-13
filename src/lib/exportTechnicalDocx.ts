@@ -1,0 +1,497 @@
+/**
+ * Export SISTUR Technical Document — "Secret Sauce" for application registration
+ */
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  Table,
+  TableRow,
+  TableCell,
+  HeadingLevel,
+  AlignmentType,
+  BorderStyle,
+  WidthType,
+  ShadingType,
+  Header,
+  Footer,
+  PageNumber,
+  LevelFormat,
+  PageBreak,
+} from 'docx';
+import { saveAs } from 'file-saver';
+
+const PRIMARY = '1E40AF';
+const BORDER_COLOR = 'CBD5E1';
+const HEADER_BG = 'EFF6FF';
+const MUTED = '64748B';
+const ACCENT = '059669';
+
+function cellBorders() {
+  const b = { style: BorderStyle.SINGLE, size: 1, color: BORDER_COLOR };
+  return { top: b, bottom: b, left: b, right: b };
+}
+
+function heading(text: string, level: (typeof HeadingLevel)[keyof typeof HeadingLevel]) {
+  return new Paragraph({
+    heading: level,
+    spacing: { before: 300, after: 150 },
+    children: [new TextRun({ text, bold: true, font: 'Arial', color: PRIMARY })],
+  });
+}
+
+function para(text: string, opts?: { bold?: boolean; italic?: boolean; color?: string; size?: number }) {
+  return new Paragraph({
+    spacing: { after: 120 },
+    children: [
+      new TextRun({
+        text,
+        font: 'Arial',
+        size: opts?.size ?? 22,
+        bold: opts?.bold,
+        italics: opts?.italic,
+        color: opts?.color,
+      }),
+    ],
+  });
+}
+
+function bullet(text: string, ref: string, level = 0) {
+  return new Paragraph({
+    numbering: { reference: ref, level },
+    spacing: { after: 60 },
+    children: [new TextRun({ text, font: 'Arial', size: 22 })],
+  });
+}
+
+function tableRow(cells: { text: string; bold?: boolean; bg?: string; width?: number }[]) {
+  return new TableRow({
+    children: cells.map(c => new TableCell({
+      borders: cellBorders(),
+      width: c.width ? { size: c.width, type: WidthType.DXA } : undefined,
+      shading: c.bg ? { fill: c.bg, type: ShadingType.CLEAR } : undefined,
+      margins: { top: 60, bottom: 60, left: 100, right: 100 },
+      children: [new Paragraph({ children: [new TextRun({ text: c.text, font: 'Arial', size: 20, bold: c.bold })] })],
+    })),
+  });
+}
+
+export async function exportTechnicalDocx() {
+  const doc = new Document({
+    numbering: {
+      config: [
+        {
+          reference: 'bullets',
+          levels: [{
+            level: 0,
+            format: LevelFormat.BULLET,
+            text: '\u2022',
+            alignment: AlignmentType.LEFT,
+            style: { paragraph: { indent: { left: 720, hanging: 360 } } },
+          }],
+        },
+        {
+          reference: 'numbers',
+          levels: [{
+            level: 0,
+            format: LevelFormat.DECIMAL,
+            text: '%1.',
+            alignment: AlignmentType.LEFT,
+            style: { paragraph: { indent: { left: 720, hanging: 360 } } },
+          }],
+        },
+      ],
+    },
+    styles: {
+      default: { document: { run: { font: 'Arial', size: 22 } } },
+      paragraphStyles: [
+        {
+          id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+          run: { size: 36, bold: true, font: 'Arial', color: PRIMARY },
+          paragraph: { spacing: { before: 360, after: 200 } },
+        },
+        {
+          id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+          run: { size: 28, bold: true, font: 'Arial', color: PRIMARY },
+          paragraph: { spacing: { before: 240, after: 160 } },
+        },
+        {
+          id: 'Heading3', name: 'Heading 3', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+          run: { size: 24, bold: true, font: 'Arial' },
+          paragraph: { spacing: { before: 200, after: 120 } },
+        },
+      ],
+    },
+    sections: [{
+      properties: {
+        page: {
+          size: { width: 11906, height: 16838 },
+          margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 },
+        },
+      },
+      headers: {
+        default: new Header({
+          children: [new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            children: [new TextRun({ text: 'SISTUR — Documento Técnico Confidencial', font: 'Arial', size: 18, color: MUTED, italics: true })],
+          })],
+        }),
+      },
+      footers: {
+        default: new Footer({
+          children: [new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun({ text: 'Página ', font: 'Arial', size: 18, color: MUTED }),
+              new TextRun({ children: [PageNumber.CURRENT], font: 'Arial', size: 18, color: MUTED }),
+            ],
+          })],
+        }),
+      },
+      children: [
+        // ══════════ CAPA ══════════
+        new Paragraph({ spacing: { before: 3000 } }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 200 },
+          children: [new TextRun({ text: 'SISTUR', bold: true, font: 'Arial', size: 72, color: PRIMARY })],
+        }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 100 },
+          children: [new TextRun({ text: 'Sistema Integrado de Suporte para Turismo em Regiões', font: 'Arial', size: 28, color: MUTED })],
+        }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 600 },
+          children: [new TextRun({ text: 'Documento Técnico para Registro de Software', font: 'Arial', size: 24, bold: true, color: PRIMARY })],
+        }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 100 },
+          children: [new TextRun({ text: `Data: ${new Date().toLocaleDateString('pt-BR')}`, font: 'Arial', size: 22, color: MUTED })],
+        }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 100 },
+          children: [new TextRun({ text: 'Classificação: CONFIDENCIAL', font: 'Arial', size: 22, bold: true, color: 'DC2626' })],
+        }),
+
+        new Paragraph({ children: [new PageBreak()] }),
+
+        // ══════════ 1. VISÃO GERAL ══════════
+        heading('1. Visão Geral do Sistema', HeadingLevel.HEADING_1),
+        para('O SISTUR (Sistema Integrado de Suporte para Turismo em Regiões) é uma plataforma web proprietária de inteligência territorial que digitaliza e automatiza a análise sistêmica do turismo, baseando-se na Teoria da Análise Estrutural do Turismo do Prof. Mario Carlos Beni.'),
+        para('O sistema é composto por cinco módulos integrados que cobrem todo o ciclo de gestão de destinos turísticos: diagnóstico, prescrição, capacitação, monitoramento e gamificação educacional.'),
+
+        heading('1.1 Problema Resolvido', HeadingLevel.HEADING_2),
+        bullet('Diagnósticos turísticos municipais são subjetivos, fragmentados e não reprodutíveis', 'bullets'),
+        bullet('Inexistência de ferramenta que aplique automaticamente teoria acadêmica validada', 'bullets'),
+        bullet('Capacitação desconectada dos resultados de diagnóstico territorial', 'bullets'),
+        bullet('Falta de padronização na avaliação e comparação entre destinos', 'bullets'),
+        bullet('Dados oficiais dispersos em múltiplas APIs sem integração', 'bullets'),
+
+        heading('1.2 Proposta de Valor Única', HeadingLevel.HEADING_2),
+        para('O diferencial central (Secret Sauce) do SISTUR é a implementação computacional das 6 regras sistêmicas de Mario Beni em um motor de interpretação automatizado — o Motor IGMA — que transforma dados brutos em diagnósticos acionáveis com prescrições determinísticas de capacitação.'),
+
+        new Paragraph({ children: [new PageBreak()] }),
+
+        // ══════════ 2. ARQUITETURA TÉCNICA ══════════
+        heading('2. Arquitetura Técnica', HeadingLevel.HEADING_1),
+
+        heading('2.1 Stack Tecnológico', HeadingLevel.HEADING_2),
+        new Table({
+          width: { size: 9026, type: WidthType.DXA },
+          columnWidths: [2500, 6526],
+          rows: [
+            tableRow([{ text: 'Camada', bold: true, bg: HEADER_BG, width: 2500 }, { text: 'Tecnologia', bold: true, bg: HEADER_BG, width: 6526 }]),
+            tableRow([{ text: 'Frontend', bold: true, width: 2500 }, { text: 'React 18 + TypeScript 5 + Vite 5 (SWC)', width: 6526 }]),
+            tableRow([{ text: 'UI Framework', width: 2500 }, { text: 'shadcn/ui (Radix Primitives) + Tailwind CSS v3 + Framer Motion', width: 6526 }]),
+            tableRow([{ text: 'Estado', width: 2500 }, { text: 'React Context (Auth, Profile, License) + TanStack React Query v5', width: 6526 }]),
+            tableRow([{ text: 'Backend', width: 2500 }, { text: 'Supabase (PostgreSQL 15 + Edge Functions Deno)', width: 6526 }]),
+            tableRow([{ text: 'Autenticação', width: 2500 }, { text: 'Supabase Auth (email/password) com Row Level Security', width: 6526 }]),
+            tableRow([{ text: 'IA', width: 2500 }, { text: 'Lovable AI Gateway (GPT-5, Gemini 2.5) para relatórios e chat', width: 6526 }]),
+            tableRow([{ text: 'Gráficos', width: 2500 }, { text: 'Recharts (dashboards) + Three.js/R3F (jogos 3D)', width: 6526 }]),
+            tableRow([{ text: 'Formulários', width: 2500 }, { text: 'React Hook Form + Zod validation', width: 6526 }]),
+            tableRow([{ text: 'Hospedagem', width: 2500 }, { text: 'Lovable Cloud (CDN global, SSL automático)', width: 6526 }]),
+          ],
+        }),
+
+        heading('2.2 Estrutura do Projeto', HeadingLevel.HEADING_2),
+        para('O projeto segue arquitetura modular com 154+ componentes organizados em 21 módulos de funcionalidade:'),
+        bullet('src/components/ — Componentes reutilizáveis (UI, layout, dashboard, diagnostics, edu, admin, forum, games)', 'bullets'),
+        bullet('src/hooks/ — 50+ custom hooks para lógica de negócio (useAuth, useAssessments, useIndicators, etc.)', 'bullets'),
+        bullet('src/pages/ — 44 páginas lazy-loaded com React.lazy() + Suspense', 'bullets'),
+        bullet('src/lib/igmaEngine.ts — Núcleo: Motor IGMA com as 6 regras sistêmicas', 'bullets'),
+        bullet('src/contexts/ — Contextos globais (ProfileContext, LicenseContext)', 'bullets'),
+        bullet('supabase/functions/ — 20+ Edge Functions serverless', 'bullets'),
+        bullet('supabase/migrations/ — 30+ migrações de schema com RLS policies', 'bullets'),
+
+        heading('2.3 Segurança', HeadingLevel.HEADING_2),
+        bullet('Row Level Security (RLS) em todas as 40+ tabelas do banco de dados', 'bullets'),
+        bullet('Autenticação obrigatória com verificação de e-mail', 'bullets'),
+        bullet('Roles segregados: ADMIN, ANALYST, VIEWER, ESTUDANTE, PROFESSOR', 'bullets'),
+        bullet('Route Guards: ProtectedRoute, AdminRoute, ERPRoute, EduRoute, LicenseRoute', 'bullets'),
+        bullet('Audit logging de todas as operações críticas', 'bullets'),
+        bullet('Moderação de conteúdo com IA para uploads de imagem', 'bullets'),
+        bullet('Secrets gerenciados via vault (nunca hardcoded)', 'bullets'),
+
+        new Paragraph({ children: [new PageBreak()] }),
+
+        // ══════════ 3. MOTOR IGMA ══════════
+        heading('3. Motor IGMA — Núcleo Proprietário', HeadingLevel.HEADING_1),
+        para('O Motor IGMA (Intelligence for Governance, Management and Action) é o componente central do SISTUR. Implementa computacionalmente as 6 regras sistêmicas derivadas da Análise Estrutural do Turismo do Prof. Mario Beni.', { bold: true }),
+
+        heading('3.1 Pipeline de Processamento (9 Etapas)', HeadingLevel.HEADING_2),
+        new Table({
+          width: { size: 9026, type: WidthType.DXA },
+          columnWidths: [600, 2400, 6026],
+          rows: [
+            tableRow([{ text: '#', bold: true, bg: HEADER_BG, width: 600 }, { text: 'Etapa', bold: true, bg: HEADER_BG, width: 2400 }, { text: 'Descrição', bold: true, bg: HEADER_BG, width: 6026 }]),
+            tableRow([{ text: '1', width: 600 }, { text: 'Coleta de Dados', width: 2400 }, { text: 'Ingestão via APIs (IBGE, CADASTUR, Mapa do Turismo) + dados manuais', width: 6026 }]),
+            tableRow([{ text: '2', width: 600 }, { text: 'Validação', width: 2400 }, { text: 'Checklist pré-cálculo: ≥60% dos indicadores com valor, sem indicadores duplicados', width: 6026 }]),
+            tableRow([{ text: '3', width: 600 }, { text: 'Normalização', width: 2400 }, { text: 'Escala 0-10 com funções lineares, inversas e logarítmicas por indicador', width: 6026 }]),
+            tableRow([{ text: '4', width: 600 }, { text: 'Cálculo de Pilares', width: 2400 }, { text: 'Média ponderada dos indicadores normalizados por pilar (RA, OE, AO)', width: 6026 }]),
+            tableRow([{ text: '5', width: 600 }, { text: 'Classificação', width: 2400 }, { text: 'Crítico (0-3.33), Atenção (3.34-6.66), Adequado (6.67-10)', width: 6026 }]),
+            tableRow([{ text: '6', width: 600 }, { text: 'Aplicação IGMA', width: 2400 }, { text: 'Execução sequencial das 6 regras sistêmicas (ver seção 3.2)', width: 6026 }]),
+            tableRow([{ text: '7', width: 600 }, { text: 'Geração de Issues', width: 2400 }, { text: 'Problemas identificados com severidade (crítico/moderado/bom)', width: 6026 }]),
+            tableRow([{ text: '8', width: 600 }, { text: 'Prescrições', width: 2400 }, { text: 'Recomendações determinísticas vinculadas a capacitações EDU', width: 6026 }]),
+            tableRow([{ text: '9', width: 600 }, { text: 'Snapshot', width: 2400 }, { text: 'Registro imutável dos dados, fontes e confiabilidade para rastreabilidade', width: 6026 }]),
+          ],
+        }),
+
+        heading('3.2 As 6 Regras Sistêmicas', HeadingLevel.HEADING_2),
+
+        heading('Regra 1 — Prioridade Ambiental (RA)', HeadingLevel.HEADING_3),
+        para('SE score_RA < 3.33 ENTÃO ra_limitation = TRUE → bloqueia expansão de OE e marketing turístico. Fundamento: recursos ambientais degradados inviabilizam crescimento sustentável da infraestrutura.'),
+
+        heading('Regra 2 — Ciclo Contínuo de Revisão', HeadingLevel.HEADING_3),
+        para('Define periodicidade obrigatória: Crítico → revisão em 6 meses | Atenção → 12 meses | Adequado → 18 meses. Campo next_review_recommended_at calculado automaticamente.'),
+
+        heading('Regra 3 — Externalidades Negativas', HeadingLevel.HEADING_3),
+        para('SE score_OE melhora E score_RA piora simultaneamente ENTÃO externality_warning = TRUE. Detecta crescimento estrutural predatório ao meio ambiente.'),
+
+        heading('Regra 4 — Governança Central (AO)', HeadingLevel.HEADING_3),
+        para('SE score_AO < 3.33 ENTÃO governance_block = TRUE → bloqueia todo o sistema. Sem governança operacional, nenhuma melhoria pode ser implementada.'),
+
+        heading('Regra 5 — Marketing Bloqueado', HeadingLevel.HEADING_3),
+        para('SE score_RA < 3.33 OU score_AO < 3.33 ENTÃO marketing_blocked = TRUE. Promoção de destino com base ambiental ou governança precárias gera dano reputacional.'),
+
+        heading('Regra 6 — Interdependência Setorial', HeadingLevel.HEADING_3),
+        para('Identifica indicadores que dependem de múltiplos setores governamentais (saúde, educação, saneamento). Gera alertas de coordenação intersetorial.'),
+
+        new Paragraph({ children: [new PageBreak()] }),
+
+        // ══════════ 4. MÓDULOS FUNCIONAIS ══════════
+        heading('4. Módulos Funcionais', HeadingLevel.HEADING_1),
+
+        heading('4.1 ERP — Diagnóstico Territorial', HeadingLevel.HEADING_2),
+        para('Módulo central de avaliação de destinos turísticos.'),
+        bullet('3 níveis de diagnóstico: Essencial (9 indicadores), Estratégico (19), Integral (96)', 'bullets'),
+        bullet('Criação de rodadas (rounds) com período de coleta definido', 'bullets'),
+        bullet('Preenchimento assistido com dados de APIs oficiais (IBGE, CADASTUR, Mapa do Turismo)', 'bullets'),
+        bullet('Normalização automática com 3 funções: linear, inversa e logarítmica', 'bullets'),
+        bullet('Comparação entre rodadas e evolução temporal', 'bullets'),
+        bullet('Geração de relatórios personalizáveis com IA (templates: Completo, Executivo, Investidores)', 'bullets'),
+        bullet('Exportação DOCX e PDF com identidade visual customizável', 'bullets'),
+
+        heading('4.2 EDU — Capacitação Prescritiva', HeadingLevel.HEADING_2),
+        para('Sistema educacional integrado ao diagnóstico.'),
+        bullet('Prescrição determinística: cada resultado de diagnóstico mapeia para capacitações específicas', 'bullets'),
+        bullet('Trilhas de aprendizado (tracks) compostas por múltiplos treinamentos ordenados', 'bullets'),
+        bullet('Player de vídeo integrado com tracking de progresso (watch_seconds, progress_percent)', 'bullets'),
+        bullet('Suporte a YouTube embeddings com ingestão automática de metadados', 'bullets'),
+        bullet('Sistema de exames com anti-cheat: fullscreen enforcement, tab-switch detection, time limits', 'bullets'),
+        bullet('Certificados digitais com QR code e verificação pública via URL única', 'bullets'),
+        bullet('Perfil de estudante com wizard e recomendações personalizadas por IA', 'bullets'),
+
+        heading('4.3 Enterprise — Módulo Hoteleiro', HeadingLevel.HEADING_2),
+        para('Adaptação da metodologia para o setor privado de hospitalidade.'),
+        bullet('22 indicadores especializados em 7 categorias', 'bullets'),
+        bullet('6 indicadores compartilhados com diagnósticos territoriais (NPS, Reviews, Treinamento, etc.)', 'bullets'),
+        bullet('Integração com Google Business Reviews via Edge Function', 'bullets'),
+        bullet('Dashboard dedicado com KPIs financeiros, operacionais e de sustentabilidade', 'bullets'),
+
+        heading('4.4 Gamificação Educacional', HeadingLevel.HEADING_2),
+        para('4 jogos educacionais com persistência de sessão:'),
+        bullet('TCG (Trading Card Game): batalhas com cartas de ameaças turísticas vs. defesas dos pilares', 'bullets'),
+        bullet('RPG: narrativas interativas com escolhas que afetam indicadores ambientais', 'bullets'),
+        bullet('Jogo da Memória: pares de conceitos turísticos gerados dinamicamente', 'bullets'),
+        bullet('Caça ao Tesouro: exploração de mapa com charadas sobre sustentabilidade', 'bullets'),
+
+        heading('4.5 Fórum e Comunidade', HeadingLevel.HEADING_2),
+        bullet('Posts com categorias, imagens moderadas por IA e sistema de likes', 'bullets'),
+        bullet('Comentários em thread com notificações em tempo real', 'bullets'),
+        bullet('Sistema de denúncia e moderação de conteúdo configurável por organização', 'bullets'),
+
+        new Paragraph({ children: [new PageBreak()] }),
+
+        // ══════════ 5. INTEGRAÇÕES E APIs ══════════
+        heading('5. Integrações e Fontes de Dados', HeadingLevel.HEADING_1),
+
+        new Table({
+          width: { size: 9026, type: WidthType.DXA },
+          columnWidths: [2200, 3200, 1800, 1826],
+          rows: [
+            tableRow([
+              { text: 'Fonte', bold: true, bg: HEADER_BG, width: 2200 },
+              { text: 'Dados Capturados', bold: true, bg: HEADER_BG, width: 3200 },
+              { text: 'Método', bold: true, bg: HEADER_BG, width: 1800 },
+              { text: 'Confiabilidade', bold: true, bg: HEADER_BG, width: 1826 },
+            ]),
+            tableRow([
+              { text: 'IBGE Agregados', width: 2200 },
+              { text: 'População, PIB per capita, Área territorial, Densidade', width: 3200 },
+              { text: 'API REST', width: 1800 },
+              { text: '5/5', width: 1826 },
+            ]),
+            tableRow([
+              { text: 'Mapa do Turismo', width: 2200 },
+              { text: 'Região turística, Categoria A-E, Empregos, Estabelecimentos, Visitantes, Arrecadação', width: 3200 },
+              { text: 'API REST + CKAN', width: 1800 },
+              { text: '5/5', width: 1826 },
+            ]),
+            tableRow([
+              { text: 'CADASTUR', width: 2200 },
+              { text: 'Guias e Agências registradas por município', width: 3200 },
+              { text: 'Dataset CSV', width: 1800 },
+              { text: '5/5', width: 1826 },
+            ]),
+            tableRow([
+              { text: 'Bases Públicas', width: 2200 },
+              { text: 'IDH, IDEB, Leitos, Cobertura saúde, Receita, Despesa turismo', width: 3200 },
+              { text: 'Datasets', width: 1800 },
+              { text: '4/5', width: 1826 },
+            ]),
+            tableRow([
+              { text: 'Coleta Manual', width: 2200 },
+              { text: 'Indicadores de campo, secretarias municipais', width: 3200 },
+              { text: 'Formulário', width: 1800 },
+              { text: '1-3/5', width: 1826 },
+            ]),
+          ],
+        }),
+
+        heading('5.1 Edge Functions (Serverless)', HeadingLevel.HEADING_2),
+        para('20+ funções serverless em Deno/TypeScript para processamento backend:'),
+        bullet('calculate-assessment: Execução do pipeline IGMA completo', 'bullets'),
+        bullet('beni-chat: IA conversacional contextualizada com dados do destino', 'bullets'),
+        bullet('generate-report: Relatórios personalizados via IA com templates', 'bullets'),
+        bullet('fetch-official-data: Proxy para APIs oficiais (IBGE, CADASTUR)', 'bullets'),
+        bullet('ingest-mapa-turismo: Ingestão de dados do Mapa do Turismo Brasileiro', 'bullets'),
+        bullet('ingest-youtube: Metadados de vídeos para biblioteca EDU', 'bullets'),
+        bullet('moderate-image: Moderação de conteúdo via IA', 'bullets'),
+        bullet('send-transactional-email: E-mails transacionais com templates React', 'bullets'),
+        bullet('auth-email-hook: Templates customizados de e-mail de autenticação', 'bullets'),
+
+        new Paragraph({ children: [new PageBreak()] }),
+
+        // ══════════ 6. MODELO DE DADOS ══════════
+        heading('6. Modelo de Dados', HeadingLevel.HEADING_1),
+        para('O banco de dados PostgreSQL contém 40+ tabelas com Row Level Security habilitado em todas. Principais entidades:'),
+
+        new Table({
+          width: { size: 9026, type: WidthType.DXA },
+          columnWidths: [2600, 6426],
+          rows: [
+            tableRow([{ text: 'Tabela', bold: true, bg: HEADER_BG, width: 2600 }, { text: 'Função', bold: true, bg: HEADER_BG, width: 6426 }]),
+            tableRow([{ text: 'orgs', width: 2600 }, { text: 'Organizações (multi-tenant)', width: 6426 }]),
+            tableRow([{ text: 'profiles', width: 2600 }, { text: 'Perfis de usuário com role e org_id', width: 6426 }]),
+            tableRow([{ text: 'destinations', width: 2600 }, { text: 'Destinos turísticos com IBGE code e coordenadas', width: 6426 }]),
+            tableRow([{ text: 'assessments', width: 2600 }, { text: 'Rodadas de diagnóstico com resultados IGMA', width: 6426 }]),
+            tableRow([{ text: 'indicators', width: 2600 }, { text: 'Valores de indicadores por assessment', width: 6426 }]),
+            tableRow([{ text: 'issues', width: 2600 }, { text: 'Problemas identificados pelo Motor IGMA', width: 6426 }]),
+            tableRow([{ text: 'prescriptions', width: 2600 }, { text: 'Prescrições vinculadas a capacitações', width: 6426 }]),
+            tableRow([{ text: 'action_plans', width: 2600 }, { text: 'Planos de ação com owner e due_date', width: 6426 }]),
+            tableRow([{ text: 'edu_trainings', width: 2600 }, { text: 'Materiais de capacitação (vídeo, texto, quiz)', width: 6426 }]),
+            tableRow([{ text: 'edu_tracks', width: 2600 }, { text: 'Trilhas de aprendizado ordenadas', width: 6426 }]),
+            tableRow([{ text: 'edu_progress', width: 2600 }, { text: 'Progresso do aluno com watch_seconds', width: 6426 }]),
+            tableRow([{ text: 'certificates', width: 2600 }, { text: 'Certificados com QR code e verificação pública', width: 6426 }]),
+            tableRow([{ text: 'exams / exam_attempts', width: 2600 }, { text: 'Provas com anti-cheat e histórico', width: 6426 }]),
+            tableRow([{ text: 'licenses', width: 2600 }, { text: 'Licenciamento: Trial (7d), Basic, Pro, Enterprise', width: 6426 }]),
+            tableRow([{ text: 'audit_events', width: 2600 }, { text: 'Log de auditoria de operações críticas', width: 6426 }]),
+            tableRow([{ text: 'forum_posts / comments', width: 2600 }, { text: 'Comunidade com moderação', width: 6426 }]),
+            tableRow([{ text: 'game_sessions', width: 2600 }, { text: 'Persistência de sessões dos 4 jogos', width: 6426 }]),
+          ],
+        }),
+
+        new Paragraph({ children: [new PageBreak()] }),
+
+        // ══════════ 7. FLUXOS PRINCIPAIS ══════════
+        heading('7. Fluxos Principais do Sistema', HeadingLevel.HEADING_1),
+
+        heading('7.1 Fluxo de Diagnóstico Territorial', HeadingLevel.HEADING_2),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Usuário cria destino turístico (com código IBGE)', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Cria nova rodada de diagnóstico (Essencial/Estratégico/Integral)', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Sistema pré-preenche indicadores via APIs oficiais (IBGE, Mapa do Turismo, CADASTUR)', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Usuário complementa dados manuais e confirma', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Checklist pré-cálculo valida completude (≥60%)', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Edge Function calculate-assessment executa pipeline IGMA', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Resultados: scores RA/OE/AO, flags IGMA, issues, prescrições', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Dashboard exibe gauges, alertas e comparação com rodadas anteriores', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Relatório gerado via IA com contexto do destino + Base de Conhecimento', font: 'Arial', size: 22 })] }),
+
+        heading('7.2 Fluxo de Prescrição EDU', HeadingLevel.HEADING_2),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Diagnóstico calculado identifica indicadores críticos/atenção', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Tabela edu_indicator_training_map mapeia cada indicador para treinamentos', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Sistema gera recomendações com prioridade e razão específica', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Usuário pode criar trilha personalizada a partir das recomendações', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Progresso rastreado com certificação ao completar trilha', font: 'Arial', size: 22 })] }),
+
+        heading('7.3 Fluxo de Licenciamento', HeadingLevel.HEADING_2),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Novo usuário recebe Trial gratuito de 7 dias automaticamente', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Feature gating via LicenseContext: funcionalidades bloqueadas por plano', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Planos: Basic (5 destinos), Pro (20 destinos + Enterprise), Enterprise (ilimitado)', font: 'Arial', size: 22 })] }),
+        new Paragraph({ numbering: { reference: 'numbers', level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: 'Expiração automática via cron job (expire_trial_licenses)', font: 'Arial', size: 22 })] }),
+
+        new Paragraph({ children: [new PageBreak()] }),
+
+        // ══════════ 8. DIFERENCIAIS COMPETITIVOS ══════════
+        heading('8. Diferenciais Competitivos', HeadingLevel.HEADING_1),
+
+        new Table({
+          width: { size: 9026, type: WidthType.DXA },
+          columnWidths: [3000, 6026],
+          rows: [
+            tableRow([{ text: 'Diferencial', bold: true, bg: HEADER_BG, width: 3000 }, { text: 'Descrição', bold: true, bg: HEADER_BG, width: 6026 }]),
+            tableRow([{ text: 'Motor IGMA Proprietário', bold: true, width: 3000 }, { text: 'Única implementação computacional das 6 regras sistêmicas de Mario Beni', width: 6026 }]),
+            tableRow([{ text: 'Prescrição Determinística', width: 3000 }, { text: 'Diagnóstico → Capacitação é automático e rastreável, não subjetivo', width: 6026 }]),
+            tableRow([{ text: 'Multi-fonte Automatizada', width: 3000 }, { text: 'Integração com 5+ APIs oficiais para pré-preenchimento de dados', width: 6026 }]),
+            tableRow([{ text: 'Rastreabilidade Total', width: 3000 }, { text: 'Snapshot imutável de dados, fontes e confiabilidade por diagnóstico', width: 6026 }]),
+            tableRow([{ text: 'Multi-tenant', width: 3000 }, { text: 'Organizações isoladas com RLS, convites por código e roles granulares', width: 6026 }]),
+            tableRow([{ text: 'Gamificação Integrada', width: 3000 }, { text: '4 jogos educacionais com persistência e relação direta com conteúdo', width: 6026 }]),
+            tableRow([{ text: 'IA Contextualizada', width: 3000 }, { text: 'Chat e relatórios com contexto do destino + Base de Conhecimento', width: 6026 }]),
+            tableRow([{ text: 'Certificação Digital', width: 3000 }, { text: 'QR code + verificação pública + exames com anti-cheat', width: 6026 }]),
+            tableRow([{ text: 'Destinos Públicos', width: 3000 }, { text: 'Vitrine de destinos certificados com selo de qualidade SISTUR', width: 6026 }]),
+          ],
+        }),
+
+        // ══════════ 9. PROPRIEDADE INTELECTUAL ══════════
+        heading('9. Propriedade Intelectual', HeadingLevel.HEADING_1),
+        para('O SISTUR constitui obra original protegida pela Lei 9.609/1998 (Lei de Software) e Lei 9.610/1998 (Direitos Autorais). Os seguintes elementos são proprietários:'),
+        bullet('Motor IGMA: algoritmo de interpretação sistêmica com 6 regras encadeadas', 'bullets'),
+        bullet('Pipeline de 9 etapas: fluxo de processamento de dados turísticos', 'bullets'),
+        bullet('Sistema de prescrição determinística: mapeamento indicador → capacitação', 'bullets'),
+        bullet('Interface e experiência de usuário: design system, fluxos de navegação', 'bullets'),
+        bullet('Código-fonte: 44 páginas, 154+ componentes, 50+ hooks, 20+ edge functions', 'bullets'),
+        bullet('Base de dados e schema: 40+ tabelas com políticas de segurança', 'bullets'),
+        bullet('Jogos educacionais: mecânicas, conteúdo e persistência', 'bullets'),
+
+        heading('10. Referências Bibliográficas', HeadingLevel.HEADING_1),
+        bullet('BENI, Mario Carlos. Análise Estrutural do Turismo. São Paulo: Editora Senac São Paulo, 2001.', 'bullets'),
+        bullet('BENI, Mario Carlos. Globalização do Turismo: Megatendências do Setor e a Realidade Brasileira. São Paulo: Aleph, 2003.', 'bullets'),
+        bullet('BENI, Mario Carlos. Política e Planejamento de Turismo no Brasil. São Paulo: Aleph, 2006.', 'bullets'),
+        bullet('IBGE. API de Agregados e Pesquisas Municipais. servicodados.ibge.gov.br', 'bullets'),
+        bullet('Ministério do Turismo. CADASTUR. cadastur.turismo.gov.br', 'bullets'),
+        bullet('Ministério do Turismo. Plano Nacional de Turismo 2024-2027. gov.br/turismo', 'bullets'),
+        bullet('Ministério do Turismo. Mapa do Turismo Brasileiro. mapa.turismo.gov.br', 'bullets'),
+        bullet('Lei 9.609/1998 — Proteção da Propriedade Intelectual de Programa de Computador.', 'bullets'),
+        bullet('Lei 9.610/1998 — Direitos Autorais.', 'bullets'),
+      ],
+    }],
+  });
+
+  const buffer = await Packer.toBlob(doc);
+  saveAs(buffer, 'SISTUR_Documento_Tecnico.docx');
+}
