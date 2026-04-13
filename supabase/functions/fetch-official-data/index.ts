@@ -345,7 +345,7 @@ Deno.serve(async (req) => {
         org_id: org_id,
       }));
 
-    // 6. Upsert
+    // 7. Upsert
     const { data: upsertedData, error: upsertError } = await supabaseClient
       .from('external_indicator_values')
       .upsert(
