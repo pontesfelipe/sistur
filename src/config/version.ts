@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 16,
+  minor: 17,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,20 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.17.0",
+    date: "2026-04-13",
+    type: "minor" as const,
+    changes: [
+      "Novo serviço de Verificação de Saúde do Sistema com testes de banco de dados, edge functions, storage e integridade de dados",
+      "Monitoramento client-side automático: captura erros JS, rejeições de Promise e falhas de API em tempo real",
+      "Botão 'Executar Verificação' em Configurações > Ferramentas para rodar testes sob demanda",
+      "Cron job diário (4h UTC) executa verificação automaticamente e gera bug report em caso de falhas",
+      "Histórico de verificações com status visual e detalhamento por categoria",
+      "Tabelas system_health_checks e client_error_reports com RLS por organização",
+      "Edge function run-health-check com 25+ checks distribuídos em 5 categorias",
+    ],
+  },
   {
     version: "1.16.0",
     date: "2026-04-13",
