@@ -631,11 +631,10 @@ export async function exportTechnicalDocx() {
 
         new Paragraph({ children: [new PageBreak()] }),
 
-        // ══════════ 9. CÓDIGO ══════════ (existente)
         new Paragraph({ children: [new PageBreak()] }),
 
-        // ══════════ 8. DIFERENCIAIS COMPETITIVOS ══════════
-        heading('8. Diferenciais Competitivos', HeadingLevel.HEADING_1),
+        // ══════════ 9. DIFERENCIAIS COMPETITIVOS ══════════
+        heading('9. Diferenciais Competitivos', HeadingLevel.HEADING_1),
 
         new Table({
           width: { size: 9026, type: WidthType.DXA },
