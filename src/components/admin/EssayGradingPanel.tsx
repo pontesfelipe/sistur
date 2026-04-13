@@ -162,6 +162,7 @@ export function EssayGradingPanel() {
           .update({
             awarded_points: awardedPoints,
             is_correct: awardedPoints > 0,
+            grader_comment: grade.comment || null,
           })
           .eq('attempt_id', attempt.attempt_id)
           .eq('quiz_id', answer.quiz_id);
