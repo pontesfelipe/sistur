@@ -95,6 +95,10 @@ const API_FETCHED_CODES = new Set([
   'igma_densidade_demografica', 'igma_leitos_por_habitante', 'igma_cobertura_saude',
   'igma_ideb', 'igma_receita_propria', 'igma_despesa_turismo',
   'igma_meios_hospedagem',
+  'igma_categoria_mapa_turismo', 'igma_regiao_turistica',
+  'igma_empregos_turismo', 'igma_estabelecimentos_turismo',
+  'igma_visitantes_internacionais', 'igma_visitantes_nacionais',
+  'igma_arrecadacao_turismo', 'igma_conselho_municipal_turismo',
 ]);
 
 const CADASTUR_SEMI_AUTO_CODES = new Set([

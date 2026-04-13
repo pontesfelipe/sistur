@@ -20,6 +20,9 @@ const API_FETCHED_CODES = new Set([
   'igma_ideb', 'igma_receita_propria', 'igma_despesa_turismo',
   'igma_meios_hospedagem',
   'igma_categoria_mapa_turismo', 'igma_regiao_turistica',
+  'igma_empregos_turismo', 'igma_estabelecimentos_turismo',
+  'igma_visitantes_internacionais', 'igma_visitantes_nacionais',
+  'igma_arrecadacao_turismo', 'igma_conselho_municipal_turismo',
 ]);
 
 // Codes fetched semi-automatically from CADASTUR open data (CSV pipeline)
