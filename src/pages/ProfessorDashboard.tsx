@@ -24,6 +24,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DeleteConfirmDialog } from '@/components/projects/DeleteConfirmDialog';
 import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
+import { ExamManagementPanel } from '@/components/admin/ExamManagementPanel';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';

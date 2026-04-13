@@ -46,6 +46,8 @@ const ERPIntegration = lazy(() => import("./pages/ERPIntegration"));
 const PublicDestinations = lazy(() => import("./pages/PublicDestinations"));
 const QuizManagement = lazy(() => import("./pages/QuizManagement"));
 const ExamTaking = lazy(() => import("./pages/ExamTaking"));
+const ExamHistory = lazy(() => import("./pages/ExamHistory"));
+const ExamReview = lazy(() => import("./pages/ExamReview"));
 const Certificates = lazy(() => import("./pages/Certificates"));
 const VerifyCertificate = lazy(() => import("./pages/VerifyCertificate"));
 const OnDemandRequests = lazy(() => import("./pages/OnDemandRequests"));
