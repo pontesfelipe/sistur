@@ -87,12 +87,6 @@ function codeBlock(lines: string[]) {
     ],
   });
 }
-  return new Paragraph({
-    numbering: { reference: ref, level },
-    spacing: { after: 60 },
-    children: [new TextRun({ text, font: 'Arial', size: 22 })],
-  });
-}
 
 function tableRow(cells: { text: string; bold?: boolean; bg?: string; width?: number }[]) {
   return new TableRow({
