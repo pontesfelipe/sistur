@@ -155,8 +155,8 @@ export function NovaRodadaDialogs({
         </Card>
       )}
 
-      {/* Navigation for step 5 */}
-      {currentStep === 5 && (
+      {/* Navigation for step 5 — only for territorial (enterprise has its own nav in EnterpriseDataEntryPanel) */}
+      {currentStep === 5 && diagnosticType === 'territorial' && (
         <Card className="mt-4">
           <CardContent className="pt-6">
             <div className="flex justify-between">

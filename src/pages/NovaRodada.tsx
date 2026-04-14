@@ -330,7 +330,7 @@ export default function NovaRodada() {
           selectedTier={selectedTier}
           createdAssessmentId={createdAssessmentId}
           validatedDataCount={validatedDataCount}
-          orgId={profile?.org_id || null}
+          orgId={effectiveOrgId || null}
           onSetCurrentStep={setCurrentStep}
           onPreviousStep={handlePreviousStep}
           onNextStep={handleNextStep}
