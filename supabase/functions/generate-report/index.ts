@@ -279,7 +279,7 @@ ESTRUTURA OBRIGATÓRIA:
 
 ## 3. Metodologia SISTUR
 - Breve descrição dos 3 eixos e critérios de classificação
-- Fontes de dados utilizadas (IBGE, Cadastur, etc.)
+- Fontes de dados utilizadas (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo Brasileiro)
 
 ## 4. Diagnóstico por Eixo SISTUR
 ### 4.1. I-RA — Relações Ambientais
