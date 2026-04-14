@@ -223,6 +223,81 @@ export function DataValidationPanel({
         </Card>
       </div>
 
+      {/* Source breakdown - visual display of where data came from */}
+      {values.length > 0 && (
+        <Card className="border-primary/20">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              Fontes de Dados Utilizadas
+            </CardTitle>
+            <CardDescription>
+              Detalhamento das bases oficiais que alimentaram o pré-preenchimento automático
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {(() => {
+                const bySource: Record<string, { count: number; indicators: string[] }> = {};
+                values.forEach(v => {
+                  const src = v.source_code || 'MANUAL';
+                  if (!bySource[src]) bySource[src] = { count: 0, indicators: [] };
+                  bySource[src].count++;
+                  bySource[src].indicators.push(
+                    v.indicator_code.replace('igma_', '').replace(/_/g, ' ')
+                  );
+                });
+                return Object.entries(bySource)
+                  .sort((a, b) => b[1].count - a[1].count)
+                  .map(([source, data]) => {
+                    const info = SOURCE_INFO[source] || { name: source, color: 'bg-gray-400', icon: '📄' };
+                    return (
+                      <TooltipProvider key={source}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className={cn(
+                              "flex items-center gap-3 p-3 rounded-lg border cursor-help transition-colors",
+                              source === 'MAPA_TURISMO' && "border-teal-500/40 bg-teal-50/50 dark:bg-teal-950/20",
+                              source === 'IBGE' && "border-blue-500/40 bg-blue-50/50 dark:bg-blue-950/20",
+                              source === 'CADASTUR' && "border-cyan-500/40 bg-cyan-50/50 dark:bg-cyan-950/20",
+                              source === 'DATASUS' && "border-green-500/40 bg-green-50/50 dark:bg-green-950/20",
+                              source !== 'MAPA_TURISMO' && source !== 'IBGE' && source !== 'CADASTUR' && source !== 'DATASUS' && "border-muted"
+                            )}>
+                              <span className="text-2xl">{info.icon}</span>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">{info.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {data.count} indicador{data.count > 1 ? 'es' : ''}
+                                </p>
+                              </div>
+                              <Badge variant="secondary" className="text-xs font-bold">
+                                {data.count}
+                              </Badge>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-xs">
+                            <p className="font-medium mb-1">{info.name}</p>
+                            <ul className="text-xs space-y-0.5">
+                              {data.indicators.map((ind, i) => (
+                                <li key={i} className="capitalize">• {ind}</li>
+                              ))}
+                            </ul>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    );
+                  });
+              })()}
+            </div>
+            {manualCount > 0 && (
+              <p className="text-xs text-muted-foreground mt-3 pt-3 border-t">
+                ✏️ {manualCount} indicador{manualCount > 1 ? 'es' : ''} requer{manualCount > 1 ? 'em' : ''} preenchimento manual na próxima etapa.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Data table */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
