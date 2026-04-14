@@ -150,7 +150,7 @@ export function useCertificateMutations() {
   // remains here, gated by `revoke_certificate(text, text)`.
   const revokeCertificate = useMutation({
     mutationFn: async ({ certificateId, reason }: { certificateId: string; reason: string }) => {
-      const { error } = await supabase.rpc('revoke_certificate', {
+      const { error } = await (supabase.rpc as any)('revoke_certificate', {
         _certificate_id: certificateId,
         _reason: reason,
       });
