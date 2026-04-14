@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfileContext } from '@/contexts/ProfileContext';
 
 export type LicensePlan = 'trial' | 'estudante' | 'professor' | 'basic' | 'pro' | 'enterprise';
 export type LicenseStatus = 'active' | 'expired' | 'cancelled' | 'suspended';
@@ -62,6 +63,11 @@ interface ServerLicenseFlags {
 
 export function LicenseProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  // Admins (platform or org) bypass license gating — they always need
+  // access to administrative tooling even if billing fails or their
+  // license row is missing. ProfileProvider wraps LicenseProvider in
+  // App.tsx, so this hook resolves before useLicense is called.
+  const { isAdmin, isOrgAdmin } = useProfileContext();
   const [license, setLicense] = useState<License | null>(null);
   const [serverFlags, setServerFlags] = useState<ServerLicenseFlags>({
     isValid: false,
@@ -147,8 +153,12 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
   }, [user?.id, fetchLicense]);
 
   const computed = useMemo(() => {
+    // Admins bypass license validity entirely so that a broken/missing
+    // license never locks them out of administrative tooling.
+    const adminBypass = isAdmin || isOrgAdmin;
     // Use server-authoritative flags for access control
-    const { isTrialActive, isTrialExpired, isPaidPlan, isValid: isLicenseValid, serverNow } = serverFlags;
+    const { isTrialActive, isTrialExpired, isPaidPlan, isValid: rawValid, serverNow } = serverFlags;
+    const isLicenseValid = adminBypass || rawValid;
 
     // Display-only: trial days remaining using server time
     const trialDaysRemaining = (() => {
@@ -168,14 +178,16 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
     const planLabel = plan ? PLAN_LABELS[plan] : 'Sem Licença';
 
     return { isTrialActive, isTrialExpired, isPaidPlan, isLicenseValid, trialDaysRemaining, trialDaysTotal, trialProgress, plan, planLabel };
-  }, [license, serverFlags]);
+  }, [license, serverFlags, isAdmin, isOrgAdmin]);
 
   const hasFeature = useCallback((feature: string) => {
+    // Admins bypass feature gating regardless of license state.
+    if (isAdmin || isOrgAdmin) return true;
     if (!license) return false;
     if (!computed.isLicenseValid) return false;
     if (license.plan === 'enterprise') return true;
     return license.features[feature] === true;
-  }, [license, computed.isLicenseValid]);
+  }, [license, computed.isLicenseValid, isAdmin, isOrgAdmin]);
 
   const forceRefetch = async () => {
     lastUserId.current = null;

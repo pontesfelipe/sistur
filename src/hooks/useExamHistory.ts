@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { fetchProfileNamesByIds } from '@/services/profiles';
 import { toast } from 'sonner';
 
 // ============================================
@@ -232,15 +233,9 @@ export function useAllExamAttempts() {
       if (error) throw error;
 
       // Get user profiles
-      const userIds = [...new Set((data || []).map(a => a.user_id).filter(Boolean))];
-      let profileMap = new Map<string, string>();
-      if (userIds.length > 0) {
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('user_id, full_name')
-          .in('user_id', userIds);
-        profiles?.forEach(p => profileMap.set(p.user_id, p.full_name));
-      }
+      const profileMap = await fetchProfileNamesByIds(
+        (data || []).map(a => a.user_id).filter(Boolean) as string[]
+      );
 
       return (data || []).map(a => ({
         ...a,
@@ -263,15 +258,9 @@ export function useAllExamAppeals() {
       if (error) throw error;
 
       // Enrich with user names
-      const userIds = [...new Set((data || []).map(a => a.user_id).filter(Boolean))];
-      let profileMap = new Map<string, string>();
-      if (userIds.length > 0) {
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('user_id, full_name')
-          .in('user_id', userIds);
-        profiles?.forEach(p => profileMap.set(p.user_id, p.full_name));
-      }
+      const profileMap = await fetchProfileNamesByIds(
+        (data || []).map(a => a.user_id).filter(Boolean) as string[]
+      );
 
       return (data || []).map(a => ({
         ...a,

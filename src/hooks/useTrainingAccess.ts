@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { fetchProfileNamesByIds } from '@/services/profiles';
 import { toast } from 'sonner';
 
 export interface TrainingAccess {
@@ -34,37 +35,31 @@ export function useTrainingAccess(trainingId?: string) {
         .order('access_type', { ascending: true });
       
       if (error) throw error;
-      
-      // Enrich with org names and user info
-      const enrichedData: TrainingAccessWithDetails[] = [];
-      
-      for (const access of (data || [])) {
-        const enriched: TrainingAccessWithDetails = { 
-          ...access as unknown as TrainingAccess 
-        };
-        
-        if (access.org_id) {
-          const { data: org } = await supabase
-            .from('orgs')
-            .select('name')
-            .eq('id', access.org_id)
-            .single();
-          enriched.org_name = org?.name;
-        }
-        
-        if (access.user_id) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('full_name')
-            .eq('user_id', access.user_id)
-            .single();
-          enriched.user_name = profile?.full_name || undefined;
-        }
-        
-        enrichedData.push(enriched);
+
+      // Batch-fetch related org and user display names up front to avoid
+      // the per-row N+1 round trips that previously lived in this loop.
+      const rows = (data || []) as unknown as TrainingAccess[];
+      const orgIds = Array.from(
+        new Set(rows.map(r => r.org_id).filter(Boolean) as string[])
+      );
+      const userIds = rows.map(r => r.user_id).filter(Boolean) as string[];
+
+      const orgMap = new Map<string, string>();
+      if (orgIds.length > 0) {
+        const { data: orgs } = await supabase
+          .from('orgs')
+          .select('id, name')
+          .in('id', orgIds);
+        for (const o of orgs || []) orgMap.set(o.id, o.name);
       }
-      
-      return enrichedData;
+
+      const profileMap = await fetchProfileNamesByIds(userIds);
+
+      return rows.map<TrainingAccessWithDetails>(access => ({
+        ...access,
+        org_name: access.org_id ? orgMap.get(access.org_id) : undefined,
+        user_name: access.user_id ? profileMap.get(access.user_id) || undefined : undefined,
+      }));
     },
     enabled: !!trainingId,
   });
