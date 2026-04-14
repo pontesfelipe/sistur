@@ -681,13 +681,12 @@ serve(async (req) => {
     const globalRefs = results[4].data || [];
     const kbFiles = results[5].data || [];
     const dataSnapshots = results[6].data || [];
-    const communityFeedback = results[7].data || [];
-    const enterpriseValues = isEnterprise ? (results[8]?.data || []) : [];
+    const enterpriseValues = isEnterprise ? (results[7]?.data || []) : [];
 
     console.log('Report data — Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 
       'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 
       'KB files:', kbFiles.length, 'Snapshots:', dataSnapshots.length, 
-      'Community feedback:', communityFeedback.length, 'Enterprise values:', enterpriseValues.length);
+      'Enterprise values:', enterpriseValues.length);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
