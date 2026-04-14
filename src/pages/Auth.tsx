@@ -676,67 +676,61 @@ const Auth = () => {
   return (
     <main className="min-h-screen flex">
       {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 gradient-hero p-12 flex-col justify-between">
-        <div>
+      <div className="hidden lg:flex lg:w-1/2 gradient-hero p-12 flex-col justify-between relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, hsl(0 0% 100%) 1px, transparent 1px), radial-gradient(circle at 75% 75%, hsl(0 0% 100%) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-primary-foreground/10 blur-3xl" />
+        <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-accent/10 blur-3xl" />
+
+        <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary-foreground/20 flex items-center justify-center">
-              <span className="text-primary-foreground font-display font-bold text-xl">S</span>
+            <div className="h-12 w-12 rounded-2xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center">
+              <span className="text-primary-foreground font-display font-bold text-2xl">S</span>
             </div>
             <span className="font-display font-bold text-2xl text-primary-foreground">SISTUR</span>
           </div>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-10 relative z-10">
           <div>
-            <h1 className="text-4xl font-display font-bold text-primary-foreground mb-4">
+            <h1 className="text-4xl xl:text-5xl font-display font-bold text-primary-foreground mb-5 leading-[1.1]">
               Sistema Integrado de Gestão do Turismo
             </h1>
-            <p className="text-primary-foreground/80 text-lg">
+            <p className="text-primary-foreground/80 text-lg leading-relaxed max-w-md">
               Diagnóstico inteligente e capacitação para destinos turísticos brasileiros.
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 text-primary-foreground/90">
-              <div className="h-10 w-10 rounded-lg bg-primary-foreground/20 flex items-center justify-center">
-                <MapPin className="h-5 w-5" />
+          <div className="space-y-5">
+            {[
+              { icon: MapPin, title: 'Gestão de Destinos', desc: 'Cadastre e monitore seus destinos turísticos' },
+              { icon: BarChart3, title: 'Diagnóstico por Pilares', desc: 'Análise I-RA, I-OE e I-AO com identificação de gargalos' },
+              { icon: GraduationCap, title: 'SISTUR EDU', desc: 'Recomendações de capacitação personalizadas' },
+            ].map(({ icon: FIcon, title: fTitle, desc }) => (
+              <div key={fTitle} className="flex items-center gap-4 text-primary-foreground/90 group">
+                <div className="h-11 w-11 rounded-2xl bg-primary-foreground/15 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                  <FIcon className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-semibold">{fTitle}</p>
+                  <p className="text-sm text-primary-foreground/60">{desc}</p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium">Gestão de Destinos</p>
-                <p className="text-sm text-primary-foreground/70">Cadastre e monitore seus destinos turísticos</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 text-primary-foreground/90">
-              <div className="h-10 w-10 rounded-lg bg-primary-foreground/20 flex items-center justify-center">
-                <BarChart3 className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-medium">Diagnóstico por Pilares</p>
-                <p className="text-sm text-primary-foreground/70">Análise I-RA, I-OE e I-AO com identificação de gargalos</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 text-primary-foreground/90">
-              <div className="h-10 w-10 rounded-lg bg-primary-foreground/20 flex items-center justify-center">
-                <GraduationCap className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-medium">SISTUR EDU</p>
-                <p className="text-sm text-primary-foreground/70">Recomendações de capacitação personalizadas</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        <p className="text-primary-foreground/60 text-sm">
-          © 2024 SISTUR. Todos os direitos reservados.
+        <p className="text-primary-foreground/50 text-sm relative z-10">
+          © 2025 SISTUR — Instituto Mario Beni. Todos os direitos reservados.
         </p>
       </div>
 
       {/* Right side - Forms */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-background">
-        {renderForm()}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-background relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-accent/[0.02]" />
+        <div className="relative z-10 w-full max-w-md animate-fade-in">
+          {renderForm()}
+        </div>
       </div>
     </main>
   );
