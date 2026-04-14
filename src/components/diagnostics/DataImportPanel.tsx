@@ -343,7 +343,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         });
       }
     };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
   };
 
   const handleImport = async () => {
