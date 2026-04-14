@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 19,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.19.2",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "Busca de Reviews agora auto-preenche campos do perfil (estrelas, tipo, nº de UHs) além dos indicadores",
+      "Removida duplicação do componente BusinessReviewSearch entre Passo 4 e Passo 5 Enterprise",
+      "IA da edge function search-business-reviews agora extrai metadados do estabelecimento (property_metadata)",
+      "Dados de reviews são persistidos no Passo 4 e repassados ao Passo 5 via initialAutoFillValues",
+    ],
+  },
   {
     version: "1.19.1",
     date: "2026-04-14",

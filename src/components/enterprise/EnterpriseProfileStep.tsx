@@ -68,6 +68,16 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     setReviewAutoFilled(true);
     onReviewAutoFill?.(values);
   };
+
+  const handleProfileAutoFill = (metadata: { star_rating: number | null; property_type: string | null; room_count: number | null; employee_count: number | null }) => {
+    setFormData(prev => ({
+      ...prev,
+      ...(metadata.star_rating && !prev.star_rating ? { star_rating: metadata.star_rating } : {}),
+      ...(metadata.property_type && prev.property_type === 'hotel' ? { property_type: metadata.property_type } : {}),
+      ...(metadata.room_count && !prev.room_count ? { room_count: metadata.room_count } : {}),
+      ...(metadata.employee_count && !prev.employee_count ? { employee_count: metadata.employee_count } : {}),
+    }));
+  };
   const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
   const queryClient = useQueryClient();
@@ -343,6 +353,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <CardContent className="pt-0">
           <BusinessReviewSearch
             onAutoFill={handleReviewAutoFill}
+            onProfileAutoFill={handleProfileAutoFill}
             defaultLocation={destinationName}
             compact
           />

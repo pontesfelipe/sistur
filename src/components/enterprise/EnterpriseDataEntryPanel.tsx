@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 import { 
   Hotel, 
   Leaf, 
@@ -23,13 +23,10 @@ import {
   Minus,
   EyeOff,
   Search,
-  ChevronDown,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
-import { BusinessReviewSearch } from './BusinessReviewSearch';
 import { INDICATOR_GUIDANCE, validateIndicatorValue } from '@/data/enterpriseIndicatorGuidance';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -78,21 +75,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
-  const [showReviewSearch, setShowReviewSearch] = useState(!initialAutoFillValues || Object.keys(initialAutoFillValues).length === 0);
 
-  // Auto-fill handler from review search
-  const handleReviewAutoFill = useCallback((indicatorValues: Record<string, number>) => {
-    if (!indicators) return;
-    const codeToId = new Map(indicators.map(i => [(i as any).code, i.id]));
-    const newValues = { ...localValues };
-    Object.entries(indicatorValues).forEach(([code, value]) => {
-      const id = codeToId.get(code);
-      if (id) {
-        newValues[id] = value.toString();
-      }
-    });
-    setLocalValues(newValues);
-  }, [indicators, localValues]);
   
   // Initialize local values and ignored state from existing
   useEffect(() => {
@@ -353,33 +336,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
         </CardContent>
       </Card>
 
-      {/* Business Review Search */}
-      <Collapsible open={showReviewSearch} onOpenChange={setShowReviewSearch}>
-        <Card>
-          <CollapsibleTrigger asChild>
-            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Search className="h-4 w-4 text-primary" />
-                  Busca Automática de Reviews Online
-                </CardTitle>
-                <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", showReviewSearch && "rotate-180")} />
-              </div>
-              <CardDescription className="text-xs">
-                Pesquise avaliações do seu estabelecimento e preencha indicadores automaticamente
-              </CardDescription>
-            </CardHeader>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <CardContent className="pt-0">
-              <BusinessReviewSearch
-                onAutoFill={handleReviewAutoFill}
-                compact
-              />
-            </CardContent>
-          </CollapsibleContent>
-        </Card>
-      </Collapsible>
+      {/* Note: Review search moved to Step 4 (EnterpriseProfileStep) to avoid duplication */}
       
       {/* Indicator Entry by Pillar */}
       <Card>

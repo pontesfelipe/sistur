@@ -111,6 +111,7 @@ Preste atenção especial a:
 - Padrões recorrentes nos elogios e reclamações
 - Aspectos operacionais mencionados (limpeza, atendimento, infraestrutura, gastronomia, localização, custo-benefício)
 - Tom emocional predominante (encantamento, satisfação, frustração, decepção)
+- Informações sobre o estabelecimento: categoria de estrelas, tipo (hotel, pousada, resort), porte
 
 Retorne APENAS um JSON válido com esta estrutura:
 {
@@ -120,6 +121,12 @@ Retorne APENAS um JSON válido com esta estrutura:
   "platforms_found": string[], // Plataformas onde o negócio foi encontrado
   "sentiment_summary": string, // Resumo detalhado do sentimento geral baseado nos COMENTÁRIOS (não só notas)
   "sentiment_score": number | null, // Score de sentimento de 1-5 baseado na análise dos textos dos comentários
+  "property_metadata": {
+    "star_rating": number | null, // Categoria oficial de estrelas (1-5) se mencionada nos resultados
+    "property_type": string | null, // Tipo: "hotel", "resort", "pousada", "hostel", "apart_hotel", "flat", "camping" ou null
+    "room_count": number | null, // Número de quartos/UHs se mencionado
+    "employee_count": number | null // Número de funcionários se mencionado
+  },
   "guest_experience_dimensions": {
     "atendimento": number | null, // 1-5 baseado nos comentários sobre atendimento/staff
     "limpeza": number | null, // 1-5 baseado nos comentários sobre limpeza/higiene
@@ -128,7 +135,7 @@ Retorne APENAS um JSON válido com esta estrutura:
     "localizacao": number | null, // 1-5 baseado nos comentários sobre localização/acesso
     "custo_beneficio": number | null // 1-5 baseado nos comentários sobre valor percebido
   },
-  "recurring_themes": string[], // Temas/assuntos mais mencionados nos comentários (ex: "café da manhã excelente", "Wi-Fi instável")
+  "recurring_themes": string[], // Temas/assuntos mais mencionados nos comentários
   "strengths": string[], // Pontos fortes extraídos dos COMENTÁRIOS
   "weaknesses": string[], // Pontos fracos extraídos dos COMENTÁRIOS
   "sample_positive_quotes": string[], // 2-3 trechos representativos de comentários positivos

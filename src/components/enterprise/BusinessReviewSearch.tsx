@@ -38,6 +38,13 @@ interface GuestExperienceDimensions {
   custo_beneficio: number | null;
 }
 
+interface PropertyMetadata {
+  star_rating: number | null;
+  property_type: string | null;
+  room_count: number | null;
+  employee_count: number | null;
+}
+
 interface BusinessReviewAnalysis {
   review_score: number | null;
   review_count: number | null;
@@ -45,6 +52,7 @@ interface BusinessReviewAnalysis {
   platforms_found: string[];
   sentiment_summary: string;
   sentiment_score: number | null;
+  property_metadata?: PropertyMetadata;
   guest_experience_dimensions: GuestExperienceDimensions;
   recurring_themes: string[];
   strengths: string[];
@@ -64,8 +72,10 @@ interface SearchResult {
 }
 
 interface BusinessReviewSearchProps {
-  /** If provided, enables auto-fill mode */
+  /** If provided, enables auto-fill mode for indicators */
   onAutoFill?: (indicatorValues: Record<string, number>) => void;
+  /** If provided, auto-fills profile fields from review data */
+  onProfileAutoFill?: (metadata: PropertyMetadata) => void;
   /** Pre-fill business name */
   defaultBusinessName?: string;
   /** Pre-fill location */
@@ -84,7 +94,7 @@ const PROPERTY_TYPES = [
   { value: 'operadora', label: 'Operadora/Agência' },
 ];
 
-export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
+export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
   const [businessName, setBusinessName] = useState(defaultBusinessName);
   const [location, setLocation] = useState(defaultLocation);
   const [propertyType, setPropertyType] = useState('hotel');
@@ -117,26 +127,35 @@ export function BusinessReviewSearch({ onAutoFill, defaultBusinessName = '', def
   };
 
   const handleAutoFill = () => {
-    if (!result?.analysis || !onAutoFill) return;
+    if (!result?.analysis) return;
 
-    const values: Record<string, number> = {};
-    if (result.analysis.review_score !== null) {
-      values['ENT_REVIEW_SCORE'] = result.analysis.review_score;
-    }
-    if (result.analysis.digital_maturity !== null) {
-      values['ENT_TECH_SCORE'] = result.analysis.digital_maturity;
-    }
-    if (result.analysis.sentiment_score !== null) {
-      values['ENT_SENTIMENT_SCORE'] = result.analysis.sentiment_score;
+    // Auto-fill indicators
+    if (onAutoFill) {
+      const values: Record<string, number> = {};
+      if (result.analysis.review_score !== null) {
+        values['ENT_REVIEW_SCORE'] = result.analysis.review_score;
+      }
+      if (result.analysis.digital_maturity !== null) {
+        values['ENT_TECH_SCORE'] = result.analysis.digital_maturity;
+      }
+      if (result.analysis.sentiment_score !== null) {
+        values['ENT_SENTIMENT_SCORE'] = result.analysis.sentiment_score;
+      }
+
+      if (Object.keys(values).length > 0) {
+        onAutoFill(values);
+      }
     }
 
-    if (Object.keys(values).length === 0) {
-      toast.warning('Nenhum indicador encontrado para auto-preencher');
-      return;
+    // Auto-fill profile metadata
+    if (onProfileAutoFill && result.analysis.property_metadata) {
+      const meta = result.analysis.property_metadata;
+      if (meta.star_rating || meta.property_type || meta.room_count || meta.employee_count) {
+        onProfileAutoFill(meta);
+      }
     }
 
-    onAutoFill(values);
-    toast.success(`${Object.keys(values).length} indicador(es) preenchido(s) automaticamente`);
+    toast.success('Dados preenchidos automaticamente a partir dos reviews');
   };
 
   const DIMENSION_LABELS: Record<string, string> = {
