@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Plus, 
-  Search, 
-  MapPin, 
+import { toast } from 'sonner';
+import {
+  Plus,
+  Search,
+  MapPin,
   MoreVertical,
   Edit,
   Trash2,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDestinations } from '@/hooks/useDestinations';
+import { useProfileContext } from '@/contexts/ProfileContext';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 import {
   DropdownMenu,
@@ -41,6 +43,8 @@ const Destinos = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   
   const { destinations, isLoading, createDestination, updateDestination, deleteDestination } = useDestinations();
+  const { roles } = useProfileContext();
+  const canMutate = roles?.some(r => r.role !== 'VIEWER') ?? false;
 
   const filteredDestinations = destinations?.filter((dest) =>
     dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -68,9 +72,13 @@ const Destinos = () => {
   };
 
   const handleDelete = async () => {
-    if (deleteId) {
+    if (!deleteId) return;
+    try {
       await deleteDestination.mutateAsync(deleteId);
       setDeleteId(null);
+    } catch (err) {
+      // Keep the dialog open so the user sees the action didn't succeed.
+      toast.error(err instanceof Error ? err.message : 'Não foi possível excluir o destino.');
     }
   };
 
@@ -90,10 +98,12 @@ const Destinos = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Destino
-        </Button>
+        {canMutate && (
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Novo Destino
+          </Button>
+        )}
       </div>
 
       {/* Loading State */}
@@ -134,21 +144,27 @@ const Destinos = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Eye className="mr-2 h-4 w-4" />
-                      Ver detalhes
+                    <DropdownMenuItem asChild>
+                      <Link to={`/diagnosticos?destino=${destination.id}`}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        Ver detalhes
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleEdit(destination)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="text-destructive"
-                      onClick={() => setDeleteId(destination.id)}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
-                    </DropdownMenuItem>
+                    {canMutate && (
+                      <DropdownMenuItem onClick={() => handleEdit(destination)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Editar
+                      </DropdownMenuItem>
+                    )}
+                    {canMutate && (
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => setDeleteId(destination.id)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Excluir
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -190,7 +206,7 @@ const Destinos = () => {
               ? 'Tente ajustar sua busca.'
               : 'Comece cadastrando seu primeiro destino turístico.'}
           </p>
-          {!searchQuery && (
+          {!searchQuery && canMutate && (
             <Button className="mt-4" onClick={() => setIsFormOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Novo Destino

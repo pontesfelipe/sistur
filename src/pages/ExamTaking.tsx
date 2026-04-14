@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -56,6 +56,12 @@ const ExamTaking = () => {
   const { startExam } = useExamMutations();
   const { submitAnswer, submitExam } = useExamAnswerMutations();
 
+  // Debounced per-question save. Essays are saved ~800ms after typing stops;
+  // option picks save immediately. A refresh/close mid-exam won't wipe answers.
+  const saveTimers = useRef<Record<string, number>>({});
+  const lastSavedRef = useRef<Record<string, string>>({});
+  const hydratedRef = useRef(false);
+
   // AVA Compliance: session tracking for exams
   const { logInteraction } = useEduSessionTracker({
     sessionType: 'exam',
@@ -70,10 +76,33 @@ const ExamTaking = () => {
   const currentOptions = currentQuestion?.options || [];
   const isEssayQuestion = currentQuestion?.question_type === 'essay';
 
-  // Timer effect
+  // Hydrate answers from server when the attempt arrives (supports refresh mid-exam).
   useEffect(() => {
-    if (!exam || exam.status !== 'started') return;
-    
+    if (hydratedRef.current || !attempt?.answers?.length) return;
+    const restored: Record<string, string> = {};
+    const restoredTypes: Record<string, 'essay' | 'choice'> = {};
+    for (const a of attempt.answers as Array<{ quiz_id: string; selected_option_id: string | null; free_text_answer: string | null }>) {
+      if (a.free_text_answer) {
+        restored[a.quiz_id] = a.free_text_answer;
+        restoredTypes[a.quiz_id] = 'essay';
+      } else if (a.selected_option_id) {
+        restored[a.quiz_id] = a.selected_option_id;
+        restoredTypes[a.quiz_id] = 'choice';
+      }
+    }
+    if (Object.keys(restored).length > 0) {
+      setAnswers(restored);
+      setAnswerTypes(restoredTypes);
+      lastSavedRef.current = { ...restored };
+    }
+    hydratedRef.current = true;
+  }, [attempt]);
+
+  // Timer effect — only starts when an attempt exists so auto-submit can't
+  // silently no-op by racing ahead of the attempt query.
+  useEffect(() => {
+    if (!exam || exam.status !== 'started' || !attempt) return;
+
     const expiresAt = new Date(exam.expires_at).getTime();
     const now = Date.now();
     const remaining = Math.max(0, Math.floor((expiresAt - now) / 1000));
@@ -96,7 +125,26 @@ const ExamTaking = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [exam]);
+  }, [exam, attempt]);
+
+  // Prevent accidental navigation away from an active exam.
+  useEffect(() => {
+    if (!exam || exam.status !== 'started' || submitted) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [exam, submitted]);
+
+  // Flush any pending debounced saves on unmount.
+  useEffect(() => {
+    const timers = saveTimers.current;
+    return () => {
+      for (const t of Object.values(timers)) window.clearTimeout(t);
+    };
+  }, []);
 
   const handleAutoSubmit = async () => {
     if (!examId || submitted) return;
@@ -121,14 +169,44 @@ const ExamTaking = () => {
     }
   };
 
+  const persistAnswer = useCallback(
+    (questionId: string, value: string, type: 'essay' | 'choice') => {
+      if (!attempt) return;
+      if (lastSavedRef.current[questionId] === value) return;
+      lastSavedRef.current[questionId] = value;
+      submitAnswer
+        .mutateAsync({
+          attemptId: attempt.attempt_id,
+          quizId: questionId,
+          selectedOptionId: type === 'essay' ? undefined : value,
+          freeTextAnswer: type === 'essay' ? value : undefined,
+        })
+        .catch(() => {
+          // Allow the next change to retry; don't spam the user with toasts.
+          delete lastSavedRef.current[questionId];
+        });
+    },
+    [attempt, submitAnswer]
+  );
+
   const handleAnswerChange = (questionId: string, answer: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: answer }));
     // Track question type so we don't rely on fragile UUID-length heuristics at submit time.
+    const type: 'essay' | 'choice' = isEssayQuestion ? 'essay' : 'choice';
     setAnswerTypes(prev => ({
       ...prev,
-      [questionId]: isEssayQuestion ? 'essay' : 'choice',
+      [questionId]: type,
     }));
     logInteraction('answer_select', questionId, `Resposta Q${currentQuestionIndex + 1}`);
+
+    // Choice answers save immediately; essays are debounced to ~800ms after typing stops.
+    if (saveTimers.current[questionId]) {
+      window.clearTimeout(saveTimers.current[questionId]);
+    }
+    const delay = type === 'essay' ? 800 : 0;
+    saveTimers.current[questionId] = window.setTimeout(() => {
+      persistAnswer(questionId, answer, type);
+    }, delay);
   };
 
   const handleSubmit = async () => {
@@ -138,20 +216,24 @@ const ExamTaking = () => {
     setSubmitted(true);
 
     try {
-      // Submit all answers
+      // Flush any outstanding debounced saves for answers that differ from what we last persisted.
       for (const [quizId, value] of Object.entries(answers)) {
-        // Use the tracked question type instead of guessing from the answer shape.
-        // Falling back to UUID detection only when the type wasn't tracked (should not happen in practice).
+        if (lastSavedRef.current[quizId] === value) continue;
         const trackedType = answerTypes[quizId];
         const isEssay = trackedType
           ? trackedType === 'essay'
           : !/^[0-9a-f-]{36}$/i.test(value);
+        if (saveTimers.current[quizId]) {
+          window.clearTimeout(saveTimers.current[quizId]);
+          delete saveTimers.current[quizId];
+        }
         await submitAnswer.mutateAsync({
           attemptId: attempt.attempt_id,
           quizId,
           selectedOptionId: isEssay ? undefined : value,
           freeTextAnswer: isEssay ? value : undefined,
         });
+        lastSavedRef.current[quizId] = value;
       }
 
       // Submit the exam
@@ -212,9 +294,15 @@ const ExamTaking = () => {
 
   // Exam completed - show results
   if (result || exam.status === 'submitted') {
-    const finalScore = result?.score || 0;
-    const passed = result?.passed || false;
-    const needsGrading = result?.needsManualGrading || false;
+    // When the user navigates back to the route after submitting, `result` is null
+    // but the attempt row has the final score / grading_mode we need to show the
+    // correct summary (including "Aguardando Correção" for hybrid attempts).
+    const finalScore = result?.score ?? attempt?.score_pct ?? 0;
+    const resultPending = attempt?.result === 'pending' || attempt?.result == null;
+    const passedFromAttempt = attempt?.result === 'passed';
+    const passed = result?.passed ?? passedFromAttempt;
+    const needsGrading = result?.needsManualGrading
+      ?? (attempt?.grading_mode === 'hybrid' || attempt?.grading_mode === 'manual') && resultPending;
 
     return (
       <AppLayout title="Resultado do Exame" subtitle="Veja seu desempenho">
@@ -253,12 +341,12 @@ const ExamTaking = () => {
                   <div className="text-6xl font-bold">
                     {finalScore.toFixed(0)}%
                   </div>
-                  <Progress 
-                    value={finalScore} 
+                  <Progress
+                    value={finalScore}
                     className={`h-4 ${passed ? '[&>div]:bg-green-500' : '[&>div]:bg-red-500'}`}
                   />
                   <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-                    <span>Acertos: {Object.keys(answers).length} / {exam.question_ids?.length || 0}</span>
+                    <span>Pontuação: {finalScore.toFixed(0)}%</span>
                   </div>
                 </>
               )}
@@ -268,7 +356,7 @@ const ExamTaking = () => {
                 Voltar ao Catálogo
               </Button>
               {passed && !needsGrading && (
-                <Button onClick={() => navigate('/edu/certificados')}>
+                <Button onClick={() => navigate('/certificados')}>
                   <Award className="mr-2 h-4 w-4" />
                   Ver Certificados
                 </Button>

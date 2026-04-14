@@ -41,7 +41,7 @@ const VerifyCertificate = () => {
     );
   }
 
-  if (error || !result || !result.valid) {
+  if (error || !result || (!result.valid && !result.certificate)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-4">
         <Card className="w-full max-w-lg border-red-500/30">
@@ -72,6 +72,12 @@ const VerifyCertificate = () => {
 
   const certificate = result.certificate;
   const isValid = result.valid;
+  const revokedReason = certificate?.status === 'revoked' ? certificate.revoked_reason : null;
+  const revokedAt = certificate?.status === 'revoked' ? certificate.revoked_at : null;
+  const verificationUrl =
+    typeof window !== 'undefined' && code
+      ? `${window.location.origin}/verificar-certificado/${code}`
+      : '';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-4">
@@ -112,11 +118,22 @@ const VerifyCertificate = () => {
           <CardContent>
             <div className="text-center mb-6">
               <p className="text-sm text-muted-foreground">
-                {isValid 
+                {isValid
                   ? 'Este certificado é autêntico e foi emitido pela plataforma SISTUR EDU.'
-                  : 'Este certificado não pôde ser verificado.'
+                  : result?.message || 'Este certificado não pôde ser verificado.'
                 }
               </p>
+              {revokedReason && (
+                <div className="mt-4 rounded-md border border-red-500/30 bg-red-500/5 p-3 text-left">
+                  <p className="text-xs font-semibold text-red-700">Motivo da revogação</p>
+                  <p className="text-sm mt-1">{revokedReason}</p>
+                  {revokedAt && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Revogado em {format(new Date(revokedAt), "dd/MM/yyyy", { locale: ptBR })}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -172,8 +189,8 @@ const VerifyCertificate = () => {
               {/* QR Code Section */}
               <div className="flex flex-col items-center p-4 border rounded-lg bg-muted/30">
                 <div className="bg-white p-3 rounded-lg shadow-sm mb-3">
-                  <QRCodeSVG 
-                    value={window.location.href}
+                  <QRCodeSVG
+                    value={verificationUrl}
                     size={100}
                     level="M"
                     includeMargin={false}

@@ -183,7 +183,7 @@ export function useQuizMutations() {
       question, 
       options 
     }: { 
-      question: { pillar: string; level: number; question_type: 'multiple_choice' | 'short_answer' | 'true_false'; stem: string; explanation?: string; difficulty?: number; is_active?: boolean }; 
+      question: { pillar: string; level: number; question_type: 'multiple_choice' | 'true_false' | 'essay'; stem: string; explanation?: string; difficulty?: number; is_active?: boolean };
       options: { option_label: string; option_text: string; is_correct: boolean }[];
     }) => {
       // Create question

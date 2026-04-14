@@ -174,7 +174,7 @@ export function QuestionBankPanel() {
         await createQuiz.mutateAsync({
           question: {
             stem: formData.stem,
-            question_type: formData.question_type as 'multiple_choice' | 'true_false',
+            question_type: formData.question_type,
             pillar: formData.pillar,
             level: formData.level,
             difficulty: formData.difficulty,
@@ -182,7 +182,7 @@ export function QuestionBankPanel() {
           },
           options: optionsFormatted,
         });
-        
+
         toast.success('Questão criada com sucesso!');
       }
       setIsDialogOpen(false);
@@ -208,12 +208,16 @@ export function QuestionBankPanel() {
   const updateOption = (index: number, field: 'text' | 'is_correct', value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
+      // Single-select semantics for is_correct: when a user marks option i as
+      // correct, exactly that row becomes correct and every other row becomes
+      // false. The previous logic cleared `i` itself too, so tapping an option
+      // that was already correct would leave no correct answer.
       options: prev.options.map((opt, i) => {
+        if (field === 'is_correct' && value === true) {
+          return { ...opt, is_correct: i === index };
+        }
         if (i === index) {
           return { ...opt, [field]: value };
-        }
-        if (field === 'is_correct' && value === true) {
-          return { ...opt, is_correct: false };
         }
         return opt;
       }),
@@ -324,7 +328,7 @@ export function QuestionBankPanel() {
                         <SelectContent>
                           <SelectItem value="multiple_choice">Múltipla Escolha</SelectItem>
                           <SelectItem value="true_false">Verdadeiro/Falso</SelectItem>
-                          <SelectItem value="short_answer">Dissertativa</SelectItem>
+                          <SelectItem value="essay">Dissertativa</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -374,7 +378,7 @@ export function QuestionBankPanel() {
                     </div>
                   </div>
 
-                  {formData.question_type === 'multiple_choice' && !editingQuestion && (
+                  {formData.question_type === 'multiple_choice' && (
                     <div className="space-y-4 pt-4 border-t">
                       <Label className="text-base font-semibold">Alternativas</Label>
                       {formData.options.map((opt, idx) => (

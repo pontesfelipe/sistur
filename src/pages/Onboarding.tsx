@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
@@ -38,14 +38,15 @@ export default function Onboarding() {
     );
   }
 
+  // Calling navigate() during render causes "Cannot update a component while
+  // rendering another component" warnings and unpredictable redirects. Using
+  // <Navigate> lets React Router handle the redirect as part of the render.
   if (!user) {
-    navigate('/auth');
-    return null;
+    return <Navigate to="/auth" replace />;
   }
 
   if (!needsOnboarding) {
-    navigate('/');
-    return null;
+    return <Navigate to="/" replace />;
   }
 
   const handleSubmit = async () => {

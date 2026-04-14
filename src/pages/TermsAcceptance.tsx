@@ -1,20 +1,42 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Shield, FileText, ChevronDown, AlertCircle, RefreshCw } from 'lucide-react';
+import { Shield, FileText, ChevronDown, AlertCircle, RefreshCw, LogOut, Loader2 } from 'lucide-react';
 import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export default function TermsAcceptance() {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const { acceptTerms } = useTermsAcceptance();
   const [checked, setChecked] = useState(false);
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Guard: /termos only makes sense for authenticated sessions. Without this,
+  // unauthenticated visitors landed on a dead page where "Aceitar" always
+  // failed with "Not authenticated".
+  if (!authLoading && !user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await supabase.auth.signOut();
+      navigate('/auth', { replace: true });
+    } catch (err) {
+      toast.error('Não foi possível encerrar a sessão. Tente novamente.');
+      setIsSigningOut(false);
+    }
+  };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
@@ -117,6 +139,22 @@ export default function TermsAcceptance() {
           {!scrolledToEnd && (
             <p className="text-xs text-muted-foreground text-center">Role até o final do documento para habilitar a aceitação</p>
           )}
+          <div className="flex items-center justify-center pt-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOut}
+              disabled={isSigningOut || acceptTerms.isPending}
+              className="text-xs text-muted-foreground"
+            >
+              {isSigningOut ? (
+                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+              ) : (
+                <LogOut className="h-3 w-3 mr-1" />
+              )}
+              Sair sem aceitar
+            </Button>
+          </div>
         </div>
       </motion.div>
     </div>

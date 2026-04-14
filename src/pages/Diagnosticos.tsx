@@ -34,35 +34,50 @@ import { useProfile } from '@/hooks/useProfile';
 const Diagnosticos = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const { isViewingDemoData } = useProfile();
   
-  // Get tab and assessment from URL params
+  // Get tab, destination, and assessment from URL params.
+  // `tab=importacao` is a legacy alias redirected to the `indicadores` tab
+  // so that "Preencher Dados" CTAs from DiagnosticoDetalhe land on a real tab
+  // instead of defaulting to "Rodadas".
   const tabFromUrl = searchParams.get('tab');
+  const destinoFromUrl = searchParams.get('destino');
   const assessmentFromUrl = searchParams.get('assessment');
-  const [mainTab, setMainTab] = useState<'rodadas' | 'destinos' | 'indicadores'>(
-    tabFromUrl === 'destinos' ? 'destinos' :
-    tabFromUrl === 'indicadores' ? 'indicadores' : 'rodadas'
-  );
+  const resolveTab = (t: string | null) => {
+    if (t === 'destinos') return 'destinos' as const;
+    if (t === 'indicadores' || t === 'importacao') return 'indicadores' as const;
+    return 'rodadas' as const;
+  };
+  const [mainTab, setMainTab] = useState<'rodadas' | 'destinos' | 'indicadores'>(resolveTab(tabFromUrl));
 
   useEffect(() => {
-    if (tabFromUrl === 'destinos') {
-      setMainTab('destinos');
-    } else if (tabFromUrl === 'indicadores') {
-      setMainTab('indicadores');
-    }
+    setMainTab(resolveTab(tabFromUrl));
   }, [tabFromUrl]);
-  
+
   const { assessments, isLoading, deleteAssessment } = useAssessments();
 
   const filteredAssessments = assessments?.filter((assessment) => {
     const matchesSearch = assessment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (assessment.destinations as any)?.name?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || assessment.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesDestino = !destinoFromUrl || (assessment as any).destination_id === destinoFromUrl;
+    return matchesSearch && matchesStatus && matchesDestino;
   }) ?? [];
+
+  // Scroll/highlight the linked assessment when arriving via ?assessment=...
+  useEffect(() => {
+    if (!assessmentFromUrl || isLoading) return;
+    const el = document.getElementById(`assessment-${assessmentFromUrl}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('ring-2', 'ring-primary');
+      const t = window.setTimeout(() => el.classList.remove('ring-2', 'ring-primary'), 2500);
+      return () => window.clearTimeout(t);
+    }
+  }, [assessmentFromUrl, isLoading, filteredAssessments.length]);
 
   const statusCounts = {
     DRAFT: assessments?.filter(a => a.status === 'DRAFT').length ?? 0,
@@ -81,7 +96,19 @@ const Diagnosticos = () => {
       title="Diagnósticos" 
       subtitle="Rodadas de avaliação dos destinos"
     >
-      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as typeof mainTab)} className="space-y-6">
+      <Tabs
+        value={mainTab}
+        onValueChange={(v) => {
+          const next = v as typeof mainTab;
+          setMainTab(next);
+          // Keep the URL in sync with the active tab so browser Back restores it.
+          const params = new URLSearchParams(searchParams);
+          if (next === 'rodadas') params.delete('tab');
+          else params.set('tab', next);
+          setSearchParams(params, { replace: true });
+        }}
+        className="space-y-6"
+      >
         <TabsList className="w-full max-w-2xl">
           <TabsTrigger value="rodadas" className="gap-2 flex-1">
             <ClipboardList className="h-4 w-4" />
@@ -207,7 +234,8 @@ const Diagnosticos = () => {
               {filteredAssessments.map((assessment, index) => (
                 <div
                   key={assessment.id}
-                  className="animate-fade-in"
+                  id={`assessment-${assessment.id}`}
+                  className="animate-fade-in rounded-lg transition-shadow"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <AssessmentCard 

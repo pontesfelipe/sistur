@@ -322,7 +322,7 @@ const QuizManagement = () => {
                         <SelectContent>
                           <SelectItem value="multiple_choice">Múltipla Escolha</SelectItem>
                           <SelectItem value="true_false">Verdadeiro/Falso</SelectItem>
-                          <SelectItem value="short_answer">Dissertativa</SelectItem>
+                          <SelectItem value="essay">Dissertativa</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

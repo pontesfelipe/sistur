@@ -227,7 +227,10 @@ const Auth = () => {
     }
   };
 
-  if (authLoading) {
+  // Show the spinner while auth is loading OR while we already have a user
+  // and the redirect effect hasn't fired yet — otherwise the freshly-verified
+  // user briefly sees the login form before being sent home.
+  if (authLoading || (user && mode !== 'reset')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
