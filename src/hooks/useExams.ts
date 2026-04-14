@@ -235,10 +235,15 @@ export function useExam(examId?: string) {
       
       if (examError) throw examError;
       
-      // Get exam questions with full quiz data
+      // Get exam questions with full quiz data. We explicitly list the
+      // quiz_options columns we care about (no `*`) to skip `is_correct` —
+      // that column is protected by a column-level REVOKE and would
+      // otherwise trip the query with "permission denied for column".
       const { data: examQuestions, error: qError } = await supabase
         .from('exam_questions')
-        .select('*, quiz_questions(*, quiz_options(*))')
+        .select(
+          '*, quiz_questions(*, quiz_options(option_id, quiz_id, option_label, option_text))'
+        )
         .eq('exam_id', examId)
         .order('display_order', { ascending: true });
       
@@ -497,7 +502,6 @@ export function useExamAttempt(attemptId?: string) {
 
 export function useExamAnswerMutations() {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
 
   const submitAnswer = useMutation({
     mutationFn: async ({ 
@@ -533,172 +537,24 @@ export function useExamAnswerMutations() {
 
   const submitExam = useMutation({
     mutationFn: async (attemptId: string) => {
-      // Get attempt and answers
-      const { data: attempt } = await supabase
-        .from('exam_attempts')
-        .select('*, exams(ruleset_id)')
-        .eq('attempt_id', attemptId)
-        .single();
-      
-      if (!attempt) throw new Error('Attempt not found');
-      
-      const { data: answers } = await supabase
-        .from('exam_answers')
-        .select('*, quiz_options!exam_answers_selected_option_id_fkey(is_correct)')
-        .eq('attempt_id', attemptId);
-      
-      if (!answers || answers.length === 0) throw new Error('No answers found');
+      // Grading, result persistence, quiz-usage bookkeeping and certificate
+      // issuance all run server-side in the `submit_exam_attempt` RPC.
+      // Running them in the browser was exploitable — a student could set
+      // `result='passed'` directly and then INSERT a certificate — so the
+      // entire flow was folded into a SECURITY DEFINER function that
+      // cannot be bypassed from the client.
+      const { data, error } = await supabase.rpc('submit_exam_attempt', {
+        _attempt_id: attemptId,
+      });
 
-      // Look up question types for all answered questions
-      const quizIds = answers.map(a => a.quiz_id);
-      const { data: questionTypes } = await supabase
-        .from('quiz_questions')
-        .select('quiz_id, question_type')
-        .in('quiz_id', quizIds);
-      const typeMap = new Map(questionTypes?.map(q => [q.quiz_id, q.question_type as string]) || []);
-      
-      // Grade answers
-      let earnedPoints = 0;
-      let hasEssay = false;
-      const autoGradableCount = answers.filter(a => typeMap.get(a.quiz_id) !== 'essay').length;
-      const pointsPerQuestion = 100 / answers.length;
-      
-      for (const answer of answers) {
-        const qType = typeMap.get(answer.quiz_id);
-        
-        if (qType === 'essay') {
-          // Essay questions: set pending manual review
-          hasEssay = true;
-          await supabase
-            .from('exam_answers')
-            .update({
-              is_correct: null,
-              awarded_points: 0,
-            })
-            .eq('attempt_id', attemptId)
-            .eq('quiz_id', answer.quiz_id);
-        } else {
-          // Auto-grade multiple choice / true_false / short_answer
-          const isCorrect = answer.quiz_options?.is_correct || false;
-          
-          await supabase
-            .from('exam_answers')
-            .update({
-              is_correct: isCorrect,
-              awarded_points: isCorrect ? pointsPerQuestion : 0,
-            })
-            .eq('attempt_id', attemptId)
-            .eq('quiz_id', answer.quiz_id);
-          
-          if (isCorrect) {
-            earnedPoints += pointsPerQuestion;
-          }
-        }
-      }
-      
-      // Get ruleset for min score
-      let minScorePct = 70; // default
-      if (attempt.exams?.ruleset_id) {
-        const { data: ruleset } = await supabase
-          .from('exam_rulesets')
-          .select('min_score_pct')
-          .eq('ruleset_id', attempt.exams.ruleset_id)
-          .single();
-        
-        if (ruleset) minScorePct = ruleset.min_score_pct;
-      }
-      
-      // If has essay, result is 'pending' until manual grading
-      const gradingMode = hasEssay ? 'hybrid' : 'automatic';
-      const result = hasEssay ? 'pending' : (earnedPoints >= minScorePct ? 'passed' : 'failed');
-      
-      // Update attempt
-      const { data: updatedAttempt, error } = await supabase
-        .from('exam_attempts')
-        .update({
-          score_pct: earnedPoints,
-          result,
-          grading_mode: gradingMode,
-          submitted_at: new Date().toISOString(),
-        })
-        .eq('attempt_id', attemptId)
-        .select()
-        .single();
-      
       if (error) throw error;
-      
-      // Update exam status
-      await supabase
-        .from('exams')
-        .update({ status: 'submitted', submitted_at: new Date().toISOString() })
-        .eq('exam_id', attempt.exam_id);
-      
-      // Auto-generate certificate if passed (automatic grading only)
-      if (result === 'passed' && !hasEssay && user?.id) {
-        try {
-          // Get course details for certificate
-          const { data: examData } = await supabase
-            .from('exams')
-            .select('course_id, course_version')
-            .eq('exam_id', attempt.exam_id)
-            .single();
-          
-          if (examData) {
-            const { data: course } = await supabase
-              .from('lms_courses')
-              .select('title, primary_pillar, workload_minutes')
-              .eq('course_id', examData.course_id)
-              .single();
-            
-            if (course) {
-              // Generate verification code
-              const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-              let verificationCode = '';
-              for (let i = 0; i < 16; i++) {
-                verificationCode += chars.charAt(Math.floor(Math.random() * chars.length));
-              }
-              
-              const { data: certIdResult } = await supabase.rpc('generate_certificate_id');
-              const certificateId = certIdResult || `CERT-${new Date().getFullYear()}-${Date.now()}`;
-              const qrVerifyUrl = `${window.location.origin}/verify/${verificationCode}`;
-              
-              await supabase
-                .from('lms_certificates')
-                .insert({
-                  certificate_id: certificateId,
-                  user_id: user.id,
-                  course_id: examData.course_id,
-                  course_version: examData.course_version,
-                  attempt_id: attemptId,
-                  workload_minutes: course.workload_minutes || 60,
-                  pillar_scope: course.primary_pillar,
-                  verification_code: verificationCode,
-                  qr_verify_url: qrVerifyUrl,
-                  status: 'active',
-                });
-            }
-          }
-        } catch (certError) {
-          console.error('Auto-certificate generation failed:', certError);
-          // Don't fail the exam submission if certificate generation fails
-        }
-      }
-
-      // Update quiz usage history
-      for (const answer of answers) {
-        await supabase
-          .from('quiz_usage_history')
-          .upsert({
-            user_id: attempt.user_id,
-            quiz_id: answer.quiz_id,
-            last_used_at: new Date().toISOString(),
-            times_used: 1,
-          }, {
-            onConflict: 'user_id,quiz_id',
-          });
-      }
-      
-      return updatedAttempt;
+      return data as {
+        attempt_id: string;
+        score_pct: number;
+        result: 'passed' | 'failed' | 'pending';
+        grading_mode: 'automatic' | 'hybrid' | 'manual';
+        certificate_id: string | null;
+      };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['exam-attempt'] });

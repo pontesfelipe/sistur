@@ -78,53 +78,31 @@ export function useExamReview(attemptId?: string) {
 
       if (attErr) throw attErr;
 
-      // Get answers
-      const { data: answers, error: ansErr } = await supabase
-        .from('exam_answers')
-        .select('*')
-        .eq('attempt_id', attemptId);
+      // Review reads go through a SECURITY DEFINER RPC. Client-side selects
+      // on `quiz_options` no longer return `is_correct` (column-level
+      // REVOKE), so this RPC is the canonical way to show a student which
+      // option was right after the attempt is submitted. It also rejects
+      // reads of in-progress attempts.
+      const { data: reviewRows, error: reviewErr } = await supabase.rpc(
+        'review_exam_answers',
+        { _attempt_id: attemptId }
+      );
 
-      if (ansErr) throw ansErr;
+      if (reviewErr) throw reviewErr;
 
-      // Get question details for all answered questions
-      const quizIds = answers?.map(a => a.quiz_id) || [];
-      let questions: any[] = [];
-      let allOptions: any[] = [];
-
-      if (quizIds.length > 0) {
-        const { data: qs } = await supabase
-          .from('quiz_questions')
-          .select('quiz_id, stem, question_type, explanation')
-          .in('quiz_id', quizIds);
-        questions = qs || [];
-
-        const { data: opts } = await supabase
-          .from('quiz_options')
-          .select('option_id, quiz_id, option_label, option_text, is_correct')
-          .in('quiz_id', quizIds)
-          .order('option_label', { ascending: true });
-        allOptions = opts || [];
-      }
-
-      const questionMap = new Map(questions.map(q => [q.quiz_id, q]));
-      const optionsMap = new Map<string, any[]>();
-      allOptions.forEach(o => {
-        const arr = optionsMap.get(o.quiz_id) || [];
-        arr.push(o);
-        optionsMap.set(o.quiz_id, arr);
-      });
-
-      // Enrich answers with question data
-      const enrichedAnswers = (answers || []).map(a => {
-        const q = questionMap.get(a.quiz_id);
-        return {
-          ...a,
-          stem: q?.stem || 'Questão',
-          question_type: q?.question_type || 'multiple_choice',
-          explanation: q?.explanation || null,
-          options: optionsMap.get(a.quiz_id) || [],
-        };
-      });
+      const enrichedAnswers = (reviewRows || []).map((row: any) => ({
+        attempt_id: attemptId,
+        quiz_id: row.quiz_id,
+        selected_option_id: row.selected_option_id,
+        free_text_answer: row.free_text_answer,
+        is_correct: row.is_correct,
+        awarded_points: row.awarded_points,
+        answered_at: row.answered_at,
+        stem: row.stem || 'Questão',
+        question_type: row.question_type || 'multiple_choice',
+        explanation: row.explanation || null,
+        options: row.options || [],
+      }));
 
       return {
         ...attempt,
