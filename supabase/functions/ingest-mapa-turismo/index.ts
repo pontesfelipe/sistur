@@ -301,7 +301,7 @@ Deno.serve(async (req) => {
           ibge_code: data.nuMunicipioIbge,
           regiao_turistica: data.noRegiaoTuristica,
           macrorregiao: data.noRegiao,
-          categoria: { '1': 'A', '2': 'B', '3': 'C' }[data.coCluster] || null,
+          categoria: ({ '1': 'A', '2': 'B', '3': 'C' } as Record<string, string>)[data.coCluster] || null,
           municipality_type: inferMunicipalityType(data.coCluster || ''),
           empregos_turismo: parseNumericString(data.qtEmprego),
           estabelecimentos_turismo: parseNumericString(data.qtEstabelecimento),

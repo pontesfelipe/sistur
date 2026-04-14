@@ -543,7 +543,7 @@ export function useExamAnswerMutations() {
       // `result='passed'` directly and then INSERT a certificate — so the
       // entire flow was folded into a SECURITY DEFINER function that
       // cannot be bypassed from the client.
-      const { data, error } = await supabase.rpc('submit_exam_attempt', {
+      const { data, error } = await (supabase.rpc as any)('submit_exam_attempt', {
         _attempt_id: attemptId,
       });
 
