@@ -7265,6 +7265,10 @@ export type Database = {
         Returns: number
       }
       expire_trial_licenses: { Args: never; Returns: undefined }
+      finalize_essay_grading: {
+        Args: { _attempt_id: string; _grades: Json }
+        Returns: Json
+      }
       flag_suspicious_edu_sessions: { Args: never; Returns: undefined }
       generate_certificate_id: { Args: never; Returns: string }
       get_dashboard_org_access_flags: {
