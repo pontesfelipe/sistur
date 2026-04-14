@@ -204,10 +204,15 @@ export default function NovaRodada() {
       if (!selectedDestination) { toast({ title: 'Selecione um destino', variant: 'destructive' }); return; }
       setCurrentStep(3);
     } else if (currentStep === 3) {
-      if (!assessmentTitle) { toast({ title: 'Informe o título do diagnóstico', variant: 'destructive' }); return; }
+      if (!assessmentTitle.trim()) { toast({ title: 'Informe o título do diagnóstico', variant: 'destructive' }); return; }
+      if (periodStart && periodEnd && new Date(periodStart) > new Date(periodEnd)) {
+        toast({ title: 'Período inválido', description: 'A data de início deve ser anterior ou igual à data de fim.', variant: 'destructive' });
+        return;
+      }
+      if (createAssessment.isPending) return; // Guard against double-click creating duplicate assessments.
       try {
         const result = await createAssessment.mutateAsync({
-          title: assessmentTitle, destination_id: selectedDestination, period_start: periodStart || null,
+          title: assessmentTitle.trim(), destination_id: selectedDestination, period_start: periodStart || null,
           period_end: periodEnd || null, visibility, tier: selectedTier, diagnostic_type: diagnosticType,
         });
         setCreatedAssessmentId(result.id);

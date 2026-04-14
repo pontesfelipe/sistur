@@ -157,7 +157,15 @@ export default function Game() {
 
   const handlePlayCard = useCallback((index: number) => {
     const card = game.state.deck.hand[index];
-    const category = card?.category as 'RA' | 'OE' | 'AO';
+    if (!card) {
+      toast.error('Carta inválida.');
+      return;
+    }
+    if (card.category !== 'RA' && card.category !== 'OE' && card.category !== 'AO') {
+      toast.error('Categoria de carta desconhecida.');
+      return;
+    }
+    const category = card.category;
     game.playCard(index);
     setSelectedCardIndex(null);
     // Trigger screen flash + row ripple

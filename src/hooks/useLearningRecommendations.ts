@@ -276,14 +276,22 @@ export function useLearningRun(runId?: string) {
         .select('*')
         .in('training_id', trainingIds);
 
-      const enrichedRecommendations = (recommendations || []).map(rec => {
-        const training = trainings?.find(t => t.training_id === rec.entity_id);
-        return {
-          ...rec,
-          training: training as EduTraining | undefined,
-          reasons: (rec.reasons || []) as unknown as RecommendationReason[],
-        };
-      });
+      const enrichedRecommendations = (recommendations || [])
+        .map(rec => {
+          const training = trainings?.find(t => t.training_id === rec.entity_id);
+          return {
+            ...rec,
+            training: training as EduTraining | undefined,
+            reasons: (rec.reasons || []) as unknown as RecommendationReason[],
+          };
+        })
+        // Drop recommendations whose underlying course/live training no longer exists or was soft-deleted,
+        // so the UI doesn't crash reading `training.title`.
+        .filter(rec =>
+          rec.entity_type !== 'course' && rec.entity_type !== 'live'
+            ? true
+            : !!rec.training
+        );
 
       return {
         ...run,

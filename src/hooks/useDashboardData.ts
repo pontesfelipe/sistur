@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { getSeverityFromScore } from '@/lib/igmaEngine';
 
 export function useDashboardStats() {
   return useQuery({
@@ -164,11 +165,14 @@ export function useDestinationPillarScores(destinationId: string | undefined) {
         pillarAggregates[ps.pillar].push(ps.score);
       });
 
-      return Object.entries(pillarAggregates).map(([pillar, scores]) => ({
-        pillar: pillar as 'RA' | 'OE' | 'AO',
-        score: scores.reduce((a, b) => a + b, 0) / scores.length,
-        severity: 'MODERADO' as const,
-      }));
+      return Object.entries(pillarAggregates).map(([pillar, scores]) => {
+        const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+        return {
+          pillar: pillar as 'RA' | 'OE' | 'AO',
+          score: avgScore,
+          severity: getSeverityFromScore(avgScore),
+        };
+      });
     },
     enabled: !!destinationId,
   });

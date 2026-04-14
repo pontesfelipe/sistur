@@ -30,11 +30,28 @@ export function useCalculateAssessment() {
       });
 
       if (funcError) {
+        console.error('Calculate assessment edge function error:', {
+          assessmentId,
+          errorMessage: funcError.message,
+          timestamp: new Date().toISOString(),
+        });
         throw new Error(funcError.message);
+      }
+
+      if (!data) {
+        throw new Error('Resposta vazia do serviço de cálculo');
       }
 
       if (data.error) {
         throw new Error(data.error);
+      }
+
+      if (data.success !== true) {
+        throw new Error('O serviço de cálculo não sinalizou sucesso — verifique os dados do diagnóstico.');
+      }
+
+      if (typeof data.issues_created !== 'number' || typeof data.recommendations_created !== 'number') {
+        throw new Error('Resposta inválida do cálculo: contadores ausentes.');
       }
 
       toast.success('Cálculo realizado com sucesso!', {
