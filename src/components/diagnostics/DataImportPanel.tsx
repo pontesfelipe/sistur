@@ -265,10 +265,16 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       toast.error('Não foi possível ler o arquivo.');
     };
     reader.onload = (e) => {
-      const text = e.target?.result as string;
-      if (!text) {
+      const buffer = e.target?.result as ArrayBuffer;
+      if (!buffer) {
         toast.error('Arquivo vazio.');
         return;
+      }
+
+      // Try UTF-8 first; if it produces replacement chars, fall back to Latin1 (Windows-1252)
+      let text = new TextDecoder('utf-8').decode(buffer);
+      if (text.includes('\uFFFD')) {
+        text = new TextDecoder('windows-1252').decode(buffer);
       }
 
       // Strip UTF-8 BOM if present so the first header cell matches.
