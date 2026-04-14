@@ -436,7 +436,7 @@ export async function exportTechnicalDocx() {
         bullet('calculate-assessment: Execução do pipeline IGMA completo', 'bullets'),
         bullet('beni-chat: IA conversacional contextualizada com dados do destino', 'bullets'),
         bullet('generate-report: Relatórios personalizados via IA com templates', 'bullets'),
-        bullet('fetch-official-data: Proxy para APIs oficiais (IBGE, CADASTUR)', 'bullets'),
+        bullet('fetch-official-data: Proxy para APIs oficiais (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo)', 'bullets'),
         bullet('ingest-mapa-turismo: Ingestão de dados do Mapa do Turismo Brasileiro', 'bullets'),
         bullet('ingest-youtube: Metadados de vídeos para biblioteca EDU', 'bullets'),
         bullet('moderate-image: Moderação de conteúdo via IA', 'bullets'),
