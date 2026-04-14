@@ -161,78 +161,8 @@ function formatDataSnapshots(snapshots: any[]): string {
   return result;
 }
 
-function formatCommunityFeedback(feedback: any[]): string {
-  if (!feedback || feedback.length === 0) return '';
-  
-  const totalResponses = feedback.length;
-  const avgQoL = feedback.reduce((sum, f) => sum + (f.quality_of_life_score || 0), 0) / totalResponses;
-  const avgCultural = feedback.reduce((sum, f) => sum + (f.cultural_preservation_score || 0), 0) / totalResponses;
-  const avgEnv = feedback.reduce((sum, f) => sum + (f.environmental_concern_level || 0), 0) / totalResponses;
-  
-  const perceptions: Record<string, number> = {};
-  feedback.forEach(f => {
-    if (f.tourism_impact_perception) {
-      perceptions[f.tourism_impact_perception] = (perceptions[f.tourism_impact_perception] || 0) + 1;
-    }
-  });
 
-  const allConcerns: Record<string, number> = {};
-  feedback.forEach(f => {
-    (f.concerns || []).forEach((c: string) => {
-      allConcerns[c] = (allConcerns[c] || 0) + 1;
-    });
-  });
-  const topConcerns = Object.entries(allConcerns).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-  const allPriorities: Record<string, number> = {};
-  feedback.forEach(f => {
-    (f.priorities || []).forEach((p: string) => {
-      allPriorities[p] = (allPriorities[p] || 0) + 1;
-    });
-  });
-  const topPriorities = Object.entries(allPriorities).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-  let result = `\n=== FEEDBACK DA COMUNIDADE LOCAL ===\n`;
-  result += `Total de respostas: ${totalResponses}\n\n`;
-  result += `Médias de Percepção (escala 1-5):\n`;
-  result += `- Qualidade de Vida: ${avgQoL.toFixed(1)}/5\n`;
-  result += `- Preservação Cultural: ${avgCultural.toFixed(1)}/5\n`;
-  result += `- Preocupação Ambiental: ${avgEnv.toFixed(1)}/5\n\n`;
-  
-  if (Object.keys(perceptions).length > 0) {
-    result += `Percepção do Impacto do Turismo:\n`;
-    for (const [perception, count] of Object.entries(perceptions)) {
-      result += `- ${perception}: ${count} respostas (${((count / totalResponses) * 100).toFixed(0)}%)\n`;
-    }
-    result += '\n';
-  }
-
-  if (topConcerns.length > 0) {
-    result += `Principais Preocupações da Comunidade:\n`;
-    topConcerns.forEach(([concern, count]) => {
-      result += `- ${concern}: ${count} menções\n`;
-    });
-    result += '\n';
-  }
-
-  if (topPriorities.length > 0) {
-    result += `Prioridades da Comunidade:\n`;
-    topPriorities.forEach(([priority, count]) => {
-      result += `- ${priority}: ${count} menções\n`;
-    });
-    result += '\n';
-  }
-
-  // Collect unique suggestions
-  const allSuggestions = feedback.flatMap(f => f.suggestions || []).filter(Boolean);
-  if (allSuggestions.length > 0) {
-    result += `Sugestões da Comunidade (amostra):\n`;
-    const unique = [...new Set(allSuggestions)].slice(0, 8);
-    unique.forEach(s => { result += `- "${s}"\n`; });
-  }
-
-  return result;
-}
 
 function formatDestinationMetadata(dest: any): string {
   if (!dest) return '';
@@ -318,7 +248,6 @@ Os dados do diagnóstico são coletados automaticamente de fontes oficiais e com
 - STN / Tesouro Nacional: Receita própria, Despesa com turismo. Confiabilidade: ALTA (5/5).
 - CADASTUR / dados.gov.br: Guias de turismo, Agências de turismo, Meios de hospedagem. Confiabilidade: ALTA (4/5 — atualização trimestral).
 - Mapa do Turismo Brasileiro (API REST mapa.turismo.gov.br): Categoria (A-E), Região turística, Empregos formais em turismo, Estabelecimentos turísticos, Visitantes nacionais e internacionais, Arrecadação turística, Conselho municipal de turismo. Confiabilidade: ALTA (5/5).
-- Feedback da Comunidade Local: Pesquisas de percepção sobre qualidade de vida, preservação cultural e impacto ambiental do turismo. Confiabilidade: MODERADA (3/5 — amostra local).
 - Dados de preenchimento manual: Taxa de escolarização e quaisquer indicadores que não retornem valor oficial válido no momento da coleta.
 - Base de Conhecimento (KB): Documentos locais do destino (PDFs, relatórios, planos diretores) e referências nacionais com resumos extraídos por IA.
 
