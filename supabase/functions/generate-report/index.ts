@@ -304,10 +304,7 @@ ESTRUTURA OBRIGATÓRIA:
 ## 4. Quick Wins
 - 3 ações de baixo custo e alto impacto, cada uma em 2-3 linhas
 
-## 5. Voz da Comunidade
-- Se houver feedback da comunidade, incluir resumo das percepções e preocupações principais (2-3 frases)
-
-## 6. Próxima Revisão
+## 5. Próxima Revisão
 - Data recomendada e o que monitorar
 
 NÃO INCLUA: contextualização histórica, metodologia detalhada, inventário turístico, considerações filosóficas. Vá direto aos resultados e ações.`;
