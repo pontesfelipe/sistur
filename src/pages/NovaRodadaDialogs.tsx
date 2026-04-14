@@ -105,12 +105,18 @@ export function NovaRodadaDialogs({
       {/* Step 5 Enterprise: KPI Data Entry */}
       {currentStep === 5 && diagnosticType === 'enterprise' && (
         createdAssessmentId ? (
-          <EnterpriseDataEntryPanel
-            assessmentId={createdAssessmentId}
-            tier={selectedTier}
-            onComplete={() => onSetCurrentStep(6)}
-            initialAutoFillValues={reviewPreFillValues}
-          />
+          <div className="space-y-4">
+            <Button variant="outline" onClick={onPreviousStep} className="mb-2">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar ao Perfil
+            </Button>
+            <EnterpriseDataEntryPanel
+              assessmentId={createdAssessmentId}
+              tier={selectedTier}
+              onComplete={() => onSetCurrentStep(6)}
+              initialAutoFillValues={reviewPreFillValues}
+            />
+          </div>
         ) : (
           <Card>
             <CardContent className="py-12 text-center">
