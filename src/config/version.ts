@@ -23,6 +23,20 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.19.4",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "Relatórios agora integram TODAS as fontes de dados: snapshots de proveniência, feedback da comunidade, valores Enterprise e metadados do destino",
+      "Seção 'Proveniência dos Dados' com rastreabilidade completa por fonte oficial (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo)",
+      "Feedback da comunidade local incorporado na análise: percepções, preocupações e sugestões",
+      "Valores brutos Enterprise com benchmarks e categorias funcionais incluídos nos relatórios empresariais",
+      "Metadados do destino (região turística, categoria, PDT) enriquecem a contextualização",
+      "Prompts de IA atualizados para citar fontes específicas em cada dado e incluir seção de Fontes e Referências",
+      "KB do destino e referências globais com instruções reforçadas para citação no relatório",
+    ],
+  },
+  {
     version: "1.19.3",
     date: "2026-04-14",
     type: "patch" as const,
