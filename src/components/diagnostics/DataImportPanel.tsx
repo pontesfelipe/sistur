@@ -273,6 +273,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
       // Strip UTF-8 BOM if present so the first header cell matches.
       const cleaned = text.replace(/^\uFEFF/, '');
+      const sep = detectSeparator(cleaned);
       const lines = cleaned.split(/\r?\n/).filter(line => line.trim().length > 0);
 
       if (lines.length < 2) {
@@ -286,7 +287,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
       const parsed: ParsedRow[] = dataLines.map((line, idx) => {
         const rowNumber = idx + 2; // account for header
-        const cells = parseCsvLine(line);
+        const cells = parseCsvLine(line, sep);
 
         if (cells.length < 2) {
           return {
