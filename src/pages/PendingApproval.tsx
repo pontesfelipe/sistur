@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
@@ -9,9 +8,8 @@ import { Loader2, Clock, LogOut, RefreshCw } from 'lucide-react';
 
 export default function PendingApproval() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { user, loading: authLoading, signOut } = useAuth();
-  const { profile, loading: profileLoading } = useProfile();
+  const { profile, loading: profileLoading, refetchProfile } = useProfile();
   const [refreshing, setRefreshing] = useState(false);
 
   if (authLoading || profileLoading) {
@@ -37,13 +35,12 @@ export default function PendingApproval() {
     navigate('/auth');
   };
 
-  // Prefer invalidating the profile query over a hard reload — it's faster
-  // and preserves React Query cache for everything else.
+  // Refetch profile from ProfileContext so the local state updates and
+  // the redirect logic on line 31 triggers when the user has been approved.
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      await queryClient.invalidateQueries({ queryKey: ['user-roles'] });
+      await refetchProfile();
     } finally {
       setRefreshing(false);
     }
