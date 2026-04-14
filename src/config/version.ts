@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 19,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.19.1",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "Corrigida navegação duplicada no passo 5 Enterprise (botões do painel + botões do wizard)",
+      "Botão 'Voltar ao Perfil' adicionado no passo 5 Enterprise para navegação consistente",
+      "orgId corrigido para usar effectiveOrgId (compatibilidade com modo Demo)",
+    ],
+  },
   {
     version: "1.19.0",
     date: "2026-04-13",
