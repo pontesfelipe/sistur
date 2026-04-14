@@ -552,7 +552,8 @@ export default function Relatorios() {
                           </SelectItem>
                         ) : (
                           calculatedAssessments.map((assessment) => {
-                            const dest = destinations?.find(d => d.id === assessment.destination_id);
+                            const dest = destinations?.find(d => d.id === assessment.destination_id)
+                              ?? { name: (assessment as any).destinations?.name || 'Destino' };
                             const calcDate = assessment.calculated_at 
                               ? format(new Date(assessment.calculated_at), "dd/MM/yy", { locale: ptBR })
                               : format(new Date(assessment.created_at), "dd/MM/yy", { locale: ptBR });
