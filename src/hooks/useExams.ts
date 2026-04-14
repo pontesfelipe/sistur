@@ -235,10 +235,8 @@ export function useExam(examId?: string) {
       
       if (examError) throw examError;
       
-      // Get exam questions with full quiz data. We explicitly list the
-      // quiz_options columns we care about (no `*`) to skip `is_correct` —
-      // that column is protected by a column-level REVOKE and would
-      // otherwise trip the query with "permission denied for column".
+      // Explicit column list on quiz_options skips `is_correct`, which is
+      // column-level REVOKE'd for students.
       const { data: examQuestions, error: qError } = await supabase
         .from('exam_questions')
         .select(
@@ -537,12 +535,8 @@ export function useExamAnswerMutations() {
 
   const submitExam = useMutation({
     mutationFn: async (attemptId: string) => {
-      // Grading, result persistence, quiz-usage bookkeeping and certificate
-      // issuance all run server-side in the `submit_exam_attempt` RPC.
-      // Running them in the browser was exploitable — a student could set
-      // `result='passed'` directly and then INSERT a certificate — so the
-      // entire flow was folded into a SECURITY DEFINER function that
-      // cannot be bypassed from the client.
+      // Server-side grading + certificate issuance. Writing those columns
+      // from the client is intentionally impossible (column-level REVOKE).
       const { data, error } = await supabase.rpc('submit_exam_attempt', {
         _attempt_id: attemptId,
       });

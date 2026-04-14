@@ -120,6 +120,61 @@ GRANT  UPDATE (selected_option_id, free_text_answer, answered_at) ON public.exam
 -- (c) Certificate issuance is server-only
 REVOKE INSERT, UPDATE, DELETE ON public.lms_certificates FROM authenticated;
 
+-- (c1) Private helper: issues a certificate for a passed attempt, no-op if one
+--      already exists. Called by both submit_exam_attempt (automatic grading)
+--      and finalize_essay_grading (hybrid grading). SECURITY DEFINER — the
+--      callers already enforce authorization.
+CREATE OR REPLACE FUNCTION public._issue_attempt_certificate(_attempt_id uuid)
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  _user_id uuid;
+  _course_id uuid;
+  _course_version int;
+  _primary_pillar text;
+  _workload_minutes int;
+  _cert_id text;
+  _verification_code text := '';
+  _chars text := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  _i int;
+BEGIN
+  IF EXISTS (SELECT 1 FROM public.lms_certificates WHERE attempt_id = _attempt_id) THEN
+    RETURN NULL;
+  END IF;
+
+  SELECT a.user_id, e.course_id, e.course_version, c.primary_pillar, c.workload_minutes
+    INTO _user_id, _course_id, _course_version, _primary_pillar, _workload_minutes
+    FROM public.exam_attempts a
+    JOIN public.exams e ON e.exam_id = a.exam_id
+    JOIN public.lms_courses c ON c.course_id = e.course_id
+   WHERE a.attempt_id = _attempt_id;
+
+  IF _primary_pillar IS NULL THEN
+    RETURN NULL;
+  END IF;
+
+  FOR _i IN 1..16 LOOP
+    _verification_code := _verification_code
+      || substr(_chars, 1 + floor(random() * length(_chars))::int, 1);
+  END LOOP;
+  _cert_id := public.generate_certificate_id();
+
+  INSERT INTO public.lms_certificates (
+    certificate_id, user_id, course_id, course_version, attempt_id,
+    workload_minutes, pillar_scope, verification_code, status
+  ) VALUES (
+    _cert_id, _user_id, _course_id, _course_version, _attempt_id,
+    COALESCE(_workload_minutes, 60), _primary_pillar, _verification_code, 'active'
+  );
+
+  RETURN _cert_id;
+END;
+$$;
+REVOKE EXECUTE ON FUNCTION public._issue_attempt_certificate(uuid) FROM PUBLIC, authenticated, anon;
+
 -- (d) Server-side grading + certificate issuance RPC
 CREATE OR REPLACE FUNCTION public.submit_exam_attempt(_attempt_id uuid)
 RETURNS jsonb
@@ -131,21 +186,13 @@ DECLARE
   _user_id uuid;
   _exam_id uuid;
   _ruleset_id uuid;
-  _course_id uuid;
-  _course_version int;
   _min_score numeric := 70;
   _total int;
   _earned numeric := 0;
   _has_essay boolean := false;
   _result public.exam_result_type;
   _grading_mode public.grading_mode_type;
-  _course_title text;
-  _primary_pillar text;
-  _workload_minutes int;
   _cert_id text;
-  _verification_code text := '';
-  _chars text := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  _i int;
 BEGIN
   SELECT a.user_id, a.exam_id
   INTO _user_id, _exam_id
@@ -166,8 +213,7 @@ BEGIN
     RAISE EXCEPTION 'attempt already submitted';
   END IF;
 
-  SELECT ruleset_id, course_id, course_version
-  INTO _ruleset_id, _course_id, _course_version
+  SELECT ruleset_id INTO _ruleset_id
   FROM public.exams WHERE exam_id = _exam_id;
 
   IF _ruleset_id IS NOT NULL THEN
@@ -240,27 +286,9 @@ BEGIN
     SET last_used_at = EXCLUDED.last_used_at,
         times_used = public.quiz_usage_history.times_used + 1;
 
-  -- Issue certificate on automatic passes only; hybrid waits for manual review
+  -- Hybrid exams wait for manual review; only automatic passes get a cert now.
   IF _result = 'passed' AND NOT _has_essay THEN
-    SELECT title, primary_pillar, workload_minutes
-      INTO _course_title, _primary_pillar, _workload_minutes
-      FROM public.lms_courses WHERE course_id = _course_id;
-
-    IF _primary_pillar IS NOT NULL THEN
-      FOR _i IN 1..16 LOOP
-        _verification_code := _verification_code
-          || substr(_chars, 1 + floor(random() * length(_chars))::int, 1);
-      END LOOP;
-      _cert_id := public.generate_certificate_id();
-
-      INSERT INTO public.lms_certificates (
-        certificate_id, user_id, course_id, course_version, attempt_id,
-        workload_minutes, pillar_scope, verification_code, status
-      ) VALUES (
-        _cert_id, _user_id, _course_id, _course_version, _attempt_id,
-        COALESCE(_workload_minutes, 60), _primary_pillar, _verification_code, 'active'
-      );
-    END IF;
+    _cert_id := public._issue_attempt_certificate(_attempt_id);
   END IF;
 
   RETURN jsonb_build_object(
@@ -276,6 +304,111 @@ $$;
 GRANT EXECUTE ON FUNCTION public.submit_exam_attempt(uuid) TO authenticated;
 
 -- -----------------------------------------------------------------------------
+-- Essay grading RPC (companion to submit_exam_attempt)
+-- -----------------------------------------------------------------------------
+-- Hybrid exams submit with result='pending'. A grader (ADMIN) calls this RPC
+-- with the awarded points + optional comments; the function writes the
+-- grading columns (which are column-level REVOKE'd for direct writes),
+-- recomputes the overall score, flips the attempt result, and issues a
+-- certificate if the candidate now passes.
+CREATE OR REPLACE FUNCTION public.finalize_essay_grading(
+  _attempt_id uuid,
+  _grades jsonb
+) RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  _exam_id uuid;
+  _ruleset_id uuid;
+  _min_score numeric := 70;
+  _earned numeric := 0;
+  _result public.exam_result_type;
+  _cert_id text;
+  _grade jsonb;
+BEGIN
+  IF NOT public.has_role(auth.uid(), 'ADMIN'::public.app_role) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  SELECT exam_id INTO _exam_id
+    FROM public.exam_attempts
+   WHERE attempt_id = _attempt_id
+     AND submitted_at IS NOT NULL
+     AND grading_mode IN ('hybrid', 'manual');
+  IF _exam_id IS NULL THEN
+    RAISE EXCEPTION 'attempt not found or not gradable';
+  END IF;
+
+  -- Apply each grade. Caller passes an array of
+  -- { quiz_id, awarded_points, comment }.
+  FOR _grade IN SELECT * FROM jsonb_array_elements(_grades)
+  LOOP
+    UPDATE public.exam_answers
+       SET awarded_points = GREATEST(0, (_grade->>'awarded_points')::numeric),
+           is_correct     = ((_grade->>'awarded_points')::numeric > 0),
+           grader_comment = NULLIF(_grade->>'comment', '')
+     WHERE attempt_id = _attempt_id
+       AND quiz_id = (_grade->>'quiz_id')::uuid;
+  END LOOP;
+
+  SELECT ruleset_id INTO _ruleset_id FROM public.exams WHERE exam_id = _exam_id;
+  IF _ruleset_id IS NOT NULL THEN
+    SELECT min_score_pct INTO _min_score
+      FROM public.exam_rulesets WHERE ruleset_id = _ruleset_id;
+  END IF;
+
+  SELECT COALESCE(SUM(awarded_points), 0) INTO _earned
+    FROM public.exam_answers WHERE attempt_id = _attempt_id;
+
+  _result := CASE WHEN _earned >= _min_score THEN 'passed' ELSE 'failed' END;
+
+  UPDATE public.exam_attempts
+     SET score_pct = _earned, result = _result
+   WHERE attempt_id = _attempt_id;
+
+  IF _result = 'passed' THEN
+    _cert_id := public._issue_attempt_certificate(_attempt_id);
+  END IF;
+
+  RETURN jsonb_build_object(
+    'attempt_id', _attempt_id,
+    'score_pct', _earned,
+    'result', _result,
+    'certificate_id', _cert_id
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.finalize_essay_grading(uuid, jsonb) TO authenticated;
+
+-- Revoke a certificate. UPDATE on lms_certificates is REVOKE'd from
+-- authenticated above; admins revoke through this gated RPC instead.
+CREATE OR REPLACE FUNCTION public.revoke_certificate(
+  _certificate_id text,
+  _reason text
+) RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT public.has_role(auth.uid(), 'ADMIN'::public.app_role) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  UPDATE public.lms_certificates
+     SET status = 'revoked',
+         revoked_at = now(),
+         revoked_reason = _reason
+   WHERE certificate_id = _certificate_id;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.revoke_certificate(text, text) TO authenticated;
+
+-- -----------------------------------------------------------------------------
 -- Finding #2 [CRITICAL]: quiz_options.is_correct readable by students
 -- -----------------------------------------------------------------------------
 -- Root cause: `quiz_options` SELECT policy returns every column — including
@@ -288,27 +421,9 @@ GRANT EXECUTE ON FUNCTION public.submit_exam_attempt(uuid) TO authenticated;
 REVOKE SELECT (is_correct) ON public.quiz_options FROM authenticated;
 REVOKE SELECT (is_correct) ON public.quiz_options FROM anon;
 
--- Admin RPC: question-bank editor reads full options including is_correct
-CREATE OR REPLACE FUNCTION public.admin_get_quiz_options(_quiz_id uuid)
-RETURNS SETOF public.quiz_options
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT *
-    FROM public.quiz_options
-   WHERE quiz_id = _quiz_id
-     AND public.has_role(auth.uid(), 'ADMIN'::public.app_role)
-   ORDER BY option_label;
-$$;
-
-GRANT EXECUTE ON FUNCTION public.admin_get_quiz_options(uuid) TO authenticated;
-
--- Admin RPC: batch variant for the question-bank list view so we don't issue
--- one round trip per question after the column-level REVOKE above breaks the
--- previous PostgREST `quiz_options(*)` join. Accepts NULL to return every
--- option visible to the admin (used when no filter is applied).
+-- Admin RPC: returns full option rows (including `is_correct`) for one or
+-- many quizzes. Accepts NULL to return every option the caller can see.
+-- Used by both the question-bank list view and the single-question editor.
 CREATE OR REPLACE FUNCTION public.admin_list_quiz_options(_quiz_ids uuid[] DEFAULT NULL)
 RETURNS SETOF public.quiz_options
 LANGUAGE sql

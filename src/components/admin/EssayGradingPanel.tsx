@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchProfileNamesByIds } from '@/services/profiles';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,11 +41,21 @@ interface PendingAttempt {
   essay_answers: (EssayAnswer & { stem: string; max_points: number })[];
 }
 
+type AttemptRow = {
+  attempt_id: string;
+  exam_id: string | null;
+  user_id: string | null;
+  score_pct: number | null;
+  submitted_at: string | null;
+  grading_mode: string | null;
+  result: string | null;
+  exams: { question_ids: string[] | null; lms_courses: { title: string | null } | null } | null;
+};
+
 function usePendingEssayAttempts() {
   return useQuery({
     queryKey: ['pending-essay-attempts'],
     queryFn: async () => {
-      // Get attempts with hybrid/manual grading and pending result
       const { data: attempts, error: attError } = await supabase
         .from('exam_attempts')
         .select(`
@@ -63,40 +74,46 @@ function usePendingEssayAttempts() {
         .order('submitted_at', { ascending: true });
 
       if (attError) throw attError;
-      if (!attempts?.length) return [];
+      const rows = (attempts || []) as unknown as AttemptRow[];
+      if (rows.length === 0) return [];
 
-      // For each attempt, get essay answers with question stems
-      const results: PendingAttempt[] = [];
+      const attemptIds = rows.map(a => a.attempt_id);
+      const userIds = rows.map(a => a.user_id).filter(Boolean) as string[];
 
-      for (const attempt of attempts) {
-        // Get user profile
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('user_id', attempt.user_id)
-          .single();
-
-        // Get essay answers
-        const { data: answers } = await supabase
+      const [profileMap, { data: answers }, { data: questions }] = await Promise.all([
+        fetchProfileNamesByIds(userIds),
+        supabase
           .from('exam_answers')
           .select('attempt_id, quiz_id, free_text_answer, awarded_points, is_correct, answered_at')
-          .eq('attempt_id', attempt.attempt_id)
-          .not('free_text_answer', 'is', null);
+          .in('attempt_id', attemptIds)
+          .not('free_text_answer', 'is', null),
+        (async () => {
+          const allQuizIds = Array.from(
+            new Set(rows.flatMap(r => r.exams?.question_ids || []).filter(Boolean))
+          );
+          if (allQuizIds.length === 0) return { data: [] as { quiz_id: string; stem: string; question_type: string }[] };
+          return supabase
+            .from('quiz_questions')
+            .select('quiz_id, stem, question_type')
+            .in('quiz_id', allQuizIds);
+        })(),
+      ]);
 
-        if (!answers?.length) continue;
+      const questionMap = new Map((questions || []).map(q => [q.quiz_id, q]));
+      const answersByAttempt = new Map<string, typeof answers>();
+      for (const a of answers || []) {
+        const bucket = answersByAttempt.get(a.attempt_id) || [];
+        bucket.push(a);
+        answersByAttempt.set(a.attempt_id, bucket);
+      }
 
-        // Get question stems
-        const quizIds = answers.map(a => a.quiz_id);
-        const { data: questions } = await supabase
-          .from('quiz_questions')
-          .select('quiz_id, stem, question_type')
-          .in('quiz_id', quizIds);
-
-        const questionMap = new Map(questions?.map(q => [q.quiz_id, q]) || []);
-        const totalQuestions = (attempt as any).exams?.question_ids?.length || 1;
+      const results: PendingAttempt[] = [];
+      for (const attempt of rows) {
+        const attemptAnswers = answersByAttempt.get(attempt.attempt_id) || [];
+        const totalQuestions = attempt.exams?.question_ids?.length || 1;
         const pointsPerQuestion = 100 / totalQuestions;
 
-        const essayAnswers = answers
+        const essayAnswers = attemptAnswers
           .filter(a => {
             const q = questionMap.get(a.quiz_id);
             return q && (q.question_type as string) === 'essay';
@@ -117,9 +134,9 @@ function usePendingEssayAttempts() {
           submitted_at: attempt.submitted_at,
           grading_mode: attempt.grading_mode || 'hybrid',
           result: attempt.result,
-          user_name: profile?.full_name || 'Aluno',
+          user_name: profileMap.get(attempt.user_id || '') || 'Aluno',
           user_email: '',
-          course_title: (attempt as any).exams?.lms_courses?.title || 'Exame',
+          course_title: attempt.exams?.lms_courses?.title || 'Exame',
           essay_answers: essayAnswers,
         });
       }
@@ -149,126 +166,31 @@ export function EssayGradingPanel() {
 
   const saveGrading = useMutation({
     mutationFn: async (attempt: PendingAttempt) => {
-      // Update each essay answer with assigned points
-      for (const answer of attempt.essay_answers) {
-        const key = gradeKey(attempt.attempt_id, answer.quiz_id);
-        const grade = grades[key];
-        if (!grade) continue;
-
-        const awardedPoints = Math.min(Math.max(0, grade.points), answer.max_points);
-        
-        await supabase
-          .from('exam_answers')
-          .update({
-            awarded_points: awardedPoints,
-            is_correct: awardedPoints > 0,
-            grader_comment: grade.comment || null,
-          })
-          .eq('attempt_id', attempt.attempt_id)
-          .eq('quiz_id', answer.quiz_id);
-      }
-
-      // Recalculate overall score
-      const { data: allAnswers } = await supabase
-        .from('exam_answers')
-        .select('awarded_points')
-        .eq('attempt_id', attempt.attempt_id);
-
-      const totalScore = allAnswers?.reduce((sum, a) => sum + (a.awarded_points || 0), 0) || 0;
-
-      // Get min score for pass/fail
-      let minScorePct = 70;
-      const { data: attemptData } = await supabase
-        .from('exam_attempts')
-        .select('exams(ruleset_id)')
-        .eq('attempt_id', attempt.attempt_id)
-        .single();
-      
-      if ((attemptData as any)?.exams?.ruleset_id) {
-        const { data: ruleset } = await supabase
-          .from('exam_rulesets')
-          .select('min_score_pct')
-          .eq('ruleset_id', (attemptData as any).exams.ruleset_id)
-          .single();
-        if (ruleset) minScorePct = ruleset.min_score_pct;
-      }
-
-      const result = totalScore >= minScorePct ? 'passed' : 'failed';
-
-      await supabase
-        .from('exam_attempts')
-        .update({
-          score_pct: totalScore,
-          result,
+      const payload = attempt.essay_answers
+        .map(answer => {
+          const grade = grades[gradeKey(attempt.attempt_id, answer.quiz_id)];
+          if (!grade) return null;
+          return {
+            quiz_id: answer.quiz_id,
+            awarded_points: Math.min(Math.max(0, grade.points), answer.max_points),
+            comment: grade.comment || '',
+          };
         })
-        .eq('attempt_id', attempt.attempt_id);
+        .filter(Boolean);
 
-      // If the candidate now passes after essay grading, auto-generate a certificate
-      // (mirrors the automatic grading path in useExams.ts so hybrid exams aren't left without certs).
-      if (result === 'passed') {
-        try {
-          const { data: existingCert } = await supabase
-            .from('lms_certificates')
-            .select('certificate_id')
-            .eq('attempt_id', attempt.attempt_id)
-            .maybeSingle();
-
-          if (!existingCert) {
-            const { data: examData } = await supabase
-              .from('exams')
-              .select('course_id, course_version')
-              .eq('exam_id', attempt.exam_id)
-              .single();
-
-            if (examData) {
-              const { data: course } = await supabase
-                .from('lms_courses')
-                .select('title, primary_pillar, workload_minutes')
-                .eq('course_id', examData.course_id)
-                .single();
-
-              if (course) {
-                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-                let verificationCode = '';
-                for (let i = 0; i < 16; i++) {
-                  verificationCode += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-
-                const { data: certIdResult } = await supabase.rpc('generate_certificate_id');
-                const certificateId = certIdResult || `CERT-${new Date().getFullYear()}-${Date.now()}`;
-                const qrVerifyUrl = `${window.location.origin}/verify/${verificationCode}`;
-
-                await supabase
-                  .from('lms_certificates')
-                  .insert({
-                    certificate_id: certificateId,
-                    user_id: attempt.user_id,
-                    course_id: examData.course_id,
-                    course_version: examData.course_version,
-                    attempt_id: attempt.attempt_id,
-                    workload_minutes: course.workload_minutes || 60,
-                    pillar_scope: course.primary_pillar,
-                    verification_code: verificationCode,
-                    qr_verify_url: qrVerifyUrl,
-                    status: 'active',
-                  });
-              }
-            }
-          }
-        } catch (certError) {
-          console.error('Post-grading certificate generation failed:', certError);
-          // Don't fail the grading mutation if certificate generation fails — the grade still saves.
-        }
-      }
-
-      return { totalScore, result };
+      const { data, error } = await supabase.rpc('finalize_essay_grading', {
+        _attempt_id: attempt.attempt_id,
+        _grades: payload,
+      });
+      if (error) throw error;
+      return data as { score_pct: number; result: 'passed' | 'failed' };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pending-essay-attempts'] });
-      toast.success(`Correção salva! Nota final: ${data.totalScore.toFixed(0)}% — ${data.result === 'passed' ? 'Aprovado' : 'Reprovado'}`);
+      toast.success(`Correção salva! Nota final: ${data.score_pct.toFixed(0)}% — ${data.result === 'passed' ? 'Aprovado' : 'Reprovado'}`);
     },
-    onError: () => {
-      toast.error('Erro ao salvar correção');
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : 'Erro ao salvar correção');
     },
   });
 

@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { fetchProfileNamesByIds } from '@/services/profiles';
 
 // ============================================
 // TYPES
@@ -40,19 +41,6 @@ export interface CertificateWithDetails extends LMSCertificate {
   profiles?: {
     full_name: string;
   };
-}
-
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
-
-function generateVerificationCode(length: number = 16): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
 }
 
 // ============================================
@@ -134,18 +122,14 @@ export function useVerifyCertificate(verificationCode?: string) {
         };
       }
       
-      // Get user info separately (RLS may restrict access)
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('user_id', (cert as unknown as { user_id: string }).user_id)
-        .maybeSingle();
-      
+      const certUserId = (cert as unknown as { user_id: string }).user_id;
+      const profileMap = await fetchProfileNamesByIds([certUserId]);
+
       return {
         valid: true,
         certificate: {
           ...cert,
-          student_name: profile?.full_name || 'Nome não disponível',
+          student_name: profileMap.get(certUserId) || 'Nome não disponível',
         },
       };
     },
@@ -154,110 +138,23 @@ export function useVerifyCertificate(verificationCode?: string) {
 }
 
 // ============================================
-// CERTIFICATE GENERATION
+// CERTIFICATE MUTATIONS (admin only)
 // ============================================
 
 export function useCertificateMutations() {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
 
-  const generateCertificate = useMutation({
-    mutationFn: async ({ 
-      attemptId, 
-      courseId, 
-      courseVersion 
-    }: { 
-      attemptId: string; 
-      courseId: string; 
-      courseVersion: number;
-    }) => {
-      if (!user?.id) throw new Error('Not authenticated');
-      
-      // Get course details
-      const { data: course, error: courseError } = await supabase
-        .from('lms_courses')
-        .select('*')
-        .eq('course_id', courseId)
-        .single();
-      
-      if (courseError || !course) throw new Error('Course not found');
-      
-      // Generate certificate with retry on unique constraint violation
-      const MAX_RETRIES = 3;
-      let lastError: Error | null = null;
-
-      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-        const verificationCode = generateVerificationCode();
-        
-        // Generate certificate ID using database function
-        const { data: certIdResult, error: certIdError } = await supabase
-          .rpc('generate_certificate_id');
-        
-        if (certIdError) throw certIdError;
-        const certificateId = certIdResult || `CERT-${new Date().getFullYear()}-${Date.now()}`;
-        
-        const qrVerifyUrl = `${window.location.origin}/verify/${verificationCode}`;
-        
-        const { data: certificate, error: certError } = await supabase
-          .from('lms_certificates')
-          .insert({
-            certificate_id: certificateId,
-            user_id: user.id,
-            course_id: courseId,
-            course_version: courseVersion,
-            attempt_id: attemptId,
-            workload_minutes: course.workload_minutes || 60,
-            pillar_scope: course.primary_pillar,
-            verification_code: verificationCode,
-            qr_verify_url: qrVerifyUrl,
-            status: 'active',
-          })
-          .select()
-          .single();
-        
-        if (!certError) return certificate;
-        
-        // Check for unique constraint violation (PostgreSQL error code 23505)
-        if (certError.code === '23505') {
-          lastError = certError;
-          continue; // Retry with a new code
-        }
-        
-        throw certError;
-      }
-      
-      throw lastError || new Error('Falha ao gerar código único após múltiplas tentativas');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-certificates'] });
-      toast.success('Certificado gerado com sucesso!');
-    },
-    onError: (error) => {
-      toast.error(`Erro ao gerar certificado: ${error.message}`);
-    },
-  });
-
+  // Auto-issuance lives in the `submit_exam_attempt` / `finalize_essay_grading`
+  // RPCs — there is no safe client-side path for minting a certificate
+  // because the underlying table's write grants are revoked. Only revocation
+  // remains here, gated by `revoke_certificate(text, text)`.
   const revokeCertificate = useMutation({
-    mutationFn: async ({ 
-      certificateId, 
-      reason 
-    }: { 
-      certificateId: string; 
-      reason: string;
-    }) => {
-      const { data, error } = await supabase
-        .from('lms_certificates')
-        .update({
-          status: 'revoked',
-          revoked_at: new Date().toISOString(),
-          revoked_reason: reason,
-        })
-        .eq('certificate_id', certificateId)
-        .select()
-        .single();
-      
+    mutationFn: async ({ certificateId, reason }: { certificateId: string; reason: string }) => {
+      const { error } = await supabase.rpc('revoke_certificate', {
+        _certificate_id: certificateId,
+        _reason: reason,
+      });
       if (error) throw error;
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-certificates'] });
@@ -269,7 +166,7 @@ export function useCertificateMutations() {
     },
   });
 
-  return { generateCertificate, revokeCertificate };
+  return { revokeCertificate };
 }
 
 // ============================================
