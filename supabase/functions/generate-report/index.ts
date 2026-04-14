@@ -157,10 +157,14 @@ OS TRÊS EIXOS SISTUR:
 CLASSIFICAÇÃO: ADEQUADO (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
 
 FONTES DE DADOS — TRANSPARÊNCIA:
-- Dados obtidos automaticamente de bases públicas realmente disponíveis para o município: População, PIB per capita, Densidade, Área, IDH, IDEB, Leitos hospitalares, Cobertura de saúde, Receita própria, Despesa com turismo, Meios de hospedagem e, quando disponível, datasets oficiais abertos do CADASTUR. Confiabilidade: ALTA (5/5).
+- IBGE (Agregados e Pesquisas): População, PIB per capita, Densidade, Área, IDH, IDEB, Índice de Gini, Incidência de pobreza, Taxa de mortalidade infantil, Mortalidade geral. Confiabilidade: ALTA (5/5).
+- DATASUS: Leitos hospitalares, Cobertura de saúde. Confiabilidade: ALTA (5/5).
+- STN / Tesouro Nacional: Receita própria, Despesa com turismo. Confiabilidade: ALTA (5/5).
+- CADASTUR / dados.gov.br: Guias de turismo, Agências de turismo, Meios de hospedagem. Confiabilidade: ALTA (4/5 — atualização trimestral).
+- Mapa do Turismo Brasileiro (API REST mapa.turismo.gov.br): Categoria (A-E), Região turística, Empregos formais em turismo, Estabelecimentos turísticos, Visitantes nacionais e internacionais, Arrecadação turística, Conselho municipal de turismo. Confiabilidade: ALTA (5/5).
 - Dados de preenchimento manual: Taxa de escolarização e quaisquer indicadores que não retornem valor oficial válido no momento da coleta.
 - Indicadores locais coletados pelo operador do diagnóstico.
-IMPORTANTE: Ao citar fontes no relatório, especifique se o dado veio de API oficial ou de preenchimento manual.`;
+IMPORTANTE: Ao citar fontes no relatório, especifique QUAL fonte oficial forneceu cada dado (IBGE, DATASUS, STN, CADASTUR ou Mapa do Turismo). Se o dado veio de preenchimento manual, indique claramente.`;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
   if (isEnterprise) {
