@@ -118,6 +118,26 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, defaultBus
       if (error) throw error;
       setResult(data);
       toast.success('Busca concluída!');
+
+      // Auto-fill profile metadata immediately when results arrive
+      if (data?.analysis?.property_metadata && onProfileAutoFill) {
+        const meta = data.analysis.property_metadata;
+        if (meta.star_rating || meta.property_type || meta.room_count || meta.employee_count) {
+          onProfileAutoFill(meta);
+        }
+      }
+
+      // Auto-fill indicators immediately when results arrive
+      if (data?.analysis && onAutoFill) {
+        const values: Record<string, number> = {};
+        if (data.analysis.review_score !== null) values['ENT_REVIEW_SCORE'] = data.analysis.review_score;
+        if (data.analysis.digital_maturity !== null) values['ENT_TECH_SCORE'] = data.analysis.digital_maturity;
+        if (data.analysis.sentiment_score !== null) values['ENT_SENTIMENT_SCORE'] = data.analysis.sentiment_score;
+        if (Object.keys(values).length > 0) {
+          onAutoFill(values);
+          toast.success('Perfil e indicadores preenchidos automaticamente');
+        }
+      }
     } catch (err: any) {
       console.error('Search error:', err);
       toast.error('Erro ao buscar reviews: ' + (err.message || 'Tente novamente'));

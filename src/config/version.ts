@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 19,
-  patch: 5,
+  minor: 20,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,69 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.20.0",
+    date: "2026-04-14",
+    type: "minor" as const,
+    changes: [
+      "Visual overhaul Apple-like: sombras difusas, cantos arredondados (rounded-2xl/3xl) e transições suaves de 200-300ms",
+      "Botões com micro-animações: hover eleva (-translate-y-1px + shadow), active escala (0.97), font-semibold",
+      "Cards com hover shadow-lg + translate-y e ícones com group-hover:scale-110",
+      "StatCards redesenhados: tipografia maior (text-4xl), tracking-tight, espaçamento vertical refinado",
+      "Login redesenhado: glassmorphism no card, gradiente decorativo com orbes blur, pattern de pontos sutil",
+      "Tipografia global: h1-h3 com tamanhos responsivos, letter-spacing -0.025em, font-smoothing aprimorado",
+      "Bottom nav mobile com frosted glass (backdrop-blur-2xl + backdrop-saturate-150 + borda translúcida)",
+      "Novo token shadow-xl para elevações profundas e shadow-glow refinado",
+      "Border-radius base aumentado de 0.625rem para 0.875rem (estética iOS)",
+    ],
+  },
+  {
+    version: "1.19.9",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "13 screenshots anotados adicionados aos tutoriais com setas e numeração indicando onde clicar",
+      "Imagens ilustrativas para: login, onboarding, aprovação, trial, dashboard, alertas, diagnósticos, indicadores, cálculo, projetos, relatórios, catálogo EDU e Professor Beni",
+      "Cada screenshot mostra anotações visuais (setas vermelhas numeradas) guiando o usuário passo a passo",
+    ],
+  },
+  {
+    version: "1.19.8",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "Sidebar reorganizada em 3 grupos colapsáveis: ERP, Educação e Recursos",
+      "Grupos abrem automaticamente quando contêm a rota ativa",
+      "Labels de grupo com ícone, nome e chevron de expansão/colapso",
+      "Modo recolhido (ícones) mantém itens flat sem grupos para acesso rápido",
+      "Redução visual de ~12 itens soltos para 3 seções organizadas",
+    ],
+  },
+  {
+    version: "1.19.7",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "Skeleton loaders com formato contextual (cards de diagnóstico, gauges de pilar, cards de treinamento) em vez de retângulos genéricos",
+      "Componente EmptyState reutilizável com ícone, descrição e CTA para estados vazios",
+      "Stepper mobile vertical colapsável no wizard Nova Rodada — substitui scroll horizontal de 700px",
+      "Barra de progresso compacta com indicador de etapa atual no mobile",
+      "Link 'Pular para o conteúdo' acessível no AppLayout (visível apenas com foco do teclado)",
+      "aria-labels em botões de etapa do stepper e aria-current='step' na etapa ativa",
+      "role='main' adicionado ao elemento main do layout",
+    ],
+  },
+  {
+    version: "1.19.6",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "Correção de erros de build em edge functions (TS type narrowing para catch blocks)",
+      "Correção de dissertativas: lógica de correção + emissão de certificado centralizada no servidor via RPC finalize_essay_grading",
+      "Removida inserção direta em lms_certificates pelo cliente (bloqueada por REVOKE INSERT)",
+      "RPCs review_exam_answers, submit_exam_attempt e admin_list_quiz_options com cast temporário até sync de tipos",
+    ],
+  },
   {
     version: "1.19.5",
     date: "2026-04-14",

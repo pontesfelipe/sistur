@@ -14,12 +14,12 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   LogOut,
   HelpCircle,
   MessageCircleQuestion,
   BookMarked,
   BookOpen,
-  
   Bot,
   MessageSquarePlus,
   MessageSquare,
@@ -29,14 +29,15 @@ import {
   CreditCard,
   Lock,
   Library,
+  Briefcase,
+  Lightbulb,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface NavItem {
   name: string;
@@ -49,20 +50,43 @@ interface NavItem {
   requiredFeature?: string;
 }
 
-const navigation: NavItem[] = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
-  { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
-  { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
-  
-  { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
-  { name: 'Minhas Provas', href: '/edu/historico', icon: ScrollText, requiresEDU: true },
-  { name: 'Gestão de Treinamentos', href: '/professor', icon: BookOpen, requiresProfessor: true },
-  { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
-  { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
-  { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
-  { name: 'Social Turismo', href: '/forum', icon: MessageSquare },
-  { name: 'Metodologia', href: '/metodologia', icon: BookMarked, requiresAdmin: true },
-  { name: 'Jogos Educacionais', href: '/game', icon: Gamepad2 },
+interface NavGroup {
+  label: string;
+  icon: typeof LayoutDashboard;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: 'ERP',
+    icon: Briefcase,
+    items: [
+      { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
+      { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
+      { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
+      { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
+      { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
+    ],
+  },
+  {
+    label: 'Educação',
+    icon: GraduationCap,
+    items: [
+      { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
+      { name: 'Minhas Provas', href: '/edu/historico', icon: ScrollText, requiresEDU: true },
+      { name: 'Gestão de Treinamentos', href: '/professor', icon: BookOpen, requiresProfessor: true },
+    ],
+  },
+  {
+    label: 'Recursos',
+    icon: Lightbulb,
+    items: [
+      { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
+      { name: 'Social Turismo', href: '/forum', icon: MessageSquare },
+      { name: 'Jogos Educacionais', href: '/game', icon: Gamepad2 },
+      { name: 'Metodologia', href: '/metodologia', icon: BookMarked, requiresAdmin: true },
+    ],
+  },
 ];
 
 const bottomNavigation: NavItem[] = [
@@ -72,11 +96,6 @@ const bottomNavigation: NavItem[] = [
   { name: 'Licenças', href: '/admin/licencas', icon: Shield, requiresAdmin: true },
   { name: 'Configurações', href: '/configuracoes', icon: Settings },
 ];
-
-// Static items that always show (no permission check needed)
-const staticNavItems = navigation.filter(item => 
-  !item.requiresERP && !item.requiresEDU && !item.requiresProfessor && !item.requiresAdmin
-);
 
 const staticBottomNavItems = bottomNavigation.filter(item =>
   !item.requiresERP && !item.requiresEDU && !item.requiresProfessor && !item.requiresAdmin
@@ -92,10 +111,11 @@ export function AppSidebar() {
   const markForumAsSeen = useMarkForumAsSeen();
   const [collapsed, setCollapsed] = useState(false);
 
-  // Determine the home route based on user access
+  // Determine which groups are open. Auto-open the group containing the active route.
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
   const homeRoute = (hasERPAccess || isAdmin) ? '/' : '/edu';
 
-  // Mark forum as seen when navigating to it
   useEffect(() => {
     if (location.pathname === '/forum') {
       markForumAsSeen.mutate();
@@ -108,23 +128,41 @@ export function AppSidebar() {
     navigate('/auth');
   };
 
-  // Memoize filtered items to prevent recalculation
-  const filteredNavigation = useMemo(() => {
-    if (!initialized) return staticNavItems;
-    
-    return navigation.filter((item) => {
-      if (item.requiresAdmin && !isAdmin) return false;
-      // "Gestão de Treinamentos" is visible for professors, org admins, OR ERP analysts/admins
-      if (item.requiresProfessor && !isProfessor && !isAdmin && !isOrgAdmin && !(hasERPAccess && isAnalyst)) return false;
-      if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
-      if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
-      return true;
-    });
+  const canSeeItem = useCallback((item: NavItem) => {
+    if (!initialized) {
+      return !item.requiresERP && !item.requiresEDU && !item.requiresProfessor && !item.requiresAdmin;
+    }
+    if (item.requiresAdmin && !isAdmin) return false;
+    if (item.requiresProfessor && !isProfessor && !isAdmin && !isOrgAdmin && !(hasERPAccess && isAnalyst)) return false;
+    if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
+    if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
+    return true;
   }, [initialized, isAdmin, isOrgAdmin, isAnalyst, isProfessor, hasERPAccess, hasEDUAccess]);
+
+  // Filter groups — only show groups that have at least one visible item
+  const filteredGroups = useMemo(() => {
+    return navGroups
+      .map(group => ({
+        ...group,
+        items: group.items.filter(canSeeItem),
+      }))
+      .filter(group => group.items.length > 0);
+  }, [canSeeItem]);
+
+  // Auto-open group containing active route
+  useEffect(() => {
+    const activeGroup = filteredGroups.find(g =>
+      g.items.some(item =>
+        location.pathname === item.href || (item.href !== '/' && location.pathname.startsWith(item.href))
+      )
+    );
+    if (activeGroup) {
+      setOpenGroups(prev => ({ ...prev, [activeGroup.label]: true }));
+    }
+  }, [location.pathname, filteredGroups]);
 
   const filteredBottomNavigation = useMemo(() => {
     if (!initialized) return staticBottomNavItems;
-    
     return bottomNavigation.filter((item) => {
       if (item.requiresAdmin && !isAdmin) return false;
       if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
@@ -134,20 +172,23 @@ export function AppSidebar() {
     });
   }, [initialized, isAdmin, isProfessor, hasERPAccess, hasEDUAccess]);
 
-  const NavItem = ({ item }: { item: NavItem }) => {
+  const toggleGroup = (label: string) => {
+    setOpenGroups(prev => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const NavItemComponent = ({ item }: { item: NavItem }) => {
     const isActive = location.pathname === item.href || 
       (item.href !== '/' && location.pathname.startsWith(item.href));
     
     const isLocked = !isAdmin && item.requiredFeature && !hasFeature(item.requiredFeature);
-    
-    // Show badge for forum notifications (only when count > 0)
     const showBadge = item.href === '/forum' && (forumNotifications?.unreadCount ?? 0) > 0;
     
     const content = (
       <Link
         to={isLocked ? '/assinatura' : item.href}
         className={cn(
-          'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative',
+          'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group relative',
+          collapsed ? 'justify-center' : 'pl-9',
           isLocked
             ? 'text-muted-foreground/50 hover:bg-muted/30 cursor-not-allowed'
             : isActive
@@ -157,7 +198,7 @@ export function AppSidebar() {
       >
         <div className="relative">
           <item.icon className={cn(
-            'h-5 w-5 flex-shrink-0 transition-transform',
+            'h-4.5 w-4.5 flex-shrink-0 transition-transform',
             !isActive && !isLocked && 'group-hover:scale-110'
           )} />
           {showBadge && collapsed && (
@@ -197,6 +238,39 @@ export function AppSidebar() {
     return content;
   };
 
+  const BottomNavItem = ({ item }: { item: NavItem }) => {
+    const isActive = location.pathname === item.href || 
+      (item.href !== '/' && location.pathname.startsWith(item.href));
+
+    const content = (
+      <Link
+        to={item.href}
+        className={cn(
+          'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group',
+          isActive
+            ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-glow'
+            : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+        )}
+      >
+        <item.icon className={cn(
+          'h-5 w-5 flex-shrink-0 transition-transform',
+          !isActive && 'group-hover:scale-110'
+        )} />
+        {!collapsed && <span className="font-medium text-sm truncate">{item.name}</span>}
+      </Link>
+    );
+
+    if (collapsed) {
+      return (
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>{content}</TooltipTrigger>
+          <TooltipContent side="right" className="font-medium">{item.name}</TooltipContent>
+        </Tooltip>
+      );
+    }
+    return content;
+  };
+
   return (
     <aside
       className={cn(
@@ -221,20 +295,67 @@ export function AppSidebar() {
         )}
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {filteredNavigation.map((item) => (
-          <NavItem key={item.name} item={item} />
-        ))}
+      {/* Grouped Navigation */}
+      <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto scroll-momentum">
+        {filteredGroups.map((group) => {
+          const isOpen = openGroups[group.label] ?? false;
+          const GroupIcon = group.icon;
+          const hasActiveItem = group.items.some(item =>
+            location.pathname === item.href || (item.href !== '/' && location.pathname.startsWith(item.href))
+          );
+
+          if (collapsed) {
+            // In collapsed mode, show items flat with their own icons
+            return (
+              <div key={group.label} className="space-y-0.5 mb-2">
+                {group.items.map(item => (
+                  <NavItemComponent key={item.name} item={item} />
+                ))}
+              </div>
+            );
+          }
+
+          return (
+            <div key={group.label} className="mb-1">
+              <button
+                type="button"
+                onClick={() => toggleGroup(group.label)}
+                className={cn(
+                  'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors',
+                  hasActiveItem
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:text-sidebar-foreground'
+                )}
+              >
+                <GroupIcon className="h-4 w-4 flex-shrink-0" />
+                <span className="flex-1 text-left">{group.label}</span>
+                <ChevronDown className={cn(
+                  'h-3.5 w-3.5 transition-transform duration-200',
+                  isOpen && 'rotate-180'
+                )} />
+              </button>
+              <div className={cn(
+                'overflow-hidden transition-all duration-200',
+                isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+              )}>
+                <div className="space-y-0.5 mt-0.5">
+                  {group.items.map(item => (
+                    <NavItemComponent key={item.name} item={item} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </nav>
 
       {/* Bottom navigation */}
-      <div className="px-3 py-4 border-t border-sidebar-border space-y-1">
+      <div className="px-3 py-3 border-t border-sidebar-border space-y-0.5">
         {filteredBottomNavigation.map((item) => (
-          <NavItem key={item.name} item={item} />
+          <BottomNavItem key={item.name} item={item} />
         ))}
         
-        {/* Feedback button */}
+        {/* Feedback */}
         {collapsed ? (
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
@@ -252,9 +373,7 @@ export function AppSidebar() {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent side="right" className="font-medium">
-              Feedback
-            </TooltipContent>
+            <TooltipContent side="right" className="font-medium">Feedback</TooltipContent>
           </Tooltip>
         ) : (
           <FeedbackDialog
@@ -270,7 +389,7 @@ export function AppSidebar() {
           />
         )}
         
-        {/* Sign out button */}
+        {/* Sign out */}
         {collapsed ? (
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
@@ -283,9 +402,7 @@ export function AppSidebar() {
                 <LogOut className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right" className="font-medium">
-              Sair
-            </TooltipContent>
+            <TooltipContent side="right" className="font-medium">Sair</TooltipContent>
           </Tooltip>
         ) : (
           <Button
@@ -298,7 +415,7 @@ export function AppSidebar() {
           </Button>
         )}
         
-        {/* Collapse button */}
+        {/* Collapse toggle */}
         <Button
           variant="ghost"
           size="sm"

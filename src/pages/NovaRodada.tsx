@@ -326,8 +326,9 @@ export default function NovaRodada() {
         </div>
       )}
 
-      {/* Visual Stepper */}
-      <div className="mb-8 overflow-x-auto pb-4">
+      {/* Visual Stepper — horizontal on desktop, vertical on mobile */}
+      {/* Desktop horizontal stepper */}
+      <div className="mb-8 overflow-x-auto pb-4 hidden md:block">
         <div className="flex items-center justify-between relative min-w-[700px]">
           <div className="absolute top-6 left-0 right-0 h-1 bg-muted" />
           <div 
@@ -346,6 +347,8 @@ export default function NovaRodada() {
                 type="button"
                 disabled={!isClickable}
                 onClick={() => isClickable && setCurrentStep(step.id)}
+                aria-label={`Etapa ${step.id}: ${step.title} — ${step.description}`}
+                aria-current={isCurrent ? 'step' : undefined}
                 className={cn(
                   "relative flex flex-col items-center z-10 bg-transparent border-none p-0",
                   isClickable && "cursor-pointer group"
@@ -368,7 +371,65 @@ export default function NovaRodada() {
                     isUpcoming && !isClickable && 'text-muted-foreground',
                     isClickable && 'group-hover:text-primary transition-colors'
                   )}>{step.title}</p>
-                  <p className="text-xs text-muted-foreground hidden md:block">{step.description}</p>
+                  <p className="text-xs text-muted-foreground">{step.description}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Mobile vertical stepper */}
+      <div className="mb-6 md:hidden">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-xs font-medium text-muted-foreground">Etapa {currentStep} de {WORKFLOW_STEPS.length}</span>
+          <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary rounded-full transition-all duration-500"
+              style={{ width: `${(currentStep / WORKFLOW_STEPS.length) * 100}%` }}
+            />
+          </div>
+        </div>
+        <div className="space-y-1">
+          {WORKFLOW_STEPS.map((step) => {
+            const Icon = step.icon;
+            const isCompleted = step.id < currentStep;
+            const isCurrent = step.id === currentStep;
+            const isUpcoming = step.id > currentStep;
+            const isClickable = step.id <= maxStepReached && step.id !== currentStep;
+            // On mobile, only show current step, adjacent steps, and completed steps compactly
+            if (isUpcoming && step.id > currentStep + 1 && step.id !== WORKFLOW_STEPS.length) return null;
+            return (
+              <button
+                key={step.id}
+                type="button"
+                disabled={!isClickable}
+                onClick={() => isClickable && setCurrentStep(step.id)}
+                aria-label={`Etapa ${step.id}: ${step.title}`}
+                aria-current={isCurrent ? 'step' : undefined}
+                className={cn(
+                  'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all',
+                  isCurrent && 'bg-primary/10 border border-primary/30',
+                  isCompleted && 'opacity-70',
+                  isUpcoming && !isClickable && 'opacity-40',
+                  isClickable && 'active:bg-muted',
+                )}
+              >
+                <div className={cn(
+                  'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
+                  isCompleted && 'bg-primary text-primary-foreground',
+                  isCurrent && 'bg-primary text-primary-foreground',
+                  isUpcoming && 'bg-muted text-muted-foreground',
+                )}>
+                  {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={cn(
+                    'text-sm font-medium truncate',
+                    isCurrent && 'text-primary',
+                    isUpcoming && 'text-muted-foreground',
+                  )}>{step.title}</p>
+                  {isCurrent && <p className="text-xs text-muted-foreground">{step.description}</p>}
                 </div>
               </button>
             );

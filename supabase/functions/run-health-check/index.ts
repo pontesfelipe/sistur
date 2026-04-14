@@ -253,7 +253,7 @@ Deno.serve(async (req) => {
       } catch (e) {
         results.push({
           name: test.test_name, category: test.category,
-          status: "fail", message: `Exceção: ${e.message}`,
+          status: "fail", message: `Exceção: ${(e as Error).message}`,
           duration_ms: Date.now() - start,
         });
       }
@@ -311,13 +311,13 @@ Deno.serve(async (req) => {
         .update({
           status: "error",
           completed_at: new Date().toISOString(),
-          results: [{ name: "System Error", category: "system", status: "fail", message: error.message, duration_ms: 0 }],
+          results: [{ name: "System Error", category: "system", status: "fail", message: (error as Error).message, duration_ms: 0 }],
         })
         .eq("id", runId);
     }
 
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: (error as Error).message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

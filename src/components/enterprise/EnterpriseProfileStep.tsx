@@ -70,13 +70,16 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   };
 
   const handleProfileAutoFill = (metadata: { star_rating: number | null; property_type: string | null; room_count: number | null; employee_count: number | null }) => {
-    setFormData(prev => ({
-      ...prev,
-      ...(metadata.star_rating && !prev.star_rating ? { star_rating: metadata.star_rating } : {}),
-      ...(metadata.property_type && prev.property_type === 'hotel' ? { property_type: metadata.property_type } : {}),
-      ...(metadata.room_count && !prev.room_count ? { room_count: metadata.room_count } : {}),
-      ...(metadata.employee_count && !prev.employee_count ? { employee_count: metadata.employee_count } : {}),
-    }));
+    setFormData(prev => {
+      const updates: Partial<EnterpriseProfileInput> = {};
+      if (metadata.star_rating != null) updates.star_rating = metadata.star_rating;
+      if (metadata.property_type) updates.property_type = metadata.property_type;
+      if (metadata.room_count != null) updates.room_count = metadata.room_count;
+      if (metadata.employee_count != null) updates.employee_count = metadata.employee_count;
+      return { ...prev, ...updates };
+    });
+    setReviewAutoFilled(true);
+    toast.success('Perfil do empreendimento preenchido com dados dos reviews');
   };
   const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
@@ -170,6 +173,44 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
   return (
     <div className="space-y-6">
+      {/* 1) Pré-preenchimento Automático via IA (ACIMA do perfil) */}
+      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Search className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Pré-preenchimento Automático
+                <Badge variant="secondary" className="text-[10px]">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  IA
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Busque reviews online do seu estabelecimento para preencher automaticamente o perfil e os indicadores de reputação
+              </CardDescription>
+            </div>
+            {reviewAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <BusinessReviewSearch
+            onAutoFill={handleReviewAutoFill}
+            onProfileAutoFill={handleProfileAutoFill}
+            defaultLocation={destinationName}
+            compact
+          />
+        </CardContent>
+      </Card>
+
+      {/* 2) Perfil do Empreendimento (ABAIXO do pré-preenchimento) */}
       <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardHeader>
           <div className="flex items-center gap-3">
@@ -185,6 +226,11 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <CardContent className="space-y-6">
           <p className="text-sm text-muted-foreground">
             Essas informações contextualizam o diagnóstico e permitem benchmarks mais precisos para o seu tipo de empreendimento.
+            {reviewAutoFilled && (
+              <span className="text-primary font-medium ml-1">
+                Alguns campos foram preenchidos automaticamente pela busca de reviews.
+              </span>
+            )}
           </p>
           
           {/* Tipo e Porte */}
@@ -319,44 +365,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-
-      {/* Business Review Search - Pre-fill */}
-      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Search className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Pré-preenchimento Automático
-                <Badge variant="secondary" className="text-[10px]">
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  IA
-                </Badge>
-              </CardTitle>
-              <CardDescription>
-                Busque reviews online do seu estabelecimento para preencher automaticamente os indicadores de reputação (ENT_REVIEW_SCORE, ENT_TECH_SCORE)
-              </CardDescription>
-            </div>
-            {reviewAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />
-                Preenchido
-              </Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <BusinessReviewSearch
-            onAutoFill={handleReviewAutoFill}
-            onProfileAutoFill={handleProfileAutoFill}
-            defaultLocation={destinationName}
-            compact
-          />
         </CardContent>
       </Card>
 

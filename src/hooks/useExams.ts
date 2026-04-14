@@ -535,9 +535,19 @@ export function useExamAnswerMutations() {
 
   const submitExam = useMutation({
     mutationFn: async (attemptId: string) => {
+<<<<<<< claude/code-review-improvements-tncvm
       // Server-side grading + certificate issuance. Writing those columns
       // from the client is intentionally impossible (column-level REVOKE).
       const { data, error } = await supabase.rpc('submit_exam_attempt', {
+=======
+      // Grading, result persistence, quiz-usage bookkeeping and certificate
+      // issuance all run server-side in the `submit_exam_attempt` RPC.
+      // Running them in the browser was exploitable — a student could set
+      // `result='passed'` directly and then INSERT a certificate — so the
+      // entire flow was folded into a SECURITY DEFINER function that
+      // cannot be bypassed from the client.
+      const { data, error } = await (supabase.rpc as any)('submit_exam_attempt', {
+>>>>>>> main
         _attempt_id: attemptId,
       });
 
