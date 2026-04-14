@@ -212,31 +212,116 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Cap file size (5 MB) to prevent locking the page on a bad drop.
+    const MAX_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      toast.error('Arquivo muito grande', { description: 'Tamanho máximo: 5 MB.' });
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const parseCsvLine = (line: string): string[] => {
+      // Minimal CSV tokenizer supporting quoted fields and escaped quotes ("").
+      const result: string[] = [];
+      let field = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+          if (ch === '"') {
+            if (line[i + 1] === '"') { field += '"'; i++; }
+            else { inQuotes = false; }
+          } else {
+            field += ch;
+          }
+        } else if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ',') {
+          result.push(field);
+          field = '';
+        } else {
+          field += ch;
+        }
+      }
+      result.push(field);
+      return result.map(s => s.trim());
+    };
+
     const reader = new FileReader();
+    reader.onerror = () => {
+      toast.error('Não foi possível ler o arquivo.');
+    };
     reader.onload = (e) => {
       const text = e.target?.result as string;
-      const lines = text.split('\n').filter(line => line.trim());
+      if (!text) {
+        toast.error('Arquivo vazio.');
+        return;
+      }
+
+      // Strip UTF-8 BOM if present so the first header cell matches.
+      const cleaned = text.replace(/^\uFEFF/, '');
+      const lines = cleaned.split(/\r?\n/).filter(line => line.trim().length > 0);
+
+      if (lines.length < 2) {
+        toast.error('CSV sem linhas de dados', {
+          description: 'Inclua o cabeçalho e ao menos uma linha de dados.',
+        });
+        return;
+      }
+
       const dataLines = lines.slice(1);
-      
-      const parsed: ParsedRow[] = dataLines.map(line => {
-        const [code, valueStr, source] = line.split(',').map(s => s.trim());
-        const value = parseFloat(valueStr);
-        
+
+      const parsed: ParsedRow[] = dataLines.map((line, idx) => {
+        const rowNumber = idx + 2; // account for header
+        const cells = parseCsvLine(line);
+
+        if (cells.length < 2) {
+          return {
+            indicator_code: '',
+            value: null,
+            source: '',
+            valid: false,
+            error: `Linha ${rowNumber}: colunas insuficientes (esperado código,valor[,fonte])`,
+          };
+        }
+
+        const [code, valueStr, source = ''] = cells;
+
+        if (!code) {
+          return {
+            indicator_code: '',
+            value: null,
+            source,
+            valid: false,
+            error: `Linha ${rowNumber}: código do indicador vazio`,
+          };
+        }
+
         const indicator = indicators.find(i => i.code === code);
-        
         if (!indicator) {
           return { indicator_code: code, value: null, source, valid: false, error: 'Código não encontrado' };
         }
-        
-        if (isNaN(value)) {
-          return { indicator_code: code, value: null, source, valid: false, error: 'Valor inválido' };
+
+        // Parse value as number; accept comma decimal separator (pt-BR CSVs).
+        const normalized = valueStr.replace(/\./g, '').replace(',', '.');
+        const value = parseFloat(normalized);
+        if (!Number.isFinite(value)) {
+          return { indicator_code: code, value: null, source, valid: false, error: 'Valor inválido (deve ser numérico)' };
         }
 
         return { indicator_code: code, value, source, valid: true };
       });
 
       setParsedData(parsed);
-      toast.success(`${parsed.filter(p => p.valid).length} linhas válidas de ${parsed.length}`);
+      const validCount = parsed.filter(p => p.valid).length;
+      const errorCount = parsed.length - validCount;
+      if (errorCount === 0) {
+        toast.success(`${validCount} linhas válidas`);
+      } else {
+        toast.warning(`${validCount} válidas, ${errorCount} com erro`, {
+          description: 'Revise a tabela abaixo antes de importar.',
+        });
+      }
     };
     reader.readAsText(file);
   };

@@ -229,7 +229,8 @@ export function useCardGame() {
       return {
         ...prev,
         bars: newBars,
-        coins: prev.coins - card.cost + (card.effects.coins || 0),
+        // Clamp at 0 in case a card has a negative `effects.coins` that would push the balance below zero.
+        coins: Math.max(0, prev.coins - card.cost + (card.effects.coins || 0)),
         xp: newXp,
         level: newLevel,
         visitors,
