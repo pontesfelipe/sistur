@@ -270,8 +270,9 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Dados do IBGE podem ser importados automaticamente para alguns indicadores.',
         ],
         tips: [
-          'Preencha o máximo de indicadores possível para um diagnóstico preciso.',
-          'Use a ferramenta de busca IBGE para dados oficiais.',
+          'O sistema pré-preenche automaticamente dados de IBGE, DATASUS, STN, CADASTUR e Mapa do Turismo Brasileiro.',
+          'Revise os dados pré-preenchidos e confirme antes de prosseguir.',
+          'Indicadores sem fonte oficial disponível serão direcionados para preenchimento manual.',
         ],
         imagePath: '/tutorial/erp-diag-3.jpg',
       },
