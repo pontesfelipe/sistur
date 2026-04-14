@@ -20,6 +20,13 @@ export function AppLayout({ children, title, subtitle, actions }: AppLayoutProps
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip to content link for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none"
+      >
+        Pular para o conteúdo
+      </a>
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <AppSidebar />
@@ -36,7 +43,7 @@ export function AppLayout({ children, title, subtitle, actions }: AppLayoutProps
           onMobileMenuClick={() => setMobileOpen(true)}
           actions={actions}
         />
-        <main className="p-3 sm:p-4 md:p-6 pb-20 md:pb-6 animate-in fade-in-0 duration-300 ease-out scroll-momentum">
+        <main id="main-content" className="p-3 sm:p-4 md:p-6 pb-20 md:pb-6 animate-in fade-in-0 duration-300 ease-out scroll-momentum" role="main">
           {children}
         </main>
       </div>

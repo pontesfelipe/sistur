@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TrainingCardSkeleton } from '@/components/ui/content-skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Search, 
@@ -431,7 +433,7 @@ const EduCatalogo = () => {
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Skeleton key={i} className="h-48" />
+                <TrainingCardSkeleton key={i} />
               ))}
             </div>
           ) : (
@@ -490,19 +492,15 @@ const EduCatalogo = () => {
                     </div>
                   )
                 ) : (
-                  <div className="text-center py-16">
-                    <GraduationCap className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                    <h3 className="mt-4 text-lg font-semibold">
-                      {trainings?.length === 0 
-                        ? 'Nenhum treinamento cadastrado' 
-                        : 'Nenhum treinamento encontrado'}
-                    </h3>
-                    <p className="mt-2 text-muted-foreground">
-                      {trainings?.length === 0 
-                        ? 'Os treinamentos serão importados em breve.'
-                        : 'Tente ajustar os filtros de busca.'}
-                    </p>
-                  </div>
+                  <EmptyState
+                    icon={GraduationCap}
+                    title={trainings?.length === 0 ? 'Nenhum treinamento cadastrado' : 'Nenhum treinamento encontrado'}
+                    description={trainings?.length === 0 
+                      ? 'Os treinamentos serão importados em breve. Enquanto isso, configure seu perfil de aprendizado.'
+                      : 'Tente ajustar os filtros de busca para encontrar o conteúdo desejado.'}
+                    actionLabel={trainings?.length === 0 ? 'Configurar Perfil' : undefined}
+                    actionHref={trainings?.length === 0 ? '/edu/perfil' : undefined}
+                  />
                 )}
               </TabsContent>
             </Tabs>

@@ -60,6 +60,7 @@ import {
 } from '@/hooks/useERPMonitoring';
 import { useDashboardWidgets } from '@/hooks/useDashboardWidgets';
 import { Skeleton } from '@/components/ui/skeleton';
+import { StatCardSkeleton, PillarGaugeSkeleton } from '@/components/ui/content-skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfileContext } from '@/contexts/ProfileContext';
@@ -283,10 +284,10 @@ const Index = () => {
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
           {statsLoading ? (
             <>
-              <Skeleton className="h-28" />
-              <Skeleton className="h-28" />
-              <Skeleton className="h-28" />
-              <Skeleton className="h-28" />
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+              <StatCardSkeleton />
             </>
           ) : (
             <>
@@ -365,9 +366,9 @@ const Index = () => {
               <CardContent>
                 {activeLoading ? (
                   <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                    <Skeleton className="h-32" />
-                    <Skeleton className="h-32" />
-                    <Skeleton className="h-32" />
+                    <PillarGaugeSkeleton />
+                    <PillarGaugeSkeleton />
+                    <PillarGaugeSkeleton />
                   </div>
                 ) : activePillarData?.pillarScores && activePillarData.pillarScores.length > 0 ? (
                   <>
