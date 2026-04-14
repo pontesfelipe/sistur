@@ -399,19 +399,19 @@ ESTRUTURA OBRIGATÓRIA:
 ## 7. Gargalos e Prescrições
 - Tabela: Gargalo | Severidade | Pilar | Prescrição | Agente Responsável
 
-## 9. Prognóstico e Diretrizes
+## 8. Prognóstico e Diretrizes
 - Cenário tendencial vs cenário desejado
 - Diretrizes estratégicas por horizonte temporal
 
-## 10. Banco de Ações
+## 9. Banco de Ações
 - Tabela: Ação | Pilar | Prazo | Responsável | Prioridade | Status
 
-## 11. Fontes e Referências
+## 10. Fontes e Referências
 - Lista completa de fontes de dados oficiais consultadas
 - Documentos de referência nacional utilizados
 - Documentos da Base de Conhecimento do destino consultados
 
-## 12. Considerações Finais
+## 11. Considerações Finais
 - Síntese das conclusões
 - Próxima revisão recomendada: data e justificativa`;
 }
