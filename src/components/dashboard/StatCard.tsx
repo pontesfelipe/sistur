@@ -31,30 +31,30 @@ export function StatCard({ title, value, icon: Icon, trend, variant = 'default',
   return (
     <div
       className={cn(
-        'p-6 rounded-xl border transition-all duration-200 hover:shadow-md animate-fade-in',
+        'p-6 rounded-2xl border transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-1 animate-fade-in group',
         variants[variant],
         className
       )}
     >
       <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="mt-2 text-3xl font-display font-bold text-foreground">
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground tracking-wide">{title}</p>
+          <p className="text-3xl sm:text-4xl font-display font-bold text-foreground tracking-tight">
             {value}
           </p>
           {trend && (
             <p
               className={cn(
-                'mt-2 text-sm font-medium',
+                'text-sm font-semibold flex items-center gap-1',
                 trend.isPositive ? 'text-severity-good' : 'text-severity-critical'
               )}
             >
               {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
-              <span className="text-muted-foreground ml-1">vs. anterior</span>
+              <span className="text-muted-foreground font-normal ml-1">vs. anterior</span>
             </p>
           )}
         </div>
-        <div className={cn('p-3 rounded-lg', iconVariants[variant])}>
+        <div className={cn('p-3 rounded-2xl transition-transform duration-300 group-hover:scale-110', iconVariants[variant])}>
           <Icon className="h-6 w-6" />
         </div>
       </div>
