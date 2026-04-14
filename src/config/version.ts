@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 19,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.19.3",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "Painel visual de fontes de dados no pré-preenchimento: mostra quais bases alimentaram cada indicador",
+      "Cards agrupados por fonte (IBGE, Mapa do Turismo, CADASTUR, DATASUS, STN) com contagem e tooltip detalhado",
+      "Tooltip lista indicadores específicos capturados por cada fonte oficial",
+      "Indicadores manuais contabilizados separadamente com aviso visual",
+    ],
+  },
   {
     version: "1.19.2",
     date: "2026-04-14",
