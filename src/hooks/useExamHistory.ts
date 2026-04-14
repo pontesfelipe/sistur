@@ -83,7 +83,7 @@ export function useExamReview(attemptId?: string) {
       // REVOKE), so this RPC is the canonical way to show a student which
       // option was right after the attempt is submitted. It also rejects
       // reads of in-progress attempts.
-      const { data: reviewRows, error: reviewErr } = await supabase.rpc(
+      const { data: reviewRows, error: reviewErr } = await (supabase.rpc as any)(
         'review_exam_answers',
         { _attempt_id: attemptId }
       );

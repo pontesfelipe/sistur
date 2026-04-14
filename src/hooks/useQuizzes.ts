@@ -84,7 +84,7 @@ export function useQuizQuestions(pillar?: 'RA' | 'OE' | 'AO', level?: number, ac
       // The admin RPC `admin_list_quiz_options` runs as SECURITY DEFINER and
       // gates on has_role(ADMIN), which is the right scope for this hook
       // (only admin panels consume it).
-      const { data: opts, error: optsError } = await supabase.rpc(
+      const { data: opts, error: optsError } = await (supabase.rpc as any)(
         'admin_list_quiz_options',
         { _quiz_ids: quizIds }
       );
