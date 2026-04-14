@@ -233,8 +233,6 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       return semiCount >= commaCount && semiCount > 0 ? ';' : ',';
     };
 
-    const sep = detectSeparator(reader_text_placeholder);
-
     const parseCsvLine = (line: string, separator: string): string[] => {
       // Minimal CSV tokenizer supporting quoted fields and escaped quotes ("").
       const result: string[] = [];
