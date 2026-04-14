@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 19,
-  patch: 9,
+  minor: 20,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,22 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.20.0",
+    date: "2026-04-14",
+    type: "minor" as const,
+    changes: [
+      "Visual overhaul Apple-like: sombras difusas, cantos arredondados (rounded-2xl/3xl) e transições suaves de 200-300ms",
+      "Botões com micro-animações: hover eleva (-translate-y-1px + shadow), active escala (0.97), font-semibold",
+      "Cards com hover shadow-lg + translate-y e ícones com group-hover:scale-110",
+      "StatCards redesenhados: tipografia maior (text-4xl), tracking-tight, espaçamento vertical refinado",
+      "Login redesenhado: glassmorphism no card, gradiente decorativo com orbes blur, pattern de pontos sutil",
+      "Tipografia global: h1-h3 com tamanhos responsivos, letter-spacing -0.025em, font-smoothing aprimorado",
+      "Bottom nav mobile com frosted glass (backdrop-blur-2xl + backdrop-saturate-150 + borda translúcida)",
+      "Novo token shadow-xl para elevações profundas e shadow-glow refinado",
+      "Border-radius base aumentado de 0.625rem para 0.875rem (estética iOS)",
+    ],
+  },
   {
     version: "1.19.9",
     date: "2026-04-14",
