@@ -651,17 +651,18 @@ serve(async (req) => {
 
     // Fetch all data in parallel
     const destinationId = assessment.destination_id;
+    // Use the assessment's org_id to scope KB files — ensures org isolation
+    const assessmentOrgId = assessment.org_id;
     const fetchPromises = [
       supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
       supabase.from('indicator_values').select('*, indicators(code, name, pillar, theme, unit)').eq('assessment_id', assessmentId),
       supabaseAdmin.from('global_reference_files').select('file_name, category, summary, description').eq('is_active', true).not('summary', 'is', null),
-      supabase.from('knowledge_base_files').select('id, file_name, description, category').eq('is_active', true).or(destinationId ? `destination_id.eq.${destinationId},destination_id.is.null` : 'destination_id.is.null'),
-      // NEW: Data snapshots for provenance
+      // KB files: ONLY from the user's own org — scoped by org_id for multi-tenant isolation
+      supabaseAdmin.from('knowledge_base_files').select('id, file_name, description, category').eq('is_active', true).eq('org_id', assessmentOrgId).or(destinationId ? `destination_id.eq.${destinationId},destination_id.is.null` : 'destination_id.is.null'),
+      // Data snapshots for provenance
       supabase.from('diagnosis_data_snapshots').select('*').eq('assessment_id', assessmentId),
-      // NEW: Community feedback for this destination
-      supabase.from('community_feedback').select('*').eq('destination_id', destinationId),
     ];
 
     // NEW: Enterprise indicator values if enterprise diagnostic
