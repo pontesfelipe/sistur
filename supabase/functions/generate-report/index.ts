@@ -117,6 +117,161 @@ function formatIGMAFlags(flags: Record<string, boolean> | null): string {
   return activeFlags || 'Nenhuma flag IGMA ativa.';
 }
 
+function formatDataSnapshots(snapshots: any[]): string {
+  if (!snapshots || snapshots.length === 0) return '';
+  
+  const bySource: Record<string, any[]> = {};
+  snapshots.forEach((s: any) => {
+    const src = s.source_code || 'MANUAL';
+    if (!bySource[src]) bySource[src] = [];
+    bySource[src].push(s);
+  });
+
+  const sourceLabels: Record<string, string> = {
+    'IBGE_AGREGADOS': 'IBGE (Agregados)',
+    'IBGE_PESQUISAS': 'IBGE (Pesquisas)',
+    'DATASUS': 'DATASUS',
+    'STN': 'STN / Tesouro Nacional',
+    'CADASTUR': 'CADASTUR',
+    'MAPA_TURISMO': 'Mapa do Turismo Brasileiro',
+    'MANUAL': 'Preenchimento Manual',
+  };
+
+  let result = '\n=== PROVENIÊNCIA DOS DADOS (DATA SNAPSHOTS) ===\n';
+  result += 'Detalhamento das fontes oficiais utilizadas no cálculo dos indicadores:\n\n';
+  
+  for (const [source, items] of Object.entries(bySource)) {
+    const label = sourceLabels[source] || source;
+    const autoCount = items.filter(i => !i.was_manually_adjusted).length;
+    const manualCount = items.filter(i => i.was_manually_adjusted).length;
+    const avgConfidence = items.reduce((sum, i) => sum + (i.confidence_level || 0), 0) / items.length;
+    
+    result += `### ${label} (${items.length} indicadores, Confiabilidade média: ${avgConfidence.toFixed(0)}/5)\n`;
+    if (manualCount > 0) result += `  ⚠️ ${manualCount} ajustado(s) manualmente\n`;
+    
+    items.forEach((item: any) => {
+      const val = item.value_used !== null ? item.value_used : (item.value_used_text || 'N/A');
+      const year = item.reference_year ? ` (ref: ${item.reference_year})` : '';
+      const adjusted = item.was_manually_adjusted ? ' [AJUSTADO MANUALMENTE]' : '';
+      result += `  - ${item.indicator_code}: ${val}${year}${adjusted}\n`;
+    });
+    result += '\n';
+  }
+  
+  return result;
+}
+
+function formatCommunityFeedback(feedback: any[]): string {
+  if (!feedback || feedback.length === 0) return '';
+  
+  const totalResponses = feedback.length;
+  const avgQoL = feedback.reduce((sum, f) => sum + (f.quality_of_life_score || 0), 0) / totalResponses;
+  const avgCultural = feedback.reduce((sum, f) => sum + (f.cultural_preservation_score || 0), 0) / totalResponses;
+  const avgEnv = feedback.reduce((sum, f) => sum + (f.environmental_concern_level || 0), 0) / totalResponses;
+  
+  const perceptions: Record<string, number> = {};
+  feedback.forEach(f => {
+    if (f.tourism_impact_perception) {
+      perceptions[f.tourism_impact_perception] = (perceptions[f.tourism_impact_perception] || 0) + 1;
+    }
+  });
+
+  const allConcerns: Record<string, number> = {};
+  feedback.forEach(f => {
+    (f.concerns || []).forEach((c: string) => {
+      allConcerns[c] = (allConcerns[c] || 0) + 1;
+    });
+  });
+  const topConcerns = Object.entries(allConcerns).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  const allPriorities: Record<string, number> = {};
+  feedback.forEach(f => {
+    (f.priorities || []).forEach((p: string) => {
+      allPriorities[p] = (allPriorities[p] || 0) + 1;
+    });
+  });
+  const topPriorities = Object.entries(allPriorities).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  let result = `\n=== FEEDBACK DA COMUNIDADE LOCAL ===\n`;
+  result += `Total de respostas: ${totalResponses}\n\n`;
+  result += `Médias de Percepção (escala 1-5):\n`;
+  result += `- Qualidade de Vida: ${avgQoL.toFixed(1)}/5\n`;
+  result += `- Preservação Cultural: ${avgCultural.toFixed(1)}/5\n`;
+  result += `- Preocupação Ambiental: ${avgEnv.toFixed(1)}/5\n\n`;
+  
+  if (Object.keys(perceptions).length > 0) {
+    result += `Percepção do Impacto do Turismo:\n`;
+    for (const [perception, count] of Object.entries(perceptions)) {
+      result += `- ${perception}: ${count} respostas (${((count / totalResponses) * 100).toFixed(0)}%)\n`;
+    }
+    result += '\n';
+  }
+
+  if (topConcerns.length > 0) {
+    result += `Principais Preocupações da Comunidade:\n`;
+    topConcerns.forEach(([concern, count]) => {
+      result += `- ${concern}: ${count} menções\n`;
+    });
+    result += '\n';
+  }
+
+  if (topPriorities.length > 0) {
+    result += `Prioridades da Comunidade:\n`;
+    topPriorities.forEach(([priority, count]) => {
+      result += `- ${priority}: ${count} menções\n`;
+    });
+    result += '\n';
+  }
+
+  // Collect unique suggestions
+  const allSuggestions = feedback.flatMap(f => f.suggestions || []).filter(Boolean);
+  if (allSuggestions.length > 0) {
+    result += `Sugestões da Comunidade (amostra):\n`;
+    const unique = [...new Set(allSuggestions)].slice(0, 8);
+    unique.forEach(s => { result += `- "${s}"\n`; });
+  }
+
+  return result;
+}
+
+function formatDestinationMetadata(dest: any): string {
+  if (!dest) return '';
+  const parts: string[] = [];
+  if (dest.tourism_region) parts.push(`Região Turística: ${dest.tourism_region}`);
+  if (dest.municipality_type) parts.push(`Categoria no Mapa: ${dest.municipality_type}`);
+  if (dest.has_pdt !== null) parts.push(`Possui PDT: ${dest.has_pdt ? 'Sim' : 'Não'}`);
+  if (dest.latitude && dest.longitude) parts.push(`Coordenadas: ${dest.latitude}, ${dest.longitude}`);
+  if (parts.length === 0) return '';
+  return `\nMETADADOS DO DESTINO:\n${parts.map(p => `- ${p}`).join('\n')}\n`;
+}
+
+function formatEnterpriseValues(values: any[]): string {
+  if (!values || values.length === 0) return '';
+  
+  const byCategory: Record<string, any[]> = {};
+  values.forEach((v: any) => {
+    const cat = v.enterprise_indicators?.enterprise_indicator_categories?.name || 'Outros';
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push(v);
+  });
+
+  let result = '\n=== VALORES ENTERPRISE (DADOS BRUTOS) ===\n';
+  for (const [category, items] of Object.entries(byCategory)) {
+    result += `\n### ${category}\n`;
+    items.forEach((v: any) => {
+      const name = v.enterprise_indicators?.name || v.indicator_id;
+      const unit = v.enterprise_indicators?.unit || '';
+      const benchMin = v.enterprise_indicators?.benchmark_min;
+      const benchMax = v.enterprise_indicators?.benchmark_max;
+      let benchStr = '';
+      if (benchMin !== null && benchMin !== undefined) benchStr += ` | Benchmark min: ${benchMin}`;
+      if (benchMax !== null && benchMax !== undefined) benchStr += ` | Benchmark max: ${benchMax}`;
+      result += `  - ${name}: ${v.value}${unit ? ` ${unit}` : ''}${benchStr}\n`;
+    });
+  }
+  return result;
+}
+
 // ========== COVER TABLE (mandatory for all templates) ==========
 
 function buildCoverBlock(destinationName: string, assessment: any, pillarScores: any, template: string): string {
@@ -156,15 +311,22 @@ OS TRÊS EIXOS SISTUR:
 
 CLASSIFICAÇÃO: ADEQUADO (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
 
-FONTES DE DADOS — TRANSPARÊNCIA:
+FONTES DE DADOS — TRANSPARÊNCIA E RASTREABILIDADE:
+Os dados do diagnóstico são coletados automaticamente de fontes oficiais e complementados por dados locais. Cada indicador possui rastreabilidade completa de proveniência:
 - IBGE (Agregados e Pesquisas): População, PIB per capita, Densidade, Área, IDH, IDEB, Índice de Gini, Incidência de pobreza, Taxa de mortalidade infantil, Mortalidade geral. Confiabilidade: ALTA (5/5).
 - DATASUS: Leitos hospitalares, Cobertura de saúde. Confiabilidade: ALTA (5/5).
 - STN / Tesouro Nacional: Receita própria, Despesa com turismo. Confiabilidade: ALTA (5/5).
 - CADASTUR / dados.gov.br: Guias de turismo, Agências de turismo, Meios de hospedagem. Confiabilidade: ALTA (4/5 — atualização trimestral).
 - Mapa do Turismo Brasileiro (API REST mapa.turismo.gov.br): Categoria (A-E), Região turística, Empregos formais em turismo, Estabelecimentos turísticos, Visitantes nacionais e internacionais, Arrecadação turística, Conselho municipal de turismo. Confiabilidade: ALTA (5/5).
+- Feedback da Comunidade Local: Pesquisas de percepção sobre qualidade de vida, preservação cultural e impacto ambiental do turismo. Confiabilidade: MODERADA (3/5 — amostra local).
 - Dados de preenchimento manual: Taxa de escolarização e quaisquer indicadores que não retornem valor oficial válido no momento da coleta.
-- Indicadores locais coletados pelo operador do diagnóstico.
-IMPORTANTE: Ao citar fontes no relatório, especifique QUAL fonte oficial forneceu cada dado (IBGE, DATASUS, STN, CADASTUR ou Mapa do Turismo). Se o dado veio de preenchimento manual, indique claramente.`;
+- Base de Conhecimento (KB): Documentos locais do destino (PDFs, relatórios, planos diretores) e referências nacionais com resumos extraídos por IA.
+
+REGRA CRÍTICA DE TRANSPARÊNCIA:
+- SEMPRE cite a fonte específica de cada dado mencionado no relatório
+- Se houver snapshots de proveniência, use-os para identificar EXATAMENTE de onde cada valor veio
+- Se o dado veio de preenchimento manual, indique claramente
+- Quando documentos da Base de Conhecimento informarem contexto adicional, referencie-os pelo nome`;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
   if (isEnterprise) {
@@ -183,11 +345,12 @@ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Use markdown com headers hierárquicos (# ## ###)
 - SEMPRE apresente indicadores em TABELAS MARKDOWN (| col1 | col2 |)
 - NUNCA liste indicadores como texto corrido quando puder usar tabela
-- Para cada eixo: tabela com Indicador | Score | Status | Benchmark | Observação
+- Para cada eixo: tabela com Indicador | Score | Status | Fonte | Observação
 - Banco de Ações em tabela: Ação | Pilar | Prazo | Responsável | Prioridade
 - Linguagem institucional, clara e objetiva
 - Justifique conclusões com dados. Conecte: dado → impacto → decisão
-- Se estimar dados: "[ESTIMADO]"`;
+- Se estimar dados: "[ESTIMADO]"
+- SEMPRE inclua uma coluna "Fonte" nas tabelas de indicadores, citando a origem dos dados`;
 
   if (template === 'executivo') {
     return `${common}
@@ -212,7 +375,10 @@ ESTRUTURA OBRIGATÓRIA:
 ## 4. Quick Wins
 - 3 ações de baixo custo e alto impacto, cada uma em 2-3 linhas
 
-## 5. Próxima Revisão
+## 5. Voz da Comunidade
+- Se houver feedback da comunidade, incluir resumo das percepções e preocupações principais (2-3 frases)
+
+## 6. Próxima Revisão
 - Data recomendada e o que monitorar
 
 NÃO INCLUA: contextualização histórica, metodologia detalhada, inventário turístico, considerações filosóficas. Vá direto aos resultados e ações.`;
@@ -250,9 +416,12 @@ ESTRUTURA OBRIGATÓRIA:
 
 ## 6. Indicadores-Chave para Monitoramento
 - KPIs que o investidor deve acompanhar
-- Tabela: KPI | Valor Atual | Meta | Benchmark Setor
+- Tabela: KPI | Valor Atual | Meta | Benchmark Setor | Fonte
 
-## 7. Conclusão e Recomendação
+## 7. Percepção da Comunidade Local
+- Se houver feedback da comunidade, apresentar dados de aceitação/rejeição do turismo (crucial para viabilidade de investimentos)
+
+## 8. Conclusão e Recomendação
 - Rating geral de atratividade (usando scores dos eixos)
 - Horizonte de retorno estimado
 - Próximos passos para due diligence
@@ -275,16 +444,18 @@ ESTRUTURA OBRIGATÓRIA:
 
 ## 2. Contextualização do Município
 - Informações territoriais, demográficas e econômicas relevantes
-- Posição no contexto turístico regional
+- Posição no contexto turístico regional (usar dados do Mapa do Turismo: categoria, região turística)
+- Metadados do destino (se fornecidos)
 
 ## 3. Metodologia SISTUR
 - Breve descrição dos 3 eixos e critérios de classificação
 - Fontes de dados utilizadas (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo Brasileiro)
+- Resumo da rastreabilidade: quantos indicadores vieram de fontes oficiais automáticas vs preenchimento manual
 
 ## 4. Diagnóstico por Eixo SISTUR
 ### 4.1. I-RA — Relações Ambientais
-- Tabela: Indicador | Score | Status | Fonte | Observação
-- EVIDÊNCIAS: dados brutos e contexto
+- Tabela: Indicador | Score | Status | Fonte | Valor Bruto | Observação
+- EVIDÊNCIAS: dados brutos e contexto, citando a fonte oficial de cada dado
 - LEITURA TÉCNICA: interpretação dos scores
 - IMPLICAÇÕES: consequências para o destino
 
@@ -302,17 +473,27 @@ ESTRUTURA OBRIGATÓRIA:
 - Inter-relação entre os eixos
 - Efeitos cascata identificados
 
-## 7. Gargalos e Prescrições
+## 7. Percepção da Comunidade Local
+- Se houver feedback da comunidade: análise das percepções, preocupações e prioridades
+- Cruzamento entre dados objetivos e percepção subjetiva da comunidade
+- Sugestões da comunidade que merecem atenção
+
+## 8. Gargalos e Prescrições
 - Tabela: Gargalo | Severidade | Pilar | Prescrição | Agente Responsável
 
-## 8. Prognóstico e Diretrizes
+## 9. Prognóstico e Diretrizes
 - Cenário tendencial vs cenário desejado
 - Diretrizes estratégicas por horizonte temporal
 
-## 9. Banco de Ações
+## 10. Banco de Ações
 - Tabela: Ação | Pilar | Prazo | Responsável | Prioridade | Status
 
-## 10. Considerações Finais
+## 11. Fontes e Referências
+- Lista completa de fontes de dados oficiais consultadas
+- Documentos de referência nacional utilizados
+- Documentos da Base de Conhecimento do destino consultados
+
+## 12. Considerações Finais
 - Síntese das conclusões
 - Próxima revisão recomendada: data e justificativa`;
 }
@@ -331,7 +512,8 @@ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Comece SEMPRE com título seguido da tabela de ficha técnica fornecida
 - Use tabelas markdown para todos os conjuntos de dados
 - Linguagem executiva, orientada a resultados
-- Conecte: métrica → gap → ação → resultado esperado`;
+- Conecte: métrica → gap → ação → resultado esperado
+- Se houver dados de reviews/avaliações online, incorpore na análise de satisfação`;
 
   if (template === 'executivo') {
     return `${common}
@@ -375,13 +557,14 @@ ESTRUTURA:
 ## 1. Sumário Executivo para Gestão
 ## 2. Perfil do Empreendimento
 ## 3. Metodologia SISTUR Enterprise
-## 4. Diagnóstico por Categoria Funcional (tabela por categoria)
+## 4. Diagnóstico por Categoria Funcional (tabela por categoria com Fonte)
 ## 5. Análise de Gargalos Operacionais (tabela)
 ## 6. Planos de Ação em Andamento
 ## 7. Recomendações Estratégicas (curto/médio/longo prazo)
 ## 8. Prescrições de Capacitação
 ## 9. Roadmap de Implementação (tabela: Ação | Categoria | Investimento | Prazo | KPI)
-## 10. Considerações Finais`;
+## 10. Fontes e Referências
+## 11. Considerações Finais`;
 }
 
 // ========== MAIN ==========
@@ -433,7 +616,7 @@ serve(async (req) => {
 
     const { data: assessment } = await supabase
       .from('assessments')
-      .select('*, destinations(name, uf, ibge_code)')
+      .select('*, destinations(name, uf, ibge_code, tourism_region, municipality_type, has_pdt, latitude, longitude)')
       .eq('id', assessmentId)
       .single();
     
@@ -466,27 +649,44 @@ serve(async (req) => {
       }
     }
 
-    // Fetch all data in parallel (including destination-specific KB files)
+    // Fetch all data in parallel
     const destinationId = assessment.destination_id;
-    const [indicatorScoresRes, alertsRes, actionPlansRes, indicatorValuesRes, globalRefsRes, kbFilesRes] = await Promise.all([
-      supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
+    const fetchPromises = [
+      supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
       supabase.from('indicator_values').select('*, indicators(code, name, pillar, theme, unit)').eq('assessment_id', assessmentId),
       supabaseAdmin.from('global_reference_files').select('file_name, category, summary, description').eq('is_active', true).not('summary', 'is', null),
-      // Fetch KB files for this destination + global KB files
       supabase.from('knowledge_base_files').select('id, file_name, description, category').eq('is_active', true).or(destinationId ? `destination_id.eq.${destinationId},destination_id.is.null` : 'destination_id.is.null'),
-    ]);
+      // NEW: Data snapshots for provenance
+      supabase.from('diagnosis_data_snapshots').select('*').eq('assessment_id', assessmentId),
+      // NEW: Community feedback for this destination
+      supabase.from('community_feedback').select('*').eq('destination_id', destinationId),
+    ];
 
-    const indicatorScores = indicatorScoresRes.data || [];
-    const alerts = alertsRes.data || [];
-    const actionPlans = actionPlansRes.data || [];
-    const indicatorValues = indicatorValuesRes.data || [];
-    const globalRefs = globalRefsRes.data || [];
-    const kbFiles = kbFilesRes.data || [];
+    // NEW: Enterprise indicator values if enterprise diagnostic
+    if (isEnterprise) {
+      fetchPromises.push(
+        supabase.from('enterprise_indicator_values').select('*, enterprise_indicators(*, enterprise_indicator_categories(*))').eq('assessment_id', assessmentId)
+      );
+    }
 
-    console.log('Report for:', destinationName, isEnterprise ? '(ENTERPRISE)' : '(TERRITORIAL)');
-    console.log('Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 'KB files:', kbFiles.length);
+    const results = await Promise.all(fetchPromises);
+
+    const indicatorScores = results[0].data || [];
+    const alerts = results[1].data || [];
+    const actionPlans = results[2].data || [];
+    const indicatorValues = results[3].data || [];
+    const globalRefs = results[4].data || [];
+    const kbFiles = results[5].data || [];
+    const dataSnapshots = results[6].data || [];
+    const communityFeedback = results[7].data || [];
+    const enterpriseValues = isEnterprise ? (results[8]?.data || []) : [];
+
+    console.log('Report data — Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 
+      'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 
+      'KB files:', kbFiles.length, 'Snapshots:', dataSnapshots.length, 
+      'Community feedback:', communityFeedback.length, 'Enterprise values:', enterpriseValues.length);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -515,7 +715,7 @@ serve(async (req) => {
     const userPrompt = `Gere o relatório para: ${destinationName}${assessment.destinations?.uf ? ` — ${assessment.destinations.uf}` : ''}
 
 ${coverBlock}
-
+${formatDestinationMetadata(assessment.destinations)}
 === DADOS DO DIAGNÓSTICO ===
 
 SCORES DOS EIXOS:
@@ -534,7 +734,8 @@ ${indicatorsDetail}
 
 VALORES BRUTOS:
 ${formatIndicatorValues(indicatorValues)}
-
+${isEnterprise && enterpriseValues.length > 0 ? formatEnterpriseValues(enterpriseValues) : ''}
+${dataSnapshots.length > 0 ? formatDataSnapshots(dataSnapshots) : ''}
 GARGALOS:
 ${issuesText}
 
@@ -543,7 +744,7 @@ ${prescriptionsText}
 
 PLANOS DE AÇÃO:
 ${formatActionPlans(actionPlans)}
-
+${communityFeedback.length > 0 ? formatCommunityFeedback(communityFeedback) : ''}
 ${globalRefs.length > 0 ? `=== DOCUMENTOS DE REFERÊNCIA NACIONAL ===
 Os seguintes documentos oficiais devem ser usados como contexto para enriquecer a análise, alinhar recomendações com metas nacionais e fundamentar diretrizes:
 
@@ -567,14 +768,18 @@ INSTRUÇÕES SOBRE BASE DE CONHECIMENTO:
 - Use as informações desses documentos para contextualizar e enriquecer a análise
 - Referencie dados e diretrizes presentes nesses documentos quando relevante
 - Esses documentos representam dados locais e diretrizes específicas do destino
+- Na seção de Fontes e Referências, liste todos os documentos da KB consultados
 ` : ''}
 === INSTRUÇÕES FINAIS ===
 1. COMECE com o título e IMEDIATAMENTE a tabela de Ficha Técnica fornecida acima — NÃO pule essa tabela
 2. Siga EXATAMENTE a estrutura definida no system prompt para o template "${reportTemplate}"
 3. Use TABELAS MARKDOWN para todos os conjuntos de dados
 4. Justifique todas as conclusões com dados fornecidos
-${globalRefs.length > 0 ? '5. Referencie documentos oficiais quando contextualizar resultados e prescrições' : ''}
-${kbFiles.length > 0 ? `${globalRefs.length > 0 ? '6' : '5'}. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
+5. CITE A FONTE OFICIAL de cada dado utilizado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo)
+${dataSnapshots.length > 0 ? '6. Use os snapshots de proveniência para rastrear a origem exata de cada indicador' : ''}
+${globalRefs.length > 0 ? `${dataSnapshots.length > 0 ? '7' : '6'}. Referencie documentos oficiais quando contextualizar resultados e prescrições` : ''}
+${kbFiles.length > 0 ? `${dataSnapshots.length > 0 && globalRefs.length > 0 ? '8' : dataSnapshots.length > 0 || globalRefs.length > 0 ? '7' : '6'}. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}
+${communityFeedback.length > 0 ? `${dataSnapshots.length > 0 && globalRefs.length > 0 && kbFiles.length > 0 ? '9' : '7'}. Integre o feedback da comunidade local na análise — dados de percepção social são fundamentais para a sustentabilidade turística` : ''}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
