@@ -70,7 +70,7 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
   };
 
   return (
-    <nav aria-label="Navegação principal" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t border-border safe-bottom">
+    <nav aria-label="Navegação principal" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-2xl backdrop-saturate-150 border-t border-border/50 safe-bottom">
       <div className="flex items-center justify-around h-16 px-2">
         {displayItems.map((item) => {
           const isActive = location.pathname === item.href || 
