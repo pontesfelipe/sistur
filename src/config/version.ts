@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 19,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.19.6",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "Correção de erros de build em edge functions (TS type narrowing para catch blocks)",
+      "Correção de dissertativas: lógica de correção + emissão de certificado centralizada no servidor via RPC finalize_essay_grading",
+      "Removida inserção direta em lms_certificates pelo cliente (bloqueada por REVOKE INSERT)",
+      "RPCs review_exam_answers, submit_exam_attempt e admin_list_quiz_options com cast temporário até sync de tipos",
+    ],
+  },
   {
     version: "1.19.5",
     date: "2026-04-14",
