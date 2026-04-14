@@ -344,10 +344,7 @@ ESTRUTURA OBRIGATÓRIA:
 - KPIs que o investidor deve acompanhar
 - Tabela: KPI | Valor Atual | Meta | Benchmark Setor | Fonte
 
-## 7. Percepção da Comunidade Local
-- Se houver feedback da comunidade, apresentar dados de aceitação/rejeição do turismo (crucial para viabilidade de investimentos)
-
-## 8. Conclusão e Recomendação
+## 7. Conclusão e Recomendação
 - Rating geral de atratividade (usando scores dos eixos)
 - Horizonte de retorno estimado
 - Próximos passos para due diligence
@@ -399,12 +396,7 @@ ESTRUTURA OBRIGATÓRIA:
 - Inter-relação entre os eixos
 - Efeitos cascata identificados
 
-## 7. Percepção da Comunidade Local
-- Se houver feedback da comunidade: análise das percepções, preocupações e prioridades
-- Cruzamento entre dados objetivos e percepção subjetiva da comunidade
-- Sugestões da comunidade que merecem atenção
-
-## 8. Gargalos e Prescrições
+## 7. Gargalos e Prescrições
 - Tabela: Gargalo | Severidade | Pilar | Prescrição | Agente Responsável
 
 ## 9. Prognóstico e Diretrizes
@@ -670,7 +662,7 @@ ${prescriptionsText}
 
 PLANOS DE AÇÃO:
 ${formatActionPlans(actionPlans)}
-${communityFeedback.length > 0 ? formatCommunityFeedback(communityFeedback) : ''}
+
 ${globalRefs.length > 0 ? `=== DOCUMENTOS DE REFERÊNCIA NACIONAL ===
 Os seguintes documentos oficiais devem ser usados como contexto para enriquecer a análise, alinhar recomendações com metas nacionais e fundamentar diretrizes:
 
@@ -704,8 +696,7 @@ INSTRUÇÕES SOBRE BASE DE CONHECIMENTO:
 5. CITE A FONTE OFICIAL de cada dado utilizado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo)
 ${dataSnapshots.length > 0 ? '6. Use os snapshots de proveniência para rastrear a origem exata de cada indicador' : ''}
 ${globalRefs.length > 0 ? `${dataSnapshots.length > 0 ? '7' : '6'}. Referencie documentos oficiais quando contextualizar resultados e prescrições` : ''}
-${kbFiles.length > 0 ? `${dataSnapshots.length > 0 && globalRefs.length > 0 ? '8' : dataSnapshots.length > 0 || globalRefs.length > 0 ? '7' : '6'}. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}
-${communityFeedback.length > 0 ? `${dataSnapshots.length > 0 && globalRefs.length > 0 && kbFiles.length > 0 ? '9' : '7'}. Integre o feedback da comunidade local na análise — dados de percepção social são fundamentais para a sustentabilidade turística` : ''}`;
+${kbFiles.length > 0 ? `${dataSnapshots.length > 0 && globalRefs.length > 0 ? '8' : dataSnapshots.length > 0 || globalRefs.length > 0 ? '7' : '6'}. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
