@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/select";
 import { useAssessments } from '@/hooks/useAssessments';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AssessmentCardSkeleton } from '@/components/ui/content-skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProfile } from '@/hooks/useProfile';
 
@@ -192,8 +194,10 @@ const Diagnosticos = () => {
 
           {/* Loading State */}
           {isLoading && (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <AssessmentCardSkeleton key={i} />
+              ))}
             </div>
           )}
 
@@ -218,25 +222,15 @@ const Diagnosticos = () => {
 
           {/* Empty State */}
           {!isLoading && filteredAssessments.length === 0 && (
-            <div className="text-center py-16">
-              <ClipboardList className="mx-auto h-12 w-12 text-muted-foreground/50" />
-              <h3 className="mt-4 text-lg font-semibold text-foreground">
-                {searchQuery || statusFilter !== 'all' ? 'Nenhum diagnóstico encontrado' : 'Nenhum diagnóstico cadastrado'}
-              </h3>
-              <p className="mt-2 text-muted-foreground">
-                {searchQuery || statusFilter !== 'all'
-                  ? 'Tente ajustar seus filtros.'
-                  : 'Crie sua primeira rodada de diagnóstico.'}
-              </p>
-              {!searchQuery && statusFilter === 'all' && (
-                <Button className="mt-4" asChild>
-                  <Link to="/nova-rodada">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Nova Rodada
-                  </Link>
-                </Button>
-              )}
-            </div>
+            <EmptyState
+              icon={ClipboardList}
+              title={searchQuery || statusFilter !== 'all' ? 'Nenhum diagnóstico encontrado' : 'Nenhum diagnóstico cadastrado'}
+              description={searchQuery || statusFilter !== 'all'
+                ? 'Tente ajustar seus filtros para encontrar o que procura.'
+                : 'Comece avaliando um destino turístico para gerar insights e planos de ação.'}
+              actionLabel={!searchQuery && statusFilter === 'all' ? 'Criar Primeira Rodada' : undefined}
+              actionHref={!searchQuery && statusFilter === 'all' ? '/nova-rodada' : undefined}
+            />
           )}
         </TabsContent>
 

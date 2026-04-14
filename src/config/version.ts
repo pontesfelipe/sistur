@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 19,
-  patch: 6,
+  patch: 7,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,20 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.19.7",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "Skeleton loaders com formato contextual (cards de diagnóstico, gauges de pilar, cards de treinamento) em vez de retângulos genéricos",
+      "Componente EmptyState reutilizável com ícone, descrição e CTA para estados vazios",
+      "Stepper mobile vertical colapsável no wizard Nova Rodada — substitui scroll horizontal de 700px",
+      "Barra de progresso compacta com indicador de etapa atual no mobile",
+      "Link 'Pular para o conteúdo' acessível no AppLayout (visível apenas com foco do teclado)",
+      "aria-labels em botões de etapa do stepper e aria-current='step' na etapa ativa",
+      "role='main' adicionado ao elemento main do layout",
+    ],
+  },
   {
     version: "1.19.6",
     date: "2026-04-14",
