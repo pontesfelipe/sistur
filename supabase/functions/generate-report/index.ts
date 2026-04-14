@@ -161,78 +161,8 @@ function formatDataSnapshots(snapshots: any[]): string {
   return result;
 }
 
-function formatCommunityFeedback(feedback: any[]): string {
-  if (!feedback || feedback.length === 0) return '';
-  
-  const totalResponses = feedback.length;
-  const avgQoL = feedback.reduce((sum, f) => sum + (f.quality_of_life_score || 0), 0) / totalResponses;
-  const avgCultural = feedback.reduce((sum, f) => sum + (f.cultural_preservation_score || 0), 0) / totalResponses;
-  const avgEnv = feedback.reduce((sum, f) => sum + (f.environmental_concern_level || 0), 0) / totalResponses;
-  
-  const perceptions: Record<string, number> = {};
-  feedback.forEach(f => {
-    if (f.tourism_impact_perception) {
-      perceptions[f.tourism_impact_perception] = (perceptions[f.tourism_impact_perception] || 0) + 1;
-    }
-  });
 
-  const allConcerns: Record<string, number> = {};
-  feedback.forEach(f => {
-    (f.concerns || []).forEach((c: string) => {
-      allConcerns[c] = (allConcerns[c] || 0) + 1;
-    });
-  });
-  const topConcerns = Object.entries(allConcerns).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-  const allPriorities: Record<string, number> = {};
-  feedback.forEach(f => {
-    (f.priorities || []).forEach((p: string) => {
-      allPriorities[p] = (allPriorities[p] || 0) + 1;
-    });
-  });
-  const topPriorities = Object.entries(allPriorities).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-  let result = `\n=== FEEDBACK DA COMUNIDADE LOCAL ===\n`;
-  result += `Total de respostas: ${totalResponses}\n\n`;
-  result += `Médias de Percepção (escala 1-5):\n`;
-  result += `- Qualidade de Vida: ${avgQoL.toFixed(1)}/5\n`;
-  result += `- Preservação Cultural: ${avgCultural.toFixed(1)}/5\n`;
-  result += `- Preocupação Ambiental: ${avgEnv.toFixed(1)}/5\n\n`;
-  
-  if (Object.keys(perceptions).length > 0) {
-    result += `Percepção do Impacto do Turismo:\n`;
-    for (const [perception, count] of Object.entries(perceptions)) {
-      result += `- ${perception}: ${count} respostas (${((count / totalResponses) * 100).toFixed(0)}%)\n`;
-    }
-    result += '\n';
-  }
-
-  if (topConcerns.length > 0) {
-    result += `Principais Preocupações da Comunidade:\n`;
-    topConcerns.forEach(([concern, count]) => {
-      result += `- ${concern}: ${count} menções\n`;
-    });
-    result += '\n';
-  }
-
-  if (topPriorities.length > 0) {
-    result += `Prioridades da Comunidade:\n`;
-    topPriorities.forEach(([priority, count]) => {
-      result += `- ${priority}: ${count} menções\n`;
-    });
-    result += '\n';
-  }
-
-  // Collect unique suggestions
-  const allSuggestions = feedback.flatMap(f => f.suggestions || []).filter(Boolean);
-  if (allSuggestions.length > 0) {
-    result += `Sugestões da Comunidade (amostra):\n`;
-    const unique = [...new Set(allSuggestions)].slice(0, 8);
-    unique.forEach(s => { result += `- "${s}"\n`; });
-  }
-
-  return result;
-}
 
 function formatDestinationMetadata(dest: any): string {
   if (!dest) return '';
@@ -318,7 +248,6 @@ Os dados do diagnóstico são coletados automaticamente de fontes oficiais e com
 - STN / Tesouro Nacional: Receita própria, Despesa com turismo. Confiabilidade: ALTA (5/5).
 - CADASTUR / dados.gov.br: Guias de turismo, Agências de turismo, Meios de hospedagem. Confiabilidade: ALTA (4/5 — atualização trimestral).
 - Mapa do Turismo Brasileiro (API REST mapa.turismo.gov.br): Categoria (A-E), Região turística, Empregos formais em turismo, Estabelecimentos turísticos, Visitantes nacionais e internacionais, Arrecadação turística, Conselho municipal de turismo. Confiabilidade: ALTA (5/5).
-- Feedback da Comunidade Local: Pesquisas de percepção sobre qualidade de vida, preservação cultural e impacto ambiental do turismo. Confiabilidade: MODERADA (3/5 — amostra local).
 - Dados de preenchimento manual: Taxa de escolarização e quaisquer indicadores que não retornem valor oficial válido no momento da coleta.
 - Base de Conhecimento (KB): Documentos locais do destino (PDFs, relatórios, planos diretores) e referências nacionais com resumos extraídos por IA.
 
@@ -375,10 +304,7 @@ ESTRUTURA OBRIGATÓRIA:
 ## 4. Quick Wins
 - 3 ações de baixo custo e alto impacto, cada uma em 2-3 linhas
 
-## 5. Voz da Comunidade
-- Se houver feedback da comunidade, incluir resumo das percepções e preocupações principais (2-3 frases)
-
-## 6. Próxima Revisão
+## 5. Próxima Revisão
 - Data recomendada e o que monitorar
 
 NÃO INCLUA: contextualização histórica, metodologia detalhada, inventário turístico, considerações filosóficas. Vá direto aos resultados e ações.`;
@@ -418,10 +344,7 @@ ESTRUTURA OBRIGATÓRIA:
 - KPIs que o investidor deve acompanhar
 - Tabela: KPI | Valor Atual | Meta | Benchmark Setor | Fonte
 
-## 7. Percepção da Comunidade Local
-- Se houver feedback da comunidade, apresentar dados de aceitação/rejeição do turismo (crucial para viabilidade de investimentos)
-
-## 8. Conclusão e Recomendação
+## 7. Conclusão e Recomendação
 - Rating geral de atratividade (usando scores dos eixos)
 - Horizonte de retorno estimado
 - Próximos passos para due diligence
@@ -473,27 +396,22 @@ ESTRUTURA OBRIGATÓRIA:
 - Inter-relação entre os eixos
 - Efeitos cascata identificados
 
-## 7. Percepção da Comunidade Local
-- Se houver feedback da comunidade: análise das percepções, preocupações e prioridades
-- Cruzamento entre dados objetivos e percepção subjetiva da comunidade
-- Sugestões da comunidade que merecem atenção
-
-## 8. Gargalos e Prescrições
+## 7. Gargalos e Prescrições
 - Tabela: Gargalo | Severidade | Pilar | Prescrição | Agente Responsável
 
-## 9. Prognóstico e Diretrizes
+## 8. Prognóstico e Diretrizes
 - Cenário tendencial vs cenário desejado
 - Diretrizes estratégicas por horizonte temporal
 
-## 10. Banco de Ações
+## 9. Banco de Ações
 - Tabela: Ação | Pilar | Prazo | Responsável | Prioridade | Status
 
-## 11. Fontes e Referências
+## 10. Fontes e Referências
 - Lista completa de fontes de dados oficiais consultadas
 - Documentos de referência nacional utilizados
 - Documentos da Base de Conhecimento do destino consultados
 
-## 12. Considerações Finais
+## 11. Considerações Finais
 - Síntese das conclusões
 - Próxima revisão recomendada: data e justificativa`;
 }
@@ -651,17 +569,18 @@ serve(async (req) => {
 
     // Fetch all data in parallel
     const destinationId = assessment.destination_id;
+    // Use the assessment's org_id to scope KB files — ensures org isolation
+    const assessmentOrgId = assessment.org_id;
     const fetchPromises = [
       supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
       supabase.from('indicator_values').select('*, indicators(code, name, pillar, theme, unit)').eq('assessment_id', assessmentId),
       supabaseAdmin.from('global_reference_files').select('file_name, category, summary, description').eq('is_active', true).not('summary', 'is', null),
-      supabase.from('knowledge_base_files').select('id, file_name, description, category').eq('is_active', true).or(destinationId ? `destination_id.eq.${destinationId},destination_id.is.null` : 'destination_id.is.null'),
-      // NEW: Data snapshots for provenance
+      // KB files: ONLY from the user's own org — scoped by org_id for multi-tenant isolation
+      supabaseAdmin.from('knowledge_base_files').select('id, file_name, description, category').eq('is_active', true).eq('org_id', assessmentOrgId).or(destinationId ? `destination_id.eq.${destinationId},destination_id.is.null` : 'destination_id.is.null'),
+      // Data snapshots for provenance
       supabase.from('diagnosis_data_snapshots').select('*').eq('assessment_id', assessmentId),
-      // NEW: Community feedback for this destination
-      supabase.from('community_feedback').select('*').eq('destination_id', destinationId),
     ];
 
     // NEW: Enterprise indicator values if enterprise diagnostic
@@ -680,13 +599,12 @@ serve(async (req) => {
     const globalRefs = results[4].data || [];
     const kbFiles = results[5].data || [];
     const dataSnapshots = results[6].data || [];
-    const communityFeedback = results[7].data || [];
-    const enterpriseValues = isEnterprise ? (results[8]?.data || []) : [];
+    const enterpriseValues = isEnterprise ? (results[7]?.data || []) : [];
 
     console.log('Report data — Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 
       'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 
       'KB files:', kbFiles.length, 'Snapshots:', dataSnapshots.length, 
-      'Community feedback:', communityFeedback.length, 'Enterprise values:', enterpriseValues.length);
+      'Enterprise values:', enterpriseValues.length);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -744,7 +662,7 @@ ${prescriptionsText}
 
 PLANOS DE AÇÃO:
 ${formatActionPlans(actionPlans)}
-${communityFeedback.length > 0 ? formatCommunityFeedback(communityFeedback) : ''}
+
 ${globalRefs.length > 0 ? `=== DOCUMENTOS DE REFERÊNCIA NACIONAL ===
 Os seguintes documentos oficiais devem ser usados como contexto para enriquecer a análise, alinhar recomendações com metas nacionais e fundamentar diretrizes:
 
@@ -778,8 +696,7 @@ INSTRUÇÕES SOBRE BASE DE CONHECIMENTO:
 5. CITE A FONTE OFICIAL de cada dado utilizado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo)
 ${dataSnapshots.length > 0 ? '6. Use os snapshots de proveniência para rastrear a origem exata de cada indicador' : ''}
 ${globalRefs.length > 0 ? `${dataSnapshots.length > 0 ? '7' : '6'}. Referencie documentos oficiais quando contextualizar resultados e prescrições` : ''}
-${kbFiles.length > 0 ? `${dataSnapshots.length > 0 && globalRefs.length > 0 ? '8' : dataSnapshots.length > 0 || globalRefs.length > 0 ? '7' : '6'}. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}
-${communityFeedback.length > 0 ? `${dataSnapshots.length > 0 && globalRefs.length > 0 && kbFiles.length > 0 ? '9' : '7'}. Integre o feedback da comunidade local na análise — dados de percepção social são fundamentais para a sustentabilidade turística` : ''}`;
+${kbFiles.length > 0 ? `${dataSnapshots.length > 0 && globalRefs.length > 0 ? '8' : dataSnapshots.length > 0 || globalRefs.length > 0 ? '7' : '6'}. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
