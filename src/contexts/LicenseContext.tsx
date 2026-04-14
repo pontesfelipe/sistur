@@ -84,10 +84,10 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    if (lastUserId.current === user.id && initialized && license) {
-      setLoading(false);
-      return;
-    }
+    // Note: intentionally no internal short-circuit on `lastUserId.current === user.id`
+    // here. The useEffect below already guards re-fetches on user change, and the
+    // external `forceRefetch` callers (e.g. after plan upgrade) need to actually
+    // hit the RPC again even when the user hasn't changed.
 
     try {
       const { data, error } = await supabase.rpc('get_license_status');
@@ -135,7 +135,7 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       setInitialized(true);
     }
-  }, [user, initialized, license]);
+  }, [user]);
 
   useEffect(() => {
     if (user?.id !== lastUserId.current) {

@@ -78,6 +78,10 @@ export function useForum() {
   const [filter, setFilter] = useState<'all' | 'org' | 'public'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
+  // Cap initial post fetch so large communities don't blow up the DOM or query times.
+  // A follow-up pass can replace this with cursor-based infinite scrolling.
+  const POSTS_PAGE_SIZE = 50;
+
   // Fetch posts - uses secure view for public posts to hide user_id/org_id
   const { data: posts, isLoading: postsLoading, refetch: refetchPosts } = useQuery({
     queryKey: ['forum-posts', filter, categoryFilter],
@@ -87,7 +91,8 @@ export function useForum() {
         let query = supabase
           .from('public_forum_posts_view')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(POSTS_PAGE_SIZE);
 
         if (categoryFilter !== 'all') {
           query = query.eq('category', categoryFilter);
@@ -127,7 +132,8 @@ export function useForum() {
         .from('forum_posts')
         .select('*')
         .order('is_pinned', { ascending: false })
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(POSTS_PAGE_SIZE);
 
       if (filter === 'org' && profile?.org_id) {
         const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;

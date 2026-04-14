@@ -92,7 +92,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean }>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
 
-  const { assessments, isLoading: loadingAssessments } = useAssessments();
+  const { assessments, isLoading: loadingAssessments, updateAssessment } = useAssessments();
   const { values, isLoading: loadingValues, upsertValue, bulkUpsertValues } = useIndicatorValues(selectedAssessment);
   const { calculate, loading: calculating } = useCalculateAssessment();
 
@@ -448,6 +448,22 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     return value !== null && value !== undefined;
   }).length;
   const fillProgress = activeIndicators.length > 0 ? (filledCount / activeIndicators.length) * 100 : 0;
+
+  // Promote DRAFT assessments to DATA_READY once all active indicators are
+  // filled, so they show up under the "Dados Prontos" bucket on the listing
+  // page even before the user clicks "Calcular". Only runs once per fill
+  // transition — we don't downgrade from DATA_READY back to DRAFT here to
+  // avoid clobbering status manually set elsewhere.
+  useEffect(() => {
+    if (!selectedAssessment || !selectedAssessmentData) return;
+    if (selectedAssessmentData.status !== 'DRAFT') return;
+    if (activeIndicators.length === 0) return;
+    if (fillProgress < 100) return;
+    if (Object.keys(editedValues).length > 0) return;
+    if (updateAssessment.isPending) return;
+
+    updateAssessment.mutate({ id: selectedAssessment, status: 'DATA_READY' });
+  }, [selectedAssessment, selectedAssessmentData, activeIndicators.length, fillProgress, editedValues, updateAssessment]);
 
   const preFilledCount = values.filter(v => {
     if (v.is_ignored) return false;

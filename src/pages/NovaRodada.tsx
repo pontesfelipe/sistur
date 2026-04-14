@@ -114,6 +114,25 @@ export default function NovaRodada() {
     enabled: !!resumeAssessmentId,
   });
 
+  // Count indicator values already saved for the assessment we're resuming.
+  // Previously the resume logic only considered *external validated* values,
+  // so a user who had already filled in manual indicators was kicked back to
+  // the Validation step (step 4). Reading the saved count lets us jump them
+  // straight to the Fill step (5) or further.
+  const { data: resumeIndicatorCount } = useQuery({
+    queryKey: ['resume-assessment-indicator-count', resumeAssessmentId],
+    queryFn: async () => {
+      if (!resumeAssessmentId) return 0;
+      const { count, error } = await supabase
+        .from('indicator_values')
+        .select('id', { count: 'exact', head: true })
+        .eq('assessment_id', resumeAssessmentId);
+      if (error) throw error;
+      return count ?? 0;
+    },
+    enabled: !!resumeAssessmentId,
+  });
+
   const { destinations = [], isLoading: destinationsLoading, createDestination } = useDestinations();
   const { createAssessment } = useAssessments();
   const createDataSnapshot = useCreateDataSnapshot();
@@ -132,6 +151,10 @@ export default function NovaRodada() {
 
   // Load resume data
   useEffect(() => {
+    // Wait for the indicator count query to resolve so we don't mis-place the
+    // user on the stepper (e.g. kicking them back to Validation when they've
+    // already saved manual indicator values).
+    if (resumeAssessmentId && resumeIndicatorCount === undefined) return;
     if (resumeAssessment && !resumeDataLoaded && destinations.length > 0) {
       setCreatedAssessmentId(resumeAssessment.id);
       setSelectedDestination(resumeAssessment.destination_id);
@@ -140,17 +163,32 @@ export default function NovaRodada() {
       setSelectedTier((resumeAssessment.tier as DiagnosisTier) || 'COMPLETE');
       setPeriodStart(resumeAssessment.period_start || '');
       setPeriodEnd(resumeAssessment.period_end || '');
+
+      // Determine the furthest step the user has reached, using both the
+      // assessment lifecycle status and any indicator values that are already
+      // persisted. This avoids sending someone back to re-validate official
+      // data that's already been saved, and also lets CALCULATED diagnostics
+      // jump directly to the report step.
+      const savedIndicatorCount = resumeIndicatorCount ?? 0;
+      const status = resumeAssessment.status as string | null;
+      let resumeStep = 4;
+      if (status === 'CALCULATED') {
+        resumeStep = 7;
+      } else if (status === 'DATA_READY') {
+        resumeStep = 6;
+      } else if (savedIndicatorCount > 0 || validatedValuesCount > 0) {
+        resumeStep = 5;
+      }
+
+      setCurrentStep(resumeStep);
       if (validatedValuesCount > 0) {
-        setCurrentStep(5);
         setValidatedDataCount(validatedValuesCount);
-      } else {
-        setCurrentStep(4);
       }
       setResumeDataLoaded(true);
       setIsResuming(false);
       toast({ title: 'Diagnóstico carregado', description: `Retomando "${resumeAssessment.title}" de onde você parou.` });
     }
-  }, [resumeAssessment, resumeDataLoaded, destinations, validatedValuesCount]);
+  }, [resumeAssessment, resumeDataLoaded, destinations, validatedValuesCount, resumeIndicatorCount]);
 
   // Auto-generate title
   useEffect(() => {
@@ -244,7 +282,7 @@ export default function NovaRodada() {
     return true;
   };
 
-  if (resumeLoading || (isResuming && !resumeDataLoaded)) {
+  if (resumeLoading || (isResuming && !resumeDataLoaded && resumeIndicatorCount === undefined)) {
     return (
       <AppLayout title="Carregando Diagnóstico" subtitle="Preparando para retomar de onde você parou...">
         <div className="flex flex-col items-center justify-center py-20">

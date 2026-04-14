@@ -45,14 +45,16 @@ const ERPIntegration = () => {
   const { data: events, isLoading: eventsLoading } = useERPEventLog(50);
   const { receiveDiagnostic } = useERPDiagnosticMutations();
 
+  // Defensive helper: Supabase types `igma_warnings` as Json, so runtime values
+  // could be null, an object, or a stringified array. Always validate shape
+  // before calling .length to avoid rendering crashes.
+  const getWarnings = (raw: unknown): unknown[] => (Array.isArray(raw) ? raw : []);
+
   const stats = {
     totalDiagnostics: diagnostics?.length || 0,
     recentEvents: events?.length || 0,
     lastSync: events?.[0]?.created_at,
-    warnings: diagnostics?.filter(d => {
-      const warnings = d.igma_warnings as unknown[];
-      return warnings && warnings.length > 0;
-    }).length || 0,
+    warnings: diagnostics?.filter(d => getWarnings(d.igma_warnings).length > 0).length || 0,
   };
 
   const handleSync = async () => {
@@ -279,8 +281,8 @@ const ERPIntegration = () => {
                         </TableCell>
                         <TableCell>
                           {(() => {
-                            const warnings = diag.igma_warnings as unknown[];
-                            return warnings?.length ? (
+                            const warnings = getWarnings(diag.igma_warnings);
+                            return warnings.length ? (
                               <Badge className="bg-yellow-500/20 text-yellow-700">
                                 {warnings.length} alerta(s)
                               </Badge>
