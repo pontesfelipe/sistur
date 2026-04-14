@@ -72,12 +72,15 @@ export interface CreateReplyData {
   parent_reply_id?: string;
 }
 
-export function useForum() {
+export function useForum(options?: { search?: string }) {
   const { user } = useAuth();
   const { profile } = useProfileContext();
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<'all' | 'org' | 'public'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  // Trim + lower-case so the query key doesn't bust on trailing spaces or
+  // capitalization changes.
+  const search = options?.search?.trim() ?? '';
 
   // Infinite-scroll page size. Kept modest because each page hydrates
   // author profiles + like state per post, and large chunks hurt both
@@ -97,7 +100,7 @@ export function useForum() {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['forum-posts', filter, categoryFilter, profile?.org_id, profile?.viewing_demo_org_id],
+    queryKey: ['forum-posts', filter, categoryFilter, search, profile?.org_id, profile?.viewing_demo_org_id],
     initialPageParam: 0,
     getNextPageParam: (lastPage: (ForumPost & { is_owner?: boolean })[], allPages) => {
       if (!lastPage || lastPage.length < POSTS_PAGE_SIZE) return undefined;
@@ -117,6 +120,14 @@ export function useForum() {
 
         if (categoryFilter !== 'all') {
           query = query.eq('category', categoryFilter);
+        }
+
+        // Server-side full-text search on title + content. Escaping `%` and
+        // `,` in the term keeps the PostgREST `or` filter well-formed even
+        // when the user types those characters.
+        if (search) {
+          const safe = search.replace(/[%,()]/g, ' ');
+          query = query.or(`title.ilike.%${safe}%,content.ilike.%${safe}%`);
         }
 
         const { data, error } = await query;
@@ -163,6 +174,11 @@ export function useForum() {
 
       if (categoryFilter !== 'all') {
         query = query.eq('category', categoryFilter);
+      }
+
+      if (search) {
+        const safe = search.replace(/[%,()]/g, ' ');
+        query = query.or(`title.ilike.%${safe}%,content.ilike.%${safe}%`);
       }
 
       const { data, error } = await query;

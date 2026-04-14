@@ -128,9 +128,10 @@ function ReplyCard({
                   size="sm"
                   onClick={() => onMarkAsSolution(reply.id)}
                   className="text-primary"
+                  title="Marcar como solução"
                 >
-                  <CheckCircle2 className="h-4 w-4 mr-1" />
-                  Marcar como solução
+                  <CheckCircle2 className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Marcar como solução</span>
                 </Button>
               )}
 
@@ -309,16 +310,16 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
       {/* Main Post */}
       <Card>
         <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-12 w-12">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3 min-w-0">
+              <Avatar className="h-12 w-12 flex-shrink-0">
                 <AvatarImage src={post.author?.avatar_url || ''} />
                 <AvatarFallback>
                   {post.author?.full_name?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <p className="font-medium">{post.author?.full_name}</p>
+              <div className="min-w-0">
+                <p className="font-medium truncate">{post.author?.full_name}</p>
                 <p className="text-sm text-muted-foreground">
                   {formatDistanceToNow(new Date(post.created_at), {
                     addSuffix: true,
@@ -328,7 +329,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {post.is_pinned && (
                 <Badge variant="default" className="gap-1 text-xs">
                   <Pin className="h-3 w-3" />

@@ -30,6 +30,15 @@ const categories = [
 ];
 
 export default function Forum() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  // Debounce so typing doesn't fire a network request on every keystroke.
+  useEffect(() => {
+    const t = window.setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => window.clearTimeout(t);
+  }, [searchQuery]);
+
   const {
     posts,
     postsLoading,
@@ -42,7 +51,7 @@ export default function Forum() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useForum();
+  } = useForum({ search: debouncedSearch });
   const { lightTap } = useHaptic();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const isFetchingRef = useRef(isFetchingNextPage);
@@ -66,15 +75,13 @@ export default function Forum() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [editingPost, setEditingPost] = useState<ForumPost | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: selectedPost } = usePost(selectedPostId || '');
   const { data: replies } = useReplies(selectedPostId || '');
 
-  const filteredPosts = posts?.filter((post) =>
-    post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    post.content.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Search is handled server-side via useForum({ search }); posts already
+  // reflect the active search/filter/category combo.
+  const filteredPosts = posts;
 
   const handlePostClick = (post: ForumPost) => {
     lightTap();

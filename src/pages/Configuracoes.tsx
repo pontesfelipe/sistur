@@ -48,6 +48,7 @@ import {
   Map,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 // Helper component for downloadable documents
 function DocumentDownloadItem({ 
@@ -133,24 +134,45 @@ export default function Configuracoes() {
     <AppLayout title="Configurações" subtitle="Documentação, metodologia de cálculo e ferramentas do SISTUR">
       <div className="space-y-6">
 
+        {/*
+          Tabs that only make sense for admins (Feedback management, Logs
+          Analytics) are hidden from non-admin users so they don't land on an
+          empty/forbidden panel. "Usuários" stays visible for ORG_ADMIN so
+          they can manage their org members via OrgAdminUsersPanel.
+        */}
         <Tabs defaultValue="geral" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 max-w-4xl">
+          <TabsList
+            className={cn(
+              'grid w-full max-w-4xl',
+              isAdmin
+                ? 'grid-cols-6'
+                : isOrgAdmin
+                  ? 'grid-cols-4'
+                  : 'grid-cols-3'
+            )}
+          >
             <TabsTrigger value="geral" className="flex items-center gap-2">
               <Settings2 className="h-4 w-4" />
               <span className="hidden sm:inline">Geral</span>
             </TabsTrigger>
-            <TabsTrigger value="usuarios" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">Usuários</span>
-            </TabsTrigger>
-            <TabsTrigger value="feedback" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">Feedback</span>
-            </TabsTrigger>
-            <TabsTrigger value="logs" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Logs</span>
-            </TabsTrigger>
+            {(isAdmin || isOrgAdmin) && (
+              <TabsTrigger value="usuarios" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Usuários</span>
+              </TabsTrigger>
+            )}
+            {isAdmin && (
+              <TabsTrigger value="feedback" className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                <span className="hidden sm:inline">Feedback</span>
+              </TabsTrigger>
+            )}
+            {isAdmin && (
+              <TabsTrigger value="logs" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">Logs</span>
+              </TabsTrigger>
+            )}
             <TabsTrigger value="documentacao" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Docs</span>
@@ -571,7 +593,7 @@ export default function Configuracoes() {
             {isAdmin && <PerformanceMetricsPanel />}
 
             {/* Global References - Admin only */}
-            <GlobalReferencesPanel />
+            {isAdmin && <GlobalReferencesPanel />}
           </TabsContent>
         </Tabs>
       </div>

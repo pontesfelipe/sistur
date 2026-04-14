@@ -18,6 +18,7 @@ import { Link } from 'react-router-dom';
 import { useDestinations } from '@/hooks/useDestinations';
 import { useEnterpriseProfiles } from '@/hooks/useEnterpriseProfiles';
 import { useProfile } from '@/hooks/useProfile';
+import { useProfileContext } from '@/contexts/ProfileContext';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 import { EnterpriseProfilePanel } from '@/components/enterprise/EnterpriseProfilePanel';
 import {
@@ -55,6 +56,8 @@ export function DestinosPanel() {
   const { effectiveOrgId } = useProfile();
   const { destinations, isLoading, createDestination, updateDestination, deleteDestination } = useDestinations();
   const { profiles: enterpriseProfiles } = useEnterpriseProfiles();
+  const { roles } = useProfileContext();
+  const canMutate = roles?.some(r => r.role !== 'VIEWER') ?? false;
   
   // Check if organization has enterprise access
   useEffect(() => {
@@ -173,15 +176,19 @@ export function DestinosPanel() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Eye className="mr-2 h-4 w-4" />
-                        Ver detalhes
+                      <DropdownMenuItem asChild>
+                        <Link to={`/diagnosticos?destino=${destination.id}`}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          Ver detalhes
+                        </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEdit(destination)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Editar
-                      </DropdownMenuItem>
-                      {hasEnterpriseAccess && (
+                      {canMutate && (
+                        <DropdownMenuItem onClick={() => handleEdit(destination)}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Editar
+                        </DropdownMenuItem>
+                      )}
+                      {canMutate && hasEnterpriseAccess && (
                         <>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => setEnterpriseProfileDestination(destination)}>
@@ -190,14 +197,18 @@ export function DestinosPanel() {
                           </DropdownMenuItem>
                         </>
                       )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem 
-                        className="text-destructive"
-                        onClick={() => setDeleteId(destination.id)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Excluir
-                      </DropdownMenuItem>
+                      {canMutate && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => setDeleteId(destination.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Excluir
+                          </DropdownMenuItem>
+                        </>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

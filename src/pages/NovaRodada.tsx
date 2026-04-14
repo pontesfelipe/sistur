@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -52,7 +52,7 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
 
 export default function NovaRodada() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const resumeAssessmentId = searchParams.get('resume');
   const typeParam = searchParams.get('type');
   
@@ -78,6 +78,10 @@ export default function NovaRodada() {
   const [validatedDataCount, setValidatedDataCount] = useState(0);
   const [isResuming, setIsResuming] = useState(!!resumeAssessmentId);
   const [resumeDataLoaded, setResumeDataLoaded] = useState(false);
+  // Ensure the "Diagnóstico carregado" toast only fires once per resume mount,
+  // even if the effect re-runs while the destinations/indicator-count queries
+  // settle.
+  const resumeToastShownRef = useRef(false);
   
   const { data: orgData } = useQuery({
     queryKey: ['org-enterprise-access', userProfile?.org_id],
@@ -91,6 +95,21 @@ export default function NovaRodada() {
   });
   
   const hasEnterpriseAccess = orgData?.has_enterprise_access === true;
+
+  // Warn the user (once) if they arrive at the wizard with ?type=enterprise
+  // but their org doesn't actually have enterprise access. Previously the
+  // wizard silently coerced the type to 'territorial' with no feedback.
+  useEffect(() => {
+    if (typeParam === 'enterprise' && orgData !== undefined && !hasEnterpriseAccess) {
+      toast({
+        title: 'Diagnóstico enterprise indisponível',
+        description: 'Sua organização ainda não tem acesso ao diagnóstico enterprise. Fluxo territorial selecionado.',
+        variant: 'destructive',
+      });
+    }
+    // We only want this to fire when the org-data query first resolves.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typeParam, orgData]);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -186,7 +205,10 @@ export default function NovaRodada() {
       }
       setResumeDataLoaded(true);
       setIsResuming(false);
-      toast({ title: 'Diagnóstico carregado', description: `Retomando "${resumeAssessment.title}" de onde você parou.` });
+      if (!resumeToastShownRef.current) {
+        resumeToastShownRef.current = true;
+        toast({ title: 'Diagnóstico carregado', description: `Retomando "${resumeAssessment.title}" de onde você parou.` });
+      }
     }
   }, [resumeAssessment, resumeDataLoaded, destinations, validatedValuesCount, resumeIndicatorCount]);
 
@@ -266,6 +288,12 @@ export default function NovaRodada() {
           period_end: periodEnd || null, visibility, tier: selectedTier, diagnostic_type: diagnosticType,
         });
         setCreatedAssessmentId(result.id);
+        // Write the assessment id to the URL so a refresh at any later step
+        // resumes via the existing `?resume=` flow instead of restarting the
+        // wizard from step 1.
+        const params = new URLSearchParams(searchParams);
+        params.set('resume', result.id);
+        setSearchParams(params, { replace: true });
         toast({ title: 'Diagnóstico criado com sucesso!' });
         setCurrentStep(4);
       } catch (error) {
@@ -311,20 +339,38 @@ export default function NovaRodada() {
       subtitle={resumeAssessmentId ? "Continue de onde você parou" : "Siga o fluxo para criar uma nova avaliação"}
     >
       {/* Resume Banner */}
-      {resumeAssessmentId && resumeAssessment && (
-        <div className="mb-6 p-4 rounded-lg border bg-primary/5 border-primary/20">
-          <div className="flex items-center gap-3">
-            <RefreshCw className="h-5 w-5 text-primary" />
-            <div className="flex-1">
-              <p className="font-medium text-primary">Retomando diagnóstico em rascunho</p>
-              <p className="text-sm text-muted-foreground">
-                {resumeAssessment.title} • {(resumeAssessment.destinations as any)?.name}
-              </p>
+      {resumeAssessmentId && resumeAssessment && (() => {
+        const status = (resumeAssessment.status as string | null) ?? 'DRAFT';
+        const statusLabel = status === 'CALCULATED'
+          ? 'Calculado'
+          : status === 'DATA_READY'
+            ? 'Dados Prontos'
+            : 'Rascunho';
+        const statusVariant: 'calculated' | 'ready' | 'draft' = status === 'CALCULATED'
+          ? 'calculated'
+          : status === 'DATA_READY'
+            ? 'ready'
+            : 'draft';
+        const heading = status === 'CALCULATED'
+          ? 'Revisitando diagnóstico concluído'
+          : status === 'DATA_READY'
+            ? 'Retomando diagnóstico com dados prontos'
+            : 'Retomando diagnóstico em rascunho';
+        return (
+          <div className="mb-6 p-4 rounded-lg border bg-primary/5 border-primary/20">
+            <div className="flex items-center gap-3">
+              <RefreshCw className="h-5 w-5 text-primary" />
+              <div className="flex-1">
+                <p className="font-medium text-primary">{heading}</p>
+                <p className="text-sm text-muted-foreground">
+                  {resumeAssessment.title} • {(resumeAssessment.destinations as any)?.name}
+                </p>
+              </div>
+              <Badge variant={statusVariant}>{statusLabel}</Badge>
             </div>
-            <Badge variant="draft">Rascunho</Badge>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Visual Stepper — horizontal on desktop, vertical on mobile */}
       {/* Desktop horizontal stepper */}

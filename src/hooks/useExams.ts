@@ -468,33 +468,42 @@ export function useExamMutations() {
 // EXAM ATTEMPTS
 // ============================================
 
-export function useExamAttempt(attemptId?: string) {
+export function useExamAttempt(examId?: string) {
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: ['exam-attempt', attemptId],
+    queryKey: ['exam-attempt', 'by-exam', examId, user?.id],
     queryFn: async () => {
-      if (!attemptId) return null;
-      
+      if (!examId || !user?.id) return null;
+
+      // Look up the current user's most recent attempt for this exam.
+      // Previously the hook expected an attempt_id but the only caller passes
+      // exam_id, which meant `attempt` never hydrated on refresh.
       const { data: attempt, error: attemptError } = await supabase
         .from('exam_attempts')
         .select('*, exams(*, lms_courses(title))')
-        .eq('attempt_id', attemptId)
-        .single();
-      
+        .eq('exam_id', examId)
+        .eq('user_id', user.id)
+        .order('started_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
       if (attemptError) throw attemptError;
-      
+      if (!attempt) return null;
+
       const { data: answers, error: answersError } = await supabase
         .from('exam_answers')
         .select('*')
-        .eq('attempt_id', attemptId);
-      
+        .eq('attempt_id', attempt.attempt_id);
+
       if (answersError) throw answersError;
-      
+
       return {
         ...attempt,
         answers: answers || [],
       };
     },
-    enabled: !!attemptId,
+    enabled: !!examId && !!user?.id,
   });
 }
 

@@ -1,4 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
@@ -7,8 +9,10 @@ import { Loader2, Clock, LogOut, RefreshCw } from 'lucide-react';
 
 export default function PendingApproval() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, loading: authLoading, signOut } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
+  const [refreshing, setRefreshing] = useState(false);
 
   if (authLoading || profileLoading) {
     return (
@@ -18,19 +22,14 @@ export default function PendingApproval() {
     );
   }
 
+  // Use <Navigate> instead of calling navigate() during render to avoid
+  // "Cannot update a component while rendering" warnings.
   if (!user) {
-    navigate('/auth');
-    return null;
+    return <Navigate to="/auth" replace />;
   }
 
-  // If user is not pending approval, redirect appropriately
   if (!profile?.pending_approval && profile?.system_access) {
-    if (profile.system_access === 'ERP') {
-      navigate('/');
-    } else {
-      navigate('/edu');
-    }
-    return null;
+    return <Navigate to={profile.system_access === 'ERP' ? '/' : '/edu'} replace />;
   }
 
   const handleLogout = async () => {
@@ -38,8 +37,16 @@ export default function PendingApproval() {
     navigate('/auth');
   };
 
-  const handleRefresh = () => {
-    window.location.reload();
+  // Prefer invalidating the profile query over a hard reload — it's faster
+  // and preserves React Query cache for everything else.
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+      await queryClient.invalidateQueries({ queryKey: ['user-roles'] });
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   return (
@@ -86,10 +93,11 @@ export default function PendingApproval() {
             <Button
               variant="outline"
               onClick={handleRefresh}
+              disabled={refreshing}
               className="w-full"
             >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Verificar Status
+              <RefreshCw className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? 'Verificando...' : 'Verificar Status'}
             </Button>
             <Button
               variant="ghost"

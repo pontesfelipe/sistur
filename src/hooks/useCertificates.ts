@@ -101,32 +101,41 @@ export function useVerifyCertificate(verificationCode?: string) {
         .from('lms_certificates')
         .select(`
           certificate_id,
+          user_id,
           issued_at,
           workload_minutes,
           pillar_scope,
           status,
+          revoked_at,
+          revoked_reason,
           verification_code,
           pdf_uri,
           lms_courses(title, primary_pillar)
         `)
         .eq('verification_code', verificationCode)
-        .eq('status', 'active')
         .maybeSingle();
-      
+
       if (error) throw error;
-      
+
       if (!cert) {
         return {
           valid: false,
           message: 'Certificado não encontrado ou inválido',
         };
       }
-      
+
       const certUserId = (cert as unknown as { user_id: string }).user_id;
       const profileMap = await fetchProfileNamesByIds([certUserId]);
+      const isRevoked = cert.status === 'revoked';
+      const isExpired = cert.status === 'expired';
 
       return {
-        valid: true,
+        valid: !isRevoked && !isExpired,
+        message: isRevoked
+          ? 'Este certificado foi revogado pelo emissor.'
+          : isExpired
+            ? 'Este certificado está expirado.'
+            : undefined,
         certificate: {
           ...cert,
           student_name: profileMap.get(certUserId) || 'Nome não disponível',

@@ -355,7 +355,7 @@ const App = () => {
                   }
                 />
                 <Route path="/verificar-certificado" element={<VerifyCertificate />} />
-                <Route path="/verificar-certificado/:certificateId" element={<VerifyCertificate />} />
+                <Route path="/verificar-certificado/:code" element={<VerifyCertificate />} />
                 <Route
                   path="/edu/solicitacoes"
                   element={

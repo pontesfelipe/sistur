@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
 import { IssueCard } from '@/components/dashboard/IssueCard';
@@ -116,9 +116,13 @@ const normalizeDisplayScore = (
   return score;
 };
 
+const VALID_TABS = ['radiografia', 'categorias', 'normalizacao', 'indicadores', 'gargalos', 'tratamento', 'projeto'] as const;
+type DetalheTab = typeof VALID_TABS[number];
+
 const DiagnosticoDetalhe = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { calculate, loading: calculating } = useCalculateAssessment();
   const { updateAssessment } = useAssessments();
   const { indicators } = useIndicators();
@@ -126,6 +130,18 @@ const DiagnosticoDetalhe = () => {
   const { user } = useAuth();
   const [isPreFillOpen, setIsPreFillOpen] = useState(false);
   const [orgId, setOrgId] = useState<string | undefined>();
+
+  // Active tab is mirrored in the URL (?tab=...) so browser Back/Forward and
+  // deep links from other pages (e.g. "Ver relatório" CTAs) land on the right
+  // tab instead of resetting to "Radiografia".
+  const tabFromUrl = searchParams.get('tab') as DetalheTab | null;
+  const activeTab: DetalheTab = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : 'radiografia';
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (value === 'radiografia') params.delete('tab');
+    else params.set('tab', value);
+    setSearchParams(params, { replace: true });
+  };
 
   // Check if report exists for this assessment (including kb_file_ids)
   const { data: existingReport } = useQuery({
@@ -723,7 +739,7 @@ const DiagnosticoDetalhe = () => {
       )}
 
       {isCalculated && pillarScores.length > 0 ? (
-        <Tabs defaultValue="radiografia" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className={cn(
             "grid w-full",
             isEnterprise ? "max-w-4xl grid-cols-7" : "max-w-3xl grid-cols-6"
