@@ -24,11 +24,9 @@ import {
   EyeOff,
   Search,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
-import { INDICATOR_GUIDANCE, validateIndicatorValue } from '@/data/enterpriseIndicatorGuidance';
 import { INDICATOR_GUIDANCE, validateIndicatorValue } from '@/data/enterpriseIndicatorGuidance';
 import type { Database } from '@/integrations/supabase/types';
 
