@@ -203,37 +203,49 @@ export default function NovaRodada() {
   const handleValidationComplete = async (validatedValues: ExternalIndicatorValue[]) => {
     setValidatedDataCount(validatedValues.length);
     const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
-    if (createdAssessmentId && effectiveOrgId) {
-      await createDataSnapshot.mutateAsync({ assessmentId: createdAssessmentId, values: validatedValues, orgId: effectiveOrgId });
-      try {
-        const codes = validatedValues.map(v => v.indicator_code);
-        const { data: indicatorRows } = await supabase.from('indicators').select('id, code').in('code', codes);
-        if (indicatorRows && indicatorRows.length > 0) {
-          const codeToId = new Map(indicatorRows.map(r => [r.code, r.id]));
-          const valuesToInsert = validatedValues
-            .filter(v => v.raw_value !== null && codeToId.has(v.indicator_code))
-            .map(v => ({
-              assessment_id: createdAssessmentId!,
-              indicator_id: codeToId.get(v.indicator_code)!,
-              value_raw: Number(v.raw_value),
-              source: `Pré-preenchido (${v.source_code})`,
-              org_id: effectiveOrgId,
-              reference_date: v.reference_year ? `${v.reference_year}-01-01` : null,
-            }));
-          for (const val of valuesToInsert) {
-            const { data: existing } = await supabase.from('indicator_values').select('id').eq('assessment_id', val.assessment_id).eq('indicator_id', val.indicator_id).maybeSingle();
-            if (existing) {
-              await supabase.from('indicator_values').update({ value_raw: val.value_raw, source: val.source, reference_date: val.reference_date }).eq('id', existing.id);
-            } else {
-              await supabase.from('indicator_values').insert(val);
-            }
+    if (!createdAssessmentId || !effectiveOrgId) {
+      toast({ title: 'Dados validados', description: `${validatedValues.length} indicadores validados e pré-preenchidos no formulário.` });
+      return;
+    }
+
+    await createDataSnapshot.mutateAsync({ assessmentId: createdAssessmentId, values: validatedValues, orgId: effectiveOrgId });
+
+    try {
+      const codes = validatedValues.map(v => v.indicator_code);
+      const { data: indicatorRows, error: indErr } = await supabase.from('indicators').select('id, code').in('code', codes);
+      if (indErr) throw indErr;
+      if (indicatorRows && indicatorRows.length > 0) {
+        const codeToId = new Map(indicatorRows.map(r => [r.code, r.id]));
+        const valuesToInsert = validatedValues
+          .filter(v => v.raw_value !== null && codeToId.has(v.indicator_code))
+          .map(v => ({
+            assessment_id: createdAssessmentId,
+            indicator_id: codeToId.get(v.indicator_code)!,
+            value_raw: Number(v.raw_value),
+            source: `Pré-preenchido (${v.source_code})`,
+            org_id: effectiveOrgId,
+            reference_date: v.reference_year ? `${v.reference_year}-01-01` : null,
+          }));
+        for (const val of valuesToInsert) {
+          const { data: existing } = await supabase.from('indicator_values').select('id').eq('assessment_id', val.assessment_id).eq('indicator_id', val.indicator_id).maybeSingle();
+          if (existing) {
+            const { error } = await supabase.from('indicator_values').update({ value_raw: val.value_raw, source: val.source, reference_date: val.reference_date }).eq('id', existing.id);
+            if (error) throw error;
+          } else {
+            const { error } = await supabase.from('indicator_values').insert(val);
+            if (error) throw error;
           }
         }
-      } catch (err) {
-        console.error('Error injecting validated values into indicator_values:', err);
       }
+      toast({ title: 'Dados validados', description: `${validatedValues.length} indicadores validados e pré-preenchidos no formulário.` });
+    } catch (err) {
+      console.error('Error injecting validated values into indicator_values:', err);
+      toast({
+        title: 'Validação salva com falha parcial',
+        description: err instanceof Error ? err.message : 'Alguns indicadores não puderam ser pré-preenchidos.',
+        variant: 'destructive',
+      });
     }
-    toast({ title: 'Dados validados', description: `${validatedValues.length} indicadores validados e pré-preenchidos no formulário.` });
   };
 
   const handleNextStep = async () => {

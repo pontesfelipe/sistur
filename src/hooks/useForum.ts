@@ -529,16 +529,16 @@ export function useForum() {
     },
   });
 
-  // Mark reply as solution
   const markAsSolution = useMutation({
     mutationFn: async ({ replyId, postId }: { replyId: string; postId: string }) => {
-      // First, unmark any existing solution
+      // Clear any existing solution on this post; `is_solution=true` filter
+      // keeps the write scoped to the single matching row (usually zero).
       await supabase
         .from('forum_replies')
         .update({ is_solution: false })
-        .eq('post_id', postId);
+        .eq('post_id', postId)
+        .eq('is_solution', true);
 
-      // Then mark the new solution
       const { error } = await supabase
         .from('forum_replies')
         .update({ is_solution: true })

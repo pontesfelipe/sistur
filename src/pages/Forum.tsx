@@ -45,16 +45,15 @@ export default function Forum() {
   } = useForum();
   const { lightTap } = useHaptic();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const isFetchingRef = useRef(isFetchingNextPage);
+  isFetchingRef.current = isFetchingNextPage;
 
-  // IntersectionObserver drives infinite scroll — firing fetchNextPage
-  // whenever the sentinel enters the viewport. Re-arms when the sentinel
-  // mounts, the next-page flag flips, or the active filter changes.
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || !hasNextPage) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        if (entries[0]?.isIntersecting && !isFetchingRef.current) {
           fetchNextPage();
         }
       },
@@ -62,7 +61,7 @@ export default function Forum() {
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage, filter, categoryFilter]);
+  }, [hasNextPage, fetchNextPage, filter, categoryFilter]);
 
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
