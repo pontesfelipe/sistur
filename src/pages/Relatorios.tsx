@@ -119,7 +119,14 @@ export default function Relatorios() {
   }, [assessmentFromUrl, assessments]);
 
   const selectedAssessment = assessments?.find(a => a.id === selectedAssessmentId);
-  const selectedDestination = destinations?.find(d => d.id === selectedAssessment?.destination_id);
+  // Use destination from useDestinations first; fall back to the joined destination data
+  // from the assessment itself (handles cross-org destinations not visible via RLS)
+  const selectedDestination = destinations?.find(d => d.id === selectedAssessment?.destination_id)
+    ?? (selectedAssessment ? {
+      id: selectedAssessment.destination_id,
+      name: (selectedAssessment as any).destinations?.name || 'Destino',
+      uf: null as string | null,
+    } : undefined);
   
   const { data: assessmentDetails } = useAssessmentDetails(selectedAssessmentId || undefined);
   const pillarScores = assessmentDetails?.pillarScores;
