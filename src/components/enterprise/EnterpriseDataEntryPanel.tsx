@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 import { 
   Hotel, 
   Leaf, 
@@ -23,13 +23,12 @@ import {
   Minus,
   EyeOff,
   Search,
-  ChevronDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
-import { BusinessReviewSearch } from './BusinessReviewSearch';
+import { INDICATOR_GUIDANCE, validateIndicatorValue } from '@/data/enterpriseIndicatorGuidance';
 import { INDICATOR_GUIDANCE, validateIndicatorValue } from '@/data/enterpriseIndicatorGuidance';
 import type { Database } from '@/integrations/supabase/types';
 
