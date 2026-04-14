@@ -166,15 +166,6 @@ export function EssayGradingPanel() {
 
   const saveGrading = useMutation({
     mutationFn: async (attempt: PendingAttempt) => {
-<<<<<<< claude/code-review-improvements-tncvm
-      const payload = attempt.essay_answers
-        .map(answer => {
-          const grade = grades[gradeKey(attempt.attempt_id, answer.quiz_id)];
-          if (!grade) return null;
-          return {
-            quiz_id: answer.quiz_id,
-            awarded_points: Math.min(Math.max(0, grade.points), answer.max_points),
-=======
       const gradesPayload = attempt.essay_answers
         .map(answer => {
           const key = gradeKey(attempt.attempt_id, answer.quiz_id);
@@ -183,24 +174,11 @@ export function EssayGradingPanel() {
           return {
             quiz_id: answer.quiz_id,
             points: Math.min(Math.max(0, grade.points), answer.max_points),
->>>>>>> main
             comment: grade.comment || '',
           };
         })
         .filter(Boolean);
 
-<<<<<<< claude/code-review-improvements-tncvm
-      const { data, error } = await supabase.rpc('finalize_essay_grading', {
-        _attempt_id: attempt.attempt_id,
-        _grades: payload,
-      });
-      if (error) throw error;
-      return data as { score_pct: number; result: 'passed' | 'failed' };
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['pending-essay-attempts'] });
-      toast.success(`Correção salva! Nota final: ${data.score_pct.toFixed(0)}% — ${data.result === 'passed' ? 'Aprovado' : 'Reprovado'}`);
-=======
       const { data, error } = await (supabase.rpc as any)('finalize_essay_grading', {
         _attempt_id: attempt.attempt_id,
         _grades: gradesPayload,
@@ -212,7 +190,7 @@ export function EssayGradingPanel() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pending-essay-attempts'] });
       toast.success(`Correção salva! Nota final: ${data.total_score.toFixed(0)}% — ${data.result === 'passed' ? 'Aprovado' : 'Reprovado'}`);
->>>>>>> main
+
     },
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : 'Erro ao salvar correção');
