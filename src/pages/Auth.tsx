@@ -239,7 +239,7 @@ const Auth = () => {
     switch (mode) {
       case 'signup':
         return (
-          <Card className="w-full max-w-md border-0 shadow-lg">
+            <Card className="w-full max-w-md border-0 shadow-xl rounded-3xl">
             <CardHeader className="text-center">
               <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
                 <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
@@ -402,7 +402,7 @@ const Auth = () => {
 
       case 'forgot':
         return (
-          <Card className="w-full max-w-md border-0 shadow-lg">
+            <Card className="w-full max-w-md border-0 shadow-xl rounded-3xl">
             <CardHeader className="text-center">
               <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
                 <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
@@ -463,7 +463,7 @@ const Auth = () => {
 
       case 'reset':
         return (
-          <Card className="w-full max-w-md border-0 shadow-lg">
+            <Card className="w-full max-w-md border-0 shadow-xl rounded-3xl">
             <CardHeader className="text-center">
               <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
                 <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
@@ -529,7 +529,7 @@ const Auth = () => {
 
       default:
         return (
-          <Card className="w-full max-w-md border-0 shadow-lg">
+          <Card className="w-full max-w-md border-0 shadow-xl rounded-3xl">
             <CardHeader className="text-center">
               <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
                 <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
