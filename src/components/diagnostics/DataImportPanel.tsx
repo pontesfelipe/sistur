@@ -220,7 +220,20 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       return;
     }
 
-    const parseCsvLine = (line: string): string[] => {
+    // Detect separator from first data-bearing line (`;` for pt-BR Excel, `,` otherwise)
+    const detectSeparator = (text: string): string => {
+      const firstLine = text.split(/\r?\n/).find(l => l.trim().length > 0) || '';
+      // Count occurrences outside quoted fields
+      let semiCount = 0, commaCount = 0, inQ = false;
+      for (const ch of firstLine) {
+        if (ch === '"') { inQ = !inQ; continue; }
+        if (!inQ && ch === ';') semiCount++;
+        if (!inQ && ch === ',') commaCount++;
+      }
+      return semiCount >= commaCount && semiCount > 0 ? ';' : ',';
+    };
+
+    const parseCsvLine = (line: string, separator: string): string[] => {
       // Minimal CSV tokenizer supporting quoted fields and escaped quotes ("").
       const result: string[] = [];
       let field = '';
@@ -236,7 +249,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
           }
         } else if (ch === '"') {
           inQuotes = true;
-        } else if (ch === ',') {
+        } else if (ch === separator) {
           result.push(field);
           field = '';
         } else {
@@ -252,14 +265,21 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       toast.error('Não foi possível ler o arquivo.');
     };
     reader.onload = (e) => {
-      const text = e.target?.result as string;
-      if (!text) {
+      const buffer = e.target?.result as ArrayBuffer;
+      if (!buffer) {
         toast.error('Arquivo vazio.');
         return;
       }
 
+      // Try UTF-8 first; if it produces replacement chars, fall back to Latin1 (Windows-1252)
+      let text = new TextDecoder('utf-8').decode(buffer);
+      if (text.includes('\uFFFD')) {
+        text = new TextDecoder('windows-1252').decode(buffer);
+      }
+
       // Strip UTF-8 BOM if present so the first header cell matches.
       const cleaned = text.replace(/^\uFEFF/, '');
+      const sep = detectSeparator(cleaned);
       const lines = cleaned.split(/\r?\n/).filter(line => line.trim().length > 0);
 
       if (lines.length < 2) {
@@ -273,7 +293,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
       const parsed: ParsedRow[] = dataLines.map((line, idx) => {
         const rowNumber = idx + 2; // account for header
-        const cells = parseCsvLine(line);
+        const cells = parseCsvLine(line, sep);
 
         if (cells.length < 2) {
           return {
@@ -323,7 +343,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         });
       }
     };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
   };
 
   const handleImport = async () => {
