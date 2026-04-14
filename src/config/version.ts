@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 19,
-  patch: 8,
+  patch: 9,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.19.9",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "13 screenshots anotados adicionados aos tutoriais com setas e numeração indicando onde clicar",
+      "Imagens ilustrativas para: login, onboarding, aprovação, trial, dashboard, alertas, diagnósticos, indicadores, cálculo, projetos, relatórios, catálogo EDU e Professor Beni",
+      "Cada screenshot mostra anotações visuais (setas vermelhas numeradas) guiando o usuário passo a passo",
+    ],
+  },
   {
     version: "1.19.8",
     date: "2026-04-14",
