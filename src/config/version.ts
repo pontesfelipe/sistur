@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 19,
-  patch: 7,
+  patch: 8,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.19.8",
+    date: "2026-04-14",
+    type: "patch" as const,
+    changes: [
+      "Sidebar reorganizada em 3 grupos colapsáveis: ERP, Educação e Recursos",
+      "Grupos abrem automaticamente quando contêm a rota ativa",
+      "Labels de grupo com ícone, nome e chevron de expansão/colapso",
+      "Modo recolhido (ícones) mantém itens flat sem grupos para acesso rápido",
+      "Redução visual de ~12 itens soltos para 3 seções organizadas",
+    ],
+  },
   {
     version: "1.19.7",
     date: "2026-04-14",
