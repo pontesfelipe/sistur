@@ -70,13 +70,16 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   };
 
   const handleProfileAutoFill = (metadata: { star_rating: number | null; property_type: string | null; room_count: number | null; employee_count: number | null }) => {
-    setFormData(prev => ({
-      ...prev,
-      ...(metadata.star_rating && !prev.star_rating ? { star_rating: metadata.star_rating } : {}),
-      ...(metadata.property_type && prev.property_type === 'hotel' ? { property_type: metadata.property_type } : {}),
-      ...(metadata.room_count && !prev.room_count ? { room_count: metadata.room_count } : {}),
-      ...(metadata.employee_count && !prev.employee_count ? { employee_count: metadata.employee_count } : {}),
-    }));
+    setFormData(prev => {
+      const updates: Partial<EnterpriseProfileInput> = {};
+      if (metadata.star_rating != null) updates.star_rating = metadata.star_rating;
+      if (metadata.property_type) updates.property_type = metadata.property_type;
+      if (metadata.room_count != null) updates.room_count = metadata.room_count;
+      if (metadata.employee_count != null) updates.employee_count = metadata.employee_count;
+      return { ...prev, ...updates };
+    });
+    setReviewAutoFilled(true);
+    toast.success('Perfil do empreendimento preenchido com dados dos reviews');
   };
   const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
