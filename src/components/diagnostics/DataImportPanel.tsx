@@ -220,7 +220,22 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       return;
     }
 
-    const parseCsvLine = (line: string): string[] => {
+    // Detect separator from first data-bearing line (`;` for pt-BR Excel, `,` otherwise)
+    const detectSeparator = (text: string): string => {
+      const firstLine = text.split(/\r?\n/).find(l => l.trim().length > 0) || '';
+      // Count occurrences outside quoted fields
+      let semiCount = 0, commaCount = 0, inQ = false;
+      for (const ch of firstLine) {
+        if (ch === '"') { inQ = !inQ; continue; }
+        if (!inQ && ch === ';') semiCount++;
+        if (!inQ && ch === ',') commaCount++;
+      }
+      return semiCount >= commaCount && semiCount > 0 ? ';' : ',';
+    };
+
+    const sep = detectSeparator(reader_text_placeholder);
+
+    const parseCsvLine = (line: string, separator: string): string[] => {
       // Minimal CSV tokenizer supporting quoted fields and escaped quotes ("").
       const result: string[] = [];
       let field = '';
@@ -236,7 +251,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
           }
         } else if (ch === '"') {
           inQuotes = true;
-        } else if (ch === ',') {
+        } else if (ch === separator) {
           result.push(field);
           field = '';
         } else {
