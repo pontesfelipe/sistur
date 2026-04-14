@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchProfileNamesByIds } from '@/services/profiles';
 import { toast } from 'sonner';
 
 export function useAssessments() {
@@ -16,21 +17,15 @@ export function useAssessments() {
       if (error) throw error;
 
       // Fetch creator names
-      const creatorIds = [...new Set(data?.map(a => a.creator_user_id).filter(Boolean) as string[])];
-      let creatorMap: Record<string, string> = {};
-      if (creatorIds.length > 0) {
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('user_id, full_name')
-          .in('user_id', creatorIds);
-        if (profiles) {
-          creatorMap = Object.fromEntries(profiles.map(p => [p.user_id, p.full_name]));
-        }
-      }
+      const creatorMap = await fetchProfileNamesByIds(
+        (data || []).map(a => a.creator_user_id).filter(Boolean) as string[]
+      );
 
       return data?.map(a => ({
         ...a,
-        creator: a.creator_user_id ? { full_name: creatorMap[a.creator_user_id] || null } : null,
+        creator: a.creator_user_id
+          ? { full_name: creatorMap.get(a.creator_user_id) ?? null }
+          : null,
       })) ?? [];
     },
   });

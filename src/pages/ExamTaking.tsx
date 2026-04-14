@@ -43,9 +43,11 @@ const ExamTaking = () => {
   const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answerTypes, setAnswerTypes] = useState<Record<string, 'essay' | 'choice'>>({});
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<{ score: number; passed: boolean; needsManualGrading?: boolean } | null>(null);
   const [warnedLowTime, setWarnedLowTime] = useState(false);
 
@@ -121,19 +123,29 @@ const ExamTaking = () => {
 
   const handleAnswerChange = (questionId: string, answer: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: answer }));
+    // Track question type so we don't rely on fragile UUID-length heuristics at submit time.
+    setAnswerTypes(prev => ({
+      ...prev,
+      [questionId]: isEssayQuestion ? 'essay' : 'choice',
+    }));
     logInteraction('answer_select', questionId, `Resposta Q${currentQuestionIndex + 1}`);
   };
 
   const handleSubmit = async () => {
     if (!examId || !attempt) return;
+    if (submitted || isSubmitting) return;
+    setIsSubmitting(true);
     setSubmitted(true);
-    
+
     try {
       // Submit all answers
       for (const [quizId, value] of Object.entries(answers)) {
-        // Determine if this answer is essay (text) or multiple-choice (option ID)
-        // Essay answers are stored as free text; option IDs are UUIDs
-        const isEssay = value.length > 36 || !value.match(/^[0-9a-f-]{36}$/i);
+        // Use the tracked question type instead of guessing from the answer shape.
+        // Falling back to UUID detection only when the type wasn't tracked (should not happen in practice).
+        const trackedType = answerTypes[quizId];
+        const isEssay = trackedType
+          ? trackedType === 'essay'
+          : !/^[0-9a-f-]{36}$/i.test(value);
         await submitAnswer.mutateAsync({
           attemptId: attempt.attempt_id,
           quizId,
@@ -144,21 +156,23 @@ const ExamTaking = () => {
 
       // Submit the exam
       const examResult = await submitExam.mutateAsync(attempt.attempt_id);
-      
+
       const needsGrading = examResult.grading_mode === 'hybrid' || examResult.grading_mode === 'manual';
-      
+
       setResult({
         score: examResult.score_pct || 0,
         passed: examResult.result === 'passed',
         needsManualGrading: needsGrading,
       });
-      
-      toast.success(needsGrading 
-        ? 'Exame enviado! Questões dissertativas aguardam correção manual.' 
+
+      toast.success(needsGrading
+        ? 'Exame enviado! Questões dissertativas aguardam correção manual.'
         : 'Exame enviado com sucesso!');
     } catch (error) {
       toast.error('Erro ao enviar exame');
       setSubmitted(false);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

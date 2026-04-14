@@ -46,14 +46,27 @@ export function useDashboardWidgets() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return new Set(JSON.parse(stored) as WidgetId[]);
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          // Drop any widget IDs that are no longer registered to avoid phantom entries.
+          const validIds = new Set(AVAILABLE_WIDGETS.map(w => w.id));
+          return new Set(parsed.filter((id): id is WidgetId => validIds.has(id as WidgetId)));
+        }
       }
-    } catch {}
+    } catch (err) {
+      console.warn('Failed to load dashboard widget preferences:', err);
+      // Clear corrupted preference so subsequent loads don't keep failing.
+      try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+    }
     return new Set(AVAILABLE_WIDGETS.filter(w => w.defaultEnabled).map(w => w.id));
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...enabledWidgets]));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...enabledWidgets]));
+    } catch (err) {
+      console.warn('Failed to persist dashboard widget preferences:', err);
+    }
   }, [enabledWidgets]);
 
   const toggleWidget = useCallback((id: WidgetId) => {

@@ -2,7 +2,15 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import type { GameState } from '@/game/types';
+import type { GameState, BiomeType } from '@/game/types';
+
+const VALID_BIOMES: BiomeType[] = ['floresta', 'praia', 'montanha', 'cerrado', 'lagoa', 'cidade'];
+
+function sanitizeBiome(value: unknown): BiomeType {
+  return typeof value === 'string' && (VALID_BIOMES as string[]).includes(value)
+    ? (value as BiomeType)
+    : 'floresta';
+}
 
 export interface GameSessionSummary {
   id: string;
@@ -147,7 +155,7 @@ export function useGameSessions() {
         turn: gs.turn,
         visitors: gs.visitors,
         eventLog: gs.eventLog || [],
-        biome: data.biome as any,
+        biome: sanitizeBiome(data.biome),
         avatar,
         isSetup: true,
         currentEvent: null,

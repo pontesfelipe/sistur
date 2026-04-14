@@ -60,9 +60,9 @@ export function useQuizQuestions(pillar?: 'RA' | 'OE' | 'AO', level?: number, ac
     queryFn: async () => {
       let query = supabase
         .from('quiz_questions')
-        .select('*, quiz_options(*)')
+        .select('*')
         .order('created_at', { ascending: false });
-      
+
       if (activeOnly) {
         query = query.eq('is_active', true);
       }
@@ -72,13 +72,34 @@ export function useQuizQuestions(pillar?: 'RA' | 'OE' | 'AO', level?: number, ac
       if (level) {
         query = query.lte('level', level);
       }
-      
+
       const { data, error } = await query;
       if (error) throw error;
-      
+
+      const quizIds = (data || []).map(q => q.quiz_id);
+      if (quizIds.length === 0) return [] as QuizQuestion[];
+
+      // quiz_options.is_correct is REVOKE'd at the column level to protect the
+      // answer key, so a direct `quiz_options(*)` join from PostgREST fails.
+      // The admin RPC `admin_list_quiz_options` runs as SECURITY DEFINER and
+      // gates on has_role(ADMIN), which is the right scope for this hook
+      // (only admin panels consume it).
+      const { data: opts, error: optsError } = await supabase.rpc(
+        'admin_list_quiz_options',
+        { _quiz_ids: quizIds }
+      );
+      if (optsError) throw optsError;
+
+      const optionsByQuiz = new Map<string, QuizOption[]>();
+      for (const opt of (opts || []) as QuizOption[]) {
+        const bucket = optionsByQuiz.get(opt.quiz_id) || [];
+        bucket.push(opt);
+        optionsByQuiz.set(opt.quiz_id, bucket);
+      }
+
       return data.map(q => ({
         ...q,
-        options: q.quiz_options || [],
+        options: optionsByQuiz.get(q.quiz_id) || [],
       })) as unknown as QuizQuestion[];
     },
   });
@@ -98,9 +119,12 @@ export function useQuizQuestion(quizId?: string) {
       
       if (quizError) throw quizError;
       
+      // Intentionally excludes `is_correct` — this hook is consumed by
+      // `ExamTaking.tsx` while the student is writing the exam, and the
+      // answer key is column-level REVOKE'd for non-admin callers.
       const { data: options, error: optionsError } = await supabase
         .from('quiz_options')
-        .select('*')
+        .select('option_id, quiz_id, option_label, option_text, feedback_text, created_at')
         .eq('quiz_id', quizId)
         .order('option_label', { ascending: true });
       

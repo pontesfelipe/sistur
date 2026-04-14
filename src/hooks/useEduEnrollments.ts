@@ -89,7 +89,31 @@ export function useEnrollmentMutations() {
   const enroll = useMutation({
     mutationFn: async (trailId: string) => {
       if (!user?.id) throw new Error('User not authenticated');
-      
+
+      // Guard against double-click creating duplicate enrollments: reuse an existing row if present.
+      const { data: existing, error: existingError } = await supabase
+        .from('edu_enrollments')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('trail_id', trailId)
+        .maybeSingle();
+
+      if (existingError) throw existingError;
+      if (existing) {
+        // If the user previously dropped, re-activate instead of inserting again.
+        if (existing.status === 'dropped') {
+          const { data: reactivated, error: reactivateError } = await supabase
+            .from('edu_enrollments')
+            .update({ status: 'active' })
+            .eq('id', existing.id)
+            .select()
+            .single();
+          if (reactivateError) throw reactivateError;
+          return reactivated;
+        }
+        return existing;
+      }
+
       const { data, error } = await supabase
         .from('edu_enrollments')
         .insert({
@@ -99,7 +123,7 @@ export function useEnrollmentMutations() {
         })
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },

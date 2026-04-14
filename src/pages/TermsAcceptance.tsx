@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Shield, FileText, ChevronDown } from 'lucide-react';
+import { Shield, FileText, ChevronDown, AlertCircle, RefreshCw } from 'lucide-react';
 import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { toast } from 'sonner';
 
@@ -13,6 +13,7 @@ export default function TermsAcceptance() {
   const { acceptTerms } = useTermsAcceptance();
   const [checked, setChecked] = useState(false);
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -22,11 +23,14 @@ export default function TermsAcceptance() {
   };
 
   const handleAccept = async () => {
+    setLastError(null);
     try {
       await acceptTerms.mutateAsync();
       toast.success('Termos aceitos com sucesso');
       navigate('/', { replace: true });
-    } catch {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro desconhecido ao aceitar os termos.';
+      setLastError(message);
       toast.error('Erro ao aceitar termos. Tente novamente.');
     }
   };
@@ -78,14 +82,37 @@ export default function TermsAcceptance() {
               <strong>Política de Privacidade</strong> e a <strong>Política de Propriedade Intelectual</strong> do SISTUR.
             </span>
           </label>
+          {lastError && (
+            <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="font-medium">Não foi possível registrar a aceitação.</p>
+                <p className="text-xs text-destructive/80 mt-0.5">{lastError}</p>
+              </div>
+            </div>
+          )}
           <Button
             onClick={handleAccept}
             disabled={!checked || !scrolledToEnd || acceptTerms.isPending}
             className="w-full"
             size="lg"
           >
-            <FileText className="h-4 w-4 mr-2" />
-            {acceptTerms.isPending ? 'Processando...' : 'Aceitar e Continuar'}
+            {acceptTerms.isPending ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                Processando...
+              </>
+            ) : lastError ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Tentar Novamente
+              </>
+            ) : (
+              <>
+                <FileText className="h-4 w-4 mr-2" />
+                Aceitar e Continuar
+              </>
+            )}
           </Button>
           {!scrolledToEnd && (
             <p className="text-xs text-muted-foreground text-center">Role até o final do documento para habilitar a aceitação</p>

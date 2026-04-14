@@ -180,8 +180,8 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
               {(canEdit || canDelete) && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreVertical className="h-4 w-4" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Mais ações do post">
+                      <MoreVertical className="h-4 w-4" aria-hidden="true" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -259,12 +259,19 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
               size="sm"
               className={cn('gap-1', post.user_liked && 'text-red-500')}
               onClick={handleLike}
+              aria-label={post.user_liked ? 'Remover curtida' : 'Curtir post'}
+              aria-pressed={post.user_liked}
             >
-              <Heart className={cn('h-4 w-4', post.user_liked && 'fill-current')} />
+              <Heart className={cn('h-4 w-4', post.user_liked && 'fill-current')} aria-hidden="true" />
               {post.likes_count}
             </Button>
-            <Button variant="ghost" size="sm" className="gap-1">
-              <MessageCircle className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1"
+              aria-label={`Respostas (${post.replies_count})`}
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
               {post.replies_count}
             </Button>
           </div>

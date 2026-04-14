@@ -33,6 +33,7 @@ import {
 } from '@/hooks/useEduCompliance';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchProfileNamesByIds } from '@/services/profiles';
 
 // ─── Student Selector ───
 function useStudentList() {
@@ -48,14 +49,11 @@ function useStudentList() {
       const uniqueUserIds = [...new Set((data || []).map(d => d.user_id))];
       if (uniqueUserIds.length === 0) return [];
 
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name')
-        .in('user_id', uniqueUserIds);
-      
-      return (profiles || []).map(p => ({
-        user_id: p.user_id,
-        full_name: p.full_name || 'Sem nome',
+      const profileMap = await fetchProfileNamesByIds(uniqueUserIds);
+
+      return uniqueUserIds.map(user_id => ({
+        user_id,
+        full_name: profileMap.get(user_id) || 'Sem nome',
       }));
     },
   });

@@ -31,9 +31,10 @@ export function useEduRecommendationsForAssessment(indicatorScores: IndicatorSco
     queryFn: async () => {
       if (!indicatorScores || indicatorScores.length === 0) return [];
 
-      // Filter indicators with low scores (critical < 0.34, attention 0.34-0.66)
-      const criticalIndicators = indicatorScores.filter(s => s.score < 0.34);
-      const attentionIndicators = indicatorScores.filter(s => s.score >= 0.34 && s.score < 0.67);
+      // Filter indicators with low scores — must mirror getSeverityFromScore in @/lib/igmaEngine:
+      // CRITICO: score <= 0.33, MODERADO/ATENÇÃO: 0.33 < score <= 0.66, BOM: score > 0.66.
+      const criticalIndicators = indicatorScores.filter(s => s.score <= 0.33);
+      const attentionIndicators = indicatorScores.filter(s => s.score > 0.33 && s.score <= 0.66);
 
       // Get indicator codes for mapping lookup
       const indicatorIds = [
@@ -84,8 +85,8 @@ export function useEduRecommendationsForAssessment(indicatorScores: IndicatorSco
 
         if (!training || !indicator) return;
 
-        // Determine status based on score
-        const status = score && score.score < 0.34 ? 'CRÍTICO' : 'ATENÇÃO';
+        // Determine status based on score (matches getSeverityFromScore thresholds)
+        const status = score && score.score <= 0.33 ? 'CRÍTICO' : 'ATENÇÃO';
 
         // Build reason from template
         const reasonText = mapping.reason_template

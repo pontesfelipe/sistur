@@ -247,19 +247,32 @@ const ExamHistory = () => {
                               <Eye className="h-4 w-4 mr-1" />
                               Revisar
                             </Button>
-                            {(attempt.result === 'failed' || attempt.result === 'passed') && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setAppealDialog({
-                                  attemptId: attempt.attempt_id,
-                                  courseName: attempt.course_title || 'Prova',
-                                })}
-                              >
-                                <MessageSquare className="h-4 w-4 mr-1" />
-                                Recurso
-                              </Button>
-                            )}
+                            {(() => {
+                              // Allow filing an appeal for up to APPEAL_WINDOW_DAYS after submission.
+                              const APPEAL_WINDOW_DAYS = 7;
+                              const submittedAt = attempt.submitted_at ? new Date(attempt.submitted_at).getTime() : null;
+                              const daysSinceSubmission = submittedAt
+                                ? Math.floor((Date.now() - submittedAt) / (1000 * 60 * 60 * 24))
+                                : null;
+                              const canAppeal =
+                                (attempt.result === 'failed' || attempt.result === 'passed') &&
+                                daysSinceSubmission !== null &&
+                                daysSinceSubmission <= APPEAL_WINDOW_DAYS;
+                              if (!canAppeal) return null;
+                              return (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setAppealDialog({
+                                    attemptId: attempt.attempt_id,
+                                    courseName: attempt.course_title || 'Prova',
+                                  })}
+                                >
+                                  <MessageSquare className="h-4 w-4 mr-1" />
+                                  Recurso
+                                </Button>
+                              );
+                            })()}
                           </div>
                         </TableCell>
                       </TableRow>

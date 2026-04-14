@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -38,8 +39,30 @@ export default function Forum() {
     setCategoryFilter,
     usePost,
     useReplies,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   } = useForum();
   const { lightTap } = useHaptic();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // IntersectionObserver drives infinite scroll — firing fetchNextPage
+  // whenever the sentinel enters the viewport. Re-arms when the sentinel
+  // mounts, the next-page flag flips, or the active filter changes.
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, filter, categoryFilter]);
 
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -172,6 +195,21 @@ export default function Forum() {
                   onEdit={() => handleEditPost(post)}
                 />
               ))}
+
+              {/* Infinite-scroll sentinel — only rendered while more pages exist.
+                  Search-filtered results use the already-loaded set; the user can
+                  still trigger more fetches by scrolling past the sentinel. */}
+              {hasNextPage && (
+                <div ref={sentinelRef} className="flex justify-center py-6">
+                  {isFetchingNextPage ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  ) : (
+                    <Button variant="ghost" size="sm" onClick={() => fetchNextPage()}>
+                      Carregar mais
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

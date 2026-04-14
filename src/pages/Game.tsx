@@ -157,7 +157,15 @@ export default function Game() {
 
   const handlePlayCard = useCallback((index: number) => {
     const card = game.state.deck.hand[index];
-    const category = card?.category as 'RA' | 'OE' | 'AO';
+    if (!card) {
+      toast.error('Carta inválida.');
+      return;
+    }
+    if (card.category !== 'RA' && card.category !== 'OE' && card.category !== 'AO') {
+      toast.error('Categoria de carta desconhecida.');
+      return;
+    }
+    const category = card.category;
     game.playCard(index);
     setSelectedCardIndex(null);
     // Trigger screen flash + row ripple
@@ -408,7 +416,7 @@ export default function Game() {
           <div className="bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300 border border-red-800/50">
             <div className="text-6xl">💀</div>
             <h2 className="text-2xl font-black text-red-400">Fim de Jogo!</h2>
-            <p className="text-sm text-slate-400">{game.state.gameOverReason}</p>
+            <p className="text-sm text-slate-400">{game.state.gameOverReason || 'O destino turístico colapsou.'}</p>
             <div className="bg-slate-800/50 rounded-xl p-3 space-y-1 text-xs text-left text-slate-300">
               <p><strong>Turnos:</strong> {game.state.turn}</p>
               <p><strong>Pontuação:</strong> {game.state.totalScore}/{game.state.victoryTarget}</p>
@@ -430,7 +438,7 @@ export default function Game() {
           <div className="bg-gradient-to-b from-amber-950 to-yellow-950 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300 border-2 border-amber-400">
             <div className="text-7xl animate-bounce">🏆</div>
             <h2 className="text-2xl font-black text-amber-300">Você Venceu!</h2>
-            <p className="text-sm text-amber-400">{game.state.victoryReason}</p>
+            <p className="text-sm text-amber-400">{game.state.victoryReason || 'Você equilibrou o destino!'}</p>
             <div className="bg-black/20 rounded-xl p-3 space-y-2 text-xs text-left text-amber-200">
               <p><strong>Pontuação final:</strong> {game.state.totalScore}</p>
               <p><strong>Turnos:</strong> {game.state.turn}</p>

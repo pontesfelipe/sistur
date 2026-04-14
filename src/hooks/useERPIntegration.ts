@@ -179,8 +179,9 @@ export function useERPDiagnosticMutations() {
       
       if (error) throw error;
       
-      // Log event
-      await supabase.from('erp_event_log').insert({
+      // Log event — surface logging failures instead of silently swallowing them,
+      // since the ERP audit trail depends on this record.
+      const { error: logError } = await supabase.from('erp_event_log').insert({
         org_id: diagnostic.org_id,
         event_type: 'prescription_sent',
         payload: {
@@ -190,7 +191,11 @@ export function useERPDiagnosticMutations() {
           recommended_courses_count: courses?.length || 0,
         },
       });
-      
+
+      if (logError) {
+        console.error('Failed to log prescription_sent event:', logError);
+      }
+
       return newPrescription;
     },
     onSuccess: () => {

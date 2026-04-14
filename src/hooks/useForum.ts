@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { fetchProfilesByIds } from '@/services/profiles';
 import { toast } from 'sonner';
 
 export interface ReportPostData {
@@ -78,16 +79,41 @@ export function useForum() {
   const [filter, setFilter] = useState<'all' | 'org' | 'public'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
-  // Fetch posts - uses secure view for public posts to hide user_id/org_id
-  const { data: posts, isLoading: postsLoading, refetch: refetchPosts } = useQuery({
-    queryKey: ['forum-posts', filter, categoryFilter],
-    queryFn: async () => {
+  // Infinite-scroll page size. Kept modest because each page hydrates
+  // author profiles + like state per post, and large chunks hurt both
+  // network latency and initial paint.
+  const POSTS_PAGE_SIZE = 20;
+
+  // Fetch posts - uses secure view for public posts to hide user_id/org_id.
+  // Range-based pagination is intentional: `forum_posts` sorts by
+  // `(is_pinned DESC, created_at DESC)`, which makes a single-column
+  // cursor awkward. Offset drift from late pins/new posts is acceptable
+  // for a forum and gets reset whenever the caller invalidates the query.
+  const {
+    data: postsPages,
+    isLoading: postsLoading,
+    refetch: refetchPosts,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['forum-posts', filter, categoryFilter, profile?.org_id, profile?.viewing_demo_org_id],
+    initialPageParam: 0,
+    getNextPageParam: (lastPage: (ForumPost & { is_owner?: boolean })[], allPages) => {
+      if (!lastPage || lastPage.length < POSTS_PAGE_SIZE) return undefined;
+      return allPages.length; // next page index
+    },
+    queryFn: async ({ pageParam = 0 }) => {
+      const from = (pageParam as number) * POSTS_PAGE_SIZE;
+      const to = from + POSTS_PAGE_SIZE - 1;
+
       // For public-only filter, use secure view that doesn't expose UUIDs
       if (filter === 'public') {
         let query = supabase
           .from('public_forum_posts_view')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .range(from, to);
 
         if (categoryFilter !== 'all') {
           query = query.eq('category', categoryFilter);
@@ -127,7 +153,8 @@ export function useForum() {
         .from('forum_posts')
         .select('*')
         .order('is_pinned', { ascending: false })
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (filter === 'org' && profile?.org_id) {
         const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
@@ -145,15 +172,7 @@ export function useForum() {
       if (posts.length === 0) return [];
 
       // Batch fetch author profiles for all posts at once
-      const uniqueUserIds = [...new Set(posts.map(p => p.user_id))];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, avatar_url')
-        .in('user_id', uniqueUserIds);
-
-      const profileMap = new Map(
-        (profiles || []).map(p => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }])
-      );
+      const profileMap = await fetchProfilesByIds(posts.map(p => p.user_id));
 
       // Batch fetch user likes for all posts at once
       let likedPostIds = new Set<string>();
@@ -167,15 +186,26 @@ export function useForum() {
         likedPostIds = new Set((likes || []).map(l => l.post_id));
       }
 
-      return posts.map(post => ({
-        ...post,
-        author: profileMap.get(post.user_id) || { full_name: 'Usuário', avatar_url: null },
-        user_liked: likedPostIds.has(post.id),
-        is_owner: post.user_id === user?.id,
-      } as ForumPost & { is_owner?: boolean }));
+      return posts.map(post => {
+        const prof = profileMap.get(post.user_id);
+        return {
+          ...post,
+          author: prof
+            ? { full_name: prof.full_name, avatar_url: prof.avatar_url }
+            : { full_name: 'Usuário', avatar_url: null },
+          user_liked: likedPostIds.has(post.id),
+          is_owner: post.user_id === user?.id,
+        } as ForumPost & { is_owner?: boolean };
+      });
     },
     enabled: !!user,
   });
+
+  // Flatten pages for existing consumers that expect a flat array.
+  const posts = useMemo(
+    () => postsPages?.pages.flat() ?? undefined,
+    [postsPages]
+  );
 
   // Fetch single post with replies
   const usePost = (postId: string) => {
@@ -234,15 +264,7 @@ export function useForum() {
         if (replies.length === 0) return [];
 
         // Batch fetch author profiles for all replies at once
-        const uniqueUserIds = [...new Set(replies.map(r => r.user_id))];
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('user_id, full_name, avatar_url')
-          .in('user_id', uniqueUserIds);
-
-        const profileMap = new Map(
-          (profiles || []).map(p => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }])
-        );
+        const profileMap = await fetchProfilesByIds(replies.map(r => r.user_id));
 
         // Batch fetch user likes for all replies at once
         let likedReplyIds = new Set<string>();
@@ -256,11 +278,16 @@ export function useForum() {
           likedReplyIds = new Set((likes || []).map(l => l.reply_id));
         }
 
-        const repliesWithAuthors = replies.map(reply => ({
-          ...reply,
-          author: profileMap.get(reply.user_id) || { full_name: 'Usuário', avatar_url: null },
-          user_liked: likedReplyIds.has(reply.id),
-        } as ForumReply));
+        const repliesWithAuthors = replies.map(reply => {
+          const prof = profileMap.get(reply.user_id);
+          return {
+            ...reply,
+            author: prof
+              ? { full_name: prof.full_name, avatar_url: prof.avatar_url }
+              : { full_name: 'Usuário', avatar_url: null },
+            user_liked: likedReplyIds.has(reply.id),
+          } as ForumReply;
+        });
 
         // Organize into nested structure
         const topLevelReplies: ForumReply[] = [];
@@ -599,6 +626,9 @@ export function useForum() {
     posts,
     postsLoading,
     refetchPosts,
+    hasNextPage: !!hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
     filter,
     setFilter,
     categoryFilter,

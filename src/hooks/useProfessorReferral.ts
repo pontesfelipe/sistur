@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { fetchProfileNamesByIds } from '@/services/profiles';
 import { toast } from 'sonner';
 
 export function useProfessorReferralCode() {
@@ -65,16 +66,10 @@ export function useProfessorStudents() {
 
       // Get student profiles
       if (!data?.length) return [];
-      const studentIds = data.map(r => r.student_id);
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name')
-        .in('user_id', studentIds);
-
-      const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+      const profileMap = await fetchProfileNamesByIds(data.map(r => r.student_id));
       return data.map(r => ({
         ...r,
-        student_name: profileMap.get(r.student_id)?.full_name || 'Estudante',
+        student_name: profileMap.get(r.student_id) || 'Estudante',
       }));
     },
     enabled: !!user,
