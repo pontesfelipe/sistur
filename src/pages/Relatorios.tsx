@@ -119,7 +119,14 @@ export default function Relatorios() {
   }, [assessmentFromUrl, assessments]);
 
   const selectedAssessment = assessments?.find(a => a.id === selectedAssessmentId);
-  const selectedDestination = destinations?.find(d => d.id === selectedAssessment?.destination_id);
+  // Use destination from useDestinations first; fall back to the joined destination data
+  // from the assessment itself (handles cross-org destinations not visible via RLS)
+  const selectedDestination = destinations?.find(d => d.id === selectedAssessment?.destination_id)
+    ?? (selectedAssessment ? {
+      id: selectedAssessment.destination_id,
+      name: (selectedAssessment as any).destinations?.name || 'Destino',
+      uf: null as string | null,
+    } : undefined);
   
   const { data: assessmentDetails } = useAssessmentDetails(selectedAssessmentId || undefined);
   const pillarScores = assessmentDetails?.pillarScores;
@@ -545,7 +552,8 @@ export default function Relatorios() {
                           </SelectItem>
                         ) : (
                           calculatedAssessments.map((assessment) => {
-                            const dest = destinations?.find(d => d.id === assessment.destination_id);
+                            const dest = destinations?.find(d => d.id === assessment.destination_id)
+                              ?? { name: (assessment as any).destinations?.name || 'Destino' };
                             const calcDate = assessment.calculated_at 
                               ? format(new Date(assessment.calculated_at), "dd/MM/yy", { locale: ptBR })
                               : format(new Date(assessment.created_at), "dd/MM/yy", { locale: ptBR });
