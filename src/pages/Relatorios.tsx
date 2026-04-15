@@ -82,13 +82,14 @@ function useGeneratedReports() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('generated_reports')
-        .select('*, assessments!inner(diagnostic_type)')
+        .select('*, assessments!inner(diagnostic_type, tier)')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
       return (data ?? []).map((r: any) => ({
         ...r,
         diagnostic_type: r.assessments?.diagnostic_type ?? 'territorial',
+        tier: r.assessments?.tier ?? null,
       })) as GeneratedReport[];
     },
   });
