@@ -61,7 +61,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { validateIndicatorValue, getValidationForIndicator } from '@/data/enterpriseIndicatorGuidance';
+import { validateIndicatorValue, getValidationForIndicator, formatIndicatorValueBR } from '@/data/enterpriseIndicatorGuidance';
 import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
 
 interface DataImportPanelProps {
@@ -367,16 +367,15 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Format number for display in pt-BR (comma as decimal separator)
-  const formatDisplayValue = (value: number | null | undefined): string => {
-    if (value === null || value === undefined) return '';
-    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+  // Format number for display in pt-BR using indicator context
+  const formatDisplayValue = (value: number | null | undefined, indicator?: any): string => {
+    return formatIndicatorValueBR(value, indicator);
   };
 
   // Format validation hint numbers in pt-BR
   const formatHintNumber = (value: number | undefined): string => {
     if (value === undefined) return '';
-    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+    return value.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
   };
 
   // Parse pt-BR and mixed numeric input safely
@@ -864,8 +863,8 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       type="text"
                                       inputMode="decimal"
                                       value={hasUnsavedChanges 
-                                        ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue))
-                                        : formatDisplayValue(currentValue)
+                                        ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue, indicator))
+                                        : formatDisplayValue(currentValue, indicator)
                                       }
                                       onChange={(e) => {
                                         const raw = e.target.value;
@@ -879,7 +878,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           ...prev,
                                           [indicator.id]: {
                                             ...prev[indicator.id],
-                                            _rawInput: edited.value === null ? '' : formatDisplayValue(edited.value),
+                                            _rawInput: edited.value === null ? '' : formatDisplayValue(edited.value, indicator),
                                           },
                                         }));
                                       }}

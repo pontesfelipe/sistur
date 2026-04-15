@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 8,
+  patch: 9,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.9",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Formatação numérica agora contextual: analisa unidade e tipo do indicador para escolher decimais",
+      "Indicadores inteiros (hab, un, qtd) exibidos sem casas decimais (ex: 1.000 em vez de 1.000,00)",
+      "Percentuais formatados com até 1 casa decimal (ex: 85,5%)",
+      "Valores monetários (R$) com exatamente 2 casas decimais (ex: 375,00)",
+      "Demais indicadores com até 2 casas decimais, removendo zeros desnecessários",
+      "Função formatIndicatorValueBR centralizada e reutilizada nos painéis Territorial e Enterprise",
+    ],
+  },
   {
     version: "1.21.8",
     date: "2026-04-15",
