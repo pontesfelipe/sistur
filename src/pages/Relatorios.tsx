@@ -69,6 +69,7 @@ interface GeneratedReport {
   visibility: string;
   environment: string;
   created_by: string;
+  diagnostic_type: string;
 }
 
 function useGeneratedReports() {
