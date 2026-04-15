@@ -84,13 +84,14 @@ export function IndicadoresChart({
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {[
-            { name: 'IBGE', desc: 'Dados demográficos e econômicos' },
+            { name: 'IBGE', desc: 'Demográficos, econômicos e Censo (SIDRA)' },
             { name: 'CADASTUR', desc: 'Serviços turísticos registrados' },
-            { name: 'DATASUS', desc: 'Indicadores de saúde' },
-            { name: 'INEP', desc: 'Dados educacionais' },
+            { name: 'DATASUS', desc: 'Saúde e mortalidade' },
+            { name: 'INEP', desc: 'Dados educacionais (IDEB)' },
             { name: 'STN', desc: 'Dados fiscais municipais' },
+            { name: 'Mapa Turismo', desc: 'Regionalização e categorização' },
           ].map(source => (
             <div key={source.name} className="p-2 rounded bg-background border text-center">
               <span className="font-mono text-xs font-medium text-foreground">{source.name}</span>

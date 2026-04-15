@@ -1690,7 +1690,52 @@ serve(async (req) => {
       }
     }
 
-    // 16. Create audit event
+    // 16. Auto-create diagnosis_data_snapshots for provenance tracking
+    // This ensures ALL external data used in the calculation is persisted for reports and analysis
+    if (!isEnterprise) {
+      const destinationIbgeCode = assessment.destination?.ibge_code;
+      if (destinationIbgeCode) {
+        // Delete existing snapshots for this assessment to avoid duplicates on recalculation
+        await supabase
+          .from("diagnosis_data_snapshots")
+          .delete()
+          .eq("assessment_id", assessment_id);
+
+        // Fetch ALL external indicator values for this municipality (validated or not)
+        const { data: allExternalValues } = await supabase
+          .from("external_indicator_values")
+          .select("indicator_code, raw_value, raw_value_text, source_code, reference_year, confidence_level, collection_method")
+          .eq("municipality_ibge_code", destinationIbgeCode)
+          .eq("org_id", orgId);
+
+        if (allExternalValues && allExternalValues.length > 0) {
+          const snapshots = allExternalValues.map((ev: any) => ({
+            assessment_id,
+            indicator_code: ev.indicator_code,
+            value_used: ev.raw_value,
+            value_used_text: ev.raw_value_text,
+            source_code: ev.source_code,
+            reference_year: ev.reference_year,
+            confidence_level: ev.confidence_level || 1,
+            was_manually_adjusted: ev.collection_method === 'MANUAL',
+            org_id: orgId,
+          }));
+
+          const { error: snapshotError } = await supabase
+            .from("diagnosis_data_snapshots")
+            .insert(snapshots);
+
+          if (snapshotError) {
+            console.error("Error creating data snapshots:", snapshotError);
+          } else {
+            const autoCount = snapshots.filter((s: any) => !s.was_manually_adjusted).length;
+            console.log(`Created ${snapshots.length} data snapshots (${autoCount} automated, ${snapshots.length - autoCount} manual)`);
+          }
+        }
+      }
+    }
+
+    // 17. Create audit event
     await supabase.from("audit_events").insert({
       org_id: orgId,
       event_type: "ASSESSMENT_CALCULATED",

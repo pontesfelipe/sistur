@@ -301,8 +301,8 @@ const ExamTaking = () => {
     const resultPending = attempt?.result === 'pending' || attempt?.result == null;
     const passedFromAttempt = attempt?.result === 'passed';
     const passed = result?.passed ?? passedFromAttempt;
-    const needsGrading = result?.needsManualGrading
-      ?? (attempt?.grading_mode === 'hybrid' || attempt?.grading_mode === 'manual') && resultPending;
+      const needsGrading = result?.needsManualGrading
+        ?? ((attempt?.grading_mode === 'hybrid' || attempt?.grading_mode === 'manual') && resultPending);
 
     return (
       <AppLayout title="Resultado do Exame" subtitle="Veja seu desempenho">

@@ -437,7 +437,11 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
                 <p style={{ fontSize: '14px', color: '#334155', lineHeight: 1.6, maxWidth: '500px' }}>
                   concluiu com êxito o curso <span style={{ fontWeight: 600, color: '#1a365d' }}>{courseTitle}</span>,
                   com carga horária de <strong>{workloadHours} hora{workloadHours !== 1 ? 's' : ''}</strong>,
-                  na área de <strong>{getPillarName(coursePillar)}</strong>.
+                  na área de <strong>{getPillarName(coursePillar)}</strong>,
+                  conforme registro no Sistema Integrado de Suporte para Turismo em Regiões (SISTUR).
+                </p>
+                <p style={{ fontSize: '10px', color: '#94a3b8', maxWidth: '500px', lineHeight: 1.4 }}>
+                  Certificado emitido em conformidade com o Art. 32 da LDB (Lei nº 9.394/96) e Resolução CNE/CES nº 1/2001 para cursos de extensão e capacitação profissional.
                 </p>
               </div>
 

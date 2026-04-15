@@ -760,7 +760,7 @@ export default function Metodologia() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                    Fontes: IBGE, DATASUS, INEP, STN, CADASTUR
+                    Fontes: IBGE, SIDRA, DATASUS, INEP, STN, CADASTUR, Mapa do Turismo
                   </li>
                 </ul>
               </div>
@@ -1030,11 +1030,16 @@ export default function Metodologia() {
                   <h4 className="font-semibold">Dados via API Oficial</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">Confiabilidade: 5/5 ⭐ — Obtidos automaticamente de APIs públicas.</p>
-                <ul className="text-sm space-y-1">
-                  <li className="flex items-center gap-2"><span className="text-green-600">📊</span> <strong>IBGE Agregados</strong>: População, PIB per capita, Densidade e Área territorial</li>
-                  <li className="flex items-center gap-2"><span className="text-green-600">📊</span> <strong>Bases públicas integradas</strong>: IDH, IDEB, Leitos hospitalares, Cobertura de saúde, Receita própria, Despesa com turismo e Meios de hospedagem, quando houver retorno válido</li>
-                  <li className="flex items-center gap-2"><span className="text-green-600">🏨</span> <strong>CADASTUR / dados.gov.br</strong>: Guias e Agências via datasets oficiais abertos, quando o arquivo trimestral está disponível</li>
-                  <li className="flex items-center gap-2"><span className="text-green-600">🗺️</span> <strong>Mapa do Turismo Brasileiro</strong>: Região turística, categoria (A-E), empregos, estabelecimentos, visitantes (nacionais e internacionais), arrecadação e conselho municipal de turismo — via API REST do Ministério do Turismo (mapa.turismo.gov.br)</li>
+                <ul className="text-sm space-y-1.5">
+                  <li className="flex items-start gap-2"><span className="text-green-600">📊</span> <strong>IBGE Agregados</strong>: População, PIB per capita, Densidade demográfica e Área territorial (Censo 2022, tabela 4714)</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">🏘️</span> <strong>IBGE SIDRA (Censo 2010)</strong>: Abastecimento de água (rede geral %) e Coleta de lixo domiciliar (%) — tabela 3217</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">📈</span> <strong>IBGE Pesquisas</strong>: IDH Municipal, Índice de Gini, Incidência de pobreza</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">🏥</span> <strong>DATASUS</strong>: Leitos hospitalares por habitante, Cobertura de saúde (estabelecimentos), Taxa de mortalidade infantil, Mortalidade geral por mil habitantes</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">📚</span> <strong>INEP</strong>: IDEB (Índice de Desenvolvimento da Educação Básica)</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">💰</span> <strong>STN / Tesouro Nacional</strong>: Receita própria per capita, Despesa com turismo (R$ milhões)</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">🏨</span> <strong>IBGE Pesquisas (CADASTUR)</strong>: Meios de hospedagem (estabelecimentos e UH)</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">🏨</span> <strong>CADASTUR / dados.gov.br</strong>: Guias de turismo e Agências de turismo via datasets oficiais abertos (ingestão trimestral)</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">🗺️</span> <strong>Mapa do Turismo Brasileiro</strong>: Região turística, Categoria (A-E), Empregos no turismo, Estabelecimentos turísticos, Visitantes nacionais e internacionais, Arrecadação turística, Conselho municipal de turismo — via API REST do Ministério do Turismo (mapa.turismo.gov.br)</li>
                 </ul>
               </div>
 
@@ -1046,6 +1051,7 @@ export default function Metodologia() {
                 <p className="text-sm text-muted-foreground">Confiabilidade: 1/5 ⭐ — Sem API pública disponível. Requer inserção pelo operador.</p>
                 <ul className="text-sm space-y-1">
                   <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>Taxa de Escolarização</strong>: Dados disponíveis via Censo Escolar (coleta manual)</li>
+                  <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>Indicadores locais</strong>: Saneamento, segurança, acessibilidade e demais indicadores que dependem de levantamento de campo</li>
                 </ul>
               </div>
             </div>
@@ -1064,12 +1070,12 @@ export default function Metodologia() {
             </Alert>
 
             <div className="rounded-xl border bg-muted/30 p-5 space-y-3">
-              <h4 className="font-semibold">Indicadores de Coleta Local</h4>
+              <h4 className="font-semibold">Resumo: 7 Fontes Oficiais Integradas</h4>
               <p className="text-sm text-muted-foreground">
-                Além dos indicadores acima, o catálogo completo do SISTUR inclui dezenas de indicadores que dependem 
-                de levantamento local (pesquisa de campo, dados da Secretaria de Turismo, Prefeitura, etc.). 
-                Estes são preenchidos pelo operador do diagnóstico e possuem nível de confiança variável conforme 
-                a metodologia de coleta empregada.
+                O SISTUR consulta automaticamente <strong>7 fontes oficiais</strong> para pré-preencher mais de 20 indicadores: 
+                IBGE Agregados, IBGE SIDRA (Censo), IBGE Pesquisas, DATASUS, INEP, STN/Tesouro Nacional, CADASTUR e Mapa do Turismo Brasileiro. 
+                Indicadores que não possuem API pública (como taxa de escolarização e dados de levantamento local) 
+                são preenchidos manualmente pelo operador do diagnóstico.
               </p>
             </div>
           </CardContent>
@@ -1186,12 +1192,32 @@ export default function Metodologia() {
                 São Paulo: Aleph, 2006.
               </li>
               <li>
-                <strong>IBGE.</strong> API de Agregados e Pesquisas Municipais. 
-                Disponível em: servicodados.ibge.gov.br
+                <strong>IBGE.</strong> API de Agregados — Pesquisas Municipais (Censo 2022, PIB, etc.). 
+                Disponível em: servicodados.ibge.gov.br/api/v3/agregados
               </li>
               <li>
-                <strong>Ministério do Turismo.</strong> CADASTUR — Cadastro de Prestadores de Serviços Turísticos. 
-                Disponível em: cadastur.turismo.gov.br
+                <strong>IBGE.</strong> API SIDRA — Sistema IBGE de Recuperação Automática (Censo 2010, tabela 3217 — saneamento). 
+                Disponível em: apisidra.ibge.gov.br
+              </li>
+              <li>
+                <strong>IBGE.</strong> API de Pesquisas Municipais — IDH, Gini, Hospedagem, Finanças. 
+                Disponível em: servicodados.ibge.gov.br/api/v1/pesquisas
+              </li>
+              <li>
+                <strong>DATASUS.</strong> Indicadores de Saúde — Leitos hospitalares, mortalidade infantil, mortalidade geral. 
+                Disponível em: datasus.saude.gov.br (via IBGE Pesquisas)
+              </li>
+              <li>
+                <strong>INEP.</strong> IDEB — Índice de Desenvolvimento da Educação Básica. 
+                Disponível em: inep.gov.br (via IBGE Pesquisas)
+              </li>
+              <li>
+                <strong>Secretaria do Tesouro Nacional (STN).</strong> Finanças Municipais — Receita própria, Despesa com turismo. 
+                Disponível em: tesouro.fazenda.gov.br (via IBGE Pesquisas)
+              </li>
+              <li>
+                <strong>Ministério do Turismo.</strong> CADASTUR — Cadastro de Prestadores de Serviços Turísticos (dados abertos). 
+                Disponível em: dados.gov.br
               </li>
               <li>
                 <strong>Ministério do Turismo.</strong> Plano Nacional de Turismo 2024-2027. 

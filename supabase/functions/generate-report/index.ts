@@ -8,6 +8,15 @@ const corsHeaders = {
 
 // ========== HELPER FUNCTIONS ==========
 
+/** Format number using Brazilian standard: comma for decimal, period for thousands */
+function formatNumberBR(value: number, decimals = 1): string {
+  return value.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function formatPctBR(score: number): string {
+  return formatNumberBR(score * 100, 1);
+}
+
 function formatDateBR(dateStr: string | null): string {
   if (!dateStr) return 'N/A';
   const d = new Date(dateStr);
@@ -22,7 +31,7 @@ function formatDateOnlyBR(dateStr: string | null): string {
 
 function pillarLabel(score: number | undefined): string {
   if (score === undefined) return 'N/A';
-  const pct = (score * 100).toFixed(1);
+  const pct = formatPctBR(score);
   if (score >= 0.67) return `${pct}% — ADEQUADO`;
   if (score >= 0.34) return `${pct}% — ATENÇÃO`;
   return `${pct}% — CRÍTICO`;
@@ -44,13 +53,13 @@ function formatIndicatorScores(indicatorScores: any[]): string {
     const critical = scores.filter(s => s.score <= 0.33);
     const moderate = scores.filter(s => s.score > 0.33 && s.score <= 0.66);
     
-    result += `\n${pillar} (${scores.length} indicadores, média: ${(avg * 100).toFixed(1)}%):\n`;
+    result += `\n${pillar} (${scores.length} indicadores, média: ${formatPctBR(avg)}%):\n`;
     result += `  Críticos: ${critical.length}, Atenção: ${moderate.length}, Adequados: ${scores.length - critical.length - moderate.length}\n`;
     
     scores.forEach((s: any) => {
       const status = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
       const benchmark = s.indicators?.benchmark_target ? ` (benchmark: ${s.indicators.benchmark_target})` : '';
-      result += `    * ${s.indicators?.name || s.indicators?.code}: ${(s.score * 100).toFixed(1)}% [${status}] - Tema: ${s.indicators?.theme || 'N/A'}${benchmark}\n`;
+      result += `    * ${s.indicators?.name || s.indicators?.code}: ${formatPctBR(s.score)}% [${status}] - Tema: ${s.indicators?.theme || 'N/A'}${benchmark}\n`;
     });
   }
   return result;
@@ -72,13 +81,13 @@ function formatIndicatorsByCategory(indicatorScores: any[]): string {
     const avg = scores.reduce((sum, s) => sum + s.score, 0) / scores.length;
     const status = avg <= 0.33 ? 'CRÍTICO' : avg <= 0.66 ? 'ATENÇÃO' : 'BOM';
     
-    result += `\n## ${theme} (Status: ${status}, Média: ${(avg * 100).toFixed(1)}%)\n`;
+    result += `\n## ${theme} (Status: ${status}, Média: ${formatPctBR(avg)}%)\n`;
     scores.forEach((s: any) => {
       const kpiStatus = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
       const benchmarkMin = s.indicators?.benchmark_min !== null ? s.indicators.benchmark_min : 'N/A';
       const benchmarkMax = s.indicators?.benchmark_max !== null ? s.indicators.benchmark_max : 'N/A';
       const benchmarkTarget = s.indicators?.benchmark_target !== null ? s.indicators.benchmark_target : 'N/A';
-      result += `  - ${s.indicators?.name || s.indicators?.code}: ${(s.score * 100).toFixed(1)}% [${kpiStatus}]\n`;
+      result += `  - ${s.indicators?.name || s.indicators?.code}: ${formatPctBR(s.score)}% [${kpiStatus}]\n`;
       result += `    Benchmark: min=${benchmarkMin}, target=${benchmarkTarget}, max=${benchmarkMax}\n`;
     });
   }
@@ -128,6 +137,63 @@ function formatIGMAFlags(flags: Record<string, boolean> | null): string {
   return activeFlags || 'Nenhuma flag IGMA ativa.';
 }
 
+function formatEnterpriseProfile(profile: any): string {
+  if (!profile) return '';
+
+  let result = '\n=== PERFIL DO EMPREENDIMENTO ===\n';
+  if (profile.property_type) result += `Tipo: ${profile.property_type}\n`;
+  if (profile.star_rating) result += `Categoria: ${profile.star_rating} estrelas\n`;
+  if (profile.room_count) result += `Número de UHs: ${profile.room_count}\n`;
+  if (profile.suite_count) result += `Suítes: ${profile.suite_count}\n`;
+  if (profile.total_capacity) result += `Capacidade total: ${profile.total_capacity}\n`;
+  if (profile.employee_count) result += `Funcionários: ${profile.employee_count}\n`;
+  if (profile.years_in_operation) result += `Anos de operação: ${profile.years_in_operation}\n`;
+  if (profile.seasonality) result += `Sazonalidade: ${profile.seasonality}\n`;
+  if (profile.target_market?.length) result += `Mercado-alvo: ${profile.target_market.join(', ')}\n`;
+  if (profile.average_occupancy_rate) result += `Taxa de ocupação média: ${profile.average_occupancy_rate}%\n`;
+  if (profile.average_daily_rate) result += `ADR médio: R$ ${profile.average_daily_rate}\n`;
+  if (profile.certifications?.length) result += `Certificações: ${profile.certifications.join(', ')}\n`;
+  if (profile.sustainability_initiatives?.length) result += `Iniciativas de sustentabilidade: ${profile.sustainability_initiatives.join(', ')}\n`;
+  if (profile.accessibility_features?.length) result += `Acessibilidade: ${profile.accessibility_features.join(', ')}\n`;
+
+  // Review analysis data — the core intelligence from online reviews
+  if (profile.review_analysis) {
+    const ra = profile.review_analysis;
+    result += '\n=== ANÁLISE DE REVIEWS ONLINE (IA) ===\n';
+    result += `Estabelecimento pesquisado: ${ra.businessName || 'N/A'} em ${ra.location || 'N/A'}\n`;
+    result += `Data da busca: ${ra.searchedAt || 'N/A'}\n`;
+    if (ra.review_score != null) result += `Nota média: ${ra.review_score}/5\n`;
+    if (ra.review_count != null) result += `Quantidade de reviews: ~${ra.review_count}\n`;
+    if (ra.sentiment_score != null) result += `Score de sentimento: ${ra.sentiment_score}/5\n`;
+    if (ra.digital_maturity != null) result += `Maturidade digital: ${ra.digital_maturity}/5\n`;
+    if (ra.platforms_found?.length) result += `Plataformas encontradas: ${ra.platforms_found.join(', ')}\n`;
+    if (ra.sentiment_summary) result += `\nResumo de sentimento: ${ra.sentiment_summary}\n`;
+
+    if (ra.guest_experience_dimensions) {
+      result += '\nDimensões da Experiência do Hóspede:\n';
+      const dims = ra.guest_experience_dimensions;
+      for (const [key, val] of Object.entries(dims)) {
+        if (val != null) result += `  - ${key}: ${val}/5\n`;
+      }
+    }
+
+    if (ra.recurring_themes?.length) result += `\nTemas recorrentes: ${ra.recurring_themes.join(', ')}\n`;
+    if (ra.strengths?.length) result += `\nPontos fortes:\n${ra.strengths.map((s: string) => `  ✓ ${s}`).join('\n')}\n`;
+    if (ra.weaknesses?.length) result += `\nPontos de atenção:\n${ra.weaknesses.map((w: string) => `  ⚠ ${w}`).join('\n')}\n`;
+    if (ra.sample_positive_quotes?.length) result += `\nCitações positivas:\n${ra.sample_positive_quotes.map((q: string) => `  "${q}"`).join('\n')}\n`;
+    if (ra.sample_negative_quotes?.length) result += `\nCitações negativas:\n${ra.sample_negative_quotes.map((q: string) => `  "${q}"`).join('\n')}\n`;
+    if (ra.recommendation) result += `\nRecomendação estratégica: ${ra.recommendation}\n`;
+    if (ra.sources?.length) {
+      result += `\nFontes:\n`;
+      ra.sources.forEach((s: any) => {
+        result += `  - ${s.platform}${s.rating != null ? ` (${s.rating}/5)` : ''}: ${s.url}\n`;
+      });
+    }
+  }
+
+  return result;
+}
+
 function formatDataSnapshots(snapshots: any[]): string {
   if (!snapshots || snapshots.length === 0) return '';
   
@@ -139,9 +205,13 @@ function formatDataSnapshots(snapshots: any[]): string {
   });
 
   const sourceLabels: Record<string, string> = {
+    'IBGE': 'IBGE (Agregados)',
     'IBGE_AGREGADOS': 'IBGE (Agregados)',
     'IBGE_PESQUISAS': 'IBGE (Pesquisas)',
+    'IBGE_CENSO': 'IBGE / SIDRA (Censo)',
+    'IBGE_SIDRA': 'IBGE / SIDRA (Saneamento)',
     'DATASUS': 'DATASUS',
+    'INEP': 'INEP (Educação)',
     'STN': 'STN / Tesouro Nacional',
     'CADASTUR': 'CADASTUR',
     'MAPA_TURISMO': 'Mapa do Turismo Brasileiro',
@@ -157,7 +227,7 @@ function formatDataSnapshots(snapshots: any[]): string {
     const manualCount = items.filter(i => i.was_manually_adjusted).length;
     const avgConfidence = items.reduce((sum, i) => sum + (i.confidence_level || 0), 0) / items.length;
     
-    result += `### ${label} (${items.length} indicadores, Confiabilidade média: ${avgConfidence.toFixed(0)}/5)\n`;
+    result += `### ${label} (${items.length} indicadores, Confiabilidade média: ${formatNumberBR(avgConfidence, 0)}/5)\n`;
     if (manualCount > 0) result += `  ⚠️ ${manualCount} ajustado(s) manualmente\n`;
     
     items.forEach((item: any) => {
@@ -343,6 +413,60 @@ FICHA TÉCNICA DO RELATÓRIO (renderize como tabela markdown):
 Esta tabela é OBRIGATÓRIA e deve ser a primeira coisa do relatório, logo após o título.`;
 }
 
+// ========== MEC / ABNT FORMATTING STANDARDS ==========
+
+const MEC_FORMATTING_RULES = `
+PADRÕES DE FORMATAÇÃO — MEC / ABNT (OBRIGATÓRIO):
+O relatório deve seguir as recomendações do Ministério da Educação (MEC) e normas ABNT para documentos técnicos e acadêmicos:
+
+NORMAS APLICÁVEIS:
+- ABNT NBR 14724:2011 — Trabalhos acadêmicos (estrutura geral)
+- ABNT NBR 6024:2012 — Numeração progressiva de seções
+- ABNT NBR 6023:2018 — Referências bibliográficas
+- ABNT NBR 6028:2021 — Resumo e abstract
+- ABNT NBR 10520:2023 — Citações em documentos
+
+ESTRUTURA PRÉ-TEXTUAL (o DOCX adicionará automaticamente):
+- Capa com identificação institucional (SISTUR / Organização)
+- Folha de rosto com título, subtítulo, natureza do trabalho
+- Resumo com palavras-chave
+
+ESTRUTURA TEXTUAL — REGRAS:
+1. Seções primárias (##) devem ser NUMERADAS (1, 2, 3...) e em NEGRITO
+2. Subseções (###) numeradas progressivamente (1.1, 1.2, 2.1...) em negrito
+3. Sub-subseções (####) numeradas (1.1.1, 1.1.2...) em negrito itálico
+4. Parágrafos devem ser concisos, com linguagem técnica e impessoal (3ª pessoa)
+5. Citações diretas com mais de 3 linhas: recuo de 4cm, fonte menor, sem aspas
+6. Citações indiretas devem citar autor e ano: (BENI, 2001)
+7. Quando citar Mario Beni ou outros autores, usar formato ABNT: (SOBRENOME, ano)
+8. Figuras e tabelas devem ser referenciadas no texto antes de aparecerem
+9. Tabelas: título ACIMA da tabela com numeração (Tabela 1 — Título)
+10. Fonte da tabela ABAIXO da tabela: "Fonte: IBGE (2022)"
+
+ESTRUTURA PÓS-TEXTUAL — OBRIGATÓRIO:
+1. REFERÊNCIAS (NBR 6023): lista em ordem alfabética de todas as fontes citadas
+   Formato para dados oficiais:
+   - INSTITUTO BRASILEIRO DE GEOGRAFIA E ESTATÍSTICA (IBGE). Nome do dado. Ano. Disponível em: URL.
+   - BRASIL. Ministério do Turismo. Mapa do Turismo Brasileiro. Ano.
+   - BRASIL. Ministério da Saúde. DATASUS. Nome do indicador. Ano.
+   - BRASIL. Secretaria do Tesouro Nacional (STN). Dados fiscais. Ano.
+   - BRASIL. Ministério do Turismo. CADASTUR. Dados de registro. Ano.
+2. APÊNDICE (se houver notas adicionais ou metodologia estendida)
+3. GLOSSÁRIO com termos técnicos do SISTUR (RA, OE, AO, IGMA, I-SISTUR)
+
+LINGUAGEM:
+- Impessoal: "Verifica-se que..." em vez de "Verificamos que..."
+- Verbos na 3ª pessoa ou voz passiva
+- Termos técnicos na primeira menção com definição entre parênteses
+- Siglas: por extenso na primeira menção, ex: "Relações Ambientais (RA)"
+
+FORMATAÇÃO NUMÉRICA — PADRÃO BRASILEIRO (OBRIGATÓRIO):
+- Usar VÍRGULA como separador decimal: 65,3% (CORRETO) — NÃO 65.3%
+- Usar PONTO como separador de milhar: 45.321 habitantes (CORRETO) — NÃO 45,321
+- Exemplos corretos: "População: 45.321 hab.", "Score: 67,5%", "PIB per capita: R$ 32.450,00", "Área: 1.234,56 km²"
+- NUNCA usar o formato americano/inglês com ponto decimal e vírgula de milhar
+- Esta regra aplica-se a TODOS os números no relatório, sem exceção`;
+
 // ========== TEMPLATE-SPECIFIC SYSTEM PROMPTS ==========
 
 const BASE_METHODOLOGY = `FUNDAMENTOS TEÓRICOS DE MARIO BENI:
@@ -365,11 +489,16 @@ Os dados do diagnóstico são coletados automaticamente de fontes oficiais e com
 - Dados de preenchimento manual: Taxa de escolarização e quaisquer indicadores que não retornem valor oficial válido no momento da coleta.
 - Base de Conhecimento (KB): Documentos locais do destino (PDFs, relatórios, planos diretores) e referências nacionais com resumos extraídos por IA.
 
-REGRA CRÍTICA DE TRANSPARÊNCIA:
-- SEMPRE cite a fonte específica de cada dado mencionado no relatório
-- Se houver snapshots de proveniência, use-os para identificar EXATAMENTE de onde cada valor veio
-- Se o dado veio de preenchimento manual, indique claramente
-- Quando documentos da Base de Conhecimento informarem contexto adicional, referencie-os pelo nome`;
+REGRA CRÍTICA E INEGOCIÁVEL DE FONTES:
+1. CADA dado numérico mencionado no relatório DEVE ter a fonte entre parênteses imediatamente após o valor. Exemplo: "População: 45.321 hab. (IBGE, 2022)"
+2. TODAS as tabelas de indicadores DEVEM conter uma coluna "Fonte" indicando a origem do dado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo, Preenchimento Manual, etc.)
+3. Se houver snapshots de proveniência, use-os para identificar EXATAMENTE de onde cada valor veio, incluindo o ano de referência
+4. Se o dado veio de preenchimento manual, indique CLARAMENTE: "(Fonte: Preenchimento manual)"
+5. Quando documentos da Base de Conhecimento informarem contexto adicional, referencie-os pelo nome
+6. O relatório DEVE terminar com uma seção "## Referências" em formato ABNT NBR 6023 listando TODAS as fontes oficiais consultadas
+7. NUNCA apresente um dado sem citar a fonte — se a fonte for desconhecida, indique "(Fonte: Não identificada)"
+
+${MEC_FORMATTING_RULES}`;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
   if (isEnterprise) {
@@ -470,16 +599,22 @@ LINGUAGEM: Persuasiva mas fundamentada em dados. Destaque oportunidades de negó
   return `${common}
 
 TIPO: RELATÓRIO COMPLETO — Mínimo 2500 palavras. Análise técnica detalhada para equipe técnica e gestores públicos.
+Seguir integralmente as normas MEC/ABNT indicadas no system prompt.
 
-ESTRUTURA OBRIGATÓRIA:
+ESTRUTURA OBRIGATÓRIA (MEC/ABNT):
 # Relatório SISTUR — [Nome do Destino]
 [Tabela de Ficha Técnica — obrigatória]
 
-## 1. Sumário Executivo
-- Visão geral em 1 parágrafo
-- Tabela consolidada dos 3 eixos
+## Resumo
+- Síntese do relatório em até 500 palavras (NBR 6028)
+- **Palavras-chave**: Turismo. SISTUR. Diagnóstico Territorial. [Nome do Destino]. [UF].
 
-## 2. Contextualização do Município
+## 1 Introdução
+- Apresentação do objeto de estudo e contextualização
+- Objetivo do diagnóstico
+- Estrutura do relatório
+
+## 2 Contextualização do Município
 - Informações territoriais, demográficas e econômicas relevantes
 - Posição no contexto turístico regional (usar dados do Mapa do Turismo: categoria, região turística)
 - Metadados do destino (se fornecidos)
@@ -507,7 +642,7 @@ ESTRUTURA OBRIGATÓRIA:
 - Flags ativas e suas implicações
 - Bloqueios e restrições aplicáveis
 
-## 6. Análise Integrada
+## 6 Análise Integrada
 - Inter-relação entre os eixos
 - Efeitos cascata identificados
 
@@ -536,7 +671,21 @@ ESTRUTURA OBRIGATÓRIA:
 
 ## 12. Considerações Finais
 - Síntese das conclusões
-- Próxima revisão recomendada: data e justificativa`;
+- Próxima revisão recomendada: data e justificativa
+
+## Referências
+- Lista em ordem ALFABÉTICA no formato ABNT NBR 6023:2018
+- Exemplo: INSTITUTO BRASILEIRO DE GEOGRAFIA E ESTATÍSTICA (IBGE). Censo Demográfico 2022. Rio de Janeiro: IBGE, 2022.
+- Exemplo: BENI, Mário Carlos. Análise estrutural do turismo. 6. ed. São Paulo: SENAC, 2001.
+- Listar TODAS as fontes de dados oficiais, documentos da KB e referências nacionais utilizadas
+
+## Glossário
+- Definições de termos técnicos: SISTUR, IGMA, I-RA, I-AO, I-OE, I-SISTUR
+- Incluir siglas e termos específicos do turismo utilizados no relatório
+
+## Apêndice
+- Documentos da Base de Conhecimento consultados (se houver)
+- Notas metodológicas adicionais (se aplicável)`;
 }
 
 function getEnterpriseSystemPrompt(template: string): string {
@@ -549,12 +698,26 @@ OS TRÊS EIXOS SISTUR ENTERPRISE:
 
 CLASSIFICAÇÃO: BOM (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
 
+FONTES DE DADOS — RASTREABILIDADE OBRIGATÓRIA:
+Cada dado apresentado no relatório DEVE conter a fonte entre parênteses. Exemplos:
+- "Taxa de ocupação: 72% (Fonte: Dados do empreendimento — preenchimento manual)"
+- "Nota média: 4.2/5 (Fonte: Google Reviews, TripAdvisor)"
+- Se houver snapshots de proveniência, use-os para identificar a origem exata
+- Se o dado veio de preenchimento manual, indique: "(Fonte: Preenchimento manual)"
+- Se o dado veio de reviews online, indique a plataforma: "(Fonte: Google Reviews)"
+
+${MEC_FORMATTING_RULES}
+
 REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Comece SEMPRE com título seguido da tabela de ficha técnica fornecida
 - Use tabelas markdown para todos os conjuntos de dados
-- Linguagem executiva, orientada a resultados
+- TODAS as tabelas DEVEM ter uma coluna "Fonte"
+- Tabelas devem ter título numerado ACIMA: "Tabela 1 — Título"
+- Fonte da tabela ABAIXO: "Fonte: elaboração própria com dados de..."
+- Linguagem institucional e impessoal (3ª pessoa)
 - Conecte: métrica → gap → ação → resultado esperado
-- Se houver dados de reviews/avaliações online, incorpore na análise de satisfação`;
+- Se houver dados de reviews/avaliações online, incorpore na análise de satisfação
+- Seção final de Referências em formato ABNT NBR 6023`;
 
   if (template === 'executivo') {
     return `${common}
@@ -564,11 +727,12 @@ TIPO: RESUMO EXECUTIVO ENTERPRISE — Máximo 1000 palavras.
 ESTRUTURA:
 # Resumo Executivo — [Nome]
 [Ficha Técnica]
-## 1. Performance Geral (tabela dos 3 eixos)
-## 2. Top 3 KPIs Críticos (tabela)
-## 3. Ações Prioritárias (5 itens, tabela)
-## 4. Quick Wins com ROI Estimado
-## 5. Próximos Passos`;
+## 1 Performance Geral (tabela dos 3 eixos)
+## 2 KPIs Críticos (tabela com Fonte)
+## 3 Ações Prioritárias (5 itens, tabela)
+## 4 Quick Wins com ROI Estimado
+## 5 Próximos Passos
+## Referências (ABNT NBR 6023)`;
   }
 
   if (template === 'investidor') {
@@ -579,12 +743,13 @@ TIPO: RELATÓRIO PARA INVESTIDORES — 1500 palavras. Foco em ROI e oportunidade
 ESTRUTURA:
 # Análise de Investimento — [Nome]
 [Ficha Técnica]
-## 1. Tese de Investimento (1 parágrafo)
-## 2. Performance Atual (tabela de KPIs vs benchmark)
-## 3. Análise de Riscos (tabela: Risco | Severidade | Mitigação)
-## 4. Oportunidades de Melhoria (tabela: Oportunidade | Investimento | ROI Est.)
-## 5. Projeções e Cenários
-## 6. Recomendação Final`;
+## 1 Tese de Investimento (1 parágrafo)
+## 2 Performance Atual (tabela de KPIs vs benchmark com Fonte)
+## 3 Análise de Riscos (tabela: Risco | Severidade | Mitigação)
+## 4 Oportunidades de Melhoria (tabela: Oportunidade | Investimento | ROI Est.)
+## 5 Projeções e Cenários
+## 6 Recomendação Final
+## Referências (ABNT NBR 6023)`;
   }
 
   // COMPLETO
@@ -592,7 +757,7 @@ ESTRUTURA:
 
 TIPO: RELATÓRIO ENTERPRISE COMPLETO — Mínimo 2500 palavras.
 
-ESTRUTURA:
+ESTRUTURA (MEC/ABNT):
 # Relatório SISTUR Enterprise — [Nome]
 [Ficha Técnica]
 ## 1. Sumário Executivo para Gestão
@@ -724,7 +889,7 @@ serve(async (req) => {
         : Promise.resolve({ data: [] as any[] }),
     ];
 
-    // NEW: Enterprise indicator values if enterprise diagnostic
+    // Enterprise indicator values + profile with review analysis
     if (isEnterprise) {
       fetchPromises.push(
         supabase.from('enterprise_indicator_values').select('*, enterprise_indicators(*, enterprise_indicator_categories(*))').eq('assessment_id', assessmentId)
@@ -766,7 +931,8 @@ serve(async (req) => {
     console.log('Report data — Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 
       'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 
       'KB files:', kbFiles.length, 'Snapshots:', dataSnapshots.length, 
-      'Enterprise values:', enterpriseValues.length);
+      'Enterprise values:', enterpriseValues.length,
+      'Enterprise profile:', !!enterpriseProfile, 'Review analysis:', !!enterpriseProfile?.review_analysis);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -800,9 +966,9 @@ ${isEnterprise ? formatEnterpriseProfile(enterpriseProfile) : ''}
 === DADOS DO DIAGNÓSTICO ===
 
 SCORES DOS EIXOS:
-- I-RA: ${pillarScores?.RA?.score !== undefined ? (pillarScores.RA.score * 100).toFixed(1) + '%' : 'N/C'} — ${pillarScores?.RA?.severity || 'N/A'}
-- I-AO: ${pillarScores?.AO?.score !== undefined ? (pillarScores.AO.score * 100).toFixed(1) + '%' : 'N/C'} — ${pillarScores?.AO?.severity || 'N/A'}
-- I-OE: ${pillarScores?.OE?.score !== undefined ? (pillarScores.OE.score * 100).toFixed(1) + '%' : 'N/C'} — ${pillarScores?.OE?.severity || 'N/A'}
+- I-RA: ${pillarScores?.RA?.score !== undefined ? formatPctBR(pillarScores.RA.score) + '%' : 'N/C'} — ${pillarScores?.RA?.severity || 'N/A'}
+- I-AO: ${pillarScores?.AO?.score !== undefined ? formatPctBR(pillarScores.AO.score) + '%' : 'N/C'} — ${pillarScores?.AO?.severity || 'N/A'}
+- I-OE: ${pillarScores?.OE?.score !== undefined ? formatPctBR(pillarScores.OE.score) + '%' : 'N/C'} — ${pillarScores?.OE?.severity || 'N/A'}
 
 FLAGS IGMA:
 ${formatIGMAFlags(assessment.igma_flags as Record<string, boolean> | null)}

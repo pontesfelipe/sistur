@@ -1297,6 +1297,48 @@ export type Database = {
           },
         ]
       }
+      edu_detailed_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          last_accessed_at: string | null
+          module_index: number | null
+          progress_pct: number | null
+          time_spent_seconds: number | null
+          training_id: string
+          updated_at: string
+          user_id: string
+          video_position_seconds: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          module_index?: number | null
+          progress_pct?: number | null
+          time_spent_seconds?: number | null
+          training_id: string
+          updated_at?: string
+          user_id: string
+          video_position_seconds?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          module_index?: number | null
+          progress_pct?: number | null
+          time_spent_seconds?: number | null
+          training_id?: string
+          updated_at?: string
+          user_id?: string
+          video_position_seconds?: number | null
+        }
+        Relationships: []
+      }
       edu_enrollments: {
         Row: {
           completed_at: string | null
@@ -1710,6 +1752,75 @@ export type Database = {
           },
         ]
       }
+      edu_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          module_index: number | null
+          training_id: string
+          updated_at: string
+          user_id: string
+          video_timestamp_seconds: number | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          module_index?: number | null
+          training_id: string
+          updated_at?: string
+          user_id: string
+          video_timestamp_seconds?: number | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          module_index?: number | null
+          training_id?: string
+          updated_at?: string
+          user_id?: string
+          video_timestamp_seconds?: number | null
+        }
+        Relationships: []
+      }
+      edu_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean | null
+          link: string | null
+          message: string | null
+          metadata: Json | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          link?: string | null
+          message?: string | null
+          metadata?: Json | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          link?: string | null
+          message?: string | null
+          metadata?: Json | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       edu_personalized_recommendations: {
         Row: {
           created_at: string
@@ -2069,6 +2180,36 @@ export type Database = {
           },
         ]
       }
+      edu_training_ratings: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          training_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          training_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          training_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       edu_trainings: {
         Row: {
           active: boolean
@@ -2187,6 +2328,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      edu_user_achievements: {
+        Row: {
+          achievement_code: string
+          achievement_description: string | null
+          achievement_icon: string | null
+          achievement_name: string
+          earned_at: string
+          id: string
+          user_id: string
+          xp_earned: number | null
+        }
+        Insert: {
+          achievement_code: string
+          achievement_description?: string | null
+          achievement_icon?: string | null
+          achievement_name: string
+          earned_at?: string
+          id?: string
+          user_id: string
+          xp_earned?: number | null
+        }
+        Update: {
+          achievement_code?: string
+          achievement_description?: string | null
+          achievement_icon?: string | null
+          achievement_name?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+          xp_earned?: number | null
+        }
+        Relationships: []
+      }
+      edu_user_xp: {
+        Row: {
+          current_streak: number | null
+          id: string
+          last_activity_date: string | null
+          level: number | null
+          longest_streak: number | null
+          total_xp: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          level?: number | null
+          longest_streak?: number | null
+          total_xp?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          level?: number | null
+          longest_streak?: number | null
+          total_xp?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       email_send_log: {
         Row: {
@@ -2533,6 +2740,7 @@ export type Database = {
           peak_months: string[] | null
           primary_source_markets: string[] | null
           property_type: string
+          review_analysis: Json | null
           room_count: number | null
           seasonality: string | null
           star_rating: number | null
@@ -2557,6 +2765,7 @@ export type Database = {
           peak_months?: string[] | null
           primary_source_markets?: string[] | null
           property_type?: string
+          review_analysis?: Json | null
           room_count?: number | null
           seasonality?: string | null
           star_rating?: number | null
@@ -2581,6 +2790,7 @@ export type Database = {
           peak_months?: string[] | null
           primary_source_markets?: string[] | null
           property_type?: string
+          review_analysis?: Json | null
           room_count?: number | null
           seasonality?: string | null
           star_rating?: number | null
@@ -7324,6 +7534,14 @@ export type Database = {
       has_org_admin_role: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      has_role_in_org: {
+        Args: {
+          _org_id: string
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }

@@ -76,6 +76,8 @@ interface BusinessReviewSearchProps {
   onAutoFill?: (indicatorValues: Record<string, number>) => void;
   /** If provided, auto-fills profile fields from review data */
   onProfileAutoFill?: (metadata: PropertyMetadata) => void;
+  /** Captures the full analysis result for persistence */
+  onAnalysisCapture?: (fullAnalysis: Record<string, any>) => void;
   /** Pre-fill business name */
   defaultBusinessName?: string;
   /** Pre-fill location */
@@ -94,7 +96,7 @@ const PROPERTY_TYPES = [
   { value: 'operadora', label: 'Operadora/Agência' },
 ];
 
-export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
+export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysisCapture, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
   const [businessName, setBusinessName] = useState(defaultBusinessName);
   const [location, setLocation] = useState(defaultLocation);
   const [propertyType, setPropertyType] = useState('hotel');
@@ -119,11 +121,29 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, defaultBus
       setResult(data);
       toast.success('Busca concluída!');
 
+      // Capture full analysis for persistence
+      if (data?.analysis && onAnalysisCapture) {
+        onAnalysisCapture({
+          ...data.analysis,
+          businessName: data.businessName,
+          location: data.location,
+          searchResults: data.searchResults,
+          searchedAt: new Date().toISOString(),
+        });
+      }
+
       // Auto-fill profile metadata immediately when results arrive
-      if (data?.analysis?.property_metadata && onProfileAutoFill) {
-        const meta = data.analysis.property_metadata;
-        if (meta.star_rating || meta.property_type || meta.room_count || meta.employee_count) {
-          onProfileAutoFill(meta);
+      if (onProfileAutoFill) {
+        const meta = data?.analysis?.property_metadata || {};
+        // Build metadata merging AI results with search form fallback
+        const enrichedMeta = {
+          star_rating: meta.star_rating ?? null,
+          property_type: meta.property_type || propertyType || null,
+          room_count: meta.room_count ?? null,
+          employee_count: meta.employee_count ?? null,
+        };
+        if (enrichedMeta.star_rating != null || enrichedMeta.property_type || enrichedMeta.room_count != null || enrichedMeta.employee_count != null) {
+          onProfileAutoFill(enrichedMeta);
         }
       }
 
@@ -168,10 +188,16 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, defaultBus
     }
 
     // Auto-fill profile metadata
-    if (onProfileAutoFill && result.analysis.property_metadata) {
-      const meta = result.analysis.property_metadata;
-      if (meta.star_rating || meta.property_type || meta.room_count || meta.employee_count) {
-        onProfileAutoFill(meta);
+    if (onProfileAutoFill) {
+      const meta = (result.analysis.property_metadata || {}) as Partial<PropertyMetadata>;
+      const enrichedMeta = {
+        star_rating: meta.star_rating ?? null,
+        property_type: meta.property_type || propertyType || null,
+        room_count: meta.room_count ?? null,
+        employee_count: meta.employee_count ?? null,
+      };
+      if (enrichedMeta.star_rating != null || enrichedMeta.property_type || enrichedMeta.room_count != null || enrichedMeta.employee_count != null) {
+        onProfileAutoFill(enrichedMeta);
       }
     }
 

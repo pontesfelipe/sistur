@@ -28,7 +28,6 @@ import {
   Award,
   Map,
   Sparkles,
-  HelpingHand,
   Shield,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
@@ -62,13 +61,13 @@ const navigation: NavItem[] = [
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
   { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
   
-  { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
+  { name: 'Minha Jornada', href: '/edu', icon: GraduationCap, requiresEDU: true },
+  { name: 'Catálogo', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true },
   { name: 'Trilhas', href: '/edu/trilhas', icon: Map, requiresEDU: true },
   { name: 'Minhas Provas', href: '/edu/historico', icon: ScrollText, requiresEDU: true },
   { name: 'Meus Certificados', href: '/certificados', icon: Award, requiresEDU: true },
   { name: 'Treinamento Sob Demanda', href: '/edu/solicitacoes', icon: Sparkles, requiresEDU: true },
   { name: 'Gestão de Treinamentos', href: '/professor', icon: BookOpen, requiresProfessor: true },
-  { name: 'Quizzes', href: '/admin/quizzes', icon: HelpingHand, requiresAdmin: true },
   { name: 'Admin EDU', href: '/admin/edu', icon: Shield, requiresAdmin: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },

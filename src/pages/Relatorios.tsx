@@ -32,7 +32,10 @@ import {
   Eye,
   Lock,
   Users,
-  FlaskConical
+  FlaskConical,
+  Filter,
+  Building2,
+  Globe
 } from 'lucide-react';
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
@@ -69,6 +72,8 @@ interface GeneratedReport {
   visibility: string;
   environment: string;
   created_by: string;
+  diagnostic_type: string;
+  tier: string | null;
 }
 
 function useGeneratedReports() {
@@ -77,11 +82,15 @@ function useGeneratedReports() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('generated_reports')
-        .select('*')
+        .select('*, assessments!inner(diagnostic_type, tier)')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as GeneratedReport[];
+      return (data ?? []).map((r: any) => ({
+        ...r,
+        diagnostic_type: r.assessments?.diagnostic_type ?? 'territorial',
+        tier: r.assessments?.tier ?? null,
+      })) as GeneratedReport[];
     },
   });
 }
@@ -107,6 +116,12 @@ export default function Relatorios() {
   const reportRef = useRef<HTMLDivElement>(null);
   const [customizationOpen, setCustomizationOpen] = useState(false);
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
+  const [historyTypeFilter, setHistoryTypeFilter] = useState<string>('all');
+  const [historyOwnerFilter, setHistoryOwnerFilter] = useState<string>('all');
+  const [historyTierFilter, setHistoryTierFilter] = useState<string>('all');
+  const [genTypeFilter, setGenTypeFilter] = useState<string>('all');
+  const [genTierFilter, setGenTierFilter] = useState<string>('all');
+  const [genDestFilter, setGenDestFilter] = useState<string>('all');
 
   // Pre-select assessment from URL parameter
   useEffect(() => {
@@ -119,7 +134,14 @@ export default function Relatorios() {
   }, [assessmentFromUrl, assessments]);
 
   const selectedAssessment = assessments?.find(a => a.id === selectedAssessmentId);
-  const selectedDestination = destinations?.find(d => d.id === selectedAssessment?.destination_id);
+  // Use destination from useDestinations first; fall back to the joined destination data
+  // from the assessment itself (handles cross-org destinations not visible via RLS)
+  const selectedDestination = destinations?.find(d => d.id === selectedAssessment?.destination_id)
+    ?? (selectedAssessment ? {
+      id: selectedAssessment.destination_id,
+      name: (selectedAssessment as any).destinations?.name || 'Destino',
+      uf: null as string | null,
+    } : undefined);
   
   const { data: assessmentDetails } = useAssessmentDetails(selectedAssessmentId || undefined);
   const pillarScores = assessmentDetails?.pillarScores;
@@ -127,6 +149,22 @@ export default function Relatorios() {
   const prescriptions = assessmentDetails?.prescriptions;
 
   const calculatedAssessments = assessments?.filter(a => a.status === 'CALCULATED') || [];
+
+  const filteredCalculatedAssessments = calculatedAssessments.filter(a => {
+    if (genTypeFilter !== 'all') {
+      const type = (a as any).diagnostic_type || 'territorial';
+      if (genTypeFilter !== type) return false;
+    }
+    if (genTierFilter !== 'all') {
+      const tier = (a as any).tier || 'SMALL';
+      const tierMap: Record<string, string> = { essencial: 'SMALL', estrategico: 'MEDIUM', integral: 'COMPLETE' };
+      if (tier !== tierMap[genTierFilter]) return false;
+    }
+    if (genDestFilter !== 'all') {
+      if (a.destination_id !== genDestFilter) return false;
+    }
+    return true;
+  });
 
   const generateReport = async (forceRegenerate = false) => {
     if (!selectedAssessmentId || !selectedDestination) {
@@ -525,6 +563,60 @@ export default function Relatorios() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Filters row */}
+                <div className="flex flex-wrap gap-3 items-end">
+                  <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                    <Filter className="h-4 w-4" />
+                    Filtros:
+                  </div>
+                  <Select value={genTypeFilter} onValueChange={setGenTypeFilter}>
+                    <SelectTrigger className="w-40 h-8 text-xs">
+                      <SelectValue placeholder="Tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os tipos</SelectItem>
+                      <SelectItem value="territorial">
+                        <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" />Territorial</span>
+                      </SelectItem>
+                      <SelectItem value="enterprise">
+                        <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />Enterprise</span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={genTierFilter} onValueChange={setGenTierFilter}>
+                    <SelectTrigger className="w-40 h-8 text-xs">
+                      <SelectValue placeholder="Nível" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os níveis</SelectItem>
+                      <SelectItem value="essencial">⚡ Essencial</SelectItem>
+                      <SelectItem value="estrategico">📊 Estratégico</SelectItem>
+                      <SelectItem value="integral">🎯 Integral</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={genDestFilter} onValueChange={setGenDestFilter}>
+                    <SelectTrigger className="w-48 h-8 text-xs">
+                      <SelectValue placeholder="Destino" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os destinos</SelectItem>
+                      {destinations?.map(d => (
+                        <SelectItem key={d.id} value={d.id}>
+                          <span className="flex items-center gap-1.5">
+                            <MapPin className="h-3 w-3" />
+                            {d.name}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {(genTypeFilter !== 'all' || genTierFilter !== 'all' || genDestFilter !== 'all') && (
+                    <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => { setGenTypeFilter('all'); setGenTierFilter('all'); setGenDestFilter('all'); }}>
+                      Limpar filtros
+                    </Button>
+                  )}
+                </div>
+
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
@@ -539,13 +631,14 @@ export default function Relatorios() {
                         <SelectValue placeholder="Selecione um diagnóstico calculado" />
                       </SelectTrigger>
                       <SelectContent>
-                        {calculatedAssessments.length === 0 ? (
+                        {filteredCalculatedAssessments.length === 0 ? (
                           <SelectItem value="none" disabled>
                             Nenhum diagnóstico calculado disponível
                           </SelectItem>
                         ) : (
-                          calculatedAssessments.map((assessment) => {
-                            const dest = destinations?.find(d => d.id === assessment.destination_id);
+                          filteredCalculatedAssessments.map((assessment) => {
+                            const dest = destinations?.find(d => d.id === assessment.destination_id)
+                              ?? { name: (assessment as any).destinations?.name || 'Destino' };
                             const calcDate = assessment.calculated_at 
                               ? format(new Date(assessment.calculated_at), "dd/MM/yy", { locale: ptBR })
                               : format(new Date(assessment.created_at), "dd/MM/yy", { locale: ptBR });
@@ -779,19 +872,61 @@ export default function Relatorios() {
                     {savedReports?.length || 0} relatório(s) no histórico
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-3">
+                  {/* Filters */}
+                  <div className="flex flex-col gap-2">
+                    <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os tipos</SelectItem>
+                        <SelectItem value="territorial">
+                          <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" />Territorial</span>
+                        </SelectItem>
+                        <SelectItem value="enterprise">
+                          <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />Enterprise</span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={historyTierFilter} onValueChange={setHistoryTierFilter}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Nível" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os níveis</SelectItem>
+                        <SelectItem value="essencial">⚡ Essencial</SelectItem>
+                        <SelectItem value="estrategico">📊 Estratégico</SelectItem>
+                        <SelectItem value="integral">🎯 Integral</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={historyOwnerFilter} onValueChange={setHistoryOwnerFilter}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Autor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos da organização</SelectItem>
+                        <SelectItem value="mine">
+                          <span className="flex items-center gap-1.5"><Lock className="h-3 w-3" />Somente meus</span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   {reportsLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                     </div>
                   ) : savedReports && savedReports.length > 0 ? (
-                    <ScrollArea className="h-[500px]">
+                    <ScrollArea className="h-[450px]">
                       <div className="space-y-2 pr-4">
                         {savedReports
                           .filter(r => {
-                            // Show personal reports only to creator, org reports to all
-                            if (r.visibility === 'org') return true;
-                            return r.created_by === profile?.user_id;
+                            if (r.visibility === 'personal' && r.created_by !== profile?.user_id) return false;
+                            if (historyTypeFilter !== 'all' && r.diagnostic_type !== historyTypeFilter) return false;
+                            if (historyTierFilter !== 'all' && r.tier !== historyTierFilter) return false;
+                            if (historyOwnerFilter === 'mine' && r.created_by !== profile?.user_id) return false;
+                            return true;
                           })
                           .map((r) => (
                           <div
@@ -805,15 +940,24 @@ export default function Relatorios() {
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-wrap">
                                   <p className="font-medium truncate">{r.destination_name}</p>
+                                  <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0">
+                                    {r.diagnostic_type === 'enterprise' ? <Building2 className="h-2.5 w-2.5" /> : <Globe className="h-2.5 w-2.5" />}
+                                    {r.diagnostic_type === 'enterprise' ? 'Enterprise' : 'Territorial'}
+                                  </Badge>
+                                  {r.tier && (
+                                    <Badge variant="secondary" className="text-[10px] shrink-0">
+                                      {r.tier === 'essencial' ? '⚡' : r.tier === 'estrategico' ? '📊' : '🎯'} {r.tier.charAt(0).toUpperCase() + r.tier.slice(1)}
+                                    </Badge>
+                                  )}
                                   {r.visibility === 'org' ? (
-                                    <Badge variant="outline" className="text-xs gap-1 shrink-0"><Users className="h-2.5 w-2.5" />Org</Badge>
+                                    <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0"><Users className="h-2.5 w-2.5" />Org</Badge>
                                   ) : (
-                                    <Badge variant="secondary" className="text-xs gap-1 shrink-0"><Lock className="h-2.5 w-2.5" />Pessoal</Badge>
+                                    <Badge variant="secondary" className="text-[10px] gap-0.5 shrink-0"><Lock className="h-2.5 w-2.5" />Pessoal</Badge>
                                   )}
                                   {r.environment === 'demo' && (
-                                    <Badge variant="outline" className="text-xs gap-1 shrink-0 border-amber-500 text-amber-600"><FlaskConical className="h-2.5 w-2.5" />Demo</Badge>
+                                    <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0 border-amber-500 text-amber-600"><FlaskConical className="h-2.5 w-2.5" />Demo</Badge>
                                   )}
                                 </div>
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">

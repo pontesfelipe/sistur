@@ -248,15 +248,11 @@ export default function NovaRodada() {
             org_id: effectiveOrgId,
             reference_date: v.reference_year ? `${v.reference_year}-01-01` : null,
           }));
-        for (const val of valuesToInsert) {
-          const { data: existing } = await supabase.from('indicator_values').select('id').eq('assessment_id', val.assessment_id).eq('indicator_id', val.indicator_id).maybeSingle();
-          if (existing) {
-            const { error } = await supabase.from('indicator_values').update({ value_raw: val.value_raw, source: val.source, reference_date: val.reference_date }).eq('id', existing.id);
-            if (error) throw error;
-          } else {
-            const { error } = await supabase.from('indicator_values').insert(val);
-            if (error) throw error;
-          }
+        if (valuesToInsert.length > 0) {
+          const { error } = await supabase
+            .from('indicator_values')
+            .upsert(valuesToInsert, { onConflict: 'assessment_id,indicator_id' });
+          if (error) throw error;
         }
       }
       toast({ title: 'Dados validados', description: `${validatedValues.length} indicadores validados e pré-preenchidos no formulário.` });

@@ -61,7 +61,16 @@ import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { validateIndicatorValue, getValidationForIndicator, INDICATOR_GUIDANCE } from '@/data/enterpriseIndicatorGuidance';
 import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
+import {
+  EMPTY_SELECT_VALUE,
+  formatIndicatorFieldDisplayValue,
+  getIndicatorFieldConfig,
+  getIndicatorSelectValue,
+  parseIndicatorSelectValue,
+  validateIndicatorSelectValue,
+} from '@/lib/indicatorFieldConfig';
 
 interface DataImportPanelProps {
   preSelectedAssessmentId?: string;
@@ -75,7 +84,7 @@ interface ParsedRow {
   error?: string;
 }
 
-const officialSources = ['IBGE', 'DATASUS', 'INEP', 'STN', 'CADASTUR', 'Pré-preenchido'];
+const officialSources = ['IBGE', 'IBGE_CENSO', 'DATASUS', 'INEP', 'STN', 'CADASTUR', 'MAPA_TURISMO', 'Pré-preenchido'];
 
 const pillarNames = {
   RA: 'Relações Ambientais',
@@ -89,7 +98,8 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedAssessment, setSelectedAssessment] = useState<string>(preSelectedAssessmentId || '');
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
-  const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean }>>({});
+  const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean; _rawInput?: string }>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
 
   const { assessments, isLoading: loadingAssessments, updateAssessment } = useAssessments();
@@ -365,14 +375,73 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  // Format number for display in pt-BR using indicator context
+  const formatDisplayValue = (value: number | null | undefined, indicator?: any): string => {
+    return formatIndicatorFieldDisplayValue(value, indicator);
+  };
+
+  // Format validation hint numbers in pt-BR
+  const formatHintNumber = (value: number | undefined): string => {
+    if (value === undefined) return '';
+    return value.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+  };
+
+  // Parse pt-BR and mixed numeric input safely
+  const parseBRInput = (value: string): number | null => {
+    const raw = value.trim();
+    if (raw === '') return null;
+
+    if (raw.includes(',')) {
+      const normalized = raw.replace(/\./g, '').replace(',', '.');
+      const num = Number(normalized);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    const dotParts = raw.split('.');
+    if (dotParts.length === 2) {
+      const [, decimalPart] = dotParts;
+      const normalized = decimalPart.length === 3 ? raw.replace('.', '') : raw;
+      const num = Number(normalized);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    if (dotParts.length > 2) {
+      const num = Number(raw.replace(/\./g, ''));
+      return Number.isFinite(num) ? num : null;
+    }
+
+    const num = Number(raw);
+    return Number.isFinite(num) ? num : null;
+  };
+
+  const getValidationValue = (value: string): string => {
+    const parsed = parseBRInput(value);
+    if (parsed === null) return value;
+    return String(parsed);
+  };
+
   const handleValueChange = (indicatorId: string, value: string) => {
+    const indicator = indicators.find(i => i.id === indicatorId);
+    const fieldConfig = getIndicatorFieldConfig({ code: indicator?.code, normalization: indicator?.normalization });
+    const validationValue = fieldConfig.kind === 'select' ? value : getValidationValue(value);
+    
+    if (indicator) {
+      const error = fieldConfig.kind === 'select'
+        ? validateIndicatorSelectValue(validationValue, { code: indicator.code, normalization: indicator.normalization })
+        : validateIndicatorValue(validationValue, indicator as any);
+      setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
+    }
+
     setEditedValues(prev => ({
       ...prev,
       [indicatorId]: {
         ...prev[indicatorId],
-        value: value === '' ? null : parseFloat(value),
+        value: fieldConfig.kind === 'select'
+          ? parseIndicatorSelectValue(value, { code: indicator?.code, normalization: indicator?.normalization })
+          : parseBRInput(value),
         source: prev[indicatorId]?.source || 'Manual',
         is_ignored: prev[indicatorId]?.is_ignored ?? false,
+        _rawInput: value,
       },
     }));
   };
@@ -413,6 +482,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     const edited = editedValues[indicatorId];
     if (!edited) return;
 
+    // Block save if validation error
+    if (validationErrors[indicatorId]) {
+      toast.error('Corrija o valor antes de salvar');
+      return;
+    }
+
     await upsertValue.mutateAsync({
       assessment_id: selectedAssessment,
       indicator_id: indicatorId,
@@ -429,6 +504,15 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
   const handleSaveAllValues = async () => {
     if (!selectedAssessment || Object.keys(editedValues).length === 0) return;
+
+    // Check for validation errors
+    const activeErrors = Object.entries(validationErrors).filter(([id, err]) => err && editedValues[id]);
+    if (activeErrors.length > 0) {
+      toast.error('Corrija os erros de validação antes de salvar', {
+        description: `${activeErrors.length} indicador(es) com valores inválidos`,
+      });
+      return;
+    }
 
     const dataToSave = Object.entries(editedValues).map(([indicatorId, data]) => ({
       assessment_id: selectedAssessment,
@@ -679,21 +763,30 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
             {/* Form Tab */}
             <TabsContent value="formulario" className="space-y-6">
-              {Object.keys(editedValues).length > 0 && (
-                <Card className="border-accent">
+              {Object.keys(editedValues).length > 0 && (() => {
+                const errorCount = Object.entries(validationErrors).filter(([id, err]) => err && editedValues[id]).length;
+                return (
+                <Card className={cn("border-accent", errorCount > 0 && "border-destructive")}>
                   <CardContent className="py-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">
-                        {Object.keys(editedValues).length} valor(es) não salvo(s)
-                      </span>
-                      <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending}>
+                      <div className="text-sm space-y-1">
+                        <span>{Object.keys(editedValues).length} valor(es) não salvo(s)</span>
+                        {errorCount > 0 && (
+                          <p className="text-destructive flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            {errorCount} com erro de validação
+                          </p>
+                        )}
+                      </div>
+                      <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending || errorCount > 0}>
                         <Save className="mr-2 h-4 w-4" />
                         Salvar Todos
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
-              )}
+                );
+              })()}
 
               {loadingIndicators ? (
                 <div className="space-y-3">
@@ -724,11 +817,15 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                               existingValue.source?.toUpperCase().includes(s.toUpperCase())
                             );
                             const isIgnored = existingValue?.is_ignored === true;
+                            const valError = validationErrors[indicator.id];
+                            const valRules = getValidationForIndicator(indicator as any);
+                            const fieldConfig = getIndicatorFieldConfig({ code: indicator.code, normalization: indicator.normalization });
                             
                             return (
                               <div key={indicator.id} className={cn(
-                                "grid grid-cols-12 gap-3 items-center py-3 border-b last:border-0",
-                                isIgnored && "opacity-50"
+                                "grid grid-cols-12 gap-3 items-start py-3 border-b last:border-0",
+                                isIgnored && "opacity-50",
+                                valError && "bg-destructive/5 rounded-lg px-2 -mx-2"
                               )}>
                                 <div className="col-span-5">
                                   <div className="flex items-start gap-2">
@@ -758,6 +855,19 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                         {indicator.unit}
                                       </span>
                                     )}
+                                    {!isIgnored && fieldConfig.kind === 'number' && (valRules.min !== undefined || valRules.max !== undefined) && (
+                                      <span className="text-xs text-muted-foreground">
+                                        ({valRules.min !== undefined ? `mín: ${formatHintNumber(valRules.min)}` : ''}
+                                        {valRules.min !== undefined && valRules.max !== undefined ? ' · ' : ''}
+                                        {valRules.max !== undefined ? `máx: ${formatHintNumber(valRules.max)}` : ''}
+                                        {valRules.integer ? ' · inteiro' : ''})
+                                      </span>
+                                    )}
+                                    {!isIgnored && fieldConfig.kind === 'select' && (
+                                      <span className="text-xs text-muted-foreground">
+                                        Opções: {fieldConfig.options.map((option) => option.label).join(' · ')}
+                                      </span>
+                                    )}
                                     {isIgnored && (
                                       <Badge variant="outline" className="text-xs px-1.5 py-0 border-destructive/50 text-destructive">
                                         <EyeOff className="h-3 w-3 mr-1" />
@@ -765,24 +875,92 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       </Badge>
                                     )}
                                   </div>
+                                  {!isIgnored && (() => {
+                                    const guidance = INDICATOR_GUIDANCE[indicator.code];
+                                    if (!guidance) return null;
+                                    return (
+                                      <div className="mt-2 p-2 rounded bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
+                                        <p className="text-xs text-blue-700 dark:text-blue-300">
+                                          <strong>💡 Como obter:</strong> {guidance.howToFind}
+                                        </p>
+                                        {guidance.examples && (
+                                          <p className="text-xs text-blue-600/80 dark:text-blue-400/80 mt-1">
+                                            <em>Ex: {guidance.examples}</em>
+                                          </p>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
                                 <div className="col-span-3">
                                   <div className="relative">
-                                    <Input
-                                      type="number"
-                                      step="any"
-                                      value={currentValue ?? ''}
-                                      onChange={(e) => handleValueChange(indicator.id, e.target.value)}
-                                      disabled={isIgnored}
-                                      className={cn(
-                                        'w-full pr-8',
-                                        hasUnsavedChanges && 'border-accent ring-1 ring-accent',
-                                        isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
-                                        isIgnored && 'bg-muted cursor-not-allowed'
-                                      )}
-                                      placeholder={isIgnored ? 'Ignorado' : 'Valor'}
-                                    />
-                                    {isPreFilled && !hasUnsavedChanges && !isIgnored && (
+                                    {fieldConfig.kind === 'select' ? (
+                                      <Select
+                                        value={hasUnsavedChanges
+                                          ? (editedValues[indicator.id]?._rawInput ?? (currentValue === null || currentValue === undefined
+                                              ? EMPTY_SELECT_VALUE
+                                              : getIndicatorSelectValue(currentValue, indicator)))
+                                          : (getIndicatorSelectValue(currentValue, indicator) || EMPTY_SELECT_VALUE)
+                                        }
+                                        onValueChange={(selectedValue) => handleValueChange(indicator.id, selectedValue)}
+                                        disabled={isIgnored}
+                                      >
+                                        <SelectTrigger
+                                          className={cn(
+                                            'w-full',
+                                            valError && 'border-destructive ring-1 ring-destructive',
+                                            !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
+                                            !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
+                                            isIgnored && 'bg-muted cursor-not-allowed'
+                                          )}
+                                        >
+                                          <SelectValue placeholder={isIgnored ? 'Ignorado' : 'Selecionar'} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value={EMPTY_SELECT_VALUE}>Não informado</SelectItem>
+                                          {fieldConfig.options.map((option) => (
+                                            <SelectItem key={option.value} value={option.value}>
+                                              {option.label}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    ) : (
+                                      <Input
+                                        type="text"
+                                        inputMode="decimal"
+                                        value={hasUnsavedChanges 
+                                          ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue, indicator))
+                                          : formatDisplayValue(currentValue, indicator)
+                                        }
+                                        onChange={(e) => {
+                                          const raw = e.target.value;
+                                          if (raw !== '' && !/^-?[\d.,]*$/.test(raw)) return;
+                                          handleValueChange(indicator.id, raw);
+                                        }}
+                                        onBlur={() => {
+                                          const edited = editedValues[indicator.id];
+                                          if (!edited) return;
+                                          setEditedValues(prev => ({
+                                            ...prev,
+                                            [indicator.id]: {
+                                              ...prev[indicator.id],
+                                              _rawInput: edited.value === null ? '' : formatDisplayValue(edited.value, indicator),
+                                            },
+                                          }));
+                                        }}
+                                        disabled={isIgnored}
+                                        className={cn(
+                                          'w-full pr-8',
+                                          valError && 'border-destructive ring-1 ring-destructive',
+                                          !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
+                                          !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
+                                          isIgnored && 'bg-muted cursor-not-allowed'
+                                        )}
+                                        placeholder={isIgnored ? 'Ignorado' : 'Valor'}
+                                      />
+                                    )}
+                                    {isPreFilled && !hasUnsavedChanges && !isIgnored && !valError && (
                                       <Tooltip>
                                         <TooltipTrigger asChild>
                                           <PenLine className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-primary/50 pointer-events-auto cursor-pointer" />
@@ -791,6 +969,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       </Tooltip>
                                     )}
                                   </div>
+                                  {valError && (
+                                    <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                                      <AlertCircle className="h-3 w-3 shrink-0" />
+                                      {valError}
+                                    </p>
+                                  )}
                                 </div>
                                 <div className="col-span-4 flex justify-end items-center gap-1.5">
                                   <Tooltip>
@@ -840,7 +1024,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       size="sm"
                                       variant="outline"
                                       onClick={() => handleSaveValue(indicator.id)}
-                                      disabled={upsertValue.isPending}
+                                      disabled={upsertValue.isPending || !!valError}
                                     >
                                       <Save className="h-3 w-3" />
                                     </Button>

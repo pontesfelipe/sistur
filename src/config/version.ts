@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 20,
-  patch: 0,
+  minor: 21,
+  patch: 14,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,178 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.14",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Adicionadas dicas de preenchimento ('Como obter') abaixo de cada indicador territorial no formulário de preenchimento",
+      "Expandido catálogo de orientações (INDICATOR_GUIDANCE) com 25+ indicadores territoriais: saneamento, educação, saúde, economia, governança, IGMA, finanças e segurança",
+      "Indicadores Enterprise e Territorial agora possuem orientação uniforme durante o preenchimento",
+    ]
+  },
+  {
+    version: "1.21.13",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Motor de cálculo agora cria automaticamente snapshots de proveniência (diagnosis_data_snapshots) ao calcular diagnósticos",
+      "Todos os dados oficiais integrados (IBGE, SIDRA, CADASTUR, Mapa do Turismo, DATASUS, STN) são persistidos para uso em relatórios e análises",
+      "Relatórios agora reconhecem fontes IBGE_CENSO, IBGE_SIDRA e INEP nos rótulos de proveniência",
+      "Eliminada dependência de congelamento manual: proveniência é registrada automaticamente no cálculo",
+    ]
+  },
+  {
+    version: "1.21.12",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Novos indicadores automáticos via SIDRA/IBGE: Abastecimento de água (rede geral %) e Coleta de lixo domiciliar (%)",
+      "Dados do Censo 2010 (tabela 3217) integrados ao pré-preenchimento de diagnósticos territoriais",
+      "Edge function fetch-official-data agora consulta API SIDRA em paralelo com IBGE Pesquisas e Mapa do Turismo",
+    ]
+  },
+  {
+    version: "1.21.11",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Campos binários e categóricos no preenchimento agora usam lista de seleção em vez de input numérico",
+      "Indicadores como Plano de Turismo, Conselho de Turismo e Região Turística passaram a validar por opções válidas",
+      "Pré-preenchimento oficial e formulário principal exibem rótulos legíveis como Sim/Não e categorias A-E",
+    ]
+  },
+  {
+    version: "1.21.10",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Filtros no Histórico de Relatórios: tipo (Territorial/Enterprise), nível (Essencial/Estratégico/Integral) e autor (meus/todos)",
+      "Badge de tipo de diagnóstico e nível nos relatórios salvos",
+    ]
+  },
+  {
+    version: "1.21.9",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Formatação numérica agora contextual: analisa unidade e tipo do indicador para escolher decimais",
+      "Indicadores inteiros (hab, un, qtd) exibidos sem casas decimais (ex: 1.000 em vez de 1.000,00)",
+      "Percentuais formatados com até 1 casa decimal (ex: 85,5%)",
+      "Valores monetários (R$) com exatamente 2 casas decimais (ex: 375,00)",
+      "Demais indicadores com até 2 casas decimais, removendo zeros desnecessários",
+      "Função formatIndicatorValueBR centralizada e reutilizada nos painéis Territorial e Enterprise",
+    ],
+  },
+  {
+    version: "1.21.8",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Pré-preenchimento territorial e Enterprise agora normaliza e exibe números no padrão pt-BR em todos os campos atualizados",
+      "Campos convertem visualmente valores com ponto para vírgula ao perder foco",
+      "Validação e parsing aceitam formatos mistos e persistem os números internamente de forma consistente",
+      "Metas, dicas de validação e inputs de pré-preenchimento alinhados ao padrão brasileiro de decimais",
+    ],
+  },
+  {
+    version: "1.21.7",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Campos de indicadores no pré-preenchimento agora exibem valores com vírgula decimal (padrão brasileiro)",
+      "Input alterado de type=number para type=text com inputMode=decimal para aceitar vírgula",
+      "Dicas de validação (mín/máx) formatadas em pt-BR com vírgula decimal",
+      "Conversão automática de vírgula para ponto ao salvar valores internamente",
+    ],
+  },
+  {
+    version: "1.21.6",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Formatação numérica padrão brasileiro em relatórios: vírgula decimal e ponto de milhar",
+      "Todos os percentuais, scores e valores numéricos nos dados do relatório usam formato pt-BR",
+      "Instrução explícita no prompt da IA para nunca usar formato americano (ponto decimal)",
+      "Exemplos: 65,3% (correto) em vez de 65.3%, 45.321 hab. em vez de 45,321",
+    ],
+  },
+  {
+    version: "1.21.5",
+    date: "2026-04-15",
+    type: "minor" as const,
+    changes: [
+      "Relatórios seguem recomendações do MEC e normas ABNT (NBR 14724, 6024, 6023, 6028, 10520)",
+      "Capa institucional ABNT no DOCX com instituição, título, natureza do trabalho, cidade e ano",
+      "Estrutura textual MEC: Resumo com palavras-chave, seções numeradas progressivamente",
+      "Referências em formato ABNT NBR 6023:2018 (ordem alfabética com padrão institucional)",
+      "Glossário de termos técnicos SISTUR e Apêndice com documentos da KB",
+      "Linguagem impessoal (3ª pessoa) e citações no formato (SOBRENOME, ano)",
+      "Tabelas com título numerado acima e fonte abaixo conforme ABNT",
+      "Template Enterprise atualizado com mesmas regras MEC/ABNT",
+      "Certificados EDU com base legal MEC (Art. 32 LDB, Resolução CNE/CES nº 1/2001)",
+    ],
+  },
+  {
+    version: "1.21.3",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Relatórios DOCX agora exportados no formato ABNT (NBR 14724 / NBR 6024)",
+      "Margens: superior e esquerda 3cm, inferior e direita 2cm",
+      "Espaçamento entrelinhas 1.5, recuo de parágrafo 1.25cm, texto justificado",
+      "Títulos em caixa alta (H1), subtítulos em negrito, tabelas centralizadas com fonte 10pt",
+      "Página A4, fonte Arial 12pt padrão, numeração de página à direita",
+    ],
+  },
+  {
+    version: "1.21.2",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Corrigido botão 'Calcular Índices' bloqueado para diagnósticos DRAFT com dados preenchidos",
+      "Auto-promoção de DRAFT para DATA_READY na página de detalhes do diagnóstico quando dados suficientes",
+      "Condição de habilitação do cálculo agora baseada em dados reais (indicadores preenchidos) em vez de status",
+    ],
+  },
+  {
+    version: "1.21.1",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Validação de campos no formulário territorial: limites min/max, inteiros e percentuais baseados no tipo de indicador",
+      "Erros de validação exibidos em tempo real com destaque visual e bloqueio de salvamento",
+      "Indicações de faixa válida (mín/máx) exibidas junto a cada indicador no formulário",
+      "Atributos HTML min/max/step adicionados aos inputs para reforçar restrições no navegador",
+    ],
+  },
+  {
+    version: "1.21.0",
+    date: "2026-04-15",
+    type: "minor" as const,
+    changes: [
+      "Novo Dashboard 'Minha Jornada' (/edu) com visão consolidada de progresso, XP, streak e atividades recentes",
+      "Catálogo de treinamentos movido para /edu/catalogo com navegação dedicada no menu",
+      "Sistema de progresso granular: rastreamento por módulo, posição de vídeo e tempo de estudo (edu_detailed_progress)",
+      "Sistema de gamificação: XP, níveis, streaks diários e 10 conquistas desbloqueáveis (edu_user_xp, edu_user_achievements)",
+      "Notificações EDU em tempo real: prazos, resultados de exames, certificados emitidos (edu_notifications)",
+      "Widget de avaliação/rating de treinamentos com estrelas e comentários (edu_training_ratings)",
+      "Painel de anotações pessoais vinculadas a treinamentos e timestamps de vídeo (edu_notes)",
+      "Calendário de estudos com aulas ao vivo e eventos futuros",
+      "Relatório individual do aluno para professores: progresso por pilar, tempo de estudo e histórico de exames",
+      "Importação CSV de alunos para turmas com preview e validação",
+    ],
+  },
+  {
+    version: "1.20.1",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Removidas rotas duplicadas do módulo EDU: /cursos (legado), /learning e /admin/cursos (redirect)",
+      "Item 'Quizzes' removido do menu lateral — funcionalidade integrada como aba dentro de Admin EDU",
+      "Rotas legadas redirecionam automaticamente para equivalentes atuais (/cursos→/edu, /learning→/edu)",
+    ],
+  },
   {
     version: "1.20.0",
     date: "2026-04-14",
