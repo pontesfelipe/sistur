@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 3,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,22 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.5",
+    date: "2026-04-15",
+    type: "minor" as const,
+    changes: [
+      "Relatórios seguem recomendações do MEC e normas ABNT (NBR 14724, 6024, 6023, 6028, 10520)",
+      "Capa institucional ABNT no DOCX com instituição, título, natureza do trabalho, cidade e ano",
+      "Estrutura textual MEC: Resumo com palavras-chave, seções numeradas progressivamente",
+      "Referências em formato ABNT NBR 6023:2018 (ordem alfabética com padrão institucional)",
+      "Glossário de termos técnicos SISTUR e Apêndice com documentos da KB",
+      "Linguagem impessoal (3ª pessoa) e citações no formato (SOBRENOME, ano)",
+      "Tabelas com título numerado acima e fonte abaixo conforme ABNT",
+      "Template Enterprise atualizado com mesmas regras MEC/ABNT",
+      "Certificados EDU com base legal MEC (Art. 32 LDB, Resolução CNE/CES nº 1/2001)",
+    ],
+  },
   {
     version: "1.21.3",
     date: "2026-04-15",
