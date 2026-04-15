@@ -389,7 +389,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                   <div className="space-y-4 pt-2">
                     {categoryIndicators.map(indicator => {
                       const currentValue = localValues[indicator.id] || '';
-                      const numericValue = currentValue ? parseFloat(currentValue) : null;
+                      const numericValue = currentValue ? parseNumberBR(currentValue) : null;
                       const benchmarkStatus = getBenchmarkStatus(indicator, numericValue);
                       const benchmarkTarget = (indicator as any).benchmark_target;
                       const isIgnored = ignoredIds.has(indicator.id);
@@ -430,7 +430,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                             {!isIgnored && benchmarkTarget !== null && (
                               <p className="text-xs text-muted-foreground mt-1">
                                 <Target className="h-3 w-3 inline mr-1" />
-                                Meta: {benchmarkTarget} {indicator.unit}
+                                Meta: {formatNumberBR(benchmarkTarget)} {indicator.unit}
                               </p>
                             )}
                             {!isIgnored && guidance && (
@@ -449,8 +449,8 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
                               <Input
-                                type="number"
-                                step="any"
+                                type="text"
+                                inputMode="decimal"
                                 placeholder={isIgnored ? 'Ignorado' : 'Valor'}
                                 value={currentValue}
                                 onChange={(e) => handleValueChange(indicator.id, e.target.value, indicator)}
