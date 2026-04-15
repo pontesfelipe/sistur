@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 6,
+  patch: 7,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.7",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Campos de indicadores no pré-preenchimento agora exibem valores com vírgula decimal (padrão brasileiro)",
+      "Input alterado de type=number para type=text com inputMode=decimal para aceitar vírgula",
+      "Dicas de validação (mín/máx) formatadas em pt-BR com vírgula decimal",
+      "Conversão automática de vírgula para ponto ao salvar valores internamente",
+    ],
+  },
   {
     version: "1.21.6",
     date: "2026-04-15",
