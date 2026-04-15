@@ -367,16 +367,15 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Format number for display in pt-BR (comma as decimal separator)
-  const formatDisplayValue = (value: number | null | undefined): string => {
-    if (value === null || value === undefined) return '';
-    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+  // Format number for display in pt-BR using indicator context
+  const formatDisplayValue = (value: number | null | undefined, indicator?: any): string => {
+    return formatIndicatorValueBR(value, indicator);
   };
 
   // Format validation hint numbers in pt-BR
   const formatHintNumber = (value: number | undefined): string => {
     if (value === undefined) return '';
-    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+    return value.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
   };
 
   // Parse pt-BR and mixed numeric input safely
