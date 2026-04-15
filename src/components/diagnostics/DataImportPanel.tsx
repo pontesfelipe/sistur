@@ -749,11 +749,14 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                               existingValue.source?.toUpperCase().includes(s.toUpperCase())
                             );
                             const isIgnored = existingValue?.is_ignored === true;
+                            const valError = validationErrors[indicator.id];
+                            const valRules = getValidationForIndicator(indicator as any);
                             
                             return (
                               <div key={indicator.id} className={cn(
-                                "grid grid-cols-12 gap-3 items-center py-3 border-b last:border-0",
-                                isIgnored && "opacity-50"
+                                "grid grid-cols-12 gap-3 items-start py-3 border-b last:border-0",
+                                isIgnored && "opacity-50",
+                                valError && "bg-destructive/5 rounded-lg px-2 -mx-2"
                               )}>
                                 <div className="col-span-5">
                                   <div className="flex items-start gap-2">
@@ -783,6 +786,14 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                         {indicator.unit}
                                       </span>
                                     )}
+                                    {!isIgnored && (valRules.min !== undefined || valRules.max !== undefined) && (
+                                      <span className="text-xs text-muted-foreground">
+                                        ({valRules.min !== undefined ? `mín: ${valRules.min}` : ''}
+                                        {valRules.min !== undefined && valRules.max !== undefined ? ' · ' : ''}
+                                        {valRules.max !== undefined ? `máx: ${valRules.max}` : ''}
+                                        {valRules.integer ? ' · inteiro' : ''})
+                                      </span>
+                                    )}
                                     {isIgnored && (
                                       <Badge variant="outline" className="text-xs px-1.5 py-0 border-destructive/50 text-destructive">
                                         <EyeOff className="h-3 w-3 mr-1" />
@@ -795,19 +806,22 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                   <div className="relative">
                                     <Input
                                       type="number"
-                                      step="any"
+                                      step={valRules.integer ? "1" : "any"}
+                                      min={valRules.min}
+                                      max={valRules.max}
                                       value={currentValue ?? ''}
                                       onChange={(e) => handleValueChange(indicator.id, e.target.value)}
                                       disabled={isIgnored}
                                       className={cn(
                                         'w-full pr-8',
-                                        hasUnsavedChanges && 'border-accent ring-1 ring-accent',
-                                        isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
+                                        valError && 'border-destructive ring-1 ring-destructive',
+                                        !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
+                                        !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
                                         isIgnored && 'bg-muted cursor-not-allowed'
                                       )}
                                       placeholder={isIgnored ? 'Ignorado' : 'Valor'}
                                     />
-                                    {isPreFilled && !hasUnsavedChanges && !isIgnored && (
+                                    {isPreFilled && !hasUnsavedChanges && !isIgnored && !valError && (
                                       <Tooltip>
                                         <TooltipTrigger asChild>
                                           <PenLine className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-primary/50 pointer-events-auto cursor-pointer" />
@@ -816,6 +830,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       </Tooltip>
                                     )}
                                   </div>
+                                  {valError && (
+                                    <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                                      <AlertCircle className="h-3 w-3 shrink-0" />
+                                      {valError}
+                                    </p>
+                                  )}
                                 </div>
                                 <div className="col-span-4 flex justify-end items-center gap-1.5">
                                   <Tooltip>
