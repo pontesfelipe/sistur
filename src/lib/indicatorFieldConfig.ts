@@ -68,6 +68,14 @@ export function getIndicatorFieldConfig(indicator?: IndicatorLike | null): Indic
     return { kind: 'select', options: BINARY_OPTIONS };
   }
 
+  const unit = indicator?.unit?.trim()?.toLowerCase();
+  if (unit && SCORE_1_5_UNITS.has(unit)) {
+    return { kind: 'select', options: SCORE_1_5_OPTIONS };
+  }
+  if (unit && NOTA_0_10_UNITS.has(unit)) {
+    return { kind: 'select', options: NOTA_0_10_OPTIONS };
+  }
+
   return { kind: 'number' };
 }
 
