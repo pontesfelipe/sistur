@@ -346,6 +346,14 @@ const DiagnosticoDetalhe = () => {
   const completenessPercentage = totalIndicators > 0 ? (filledIndicators / totalIndicators) * 100 : 0;
   const hasIncompleteData = completenessPercentage < 100 && completenessPercentage > 0;
 
+  // Auto-promote DRAFT to DATA_READY when there's sufficient data
+  useEffect(() => {
+    if (!assessment || assessment.status !== 'DRAFT' || !id) return;
+    if (filledIndicators === 0 || completenessPercentage < 50) return;
+    if (updateAssessment.isPending) return;
+    updateAssessment.mutate({ id, status: 'DATA_READY' });
+  }, [assessment?.status, id, filledIndicators, completenessPercentage]);
+
   const handleCalculate = async () => {
     if (!id) return;
     const result = await calculate(id);
