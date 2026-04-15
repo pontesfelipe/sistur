@@ -550,12 +550,26 @@ OS TRÊS EIXOS SISTUR ENTERPRISE:
 
 CLASSIFICAÇÃO: BOM (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
 
+FONTES DE DADOS — RASTREABILIDADE OBRIGATÓRIA:
+Cada dado apresentado no relatório DEVE conter a fonte entre parênteses. Exemplos:
+- "Taxa de ocupação: 72% (Fonte: Dados do empreendimento — preenchimento manual)"
+- "Nota média: 4.2/5 (Fonte: Google Reviews, TripAdvisor)"
+- Se houver snapshots de proveniência, use-os para identificar a origem exata
+- Se o dado veio de preenchimento manual, indique: "(Fonte: Preenchimento manual)"
+- Se o dado veio de reviews online, indique a plataforma: "(Fonte: Google Reviews)"
+
+${MEC_FORMATTING_RULES}
+
 REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Comece SEMPRE com título seguido da tabela de ficha técnica fornecida
 - Use tabelas markdown para todos os conjuntos de dados
-- Linguagem executiva, orientada a resultados
+- TODAS as tabelas DEVEM ter uma coluna "Fonte"
+- Tabelas devem ter título numerado ACIMA: "Tabela 1 — Título"
+- Fonte da tabela ABAIXO: "Fonte: elaboração própria com dados de..."
+- Linguagem institucional e impessoal (3ª pessoa)
 - Conecte: métrica → gap → ação → resultado esperado
-- Se houver dados de reviews/avaliações online, incorpore na análise de satisfação`;
+- Se houver dados de reviews/avaliações online, incorpore na análise de satisfação
+- Seção final de Referências em formato ABNT NBR 6023`;
 
   if (template === 'executivo') {
     return `${common}
@@ -565,11 +579,12 @@ TIPO: RESUMO EXECUTIVO ENTERPRISE — Máximo 1000 palavras.
 ESTRUTURA:
 # Resumo Executivo — [Nome]
 [Ficha Técnica]
-## 1. Performance Geral (tabela dos 3 eixos)
-## 2. Top 3 KPIs Críticos (tabela)
-## 3. Ações Prioritárias (5 itens, tabela)
-## 4. Quick Wins com ROI Estimado
-## 5. Próximos Passos`;
+## 1 Performance Geral (tabela dos 3 eixos)
+## 2 KPIs Críticos (tabela com Fonte)
+## 3 Ações Prioritárias (5 itens, tabela)
+## 4 Quick Wins com ROI Estimado
+## 5 Próximos Passos
+## Referências (ABNT NBR 6023)`;
   }
 
   if (template === 'investidor') {
@@ -580,12 +595,13 @@ TIPO: RELATÓRIO PARA INVESTIDORES — 1500 palavras. Foco em ROI e oportunidade
 ESTRUTURA:
 # Análise de Investimento — [Nome]
 [Ficha Técnica]
-## 1. Tese de Investimento (1 parágrafo)
-## 2. Performance Atual (tabela de KPIs vs benchmark)
-## 3. Análise de Riscos (tabela: Risco | Severidade | Mitigação)
-## 4. Oportunidades de Melhoria (tabela: Oportunidade | Investimento | ROI Est.)
-## 5. Projeções e Cenários
-## 6. Recomendação Final`;
+## 1 Tese de Investimento (1 parágrafo)
+## 2 Performance Atual (tabela de KPIs vs benchmark com Fonte)
+## 3 Análise de Riscos (tabela: Risco | Severidade | Mitigação)
+## 4 Oportunidades de Melhoria (tabela: Oportunidade | Investimento | ROI Est.)
+## 5 Projeções e Cenários
+## 6 Recomendação Final
+## Referências (ABNT NBR 6023)`;
   }
 
   // COMPLETO
@@ -593,20 +609,32 @@ ESTRUTURA:
 
 TIPO: RELATÓRIO ENTERPRISE COMPLETO — Mínimo 2500 palavras.
 
-ESTRUTURA:
+ESTRUTURA (MEC/ABNT):
 # Relatório SISTUR Enterprise — [Nome]
 [Ficha Técnica]
-## 1. Sumário Executivo para Gestão
-## 2. Perfil do Empreendimento
-## 3. Metodologia SISTUR Enterprise
-## 4. Diagnóstico por Categoria Funcional (tabela por categoria com Fonte)
-## 5. Análise de Gargalos Operacionais (tabela)
-## 6. Planos de Ação em Andamento
-## 7. Recomendações Estratégicas (curto/médio/longo prazo)
-## 8. Prescrições de Capacitação
-## 9. Roadmap de Implementação (tabela: Ação | Categoria | Investimento | Prazo | KPI)
-## 10. Fontes e Referências
-## 11. Considerações Finais`;
+
+## Resumo
+- Síntese em até 500 palavras
+- **Palavras-chave**: Gestão Hoteleira. SISTUR. Diagnóstico Enterprise. [Nome].
+
+## 1 Introdução
+## 2 Perfil do Empreendimento
+## 3 Metodologia SISTUR Enterprise
+### 3.1 Fundamentação Teórica
+### 3.2 Fontes de Dados (tabela com Fonte | Tipo | Confiabilidade)
+## 4 Diagnóstico por Categoria Funcional (tabela por categoria com Fonte)
+## 5 Análise de Gargalos Operacionais (tabela)
+## 6 Planos de Ação em Andamento
+## 7 Recomendações Estratégicas (curto/médio/longo prazo)
+## 8 Prescrições de Capacitação
+## 9 Roadmap de Implementação (tabela: Ação | Categoria | Investimento | Prazo | KPI)
+## 10 Considerações Finais
+
+## Referências
+- ABNT NBR 6023:2018 — ordem alfabética
+
+## Glossário
+## Apêndice`;
 }
 
 // ========== MAIN ==========
