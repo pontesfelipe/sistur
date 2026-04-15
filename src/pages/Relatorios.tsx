@@ -114,6 +114,8 @@ export default function Relatorios() {
   const reportRef = useRef<HTMLDivElement>(null);
   const [customizationOpen, setCustomizationOpen] = useState(false);
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
+  const [historyTypeFilter, setHistoryTypeFilter] = useState<string>('all');
+  const [historyOwnerFilter, setHistoryOwnerFilter] = useState<string>('all');
 
   // Pre-select assessment from URL parameter
   useEffect(() => {
