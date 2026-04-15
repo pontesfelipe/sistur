@@ -368,6 +368,14 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   };
 
   const handleValueChange = (indicatorId: string, value: string) => {
+    const indicator = indicators.find(i => i.id === indicatorId);
+    
+    // Validate the value
+    if (indicator) {
+      const error = validateIndicatorValue(value, indicator as any);
+      setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
+    }
+
     setEditedValues(prev => ({
       ...prev,
       [indicatorId]: {
