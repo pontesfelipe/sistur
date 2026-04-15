@@ -885,7 +885,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       size="sm"
                                       variant="outline"
                                       onClick={() => handleSaveValue(indicator.id)}
-                                      disabled={upsertValue.isPending}
+                                      disabled={upsertValue.isPending || !!valError}
                                     >
                                       <Save className="h-3 w-3" />
                                     </Button>
