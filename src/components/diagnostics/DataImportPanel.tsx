@@ -61,6 +61,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { validateIndicatorValue, getValidationForIndicator } from '@/data/enterpriseIndicatorGuidance';
 import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
 
 interface DataImportPanelProps {
