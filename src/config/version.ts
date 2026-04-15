@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.6",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Formatação numérica padrão brasileiro em relatórios: vírgula decimal e ponto de milhar",
+      "Todos os percentuais, scores e valores numéricos nos dados do relatório usam formato pt-BR",
+      "Instrução explícita no prompt da IA para nunca usar formato americano (ponto decimal)",
+      "Exemplos: 65,3% (correto) em vez de 65.3%, 45.321 hab. em vez de 45,321",
+    ],
+  },
   {
     version: "1.21.5",
     date: "2026-04-15",
