@@ -76,9 +76,8 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
 
-  const formatNumberBR = useCallback((value: number | null | undefined) => {
-    if (value === null || value === undefined) return '';
-    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+  const formatNumberBR = useCallback((value: number | null | undefined, indicator?: Indicator) => {
+    return formatIndicatorValueBR(value, indicator as any);
   }, []);
 
   const parseNumberBR = useCallback((value: string) => {
