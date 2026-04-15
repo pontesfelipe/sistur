@@ -34,7 +34,6 @@ import {
   Award,
   Map,
   Sparkles,
-  HelpingHand,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState, useMemo, useEffect, useCallback } from 'react';
