@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.1",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Validação de campos no formulário territorial: limites min/max, inteiros e percentuais baseados no tipo de indicador",
+      "Erros de validação exibidos em tempo real com destaque visual e bloqueio de salvamento",
+      "Indicações de faixa válida (mín/máx) exibidas junto a cada indicador no formulário",
+      "Atributos HTML min/max/step adicionados aos inputs para reforçar restrições no navegador",
+    ],
+  },
   {
     version: "1.21.0",
     date: "2026-04-15",
