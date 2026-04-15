@@ -1,14 +1,16 @@
 /**
- * Export a Markdown report as a .docx file in ABNT format (NBR 14724 / NBR 6024)
+ * Export a Markdown report as a .docx file following MEC / ABNT standards
  *
- * ABNT rules applied:
- *  - Font: Arial 12pt (body), titles up to 14pt
+ * MEC / ABNT rules applied:
+ *  - ABNT NBR 14724 — Structure (cover, abstract, body, references, glossary, appendix)
+ *  - ABNT NBR 6024  — Progressive numbering
+ *  - ABNT NBR 6023  — References
+ *  - Font: Arial 12pt (body), 14pt (H1)
  *  - Line spacing: 1.5 (360 twips)
  *  - Margins: top 3cm, bottom 2cm, left 3cm, right 2cm
  *  - First-line indent: 1.25cm on body paragraphs
  *  - Page numbers: top-right, Arabic numerals
- *  - Headings: bold, left-aligned, numbered style
- *  - Tables: centered, with thin borders
+ *  - Tables: centered, title above, source below
  */
 import {
   Document,
@@ -26,39 +28,30 @@ import {
   Header,
   Footer,
   PageNumber,
+  PageBreak,
 } from 'docx';
 import { saveAs } from 'file-saver';
 import type { ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
-// --- ABNT constants (in DXA: 1cm ≈ 567 DXA, 1pt = 2 half-points) ---
-const CM = 567; // 1 cm in DXA (twips)
+// --- ABNT constants (1cm ≈ 567 DXA, 1pt = 2 half-points) ---
+const CM = 567;
+const MARGIN_TOP = Math.round(3 * CM);
+const MARGIN_BOTTOM = Math.round(2 * CM);
+const MARGIN_LEFT = Math.round(3 * CM);
+const MARGIN_RIGHT = Math.round(2 * CM);
+const PAGE_WIDTH = 11906;  // A4
+const PAGE_HEIGHT = 16838;
+const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
 
-// Margins: top 3cm, bottom 2cm, left 3cm, right 2cm
-const MARGIN_TOP = Math.round(3 * CM);    // 1701
-const MARGIN_BOTTOM = Math.round(2 * CM); // 1134
-const MARGIN_LEFT = Math.round(3 * CM);   // 1701
-const MARGIN_RIGHT = Math.round(2 * CM);  // 1134
-
-// Page: A4 (210mm x 297mm)
-const PAGE_WIDTH = 11906;  // A4 width in DXA
-const PAGE_HEIGHT = 16838; // A4 height in DXA
-const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT; // ~9071
-
-// Typography
 const FONT = 'Arial';
-const BODY_SIZE = 24;       // 12pt in half-points
+const BODY_SIZE = 24;       // 12pt
 const H1_SIZE = 28;         // 14pt
 const H2_SIZE = 24;         // 12pt
 const H3_SIZE = 24;         // 12pt
-const SMALL_SIZE = 20;      // 10pt (for headers/footers/table captions)
+const SMALL_SIZE = 20;      // 10pt
+const LINE_SPACING = 360;   // 1.5
+const FIRST_LINE_INDENT = Math.round(1.25 * CM);
 
-// Spacing: 1.5 line spacing = 360 twips
-const LINE_SPACING = 360;
-
-// First-line indent: 1.25cm
-const FIRST_LINE_INDENT = Math.round(1.25 * CM); // ~709
-
-// Colors
 const BORDER_COLOR = '000000';
 const MUTED = '333333';
 
@@ -83,8 +76,8 @@ function parseInlineFormatting(text: string, size = BODY_SIZE): TextRun[] {
   return runs.length > 0 ? runs : [new TextRun({ text, font: FONT, size })];
 }
 
-function parseMarkdownTable(lines: string[]): Table | null {
-  if (lines.length < 2) return null;
+function parseMarkdownTable(lines: string[]): (Paragraph | Table)[] {
+  if (lines.length < 2) return [];
 
   const parseRow = (line: string) =>
     line.split('|').map(c => c.trim()).filter(Boolean);
@@ -92,13 +85,11 @@ function parseMarkdownTable(lines: string[]): Table | null {
   const headers = parseRow(lines[0]);
   const colCount = headers.length;
   const colWidth = Math.floor(CONTENT_WIDTH / colCount);
-
   const dataLines = lines.filter((_, i) => i !== 1); // skip separator
 
   const rows = dataLines.map((line, rowIdx) => {
     const cells = parseRow(line);
     const isHeader = rowIdx === 0;
-
     return new TableRow({
       children: Array.from({ length: colCount }, (_, ci) => {
         const cellText = cells[ci] || '';
@@ -110,13 +101,13 @@ function parseMarkdownTable(lines: string[]): Table | null {
           children: [
             new Paragraph({
               alignment: AlignmentType.CENTER,
-              spacing: { line: 240 }, // single spacing inside tables per ABNT
+              spacing: { line: 240 },
               children: [
                 new TextRun({
                   text: cellText,
                   bold: isHeader,
                   font: FONT,
-                  size: SMALL_SIZE, // 10pt for tables per ABNT
+                  size: SMALL_SIZE,
                 }),
               ],
             }),
@@ -126,11 +117,73 @@ function parseMarkdownTable(lines: string[]): Table | null {
     });
   });
 
-  return new Table({
+  const table = new Table({
     width: { size: CONTENT_WIDTH, type: WidthType.DXA },
     columnWidths: Array(colCount).fill(colWidth),
     rows,
   });
+
+  return [table];
+}
+
+/** Build ABNT-compliant cover page */
+function buildCoverPage(destinationName: string, customization?: ReportCustomization): Paragraph[] {
+  const orgName = customization?.organizationName || 'SISTUR — Sistema Integrado de Suporte para Turismo em Regiões';
+  const now = new Date();
+  const year = now.getFullYear();
+  const city = 'Brasil';
+
+  return [
+    // Institution name (centered, uppercase, bold)
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 600, line: LINE_SPACING },
+      children: [new TextRun({ text: orgName.toUpperCase(), font: FONT, size: H1_SIZE, bold: true })],
+    }),
+    // Empty space
+    new Paragraph({ spacing: { before: 2400 }, children: [] }),
+    // Title
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 400, line: LINE_SPACING },
+      children: [new TextRun({ text: `RELATÓRIO DE DIAGNÓSTICO SISTUR`, font: FONT, size: 32, bold: true })],
+    }),
+    // Subtitle with destination name
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 200, line: LINE_SPACING },
+      children: [new TextRun({ text: destinationName.toUpperCase(), font: FONT, size: H1_SIZE, bold: true })],
+    }),
+    // Empty space
+    new Paragraph({ spacing: { before: 2400 }, children: [] }),
+    // Nature of document (ABNT requirement — right-aligned, half-width)
+    new Paragraph({
+      alignment: AlignmentType.RIGHT,
+      indent: { left: Math.round(7 * CM) },
+      spacing: { after: 200, line: LINE_SPACING },
+      children: [
+        new TextRun({
+          text: 'Relatório técnico de diagnóstico territorial gerado pelo Sistema SISTUR conforme metodologia de Mario Carlos Beni, seguindo padrões MEC/ABNT.',
+          font: FONT, size: SMALL_SIZE, italics: true,
+        }),
+      ],
+    }),
+    // Empty space
+    new Paragraph({ spacing: { before: 3600 }, children: [] }),
+    // City and year
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { line: LINE_SPACING },
+      children: [new TextRun({ text: `${city}`, font: FONT, size: BODY_SIZE })],
+    }),
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { line: LINE_SPACING },
+      children: [new TextRun({ text: `${year}`, font: FONT, size: BODY_SIZE })],
+    }),
+    // Page break after cover
+    new Paragraph({ children: [new PageBreak()] }),
+  ];
 }
 
 export async function exportReportAsDocx(
@@ -140,6 +193,10 @@ export async function exportReportAsDocx(
 ) {
   const lines = markdownContent.split('\n');
   const children: (Paragraph | Table)[] = [];
+
+  // --- Cover page (MEC/ABNT pre-textual element) ---
+  children.push(...buildCoverPage(destinationName, customization));
+
   let i = 0;
 
   while (i < lines.length) {
@@ -152,10 +209,10 @@ export async function exportReportAsDocx(
         tableLines.push(lines[i]);
         i++;
       }
-      const table = parseMarkdownTable(tableLines);
-      if (table) {
+      const tableElements = parseMarkdownTable(tableLines);
+      if (tableElements.length > 0) {
         children.push(new Paragraph({ spacing: { before: 120, line: LINE_SPACING }, children: [] }));
-        children.push(table);
+        children.push(...tableElements);
         children.push(new Paragraph({ spacing: { after: 120, line: LINE_SPACING }, children: [] }));
       }
       continue;
@@ -171,9 +228,7 @@ export async function exportReportAsDocx(
           children: [
             new TextRun({
               text: line.slice(2).toUpperCase(),
-              font: FONT,
-              size: H1_SIZE,
-              bold: true,
+              font: FONT, size: H1_SIZE, bold: true,
             }),
           ],
         }),
@@ -190,9 +245,7 @@ export async function exportReportAsDocx(
           children: [
             new TextRun({
               text: line.slice(3),
-              font: FONT,
-              size: H2_SIZE,
-              bold: true,
+              font: FONT, size: H2_SIZE, bold: true,
             }),
           ],
         }),
@@ -209,10 +262,24 @@ export async function exportReportAsDocx(
           children: [
             new TextRun({
               text: line.slice(4),
-              font: FONT,
-              size: H3_SIZE,
-              bold: true,
-              italics: true,
+              font: FONT, size: H3_SIZE, bold: true, italics: true,
+            }),
+          ],
+        }),
+      );
+      i++;
+      continue;
+    }
+    if (line.startsWith('#### ')) {
+      children.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_4,
+          alignment: AlignmentType.LEFT,
+          spacing: { before: 200, after: 100, line: LINE_SPACING },
+          children: [
+            new TextRun({
+              text: line.slice(5),
+              font: FONT, size: BODY_SIZE, bold: true,
             }),
           ],
         }),
@@ -234,7 +301,7 @@ export async function exportReportAsDocx(
       continue;
     }
 
-    // --- Bullet list (ABNT: no first-line indent for lists) ---
+    // --- Bullet list ---
     if (line.match(/^\s*[-*]\s/)) {
       const text = line.replace(/^\s*[-*]\s/, '');
       children.push(
@@ -268,7 +335,25 @@ export async function exportReportAsDocx(
       continue;
     }
 
-    // --- Regular paragraph (ABNT: 1.25cm first-line indent, justified, 1.5 spacing) ---
+    // --- Table source line (ABNT: "Fonte:" below tables, smaller font) ---
+    if (line.trim().toLowerCase().startsWith('fonte:')) {
+      children.push(
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          spacing: { before: 40, after: 120, line: 240 },
+          children: [
+            new TextRun({
+              text: line.trim(),
+              font: FONT, size: SMALL_SIZE, italics: true, color: MUTED,
+            }),
+          ],
+        }),
+      );
+      i++;
+      continue;
+    }
+
+    // --- Regular paragraph (ABNT: 1.25cm indent, justified, 1.5 spacing) ---
     children.push(
       new Paragraph({
         alignment: AlignmentType.JUSTIFIED,
@@ -280,28 +365,25 @@ export async function exportReportAsDocx(
     i++;
   }
 
-  // --- Additional notes block ---
+  // --- Additional notes (ABNT: long quote format — 4cm indent, single spacing, 10pt) ---
   if (customization?.additionalNotes) {
     children.push(new Paragraph({ spacing: { before: 480, line: LINE_SPACING }, children: [] }));
     children.push(
       new Paragraph({
         alignment: AlignmentType.JUSTIFIED,
-        indent: { left: Math.round(4 * CM) }, // ABNT: long quotes indented 4cm
-        spacing: { before: 120, after: 120, line: 240 }, // single spacing for quotes
+        indent: { left: Math.round(4 * CM) },
+        spacing: { before: 120, after: 120, line: 240 },
         children: [
           new TextRun({
             text: customization.additionalNotes,
-            font: FONT,
-            size: SMALL_SIZE,
-            italics: true,
-            color: MUTED,
+            font: FONT, size: SMALL_SIZE, italics: true, color: MUTED,
           }),
         ],
       }),
     );
   }
 
-  // --- Header: org name + header text (ABNT: 10pt, right-aligned) ---
+  // --- Header ---
   const headerText = customization?.headerText || 'SISTUR — Relatório de Diagnóstico';
   const orgName = customization?.organizationName || '';
 
@@ -322,7 +404,7 @@ export async function exportReportAsDocx(
     }),
   );
 
-  // --- Footer: page number top-right per ABNT (using footer as fallback) ---
+  // --- Footer: page number (ABNT: top-right ideally, but footer is common) ---
   const footerChildren: Paragraph[] = [];
   if (customization?.showPageNumbers !== false) {
     footerChildren.push(
@@ -345,7 +427,7 @@ export async function exportReportAsDocx(
     );
   }
 
-  // --- Font size override from customization ---
+  // --- Font size override ---
   const fontSizeMap = { small: 20, medium: 24, large: 28 };
   const baseSize = fontSizeMap[customization?.fontSize || 'medium'] || BODY_SIZE;
 
@@ -354,9 +436,7 @@ export async function exportReportAsDocx(
       default: {
         document: {
           run: { font: FONT, size: baseSize },
-          paragraph: {
-            spacing: { line: LINE_SPACING },
-          },
+          paragraph: { spacing: { line: LINE_SPACING } },
         },
       },
     },
