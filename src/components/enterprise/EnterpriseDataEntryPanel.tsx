@@ -76,7 +76,26 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
 
-  
+  const formatNumberBR = useCallback((value: number | null | undefined) => {
+    if (value === null || value === undefined) return '';
+    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+  }, []);
+
+  const parseNumberBR = useCallback((value: string) => {
+    if (!value) return null;
+    const normalized = value.replace(/\./g, '').replace(',', '.');
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : null;
+  }, []);
+
+  const normalizeForValidation = useCallback((value: string) => {
+    if (!value) return value;
+    if (value.includes(',')) {
+      return value.replace(/\./g, '').replace(',', '.');
+    }
+    return value;
+  }, []);
+
   // Initialize local values and ignored state from existing
   useEffect(() => {
     if (existingValues && existingValues.length > 0 && Object.keys(localValues).length === 0) {
@@ -84,7 +103,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
       const ignored = new Set<string>();
       existingValues.forEach(v => {
         if (v.value_raw !== null) {
-          initial[v.indicator_id] = v.value_raw.toString();
+          initial[v.indicator_id] = formatNumberBR(v.value_raw);
         }
         if (v.is_ignored) {
           ignored.add(v.indicator_id);
@@ -97,7 +116,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
         setIgnoredIds(ignored);
       }
     }
-  }, [existingValues]);
+  }, [existingValues, localValues, formatNumberBR]);
 
   // Apply initial auto-fill values from step 4 review search
   useEffect(() => {
@@ -109,13 +128,13 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
       Object.entries(initialAutoFillValues).forEach(([code, value]) => {
         const id = codeToId.get(code);
         if (id && !updated[id]) {
-          updated[id] = value.toString();
+          updated[id] = formatNumberBR(value);
           applied = true;
         }
       });
       return applied ? updated : prev;
     });
-  }, [initialAutoFillValues, indicators]);
+  }, [initialAutoFillValues, indicators, formatNumberBR]);
 
   const handleToggleIgnore = useCallback((indicatorId: string) => {
     setIgnoredIds(prev => {
@@ -184,20 +203,17 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   }, [indicators, localValues, ignoredIds]);
   
   const handleValueChange = (indicatorId: string, value: string, indicator: Indicator) => {
-    // Only allow valid numeric characters
-    if (value !== '' && !/^-?\d*\.?\d*$/.test(value)) return;
+    if (value !== '' && !/^-?[\d.,]*$/.test(value)) return;
 
     setLocalValues(prev => ({ ...prev, [indicatorId]: value }));
 
-    // Validate
-    const error = validateIndicatorValue(value, indicator as any);
+    const error = validateIndicatorValue(normalizeForValidation(value), indicator as any);
     setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
   };
   
   const handleSave = async (proceedToCalculation: boolean = false) => {
     if (!profile?.org_id) return;
 
-    // Check for validation errors before saving
     const activeErrors = Object.entries(validationErrors).filter(([id, err]) => err && localValues[id]);
     if (activeErrors.length > 0) {
       toast.error('Corrija os erros de validação antes de salvar', {
@@ -211,7 +227,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
       .map(([indicatorId, value]) => ({
         assessment_id: assessmentId,
         indicator_id: indicatorId,
-        value_raw: parseFloat(value),
+        value_raw: parseNumberBR(value),
         source: 'Manual (Enterprise)',
       }));
     
