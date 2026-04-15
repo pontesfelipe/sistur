@@ -51,6 +51,7 @@ interface DataValidationPanelProps {
 // Source display info
 const SOURCE_INFO: Record<string, { name: string; color: string; icon: string }> = {
   IBGE: { name: 'IBGE', color: 'bg-blue-500', icon: '📊' },
+  IBGE_CENSO: { name: 'IBGE / SIDRA (Censo)', color: 'bg-indigo-500', icon: '🏘️' },
   DATASUS: { name: 'DATASUS', color: 'bg-green-500', icon: '🏥' },
   INEP: { name: 'INEP', color: 'bg-purple-500', icon: '📚' },
   STN: { name: 'Tesouro Nacional', color: 'bg-amber-500', icon: '💰' },
