@@ -117,14 +117,15 @@ Deno.serve(async (req) => {
               messages: [
                 {
                   role: 'system',
-                   content: `Você é um analista sênior de reputação digital e experiência do hóspede para o setor de hospitalidade. Analise TODOS os resultados de busca — incluindo o texto completo dos comentários e avaliações — e extraia uma análise profunda da reputação do estabelecimento.
+                   content: `Você é um analista sênior de reputação digital e experiência do hóspede para o setor de hospitalidade. Analise TODOS os resultados de busca — incluindo o texto completo dos comentários, avaliações E o conteúdo do site oficial do empreendimento — e extraia uma análise profunda da reputação e do perfil do estabelecimento.
 
 Preste atenção especial a:
 - Comentários textuais dos hóspedes (sentimentos, emoções, experiências relatadas)
 - Padrões recorrentes nos elogios e reclamações
 - Aspectos operacionais mencionados (limpeza, atendimento, infraestrutura, gastronomia, localização, custo-benefício)
 - Tom emocional predominante (encantamento, satisfação, frustração, decepção)
-- Informações sobre o estabelecimento: categoria de estrelas, tipo (hotel, pousada, resort), porte
+- **IMPORTANTE - DADOS DO SITE OFICIAL**: Extraia do site oficial (marcado como [SiteOficial]) informações como: categoria de estrelas, tipo de empreendimento, número de quartos/UHs/apartamentos/suítes, número de funcionários, capacidade total, ano de inauguração, amenidades, certificações. Priorize dados do site oficial sobre estimativas.
+- Informações sobre o estabelecimento encontradas em QUALQUER fonte: categoria de estrelas, tipo (hotel, pousada, resort), porte
 
 Retorne APENAS um JSON válido com esta estrutura:
 {
