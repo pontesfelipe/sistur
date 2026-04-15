@@ -73,6 +73,7 @@ interface GeneratedReport {
   environment: string;
   created_by: string;
   diagnostic_type: string;
+  tier: string | null;
 }
 
 function useGeneratedReports() {
@@ -81,13 +82,14 @@ function useGeneratedReports() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('generated_reports')
-        .select('*, assessments!inner(diagnostic_type)')
+        .select('*, assessments!inner(diagnostic_type, tier)')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
       return (data ?? []).map((r: any) => ({
         ...r,
         diagnostic_type: r.assessments?.diagnostic_type ?? 'territorial',
+        tier: r.assessments?.tier ?? null,
       })) as GeneratedReport[];
     },
   });
@@ -116,6 +118,7 @@ export default function Relatorios() {
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
   const [historyTypeFilter, setHistoryTypeFilter] = useState<string>('all');
   const [historyOwnerFilter, setHistoryOwnerFilter] = useState<string>('all');
+  const [historyTierFilter, setHistoryTierFilter] = useState<string>('all');
 
   // Pre-select assessment from URL parameter
   useEffect(() => {
@@ -813,6 +816,17 @@ export default function Relatorios() {
                         </SelectItem>
                       </SelectContent>
                     </Select>
+                    <Select value={historyTierFilter} onValueChange={setHistoryTierFilter}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Nível" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os níveis</SelectItem>
+                        <SelectItem value="essencial">⚡ Essencial</SelectItem>
+                        <SelectItem value="estrategico">📊 Estratégico</SelectItem>
+                        <SelectItem value="integral">🎯 Integral</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Select value={historyOwnerFilter} onValueChange={setHistoryOwnerFilter}>
                       <SelectTrigger className="h-8 text-xs">
                         <SelectValue placeholder="Autor" />
@@ -835,11 +849,9 @@ export default function Relatorios() {
                       <div className="space-y-2 pr-4">
                         {savedReports
                           .filter(r => {
-                            // Visibility: personal reports only to creator, org reports to all
                             if (r.visibility === 'personal' && r.created_by !== profile?.user_id) return false;
-                            // Type filter
                             if (historyTypeFilter !== 'all' && r.diagnostic_type !== historyTypeFilter) return false;
-                            // Owner filter
+                            if (historyTierFilter !== 'all' && r.tier !== historyTierFilter) return false;
                             if (historyOwnerFilter === 'mine' && r.created_by !== profile?.user_id) return false;
                             return true;
                           })
@@ -861,6 +873,11 @@ export default function Relatorios() {
                                     {r.diagnostic_type === 'enterprise' ? <Building2 className="h-2.5 w-2.5" /> : <Globe className="h-2.5 w-2.5" />}
                                     {r.diagnostic_type === 'enterprise' ? 'Enterprise' : 'Territorial'}
                                   </Badge>
+                                  {r.tier && (
+                                    <Badge variant="secondary" className="text-[10px] shrink-0">
+                                      {r.tier === 'essencial' ? '⚡' : r.tier === 'estrategico' ? '📊' : '🎯'} {r.tier.charAt(0).toUpperCase() + r.tier.slice(1)}
+                                    </Badge>
+                                  )}
                                   {r.visibility === 'org' ? (
                                     <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0"><Users className="h-2.5 w-2.5" />Org</Badge>
                                   ) : (
