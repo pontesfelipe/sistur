@@ -123,6 +123,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         ...formData,
         destination_id: destinationId,
         org_id: effectiveOrgId,
+        review_analysis: reviewAnalysisData,
       };
       
       const { data, error } = await supabase
