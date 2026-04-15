@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,14 +23,19 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.21.4",
+    version: "1.21.5",
     date: "2026-04-15",
-    type: "patch" as const,
+    type: "minor" as const,
     changes: [
-      "Relatórios agora obrigam citação de fonte para TODOS os dados numéricos e tabelas",
-      "Coluna 'Fonte' obrigatória em todas as tabelas de indicadores (territorial e enterprise)",
-      "Seção 'Fontes e Referências' obrigatória ao final de todos os templates",
-      "Template Enterprise agora inclui regras de rastreabilidade de fontes equivalentes ao territorial",
+      "Relatórios seguem recomendações do MEC e normas ABNT (NBR 14724, 6024, 6023, 6028, 10520)",
+      "Capa institucional ABNT no DOCX com instituição, título, natureza do trabalho, cidade e ano",
+      "Estrutura textual MEC: Resumo com palavras-chave, seções numeradas progressivamente",
+      "Referências em formato ABNT NBR 6023:2018 (ordem alfabética com padrão institucional)",
+      "Glossário de termos técnicos SISTUR e Apêndice com documentos da KB",
+      "Linguagem impessoal (3ª pessoa) e citações no formato (SOBRENOME, ano)",
+      "Tabelas com título numerado acima e fonte abaixo conforme ABNT",
+      "Template Enterprise atualizado com mesmas regras MEC/ABNT",
+      "Certificados EDU com base legal MEC (Art. 32 LDB, Resolução CNE/CES nº 1/2001)",
     ],
   },
   {

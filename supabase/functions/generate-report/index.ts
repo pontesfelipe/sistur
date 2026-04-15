@@ -286,6 +286,53 @@ FICHA TÉCNICA DO RELATÓRIO (renderize como tabela markdown):
 Esta tabela é OBRIGATÓRIA e deve ser a primeira coisa do relatório, logo após o título.`;
 }
 
+// ========== MEC / ABNT FORMATTING STANDARDS ==========
+
+const MEC_FORMATTING_RULES = `
+PADRÕES DE FORMATAÇÃO — MEC / ABNT (OBRIGATÓRIO):
+O relatório deve seguir as recomendações do Ministério da Educação (MEC) e normas ABNT para documentos técnicos e acadêmicos:
+
+NORMAS APLICÁVEIS:
+- ABNT NBR 14724:2011 — Trabalhos acadêmicos (estrutura geral)
+- ABNT NBR 6024:2012 — Numeração progressiva de seções
+- ABNT NBR 6023:2018 — Referências bibliográficas
+- ABNT NBR 6028:2021 — Resumo e abstract
+- ABNT NBR 10520:2023 — Citações em documentos
+
+ESTRUTURA PRÉ-TEXTUAL (o DOCX adicionará automaticamente):
+- Capa com identificação institucional (SISTUR / Organização)
+- Folha de rosto com título, subtítulo, natureza do trabalho
+- Resumo com palavras-chave
+
+ESTRUTURA TEXTUAL — REGRAS:
+1. Seções primárias (##) devem ser NUMERADAS (1, 2, 3...) e em NEGRITO
+2. Subseções (###) numeradas progressivamente (1.1, 1.2, 2.1...) em negrito
+3. Sub-subseções (####) numeradas (1.1.1, 1.1.2...) em negrito itálico
+4. Parágrafos devem ser concisos, com linguagem técnica e impessoal (3ª pessoa)
+5. Citações diretas com mais de 3 linhas: recuo de 4cm, fonte menor, sem aspas
+6. Citações indiretas devem citar autor e ano: (BENI, 2001)
+7. Quando citar Mario Beni ou outros autores, usar formato ABNT: (SOBRENOME, ano)
+8. Figuras e tabelas devem ser referenciadas no texto antes de aparecerem
+9. Tabelas: título ACIMA da tabela com numeração (Tabela 1 — Título)
+10. Fonte da tabela ABAIXO da tabela: "Fonte: IBGE (2022)"
+
+ESTRUTURA PÓS-TEXTUAL — OBRIGATÓRIO:
+1. REFERÊNCIAS (NBR 6023): lista em ordem alfabética de todas as fontes citadas
+   Formato para dados oficiais:
+   - INSTITUTO BRASILEIRO DE GEOGRAFIA E ESTATÍSTICA (IBGE). Nome do dado. Ano. Disponível em: URL.
+   - BRASIL. Ministério do Turismo. Mapa do Turismo Brasileiro. Ano.
+   - BRASIL. Ministério da Saúde. DATASUS. Nome do indicador. Ano.
+   - BRASIL. Secretaria do Tesouro Nacional (STN). Dados fiscais. Ano.
+   - BRASIL. Ministério do Turismo. CADASTUR. Dados de registro. Ano.
+2. APÊNDICE (se houver notas adicionais ou metodologia estendida)
+3. GLOSSÁRIO com termos técnicos do SISTUR (RA, OE, AO, IGMA, I-SISTUR)
+
+LINGUAGEM:
+- Impessoal: "Verifica-se que..." em vez de "Verificamos que..."
+- Verbos na 3ª pessoa ou voz passiva
+- Termos técnicos na primeira menção com definição entre parênteses
+- Siglas: por extenso na primeira menção, ex: "Relações Ambientais (RA)"`;
+
 // ========== TEMPLATE-SPECIFIC SYSTEM PROMPTS ==========
 
 const BASE_METHODOLOGY = `FUNDAMENTOS TEÓRICOS DE MARIO BENI:
@@ -309,13 +356,15 @@ Os dados do diagnóstico são coletados automaticamente de fontes oficiais e com
 - Base de Conhecimento (KB): Documentos locais do destino (PDFs, relatórios, planos diretores) e referências nacionais com resumos extraídos por IA.
 
 REGRA CRÍTICA E INEGOCIÁVEL DE FONTES:
-1. CADA dado numérico mencionado no relatório DEVE ter a fonte entre parênteses imediatamente após o valor. Exemplo: "População: 45.321 hab. (Fonte: IBGE Agregados, 2022)"
+1. CADA dado numérico mencionado no relatório DEVE ter a fonte entre parênteses imediatamente após o valor. Exemplo: "População: 45.321 hab. (IBGE, 2022)"
 2. TODAS as tabelas de indicadores DEVEM conter uma coluna "Fonte" indicando a origem do dado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo, Preenchimento Manual, etc.)
 3. Se houver snapshots de proveniência, use-os para identificar EXATAMENTE de onde cada valor veio, incluindo o ano de referência
 4. Se o dado veio de preenchimento manual, indique CLARAMENTE: "(Fonte: Preenchimento manual)"
 5. Quando documentos da Base de Conhecimento informarem contexto adicional, referencie-os pelo nome
-6. O relatório DEVE terminar com uma seção "## Fontes e Referências" listando TODAS as fontes oficiais consultadas, com o tipo de dado e ano de referência
-7. NUNCA apresente um dado sem citar a fonte — se a fonte for desconhecida, indique "(Fonte: Não identificada)"`;
+6. O relatório DEVE terminar com uma seção "## Referências" em formato ABNT NBR 6023 listando TODAS as fontes oficiais consultadas
+7. NUNCA apresente um dado sem citar a fonte — se a fonte for desconhecida, indique "(Fonte: Não identificada)"
+
+${MEC_FORMATTING_RULES}`;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
   if (isEnterprise) {
@@ -334,13 +383,12 @@ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Use markdown com headers hierárquicos (# ## ###)
 - SEMPRE apresente indicadores em TABELAS MARKDOWN (| col1 | col2 |)
 - NUNCA liste indicadores como texto corrido quando puder usar tabela
-- Para cada eixo: tabela com Indicador | Score | Status | Fonte | Valor Bruto | Observação
+- Para cada eixo: tabela com Indicador | Score | Status | Fonte | Observação
 - Banco de Ações em tabela: Ação | Pilar | Prazo | Responsável | Prioridade
 - Linguagem institucional, clara e objetiva
 - Justifique conclusões com dados. Conecte: dado → impacto → decisão
 - Se estimar dados: "[ESTIMADO]"
-- A coluna "Fonte" é OBRIGATÓRIA em TODAS as tabelas que apresentam dados — NUNCA omita
-- Ao mencionar qualquer número no texto corrido, inclua "(Fonte: X)" logo após o valor`;
+- SEMPRE inclua uma coluna "Fonte" nas tabelas de indicadores, citando a origem dos dados`;
 
   if (template === 'executivo') {
     return `${common}
@@ -417,64 +465,79 @@ LINGUAGEM: Persuasiva mas fundamentada em dados. Destaque oportunidades de negó
   return `${common}
 
 TIPO: RELATÓRIO COMPLETO — Mínimo 2500 palavras. Análise técnica detalhada para equipe técnica e gestores públicos.
+Seguir integralmente as normas MEC/ABNT indicadas no system prompt.
 
-ESTRUTURA OBRIGATÓRIA:
+ESTRUTURA OBRIGATÓRIA (MEC/ABNT):
 # Relatório SISTUR — [Nome do Destino]
 [Tabela de Ficha Técnica — obrigatória]
 
-## 1. Sumário Executivo
-- Visão geral em 1 parágrafo
-- Tabela consolidada dos 3 eixos
+## Resumo
+- Síntese do relatório em até 500 palavras (NBR 6028)
+- **Palavras-chave**: Turismo. SISTUR. Diagnóstico Territorial. [Nome do Destino]. [UF].
 
-## 2. Contextualização do Município
+## 1 Introdução
+- Apresentação do objeto de estudo e contextualização
+- Objetivo do diagnóstico
+- Estrutura do relatório
+
+## 2 Contextualização do Município
 - Informações territoriais, demográficas e econômicas relevantes
 - Posição no contexto turístico regional (usar dados do Mapa do Turismo: categoria, região turística)
 - Metadados do destino (se fornecidos)
 
-## 3. Metodologia SISTUR
-- Breve descrição dos 3 eixos e critérios de classificação
-- Fontes de dados utilizadas (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo Brasileiro)
-- Resumo da rastreabilidade: quantos indicadores vieram de fontes oficiais automáticas vs preenchimento manual
+## 3 Metodologia
+### 3.1 Fundamentação Teórica
+- Breve descrição do modelo sistêmico de Beni (BENI, 2001) e os 3 eixos
+- Critérios de classificação (Adequado, Atenção, Crítico)
+### 3.2 Fontes de Dados
+- Fontes utilizadas (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo Brasileiro)
+- Tabela 1 — Resumo das fontes: Fonte | Tipo de dado | Confiabilidade | Ano de referência
+- Quantos indicadores vieram de fontes oficiais automáticas vs preenchimento manual
 
-## 4. Diagnóstico por Eixo SISTUR
-### 4.1. I-RA — Relações Ambientais
-- Tabela: Indicador | Score | Status | Fonte | Valor Bruto | Observação
-- EVIDÊNCIAS: dados brutos e contexto, citando a fonte oficial de cada dado
-- LEITURA TÉCNICA: interpretação dos scores
-- IMPLICAÇÕES: consequências para o destino
+## 4 Diagnóstico por Eixo SISTUR
+### 4.1 Índice de Relações Ambientais (I-RA)
+- Tabela 2 — Indicadores I-RA: Indicador | Score | Status | Fonte | Valor Bruto | Observação
+- Análise textual em linguagem impessoal, citando fontes no formato (IBGE, 2022)
+### 4.2 Índice de Ações Operacionais (I-AO)
+- Tabela 3 — (mesma estrutura)
+### 4.3 Índice de Organização Estrutural (I-OE)
+- Tabela 4 — (mesma estrutura)
 
-### 4.2. I-AO — Ações Operacionais
-(mesma estrutura)
-
-### 4.3. I-OE — Organização Estrutural
-(mesma estrutura)
-
-## 5. Alertas Sistêmicos IGMA
-- Flags ativas e suas implicações
+## 5 Alertas Sistêmicos IGMA
+- Flags ativas e suas implicações segundo Beni (BENI, 2001)
 - Bloqueios e restrições aplicáveis
 
-## 6. Análise Integrada
+## 6 Análise Integrada
 - Inter-relação entre os eixos
 - Efeitos cascata identificados
 
-## 7. Gargalos e Prescrições
-- Tabela: Gargalo | Severidade | Pilar | Prescrição | Agente Responsável
+## 7 Gargalos e Prescrições
+- Tabela 5 — Gargalos: Gargalo | Severidade | Pilar | Prescrição | Agente Responsável
 
-## 8. Prognóstico e Diretrizes
+## 8 Prognóstico e Diretrizes
 - Cenário tendencial vs cenário desejado
 - Diretrizes estratégicas por horizonte temporal
 
-## 9. Banco de Ações
-- Tabela: Ação | Pilar | Prazo | Responsável | Prioridade | Status
+## 9 Banco de Ações
+- Tabela 6 — Ações: Ação | Pilar | Prazo | Responsável | Prioridade | Status
 
-## 10. Fontes e Referências
-- Lista completa de fontes de dados oficiais consultadas
-- Documentos de referência nacional utilizados
-- Documentos da Base de Conhecimento do destino consultados
-
-## 11. Considerações Finais
+## 10 Considerações Finais
 - Síntese das conclusões
-- Próxima revisão recomendada: data e justificativa`;
+- Próxima revisão recomendada: data e justificativa
+
+## Referências
+- Lista em ordem ALFABÉTICA no formato ABNT NBR 6023:2018
+- Exemplo: INSTITUTO BRASILEIRO DE GEOGRAFIA E ESTATÍSTICA (IBGE). Censo Demográfico 2022. Rio de Janeiro: IBGE, 2022.
+- Exemplo: BENI, Mário Carlos. Análise estrutural do turismo. 6. ed. São Paulo: SENAC, 2001.
+- Listar TODAS as fontes de dados oficiais, documentos da KB e referências nacionais utilizadas
+
+## Glossário
+- Definições de termos técnicos: SISTUR, IGMA, I-RA, I-AO, I-OE, I-SISTUR
+- Incluir siglas e termos específicos do turismo utilizados no relatório
+
+## Apêndice
+- Documentos da Base de Conhecimento consultados (se houver)
+- Notas metodológicas adicionais (se aplicável)`;
 }
 
 function getEnterpriseSystemPrompt(template: string): string {
@@ -495,14 +558,18 @@ Cada dado apresentado no relatório DEVE conter a fonte entre parênteses. Exemp
 - Se o dado veio de preenchimento manual, indique: "(Fonte: Preenchimento manual)"
 - Se o dado veio de reviews online, indique a plataforma: "(Fonte: Google Reviews)"
 
+${MEC_FORMATTING_RULES}
+
 REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Comece SEMPRE com título seguido da tabela de ficha técnica fornecida
 - Use tabelas markdown para todos os conjuntos de dados
-- TODAS as tabelas de indicadores DEVEM ter uma coluna "Fonte"
-- Linguagem executiva, orientada a resultados
+- TODAS as tabelas DEVEM ter uma coluna "Fonte"
+- Tabelas devem ter título numerado ACIMA: "Tabela 1 — Título"
+- Fonte da tabela ABAIXO: "Fonte: elaboração própria com dados de..."
+- Linguagem institucional e impessoal (3ª pessoa)
 - Conecte: métrica → gap → ação → resultado esperado
 - Se houver dados de reviews/avaliações online, incorpore na análise de satisfação
-- Ao final do relatório, inclua uma seção "Fontes e Referências" listando todas as fontes utilizadas`;
+- Seção final de Referências em formato ABNT NBR 6023`;
 
   if (template === 'executivo') {
     return `${common}
@@ -512,11 +579,12 @@ TIPO: RESUMO EXECUTIVO ENTERPRISE — Máximo 1000 palavras.
 ESTRUTURA:
 # Resumo Executivo — [Nome]
 [Ficha Técnica]
-## 1. Performance Geral (tabela dos 3 eixos)
-## 2. Top 3 KPIs Críticos (tabela)
-## 3. Ações Prioritárias (5 itens, tabela)
-## 4. Quick Wins com ROI Estimado
-## 5. Próximos Passos`;
+## 1 Performance Geral (tabela dos 3 eixos)
+## 2 KPIs Críticos (tabela com Fonte)
+## 3 Ações Prioritárias (5 itens, tabela)
+## 4 Quick Wins com ROI Estimado
+## 5 Próximos Passos
+## Referências (ABNT NBR 6023)`;
   }
 
   if (template === 'investidor') {
@@ -527,12 +595,13 @@ TIPO: RELATÓRIO PARA INVESTIDORES — 1500 palavras. Foco em ROI e oportunidade
 ESTRUTURA:
 # Análise de Investimento — [Nome]
 [Ficha Técnica]
-## 1. Tese de Investimento (1 parágrafo)
-## 2. Performance Atual (tabela de KPIs vs benchmark)
-## 3. Análise de Riscos (tabela: Risco | Severidade | Mitigação)
-## 4. Oportunidades de Melhoria (tabela: Oportunidade | Investimento | ROI Est.)
-## 5. Projeções e Cenários
-## 6. Recomendação Final`;
+## 1 Tese de Investimento (1 parágrafo)
+## 2 Performance Atual (tabela de KPIs vs benchmark com Fonte)
+## 3 Análise de Riscos (tabela: Risco | Severidade | Mitigação)
+## 4 Oportunidades de Melhoria (tabela: Oportunidade | Investimento | ROI Est.)
+## 5 Projeções e Cenários
+## 6 Recomendação Final
+## Referências (ABNT NBR 6023)`;
   }
 
   // COMPLETO
@@ -540,20 +609,32 @@ ESTRUTURA:
 
 TIPO: RELATÓRIO ENTERPRISE COMPLETO — Mínimo 2500 palavras.
 
-ESTRUTURA:
+ESTRUTURA (MEC/ABNT):
 # Relatório SISTUR Enterprise — [Nome]
 [Ficha Técnica]
-## 1. Sumário Executivo para Gestão
-## 2. Perfil do Empreendimento
-## 3. Metodologia SISTUR Enterprise
-## 4. Diagnóstico por Categoria Funcional (tabela por categoria com Fonte)
-## 5. Análise de Gargalos Operacionais (tabela)
-## 6. Planos de Ação em Andamento
-## 7. Recomendações Estratégicas (curto/médio/longo prazo)
-## 8. Prescrições de Capacitação
-## 9. Roadmap de Implementação (tabela: Ação | Categoria | Investimento | Prazo | KPI)
-## 10. Fontes e Referências
-## 11. Considerações Finais`;
+
+## Resumo
+- Síntese em até 500 palavras
+- **Palavras-chave**: Gestão Hoteleira. SISTUR. Diagnóstico Enterprise. [Nome].
+
+## 1 Introdução
+## 2 Perfil do Empreendimento
+## 3 Metodologia SISTUR Enterprise
+### 3.1 Fundamentação Teórica
+### 3.2 Fontes de Dados (tabela com Fonte | Tipo | Confiabilidade)
+## 4 Diagnóstico por Categoria Funcional (tabela por categoria com Fonte)
+## 5 Análise de Gargalos Operacionais (tabela)
+## 6 Planos de Ação em Andamento
+## 7 Recomendações Estratégicas (curto/médio/longo prazo)
+## 8 Prescrições de Capacitação
+## 9 Roadmap de Implementação (tabela: Ação | Categoria | Investimento | Prazo | KPI)
+## 10 Considerações Finais
+
+## Referências
+- ABNT NBR 6023:2018 — ordem alfabética
+
+## Glossário
+## Apêndice`;
 }
 
 // ========== MAIN ==========
