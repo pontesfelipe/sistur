@@ -423,6 +423,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     const edited = editedValues[indicatorId];
     if (!edited) return;
 
+    // Block save if validation error
+    if (validationErrors[indicatorId]) {
+      toast.error('Corrija o valor antes de salvar');
+      return;
+    }
+
     await upsertValue.mutateAsync({
       assessment_id: selectedAssessment,
       indicator_id: indicatorId,
