@@ -23,6 +23,9 @@ import {
   Minus,
   EyeOff,
   Search,
+  Database,
+  Calendar,
+  MessageSquare,
 } from 'lucide-react';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useProfile } from '@/hooks/useProfile';
@@ -97,6 +100,18 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
         setIgnoredIds(ignored);
       }
     }
+  }, [existingValues]);
+
+  // Index existing values by indicator_id so we can surface provenance
+  // (source, reference_date, value_text) next to each input. This data is
+  // already persisted and used in the report prompt — the UI just never
+  // exposed it before.
+  const existingByIndicator = useMemo(() => {
+    const map = new Map<string, any>();
+    (existingValues || []).forEach((v: any) => {
+      map.set(v.indicator_id, v);
+    });
+    return map;
   }, [existingValues]);
 
   // Apply initial auto-fill values from step 4 review search
@@ -379,6 +394,12 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                       const isIgnored = ignoredIds.has(indicator.id);
                       const guidance = INDICATOR_GUIDANCE[(indicator as any).code];
                       const valError = validationErrors[indicator.id];
+                      const existing = existingByIndicator.get(indicator.id);
+                      const hasNonManualSource = existing?.source && existing.source !== 'Manual (Enterprise)' && existing.source !== 'Manual';
+                      const referenceDate = existing?.reference_date
+                        ? new Date(existing.reference_date).toLocaleDateString('pt-BR')
+                        : null;
+                      const observation = existing?.value_text;
                       
                       return (
                         <div key={indicator.id} className={cn(
@@ -426,6 +447,39 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                                   <p className="text-xs text-blue-600/80 dark:text-blue-400/80 mt-1">
                                     <em>Ex: {guidance.examples}</em>
                                   </p>
+                                )}
+                              </div>
+                            )}
+                            {/* Provenance: surface source, reference date and free-text
+                                observation that are already persisted on indicator_values
+                                but were invisible in the UI until now. This is what the
+                                report prompt consumes as "Evidência:". */}
+                            {existing && (hasNonManualSource || referenceDate || observation) && (
+                              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                {hasNonManualSource && (
+                                  <Badge variant="secondary" className="text-[10px] font-normal gap-1">
+                                    <Database className="h-3 w-3" />
+                                    {existing.source}
+                                  </Badge>
+                                )}
+                                {referenceDate && (
+                                  <Badge variant="outline" className="text-[10px] font-normal gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    Ref: {referenceDate}
+                                  </Badge>
+                                )}
+                                {observation && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Badge variant="outline" className="text-[10px] font-normal gap-1 cursor-help">
+                                        <MessageSquare className="h-3 w-3" />
+                                        Observação
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-xs">
+                                      {observation}
+                                    </TooltipContent>
+                                  </Tooltip>
                                 )}
                               </div>
                             )}
