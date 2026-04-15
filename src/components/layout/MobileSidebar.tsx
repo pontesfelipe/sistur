@@ -27,6 +27,7 @@ import {
   Lock,
   Award,
   Map,
+  Sparkles,
   Shield,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
