@@ -465,64 +465,79 @@ LINGUAGEM: Persuasiva mas fundamentada em dados. Destaque oportunidades de negó
   return `${common}
 
 TIPO: RELATÓRIO COMPLETO — Mínimo 2500 palavras. Análise técnica detalhada para equipe técnica e gestores públicos.
+Seguir integralmente as normas MEC/ABNT indicadas no system prompt.
 
-ESTRUTURA OBRIGATÓRIA:
+ESTRUTURA OBRIGATÓRIA (MEC/ABNT):
 # Relatório SISTUR — [Nome do Destino]
 [Tabela de Ficha Técnica — obrigatória]
 
-## 1. Sumário Executivo
-- Visão geral em 1 parágrafo
-- Tabela consolidada dos 3 eixos
+## Resumo
+- Síntese do relatório em até 500 palavras (NBR 6028)
+- **Palavras-chave**: Turismo. SISTUR. Diagnóstico Territorial. [Nome do Destino]. [UF].
 
-## 2. Contextualização do Município
+## 1 Introdução
+- Apresentação do objeto de estudo e contextualização
+- Objetivo do diagnóstico
+- Estrutura do relatório
+
+## 2 Contextualização do Município
 - Informações territoriais, demográficas e econômicas relevantes
 - Posição no contexto turístico regional (usar dados do Mapa do Turismo: categoria, região turística)
 - Metadados do destino (se fornecidos)
 
-## 3. Metodologia SISTUR
-- Breve descrição dos 3 eixos e critérios de classificação
-- Fontes de dados utilizadas (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo Brasileiro)
-- Resumo da rastreabilidade: quantos indicadores vieram de fontes oficiais automáticas vs preenchimento manual
+## 3 Metodologia
+### 3.1 Fundamentação Teórica
+- Breve descrição do modelo sistêmico de Beni (BENI, 2001) e os 3 eixos
+- Critérios de classificação (Adequado, Atenção, Crítico)
+### 3.2 Fontes de Dados
+- Fontes utilizadas (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo Brasileiro)
+- Tabela 1 — Resumo das fontes: Fonte | Tipo de dado | Confiabilidade | Ano de referência
+- Quantos indicadores vieram de fontes oficiais automáticas vs preenchimento manual
 
-## 4. Diagnóstico por Eixo SISTUR
-### 4.1. I-RA — Relações Ambientais
-- Tabela: Indicador | Score | Status | Fonte | Valor Bruto | Observação
-- EVIDÊNCIAS: dados brutos e contexto, citando a fonte oficial de cada dado
-- LEITURA TÉCNICA: interpretação dos scores
-- IMPLICAÇÕES: consequências para o destino
+## 4 Diagnóstico por Eixo SISTUR
+### 4.1 Índice de Relações Ambientais (I-RA)
+- Tabela 2 — Indicadores I-RA: Indicador | Score | Status | Fonte | Valor Bruto | Observação
+- Análise textual em linguagem impessoal, citando fontes no formato (IBGE, 2022)
+### 4.2 Índice de Ações Operacionais (I-AO)
+- Tabela 3 — (mesma estrutura)
+### 4.3 Índice de Organização Estrutural (I-OE)
+- Tabela 4 — (mesma estrutura)
 
-### 4.2. I-AO — Ações Operacionais
-(mesma estrutura)
-
-### 4.3. I-OE — Organização Estrutural
-(mesma estrutura)
-
-## 5. Alertas Sistêmicos IGMA
-- Flags ativas e suas implicações
+## 5 Alertas Sistêmicos IGMA
+- Flags ativas e suas implicações segundo Beni (BENI, 2001)
 - Bloqueios e restrições aplicáveis
 
-## 6. Análise Integrada
+## 6 Análise Integrada
 - Inter-relação entre os eixos
 - Efeitos cascata identificados
 
-## 7. Gargalos e Prescrições
-- Tabela: Gargalo | Severidade | Pilar | Prescrição | Agente Responsável
+## 7 Gargalos e Prescrições
+- Tabela 5 — Gargalos: Gargalo | Severidade | Pilar | Prescrição | Agente Responsável
 
-## 8. Prognóstico e Diretrizes
+## 8 Prognóstico e Diretrizes
 - Cenário tendencial vs cenário desejado
 - Diretrizes estratégicas por horizonte temporal
 
-## 9. Banco de Ações
-- Tabela: Ação | Pilar | Prazo | Responsável | Prioridade | Status
+## 9 Banco de Ações
+- Tabela 6 — Ações: Ação | Pilar | Prazo | Responsável | Prioridade | Status
 
-## 10. Fontes e Referências
-- Lista completa de fontes de dados oficiais consultadas
-- Documentos de referência nacional utilizados
-- Documentos da Base de Conhecimento do destino consultados
-
-## 11. Considerações Finais
+## 10 Considerações Finais
 - Síntese das conclusões
-- Próxima revisão recomendada: data e justificativa`;
+- Próxima revisão recomendada: data e justificativa
+
+## Referências
+- Lista em ordem ALFABÉTICA no formato ABNT NBR 6023:2018
+- Exemplo: INSTITUTO BRASILEIRO DE GEOGRAFIA E ESTATÍSTICA (IBGE). Censo Demográfico 2022. Rio de Janeiro: IBGE, 2022.
+- Exemplo: BENI, Mário Carlos. Análise estrutural do turismo. 6. ed. São Paulo: SENAC, 2001.
+- Listar TODAS as fontes de dados oficiais, documentos da KB e referências nacionais utilizadas
+
+## Glossário
+- Definições de termos técnicos: SISTUR, IGMA, I-RA, I-AO, I-OE, I-SISTUR
+- Incluir siglas e termos específicos do turismo utilizados no relatório
+
+## Apêndice
+- Documentos da Base de Conhecimento consultados (se houver)
+- Notas metodológicas adicionais (se aplicável)`;
 }
 
 function getEnterpriseSystemPrompt(template: string): string {
