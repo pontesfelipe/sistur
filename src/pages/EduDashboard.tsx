@@ -53,7 +53,7 @@ const EduDashboard = () => {
   const unreadCount = useUnreadEduNotificationCount();
   const { hasProfile } = useStudentProfile();
   const { isAdmin, isProfessor, isOrgAdmin } = useProfile();
-  const { data: certificates } = useCertificates();
+  const { data: certificates } = useUserCertificates();
   const { data: trackProgress } = useAllUserProgress();
 
   const completedTrainings = allProgress?.filter(p => p.completed_at)?.length ?? 0;
