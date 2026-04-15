@@ -796,19 +796,52 @@ export default function Relatorios() {
                     {savedReports?.length || 0} relatório(s) no histórico
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-3">
+                  {/* Filters */}
+                  <div className="flex flex-col gap-2">
+                    <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os tipos</SelectItem>
+                        <SelectItem value="territorial">
+                          <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" />Territorial</span>
+                        </SelectItem>
+                        <SelectItem value="enterprise">
+                          <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />Enterprise</span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={historyOwnerFilter} onValueChange={setHistoryOwnerFilter}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Autor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos da organização</SelectItem>
+                        <SelectItem value="mine">
+                          <span className="flex items-center gap-1.5"><Lock className="h-3 w-3" />Somente meus</span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   {reportsLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                     </div>
                   ) : savedReports && savedReports.length > 0 ? (
-                    <ScrollArea className="h-[500px]">
+                    <ScrollArea className="h-[450px]">
                       <div className="space-y-2 pr-4">
                         {savedReports
                           .filter(r => {
-                            // Show personal reports only to creator, org reports to all
-                            if (r.visibility === 'org') return true;
-                            return r.created_by === profile?.user_id;
+                            // Visibility: personal reports only to creator, org reports to all
+                            if (r.visibility === 'personal' && r.created_by !== profile?.user_id) return false;
+                            // Type filter
+                            if (historyTypeFilter !== 'all' && r.diagnostic_type !== historyTypeFilter) return false;
+                            // Owner filter
+                            if (historyOwnerFilter === 'mine' && r.created_by !== profile?.user_id) return false;
+                            return true;
                           })
                           .map((r) => (
                           <div
@@ -822,15 +855,19 @@ export default function Relatorios() {
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-wrap">
                                   <p className="font-medium truncate">{r.destination_name}</p>
+                                  <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0">
+                                    {r.diagnostic_type === 'enterprise' ? <Building2 className="h-2.5 w-2.5" /> : <Globe className="h-2.5 w-2.5" />}
+                                    {r.diagnostic_type === 'enterprise' ? 'Enterprise' : 'Territorial'}
+                                  </Badge>
                                   {r.visibility === 'org' ? (
-                                    <Badge variant="outline" className="text-xs gap-1 shrink-0"><Users className="h-2.5 w-2.5" />Org</Badge>
+                                    <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0"><Users className="h-2.5 w-2.5" />Org</Badge>
                                   ) : (
-                                    <Badge variant="secondary" className="text-xs gap-1 shrink-0"><Lock className="h-2.5 w-2.5" />Pessoal</Badge>
+                                    <Badge variant="secondary" className="text-[10px] gap-0.5 shrink-0"><Lock className="h-2.5 w-2.5" />Pessoal</Badge>
                                   )}
                                   {r.environment === 'demo' && (
-                                    <Badge variant="outline" className="text-xs gap-1 shrink-0 border-amber-500 text-amber-600"><FlaskConical className="h-2.5 w-2.5" />Demo</Badge>
+                                    <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0 border-amber-500 text-amber-600"><FlaskConical className="h-2.5 w-2.5" />Demo</Badge>
                                   )}
                                 </div>
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
