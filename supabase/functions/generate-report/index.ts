@@ -8,6 +8,15 @@ const corsHeaders = {
 
 // ========== HELPER FUNCTIONS ==========
 
+/** Format number using Brazilian standard: comma for decimal, period for thousands */
+function formatNumberBR(value: number, decimals = 1): string {
+  return value.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function formatPctBR(score: number): string {
+  return formatNumberBR(score * 100, 1);
+}
+
 function formatDateBR(dateStr: string | null): string {
   if (!dateStr) return 'N/A';
   const d = new Date(dateStr);
@@ -22,7 +31,7 @@ function formatDateOnlyBR(dateStr: string | null): string {
 
 function pillarLabel(score: number | undefined): string {
   if (score === undefined) return 'N/A';
-  const pct = (score * 100).toFixed(1);
+  const pct = formatPctBR(score);
   if (score >= 0.67) return `${pct}% — ADEQUADO`;
   if (score >= 0.34) return `${pct}% — ATENÇÃO`;
   return `${pct}% — CRÍTICO`;
@@ -44,13 +53,13 @@ function formatIndicatorScores(indicatorScores: any[]): string {
     const critical = scores.filter(s => s.score <= 0.33);
     const moderate = scores.filter(s => s.score > 0.33 && s.score <= 0.66);
     
-    result += `\n${pillar} (${scores.length} indicadores, média: ${(avg * 100).toFixed(1)}%):\n`;
+    result += `\n${pillar} (${scores.length} indicadores, média: ${formatPctBR(avg)}%):\n`;
     result += `  Críticos: ${critical.length}, Atenção: ${moderate.length}, Adequados: ${scores.length - critical.length - moderate.length}\n`;
     
     scores.forEach((s: any) => {
       const status = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
       const benchmark = s.indicators?.benchmark_target ? ` (benchmark: ${s.indicators.benchmark_target})` : '';
-      result += `    * ${s.indicators?.name || s.indicators?.code}: ${(s.score * 100).toFixed(1)}% [${status}] - Tema: ${s.indicators?.theme || 'N/A'}${benchmark}\n`;
+      result += `    * ${s.indicators?.name || s.indicators?.code}: ${formatPctBR(s.score)}% [${status}] - Tema: ${s.indicators?.theme || 'N/A'}${benchmark}\n`;
     });
   }
   return result;
@@ -72,13 +81,13 @@ function formatIndicatorsByCategory(indicatorScores: any[]): string {
     const avg = scores.reduce((sum, s) => sum + s.score, 0) / scores.length;
     const status = avg <= 0.33 ? 'CRÍTICO' : avg <= 0.66 ? 'ATENÇÃO' : 'BOM';
     
-    result += `\n## ${theme} (Status: ${status}, Média: ${(avg * 100).toFixed(1)}%)\n`;
+    result += `\n## ${theme} (Status: ${status}, Média: ${formatPctBR(avg)}%)\n`;
     scores.forEach((s: any) => {
       const kpiStatus = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
       const benchmarkMin = s.indicators?.benchmark_min !== null ? s.indicators.benchmark_min : 'N/A';
       const benchmarkMax = s.indicators?.benchmark_max !== null ? s.indicators.benchmark_max : 'N/A';
       const benchmarkTarget = s.indicators?.benchmark_target !== null ? s.indicators.benchmark_target : 'N/A';
-      result += `  - ${s.indicators?.name || s.indicators?.code}: ${(s.score * 100).toFixed(1)}% [${kpiStatus}]\n`;
+      result += `  - ${s.indicators?.name || s.indicators?.code}: ${formatPctBR(s.score)}% [${kpiStatus}]\n`;
       result += `    Benchmark: min=${benchmarkMin}, target=${benchmarkTarget}, max=${benchmarkMax}\n`;
     });
   }
@@ -203,7 +212,7 @@ function formatDataSnapshots(snapshots: any[]): string {
     const manualCount = items.filter(i => i.was_manually_adjusted).length;
     const avgConfidence = items.reduce((sum, i) => sum + (i.confidence_level || 0), 0) / items.length;
     
-    result += `### ${label} (${items.length} indicadores, Confiabilidade média: ${avgConfidence.toFixed(0)}/5)\n`;
+    result += `### ${label} (${items.length} indicadores, Confiabilidade média: ${formatNumberBR(avgConfidence, 0)}/5)\n`;
     if (manualCount > 0) result += `  ⚠️ ${manualCount} ajustado(s) manualmente\n`;
     
     items.forEach((item: any) => {
@@ -331,7 +340,14 @@ LINGUAGEM:
 - Impessoal: "Verifica-se que..." em vez de "Verificamos que..."
 - Verbos na 3ª pessoa ou voz passiva
 - Termos técnicos na primeira menção com definição entre parênteses
-- Siglas: por extenso na primeira menção, ex: "Relações Ambientais (RA)"`;
+- Siglas: por extenso na primeira menção, ex: "Relações Ambientais (RA)"
+
+FORMATAÇÃO NUMÉRICA — PADRÃO BRASILEIRO (OBRIGATÓRIO):
+- Usar VÍRGULA como separador decimal: 65,3% (CORRETO) — NÃO 65.3%
+- Usar PONTO como separador de milhar: 45.321 habitantes (CORRETO) — NÃO 45,321
+- Exemplos corretos: "População: 45.321 hab.", "Score: 67,5%", "PIB per capita: R$ 32.450,00", "Área: 1.234,56 km²"
+- NUNCA usar o formato americano/inglês com ponto decimal e vírgula de milhar
+- Esta regra aplica-se a TODOS os números no relatório, sem exceção`;
 
 // ========== TEMPLATE-SPECIFIC SYSTEM PROMPTS ==========
 
@@ -794,9 +810,9 @@ ${formatDestinationMetadata(assessment.destinations)}
 === DADOS DO DIAGNÓSTICO ===
 
 SCORES DOS EIXOS:
-- I-RA: ${pillarScores?.RA?.score !== undefined ? (pillarScores.RA.score * 100).toFixed(1) + '%' : 'N/C'} — ${pillarScores?.RA?.severity || 'N/A'}
-- I-AO: ${pillarScores?.AO?.score !== undefined ? (pillarScores.AO.score * 100).toFixed(1) + '%' : 'N/C'} — ${pillarScores?.AO?.severity || 'N/A'}
-- I-OE: ${pillarScores?.OE?.score !== undefined ? (pillarScores.OE.score * 100).toFixed(1) + '%' : 'N/C'} — ${pillarScores?.OE?.severity || 'N/A'}
+- I-RA: ${pillarScores?.RA?.score !== undefined ? formatPctBR(pillarScores.RA.score) + '%' : 'N/C'} — ${pillarScores?.RA?.severity || 'N/A'}
+- I-AO: ${pillarScores?.AO?.score !== undefined ? formatPctBR(pillarScores.AO.score) + '%' : 'N/C'} — ${pillarScores?.AO?.severity || 'N/A'}
+- I-OE: ${pillarScores?.OE?.score !== undefined ? formatPctBR(pillarScores.OE.score) + '%' : 'N/C'} — ${pillarScores?.OE?.severity || 'N/A'}
 
 FLAGS IGMA:
 ${formatIGMAFlags(assessment.igma_flags as Record<string, boolean> | null)}
