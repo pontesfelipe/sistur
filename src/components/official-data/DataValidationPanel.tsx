@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,10 +77,19 @@ export function DataValidationPanel({
   const [editedValues, setEditedValues] = useState<Record<string, number | null>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmedIds, setConfirmedIds] = useState<Set<string>>(new Set());
+  const [autoFetched, setAutoFetched] = useState(false);
 
   const { data: rawValues = [], isLoading } = useExternalIndicatorValues(ibgeCode, orgId);
   const fetchOfficialData = useFetchOfficialData();
   const validateValues = useValidateIndicatorValues();
+
+  // Always fetch fresh data when the panel mounts for a new diagnostic
+  useEffect(() => {
+    if (!autoFetched && ibgeCode && orgId) {
+      setAutoFetched(true);
+      fetchOfficialData.mutate({ ibgeCode, orgId });
+    }
+  }, [ibgeCode, orgId, autoFetched]);
 
   const values = useMemo(
     () => rawValues.filter(isOfficialPreFilledValue),
