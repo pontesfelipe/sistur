@@ -367,12 +367,36 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  // Format number for display in pt-BR (comma as decimal separator)
+  const formatDisplayValue = (value: number | null | undefined): string => {
+    if (value === null || value === undefined) return '';
+    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+  };
+
+  // Format validation hint numbers in pt-BR
+  const formatHintNumber = (value: number | undefined): string => {
+    if (value === undefined) return '';
+    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+  };
+
+  // Parse Brazilian formatted input (comma → dot) to number
+  const parseBRInput = (value: string): number | null => {
+    if (value === '') return null;
+    // Replace comma with dot for parsing
+    const normalized = value.replace(/\./g, '').replace(',', '.');
+    const num = parseFloat(normalized);
+    return isNaN(num) ? null : num;
+  };
+
   const handleValueChange = (indicatorId: string, value: string) => {
     const indicator = indicators.find(i => i.id === indicatorId);
     
+    // Normalize for validation (comma → dot)
+    const normalizedValue = value.replace(',', '.');
+    
     // Validate the value
     if (indicator) {
-      const error = validateIndicatorValue(value, indicator as any);
+      const error = validateIndicatorValue(normalizedValue, indicator as any);
       setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
     }
 
@@ -380,7 +404,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       ...prev,
       [indicatorId]: {
         ...prev[indicatorId],
-        value: value === '' ? null : parseFloat(value),
+        value: parseBRInput(value),
         source: prev[indicatorId]?.source || 'Manual',
         is_ignored: prev[indicatorId]?.is_ignored ?? false,
       },
