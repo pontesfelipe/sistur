@@ -26,6 +26,7 @@ const DiagnosticoDetalhe = lazy(() => import("./pages/DiagnosticoDetalhe"));
 
 
 const AdminEdu = lazy(() => import("./pages/AdminEdu"));
+const EduDashboard = lazy(() => import("./pages/EduDashboard"));
 const EduCatalogo = lazy(() => import("./pages/EduCatalogo"));
 const EduPerfil = lazy(() => import("./pages/EduPerfil"));
 const EduTrilhas = lazy(() => import("./pages/EduTrilhas"));
@@ -168,6 +169,14 @@ const App = () => {
                 />
                 <Route
                   path="/edu"
+                  element={
+                    <EduRoute>
+                      <EduDashboard />
+                    </EduRoute>
+                  }
+                />
+                <Route
+                  path="/edu/catalogo"
                   element={
                     <EduRoute>
                       <EduCatalogo />

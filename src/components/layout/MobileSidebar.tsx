@@ -61,7 +61,8 @@ const navigation: NavItem[] = [
   { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
   { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
   
-  { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
+  { name: 'Minha Jornada', href: '/edu', icon: GraduationCap, requiresEDU: true },
+  { name: 'Catálogo', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true },
   { name: 'Trilhas', href: '/edu/trilhas', icon: Map, requiresEDU: true },
   { name: 'Minhas Provas', href: '/edu/historico', icon: ScrollText, requiresEDU: true },
   { name: 'Meus Certificados', href: '/certificados', icon: Award, requiresEDU: true },
