@@ -334,12 +334,13 @@ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Use markdown com headers hierárquicos (# ## ###)
 - SEMPRE apresente indicadores em TABELAS MARKDOWN (| col1 | col2 |)
 - NUNCA liste indicadores como texto corrido quando puder usar tabela
-- Para cada eixo: tabela com Indicador | Score | Status | Fonte | Observação
+- Para cada eixo: tabela com Indicador | Score | Status | Fonte | Valor Bruto | Observação
 - Banco de Ações em tabela: Ação | Pilar | Prazo | Responsável | Prioridade
 - Linguagem institucional, clara e objetiva
 - Justifique conclusões com dados. Conecte: dado → impacto → decisão
 - Se estimar dados: "[ESTIMADO]"
-- SEMPRE inclua uma coluna "Fonte" nas tabelas de indicadores, citando a origem dos dados`;
+- A coluna "Fonte" é OBRIGATÓRIA em TODAS as tabelas que apresentam dados — NUNCA omita
+- Ao mencionar qualquer número no texto corrido, inclua "(Fonte: X)" logo após o valor`;
 
   if (template === 'executivo') {
     return `${common}
