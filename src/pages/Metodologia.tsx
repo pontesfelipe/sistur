@@ -760,7 +760,7 @@ export default function Metodologia() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                    Fontes: IBGE, DATASUS, INEP, STN, CADASTUR
+                    Fontes: IBGE, SIDRA, DATASUS, INEP, STN, CADASTUR, Mapa do Turismo
                   </li>
                 </ul>
               </div>
