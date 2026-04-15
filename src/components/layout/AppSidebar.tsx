@@ -34,7 +34,6 @@ import {
   Award,
   Map,
   Sparkles,
-  HelpingHand,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -82,7 +81,6 @@ const navGroups: NavGroup[] = [
       { name: 'Meus Certificados', href: '/certificados', icon: Award, requiresEDU: true },
       { name: 'Treinamento Sob Demanda', href: '/edu/solicitacoes', icon: Sparkles, requiresEDU: true },
       { name: 'Gestão de Treinamentos', href: '/professor', icon: BookOpen, requiresProfessor: true },
-      { name: 'Quizzes', href: '/admin/quizzes', icon: HelpingHand, requiresAdmin: true },
       { name: 'Admin EDU', href: '/admin/edu', icon: Shield, requiresAdmin: true },
     ],
   },

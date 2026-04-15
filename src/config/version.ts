@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 20,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.20.1",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Removidas rotas duplicadas do módulo EDU: /cursos (legado), /learning e /admin/cursos (redirect)",
+      "Item 'Quizzes' removido do menu lateral — funcionalidade integrada como aba dentro de Admin EDU",
+      "Rotas legadas redirecionam automaticamente para equivalentes atuais (/cursos→/edu, /learning→/edu)",
+    ],
+  },
   {
     version: "1.20.0",
     date: "2026-04-14",

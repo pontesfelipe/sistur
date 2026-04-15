@@ -25,15 +25,13 @@ const Diagnosticos = lazy(() => import("./pages/Diagnosticos"));
 const DiagnosticoDetalhe = lazy(() => import("./pages/DiagnosticoDetalhe"));
 
 
-const Cursos = lazy(() => import("./pages/Cursos"));
-const AdminCursos = lazy(() => import("./pages/AdminCursos"));
 const AdminEdu = lazy(() => import("./pages/AdminEdu"));
 const EduCatalogo = lazy(() => import("./pages/EduCatalogo"));
 const EduPerfil = lazy(() => import("./pages/EduPerfil"));
 const EduTrilhas = lazy(() => import("./pages/EduTrilhas"));
 const EduTrilhaDetalhe = lazy(() => import("./pages/EduTrilhas").then(m => ({ default: m.EduTrilhaDetalhe })));
 const EduTrainingDetalhe = lazy(() => import("./pages/EduTrainingDetalhe"));
-const Learning = lazy(() => import("./pages/Learning"));
+
 const Configuracoes = lazy(() => import("./pages/Configuracoes"));
 const Relatorios = lazy(() => import("./pages/Relatorios"));
 const NovaRodada = lazy(() => import("./pages/NovaRodada"));
@@ -44,7 +42,6 @@ const Ajuda = lazy(() => import("./pages/Ajuda"));
 
 const ERPIntegration = lazy(() => import("./pages/ERPIntegration"));
 const PublicDestinations = lazy(() => import("./pages/PublicDestinations"));
-const QuizManagement = lazy(() => import("./pages/QuizManagement"));
 const ExamTaking = lazy(() => import("./pages/ExamTaking"));
 const ExamHistory = lazy(() => import("./pages/ExamHistory"));
 const ExamReview = lazy(() => import("./pages/ExamReview"));
@@ -158,22 +155,9 @@ const App = () => {
                     </ERPRoute>
                   }
                 />
-                <Route
-                  path="/cursos"
-                  element={
-                    <ERPRoute>
-                      <Cursos />
-                    </ERPRoute>
-                  }
-                />
-                <Route
-                  path="/admin/cursos"
-                  element={
-                    <EduRoute requireProfessor>
-                      <AdminCursos />
-                    </EduRoute>
-                  }
-                />
+                <Route path="/cursos" element={<Navigate to="/edu" replace />} />
+                <Route path="/admin/cursos" element={<Navigate to="/professor" replace />} />
+                <Route path="/learning" element={<Navigate to="/edu" replace />} />
                 <Route
                   path="/admin/edu"
                   element={
@@ -220,14 +204,6 @@ const App = () => {
                     <EduRoute>
                       <EduTrainingDetalhe />
                     </EduRoute>
-                  }
-                />
-                <Route
-                  path="/learning"
-                  element={
-                    <ProtectedRoute>
-                      <Learning />
-                    </ProtectedRoute>
                   }
                 />
                 <Route
@@ -314,14 +290,7 @@ const App = () => {
                     </ERPRoute>
                   }
                 />
-                <Route
-                  path="/admin/quizzes"
-                  element={
-                    <AdminRoute>
-                      <QuizManagement />
-                    </AdminRoute>
-                  }
-                />
+                <Route path="/admin/quizzes" element={<Navigate to="/admin/edu" replace />} />
                 <Route
                   path="/edu/exam/:examId"
                   element={

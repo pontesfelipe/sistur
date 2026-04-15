@@ -28,7 +28,6 @@ import {
   Award,
   Map,
   Sparkles,
-  HelpingHand,
   Shield,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
@@ -68,7 +67,6 @@ const navigation: NavItem[] = [
   { name: 'Meus Certificados', href: '/certificados', icon: Award, requiresEDU: true },
   { name: 'Treinamento Sob Demanda', href: '/edu/solicitacoes', icon: Sparkles, requiresEDU: true },
   { name: 'Gestão de Treinamentos', href: '/professor', icon: BookOpen, requiresProfessor: true },
-  { name: 'Quizzes', href: '/admin/quizzes', icon: HelpingHand, requiresAdmin: true },
   { name: 'Admin EDU', href: '/admin/edu', icon: Shield, requiresAdmin: true },
   { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
   { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
