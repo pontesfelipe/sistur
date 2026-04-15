@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.4",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Relatórios agora obrigam citação de fonte para TODOS os dados numéricos e tabelas",
+      "Coluna 'Fonte' obrigatória em todas as tabelas de indicadores (territorial e enterprise)",
+      "Seção 'Fontes e Referências' obrigatória ao final de todos os templates",
+      "Template Enterprise agora inclui regras de rastreabilidade de fontes equivalentes ao territorial",
+    ],
+  },
   {
     version: "1.21.3",
     date: "2026-04-15",

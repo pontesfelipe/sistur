@@ -308,11 +308,14 @@ Os dados do diagnóstico são coletados automaticamente de fontes oficiais e com
 - Dados de preenchimento manual: Taxa de escolarização e quaisquer indicadores que não retornem valor oficial válido no momento da coleta.
 - Base de Conhecimento (KB): Documentos locais do destino (PDFs, relatórios, planos diretores) e referências nacionais com resumos extraídos por IA.
 
-REGRA CRÍTICA DE TRANSPARÊNCIA:
-- SEMPRE cite a fonte específica de cada dado mencionado no relatório
-- Se houver snapshots de proveniência, use-os para identificar EXATAMENTE de onde cada valor veio
-- Se o dado veio de preenchimento manual, indique claramente
-- Quando documentos da Base de Conhecimento informarem contexto adicional, referencie-os pelo nome`;
+REGRA CRÍTICA E INEGOCIÁVEL DE FONTES:
+1. CADA dado numérico mencionado no relatório DEVE ter a fonte entre parênteses imediatamente após o valor. Exemplo: "População: 45.321 hab. (Fonte: IBGE Agregados, 2022)"
+2. TODAS as tabelas de indicadores DEVEM conter uma coluna "Fonte" indicando a origem do dado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo, Preenchimento Manual, etc.)
+3. Se houver snapshots de proveniência, use-os para identificar EXATAMENTE de onde cada valor veio, incluindo o ano de referência
+4. Se o dado veio de preenchimento manual, indique CLARAMENTE: "(Fonte: Preenchimento manual)"
+5. Quando documentos da Base de Conhecimento informarem contexto adicional, referencie-os pelo nome
+6. O relatório DEVE terminar com uma seção "## Fontes e Referências" listando TODAS as fontes oficiais consultadas, com o tipo de dado e ano de referência
+7. NUNCA apresente um dado sem citar a fonte — se a fonte for desconhecida, indique "(Fonte: Não identificada)"`;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
   if (isEnterprise) {
@@ -331,12 +334,13 @@ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Use markdown com headers hierárquicos (# ## ###)
 - SEMPRE apresente indicadores em TABELAS MARKDOWN (| col1 | col2 |)
 - NUNCA liste indicadores como texto corrido quando puder usar tabela
-- Para cada eixo: tabela com Indicador | Score | Status | Fonte | Observação
+- Para cada eixo: tabela com Indicador | Score | Status | Fonte | Valor Bruto | Observação
 - Banco de Ações em tabela: Ação | Pilar | Prazo | Responsável | Prioridade
 - Linguagem institucional, clara e objetiva
 - Justifique conclusões com dados. Conecte: dado → impacto → decisão
 - Se estimar dados: "[ESTIMADO]"
-- SEMPRE inclua uma coluna "Fonte" nas tabelas de indicadores, citando a origem dos dados`;
+- A coluna "Fonte" é OBRIGATÓRIA em TODAS as tabelas que apresentam dados — NUNCA omita
+- Ao mencionar qualquer número no texto corrido, inclua "(Fonte: X)" logo após o valor`;
 
   if (template === 'executivo') {
     return `${common}
@@ -483,12 +487,22 @@ OS TRÊS EIXOS SISTUR ENTERPRISE:
 
 CLASSIFICAÇÃO: BOM (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
 
+FONTES DE DADOS — RASTREABILIDADE OBRIGATÓRIA:
+Cada dado apresentado no relatório DEVE conter a fonte entre parênteses. Exemplos:
+- "Taxa de ocupação: 72% (Fonte: Dados do empreendimento — preenchimento manual)"
+- "Nota média: 4.2/5 (Fonte: Google Reviews, TripAdvisor)"
+- Se houver snapshots de proveniência, use-os para identificar a origem exata
+- Se o dado veio de preenchimento manual, indique: "(Fonte: Preenchimento manual)"
+- Se o dado veio de reviews online, indique a plataforma: "(Fonte: Google Reviews)"
+
 REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Comece SEMPRE com título seguido da tabela de ficha técnica fornecida
 - Use tabelas markdown para todos os conjuntos de dados
+- TODAS as tabelas de indicadores DEVEM ter uma coluna "Fonte"
 - Linguagem executiva, orientada a resultados
 - Conecte: métrica → gap → ação → resultado esperado
-- Se houver dados de reviews/avaliações online, incorpore na análise de satisfação`;
+- Se houver dados de reviews/avaliações online, incorpore na análise de satisfação
+- Ao final do relatório, inclua uma seção "Fontes e Referências" listando todas as fontes utilizadas`;
 
   if (template === 'executivo') {
     return `${common}
