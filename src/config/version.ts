@@ -23,6 +23,23 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.21.0",
+    date: "2026-04-15",
+    type: "minor" as const,
+    changes: [
+      "Novo Dashboard 'Minha Jornada' (/edu) com visão consolidada de progresso, XP, streak e atividades recentes",
+      "Catálogo de treinamentos movido para /edu/catalogo com navegação dedicada no menu",
+      "Sistema de progresso granular: rastreamento por módulo, posição de vídeo e tempo de estudo (edu_detailed_progress)",
+      "Sistema de gamificação: XP, níveis, streaks diários e 10 conquistas desbloqueáveis (edu_user_xp, edu_user_achievements)",
+      "Notificações EDU em tempo real: prazos, resultados de exames, certificados emitidos (edu_notifications)",
+      "Widget de avaliação/rating de treinamentos com estrelas e comentários (edu_training_ratings)",
+      "Painel de anotações pessoais vinculadas a treinamentos e timestamps de vídeo (edu_notes)",
+      "Calendário de estudos com aulas ao vivo e eventos futuros",
+      "Relatório individual do aluno para professores: progresso por pilar, tempo de estudo e histórico de exames",
+      "Importação CSV de alunos para turmas com preview e validação",
+    ],
+  },
+  {
     version: "1.20.1",
     date: "2026-04-15",
     type: "patch" as const,
