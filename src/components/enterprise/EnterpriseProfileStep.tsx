@@ -63,6 +63,7 @@ const TARGET_MARKETS = [
 
 export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill }: EnterpriseProfileStepProps) {
   const [reviewAutoFilled, setReviewAutoFilled] = useState(false);
+  const [reviewAnalysisData, setReviewAnalysisData] = useState<Record<string, any> | null>(null);
 
   const handleReviewAutoFill = (values: Record<string, number>) => {
     setReviewAutoFilled(true);
@@ -80,6 +81,10 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     });
     setReviewAutoFilled(true);
     toast.success('Perfil do empreendimento preenchido com dados dos reviews');
+  };
+
+  const handleReviewAnalysisCapture = (fullAnalysis: Record<string, any>) => {
+    setReviewAnalysisData(fullAnalysis);
   };
   const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
