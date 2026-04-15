@@ -658,6 +658,7 @@ ${indicatorsDetail}
 VALORES BRUTOS:
 ${formatIndicatorValues(indicatorValues)}
 ${isEnterprise && enterpriseValues.length > 0 ? formatEnterpriseValues(enterpriseValues) : ''}
+${isEnterprise && enterpriseProfile ? formatEnterpriseProfile(enterpriseProfile) : ''}
 ${dataSnapshots.length > 0 ? formatDataSnapshots(dataSnapshots) : ''}
 GARGALOS:
 ${issuesText}
