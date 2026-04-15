@@ -61,7 +61,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { validateIndicatorValue, getValidationForIndicator } from '@/data/enterpriseIndicatorGuidance';
+import { validateIndicatorValue, getValidationForIndicator, INDICATOR_GUIDANCE } from '@/data/enterpriseIndicatorGuidance';
 import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
 import {
   EMPTY_SELECT_VALUE,
@@ -875,6 +875,22 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       </Badge>
                                     )}
                                   </div>
+                                  {!isIgnored && (() => {
+                                    const guidance = INDICATOR_GUIDANCE[indicator.code];
+                                    if (!guidance) return null;
+                                    return (
+                                      <div className="mt-2 p-2 rounded bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
+                                        <p className="text-xs text-blue-700 dark:text-blue-300">
+                                          <strong>💡 Como obter:</strong> {guidance.howToFind}
+                                        </p>
+                                        {guidance.examples && (
+                                          <p className="text-xs text-blue-600/80 dark:text-blue-400/80 mt-1">
+                                            <em>Ex: {guidance.examples}</em>
+                                          </p>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
                                 <div className="col-span-3">
                                   <div className="relative">

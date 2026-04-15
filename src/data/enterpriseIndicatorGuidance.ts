@@ -200,6 +200,155 @@ export const INDICATOR_GUIDANCE: Record<string, IndicatorGuidance> = {
     examples: '800 recorrentes / 3.000 únicos = 26,7%',
     validation: { min: 0, max: 100 },
   },
+  // ── Territorial: Saneamento & Infraestrutura ──
+  RA_AGUA_TRATADA: {
+    howToFind:
+      'Consulte o SNIS (Sistema Nacional de Informações sobre Saneamento) ou a concessionária local. Dado disponível via IBGE/SIDRA (Censo).',
+    examples: '92% da população atendida',
+    validation: { min: 0, max: 100 },
+  },
+  RA_ESGOTO: {
+    howToFind:
+      'Verifique no SNIS ou Atlas Esgotos da ANA. % de domicílios com coleta de esgoto adequada.',
+    examples: '65% de cobertura',
+    validation: { min: 0, max: 100 },
+  },
+  RA_LIXO_COLETADO: {
+    howToFind:
+      'Consulte dados do IBGE/SIDRA (Censo Demográfico) ou a prefeitura. % de domicílios com coleta regular de lixo.',
+    examples: '97% dos domicílios atendidos',
+    validation: { min: 0, max: 100 },
+  },
+  RA_AREAS_PROTEGIDAS: {
+    howToFind:
+      'Consulte o ICMBio ou a Secretaria de Meio Ambiente local. Área de unidades de conservação ÷ área total do município × 100.',
+    examples: '12% do território em áreas protegidas',
+    validation: { min: 0, max: 100 },
+  },
+  RA_DESMATAMENTO: {
+    howToFind:
+      'Dados do INPE (PRODES/DETER) ou MapBiomas. Taxa de desmatamento no município em km²/ano.',
+    examples: '2,5 km²/ano',
+    validation: { min: 0 },
+  },
+
+  // ── Territorial: Educação ──
+  OE_IDEB: {
+    howToFind:
+      'Consulte o portal do INEP (ideb.inep.gov.br). Busque pelo nome do município e selecione anos iniciais ou finais.',
+    examples: '5,8 (anos iniciais) / 4,9 (anos finais)',
+    validation: { min: 0, max: 10 },
+  },
+  OE_ESCOLARIDADE: {
+    howToFind:
+      'Dados do IBGE (Censo ou PNAD Contínua). % da população com ensino médio completo ou superior.',
+    examples: '45% com ensino médio completo',
+    validation: { min: 0, max: 100 },
+  },
+
+  // ── Territorial: Saúde ──
+  RA_MORTALIDADE_INFANTIL: {
+    howToFind:
+      'Consulte o DATASUS (TabNet) ou a Secretaria de Saúde. Óbitos de menores de 1 ano ÷ nascidos vivos × 1.000.',
+    examples: '12,5 por mil nascidos vivos',
+    validation: { min: 0 },
+  },
+  RA_LEITOS: {
+    howToFind:
+      'DATASUS/CNES: total de leitos hospitalares no município ÷ população × 1.000.',
+    examples: '2,3 leitos por 1.000 habitantes',
+    validation: { min: 0 },
+  },
+
+  // ── Territorial: Economia & Turismo ──
+  OE_PIB_PER_CAPITA: {
+    howToFind:
+      'Consulte o IBGE (Produto Interno Bruto dos Municípios). PIB municipal ÷ população estimada.',
+    examples: 'R$ 32.500,00 per capita',
+    validation: { min: 0 },
+  },
+  OE_EMPREGOS_TURISMO: {
+    howToFind:
+      'Dados da RAIS/CAGED (Ministério do Trabalho). Filtre por CNAEs de turismo (55, 56, 79, 91, 93).',
+    examples: '1.250 empregos formais em turismo',
+    validation: { min: 0, integer: true },
+  },
+  AO_RECEITA_TURISMO: {
+    howToFind:
+      'Estimativa da Secretaria de Turismo ou estudos de demanda. Receita total gerada por visitantes no período.',
+    examples: 'R$ 45 milhões/ano',
+    validation: { min: 0 },
+  },
+
+  // ── Territorial: Governança ──
+  AO_PLANO_TURISMO: {
+    howToFind:
+      'Verifique se o município possui Plano Municipal de Turismo vigente. Consulte a Secretaria de Turismo ou o Diário Oficial.',
+    examples: 'Sim (1) ou Não (0)',
+  },
+  AO_CONSELHO_TURISMO: {
+    howToFind:
+      'Verifique se existe Conselho Municipal de Turismo ativo (COMTUR). Consulte a Secretaria de Turismo ou legislação municipal.',
+    examples: 'Sim (1) ou Não (0)',
+  },
+  AO_FUNDO_TURISMO: {
+    howToFind:
+      'Verifique se o município possui Fundo Municipal de Turismo (FUMTUR) instituído por lei.',
+    examples: 'Sim (1) ou Não (0)',
+  },
+
+  // ── Territorial: IGMA / Mapa do Turismo ──
+  igma_categoria_mapa_turismo: {
+    howToFind:
+      'Consulte o Mapa do Turismo Brasileiro (MTur). O município é classificado de A (mais desenvolvido) a E (menos desenvolvido).',
+    examples: 'Categoria B',
+  },
+  igma_regiao_turistica: {
+    howToFind:
+      'Verifique se o município pertence a alguma Região Turística no Mapa do Turismo Brasileiro do MTur.',
+    examples: 'Sim (1) ou Não (0)',
+  },
+  igma_conselho_municipal_turismo: {
+    howToFind:
+      'Dado do IBGE (Pesquisa de Informações Básicas Municipais - MUNIC). Existência de conselho municipal de turismo.',
+    examples: 'Sim (1) ou Não (0)',
+  },
+
+  // ── Territorial: Finanças Públicas ──
+  OE_RECEITA_PROPRIA: {
+    howToFind:
+      'Consulte o STN (Tesouro Nacional) via FINBRA/SICONFI. Receita tributária própria ÷ receita total × 100.',
+    examples: '35% de receita própria',
+    validation: { min: 0, max: 100 },
+  },
+  OE_DESPESA_TURISMO: {
+    howToFind:
+      'SICONFI/STN: Despesas na função "Turismo" (código 23) no orçamento municipal.',
+    examples: 'R$ 1.200.000,00',
+    validation: { min: 0 },
+  },
+
+  // ── Territorial: Segurança ──
+  RA_CRIMINALIDADE: {
+    howToFind:
+      'Consulte a Secretaria de Segurança Pública estadual. Taxa de crimes por 100 mil habitantes.',
+    examples: '15,2 por 100 mil hab.',
+    validation: { min: 0 },
+  },
+
+  // ── Territorial: CADASTUR ──
+  AO_CADASTUR_GUIAS: {
+    howToFind:
+      'Dados do CADASTUR (MTur). Número de guias de turismo cadastrados no município. O sistema busca automaticamente.',
+    examples: '23 guias cadastrados',
+    validation: { min: 0, integer: true },
+  },
+  AO_CADASTUR_AGENCIAS: {
+    howToFind:
+      'Dados do CADASTUR (MTur). Número de agências de turismo cadastradas no município. O sistema busca automaticamente.',
+    examples: '8 agências cadastradas',
+    validation: { min: 0, integer: true },
+  },
 };
 
 /**
