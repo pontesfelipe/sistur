@@ -112,11 +112,18 @@ export function useEduNotificationMutations() {
       title: string;
       message?: string;
       link?: string;
-      metadata?: Record<string, unknown>;
+      metadata?: Record<string, string | number | boolean>;
     }) => {
       const { error } = await supabase
         .from('edu_notifications')
-        .insert([data]);
+        .insert([{
+          user_id: data.user_id,
+          type: data.type,
+          title: data.title,
+          message: data.message ?? null,
+          link: data.link ?? null,
+          metadata: (data.metadata ?? {}) as any,
+        }]);
       if (error) throw error;
     },
   });
