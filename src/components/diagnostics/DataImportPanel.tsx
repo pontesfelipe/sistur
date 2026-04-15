@@ -90,7 +90,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedAssessment, setSelectedAssessment] = useState<string>(preSelectedAssessmentId || '');
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
-  const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean }>>({});
+  const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean; _rawInput?: string }>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
 
@@ -367,12 +367,36 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  // Format number for display in pt-BR (comma as decimal separator)
+  const formatDisplayValue = (value: number | null | undefined): string => {
+    if (value === null || value === undefined) return '';
+    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+  };
+
+  // Format validation hint numbers in pt-BR
+  const formatHintNumber = (value: number | undefined): string => {
+    if (value === undefined) return '';
+    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+  };
+
+  // Parse Brazilian formatted input (comma → dot) to number
+  const parseBRInput = (value: string): number | null => {
+    if (value === '') return null;
+    // Replace comma with dot for parsing
+    const normalized = value.replace(/\./g, '').replace(',', '.');
+    const num = parseFloat(normalized);
+    return isNaN(num) ? null : num;
+  };
+
   const handleValueChange = (indicatorId: string, value: string) => {
     const indicator = indicators.find(i => i.id === indicatorId);
     
+    // Normalize for validation (comma → dot)
+    const normalizedValue = value.replace(',', '.');
+    
     // Validate the value
     if (indicator) {
-      const error = validateIndicatorValue(value, indicator as any);
+      const error = validateIndicatorValue(normalizedValue, indicator as any);
       setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
     }
 
@@ -380,7 +404,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       ...prev,
       [indicatorId]: {
         ...prev[indicatorId],
-        value: value === '' ? null : parseFloat(value),
+        value: parseBRInput(value),
         source: prev[indicatorId]?.source || 'Manual',
         is_ignored: prev[indicatorId]?.is_ignored ?? false,
       },
@@ -797,9 +821,9 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                     )}
                                     {!isIgnored && (valRules.min !== undefined || valRules.max !== undefined) && (
                                       <span className="text-xs text-muted-foreground">
-                                        ({valRules.min !== undefined ? `mín: ${valRules.min}` : ''}
+                                        ({valRules.min !== undefined ? `mín: ${formatHintNumber(valRules.min)}` : ''}
                                         {valRules.min !== undefined && valRules.max !== undefined ? ' · ' : ''}
-                                        {valRules.max !== undefined ? `máx: ${valRules.max}` : ''}
+                                        {valRules.max !== undefined ? `máx: ${formatHintNumber(valRules.max)}` : ''}
                                         {valRules.integer ? ' · inteiro' : ''})
                                       </span>
                                     )}
@@ -814,12 +838,34 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                 <div className="col-span-3">
                                   <div className="relative">
                                     <Input
-                                      type="number"
-                                      step={valRules.integer ? "1" : "any"}
-                                      min={valRules.min}
-                                      max={valRules.max}
-                                      value={currentValue ?? ''}
-                                      onChange={(e) => handleValueChange(indicator.id, e.target.value)}
+                                      type="text"
+                                      inputMode="decimal"
+                                      value={hasUnsavedChanges 
+                                        ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue))
+                                        : formatDisplayValue(currentValue)
+                                      }
+                                      onChange={(e) => {
+                                        // Allow only digits, comma, dot and minus
+                                        const raw = e.target.value;
+                                        if (raw !== '' && !/^-?[\d.,]*$/.test(raw)) return;
+                                        // Store raw input for display
+                                        setEditedValues(prev => ({
+                                          ...prev,
+                                          [indicator.id]: {
+                                            ...prev[indicator.id],
+                                            value: parseBRInput(raw),
+                                            source: prev[indicator.id]?.source || 'Manual',
+                                            is_ignored: prev[indicator.id]?.is_ignored ?? false,
+                                            _rawInput: raw,
+                                          },
+                                        }));
+                                        // Validate
+                                        if (indicators.find(i => i.id === indicator.id)) {
+                                          const normalizedValue = raw.replace(',', '.');
+                                          const error = validateIndicatorValue(normalizedValue, indicator as any);
+                                          setValidationErrors(prev => ({ ...prev, [indicator.id]: error }));
+                                        }
+                                      }}
                                       disabled={isIgnored}
                                       className={cn(
                                         'w-full pr-8',
