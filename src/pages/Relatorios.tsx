@@ -73,6 +73,7 @@ interface GeneratedReport {
   environment: string;
   created_by: string;
   diagnostic_type: string;
+  tier: string | null;
 }
 
 function useGeneratedReports() {
