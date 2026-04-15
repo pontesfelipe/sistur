@@ -291,14 +291,7 @@ const App = () => {
                     </ERPRoute>
                   }
                 />
-                <Route
-                  path="/admin/quizzes"
-                  element={
-                    <AdminRoute>
-                      <QuizManagement />
-                    </AdminRoute>
-                  }
-                />
+                <Route path="/admin/quizzes" element={<Navigate to="/admin/edu" replace />} />
                 <Route
                   path="/edu/exam/:examId"
                   element={
