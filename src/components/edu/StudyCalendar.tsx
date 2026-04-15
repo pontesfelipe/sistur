@@ -31,8 +31,8 @@ export function StudyCalendar() {
 
     // Add upcoming lives from trainings
     trainings?.forEach((t) => {
-      if (t.type === 'live' && t.scheduled_at) {
-        const date = new Date(t.scheduled_at);
+      if (t.type === 'live' && (t as any).scheduled_at) {
+        const date = new Date((t as any).scheduled_at);
         if (isAfter(date, now) && isBefore(date, cutoff)) {
           events.push({
             id: `live-${t.training_id}`,
