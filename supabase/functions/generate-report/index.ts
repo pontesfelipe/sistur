@@ -109,7 +109,8 @@ function formatIndicatorValues(indicatorValues: any[]): string {
     // value_text carries qualitative evidence / free-text provenance the analyst added.
     if (iv.value_text) extras.push(`    Evidência: ${iv.value_text}`);
     if (iv.reference_date) extras.push(`    Referência: ${iv.reference_date}`);
-    const header = `- ${iv.indicators?.name || iv.indicators?.code}: ${value}${unit ? ` ${unit}` : ''} (${meta.join(', ')})`;
+    const metaStr = meta.length > 0 ? ` (${meta.join(', ')})` : '';
+    const header = `- ${iv.indicators?.name || iv.indicators?.code}: ${value}${unit ? ` ${unit}` : ''}${metaStr}`;
     return extras.length > 0 ? `${header}\n${extras.join('\n')}` : header;
   }).join('\n');
 }
@@ -864,12 +865,29 @@ serve(async (req) => {
       }
     }
 
-    // Fetch all data in parallel
+    // Fetch all data in parallel — use Promise.all on a keyed object so we can
+    // read each result by name and avoid fragile positional indexing when
+    // conditional queries are toggled (enterprise-only, ibge-dependent…).
     const destinationId = assessment.destination_id;
     // Use the assessment's org_id to scope KB files — ensures org isolation
     const assessmentOrgId = assessment.org_id;
     const ibgeCode = (assessment.destinations as any)?.ibge_code;
-    const fetchPromises = [
+
+    const emptyArray = Promise.resolve({ data: [] as any[] });
+    const emptyMaybe = Promise.resolve({ data: null as any });
+
+    const [
+      indicatorScoresRes,
+      alertsRes,
+      actionPlansRes,
+      indicatorValuesRes,
+      globalRefsRes,
+      kbFilesRes,
+      dataSnapshotsRes,
+      externalValuesRes,
+      enterpriseValuesRes,
+      enterpriseProfileRes,
+    ] = await Promise.all([
       supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
@@ -886,35 +904,28 @@ serve(async (req) => {
       // set when there's no ibge_code (enterprise-only flows) or no import yet.
       ibgeCode
         ? supabase.from('external_indicator_values').select('*').eq('municipality_ibge_code', ibgeCode).eq('org_id', assessmentOrgId)
-        : Promise.resolve({ data: [] as any[] }),
-    ];
+        : emptyArray,
+      // Enterprise-only: indicator values persisted in the legacy enterprise table.
+      isEnterprise
+        ? supabase.from('enterprise_indicator_values').select('*, enterprise_indicators(*, enterprise_indicator_categories(*))').eq('assessment_id', assessmentId)
+        : emptyArray,
+      // Enterprise profile: 26 descriptive fields (property_type, certifications,
+      // sustainability, accessibility…) that used to be dead data.
+      isEnterprise && destinationId
+        ? supabase.from('enterprise_profiles').select('*').eq('destination_id', destinationId).maybeSingle()
+        : emptyMaybe,
+    ]);
 
-    // Enterprise indicator values + profile with review analysis
-    if (isEnterprise) {
-      fetchPromises.push(
-        supabase.from('enterprise_indicator_values').select('*, enterprise_indicators(*, enterprise_indicator_categories(*))').eq('assessment_id', assessmentId)
-      );
-      // Enterprise profile (property_type, certifications, sustainability, etc.)
-      // — 26 descriptive fields that never influenced narrative before.
-      if (destinationId) {
-        fetchPromises.push(
-          supabase.from('enterprise_profiles').select('*').eq('destination_id', destinationId).maybeSingle()
-        );
-      }
-    }
-
-    const results = await Promise.all(fetchPromises);
-
-    const indicatorScores = results[0].data || [];
-    const alerts = results[1].data || [];
-    const actionPlans = results[2].data || [];
-    const indicatorValues = results[3].data || [];
-    const globalRefs = results[4].data || [];
-    const kbFiles = results[5].data || [];
-    const dataSnapshots = results[6].data || [];
-    const externalValues = results[7]?.data || [];
-    const enterpriseValues = isEnterprise ? (results[8]?.data || []) : [];
-    const enterpriseProfile = isEnterprise ? (results[9]?.data || null) : null;
+    const indicatorScores = indicatorScoresRes.data || [];
+    const alerts = alertsRes.data || [];
+    const actionPlans = actionPlansRes.data || [];
+    const indicatorValues = indicatorValuesRes.data || [];
+    const globalRefs = globalRefsRes.data || [];
+    const kbFiles = kbFilesRes.data || [];
+    const dataSnapshots = dataSnapshotsRes.data || [];
+    const externalValues = externalValuesRes.data || [];
+    const enterpriseValues = enterpriseValuesRes.data || [];
+    const enterpriseProfile = enterpriseProfileRes.data || null;
 
     // Catalog indicators by code so we can decorate external benchmarks with
     // names/units from the indicators table.
