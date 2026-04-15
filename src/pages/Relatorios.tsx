@@ -873,6 +873,11 @@ export default function Relatorios() {
                                     {r.diagnostic_type === 'enterprise' ? <Building2 className="h-2.5 w-2.5" /> : <Globe className="h-2.5 w-2.5" />}
                                     {r.diagnostic_type === 'enterprise' ? 'Enterprise' : 'Territorial'}
                                   </Badge>
+                                  {r.tier && (
+                                    <Badge variant="secondary" className="text-[10px] shrink-0">
+                                      {r.tier === 'essencial' ? '⚡' : r.tier === 'estrategico' ? '📊' : '🎯'} {r.tier.charAt(0).toUpperCase() + r.tier.slice(1)}
+                                    </Badge>
+                                  )}
                                   {r.visibility === 'org' ? (
                                     <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0"><Users className="h-2.5 w-2.5" />Org</Badge>
                                   ) : (
