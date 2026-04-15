@@ -194,9 +194,13 @@ function formatDataSnapshots(snapshots: any[]): string {
   });
 
   const sourceLabels: Record<string, string> = {
+    'IBGE': 'IBGE (Agregados)',
     'IBGE_AGREGADOS': 'IBGE (Agregados)',
     'IBGE_PESQUISAS': 'IBGE (Pesquisas)',
+    'IBGE_CENSO': 'IBGE / SIDRA (Censo)',
+    'IBGE_SIDRA': 'IBGE / SIDRA (Saneamento)',
     'DATASUS': 'DATASUS',
+    'INEP': 'INEP (Educação)',
     'STN': 'STN / Tesouro Nacional',
     'CADASTUR': 'CADASTUR',
     'MAPA_TURISMO': 'Mapa do Turismo Brasileiro',
