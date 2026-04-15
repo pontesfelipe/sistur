@@ -563,6 +563,60 @@ export default function Relatorios() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Filters row */}
+                <div className="flex flex-wrap gap-3 items-end">
+                  <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                    <Filter className="h-4 w-4" />
+                    Filtros:
+                  </div>
+                  <Select value={genTypeFilter} onValueChange={setGenTypeFilter}>
+                    <SelectTrigger className="w-40 h-8 text-xs">
+                      <SelectValue placeholder="Tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os tipos</SelectItem>
+                      <SelectItem value="territorial">
+                        <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" />Territorial</span>
+                      </SelectItem>
+                      <SelectItem value="enterprise">
+                        <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />Enterprise</span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={genTierFilter} onValueChange={setGenTierFilter}>
+                    <SelectTrigger className="w-40 h-8 text-xs">
+                      <SelectValue placeholder="Nível" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os níveis</SelectItem>
+                      <SelectItem value="essencial">⚡ Essencial</SelectItem>
+                      <SelectItem value="estrategico">📊 Estratégico</SelectItem>
+                      <SelectItem value="integral">🎯 Integral</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={genDestFilter} onValueChange={setGenDestFilter}>
+                    <SelectTrigger className="w-48 h-8 text-xs">
+                      <SelectValue placeholder="Destino" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os destinos</SelectItem>
+                      {destinations?.map(d => (
+                        <SelectItem key={d.id} value={d.id}>
+                          <span className="flex items-center gap-1.5">
+                            <MapPin className="h-3 w-3" />
+                            {d.name}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {(genTypeFilter !== 'all' || genTierFilter !== 'all' || genDestFilter !== 'all') && (
+                    <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => { setGenTypeFilter('all'); setGenTierFilter('all'); setGenDestFilter('all'); }}>
+                      Limpar filtros
+                    </Button>
+                  )}
+                </div>
+
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
@@ -577,12 +631,12 @@ export default function Relatorios() {
                         <SelectValue placeholder="Selecione um diagnóstico calculado" />
                       </SelectTrigger>
                       <SelectContent>
-                        {calculatedAssessments.length === 0 ? (
+                        {filteredCalculatedAssessments.length === 0 ? (
                           <SelectItem value="none" disabled>
                             Nenhum diagnóstico calculado disponível
                           </SelectItem>
                         ) : (
-                          calculatedAssessments.map((assessment) => {
+                          filteredCalculatedAssessments.map((assessment) => {
                             const dest = destinations?.find(d => d.id === assessment.destination_id)
                               ?? { name: (assessment as any).destinations?.name || 'Destino' };
                             const calcDate = assessment.calculated_at 
