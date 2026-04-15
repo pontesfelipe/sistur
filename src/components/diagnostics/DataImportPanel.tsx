@@ -446,6 +446,15 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const handleSaveAllValues = async () => {
     if (!selectedAssessment || Object.keys(editedValues).length === 0) return;
 
+    // Check for validation errors
+    const activeErrors = Object.entries(validationErrors).filter(([id, err]) => err && editedValues[id]);
+    if (activeErrors.length > 0) {
+      toast.error('Corrija os erros de validação antes de salvar', {
+        description: `${activeErrors.length} indicador(es) com valores inválidos`,
+      });
+      return;
+    }
+
     const dataToSave = Object.entries(editedValues).map(([indicatorId, data]) => ({
       assessment_id: selectedAssessment,
       indicator_id: indicatorId,
