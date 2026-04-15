@@ -75,7 +75,8 @@ const navGroups: NavGroup[] = [
     label: 'Educação',
     icon: GraduationCap,
     items: [
-      { name: 'SISTUR EDU', href: '/edu', icon: GraduationCap, requiresEDU: true },
+      { name: 'Minha Jornada', href: '/edu', icon: GraduationCap, requiresEDU: true },
+      { name: 'Catálogo', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true },
       { name: 'Trilhas', href: '/edu/trilhas', icon: Map, requiresEDU: true },
       { name: 'Minhas Provas', href: '/edu/historico', icon: ScrollText, requiresEDU: true },
       { name: 'Meus Certificados', href: '/certificados', icon: Award, requiresEDU: true },
