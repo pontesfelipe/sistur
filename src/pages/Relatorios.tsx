@@ -150,6 +150,22 @@ export default function Relatorios() {
 
   const calculatedAssessments = assessments?.filter(a => a.status === 'CALCULATED') || [];
 
+  const filteredCalculatedAssessments = calculatedAssessments.filter(a => {
+    if (genTypeFilter !== 'all') {
+      const type = (a as any).diagnostic_type || 'territorial';
+      if (genTypeFilter !== type) return false;
+    }
+    if (genTierFilter !== 'all') {
+      const tier = (a as any).tier || 'SMALL';
+      const tierMap: Record<string, string> = { essencial: 'SMALL', estrategico: 'MEDIUM', integral: 'COMPLETE' };
+      if (tier !== tierMap[genTierFilter]) return false;
+    }
+    if (genDestFilter !== 'all') {
+      if (a.destination_id !== genDestFilter) return false;
+    }
+    return true;
+  });
+
   const generateReport = async (forceRegenerate = false) => {
     if (!selectedAssessmentId || !selectedDestination) {
       toast.error('Selecione um diagnóstico calculado');
