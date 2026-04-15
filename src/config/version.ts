@@ -23,6 +23,16 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.21.2",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Corrigido botão 'Calcular Índices' bloqueado para diagnósticos DRAFT com dados preenchidos",
+      "Auto-promoção de DRAFT para DATA_READY na página de detalhes do diagnóstico quando dados suficientes",
+      "Condição de habilitação do cálculo agora baseada em dados reais (indicadores preenchidos) em vez de status",
+    ],
+  },
+  {
     version: "1.21.1",
     date: "2026-04-15",
     type: "patch" as const,
