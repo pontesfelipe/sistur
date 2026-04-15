@@ -34,7 +34,7 @@ import { useUserXP, useUserAchievements, calcLevel, xpForNextLevel, ACHIEVEMENTS
 import { useEduNotifications, useUnreadEduNotificationCount } from '@/hooks/useEduNotifications';
 import { useStudentProfile } from '@/hooks/useStudentProfile';
 import { useProfile } from '@/hooks/useProfile';
-import { useCertificates } from '@/hooks/useCertificates';
+import { useUserCertificates } from '@/hooks/useCertificates';
 import { useAllUserProgress } from '@/hooks/useEdu';
 import { PersonalizedRecommendationsPanel } from '@/components/edu/PersonalizedRecommendationsPanel';
 import { PILLAR_INFO, type Pillar } from '@/types/sistur';
