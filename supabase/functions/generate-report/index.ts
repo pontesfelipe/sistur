@@ -8,6 +8,15 @@ const corsHeaders = {
 
 // ========== HELPER FUNCTIONS ==========
 
+/** Format number using Brazilian standard: comma for decimal, period for thousands */
+function formatNumberBR(value: number, decimals = 1): string {
+  return value.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function formatPctBR(score: number): string {
+  return formatNumberBR(score * 100, 1);
+}
+
 function formatDateBR(dateStr: string | null): string {
   if (!dateStr) return 'N/A';
   const d = new Date(dateStr);
