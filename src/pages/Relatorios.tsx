@@ -32,7 +32,10 @@ import {
   Eye,
   Lock,
   Users,
-  FlaskConical
+  FlaskConical,
+  Filter,
+  Building2,
+  Globe
 } from 'lucide-react';
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
