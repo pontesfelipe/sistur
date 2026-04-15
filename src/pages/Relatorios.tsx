@@ -849,11 +849,9 @@ export default function Relatorios() {
                       <div className="space-y-2 pr-4">
                         {savedReports
                           .filter(r => {
-                            // Visibility: personal reports only to creator, org reports to all
                             if (r.visibility === 'personal' && r.created_by !== profile?.user_id) return false;
-                            // Type filter
                             if (historyTypeFilter !== 'all' && r.diagnostic_type !== historyTypeFilter) return false;
-                            // Owner filter
+                            if (historyTierFilter !== 'all' && r.tier !== historyTierFilter) return false;
                             if (historyOwnerFilter === 'mine' && r.created_by !== profile?.user_id) return false;
                             return true;
                           })
