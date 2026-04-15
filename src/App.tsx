@@ -25,15 +25,13 @@ const Diagnosticos = lazy(() => import("./pages/Diagnosticos"));
 const DiagnosticoDetalhe = lazy(() => import("./pages/DiagnosticoDetalhe"));
 
 
-const Cursos = lazy(() => import("./pages/Cursos"));
-const AdminCursos = lazy(() => import("./pages/AdminCursos"));
 const AdminEdu = lazy(() => import("./pages/AdminEdu"));
 const EduCatalogo = lazy(() => import("./pages/EduCatalogo"));
 const EduPerfil = lazy(() => import("./pages/EduPerfil"));
 const EduTrilhas = lazy(() => import("./pages/EduTrilhas"));
 const EduTrilhaDetalhe = lazy(() => import("./pages/EduTrilhas").then(m => ({ default: m.EduTrilhaDetalhe })));
 const EduTrainingDetalhe = lazy(() => import("./pages/EduTrainingDetalhe"));
-const Learning = lazy(() => import("./pages/Learning"));
+
 const Configuracoes = lazy(() => import("./pages/Configuracoes"));
 const Relatorios = lazy(() => import("./pages/Relatorios"));
 const NovaRodada = lazy(() => import("./pages/NovaRodada"));
