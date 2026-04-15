@@ -117,6 +117,63 @@ function formatIGMAFlags(flags: Record<string, boolean> | null): string {
   return activeFlags || 'Nenhuma flag IGMA ativa.';
 }
 
+function formatEnterpriseProfile(profile: any): string {
+  if (!profile) return '';
+
+  let result = '\n=== PERFIL DO EMPREENDIMENTO ===\n';
+  if (profile.property_type) result += `Tipo: ${profile.property_type}\n`;
+  if (profile.star_rating) result += `Categoria: ${profile.star_rating} estrelas\n`;
+  if (profile.room_count) result += `Número de UHs: ${profile.room_count}\n`;
+  if (profile.suite_count) result += `Suítes: ${profile.suite_count}\n`;
+  if (profile.total_capacity) result += `Capacidade total: ${profile.total_capacity}\n`;
+  if (profile.employee_count) result += `Funcionários: ${profile.employee_count}\n`;
+  if (profile.years_in_operation) result += `Anos de operação: ${profile.years_in_operation}\n`;
+  if (profile.seasonality) result += `Sazonalidade: ${profile.seasonality}\n`;
+  if (profile.target_market?.length) result += `Mercado-alvo: ${profile.target_market.join(', ')}\n`;
+  if (profile.average_occupancy_rate) result += `Taxa de ocupação média: ${profile.average_occupancy_rate}%\n`;
+  if (profile.average_daily_rate) result += `ADR médio: R$ ${profile.average_daily_rate}\n`;
+  if (profile.certifications?.length) result += `Certificações: ${profile.certifications.join(', ')}\n`;
+  if (profile.sustainability_initiatives?.length) result += `Iniciativas de sustentabilidade: ${profile.sustainability_initiatives.join(', ')}\n`;
+  if (profile.accessibility_features?.length) result += `Acessibilidade: ${profile.accessibility_features.join(', ')}\n`;
+
+  // Review analysis data — the core intelligence from online reviews
+  if (profile.review_analysis) {
+    const ra = profile.review_analysis;
+    result += '\n=== ANÁLISE DE REVIEWS ONLINE (IA) ===\n';
+    result += `Estabelecimento pesquisado: ${ra.businessName || 'N/A'} em ${ra.location || 'N/A'}\n`;
+    result += `Data da busca: ${ra.searchedAt || 'N/A'}\n`;
+    if (ra.review_score != null) result += `Nota média: ${ra.review_score}/5\n`;
+    if (ra.review_count != null) result += `Quantidade de reviews: ~${ra.review_count}\n`;
+    if (ra.sentiment_score != null) result += `Score de sentimento: ${ra.sentiment_score}/5\n`;
+    if (ra.digital_maturity != null) result += `Maturidade digital: ${ra.digital_maturity}/5\n`;
+    if (ra.platforms_found?.length) result += `Plataformas encontradas: ${ra.platforms_found.join(', ')}\n`;
+    if (ra.sentiment_summary) result += `\nResumo de sentimento: ${ra.sentiment_summary}\n`;
+
+    if (ra.guest_experience_dimensions) {
+      result += '\nDimensões da Experiência do Hóspede:\n';
+      const dims = ra.guest_experience_dimensions;
+      for (const [key, val] of Object.entries(dims)) {
+        if (val != null) result += `  - ${key}: ${val}/5\n`;
+      }
+    }
+
+    if (ra.recurring_themes?.length) result += `\nTemas recorrentes: ${ra.recurring_themes.join(', ')}\n`;
+    if (ra.strengths?.length) result += `\nPontos fortes:\n${ra.strengths.map((s: string) => `  ✓ ${s}`).join('\n')}\n`;
+    if (ra.weaknesses?.length) result += `\nPontos de atenção:\n${ra.weaknesses.map((w: string) => `  ⚠ ${w}`).join('\n')}\n`;
+    if (ra.sample_positive_quotes?.length) result += `\nCitações positivas:\n${ra.sample_positive_quotes.map((q: string) => `  "${q}"`).join('\n')}\n`;
+    if (ra.sample_negative_quotes?.length) result += `\nCitações negativas:\n${ra.sample_negative_quotes.map((q: string) => `  "${q}"`).join('\n')}\n`;
+    if (ra.recommendation) result += `\nRecomendação estratégica: ${ra.recommendation}\n`;
+    if (ra.sources?.length) {
+      result += `\nFontes:\n`;
+      ra.sources.forEach((s: any) => {
+        result += `  - ${s.platform}${s.rating != null ? ` (${s.rating}/5)` : ''}: ${s.url}\n`;
+      });
+    }
+  }
+
+  return result;
+}
+
 function formatDataSnapshots(snapshots: any[]): string {
   if (!snapshots || snapshots.length === 0) return '';
   
