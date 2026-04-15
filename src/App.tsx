@@ -156,22 +156,9 @@ const App = () => {
                     </ERPRoute>
                   }
                 />
-                <Route
-                  path="/cursos"
-                  element={
-                    <ERPRoute>
-                      <Cursos />
-                    </ERPRoute>
-                  }
-                />
-                <Route
-                  path="/admin/cursos"
-                  element={
-                    <EduRoute requireProfessor>
-                      <AdminCursos />
-                    </EduRoute>
-                  }
-                />
+                <Route path="/cursos" element={<Navigate to="/edu" replace />} />
+                <Route path="/admin/cursos" element={<Navigate to="/professor" replace />} />
+                <Route path="/learning" element={<Navigate to="/edu" replace />} />
                 <Route
                   path="/admin/edu"
                   element={
@@ -218,14 +205,6 @@ const App = () => {
                     <EduRoute>
                       <EduTrainingDetalhe />
                     </EduRoute>
-                  }
-                />
-                <Route
-                  path="/learning"
-                  element={
-                    <ProtectedRoute>
-                      <Learning />
-                    </ProtectedRoute>
                   }
                 />
                 <Route
