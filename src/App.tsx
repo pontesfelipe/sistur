@@ -171,6 +171,14 @@ const App = () => {
                   path="/edu"
                   element={
                     <EduRoute>
+                      <EduDashboard />
+                    </EduRoute>
+                  }
+                />
+                <Route
+                  path="/edu/catalogo"
+                  element={
+                    <EduRoute>
                       <EduCatalogo />
                     </EduRoute>
                   }
