@@ -121,6 +121,17 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
       setResult(data);
       toast.success('Busca concluída!');
 
+      // Capture full analysis for persistence
+      if (data?.analysis && onAnalysisCapture) {
+        onAnalysisCapture({
+          ...data.analysis,
+          businessName: data.businessName,
+          location: data.location,
+          searchResults: data.searchResults,
+          searchedAt: new Date().toISOString(),
+        });
+      }
+
       // Auto-fill profile metadata immediately when results arrive
       if (onProfileAutoFill) {
         const meta = data?.analysis?.property_metadata || {};
