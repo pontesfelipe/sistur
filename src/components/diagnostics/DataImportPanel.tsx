@@ -379,24 +379,46 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
   };
 
-  // Parse Brazilian formatted input (comma → dot) to number
+  // Parse pt-BR and mixed numeric input safely
   const parseBRInput = (value: string): number | null => {
-    if (value === '') return null;
-    // Replace comma with dot for parsing
-    const normalized = value.replace(/\./g, '').replace(',', '.');
-    const num = parseFloat(normalized);
-    return isNaN(num) ? null : num;
+    const raw = value.trim();
+    if (raw === '') return null;
+
+    if (raw.includes(',')) {
+      const normalized = raw.replace(/\./g, '').replace(',', '.');
+      const num = Number(normalized);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    const dotParts = raw.split('.');
+    if (dotParts.length === 2) {
+      const [, decimalPart] = dotParts;
+      const normalized = decimalPart.length === 3 ? raw.replace('.', '') : raw;
+      const num = Number(normalized);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    if (dotParts.length > 2) {
+      const num = Number(raw.replace(/\./g, ''));
+      return Number.isFinite(num) ? num : null;
+    }
+
+    const num = Number(raw);
+    return Number.isFinite(num) ? num : null;
+  };
+
+  const getValidationValue = (value: string): string => {
+    const parsed = parseBRInput(value);
+    if (parsed === null) return value;
+    return String(parsed);
   };
 
   const handleValueChange = (indicatorId: string, value: string) => {
     const indicator = indicators.find(i => i.id === indicatorId);
+    const validationValue = getValidationValue(value);
     
-    // Normalize for validation (comma → dot)
-    const normalizedValue = value.replace(',', '.');
-    
-    // Validate the value
     if (indicator) {
-      const error = validateIndicatorValue(normalizedValue, indicator as any);
+      const error = validateIndicatorValue(validationValue, indicator as any);
       setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
     }
 
@@ -407,6 +429,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         value: parseBRInput(value),
         source: prev[indicatorId]?.source || 'Manual',
         is_ignored: prev[indicatorId]?.is_ignored ?? false,
+        _rawInput: value,
       },
     }));
   };
@@ -845,26 +868,20 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                         : formatDisplayValue(currentValue)
                                       }
                                       onChange={(e) => {
-                                        // Allow only digits, comma, dot and minus
                                         const raw = e.target.value;
                                         if (raw !== '' && !/^-?[\d.,]*$/.test(raw)) return;
-                                        // Store raw input for display
+                                        handleValueChange(indicator.id, raw);
+                                      }}
+                                      onBlur={() => {
+                                        const edited = editedValues[indicator.id];
+                                        if (!edited) return;
                                         setEditedValues(prev => ({
                                           ...prev,
                                           [indicator.id]: {
                                             ...prev[indicator.id],
-                                            value: parseBRInput(raw),
-                                            source: prev[indicator.id]?.source || 'Manual',
-                                            is_ignored: prev[indicator.id]?.is_ignored ?? false,
-                                            _rawInput: raw,
+                                            _rawInput: edited.value === null ? '' : formatDisplayValue(edited.value),
                                           },
                                         }));
-                                        // Validate
-                                        if (indicators.find(i => i.id === indicator.id)) {
-                                          const normalizedValue = raw.replace(',', '.');
-                                          const error = validateIndicatorValue(normalizedValue, indicator as any);
-                                          setValidationErrors(prev => ({ ...prev, [indicator.id]: error }));
-                                        }
                                       }}
                                       disabled={isIgnored}
                                       className={cn(

@@ -76,7 +76,43 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
 
-  
+  const formatNumberBR = useCallback((value: number | null | undefined) => {
+    if (value === null || value === undefined) return '';
+    return value.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+  }, []);
+
+  const parseNumberBR = useCallback((value: string) => {
+    const raw = value.trim();
+    if (!raw) return null;
+
+    if (raw.includes(',')) {
+      const normalized = raw.replace(/\./g, '').replace(',', '.');
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    const dotParts = raw.split('.');
+    if (dotParts.length === 2) {
+      const [, decimalPart] = dotParts;
+      const normalized = decimalPart.length === 3 ? raw.replace('.', '') : raw;
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    if (dotParts.length > 2) {
+      const parsed = Number(raw.replace(/\./g, ''));
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : null;
+  }, []);
+
+  const normalizeForValidation = useCallback((value: string) => {
+    const parsed = parseNumberBR(value);
+    return parsed === null ? value : String(parsed);
+  }, [parseNumberBR]);
+
   // Initialize local values and ignored state from existing
   useEffect(() => {
     if (existingValues && existingValues.length > 0 && Object.keys(localValues).length === 0) {
@@ -84,7 +120,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
       const ignored = new Set<string>();
       existingValues.forEach(v => {
         if (v.value_raw !== null) {
-          initial[v.indicator_id] = v.value_raw.toString();
+          initial[v.indicator_id] = formatNumberBR(v.value_raw);
         }
         if (v.is_ignored) {
           ignored.add(v.indicator_id);
@@ -97,7 +133,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
         setIgnoredIds(ignored);
       }
     }
-  }, [existingValues]);
+  }, [existingValues, localValues, formatNumberBR]);
 
   // Apply initial auto-fill values from step 4 review search
   useEffect(() => {
@@ -109,13 +145,13 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
       Object.entries(initialAutoFillValues).forEach(([code, value]) => {
         const id = codeToId.get(code);
         if (id && !updated[id]) {
-          updated[id] = value.toString();
+          updated[id] = formatNumberBR(value);
           applied = true;
         }
       });
       return applied ? updated : prev;
     });
-  }, [initialAutoFillValues, indicators]);
+  }, [initialAutoFillValues, indicators, formatNumberBR]);
 
   const handleToggleIgnore = useCallback((indicatorId: string) => {
     setIgnoredIds(prev => {
@@ -184,20 +220,17 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   }, [indicators, localValues, ignoredIds]);
   
   const handleValueChange = (indicatorId: string, value: string, indicator: Indicator) => {
-    // Only allow valid numeric characters
-    if (value !== '' && !/^-?\d*\.?\d*$/.test(value)) return;
+    if (value !== '' && !/^-?[\d.,]*$/.test(value)) return;
 
     setLocalValues(prev => ({ ...prev, [indicatorId]: value }));
 
-    // Validate
-    const error = validateIndicatorValue(value, indicator as any);
+    const error = validateIndicatorValue(normalizeForValidation(value), indicator as any);
     setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
   };
   
   const handleSave = async (proceedToCalculation: boolean = false) => {
     if (!profile?.org_id) return;
 
-    // Check for validation errors before saving
     const activeErrors = Object.entries(validationErrors).filter(([id, err]) => err && localValues[id]);
     if (activeErrors.length > 0) {
       toast.error('Corrija os erros de validação antes de salvar', {
@@ -211,7 +244,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
       .map(([indicatorId, value]) => ({
         assessment_id: assessmentId,
         indicator_id: indicatorId,
-        value_raw: parseFloat(value),
+        value_raw: parseNumberBR(value),
         source: 'Manual (Enterprise)',
       }));
     
@@ -373,7 +406,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                   <div className="space-y-4 pt-2">
                     {categoryIndicators.map(indicator => {
                       const currentValue = localValues[indicator.id] || '';
-                      const numericValue = currentValue ? parseFloat(currentValue) : null;
+                      const numericValue = currentValue ? parseNumberBR(currentValue) : null;
                       const benchmarkStatus = getBenchmarkStatus(indicator, numericValue);
                       const benchmarkTarget = (indicator as any).benchmark_target;
                       const isIgnored = ignoredIds.has(indicator.id);
@@ -414,7 +447,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                             {!isIgnored && benchmarkTarget !== null && (
                               <p className="text-xs text-muted-foreground mt-1">
                                 <Target className="h-3 w-3 inline mr-1" />
-                                Meta: {benchmarkTarget} {indicator.unit}
+                                Meta: {formatNumberBR(benchmarkTarget)} {indicator.unit}
                               </p>
                             )}
                             {!isIgnored && guidance && (
@@ -433,11 +466,18 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
                               <Input
-                                type="number"
-                                step="any"
+                                type="text"
+                                inputMode="decimal"
                                 placeholder={isIgnored ? 'Ignorado' : 'Valor'}
                                 value={currentValue}
                                 onChange={(e) => handleValueChange(indicator.id, e.target.value, indicator)}
+                                onBlur={() => {
+                                  const parsed = parseNumberBR(currentValue);
+                                  setLocalValues(prev => ({
+                                    ...prev,
+                                    [indicator.id]: parsed === null ? '' : formatNumberBR(parsed),
+                                  }));
+                                }}
                                 disabled={isIgnored}
                                 className={cn(
                                   "flex-1",
