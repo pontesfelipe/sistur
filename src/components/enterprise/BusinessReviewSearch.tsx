@@ -176,7 +176,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, defaultBus
 
     // Auto-fill profile metadata
     if (onProfileAutoFill) {
-      const meta = result.analysis.property_metadata || {};
+      const meta = (result.analysis.property_metadata || {}) as Partial<PropertyMetadata>;
       const enrichedMeta = {
         star_rating: meta.star_rating ?? null,
         property_type: meta.property_type || propertyType || null,
