@@ -76,6 +76,8 @@ interface BusinessReviewSearchProps {
   onAutoFill?: (indicatorValues: Record<string, number>) => void;
   /** If provided, auto-fills profile fields from review data */
   onProfileAutoFill?: (metadata: PropertyMetadata) => void;
+  /** Captures the full analysis result for persistence */
+  onAnalysisCapture?: (fullAnalysis: Record<string, any>) => void;
   /** Pre-fill business name */
   defaultBusinessName?: string;
   /** Pre-fill location */
