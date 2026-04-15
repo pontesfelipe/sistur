@@ -392,6 +392,11 @@ const EduTrainingDetalhe = () => {
               </CardContent>
             </Card>
           )}
+          {/* Rating Widget */}
+          <TrainingRatingWidget trainingId={training.training_id} trainingTitle={training.title} />
+
+          {/* Notes Panel */}
+          <TrainingNotesPanel trainingId={training.training_id} />
         </div>
       </div>
     </AppLayout>
