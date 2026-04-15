@@ -583,10 +583,13 @@ serve(async (req) => {
       supabase.from('diagnosis_data_snapshots').select('*').eq('assessment_id', assessmentId),
     ];
 
-    // NEW: Enterprise indicator values if enterprise diagnostic
+    // Enterprise indicator values + profile with review analysis
     if (isEnterprise) {
       fetchPromises.push(
         supabase.from('enterprise_indicator_values').select('*, enterprise_indicators(*, enterprise_indicator_categories(*))').eq('assessment_id', assessmentId)
+      );
+      fetchPromises.push(
+        supabase.from('enterprise_profiles').select('*').eq('destination_id', destinationId).maybeSingle()
       );
     }
 
@@ -600,11 +603,13 @@ serve(async (req) => {
     const kbFiles = results[5].data || [];
     const dataSnapshots = results[6].data || [];
     const enterpriseValues = isEnterprise ? (results[7]?.data || []) : [];
+    const enterpriseProfile = isEnterprise ? (results[8]?.data || null) : null;
 
     console.log('Report data — Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 
       'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 
       'KB files:', kbFiles.length, 'Snapshots:', dataSnapshots.length, 
-      'Enterprise values:', enterpriseValues.length);
+      'Enterprise values:', enterpriseValues.length,
+      'Enterprise profile:', !!enterpriseProfile, 'Review analysis:', !!enterpriseProfile?.review_analysis);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
