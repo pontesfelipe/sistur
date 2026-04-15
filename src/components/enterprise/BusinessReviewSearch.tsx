@@ -96,7 +96,7 @@ const PROPERTY_TYPES = [
   { value: 'operadora', label: 'Operadora/Agência' },
 ];
 
-export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
+export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysisCapture, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
   const [businessName, setBusinessName] = useState(defaultBusinessName);
   const [location, setLocation] = useState(defaultLocation);
   const [propertyType, setPropertyType] = useState('hotel');
