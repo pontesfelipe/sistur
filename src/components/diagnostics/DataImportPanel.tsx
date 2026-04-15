@@ -863,8 +863,8 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       type="text"
                                       inputMode="decimal"
                                       value={hasUnsavedChanges 
-                                        ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue))
-                                        : formatDisplayValue(currentValue)
+                                        ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue, indicator))
+                                        : formatDisplayValue(currentValue, indicator)
                                       }
                                       onChange={(e) => {
                                         const raw = e.target.value;
@@ -878,7 +878,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           ...prev,
                                           [indicator.id]: {
                                             ...prev[indicator.id],
-                                            _rawInput: edited.value === null ? '' : formatDisplayValue(edited.value),
+                                            _rawInput: edited.value === null ? '' : formatDisplayValue(edited.value, indicator),
                                           },
                                         }));
                                       }}
