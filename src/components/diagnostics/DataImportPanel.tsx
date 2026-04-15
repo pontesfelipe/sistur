@@ -821,9 +821,9 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                     )}
                                     {!isIgnored && (valRules.min !== undefined || valRules.max !== undefined) && (
                                       <span className="text-xs text-muted-foreground">
-                                        ({valRules.min !== undefined ? `mín: ${valRules.min}` : ''}
+                                        ({valRules.min !== undefined ? `mín: ${formatHintNumber(valRules.min)}` : ''}
                                         {valRules.min !== undefined && valRules.max !== undefined ? ' · ' : ''}
-                                        {valRules.max !== undefined ? `máx: ${valRules.max}` : ''}
+                                        {valRules.max !== undefined ? `máx: ${formatHintNumber(valRules.max)}` : ''}
                                         {valRules.integer ? ' · inteiro' : ''})
                                       </span>
                                     )}
@@ -838,12 +838,34 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                 <div className="col-span-3">
                                   <div className="relative">
                                     <Input
-                                      type="number"
-                                      step={valRules.integer ? "1" : "any"}
-                                      min={valRules.min}
-                                      max={valRules.max}
-                                      value={currentValue ?? ''}
-                                      onChange={(e) => handleValueChange(indicator.id, e.target.value)}
+                                      type="text"
+                                      inputMode="decimal"
+                                      value={hasUnsavedChanges 
+                                        ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue))
+                                        : formatDisplayValue(currentValue)
+                                      }
+                                      onChange={(e) => {
+                                        // Allow only digits, comma, dot and minus
+                                        const raw = e.target.value;
+                                        if (raw !== '' && !/^-?[\d.,]*$/.test(raw)) return;
+                                        // Store raw input for display
+                                        setEditedValues(prev => ({
+                                          ...prev,
+                                          [indicator.id]: {
+                                            ...prev[indicator.id],
+                                            value: parseBRInput(raw),
+                                            source: prev[indicator.id]?.source || 'Manual',
+                                            is_ignored: prev[indicator.id]?.is_ignored ?? false,
+                                            _rawInput: raw,
+                                          },
+                                        }));
+                                        // Validate
+                                        if (indicators.find(i => i.id === indicator.id)) {
+                                          const normalizedValue = raw.replace(',', '.');
+                                          const error = validateIndicatorValue(normalizedValue, indicator as any);
+                                          setValidationErrors(prev => ({ ...prev, [indicator.id]: error }));
+                                        }
+                                      }}
                                       disabled={isIgnored}
                                       className={cn(
                                         'w-full pr-8',
