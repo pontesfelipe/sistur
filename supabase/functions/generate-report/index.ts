@@ -97,9 +97,20 @@ function formatIndicatorsByCategory(indicatorScores: any[]): string {
 function formatIndicatorValues(indicatorValues: any[]): string {
   if (!indicatorValues || indicatorValues.length === 0) return 'Nenhum valor bruto disponível.';
   return indicatorValues.map((iv: any) => {
-    const value = iv.value !== null ? iv.value : 'N/A';
+    // Column is `value_raw` (not `value`) — keep fallback for resilience across schemas.
+    const rawValue = iv.value_raw ?? iv.value;
+    const value = rawValue !== null && rawValue !== undefined ? rawValue : 'N/A';
     const unit = iv.indicators?.unit || '';
-    return `- ${iv.indicators?.name || iv.indicators?.code}: ${value}${unit ? ` ${unit}` : ''} (Pilar: ${iv.indicators?.pillar || 'N/A'}, Tema: ${iv.indicators?.theme || 'N/A'})`;
+    const meta: string[] = [];
+    if (iv.indicators?.pillar) meta.push(`Pilar: ${iv.indicators.pillar}`);
+    if (iv.indicators?.theme) meta.push(`Tema: ${iv.indicators.theme}`);
+    if (iv.source) meta.push(`Fonte: ${iv.source}`);
+    const extras: string[] = [];
+    // value_text carries qualitative evidence / free-text provenance the analyst added.
+    if (iv.value_text) extras.push(`    Evidência: ${iv.value_text}`);
+    if (iv.reference_date) extras.push(`    Referência: ${iv.reference_date}`);
+    const header = `- ${iv.indicators?.name || iv.indicators?.code}: ${value}${unit ? ` ${unit}` : ''} (${meta.join(', ')})`;
+    return extras.length > 0 ? `${header}\n${extras.join('\n')}` : header;
   }).join('\n');
 }
 
@@ -247,7 +258,7 @@ function formatDestinationMetadata(dest: any): string {
 
 function formatEnterpriseValues(values: any[]): string {
   if (!values || values.length === 0) return '';
-  
+
   const byCategory: Record<string, any[]> = {};
   values.forEach((v: any) => {
     const cat = v.enterprise_indicators?.enterprise_indicator_categories?.name || 'Outros';
@@ -263,13 +274,116 @@ function formatEnterpriseValues(values: any[]): string {
       const unit = v.enterprise_indicators?.unit || '';
       const benchMin = v.enterprise_indicators?.benchmark_min;
       const benchMax = v.enterprise_indicators?.benchmark_max;
-      let benchStr = '';
-      if (benchMin !== null && benchMin !== undefined) benchStr += ` | Benchmark min: ${benchMin}`;
-      if (benchMax !== null && benchMax !== undefined) benchStr += ` | Benchmark max: ${benchMax}`;
-      result += `  - ${name}: ${v.value}${unit ? ` ${unit}` : ''}${benchStr}\n`;
+      const metaParts: string[] = [];
+      if (benchMin !== null && benchMin !== undefined) metaParts.push(`Benchmark min: ${benchMin}`);
+      if (benchMax !== null && benchMax !== undefined) metaParts.push(`Benchmark max: ${benchMax}`);
+      if (v.source) metaParts.push(`Fonte: ${v.source}`);
+      if (v.validated) {
+        const validatedAt = v.validated_at ? new Date(v.validated_at).toLocaleDateString('pt-BR') : null;
+        metaParts.push(validatedAt ? `Validado em ${validatedAt}` : 'Validado');
+      }
+      const metaStr = metaParts.length > 0 ? ` | ${metaParts.join(' | ')}` : '';
+      result += `  - ${name}: ${v.value}${unit ? ` ${unit}` : ''}${metaStr}\n`;
+      if (v.value_text) result += `      Evidência: ${v.value_text}\n`;
+      if (v.notes) result += `      Observações: ${v.notes}\n`;
     });
   }
   return result;
+}
+
+function formatIssuesWithEvidence(issues: any[]): string {
+  if (!issues || issues.length === 0) return 'Nenhum problema identificado.';
+  return issues.map((issue: any) => {
+    const header = `- [${issue.severity}] ${issue.title} (Pilar: ${issue.pillar}, Tema: ${issue.theme || 'N/A'}, Interpretação: ${issue.interpretation || 'N/A'})`;
+    const evidence = issue.evidence;
+    if (!evidence || typeof evidence !== 'object') return header;
+    const parts: string[] = [];
+    if (Array.isArray(evidence.indicators) && evidence.indicators.length > 0) {
+      const indicatorLines = evidence.indicators
+        .slice(0, 5)
+        .map((ind: any) => `      • ${ind.name || ind.code}: ${typeof ind.score === 'number' ? Math.round(ind.score * 100) + '%' : 'N/A'}`)
+        .join('\n');
+      parts.push(`    Indicadores que puxaram pra baixo:\n${indicatorLines}`);
+    }
+    if (evidence.rule) parts.push(`    Regra disparada: ${evidence.rule}`);
+    if (evidence.pillar_score !== undefined) parts.push(`    Score do pilar: ${(evidence.pillar_score * 100).toFixed(1)}%`);
+    if (evidence.threshold !== undefined) parts.push(`    Limiar: ${(evidence.threshold * 100).toFixed(1)}%`);
+    return parts.length > 0 ? `${header}\n${parts.join('\n')}` : header;
+  }).join('\n');
+}
+
+// Build a contextual summary of the enterprise profile for the LLM. The profile
+// is ignored by the scoring engine today, but surfacing it in the report prompt
+// lets the narrative reflect segment (hostel vs resort), certifications and
+// sustainability initiatives that would otherwise be dead data.
+function formatEnterpriseProfile(profile: any): string {
+  if (!profile) return '';
+  const lines: string[] = ['\n=== PERFIL DO EMPREENDIMENTO ==='];
+  if (profile.property_type) lines.push(`- Tipo: ${profile.property_type}`);
+  if (profile.star_rating) lines.push(`- Classificação: ${profile.star_rating}★`);
+  if (profile.room_count) lines.push(`- UHs: ${profile.room_count}`);
+  if (profile.suite_count) lines.push(`- Suítes: ${profile.suite_count}`);
+  if (profile.total_capacity) lines.push(`- Capacidade total: ${profile.total_capacity} hóspedes`);
+  if (profile.employee_count) lines.push(`- Funcionários: ${profile.employee_count}`);
+  if (profile.years_in_operation !== null && profile.years_in_operation !== undefined) {
+    lines.push(`- Anos de operação: ${profile.years_in_operation}`);
+  }
+  if (profile.seasonality) lines.push(`- Sazonalidade: ${profile.seasonality}`);
+  if (Array.isArray(profile.peak_months) && profile.peak_months.length > 0) {
+    lines.push(`- Meses de alta: ${profile.peak_months.join(', ')}`);
+  }
+  if (profile.average_occupancy_rate !== null && profile.average_occupancy_rate !== undefined) {
+    lines.push(`- Ocupação média: ${profile.average_occupancy_rate}%`);
+  }
+  if (profile.average_daily_rate !== null && profile.average_daily_rate !== undefined) {
+    lines.push(`- ADR médio: R$ ${profile.average_daily_rate}`);
+  }
+  if (Array.isArray(profile.target_market) && profile.target_market.length > 0) {
+    lines.push(`- Público-alvo: ${profile.target_market.join(', ')}`);
+  }
+  if (Array.isArray(profile.primary_source_markets) && profile.primary_source_markets.length > 0) {
+    lines.push(`- Mercados emissores: ${profile.primary_source_markets.join(', ')}`);
+  }
+  if (Array.isArray(profile.certifications) && profile.certifications.length > 0) {
+    lines.push(`- Certificações: ${profile.certifications.join(', ')}`);
+  }
+  if (Array.isArray(profile.sustainability_initiatives) && profile.sustainability_initiatives.length > 0) {
+    lines.push(`- Iniciativas de sustentabilidade: ${profile.sustainability_initiatives.join(', ')}`);
+  }
+  if (Array.isArray(profile.accessibility_features) && profile.accessibility_features.length > 0) {
+    lines.push(`- Recursos de acessibilidade: ${profile.accessibility_features.join(', ')}`);
+  }
+  if (profile.notes) lines.push(`- Observações: ${profile.notes}`);
+  return lines.length > 1 ? lines.join('\n') + '\n' : '';
+}
+
+// External indicator values (IBGE, DATASUS, STN, CADASTUR …) serve as benchmark
+// references. Today they're only used at the data-import stage — surfacing them
+// in the prompt lets the LLM cite oficial baselines next to observed values.
+function formatExternalBenchmarks(externalValues: any[], indicatorsById: Map<string, any>): string {
+  if (!externalValues || externalValues.length === 0) return '';
+  const sourceLabels: Record<string, string> = {
+    IBGE_AGREGADOS: 'IBGE (Agregados)',
+    IBGE_PESQUISAS: 'IBGE (Pesquisas)',
+    DATASUS: 'DATASUS',
+    STN: 'STN / Tesouro Nacional',
+    CADASTUR: 'CADASTUR',
+    INEP: 'INEP',
+    MAPA_TURISMO: 'Mapa do Turismo',
+  };
+  const lines: string[] = ['\n=== BENCHMARKS DE FONTES OFICIAIS ==='];
+  lines.push('(valores de referência coletados via integrações oficiais — usar para comparar com os dados do diagnóstico e fundamentar comparações regionais)');
+  externalValues.forEach((ev: any) => {
+    const indicator = indicatorsById.get(ev.indicator_code);
+    const indicatorName = indicator?.name || ev.indicator_code;
+    const unit = indicator?.unit || '';
+    const rawValue = ev.raw_value !== null && ev.raw_value !== undefined ? ev.raw_value : (ev.raw_value_text || 'N/A');
+    const sourceLabel = sourceLabels[ev.source_code] || ev.source_code;
+    const year = ev.reference_year ? ` (${ev.reference_year})` : '';
+    const validated = ev.validated ? ' ✓validado' : '';
+    lines.push(`- ${indicatorName}: ${rawValue}${unit ? ` ${unit}` : ''} — fonte: ${sourceLabel}${year}${validated}`);
+  });
+  return lines.join('\n') + '\n';
 }
 
 // ========== COVER TABLE (mandatory for all templates) ==========
@@ -505,43 +619,57 @@ ESTRUTURA OBRIGATÓRIA (MEC/ABNT):
 - Posição no contexto turístico regional (usar dados do Mapa do Turismo: categoria, região turística)
 - Metadados do destino (se fornecidos)
 
-## 3 Metodologia
-### 3.1 Fundamentação Teórica
-- Breve descrição do modelo sistêmico de Beni (BENI, 2001) e os 3 eixos
-- Critérios de classificação (Adequado, Atenção, Crítico)
-### 3.2 Fontes de Dados
-- Fontes utilizadas (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo Brasileiro)
-- Tabela 1 — Resumo das fontes: Fonte | Tipo de dado | Confiabilidade | Ano de referência
-- Quantos indicadores vieram de fontes oficiais automáticas vs preenchimento manual
+## 3. Metodologia SISTUR
+- Breve descrição dos 3 eixos e critérios de classificação
+- Fontes de dados utilizadas (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo Brasileiro)
+- Resumo da rastreabilidade: quantos indicadores vieram de fontes oficiais automáticas vs preenchimento manual
 
-## 4 Diagnóstico por Eixo SISTUR
-### 4.1 Índice de Relações Ambientais (I-RA)
-- Tabela 2 — Indicadores I-RA: Indicador | Score | Status | Fonte | Valor Bruto | Observação
-- Análise textual em linguagem impessoal, citando fontes no formato (IBGE, 2022)
-### 4.2 Índice de Ações Operacionais (I-AO)
-- Tabela 3 — (mesma estrutura)
-### 4.3 Índice de Organização Estrutural (I-OE)
-- Tabela 4 — (mesma estrutura)
+## 4. Diagnóstico por Eixo SISTUR
+### 4.1. I-RA — Relações Ambientais
+- Tabela: Indicador | Score | Status | Fonte | Valor Bruto | Evidência | Observação
+- Coluna "Evidência" DEVE vir do campo value_text ou Evidência presente nos VALORES BRUTOS quando existir
+- Coluna "Fonte" DEVE vir do campo Fonte presente nos VALORES BRUTOS (IBGE, DATASUS, STN, CADASTUR, Manual, etc.)
+- LEITURA TÉCNICA: interpretação dos scores
+- IMPLICAÇÕES: consequências para o destino
 
-## 5 Alertas Sistêmicos IGMA
-- Flags ativas e suas implicações segundo Beni (BENI, 2001)
+### 4.2. I-AO — Ações Operacionais
+(mesma estrutura)
+
+### 4.3. I-OE — Organização Estrutural
+(mesma estrutura)
+
+## 5. Alertas Sistêmicos IGMA
+- Flags ativas e suas implicações
 - Bloqueios e restrições aplicáveis
 
 ## 6 Análise Integrada
 - Inter-relação entre os eixos
 - Efeitos cascata identificados
 
-## 7 Gargalos e Prescrições
-- Tabela 5 — Gargalos: Gargalo | Severidade | Pilar | Prescrição | Agente Responsável
+## 7. Gargalos e Prescrições
+- Tabela: Gargalo | Severidade | Pilar | Indicadores que dispararam | Prescrição | Agente Responsável
+- A coluna "Indicadores que dispararam" DEVE ser preenchida a partir da evidência de cada gargalo (campo "Indicadores que puxaram pra baixo" na seção GARGALOS). NUNCA deixe vazio se a evidência estiver presente.
 
-## 8 Prognóstico e Diretrizes
+## 8. Benchmarks Externos (Fontes Oficiais)
+- Se houver dados na seção "BENCHMARKS DE FONTES OFICIAIS" do input, SEMPRE renderize esta seção
+- Tabela: Indicador | Valor Observado | Valor Oficial (Fonte) | Ano | Comparação
+- Compare o valor observado no diagnóstico com o valor oficial para fundamentar conclusões regionais
+- Se não houver dados oficiais, escreva "Nenhum benchmark externo disponível para este destino no momento."
+
+## 9. Prognóstico e Diretrizes
 - Cenário tendencial vs cenário desejado
 - Diretrizes estratégicas por horizonte temporal
 
-## 9 Banco de Ações
-- Tabela 6 — Ações: Ação | Pilar | Prazo | Responsável | Prioridade | Status
+## 10. Banco de Ações
+- Tabela: Ação | Pilar | Prazo | Responsável | Prioridade | Status
 
-## 10 Considerações Finais
+## 11. Fontes e Referências
+- Lista completa de fontes de dados oficiais consultadas (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo, INEP, etc.)
+- Documentos de referência nacional utilizados
+- Documentos da Base de Conhecimento do destino consultados
+- Evidências textuais (value_text) relevantes citadas no relatório
+
+## 12. Considerações Finais
 - Síntese das conclusões
 - Próxima revisão recomendada: data e justificativa
 
@@ -632,29 +760,26 @@ TIPO: RELATÓRIO ENTERPRISE COMPLETO — Mínimo 2500 palavras.
 ESTRUTURA (MEC/ABNT):
 # Relatório SISTUR Enterprise — [Nome]
 [Ficha Técnica]
-
-## Resumo
-- Síntese em até 500 palavras
-- **Palavras-chave**: Gestão Hoteleira. SISTUR. Diagnóstico Enterprise. [Nome].
-
-## 1 Introdução
-## 2 Perfil do Empreendimento
-## 3 Metodologia SISTUR Enterprise
-### 3.1 Fundamentação Teórica
-### 3.2 Fontes de Dados (tabela com Fonte | Tipo | Confiabilidade)
-## 4 Diagnóstico por Categoria Funcional (tabela por categoria com Fonte)
-## 5 Análise de Gargalos Operacionais (tabela)
-## 6 Planos de Ação em Andamento
-## 7 Recomendações Estratégicas (curto/médio/longo prazo)
-## 8 Prescrições de Capacitação
-## 9 Roadmap de Implementação (tabela: Ação | Categoria | Investimento | Prazo | KPI)
-## 10 Considerações Finais
-
-## Referências
-- ABNT NBR 6023:2018 — ordem alfabética
-
-## Glossário
-## Apêndice`;
+## 1. Sumário Executivo para Gestão
+## 2. Perfil do Empreendimento
+- Se houver seção "PERFIL DO EMPREENDIMENTO" no input, renderize-a integralmente em tabela markdown (Atributo | Valor).
+- Destaque tipo de propriedade, capacidade, sazonalidade, público-alvo, certificações, iniciativas de sustentabilidade e recursos de acessibilidade.
+- Se não houver dados de perfil, indique que a ficha cadastral deve ser completada.
+## 3. Metodologia SISTUR Enterprise
+## 4. Diagnóstico por Categoria Funcional (tabela por categoria com Indicador | Valor | Benchmark | Fonte | Validado | Evidência)
+- A coluna "Validado" vem do campo "Validado em" nos VALORES ENTERPRISE; "Evidência" vem de value_text ou Observações quando presentes
+## 5. Análise de Gargalos Operacionais
+- Tabela: Gargalo | Severidade | Categoria | Indicadores que dispararam | Prescrição
+- A coluna "Indicadores que dispararam" DEVE ser preenchida a partir da evidência de cada gargalo (campo "Indicadores que puxaram pra baixo" na seção GARGALOS)
+## 6. Planos de Ação em Andamento
+## 7. Recomendações Estratégicas (curto/médio/longo prazo)
+- Conecte recomendações ao perfil do empreendimento (ex.: certificações ESG para propriedades com iniciativas de sustentabilidade; estratégias de sazonalidade para propriedades com alta concentração em meses específicos)
+## 8. Prescrições de Capacitação
+## 9. Roadmap de Implementação (tabela: Ação | Categoria | Investimento | Prazo | KPI)
+## 10. Fontes e Referências
+- Liste indicadores com dados validados e suas fontes
+- Cite evidências textuais (value_text/Observações) relevantes
+## 11. Considerações Finais`;
 }
 
 // ========== MAIN ==========
@@ -743,16 +868,25 @@ serve(async (req) => {
     const destinationId = assessment.destination_id;
     // Use the assessment's org_id to scope KB files — ensures org isolation
     const assessmentOrgId = assessment.org_id;
+    const ibgeCode = (assessment.destinations as any)?.ibge_code;
     const fetchPromises = [
       supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
+      // `value_raw`, `value_text`, `source` and `reference_date` are all persisted
+      // per the indicator_values schema — select * so evidence/provenance reach
+      // the LLM prompt (they used to be loaded but never surfaced).
       supabase.from('indicator_values').select('*, indicators(code, name, pillar, theme, unit)').eq('assessment_id', assessmentId),
       supabaseAdmin.from('global_reference_files').select('file_name, category, summary, description').eq('is_active', true).not('summary', 'is', null),
       // KB files: ONLY from the user's own org — scoped by org_id for multi-tenant isolation
       supabaseAdmin.from('knowledge_base_files').select('id, file_name, description, category').eq('is_active', true).eq('org_id', assessmentOrgId).or(destinationId ? `destination_id.eq.${destinationId},destination_id.is.null` : 'destination_id.is.null'),
       // Data snapshots for provenance
       supabase.from('diagnosis_data_snapshots').select('*').eq('assessment_id', assessmentId),
+      // Official external benchmarks tied to the destination's IBGE code — empty
+      // set when there's no ibge_code (enterprise-only flows) or no import yet.
+      ibgeCode
+        ? supabase.from('external_indicator_values').select('*').eq('municipality_ibge_code', ibgeCode).eq('org_id', assessmentOrgId)
+        : Promise.resolve({ data: [] as any[] }),
     ];
 
     // Enterprise indicator values + profile with review analysis
@@ -760,9 +894,13 @@ serve(async (req) => {
       fetchPromises.push(
         supabase.from('enterprise_indicator_values').select('*, enterprise_indicators(*, enterprise_indicator_categories(*))').eq('assessment_id', assessmentId)
       );
-      fetchPromises.push(
-        supabase.from('enterprise_profiles').select('*').eq('destination_id', destinationId).maybeSingle()
-      );
+      // Enterprise profile (property_type, certifications, sustainability, etc.)
+      // — 26 descriptive fields that never influenced narrative before.
+      if (destinationId) {
+        fetchPromises.push(
+          supabase.from('enterprise_profiles').select('*').eq('destination_id', destinationId).maybeSingle()
+        );
+      }
     }
 
     const results = await Promise.all(fetchPromises);
@@ -774,8 +912,21 @@ serve(async (req) => {
     const globalRefs = results[4].data || [];
     const kbFiles = results[5].data || [];
     const dataSnapshots = results[6].data || [];
-    const enterpriseValues = isEnterprise ? (results[7]?.data || []) : [];
-    const enterpriseProfile = isEnterprise ? (results[8]?.data || null) : null;
+    const externalValues = results[7]?.data || [];
+    const enterpriseValues = isEnterprise ? (results[8]?.data || []) : [];
+    const enterpriseProfile = isEnterprise ? (results[9]?.data || null) : null;
+
+    // Catalog indicators by code so we can decorate external benchmarks with
+    // names/units from the indicators table.
+    const indicatorsByCode = new Map<string, any>();
+    indicatorScores.forEach((is: any) => {
+      if (is.indicators?.code) indicatorsByCode.set(is.indicators.code, is.indicators);
+    });
+    indicatorValues.forEach((iv: any) => {
+      if (iv.indicators?.code && !indicatorsByCode.has(iv.indicators.code)) {
+        indicatorsByCode.set(iv.indicators.code, iv.indicators);
+      }
+    });
 
     console.log('Report data — Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 
       'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 
@@ -793,9 +944,9 @@ serve(async (req) => {
       ? prescriptions.map((p: any) => `- [${p.status}] ${p.justification} (Pilar: ${p.pillar}, Agente: ${p.target_agent}, Prioridade: ${p.priority || 'N/A'})`).join('\n')
       : 'Nenhuma prescrição.';
 
-    const issuesText = issues?.length > 0 
-      ? issues.map((issue: any) => `- [${issue.severity}] ${issue.title} (Pilar: ${issue.pillar}, Tema: ${issue.theme}, Interpretação: ${issue.interpretation || 'N/A'})`).join('\n')
-      : 'Nenhum problema identificado.';
+    // Surfaces evidence.indicators / rule / pillar_score / threshold stored on
+    // each issue so the LLM can quote the specific indicators that triggered it.
+    const issuesText = formatIssuesWithEvidence(issues);
 
     const alertsText = alerts.length > 0
       ? alerts.map((a: any) => `- [${a.alert_type}] ${a.message} (Pilar: ${a.pillar}, Ciclos: ${a.consecutive_cycles})`).join('\n')
@@ -811,6 +962,7 @@ serve(async (req) => {
 
 ${coverBlock}
 ${formatDestinationMetadata(assessment.destinations)}
+${isEnterprise ? formatEnterpriseProfile(enterpriseProfile) : ''}
 === DADOS DO DIAGNÓSTICO ===
 
 SCORES DOS EIXOS:
@@ -830,9 +982,9 @@ ${indicatorsDetail}
 VALORES BRUTOS:
 ${formatIndicatorValues(indicatorValues)}
 ${isEnterprise && enterpriseValues.length > 0 ? formatEnterpriseValues(enterpriseValues) : ''}
-${isEnterprise && enterpriseProfile ? formatEnterpriseProfile(enterpriseProfile) : ''}
+${!isEnterprise ? formatExternalBenchmarks(externalValues, indicatorsByCode) : ''}
 ${dataSnapshots.length > 0 ? formatDataSnapshots(dataSnapshots) : ''}
-GARGALOS:
+GARGALOS (com evidências e indicadores que dispararam cada problema):
 ${issuesText}
 
 PRESCRIÇÕES:
@@ -871,10 +1023,14 @@ INSTRUÇÕES SOBRE BASE DE CONHECIMENTO:
 2. Siga EXATAMENTE a estrutura definida no system prompt para o template "${reportTemplate}"
 3. Use TABELAS MARKDOWN para todos os conjuntos de dados
 4. Justifique todas as conclusões com dados fornecidos
-5. CITE A FONTE OFICIAL de cada dado utilizado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo)
-${dataSnapshots.length > 0 ? '6. Use os snapshots de proveniência para rastrear a origem exata de cada indicador' : ''}
-${globalRefs.length > 0 ? `${dataSnapshots.length > 0 ? '7' : '6'}. Referencie documentos oficiais quando contextualizar resultados e prescrições` : ''}
-${kbFiles.length > 0 ? `${dataSnapshots.length > 0 && globalRefs.length > 0 ? '8' : dataSnapshots.length > 0 || globalRefs.length > 0 ? '7' : '6'}. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
+5. CITE A FONTE OFICIAL de cada dado utilizado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo, INEP)
+6. Para cada GARGALO listado, use a evidência (indicadores que puxaram pra baixo + regra + score do pilar) na análise — nunca trate gargalos como listas abstratas
+7. Quando a seção VALORES BRUTOS trouxer "Evidência:" (value_text) para um indicador, inclua essa evidência textual nas tabelas e no corpo do texto
+${externalValues.length > 0 && !isEnterprise ? '8. SEMPRE renderize a seção de Benchmarks Externos comparando os valores observados no diagnóstico com os valores oficiais retornados pelas integrações (IBGE/DATASUS/STN/CADASTUR/INEP)' : ''}
+${isEnterprise && enterpriseProfile ? '8. Incorpore o PERFIL DO EMPREENDIMENTO (tipo, capacidade, certificações, sustentabilidade, acessibilidade) nas recomendações — não escreva um relatório genérico ignorando esses atributos' : ''}
+${dataSnapshots.length > 0 ? '9. Use os snapshots de proveniência para rastrear a origem exata de cada indicador' : ''}
+${globalRefs.length > 0 ? `10. Referencie documentos oficiais quando contextualizar resultados e prescrições` : ''}
+${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

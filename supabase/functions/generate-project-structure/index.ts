@@ -62,6 +62,24 @@ IMPORTANTE:
           }).join('\n')
       : 'Nenhum indicador crítico';
 
+    // Slice the inputs so we can refer to each one by its index in the prompt.
+    // The client maps linkedIssueIndex / linkedPrescriptionIndex back to the real
+    // database ids, so these arrays are the single source of truth for indexing.
+    const issuesSlice = Array.isArray(issues) ? issues.slice(0, 15) : [];
+    const prescriptionsSlice = Array.isArray(prescriptions) ? prescriptions.slice(0, 15) : [];
+
+    const issuesBlock = issuesSlice.length > 0
+      ? issuesSlice.map((i: any, idx: number) =>
+          `[ISSUE_${idx}] [${i.pillar}] ${i.title || i.description?.substring(0, 100)} (Severidade: ${i.severity}, Tema: ${i.theme || 'N/A'}, Interpretação: ${i.interpretation || 'N/A'})`
+        ).join('\n')
+      : 'Nenhum problema identificado';
+
+    const prescriptionsBlock = prescriptionsSlice.length > 0
+      ? prescriptionsSlice.map((p: any, idx: number) =>
+          `[PRESCRIPTION_${idx}] [${p.pillar}] ${p.justification?.substring(0, 200) || p.what || 'N/A'} (Agente: ${p.target_agent || 'N/A'}, Prioridade: ${p.priority || 'N/A'})`
+        ).join('\n')
+      : 'Nenhuma prescrição';
+
     const userPrompt = `Analise os seguintes dados de diagnóstico para o destino "${destinationName}" e gere uma estrutura de projeto em PORTUGUÊS BRASILEIRO:
 
 ## Resumo do Relatório
@@ -74,10 +92,12 @@ ${pillarScoresText}
 ${indicatorScoresText}
 
 ## Problemas/Gargalos Identificados (${issues?.length || 0})
-${issues?.slice(0, 10).map((i: any) => `- [${i.pillar}] ${i.title || i.description?.substring(0, 100)} (Severidade: ${i.severity}, Interpretação: ${i.interpretation || 'N/A'})`).join('\n') || 'Nenhum problema identificado'}
+Cada gargalo recebe um identificador [ISSUE_<index>]. Use esse índice em "linkedIssueIndex" para conectar cada tarefa ao gargalo que ela resolve.
+${issuesBlock}
 
 ## Prescrições de Capacitação (${prescriptions?.length || 0})
-${prescriptions?.slice(0, 10).map((p: any) => `- [${p.pillar}] ${p.justification?.substring(0, 150) || p.what || 'N/A'} (Agente: ${p.target_agent || 'N/A'})`).join('\n') || 'Nenhuma prescrição'}
+Cada prescrição recebe um identificador [PRESCRIPTION_<index>]. Use esse índice em "linkedPrescriptionIndex" para conectar cada tarefa à prescrição que ela implementa.
+${prescriptionsBlock}
 
 ## Planos de Ação Existentes (${actionPlans?.length || 0})
 ${actionPlansText}
@@ -85,10 +105,19 @@ ${actionPlansText}
 Gere uma estrutura JSON com (TODO O CONTEÚDO EM PORTUGUÊS BRASILEIRO):
 1. "description": Uma breve descrição do projeto (2-3 frases), considerando os scores dos eixos e problemas identificados
 2. "phases": Array de fases apropriadas para ${methodology}, cada uma com "name", "description" e array "deliverables". As fases devem refletir a priorização sistêmica (RA antes de OE, governança antes de marketing)
-3. "tasks": Array de 10-20 tarefas iniciais derivadas dos problemas, prescrições, indicadores críticos e planos de ação, cada uma com "title", "description", "type" (epic/feature/story/task), "priority" (low/medium/high/critical), "estimatedHours" e array "tags"
+3. "tasks": Array de 10-20 tarefas iniciais derivadas dos problemas, prescrições, indicadores críticos e planos de ação. Cada tarefa DEVE ter os seguintes campos:
+   - "title": título curto e acionável
+   - "description": descrição detalhada
+   - "type": um de "epic", "feature", "story" ou "task"
+   - "priority": um de "low", "medium", "high" ou "critical"
+   - "estimatedHours": número estimado de horas
+   - "tags": array de tags (incluir o pilar SISTUR)
+   - "linkedIssueIndex": número inteiro (0-based) quando a tarefa resolve DIRETAMENTE um [ISSUE_n] listado acima, ou null
+   - "linkedPrescriptionIndex": número inteiro (0-based) quando a tarefa implementa DIRETAMENTE uma [PRESCRIPTION_n] listada acima, ou null
+   - REGRA: quase todas as tarefas devem estar ligadas a um ISSUE ou PRESCRIPTION. Apenas tarefas puramente organizacionais (kickoff, governança interna do projeto) podem ter ambos os campos null. Cada ISSUE e cada PRESCRIPTION deve ser coberta por pelo menos uma tarefa.
 4. "milestones": Array de 3-5 marcos principais com "name", "description" e "targetDate" sugerida (como string de data ISO, começando a partir de hoje)
 
-Foque em tarefas acionáveis e mensuráveis que abordem os problemas identificados. Conecte cada tarefa a um indicador ou gargalo específico quando possível.`;
+Foque em tarefas acionáveis e mensuráveis que abordem os problemas identificados. Conecte cada tarefa a um indicador, gargalo ou prescrição específico.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -154,14 +183,18 @@ Foque em tarefas acionáveis e mensuráveis que abordem os problemas identificad
           { name: "Implementação", description: "Execução das ações prioritárias", deliverables: ["Ações implementadas"] },
           { name: "Monitoramento", description: "Acompanhamento de resultados", deliverables: ["Relatório de progresso"] },
         ],
-        tasks: issues?.slice(0, 10).map((issue: any, idx: number) => ({
+        // Fallback: keep indexes aligned with issuesSlice so the client can still
+        // populate linked_issue_id when the LLM response fails to parse.
+        tasks: issuesSlice.map((issue: any, idx: number) => ({
           title: issue.title || `Tarefa ${idx + 1}`,
           description: issue.description || "",
           type: "task",
           priority: issue.severity === "CRITICO" ? "critical" : issue.severity === "MODERADO" ? "high" : "medium",
           estimatedHours: 8,
           tags: [issue.pillar],
-        })) || [],
+          linkedIssueIndex: idx,
+          linkedPrescriptionIndex: null,
+        })),
         milestones: [
           { name: "Kickoff", description: "Início do projeto", targetDate: new Date().toISOString().split('T')[0] },
           { name: "Primeira entrega", description: "Conclusão da primeira fase", targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] },
