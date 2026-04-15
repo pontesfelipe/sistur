@@ -816,6 +816,17 @@ export default function Relatorios() {
                         </SelectItem>
                       </SelectContent>
                     </Select>
+                    <Select value={historyTierFilter} onValueChange={setHistoryTierFilter}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Nível" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os níveis</SelectItem>
+                        <SelectItem value="essencial">⚡ Essencial</SelectItem>
+                        <SelectItem value="estrategico">📊 Estratégico</SelectItem>
+                        <SelectItem value="integral">🎯 Integral</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Select value={historyOwnerFilter} onValueChange={setHistoryOwnerFilter}>
                       <SelectTrigger className="h-8 text-xs">
                         <SelectValue placeholder="Autor" />
