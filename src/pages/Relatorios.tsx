@@ -119,6 +119,9 @@ export default function Relatorios() {
   const [historyTypeFilter, setHistoryTypeFilter] = useState<string>('all');
   const [historyOwnerFilter, setHistoryOwnerFilter] = useState<string>('all');
   const [historyTierFilter, setHistoryTierFilter] = useState<string>('all');
+  const [genTypeFilter, setGenTypeFilter] = useState<string>('all');
+  const [genTierFilter, setGenTierFilter] = useState<string>('all');
+  const [genDestFilter, setGenDestFilter] = useState<string>('all');
 
   // Pre-select assessment from URL parameter
   useEffect(() => {
