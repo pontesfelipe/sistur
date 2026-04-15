@@ -483,12 +483,22 @@ OS TRÊS EIXOS SISTUR ENTERPRISE:
 
 CLASSIFICAÇÃO: BOM (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
 
+FONTES DE DADOS — RASTREABILIDADE OBRIGATÓRIA:
+Cada dado apresentado no relatório DEVE conter a fonte entre parênteses. Exemplos:
+- "Taxa de ocupação: 72% (Fonte: Dados do empreendimento — preenchimento manual)"
+- "Nota média: 4.2/5 (Fonte: Google Reviews, TripAdvisor)"
+- Se houver snapshots de proveniência, use-os para identificar a origem exata
+- Se o dado veio de preenchimento manual, indique: "(Fonte: Preenchimento manual)"
+- Se o dado veio de reviews online, indique a plataforma: "(Fonte: Google Reviews)"
+
 REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Comece SEMPRE com título seguido da tabela de ficha técnica fornecida
 - Use tabelas markdown para todos os conjuntos de dados
+- TODAS as tabelas de indicadores DEVEM ter uma coluna "Fonte"
 - Linguagem executiva, orientada a resultados
 - Conecte: métrica → gap → ação → resultado esperado
-- Se houver dados de reviews/avaliações online, incorpore na análise de satisfação`;
+- Se houver dados de reviews/avaliações online, incorpore na análise de satisfação
+- Ao final do relatório, inclua uma seção "Fontes e Referências" listando todas as fontes utilizadas`;
 
   if (template === 'executivo') {
     return `${common}
