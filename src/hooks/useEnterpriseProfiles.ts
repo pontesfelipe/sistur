@@ -32,6 +32,7 @@ export interface EnterpriseProfile {
   accessibility_features: string[] | null;
   
   notes: string | null;
+  review_analysis: Record<string, any> | null;
   created_at: string;
   updated_at: string;
 }
