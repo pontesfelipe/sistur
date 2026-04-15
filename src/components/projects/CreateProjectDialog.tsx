@@ -167,11 +167,33 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
 
       setGenerationProgress('Criando tarefas...');
 
-      // Create tasks from AI-generated structure or issues/prescriptions
+      // The edge function receives `issues` / `prescriptions` and tags each one
+      // with an index in the LLM prompt ([ISSUE_n] / [PRESCRIPTION_n]). The LLM
+      // is instructed to return linkedIssueIndex / linkedPrescriptionIndex on
+      // each generated task so we can resolve the numeric index back to the
+      // actual row id. This closes the gap where AI-generated tasks used to
+      // store null for linked_issue_id / linked_prescription_id.
+      const issuesList = issuesRes.data || [];
+      const prescriptionsList = prescriptionsRes.data || [];
+      // These slices MUST mirror generate-project-structure/index.ts — keep in
+      // sync when changing the cap.
+      const issuesSlice = issuesList.slice(0, 15);
+      const prescriptionsSlice = prescriptionsList.slice(0, 15);
+
       const tasks: Parameters<typeof createTasks.mutateAsync>[0] = [];
+      const linkedIssueIds = new Set<string>();
+      const linkedPrescriptionIds = new Set<string>();
 
       if (structure?.tasks && Array.isArray(structure.tasks)) {
-        structure.tasks.forEach((task: any, index: number) => {
+        structure.tasks.forEach((task: any) => {
+          const issueIdx = typeof task.linkedIssueIndex === 'number' ? task.linkedIssueIndex : null;
+          const prescriptionIdx = typeof task.linkedPrescriptionIndex === 'number' ? task.linkedPrescriptionIndex : null;
+          const linkedIssue = issueIdx !== null ? issuesSlice[issueIdx] : null;
+          const linkedPrescription = prescriptionIdx !== null ? prescriptionsSlice[prescriptionIdx] : null;
+
+          if (linkedIssue?.id) linkedIssueIds.add(linkedIssue.id);
+          if (linkedPrescription?.id) linkedPrescriptionIds.add(linkedPrescription.id);
+
           tasks.push({
             project_id: project.id,
             phase_id: createdPhases?.[0]?.id || null,
@@ -190,16 +212,18 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
             planned_end_date: null,
             actual_start_date: null,
             actual_end_date: null,
-            linked_issue_id: null,
-            linked_prescription_id: null,
+            linked_issue_id: linkedIssue?.id || null,
+            linked_prescription_id: linkedPrescription?.id || null,
             linked_action_plan_id: null,
             tags: task.tags || [],
           });
         });
       }
 
-      // Also create tasks from issues
-      issuesRes.data?.forEach((issue) => {
+      // Safety net: ensure every issue becomes a task even if the LLM missed it.
+      // Skip issues already linked by an AI-generated task to avoid duplicates.
+      issuesList.forEach((issue) => {
+        if (linkedIssueIds.has(issue.id)) return;
         tasks.push({
           project_id: project.id,
           phase_id: null,
@@ -222,6 +246,42 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
           linked_prescription_id: null,
           linked_action_plan_id: null,
           tags: [issue.pillar],
+        });
+      });
+
+      // Same safety net for prescriptions — previously they were ignored entirely
+      // as a task source, so "Implementar prescrição" tasks never showed up.
+      prescriptionsList.forEach((prescription: any) => {
+        if (linkedPrescriptionIds.has(prescription.id)) return;
+        const prescriptionTitle = prescription.what
+          || prescription.justification?.substring(0, 80)
+          || 'Prescrição';
+        tasks.push({
+          project_id: project.id,
+          phase_id: null,
+          parent_task_id: null,
+          title: `Implementar: ${prescriptionTitle}`,
+          description: prescription.justification || null,
+          task_type: 'task',
+          status: 'backlog',
+          priority: prescription.priority === 'ALTA' || prescription.priority === 'CRITICA'
+            ? 'high'
+            : prescription.priority === 'BAIXA'
+              ? 'low'
+              : 'medium',
+          assignee_id: null,
+          assignee_name: prescription.target_agent || null,
+          estimated_hours: null,
+          actual_hours: null,
+          story_points: null,
+          planned_start_date: null,
+          planned_end_date: null,
+          actual_start_date: null,
+          actual_end_date: null,
+          linked_issue_id: null,
+          linked_prescription_id: prescription.id,
+          linked_action_plan_id: null,
+          tags: prescription.pillar ? [prescription.pillar] : [],
         });
       });
 
