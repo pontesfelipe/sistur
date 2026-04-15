@@ -23,6 +23,20 @@ const BINARY_OPTIONS: IndicatorFieldOption[] = [
   { value: '0', numericValue: 0, label: 'Não' },
 ];
 
+const SCORE_1_5_OPTIONS: IndicatorFieldOption[] = [
+  { value: '1', numericValue: 1, label: '1' },
+  { value: '2', numericValue: 2, label: '2' },
+  { value: '3', numericValue: 3, label: '3' },
+  { value: '4', numericValue: 4, label: '4' },
+  { value: '5', numericValue: 5, label: '5' },
+];
+
+const NOTA_0_10_OPTIONS: IndicatorFieldOption[] = Array.from({ length: 11 }, (_, i) => ({
+  value: String(i),
+  numericValue: i,
+  label: String(i),
+}));
+
 const OPTIONS_BY_CODE: Record<string, IndicatorFieldOption[]> = {
   igma_categoria_mapa_turismo: [
     { value: '5', numericValue: 5, label: 'A' },
@@ -40,6 +54,9 @@ const BINARY_CODES = new Set([
   'igma_conselho_municipal_turismo',
 ]);
 
+const SCORE_1_5_UNITS = new Set(['score 1-5']);
+const NOTA_0_10_UNITS = new Set(['nota 0-10']);
+
 export function getIndicatorFieldConfig(indicator?: IndicatorLike | null): IndicatorFieldConfig {
   const code = indicator?.code?.trim();
 
@@ -49,6 +66,14 @@ export function getIndicatorFieldConfig(indicator?: IndicatorLike | null): Indic
 
   if (indicator?.normalization === 'BINARY' || (code && BINARY_CODES.has(code))) {
     return { kind: 'select', options: BINARY_OPTIONS };
+  }
+
+  const unit = indicator?.unit?.trim()?.toLowerCase();
+  if (unit && SCORE_1_5_UNITS.has(unit)) {
+    return { kind: 'select', options: SCORE_1_5_OPTIONS };
+  }
+  if (unit && NOTA_0_10_UNITS.has(unit)) {
+    return { kind: 'select', options: NOTA_0_10_OPTIONS };
   }
 
   return { kind: 'number' };
