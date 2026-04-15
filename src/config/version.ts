@@ -23,6 +23,15 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.21.12",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Novos indicadores automáticos via SIDRA/IBGE: Abastecimento de água (rede geral %) e Coleta de lixo domiciliar (%)",
+      "Dados do Censo 2010 (tabela 3217) integrados ao pré-preenchimento de diagnósticos territoriais",
+      "Edge function fetch-official-data agora consulta API SIDRA em paralelo com IBGE Pesquisas e Mapa do Turismo",
+    ]
+  },
     version: "1.21.11",
     date: "2026-04-15",
     type: "patch" as const,
