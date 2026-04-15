@@ -704,20 +704,30 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
             {/* Form Tab */}
             <TabsContent value="formulario" className="space-y-6">
-              {Object.keys(editedValues).length > 0 && (
-                <Card className="border-accent">
+              {Object.keys(editedValues).length > 0 && (() => {
+                const errorCount = Object.entries(validationErrors).filter(([id, err]) => err && editedValues[id]).length;
+                return (
+                <Card className={cn("border-accent", errorCount > 0 && "border-destructive")}>
                   <CardContent className="py-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">
-                        {Object.keys(editedValues).length} valor(es) não salvo(s)
-                      </span>
-                      <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending}>
+                      <div className="text-sm space-y-1">
+                        <span>{Object.keys(editedValues).length} valor(es) não salvo(s)</span>
+                        {errorCount > 0 && (
+                          <p className="text-destructive flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            {errorCount} com erro de validação
+                          </p>
+                        )}
+                      </div>
+                      <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending || errorCount > 0}>
                         <Save className="mr-2 h-4 w-4" />
                         Salvar Todos
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
+                );
+              })()}
               )}
 
               {loadingIndicators ? (
