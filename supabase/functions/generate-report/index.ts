@@ -340,7 +340,14 @@ LINGUAGEM:
 - Impessoal: "Verifica-se que..." em vez de "Verificamos que..."
 - Verbos na 3ª pessoa ou voz passiva
 - Termos técnicos na primeira menção com definição entre parênteses
-- Siglas: por extenso na primeira menção, ex: "Relações Ambientais (RA)"`;
+- Siglas: por extenso na primeira menção, ex: "Relações Ambientais (RA)"
+
+FORMATAÇÃO NUMÉRICA — PADRÃO BRASILEIRO (OBRIGATÓRIO):
+- Usar VÍRGULA como separador decimal: 65,3% (CORRETO) — NÃO 65.3%
+- Usar PONTO como separador de milhar: 45.321 habitantes (CORRETO) — NÃO 45,321
+- Exemplos corretos: "População: 45.321 hab.", "Score: 67,5%", "PIB per capita: R$ 32.450,00", "Área: 1.234,56 km²"
+- NUNCA usar o formato americano/inglês com ponto decimal e vírgula de milhar
+- Esta regra aplica-se a TODOS os números no relatório, sem exceção`;
 
 // ========== TEMPLATE-SPECIFIC SYSTEM PROMPTS ==========
 
