@@ -203,6 +203,79 @@ async function fetchIBGEPesquisas(ibgeCode: string, populacao?: number): Promise
   return results;
 }
 
+// ─── 2b. SIDRA API: Censo 2010 Saneamento (table 3217) ──────────────
+async function fetchSIDRASaneamento(ibgeCode: string): Promise<Record<string, IndicatorResult>> {
+  const results: Record<string, IndicatorResult> = {};
+
+  // Table 3217: Domicílios por abastecimento de água, destino do lixo
+  // v/1000096 = percentual do total geral
+  // c61 = Forma de abastecimento de água; category 92853 = Rede geral
+  // c67 = Destino do lixo; category 11233 = Coletado (serviço de limpeza)
+  const queries = [
+    {
+      key: 'igma_abastecimento_de_agua',
+      url: `https://apisidra.ibge.gov.br/values/t/3217/n6/${ibgeCode}/v/1000096/p/last%201/c61/92853`,
+      source: 'IBGE_CENSO',
+    },
+    {
+      key: 'igma_coleta_de_lixo_domiciliar',
+      url: `https://apisidra.ibge.gov.br/values/t/3217/n6/${ibgeCode}/v/1000096/p/last%201/c67/allxt`,
+      source: 'IBGE_CENSO',
+      // Sum "Coletado" categories (serviço de limpeza + caçamba)
+      aggregate: true,
+      targetCategories: ['Coletado por serviço de limpeza', 'Coletado em caçamba de serviço de limpeza'],
+    },
+  ];
+
+  const responses = await Promise.allSettled(
+    queries.map(async (q) => {
+      try {
+        console.log(`SIDRA [${q.key}]:`, q.url);
+        const resp = await fetchWithTimeout(q.url, 10000);
+        if (!resp.ok) return { ...q, data: null };
+        const data = await resp.json();
+        return { ...q, data };
+      } catch (e) {
+        console.warn(`SIDRA [${q.key}] error:`, e instanceof Error ? e.message : e);
+        return { ...q, data: null };
+      }
+    })
+  );
+
+  for (const result of responses) {
+    if (result.status !== 'fulfilled' || !result.value.data) continue;
+    const { key, data, source, aggregate, targetCategories } = result.value as any;
+    if (!Array.isArray(data) || data.length < 2) continue;
+
+    if (aggregate && targetCategories) {
+      // Sum matching categories
+      let total = 0;
+      let year = 0;
+      for (const row of data.slice(1)) {
+        const catName = row.D4N || '';
+        const val = parseFloat(row.V);
+        if (!isNaN(val) && targetCategories.some((t: string) => catName.includes(t))) {
+          total += val;
+        }
+        if (!year && row.D3N) year = parseInt(row.D3N);
+      }
+      if (total > 0) {
+        results[key] = { value: Math.round(total * 100) / 100, year, source, real: true };
+      }
+    } else {
+      // Single value
+      const row = data[1];
+      const val = parseFloat(row?.V);
+      const year = parseInt(row?.D3N || '0');
+      if (!isNaN(val)) {
+        results[key] = { value: Math.round(val * 100) / 100, year, source, real: true };
+      }
+    }
+  }
+
+  return results;
+}
+
 // ─── 3. Mapa do Turismo Brasileiro (REST API + DB fallback) ─────────
 async function fetchMapaTurismo(
   supabaseClient: any,
