@@ -116,7 +116,7 @@ export function useEduNotificationMutations() {
     }) => {
       const { error } = await supabase
         .from('edu_notifications')
-        .insert(data);
+        .insert([data]);
       if (error) throw error;
     },
   });
