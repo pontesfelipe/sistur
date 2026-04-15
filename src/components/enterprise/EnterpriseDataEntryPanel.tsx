@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -28,6 +29,14 @@ import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { INDICATOR_GUIDANCE, validateIndicatorValue, formatIndicatorValueBR } from '@/data/enterpriseIndicatorGuidance';
+import {
+  EMPTY_SELECT_VALUE,
+  formatIndicatorFieldDisplayValue,
+  getIndicatorFieldConfig,
+  getIndicatorSelectValue,
+  parseIndicatorSelectValue,
+  validateIndicatorSelectValue,
+} from '@/lib/indicatorFieldConfig';
 import type { Database } from '@/integrations/supabase/types';
 
 type Indicator = Database['public']['Tables']['indicators']['Row'];
@@ -77,7 +86,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
 
   const formatNumberBR = useCallback((value: number | null | undefined, indicator?: Indicator) => {
-    return formatIndicatorValueBR(value, indicator as any);
+    return formatIndicatorFieldDisplayValue(value, indicator as any);
   }, []);
 
   const parseNumberBR = useCallback((value: string) => {
@@ -221,14 +230,33 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   }, [indicators, localValues, ignoredIds]);
   
   const handleValueChange = (indicatorId: string, value: string, indicator: Indicator) => {
+    const fieldConfig = getIndicatorFieldConfig({ code: (indicator as any).code, normalization: indicator.normalization });
+
+    if (fieldConfig.kind === 'select') {
+      const numVal = parseIndicatorSelectValue(value, { code: (indicator as any).code, normalization: indicator.normalization });
+      const label = fieldConfig.options.find(o => o.value === value)?.label ?? '';
+      setLocalValues(prev => ({ ...prev, [indicatorId]: label }));
+      setValidationErrors(prev => ({ ...prev, [indicatorId]: validateIndicatorSelectValue(value, { code: (indicator as any).code, normalization: indicator.normalization }) }));
+      return;
+    }
+
     if (value !== '' && !/^-?[\d.,]*$/.test(value)) return;
-
     setLocalValues(prev => ({ ...prev, [indicatorId]: value }));
-
     const error = validateIndicatorValue(normalizeForValidation(value), indicator as any);
     setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
   };
   
+  // Parse local value back to number, handling select fields
+  const parseLocalValue = useCallback((value: string, indicator?: Indicator) => {
+    if (!indicator) return parseNumberBR(value);
+    const fieldConfig = getIndicatorFieldConfig({ code: (indicator as any).code, normalization: indicator.normalization });
+    if (fieldConfig.kind === 'select') {
+      const option = fieldConfig.options.find(o => o.label === value);
+      return option ? option.numericValue : parseNumberBR(value);
+    }
+    return parseNumberBR(value);
+  }, [parseNumberBR]);
+
   const handleSave = async (proceedToCalculation: boolean = false) => {
     if (!profile?.org_id) return;
 
@@ -240,12 +268,13 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
       return;
     }
     
+    const indicatorById = new Map((indicators || []).map(i => [i.id, i]));
     const values = Object.entries(localValues)
       .filter(([_, value]) => value !== '')
       .map(([indicatorId, value]) => ({
         assessment_id: assessmentId,
         indicator_id: indicatorId,
-        value_raw: parseNumberBR(value),
+        value_raw: parseLocalValue(value, indicatorById.get(indicatorId)),
         source: 'Manual (Enterprise)',
       }));
     
@@ -413,6 +442,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                       const isIgnored = ignoredIds.has(indicator.id);
                       const guidance = INDICATOR_GUIDANCE[(indicator as any).code];
                       const valError = validationErrors[indicator.id];
+                      const fieldConfig = getIndicatorFieldConfig({ code: (indicator as any).code, normalization: indicator.normalization });
                       
                       return (
                         <div key={indicator.id} className={cn(
@@ -466,29 +496,58 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                           </div>
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
-                              <Input
-                                type="text"
-                                inputMode="decimal"
-                                placeholder={isIgnored ? 'Ignorado' : 'Valor'}
-                                value={currentValue}
-                                onChange={(e) => handleValueChange(indicator.id, e.target.value, indicator)}
-                                onBlur={() => {
-                                  const parsed = parseNumberBR(currentValue);
-                                  setLocalValues(prev => ({
-                                    ...prev,
-                                    [indicator.id]: parsed === null ? '' : formatNumberBR(parsed, indicator),
-                                  }));
-                                }}
-                                disabled={isIgnored}
-                                className={cn(
-                                  "flex-1",
-                                  isIgnored && "bg-muted cursor-not-allowed",
-                                  valError && "border-destructive focus-visible:ring-destructive",
-                                  !valError && !isIgnored && benchmarkStatus === 'good' && "border-green-500",
-                                  !valError && !isIgnored && benchmarkStatus === 'moderate' && "border-amber-500",
-                                  !valError && !isIgnored && benchmarkStatus === 'bad' && "border-red-500"
-                                )}
-                              />
+                              {fieldConfig.kind === 'select' ? (
+                                <Select
+                                  value={(() => {
+                                    const opt = fieldConfig.options.find(o => o.label === currentValue);
+                                    return opt?.value ?? EMPTY_SELECT_VALUE;
+                                  })()}
+                                  onValueChange={(selectedValue) => handleValueChange(indicator.id, selectedValue, indicator)}
+                                  disabled={isIgnored}
+                                >
+                                  <SelectTrigger
+                                    className={cn(
+                                      "flex-1",
+                                      isIgnored && "bg-muted cursor-not-allowed",
+                                      valError && "border-destructive focus-visible:ring-destructive",
+                                    )}
+                                  >
+                                    <SelectValue placeholder={isIgnored ? 'Ignorado' : 'Selecionar'} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value={EMPTY_SELECT_VALUE}>Não informado</SelectItem>
+                                    {fieldConfig.options.map((option) => (
+                                      <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Input
+                                  type="text"
+                                  inputMode="decimal"
+                                  placeholder={isIgnored ? 'Ignorado' : 'Valor'}
+                                  value={currentValue}
+                                  onChange={(e) => handleValueChange(indicator.id, e.target.value, indicator)}
+                                  onBlur={() => {
+                                    const parsed = parseNumberBR(currentValue);
+                                    setLocalValues(prev => ({
+                                      ...prev,
+                                      [indicator.id]: parsed === null ? '' : formatNumberBR(parsed, indicator),
+                                    }));
+                                  }}
+                                  disabled={isIgnored}
+                                  className={cn(
+                                    "flex-1",
+                                    isIgnored && "bg-muted cursor-not-allowed",
+                                    valError && "border-destructive focus-visible:ring-destructive",
+                                    !valError && !isIgnored && benchmarkStatus === 'good' && "border-green-500",
+                                    !valError && !isIgnored && benchmarkStatus === 'moderate' && "border-amber-500",
+                                    !valError && !isIgnored && benchmarkStatus === 'bad' && "border-red-500"
+                                  )}
+                                />
+                              )}
                               <span className="text-sm text-muted-foreground min-w-[40px]">
                                 {indicator.unit}
                               </span>
