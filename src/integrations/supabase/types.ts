@@ -2533,6 +2533,7 @@ export type Database = {
           peak_months: string[] | null
           primary_source_markets: string[] | null
           property_type: string
+          review_analysis: Json | null
           room_count: number | null
           seasonality: string | null
           star_rating: number | null
@@ -2557,6 +2558,7 @@ export type Database = {
           peak_months?: string[] | null
           primary_source_markets?: string[] | null
           property_type?: string
+          review_analysis?: Json | null
           room_count?: number | null
           seasonality?: string | null
           star_rating?: number | null
@@ -2581,6 +2583,7 @@ export type Database = {
           peak_months?: string[] | null
           primary_source_markets?: string[] | null
           property_type?: string
+          review_analysis?: Json | null
           room_count?: number | null
           seasonality?: string | null
           star_rating?: number | null
