@@ -51,6 +51,7 @@ interface DataValidationPanelProps {
 // Source display info
 const SOURCE_INFO: Record<string, { name: string; color: string; icon: string }> = {
   IBGE: { name: 'IBGE', color: 'bg-blue-500', icon: '📊' },
+  IBGE_CENSO: { name: 'IBGE / SIDRA (Censo)', color: 'bg-indigo-500', icon: '🏘️' },
   DATASUS: { name: 'DATASUS', color: 'bg-green-500', icon: '🏥' },
   INEP: { name: 'INEP', color: 'bg-purple-500', icon: '📚' },
   STN: { name: 'Tesouro Nacional', color: 'bg-amber-500', icon: '💰' },
@@ -288,9 +289,12 @@ export function DataValidationPanel({
                               "flex items-center gap-3 p-3 rounded-lg border cursor-help transition-colors",
                               source === 'MAPA_TURISMO' && "border-teal-500/40 bg-teal-50/50 dark:bg-teal-950/20",
                               source === 'IBGE' && "border-blue-500/40 bg-blue-50/50 dark:bg-blue-950/20",
+                              source === 'IBGE_CENSO' && "border-indigo-500/40 bg-indigo-50/50 dark:bg-indigo-950/20",
                               source === 'CADASTUR' && "border-cyan-500/40 bg-cyan-50/50 dark:bg-cyan-950/20",
                               source === 'DATASUS' && "border-green-500/40 bg-green-50/50 dark:bg-green-950/20",
-                              source !== 'MAPA_TURISMO' && source !== 'IBGE' && source !== 'CADASTUR' && source !== 'DATASUS' && "border-muted"
+                              source === 'INEP' && "border-purple-500/40 bg-purple-50/50 dark:bg-purple-950/20",
+                              source === 'STN' && "border-amber-500/40 bg-amber-50/50 dark:bg-amber-950/20",
+                              !['MAPA_TURISMO','IBGE','IBGE_CENSO','CADASTUR','DATASUS','INEP','STN'].includes(source) && "border-muted"
                             )}>
                               <span className="text-2xl">{info.icon}</span>
                               <div className="flex-1 min-w-0">

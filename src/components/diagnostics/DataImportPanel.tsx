@@ -84,7 +84,7 @@ interface ParsedRow {
   error?: string;
 }
 
-const officialSources = ['IBGE', 'DATASUS', 'INEP', 'STN', 'CADASTUR', 'Pré-preenchido'];
+const officialSources = ['IBGE', 'IBGE_CENSO', 'DATASUS', 'INEP', 'STN', 'CADASTUR', 'MAPA_TURISMO', 'Pré-preenchido'];
 
 const pillarNames = {
   RA: 'Relações Ambientais',
