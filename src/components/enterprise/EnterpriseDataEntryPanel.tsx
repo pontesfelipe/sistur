@@ -448,7 +448,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                             {!isIgnored && benchmarkTarget !== null && (
                               <p className="text-xs text-muted-foreground mt-1">
                                 <Target className="h-3 w-3 inline mr-1" />
-                                Meta: {formatNumberBR(benchmarkTarget)} {indicator.unit}
+                                Meta: {formatNumberBR(benchmarkTarget, indicator)} {indicator.unit}
                               </p>
                             )}
                             {!isIgnored && guidance && (
@@ -476,7 +476,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                                   const parsed = parseNumberBR(currentValue);
                                   setLocalValues(prev => ({
                                     ...prev,
-                                    [indicator.id]: parsed === null ? '' : formatNumberBR(parsed),
+                                    [indicator.id]: parsed === null ? '' : formatNumberBR(parsed, indicator),
                                   }));
                                 }}
                                 disabled={isIgnored}
