@@ -210,6 +210,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           <BusinessReviewSearch
             onAutoFill={handleReviewAutoFill}
             onProfileAutoFill={handleProfileAutoFill}
+            onAnalysisCapture={handleReviewAnalysisCapture}
             defaultLocation={destinationName}
             compact
           />
