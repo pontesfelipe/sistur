@@ -32,6 +32,7 @@ import {
   useValidateIndicatorValues,
 } from '@/hooks/useOfficialData';
 import { useAuth } from '@/hooks/useAuth';
+import { formatIndicatorValueBR } from '@/data/enterpriseIndicatorGuidance';
 
 interface DataValidationPanelProps {
   ibgeCode: string;
@@ -95,9 +96,11 @@ export function DataValidationPanel({
     await fetchOfficialData.mutateAsync({ ibgeCode, orgId });
   };
 
-  const handleValueChange = (id: string, value: string) => {
-    const numValue = value === '' ? null : parseFloat(value);
-    setEditedValues(prev => ({ ...prev, [id]: numValue }));
+  const handleValueChange = (id: string, rawInput: string) => {
+    // Accept Brazilian input: comma as decimal
+    const cleaned = rawInput.replace(/\./g, '').replace(',', '.');
+    const numValue = cleaned === '' ? null : parseFloat(cleaned);
+    setEditedValues(prev => ({ ...prev, [id]: Number.isFinite(numValue) ? numValue : null }));
   };
 
   const handleSelectAll = (checked: boolean) => {
@@ -384,13 +387,28 @@ export function DataValidationPanel({
                         </TableCell>
                         <TableCell>
                           {isConfirmed ? (
-                            <span className="font-mono">{displayValue?.toLocaleString('pt-BR')}</span>
+                            <span className="font-mono">
+                              {displayValue !== null && displayValue !== undefined
+                                ? formatIndicatorValueBR(displayValue, { code: value.indicator_code })
+                                : '—'}
+                            </span>
                           ) : (
                             <Input
-                              type="number"
-                              step="any"
-                              value={displayValue ?? ''}
-                              onChange={(e) => handleValueChange(value.id, e.target.value)}
+                              type="text"
+                              inputMode="decimal"
+                              value={isEdited
+                                ? (displayValue !== null && displayValue !== undefined
+                                    ? formatIndicatorValueBR(displayValue, { code: value.indicator_code })
+                                    : '')
+                                : (value.raw_value !== null && value.raw_value !== undefined
+                                    ? formatIndicatorValueBR(value.raw_value, { code: value.indicator_code })
+                                    : '')
+                              }
+                              onChange={(e) => {
+                                const raw = e.target.value;
+                                if (raw !== '' && !/^-?[\d.,]*$/.test(raw)) return;
+                                handleValueChange(value.id, raw);
+                              }}
                               className={cn(
                                 'w-28 h-8 text-right font-mono',
                                 isEdited && 'border-blue-500 bg-blue-50 dark:bg-blue-950'
