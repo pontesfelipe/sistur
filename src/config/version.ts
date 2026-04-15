@@ -23,6 +23,15 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.21.10",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Filtros no Histórico de Relatórios: tipo (Territorial/Enterprise) e autor (meus/todos da organização)",
+      "Badge de tipo de diagnóstico nos relatórios salvos",
+    ]
+  },
+  {
     version: "1.21.9",
     date: "2026-04-15",
     type: "patch" as const,
