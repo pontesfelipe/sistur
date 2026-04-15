@@ -346,6 +346,14 @@ const DiagnosticoDetalhe = () => {
   const completenessPercentage = totalIndicators > 0 ? (filledIndicators / totalIndicators) * 100 : 0;
   const hasIncompleteData = completenessPercentage < 100 && completenessPercentage > 0;
 
+  // Auto-promote DRAFT to DATA_READY when there's sufficient data
+  useEffect(() => {
+    if (!assessment || assessment.status !== 'DRAFT' || !id) return;
+    if (filledIndicators === 0 || completenessPercentage < 50) return;
+    if (updateAssessment.isPending) return;
+    updateAssessment.mutate({ id, status: 'DATA_READY' });
+  }, [assessment?.status, id, filledIndicators, completenessPercentage]);
+
   const handleCalculate = async () => {
     if (!id) return;
     const result = await calculate(id);
@@ -545,7 +553,7 @@ const DiagnosticoDetalhe = () => {
                 </Link>
               </Button>
               <div className="relative group">
-                <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
+                <Button onClick={handleCalculate} disabled={calculating || filledIndicators === 0}>
                   {calculating ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -558,7 +566,7 @@ const DiagnosticoDetalhe = () => {
                     </>
                   )}
                 </Button>
-                {assessment.status === 'DRAFT' && (
+                {filledIndicators === 0 && (
                   <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-popover text-popover-foreground border rounded px-2 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                     Preencha ao menos um indicador para habilitar o cálculo
                   </span>
@@ -944,7 +952,7 @@ const DiagnosticoDetalhe = () => {
                 </Button>
               </>
             )}
-            <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
+            <Button onClick={handleCalculate} disabled={calculating || filledIndicators === 0}>
               {calculating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
