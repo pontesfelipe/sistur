@@ -944,7 +944,7 @@ const DiagnosticoDetalhe = () => {
                 </Button>
               </>
             )}
-            <Button onClick={handleCalculate} disabled={calculating || assessment.status === 'DRAFT'}>
+            <Button onClick={handleCalculate} disabled={calculating || filledIndicators === 0}>
               {calculating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
