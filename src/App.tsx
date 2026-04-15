@@ -26,6 +26,7 @@ const DiagnosticoDetalhe = lazy(() => import("./pages/DiagnosticoDetalhe"));
 
 
 const AdminEdu = lazy(() => import("./pages/AdminEdu"));
+const EduDashboard = lazy(() => import("./pages/EduDashboard"));
 const EduCatalogo = lazy(() => import("./pages/EduCatalogo"));
 const EduPerfil = lazy(() => import("./pages/EduPerfil"));
 const EduTrilhas = lazy(() => import("./pages/EduTrilhas"));
