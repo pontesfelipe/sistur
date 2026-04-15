@@ -76,6 +76,8 @@ interface BusinessReviewSearchProps {
   onAutoFill?: (indicatorValues: Record<string, number>) => void;
   /** If provided, auto-fills profile fields from review data */
   onProfileAutoFill?: (metadata: PropertyMetadata) => void;
+  /** Captures the full analysis result for persistence */
+  onAnalysisCapture?: (fullAnalysis: Record<string, any>) => void;
   /** Pre-fill business name */
   defaultBusinessName?: string;
   /** Pre-fill location */
@@ -94,7 +96,7 @@ const PROPERTY_TYPES = [
   { value: 'operadora', label: 'Operadora/Agência' },
 ];
 
-export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
+export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysisCapture, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
   const [businessName, setBusinessName] = useState(defaultBusinessName);
   const [location, setLocation] = useState(defaultLocation);
   const [propertyType, setPropertyType] = useState('hotel');
@@ -118,6 +120,17 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, defaultBus
       if (error) throw error;
       setResult(data);
       toast.success('Busca concluída!');
+
+      // Capture full analysis for persistence
+      if (data?.analysis && onAnalysisCapture) {
+        onAnalysisCapture({
+          ...data.analysis,
+          businessName: data.businessName,
+          location: data.location,
+          searchResults: data.searchResults,
+          searchedAt: new Date().toISOString(),
+        });
+      }
 
       // Auto-fill profile metadata immediately when results arrive
       if (onProfileAutoFill) {
