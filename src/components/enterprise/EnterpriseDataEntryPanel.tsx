@@ -117,9 +117,10 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
     if (existingValues && existingValues.length > 0 && Object.keys(localValues).length === 0) {
       const initial: Record<string, string> = {};
       const ignored = new Set<string>();
+      const indicatorById = new Map((indicators || []).map(i => [i.id, i]));
       existingValues.forEach(v => {
         if (v.value_raw !== null) {
-          initial[v.indicator_id] = formatNumberBR(v.value_raw);
+          initial[v.indicator_id] = formatNumberBR(v.value_raw, indicatorById.get(v.indicator_id));
         }
         if (v.is_ignored) {
           ignored.add(v.indicator_id);
@@ -132,19 +133,20 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
         setIgnoredIds(ignored);
       }
     }
-  }, [existingValues, localValues, formatNumberBR]);
+  }, [existingValues, localValues, formatNumberBR, indicators]);
 
   // Apply initial auto-fill values from step 4 review search
   useEffect(() => {
     if (!initialAutoFillValues || Object.keys(initialAutoFillValues).length === 0 || !indicators) return;
     const codeToId = new Map(indicators.map(i => [(i as any).code, i.id]));
+    const codeToIndicator = new Map(indicators.map(i => [(i as any).code, i]));
     setLocalValues(prev => {
       const updated = { ...prev };
       let applied = false;
       Object.entries(initialAutoFillValues).forEach(([code, value]) => {
         const id = codeToId.get(code);
         if (id && !updated[id]) {
-          updated[id] = formatNumberBR(value);
+          updated[id] = formatNumberBR(value, codeToIndicator.get(code));
           applied = true;
         }
       });
