@@ -308,11 +308,14 @@ Os dados do diagnóstico são coletados automaticamente de fontes oficiais e com
 - Dados de preenchimento manual: Taxa de escolarização e quaisquer indicadores que não retornem valor oficial válido no momento da coleta.
 - Base de Conhecimento (KB): Documentos locais do destino (PDFs, relatórios, planos diretores) e referências nacionais com resumos extraídos por IA.
 
-REGRA CRÍTICA DE TRANSPARÊNCIA:
-- SEMPRE cite a fonte específica de cada dado mencionado no relatório
-- Se houver snapshots de proveniência, use-os para identificar EXATAMENTE de onde cada valor veio
-- Se o dado veio de preenchimento manual, indique claramente
-- Quando documentos da Base de Conhecimento informarem contexto adicional, referencie-os pelo nome`;
+REGRA CRÍTICA E INEGOCIÁVEL DE FONTES:
+1. CADA dado numérico mencionado no relatório DEVE ter a fonte entre parênteses imediatamente após o valor. Exemplo: "População: 45.321 hab. (Fonte: IBGE Agregados, 2022)"
+2. TODAS as tabelas de indicadores DEVEM conter uma coluna "Fonte" indicando a origem do dado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo, Preenchimento Manual, etc.)
+3. Se houver snapshots de proveniência, use-os para identificar EXATAMENTE de onde cada valor veio, incluindo o ano de referência
+4. Se o dado veio de preenchimento manual, indique CLARAMENTE: "(Fonte: Preenchimento manual)"
+5. Quando documentos da Base de Conhecimento informarem contexto adicional, referencie-os pelo nome
+6. O relatório DEVE terminar com uma seção "## Fontes e Referências" listando TODAS as fontes oficiais consultadas, com o tipo de dado e ano de referência
+7. NUNCA apresente um dado sem citar a fonte — se a fonte for desconhecida, indique "(Fonte: Não identificada)"`;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
   if (isEnterprise) {
