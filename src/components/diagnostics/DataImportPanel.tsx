@@ -61,8 +61,16 @@ import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { validateIndicatorValue, getValidationForIndicator, formatIndicatorValueBR } from '@/data/enterpriseIndicatorGuidance';
+import { validateIndicatorValue, getValidationForIndicator } from '@/data/enterpriseIndicatorGuidance';
 import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
+import {
+  EMPTY_SELECT_VALUE,
+  formatIndicatorFieldDisplayValue,
+  getIndicatorFieldConfig,
+  getIndicatorSelectValue,
+  parseIndicatorSelectValue,
+  validateIndicatorSelectValue,
+} from '@/lib/indicatorFieldConfig';
 
 interface DataImportPanelProps {
   preSelectedAssessmentId?: string;
@@ -369,7 +377,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
   // Format number for display in pt-BR using indicator context
   const formatDisplayValue = (value: number | null | undefined, indicator?: any): string => {
-    return formatIndicatorValueBR(value, indicator);
+    return formatIndicatorFieldDisplayValue(value, indicator);
   };
 
   // Format validation hint numbers in pt-BR
@@ -414,10 +422,13 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
   const handleValueChange = (indicatorId: string, value: string) => {
     const indicator = indicators.find(i => i.id === indicatorId);
-    const validationValue = getValidationValue(value);
+    const fieldConfig = getIndicatorFieldConfig({ code: indicator?.code, normalization: indicator?.normalization });
+    const validationValue = fieldConfig.kind === 'select' ? value : getValidationValue(value);
     
     if (indicator) {
-      const error = validateIndicatorValue(validationValue, indicator as any);
+      const error = fieldConfig.kind === 'select'
+        ? validateIndicatorSelectValue(validationValue, { code: indicator.code, normalization: indicator.normalization })
+        : validateIndicatorValue(validationValue, indicator as any);
       setValidationErrors(prev => ({ ...prev, [indicatorId]: error }));
     }
 
@@ -425,7 +436,9 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       ...prev,
       [indicatorId]: {
         ...prev[indicatorId],
-        value: parseBRInput(value),
+        value: fieldConfig.kind === 'select'
+          ? parseIndicatorSelectValue(value, { code: indicator?.code, normalization: indicator?.normalization })
+          : parseBRInput(value),
         source: prev[indicatorId]?.source || 'Manual',
         is_ignored: prev[indicatorId]?.is_ignored ?? false,
         _rawInput: value,
@@ -806,6 +819,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                             const isIgnored = existingValue?.is_ignored === true;
                             const valError = validationErrors[indicator.id];
                             const valRules = getValidationForIndicator(indicator as any);
+                            const fieldConfig = getIndicatorFieldConfig({ code: indicator.code, normalization: indicator.normalization });
                             
                             return (
                               <div key={indicator.id} className={cn(
@@ -841,12 +855,17 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                         {indicator.unit}
                                       </span>
                                     )}
-                                    {!isIgnored && (valRules.min !== undefined || valRules.max !== undefined) && (
+                                    {!isIgnored && fieldConfig.kind === 'number' && (valRules.min !== undefined || valRules.max !== undefined) && (
                                       <span className="text-xs text-muted-foreground">
                                         ({valRules.min !== undefined ? `mín: ${formatHintNumber(valRules.min)}` : ''}
                                         {valRules.min !== undefined && valRules.max !== undefined ? ' · ' : ''}
                                         {valRules.max !== undefined ? `máx: ${formatHintNumber(valRules.max)}` : ''}
                                         {valRules.integer ? ' · inteiro' : ''})
+                                      </span>
+                                    )}
+                                    {!isIgnored && fieldConfig.kind === 'select' && (
+                                      <span className="text-xs text-muted-foreground">
+                                        Opções: {fieldConfig.options.map((option) => option.label).join(' · ')}
                                       </span>
                                     )}
                                     {isIgnored && (
@@ -859,39 +878,72 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                 </div>
                                 <div className="col-span-3">
                                   <div className="relative">
-                                    <Input
-                                      type="text"
-                                      inputMode="decimal"
-                                      value={hasUnsavedChanges 
-                                        ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue, indicator))
-                                        : formatDisplayValue(currentValue, indicator)
-                                      }
-                                      onChange={(e) => {
-                                        const raw = e.target.value;
-                                        if (raw !== '' && !/^-?[\d.,]*$/.test(raw)) return;
-                                        handleValueChange(indicator.id, raw);
-                                      }}
-                                      onBlur={() => {
-                                        const edited = editedValues[indicator.id];
-                                        if (!edited) return;
-                                        setEditedValues(prev => ({
-                                          ...prev,
-                                          [indicator.id]: {
-                                            ...prev[indicator.id],
-                                            _rawInput: edited.value === null ? '' : formatDisplayValue(edited.value, indicator),
-                                          },
-                                        }));
-                                      }}
-                                      disabled={isIgnored}
-                                      className={cn(
-                                        'w-full pr-8',
-                                        valError && 'border-destructive ring-1 ring-destructive',
-                                        !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
-                                        !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
-                                        isIgnored && 'bg-muted cursor-not-allowed'
-                                      )}
-                                      placeholder={isIgnored ? 'Ignorado' : 'Valor'}
-                                    />
+                                    {fieldConfig.kind === 'select' ? (
+                                      <Select
+                                        value={hasUnsavedChanges
+                                          ? (editedValues[indicator.id]?._rawInput ?? (currentValue === null || currentValue === undefined
+                                              ? EMPTY_SELECT_VALUE
+                                              : getIndicatorSelectValue(currentValue, indicator)))
+                                          : (getIndicatorSelectValue(currentValue, indicator) || EMPTY_SELECT_VALUE)
+                                        }
+                                        onValueChange={(selectedValue) => handleValueChange(indicator.id, selectedValue)}
+                                        disabled={isIgnored}
+                                      >
+                                        <SelectTrigger
+                                          className={cn(
+                                            'w-full',
+                                            valError && 'border-destructive ring-1 ring-destructive',
+                                            !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
+                                            !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
+                                            isIgnored && 'bg-muted cursor-not-allowed'
+                                          )}
+                                        >
+                                          <SelectValue placeholder={isIgnored ? 'Ignorado' : 'Selecionar'} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value={EMPTY_SELECT_VALUE}>Não informado</SelectItem>
+                                          {fieldConfig.options.map((option) => (
+                                            <SelectItem key={option.value} value={option.value}>
+                                              {option.label}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    ) : (
+                                      <Input
+                                        type="text"
+                                        inputMode="decimal"
+                                        value={hasUnsavedChanges 
+                                          ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue, indicator))
+                                          : formatDisplayValue(currentValue, indicator)
+                                        }
+                                        onChange={(e) => {
+                                          const raw = e.target.value;
+                                          if (raw !== '' && !/^-?[\d.,]*$/.test(raw)) return;
+                                          handleValueChange(indicator.id, raw);
+                                        }}
+                                        onBlur={() => {
+                                          const edited = editedValues[indicator.id];
+                                          if (!edited) return;
+                                          setEditedValues(prev => ({
+                                            ...prev,
+                                            [indicator.id]: {
+                                              ...prev[indicator.id],
+                                              _rawInput: edited.value === null ? '' : formatDisplayValue(edited.value, indicator),
+                                            },
+                                          }));
+                                        }}
+                                        disabled={isIgnored}
+                                        className={cn(
+                                          'w-full pr-8',
+                                          valError && 'border-destructive ring-1 ring-destructive',
+                                          !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
+                                          !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
+                                          isIgnored && 'bg-muted cursor-not-allowed'
+                                        )}
+                                        placeholder={isIgnored ? 'Ignorado' : 'Valor'}
+                                      />
+                                    )}
                                     {isPreFilled && !hasUnsavedChanges && !isIgnored && !valError && (
                                       <Tooltip>
                                         <TooltipTrigger asChild>

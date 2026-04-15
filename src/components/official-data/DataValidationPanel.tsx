@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Table, 
@@ -32,7 +33,13 @@ import {
   useValidateIndicatorValues,
 } from '@/hooks/useOfficialData';
 import { useAuth } from '@/hooks/useAuth';
-import { formatIndicatorValueBR } from '@/data/enterpriseIndicatorGuidance';
+import {
+  EMPTY_SELECT_VALUE,
+  formatIndicatorFieldDisplayValue,
+  getIndicatorFieldConfig,
+  getIndicatorSelectValue,
+  parseIndicatorSelectValue,
+} from '@/lib/indicatorFieldConfig';
 
 interface DataValidationPanelProps {
   ibgeCode: string;
@@ -106,7 +113,17 @@ export function DataValidationPanel({
   };
 
   const handleValueChange = (id: string, rawInput: string) => {
-    // Accept Brazilian input: comma as decimal
+    const value = values.find((item) => item.id === id);
+    const fieldConfig = getIndicatorFieldConfig({ code: value?.indicator_code });
+
+    if (fieldConfig.kind === 'select') {
+      setEditedValues((prev) => ({
+        ...prev,
+        [id]: parseIndicatorSelectValue(rawInput, { code: value?.indicator_code }),
+      }));
+      return;
+    }
+
     const cleaned = rawInput.replace(/\./g, '').replace(',', '.');
     const numValue = cleaned === '' ? null : parseFloat(cleaned);
     setEditedValues(prev => ({ ...prev, [id]: Number.isFinite(numValue) ? numValue : null }));
@@ -370,6 +387,7 @@ export function DataValidationPanel({
                     const isEdited = editedValues[value.id] !== undefined;
                     const displayValue = isEdited ? editedValues[value.id] : value.raw_value;
                     const isConfirmed = confirmedIds.has(value.id);
+                    const fieldConfig = getIndicatorFieldConfig({ code: value.indicator_code });
 
                     return (
                       <TableRow key={value.id} className={cn(isConfirmed && 'bg-muted/30')}>
@@ -398,19 +416,44 @@ export function DataValidationPanel({
                           {isConfirmed ? (
                             <span className="font-mono">
                               {displayValue !== null && displayValue !== undefined
-                                ? formatIndicatorValueBR(displayValue, { code: value.indicator_code })
+                                ? formatIndicatorFieldDisplayValue(displayValue, { code: value.indicator_code })
                                 : '—'}
                             </span>
+                          ) : fieldConfig.kind === 'select' ? (
+                            <Select
+                              value={isEdited
+                                ? (displayValue === null
+                                    ? EMPTY_SELECT_VALUE
+                                    : getIndicatorSelectValue(displayValue, { code: value.indicator_code }))
+                                : (getIndicatorSelectValue(value.raw_value, { code: value.indicator_code }) || EMPTY_SELECT_VALUE)
+                              }
+                              onValueChange={(selectedValue) => handleValueChange(value.id, selectedValue)}
+                            >
+                              <SelectTrigger className={cn(
+                                'h-8 w-32',
+                                isEdited && 'border-blue-500 bg-blue-50 dark:bg-blue-950'
+                              )}>
+                                <SelectValue placeholder="Selecionar" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value={EMPTY_SELECT_VALUE}>Não informado</SelectItem>
+                                {fieldConfig.options.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           ) : (
                             <Input
                               type="text"
                               inputMode="decimal"
                               value={isEdited
                                 ? (displayValue !== null && displayValue !== undefined
-                                    ? formatIndicatorValueBR(displayValue, { code: value.indicator_code })
+                                    ? formatIndicatorFieldDisplayValue(displayValue, { code: value.indicator_code })
                                     : '')
                                 : (value.raw_value !== null && value.raw_value !== undefined
-                                    ? formatIndicatorValueBR(value.raw_value, { code: value.indicator_code })
+                                    ? formatIndicatorFieldDisplayValue(value.raw_value, { code: value.indicator_code })
                                     : '')
                               }
                               onChange={(e) => {

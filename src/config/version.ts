@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 10,
+  patch: 11,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.11",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Campos binários e categóricos no preenchimento agora usam lista de seleção em vez de input numérico",
+      "Indicadores como Plano de Turismo, Conselho de Turismo e Região Turística passaram a validar por opções válidas",
+      "Pré-preenchimento oficial e formulário principal exibem rótulos legíveis como Sim/Não e categorias A-E",
+    ]
+  },
   {
     version: "1.21.10",
     date: "2026-04-15",
