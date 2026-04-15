@@ -102,6 +102,7 @@ Deno.serve(async (req) => {
         ...(allResults.tripAdvisor?.data || []).map((r: any) => extractContent(r, 'TripAdvisor')),
         ...(allResults.general?.data || []).map((r: any) => extractContent(r, 'Web')),
         ...(allResults.googleMaps || []).map((r: any) => extractContent(r, 'Maps')),
+        ...(allResults.officialSite || []).map((r: any) => extractContent(r, 'SiteOficial')),
       ].join('\n---\n');
       if (allContent.trim()) {
         try {
