@@ -28,6 +28,8 @@ import {
 import { useEduTraining, type TrainingModule } from '@/hooks/useEduTrainings';
 import { PILLAR_INFO } from '@/types/sistur';
 import { VideoPlayer } from '@/components/edu/VideoPlayer';
+import { TrainingRatingWidget } from '@/components/edu/TrainingRatingWidget';
+import { TrainingNotesPanel } from '@/components/edu/TrainingNotesPanel';
 
 interface TrainingMaterial {
   id: string;
