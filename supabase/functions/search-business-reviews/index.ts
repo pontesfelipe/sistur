@@ -66,12 +66,24 @@ Deno.serve(async (req) => {
       console.error('Google Maps search error:', e);
     }
 
+    // Search for the business's own official website to extract property details
+    let officialSiteData = null;
+    try {
+      const siteSearch = await searchFirecrawl(firecrawlKey, `"${businessName}" ${location} site oficial quartos acomodações estrutura`, 3, scrapeOpts);
+      if (siteSearch?.data?.length > 0) {
+        officialSiteData = siteSearch.data;
+      }
+    } catch (e) {
+      console.error('Official site search error:', e);
+    }
+
     // Process results
     const allResults = {
       google: googleResults.status === 'fulfilled' ? googleResults.value : null,
       tripAdvisor: tripAdvisorResults.status === 'fulfilled' ? tripAdvisorResults.value : null,
       general: generalResults.status === 'fulfilled' ? generalResults.value : null,
       googleMaps: googleMapsData,
+      officialSite: officialSiteData,
     };
 
     // Extract review scores and insights using AI
