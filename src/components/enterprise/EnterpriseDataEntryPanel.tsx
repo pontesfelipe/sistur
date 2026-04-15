@@ -82,19 +82,36 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   }, []);
 
   const parseNumberBR = useCallback((value: string) => {
-    if (!value) return null;
-    const normalized = value.replace(/\./g, '').replace(',', '.');
-    const parsed = Number(normalized);
+    const raw = value.trim();
+    if (!raw) return null;
+
+    if (raw.includes(',')) {
+      const normalized = raw.replace(/\./g, '').replace(',', '.');
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    const dotParts = raw.split('.');
+    if (dotParts.length === 2) {
+      const [, decimalPart] = dotParts;
+      const normalized = decimalPart.length === 3 ? raw.replace('.', '') : raw;
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    if (dotParts.length > 2) {
+      const parsed = Number(raw.replace(/\./g, ''));
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    const parsed = Number(raw);
     return Number.isFinite(parsed) ? parsed : null;
   }, []);
 
   const normalizeForValidation = useCallback((value: string) => {
-    if (!value) return value;
-    if (value.includes(',')) {
-      return value.replace(/\./g, '').replace(',', '.');
-    }
-    return value;
-  }, []);
+    const parsed = parseNumberBR(value);
+    return parsed === null ? value : String(parsed);
+  }, [parseNumberBR]);
 
   // Initialize local values and ignored state from existing
   useEffect(() => {
@@ -454,6 +471,13 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                                 placeholder={isIgnored ? 'Ignorado' : 'Valor'}
                                 value={currentValue}
                                 onChange={(e) => handleValueChange(indicator.id, e.target.value, indicator)}
+                                onBlur={() => {
+                                  const parsed = parseNumberBR(currentValue);
+                                  setLocalValues(prev => ({
+                                    ...prev,
+                                    [indicator.id]: parsed === null ? '' : formatNumberBR(parsed),
+                                  }));
+                                }}
                                 disabled={isIgnored}
                                 className={cn(
                                   "flex-1",

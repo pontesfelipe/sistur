@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 7,
+  patch: 8,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.8",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Pré-preenchimento territorial e Enterprise agora normaliza e exibe números no padrão pt-BR em todos os campos atualizados",
+      "Campos convertem visualmente valores com ponto para vírgula ao perder foco",
+      "Validação e parsing aceitam formatos mistos e persistem os números internamente de forma consistente",
+      "Metas, dicas de validação e inputs de pré-preenchimento alinhados ao padrão brasileiro de decimais",
+    ],
+  },
   {
     version: "1.21.7",
     date: "2026-04-15",
