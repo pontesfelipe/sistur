@@ -425,7 +425,7 @@ export function DataValidationPanel({
                                 ? (displayValue === null
                                     ? EMPTY_SELECT_VALUE
                                     : getIndicatorSelectValue(displayValue, { code: value.indicator_code }))
-                                : (getIndicatorSelectValue(value.raw_value, { code: value.indicator_code }) || undefined)
+                                : (getIndicatorSelectValue(value.raw_value, { code: value.indicator_code }) || EMPTY_SELECT_VALUE)
                               }
                               onValueChange={(selectedValue) => handleValueChange(value.id, selectedValue)}
                             >

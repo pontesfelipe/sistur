@@ -61,7 +61,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { validateIndicatorValue, getValidationForIndicator, formatIndicatorValueBR } from '@/data/enterpriseIndicatorGuidance';
+import { validateIndicatorValue, getValidationForIndicator } from '@/data/enterpriseIndicatorGuidance';
 import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
 import {
   EMPTY_SELECT_VALUE,
@@ -884,7 +884,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           ? (editedValues[indicator.id]?._rawInput ?? (currentValue === null || currentValue === undefined
                                               ? EMPTY_SELECT_VALUE
                                               : getIndicatorSelectValue(currentValue, indicator)))
-                                          : (getIndicatorSelectValue(currentValue, indicator) || undefined)
+                                          : (getIndicatorSelectValue(currentValue, indicator) || EMPTY_SELECT_VALUE)
                                         }
                                         onValueChange={(selectedValue) => handleValueChange(indicator.id, selectedValue)}
                                         disabled={isIgnored}
