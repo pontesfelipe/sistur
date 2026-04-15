@@ -728,7 +728,6 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                 </Card>
                 );
               })()}
-              )}
 
               {loadingIndicators ? (
                 <div className="space-y-3">
