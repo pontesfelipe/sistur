@@ -286,6 +286,53 @@ FICHA TÉCNICA DO RELATÓRIO (renderize como tabela markdown):
 Esta tabela é OBRIGATÓRIA e deve ser a primeira coisa do relatório, logo após o título.`;
 }
 
+// ========== MEC / ABNT FORMATTING STANDARDS ==========
+
+const MEC_FORMATTING_RULES = `
+PADRÕES DE FORMATAÇÃO — MEC / ABNT (OBRIGATÓRIO):
+O relatório deve seguir as recomendações do Ministério da Educação (MEC) e normas ABNT para documentos técnicos e acadêmicos:
+
+NORMAS APLICÁVEIS:
+- ABNT NBR 14724:2011 — Trabalhos acadêmicos (estrutura geral)
+- ABNT NBR 6024:2012 — Numeração progressiva de seções
+- ABNT NBR 6023:2018 — Referências bibliográficas
+- ABNT NBR 6028:2021 — Resumo e abstract
+- ABNT NBR 10520:2023 — Citações em documentos
+
+ESTRUTURA PRÉ-TEXTUAL (o DOCX adicionará automaticamente):
+- Capa com identificação institucional (SISTUR / Organização)
+- Folha de rosto com título, subtítulo, natureza do trabalho
+- Resumo com palavras-chave
+
+ESTRUTURA TEXTUAL — REGRAS:
+1. Seções primárias (##) devem ser NUMERADAS (1, 2, 3...) e em NEGRITO
+2. Subseções (###) numeradas progressivamente (1.1, 1.2, 2.1...) em negrito
+3. Sub-subseções (####) numeradas (1.1.1, 1.1.2...) em negrito itálico
+4. Parágrafos devem ser concisos, com linguagem técnica e impessoal (3ª pessoa)
+5. Citações diretas com mais de 3 linhas: recuo de 4cm, fonte menor, sem aspas
+6. Citações indiretas devem citar autor e ano: (BENI, 2001)
+7. Quando citar Mario Beni ou outros autores, usar formato ABNT: (SOBRENOME, ano)
+8. Figuras e tabelas devem ser referenciadas no texto antes de aparecerem
+9. Tabelas: título ACIMA da tabela com numeração (Tabela 1 — Título)
+10. Fonte da tabela ABAIXO da tabela: "Fonte: IBGE (2022)"
+
+ESTRUTURA PÓS-TEXTUAL — OBRIGATÓRIO:
+1. REFERÊNCIAS (NBR 6023): lista em ordem alfabética de todas as fontes citadas
+   Formato para dados oficiais:
+   - INSTITUTO BRASILEIRO DE GEOGRAFIA E ESTATÍSTICA (IBGE). Nome do dado. Ano. Disponível em: URL.
+   - BRASIL. Ministério do Turismo. Mapa do Turismo Brasileiro. Ano.
+   - BRASIL. Ministério da Saúde. DATASUS. Nome do indicador. Ano.
+   - BRASIL. Secretaria do Tesouro Nacional (STN). Dados fiscais. Ano.
+   - BRASIL. Ministério do Turismo. CADASTUR. Dados de registro. Ano.
+2. APÊNDICE (se houver notas adicionais ou metodologia estendida)
+3. GLOSSÁRIO com termos técnicos do SISTUR (RA, OE, AO, IGMA, I-SISTUR)
+
+LINGUAGEM:
+- Impessoal: "Verifica-se que..." em vez de "Verificamos que..."
+- Verbos na 3ª pessoa ou voz passiva
+- Termos técnicos na primeira menção com definição entre parênteses
+- Siglas: por extenso na primeira menção, ex: "Relações Ambientais (RA)"`;
+
 // ========== TEMPLATE-SPECIFIC SYSTEM PROMPTS ==========
 
 const BASE_METHODOLOGY = `FUNDAMENTOS TEÓRICOS DE MARIO BENI:
@@ -308,11 +355,16 @@ Os dados do diagnóstico são coletados automaticamente de fontes oficiais e com
 - Dados de preenchimento manual: Taxa de escolarização e quaisquer indicadores que não retornem valor oficial válido no momento da coleta.
 - Base de Conhecimento (KB): Documentos locais do destino (PDFs, relatórios, planos diretores) e referências nacionais com resumos extraídos por IA.
 
-REGRA CRÍTICA DE TRANSPARÊNCIA:
-- SEMPRE cite a fonte específica de cada dado mencionado no relatório
-- Se houver snapshots de proveniência, use-os para identificar EXATAMENTE de onde cada valor veio
-- Se o dado veio de preenchimento manual, indique claramente
-- Quando documentos da Base de Conhecimento informarem contexto adicional, referencie-os pelo nome`;
+REGRA CRÍTICA E INEGOCIÁVEL DE FONTES:
+1. CADA dado numérico mencionado no relatório DEVE ter a fonte entre parênteses imediatamente após o valor. Exemplo: "População: 45.321 hab. (IBGE, 2022)"
+2. TODAS as tabelas de indicadores DEVEM conter uma coluna "Fonte" indicando a origem do dado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo, Preenchimento Manual, etc.)
+3. Se houver snapshots de proveniência, use-os para identificar EXATAMENTE de onde cada valor veio, incluindo o ano de referência
+4. Se o dado veio de preenchimento manual, indique CLARAMENTE: "(Fonte: Preenchimento manual)"
+5. Quando documentos da Base de Conhecimento informarem contexto adicional, referencie-os pelo nome
+6. O relatório DEVE terminar com uma seção "## Referências" em formato ABNT NBR 6023 listando TODAS as fontes oficiais consultadas
+7. NUNCA apresente um dado sem citar a fonte — se a fonte for desconhecida, indique "(Fonte: Não identificada)"
+
+${MEC_FORMATTING_RULES}`;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
   if (isEnterprise) {
