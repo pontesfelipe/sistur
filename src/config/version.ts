@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.3",
+    date: "2026-04-15",
+    type: "patch" as const,
+    changes: [
+      "Relatórios DOCX agora exportados no formato ABNT (NBR 14724 / NBR 6024)",
+      "Margens: superior e esquerda 3cm, inferior e direita 2cm",
+      "Espaçamento entrelinhas 1.5, recuo de parágrafo 1.25cm, texto justificado",
+      "Títulos em caixa alta (H1), subtítulos em negrito, tabelas centralizadas com fonte 10pt",
+      "Página A4, fonte Arial 12pt padrão, numeração de página à direita",
+    ],
+  },
   {
     version: "1.21.2",
     date: "2026-04-15",
