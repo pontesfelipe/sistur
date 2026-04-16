@@ -84,8 +84,14 @@ export function useExternalIndicatorValues(ibgeCode: string | undefined, orgId: 
 
 // Bridge Mapa do Turismo data into external_indicator_values
 async function bridgeMapaTurismoData(ibgeCode: string, orgId: string) {
-  // Get latest mapa_turismo row for this municipality
-  const { data: mapaRow, error } = await supabase
+  let upserted = 0;
+  let year = new Date().getFullYear();
+  let visitNac = 0;
+  let visitInt = 0;
+  let categoria: string | null = null;
+
+  // Try mapa_turismo_municipios first (raw ingestion table)
+  const { data: mapaRow } = await supabase
     .from('mapa_turismo_municipios')
     .select('categoria, raw_data, ano_referencia')
     .eq('ibge_code', ibgeCode)
@@ -93,16 +99,36 @@ async function bridgeMapaTurismoData(ibgeCode: string, orgId: string) {
     .limit(1)
     .maybeSingle();
 
-  if (error || !mapaRow) return { status: 'unavailable' as const, count: 0 };
+  if (mapaRow) {
+    const rawData = (mapaRow.raw_data || {}) as Record<string, any>;
+    year = mapaRow.ano_referencia || year;
+    visitNac = parseFloat(rawData.qt_visita_nacional) || 0;
+    visitInt = parseFloat(rawData.qt_visita_internacional) || 0;
+    categoria = mapaRow.categoria;
+  }
 
-  const rawData = (mapaRow.raw_data || {}) as Record<string, any>;
-  const year = mapaRow.ano_referencia || new Date().getFullYear();
-  let upserted = 0;
+  // Fallback: read from existing external_indicator_values (igma_visitantes_*)
+  if (visitNac === 0 && visitInt === 0) {
+    const { data: existing } = await supabase
+      .from('external_indicator_values')
+      .select('indicator_code, raw_value, reference_year')
+      .eq('municipality_ibge_code', ibgeCode)
+      .eq('org_id', orgId)
+      .in('indicator_code', ['igma_visitantes_nacionais', 'igma_visitantes_internacionais']);
+
+    if (existing && existing.length > 0) {
+      for (const row of existing) {
+        if (row.indicator_code === 'igma_visitantes_nacionais') visitNac = Number(row.raw_value) || 0;
+        if (row.indicator_code === 'igma_visitantes_internacionais') visitInt = Number(row.raw_value) || 0;
+        if (row.reference_year) year = row.reference_year;
+      }
+    }
+  }
 
   // 1. Categoria no Mapa do Turismo → igma_categoria_mapa_turismo
-  if (mapaRow.categoria) {
+  if (categoria) {
     const categoriaMap: Record<string, number> = { 'A': 3, 'B': 2, 'C': 1 };
-    const categoriaValue = categoriaMap[mapaRow.categoria] ?? null;
+    const categoriaValue = categoriaMap[categoria] ?? null;
     if (categoriaValue !== null) {
       const { error: e1 } = await supabase
         .from('external_indicator_values')
@@ -111,21 +137,19 @@ async function bridgeMapaTurismoData(ibgeCode: string, orgId: string) {
           municipality_ibge_code: ibgeCode,
           source_code: 'MAPA_TURISMO',
           raw_value: categoriaValue,
-          raw_value_text: mapaRow.categoria,
+          raw_value_text: categoria,
           reference_year: year,
           collection_method: 'BATCH' as const,
           confidence_level: 5,
           validated: false,
           org_id: orgId,
-          notes: `Mapa do Turismo ${year}. Categoria: ${mapaRow.categoria}.`,
+          notes: `Mapa do Turismo ${year}. Categoria: ${categoria}.`,
         }, { onConflict: 'org_id,municipality_ibge_code,indicator_code' });
       if (!e1) upserted++;
     }
   }
 
   // 2. Fluxo Turístico Anual → AO001 (visitantes nacionais + internacionais)
-  const visitNac = parseFloat(rawData.qt_visita_nacional) || 0;
-  const visitInt = parseFloat(rawData.qt_visita_internacional) || 0;
   const totalFlow = visitNac + visitInt;
   if (totalFlow > 0) {
     const { error: e2 } = await supabase
@@ -145,7 +169,7 @@ async function bridgeMapaTurismoData(ibgeCode: string, orgId: string) {
     if (!e2) upserted++;
   }
 
-  return { status: 'success' as const, count: upserted };
+  return { status: upserted > 0 ? ('success' as const) : ('unavailable' as const), count: upserted };
 }
 
 // Fetch official data from external sources
