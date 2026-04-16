@@ -85,7 +85,8 @@ interface TrackFormDialogProps {
   trainings: EduTraining[];
   onSubmit: (data: { 
     track: { name: string; description?: string; objective?: string; audience?: TargetAgent; delivery?: string }; 
-    trainingIds: string[] 
+    trainingIds: string[];
+    autoGenerateExams?: boolean;
   }) => void;
   isSubmitting: boolean;
   initialData?: {
@@ -117,6 +118,7 @@ const TrackFormDialog = ({
   const [delivery, setDelivery] = useState(initialData?.delivery || '');
   const [selectedTrainings, setSelectedTrainings] = useState<string[]>(initialData?.trainingIds || []);
   const [searchQuery, setSearchQuery] = useState('');
+  const [autoGenerateExams, setAutoGenerateExams] = useState(true);
 
   // Reset form when initialData changes
   useEffect(() => {
@@ -147,6 +149,7 @@ const TrackFormDialog = ({
         delivery: delivery.trim() || undefined,
       },
       trainingIds: selectedTrainings,
+      ...(mode === 'create' ? { autoGenerateExams } : {}),
     });
     
     if (mode === 'create') {
@@ -158,6 +161,7 @@ const TrackFormDialog = ({
       setDelivery('');
       setSelectedTrainings([]);
       setSearchQuery('');
+      setAutoGenerateExams(true);
     }
   };
 
