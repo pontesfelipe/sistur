@@ -957,7 +957,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
                                           isIgnored && 'bg-muted cursor-not-allowed'
                                         )}
-                                        placeholder={isIgnored ? 'Ignorado' : 'Valor'}
+                                        placeholder={isIgnored ? 'Ignorado' : indicator.unit ? `Valor (${indicator.unit})` : 'Valor'}
                                       />
                                     )}
                                     {isPreFilled && !hasUnsavedChanges && !isIgnored && !valError && (
