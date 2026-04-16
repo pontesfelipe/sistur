@@ -182,10 +182,12 @@ export function useFetchOfficialData() {
 
       // Merge statuses into response
       const cadasturStatus = cadastur?.data?.results || {};
+      const anaStatus = ana?.data?.results || {};
       return {
         ...official.data,
         cadastur_status: cadasturStatus,
         mapa_turismo_status: mapa || { status: 'unavailable', count: 0 },
+        ana_status: anaStatus,
       };
     },
     onSuccess: (data, variables) => {
@@ -204,7 +206,12 @@ export function useFetchOfficialData() {
         ? `${data.mapa_turismo_status.count} indicadores` 
         : '';
 
-      const extras = [cadasturMsg, mapaMsg].filter(Boolean).join(' | ');
+      const anaIqa = data.ana_status?.iqa;
+      const anaMsg = anaIqa?.status === 'success'
+        ? `IQA: ${anaIqa.avg_iqa} (${anaIqa.stations_count} estações)`
+        : '';
+
+      const extras = [cadasturMsg, mapaMsg, anaMsg].filter(Boolean).join(' | ');
 
       toast({
         title: 'Dados oficiais carregados',
