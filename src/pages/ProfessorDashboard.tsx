@@ -170,6 +170,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
   const [showAddAssignment, setShowAddAssignment] = useState(false);
   const [showDeleteAssignment, setShowDeleteAssignment] = useState(false);
   const [deletingAssignment, setDeletingAssignment] = useState<any>(null);
+  const [progressAssignmentId, setProgressAssignmentId] = useState<string | null>(null);
 
   // Fetch org members for adding
   const { data: orgMembers } = useQuery({
