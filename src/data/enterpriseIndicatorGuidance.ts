@@ -396,7 +396,7 @@ export const INDICATOR_GUIDANCE: Record<string, IndicatorGuidance> = {
   // ── Territorial: Organização Estrutural (OE) ──
   OE001: {
     howToFind:
-      'Consulte a Secretaria de Turismo, CADASTUR ou associação hoteleira. Some leitos de hotéis, pousadas, hostels e outros meios de hospedagem.',
+      '🔄 Pré-preenchido via CADASTUR (Meios de Hospedagem) quando disponível. Caso contrário, consulte a Secretaria de Turismo ou associação hoteleira.',
     examples: '2.500 leitos',
     validation: { min: 0, integer: true },
   },
