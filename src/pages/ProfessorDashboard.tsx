@@ -19,7 +19,7 @@ import {
   Users, Copy, Gift, Plus, School, BookOpen, ClipboardList,
   Trash2, Calendar, Loader2, Check, X, UserPlus, FileText,
   Building2, GraduationCap, Target, BarChart3, Settings,
-  MoreVertical, Pencil, Shield
+  MoreVertical, Pencil, Shield, Eye
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DeleteConfirmDialog } from '@/components/projects/DeleteConfirmDialog';
@@ -27,6 +27,7 @@ import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
 import { ExamManagementPanel } from '@/components/admin/ExamManagementPanel';
 import { ComplianceReportPanel } from '@/components/edu/ComplianceReportPanel';
 import { AssignmentFormDialog } from '@/components/edu/AssignmentFormDialog';
+import { AssignmentProgressDialog } from '@/components/edu/AssignmentProgressDialog';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
