@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 24,
-  patch: 3,
+  minor: 25,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.25.0",
+    date: "2026-04-16",
+    type: "minor" as const,
+    changes: [
+      "Nova flag interna value_format nos indicadores (13 categorias: PERCENTAGE, RATIO, INDEX_SCORE, CURRENCY, CURRENCY_THOUSANDS, CURRENCY_MILLIONS, COUNT, RATE_PER_CAPITA, DURATION, AREA, BINARY, CATEGORICAL, NUMERIC) — define como cada número deve ser interpretado em relatórios, dashboards e formulários",
+      "Auto-inferência aplicada aos 130+ indicadores existentes a partir da unidade já cadastrada (% → PERCENTAGE, R$ → CURRENCY, IQA → INDEX_SCORE, etc.)",
+      "Motor de relatório (generate-report) agora formata cada valor bruto seguindo a flag (R$ X,XX para moeda, X,X% para porcentagem, X mi para milhões) e inclui o formato como metadado no prompt da IA — fim das interpretações ambíguas (ex: 0,75 lido como 75% vs 0,75 unidades)",
+      "Formatador centralizado em src/lib/indicatorValueFormat.ts (formatIndicatorValue, formatIndicatorValueWithUnit) — single source of truth para exibição numérica em todo o sistema",
+      "formatIndicatorValueBR refatorado para delegar à flag value_format quando presente; mantém fallback por unidade para retrocompatibilidade",
+    ]
+  },
   {
     version: "1.24.3",
     date: "2026-04-16",
