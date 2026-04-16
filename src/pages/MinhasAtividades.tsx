@@ -109,7 +109,7 @@ export default function MinhasAtividades() {
   const { data, isLoading } = useMyClassroomAssignments();
 
   return (
-    <AppLayout>
+    <AppLayout title="Minhas Atividades">
       <div className="container max-w-4xl py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight">Minhas Atividades</h1>
