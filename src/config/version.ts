@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 24,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.24.3",
+    date: "2026-04-16",
+    type: "patch" as const,
+    changes: [
+      "Correção do IQA (Índice de Qualidade da Água): cadastrado o indicador 'ana_iqa' no catálogo territorial — agora os valores capturados pela integração ANA/Hidroweb passam a ser injetados corretamente no preenchimento do diagnóstico (caso reportado: Itanhaém/SP)",
+      "Arquivamento do indicador duplicado 'RA002' (IQA manual) para evitar duplicidade — valores históricos foram migrados para 'ana_iqa' preservando o IQA de diagnósticos anteriores",
+      "Auditoria completa de escopo: 26 indicadores ENT_* corretamente classificados como 'enterprise' e 107 indicadores 'territorial' (sem mais escopo 'both' incorreto)",
+    ]
+  },
   {
     version: "1.24.2",
     date: "2026-04-16",
