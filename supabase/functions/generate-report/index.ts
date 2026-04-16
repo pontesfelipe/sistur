@@ -899,13 +899,13 @@ serve(async (req) => {
       enterpriseValuesRes,
       enterpriseProfileRes,
     ] = await Promise.all([
-      supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
+      supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit, value_format, normalization)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
       // `value_raw`, `value_text`, `source` and `reference_date` are all persisted
       // per the indicator_values schema — select * so evidence/provenance reach
       // the LLM prompt (they used to be loaded but never surfaced).
-      supabase.from('indicator_values').select('*, indicators(code, name, pillar, theme, unit)').eq('assessment_id', assessmentId),
+      supabase.from('indicator_values').select('*, indicators(code, name, pillar, theme, unit, value_format, normalization)').eq('assessment_id', assessmentId),
       supabaseAdmin.from('global_reference_files').select('file_name, category, summary, description').eq('is_active', true).not('summary', 'is', null),
       // KB files: ONLY from the user's own org — scoped by org_id for multi-tenant isolation
       supabaseAdmin.from('knowledge_base_files').select('id, file_name, description, category').eq('is_active', true).eq('org_id', assessmentOrgId).or(destinationId ? `destination_id.eq.${destinationId},destination_id.is.null` : 'destination_id.is.null'),
