@@ -479,8 +479,9 @@ export const INDICATOR_GUIDANCE: Record<string, IndicatorGuidance> = {
   },
   igma_satisfacao_turista: {
     howToFind:
-      'Pesquisa de satisfação aplicada pelo destino ou Observatório de Turismo. Índice geral de satisfação.',
-    examples: 'Índice 0,78',
+      'Pesquisa de satisfação aplicada pelo destino ou Observatório de Turismo. Escala de 0 a 10 (aceita 1 casa decimal).',
+    examples: 'Nota 7,8',
+    validation: { min: 0, max: 10, maxDecimals: 1 },
   },
   igma_turistas_ano: {
     howToFind:
@@ -518,7 +519,7 @@ export function getValidationForIndicator(indicator: {
   direction?: string;
   min_ref?: number | null;
   max_ref?: number | null;
-}): { min?: number; max?: number; integer?: boolean } {
+}): { min?: number; max?: number; integer?: boolean; maxDecimals?: number } {
   // Check specific guidance first
   const guidance = INDICATOR_GUIDANCE[indicator.code];
   if (guidance?.validation) return guidance.validation;
@@ -593,6 +594,12 @@ export function validateIndicatorValue(
 
   if (rules.integer && !Number.isInteger(num)) {
     return 'Valor deve ser um número inteiro';
+  }
+  if (rules.maxDecimals !== undefined) {
+    const parts = rawValue.replace(',', '.').split('.');
+    if (parts.length === 2 && parts[1].length > rules.maxDecimals) {
+      return `Máximo de ${rules.maxDecimals} casa(s) decimal(is)`;
+    }
   }
   if (rules.min !== undefined && num < rules.min) {
     return `Valor mínimo permitido: ${rules.min}`;
