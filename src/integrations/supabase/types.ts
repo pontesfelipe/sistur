@@ -7623,6 +7623,10 @@ export type Database = {
         Returns: number
       }
       expire_trial_licenses: { Args: never; Returns: undefined }
+      extend_assignment_due_date: {
+        Args: { p_assignment_id: string; p_new_due_date: string }
+        Returns: undefined
+      }
       finalize_essay_grading: {
         Args: { _attempt_id: string; _grades: Json }
         Returns: Json
@@ -7643,6 +7647,10 @@ export type Database = {
           pillar: string
           ruleset_id: string
         }[]
+      }
+      get_assignment_progress: {
+        Args: { p_assignment_id: string }
+        Returns: Json
       }
       get_dashboard_org_access_flags: {
         Args: never
@@ -7721,6 +7729,10 @@ export type Database = {
         Returns: number
       }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
+      grant_extra_attempts: {
+        Args: { p_assignment_id: string; p_extra_count?: number }
+        Returns: number
+      }
       has_org_admin_role: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -7774,6 +7786,14 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      send_assignment_reminder: {
+        Args: {
+          p_assignment_id: string
+          p_custom_message?: string
+          p_mode?: string
+        }
+        Returns: number
       }
       set_demo_org_id: { Args: { target_org_id: string }; Returns: undefined }
       start_assignment_exam: {
