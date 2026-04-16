@@ -221,6 +221,11 @@ export function useClassroomAssignmentActions(classroomId: string) {
       training_id?: string;
       exam_ruleset_id?: string;
       due_date?: string;
+      available_from?: string;
+      target_user_ids?: string[] | null;
+      override_time_limit_minutes?: number | null;
+      override_max_attempts?: number | null;
+      override_min_score_pct?: number | null;
       custom_content?: any;
     }) => {
       const { data, error } = await supabase
