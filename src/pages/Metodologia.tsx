@@ -760,7 +760,7 @@ export default function Metodologia() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                    Fontes: IBGE, SIDRA, DATASUS, INEP, STN, CADASTUR, Mapa do Turismo
+                    Fontes: IBGE, SIDRA, DATASUS, INEP, STN, CADASTUR, Mapa do Turismo, ANA/Hidroweb
                   </li>
                 </ul>
               </div>
@@ -1040,6 +1040,7 @@ export default function Metodologia() {
                   <li className="flex items-start gap-2"><span className="text-green-600">🏨</span> <strong>IBGE Pesquisas (CADASTUR)</strong>: Meios de hospedagem (estabelecimentos e UH)</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">🏨</span> <strong>CADASTUR / dados.gov.br</strong>: Guias de turismo e Agências de turismo via datasets oficiais abertos (ingestão trimestral)</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">🗺️</span> <strong>Mapa do Turismo Brasileiro</strong>: Região turística, Categoria (A-E), Empregos no turismo, Estabelecimentos turísticos, Visitantes nacionais e internacionais, Arrecadação turística, Conselho municipal de turismo — via API REST do Ministério do Turismo (mapa.turismo.gov.br)</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">💧</span> <strong>ANA / Hidroweb (Qualiágua)</strong>: IQA (Índice de Qualidade da Água) médio das estações de monitoramento do município, número de estações ativas e ano de referência — via API pública da Agência Nacional de Águas (alimenta o pilar RA com base hídrica oficial)</li>
                 </ul>
               </div>
 
@@ -1070,12 +1071,13 @@ export default function Metodologia() {
             </Alert>
 
             <div className="rounded-xl border bg-muted/30 p-5 space-y-3">
-              <h4 className="font-semibold">Resumo: 7 Fontes Oficiais Integradas</h4>
+              <h4 className="font-semibold">Resumo: 8 Fontes Oficiais Integradas</h4>
               <p className="text-sm text-muted-foreground">
-                O SISTUR consulta automaticamente <strong>7 fontes oficiais</strong> para pré-preencher mais de 20 indicadores: 
-                IBGE Agregados, IBGE SIDRA (Censo), IBGE Pesquisas, DATASUS, INEP, STN/Tesouro Nacional, CADASTUR e Mapa do Turismo Brasileiro. 
-                Indicadores que não possuem API pública (como taxa de escolarização e dados de levantamento local) 
-                são preenchidos manualmente pelo operador do diagnóstico.
+                O SISTUR consulta automaticamente <strong>8 fontes oficiais</strong> para pré-preencher mais de 25 indicadores:
+                IBGE Agregados, IBGE SIDRA (Censo), IBGE Pesquisas, DATASUS, INEP, STN/Tesouro Nacional, CADASTUR (datasets abertos),
+                Mapa do Turismo Brasileiro (API REST do MTur) e ANA/Hidroweb (Qualiágua) para o IQA municipal.
+                Indicadores que não possuem API pública (como taxa de escolarização e dados de levantamento local)
+                são preenchidos manualmente pelo operador do diagnóstico, sempre com confirmação humana antes do cálculo.
               </p>
             </div>
           </CardContent>
