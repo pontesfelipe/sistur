@@ -300,7 +300,7 @@ export const INDICATOR_GUIDANCE: Record<string, IndicatorGuidance> = {
   // ── Territorial: IGMA / Mapa do Turismo ──
   igma_categoria_mapa_turismo: {
     howToFind:
-      'Consulte o Mapa do Turismo Brasileiro (MTur). O município é classificado de A (mais desenvolvido) a E (menos desenvolvido).',
+      '🔄 Pré-preenchido automaticamente via integração com o Mapa do Turismo Brasileiro (MTur). Categorias: A (mais desenvolvido), B, C.',
     examples: 'Categoria B',
   },
   igma_regiao_turistica: {
@@ -353,7 +353,7 @@ export const INDICATOR_GUIDANCE: Record<string, IndicatorGuidance> = {
   // ── Territorial: Ações Operacionais (AO) ──
   AO001: {
     howToFind:
-      'Consulte a Secretaria de Turismo municipal, Observatório de Turismo ou estimativas do MTur. Inclui turistas nacionais e internacionais.',
+      '🔄 Pré-preenchido via Mapa do Turismo (visitantes nacionais + internacionais estimados). Caso necessário, ajuste com dados da Secretaria de Turismo local.',
     examples: '150.000 turistas/ano',
     validation: { min: 0, integer: true },
   },
