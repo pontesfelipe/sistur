@@ -50,6 +50,7 @@ const OPTIONS_BY_CODE: Record<string, IndicatorFieldOption[]> = {
 const BINARY_CODES = new Set([
   'AO_PLANO_TURISMO',
   'AO_CONSELHO_TURISMO',
+  'OE007',
   'igma_regiao_turistica',
   'igma_conselho_municipal_turismo',
 ]);
