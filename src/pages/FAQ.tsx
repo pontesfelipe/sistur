@@ -71,6 +71,31 @@ export const faqItems: FAQItem[] = [
     answer: 'Os cursos são direcionados a três perfis: Gestores Públicos (responsáveis por políticas), Técnicos (profissionais de planejamento) e Trade Turístico (empresários e operadores do setor).',
     category: 'edu',
   },
+  {
+    question: 'Como o professor agenda uma prova ou trilha para a turma?',
+    answer: 'No Painel do Professor, na aba "Atividades", o professor cria uma atribuição informando: tipo (prova, trilha ou treinamento), título, descrição, data e horário de liberação (available_from), prazo final (due_date) e alunos-alvo (toda a turma ou indivíduos selecionados). É possível ainda definir regras específicas para aquela atividade — limite de tempo, número de tentativas e nota mínima — sem alterar a configuração global da prova. Os alunos-alvo recebem uma notificação automática na central de avisos no momento da criação.',
+    category: 'edu',
+  },
+  {
+    question: 'Como o aluno acessa as atividades atribuídas pelo professor?',
+    answer: 'O aluno acessa "Minhas Atividades" (/edu/minhas-atividades) e visualiza todas as atribuições com janela de disponibilidade, prazo e status. Ao clicar em "Iniciar" em uma prova, o servidor valida automaticamente a janela, o número de tentativas restantes e a matrícula na turma — gera a prova com amostragem estratificada de questões (30% fáceis, 50% médias, 20% difíceis), aplica overrides definidos pelo professor e redireciona o aluno direto para a tela de execução.',
+    category: 'edu',
+  },
+  {
+    question: 'Como o professor acompanha o desempenho da turma em uma atividade?',
+    answer: 'Cada atividade no Painel do Professor possui um botão "Acompanhar" que abre um drill-down com KPIs (taxa de conclusão, taxa de aprovação, nota média) e o status individual de cada aluno: não iniciou, em andamento, aguarda correção, reprovado (pode tentar novamente), esgotou tentativas ou aprovado. É possível filtrar por status clicando nos chips e executar ações em massa: enviar lembrete (para todos pendentes, não iniciantes ou não entregues), prorrogar o prazo da atividade ou liberar tentativas extras. Todas as ações disparam notificações automáticas para os alunos-alvo.',
+    category: 'edu',
+  },
+  {
+    question: 'Como funcionam as provas finais das trilhas formativas?',
+    answer: 'Toda trilha pode ter provas finais por pilar coberto (RA, OE e/ou AO). A configuração padrão usa 20 questões, nota mínima de 70%, 60 minutos de duração e 2 tentativas. Ao criar uma trilha, o checkbox "Gerar provas finais automaticamente" (marcado por padrão) cria os rulesets imediatamente; o botão "Gerar provas" no detalhe da trilha permite regenerar a qualquer momento. As trilhas pré-prontas existentes receberam backfill automático dessas provas.',
+    category: 'edu',
+  },
+  {
+    question: 'Como funciona o sistema anti-fraude nos exames?',
+    answer: 'O SISTUR EDU rastreia toda a sessão da prova: heartbeats periódicos, mudanças de aba/janela, tentativa de copiar/colar e tempo gasto por questão. A correção de questões objetivas é instantânea no servidor; questões dissertativas seguem para correção manual via RPC finalize_essay_grading (que centraliza nota + emissão de certificado). Certificados só são emitidos após validação completa, com QR Code de verificação pública.',
+    category: 'edu',
+  },
 
   // ERP-specific questions
   {
