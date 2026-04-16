@@ -91,14 +91,49 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
         .eq('assessment_id', selectedAssessment)
         .single();
 
-      // Fetch issues, prescriptions, action plans, pillar scores, and indicator scores
-      const [issuesRes, prescriptionsRes, actionPlansRes, pillarScoresRes, indicatorScoresRes] = await Promise.all([
+      // Destination drives the enterprise-profile and external-benchmarks lookups
+      // (both are destination-scoped, not assessment-scoped).
+      const destinationId = selectedData.destination_id;
+
+      // Fetch issues, prescriptions, action plans, pillar scores, indicator scores,
+      // destination (for ibge_code), and the enterprise profile — in parallel.
+      // External benchmarks are fetched in a dependent step because we need the
+      // destination's ibge_code + org_id first.
+      const [
+        issuesRes,
+        prescriptionsRes,
+        actionPlansRes,
+        pillarScoresRes,
+        indicatorScoresRes,
+        destinationRes,
+        enterpriseProfileRes,
+      ] = await Promise.all([
         supabase.from('issues').select('*').eq('assessment_id', selectedAssessment),
         supabase.from('prescriptions').select('*').eq('assessment_id', selectedAssessment),
         supabase.from('action_plans').select('*').eq('assessment_id', selectedAssessment).order('priority', { ascending: true }),
         supabase.from('pillar_scores').select('*').eq('assessment_id', selectedAssessment),
-        supabase.from('indicator_scores').select('*, indicator:indicators(code, name, pillar, theme)').eq('assessment_id', selectedAssessment).order('score', { ascending: true }),
+        supabase.from('indicator_scores').select('*, indicator:indicators(code, name, pillar, theme, unit)').eq('assessment_id', selectedAssessment).order('score', { ascending: true }),
+        supabase.from('destinations').select('id, ibge_code, org_id').eq('id', destinationId).maybeSingle(),
+        supabase.from('enterprise_profiles').select('*').eq('destination_id', destinationId).maybeSingle(),
       ]);
+
+      // Pull external benchmarks only if the destination has an IBGE code.
+      // This is a best-effort enrichment — the AI still works without it.
+      const ibgeCode = destinationRes.data?.ibge_code;
+      const destinationOrgId = destinationRes.data?.org_id;
+      // No FK between external_indicator_values.indicator_code and indicators.id
+      // (indicator_code is TEXT, joined by code), so we can't rely on PostgREST
+      // embedding — the edge fn falls back to showing the code when a name
+      // isn't in the indicator_scores catalog.
+      let externalValues: any[] = [];
+      if (ibgeCode && destinationOrgId) {
+        const { data: extData } = await supabase
+          .from('external_indicator_values')
+          .select('indicator_code, raw_value, raw_value_text, source_code, reference_year')
+          .eq('municipality_ibge_code', ibgeCode)
+          .eq('org_id', destinationOrgId);
+        externalValues = extData || [];
+      }
 
       // Build pillar scores map
       const pillarScoresMap: Record<string, any> = {};
@@ -119,6 +154,11 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
           actionPlans: actionPlansRes.data || [],
           pillarScores: pillarScoresMap,
           indicatorScores: indicatorScoresRes.data || [],
+          // Contextualizes prescriptions against the real operation (sazonalidade,
+          // certificações já existentes, público-alvo) in enterprise assessments.
+          enterpriseProfile: enterpriseProfileRes.data || null,
+          // Lets the AI anchor task metas in regional baselines (IBGE/DATASUS…).
+          externalValues,
         },
       });
 

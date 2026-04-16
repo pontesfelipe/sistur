@@ -59,7 +59,18 @@ function formatIndicatorScores(indicatorScores: any[]): string {
     scores.forEach((s: any) => {
       const status = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
       const benchmark = s.indicators?.benchmark_target ? ` (benchmark: ${s.indicators.benchmark_target})` : '';
-      result += `    * ${s.indicators?.name || s.indicators?.code}: ${formatPctBR(s.score)}% [${status}] - Tema: ${s.indicators?.theme || 'N/A'}${benchmark}\n`;
+      // Surface the normalization parameters actually used by
+      // calculate-assessment (weight_used / min_ref_used / max_ref_used are
+      // persisted on indicator_scores). Without them, an auditor can't verify
+      // how a "65%" came to be — e.g. what interval was used to MIN-MAX.
+      const normRefs = (s.min_ref_used !== null && s.min_ref_used !== undefined
+        && s.max_ref_used !== null && s.max_ref_used !== undefined)
+        ? ` | Normalização: [${s.min_ref_used}, ${s.max_ref_used}]`
+        : '';
+      const weightStr = (s.weight_used !== null && s.weight_used !== undefined && s.weight_used !== 1)
+        ? ` | Peso: ${s.weight_used}`
+        : '';
+      result += `    * ${s.indicators?.name || s.indicators?.code}: ${formatPctBR(s.score)}% [${status}] - Tema: ${s.indicators?.theme || 'N/A'}${benchmark}${normRefs}${weightStr}\n`;
     });
   }
   return result;
@@ -89,6 +100,15 @@ function formatIndicatorsByCategory(indicatorScores: any[]): string {
       const benchmarkTarget = s.indicators?.benchmark_target !== null ? s.indicators.benchmark_target : 'N/A';
       result += `  - ${s.indicators?.name || s.indicators?.code}: ${formatPctBR(s.score)}% [${kpiStatus}]\n`;
       result += `    Benchmark: min=${benchmarkMin}, target=${benchmarkTarget}, max=${benchmarkMax}\n`;
+      // See formatIndicatorScores: same rationale — make the normalization
+      // parameters auditable per indicator.
+      if (s.min_ref_used !== null && s.min_ref_used !== undefined
+        && s.max_ref_used !== null && s.max_ref_used !== undefined) {
+        const weightSuffix = (s.weight_used !== null && s.weight_used !== undefined && s.weight_used !== 1)
+          ? `, peso ${s.weight_used}`
+          : '';
+        result += `    Normalização: intervalo [${s.min_ref_used}, ${s.max_ref_used}]${weightSuffix}\n`;
+      }
     });
   }
   return result;
