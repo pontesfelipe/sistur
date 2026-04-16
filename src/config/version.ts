@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 23,
-  patch: 1,
+  minor: 24,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.24.0",
+    date: "2026-04-16",
+    type: "minor" as const,
+    changes: [
+      "Professor: novo painel 'Acompanhar' por atividade — drill-down com KPIs (conclusão, aprovação, nota média) e status individual por aluno (não iniciou, em andamento, aguarda correção, reprovado, esgotou tentativas, aprovado)",
+      "Professor: filtro por status clicando nos chips de breakdown",
+      "Ações em massa: enviar lembrete (todos pendentes / não iniciaram / não entregaram), prorrogar prazo, liberar tentativas extras",
+      "RPCs server-authoritative: get_assignment_progress, extend_assignment_due_date, grant_extra_attempts, send_assignment_reminder",
+      "Notificações automáticas em edu_notifications para alunos-alvo em prorrogação, tentativas extras e lembretes",
+    ]
+  },
   {
     version: "1.23.1",
     date: "2026-04-16",
