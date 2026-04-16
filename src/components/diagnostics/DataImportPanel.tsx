@@ -983,6 +983,11 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       {valError}
                                     </p>
                                   )}
+                                  {indicator.code === 'ana_iqa' && !isPreFilled && !currentValue && !hasUnsavedChanges && (
+                                    <p className="text-xs text-muted-foreground mt-1 italic">
+                                      Nota: Nem todos os municípios terão estações IQA num raio de 50 km — nesses casos o campo fica disponível para preenchimento manual.
+                                    </p>
+                                  )}
                                 </div>
                                 <div className="col-span-4 flex justify-end items-center gap-1.5">
                                   <Tooltip>
