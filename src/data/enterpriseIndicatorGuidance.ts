@@ -349,6 +349,148 @@ export const INDICATOR_GUIDANCE: Record<string, IndicatorGuidance> = {
     examples: '8 agências cadastradas',
     validation: { min: 0, integer: true },
   },
+
+  // ── Territorial: Ações Operacionais (AO) ──
+  AO001: {
+    howToFind:
+      'Consulte a Secretaria de Turismo municipal, Observatório de Turismo ou estimativas do MTur. Inclui turistas nacionais e internacionais.',
+    examples: '150.000 turistas/ano',
+    validation: { min: 0, integer: true },
+  },
+  AO002: {
+    howToFind:
+      'Solicite dados à associação hoteleira local, ABIH regional ou Secretaria de Turismo. Média anual da ocupação dos meios de hospedagem.',
+    examples: '62%',
+    validation: { min: 0, max: 100 },
+  },
+  AO003: {
+    howToFind:
+      'Pesquisa de demanda turística do município ou estimativa da Secretaria de Turismo. Média de dias que o turista permanece no destino.',
+    examples: '3,5 dias',
+    validation: { min: 0 },
+  },
+  AO004: {
+    howToFind:
+      'Estimativa da receita gerada pelo turismo. Consulte estudos de impacto econômico, Observatório de Turismo ou IBGE (conta satélite).',
+    examples: 'R$ 25.000.000',
+    validation: { min: 0 },
+  },
+  AO005: {
+    howToFind:
+      'Conte os segmentos turísticos ativos: Sol e Praia, Ecoturismo, Cultural, Aventura, Negócios, Gastronômico, Rural, Religioso, Saúde, etc.',
+    examples: '4 segmentos (Cultural, Ecoturismo, Negócios, Gastronômico)',
+    validation: { min: 0, integer: true },
+  },
+  AO006: {
+    howToFind:
+      'Levante o calendário de eventos turísticos junto à Secretaria de Turismo ou Convention Bureau. Conte apenas eventos com impacto turístico.',
+    examples: '12 eventos/ano',
+    validation: { min: 0, integer: true },
+  },
+  AO007: {
+    howToFind:
+      'Aplique pesquisa de satisfação com turistas (escala 0-10) ou use dados do Observatório de Turismo local.',
+    examples: 'Nota 7,8',
+  },
+
+  // ── Territorial: Organização Estrutural (OE) ──
+  OE001: {
+    howToFind:
+      'Consulte a Secretaria de Turismo, CADASTUR ou associação hoteleira. Some leitos de hotéis, pousadas, hostels e outros meios de hospedagem.',
+    examples: '2.500 leitos',
+    validation: { min: 0, integer: true },
+  },
+  OE002: {
+    howToFind:
+      'Dados do IBGE (Censo) ou SNIS (Sistema Nacional de Informações sobre Saneamento). Percentual de domicílios com água tratada, esgoto e coleta de lixo.',
+    examples: '78%',
+    validation: { min: 0, max: 100 },
+  },
+  OE003: {
+    howToFind:
+      'Consulte o site da ANAC ou INFRAERO. Conte voos comerciais regulares semanais no aeroporto mais próximo do destino.',
+    examples: '14 voos/semana',
+    validation: { min: 0, integer: true },
+  },
+  OE007: {
+    howToFind:
+      'Verifique se o município possui Plano Municipal de Turismo vigente. Consulte a Secretaria de Turismo ou Diário Oficial.',
+    examples: 'Sim ou Não',
+  },
+
+  // ── Territorial: Relações Ambientais (RA) ──
+  RA001: {
+    howToFind:
+      'Consulte o ICMBio, SNUC ou órgão ambiental estadual. Calcule: (área de UCs ÷ área total do município) × 100.',
+    examples: '18% do território em áreas protegidas',
+    validation: { min: 0, max: 100 },
+  },
+  RA002: {
+    howToFind:
+      'Consulte a ANA (Agência Nacional de Águas) ou órgão ambiental estadual. IQA de pontos turísticos (praias, rios, cachoeiras).',
+    examples: 'IQA 72 (Boa)',
+    validation: { min: 0, max: 100 },
+  },
+  RA003: {
+    howToFind:
+      'Consulte o IPHAN (federal) e órgão de patrimônio estadual/municipal. Conte bens tombados e registrados.',
+    examples: '8 patrimônios registrados',
+    validation: { min: 0, integer: true },
+  },
+  RA004: {
+    howToFind:
+      'Levante festas, tradições, artesanato, gastronomia típica e expressões culturais ativas no município junto à Secretaria de Cultura.',
+    examples: '12 manifestações culturais',
+    validation: { min: 0, integer: true },
+  },
+  RA006: {
+    howToFind:
+      'Dados do CAGED/MTE ou RAIS. Calcule: (empregos formais em ACTs ÷ total de empregos formais) × 100.',
+    examples: '8,5% dos empregos no setor turístico',
+    validation: { min: 0, max: 100 },
+  },
+  RA007: {
+    howToFind:
+      'Avalie a existência e atuação de conselhos participativos (COMTUR, Instância de Governança). Escala de 1 (inexistente) a 5 (muito ativo).',
+    examples: 'Score 3',
+  },
+
+  // ── IGMA: Indicadores manuais comuns ──
+  igma_taxa_escolarizacao: {
+    howToFind:
+      'IBGE ou INEP. Percentual da população de 6-14 anos matriculada na escola.',
+    examples: '97,5%',
+    validation: { min: 0, max: 100 },
+  },
+  igma_satisfacao_turista: {
+    howToFind:
+      'Pesquisa de satisfação aplicada pelo destino ou Observatório de Turismo. Índice geral de satisfação.',
+    examples: 'Índice 0,78',
+  },
+  igma_turistas_ano: {
+    howToFind:
+      'Dados da Secretaria de Turismo, Observatório de Turismo ou estimativas do MTur.',
+    examples: '150.000 turistas/ano',
+    validation: { min: 0, integer: true },
+  },
+  igma_receita_turistica: {
+    howToFind:
+      'Estimativa da receita gerada pelo turismo no município. Consulte Observatório de Turismo ou estudos de impacto econômico.',
+    examples: 'R$ 25.000.000',
+    validation: { min: 0 },
+  },
+  igma_permanencia_media: {
+    howToFind:
+      'Pesquisa de demanda turística municipal. Média de dias de permanência dos visitantes.',
+    examples: '3,2 dias',
+    validation: { min: 0 },
+  },
+  igma_taxa_de_ocupacao_hoteleira: {
+    howToFind:
+      'Associação hoteleira local, ABIH regional ou pesquisa de oferta hoteleira. Taxa média anual.',
+    examples: '58%',
+    validation: { min: 0, max: 100 },
+  },
 };
 
 /**
