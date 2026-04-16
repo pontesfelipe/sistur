@@ -158,6 +158,13 @@ export function useFetchOfficialData() {
       orgId: string; 
       indicators?: string[];
     }) => {
+      // Reset previous validation flags so fresh data is presented for re-validation
+      await supabase
+        .from('external_indicator_values')
+        .update({ validated: false, validated_by: null, validated_at: null })
+        .eq('municipality_ibge_code', ibgeCode)
+        .eq('org_id', orgId);
+
       // Fire all in parallel: IBGE + CADASTUR + Mapa do Turismo bridge + ANA
       const [officialResult, cadasturResult, mapaResult, anaResult] = await Promise.allSettled([
         supabase.functions.invoke('fetch-official-data', {

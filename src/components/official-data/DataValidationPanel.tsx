@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -87,15 +88,18 @@ export function DataValidationPanel({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmedIds, setConfirmedIds] = useState<Set<string>>(new Set());
   const [autoFetched, setAutoFetched] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: rawValues = [], isLoading } = useExternalIndicatorValues(ibgeCode, orgId);
   const fetchOfficialData = useFetchOfficialData();
   const validateValues = useValidateIndicatorValues();
 
-  // Always fetch fresh data when the panel mounts for a new diagnostic
+  // Always fetch fresh data from all sources when the panel mounts for a new diagnostic
   useEffect(() => {
     if (!autoFetched && ibgeCode && orgId) {
       setAutoFetched(true);
+      // Clear stale cache before fetching fresh data
+      queryClient.removeQueries({ queryKey: ['external-indicator-values', ibgeCode, orgId] });
       fetchOfficialData.mutate({ ibgeCode, orgId });
     }
   }, [ibgeCode, orgId, autoFetched]);
