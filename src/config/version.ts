@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 21,
-  patch: 14,
+  patch: 15,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.21.15",
+    date: "2026-04-16",
+    type: "patch" as const,
+    changes: [
+      "Removidas políticas RLS permissivas (anon/true) em test_flow_registry, system_health_checks e test_registry_sync_log",
+      "Acesso a tabelas de sistema restrito a ADMIN e service_role exclusivamente",
+      "Removido SELECT público em lms_certificates — verificação pública via RPC verify_certificate_by_code",
+      "Removido SELECT direto de org_admin em investor_profiles — acesso PII restrito ao dono do perfil (view segura mantida)",
+      "Simplificada extração de indicadores em generate-project-structure (consistência código/objeto)",
+    ]
+  },
   {
     version: "1.21.14",
     date: "2026-04-15",
