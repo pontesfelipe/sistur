@@ -68,6 +68,7 @@ import { useEduTrainings, EduTraining } from '@/hooks/useEduTrainings';
 import { useAuth } from '@/hooks/useAuth';
 import { TARGET_AGENT_INFO, type TargetAgent } from '@/types/sistur';
 import { TrackCertificate } from '@/components/edu/TrackCertificate';
+import { TrackExamsPanel } from '@/components/edu/TrackExamsPanel';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
