@@ -926,39 +926,47 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                         </SelectContent>
                                       </Select>
                                     ) : (
-                                      <Input
-                                        type="text"
-                                        inputMode="decimal"
-                                        value={hasUnsavedChanges 
-                                          ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue, indicator))
-                                          : formatDisplayValue(currentValue, indicator)
-                                        }
-                                        onChange={(e) => {
-                                          const raw = e.target.value;
-                                          if (raw !== '' && !/^-?[\d.,]*$/.test(raw)) return;
-                                          handleValueChange(indicator.id, raw);
-                                        }}
-                                        onBlur={() => {
-                                          const edited = editedValues[indicator.id];
-                                          if (!edited) return;
-                                          setEditedValues(prev => ({
-                                            ...prev,
-                                            [indicator.id]: {
-                                              ...prev[indicator.id],
-                                              _rawInput: edited.value === null ? '' : formatDisplayValue(edited.value, indicator),
-                                            },
-                                          }));
-                                        }}
-                                        disabled={isIgnored}
-                                        className={cn(
-                                          'w-full pr-8',
-                                          valError && 'border-destructive ring-1 ring-destructive',
-                                          !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
-                                          !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
-                                          isIgnored && 'bg-muted cursor-not-allowed'
+                                      <div className="relative flex items-center gap-2">
+                                        <Input
+                                          type="text"
+                                          inputMode="decimal"
+                                          value={hasUnsavedChanges 
+                                            ? (editedValues[indicator.id]?._rawInput ?? formatDisplayValue(currentValue, indicator))
+                                            : formatDisplayValue(currentValue, indicator)
+                                          }
+                                          onChange={(e) => {
+                                            const raw = e.target.value;
+                                            if (raw !== '' && !/^-?[\d.,]*$/.test(raw)) return;
+                                            handleValueChange(indicator.id, raw);
+                                          }}
+                                          onBlur={() => {
+                                            const edited = editedValues[indicator.id];
+                                            if (!edited) return;
+                                            setEditedValues(prev => ({
+                                              ...prev,
+                                              [indicator.id]: {
+                                                ...prev[indicator.id],
+                                                _rawInput: edited.value === null ? '' : formatDisplayValue(edited.value, indicator),
+                                              },
+                                            }));
+                                          }}
+                                          disabled={isIgnored}
+                                          className={cn(
+                                            'w-full',
+                                            isPreFilled && !hasUnsavedChanges && 'pr-8',
+                                            valError && 'border-destructive ring-1 ring-destructive',
+                                            !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
+                                            !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
+                                            isIgnored && 'bg-muted cursor-not-allowed'
+                                          )}
+                                          placeholder={isIgnored ? 'Ignorado' : 'Valor'}
+                                        />
+                                        {indicator.unit && (
+                                          <span className="text-xs text-muted-foreground font-medium whitespace-nowrap shrink-0">
+                                            {indicator.unit}
+                                          </span>
                                         )}
-                                        placeholder={isIgnored ? 'Ignorado' : indicator.unit ? `Valor (${indicator.unit})` : 'Valor'}
-                                      />
+                                      </div>
                                     )}
                                     {isPreFilled && !hasUnsavedChanges && !isIgnored && !valError && (
                                       <Tooltip>
