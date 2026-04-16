@@ -57,6 +57,7 @@ const SOURCE_INFO: Record<string, { name: string; color: string; icon: string }>
   STN: { name: 'Tesouro Nacional', color: 'bg-amber-500', icon: '💰' },
   CADASTUR: { name: 'CADASTUR', color: 'bg-cyan-500', icon: '🏨' },
   MAPA_TURISMO: { name: 'Mapa do Turismo', color: 'bg-teal-500', icon: '🗺️' },
+  ANA: { name: 'ANA — Águas', color: 'bg-sky-500', icon: '💧' },
   MANUAL: { name: 'Preenchimento Manual', color: 'bg-gray-400', icon: '✏️' },
 };
 

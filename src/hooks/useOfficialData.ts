@@ -158,8 +158,8 @@ export function useFetchOfficialData() {
       orgId: string; 
       indicators?: string[];
     }) => {
-      // Fire all in parallel: IBGE + CADASTUR + Mapa do Turismo bridge
-      const [officialResult, cadasturResult, mapaResult] = await Promise.allSettled([
+      // Fire all in parallel: IBGE + CADASTUR + Mapa do Turismo bridge + ANA
+      const [officialResult, cadasturResult, mapaResult, anaResult] = await Promise.allSettled([
         supabase.functions.invoke('fetch-official-data', {
           body: { ibge_code: ibgeCode, org_id: orgId, indicators },
         }),
@@ -167,11 +167,15 @@ export function useFetchOfficialData() {
           body: { ibge_code: ibgeCode, org_id: orgId },
         }),
         bridgeMapaTurismoData(ibgeCode, orgId),
+        supabase.functions.invoke('ingest-ana', {
+          body: { ibge_code: ibgeCode, org_id: orgId },
+        }),
       ]);
 
       const official = officialResult.status === 'fulfilled' ? officialResult.value : null;
       const cadastur = cadasturResult.status === 'fulfilled' ? cadasturResult.value : null;
       const mapa = mapaResult.status === 'fulfilled' ? mapaResult.value : null;
+      const ana = anaResult.status === 'fulfilled' ? anaResult.value : null;
 
       if (official?.error) throw official.error;
       if (!official?.data?.success) throw new Error(official?.data?.error || 'Erro ao buscar dados oficiais');
