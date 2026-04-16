@@ -348,8 +348,10 @@ export function useProjectStats() {
 
 // Get progress by pillar based on assessment pillar_scores
 export function usePillarProgress(diagnosticType?: 'territorial' | 'enterprise') {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['erp-pillar-progress', diagnosticType],
+    queryKey: ['erp-pillar-progress', effectiveOrgId, diagnosticType],
     queryFn: async () => {
       // Fetch calculated assessments with pillar scores
       let query = supabase
