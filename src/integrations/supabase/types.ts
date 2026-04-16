@@ -7776,6 +7776,10 @@ export type Database = {
         }[]
       }
       set_demo_org_id: { Args: { target_org_id: string }; Returns: undefined }
+      start_assignment_exam: {
+        Args: { p_assignment_id: string }
+        Returns: Json
+      }
       toggle_demo_mode: { Args: { _enable: boolean }; Returns: undefined }
       user_belongs_to_org: {
         Args: { _org_id: string; _user_id: string }
