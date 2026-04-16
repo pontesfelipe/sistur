@@ -26,6 +26,7 @@ import { DeleteConfirmDialog } from '@/components/projects/DeleteConfirmDialog';
 import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
 import { ExamManagementPanel } from '@/components/admin/ExamManagementPanel';
 import { ComplianceReportPanel } from '@/components/edu/ComplianceReportPanel';
+import { AssignmentFormDialog } from '@/components/edu/AssignmentFormDialog';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -168,10 +169,6 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
   const [showAddAssignment, setShowAddAssignment] = useState(false);
   const [showDeleteAssignment, setShowDeleteAssignment] = useState(false);
   const [deletingAssignment, setDeletingAssignment] = useState<any>(null);
-  const [assignmentForm, setAssignmentForm] = useState({
-    type: 'custom' as string, title: '', description: '', due_date: '',
-    track_id: '', training_id: '', exam_ruleset_id: '',
-  });
 
   // Fetch org members for adding
   const { data: orgMembers } = useQuery({
@@ -229,7 +226,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
   // Combine referral students + org members as available people to add
   const referralAvailable = allStudents?.filter(s => !enrolledIds.has(s.student_id)) || [];
   const orgAvailable = orgMembers?.filter(m => !enrolledIds.has(m.user_id)) || [];
-  
+
   // Merge and deduplicate
   const allAvailable = [
     ...referralAvailable.map(s => ({ id: s.student_id, name: s.student_name, source: 'referral' })),
@@ -237,34 +234,6 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
       .filter(m => !referralAvailable.some(r => r.student_id === m.user_id))
       .map(m => ({ id: m.user_id, name: m.full_name || 'Sem nome', source: 'org' })),
   ];
-
-  const resetForm = () => setAssignmentForm({ type: 'track', title: '', description: '', due_date: '', track_id: '', training_id: '', exam_ruleset_id: '' });
-
-  const handleAddAssignment = () => {
-    let title = assignmentForm.title;
-    if (!title.trim()) {
-      if (assignmentForm.type === 'track' && assignmentForm.track_id) {
-        title = availableTracks?.find(t => t.id === assignmentForm.track_id)?.name || '';
-      } else if (assignmentForm.type === 'training' && assignmentForm.training_id) {
-        title = availableTrainings?.find(t => t.training_id === assignmentForm.training_id)?.title || '';
-      } else if (assignmentForm.type === 'exam' && assignmentForm.exam_ruleset_id) {
-        title = availableExams?.find(e => e.ruleset_id === assignmentForm.exam_ruleset_id)?.label || '';
-      }
-    }
-    if (!title.trim()) { toast.error('Título obrigatório'); return; }
-
-    createAssignment.mutate({
-      assignment_type: assignmentForm.type,
-      title,
-      description: assignmentForm.description || undefined,
-      due_date: assignmentForm.due_date || undefined,
-      track_id: assignmentForm.type === 'track' ? assignmentForm.track_id || undefined : undefined,
-      training_id: assignmentForm.type === 'training' ? assignmentForm.training_id || undefined : undefined,
-      exam_ruleset_id: assignmentForm.type === 'exam' ? assignmentForm.exam_ruleset_id || undefined : undefined,
-    }, {
-      onSuccess: () => { setShowAddAssignment(false); resetForm(); },
-    });
-  };
 
   const confirmDeleteAssignment = (a: any) => {
     setDeletingAssignment(a);
@@ -354,137 +323,92 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
             <CardTitle className="flex items-center gap-2"><ClipboardList className="h-5 w-5" /> Atividades</CardTitle>
             <CardDescription>Trilhas, treinamentos, provas e conteúdo atribuídos</CardDescription>
           </div>
-          <Dialog open={showAddAssignment} onOpenChange={setShowAddAssignment}>
-            <DialogTrigger asChild>
-              <Button size="sm"><Plus className="h-4 w-4 mr-2" />Nova Atividade</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>Nova Atividade</DialogTitle></DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Tipo</Label>
-                  <Select value={assignmentForm.type} onValueChange={v => setAssignmentForm(p => ({ ...p, type: v, track_id: '', training_id: '', exam_ruleset_id: '', title: '' }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      
-                      <SelectItem value="track">Trilha de aprendizado</SelectItem>
-                      <SelectItem value="training">Treinamento</SelectItem>
-                      <SelectItem value="exam">Prova / Exame</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {assignmentForm.type === 'track' && (
-                  <div className="space-y-2">
-                    <Label>Selecionar Trilha *</Label>
-                    <Select value={assignmentForm.track_id} onValueChange={v => {
-                      const track = availableTracks?.find(t => t.id === v);
-                      setAssignmentForm(p => ({ ...p, track_id: v, title: track?.name || p.title }));
-                    }}>
-                      <SelectTrigger><SelectValue placeholder="Escolha uma trilha" /></SelectTrigger>
-                      <SelectContent>
-                        {availableTracks?.map(t => (
-                          <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                {assignmentForm.type === 'training' && (
-                  <div className="space-y-2">
-                    <Label>Selecionar Treinamento *</Label>
-                    <Select value={assignmentForm.training_id} onValueChange={v => {
-                      const tr = availableTrainings?.find(t => t.training_id === v);
-                      setAssignmentForm(p => ({ ...p, training_id: v, title: tr?.title || p.title }));
-                    }}>
-                      <SelectTrigger><SelectValue placeholder="Escolha um treinamento" /></SelectTrigger>
-                      <SelectContent>
-                        {availableTrainings?.map(t => (
-                          <SelectItem key={t.training_id} value={t.training_id}>{t.title}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                {assignmentForm.type === 'exam' && (
-                  <div className="space-y-2">
-                    <Label>Selecionar Prova *</Label>
-                    <Select value={assignmentForm.exam_ruleset_id} onValueChange={v => {
-                      const ex = availableExams?.find(e => e.ruleset_id === v);
-                      setAssignmentForm(p => ({ ...p, exam_ruleset_id: v, title: ex?.label || p.title }));
-                    }}>
-                      <SelectTrigger><SelectValue placeholder="Escolha uma prova" /></SelectTrigger>
-                      <SelectContent>
-                        {availableExams?.map(e => (
-                          <SelectItem key={e.ruleset_id} value={e.ruleset_id}>{e.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label>Título (auto-preenchido)</Label>
-                  <Input value={assignmentForm.title} onChange={e => setAssignmentForm(p => ({ ...p, title: e.target.value }))} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Descrição</Label>
-                  <Textarea value={assignmentForm.description} onChange={e => setAssignmentForm(p => ({ ...p, description: e.target.value }))} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Data de entrega</Label>
-                  <Input type="date" value={assignmentForm.due_date} onChange={e => setAssignmentForm(p => ({ ...p, due_date: e.target.value }))} />
-                </div>
-                <Button className="w-full" onClick={handleAddAssignment} disabled={createAssignment.isPending}>
-                  {createAssignment.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                  Criar Atividade
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button size="sm" onClick={() => setShowAddAssignment(true)}>
+            <Plus className="h-4 w-4 mr-2" />Nova Atividade
+          </Button>
         </CardHeader>
         <CardContent>
           {!assignments?.length ? (
             <p className="text-sm text-muted-foreground text-center py-4">Nenhuma atividade criada.</p>
           ) : (
             <div className="space-y-3">
-              {assignments.map(a => (
-                <div key={a.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                      {a.assignment_type === 'track' ? <BookOpen className="h-4 w-4 text-primary" /> :
-                        a.assignment_type === 'exam' ? <ClipboardList className="h-4 w-4 text-primary" /> :
-                        a.assignment_type === 'training' ? <GraduationCap className="h-4 w-4 text-primary" /> :
-                          <FileText className="h-4 w-4 text-primary" />}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{a.title}</p>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          {a.assignment_type === 'track' ? 'Trilha' :
-                            a.assignment_type === 'exam' ? 'Prova' :
-                              a.assignment_type === 'training' ? 'Treinamento' : 'Conteúdo'}
-                        </Badge>
-                        {a.due_date && (
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {format(new Date(a.due_date), 'dd/MM/yyyy')}
-                          </span>
-                        )}
+              {assignments.map(a => {
+                const targetCount = a.target_user_ids?.length;
+                const overrides = [
+                  a.override_time_limit_minutes && `${a.override_time_limit_minutes}min`,
+                  a.override_max_attempts && `${a.override_max_attempts} tent.`,
+                  a.override_min_score_pct && `${a.override_min_score_pct}%`,
+                ].filter(Boolean);
+                return (
+                  <div key={a.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        {a.assignment_type === 'track' ? <BookOpen className="h-4 w-4 text-primary" /> :
+                          a.assignment_type === 'exam' ? <ClipboardList className="h-4 w-4 text-primary" /> :
+                          a.assignment_type === 'training' ? <GraduationCap className="h-4 w-4 text-primary" /> :
+                            <FileText className="h-4 w-4 text-primary" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{a.title}</p>
+                        <div className="flex items-center gap-2 flex-wrap mt-1">
+                          <Badge variant="outline" className="text-xs">
+                            {a.assignment_type === 'track' ? 'Trilha' :
+                              a.assignment_type === 'exam' ? 'Prova' :
+                                a.assignment_type === 'training' ? 'Treinamento' : 'Conteúdo'}
+                          </Badge>
+                          {a.available_from && new Date(a.available_from) > new Date() && (
+                            <span className="text-xs text-warning flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              Abre {format(new Date(a.available_from), 'dd/MM HH:mm')}
+                            </span>
+                          )}
+                          {a.due_date && (
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              Entrega {format(new Date(a.due_date), 'dd/MM HH:mm')}
+                            </span>
+                          )}
+                          {targetCount ? (
+                            <Badge variant="secondary" className="text-xs">
+                              <Users className="h-3 w-3 mr-1" />
+                              {targetCount} aluno(s)
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-xs">Toda a turma</Badge>
+                          )}
+                          {overrides.length > 0 && (
+                            <Badge variant="outline" className="text-xs">
+                              {overrides.join(' · ')}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
+                    <Button size="icon" variant="ghost" onClick={() => confirmDeleteAssignment(a)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                   </div>
-                  <Button size="icon" variant="ghost" onClick={() => confirmDeleteAssignment(a)}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
       </Card>
+
+      <AssignmentFormDialog
+        open={showAddAssignment}
+        onOpenChange={setShowAddAssignment}
+        members={students || []}
+        availableTracks={availableTracks || []}
+        availableTrainings={availableTrainings || []}
+        availableExams={availableExams || []}
+        isPending={createAssignment.isPending}
+        onSubmit={(input) => {
+          createAssignment.mutate(input, {
+            onSuccess: () => setShowAddAssignment(false),
+          });
+        }}
+      />
 
       <DeleteConfirmDialog
         open={showDeleteAssignment}

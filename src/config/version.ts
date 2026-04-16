@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 22,
+  minor: 23,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,20 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.23.0",
+    date: "2026-04-16",
+    type: "minor" as const,
+    changes: [
+      "Professor: novo diálogo de atribuição de provas/trilhas/treinamentos com agendamento data+hora (liberação e prazo)",
+      "Professor: atribuição individual — selecionar alunos específicos da turma ou enviar para todos",
+      "Professor: regras específicas opcionais por prova (tempo, tentativas, nota mínima) sem alterar o ruleset global",
+      "Aluno: nova página /edu/minhas-atividades listando todas as atribuições com janela, prazo e status",
+      "Segurança: RPC server-authoritative can_student_start_assignment valida matrícula, alvo, janela e tentativas antes de iniciar prova",
+      "Notificações: alunos-alvo recebem aviso automático na central ao serem atribuídos",
+      "RLS: aluno só vê atividades em que está matriculado E é alvo (target_user_ids)",
+    ]
+  },
   {
     version: "1.22.0",
     date: "2026-04-16",
