@@ -5,6 +5,76 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Mirror of the 26-field enterprise profile formatter in generate-report.
+// Lets the project AI contextualize prescriptions against the actual operation
+// (e.g. seasonal hotel vs year-round resort) instead of producing generic tasks.
+function formatEnterpriseProfile(profile: any): string {
+  if (!profile) return '';
+  const lines: string[] = [];
+  if (profile.property_type) lines.push(`- Tipo: ${profile.property_type}`);
+  if (profile.star_rating) lines.push(`- Classificação: ${profile.star_rating}★`);
+  if (profile.room_count) lines.push(`- UHs: ${profile.room_count}`);
+  if (profile.suite_count) lines.push(`- Suítes: ${profile.suite_count}`);
+  if (profile.total_capacity) lines.push(`- Capacidade total: ${profile.total_capacity} hóspedes`);
+  if (profile.employee_count) lines.push(`- Funcionários: ${profile.employee_count}`);
+  if (profile.years_in_operation !== null && profile.years_in_operation !== undefined) {
+    lines.push(`- Anos de operação: ${profile.years_in_operation}`);
+  }
+  if (profile.seasonality) lines.push(`- Sazonalidade: ${profile.seasonality}`);
+  if (Array.isArray(profile.peak_months) && profile.peak_months.length > 0) {
+    lines.push(`- Meses de alta: ${profile.peak_months.join(', ')}`);
+  }
+  if (profile.average_occupancy_rate !== null && profile.average_occupancy_rate !== undefined) {
+    lines.push(`- Ocupação média: ${profile.average_occupancy_rate}%`);
+  }
+  if (profile.average_daily_rate !== null && profile.average_daily_rate !== undefined) {
+    lines.push(`- ADR médio: R$ ${profile.average_daily_rate}`);
+  }
+  if (Array.isArray(profile.target_market) && profile.target_market.length > 0) {
+    lines.push(`- Público-alvo: ${profile.target_market.join(', ')}`);
+  }
+  if (Array.isArray(profile.primary_source_markets) && profile.primary_source_markets.length > 0) {
+    lines.push(`- Mercados emissores: ${profile.primary_source_markets.join(', ')}`);
+  }
+  if (Array.isArray(profile.certifications) && profile.certifications.length > 0) {
+    lines.push(`- Certificações: ${profile.certifications.join(', ')}`);
+  }
+  if (Array.isArray(profile.sustainability_initiatives) && profile.sustainability_initiatives.length > 0) {
+    lines.push(`- Iniciativas de sustentabilidade: ${profile.sustainability_initiatives.join(', ')}`);
+  }
+  if (Array.isArray(profile.accessibility_features) && profile.accessibility_features.length > 0) {
+    lines.push(`- Recursos de acessibilidade: ${profile.accessibility_features.join(', ')}`);
+  }
+  if (profile.notes) lines.push(`- Observações: ${profile.notes}`);
+  return lines.length > 0 ? lines.join('\n') : '';
+}
+
+// Official external benchmarks (IBGE / DATASUS / STN / CADASTUR / INEP / Mapa do
+// Turismo). Previously only the report prompt saw these — the project prompt
+// had no way to frame tasks against regional baselines.
+function formatExternalBenchmarks(externalValues: any[], indicatorsByCode: Map<string, any>): string {
+  if (!externalValues || externalValues.length === 0) return '';
+  const sourceLabels: Record<string, string> = {
+    IBGE_AGREGADOS: 'IBGE (Agregados)',
+    IBGE_PESQUISAS: 'IBGE (Pesquisas)',
+    DATASUS: 'DATASUS',
+    STN: 'STN / Tesouro Nacional',
+    CADASTUR: 'CADASTUR',
+    INEP: 'INEP',
+    MAPA_TURISMO: 'Mapa do Turismo',
+  };
+  return externalValues.slice(0, 20).map((ev: any) => {
+    const indicator = indicatorsByCode.get(ev.indicator_code);
+    const indicatorName = indicator?.name || ev.indicator_code;
+    const unit = indicator?.unit || '';
+    const rawValue = ev.raw_value !== null && ev.raw_value !== undefined
+      ? ev.raw_value
+      : (ev.raw_value_text || 'N/A');
+    const sourceLabel = sourceLabels[ev.source_code] || ev.source_code;
+    const year = ev.reference_year ? ` (${ev.reference_year})` : '';
+    return `- ${indicatorName}: ${rawValue}${unit ? ` ${unit}` : ''} — ${sourceLabel}${year}`;
+  }).join('\n');
+}
 // Cap how many issues/prescriptions we hand to the LLM. The client MUST use the
 // same cap (see src/lib/projectGeneration.ts) so linkedIssueIndex /
 // linkedPrescriptionIndex in the AI response map 1:1 back to the real db ids.
@@ -18,9 +88,25 @@ serve(async (req) => {
   }
 
   try {
-    const { destinationName, methodology, reportContent, issues, prescriptions, actionPlans, pillarScores, indicatorScores } = await req.json();
+    const {
+      destinationName,
+      methodology,
+      reportContent,
+      issues,
+      prescriptions,
+      actionPlans,
+      pillarScores,
+      indicatorScores,
+      // NEW: enterprise + external context that used to be invisible to the
+      // project AI — see CreateProjectDialog.tsx for how these are fetched.
+      enterpriseProfile,
+      externalValues,
+    } = await req.json();
 
-    console.log(`Generating project structure for ${destinationName} using ${methodology}`);
+    console.log(
+      `Generating project structure for ${destinationName} using ${methodology}`,
+      `— enterpriseProfile: ${!!enterpriseProfile}, externalValues: ${Array.isArray(externalValues) ? externalValues.length : 0}`,
+    );
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -41,7 +127,11 @@ ${methodologyDescriptions[methodology] || ''}
 
 Gere uma estrutura de projeto que aborde as questões identificadas e implemente as prescrições da avaliação diagnóstica.
 
-IMPORTANTE: 
+Quando houver seção "## Perfil do Empreendimento", CONTEXTUALIZE cada tarefa à realidade operacional: tipo de empreendimento, sazonalidade (ajustar prazos/fases aos meses de pico), público-alvo/mercados emissores (calibrar prescrições de marketing), certificações e iniciativas de sustentabilidade já existentes (evitar recomendar o que já está implantado).
+
+Quando houver seção "## Benchmarks Externos", use os valores oficiais (IBGE/DATASUS/STN/CADASTUR/INEP) como referência regional nas descrições das tarefas — ancore metas em números comparáveis da região/UF em vez de generalidades.
+
+IMPORTANTE:
 - Responda APENAS com um objeto JSON válido. Não inclua markdown, blocos de código ou texto explicativo.
 - TODO O CONTEÚDO DEVE ESTAR EM PORTUGUÊS BRASILEIRO (pt-BR).`;
 
@@ -86,6 +176,32 @@ IMPORTANTE:
         ).join('\n')
       : 'Nenhuma prescrição';
 
+    // Build indicator catalog for benchmark labels. indicator_scores already
+    // joins the indicator row, so harvest it from there. External indicators
+    // that aren't in indicator_scores fall back to showing their raw code.
+    const indicatorsByCode = new Map<string, any>();
+    if (Array.isArray(indicatorScores)) {
+      indicatorScores.forEach((is: any) => {
+        const code = is.indicator?.code || is.indicators?.code;
+        const indicator = is.indicator || is.indicators;
+        if (code && indicator) indicatorsByCode.set(code, indicator);
+      });
+    }
+
+    // Only attach the context sections when we actually have data — empty
+    // headers waste tokens and confuse the model.
+    const enterpriseProfileText = formatEnterpriseProfile(enterpriseProfile);
+    const enterpriseProfileSection = enterpriseProfileText
+      ? `\n## Perfil do Empreendimento\n${enterpriseProfileText}\n`
+      : '';
+    const externalBenchmarksText = formatExternalBenchmarks(
+      Array.isArray(externalValues) ? externalValues : [],
+      indicatorsByCode,
+    );
+    const externalBenchmarksSection = externalBenchmarksText
+      ? `\n## Benchmarks Externos (fontes oficiais)\n${externalBenchmarksText}\n`
+      : '';
+
     const userPrompt = `Analise os seguintes dados de diagnóstico para o destino "${destinationName}" e gere uma estrutura de projeto em PORTUGUÊS BRASILEIRO:
 
 ## Resumo do Relatório
@@ -96,7 +212,7 @@ ${pillarScoresText}
 
 ## Indicadores Críticos e de Atenção
 ${indicatorScoresText}
-
+${enterpriseProfileSection}${externalBenchmarksSection}
 ## Problemas/Gargalos Identificados (${issues?.length || 0})
 Cada gargalo recebe um identificador [ISSUE_<index>]. Use esse índice em "linkedIssueIndex" para conectar cada tarefa ao gargalo que ela resolve.
 ${issuesBlock}
