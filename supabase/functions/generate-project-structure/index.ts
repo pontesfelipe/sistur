@@ -5,6 +5,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Cap how many issues/prescriptions we hand to the LLM. The client MUST use the
+// same cap (see src/lib/projectGeneration.ts) so linkedIssueIndex /
+// linkedPrescriptionIndex in the AI response map 1:1 back to the real db ids.
+// Echoed in the response so the client can detect a mismatch at runtime.
+const MAX_AI_ITEMS = 15;
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -65,8 +71,8 @@ IMPORTANTE:
     // Slice the inputs so we can refer to each one by its index in the prompt.
     // The client maps linkedIssueIndex / linkedPrescriptionIndex back to the real
     // database ids, so these arrays are the single source of truth for indexing.
-    const issuesSlice = Array.isArray(issues) ? issues.slice(0, 15) : [];
-    const prescriptionsSlice = Array.isArray(prescriptions) ? prescriptions.slice(0, 15) : [];
+    const issuesSlice = Array.isArray(issues) ? issues.slice(0, MAX_AI_ITEMS) : [];
+    const prescriptionsSlice = Array.isArray(prescriptions) ? prescriptions.slice(0, MAX_AI_ITEMS) : [];
 
     const issuesBlock = issuesSlice.length > 0
       ? issuesSlice.map((i: any, idx: number) =>
@@ -205,7 +211,10 @@ Foque em tarefas acionáveis e mensuráveis que abordem os problemas identificad
     console.log("Project structure generated successfully");
 
     return new Response(
-      JSON.stringify({ structure }),
+      // Echo back the slice size so the caller can validate its local cap
+      // matches — any drift means linkedIssueIndex / linkedPrescriptionIndex
+      // would resolve to the wrong row.
+      JSON.stringify({ structure, maxAiItems: MAX_AI_ITEMS }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
