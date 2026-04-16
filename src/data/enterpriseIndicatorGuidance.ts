@@ -363,6 +363,21 @@ export const INDICATOR_GUIDANCE: Record<string, IndicatorGuidance> = {
     examples: '62%',
     validation: { min: 0, max: 100 },
   },
+
+  // ── Territorial: ANA — Agência Nacional de Águas ──
+  ana_iqa: {
+    howToFind:
+      '🔄 Pré-preenchido automaticamente via integração com a ANA (Agência Nacional de Águas). Índice de Qualidade da Água (IQA) médio das estações de monitoramento em raio de 50 km.',
+    examples: '72.5 (escala 0-100: 0=péssima, 100=ótima)',
+    validation: { min: 0, max: 100 },
+  },
+  ana_atlas_esgotos: {
+    howToFind:
+      '🔄 Pré-preenchido automaticamente via Atlas Esgotos da ANA. Indica se o município necessita atenção quanto ao lançamento de fósforo nos corpos hídricos (0=Não, 1=Sim).',
+    examples: '0 (Não) ou 1 (Sim)',
+    validation: { min: 0, max: 1, integer: true },
+  },
+
   AO003: {
     howToFind:
       'Pesquisa de demanda turística do município ou estimativa da Secretaria de Turismo. Média de dias que o turista permanece no destino.',
