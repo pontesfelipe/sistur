@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 23,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.23.1",
+    date: "2026-04-16",
+    type: "patch" as const,
+    changes: [
+      "Aluno: botão 'Iniciar' em Minhas Atividades agora gera a prova e direciona direto para /edu/exam/:id",
+      "RPC start_assignment_exam: valida janela/tentativas, gera exam+attempt aplicando overrides (tempo, nota mínima) e retorna exam_id",
+      "Amostragem estratificada de questões por dificuldade (30% fáceis, 50% médias, 20% difíceis) feita no servidor",
+    ]
+  },
   {
     version: "1.23.0",
     date: "2026-04-16",

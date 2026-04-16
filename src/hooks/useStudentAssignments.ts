@@ -70,3 +70,24 @@ export function useCanStartAssignment() {
     },
   });
 }
+
+export interface StartAssignmentExamResult {
+  allowed: boolean;
+  reason?: CanStartResult['reason'];
+  exam_id?: string;
+  attempt_id?: string;
+  time_limit_minutes?: number;
+  min_score_pct?: number;
+}
+
+export function useStartAssignmentExam() {
+  return useMutation({
+    mutationFn: async (assignmentId: string): Promise<StartAssignmentExamResult> => {
+      const { data, error } = await (supabase.rpc as any)('start_assignment_exam', {
+        p_assignment_id: assignmentId,
+      });
+      if (error) throw error;
+      return data as StartAssignmentExamResult;
+    },
+  });
+}

@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
-import { useMyClassroomAssignments, useCanStartAssignment, type StudentAssignment } from '@/hooks/useStudentAssignments';
+import { useMyClassroomAssignments, useStartAssignmentExam, type StudentAssignment } from '@/hooks/useStudentAssignments';
 import { ClipboardList, Calendar, Clock, Lock, AlertTriangle, CheckCircle2, BookOpen, GraduationCap } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +22,7 @@ const REASON_MSG: Record<string, string> = {
 
 function AssignmentRow({ a }: { a: StudentAssignment }) {
   const navigate = useNavigate();
-  const canStart = useCanStartAssignment();
+  const startExam = useStartAssignmentExam();
 
   const Icon = a.assignment_type === 'exam' ? ClipboardList
     : a.assignment_type === 'track' ? BookOpen
@@ -39,14 +39,17 @@ function AssignmentRow({ a }: { a: StudentAssignment }) {
       else if (a.assignment_type === 'training' && a.training_id) navigate(`/edu/training/${a.training_id}`);
       return;
     }
-    const res = await canStart.mutateAsync(a.id);
-    if (!res.allowed) {
-      toast.error(REASON_MSG[res.reason || ''] || 'Não é possível iniciar agora');
-      return;
+    try {
+      const res = await startExam.mutateAsync(a.id);
+      if (!res.allowed || !res.exam_id) {
+        toast.error(REASON_MSG[res.reason || ''] || 'Não é possível iniciar agora');
+        return;
+      }
+      toast.success('Prova iniciada!');
+      navigate(`/edu/exam/${res.exam_id}`);
+    } catch (e: any) {
+      toast.error(e?.message || 'Falha ao iniciar a prova');
     }
-    // For exam: route to ExamTaking — actual exam generation flow is handled there using ruleset
-    toast.success('Acesso liberado! Redirecionando…');
-    navigate(`/edu/catalogo`);
   };
 
   return (
@@ -96,7 +99,7 @@ function AssignmentRow({ a }: { a: StudentAssignment }) {
       <Button
         size="sm"
         variant={blocked ? 'outline' : 'default'}
-        disabled={blocked || canStart.isPending}
+        disabled={blocked || startExam.isPending}
         onClick={handleStart}
       >
         {a.is_overdue ? 'Encerrada' : !a.is_open ? 'Aguardando' : a.assignment_type === 'exam' ? 'Iniciar' : 'Acessar'}
