@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { getSeverityFromScore } from '@/lib/igmaEngine';
+import { useProfileContext } from '@/contexts/ProfileContext';
 
 export function useDashboardStats() {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['dashboard-stats'],
+    queryKey: ['dashboard-stats', effectiveOrgId],
     queryFn: async () => {
       const [destinations, assessments, issues, recommendations] = await Promise.all([
         supabase.from('destinations').select('id', { count: 'exact', head: true }),
@@ -24,8 +27,10 @@ export function useDashboardStats() {
 }
 
 export function useLatestAssessment() {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['latest-assessment'],
+    queryKey: ['latest-assessment', effectiveOrgId],
     queryFn: async () => {
       const { data: assessment } = await supabase
         .from('assessments')
@@ -55,8 +60,10 @@ export function useLatestAssessment() {
 
 // Aggregated pillar scores across all calculated assessments
 export function useAggregatedPillarScores(destinationId?: string) {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['aggregated-pillar-scores', destinationId],
+    queryKey: ['aggregated-pillar-scores', effectiveOrgId, destinationId],
     queryFn: async () => {
       // Get all calculated assessments, optionally filtered by destination
       let query = supabase
@@ -180,8 +187,10 @@ export function useDestinationPillarScores(destinationId: string | undefined) {
 
 // Get all destinations that have calculated assessments
 export function useDestinationsWithAssessments() {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['destinations-with-assessments'],
+    queryKey: ['destinations-with-assessments', effectiveOrgId],
     queryFn: async () => {
       const { data: assessments } = await supabase
         .from('assessments')
@@ -206,8 +215,10 @@ export function useDestinationsWithAssessments() {
 
 // Aggregated issues across all assessments
 export function useAggregatedIssues(destinationId?: string) {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['aggregated-issues', destinationId],
+    queryKey: ['aggregated-issues', effectiveOrgId, destinationId],
     queryFn: async () => {
       let query = supabase
         .from('issues')
@@ -231,8 +242,10 @@ export function useAggregatedIssues(destinationId?: string) {
 }
 
 export function useRecentAssessments() {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['recent-assessments'],
+    queryKey: ['recent-assessments', effectiveOrgId],
     queryFn: async () => {
       const { data } = await supabase
         .from('assessments')
@@ -246,8 +259,10 @@ export function useRecentAssessments() {
 }
 
 export function useTopRecommendations() {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['top-recommendations'],
+    queryKey: ['top-recommendations', effectiveOrgId],
     queryFn: async () => {
       const { data } = await supabase
         .from('recommendations')
