@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 21,
-  patch: 15,
+  minor: 22,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.22.0",
+    date: "2026-04-16",
+    type: "minor" as const,
+    changes: [
+      "EDU: trilhas formativas agora podem ter prova final por pilar coberto (RA/OE/AO)",
+      "Nova tabela edu_track_exam_rulesets liga cada trilha a um ruleset por pilar (20 questões, 70% nota mínima, 60min, 2 tentativas)",
+      "Backfill automático: todas as trilhas pré-prontas existentes receberam provas finais por pilar",
+      "Novo checkbox 'Gerar provas finais automaticamente' (marcado por padrão) ao criar trilha — opcional",
+      "Botão 'Gerar provas' no detalhe da trilha permite gerar/regenerar provas a qualquer momento (admin/criador)",
+      "Painel 'Provas Finais da Trilha' lista provas disponíveis por pilar com config (questões/nota/tempo)",
+    ]
+  },
   {
     version: "1.21.15",
     date: "2026-04-16",
