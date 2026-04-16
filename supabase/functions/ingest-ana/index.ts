@@ -5,24 +5,18 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// ─── ANA Data Sources ───────────────────────────────────────────────
-// All GeoJSON endpoints from dadosabertos.ana.gov.br (ArcGIS Hub)
+// ─── ANA ArcGIS FeatureServer endpoints ─────────────────────────────
 
-// IQA — Water Quality Index (point data with lat/lon by UF)
-const IQA_GEOJSON_URL =
-  'https://dadosabertos.ana.gov.br/datasets/bd6ea680e9024ec3b644817e4df344d8_16.geojson';
+const IQA_FEATURE_SERVER =
+  'https://www.snirh.gov.br/arcgis/rest/services/SPR/Indicadores_Qualidade_v31072023/FeatureServer/16/query';
 
-// Atlas Esgotos — Phosphorus analysis per municipality (has MUN_CD_MUN)
-const ATLAS_ESGOTOS_FOSFORO_URL =
-  'https://dadosabertos.ana.gov.br/datasets/15bbcb5d083d439a816eb4090dbd4bbe_0.geojson';
+// Atlas Esgotos — download filtered GeoJSON (smaller dataset, by IBGE code)
+const ATLAS_ESGOTOS_DOWNLOAD =
+  'https://hub.arcgis.com/api/v3/datasets/15bbcb5d083d439a816eb4090dbd4bbe_0/downloads/data';
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
-/** Haversine distance in km between two coordinates */
-function haversineKm(
-  lat1: number, lon1: number,
-  lat2: number, lon2: number,
-): number {
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -34,129 +28,126 @@ function haversineKm(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-/** Fetch GeoJSON with timeout and size guard */
-async function fetchGeoJSON(url: string, timeoutMs = 30000): Promise<any> {
-  const resp = await fetch(url, {
-    signal: AbortSignal.timeout(timeoutMs),
-    headers: { Accept: 'application/geo+json, application/json' },
-  });
-  if (!resp.ok) throw new Error(`HTTP ${resp.status} fetching ${url}`);
-  return resp.json();
-}
+// ─── IQA via FeatureServer (spatial query) ──────────────────────────
 
-// ─── IQA Processing ─────────────────────────────────────────────────
-
-interface IQAResult {
+interface IQAStation {
   mediqa: number;
-  nuiqa: number;
   corpo_dagua: string;
   estacao: string;
   distancia_km: number;
 }
 
-/**
- * Find IQA stations near a destination (within 50 km radius).
- * Returns average IQA and closest station details.
- */
-async function findIQAForDestination(
-  destLat: number | null,
-  destLon: number | null,
-  destUf: string | null,
-): Promise<{ avg_iqa: number | null; stations_count: number; closest: IQAResult | null }> {
-  if (!destLat || !destLon) {
+async function queryIQANearby(
+  lat: number,
+  lon: number,
+): Promise<{ avg_iqa: number | null; stations_count: number; closest: IQAStation | null }> {
+  // Build a ~50 km bounding box envelope (approx 0.45° at mid-latitudes)
+  const OFFSET = 0.5;
+  const envelope = `${lon - OFFSET},${lat - OFFSET},${lon + OFFSET},${lat + OFFSET}`;
+
+  const params = new URLSearchParams({
+    where: '1=1',
+    geometry: envelope,
+    geometryType: 'esriGeometryEnvelope',
+    inSR: '4326',
+    spatialRel: 'esriSpatialRelIntersects',
+    outFields: 'CDESTACAO,MEDIQA,NUIQA,CORPODAGUA,LATITUDE,LONGITUDE',
+    f: 'json',
+    resultRecordCount: '200',
+  });
+
+  const resp = await fetch(`${IQA_FEATURE_SERVER}?${params}`, {
+    signal: AbortSignal.timeout(20000),
+  });
+
+  if (!resp.ok) {
+    console.error(`[ANA/IQA] FeatureServer HTTP ${resp.status}`);
     return { avg_iqa: null, stations_count: 0, closest: null };
   }
 
-  try {
-    const geojson = await fetchGeoJSON(IQA_GEOJSON_URL, 45000);
-    const features = geojson?.features || [];
-
-    // Filter stations within 50 km radius
-    const RADIUS_KM = 50;
-    const nearby: IQAResult[] = [];
-
-    for (const f of features) {
-      const props = f.properties || {};
-      const coords = f.geometry?.coordinates;
-      if (!coords || !props.MEDIQA) continue;
-
-      // Optionally pre-filter by UF for speed
-      if (destUf && props.SGUF && props.SGUF !== destUf) continue;
-
-      const stLon = coords[0];
-      const stLat = coords[1];
-      const dist = haversineKm(destLat, destLon, stLat, stLon);
-
-      if (dist <= RADIUS_KM) {
-        nearby.push({
-          mediqa: props.MEDIQA,
-          nuiqa: props.NUIQA || 0,
-          corpo_dagua: props.CORPODAGUA || '',
-          estacao: props.CDESTACAO || '',
-          distancia_km: Math.round(dist * 10) / 10,
-        });
-      }
-    }
-
-    if (nearby.length === 0) {
-      return { avg_iqa: null, stations_count: 0, closest: null };
-    }
-
-    nearby.sort((a, b) => a.distancia_km - b.distancia_km);
-    const avg_iqa = nearby.reduce((sum, s) => sum + s.mediqa, 0) / nearby.length;
-
-    return {
-      avg_iqa: Math.round(avg_iqa * 100) / 100,
-      stations_count: nearby.length,
-      closest: nearby[0],
-    };
-  } catch (e) {
-    console.error('[ANA/IQA] Error:', e instanceof Error ? e.message : e);
+  const data = await resp.json();
+  if (data.error) {
+    console.error('[ANA/IQA] FeatureServer error:', JSON.stringify(data.error));
     return { avg_iqa: null, stations_count: 0, closest: null };
   }
+
+  const features = data.features || [];
+  console.log(`[ANA/IQA] FeatureServer returned ${features.length} features in envelope`);
+
+  // Refine by actual distance (50 km Haversine)
+  const RADIUS_KM = 50;
+  const nearby: IQAStation[] = [];
+
+  for (const f of features) {
+    const a = f.attributes || {};
+    if (!a.MEDIQA || !a.LATITUDE || !a.LONGITUDE) continue;
+
+    const dist = haversineKm(lat, lon, a.LATITUDE, a.LONGITUDE);
+    if (dist <= RADIUS_KM) {
+      nearby.push({
+        mediqa: a.MEDIQA,
+        corpo_dagua: a.CORPODAGUA || '',
+        estacao: a.CDESTACAO || '',
+        distancia_km: Math.round(dist * 10) / 10,
+      });
+    }
+  }
+
+  if (nearby.length === 0) {
+    return { avg_iqa: null, stations_count: 0, closest: null };
+  }
+
+  nearby.sort((a, b) => a.distancia_km - b.distancia_km);
+  const avg = nearby.reduce((s, st) => s + st.mediqa, 0) / nearby.length;
+
+  return {
+    avg_iqa: Math.round(avg * 100) / 100,
+    stations_count: nearby.length,
+    closest: nearby[0],
+  };
 }
 
-// ─── Atlas Esgotos Processing ───────────────────────────────────────
+// ─── Atlas Esgotos (download filtered JSON) ─────────────────────────
 
 interface EsgotoResult {
   resultado_fosforo: string;
   municipio: string;
 }
 
-/**
- * Find Atlas Esgotos data for a municipality by IBGE code.
- */
-async function findAtlasEsgotosForMunicipality(
-  ibgeCode: string,
-): Promise<EsgotoResult | null> {
+async function queryAtlasEsgotos(ibgeCode: string): Promise<EsgotoResult | null> {
+  // Use the download API with a WHERE clause to filter by municipality code
+  const url = `${ATLAS_ESGOTOS_DOWNLOAD}?format=geojson&spatialRefId=4326&where=MUN_CD_MUN%3D%27${ibgeCode}%27`;
+
   try {
-    const geojson = await fetchGeoJSON(ATLAS_ESGOTOS_FOSFORO_URL, 45000);
-    const features = geojson?.features || [];
-
-    for (const f of features) {
-      const props = f.properties || {};
-      const munCode = String(props.MUN_CD_MUN || '').replace(/\D/g, '');
-
-      // Match IBGE code (handle 6 vs 7 digit codes)
-      if (
-        munCode === ibgeCode ||
-        munCode === ibgeCode.substring(0, 6) ||
-        ibgeCode === munCode.substring(0, 6)
-      ) {
-        return {
-          resultado_fosforo: props.MUN_RESUL1 || props.MUN_RESU_1 || 'Não avaliado',
-          municipio: props.MUN_NM_MUN || '',
-        };
-      }
+    const resp = await fetch(url, { signal: AbortSignal.timeout(20000) });
+    if (!resp.ok) {
+      console.warn(`[ANA/Atlas] HTTP ${resp.status}`);
+      return null;
     }
-    return null;
+
+    const data = await resp.json();
+    const features = data?.features || [];
+
+    if (features.length === 0) {
+      // Try with 7-digit code if we sent 6
+      if (ibgeCode.length === 6) {
+        return null; // Already tried
+      }
+      return null;
+    }
+
+    const props = features[0].properties || {};
+    return {
+      resultado_fosforo: props.MUN_RESUL1 || props.MUN_RESU_1 || 'Não avaliado',
+      municipio: props.MUN_NM_MUN || '',
+    };
   } catch (e) {
     console.error('[ANA/Atlas] Error:', e instanceof Error ? e.message : e);
     return null;
   }
 }
 
-// ─── Main Handler ───────────────────────────────────────────────────
+// ─── Main ───────────────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -170,11 +161,7 @@ Deno.serve(async (req) => {
     );
 
     let body: any = {};
-    try {
-      body = await req.json();
-    } catch {
-      // Allow empty body
-    }
+    try { body = await req.json(); } catch { /* empty */ }
 
     const { ibge_code, org_id } = body;
 
@@ -185,10 +172,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`=== ANA Ingestion Start === ibge_code=${ibge_code}, org_id=${org_id}`);
+    console.log(`=== ANA Ingestion === ibge=${ibge_code}, org=${org_id}`);
 
-    // Get destination coordinates and UF for IQA proximity search
-    const { data: destination } = await supabaseClient
+    // Get destination coordinates
+    const { data: dest } = await supabaseClient
       .from('destinations')
       .select('latitude, longitude, uf, name')
       .eq('ibge_code', ibge_code)
@@ -196,104 +183,81 @@ Deno.serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
-    const destLat = destination?.latitude ?? null;
-    const destLon = destination?.longitude ?? null;
-    const destUf = destination?.uf ?? null;
-    const destName = destination?.name ?? ibge_code;
-
-    console.log(`Destination: ${destName} (${destUf}), lat=${destLat}, lon=${destLon}`);
+    const destName = dest?.name ?? ibge_code;
 
     // Fetch IQA and Atlas Esgotos in parallel
     const [iqaResult, esgotoResult] = await Promise.allSettled([
-      findIQAForDestination(destLat, destLon, destUf),
-      findAtlasEsgotosForMunicipality(ibge_code),
+      dest?.latitude && dest?.longitude
+        ? queryIQANearby(dest.latitude, dest.longitude)
+        : Promise.resolve({ avg_iqa: null, stations_count: 0, closest: null }),
+      queryAtlasEsgotos(ibge_code),
     ]);
 
     const iqa = iqaResult.status === 'fulfilled' ? iqaResult.value : null;
     const esgoto = esgotoResult.status === 'fulfilled' ? esgotoResult.value : null;
 
     let upsertCount = 0;
-    const currentYear = new Date().getFullYear();
 
-    // ── Upsert IQA indicator ──
-    if (iqa?.avg_iqa !== null && iqa?.avg_iqa !== undefined) {
+    // ── Upsert IQA ──
+    if (iqa?.avg_iqa != null) {
       const closestInfo = iqa.closest
         ? `Estação mais próxima: ${iqa.closest.estacao} (${iqa.closest.corpo_dagua}) a ${iqa.closest.distancia_km} km.`
         : '';
 
       const { error: e1 } = await supabaseClient
         .from('external_indicator_values')
-        .upsert(
-          {
-            indicator_code: 'ana_iqa',
-            municipality_ibge_code: ibge_code,
-            source_code: 'ANA',
-            raw_value: iqa.avg_iqa,
-            reference_year: 2021, // ANA dataset is from 2021
-            collection_method: 'BATCH' as const,
-            confidence_level: 4,
-            validated: false,
-            org_id,
-            notes: `IQA médio: ${iqa.avg_iqa} (${iqa.stations_count} estações em raio de 50 km). ${closestInfo} Escala: 0-100 (0=péssima, 100=ótima).`,
-          },
-          { onConflict: 'org_id,municipality_ibge_code,indicator_code' },
-        );
+        .upsert({
+          indicator_code: 'ana_iqa',
+          municipality_ibge_code: ibge_code,
+          source_code: 'ANA',
+          raw_value: iqa.avg_iqa,
+          reference_year: 2021,
+          collection_method: 'BATCH' as const,
+          confidence_level: 4,
+          validated: false,
+          org_id,
+          notes: `IQA médio: ${iqa.avg_iqa} (${iqa.stations_count} estações em raio de 50 km). ${closestInfo} Escala: 0-100.`,
+        }, { onConflict: 'org_id,municipality_ibge_code,indicator_code' });
       if (!e1) upsertCount++;
       else console.error('[ANA/IQA] Upsert error:', e1.message);
-    } else {
-      console.log(`[ANA/IQA] Sem estações IQA próximas para ${destName}`);
     }
 
-    // ── Upsert Atlas Esgotos indicator ──
-    if (esgoto) {
-      // Map Fósforo result to a numeric indicator
-      // "Sim" = municipality needs attention (1), "Não" = OK (0), "Não avaliado" = null
-      let esgotoValue: number | null = null;
-      if (esgoto.resultado_fosforo === 'Sim') esgotoValue = 1;
-      else if (esgoto.resultado_fosforo === 'Não') esgotoValue = 0;
+    // ── Upsert Atlas Esgotos ──
+    if (esgoto && esgoto.resultado_fosforo !== 'Não avaliado') {
+      const esgotoValue = esgoto.resultado_fosforo === 'Sim' ? 1 : 0;
 
-      if (esgotoValue !== null) {
-        const { error: e2 } = await supabaseClient
-          .from('external_indicator_values')
-          .upsert(
-            {
-              indicator_code: 'ana_atlas_esgotos',
-              municipality_ibge_code: ibge_code,
-              source_code: 'ANA',
-              raw_value: esgotoValue,
-              raw_value_text: esgoto.resultado_fosforo,
-              reference_year: 2035, // Atlas Esgotos Planejamento 2035
-              collection_method: 'BATCH' as const,
-              confidence_level: 5,
-              validated: false,
-              org_id,
-              notes: `Atlas Esgotos ANA — Análise de Fósforo (Planejamento 2035). Município necessita atenção: ${esgoto.resultado_fosforo}. Município: ${esgoto.municipio}.`,
-            },
-            { onConflict: 'org_id,municipality_ibge_code,indicator_code' },
-          );
-        if (!e2) upsertCount++;
-        else console.error('[ANA/Atlas] Upsert error:', e2.message);
-      }
-    } else {
-      console.log(`[ANA/Atlas] Sem dados Atlas Esgotos para IBGE ${ibge_code}`);
+      const { error: e2 } = await supabaseClient
+        .from('external_indicator_values')
+        .upsert({
+          indicator_code: 'ana_atlas_esgotos',
+          municipality_ibge_code: ibge_code,
+          source_code: 'ANA',
+          raw_value: esgotoValue,
+          raw_value_text: esgoto.resultado_fosforo,
+          reference_year: 2035,
+          collection_method: 'BATCH' as const,
+          confidence_level: 5,
+          validated: false,
+          org_id,
+          notes: `Atlas Esgotos ANA — Fósforo (Planejamento 2035). Necessita atenção: ${esgoto.resultado_fosforo}. Município: ${esgoto.municipio}.`,
+        }, { onConflict: 'org_id,municipality_ibge_code,indicator_code' });
+      if (!e2) upsertCount++;
+      else console.error('[ANA/Atlas] Upsert error:', e2.message);
     }
 
     // Update data source metadata
     await supabaseClient
       .from('external_data_sources')
-      .upsert(
-        {
-          code: 'ANA',
-          name: 'ANA — Agência Nacional de Águas',
-          description: `Dados de qualidade da água (IQA) e saneamento (Atlas Esgotos). Última atualização: ${new Date().toISOString()}.`,
-          update_frequency: 'ANUAL',
-          trust_level_default: 4,
-          active: true,
-        },
-        { onConflict: 'code' },
-      );
+      .upsert({
+        code: 'ANA',
+        name: 'ANA — Agência Nacional de Águas',
+        description: `Qualidade da água (IQA) e saneamento (Atlas Esgotos). Atualizado: ${new Date().toISOString()}.`,
+        update_frequency: 'ANUAL',
+        trust_level_default: 4,
+        active: true,
+      }, { onConflict: 'code' });
 
-    console.log(`=== ANA Ingestion Complete === ${upsertCount} indicadores atualizados`);
+    console.log(`=== ANA Done === ${upsertCount} indicadores para ${destName}`);
 
     return new Response(
       JSON.stringify({
@@ -301,11 +265,7 @@ Deno.serve(async (req) => {
         message: `ANA: ${upsertCount} indicadores atualizados para ${destName}.`,
         results: {
           iqa: iqa
-            ? {
-                status: iqa.avg_iqa !== null ? 'success' : 'unavailable',
-                avg_iqa: iqa.avg_iqa,
-                stations_count: iqa.stations_count,
-              }
+            ? { status: iqa.avg_iqa != null ? 'success' : 'unavailable', avg_iqa: iqa.avg_iqa, stations_count: iqa.stations_count }
             : { status: 'error' },
           atlas_esgotos: esgoto
             ? { status: 'success', resultado: esgoto.resultado_fosforo }
@@ -315,12 +275,9 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (error) {
-    console.error('[ANA] Fatal error:', error);
+    console.error('[ANA] Fatal:', error);
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }),
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   }
