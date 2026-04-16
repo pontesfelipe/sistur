@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 24,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.24.2",
+    date: "2026-04-16",
+    type: "patch" as const,
+    changes: [
+      "Correção de escopo: 6 indicadores Enterprise (ENT_REVIEW_SCORE, ENT_NPS, ENT_HORAS_TREINO, ENT_FORNECEDORES_LOCAIS, ENT_EMPREGO_LOCAL, ENT_CERTIFICACAO_AMB) deixaram de aparecer no diagnóstico Territorial — esses indicadores são exclusivos da análise empresarial (hospedagem/empresa) e não fazem sentido para a avaliação agregada do destino",
+    ]
+  },
   {
     version: "1.24.1",
     date: "2026-04-16",
