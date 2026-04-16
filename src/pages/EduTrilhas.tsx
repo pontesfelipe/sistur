@@ -385,7 +385,11 @@ const EduTrilhas = () => {
         <TrackFormDialog
           trainings={trainings}
           onSubmit={(data) => {
-            createTrackWithTrainings.mutate(data);
+            createTrackWithTrainings.mutate({
+              track: data.track,
+              trainingIds: data.trainingIds,
+              autoGenerateExams: data.autoGenerateExams,
+            });
             setCreateDialogOpen(false);
           }}
           isSubmitting={createTrackWithTrainings.isPending}
@@ -562,7 +566,8 @@ export const EduTrilhaDetalhe = () => {
 
   const handleUpdateTrack = (data: { 
     track: { name: string; description?: string; objective?: string; audience?: TargetAgent; delivery?: string }; 
-    trainingIds: string[] 
+    trainingIds: string[];
+    autoGenerateExams?: boolean;
   }) => {
     if (!id) return;
     updateTrackWithTrainings.mutate({
