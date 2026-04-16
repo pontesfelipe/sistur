@@ -19,7 +19,7 @@ import {
   Users, Copy, Gift, Plus, School, BookOpen, ClipboardList,
   Trash2, Calendar, Loader2, Check, X, UserPlus, FileText,
   Building2, GraduationCap, Target, BarChart3, Settings,
-  MoreVertical, Pencil, Shield
+  MoreVertical, Pencil, Shield, Eye
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DeleteConfirmDialog } from '@/components/projects/DeleteConfirmDialog';
@@ -27,6 +27,7 @@ import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
 import { ExamManagementPanel } from '@/components/admin/ExamManagementPanel';
 import { ComplianceReportPanel } from '@/components/edu/ComplianceReportPanel';
 import { AssignmentFormDialog } from '@/components/edu/AssignmentFormDialog';
+import { AssignmentProgressDialog } from '@/components/edu/AssignmentProgressDialog';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -169,6 +170,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
   const [showAddAssignment, setShowAddAssignment] = useState(false);
   const [showDeleteAssignment, setShowDeleteAssignment] = useState(false);
   const [deletingAssignment, setDeletingAssignment] = useState<any>(null);
+  const [progressAssignmentId, setProgressAssignmentId] = useState<string | null>(null);
 
   // Fetch org members for adding
   const { data: orgMembers } = useQuery({
@@ -384,9 +386,22 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                         </div>
                       </div>
                     </div>
-                    <Button size="icon" variant="ghost" onClick={() => confirmDeleteAssignment(a)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {(a.assignment_type === 'exam' || a.assignment_type === 'track') && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setProgressAssignmentId(a.id)}
+                          className="gap-1"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          Acompanhar
+                        </Button>
+                      )}
+                      <Button size="icon" variant="ghost" onClick={() => confirmDeleteAssignment(a)}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
@@ -421,6 +436,12 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
           });
         }}
         isPending={deleteAssignment.isPending}
+      />
+
+      <AssignmentProgressDialog
+        assignmentId={progressAssignmentId}
+        open={!!progressAssignmentId}
+        onOpenChange={(o) => !o && setProgressAssignmentId(null)}
       />
     </div>
   );
