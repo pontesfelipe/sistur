@@ -2029,6 +2029,45 @@ export type Database = {
           },
         ]
       }
+      edu_track_exam_rulesets: {
+        Row: {
+          created_at: string
+          id: string
+          pillar: string
+          ruleset_id: string
+          track_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pillar: string
+          ruleset_id: string
+          track_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pillar?: string
+          ruleset_id?: string
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_track_exam_rulesets_ruleset_id_fkey"
+            columns: ["ruleset_id"]
+            isOneToOne: false
+            referencedRelation: "exam_rulesets"
+            referencedColumns: ["ruleset_id"]
+          },
+          {
+            foreignKeyName: "edu_track_exam_rulesets_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "edu_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       edu_track_trainings: {
         Row: {
           created_at: string
@@ -3159,6 +3198,7 @@ export type Database = {
           max_attempts: number | null
           min_days_between_same_quiz: number | null
           min_score_pct: number
+          pillar: string | null
           pillar_mix: Json | null
           question_count: number
           retake_wait_hours: number | null
@@ -3175,6 +3215,7 @@ export type Database = {
           max_attempts?: number | null
           min_days_between_same_quiz?: number | null
           min_score_pct: number
+          pillar?: string | null
           pillar_mix?: Json | null
           question_count: number
           retake_wait_hours?: number | null
@@ -3191,6 +3232,7 @@ export type Database = {
           max_attempts?: number | null
           min_days_between_same_quiz?: number | null
           min_score_pct?: number
+          pillar?: string | null
           pillar_mix?: Json | null
           question_count?: number
           retake_wait_hours?: number | null
@@ -3216,11 +3258,13 @@ export type Database = {
           created_at: string
           exam_id: string
           expires_at: string
+          pillar: string | null
           question_ids: string[]
           ruleset_id: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["exam_status_type"]
           submitted_at: string | null
+          track_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -3230,11 +3274,13 @@ export type Database = {
           created_at?: string
           exam_id?: string
           expires_at: string
+          pillar?: string | null
           question_ids: string[]
           ruleset_id?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["exam_status_type"]
           submitted_at?: string | null
+          track_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -3244,11 +3290,13 @@ export type Database = {
           created_at?: string
           exam_id?: string
           expires_at?: string
+          pillar?: string | null
           question_ids?: string[]
           ruleset_id?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["exam_status_type"]
           submitted_at?: string | null
+          track_id?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -3265,6 +3313,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "exam_rulesets"
             referencedColumns: ["ruleset_id"]
+          },
+          {
+            foreignKeyName: "exams_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "edu_tracks"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -7558,6 +7613,21 @@ export type Database = {
       }
       flag_suspicious_edu_sessions: { Args: never; Returns: undefined }
       generate_certificate_id: { Args: never; Returns: string }
+      generate_track_exam_rulesets: {
+        Args: {
+          p_max_attempts?: number
+          p_min_score_pct?: number
+          p_overwrite?: boolean
+          p_question_count?: number
+          p_time_limit_minutes?: number
+          p_track_id: string
+        }
+        Returns: {
+          created: boolean
+          pillar: string
+          ruleset_id: string
+        }[]
+      }
       get_dashboard_org_access_flags: {
         Args: never
         Returns: {
