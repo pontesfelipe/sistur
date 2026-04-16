@@ -66,7 +66,7 @@ export function useCanStartAssignment() {
         p_assignment_id: assignmentId,
       });
       if (error) throw error;
-      return data as CanStartResult;
+      return data as unknown as CanStartResult;
     },
   });
 }
