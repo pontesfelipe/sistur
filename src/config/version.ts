@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 24,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.24.1",
+    date: "2026-04-16",
+    type: "patch" as const,
+    changes: [
+      "Documentação: Metodologia atualizada para 8 fontes oficiais integradas (inclusão da ANA/Hidroweb/Qualiágua para IQA municipal alimentando o pilar RA)",
+      "FAQ ERP: nova pergunta sobre integração ANA/IQA e atualização da pergunta de fontes oficiais (8 fontes, 25+ indicadores)",
+      "FAQ EDU: 5 novas perguntas cobrindo o fluxo completo de provas — agendamento pelo professor, acesso via Minhas Atividades, painel Acompanhar com KPIs e ações em massa, provas finais por pilar nas trilhas, e sistema anti-fraude",
+    ]
+  },
+  {
     version: "1.24.0",
     date: "2026-04-16",
     type: "minor" as const,
@@ -32,16 +42,6 @@ export const VERSION_HISTORY = [
       "Ações em massa: enviar lembrete (todos pendentes / não iniciaram / não entregaram), prorrogar prazo, liberar tentativas extras",
       "RPCs server-authoritative: get_assignment_progress, extend_assignment_due_date, grant_extra_attempts, send_assignment_reminder",
       "Notificações automáticas em edu_notifications para alunos-alvo em prorrogação, tentativas extras e lembretes",
-    ]
-  },
-  {
-    version: "1.23.1",
-    date: "2026-04-16",
-    type: "patch" as const,
-    changes: [
-      "Aluno: botão 'Iniciar' em Minhas Atividades agora gera a prova e direciona direto para /edu/exam/:id",
-      "RPC start_assignment_exam: valida janela/tentativas, gera exam+attempt aplicando overrides (tempo, nota mínima) e retorna exam_id",
-      "Amostragem estratificada de questões por dificuldade (30% fáceis, 50% médias, 20% difíceis) feita no servidor",
     ]
   },
   {
