@@ -82,6 +82,72 @@ export function useExternalIndicatorValues(ibgeCode: string | undefined, orgId: 
   });
 }
 
+// Bridge Mapa do Turismo data into external_indicator_values
+async function bridgeMapaTurismoData(ibgeCode: string, orgId: string) {
+  // Get latest mapa_turismo row for this municipality
+  const { data: mapaRow, error } = await supabase
+    .from('mapa_turismo_municipios')
+    .select('categoria, raw_data, ano_referencia')
+    .eq('ibge_code', ibgeCode)
+    .order('ano_referencia', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !mapaRow) return { status: 'unavailable' as const, count: 0 };
+
+  const rawData = (mapaRow.raw_data || {}) as Record<string, any>;
+  const year = mapaRow.ano_referencia || new Date().getFullYear();
+  let upserted = 0;
+
+  // 1. Categoria no Mapa do Turismo → igma_categoria_mapa_turismo
+  if (mapaRow.categoria) {
+    const categoriaMap: Record<string, number> = { 'A': 3, 'B': 2, 'C': 1 };
+    const categoriaValue = categoriaMap[mapaRow.categoria] ?? null;
+    if (categoriaValue !== null) {
+      const { error: e1 } = await supabase
+        .from('external_indicator_values')
+        .upsert({
+          indicator_code: 'igma_categoria_mapa_turismo',
+          municipality_ibge_code: ibgeCode,
+          source_code: 'MAPA_TURISMO',
+          raw_value: categoriaValue,
+          raw_value_text: mapaRow.categoria,
+          reference_year: year,
+          collection_method: 'BATCH' as const,
+          confidence_level: 5,
+          validated: false,
+          org_id: orgId,
+          notes: `Mapa do Turismo ${year}. Categoria: ${mapaRow.categoria}.`,
+        }, { onConflict: 'org_id,municipality_ibge_code,indicator_code' });
+      if (!e1) upserted++;
+    }
+  }
+
+  // 2. Fluxo Turístico Anual → AO001 (visitantes nacionais + internacionais)
+  const visitNac = parseFloat(rawData.qt_visita_nacional) || 0;
+  const visitInt = parseFloat(rawData.qt_visita_internacional) || 0;
+  const totalFlow = visitNac + visitInt;
+  if (totalFlow > 0) {
+    const { error: e2 } = await supabase
+      .from('external_indicator_values')
+      .upsert({
+        indicator_code: 'AO001',
+        municipality_ibge_code: ibgeCode,
+        source_code: 'MAPA_TURISMO',
+        raw_value: totalFlow,
+        reference_year: year,
+        collection_method: 'BATCH' as const,
+        confidence_level: 4,
+        validated: false,
+        org_id: orgId,
+        notes: `Mapa do Turismo ${year}. Visitantes nacionais: ${visitNac.toLocaleString('pt-BR')}, internacionais: ${visitInt.toLocaleString('pt-BR')}.`,
+      }, { onConflict: 'org_id,municipality_ibge_code,indicator_code' });
+    if (!e2) upserted++;
+  }
+
+  return { status: 'success' as const, count: upserted };
+}
+
 // Fetch official data from external sources
 export function useFetchOfficialData() {
   const queryClient = useQueryClient();
@@ -92,27 +158,30 @@ export function useFetchOfficialData() {
       orgId: string; 
       indicators?: string[];
     }) => {
-      // Fire both in parallel: IBGE + CADASTUR
-      const [officialResult, cadasturResult] = await Promise.allSettled([
+      // Fire all in parallel: IBGE + CADASTUR + Mapa do Turismo bridge
+      const [officialResult, cadasturResult, mapaResult] = await Promise.allSettled([
         supabase.functions.invoke('fetch-official-data', {
           body: { ibge_code: ibgeCode, org_id: orgId, indicators },
         }),
         supabase.functions.invoke('ingest-cadastur', {
           body: { ibge_code: ibgeCode, org_id: orgId },
         }),
+        bridgeMapaTurismoData(ibgeCode, orgId),
       ]);
 
       const official = officialResult.status === 'fulfilled' ? officialResult.value : null;
       const cadastur = cadasturResult.status === 'fulfilled' ? cadasturResult.value : null;
+      const mapa = mapaResult.status === 'fulfilled' ? mapaResult.value : null;
 
       if (official?.error) throw official.error;
       if (!official?.data?.success) throw new Error(official?.data?.error || 'Erro ao buscar dados oficiais');
 
-      // Merge CADASTUR status into response
+      // Merge statuses into response
       const cadasturStatus = cadastur?.data?.results || {};
       return {
         ...official.data,
         cadastur_status: cadasturStatus,
+        mapa_turismo_status: mapa || { status: 'unavailable', count: 0 },
       };
     },
     onSuccess: (data, variables) => {
@@ -127,9 +196,15 @@ export function useFetchOfficialData() {
           ).join('; ')
         : '';
 
+      const mapaMsg = data.mapa_turismo_status?.status === 'success' 
+        ? `${data.mapa_turismo_status.count} indicadores` 
+        : '';
+
+      const extras = [cadasturMsg, mapaMsg].filter(Boolean).join(' | ');
+
       toast({
         title: 'Dados oficiais carregados',
-        description: `${data.message}${cadasturMsg ? ` | CADASTUR: ${cadasturMsg}` : ''}`,
+        description: `${data.message}${extras ? ` | ${extras}` : ''}`,
       });
     },
     onError: (error: Error) => {
