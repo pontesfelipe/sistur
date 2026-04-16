@@ -88,6 +88,7 @@ export function DataValidationPanel({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmedIds, setConfirmedIds] = useState<Set<string>>(new Set());
   const [autoFetched, setAutoFetched] = useState(false);
+  const [anaIqaStatus, setAnaIqaStatus] = useState<'success' | 'unavailable' | null>(null);
   const queryClient = useQueryClient();
 
   const { data: rawValues = [], isLoading } = useExternalIndicatorValues(ibgeCode, orgId);
@@ -100,7 +101,16 @@ export function DataValidationPanel({
       setAutoFetched(true);
       // Clear stale cache before fetching fresh data
       queryClient.removeQueries({ queryKey: ['external-indicator-values', ibgeCode, orgId] });
-      fetchOfficialData.mutate({ ibgeCode, orgId });
+      fetchOfficialData.mutate(
+        { ibgeCode, orgId },
+        {
+          onSuccess: (data) => {
+            const iqa = data?.ana_status?.iqa;
+            if (iqa?.status === 'success') setAnaIqaStatus('success');
+            else setAnaIqaStatus('unavailable');
+          },
+        }
+      );
     }
   }, [ibgeCode, orgId, autoFetched]);
 
@@ -332,6 +342,26 @@ export function DataValidationPanel({
                 ✏️ {manualCount} indicador{manualCount > 1 ? 'es' : ''} requer{manualCount > 1 ? 'em' : ''} preenchimento manual na próxima etapa.
               </p>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* IQA / ANA unavailability notice */}
+      {anaIqaStatus === 'unavailable' && !values.some(v => v.indicator_code === 'ana_iqa') && (
+        <Card className="border-sky-500/40 bg-sky-50/50 dark:bg-sky-950/20">
+          <CardContent className="p-4 flex items-start gap-3">
+            <span className="text-2xl shrink-0">💧</span>
+            <div className="space-y-1">
+              <p className="text-sm font-medium">
+                Índice de Qualidade da Água (IQA / ANA) — sem dados disponíveis
+              </p>
+              <p className="text-xs text-muted-foreground">
+                A ANA não possui estações de monitoramento de qualidade da água num raio de 50 km
+                deste município. O campo permanecerá disponível para preenchimento manual na próxima
+                etapa, caso você tenha acesso a fontes locais (vigilância sanitária, secretaria de
+                meio ambiente ou estudos de bacia hidrográfica).
+              </p>
+            </div>
           </CardContent>
         </Card>
       )}
