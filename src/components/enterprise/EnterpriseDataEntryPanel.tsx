@@ -24,7 +24,7 @@ import {
   Minus,
   EyeOff,
   Search,
-  Database,
+  Database as DatabaseIcon,
   Calendar,
   MessageSquare,
 } from 'lucide-react';
@@ -462,7 +462,8 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                       const referenceDate = existing?.reference_date
                         ? new Date(existing.reference_date).toLocaleDateString('pt-BR')
                         : null;
-                      const observation = existing?.value_text;
+                       const observation = existing?.value_text;
+                       const fieldConfig = getIndicatorFieldConfig({ code: (indicator as any).code, normalization: indicator.normalization });
                       
                       return (
                         <div key={indicator.id} className={cn(
@@ -521,7 +522,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                               <div className="mt-2 flex flex-wrap items-center gap-1.5">
                                 {hasNonManualSource && (
                                   <Badge variant="secondary" className="text-[10px] font-normal gap-1">
-                                    <Database className="h-3 w-3" />
+                                    <DatabaseIcon className="h-3 w-3" />
                                     {existing.source}
                                   </Badge>
                                 )}

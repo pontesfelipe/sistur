@@ -4262,6 +4262,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "investment_interests_investor_profile_id_fkey"
+            columns: ["investor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "investor_profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "investment_interests_opportunity_id_fkey"
             columns: ["opportunity_id"]
             isOneToOne: false
@@ -7311,6 +7318,69 @@ export type Database = {
       }
     }
     Views: {
+      investor_profiles_safe: {
+        Row: {
+          created_at: string | null
+          geographic_scope: string[] | null
+          id: string | null
+          impact_focus: string[] | null
+          investment_thesis: Json | null
+          investor_type: string | null
+          org_id: string | null
+          preferred_contact_method: string | null
+          stakeholder_profile_id: string | null
+          ticket_size_max: number | null
+          ticket_size_min: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          geographic_scope?: string[] | null
+          id?: string | null
+          impact_focus?: string[] | null
+          investment_thesis?: Json | null
+          investor_type?: string | null
+          org_id?: string | null
+          preferred_contact_method?: string | null
+          stakeholder_profile_id?: string | null
+          ticket_size_max?: number | null
+          ticket_size_min?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          geographic_scope?: string[] | null
+          id?: string | null
+          impact_focus?: string[] | null
+          investment_thesis?: Json | null
+          investor_type?: string | null
+          org_id?: string | null
+          preferred_contact_method?: string | null
+          stakeholder_profile_id?: string | null
+          ticket_size_max?: number | null
+          ticket_size_min?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investor_profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investor_profiles_stakeholder_profile_id_fkey"
+            columns: ["stakeholder_profile_id"]
+            isOneToOne: true
+            referencedRelation: "stakeholder_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_destination_summary: {
         Row: {
           certification_eligible: boolean | null

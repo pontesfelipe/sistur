@@ -41,6 +41,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MAX_AI_ITEMS } from '@/lib/projectGeneration';
 import { useToast } from '@/hooks/use-toast';
 
 interface CreateProjectDialogProps {
@@ -165,6 +166,14 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
       if (aiError) throw aiError;
 
       const structure = aiResponse?.structure;
+      // Edge function echoes the slice size it used; if the client cap drifted
+      // from the backend cap, linked indexes would resolve to wrong rows. Fail
+      // loudly instead of silently mis-linking tasks.
+      if (typeof aiResponse?.maxAiItems === 'number' && aiResponse.maxAiItems !== MAX_AI_ITEMS) {
+        throw new Error(
+          `Descompasso entre cliente e edge function em MAX_AI_ITEMS: cliente=${MAX_AI_ITEMS}, servidor=${aiResponse.maxAiItems}. Atualize a constante em src/lib/projectGeneration.ts.`
+        );
+      }
 
       setGenerationProgress('Criando projeto...');
 
@@ -215,10 +224,10 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
       // store null for linked_issue_id / linked_prescription_id.
       const issuesList = issuesRes.data || [];
       const prescriptionsList = prescriptionsRes.data || [];
-      // These slices MUST mirror generate-project-structure/index.ts — keep in
-      // sync when changing the cap.
-      const issuesSlice = issuesList.slice(0, 15);
-      const prescriptionsSlice = prescriptionsList.slice(0, 15);
+      // These slices MUST mirror generate-project-structure/index.ts — the
+      // shared MAX_AI_ITEMS constant + the response echo guard above enforce it.
+      const issuesSlice = issuesList.slice(0, MAX_AI_ITEMS);
+      const prescriptionsSlice = prescriptionsList.slice(0, MAX_AI_ITEMS);
 
       const tasks: Parameters<typeof createTasks.mutateAsync>[0] = [];
       const linkedIssueIds = new Set<string>();
