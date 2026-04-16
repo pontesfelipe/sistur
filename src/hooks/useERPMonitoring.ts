@@ -435,8 +435,10 @@ export function usePillarProgress(diagnosticType?: 'territorial' | 'enterprise')
 
 // Get cycle evolution data with project info
 export function useCycleEvolution(destinationId?: string, diagnosticType?: 'territorial' | 'enterprise') {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['erp-cycle-evolution', destinationId, diagnosticType],
+    queryKey: ['erp-cycle-evolution', effectiveOrgId, destinationId, diagnosticType],
     queryFn: async () => {
       let query = supabase
         .from('assessments')
