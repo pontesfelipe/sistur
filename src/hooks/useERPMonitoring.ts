@@ -600,8 +600,10 @@ export interface OverdueProject {
 
 // Get overdue projects
 export function useOverdueProjects() {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['erp-overdue-projects'],
+    queryKey: ['erp-overdue-projects', effectiveOrgId],
     queryFn: async () => {
       const now = new Date().toISOString().split('T')[0];
       
