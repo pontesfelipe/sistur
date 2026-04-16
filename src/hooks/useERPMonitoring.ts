@@ -348,8 +348,10 @@ export function useProjectStats() {
 
 // Get progress by pillar based on assessment pillar_scores
 export function usePillarProgress(diagnosticType?: 'territorial' | 'enterprise') {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['erp-pillar-progress', diagnosticType],
+    queryKey: ['erp-pillar-progress', effectiveOrgId, diagnosticType],
     queryFn: async () => {
       // Fetch calculated assessments with pillar scores
       let query = supabase
@@ -433,8 +435,10 @@ export function usePillarProgress(diagnosticType?: 'territorial' | 'enterprise')
 
 // Get cycle evolution data with project info
 export function useCycleEvolution(destinationId?: string, diagnosticType?: 'territorial' | 'enterprise') {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['erp-cycle-evolution', destinationId, diagnosticType],
+    queryKey: ['erp-cycle-evolution', effectiveOrgId, destinationId, diagnosticType],
     queryFn: async () => {
       let query = supabase
         .from('assessments')
@@ -596,8 +600,10 @@ export interface OverdueProject {
 
 // Get overdue projects
 export function useOverdueProjects() {
+  const { effectiveOrgId } = useProfileContext();
+
   return useQuery({
-    queryKey: ['erp-overdue-projects'],
+    queryKey: ['erp-overdue-projects', effectiveOrgId],
     queryFn: async () => {
       const now = new Date().toISOString().split('T')[0];
       
