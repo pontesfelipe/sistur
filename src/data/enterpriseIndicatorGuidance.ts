@@ -551,30 +551,55 @@ export function getValidationForIndicator(indicator: {
  */
 export function formatIndicatorValueBR(
   value: number | null | undefined,
-  indicator?: { code?: string; unit?: string; direction?: string; min_ref?: number | null; max_ref?: number | null },
+  indicator?: { code?: string; unit?: string; direction?: string; min_ref?: number | null; max_ref?: number | null; value_format?: string | null; normalization?: string | null },
 ): string {
   if (value === null || value === undefined) return '';
+  // Lazy import via dynamic require avoided — use a simple inline shim that
+  // mirrors the canonical formatter to prevent circular imports.
+  return _formatByValueFormat(value, indicator);
+}
 
-  const rules = indicator ? getValidationForIndicator(indicator as any) : {};
+function _formatByValueFormat(
+  value: number,
+  indicator?: { code?: string; unit?: string; value_format?: string | null; normalization?: string | null },
+): string {
+  const explicit = indicator?.value_format as string | undefined;
   const unit = (indicator?.unit || '').toLowerCase().trim();
+  const norm = indicator?.normalization;
 
-  // Integer indicators — no decimals
-  if (rules.integer || unit === 'hab' || unit === 'un' || unit === 'unidades' || unit === 'qtd') {
-    return Math.round(value).toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+  let format = explicit;
+  if (!format) {
+    if (norm === 'BINARY') format = 'BINARY';
+    else if (unit === '%') format = 'PERCENTAGE';
+    else if (unit === 'índice 0-1' || unit === 'indice 0-1') format = 'RATIO';
+    else if (['índice', 'indice', 'iqa', 'iqa (0-100)', 'score', 'score 1-5', 'score -100 a 100', 'nota', 'nota 0-10'].includes(unit)) format = 'INDEX_SCORE';
+    else if (unit === 'r$ mi') format = 'CURRENCY_MILLIONS';
+    else if (unit.startsWith('r$') || unit.includes('reais')) format = 'CURRENCY';
+    else if (unit.includes('por mil') || unit.includes('por 100')) format = 'RATE_PER_CAPITA';
+    else if (['horas/ano', 'minutos', 'dias', 'anos'].includes(unit)) format = 'DURATION';
+    else if (unit === 'km²' || unit.includes('/km²')) format = 'AREA';
+    else if (['unidades', 'unidade', 'un', 'eventos/ano', 'voos/sem', 'turistas/ano', 'segmentos', 'habitantes', 'hab', 'qtd'].includes(unit)) format = 'COUNT';
+    else format = 'NUMERIC';
   }
 
-  // Currency — always 2 decimals
-  if (unit === 'r$' || unit === 'brl' || unit.includes('reais')) {
-    return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  switch (format) {
+    case 'PERCENTAGE': return value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 1 });
+    case 'RATIO': return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
+    case 'INDEX_SCORE': return value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    case 'CURRENCY': return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    case 'CURRENCY_THOUSANDS': return value.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+    case 'CURRENCY_MILLIONS': return value.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+    case 'COUNT': return Math.round(value).toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+    case 'RATE_PER_CAPITA': return value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    case 'DURATION': return value.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+    case 'AREA': return value.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+    case 'BINARY': return value >= 0.5 ? 'Sim' : 'Não';
+    case 'CATEGORICAL': {
+      const letters: Record<number, string> = { 5: 'A', 4: 'B', 3: 'C', 2: 'D', 1: 'E' };
+      return letters[Math.round(value)] ?? value.toLocaleString('pt-BR');
+    }
+    default: return value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
-
-  // Percentage — up to 1 decimal
-  if (unit === '%' || unit === 'pct' || unit === 'percent') {
-    return value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 1 });
-  }
-
-  // Default — up to 2 decimals
-  return value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
 
 /**
