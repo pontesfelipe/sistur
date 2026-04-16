@@ -45,6 +45,12 @@ const OPTIONS_BY_CODE: Record<string, IndicatorFieldOption[]> = {
     { value: '2', numericValue: 2, label: 'D' },
     { value: '1', numericValue: 1, label: 'E' },
   ],
+  igma_classificacao_da_capacidade_de_pagamento_capag: [
+    { value: '4', numericValue: 4, label: 'A' },
+    { value: '3', numericValue: 3, label: 'B' },
+    { value: '2', numericValue: 2, label: 'C' },
+    { value: '1', numericValue: 1, label: 'D' },
+  ],
 };
 
 const BINARY_CODES = new Set([
