@@ -295,6 +295,23 @@ const TrackFormDialog = ({
               )}
             </div>
           </div>
+
+          {mode === 'create' && (
+            <label className="flex items-start gap-3 rounded-md border border-dashed p-3 cursor-pointer hover:bg-muted/40 transition-colors">
+              <Checkbox
+                checked={autoGenerateExams}
+                onCheckedChange={(v) => setAutoGenerateExams(v === true)}
+                className="mt-0.5"
+              />
+              <div className="space-y-1">
+                <p className="text-sm font-medium">Gerar provas finais automaticamente</p>
+                <p className="text-xs text-muted-foreground">
+                  Cria uma prova por pilar coberto pelos treinamentos (20 questões, 70% nota mínima, 60 min, até 2 tentativas).
+                  Opcional — você pode gerar depois pelo botão "Gerar provas" no detalhe da trilha.
+                </p>
+              </div>
+            </label>
+          )}
         </div>
 
         <DialogFooter>
