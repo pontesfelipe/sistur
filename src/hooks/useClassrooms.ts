@@ -38,6 +38,10 @@ export interface ClassroomAssignment {
   exam_ruleset_id: string | null;
   due_date: string | null;
   available_from: string | null;
+  target_user_ids: string[] | null;
+  override_time_limit_minutes: number | null;
+  override_max_attempts: number | null;
+  override_min_score_pct: number | null;
   custom_content: any;
   status: string;
   created_at: string;
