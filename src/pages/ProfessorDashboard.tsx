@@ -357,7 +357,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                                 a.assignment_type === 'training' ? 'Treinamento' : 'Conteúdo'}
                           </Badge>
                           {a.available_from && new Date(a.available_from) > new Date() && (
-                            <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                            <span className="text-xs text-warning flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
                               Abre {format(new Date(a.available_from), 'dd/MM HH:mm')}
                             </span>
