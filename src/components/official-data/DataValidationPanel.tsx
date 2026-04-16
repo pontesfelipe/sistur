@@ -88,6 +88,7 @@ export function DataValidationPanel({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmedIds, setConfirmedIds] = useState<Set<string>>(new Set());
   const [autoFetched, setAutoFetched] = useState(false);
+  const [anaIqaStatus, setAnaIqaStatus] = useState<'success' | 'unavailable' | null>(null);
   const queryClient = useQueryClient();
 
   const { data: rawValues = [], isLoading } = useExternalIndicatorValues(ibgeCode, orgId);
@@ -100,7 +101,16 @@ export function DataValidationPanel({
       setAutoFetched(true);
       // Clear stale cache before fetching fresh data
       queryClient.removeQueries({ queryKey: ['external-indicator-values', ibgeCode, orgId] });
-      fetchOfficialData.mutate({ ibgeCode, orgId });
+      fetchOfficialData.mutate(
+        { ibgeCode, orgId },
+        {
+          onSuccess: (data) => {
+            const iqa = data?.ana_status?.iqa;
+            if (iqa?.status === 'success') setAnaIqaStatus('success');
+            else setAnaIqaStatus('unavailable');
+          },
+        }
+      );
     }
   }, [ibgeCode, orgId, autoFetched]);
 
