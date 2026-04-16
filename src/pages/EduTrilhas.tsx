@@ -748,6 +748,9 @@ export const EduTrilhaDetalhe = () => {
         </CardContent>
       </Card>
 
+      {/* Track Final Exams (per pillar) */}
+      {id && <TrackExamsPanel trackId={id} canManage={!!isCreator} />}
+
       {/* Trainings in Track */}
       <h3 className="text-xl font-semibold mb-4">Treinamentos da Trilha</h3>
       {trackTrainings && trackTrainings.length > 0 ? (
