@@ -254,16 +254,18 @@ export function useTopRecommendations() {
         .select(`
           *,
           issues (id, title, pillar, severity, interpretation, evidence),
-          courses (id, title, description, level, duration_minutes, url, tags)
+          courses (id, title, description, level, duration_minutes, url, tags),
+          edu_trainings (training_id, title, description, type, pillar, level, duration_minutes, video_url, target_audience, tags, course_code)
         `)
         .order('priority', { ascending: true })
-        .limit(2);
+        .limit(5);
 
       // Transform to match the expected shape
       return (data ?? []).map(rec => ({
         ...rec,
         issue: rec.issues,
         course: rec.courses,
+        training: rec.edu_trainings,
       }));
     },
   });

@@ -6732,6 +6732,13 @@ export type Database = {
             referencedRelation: "orgs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "recommendations_training_id_fkey"
+            columns: ["training_id"]
+            isOneToOne: false
+            referencedRelation: "edu_trainings"
+            referencedColumns: ["training_id"]
+          },
         ]
       }
       stakeholder_profiles: {
