@@ -851,9 +851,9 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       </Badge>
                                     )}
                                     {indicator.unit && (
-                                      <span className="text-xs text-muted-foreground">
+                                      <Badge variant="secondary" className="text-xs px-1.5 py-0 font-medium">
                                         {indicator.unit}
-                                      </span>
+                                      </Badge>
                                     )}
                                     {!isIgnored && fieldConfig.kind === 'number' && (valRules.min !== undefined || valRules.max !== undefined) && (
                                       <span className="text-xs text-muted-foreground">
