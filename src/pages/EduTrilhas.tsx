@@ -68,6 +68,7 @@ import { useEduTrainings, EduTraining } from '@/hooks/useEduTrainings';
 import { useAuth } from '@/hooks/useAuth';
 import { TARGET_AGENT_INFO, type TargetAgent } from '@/types/sistur';
 import { TrackCertificate } from '@/components/edu/TrackCertificate';
+import { TrackExamsPanel } from '@/components/edu/TrackExamsPanel';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -85,7 +86,8 @@ interface TrackFormDialogProps {
   trainings: EduTraining[];
   onSubmit: (data: { 
     track: { name: string; description?: string; objective?: string; audience?: TargetAgent; delivery?: string }; 
-    trainingIds: string[] 
+    trainingIds: string[];
+    autoGenerateExams?: boolean;
   }) => void;
   isSubmitting: boolean;
   initialData?: {
@@ -117,6 +119,7 @@ const TrackFormDialog = ({
   const [delivery, setDelivery] = useState(initialData?.delivery || '');
   const [selectedTrainings, setSelectedTrainings] = useState<string[]>(initialData?.trainingIds || []);
   const [searchQuery, setSearchQuery] = useState('');
+  const [autoGenerateExams, setAutoGenerateExams] = useState(true);
 
   // Reset form when initialData changes
   useEffect(() => {
@@ -147,6 +150,7 @@ const TrackFormDialog = ({
         delivery: delivery.trim() || undefined,
       },
       trainingIds: selectedTrainings,
+      ...(mode === 'create' ? { autoGenerateExams } : {}),
     });
     
     if (mode === 'create') {
@@ -158,6 +162,7 @@ const TrackFormDialog = ({
       setDelivery('');
       setSelectedTrainings([]);
       setSearchQuery('');
+      setAutoGenerateExams(true);
     }
   };
 
@@ -291,6 +296,23 @@ const TrackFormDialog = ({
               )}
             </div>
           </div>
+
+          {mode === 'create' && (
+            <label className="flex items-start gap-3 rounded-md border border-dashed p-3 cursor-pointer hover:bg-muted/40 transition-colors">
+              <Checkbox
+                checked={autoGenerateExams}
+                onCheckedChange={(v) => setAutoGenerateExams(v === true)}
+                className="mt-0.5"
+              />
+              <div className="space-y-1">
+                <p className="text-sm font-medium">Gerar provas finais automaticamente</p>
+                <p className="text-xs text-muted-foreground">
+                  Cria uma prova por pilar coberto pelos treinamentos (20 questões, 70% nota mínima, 60 min, até 2 tentativas).
+                  Opcional — você pode gerar depois pelo botão "Gerar provas" no detalhe da trilha.
+                </p>
+              </div>
+            </label>
+          )}
         </div>
 
         <DialogFooter>
@@ -364,7 +386,11 @@ const EduTrilhas = () => {
         <TrackFormDialog
           trainings={trainings}
           onSubmit={(data) => {
-            createTrackWithTrainings.mutate(data);
+            createTrackWithTrainings.mutate({
+              track: data.track,
+              trainingIds: data.trainingIds,
+              autoGenerateExams: data.autoGenerateExams,
+            });
             setCreateDialogOpen(false);
           }}
           isSubmitting={createTrackWithTrainings.isPending}
@@ -541,7 +567,8 @@ export const EduTrilhaDetalhe = () => {
 
   const handleUpdateTrack = (data: { 
     track: { name: string; description?: string; objective?: string; audience?: TargetAgent; delivery?: string }; 
-    trainingIds: string[] 
+    trainingIds: string[];
+    autoGenerateExams?: boolean;
   }) => {
     if (!id) return;
     updateTrackWithTrainings.mutate({
@@ -720,6 +747,9 @@ export const EduTrilhaDetalhe = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Track Final Exams (per pillar) */}
+      {id && <TrackExamsPanel trackId={id} canManage={!!isCreator} />}
 
       {/* Trainings in Track */}
       <h3 className="text-xl font-semibold mb-4">Treinamentos da Trilha</h3>
