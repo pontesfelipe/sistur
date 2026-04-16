@@ -17,6 +17,51 @@ function formatPctBR(score: number): string {
   return formatNumberBR(score * 100, 1);
 }
 
+/**
+ * Format a raw indicator value for the report based on its semantic
+ * `value_format` flag (PERCENTAGE, CURRENCY, COUNT, etc.). Mirrors
+ * `src/lib/indicatorValueFormat.ts` since Deno can't import @/lib.
+ */
+function formatRawIndicatorValue(value: number | null | undefined, indicator: any): { display: string; unitSuffix: string } {
+  if (value === null || value === undefined || Number.isNaN(value)) return { display: 'N/A', unitSuffix: '' };
+  const fmt = (indicator?.value_format as string | undefined) || inferFormat(indicator?.unit, indicator?.normalization);
+  const num = Number(value);
+  switch (fmt) {
+    case 'PERCENTAGE': return { display: num.toLocaleString('pt-BR', { maximumFractionDigits: 1 }), unitSuffix: '%' };
+    case 'RATIO': return { display: num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 3 }), unitSuffix: '' };
+    case 'INDEX_SCORE': return { display: num.toLocaleString('pt-BR', { maximumFractionDigits: 2 }), unitSuffix: indicator?.unit || '' };
+    case 'CURRENCY': return { display: `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, unitSuffix: '' };
+    case 'CURRENCY_THOUSANDS': return { display: `R$ ${num.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} mil`, unitSuffix: '' };
+    case 'CURRENCY_MILLIONS': return { display: `R$ ${num.toLocaleString('pt-BR', { maximumFractionDigits: 2 })} mi`, unitSuffix: '' };
+    case 'COUNT': return { display: Math.round(num).toLocaleString('pt-BR'), unitSuffix: indicator?.unit || '' };
+    case 'RATE_PER_CAPITA': return { display: num.toLocaleString('pt-BR', { maximumFractionDigits: 2 }), unitSuffix: indicator?.unit || '' };
+    case 'DURATION': return { display: num.toLocaleString('pt-BR', { maximumFractionDigits: 1 }), unitSuffix: indicator?.unit || '' };
+    case 'AREA': return { display: num.toLocaleString('pt-BR', { maximumFractionDigits: 2 }), unitSuffix: indicator?.unit || '' };
+    case 'BINARY': return { display: num >= 0.5 ? 'Sim' : 'Não', unitSuffix: '' };
+    case 'CATEGORICAL': {
+      const letters: Record<number, string> = { 5: 'A', 4: 'B', 3: 'C', 2: 'D', 1: 'E' };
+      return { display: letters[Math.round(num)] ?? String(num), unitSuffix: '' };
+    }
+    default: return { display: num.toLocaleString('pt-BR', { maximumFractionDigits: 2 }), unitSuffix: indicator?.unit || '' };
+  }
+}
+
+function inferFormat(unit?: string | null, normalization?: string | null): string {
+  if (normalization === 'BINARY') return 'BINARY';
+  if (!unit) return 'NUMERIC';
+  const u = unit.toLowerCase().trim();
+  if (u === '%') return 'PERCENTAGE';
+  if (u === 'índice 0-1') return 'RATIO';
+  if (['índice', 'iqa', 'iqa (0-100)', 'score', 'score 1-5', 'nota', 'nota 0-10'].includes(u)) return 'INDEX_SCORE';
+  if (u === 'r$ mi') return 'CURRENCY_MILLIONS';
+  if (u.startsWith('r$')) return 'CURRENCY';
+  if (u.includes('por mil') || u.includes('por 100')) return 'RATE_PER_CAPITA';
+  if (['horas/ano', 'minutos', 'dias', 'anos'].includes(u)) return 'DURATION';
+  if (u === 'km²' || u.includes('/km²')) return 'AREA';
+  if (['unidades', 'un', 'eventos/ano', 'voos/sem'].includes(u)) return 'COUNT';
+  return 'NUMERIC';
+}
+
 function formatDateBR(dateStr: string | null): string {
   if (!dateStr) return 'N/A';
   const d = new Date(dateStr);
@@ -117,20 +162,20 @@ function formatIndicatorsByCategory(indicatorScores: any[]): string {
 function formatIndicatorValues(indicatorValues: any[]): string {
   if (!indicatorValues || indicatorValues.length === 0) return 'Nenhum valor bruto disponível.';
   return indicatorValues.map((iv: any) => {
-    // Column is `value_raw` (not `value`) — keep fallback for resilience across schemas.
     const rawValue = iv.value_raw ?? iv.value;
-    const value = rawValue !== null && rawValue !== undefined ? rawValue : 'N/A';
-    const unit = iv.indicators?.unit || '';
+    // Format respecting the indicator's value_format flag (PERCENTAGE, CURRENCY, COUNT, etc.)
+    const { display, unitSuffix } = formatRawIndicatorValue(rawValue, iv.indicators);
+    const valueLabel = unitSuffix ? `${display} ${unitSuffix}` : display;
     const meta: string[] = [];
     if (iv.indicators?.pillar) meta.push(`Pilar: ${iv.indicators.pillar}`);
     if (iv.indicators?.theme) meta.push(`Tema: ${iv.indicators.theme}`);
+    if (iv.indicators?.value_format) meta.push(`Formato: ${iv.indicators.value_format}`);
     if (iv.source) meta.push(`Fonte: ${iv.source}`);
     const extras: string[] = [];
-    // value_text carries qualitative evidence / free-text provenance the analyst added.
     if (iv.value_text) extras.push(`    Evidência: ${iv.value_text}`);
     if (iv.reference_date) extras.push(`    Referência: ${iv.reference_date}`);
     const metaStr = meta.length > 0 ? ` (${meta.join(', ')})` : '';
-    const header = `- ${iv.indicators?.name || iv.indicators?.code}: ${value}${unit ? ` ${unit}` : ''}${metaStr}`;
+    const header = `- ${iv.indicators?.name || iv.indicators?.code}: ${valueLabel}${metaStr}`;
     return extras.length > 0 ? `${header}\n${extras.join('\n')}` : header;
   }).join('\n');
 }
