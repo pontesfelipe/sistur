@@ -551,30 +551,16 @@ export function getValidationForIndicator(indicator: {
  */
 export function formatIndicatorValueBR(
   value: number | null | undefined,
-  indicator?: { code?: string; unit?: string; direction?: string; min_ref?: number | null; max_ref?: number | null },
+  indicator?: { code?: string; unit?: string; direction?: string; min_ref?: number | null; max_ref?: number | null; value_format?: string | null; normalization?: string | null },
 ): string {
   if (value === null || value === undefined) return '';
 
-  const rules = indicator ? getValidationForIndicator(indicator as any) : {};
-  const unit = (indicator?.unit || '').toLowerCase().trim();
-
-  // Integer indicators — no decimals
-  if (rules.integer || unit === 'hab' || unit === 'un' || unit === 'unidades' || unit === 'qtd') {
-    return Math.round(value).toLocaleString('pt-BR', { maximumFractionDigits: 0 });
-  }
-
-  // Currency — always 2 decimals
-  if (unit === 'r$' || unit === 'brl' || unit.includes('reais')) {
-    return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-
-  // Percentage — up to 1 decimal
-  if (unit === '%' || unit === 'pct' || unit === 'percent') {
-    return value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 1 });
-  }
-
-  // Default — up to 2 decimals
-  return value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  // Delegate to the canonical formatter (uses value_format flag when present,
+  // falls back to unit-based inference for legacy callers).
+  // Keeps this function exported for backwards compat with existing imports.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { formatIndicatorValue } = require('@/lib/indicatorValueFormat') as typeof import('@/lib/indicatorValueFormat');
+  return formatIndicatorValue(value, indicator, { includeUnit: false });
 }
 
 /**
