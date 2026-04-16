@@ -437,6 +437,12 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
         }}
         isPending={deleteAssignment.isPending}
       />
+
+      <AssignmentProgressDialog
+        assignmentId={progressAssignmentId}
+        open={!!progressAssignmentId}
+        onOpenChange={(o) => !o && setProgressAssignmentId(null)}
+      />
     </div>
   );
 }
