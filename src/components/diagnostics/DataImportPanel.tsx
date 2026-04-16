@@ -827,7 +827,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                 isIgnored && "opacity-50",
                                 valError && "bg-destructive/5 rounded-lg px-2 -mx-2"
                               )}>
-                                <div className="col-span-5">
+                                <div className="col-span-4">
                                   <div className="flex items-start gap-2">
                                     <span className={cn(
                                       "font-medium text-sm leading-tight",
@@ -892,7 +892,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                     );
                                   })()}
                                 </div>
-                                <div className="col-span-3">
+                                <div className="col-span-4">
                                   <div className="relative">
                                     {fieldConfig.kind === 'select' ? (
                                       <Select
