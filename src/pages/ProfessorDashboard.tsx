@@ -386,10 +386,22 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                         </div>
                       </div>
                     </div>
-                    <Button size="icon" variant="ghost" onClick={() => confirmDeleteAssignment(a)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {(a.assignment_type === 'exam' || a.assignment_type === 'track') && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setProgressAssignmentId(a.id)}
+                          className="gap-1"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          Acompanhar
+                        </Button>
+                      )}
+                      <Button size="icon" variant="ghost" onClick={() => confirmDeleteAssignment(a)}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                 );
               })}
             </div>
