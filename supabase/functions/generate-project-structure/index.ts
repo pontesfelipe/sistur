@@ -182,8 +182,8 @@ IMPORTANTE:
     const indicatorsByCode = new Map<string, any>();
     if (Array.isArray(indicatorScores)) {
       indicatorScores.forEach((is: any) => {
-        const code = is.indicator?.code || is.indicators?.code;
         const indicator = is.indicator || is.indicators;
+        const code = indicator?.code;
         if (code && indicator) indicatorsByCode.set(code, indicator);
       });
     }
