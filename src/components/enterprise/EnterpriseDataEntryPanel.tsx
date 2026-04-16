@@ -24,7 +24,7 @@ import {
   Minus,
   EyeOff,
   Search,
-  Database,
+  Database as DatabaseIcon,
   Calendar,
   MessageSquare,
 } from 'lucide-react';
