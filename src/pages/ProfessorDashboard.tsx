@@ -26,6 +26,7 @@ import { DeleteConfirmDialog } from '@/components/projects/DeleteConfirmDialog';
 import { AdminTrainingsPanel } from '@/components/edu/AdminTrainingsPanel';
 import { ExamManagementPanel } from '@/components/admin/ExamManagementPanel';
 import { ComplianceReportPanel } from '@/components/edu/ComplianceReportPanel';
+import { AssignmentFormDialog } from '@/components/edu/AssignmentFormDialog';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
