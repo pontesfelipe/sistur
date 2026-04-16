@@ -4180,6 +4180,7 @@ export type Database = {
           source: string | null
           theme: string
           unit: string | null
+          value_format: Database["public"]["Enums"]["value_format_type"]
           weight: number
         }
         Insert: {
@@ -4225,6 +4226,7 @@ export type Database = {
           source?: string | null
           theme: string
           unit?: string | null
+          value_format?: Database["public"]["Enums"]["value_format_type"]
           weight?: number
         }
         Update: {
@@ -4270,6 +4272,7 @@ export type Database = {
           source?: string | null
           theme?: string
           unit?: string | null
+          value_format?: Database["public"]["Enums"]["value_format_type"]
           weight?: number
         }
         Relationships: [
@@ -7927,6 +7930,20 @@ export type Database = {
       target_agent: "GESTORES" | "TECNICOS" | "TRADE"
       territorial_interpretation: "ESTRUTURAL" | "GESTAO" | "ENTREGA"
       track_status_type: "draft" | "published" | "archived"
+      value_format_type:
+        | "PERCENTAGE"
+        | "RATIO"
+        | "INDEX_SCORE"
+        | "CURRENCY"
+        | "CURRENCY_THOUSANDS"
+        | "CURRENCY_MILLIONS"
+        | "COUNT"
+        | "RATE_PER_CAPITA"
+        | "DURATION"
+        | "AREA"
+        | "BINARY"
+        | "CATEGORICAL"
+        | "NUMERIC"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -8163,6 +8180,21 @@ export const Constants = {
       target_agent: ["GESTORES", "TECNICOS", "TRADE"],
       territorial_interpretation: ["ESTRUTURAL", "GESTAO", "ENTREGA"],
       track_status_type: ["draft", "published", "archived"],
+      value_format_type: [
+        "PERCENTAGE",
+        "RATIO",
+        "INDEX_SCORE",
+        "CURRENCY",
+        "CURRENCY_THOUSANDS",
+        "CURRENCY_MILLIONS",
+        "COUNT",
+        "RATE_PER_CAPITA",
+        "DURATION",
+        "AREA",
+        "BINARY",
+        "CATEGORICAL",
+        "NUMERIC",
+      ],
     },
   },
 } as const
