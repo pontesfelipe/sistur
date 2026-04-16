@@ -92,10 +92,12 @@ export function DataValidationPanel({
   const fetchOfficialData = useFetchOfficialData();
   const validateValues = useValidateIndicatorValues();
 
-  // Always fetch fresh data when the panel mounts for a new diagnostic
+  // Always fetch fresh data from all sources when the panel mounts for a new diagnostic
   useEffect(() => {
     if (!autoFetched && ibgeCode && orgId) {
       setAutoFetched(true);
+      // Clear stale cache before fetching fresh data
+      queryClient.removeQueries({ queryKey: ['external-indicator-values', ibgeCode, orgId] });
       fetchOfficialData.mutate({ ibgeCode, orgId });
     }
   }, [ibgeCode, orgId, autoFetched]);
