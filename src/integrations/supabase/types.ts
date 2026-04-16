@@ -474,8 +474,12 @@ export type Database = {
           due_date: string | null
           exam_ruleset_id: string | null
           id: string
+          override_max_attempts: number | null
+          override_min_score_pct: number | null
+          override_time_limit_minutes: number | null
           professor_id: string
           status: string
+          target_user_ids: string[] | null
           title: string
           track_id: string | null
           training_id: string | null
@@ -491,8 +495,12 @@ export type Database = {
           due_date?: string | null
           exam_ruleset_id?: string | null
           id?: string
+          override_max_attempts?: number | null
+          override_min_score_pct?: number | null
+          override_time_limit_minutes?: number | null
           professor_id: string
           status?: string
+          target_user_ids?: string[] | null
           title: string
           track_id?: string | null
           training_id?: string | null
@@ -508,8 +516,12 @@ export type Database = {
           due_date?: string | null
           exam_ruleset_id?: string | null
           id?: string
+          override_max_attempts?: number | null
+          override_min_score_pct?: number | null
+          override_time_limit_minutes?: number | null
           professor_id?: string
           status?: string
+          target_user_ids?: string[] | null
           title?: string
           track_id?: string | null
           training_id?: string | null
@@ -7580,6 +7592,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      can_student_start_assignment: {
+        Args: { p_assignment_id: string }
+        Returns: Json
+      }
       cancel_my_license: { Args: { p_reason: string }; Returns: undefined }
       cleanup_exam_tracking_data: { Args: never; Returns: undefined }
       complete_user_onboarding: {
@@ -7660,6 +7676,33 @@ export type Database = {
           trial_started_at: string
           updated_at: string
           user_id: string
+        }[]
+      }
+      get_my_classroom_assignments: {
+        Args: never
+        Returns: {
+          assignment_type: string
+          attempts_made: number
+          available_from: string
+          classroom_id: string
+          classroom_name: string
+          created_at: string
+          description: string
+          due_date: string
+          exam_ruleset_id: string
+          id: string
+          is_open: boolean
+          is_overdue: boolean
+          last_attempt_result: string
+          override_max_attempts: number
+          override_min_score_pct: number
+          override_time_limit_minutes: number
+          professor_id: string
+          professor_name: string
+          status: string
+          title: string
+          track_id: string
+          training_id: string
         }[]
       }
       get_org_license_usage: {
