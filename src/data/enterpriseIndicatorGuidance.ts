@@ -13,6 +13,7 @@ export interface IndicatorGuidance {
     min?: number;
     max?: number;
     integer?: boolean;
+    maxDecimals?: number;
   };
 }
 
