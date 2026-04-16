@@ -598,7 +598,7 @@ const Index = () => {
                   </p>
                 )}
                 <Button variant="outline" className="w-full mt-4" asChild>
-                  <Link to="/cursos">
+                  <Link to="/edu/catalogo">
                     <GraduationCap className="mr-2 h-4 w-4" />
                     Ver catálogo SISTUR EDU
                   </Link>
