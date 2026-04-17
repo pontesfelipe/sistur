@@ -9,6 +9,7 @@ import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendatio
 import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
 import { CreateProjectFromDiagnosticView } from '@/components/dashboard/CreateProjectFromDiagnosticView';
 import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
+import { MandalaAnalysisView } from '@/components/dashboard/MandalaAnalysisView';
 import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculationChecklist';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
@@ -58,6 +59,7 @@ import {
   Layers,
   EyeOff,
   BookOpen,
+  Sparkles,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
