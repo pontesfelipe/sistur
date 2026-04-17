@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 29,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.29.1",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Documentação: página Metodologia ganha seção dedicada à Mandala da Sustentabilidade no Turismo (MST) com os 9 indicadores complementares mapeados em RA/OE/AO, automação via TSE/Anatel/CADASTUR e nota sobre a Mandala do Destino",
+      "FAQ: 4 novas perguntas cobrindo o que é a MST, como ativar via opt-in no Step 3 da Nova Rodada, quais indicadores são automatizados nos 15 destinos âncora e o que é o componente Mandala do Destino no Dashboard",
+      "Sem mudanças funcionais — apenas atualização de documentação e FAQ para alinhar a base de conhecimento com as features lançadas em v1.28.0 e v1.29.0",
+    ],
+  },
   {
     version: "1.29.0",
     date: "2026-04-17",

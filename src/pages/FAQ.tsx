@@ -210,6 +210,28 @@ export const faqItems: FAQItem[] = [
     answer: 'Uma organização privada com Enterprise habilitado pode usar tanto os indicadores territoriais padrão (quando aplicável) quanto os indicadores específicos de hospitalidade. Os 6 indicadores compartilhados facilitam a integração entre diagnósticos territoriais e empresariais. Organizações públicas não têm acesso ao módulo Enterprise.',
     category: 'enterprise',
   },
+
+  // Mandala da Sustentabilidade no Turismo (MST) — extensão opcional
+  {
+    question: 'O que é a Mandala da Sustentabilidade no Turismo (MST)?',
+    answer: 'A MST é uma extensão opcional (a partir da v1.28.0) baseada em Tasso, Silva & Nascimento (2024) que adiciona 9 indicadores complementares ao núcleo SISTUR — 4 em RA (acessibilidade NBR 9050, áreas verdes, balneabilidade, patrimônio), 3 em OE (conectividade 5G/Wi-Fi via Anatel, qualificação PNQT via CADASTUR, comparecimento eleitoral via TSE) e 2 em AO (promoção digital, Turismo de Base Comunitária). O Score Final SISTUR e a classificação são preservados — a MST adiciona profundidade sem quebrar comparabilidade.',
+    category: 'general',
+  },
+  {
+    question: 'Como ativo a Mandala (MST) num diagnóstico?',
+    answer: 'Na criação de uma Nova Rodada Territorial, no Step 3 (Configurações), ative o switch "Expandir com Mandala da Sustentabilidade no Turismo". A flag fica salva no diagnóstico (assessments.expand_with_mandala) e os 9 indicadores MST passam a aparecer na coleta. Diagnósticos sem o opt-in continuam usando apenas o núcleo SISTUR original. Você pode filtrar o catálogo por "Núcleo SISTUR" vs "🌀 Mandala MST" no painel de Indicadores.',
+    category: 'erp',
+  },
+  {
+    question: 'Quais indicadores MST são preenchidos automaticamente?',
+    answer: 'Para 15 destinos âncora (capitais + Foz do Iguaçu, Olinda, Ribeirão Preto, Uberlândia), três indicadores são automatizados via cache: MST_TSE_TURNOUT (TSE — comparecimento eleitoral), MST_5G_WIFI (Anatel — cobertura 5G/Wi-Fi público) e MST_PNQT_QUAL/MST_ACC_NBR9050 (CADASTUR estendido). Os demais municípios usam coleta manual com valores oficiais documentados.',
+    category: 'erp',
+  },
+  {
+    question: 'O que é o componente "Mandala do Destino" no Dashboard?',
+    answer: 'É a visualização circular dos 3 conjuntos de Mario Beni (RA / OE / AO) com seus subsistemas explícitos (Ecológico, Social, Econômico, Cultural; Superestrutura, Infraestrutura; Mercado, Oferta, Demanda, Distribuição). Quando o diagnóstico tem MST ativo, um anel externo mostra as 4 dimensões adicionais (Tecnologia, Inclusão, TBC, Sensibilização). O Score Final SISTUR aparece no centro da mandala como média dos pilares.',
+    category: 'general',
+  },
 ];
 
 export default function FAQ() {
