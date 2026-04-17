@@ -1447,7 +1447,26 @@ serve(async (req) => {
 
     console.log(`Created ${recommendations.length} recommendations`);
 
-    // 12. Update assessment with IGMA results (including new ra_limitation and governance_block flags)
+    // 12. Update assessment with IGMA results + Score Final SISTUR (Etapa 4 do documento)
+    // Fórmula canônica: Final = (RA × 0.35) + (OE × 0.30) + (AO × 0.35)
+    // Classificação em 5 faixas:
+    //   CRITICO            0.00–0.39
+    //   INSUFICIENTE       0.40–0.54
+    //   EM_DESENVOLVIMENTO 0.55–0.69
+    //   BOM                0.70–0.84
+    //   EXCELENTE          0.85–1.00
+    const raScore = pillarScores.find(p => p.pillar === "RA")?.score ?? 0;
+    const oeScore = pillarScores.find(p => p.pillar === "OE")?.score ?? 0;
+    const aoScore = pillarScores.find(p => p.pillar === "AO")?.score ?? 0;
+    const finalScore = Number(((raScore * 0.35) + (oeScore * 0.30) + (aoScore * 0.35)).toFixed(4));
+    const finalClassification =
+      finalScore < 0.40 ? "CRITICO" :
+      finalScore < 0.55 ? "INSUFICIENTE" :
+      finalScore < 0.70 ? "EM_DESENVOLVIMENTO" :
+      finalScore < 0.85 ? "BOM" : "EXCELENTE";
+
+    console.log(`[SISTUR Final] RA=${raScore.toFixed(3)} OE=${oeScore.toFixed(3)} AO=${aoScore.toFixed(3)} → Final=${finalScore} (${finalClassification})`);
+
     const { error: updateError } = await supabase
       .from("assessments")
       .update({
@@ -1467,9 +1486,11 @@ serve(async (req) => {
         },
         marketing_blocked: igmaResult.flags.MARKETING_BLOCKED,
         externality_warning: igmaResult.flags.EXTERNALITY_WARNING,
-        // NEW: Persist RA_LIMITATION and GOVERNANCE_BLOCK flags for full auditability
         ra_limitation: igmaResult.flags.RA_LIMITATION,
         governance_block: igmaResult.flags.GOVERNANCE_BLOCK,
+        // Score Final SISTUR (Etapa 4) — uso interno apenas (sem rankings públicos)
+        final_score: finalScore,
+        final_classification: finalClassification,
       })
       .eq("id", assessment_id);
 
