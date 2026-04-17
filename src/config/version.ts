@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 8,
+  patch: 9,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.9",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Fase de preenchimento manual agora exibe alerta âmbar com link à fonte oficial para indicadores cuja coleta automática falhou. O DataImportPanel carrega os placeholders MANUAL deixados pelas edge functions ingest-tse e ingest-anatel (registros em external_indicator_values com raw_value=null e collection_method=MANUAL) e renderiza um quadro destacado abaixo do nome do indicador, com a nota explicativa e o link clicável para o portal oficial da fonte (TSE, Anatel, etc.). Antes, esses indicadores apareciam mudos no formulário — o operador não sabia que precisava buscar o dado em fonte externa nem para onde ir. Foco em MST_TSE_TURNOUT e MST_5G_WIFI (Mandala da Sustentabilidade no Turismo), mas o mecanismo é genérico e cobre qualquer indicador com placeholder MANUAL.",
+    ],
+  },
   {
     version: "1.30.8",
     date: "2026-04-17",
