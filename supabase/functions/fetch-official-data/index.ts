@@ -433,6 +433,28 @@ async function fetchMapaTurismo(
       if (raw.arrecadacao) {
         results['igma_arrecadacao_turismo'] = { value: raw.arrecadacao, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
       }
+
+      // Visitor counts + AO001 derivation (Fluxo Turístico Anual)
+      let visNacVal = 0;
+      let visIntVal = 0;
+      if (raw.qt_visita_nacional) {
+        const v = parseFloat(String(raw.qt_visita_nacional).replace(/\./g, '').replace(',', '.'));
+        if (!isNaN(v)) {
+          visNacVal = v;
+          results['igma_visitantes_nacionais'] = { value: v, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
+        }
+      }
+      if (raw.qt_visita_internacional) {
+        const v = parseFloat(String(raw.qt_visita_internacional).replace(/\./g, '').replace(',', '.'));
+        if (!isNaN(v)) {
+          visIntVal = v;
+          results['igma_visitantes_internacionais'] = { value: v, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
+        }
+      }
+      const totalFlow = visNacVal + visIntVal;
+      if (totalFlow > 0) {
+        results['AO001'] = { value: totalFlow, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
+      }
     }
   } catch (e) {
     console.error('Mapa Turismo DB error:', e instanceof Error ? e.message : e);
