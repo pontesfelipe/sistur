@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 27,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.27.3",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Configurações > Ferramentas: novo painel 'Ajuste de Pesos dos Indicadores' (admin-only) para calibrar pesos por pilar (RA/OE/AO) com edição inline, validação de soma 100%, ações Igualar / Normalizar 100% / Reverter / Salvar e indicação visual de pilares editados",
+    ],
+  },
   {
     version: "1.27.2",
     date: "2026-04-17",
