@@ -97,6 +97,7 @@ const Index = () => {
   // Reset destination filter when switching modes
   useEffect(() => {
     setSelectedDestination(undefined);
+    setMandalaDestination(undefined);
   }, [diagnosticMode]);
   
   // Territorial hooks
