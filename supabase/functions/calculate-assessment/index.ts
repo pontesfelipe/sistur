@@ -1802,6 +1802,8 @@ serve(async (req) => {
         critical_score: criticalPillar?.score,
         issues_created: insertedIssues.length,
         recommendations_created: recommendations.length,
+        final_score: finalScore,
+        final_classification: finalClassification,
         igma: {
           flags: igmaResult.flags,
           allowedActions: igmaResult.allowedActions,
