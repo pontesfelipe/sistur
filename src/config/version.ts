@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.6",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Cache TTL inteligente para scraping MST: ingest-tse e ingest-anatel agora consultam tse_turnout_cache (reuso quando election_year >= 2024, último pleito municipal) e anatel_coverage_cache (TTL de 90 dias) ANTES de chamar Firecrawl. Cache hit retorna em <100ms sem custo de créditos. Cache miss aciona scrape e persiste o resultado para próximas rodadas. Como o disparo já acontecia no diagnóstico (DataValidationPanel quando includeMandala=true), os dados ficam sempre frescos para a rodada em curso e baratos para rodadas subsequentes do mesmo município.",
+    ],
+  },
   {
     version: "1.30.5",
     date: "2026-04-17",
