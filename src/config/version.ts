@@ -25,9 +25,9 @@ export const VERSION_HISTORY = [
   {
     version: "1.30.8",
     date: "2026-04-17",
-    type: "minor" as const,
+    type: "patch" as const,
     changes: [
-      "Nova aba 'Mandala' no resultado do diagnóstico: aparece ao lado de 'Projeto' apenas quando o diagnóstico foi criado com a flag MST (expand_with_mandala = true). Renderiza a Mandala visual completa (Beni 2007 + 4 dimensões transversais MST de Tasso et al. 2024) e cards de análise por dimensão (Tecnologia, Inclusão, TBC, Sensibilização) com a média dos indicadores MST_* preenchidos, status colorido e lista detalhada de cada indicador (preenchido ou vazio). Diagnósticos sem opt-in MST mantêm a UI original sem a aba extra.",
+      "Calibração de 13 indicadores IGMA estruturais que estavam sem normalização (min_ref/max_ref nulos), causando score 0 ou indefinido. Três deles foram reclassificados como descritores estruturais com peso zerado (População, Área Territorial, Densidade Demográfica) — permanecem visíveis para contexto territorial mas não pontuam no I-SISTUR, pois são características do território e não métricas de desempenho. Os outros 10 receberam benchmarks oficiais brasileiros: IDH (PNUD 0,4–0,9, meta 0,8), IDEB (INEP 2–8, meta 6), Taxa de Escolarização (PNE 70–100%, meta 98%), Cobertura de Saúde (SUS 30–100%, meta 80%), Leitos por Habitante (OMS 0,5–6 por mil, meta 3), CADASTUR (Agências/Hospedagem/Guias por 10 mil habitantes), Despesa com Turismo (% executado, meta 2%) e Receita Própria (% receita total, meta 30% para autonomia fiscal).",
     ],
   },
   {

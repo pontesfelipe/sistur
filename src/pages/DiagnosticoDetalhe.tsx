@@ -9,7 +9,6 @@ import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendatio
 import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
 import { CreateProjectFromDiagnosticView } from '@/components/dashboard/CreateProjectFromDiagnosticView';
 import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
-import { MandalaAnalysisView } from '@/components/dashboard/MandalaAnalysisView';
 import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculationChecklist';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
@@ -59,7 +58,6 @@ import {
   Layers,
   EyeOff,
   BookOpen,
-  Sparkles,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -755,10 +753,7 @@ const DiagnosticoDetalhe = () => {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className={cn(
             "grid w-full",
-            isEnterprise && assessment.expand_with_mandala ? "max-w-5xl grid-cols-8" :
-            isEnterprise ? "max-w-4xl grid-cols-7" :
-            assessment.expand_with_mandala ? "max-w-4xl grid-cols-7" :
-            "max-w-3xl grid-cols-6"
+            isEnterprise ? "max-w-4xl grid-cols-7" : "max-w-3xl grid-cols-6"
           )}>
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -790,12 +785,6 @@ const DiagnosticoDetalhe = () => {
               <FolderKanban className="h-4 w-4" />
               <span className="hidden sm:inline">Projeto</span>
             </TabsTrigger>
-            {assessment.expand_with_mandala && (
-              <TabsTrigger value="mandala" className="gap-2">
-                <Sparkles className="h-4 w-4" />
-                <span className="hidden sm:inline">Mandala</span>
-              </TabsTrigger>
-            )}
           </TabsList>
 
           {/* Radiografia Tab */}
@@ -933,17 +922,6 @@ const DiagnosticoDetalhe = () => {
           <TabsContent value="projeto">
             <CreateProjectFromDiagnosticView assessmentId={id!} destinationId={assessment?.destination_id} />
           </TabsContent>
-
-          {/* Mandala Tab — only when expand_with_mandala */}
-          {assessment.expand_with_mandala && (
-            <TabsContent value="mandala">
-              <MandalaAnalysisView
-                pillarScores={pillarScores as any}
-                indicatorScores={indicatorScores as any}
-                destinationName={assessmentDestination?.name}
-              />
-            </TabsContent>
-          )}
         </Tabs>
       ) : (
         /* Pre-calculation state */
