@@ -929,6 +929,7 @@ serve(async (req) => {
       );
       
       console.log(`Inserting ${deduplicatedScores.length} ${isEnterpriseCalc ? 'enterprise ' : ''}indicator scores (deduplicated from ${indicatorScores.length})`);
+      console.log('[3-LAYER DEBUG] First score sample:', JSON.stringify(deduplicatedScores[0]));
       
        // Insert into unified indicator_scores (works for both territorial and enterprise).
        // Ensure computed_at is present (indicator_scores has NOT NULL computed_at).
