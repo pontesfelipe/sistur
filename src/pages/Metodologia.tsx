@@ -395,6 +395,70 @@ export default function Metodologia() {
               do sistema que aplica automaticamente 6 regras derivadas dessa teoria, garantindo que as 
               decisões respeitem a lógica sistêmica do turismo.
             </p>
+            <p>
+              A partir da v1.28.0, o SISTUR oferece a <strong>Mandala da Sustentabilidade no Turismo (MST)</strong>{' '}
+              como expansão opcional. A MST representa visualmente os 3 conjuntos de Beni (RA / OE / AO) e seus
+              subsistemas, e adiciona 4 dimensões contemporâneas (Tecnologia, Inclusão, TBC e Sensibilização) com
+              9 indicadores complementares automatizáveis (TSE, Anatel, CADASTUR PNQT, NBR 9050).
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Mandala da Sustentabilidade no Turismo */}
+        <Card className="border-accent/40 bg-accent/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-accent-foreground" />
+              🌀 Mandala da Sustentabilidade no Turismo (MST)
+              <Badge variant="outline" className="ml-2 text-xs">Opcional</Badge>
+            </CardTitle>
+            <CardDescription>
+              Extensão contemporânea baseada em Tasso, Silva &amp; Nascimento (2024) — opt-in por diagnóstico
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 prose prose-sm max-w-none dark:prose-invert">
+            <p>
+              A MST mantém o núcleo SISTUR (Score Final, classificação e regras IGMA) intacto e adiciona 9
+              indicadores complementares mapeados nos 3 pilares de Beni. Os indicadores MST aparecem com badge{' '}
+              <strong>🌀 MST</strong> no catálogo e só são exigidos quando o opt-in{' '}
+              <em>Expandir com Mandala</em> é ativado no Step 3 da Nova Rodada.
+            </p>
+            <div className="grid md:grid-cols-3 gap-3 not-prose">
+              <div className="rounded-lg border border-emerald-500/40 bg-emerald-50/40 dark:bg-emerald-950/20 p-3">
+                <p className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400">RA — 4 indicadores</p>
+                <ul className="text-xs mt-1 space-y-0.5 text-muted-foreground">
+                  <li>• MST_ACC_NBR9050 — Acessibilidade</li>
+                  <li>• MST_GREEN_AREA — Áreas verdes</li>
+                  <li>• MST_WATER_QUALITY — Balneabilidade</li>
+                  <li>• MST_HERITAGE — Patrimônio cultural</li>
+                </ul>
+              </div>
+              <div className="rounded-lg border border-blue-500/40 bg-blue-50/40 dark:bg-blue-950/20 p-3">
+                <p className="text-xs font-mono font-bold text-blue-700 dark:text-blue-400">OE — 3 indicadores</p>
+                <ul className="text-xs mt-1 space-y-0.5 text-muted-foreground">
+                  <li>• MST_5G_WIFI — Conectividade (Anatel)</li>
+                  <li>• MST_PNQT_QUAL — Qualificação CADASTUR</li>
+                  <li>• MST_TSE_TURNOUT — Engajamento eleitoral</li>
+                </ul>
+              </div>
+              <div className="rounded-lg border border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/20 p-3">
+                <p className="text-xs font-mono font-bold text-amber-700 dark:text-amber-400">AO — 2 indicadores</p>
+                <ul className="text-xs mt-1 space-y-0.5 text-muted-foreground">
+                  <li>• MST_DIGITAL_PROMO — Promoção digital</li>
+                  <li>• MST_TBC — Turismo de Base Comunitária</li>
+                </ul>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              <strong>Automação:</strong> as edge functions <code>ingest-tse</code>, <code>ingest-anatel</code>{' '}
+              e <code>ingest-cadastur</code> alimentam automaticamente os caches{' '}
+              <code>tse_turnout_cache</code> e <code>anatel_coverage_cache</code> para 15 destinos âncora
+              (capitais + Foz do Iguaçu, Olinda, Ribeirão Preto, Uberlândia). Demais municípios usam coleta manual.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              <strong>Visualização:</strong> o componente <em>Mandala do Destino</em> no Dashboard Territorial
+              renderiza os 3 conjuntos como setores circulares, com anel externo MST quando o opt-in está ativo.
+            </p>
           </CardContent>
         </Card>
 
