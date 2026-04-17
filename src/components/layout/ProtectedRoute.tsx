@@ -21,6 +21,8 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true, skipLic
     initialized,
     profile,
     isEstudante,
+    isProfessor,
+    isOrgAdmin,
     hasERPAccess,
     isAdmin 
   } = useProfileContext();
@@ -76,14 +78,22 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true, skipLic
     return <Navigate to="/pending-approval" replace />;
   }
 
-  // Check license - redirect to subscription if no valid license (admins bypass)
-  if (!skipLicenseCheck && !isAdmin && !isLicenseValid) {
+  // Check license - redirect to subscription if no valid license (admins/org admins bypass)
+  if (!skipLicenseCheck && !isAdmin && !isOrgAdmin && !isLicenseValid) {
     return <Navigate to="/assinatura" replace />;
   }
 
-  // Redirect students to EDU (they shouldn't see ERP dashboard)
-  if (redirectStudentsToEdu && isEstudante && !hasERPAccess && !isAdmin) {
-    return <Navigate to="/edu" replace />;
+  // Role-based landing redirect from "/":
+  // - ADMIN / ORG_ADMIN / users with ERP access → keep ERP dashboard
+  // - PROFESSOR (without ERP access) → professor management dashboard
+  // - ESTUDANTE (without ERP access) → EDU dashboard ("Minha Jornada")
+  if (redirectStudentsToEdu && !isAdmin && !isOrgAdmin && !hasERPAccess) {
+    if (isProfessor) {
+      return <Navigate to="/professor" replace />;
+    }
+    if (isEstudante) {
+      return <Navigate to="/edu" replace />;
+    }
   }
 
   return (
