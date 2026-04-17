@@ -47,6 +47,8 @@ interface DataValidationPanelProps {
   orgId: string;
   destinationName: string;
   onValidationComplete: (values: ExternalIndicatorValue[]) => void;
+  /** Whether the host assessment opted into the Mandala MST extension. */
+  includeMandala?: boolean;
 }
 
 // Source display info
@@ -59,8 +61,15 @@ const SOURCE_INFO: Record<string, { name: string; color: string; icon: string }>
   CADASTUR: { name: 'CADASTUR', color: 'bg-cyan-500', icon: '🏨' },
   MAPA_TURISMO: { name: 'Mapa do Turismo', color: 'bg-teal-500', icon: '🗺️' },
   ANA: { name: 'ANA — Águas', color: 'bg-sky-500', icon: '💧' },
+  TSE: { name: 'TSE — Eleições', color: 'bg-rose-500', icon: '🗳️' },
+  ANATEL: { name: 'Anatel — Conectividade', color: 'bg-fuchsia-500', icon: '📡' },
   MANUAL: { name: 'Preenchimento Manual', color: 'bg-gray-400', icon: '✏️' },
 };
+
+// Indicators that come from the Mandala MST extension (Tasso, Silva & Nascimento, 2024)
+function isMandalaIndicator(code: string): boolean {
+  return code.startsWith('MST_');
+}
 
 // Confidence level display
 const CONFIDENCE_CRITERIA: Record<number, { label: string; color: string }> = {

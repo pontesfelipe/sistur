@@ -4,6 +4,8 @@
 //
 // Fonte: dados.anatel.gov.br (Mosaico — cobertura móvel por município).
 // Score 0-100 = (peso 5G * cobertura 5G) + (peso 4G * cobertura 4G) + (peso Wi-Fi público).
+// Quando org_id é fornecido, faz UPSERT em external_indicator_values para que
+// o indicador apareça no painel de pré-preenchimento (DataValidationPanel).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 
 const corsHeaders = {
@@ -13,6 +15,7 @@ const corsHeaders = {
 
 interface RequestBody {
   ibge_code: string;
+  org_id?: string;
 }
 
 // Pesos do score composto
@@ -39,7 +42,6 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    // Try cached Anatel data first
     let coverage5g = 0;
     let coverage4g = 0;
     let wifiPublic = 0;
@@ -71,13 +73,38 @@ Deno.serve(async (req) => {
       WEIGHT_5G * coverage5g + WEIGHT_4G * coverage4g + WEIGHT_WIFI * wifiPublic,
     );
 
+    const value = collectionMethod === 'AUTOMATIC' ? score : null;
+
+    // Persist into external_indicator_values when org_id is provided so the
+    // pre-fill panel (DataValidationPanel) can display the MST indicator.
+    let upserted = false;
+    if (body.org_id && value !== null) {
+      const { error: upsertError } = await supabase
+        .from('external_indicator_values')
+        .upsert({
+          indicator_code: 'MST_5G_WIFI',
+          municipality_ibge_code: body.ibge_code,
+          source_code: 'ANATEL',
+          raw_value: value,
+          reference_year: referenceYear,
+          collection_method: 'AUTOMATIC' as const,
+          confidence_level: 5,
+          validated: false,
+          org_id: body.org_id,
+          notes: `Anatel ${referenceYear} — Score ${value}/100 (5G: ${coverage5g}%, 4G: ${coverage4g}%, Wi-Fi público: ${wifiPublic}). 🌀 MST.`,
+        }, { onConflict: 'org_id,municipality_ibge_code,indicator_code' });
+      upserted = !upsertError;
+      if (upsertError) console.error('Anatel upsert error:', upsertError);
+    }
+
     return new Response(
       JSON.stringify({
         indicator_code: 'MST_5G_WIFI',
-        value: collectionMethod === 'AUTOMATIC' ? score : null,
+        value,
         reference_year: referenceYear,
         source: 'Anatel — dados.anatel.gov.br (Mosaico)',
         collection_method: collectionMethod,
+        upserted,
         breakdown: collectionMethod === 'AUTOMATIC'
           ? { coverage_5g: coverage5g, coverage_4g: coverage4g, wifi_public: wifiPublic }
           : null,

@@ -3,13 +3,9 @@
 // Indicador: MST_TSE_TURNOUT (Mandala da Sustentabilidade no Turismo).
 //
 // Fonte primária: https://dadosabertos.tse.jus.br/dataset/resultados-{ano}
-// Como o dataset oficial é massivo (CSV gigante), expomos um endpoint que aceita
-// um valor pré-calculado (input manual + auditoria) e/ou um override por município.
-//
-// Para o MVP, a função aceita ibge_code + ano (opcional) e retorna o último
-// percentual conhecido a partir de uma tabela curada `tse_turnout_cache` que o
-// admin pode popular periodicamente. Se não houver cache, retorna null com
-// instrução para coleta manual.
+// Para o MVP, lê de uma tabela curada `tse_turnout_cache` populada pelo admin.
+// Quando org_id é fornecido, faz UPSERT em external_indicator_values para que
+// o indicador apareça no painel de pré-preenchimento (DataValidationPanel).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 
 const corsHeaders = {
@@ -19,6 +15,7 @@ const corsHeaders = {
 
 interface RequestBody {
   ibge_code: string;
+  org_id?: string;
   year?: number;
 }
 
@@ -41,12 +38,11 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    // Best-effort: try a curated cache table if available.
-    // The table can be created by the admin to mirror TSE bulk extracts.
     let value: number | null = null;
     let referenceYear: number | null = body.year ?? null;
-    let source = 'TSE — dadosabertos.tse.jus.br';
+    const source = 'TSE — dadosabertos.tse.jus.br';
     let note: string | null = null;
+    let collectionMethod: 'AUTOMATIC' | 'MANUAL' = 'MANUAL';
 
     try {
       const { data: cached } = await supabase
@@ -60,24 +56,32 @@ Deno.serve(async (req) => {
       if (cached) {
         value = Number((cached as any).turnout_pct);
         referenceYear = Number((cached as any).election_year);
+        collectionMethod = 'AUTOMATIC';
       }
     } catch (_e) {
-      // Cache table doesn't exist yet — fallback to manual.
       note = 'Cache TSE indisponível. Colete manualmente via tse.jus.br/eleicoes/estatisticas.';
     }
 
-    if (value === null) {
-      return new Response(
-        JSON.stringify({
+    // Persist into external_indicator_values when org_id is provided so the
+    // pre-fill panel (DataValidationPanel) can display the MST indicator.
+    let upserted = false;
+    if (body.org_id && value !== null) {
+      const { error: upsertError } = await supabase
+        .from('external_indicator_values')
+        .upsert({
           indicator_code: 'MST_TSE_TURNOUT',
-          value: null,
+          municipality_ibge_code: body.ibge_code,
+          source_code: 'TSE',
+          raw_value: value,
           reference_year: referenceYear,
-          source,
-          collection_method: 'MANUAL',
-          note: note ?? 'Sem dado cacheado para este município. Preencha manualmente.',
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+          collection_method: 'AUTOMATIC' as const,
+          confidence_level: 5,
+          validated: false,
+          org_id: body.org_id,
+          notes: `TSE — comparecimento eleitoral ${referenceYear}: ${value}%. 🌀 MST.`,
+        }, { onConflict: 'org_id,municipality_ibge_code,indicator_code' });
+      upserted = !upsertError;
+      if (upsertError) console.error('TSE upsert error:', upsertError);
     }
 
     return new Response(
@@ -86,7 +90,9 @@ Deno.serve(async (req) => {
         value,
         reference_year: referenceYear,
         source,
-        collection_method: 'AUTOMATIC',
+        collection_method: collectionMethod,
+        upserted,
+        note: note ?? (value === null ? 'Sem dado cacheado para este município. Preencha manualmente.' : null),
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
