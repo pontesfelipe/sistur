@@ -489,6 +489,63 @@ export function NovaRodadaForm({
               </RadioGroup>
             </div>
 
+            {/* Mandala da Sustentabilidade — Opt-in */}
+            <div
+              className={cn(
+                "rounded-lg border-2 p-4 transition-all",
+                expandWithMandala
+                  ? "border-primary bg-primary/5"
+                  : "border-muted hover:border-muted-foreground/40"
+              )}
+            >
+              <div className="flex items-start gap-4">
+                <div className={cn(
+                  "mt-0.5 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+                  expandWithMandala ? "bg-primary/15" : "bg-muted"
+                )}>
+                  <Flower2 className={cn("h-5 w-5", expandWithMandala ? "text-primary" : "text-muted-foreground")} />
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <Label htmlFor="mandala-toggle" className="font-medium cursor-pointer flex items-center gap-2">
+                        Expandir com Mandala da Sustentabilidade
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/40 text-primary">
+                          MST
+                        </Badge>
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Adiciona 9 indicadores complementares baseados em Tasso, Silva & Nascimento (2024):
+                        acessibilidade NBR 9050, comparecimento eleitoral, qualificação PNQT, conectividade 5G/Wi-Fi,
+                        promoção digital, Big Data turístico, TBC, inclusão na gestão e sensibilização.
+                      </p>
+                    </div>
+                    <Switch
+                      id="mandala-toggle"
+                      checked={expandWithMandala}
+                      onCheckedChange={onExpandWithMandalaChange}
+                    />
+                  </div>
+                  {expandWithMandala && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-primary/15">
+                      <div className="text-xs">
+                        <span className="font-medium text-severity-good">✓ 3 automáticos</span>
+                        <p className="text-muted-foreground">TSE, Anatel, CADASTUR</p>
+                      </div>
+                      <div className="text-xs">
+                        <span className="font-medium text-amber-600">⚠ 6 manuais</span>
+                        <p className="text-muted-foreground">Coleta pelo gestor</p>
+                      </div>
+                      <div className="text-xs">
+                        <span className="font-medium text-primary">+ Não altera score</span>
+                        <p className="text-muted-foreground">Indicadores opcionais</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">
                 <strong>Destino selecionado:</strong>{' '}
