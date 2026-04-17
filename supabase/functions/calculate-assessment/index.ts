@@ -769,11 +769,23 @@ serve(async (req) => {
         indicator.normalization
       );
 
+      // Compute confidence based on source (manual vs auto)
+      const ivSource = (iv as any)._source || (iv as any).source || '';
+      const isAutoSource = /api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn/i.test(String(ivSource));
+      const confidenceLevel = isAutoSource ? 1.0 : 0.7;
+
       indicatorScores.push({
         org_id: orgId,
         assessment_id,
         indicator_id: iv.indicator_id,
         score,
+        // 3-layer enrichment (raw → normalized → score%)
+        value_raw: iv.value_raw,
+        value_normalized: score,
+        score_pct: score * 100,
+        polarity: indicator.direction === 'LOW_IS_BETTER' ? 'LOW_IS_BETTER' : 'HIGH_IS_BETTER',
+        normalization_method: indicator.normalization || 'minmax',
+        confidence_level: confidenceLevel,
         min_ref_used: indicator.min_ref,
         max_ref_used: indicator.max_ref,
         weight_used: indicator.weight,
@@ -855,12 +867,18 @@ serve(async (req) => {
             .single();
 
           if (compositeIndicator) {
-            // Add to indicator scores
+            // Add to indicator scores with 3-layer data
             indicatorScores.push({
               org_id: orgId,
               assessment_id,
               indicator_id: compositeIndicator.id,
               score: compositeScore,
+              value_raw: null, // composites have no single raw value
+              value_normalized: compositeScore,
+              score_pct: compositeScore * 100,
+              polarity: 'HIGH_IS_BETTER',
+              normalization_method: 'composite_weighted',
+              confidence_level: 0.85, // composites: medium-high confidence
               min_ref_used: 0,
               max_ref_used: 100,
               weight_used: 1.5,
@@ -911,6 +929,7 @@ serve(async (req) => {
       );
       
       console.log(`Inserting ${deduplicatedScores.length} ${isEnterpriseCalc ? 'enterprise ' : ''}indicator scores (deduplicated from ${indicatorScores.length})`);
+      console.log('[3-LAYER DEBUG] First score sample:', JSON.stringify(deduplicatedScores[0]));
       
        // Insert into unified indicator_scores (works for both territorial and enterprise).
        // Ensure computed_at is present (indicator_scores has NOT NULL computed_at).
