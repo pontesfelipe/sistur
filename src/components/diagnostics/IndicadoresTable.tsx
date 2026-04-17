@@ -494,8 +494,13 @@ export function IndicadoresTable({
                             className="text-left hover:underline w-full"
                             onClick={() => onSetSelectedIndicator(indicator)}
                           >
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 flex-wrap">
                               <span className="font-medium text-sm">{indicator.name}</span>
+                              {(indicator as any).is_mandala_extension && (
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-primary/50 text-primary bg-primary/10">
+                                  🌀 MST
+                                </Badge>
+                              )}
                               {CADASTUR_SEMI_AUTO_CODES.has(indicator.code) ? (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 border-cyan-500/50 text-cyan-600 bg-cyan-500/10">
                                   <Database className="h-2.5 w-2.5 mr-0.5" />
@@ -636,10 +641,15 @@ export function IndicadoresTable({
                             className="text-left hover:underline"
                             onClick={() => onSetSelectedIndicator(indicator)}
                           >
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-medium">{indicator.name}</span>
                               {indicator.description && (
                                 <Info className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              {(indicator as any).is_mandala_extension && (
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/50 text-primary bg-primary/10">
+                                  🌀 MST
+                                </Badge>
                               )}
                               {CADASTUR_SEMI_AUTO_CODES.has(indicator.code) ? (
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-cyan-500/50 text-cyan-600 bg-cyan-500/10">
