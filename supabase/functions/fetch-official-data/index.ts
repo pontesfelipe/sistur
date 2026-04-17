@@ -350,19 +350,30 @@ async function fetchMapaTurismo(
               }
 
               // International visitors
+              let visIntVal: number | null = null;
               if (d.qtVisitaInternacionalEstimada) {
                 const vis = parseFloat(String(d.qtVisitaInternacionalEstimada).replace(/\./g, '').replace(',', '.'));
                 if (!isNaN(vis)) {
+                  visIntVal = vis;
                   results['igma_visitantes_internacionais'] = { value: vis, year: currentYear, source: 'MAPA_TURISMO', real: true };
                 }
               }
 
               // National visitors
+              let visNacVal: number | null = null;
               if (d.qtVisitaNacionalEstimada) {
                 const vis = parseFloat(String(d.qtVisitaNacionalEstimada).replace(/\./g, '').replace(',', '.'));
                 if (!isNaN(vis)) {
+                  visNacVal = vis;
                   results['igma_visitantes_nacionais'] = { value: vis, year: currentYear, source: 'MAPA_TURISMO', real: true };
                 }
+              }
+
+              // AO001 — Fluxo Turístico Anual = visitantes nacionais + internacionais
+              // Auto-derived from Mapa do Turismo so the indicator pre-fills in the data entry form.
+              const totalFlow = (visNacVal ?? 0) + (visIntVal ?? 0);
+              if (totalFlow > 0) {
+                results['AO001'] = { value: totalFlow, year: currentYear, source: 'MAPA_TURISMO', real: true };
               }
 
               // Tourism revenue
