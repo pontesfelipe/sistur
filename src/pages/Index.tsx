@@ -73,6 +73,8 @@ const Index = () => {
   const { isAdmin, hasERPAccess } = useProfileContext();
   const [diagnosticMode, setDiagnosticMode] = useState<DiagnosticMode>('territorial');
   const [selectedDestination, setSelectedDestination] = useState<string | undefined>(undefined);
+  // Independent destination selection for the Mandala visualization
+  const [mandalaDestination, setMandalaDestination] = useState<string | undefined>(undefined);
   const { isEnabled, toggleWidget, resetToDefaults } = useDashboardWidgets();
 
   // Fetch org settings for enterprise access
@@ -95,6 +97,7 @@ const Index = () => {
   // Reset destination filter when switching modes
   useEffect(() => {
     setSelectedDestination(undefined);
+    setMandalaDestination(undefined);
   }, [diagnosticMode]);
   
   // Territorial hooks
@@ -122,9 +125,13 @@ const Index = () => {
   const { data: overdueProjects, isLoading: overdueProjectsLoading } = useOverdueProjects();
   const { data: projectStats, isLoading: projectStatsLoading } = useProjectStats();
 
-  // Mandala MST opt-in: read from latest assessment of selected destination (territorial only)
+  // Mandala uses its own destination selection (falls back to the card-level filter)
+  const mandalaDestId = mandalaDestination ?? selectedDestination;
+  const { data: mandalaPillarData, isLoading: mandalaLoading } = useAggregatedPillarScores(mandalaDestId);
+
+  // Mandala MST opt-in: read from latest assessment of the mandala-selected destination (territorial only)
   const { data: mandalaMeta } = useQuery({
-    queryKey: ['mandala-meta', selectedDestination, effectiveOrgId, diagnosticMode],
+    queryKey: ['mandala-meta', mandalaDestId, effectiveOrgId, diagnosticMode],
     queryFn: async () => {
       if (diagnosticMode !== 'territorial') return { expand: false, name: undefined };
       let q = supabase
@@ -133,7 +140,7 @@ const Index = () => {
         .eq('status', 'CALCULATED')
         .order('calculated_at', { ascending: false })
         .limit(1);
-      if (selectedDestination) q = q.eq('destination_id', selectedDestination);
+      if (mandalaDestId) q = q.eq('destination_id', mandalaDestId);
       const { data } = await q.maybeSingle();
       return {
         expand: (data as any)?.expand_with_mandala === true,
@@ -424,16 +431,49 @@ const Index = () => {
                     </div>
                     {/* Mandala visualization (only territorial mode) */}
                     {!isEnterprise && (
-                      <div className="mt-6">
-                        <MandalaDestino
-                          pillarScores={activePillarData.pillarScores.map((ps) => ({
-                            pillar: ps.pillar,
-                            score: ps.score,
-                            severity: ps.severity,
-                          }))}
-                          expandWithMandala={mandalaMeta?.expand}
-                          destinationName={mandalaMeta?.name}
-                        />
+                      <div className="mt-6 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div>
+                            <h4 className="font-display text-base font-semibold text-foreground">Mandala do Destino</h4>
+                            <p className="text-xs text-muted-foreground">Selecione um destino para visualizar sua mandala sistêmica.</p>
+                          </div>
+                          <Select
+                            value={mandalaDestination ?? "inherit"}
+                            onValueChange={(value) => setMandalaDestination(value === "inherit" ? undefined : value)}
+                          >
+                            <SelectTrigger className="w-full sm:w-[220px]">
+                              <MapPin className="h-4 w-4 mr-2" />
+                              <SelectValue placeholder="Destino da Mandala" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="inherit">
+                                {selectedDestination
+                                  ? `Usar filtro do card (${selectedDestinationName ?? '—'})`
+                                  : 'Média de todos os destinos'}
+                              </SelectItem>
+                              {activeDestinations?.map((dest) => (
+                                <SelectItem key={dest.id} value={dest.id}>{dest.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {mandalaLoading ? (
+                          <Skeleton className="h-[420px] w-full rounded-2xl" />
+                        ) : mandalaPillarData?.pillarScores && mandalaPillarData.pillarScores.length > 0 ? (
+                          <MandalaDestino
+                            pillarScores={mandalaPillarData.pillarScores.map((ps) => ({
+                              pillar: ps.pillar,
+                              score: ps.score,
+                              severity: ps.severity,
+                            }))}
+                            expandWithMandala={mandalaMeta?.expand}
+                            destinationName={mandalaMeta?.name}
+                          />
+                        ) : (
+                          <p className="text-sm text-muted-foreground text-center py-8 border rounded-2xl">
+                            Nenhum diagnóstico calculado para o destino selecionado.
+                          </p>
+                        )}
                       </div>
                     )}
                   </>
