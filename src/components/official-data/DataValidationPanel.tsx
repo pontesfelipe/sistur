@@ -448,18 +448,36 @@ export function DataValidationPanel({
                           />
                         </TableCell>
                         <TableCell>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="font-medium cursor-help">
-                                  {value.indicator_code.replace('igma_', '').replace(/_/g, ' ')}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p className="text-xs">{value.indicator_code}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="font-medium cursor-help">
+                                    {value.indicator_code.replace('igma_', '').replace('MST_', '').replace(/_/g, ' ')}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs">{value.indicator_code}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            {isMandalaIndicator(value.indicator_code) && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/50 text-primary bg-primary/10 cursor-help">
+                                      🌀 MST
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="max-w-xs">
+                                    <p className="text-xs">
+                                      Indicador da Mandala da Sustentabilidade no Turismo (Tasso, Silva &amp; Nascimento, 2024) — extensão complementar ativada via opt-in no diagnóstico.
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           {isConfirmed ? (
