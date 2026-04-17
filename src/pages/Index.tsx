@@ -125,9 +125,13 @@ const Index = () => {
   const { data: overdueProjects, isLoading: overdueProjectsLoading } = useOverdueProjects();
   const { data: projectStats, isLoading: projectStatsLoading } = useProjectStats();
 
-  // Mandala MST opt-in: read from latest assessment of selected destination (territorial only)
+  // Mandala uses its own destination selection (falls back to the card-level filter)
+  const mandalaDestId = mandalaDestination ?? selectedDestination;
+  const { data: mandalaPillarData, isLoading: mandalaLoading } = useAggregatedPillarScores(mandalaDestId);
+
+  // Mandala MST opt-in: read from latest assessment of the mandala-selected destination (territorial only)
   const { data: mandalaMeta } = useQuery({
-    queryKey: ['mandala-meta', selectedDestination, effectiveOrgId, diagnosticMode],
+    queryKey: ['mandala-meta', mandalaDestId, effectiveOrgId, diagnosticMode],
     queryFn: async () => {
       if (diagnosticMode !== 'territorial') return { expand: false, name: undefined };
       let q = supabase
@@ -136,7 +140,7 @@ const Index = () => {
         .eq('status', 'CALCULATED')
         .order('calculated_at', { ascending: false })
         .limit(1);
-      if (selectedDestination) q = q.eq('destination_id', selectedDestination);
+      if (mandalaDestId) q = q.eq('destination_id', mandalaDestId);
       const { data } = await q.maybeSingle();
       return {
         expand: (data as any)?.expand_with_mandala === true,
