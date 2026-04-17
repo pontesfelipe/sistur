@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 27,
-  patch: 3,
+  minor: 28,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.28.0",
+    date: "2026-04-17",
+    type: "minor" as const,
+    changes: [
+      "Mandala da Sustentabilidade no Turismo (MST): expansão opcional do diagnóstico baseada em Tasso, Silva & Nascimento (2024). Toggle no Step 3 do fluxo Nova Rodada permite incluir 9 indicadores complementares (4 RA, 3 OE, 2 AO) cobrindo acessibilidade NBR 9050, comparecimento eleitoral, qualificação PNQT, conectividade 5G/Wi-Fi, promoção digital, Big Data turístico, TBC, inclusão na gestão e sensibilização",
+      "Banco: novas colunas indicators.is_mandala_extension e assessments.expand_with_mandala (não-destrutivo, default false). Diagnósticos antigos não são afetados",
+      "Edge functions de automação: ingest-tse (comparecimento eleitoral), ingest-anatel (conectividade 5G/Wi-Fi) e ingest-cadastur estendido para extrair MST_PNQT_QUAL e MST_ACC_NBR9050",
+      "useIndicators ganha parâmetro includeMandala para filtrar/incluir indicadores MST conforme contexto. Tabela de indicadores exibe badge '🌀 MST' nos 9 indicadores da extensão",
+      "Score Final SISTUR e classificação preservados sem MST para garantir comparabilidade entre diagnósticos com/sem expansão",
+    ],
+  },
   {
     version: "1.27.3",
     date: "2026-04-17",
