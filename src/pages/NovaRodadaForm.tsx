@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
@@ -26,6 +27,7 @@ import {
   Hotel,
   Sparkles,
   FileText,
+  Flower2,
 } from 'lucide-react';
 
 type VisibilityType = 'organization' | 'personal' | 'demo';
@@ -89,6 +91,8 @@ interface NovaRodadaFormProps {
   onPeriodEndChange: (v: string) => void;
   selectedTier: DiagnosisTier;
   onSelectedTierChange: (tier: DiagnosisTier) => void;
+  expandWithMandala: boolean;
+  onExpandWithMandalaChange: (v: boolean) => void;
   validatedDataCount: number;
   isViewingDemoData: boolean;
   hasEnterpriseAccess: boolean;
@@ -123,6 +127,8 @@ export function NovaRodadaForm({
   onPeriodEndChange,
   selectedTier,
   onSelectedTierChange,
+  expandWithMandala,
+  onExpandWithMandalaChange,
   validatedDataCount,
   isViewingDemoData,
   hasEnterpriseAccess,
