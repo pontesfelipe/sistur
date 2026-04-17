@@ -27,7 +27,7 @@ export const VERSION_HISTORY = [
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
-      "Ingestão automática real de MST_TSE_TURNOUT e MST_5G_WIFI via Firecrawl como proxy de scraping. Edge function ingest-tse agora busca o % de comparecimento eleitoral do município (G1 Eleições, que sindica dados oficiais TSE) com extração regex tolerante (comparecimento direto ou 100 - abstenção) e detecção do ano do pleito (2024 municipal / 2022 geral). Edge function ingest-anatel busca cobertura 5G/4G via Teleco (que republica dados Anatel por município) e calcula score composto 0-100 = 50% × cov_5g + 30% × cov_4g + 20% × wifi_proxy (categoria Mapa do Turismo). Resultados gravados como AUTOMATIC com confidence_level=4. Cache populado em anatel_coverage_cache. Quando o scraping não consegue extrair, mantém comportamento manual com link à fonte oficial.",
+      "Tentativa de scraping sob demanda via Firecrawl para MST_TSE_TURNOUT e MST_5G_WIFI: edge functions ingest-tse e ingest-anatel agora chamam o Firecrawl com candidatos de URL agregadores (G1 Eleições para TSE; Teleco para Anatel) ao criar destino. QUANDO o scraping consegue extrair o número (regex tolerante: comparecimento direto, abstenção, cobertura 5G/4G), o valor é gravado como AUTOMATIC com confidence 4 e cache em anatel_coverage_cache. Resultado prático: a maioria dos municípios cai no fallback MANUAL porque as agregadoras não publicam % por município em página estática (TSE expõe via SPA com hash routing; Anatel via painel Leaflet) — o sistema mantém o placeholder MANUAL com link à fonte oficial nesses casos. Para destinos onde a agregadora publica o número (ex: capitais com cobertura editorial pesada), a ingestão automática funciona.",
     ],
   },
   {
