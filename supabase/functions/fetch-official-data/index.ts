@@ -350,19 +350,30 @@ async function fetchMapaTurismo(
               }
 
               // International visitors
+              let visIntVal: number | null = null;
               if (d.qtVisitaInternacionalEstimada) {
                 const vis = parseFloat(String(d.qtVisitaInternacionalEstimada).replace(/\./g, '').replace(',', '.'));
                 if (!isNaN(vis)) {
+                  visIntVal = vis;
                   results['igma_visitantes_internacionais'] = { value: vis, year: currentYear, source: 'MAPA_TURISMO', real: true };
                 }
               }
 
               // National visitors
+              let visNacVal: number | null = null;
               if (d.qtVisitaNacionalEstimada) {
                 const vis = parseFloat(String(d.qtVisitaNacionalEstimada).replace(/\./g, '').replace(',', '.'));
                 if (!isNaN(vis)) {
+                  visNacVal = vis;
                   results['igma_visitantes_nacionais'] = { value: vis, year: currentYear, source: 'MAPA_TURISMO', real: true };
                 }
+              }
+
+              // AO001 — Fluxo Turístico Anual = visitantes nacionais + internacionais
+              // Auto-derived from Mapa do Turismo so the indicator pre-fills in the data entry form.
+              const totalFlow = (visNacVal ?? 0) + (visIntVal ?? 0);
+              if (totalFlow > 0) {
+                results['AO001'] = { value: totalFlow, year: currentYear, source: 'MAPA_TURISMO', real: true };
               }
 
               // Tourism revenue
@@ -421,6 +432,28 @@ async function fetchMapaTurismo(
       }
       if (raw.arrecadacao) {
         results['igma_arrecadacao_turismo'] = { value: raw.arrecadacao, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
+      }
+
+      // Visitor counts + AO001 derivation (Fluxo Turístico Anual)
+      let visNacVal = 0;
+      let visIntVal = 0;
+      if (raw.qt_visita_nacional) {
+        const v = parseFloat(String(raw.qt_visita_nacional).replace(/\./g, '').replace(',', '.'));
+        if (!isNaN(v)) {
+          visNacVal = v;
+          results['igma_visitantes_nacionais'] = { value: v, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
+        }
+      }
+      if (raw.qt_visita_internacional) {
+        const v = parseFloat(String(raw.qt_visita_internacional).replace(/\./g, '').replace(',', '.'));
+        if (!isNaN(v)) {
+          visIntVal = v;
+          results['igma_visitantes_internacionais'] = { value: v, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
+        }
+      }
+      const totalFlow = visNacVal + visIntVal;
+      if (totalFlow > 0) {
+        results['AO001'] = { value: totalFlow, year: data.ano_referencia || 0, source: 'MAPA_TURISMO', real: true };
       }
     }
   } catch (e) {

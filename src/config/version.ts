@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.2",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Autopreenchimento do indicador AO001 (Fluxo Turístico Anual): a edge function fetch-official-data agora deriva automaticamente AO001 = visitantes nacionais + visitantes internacionais a partir do Mapa do Turismo, tanto na rota REST API quanto no fallback de banco. Antes o agregado nunca era criado e o indicador aparecia vazio na tela de preenchimento mesmo com os dados-fonte (igma_visitantes_nacionais e igma_visitantes_internacionais) já ingeridos",
+      "Backfill aplicado em 6 municípios que já tinham visitantes ingeridos (3505500, 3507100, 3509700, 3522109, 4108304, 5002209) — AO001 calculado e gravado em external_indicator_values com source MAPA_TURISMO e validated=false para revisão pelo gestor",
+    ],
+  },
   {
     version: "1.30.1",
     date: "2026-04-17",
