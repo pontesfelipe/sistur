@@ -27,6 +27,7 @@ interface NovaRodadaDialogsProps {
   createdAssessmentId: string | null;
   validatedDataCount: number;
   orgId: string | null;
+  expandWithMandala?: boolean;
   onSetCurrentStep: (step: number) => void;
   onPreviousStep: () => void;
   onNextStep: () => void;
@@ -43,6 +44,7 @@ export function NovaRodadaDialogs({
   createdAssessmentId,
   validatedDataCount,
   orgId,
+  expandWithMandala = false,
   onSetCurrentStep,
   onPreviousStep,
   onNextStep,
@@ -82,6 +84,7 @@ export function NovaRodadaDialogs({
               ibgeCode={selectedDestinationData.ibge_code}
               orgId={orgId}
               destinationName={selectedDestinationData.name}
+              includeMandala={expandWithMandala}
               onValidationComplete={onValidationComplete}
             />
           ) : (

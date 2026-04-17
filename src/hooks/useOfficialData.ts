@@ -173,14 +173,16 @@ async function bridgeMapaTurismoData(ibgeCode: string, orgId: string) {
 }
 
 // Fetch official data from external sources
+// `includeMandala`: when true, also invokes ingest-tse and ingest-anatel for MST indicators
 export function useFetchOfficialData() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ ibgeCode, orgId, indicators }: { 
-      ibgeCode: string; 
-      orgId: string; 
+    mutationFn: async ({ ibgeCode, orgId, indicators, includeMandala }: {
+      ibgeCode: string;
+      orgId: string;
       indicators?: string[];
+      includeMandala?: boolean;
     }) => {
       // Reset previous validation flags so fresh data is presented for re-validation
       await supabase
@@ -189,8 +191,8 @@ export function useFetchOfficialData() {
         .eq('municipality_ibge_code', ibgeCode)
         .eq('org_id', orgId);
 
-      // Fire all in parallel: IBGE + CADASTUR + Mapa do Turismo bridge + ANA
-      const [officialResult, cadasturResult, mapaResult, anaResult] = await Promise.allSettled([
+      // Fire core sources in parallel: IBGE + CADASTUR + Mapa do Turismo bridge + ANA
+      const corePromises: Promise<any>[] = [
         supabase.functions.invoke('fetch-official-data', {
           body: { ibge_code: ibgeCode, org_id: orgId, indicators },
         }),
@@ -201,12 +203,29 @@ export function useFetchOfficialData() {
         supabase.functions.invoke('ingest-ana', {
           body: { ibge_code: ibgeCode, org_id: orgId },
         }),
-      ]);
+      ];
+
+      // When MST is enabled, also fetch TSE (electoral turnout) and Anatel (5G/Wi-Fi)
+      if (includeMandala) {
+        corePromises.push(
+          supabase.functions.invoke('ingest-tse', {
+            body: { ibge_code: ibgeCode, org_id: orgId },
+          }),
+          supabase.functions.invoke('ingest-anatel', {
+            body: { ibge_code: ibgeCode, org_id: orgId },
+          }),
+        );
+      }
+
+      const settled = await Promise.allSettled(corePromises);
+      const [officialResult, cadasturResult, mapaResult, anaResult, tseResult, anatelResult] = settled;
 
       const official = officialResult.status === 'fulfilled' ? officialResult.value : null;
       const cadastur = cadasturResult.status === 'fulfilled' ? cadasturResult.value : null;
       const mapa = mapaResult.status === 'fulfilled' ? mapaResult.value : null;
       const ana = anaResult.status === 'fulfilled' ? anaResult.value : null;
+      const tse = tseResult?.status === 'fulfilled' ? tseResult.value : null;
+      const anatel = anatelResult?.status === 'fulfilled' ? anatelResult.value : null;
 
       if (official?.error) throw official.error;
       if (!official?.data?.success) throw new Error(official?.data?.error || 'Erro ao buscar dados oficiais');
@@ -219,6 +238,10 @@ export function useFetchOfficialData() {
         cadastur_status: cadasturStatus,
         mapa_turismo_status: mapa || { status: 'unavailable', count: 0 },
         ana_status: anaStatus,
+        mst_status: includeMandala ? {
+          tse: tse?.data || null,
+          anatel: anatel?.data || null,
+        } : null,
       };
     },
     onSuccess: (data, variables) => {

@@ -492,6 +492,7 @@ export default function NovaRodada() {
           createdAssessmentId={createdAssessmentId}
           validatedDataCount={validatedDataCount}
           orgId={effectiveOrgId || null}
+          expandWithMandala={expandWithMandala}
           onSetCurrentStep={setCurrentStep}
           onPreviousStep={handlePreviousStep}
           onNextStep={handleNextStep}

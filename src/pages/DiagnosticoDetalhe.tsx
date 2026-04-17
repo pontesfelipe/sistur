@@ -539,6 +539,7 @@ const DiagnosticoDetalhe = () => {
                       ibgeCode={ibgeCode || ''}
                       orgId={orgId || ''}
                       destinationName={assessmentDestination?.name || ''}
+                      includeMandala={includeMandala}
                       onValidationComplete={() => {
                         toast.success('Dados validados com sucesso!');
                         setIsPreFillOpen(false);

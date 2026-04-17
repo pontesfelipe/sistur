@@ -47,6 +47,8 @@ interface DataValidationPanelProps {
   orgId: string;
   destinationName: string;
   onValidationComplete: (values: ExternalIndicatorValue[]) => void;
+  /** Whether the host assessment opted into the Mandala MST extension. */
+  includeMandala?: boolean;
 }
 
 // Source display info
@@ -59,8 +61,15 @@ const SOURCE_INFO: Record<string, { name: string; color: string; icon: string }>
   CADASTUR: { name: 'CADASTUR', color: 'bg-cyan-500', icon: '🏨' },
   MAPA_TURISMO: { name: 'Mapa do Turismo', color: 'bg-teal-500', icon: '🗺️' },
   ANA: { name: 'ANA — Águas', color: 'bg-sky-500', icon: '💧' },
+  TSE: { name: 'TSE — Eleições', color: 'bg-rose-500', icon: '🗳️' },
+  ANATEL: { name: 'Anatel — Conectividade', color: 'bg-fuchsia-500', icon: '📡' },
   MANUAL: { name: 'Preenchimento Manual', color: 'bg-gray-400', icon: '✏️' },
 };
+
+// Indicators that come from the Mandala MST extension (Tasso, Silva & Nascimento, 2024)
+function isMandalaIndicator(code: string): boolean {
+  return code.startsWith('MST_');
+}
 
 // Confidence level display
 const CONFIDENCE_CRITERIA: Record<number, { label: string; color: string }> = {
@@ -82,6 +91,7 @@ export function DataValidationPanel({
   orgId,
   destinationName,
   onValidationComplete,
+  includeMandala = false,
 }: DataValidationPanelProps) {
   const { user } = useAuth();
   const [editedValues, setEditedValues] = useState<Record<string, number | null>>({});
@@ -102,7 +112,7 @@ export function DataValidationPanel({
       // Clear stale cache before fetching fresh data
       queryClient.removeQueries({ queryKey: ['external-indicator-values', ibgeCode, orgId] });
       fetchOfficialData.mutate(
-        { ibgeCode, orgId },
+        { ibgeCode, orgId, includeMandala },
         {
           onSuccess: (data) => {
             const iqa = data?.ana_status?.iqa;
@@ -112,7 +122,7 @@ export function DataValidationPanel({
         }
       );
     }
-  }, [ibgeCode, orgId, autoFetched]);
+  }, [ibgeCode, orgId, autoFetched, includeMandala]);
 
   const values = useMemo(
     () => rawValues.filter(isOfficialPreFilledValue),
@@ -125,7 +135,7 @@ export function DataValidationPanel({
   );
 
   const handleFetchData = async () => {
-    await fetchOfficialData.mutateAsync({ ibgeCode, orgId });
+    await fetchOfficialData.mutateAsync({ ibgeCode, orgId, includeMandala });
   };
 
   const handleValueChange = (id: string, rawInput: string) => {
@@ -438,18 +448,36 @@ export function DataValidationPanel({
                           />
                         </TableCell>
                         <TableCell>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="font-medium cursor-help">
-                                  {value.indicator_code.replace('igma_', '').replace(/_/g, ' ')}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p className="text-xs">{value.indicator_code}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="font-medium cursor-help">
+                                    {value.indicator_code.replace('igma_', '').replace('MST_', '').replace(/_/g, ' ')}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs">{value.indicator_code}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            {isMandalaIndicator(value.indicator_code) && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/50 text-primary bg-primary/10 cursor-help">
+                                      🌀 MST
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="max-w-xs">
+                                    <p className="text-xs">
+                                      Indicador da Mandala da Sustentabilidade no Turismo (Tasso, Silva &amp; Nascimento, 2024) — extensão complementar ativada via opt-in no diagnóstico.
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           {isConfirmed ? (

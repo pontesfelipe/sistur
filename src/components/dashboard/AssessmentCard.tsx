@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target, User, Eye, Building2, Monitor, Landmark, Hotel } from 'lucide-react';
+import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target, User, Eye, Building2, Monitor, Landmark, Hotel, Flower2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Assessment } from '@/types/sistur';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { DeleteAssessmentDialog } from './DeleteAssessmentDialog';
 
 interface AssessmentCardProps {
-  assessment: Assessment & { tier?: string; creator?: { full_name: string } | null; visibility?: string; is_demo?: boolean; diagnostic_type?: string | null };
+  assessment: Assessment & { tier?: string; creator?: { full_name: string } | null; visibility?: string; is_demo?: boolean; diagnostic_type?: string | null; expand_with_mandala?: boolean };
   onDelete?: () => void;
   isDemoContext?: boolean;
 }
@@ -121,6 +121,19 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
               {diagnosticType === 'territorial' ? 'Diagnóstico territorial (público)' : 'Diagnóstico enterprise (privado)'}
             </TooltipContent>
           </Tooltip>
+          {(assessment as any).expand_with_mandala && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border border-primary/40 bg-primary/10 text-primary">
+                  <Flower2 className="h-3 w-3" />
+                  🌀 MST
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                Mandala da Sustentabilidade no Turismo ativada — diagnóstico inclui 9 indicadores complementares (Tasso, Silva &amp; Nascimento, 2024) cobrindo acessibilidade, conectividade 5G/Wi-Fi (Anatel), comparecimento eleitoral (TSE), qualificação PNQT (CADASTUR), TBC e mais.
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
         {onDelete && (
           <>
