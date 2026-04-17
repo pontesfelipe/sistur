@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
+import { MandalaDestino } from '@/components/dashboard/MandalaDestino';
 import { AssessmentCard } from '@/components/dashboard/AssessmentCard';
 import { IssueCard } from '@/components/dashboard/IssueCard';
 import { RecommendationCard } from '@/components/dashboard/RecommendationCard';
