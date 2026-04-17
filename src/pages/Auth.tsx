@@ -120,31 +120,111 @@ const Auth = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const diagnoseNetworkFailure = async (): Promise<{ kind: string; detail: string }> => {
+    // 1) Browser is offline
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      return { kind: 'offline', detail: 'navigator.onLine = false' };
+    }
+    // 2) Try reaching Supabase auth health endpoint directly
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+    if (!supabaseUrl) {
+      return { kind: 'misconfig', detail: 'VITE_SUPABASE_URL ausente' };
+    }
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 5000);
+      const res = await fetch(`${supabaseUrl}/auth/v1/health`, {
+        method: 'GET',
+        signal: ctrl.signal,
+        cache: 'no-store',
+      });
+      clearTimeout(timer);
+      if (!res.ok) return { kind: 'server', detail: `auth/health HTTP ${res.status}` };
+      return { kind: 'unknown', detail: 'auth/health OK mas signIn falhou' };
+    } catch (e: any) {
+      if (e?.name === 'AbortError') return { kind: 'timeout', detail: 'auth/health timeout 5s' };
+      return { kind: 'blocked', detail: e?.message || 'fetch rejeitado pelo cliente' };
+    }
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateLoginForm()) return;
-    
+
     setLoading(true);
+    const t0 = performance.now();
     const { error } = await signIn(email, password);
+    const elapsedMs = Math.round(performance.now() - t0);
     setLoading(false);
 
-    if (error) {
-      const msg = error.message || '';
-      if (msg.includes('Invalid login credentials')) {
-        toast.error('Email ou senha incorretos');
-      } else if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('networkerror') || msg.toLowerCase().includes('load failed')) {
-        toast.error('Falha de conexão. Verifique sua internet, desative VPN/bloqueadores de anúncio e tente novamente.', { duration: 6000 });
-      } else if (msg.includes('Email not confirmed')) {
-        toast.error('Confirme seu email antes de entrar. Verifique sua caixa de entrada.');
-      } else if (msg.toLowerCase().includes('rate limit')) {
-        toast.error('Muitas tentativas. Aguarde alguns minutos e tente novamente.');
-      } else {
-        toast.error(msg || 'Erro ao fazer login');
-      }
-    } else {
+    if (!error) {
       toast.success('Login realizado com sucesso!');
       navigate('/');
+      return;
+    }
+
+    const msg = error.message || '';
+    const lower = msg.toLowerCase();
+    const isNetwork =
+      lower.includes('failed to fetch') ||
+      lower.includes('networkerror') ||
+      lower.includes('load failed') ||
+      lower.includes('fetch') && lower.includes('abort');
+
+    // Telemetry: always log structured info to console for support
+    console.error('[auth.signIn] failed', {
+      message: msg,
+      name: (error as any)?.name,
+      elapsedMs,
+      online: typeof navigator !== 'undefined' ? navigator.onLine : null,
+      ua: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+    });
+
+    if (msg.includes('Invalid login credentials')) {
+      toast.error('Email ou senha incorretos');
+    } else if (msg.includes('Email not confirmed')) {
+      toast.error('Confirme seu email antes de entrar. Verifique sua caixa de entrada.');
+    } else if (lower.includes('rate limit')) {
+      toast.error('Muitas tentativas. Aguarde alguns minutos e tente novamente.');
+    } else if (isNetwork) {
+      // Run a quick diagnostic so the user knows WHY
+      const diag = await diagnoseNetworkFailure();
+      console.error('[auth.signIn] network diagnostic', diag);
+
+      const map: Record<string, { title: string; hint: string }> = {
+        offline: {
+          title: 'Você está offline',
+          hint: 'Reconecte à internet (Wi-Fi ou 4G/5G) e tente novamente.',
+        },
+        timeout: {
+          title: 'Tempo esgotado ao contatar o servidor',
+          hint: 'Sua rede está lenta ou bloqueando. Tente outra rede (4G/5G) ou desative VPN.',
+        },
+        blocked: {
+          title: 'Conexão bloqueada pelo navegador',
+          hint: 'Desative VPN, antivírus, firewall corporativo ou bloqueadores (uBlock/AdBlock). Tente em aba anônima.',
+        },
+        server: {
+          title: 'Servidor de autenticação indisponível',
+          hint: 'Tente novamente em alguns minutos. Se persistir, contate o suporte.',
+        },
+        misconfig: {
+          title: 'Configuração ausente',
+          hint: 'Recarregue a página (Ctrl+Shift+R). Se persistir, contate o suporte.',
+        },
+        unknown: {
+          title: 'Falha intermitente de conexão',
+          hint: 'Recarregue a página (Ctrl+Shift+R) e tente novamente. Se persistir, troque de rede.',
+        },
+      };
+      const info = map[diag.kind] || map.unknown;
+      toast.error(`${info.title} — ${info.hint}`, {
+        duration: 9000,
+        description: `Diagnóstico: ${diag.kind} (${diag.detail})`,
+      });
+    } else {
+      toast.error(msg || 'Erro ao fazer login');
     }
   };
 
