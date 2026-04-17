@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 26,
+  minor: 27,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.27.0",
+    date: "2026-04-17",
+    type: "minor" as const,
+    changes: [
+      "Etapa 3 (Fontes Turismo): indicador 'Leitos por Habitante' (igma_leitos_por_habitante) corrigido de DATASUS → CADASTUR — refere-se a leitos de meios de hospedagem, não a leitos hospitalares SUS. Indicador hospitalar renomeado para 'Leitos hospitalares SUS por mil habitantes' para eliminar ambiguidade",
+      "Etapa 4 (Confiança): backfill aplicado em indicator_scores.confidence_level (Automática=1.0, Manual=0.7, Estimada=0.4) + populadas as colunas polarity e normalization_method a partir do indicador-mãe",
+      "Etapa 5 (Padronização): novo indicador canônico cadunico_baixa_renda_pct (RA, polaridade LOW_IS_BETTER, fonte CADUNICO/MDS, faixa 0–60%) elimina a ambiguidade de 'população baixa renda' que estava como Manual genérico",
+      "Nova view indicator_scores_enriched (security_invoker): consolida pipeline raw→normalized→score, polaridade aplicada, fonte e selo de auditoria (verificado / auditoria_pendente / baixa_confianca) — pronta para uso em dashboards e relatórios",
+      "Etapa 6 (Relatório): generate-report agora envia ao prompt da IA, para cada indicador, três camadas explícitas: Bruto (com unidade formatada), Índice (0–1) e Score% (0–100), além de Polaridade aplicada, Fonte e selo visual de auditoria (✓ verificado / ⚠ auditoria pendente / ✗ baixa confiança) — corrige as divergências de Foz do Iguaçu",
+      "Resultado prático: o LLM e o leitor humano agora distinguem claramente IDH 0,751 (índice) de 0,8% (porcentagem) e veem se a fonte é Cadastur, IBGE ou entrada manual pendente de validação",
+    ]
+  },
   {
     version: "1.26.0",
     date: "2026-04-17",

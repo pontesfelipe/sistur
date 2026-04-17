@@ -97,17 +97,13 @@ function formatIndicatorScores(indicatorScores: any[]): string {
     const avg = scores.reduce((sum, s) => sum + s.score, 0) / scores.length;
     const critical = scores.filter(s => s.score <= 0.33);
     const moderate = scores.filter(s => s.score > 0.33 && s.score <= 0.66);
-    
+
     result += `\n${pillar} (${scores.length} indicadores, média: ${formatPctBR(avg)}%):\n`;
     result += `  Críticos: ${critical.length}, Atenção: ${moderate.length}, Adequados: ${scores.length - critical.length - moderate.length}\n`;
-    
+
     scores.forEach((s: any) => {
       const status = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
       const benchmark = s.indicators?.benchmark_target ? ` (benchmark: ${s.indicators.benchmark_target})` : '';
-      // Surface the normalization parameters actually used by
-      // calculate-assessment (weight_used / min_ref_used / max_ref_used are
-      // persisted on indicator_scores). Without them, an auditor can't verify
-      // how a "65%" came to be — e.g. what interval was used to MIN-MAX.
       const normRefs = (s.min_ref_used !== null && s.min_ref_used !== undefined
         && s.max_ref_used !== null && s.max_ref_used !== undefined)
         ? ` | Normalização: [${s.min_ref_used}, ${s.max_ref_used}]`
@@ -115,7 +111,36 @@ function formatIndicatorScores(indicatorScores: any[]): string {
       const weightStr = (s.weight_used !== null && s.weight_used !== undefined && s.weight_used !== 1)
         ? ` | Peso: ${s.weight_used}`
         : '';
-      result += `    * ${s.indicators?.name || s.indicators?.code}: ${formatPctBR(s.score)}% [${status}] - Tema: ${s.indicators?.theme || 'N/A'}${benchmark}${normRefs}${weightStr}\n`;
+
+      // ===== Pipeline 3-camadas (raw → normalized → score%) =====
+      const rawDisplay = (s.value_raw !== null && s.value_raw !== undefined)
+        ? formatRawIndicatorValue(s.value_raw, s.indicators)
+        : null;
+      const rawStr = rawDisplay
+        ? ` | Bruto: ${rawDisplay.unitSuffix ? `${rawDisplay.display} ${rawDisplay.unitSuffix}` : rawDisplay.display}`
+        : '';
+      const normStr = (s.value_normalized !== null && s.value_normalized !== undefined)
+        ? ` | Índice: ${Number(s.value_normalized).toFixed(3)}`
+        : '';
+      const scoreStr = (s.score_pct !== null && s.score_pct !== undefined)
+        ? `${Number(s.score_pct).toFixed(1)}%`
+        : `${formatPctBR(s.score)}%`;
+
+      // ===== Procedência e selo de auditoria =====
+      const polarity = s.polarity || s.indicators?.direction;
+      const polarityStr = polarity ? ` | Polaridade: ${polarity}` : '';
+      const dataSource = s.indicators?.data_source || s.indicators?.source;
+      const sourceStr = dataSource ? ` | Fonte: ${dataSource}` : '';
+      const conf = s.confidence_level;
+      const auditBadge = conf === null || conf === undefined
+        ? ''
+        : conf >= 0.95
+          ? ' [✓ verificado]'
+          : conf >= 0.65
+            ? ' [⚠ auditoria pendente]'
+            : ' [✗ baixa confiança]';
+
+      result += `    * ${s.indicators?.name || s.indicators?.code}: ${scoreStr} [${status}]${auditBadge} - Tema: ${s.indicators?.theme || 'N/A'}${rawStr}${normStr}${benchmark}${normRefs}${weightStr}${polarityStr}${sourceStr}\n`;
     });
   }
   return result;
@@ -899,7 +924,7 @@ serve(async (req) => {
       enterpriseValuesRes,
       enterpriseProfileRes,
     ] = await Promise.all([
-      supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit, value_format, normalization)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
+      supabase.from('indicator_scores').select('*, value_raw, value_normalized, score_pct, polarity, normalization_method, confidence_level, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit, value_format, normalization, data_source, source, collection_type)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
       // `value_raw`, `value_text`, `source` and `reference_date` are all persisted

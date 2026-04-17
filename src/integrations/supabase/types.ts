@@ -4006,6 +4006,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "indicator_calculation_trail_indicator_score_id_fkey"
+            columns: ["indicator_score_id"]
+            isOneToOne: false
+            referencedRelation: "indicator_scores_enriched"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "indicator_calculation_trail_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
@@ -7506,6 +7513,65 @@ export type Database = {
       }
     }
     Views: {
+      indicator_scores_enriched: {
+        Row: {
+          assessment_id: string | null
+          audit_badge: string | null
+          collection_type: Database["public"]["Enums"]["collection_type"] | null
+          computed_at: string | null
+          confidence_level: number | null
+          data_source: Database["public"]["Enums"]["data_source"] | null
+          id: string | null
+          indicator_code: string | null
+          indicator_id: string | null
+          indicator_name: string | null
+          max_ref_used: number | null
+          min_ref_used: number | null
+          normalization_method: string | null
+          org_id: string | null
+          pillar: Database["public"]["Enums"]["pillar_type"] | null
+          polarity: string | null
+          score_legacy_0_1: number | null
+          score_pct: number | null
+          source: string | null
+          theme: string | null
+          unit: string | null
+          value_format: Database["public"]["Enums"]["value_format_type"] | null
+          value_normalized: number | null
+          value_raw: number | null
+          weight_used: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicator_scores_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_scores_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
+            foreignKeyName: "indicator_scores_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_scores_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investor_profiles_safe: {
         Row: {
           created_at: string | null
