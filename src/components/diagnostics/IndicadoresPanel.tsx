@@ -43,6 +43,7 @@ export function IndicadoresPanel() {
   const [tierFilter, setTierFilter] = useState('all');
   const [collectionFilter, setCollectionFilter] = useState('all');
   const [scopeFilter, setScopeFilter] = useState('all');
+  const [mandalaFilter, setMandalaFilter] = useState('all');
   const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
   const [editingWeightId, setEditingWeightId] = useState<string | null>(null);
   const [editingWeightValue, setEditingWeightValue] = useState<string>('');
@@ -85,8 +86,18 @@ export function IndicadoresPanel() {
     const matchesScope = scopeFilter === 'all' || indicatorScope === scopeFilter;
     const indicatorCollection = getEffectiveCollection(i);
     const matchesCollection = collectionFilter === 'all' || indicatorCollection === collectionFilter;
-    return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier && matchesScope && matchesCollection;
+    const isMandala = (i as any).is_mandala_extension === true;
+    const matchesMandala = mandalaFilter === 'all'
+      || (mandalaFilter === 'mandala' && isMandala)
+      || (mandalaFilter === 'core' && !isMandala);
+    return matchesSearch && matchesPillar && matchesSource && matchesTheme && matchesTier && matchesScope && matchesCollection && matchesMandala;
   });
+
+  // Count Mandala vs Core
+  const mandalaCounts = useMemo(() => ({
+    core: indicators.filter(i => !((i as any).is_mandala_extension)).length,
+    mandala: indicators.filter(i => (i as any).is_mandala_extension === true).length,
+  }), [indicators]);
 
   // Count by tier
   const tierCounts = useMemo(() => ({
@@ -208,10 +219,13 @@ export function IndicadoresPanel() {
           onScopeFilterChange={setScopeFilter}
           collectionFilter={collectionFilter}
           onCollectionFilterChange={setCollectionFilter}
+          mandalaFilter={mandalaFilter}
+          onMandalaFilterChange={setMandalaFilter}
           availableThemes={availableThemes}
           tierCounts={tierCounts}
           scopeCounts={scopeCounts}
           collectionCounts={collectionCounts}
+          mandalaCounts={mandalaCounts}
           indicatorsTotal={indicators.length}
           onNewIndicator={() => setIsFormDialogOpen(true)}
         />

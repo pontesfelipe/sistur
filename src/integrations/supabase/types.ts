@@ -185,6 +185,45 @@ export type Database = {
           },
         ]
       }
+      anatel_coverage_cache: {
+        Row: {
+          coverage_4g_pct: number | null
+          coverage_5g_pct: number | null
+          created_at: string
+          ibge_code: string
+          id: string
+          notes: string | null
+          reference_year: number
+          source: string | null
+          updated_at: string
+          wifi_public_score: number | null
+        }
+        Insert: {
+          coverage_4g_pct?: number | null
+          coverage_5g_pct?: number | null
+          created_at?: string
+          ibge_code: string
+          id?: string
+          notes?: string | null
+          reference_year: number
+          source?: string | null
+          updated_at?: string
+          wifi_public_score?: number | null
+        }
+        Update: {
+          coverage_4g_pct?: number | null
+          coverage_5g_pct?: number | null
+          created_at?: string
+          ibge_code?: string
+          id?: string
+          notes?: string | null
+          reference_year?: number
+          source?: string | null
+          updated_at?: string
+          wifi_public_score?: number | null
+        }
+        Relationships: []
+      }
       assessments: {
         Row: {
           algo_version: string
@@ -7399,6 +7438,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tse_turnout_cache: {
+        Row: {
+          created_at: string
+          election_year: number
+          ibge_code: string
+          id: string
+          notes: string | null
+          source: string | null
+          turnout_pct: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          election_year: number
+          ibge_code: string
+          id?: string
+          notes?: string | null
+          source?: string | null
+          turnout_pct: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          election_year?: number
+          ibge_code?: string
+          id?: string
+          notes?: string | null
+          source?: string | null
+          turnout_pct?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_feedback: {
         Row: {

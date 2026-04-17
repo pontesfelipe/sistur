@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
+import { MandalaDestino } from '@/components/dashboard/MandalaDestino';
 import { AssessmentCard } from '@/components/dashboard/AssessmentCard';
 import { IssueCard } from '@/components/dashboard/IssueCard';
 import { RecommendationCard } from '@/components/dashboard/RecommendationCard';
@@ -120,6 +121,28 @@ const Index = () => {
   );
   const { data: overdueProjects, isLoading: overdueProjectsLoading } = useOverdueProjects();
   const { data: projectStats, isLoading: projectStatsLoading } = useProjectStats();
+
+  // Mandala MST opt-in: read from latest assessment of selected destination (territorial only)
+  const { data: mandalaMeta } = useQuery({
+    queryKey: ['mandala-meta', selectedDestination, effectiveOrgId, diagnosticMode],
+    queryFn: async () => {
+      if (diagnosticMode !== 'territorial') return { expand: false, name: undefined };
+      let q = supabase
+        .from('assessments')
+        .select('expand_with_mandala, destinations(name)')
+        .eq('status', 'CALCULATED')
+        .order('calculated_at', { ascending: false })
+        .limit(1);
+      if (selectedDestination) q = q.eq('destination_id', selectedDestination);
+      const { data } = await q.maybeSingle();
+      return {
+        expand: (data as any)?.expand_with_mandala === true,
+        name: (data?.destinations as any)?.name as string | undefined,
+      };
+    },
+    enabled: !!effectiveOrgId,
+  });
+
 
   // Determine if enterprise mode is available
   const hasEnterpriseAccess = orgSettings?.has_enterprise_access ?? false;
@@ -399,6 +422,20 @@ const Index = () => {
                         indicatorClassName={getSeverityColor(averageScore)}
                       />
                     </div>
+                    {/* Mandala visualization (only territorial mode) */}
+                    {!isEnterprise && (
+                      <div className="mt-6">
+                        <MandalaDestino
+                          pillarScores={activePillarData.pillarScores.map((ps) => ({
+                            pillar: ps.pillar,
+                            score: ps.score,
+                            severity: ps.severity,
+                          }))}
+                          expandWithMandala={mandalaMeta?.expand}
+                          destinationName={mandalaMeta?.name}
+                        />
+                      </div>
+                    )}
                   </>
                 ) : (
                   <p className="text-muted-foreground text-center py-8">

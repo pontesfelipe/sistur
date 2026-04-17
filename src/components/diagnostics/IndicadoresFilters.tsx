@@ -20,6 +20,7 @@ import {
   Landmark,
   Hotel,
   Globe,
+  Sparkles,
 } from 'lucide-react';
 
 interface IndicadoresFiltersProps {
@@ -37,10 +38,13 @@ interface IndicadoresFiltersProps {
   onScopeFilterChange: (value: string) => void;
   collectionFilter: string;
   onCollectionFilterChange: (value: string) => void;
+  mandalaFilter: string;
+  onMandalaFilterChange: (value: string) => void;
   availableThemes: string[];
   tierCounts: { SMALL: number; MEDIUM: number; COMPLETE: number };
   scopeCounts: { territorial: number; enterprise: number; both: number };
   collectionCounts: { AUTOMATICA: number; MANUAL: number; ESTIMADA: number };
+  mandalaCounts: { core: number; mandala: number };
   indicatorsTotal: number;
   onNewIndicator: () => void;
 }
@@ -60,10 +64,13 @@ export function IndicadoresFilters({
   onScopeFilterChange,
   collectionFilter,
   onCollectionFilterChange,
+  mandalaFilter,
+  onMandalaFilterChange,
   availableThemes,
   tierCounts,
   scopeCounts,
   collectionCounts,
+  mandalaCounts,
   indicatorsTotal,
   onNewIndicator,
 }: IndicadoresFiltersProps) {
@@ -185,6 +192,26 @@ export function IndicadoresFilters({
               <div className="flex items-center gap-2">
                 <ShieldAlert className="h-3 w-3 text-severity-critical" />
                 Estimado ({collectionCounts.ESTIMADA})
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={mandalaFilter} onValueChange={onMandalaFilterChange}>
+          <SelectTrigger className="w-full xs:w-44">
+            <SelectValue placeholder="Mandala" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos ({mandalaCounts.core + mandalaCounts.mandala})</SelectItem>
+            <SelectItem value="core">
+              <div className="flex items-center gap-2">
+                <Landmark className="h-3 w-3 text-primary" />
+                Núcleo SISTUR ({mandalaCounts.core})
+              </div>
+            </SelectItem>
+            <SelectItem value="mandala">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-3 w-3 text-accent-foreground" />
+                🌀 Mandala MST ({mandalaCounts.mandala})
               </div>
             </SelectItem>
           </SelectContent>

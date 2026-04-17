@@ -125,8 +125,11 @@ const DiagnosticoDetalhe = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { calculate, loading: calculating } = useCalculateAssessment();
   const { updateAssessment } = useAssessments();
-  const { indicators } = useIndicators();
-  const { indicators: enterpriseIndicators = [] } = useIndicators({ scope: 'enterprise' });
+  // Read assessment first to know whether MST extension is enabled
+  const { data: assessment, isLoading: loadingAssessment, refetch: refetchAssessment } = useAssessment(id);
+  const includeMandala = (assessment as any)?.expand_with_mandala === true;
+  const { indicators } = useIndicators({ includeMandala });
+  const { indicators: enterpriseIndicators = [] } = useIndicators({ scope: 'enterprise', includeMandala });
   const { user } = useAuth();
   const [isPreFillOpen, setIsPreFillOpen] = useState(false);
   const [orgId, setOrgId] = useState<string | undefined>();
@@ -187,8 +190,7 @@ const DiagnosticoDetalhe = () => {
     fetchOrgId();
   }, [user?.id]);
 
-  // Fetch data
-  const { data: assessment, isLoading: loadingAssessment, refetch: refetchAssessment } = useAssessment(id);
+  // Diagnostic type derived from assessment (loaded above)
   const diagnosticType = (assessment as any)?.diagnostic_type || 'territorial';
   const isEnterprise = diagnosticType === 'enterprise';
   
