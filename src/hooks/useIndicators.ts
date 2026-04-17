@@ -10,14 +10,21 @@ type IndicatorScope = 'territorial' | 'enterprise' | 'both';
 interface UseIndicatorsOptions {
   scope?: IndicatorScope | 'all';
   tier?: 'SMALL' | 'MEDIUM' | 'COMPLETE';
+  /**
+   * Controls whether Mandala da Sustentabilidade no Turismo (MST) indicators are returned.
+   * - undefined (default): returns ALL indicators (both core + Mandala) — for catalog views
+   * - false: excludes MST indicators — for diagnostics that did NOT opt-in
+   * - true: includes MST indicators — for diagnostics that opted-in
+   */
+  includeMandala?: boolean;
 }
 
 export function useIndicators(options: UseIndicatorsOptions = {}) {
-  const { scope = 'all', tier } = options;
+  const { scope = 'all', tier, includeMandala } = options;
   const queryClient = useQueryClient();
 
   const { data: indicators = [], isLoading, error } = useQuery({
-    queryKey: ['indicators', scope, tier],
+    queryKey: ['indicators', scope, tier, includeMandala],
     queryFn: async () => {
       let query = supabase
         .from('indicators')
@@ -38,6 +45,11 @@ export function useIndicators(options: UseIndicatorsOptions = {}) {
             ? ['SMALL', 'MEDIUM'] 
             : ['SMALL', 'MEDIUM', 'COMPLETE'];
         query = query.in('minimum_tier', allowedTiers);
+      }
+
+      // Filter Mandala extension indicators when explicitly excluded
+      if (includeMandala === false) {
+        query = query.eq('is_mandala_extension', false);
       }
 
       const { data, error } = await query;
