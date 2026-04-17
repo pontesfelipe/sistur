@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 27,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.27.2",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Etapa A — Score Final SISTUR (FORMULAS_MATEMÁTICAS.docx): novas colunas assessments.final_score e assessments.final_classification populadas automaticamente em cada cálculo. Fórmula canônica: Final = (RA × 0,35) + (OE × 0,30) + (AO × 0,35)",
+      "Classificação em 5 faixas conforme documento metodológico: Crítico (0,00–0,39), Insuficiente (0,40–0,54), Em Desenvolvimento (0,55–0,69), Bom (0,70–0,84), Excelente (0,85–1,00)",
+      "Etapa B — Calibração de pesos: indicators.weight normalizado para somar exatamente 1,0 por pilar (RA/OE/AO), com proporção relativa preservada. Pesos originais arquivados em indicators.weight_legacy para auditoria",
+      "Etapa C — Memória de cálculo: generate-report passa a incluir o Score Final SISTUR e classificação na tabela de identificação do relatório, com nota metodológica explícita (uso interno, sem ranking público, em conformidade com a constraint i-sistur-internal-only)",
+      "Edge function calculate-assessment retorna final_score e final_classification no payload de resposta para uso direto no frontend",
+    ],
+  },
   {
     version: "1.27.1",
     date: "2026-04-17",
