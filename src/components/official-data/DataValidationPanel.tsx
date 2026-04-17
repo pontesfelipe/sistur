@@ -91,6 +91,7 @@ export function DataValidationPanel({
   orgId,
   destinationName,
   onValidationComplete,
+  includeMandala = false,
 }: DataValidationPanelProps) {
   const { user } = useAuth();
   const [editedValues, setEditedValues] = useState<Record<string, number | null>>({});
@@ -111,7 +112,7 @@ export function DataValidationPanel({
       // Clear stale cache before fetching fresh data
       queryClient.removeQueries({ queryKey: ['external-indicator-values', ibgeCode, orgId] });
       fetchOfficialData.mutate(
-        { ibgeCode, orgId },
+        { ibgeCode, orgId, includeMandala },
         {
           onSuccess: (data) => {
             const iqa = data?.ana_status?.iqa;
@@ -121,7 +122,7 @@ export function DataValidationPanel({
         }
       );
     }
-  }, [ibgeCode, orgId, autoFetched]);
+  }, [ibgeCode, orgId, autoFetched, includeMandala]);
 
   const values = useMemo(
     () => rawValues.filter(isOfficialPreFilledValue),
@@ -134,7 +135,7 @@ export function DataValidationPanel({
   );
 
   const handleFetchData = async () => {
-    await fetchOfficialData.mutateAsync({ ibgeCode, orgId });
+    await fetchOfficialData.mutateAsync({ ibgeCode, orgId, includeMandala });
   };
 
   const handleValueChange = (id: string, rawInput: string) => {
