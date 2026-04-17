@@ -85,7 +85,7 @@ export function MandalaAnalysisView({
 
   // Group by dimension and compute aggregate score
   const dimensionAnalysis = MST_DIMENSIONS.map((dim) => {
-    const matched = mstIndicators.filter((i) => dim.codes.includes(i.indicator_code as any));
+    const matched = mstIndicators.filter((i) => (dim.codes as readonly string[]).includes(i.indicator_code));
     const filled = matched.filter((i) => i.normalized_score !== null && i.normalized_score !== undefined);
     const avgScore =
       filled.length > 0
