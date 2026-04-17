@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.1",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Roteamento pós-login por papel: ao acessar '/', usuários ESTUDANTE (sem ERP) vão direto para '/edu' (Minha Jornada), PROFESSOR (sem ERP) vão para '/professor' (Gestão de Turmas) e ADMIN/ORG_ADMIN/usuários com acesso ERP continuam no Dashboard ERP. Antes apenas estudantes eram redirecionados, professores caíam em telas inadequadas",
+      "ProtectedRoute: ORG_ADMIN agora também faz bypass da checagem de licença (igual ao ADMIN), evitando que administradores de organização sejam empurrados para a página de assinatura caso a licença esteja momentaneamente indisponível",
+    ],
+  },
   {
     version: "1.30.0",
     date: "2026-04-17",
