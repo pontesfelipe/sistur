@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 28,
+  minor: 29,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.29.0",
+    date: "2026-04-17",
+    type: "minor" as const,
+    changes: [
+      "Caches oficiais MST: novas tabelas tse_turnout_cache (comparecimento eleitoral por município/ano) e anatel_coverage_cache (cobertura 5G/4G/Wi-Fi público) — populadas com 15 destinos turísticos âncora (capitais + Foz do Iguaçu, Olinda, Ribeirão Preto, Uberlândia)",
+      "Edge functions ingest-tse e ingest-anatel agora retornam dados reais via cache (collection_method='AUTOMATIC') em vez de exigir entrada manual para esses 15 municípios",
+      "Filtro 'Mandala' adicionado ao painel de Indicadores: 'Núcleo SISTUR' vs '🌀 Mandala MST' para visualização segregada do catálogo",
+      "DiagnosticoDetalhe agora respeita assessment.expand_with_mandala: indicadores MST só aparecem quando o opt-in foi ativado na criação da rodada — diagnósticos legados continuam vendo apenas o núcleo SISTUR",
+      "Novo componente MandalaDestino no Dashboard Territorial: visualização circular dos 3 conjuntos de Mario Beni (RA/OE/AO) com seus subsistemas explícitos (Ecológico/Social/Econômico/Cultural, Superestrutura/Infraestrutura, Mercado/Oferta/Demanda/Distribuição). Quando MST está ativo, anel externo mostra Tecnologia, Inclusão, TBC e Sensibilização",
+      "Score Final SISTUR exibido no centro da Mandala como média dos pilares — sem ranking público, em conformidade com a constraint i-sistur-internal-only",
+    ],
+  },
   {
     version: "1.28.0",
     date: "2026-04-17",
