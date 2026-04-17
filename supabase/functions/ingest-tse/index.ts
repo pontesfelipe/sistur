@@ -1,11 +1,11 @@
 // Edge function: ingest-tse
-// Calcula comparecimento eleitoral por município usando dados abertos do TSE.
-// Indicador: MST_TSE_TURNOUT (Mandala da Sustentabilidade no Turismo).
+// Cria placeholder MANUAL em external_indicator_values para o indicador MST_TSE_TURNOUT.
 //
-// Fonte primária: https://dadosabertos.tse.jus.br/dataset/resultados-{ano}
-// Para o MVP, lê de uma tabela curada `tse_turnout_cache` populada pelo admin.
-// Quando org_id é fornecido, faz UPSERT em external_indicator_values para que
-// o indicador apareça no painel de pré-preenchimento (DataValidationPanel).
+// IMPORTANTE: Não existe API pública/aberta do TSE acessível por edge function
+// que retorne comparecimento eleitoral por município (todos os endpoints
+// oficiais bloqueiam tráfego de datacenter). Por isso este indicador é tratado
+// como MANUAL: criamos um registro vazio no painel de pré-preenchimento com
+// link direto à fonte oficial para o usuário consultar e preencher.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 
 const corsHeaders = {
@@ -16,7 +16,6 @@ const corsHeaders = {
 interface RequestBody {
   ibge_code: string;
   org_id?: string;
-  year?: number;
 }
 
 Deno.serve(async (req) => {
@@ -38,61 +37,49 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    let value: number | null = null;
-    let referenceYear: number | null = body.year ?? null;
-    const source = 'TSE — dadosabertos.tse.jus.br';
-    let note: string | null = null;
-    let collectionMethod: 'AUTOMATIC' | 'MANUAL' = 'MANUAL';
+    const sourceUrl = 'https://www.tse.jus.br/eleicoes/estatisticas/estatisticas-eleitorais';
+    const note = `🌀 MST — Comparecimento eleitoral. Consulte o último pleito (geral 2022 ou municipal 2024) em ${sourceUrl} e informe o percentual.`;
 
-    try {
-      const { data: cached } = await supabase
-        .from('tse_turnout_cache' as any)
-        .select('turnout_pct, election_year')
-        .eq('ibge_code', body.ibge_code)
-        .order('election_year', { ascending: false })
-        .limit(1)
+    let upserted = false;
+    if (body.org_id) {
+      // Only create placeholder if no value exists yet (don't overwrite manual entries)
+      const { data: existing } = await supabase
+        .from('external_indicator_values')
+        .select('id, raw_value, collection_method')
+        .eq('org_id', body.org_id)
+        .eq('municipality_ibge_code', body.ibge_code)
+        .eq('indicator_code', 'MST_TSE_TURNOUT')
         .maybeSingle();
 
-      if (cached) {
-        value = Number((cached as any).turnout_pct);
-        referenceYear = Number((cached as any).election_year);
-        collectionMethod = 'AUTOMATIC';
+      if (!existing || (existing.raw_value === null && !existing.validated)) {
+        const { error: upsertError } = await supabase
+          .from('external_indicator_values')
+          .upsert({
+            indicator_code: 'MST_TSE_TURNOUT',
+            municipality_ibge_code: body.ibge_code,
+            source_code: 'TSE',
+            raw_value: null,
+            reference_year: null,
+            collection_method: 'MANUAL' as const,
+            confidence_level: 3,
+            validated: false,
+            org_id: body.org_id,
+            notes: note,
+          }, { onConflict: 'org_id,municipality_ibge_code,indicator_code' });
+        upserted = !upsertError;
+        if (upsertError) console.error('TSE placeholder upsert error:', upsertError);
       }
-    } catch (_e) {
-      note = 'Cache TSE indisponível. Colete manualmente via tse.jus.br/eleicoes/estatisticas.';
-    }
-
-    // Persist into external_indicator_values when org_id is provided so the
-    // pre-fill panel (DataValidationPanel) can display the MST indicator.
-    let upserted = false;
-    if (body.org_id && value !== null) {
-      const { error: upsertError } = await supabase
-        .from('external_indicator_values')
-        .upsert({
-          indicator_code: 'MST_TSE_TURNOUT',
-          municipality_ibge_code: body.ibge_code,
-          source_code: 'TSE',
-          raw_value: value,
-          reference_year: referenceYear,
-          collection_method: 'AUTOMATIC' as const,
-          confidence_level: 5,
-          validated: false,
-          org_id: body.org_id,
-          notes: `TSE — comparecimento eleitoral ${referenceYear}: ${value}%. 🌀 MST.`,
-        }, { onConflict: 'org_id,municipality_ibge_code,indicator_code' });
-      upserted = !upsertError;
-      if (upsertError) console.error('TSE upsert error:', upsertError);
     }
 
     return new Response(
       JSON.stringify({
         indicator_code: 'MST_TSE_TURNOUT',
-        value,
-        reference_year: referenceYear,
-        source,
-        collection_method: collectionMethod,
+        value: null,
+        source: 'TSE — preenchimento manual',
+        source_url: sourceUrl,
+        collection_method: 'MANUAL',
         upserted,
-        note: note ?? (value === null ? 'Sem dado cacheado para este município. Preencha manualmente.' : null),
+        note,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
