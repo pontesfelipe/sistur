@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 25,
+  minor: 26,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,19 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.26.0",
+    date: "2026-04-17",
+    type: "minor" as const,
+    changes: [
+      "Etapa 1 (Fundação Auditável): tabela indicator_scores expandida com value_raw (valor original), value_normalized (escala 0-1), score_pct (0-100), polarity (HIGH/LOW_IS_BETTER) e normalization_method aplicado — fim da confusão entre 'IDH 0,751' e '0,8%'",
+      "Coluna confidence_level adicionada para sinalizar fontes manuais (0.7) vs automáticas (1.0) vs estimadas (0.4) — base para selos de auditoria",
+      "Etapa 2 (Memória de Cálculo): nova tabela indicator_calculation_trail com fórmula textual, variáveis usadas (JSONB), fontes consultadas, ano/data de referência e snapshot das 3 etapas do pipeline (raw → normalized → score) — padrão acadêmico auditável",
+      "Backfill automático: scores existentes copiados para value_normalized + score_pct preservando histórico calculado",
+      "RLS multi-tenant aplicada a indicator_calculation_trail (visualização por org/demo, escrita restrita a ANALYST/ADMIN)",
+      "Próximas etapas: 3 (migrar fontes turismo p/ Cadastur+SISMAPA), 4 (selos de confiança na UI), 5 (CADUNICO baixa renda), 6 (relatório com 3 colunas Bruto/Índice/Score)",
+    ]
+  },
   {
     version: "1.25.0",
     date: "2026-04-16",
