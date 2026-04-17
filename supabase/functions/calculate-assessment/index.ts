@@ -769,11 +769,23 @@ serve(async (req) => {
         indicator.normalization
       );
 
+      // Compute confidence based on source (manual vs auto)
+      const ivSource = (iv as any)._source || (iv as any).source || '';
+      const isAutoSource = /api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn/i.test(String(ivSource));
+      const confidenceLevel = isAutoSource ? 1.0 : 0.7;
+
       indicatorScores.push({
         org_id: orgId,
         assessment_id,
         indicator_id: iv.indicator_id,
         score,
+        // 3-layer enrichment (raw → normalized → score%)
+        value_raw: iv.value_raw,
+        value_normalized: score,
+        score_pct: score * 100,
+        polarity: indicator.direction === 'LOW_IS_BETTER' ? 'LOW_IS_BETTER' : 'HIGH_IS_BETTER',
+        normalization_method: indicator.normalization || 'minmax',
+        confidence_level: confidenceLevel,
         min_ref_used: indicator.min_ref,
         max_ref_used: indicator.max_ref,
         weight_used: indicator.weight,
