@@ -941,7 +941,31 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       </div>
                                     );
                                   })()}
-                                </div>
+                                  {!isIgnored && currentValue === null && manualPlaceholders[indicator.code] && (() => {
+                                    const ph = manualPlaceholders[indicator.code];
+                                    const isMandala = indicator.code.startsWith('MST_');
+                                    return (
+                                      <div className="mt-2 p-2 rounded bg-amber-50/60 dark:bg-amber-950/20 border border-amber-300/60 dark:border-amber-800/40">
+                                        <p className="text-xs text-amber-800 dark:text-amber-200 font-medium flex items-center gap-1">
+                                          {isMandala ? '🌀' : '⚠️'} Preenchimento manual necessário
+                                        </p>
+                                        <p className="text-xs text-amber-700/90 dark:text-amber-300/90 mt-1">
+                                          A coleta automática via {ph.source_code} não retornou dados para este município.
+                                          {isMandala && ' Indicador da Mandala da Sustentabilidade no Turismo.'}
+                                        </p>
+                                        {ph.source_url && (
+                                          <a
+                                            href={ph.source_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs text-amber-700 dark:text-amber-200 underline hover:no-underline mt-1 inline-block break-all"
+                                          >
+                                            🔗 Consultar fonte oficial ({ph.source_code})
+                                          </a>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
                                 <div className="col-span-4">
                                   <div className="relative">
                                     {fieldConfig.kind === 'select' ? (
