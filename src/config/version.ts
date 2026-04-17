@@ -50,8 +50,6 @@ export const VERSION_HISTORY = [
   },
   {
     version: "1.25.0",
-  {
-    version: "1.25.0",
     date: "2026-04-16",
     type: "minor" as const,
     changes: [
