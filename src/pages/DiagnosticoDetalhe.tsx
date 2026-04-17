@@ -190,8 +190,7 @@ const DiagnosticoDetalhe = () => {
     fetchOrgId();
   }, [user?.id]);
 
-  // Fetch data
-  const { data: assessment, isLoading: loadingAssessment, refetch: refetchAssessment } = useAssessment(id);
+  // Diagnostic type derived from assessment (loaded above)
   const diagnosticType = (assessment as any)?.diagnostic_type || 'territorial';
   const isEnterprise = diagnosticType === 'enterprise';
   
