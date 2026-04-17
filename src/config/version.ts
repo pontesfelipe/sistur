@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 7,
+  patch: 8,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.8",
+    date: "2026-04-17",
+    type: "minor" as const,
+    changes: [
+      "Nova aba 'Mandala' no resultado do diagnóstico: aparece ao lado de 'Projeto' apenas quando o diagnóstico foi criado com a flag MST (expand_with_mandala = true). Renderiza a Mandala visual completa (Beni 2007 + 4 dimensões transversais MST de Tasso et al. 2024) e cards de análise por dimensão (Tecnologia, Inclusão, TBC, Sensibilização) com a média dos indicadores MST_* preenchidos, status colorido e lista detalhada de cada indicador (preenchido ou vazio). Diagnósticos sem opt-in MST mantêm a UI original sem a aba extra.",
+    ],
+  },
   {
     version: "1.30.7",
     date: "2026-04-17",
