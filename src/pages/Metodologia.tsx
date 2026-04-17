@@ -450,10 +450,24 @@ export default function Metodologia() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              <strong>Automação:</strong> as edge functions <code>ingest-tse</code>, <code>ingest-anatel</code>{' '}
-              e <code>ingest-cadastur</code> alimentam automaticamente os caches{' '}
-              <code>tse_turnout_cache</code> e <code>anatel_coverage_cache</code> para 15 destinos âncora
-              (capitais + Foz do Iguaçu, Olinda, Ribeirão Preto, Uberlândia). Demais municípios usam coleta manual.
+              <strong>Automação parcial e fallback manual:</strong> as edge functions{' '}
+              <code>ingest-tse</code>, <code>ingest-anatel</code> e <code>ingest-cadastur</code>{' '}
+              consultam primeiro os caches <code>tse_turnout_cache</code> e{' '}
+              <code>anatel_coverage_cache</code> (15 capitais âncora pré-populadas com dados oficiais
+              verificados: comparecimento eleitoral 2022/2024 e cobertura 5G/4G). Quando o município
+              está fora do cache, o sistema tenta scraping sob demanda via Firecrawl em fontes
+              agregadoras (G1 Eleições, Teleco) — porém TSE e Anatel oficiais bloqueiam acesso
+              programático (SPA com hash routing e painéis Leaflet), então a maioria dos destinos
+              cai no <strong>fallback manual</strong>: o indicador aparece no painel de
+              pré-preenchimento como linha MANUAL com valor vazio, badge 🌀 MST e link direto para a
+              fonte oficial. O usuário insere o valor e o sistema persiste como fonte oficial
+              validada. Disparado apenas quando <em>Expandir com Mandala</em> está ativo no
+              diagnóstico (zero custo extra para rodadas sem opt-in).
+            </p>
+            <p className="text-xs text-muted-foreground">
+              <strong>Cache TTL:</strong> TSE reutiliza valores enquanto{' '}
+              <code>election_year ≥ 2024</code> (último pleito municipal); Anatel tem TTL de 90 dias
+              por município. Cache hit retorna em &lt;100ms sem consumir créditos Firecrawl.
             </p>
             <p className="text-xs text-muted-foreground">
               <strong>Visualização:</strong> o componente <em>Mandala do Destino</em> no Dashboard Territorial

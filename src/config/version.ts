@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 6,
+  patch: 7,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.7",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Correção crítica MST: as fontes TSE e ANATEL foram inseridas em external_data_sources, eliminando o erro de FK constraint que impedia ingest-tse e ingest-anatel de persistirem valores em external_indicator_values. Antes desse patch, mesmo as 15 capitais âncora pré-populadas no cache não chegavam ao painel de pré-preenchimento — os erros ficavam apenas nos logs das edge functions (code 23503: 'Key (source_code)=(TSE) is not present in table external_data_sources').",
+      "Documentação MST atualizada (FAQ, Metodologia e DOCX exportável) para refletir o estado real da automação: cobertura limitada a 15 destinos âncora, scraping sob demanda como tentativa de melhor esforço, e fallback manual com link à fonte oficial como caminho padrão para municípios fora do cache. Nova entrada no FAQ explica as 3 causas possíveis para 'não vejo indicadores MST no pré-preenchimento' (opt-in desligado, scraping falhou para município pequeno, ou bug FK pré-1.30.7).",
+    ],
+  },
   {
     version: "1.30.6",
     date: "2026-04-17",
