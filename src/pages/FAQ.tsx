@@ -224,7 +224,12 @@ export const faqItems: FAQItem[] = [
   },
   {
     question: 'Quais indicadores MST são preenchidos automaticamente?',
-    answer: 'Para 15 destinos âncora (capitais + Foz do Iguaçu, Olinda, Ribeirão Preto, Uberlândia), três indicadores são automatizados via cache: MST_TSE_TURNOUT (TSE — comparecimento eleitoral), MST_5G_WIFI (Anatel — cobertura 5G/Wi-Fi público) e MST_PNQT_QUAL/MST_ACC_NBR9050 (CADASTUR estendido). Os demais municípios usam coleta manual com valores oficiais documentados.',
+    answer: 'A automação MST é parcial e tem cobertura limitada por design. Para 15 destinos âncora pré-populados no cache (capitais brasileiras + Foz do Iguaçu, Olinda, Ribeirão Preto, Uberlândia), MST_TSE_TURNOUT (comparecimento eleitoral 2022/2024) e MST_5G_WIFI (cobertura 5G/4G/Wi-Fi público) são preenchidos automaticamente em <100ms via cache local (tse_turnout_cache e anatel_coverage_cache, com TTL de ciclo eleitoral e 90 dias respectivamente). Para os demais municípios, o sistema tenta scraping sob demanda via Firecrawl em fontes agregadoras (G1 Eleições, Teleco), mas como o TSE oficial usa SPA com hash routing e a Anatel publica via painel Leaflet, a maioria das tentativas falha e o indicador é registrado como linha MANUAL no painel de pré-preenchimento — com badge 🌀 MST, valor vazio e link direto para a fonte oficial (tse.jus.br/eleicoes/estatisticas e anatel.gov.br) para preenchimento humano. MST_PNQT_QUAL é alimentado pelo CADASTUR estendido (ingest-cadastur). Os demais 6 indicadores MST (acessibilidade, áreas verdes, balneabilidade, patrimônio, promoção digital, TBC) são sempre manuais com guidance contextual.',
+    category: 'erp',
+  },
+  {
+    question: 'Por que não vi nenhum indicador MST no meu pré-preenchimento?',
+    answer: 'Três causas possíveis: (1) o diagnóstico foi criado SEM o opt-in "Expandir com Mandala (MST)" no Step 3 da Nova Rodada — nesse caso os indicadores MST nem aparecem (assessments.expand_with_mandala = false). (2) O município está fora das 15 capitais âncora E o scraping sob demanda falhou — nesse caso a linha MANUAL com valor vazio aparece no painel de validação com badge 🌀 MST, basta clicar em "Recarregar dados oficiais" e depois preencher manualmente com o valor da fonte oficial linkada na nota do indicador. (3) A função edge ingest-tse/ingest-anatel não conseguiu persistir por falta de configuração de fonte (external_data_sources) — esse problema foi corrigido na v1.30.7 com a inserção das fontes TSE e ANATEL. Recomendação: ative o switch MST, clique em "Recarregar dados oficiais" no painel de pré-preenchimento e os 9 indicadores MST aparecerão (alguns automáticos, outros como linha manual com link à fonte).',
     category: 'erp',
   },
   {
