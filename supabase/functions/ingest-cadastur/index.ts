@@ -32,6 +32,8 @@ interface DatasetIndicator {
 const CADASTUR_DATASETS: Record<string, DatasetIndicator[]> = {
   guias: [
     { indicator_code: 'igma_guias_turismo', aggregation: 'count' },
+    // Mandala MST: profissionais qualificados PNQT (count of qualified guides — proxy)
+    { indicator_code: 'MST_PNQT_QUAL', aggregation: 'count' },
   ],
   hospedagem: [
     // Count of accommodation establishments
@@ -44,6 +46,15 @@ const CADASTUR_DATASETS: Record<string, DatasetIndicator[]> = {
         'leitos', 'qtd_leitos', 'quantidade_leitos', 'capacidade',
         'num_leitos', 'total_leitos', 'qtde_leitos', 'nro_leitos',
         'numero_leitos', 'qt_leitos', 'unidades_habitacionais', 'uhs',
+      ],
+    },
+    // Mandala MST: % equipamentos acessíveis NBR 9050
+    {
+      indicator_code: 'MST_ACC_NBR9050',
+      aggregation: 'sum_column',
+      sum_column_names: [
+        'acessibilidade', 'acessivel', 'acessível', 'pcd_acessivel',
+        'possui_acessibilidade', 'nbr_9050', 'nbr9050',
       ],
     },
   ],

@@ -74,6 +74,7 @@ export default function NovaRodada() {
   const [periodStart, setPeriodStart] = useState('');
   const [periodEnd, setPeriodEnd] = useState('');
   const [selectedTier, setSelectedTier] = useState<DiagnosisTier>('COMPLETE');
+  const [expandWithMandala, setExpandWithMandala] = useState<boolean>(false);
   const [createdAssessmentId, setCreatedAssessmentId] = useState<string | null>(null);
   const [validatedDataCount, setValidatedDataCount] = useState(0);
   const [isResuming, setIsResuming] = useState(!!resumeAssessmentId);
@@ -180,6 +181,7 @@ export default function NovaRodada() {
       setAssessmentTitle(resumeAssessment.title);
       setVisibility(resumeAssessment.visibility as VisibilityType);
       setSelectedTier((resumeAssessment.tier as DiagnosisTier) || 'COMPLETE');
+      setExpandWithMandala(Boolean((resumeAssessment as any).expand_with_mandala));
       setPeriodStart(resumeAssessment.period_start || '');
       setPeriodEnd(resumeAssessment.period_end || '');
 
@@ -282,6 +284,7 @@ export default function NovaRodada() {
         const result = await createAssessment.mutateAsync({
           title: assessmentTitle.trim(), destination_id: selectedDestination, period_start: periodStart || null,
           period_end: periodEnd || null, visibility, tier: selectedTier, diagnostic_type: diagnosticType,
+          expand_with_mandala: expandWithMandala,
         });
         setCreatedAssessmentId(result.id);
         // Write the assessment id to the URL so a refresh at any later step
@@ -517,6 +520,8 @@ export default function NovaRodada() {
           onPeriodEndChange={setPeriodEnd}
           selectedTier={selectedTier}
           onSelectedTierChange={setSelectedTier}
+          expandWithMandala={expandWithMandala}
+          onExpandWithMandalaChange={setExpandWithMandala}
           validatedDataCount={validatedDataCount}
           isViewingDemoData={isViewingDemoData}
           hasEnterpriseAccess={hasEnterpriseAccess}

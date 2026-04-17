@@ -193,6 +193,7 @@ export type Database = {
           creator_user_id: string | null
           destination_id: string
           diagnostic_type: string | null
+          expand_with_mandala: boolean
           externality_warning: boolean | null
           final_classification: string | null
           final_score: number | null
@@ -219,6 +220,7 @@ export type Database = {
           creator_user_id?: string | null
           destination_id: string
           diagnostic_type?: string | null
+          expand_with_mandala?: boolean
           externality_warning?: boolean | null
           final_classification?: string | null
           final_score?: number | null
@@ -245,6 +247,7 @@ export type Database = {
           creator_user_id?: string | null
           destination_id?: string
           diagnostic_type?: string | null
+          expand_with_mandala?: boolean
           externality_warning?: boolean | null
           final_classification?: string | null
           final_score?: number | null
@@ -4286,6 +4289,7 @@ export type Database = {
             | null
           integration_available: boolean | null
           intersectoral_dependency: boolean | null
+          is_mandala_extension: boolean
           max_ref: number | null
           min_ref: number | null
           minimum_tier:
@@ -4333,6 +4337,7 @@ export type Database = {
             | null
           integration_available?: boolean | null
           intersectoral_dependency?: boolean | null
+          is_mandala_extension?: boolean
           max_ref?: number | null
           min_ref?: number | null
           minimum_tier?:
@@ -4380,6 +4385,7 @@ export type Database = {
             | null
           integration_available?: boolean | null
           intersectoral_dependency?: boolean | null
+          is_mandala_extension?: boolean
           max_ref?: number | null
           min_ref?: number | null
           minimum_tier?:

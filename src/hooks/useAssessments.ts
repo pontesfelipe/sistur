@@ -40,6 +40,7 @@ export function useAssessments() {
       visibility?: 'organization' | 'personal' | 'demo';
       tier?: 'COMPLETE' | 'MEDIUM' | 'SMALL';
       diagnostic_type?: 'territorial' | 'enterprise';
+      expand_with_mandala?: boolean;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
@@ -73,6 +74,7 @@ export function useAssessments() {
           creator_user_id: user.id,
           tier: assessment.tier || 'COMPLETE',
           diagnostic_type: assessment.diagnostic_type || 'territorial',
+          expand_with_mandala: assessment.expand_with_mandala ?? false,
         })
         .select('*, destinations(name)')
         .single();
