@@ -130,10 +130,17 @@ const Auth = () => {
     setLoading(false);
 
     if (error) {
-      if (error.message.includes('Invalid login credentials')) {
+      const msg = error.message || '';
+      if (msg.includes('Invalid login credentials')) {
         toast.error('Email ou senha incorretos');
+      } else if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('networkerror') || msg.toLowerCase().includes('load failed')) {
+        toast.error('Falha de conexão. Verifique sua internet, desative VPN/bloqueadores de anúncio e tente novamente.', { duration: 6000 });
+      } else if (msg.includes('Email not confirmed')) {
+        toast.error('Confirme seu email antes de entrar. Verifique sua caixa de entrada.');
+      } else if (msg.toLowerCase().includes('rate limit')) {
+        toast.error('Muitas tentativas. Aguarde alguns minutos e tente novamente.');
       } else {
-        toast.error(error.message);
+        toast.error(msg || 'Erro ao fazer login');
       }
     } else {
       toast.success('Login realizado com sucesso!');
