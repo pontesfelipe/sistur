@@ -867,12 +867,18 @@ serve(async (req) => {
             .single();
 
           if (compositeIndicator) {
-            // Add to indicator scores
+            // Add to indicator scores with 3-layer data
             indicatorScores.push({
               org_id: orgId,
               assessment_id,
               indicator_id: compositeIndicator.id,
               score: compositeScore,
+              value_raw: null, // composites have no single raw value
+              value_normalized: compositeScore,
+              score_pct: compositeScore * 100,
+              polarity: 'HIGH_IS_BETTER',
+              normalization_method: 'composite_weighted',
+              confidence_level: 0.85, // composites: medium-high confidence
               min_ref_used: 0,
               max_ref_used: 100,
               weight_used: 1.5,
