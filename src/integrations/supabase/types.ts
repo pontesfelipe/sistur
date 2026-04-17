@@ -3921,6 +3921,99 @@ export type Database = {
           },
         ]
       }
+      indicator_calculation_trail: {
+        Row: {
+          assessment_id: string
+          computed_at: string
+          computed_by: string | null
+          data_sources: Json
+          formula_text: string
+          formula_variables: Json
+          id: string
+          indicator_id: string
+          indicator_score_id: string | null
+          notes: string | null
+          org_id: string
+          reference_date: string | null
+          reference_year: number | null
+          step_normalized: Json | null
+          step_raw: Json | null
+          step_score: Json | null
+        }
+        Insert: {
+          assessment_id: string
+          computed_at?: string
+          computed_by?: string | null
+          data_sources?: Json
+          formula_text: string
+          formula_variables?: Json
+          id?: string
+          indicator_id: string
+          indicator_score_id?: string | null
+          notes?: string | null
+          org_id: string
+          reference_date?: string | null
+          reference_year?: number | null
+          step_normalized?: Json | null
+          step_raw?: Json | null
+          step_score?: Json | null
+        }
+        Update: {
+          assessment_id?: string
+          computed_at?: string
+          computed_by?: string | null
+          data_sources?: Json
+          formula_text?: string
+          formula_variables?: Json
+          id?: string
+          indicator_id?: string
+          indicator_score_id?: string | null
+          notes?: string | null
+          org_id?: string
+          reference_date?: string | null
+          reference_year?: number | null
+          step_normalized?: Json | null
+          step_raw?: Json | null
+          step_score?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicator_calculation_trail_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_calculation_trail_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
+            foreignKeyName: "indicator_calculation_trail_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_calculation_trail_indicator_score_id_fkey"
+            columns: ["indicator_score_id"]
+            isOneToOne: false
+            referencedRelation: "indicator_scores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_calculation_trail_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       indicator_course_map: {
         Row: {
           course_id: string
@@ -4003,34 +4096,52 @@ export type Database = {
         Row: {
           assessment_id: string
           computed_at: string
+          confidence_level: number | null
           id: string
           indicator_id: string
           max_ref_used: number | null
           min_ref_used: number | null
+          normalization_method: string | null
           org_id: string
+          polarity: string | null
           score: number
+          score_pct: number | null
+          value_normalized: number | null
+          value_raw: number | null
           weight_used: number | null
         }
         Insert: {
           assessment_id: string
           computed_at?: string
+          confidence_level?: number | null
           id?: string
           indicator_id: string
           max_ref_used?: number | null
           min_ref_used?: number | null
+          normalization_method?: string | null
           org_id: string
+          polarity?: string | null
           score: number
+          score_pct?: number | null
+          value_normalized?: number | null
+          value_raw?: number | null
           weight_used?: number | null
         }
         Update: {
           assessment_id?: string
           computed_at?: string
+          confidence_level?: number | null
           id?: string
           indicator_id?: string
           max_ref_used?: number | null
           min_ref_used?: number | null
+          normalization_method?: string | null
           org_id?: string
+          polarity?: string | null
           score?: number
+          score_pct?: number | null
+          value_normalized?: number | null
+          value_raw?: number | null
           weight_used?: number | null
         }
         Relationships: [
