@@ -446,6 +446,9 @@ FICHA TÉCNICA DO RELATÓRIO (renderize como tabela markdown):
 | I-RA | ${pillarLabel(pillarScores?.RA?.score)} |
 | I-AO | ${pillarLabel(pillarScores?.AO?.score)} |
 | I-OE | ${pillarLabel(pillarScores?.OE?.score)} |
+| Score Final SISTUR (interno) | ${assessment.final_score !== null && assessment.final_score !== undefined ? `${(assessment.final_score * 100).toFixed(1).replace('.', ',')}% — ${({ CRITICO: 'Crítico', INSUFICIENTE: 'Insuficiente', EM_DESENVOLVIMENTO: 'Em Desenvolvimento', BOM: 'Bom', EXCELENTE: 'Excelente' } as Record<string, string>)[assessment.final_classification as string] || assessment.final_classification || ''}` : 'N/A'} |
+
+> **Nota metodológica:** O Score Final SISTUR é calculado como (RA × 35%) + (OE × 30%) + (AO × 35%), conforme metodologia oficial. Trata-se de um indicador interno de uso técnico, sem finalidade de ranqueamento público entre destinos.
 
 Esta tabela é OBRIGATÓRIA e deve ser a primeira coisa do relatório, logo após o título.`;
 }

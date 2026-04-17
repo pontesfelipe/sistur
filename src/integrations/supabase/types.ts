@@ -194,6 +194,8 @@ export type Database = {
           destination_id: string
           diagnostic_type: string | null
           externality_warning: boolean | null
+          final_classification: string | null
+          final_score: number | null
           governance_block: boolean | null
           id: string
           igma_flags: Json | null
@@ -218,6 +220,8 @@ export type Database = {
           destination_id: string
           diagnostic_type?: string | null
           externality_warning?: boolean | null
+          final_classification?: string | null
+          final_score?: number | null
           governance_block?: boolean | null
           id?: string
           igma_flags?: Json | null
@@ -242,6 +246,8 @@ export type Database = {
           destination_id?: string
           diagnostic_type?: string | null
           externality_warning?: boolean | null
+          final_classification?: string | null
+          final_score?: number | null
           governance_block?: boolean | null
           id?: string
           igma_flags?: Json | null
@@ -4300,6 +4306,7 @@ export type Database = {
           unit: string | null
           value_format: Database["public"]["Enums"]["value_format_type"]
           weight: number
+          weight_legacy: number | null
         }
         Insert: {
           benchmark_max?: number | null
@@ -4346,6 +4353,7 @@ export type Database = {
           unit?: string | null
           value_format?: Database["public"]["Enums"]["value_format_type"]
           weight?: number
+          weight_legacy?: number | null
         }
         Update: {
           benchmark_max?: number | null
@@ -4392,6 +4400,7 @@ export type Database = {
           unit?: string | null
           value_format?: Database["public"]["Enums"]["value_format_type"]
           weight?: number
+          weight_legacy?: number | null
         }
         Relationships: [
           {
