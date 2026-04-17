@@ -23,6 +23,16 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.27.1",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Validação E2E: motor 'calculate-assessment' agora popula automaticamente as 3 camadas de dados (value_raw, value_normalized, score_pct) + metadados (polarity, normalization_method, confidence_level) em cada cálculo — antes apenas o backfill histórico estava preenchido",
+      "Confidence level dinâmico no recálculo: indicadores de fontes API (IBGE, DATASUS, CADASTUR, SISMAPA, INEP, STN) recebem 1.0 e fontes manuais recebem 0.7 automaticamente",
+      "Indicadores compostos (ex: I_SEMT, IIET) ganharam metadata explícita: normalization_method='composite_weighted' e confidence_level=0.85",
+    ],
+  },
+  {
     version: "1.27.0",
     date: "2026-04-17",
     type: "minor" as const,
