@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 7,
+  patch: 8,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.8",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Calibração de 13 indicadores IGMA estruturais que estavam sem normalização (min_ref/max_ref nulos), causando score 0 ou indefinido. Três deles foram reclassificados como descritores estruturais com peso zerado (População, Área Territorial, Densidade Demográfica) — permanecem visíveis para contexto territorial mas não pontuam no I-SISTUR, pois são características do território e não métricas de desempenho. Os outros 10 receberam benchmarks oficiais brasileiros: IDH (PNUD 0,4–0,9, meta 0,8), IDEB (INEP 2–8, meta 6), Taxa de Escolarização (PNE 70–100%, meta 98%), Cobertura de Saúde (SUS 30–100%, meta 80%), Leitos por Habitante (OMS 0,5–6 por mil, meta 3), CADASTUR (Agências/Hospedagem/Guias por 10 mil habitantes), Despesa com Turismo (% executado, meta 2%) e Receita Própria (% receita total, meta 30% para autonomia fiscal).",
+    ],
+  },
   {
     version: "1.30.7",
     date: "2026-04-17",
