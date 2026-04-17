@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.3",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Pré-preenchimento MST: edge functions ingest-tse e ingest-anatel agora persistem MST_TSE_TURNOUT (comparecimento eleitoral) e MST_5G_WIFI (cobertura 5G/4G/Wi-Fi público) em external_indicator_values quando org_id é fornecido. Antes os dados ficavam apenas no cache e nunca chegavam à tela de validação",
+      "useFetchOfficialData ganha parâmetro includeMandala que dispara ingest-tse e ingest-anatel em paralelo com IBGE/CADASTUR/Mapa do Turismo/ANA. Diagnósticos sem o opt-in MST continuam sem invocar essas fontes (sem custo extra)",
+      "DataValidationPanel: badge '🌀 MST' adicionado nas linhas da tabela para indicadores com prefixo MST_, com tooltip explicando a origem (Tasso, Silva & Nascimento, 2024). SOURCE_INFO ganha entradas TSE (🗳️) e ANATEL (📡)",
+      "AssessmentCard: novo badge '🌀 MST' no cabeçalho dos cards de diagnóstico quando expand_with_mandala = true, tornando visível em /diagnosticos quais rodadas estão usando a extensão Mandala",
+      "NovaRodadaDialogs e DiagnosticoDetalhe: prop includeMandala propagada para DataValidationPanel para que o pré-preenchimento respeite o opt-in da rodada",
+    ],
+  },
   {
     version: "1.30.2",
     date: "2026-04-17",
