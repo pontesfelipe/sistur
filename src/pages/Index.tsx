@@ -431,16 +431,49 @@ const Index = () => {
                     </div>
                     {/* Mandala visualization (only territorial mode) */}
                     {!isEnterprise && (
-                      <div className="mt-6">
-                        <MandalaDestino
-                          pillarScores={activePillarData.pillarScores.map((ps) => ({
-                            pillar: ps.pillar,
-                            score: ps.score,
-                            severity: ps.severity,
-                          }))}
-                          expandWithMandala={mandalaMeta?.expand}
-                          destinationName={mandalaMeta?.name}
-                        />
+                      <div className="mt-6 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div>
+                            <h4 className="font-display text-base font-semibold text-foreground">Mandala do Destino</h4>
+                            <p className="text-xs text-muted-foreground">Selecione um destino para visualizar sua mandala sistêmica.</p>
+                          </div>
+                          <Select
+                            value={mandalaDestination ?? "inherit"}
+                            onValueChange={(value) => setMandalaDestination(value === "inherit" ? undefined : value)}
+                          >
+                            <SelectTrigger className="w-full sm:w-[220px]">
+                              <MapPin className="h-4 w-4 mr-2" />
+                              <SelectValue placeholder="Destino da Mandala" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="inherit">
+                                {selectedDestination
+                                  ? `Usar filtro do card (${selectedDestinationName ?? '—'})`
+                                  : 'Média de todos os destinos'}
+                              </SelectItem>
+                              {activeDestinations?.map((dest) => (
+                                <SelectItem key={dest.id} value={dest.id}>{dest.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {mandalaLoading ? (
+                          <Skeleton className="h-[420px] w-full rounded-2xl" />
+                        ) : mandalaPillarData?.pillarScores && mandalaPillarData.pillarScores.length > 0 ? (
+                          <MandalaDestino
+                            pillarScores={mandalaPillarData.pillarScores.map((ps) => ({
+                              pillar: ps.pillar,
+                              score: ps.score,
+                              severity: ps.severity,
+                            }))}
+                            expandWithMandala={mandalaMeta?.expand}
+                            destinationName={mandalaMeta?.name}
+                          />
+                        ) : (
+                          <p className="text-sm text-muted-foreground text-center py-8 border rounded-2xl">
+                            Nenhum diagnóstico calculado para o destino selecionado.
+                          </p>
+                        )}
                       </div>
                     )}
                   </>
