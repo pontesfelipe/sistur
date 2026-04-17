@@ -966,6 +966,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       </div>
                                     );
                                   })()}
+                                </div>
                                 <div className="col-span-4">
                                   <div className="relative">
                                     {fieldConfig.kind === 'select' ? (
