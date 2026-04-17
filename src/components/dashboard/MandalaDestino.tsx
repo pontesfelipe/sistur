@@ -53,9 +53,9 @@ const PILLAR_COLOR_VAR: Record<Pillar, string> = {
 };
 
 const SEVERITY_OPACITY: Record<Severity, number> = {
-  BOM: 0.95,
-  MODERADO: 0.7,
-  CRITICO: 0.45,
+  BOM: 1,
+  MODERADO: 0.75,
+  CRITICO: 0.5,
 };
 
 // SVG arc helper
@@ -178,8 +178,8 @@ export function MandalaDestino({
             const largeArc = endAngle - startAngle <= 180 ? 0 : 1;
             const sectorPath = `M ${cx} ${cy} L ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArc} 1 ${end.x} ${end.y} Z`;
 
-            // Pillar score arc (proportional to score)
-            const scoreRadius = score ? 50 + score.score * 130 : 50;
+            // Pillar score arc (proportional to score) — fills from center outward
+            const scoreRadius = score ? Math.max(score.score * radius, 1) : 0;
             const scoreEnd = polarToCartesian(endAngle, scoreRadius);
             const scoreStart = polarToCartesian(startAngle, scoreRadius);
             const scoreSectorPath = `M ${cx} ${cy} L ${scoreStart.x} ${scoreStart.y} A ${scoreRadius} ${scoreRadius} 0 ${largeArc} 1 ${scoreEnd.x} ${scoreEnd.y} Z`;
