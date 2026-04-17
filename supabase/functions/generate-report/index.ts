@@ -899,7 +899,7 @@ serve(async (req) => {
       enterpriseValuesRes,
       enterpriseProfileRes,
     ] = await Promise.all([
-      supabase.from('indicator_scores').select('*, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit, value_format, normalization)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
+      supabase.from('indicator_scores').select('*, value_raw, value_normalized, score_pct, polarity, normalization_method, confidence_level, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit, value_format, normalization, data_source, source, collection_type)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
       supabase.from('action_plans').select('*').eq('assessment_id', assessmentId).order('priority', { ascending: true }),
       // `value_raw`, `value_text`, `source` and `reference_date` are all persisted
