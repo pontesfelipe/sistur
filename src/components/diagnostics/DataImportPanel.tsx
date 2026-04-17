@@ -120,6 +120,14 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const { profile } = useProfile();
   const [hasAutoInjected, setHasAutoInjected] = useState(false);
 
+  // Manual-fill placeholders left by ingest-tse / ingest-anatel / fetch-official-data
+  // when scraping or API call failed. Keyed by indicator_code.
+  const [manualPlaceholders, setManualPlaceholders] = useState<Record<string, {
+    note: string | null;
+    source_url: string | null;
+    source_code: string;
+  }>>({});
+
   useEffect(() => {
     if (preSelectedAssessmentId && assessments?.length) {
       const exists = assessments.some(a => a.id === preSelectedAssessmentId);
@@ -128,6 +136,48 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       }
     }
   }, [preSelectedAssessmentId, assessments]);
+
+  // Load manual-fill placeholders (scrape failures with link to official source)
+  useEffect(() => {
+    if (!selectedAssessmentData?.destination_id || isEnterpriseAssessment) {
+      setManualPlaceholders({});
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: dest } = await supabase
+          .from('destinations')
+          .select('ibge_code')
+          .eq('id', selectedAssessmentData.destination_id)
+          .single();
+        if (!dest?.ibge_code) return;
+
+        const { data: extValues } = await supabase
+          .from('external_indicator_values')
+          .select('indicator_code, source_code, notes, raw_value, collection_method')
+          .eq('municipality_ibge_code', dest.ibge_code)
+          .is('raw_value', null);
+
+        if (cancelled || !extValues) return;
+
+        const map: Record<string, { note: string | null; source_url: string | null; source_code: string }> = {};
+        for (const ext of extValues) {
+          if (ext.collection_method !== 'MANUAL') continue;
+          const urlMatch = ext.notes?.match(/https?:\/\/[^\s)]+/);
+          map[ext.indicator_code] = {
+            note: ext.notes ?? null,
+            source_url: urlMatch?.[0] ?? null,
+            source_code: ext.source_code,
+          };
+        }
+        setManualPlaceholders(map);
+      } catch (err) {
+        console.error('Error loading manual placeholders:', err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [selectedAssessmentData?.destination_id, isEnterpriseAssessment]);
 
   // Auto-inject validated external indicator values into indicator_values
   // so pre-filled data appears in the form
