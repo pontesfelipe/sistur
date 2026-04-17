@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.4",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Indicadores MST_TSE_TURNOUT e MST_5G_WIFI passam a ser tratados como MANUAIS após verificação de que TSE (cdn.tse.jus.br, divulga, dados.gov.br) e Anatel (sistemas, paineis, dados abertos) bloqueiam acesso programático de edge functions e do Firecrawl. As funções ingest-tse e ingest-anatel agora criam um placeholder vazio (raw_value: null) no painel de pré-preenchimento com nota explicativa e link direto para a fonte oficial, em vez de prometer ingestão automática que não existia.",
+    ],
+  },
   {
     version: "1.30.3",
     date: "2026-04-17",
