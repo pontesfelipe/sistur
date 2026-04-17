@@ -73,6 +73,8 @@ const Index = () => {
   const { isAdmin, hasERPAccess } = useProfileContext();
   const [diagnosticMode, setDiagnosticMode] = useState<DiagnosticMode>('territorial');
   const [selectedDestination, setSelectedDestination] = useState<string | undefined>(undefined);
+  // Independent destination selection for the Mandala visualization
+  const [mandalaDestination, setMandalaDestination] = useState<string | undefined>(undefined);
   const { isEnabled, toggleWidget, resetToDefaults } = useDashboardWidgets();
 
   // Fetch org settings for enterprise access
