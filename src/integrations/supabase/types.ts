@@ -4306,6 +4306,7 @@ export type Database = {
           unit: string | null
           value_format: Database["public"]["Enums"]["value_format_type"]
           weight: number
+          weight_legacy: number | null
         }
         Insert: {
           benchmark_max?: number | null
@@ -4352,6 +4353,7 @@ export type Database = {
           unit?: string | null
           value_format?: Database["public"]["Enums"]["value_format_type"]
           weight?: number
+          weight_legacy?: number | null
         }
         Update: {
           benchmark_max?: number | null
@@ -4398,6 +4400,7 @@ export type Database = {
           unit?: string | null
           value_format?: Database["public"]["Enums"]["value_format_type"]
           weight?: number
+          weight_legacy?: number | null
         }
         Relationships: [
           {
