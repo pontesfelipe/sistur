@@ -120,6 +120,14 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const { profile } = useProfile();
   const [hasAutoInjected, setHasAutoInjected] = useState(false);
 
+  // Manual-fill placeholders left by ingest-tse / ingest-anatel / fetch-official-data
+  // when scraping or API call failed. Keyed by indicator_code.
+  const [manualPlaceholders, setManualPlaceholders] = useState<Record<string, {
+    note: string | null;
+    source_url: string | null;
+    source_code: string;
+  }>>({});
+
   useEffect(() => {
     if (preSelectedAssessmentId && assessments?.length) {
       const exists = assessments.some(a => a.id === preSelectedAssessmentId);
@@ -128,6 +136,48 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       }
     }
   }, [preSelectedAssessmentId, assessments]);
+
+  // Load manual-fill placeholders (scrape failures with link to official source)
+  useEffect(() => {
+    if (!selectedAssessmentData?.destination_id || isEnterpriseAssessment) {
+      setManualPlaceholders({});
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: dest } = await supabase
+          .from('destinations')
+          .select('ibge_code')
+          .eq('id', selectedAssessmentData.destination_id)
+          .single();
+        if (!dest?.ibge_code) return;
+
+        const { data: extValues } = await supabase
+          .from('external_indicator_values')
+          .select('indicator_code, source_code, notes, raw_value, collection_method')
+          .eq('municipality_ibge_code', dest.ibge_code)
+          .is('raw_value', null);
+
+        if (cancelled || !extValues) return;
+
+        const map: Record<string, { note: string | null; source_url: string | null; source_code: string }> = {};
+        for (const ext of extValues) {
+          if (ext.collection_method !== 'MANUAL') continue;
+          const urlMatch = ext.notes?.match(/https?:\/\/[^\s)]+/);
+          map[ext.indicator_code] = {
+            note: ext.notes ?? null,
+            source_url: urlMatch?.[0] ?? null,
+            source_code: ext.source_code,
+          };
+        }
+        setManualPlaceholders(map);
+      } catch (err) {
+        console.error('Error loading manual placeholders:', err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [selectedAssessmentData?.destination_id, isEnterpriseAssessment]);
 
   // Auto-inject validated external indicator values into indicator_values
   // so pre-filled data appears in the form
@@ -887,6 +937,31 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           <p className="text-xs text-blue-600/80 dark:text-blue-400/80 mt-1">
                                             <em>Ex: {guidance.examples}</em>
                                           </p>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
+                                  {!isIgnored && currentValue === null && manualPlaceholders[indicator.code] && (() => {
+                                    const ph = manualPlaceholders[indicator.code];
+                                    const isMandala = indicator.code.startsWith('MST_');
+                                    return (
+                                      <div className="mt-2 p-2 rounded bg-amber-50/60 dark:bg-amber-950/20 border border-amber-300/60 dark:border-amber-800/40">
+                                        <p className="text-xs text-amber-800 dark:text-amber-200 font-medium flex items-center gap-1">
+                                          {isMandala ? '🌀' : '⚠️'} Preenchimento manual necessário
+                                        </p>
+                                        <p className="text-xs text-amber-700/90 dark:text-amber-300/90 mt-1">
+                                          A coleta automática via {ph.source_code} não retornou dados para este município.
+                                          {isMandala && ' Indicador da Mandala da Sustentabilidade no Turismo.'}
+                                        </p>
+                                        {ph.source_url && (
+                                          <a
+                                            href={ph.source_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs text-amber-700 dark:text-amber-200 underline hover:no-underline mt-1 inline-block break-all"
+                                          >
+                                            🔗 Consultar fonte oficial ({ph.source_code})
+                                          </a>
                                         )}
                                       </div>
                                     );
