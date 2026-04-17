@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.5",
+    date: "2026-04-17",
+    type: "patch" as const,
+    changes: [
+      "Ingestão automática real de MST_TSE_TURNOUT e MST_5G_WIFI via Firecrawl como proxy de scraping. Edge function ingest-tse agora busca o % de comparecimento eleitoral do município (G1 Eleições, que sindica dados oficiais TSE) com extração regex tolerante (comparecimento direto ou 100 - abstenção) e detecção do ano do pleito (2024 municipal / 2022 geral). Edge function ingest-anatel busca cobertura 5G/4G via Teleco (que republica dados Anatel por município) e calcula score composto 0-100 = 50% × cov_5g + 30% × cov_4g + 20% × wifi_proxy (categoria Mapa do Turismo). Resultados gravados como AUTOMATIC com confidence_level=4. Cache populado em anatel_coverage_cache. Quando o scraping não consegue extrair, mantém comportamento manual com link à fonte oficial.",
+    ],
+  },
   {
     version: "1.30.4",
     date: "2026-04-17",
