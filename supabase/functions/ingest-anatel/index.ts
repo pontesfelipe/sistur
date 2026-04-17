@@ -160,9 +160,26 @@ Deno.serve(async (req) => {
     const sourceAnatelUrl = 'https://informacoes.anatel.gov.br/paineis/acessos/panorama';
 
     let coverage: CoverageData | null = null;
-    let scrapeStatus: 'success' | 'partial' | 'no_data' | 'no_firecrawl' = 'no_data';
+    let scrapeStatus: 'success' | 'partial' | 'cache_hit' | 'no_data' | 'no_firecrawl' = 'no_data';
 
-    if (!firecrawlKey) {
+    // Cache TTL: 90 dias (Anatel publica novos dados quase mensalmente, mas variação é gradual)
+    const CACHE_TTL_DAYS = 90;
+    const cutoffIso = new Date(Date.now() - CACHE_TTL_DAYS * 24 * 60 * 60 * 1000).toISOString();
+    const { data: cachedCov } = await supabase
+      .from('anatel_coverage_cache')
+      .select('coverage_5g_pct, coverage_4g_pct, source, updated_at')
+      .eq('ibge_code', body.ibge_code)
+      .gte('updated_at', cutoffIso)
+      .maybeSingle();
+
+    if (cachedCov && (cachedCov.coverage_5g_pct != null || cachedCov.coverage_4g_pct != null)) {
+      coverage = {
+        cov_5g: cachedCov.coverage_5g_pct,
+        cov_4g: cachedCov.coverage_4g_pct,
+        source_url: cachedCov.source || sourceAnatelUrl,
+      };
+      scrapeStatus = 'cache_hit';
+    } else if (!firecrawlKey) {
       scrapeStatus = 'no_firecrawl';
     } else if (ctx.name) {
       const slug = ctx.name.toLowerCase()

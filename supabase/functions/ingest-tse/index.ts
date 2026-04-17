@@ -135,9 +135,26 @@ Deno.serve(async (req) => {
     let extractedValue: number | null = null;
     let extractedYear: number | null = null;
     let scrapeUrl: string | null = null;
-    let scrapeStatus: 'success' | 'no_data' | 'no_firecrawl' | 'no_municipality' = 'no_data';
+    let scrapeStatus: 'success' | 'cache_hit' | 'no_data' | 'no_firecrawl' | 'no_municipality' = 'no_data';
 
-    if (!firecrawlKey) {
+    // Cache TTL strategy: latest known electoral year (2024 municipal, 2022 general).
+    // Reuse cached value if reference matches the most recent expected election.
+    const CURRENT_LATEST_ELECTION_YEAR = 2024;
+    const { data: cached } = await supabase
+      .from('tse_turnout_cache')
+      .select('turnout_pct, election_year, source')
+      .eq('ibge_code', body.ibge_code)
+      .gte('election_year', CURRENT_LATEST_ELECTION_YEAR)
+      .order('election_year', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (cached?.turnout_pct != null) {
+      extractedValue = Number(cached.turnout_pct);
+      extractedYear = cached.election_year;
+      scrapeUrl = cached.source || null;
+      scrapeStatus = 'cache_hit';
+    } else if (!firecrawlKey) {
       scrapeStatus = 'no_firecrawl';
     } else if (!muni?.name) {
       scrapeStatus = 'no_municipality';
@@ -165,6 +182,16 @@ Deno.serve(async (req) => {
             extractedYear = extracted.year;
             scrapeUrl = url;
             scrapeStatus = 'success';
+            // Persist in cache for future reuse (TTL = next election cycle)
+            await supabase
+              .from('tse_turnout_cache')
+              .upsert({
+                ibge_code: body.ibge_code,
+                election_year: extracted.year,
+                turnout_pct: extracted.value,
+                source: url,
+                notes: `Auto-scraped via Firecrawl em ${new Date().toISOString().slice(0, 10)}.`,
+              }, { onConflict: 'ibge_code,election_year' });
             break;
           }
         }
