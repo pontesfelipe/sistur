@@ -131,6 +131,8 @@ Quando houver seção "## Perfil do Empreendimento", CONTEXTUALIZE cada tarefa �
 
 Quando houver seção "## Benchmarks Externos", use os valores oficiais (IBGE/DATASUS/STN/CADASTUR/INEP) como referência regional nas descrições das tarefas — ancore metas em números comparáveis da região/UF em vez de generalidades.
 
+EXTENSÃO MANDALA MST: Quando gargalos ou prescrições incluírem indicadores com prefixo "MST_" (ex: MST_ACC_NBR9050, MST_TBC, MST_5G_WIFI, MST_PNQT_QUAL, MST_TSE_TURNOUT, MST_INCLUSAO_GESTAO, MST_SENSIBILIZACAO, MST_BIGDATA, MST_DIGITAL_PROMO), prefixe o título dessas tarefas com "🌀 MST:" para sinalizar que são dimensões da Mandala da Sustentabilidade no Turismo (Tasso, Silva & Nascimento, 2024) e use linguagem específica do tema (acessibilidade NBR 9050, Turismo de Base Comunitária, conectividade 5G/Wi-Fi público, qualificação PNQT, etc.). Essas tarefas devem ter prioridade pelo menos "high" quando o status do indicador for CRITICO.
+
 IMPORTANTE:
 - Responda APENAS com um objeto JSON válido. Não inclua markdown, blocos de código ou texto explicativo.
 - TODO O CONTEÚDO DEVE ESTAR EM PORTUGUÊS BRASILEIRO (pt-BR).`;

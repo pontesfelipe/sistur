@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 29,
-  patch: 1,
+  minor: 30,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.0",
+    date: "2026-04-17",
+    type: "minor" as const,
+    changes: [
+      "Mandala MST integrada ao motor de cálculo: os 9 indicadores complementares (MST_ACC_NBR9050, MST_TBC, MST_5G_WIFI, MST_PNQT_QUAL, MST_TSE_TURNOUT, MST_INCLUSAO_GESTAO, MST_SENSIBILIZACAO, MST_BIGDATA, MST_DIGITAL_PROMO) agora participam do cálculo de pilar com peso igual aos demais e geram issues + prescrições automaticamente quando o opt-in expand_with_mandala estiver ativo",
+      "Mapeamento EDU para MST: 14 entradas adicionadas em edu_indicator_training_map ligando cada indicador MST a treinamentos existentes (acessibilidade, governança regional, transformação digital, comunitário) ou a 4 novos treinamentos placeholder MST (TBC, Sensibilização, Big Data Turístico, Promoção Digital) — gargalos MST agora produzem recomendações de capacitação como qualquer outro indicador",
+      "generate-report: BASE_METHODOLOGY ganha bloco MST que orienta a IA a marcar gargalos MST com '🌀 [MST]' e citar a dimensão (Acessibilidade, TBC, Conectividade, etc.). Diagnósticos sem opt-in continuam sem qualquer menção à Mandala",
+      "generate-project-structure: prompt instrui a IA a prefixar tarefas derivadas de indicadores MST com '🌀 MST:' e elevar a prioridade para pelo menos 'high' quando o status for CRITICO — projetos gerados por IA agora cobrem dimensões da Mandala explicitamente",
+      "Cobertura completa do ciclo: ativando MST no Step 3 da Nova Rodada, o destino tem cálculo, gargalos, prescrições EDU, projeto gerado por IA e relatório PDF cobrindo automaticamente as 9 dimensões complementares da Mandala da Sustentabilidade no Turismo",
+    ],
+  },
   {
     version: "1.29.1",
     date: "2026-04-17",
