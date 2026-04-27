@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PublicDestinationSummary } from '@/hooks/usePublicDestinations';
 import { CERTIFICATION_LABELS, CERTIFICATION_COLORS, CertificationLevel } from '@/hooks/useTerritorialImpact';
 import { Award, MapPin, CheckCircle, AlertTriangle, ExternalLink, Info } from 'lucide-react';
+import { getSeverityLabel as canonicalSeverityLabel, type Severity } from '@/types/sistur';
 
 interface PublicDestinationCardProps {
   destination: PublicDestinationSummary;
@@ -25,16 +26,10 @@ export function PublicDestinationCard({ destination, onViewDetails }: PublicDest
   };
 
   const getSeverityLabel = (severity: string) => {
-    switch (severity) {
-      case 'BOM':
-        return 'Adequado';
-      case 'MODERADO':
-        return 'Atenção';
-      case 'CRITICO':
-        return 'Crítico';
-      default:
-        return severity;
+    if (severity === 'BOM' || severity === 'MODERADO' || severity === 'CRITICO') {
+      return canonicalSeverityLabel(severity as Severity);
     }
+    return severity;
   };
 
   const pillarOrder = ['RA', 'OE', 'AO'];
