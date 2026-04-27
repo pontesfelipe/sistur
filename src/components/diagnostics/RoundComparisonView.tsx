@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ArrowUp, ArrowDown, Minus, TrendingUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SEVERITY_INFO, type Severity } from '@/types/sistur';
 
 interface Props {
   assessmentId: string;
@@ -116,7 +117,7 @@ export function RoundComparisonView({ assessmentId, destinationId, currentPillar
                   </div>
                 </div>
                 <Badge variant={ps.severity === 'CRITICO' ? 'destructive' : ps.severity === 'MODERADO' ? 'secondary' : 'default'} className="mt-2">
-                  {ps.severity === 'CRITICO' ? 'Crítico' : ps.severity === 'MODERADO' ? 'Atenção' : 'Adequado'}
+                  {SEVERITY_INFO[ps.severity as Severity]?.label ?? ps.severity}
                 </Badge>
               </div>
             );
