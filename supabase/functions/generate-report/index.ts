@@ -287,7 +287,12 @@ function formatDataSnapshots(snapshots: any[]): string {
     if (manualCount > 0) result += `  ⚠️ ${manualCount} ajustado(s) manualmente\n`;
     
     items.forEach((item: any) => {
-      const val = item.value_used !== null ? item.value_used : (item.value_used_text || 'N/A');
+      // Format raw value using BR locale; fall back to value_used_text when
+      // the snapshot only has textual evidence.
+      const rawNum = item.value_used;
+      const val = rawNum !== null && rawNum !== undefined
+        ? Number(rawNum).toLocaleString('pt-BR', { maximumFractionDigits: 2 })
+        : (item.value_used_text || 'N/A');
       const year = item.reference_year ? ` (ref: ${item.reference_year})` : '';
       const adjusted = item.was_manually_adjusted ? ' [AJUSTADO MANUALMENTE]' : '';
       result += `  - ${item.indicator_code}: ${val}${year}${adjusted}\n`;
