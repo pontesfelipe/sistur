@@ -37,7 +37,7 @@ const SOURCE_LABEL: Record<string, string> = {
 export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string }) {
   const [filter, setFilter] = useState<string | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['assessment-audit', assessmentId],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_assessment_audit', { p_assessment_id: assessmentId });
@@ -45,9 +45,24 @@ export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string })
       return (data || []) as AuditRow[];
     },
     enabled: !!assessmentId,
+    retry: false,
   });
 
   if (isLoading) return <Skeleton className="h-64 w-full" />;
+
+  // Silently hide the audit panel for viewers without permission instead of crashing.
+  if (error) {
+    const msg = String((error as any)?.message || '');
+    if (msg.includes('not_authorized')) return null;
+    return (
+      <Card>
+        <CardContent className="py-8 text-center text-muted-foreground text-sm">
+          <FileSearch className="h-8 w-8 mx-auto mb-2 opacity-40" />
+          Não foi possível carregar a trilha de auditoria.
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!data || data.length === 0) {
     return (
