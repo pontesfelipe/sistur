@@ -62,6 +62,7 @@ import { cn } from '@/lib/utils';
 import { INDICATOR_GUIDANCE } from '@/data/enterpriseIndicatorGuidance';
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
+export type EffectiveCollection = 'AUTOMATICA' | 'DERIVED' | 'MANUAL' | 'ESTIMADA';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 type IndicatorScope = 'territorial' | 'enterprise' | 'both';
 
@@ -109,8 +110,35 @@ const MANUAL_ENTRY_CODES = new Set([
   'igma_taxa_escolarizacao',
 ]);
 
-export const getEffectiveCollection = (i: any): CollectionType =>
-  API_FETCHED_CODES.has(i.code) || CADASTUR_SEMI_AUTO_CODES.has(i.code) ? 'AUTOMATICA' : (MANUAL_ENTRY_CODES.has(i.code) ? 'MANUAL' : (i.collection_type || 'MANUAL'));
+// Indicadores derivados (calculados via fórmula a partir de fontes oficiais)
+export const DERIVED_INDICATOR_CODES = new Set([
+  'igma_guias_por_10k',
+  'igma_hospedagem_por_10k',
+  'igma_agencias_por_10k',
+  'igma_empregos_turismo_por_1k',
+  'igma_despesa_turismo_per_capita',
+  'igma_arrecadacao_turismo_per_capita',
+  'igma_visitantes_por_1k',
+]);
+
+export const getEffectiveCollection = (i: any): EffectiveCollection => {
+  if (DERIVED_INDICATOR_CODES.has(i.code)) return 'DERIVED';
+  if (API_FETCHED_CODES.has(i.code) || CADASTUR_SEMI_AUTO_CODES.has(i.code)) return 'AUTOMATICA';
+  if (MANUAL_ENTRY_CODES.has(i.code)) return 'MANUAL';
+  return (i.collection_type || 'MANUAL') as EffectiveCollection;
+};
+
+// Confiabilidade 1-5 baseada na efetiva coleta (regra determinística)
+export const getReliabilityStars = (i: any): number => {
+  const c = getEffectiveCollection(i);
+  switch (c) {
+    case 'AUTOMATICA': return 5;
+    case 'DERIVED': return 4;
+    case 'MANUAL': return 3;
+    case 'ESTIMADA': return 2;
+    default: return 3;
+  }
+};
 
 const directionLabels: Record<string, string> = {
   HIGH_IS_BETTER: '↑ Maior é melhor',
