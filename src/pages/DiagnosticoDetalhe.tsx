@@ -10,6 +10,7 @@ import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
 import { CreateProjectFromDiagnosticView } from '@/components/dashboard/CreateProjectFromDiagnosticView';
 import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
 import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculationChecklist';
+import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePanel';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
@@ -888,6 +889,7 @@ const DiagnosticoDetalhe = () => {
 
           {/* Indicadores Tab */}
           <TabsContent value="indicadores" className="space-y-6">
+            <DataProvenancePanel indicatorValues={indicatorValues as any} />
             <IndicatorScoresView indicatorScores={indicatorScores as any} />
           </TabsContent>
 

@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 13,
+  patch: 14,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.14",
+    date: "2026-04-27",
+    type: "patch" as const,
+    changes: [
+      "Fase 3 — UX de Transparência & Relatórios: novo painel 'Procedência dos Dados' (DataProvenancePanel) na aba Indicadores do diagnóstico, com cobertura automática (% via fontes oficiais + derivados), cards Oficiais/Calculados/Manuais e listagem dos indicadores derivados com fonte combinada (CADASTUR+IBGE, STN+IBGE, MAPA_TURISMO+IBGE). Motor de relatórios (generate-report) atualizado: rótulos das fontes derivadas no bloco PROVENIÊNCIA DOS DADOS e marcação 'Tipo: CALCULADO (derivado de fontes oficiais)' nos VALORES BRUTOS para que a narrativa do LLM diferencie indicadores oficiais de derivados.",
+    ]
+  },
   {
     version: "1.30.13",
     date: "2026-04-27",
