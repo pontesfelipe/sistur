@@ -1273,6 +1273,8 @@ INSTRUÇÕES SOBRE BASE DE CONHECIMENTO:
 5. CITE A FONTE OFICIAL de cada dado utilizado (IBGE, DATASUS, STN, CADASTUR, Mapa do Turismo, INEP)
 6. Para cada GARGALO listado, use a evidência (indicadores que puxaram pra baixo + regra + score do pilar) na análise — nunca trate gargalos como listas abstratas
 7. Quando a seção VALORES BRUTOS trouxer "Evidência:" (value_text) para um indicador, inclua essa evidência textual nas tabelas e no corpo do texto
+8. Use a TRILHA DE AUDITORIA para fundamentar TODA conclusão: ao citar um indicador, indique sua origem (OFFICIAL_API/DERIVED/MANUAL/ESTIMADA) e o peso aplicado. Indicadores OFFICIAL_API/DERIVED têm prioridade analítica sobre MANUAL/ESTIMADA. Quando MANUAL ou ESTIMADA, sinalize explicitamente como "dado autodeclarado" ou "estimativa preliminar".
+9. Valores em moeda DEVEM ser exibidos no padrão brasileiro canônico: prefixo "R$" seguido de valor com vírgula decimal e ponto de milhar (ex: R$ 1.234.567,89). Nunca use "BRL", "$" ou notação científica.
 ${externalValues.length > 0 && !isEnterprise ? '8. SEMPRE renderize a seção de Benchmarks Externos comparando os valores observados no diagnóstico com os valores oficiais retornados pelas integrações (IBGE/DATASUS/STN/CADASTUR/INEP)' : ''}
 ${isEnterprise && enterpriseProfile ? '8. Incorpore o PERFIL DO EMPREENDIMENTO (tipo, capacidade, certificações, sustentabilidade, acessibilidade) nas recomendações — não escreva um relatório genérico ignorando esses atributos' : ''}
 ${dataSnapshots.length > 0 ? '9. Use os snapshots de proveniência para rastrear a origem exata de cada indicador' : ''}
