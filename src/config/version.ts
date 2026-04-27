@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 16,
+  patch: 17,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.17",
+    date: "2026-04-27",
+    type: "patch" as const,
+    changes: [
+      "Fase 3 fechada — Auditoria & Qualidade dos Dados Oficiais. (1) Nova tabela assessment_indicator_audit que registra a procedência de cada indicador em cada cálculo (MANUAL, DERIVED, OFFICIAL_API, ESTIMADA), com valor bruto, score normalizado, fonte detalhada e peso utilizado. RLS restringe leitura a ADMIN global e ORG_ADMIN local. Edge function calculate-assessment agora popula auditEntries durante o loop de indicadores e composites, persistindo via DELETE+INSERT a cada recálculo. (2) Nova RPC get_assessment_audit(p_assessment_id) que retorna a trilha completa para o assessment (apenas para admins do escopo). Novo componente AssessmentAuditTrail integrado na aba 'Indicadores' do DiagnosticoDetalhe, exibindo tabela com indicador, pilar, valor, score%, badge colorido de procedência, detalhe da fonte e peso, mais resumo de contagem por tipo de fonte no header. (3) Novo painel admin de Qualidade dos Dados Oficiais (ExternalDataQualityPanel) na nova aba 'Qualidade' do IndicadoresPanel, alimentado pela RPC get_external_data_quality. Mostra cards por fonte (IBGE, CADASTUR, STN, DATASUS, INEP, SISMAPA) com: total de registros, municípios distintos, última coleta, idade em dias com badge semafórico (≤30d Recente / ≤180d Aceitável / >180d Defasado) e barra de cobertura municipal calculada contra destinos com ibge_code. Acesso restrito a ADMIN/ORG_ADMIN."
+    ]
+  },
   {
     version: "1.30.16",
     date: "2026-04-27",
