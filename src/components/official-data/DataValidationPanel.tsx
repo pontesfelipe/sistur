@@ -316,9 +316,7 @@ export function DataValidationPanel({
                   const src = v.source_code || 'MANUAL';
                   if (!bySource[src]) bySource[src] = { count: 0, indicators: [] };
                   bySource[src].count++;
-                  bySource[src].indicators.push(
-                    v.indicator_code.replace('igma_', '').replace(/_/g, ' ')
-                  );
+                  bySource[src].indicators.push(getIndicatorDisplayName(v.indicator_code));
                 });
                 return Object.entries(bySource)
                   .sort((a, b) => b[1].count - a[1].count)
