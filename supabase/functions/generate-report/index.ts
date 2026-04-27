@@ -76,10 +76,29 @@ function formatDateOnlyBR(dateStr: string | null): string {
 
 function pillarLabel(score: number | undefined): string {
   if (score === undefined) return 'N/A';
-  const pct = formatPctBR(score);
-  if (score >= 0.67) return `${pct}% — ADEQUADO`;
-  if (score >= 0.34) return `${pct}% — ATENÇÃO`;
+  // Detect scale: scores can come as 0-1 (canonical) or 0-100 (legacy).
+  // Normalize to 0-1 before classifying so the same threshold rules apply.
+  const scoreNorm = score > 1 ? score / 100 : score;
+  const pct = formatPctBR(scoreNorm);
+  // Régua oficial 5 níveis (Crítico/Atenção/Adequado/Forte/Excelente)
+  // Mantém compatibilidade com a régua 3-níveis quando os scores caem nas
+  // faixas baixas (≤66%) — Forte/Excelente só aparecem quando o pilar
+  // ultrapassa 80% / 90%.
+  if (scoreNorm >= 0.90) return `${pct}% — EXCELENTE`;
+  if (scoreNorm >= 0.80) return `${pct}% — FORTE`;
+  if (scoreNorm >= 0.67) return `${pct}% — ADEQUADO`;
+  if (scoreNorm >= 0.34) return `${pct}% — ATENÇÃO`;
   return `${pct}% — CRÍTICO`;
+}
+
+/** Status canônico para um score em 0-1 (régua 5 níveis) */
+function statusFromScore(score: number): string {
+  const s = score > 1 ? score / 100 : score;
+  if (s >= 0.90) return 'EXCELENTE';
+  if (s >= 0.80) return 'FORTE';
+  if (s >= 0.67) return 'ADEQUADO';
+  if (s >= 0.34) return 'ATENÇÃO';
+  return 'CRÍTICO';
 }
 
 function formatIndicatorScores(indicatorScores: any[]): string {
@@ -102,7 +121,7 @@ function formatIndicatorScores(indicatorScores: any[]): string {
     result += `  Críticos: ${critical.length}, Atenção: ${moderate.length}, Adequados: ${scores.length - critical.length - moderate.length}\n`;
 
     scores.forEach((s: any) => {
-      const status = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
+      const status = statusFromScore(s.score);
       const benchmark = s.indicators?.benchmark_target ? ` (benchmark: ${s.indicators.benchmark_target})` : '';
       const normRefs = (s.min_ref_used !== null && s.min_ref_used !== undefined
         && s.max_ref_used !== null && s.max_ref_used !== undefined)
@@ -120,10 +139,10 @@ function formatIndicatorScores(indicatorScores: any[]): string {
         ? ` | Bruto: ${rawDisplay.unitSuffix ? `${rawDisplay.display} ${rawDisplay.unitSuffix}` : rawDisplay.display}`
         : '';
       const normStr = (s.value_normalized !== null && s.value_normalized !== undefined)
-        ? ` | Índice: ${Number(s.value_normalized).toFixed(3)}`
+        ? ` | Índice: ${formatNumberBR(Number(s.value_normalized), 3)}`
         : '';
       const scoreStr = (s.score_pct !== null && s.score_pct !== undefined)
-        ? `${Number(s.score_pct).toFixed(1)}%`
+        ? `${formatNumberBR(Number(s.score_pct), 1)}%`
         : `${formatPctBR(s.score)}%`;
 
       // ===== Procedência e selo de auditoria =====
@@ -160,11 +179,11 @@ function formatIndicatorsByCategory(indicatorScores: any[]): string {
   for (const [theme, scores] of Object.entries(byTheme)) {
     if (scores.length === 0) continue;
     const avg = scores.reduce((sum, s) => sum + s.score, 0) / scores.length;
-    const status = avg <= 0.33 ? 'CRÍTICO' : avg <= 0.66 ? 'ATENÇÃO' : 'BOM';
+    const status = statusFromScore(avg);
     
     result += `\n## ${theme} (Status: ${status}, Média: ${formatPctBR(avg)}%)\n`;
     scores.forEach((s: any) => {
-      const kpiStatus = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
+      const kpiStatus = statusFromScore(s.score);
       const benchmarkMin = s.indicators?.benchmark_min !== null ? s.indicators.benchmark_min : 'N/A';
       const benchmarkMax = s.indicators?.benchmark_max !== null ? s.indicators.benchmark_max : 'N/A';
       const benchmarkTarget = s.indicators?.benchmark_target !== null ? s.indicators.benchmark_target : 'N/A';
@@ -216,7 +235,7 @@ function formatActionPlans(actionPlans: any[]): string {
 }
 
 function formatIGMAFlags(flags: Record<string, boolean> | null): string {
-  if (!flags) return 'Nenhuma flag IGMA ativa.';
+  if (!flags) return 'Flags IGMA ainda não calculadas para este diagnóstico.';
   const flagDescriptions: Record<string, string> = {
     RA_LIMITATION: 'Limitação Estrutural do Território - RA crítico bloqueia compensação por outros pilares',
     GOVERNANCE_BLOCK: 'Fragilidade de Governança - AO crítico impede efetividade de ações de mercado',
@@ -268,7 +287,12 @@ function formatDataSnapshots(snapshots: any[]): string {
     if (manualCount > 0) result += `  ⚠️ ${manualCount} ajustado(s) manualmente\n`;
     
     items.forEach((item: any) => {
-      const val = item.value_used !== null ? item.value_used : (item.value_used_text || 'N/A');
+      // Format raw value using BR locale; fall back to value_used_text when
+      // the snapshot only has textual evidence.
+      const rawNum = item.value_used;
+      const val = rawNum !== null && rawNum !== undefined
+        ? Number(rawNum).toLocaleString('pt-BR', { maximumFractionDigits: 2 })
+        : (item.value_used_text || 'N/A');
       const year = item.reference_year ? ` (ref: ${item.reference_year})` : '';
       const adjusted = item.was_manually_adjusted ? ' [AJUSTADO MANUALMENTE]' : '';
       result += `  - ${item.indicator_code}: ${val}${year}${adjusted}\n`;
@@ -338,13 +362,13 @@ function formatIssuesWithEvidence(issues: any[]): string {
     if (Array.isArray(evidence.indicators) && evidence.indicators.length > 0) {
       const indicatorLines = evidence.indicators
         .slice(0, 5)
-        .map((ind: any) => `      • ${ind.name || ind.code}: ${typeof ind.score === 'number' ? Math.round(ind.score * 100) + '%' : 'N/A'}`)
+        .map((ind: any) => `      • ${ind.name || ind.code}: ${typeof ind.score === 'number' ? formatPctBR(ind.score) + '%' : 'N/A'}`)
         .join('\n');
       parts.push(`    Indicadores que puxaram pra baixo:\n${indicatorLines}`);
     }
     if (evidence.rule) parts.push(`    Regra disparada: ${evidence.rule}`);
-    if (evidence.pillar_score !== undefined) parts.push(`    Score do pilar: ${(evidence.pillar_score * 100).toFixed(1)}%`);
-    if (evidence.threshold !== undefined) parts.push(`    Limiar: ${(evidence.threshold * 100).toFixed(1)}%`);
+    if (evidence.pillar_score !== undefined) parts.push(`    Score do pilar: ${formatPctBR(evidence.pillar_score)}%`);
+    if (evidence.threshold !== undefined) parts.push(`    Limiar: ${formatPctBR(evidence.threshold)}%`);
     return parts.length > 0 ? `${header}\n${parts.join('\n')}` : header;
   }).join('\n');
 }
@@ -413,8 +437,16 @@ function formatExternalBenchmarks(externalValues: any[], indicatorsById: Map<str
   externalValues.forEach((ev: any) => {
     const indicator = indicatorsById.get(ev.indicator_code);
     const indicatorName = indicator?.name || ev.indicator_code;
-    const unit = indicator?.unit || '';
-    const rawValue = ev.raw_value !== null && ev.raw_value !== undefined ? ev.raw_value : (ev.raw_value_text || 'N/A');
+    // Format respecting indicator's value_format (PERCENTAGE/CURRENCY/COUNT…)
+    let rawValue: string;
+    let unit = indicator?.unit || '';
+    if (ev.raw_value !== null && ev.raw_value !== undefined) {
+      const fmt = formatRawIndicatorValue(ev.raw_value, indicator);
+      rawValue = fmt.display;
+      unit = fmt.unitSuffix;
+    } else {
+      rawValue = ev.raw_value_text || 'N/A';
+    }
     const sourceLabel = sourceLabels[ev.source_code] || ev.source_code;
     const year = ev.reference_year ? ` (${ev.reference_year})` : '';
     const validated = ev.validated ? ' ✓validado' : '';
@@ -444,9 +476,22 @@ FICHA TÉCNICA DO RELATÓRIO (renderize como tabela markdown):
 | Data de Geração | ${generatedAt} |
 | Algoritmo | ${assessment.algo_version} |
 | I-RA | ${pillarLabel(pillarScores?.RA?.score)} |
-| I-AO | ${pillarLabel(pillarScores?.AO?.score)} |
 | I-OE | ${pillarLabel(pillarScores?.OE?.score)} |
-| Score Final SISTUR (interno) | ${assessment.final_score !== null && assessment.final_score !== undefined ? `${(assessment.final_score * 100).toFixed(1).replace('.', ',')}% — ${({ CRITICO: 'Crítico', INSUFICIENTE: 'Insuficiente', EM_DESENVOLVIMENTO: 'Em Desenvolvimento', BOM: 'Bom', EXCELENTE: 'Excelente' } as Record<string, string>)[assessment.final_classification as string] || assessment.final_classification || ''}` : 'N/A'} |
+| I-AO | ${pillarLabel(pillarScores?.AO?.score)} |
+| Score Final SISTUR (interno) | ${assessment.final_score !== null && assessment.final_score !== undefined ? `${formatPctBR(assessment.final_score)}% — ${({
+      CRITICO: 'Crítico',
+      CRITICAL: 'Crítico',
+      INSUFICIENTE: 'Atenção',
+      ATENCAO: 'Atenção',
+      ATTENTION: 'Atenção',
+      EM_DESENVOLVIMENTO: 'Adequado',
+      ADEQUADO: 'Adequado',
+      BOM: 'Adequado',
+      FORTE: 'Forte',
+      STRONG: 'Forte',
+      EXCELENTE: 'Excelente',
+      EXCELLENT: 'Excelente',
+    } as Record<string, string>)[assessment.final_classification as string] || assessment.final_classification || ''}` : 'N/A'} |
 
 > **Nota metodológica:** O Score Final SISTUR é calculado como (RA × 35%) + (OE × 30%) + (AO × 35%), conforme metodologia oficial. Trata-se de um indicador interno de uso técnico, sem finalidade de ranqueamento público entre destinos.
 
@@ -514,10 +559,16 @@ O turismo deve ser compreendido como um sistema aberto (SISTUR) composto por sub
 
 OS TRÊS EIXOS SISTUR:
 1. I-RA — Relações Ambientais: Contexto territorial, meio ambiente, dados demográficos, segurança, saneamento
-2. I-AO — Ações Operacionais: Governança pública, planejamento, orçamento, capacidade institucional
-3. I-OE — Organização Estrutural: Infraestrutura turística, serviços, mercado, qualificação profissional
+2. I-OE — Organização Estrutural: Infraestrutura turística, serviços, mercado, qualificação profissional
+3. I-AO — Ações Operacionais: Governança pública, planejamento, orçamento, capacidade institucional
 
-CLASSIFICAÇÃO: ADEQUADO (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
+CLASSIFICAÇÃO (régua oficial 5 níveis):
+- 🟢 EXCELENTE (≥90%): desempenho de referência, padrão a ser preservado
+- 🔵 FORTE (80-89%): desempenho consolidado, com margem para excelência
+- 🟡 ADEQUADO (67-79%): atende ao mínimo, com oportunidades pontuais de melhoria
+- 🟠 ATENÇÃO (34-66%): exige intervenção planejada para evitar degradação
+- 🔴 CRÍTICO (≤33%): requer ação imediata e priorização máxima
+Use SEMPRE estas faixas e rótulos, com a vírgula decimal brasileira (ex.: "67,3% — ADEQUADO"). Nunca use "BOM" — o termo oficial é "ADEQUADO".
 
 EXTENSÃO MANDALA DA SUSTENTABILIDADE NO TURISMO (MST) — quando ativada via opt-in:
 Quando indicadores com prefixo "MST_" aparecerem nos dados (ex: MST_ACC_NBR9050, MST_TBC, MST_5G_WIFI, MST_PNQT_QUAL, MST_TSE_TURNOUT, MST_INCLUSAO_GESTAO, MST_SENSIBILIZACAO, MST_BIGDATA, MST_DIGITAL_PROMO), trate-os como dimensões complementares baseadas em Tasso, Silva & Nascimento (2024) — Mandala da Sustentabilidade no Turismo. Eles entram no score do pilar com peso igual aos demais indicadores. NA SEÇÃO DE GARGALOS, identifique-os explicitamente com o prefixo "🌀 [MST]" e cite a dimensão (Acessibilidade, TBC, Conectividade Digital, Qualificação PNQT, Participação Cívica, Inclusão na Gestão, Sensibilização, Big Data Turístico, Promoção Digital). Se nenhum MST_ aparecer, NÃO mencione a Mandala — o diagnóstico não foi expandido.
@@ -675,10 +726,10 @@ ESTRUTURA OBRIGATÓRIA (MEC/ABNT):
 - LEITURA TÉCNICA: interpretação dos scores
 - IMPLICAÇÕES: consequências para o destino
 
-### 4.2. I-AO — Ações Operacionais
+### 4.2. I-OE — Organização Estrutural
 (mesma estrutura)
 
-### 4.3. I-OE — Organização Estrutural
+### 4.3. I-AO — Ações Operacionais
 (mesma estrutura)
 
 ## 5. Alertas Sistêmicos IGMA
@@ -739,7 +790,9 @@ OS TRÊS EIXOS SISTUR ENTERPRISE:
 2. I-AO — Ações Operacionais: Governança corporativa, saúde financeira, maturidade tecnológica, parcerias
 3. I-OE — Organização Estrutural: Qualidade de serviço, satisfação do hóspede, ocupação, capacitação
 
-CLASSIFICAÇÃO: BOM (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
+CLASSIFICAÇÃO (régua oficial 5 níveis — usar SEMPRE estes rótulos, nunca "BOM"):
+- 🟢 EXCELENTE (≥90%) | 🔵 FORTE (80-89%) | 🟡 ADEQUADO (67-79%) | 🟠 ATENÇÃO (34-66%) | 🔴 CRÍTICO (≤33%)
+Formate percentuais com vírgula decimal brasileira (ex.: "72,4% — ADEQUADO").
 
 FONTES DE DADOS — RASTREABILIDADE OBRIGATÓRIA:
 Cada dado apresentado no relatório DEVE conter a fonte entre parênteses. Exemplos:
