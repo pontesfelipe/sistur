@@ -1176,6 +1176,7 @@ ${formatIGMAFlags(assessment.igma_flags as Record<string, boolean> | null)}
 ALERTAS:
 ${alertsText}
 
+${temporalComparisonBlock}
 INDICADORES:
 ${indicatorsDetail}
 
