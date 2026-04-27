@@ -4524,6 +4524,54 @@ export type Database = {
           },
         ]
       }
+      ingestion_runs: {
+        Row: {
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          finished_at: string | null
+          function_name: string
+          id: string
+          metadata: Json
+          records_failed: number
+          records_processed: number
+          started_at: string
+          status: string
+          triggered_by: string
+          triggered_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          function_name: string
+          id?: string
+          metadata?: Json
+          records_failed?: number
+          records_processed?: number
+          started_at?: string
+          status?: string
+          triggered_by?: string
+          triggered_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          function_name?: string
+          id?: string
+          metadata?: Json
+          records_failed?: number
+          records_processed?: number
+          started_at?: string
+          status?: string
+          triggered_by?: string
+          triggered_user_id?: string | null
+        }
+        Relationships: []
+      }
       investment_interests: {
         Row: {
           created_at: string
@@ -8147,6 +8195,20 @@ export type Database = {
           total_records: number
         }[]
       }
+      get_ingestion_health: {
+        Args: never
+        Returns: {
+          age_days: number
+          expected_cadence: string
+          function_name: string
+          health: string
+          last_error: string
+          last_records_failed: number
+          last_records_processed: number
+          last_run_at: string
+          last_status: string
+        }[]
+      }
       get_license_status: {
         Args: never
         Returns: {
@@ -8170,6 +8232,16 @@ export type Database = {
           trial_started_at: string
           updated_at: string
           user_id: string
+        }[]
+      }
+      get_mtur_reference_freshness: {
+        Args: never
+        Returns: {
+          age_days: number
+          last_updated: string
+          latest_reference_year: number
+          needs_review: boolean
+          rows_count: number
         }[]
       }
       get_my_classroom_assignments: {
