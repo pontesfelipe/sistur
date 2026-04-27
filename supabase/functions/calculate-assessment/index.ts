@@ -914,13 +914,17 @@ serve(async (req) => {
         intersectoralCount++;
       }
 
-      const score = normalizeValue(
-        iv.value_raw,
-        indicator.min_ref,
-        indicator.max_ref,
-        indicator.direction,
-        indicator.normalization
-      );
+      // Fase 5 — Etapa 2: normalizações específicas têm precedência sobre MIN_MAX/BANDS
+      const specificScore = normalizeSpecific(indicator.code, iv.value_raw);
+      const score = specificScore !== null
+        ? specificScore
+        : normalizeValue(
+            iv.value_raw,
+            indicator.min_ref,
+            indicator.max_ref,
+            indicator.direction,
+            indicator.normalization
+          );
 
       // Compute confidence based on source (manual vs auto)
       const ivSource = (iv as any)._source || (iv as any).source || '';
