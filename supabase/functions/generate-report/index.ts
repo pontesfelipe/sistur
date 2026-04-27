@@ -476,9 +476,22 @@ FICHA TÉCNICA DO RELATÓRIO (renderize como tabela markdown):
 | Data de Geração | ${generatedAt} |
 | Algoritmo | ${assessment.algo_version} |
 | I-RA | ${pillarLabel(pillarScores?.RA?.score)} |
-| I-AO | ${pillarLabel(pillarScores?.AO?.score)} |
 | I-OE | ${pillarLabel(pillarScores?.OE?.score)} |
-| Score Final SISTUR (interno) | ${assessment.final_score !== null && assessment.final_score !== undefined ? `${(assessment.final_score * 100).toFixed(1).replace('.', ',')}% — ${({ CRITICO: 'Crítico', INSUFICIENTE: 'Insuficiente', EM_DESENVOLVIMENTO: 'Em Desenvolvimento', BOM: 'Bom', EXCELENTE: 'Excelente' } as Record<string, string>)[assessment.final_classification as string] || assessment.final_classification || ''}` : 'N/A'} |
+| I-AO | ${pillarLabel(pillarScores?.AO?.score)} |
+| Score Final SISTUR (interno) | ${assessment.final_score !== null && assessment.final_score !== undefined ? `${formatPctBR(assessment.final_score)}% — ${({
+      CRITICO: 'Crítico',
+      CRITICAL: 'Crítico',
+      INSUFICIENTE: 'Atenção',
+      ATENCAO: 'Atenção',
+      ATTENTION: 'Atenção',
+      EM_DESENVOLVIMENTO: 'Adequado',
+      ADEQUADO: 'Adequado',
+      BOM: 'Adequado',
+      FORTE: 'Forte',
+      STRONG: 'Forte',
+      EXCELENTE: 'Excelente',
+      EXCELLENT: 'Excelente',
+    } as Record<string, string>)[assessment.final_classification as string] || assessment.final_classification || ''}` : 'N/A'} |
 
 > **Nota metodológica:** O Score Final SISTUR é calculado como (RA × 35%) + (OE × 30%) + (AO × 35%), conforme metodologia oficial. Trata-se de um indicador interno de uso técnico, sem finalidade de ranqueamento público entre destinos.
 
