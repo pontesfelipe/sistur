@@ -5936,6 +5936,51 @@ export type Database = {
           },
         ]
       }
+      org_indicator_weights: {
+        Row: {
+          created_at: string
+          id: string
+          indicator_id: string
+          org_id: string
+          updated_at: string
+          updated_by: string | null
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          indicator_id: string
+          org_id: string
+          updated_at?: string
+          updated_by?: string | null
+          weight: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          indicator_id?: string
+          org_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_indicator_weights_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_indicator_weights_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       org_license_quotas: {
         Row: {
           created_at: string
@@ -5967,6 +6012,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "org_license_quotas_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_pillar_weights: {
+        Row: {
+          created_at: string
+          id: string
+          org_id: string
+          pillar: string
+          updated_at: string
+          updated_by: string | null
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_id: string
+          pillar: string
+          updated_at?: string
+          updated_by?: string | null
+          weight: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_id?: string
+          pillar?: string
+          updated_at?: string
+          updated_by?: string | null
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_pillar_weights_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
@@ -8076,6 +8159,18 @@ export type Database = {
           training_id: string
         }[]
       }
+      get_org_indicator_weights: {
+        Args: { p_org_id: string }
+        Returns: {
+          code: string
+          default_weight: number
+          effective_weight: number
+          indicator_id: string
+          is_overridden: boolean
+          name: string
+          pillar: string
+        }[]
+      }
       get_org_license_usage: {
         Args: {
           p_org_id: string
@@ -8085,6 +8180,14 @@ export type Database = {
           available: number
           quota: number
           used: number
+        }[]
+      }
+      get_org_pillar_weights: {
+        Args: { p_org_id: string }
+        Returns: {
+          is_custom: boolean
+          pillar: string
+          weight: number
         }[]
       }
       get_professor_referral_count: {
@@ -8165,6 +8268,10 @@ export type Database = {
           read_ct: number
         }[]
       }
+      reset_org_pillar_weights: {
+        Args: { p_org_id: string }
+        Returns: undefined
+      }
       send_assignment_reminder: {
         Args: {
           p_assignment_id: string
@@ -8174,6 +8281,14 @@ export type Database = {
         Returns: number
       }
       set_demo_org_id: { Args: { target_org_id: string }; Returns: undefined }
+      set_org_indicator_weight: {
+        Args: { p_indicator_id: string; p_org_id: string; p_weight: number }
+        Returns: undefined
+      }
+      set_org_pillar_weights: {
+        Args: { p_ao: number; p_oe: number; p_org_id: string; p_ra: number }
+        Returns: undefined
+      }
       start_assignment_exam: {
         Args: { p_assignment_id: string }
         Returns: Json

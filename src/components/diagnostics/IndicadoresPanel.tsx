@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { List, FileBarChart, RefreshCw, ShieldCheck } from 'lucide-react';
+import { List, FileBarChart, RefreshCw, ShieldCheck, Sliders } from 'lucide-react';
 import { useIndicators } from '@/hooks/useIndicators';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { IndicatorDistributionReport } from './IndicatorDistributionReport';
@@ -10,6 +10,7 @@ import { IndicadoresChart } from './IndicadoresChart';
 import { IndicadoresTable, getEffectiveCollection } from './IndicadoresTable';
 import { StaleAssessmentsPanel } from './StaleAssessmentsPanel';
 import { ExternalDataQualityPanel } from './ExternalDataQualityPanel';
+import { OrgWeightsPanel } from './OrgWeightsPanel';
 import { toast } from 'sonner';
 
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
@@ -211,6 +212,10 @@ export function IndicadoresPanel() {
             <ShieldCheck className="h-4 w-4" />
             Qualidade
           </TabsTrigger>
+          <TabsTrigger value="weights" className="gap-2">
+            <Sliders className="h-4 w-4" />
+            Pesos
+          </TabsTrigger>
         </TabsList>
       </div>
 
@@ -282,6 +287,10 @@ export function IndicadoresPanel() {
 
       <TabsContent value="quality" className="mt-0">
         <ExternalDataQualityPanel />
+      </TabsContent>
+
+      <TabsContent value="weights" className="mt-0">
+        <OrgWeightsPanel />
       </TabsContent>
 
       <IndicatorFormDialog

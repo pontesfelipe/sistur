@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 30,
-  patch: 17,
+  minor: 31,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.31.0",
+    date: "2026-04-27",
+    type: "minor" as const,
+    changes: [
+      "Fase 4 — Etapa 1: Pesos Customizáveis por Organização. Novas tabelas org_pillar_weights (RA/OE/AO com soma=100%) e org_indicator_weights (sobreposições por indicador, peso 0–10), ambas multi-tenant com RLS escopada a ADMIN global e ORG_ADMIN local. Quatro novas RPCs: get_org_pillar_weights e get_org_indicator_weights (leitura com fallback ao padrão), set_org_pillar_weights (atomic, valida soma=1.0) e set_org_indicator_weight (passa null para limpar override). Toda alteração de peso marca automaticamente os diagnósticos calculados da org como needs_recalculation=true. Edge function calculate-assessment agora carrega ambos os mapas no início do cálculo e: (a) substitui indicator.weight pelo override no loop principal, no audit trail e nas pillarData.weights; (b) aplica wRA/wOE/wAO customizados no Score Final SISTUR (default mantido em 0.35/0.30/0.35). Nova aba 'Pesos' no painel admin de Indicadores com OrgWeightsPanel: sub-aba 'Pesos por Pilar' com 3 sliders (validação visual de soma=100% com semáforo verde/vermelho) + botões Restaurar padrão / Salvar; sub-aba 'Pesos por Indicador' com filtros por pilar, tabela mostrando peso padrão vs efetivo e badge 'Personalizado' para overrides, edição inline com Enter ou botão. Acesso restrito a ADMIN/ORG_ADMIN."
+    ]
+  },
   {
     version: "1.30.17",
     date: "2026-04-27",
