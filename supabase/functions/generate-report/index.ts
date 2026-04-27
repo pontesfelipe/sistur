@@ -790,7 +790,9 @@ OS TRÊS EIXOS SISTUR ENTERPRISE:
 2. I-AO — Ações Operacionais: Governança corporativa, saúde financeira, maturidade tecnológica, parcerias
 3. I-OE — Organização Estrutural: Qualidade de serviço, satisfação do hóspede, ocupação, capacitação
 
-CLASSIFICAÇÃO: BOM (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
+CLASSIFICAÇÃO (régua oficial 5 níveis — usar SEMPRE estes rótulos, nunca "BOM"):
+- 🟢 EXCELENTE (≥90%) | 🔵 FORTE (80-89%) | 🟡 ADEQUADO (67-79%) | 🟠 ATENÇÃO (34-66%) | 🔴 CRÍTICO (≤33%)
+Formate percentuais com vírgula decimal brasileira (ex.: "72,4% — ADEQUADO").
 
 FONTES DE DADOS — RASTREABILIDADE OBRIGATÓRIA:
 Cada dado apresentado no relatório DEVE conter a fonte entre parênteses. Exemplos:
