@@ -357,13 +357,13 @@ function formatIssuesWithEvidence(issues: any[]): string {
     if (Array.isArray(evidence.indicators) && evidence.indicators.length > 0) {
       const indicatorLines = evidence.indicators
         .slice(0, 5)
-        .map((ind: any) => `      • ${ind.name || ind.code}: ${typeof ind.score === 'number' ? Math.round(ind.score * 100) + '%' : 'N/A'}`)
+        .map((ind: any) => `      • ${ind.name || ind.code}: ${typeof ind.score === 'number' ? formatPctBR(ind.score) + '%' : 'N/A'}`)
         .join('\n');
       parts.push(`    Indicadores que puxaram pra baixo:\n${indicatorLines}`);
     }
     if (evidence.rule) parts.push(`    Regra disparada: ${evidence.rule}`);
-    if (evidence.pillar_score !== undefined) parts.push(`    Score do pilar: ${(evidence.pillar_score * 100).toFixed(1)}%`);
-    if (evidence.threshold !== undefined) parts.push(`    Limiar: ${(evidence.threshold * 100).toFixed(1)}%`);
+    if (evidence.pillar_score !== undefined) parts.push(`    Score do pilar: ${formatPctBR(evidence.pillar_score)}%`);
+    if (evidence.threshold !== undefined) parts.push(`    Limiar: ${formatPctBR(evidence.threshold)}%`);
     return parts.length > 0 ? `${header}\n${parts.join('\n')}` : header;
   }).join('\n');
 }
