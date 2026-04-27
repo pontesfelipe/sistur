@@ -1582,15 +1582,15 @@ serve(async (req) => {
 
     console.log(`Created ${recommendations.length} recommendations`);
 
-    // 12. Update assessment with IGMA results + Score Final SISTUR (Etapa 4 do documento)
+    // 12. Update assessment with IGMA results + Score Final SISTUR (Etapa 4)
     // Fórmula canônica: Final = (RA × wRA) + (OE × wOE) + (AO × wAO)
     // Default: RA=0.35, OE=0.30, AO=0.35. Phase 4: pesos customizáveis por organização.
-    // Classificação em 5 faixas:
-    //   CRITICO            0.00–0.39
-    //   INSUFICIENTE       0.40–0.54
-    //   EM_DESENVOLVIMENTO 0.55–0.69
-    //   BOM                0.70–0.84
-    //   EXCELENTE          0.85–1.00
+    // Phase 5 — Régua oficial de 5 níveis (alinhada com getSeverity):
+    //   CRITICO    < 0.34
+    //   MODERADO   0.34–0.66 (Atenção)
+    //   BOM        0.67–0.79 (Adequado)
+    //   FORTE      0.80–0.89
+    //   EXCELENTE  ≥ 0.90
     const raScore = pillarScores.find(p => p.pillar === "RA")?.score ?? 0;
     const oeScore = pillarScores.find(p => p.pillar === "OE")?.score ?? 0;
     const aoScore = pillarScores.find(p => p.pillar === "AO")?.score ?? 0;
@@ -1615,11 +1615,7 @@ serve(async (req) => {
     }
 
     const finalScore = Number(((raScore * wRA) + (oeScore * wOE) + (aoScore * wAO)).toFixed(4));
-    const finalClassification =
-      finalScore < 0.40 ? "CRITICO" :
-      finalScore < 0.55 ? "INSUFICIENTE" :
-      finalScore < 0.70 ? "EM_DESENVOLVIMENTO" :
-      finalScore < 0.85 ? "BOM" : "EXCELENTE";
+    const finalClassification = getSeverity(finalScore);
 
     console.log(`[SISTUR Final] RA=${raScore.toFixed(3)}×${wRA} + OE=${oeScore.toFixed(3)}×${wOE} + AO=${aoScore.toFixed(3)}×${wAO} → Final=${finalScore} (${finalClassification})`);
 
