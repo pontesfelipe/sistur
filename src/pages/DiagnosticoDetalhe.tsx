@@ -11,6 +11,7 @@ import { CreateProjectFromDiagnosticView } from '@/components/dashboard/CreatePr
 import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
 import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculationChecklist';
 import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePanel';
+import { AssessmentAuditTrail } from '@/components/diagnostics/AssessmentAuditTrail';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
@@ -913,6 +914,9 @@ const DiagnosticoDetalhe = () => {
           <TabsContent value="indicadores" className="space-y-6">
             <DataProvenancePanel indicatorValues={indicatorValues as any} />
             <IndicatorScoresView indicatorScores={indicatorScores as any} />
+            {assessment?.id && assessment?.calculated_at && (
+              <AssessmentAuditTrail assessmentId={assessment.id} />
+            )}
           </TabsContent>
 
           {/* Gargalos Tab */}

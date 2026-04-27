@@ -788,6 +788,18 @@ serve(async (req) => {
       weight_used: number;
     }> = [];
 
+    // Phase 3 — Auditoria: rastrear procedência de cada indicador
+    const auditEntries: Array<{
+      assessment_id: string;
+      indicator_code: string;
+      pillar: string | null;
+      value: number | null;
+      normalized_score: number;
+      source_type: string;
+      source_detail: string | null;
+      weight: number;
+    }> = [];
+
     const pillarData: Record<string, { scores: number[]; weights: number[]; themes: Map<string, { scores: number[]; names: string[]; codes: string[] }> }> = {
       RA: { scores: [], weights: [], themes: new Map() },
       OE: { scores: [], weights: [], themes: new Map() },
@@ -834,6 +846,23 @@ serve(async (req) => {
         min_ref_used: indicator.min_ref,
         max_ref_used: indicator.max_ref,
         weight_used: indicator.weight,
+      });
+
+      // Audit entry — classify source
+      const srcRaw = String(ivSource || '').toLowerCase();
+      let sourceType = 'MANUAL';
+      if (/derived|derivado|formula/.test(srcRaw)) sourceType = 'DERIVED';
+      else if (/api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn/.test(srcRaw)) sourceType = 'OFFICIAL_API';
+      else if (/estima/.test(srcRaw)) sourceType = 'ESTIMADA';
+      auditEntries.push({
+        assessment_id,
+        indicator_code: indicator.code,
+        pillar: indicator.pillar,
+        value: iv.value_raw,
+        normalized_score: score,
+        source_type: sourceType,
+        source_detail: ivSource ? String(ivSource).slice(0, 200) : null,
+        weight: indicator.weight,
       });
 
       // Aggregate by pillar
@@ -927,6 +956,17 @@ serve(async (req) => {
               min_ref_used: 0,
               max_ref_used: 100,
               weight_used: 1.5,
+            });
+
+            auditEntries.push({
+              assessment_id,
+              indicator_code: compositeCode,
+              pillar: compositeIndicator.pillar,
+              value: null,
+              normalized_score: compositeScore,
+              source_type: 'DERIVED',
+              source_detail: `composite:${compositeCode} (${rules.length} components)`,
+              weight: 1.5,
             });
 
             // Add to pillar data
@@ -1545,6 +1585,23 @@ serve(async (req) => {
 
     if (updateError) {
       console.error("Error updating assessment:", updateError);
+    }
+
+    // Phase 3 — Persist indicator audit trail
+    try {
+      await supabase
+        .from("assessment_indicator_audit")
+        .delete()
+        .eq("assessment_id", assessment_id);
+      if (auditEntries.length > 0) {
+        const { error: auditErr } = await supabase
+          .from("assessment_indicator_audit")
+          .insert(auditEntries);
+        if (auditErr) console.error("Audit insert error:", auditErr);
+        else console.log(`[Audit] Inserted ${auditEntries.length} audit entries`);
+      }
+    } catch (e) {
+      console.error("Audit trail failed:", e);
     }
 
     // 12.1 Action plans generation removed — unified with Projects module.

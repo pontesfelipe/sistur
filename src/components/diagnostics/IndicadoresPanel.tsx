@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { List, FileBarChart, RefreshCw } from 'lucide-react';
+import { List, FileBarChart, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useIndicators } from '@/hooks/useIndicators';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { IndicatorDistributionReport } from './IndicatorDistributionReport';
@@ -9,6 +9,7 @@ import { IndicadoresFilters } from './IndicadoresFilters';
 import { IndicadoresChart } from './IndicadoresChart';
 import { IndicadoresTable, getEffectiveCollection } from './IndicadoresTable';
 import { StaleAssessmentsPanel } from './StaleAssessmentsPanel';
+import { ExternalDataQualityPanel } from './ExternalDataQualityPanel';
 import { toast } from 'sonner';
 
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
@@ -206,6 +207,10 @@ export function IndicadoresPanel() {
             <RefreshCw className="h-4 w-4" />
             Recálculo
           </TabsTrigger>
+          <TabsTrigger value="quality" className="gap-2">
+            <ShieldCheck className="h-4 w-4" />
+            Qualidade
+          </TabsTrigger>
         </TabsList>
       </div>
 
@@ -273,6 +278,10 @@ export function IndicadoresPanel() {
 
       <TabsContent value="stale" className="mt-0">
         <StaleAssessmentsPanel />
+      </TabsContent>
+
+      <TabsContent value="quality" className="mt-0">
+        <ExternalDataQualityPanel />
       </TabsContent>
 
       <IndicatorFormDialog

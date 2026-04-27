@@ -224,6 +224,60 @@ export type Database = {
         }
         Relationships: []
       }
+      assessment_indicator_audit: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          id: string
+          indicator_code: string
+          normalized_score: number | null
+          pillar: string | null
+          source_detail: string | null
+          source_type: string
+          value: number | null
+          weight: number | null
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          id?: string
+          indicator_code: string
+          normalized_score?: number | null
+          pillar?: string | null
+          source_detail?: string | null
+          source_type: string
+          value?: number | null
+          weight?: number | null
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          id?: string
+          indicator_code?: string
+          normalized_score?: number | null
+          pillar?: string | null
+          source_detail?: string | null
+          source_type?: string
+          value?: number | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_indicator_audit_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_indicator_audit_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+        ]
+      }
       assessments: {
         Row: {
           algo_version: string
@@ -7934,6 +7988,18 @@ export type Database = {
           ruleset_id: string
         }[]
       }
+      get_assessment_audit: {
+        Args: { p_assessment_id: string }
+        Returns: {
+          indicator_code: string
+          normalized_score: number
+          pillar: string
+          source_detail: string
+          source_type: string
+          value: number
+          weight: number
+        }[]
+      }
       get_assignment_progress: {
         Args: { p_assignment_id: string }
         Returns: Json
@@ -7947,6 +8013,17 @@ export type Database = {
         }[]
       }
       get_effective_org_id: { Args: never; Returns: string }
+      get_external_data_quality: {
+        Args: never
+        Returns: {
+          age_days: number
+          coverage_pct: number
+          distinct_municipalities: number
+          last_collected_at: string
+          source: string
+          total_records: number
+        }[]
+      }
       get_license_status: {
         Args: never
         Returns: {
