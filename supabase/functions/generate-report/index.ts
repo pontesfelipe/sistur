@@ -726,10 +726,10 @@ ESTRUTURA OBRIGATÓRIA (MEC/ABNT):
 - LEITURA TÉCNICA: interpretação dos scores
 - IMPLICAÇÕES: consequências para o destino
 
-### 4.2. I-AO — Ações Operacionais
+### 4.2. I-OE — Organização Estrutural
 (mesma estrutura)
 
-### 4.3. I-OE — Organização Estrutural
+### 4.3. I-AO — Ações Operacionais
 (mesma estrutura)
 
 ## 5. Alertas Sistêmicos IGMA
