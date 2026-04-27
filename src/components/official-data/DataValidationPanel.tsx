@@ -34,6 +34,7 @@ import {
   useValidateIndicatorValues,
 } from '@/hooks/useOfficialData';
 import { useAuth } from '@/hooks/useAuth';
+import { useIndicators } from '@/hooks/useIndicators';
 import {
   EMPTY_SELECT_VALUE,
   formatIndicatorFieldDisplayValue,
@@ -104,6 +105,23 @@ export function DataValidationPanel({
   const { data: rawValues = [], isLoading } = useExternalIndicatorValues(ibgeCode, orgId);
   const fetchOfficialData = useFetchOfficialData();
   const validateValues = useValidateIndicatorValues();
+
+  // Catalog of indicators (used to display friendly names instead of raw codes)
+  const { indicators: indicatorCatalog = [] } = useIndicators({ scope: 'all' });
+  const indicatorNameByCode = useMemo(() => {
+    const map = new Map<string, string>();
+    indicatorCatalog.forEach((ind) => {
+      if (ind?.code && ind?.name) map.set(ind.code.toLowerCase(), ind.name);
+    });
+    return map;
+  }, [indicatorCatalog]);
+
+  const getIndicatorDisplayName = (code: string): string => {
+    const friendly = indicatorNameByCode.get(code.toLowerCase());
+    if (friendly) return friendly;
+    // Fallback: clean up the code if no name is found in the catalog
+    return code.replace('igma_', '').replace('MST_', '').replace(/_/g, ' ');
+  };
 
   // Always fetch fresh data from all sources when the panel mounts for a new diagnostic
   useEffect(() => {
@@ -298,9 +316,7 @@ export function DataValidationPanel({
                   const src = v.source_code || 'MANUAL';
                   if (!bySource[src]) bySource[src] = { count: 0, indicators: [] };
                   bySource[src].count++;
-                  bySource[src].indicators.push(
-                    v.indicator_code.replace('igma_', '').replace(/_/g, ' ')
-                  );
+                  bySource[src].indicators.push(getIndicatorDisplayName(v.indicator_code));
                 });
                 return Object.entries(bySource)
                   .sort((a, b) => b[1].count - a[1].count)
@@ -453,11 +469,11 @@ export function DataValidationPanel({
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <span className="font-medium cursor-help">
-                                    {value.indicator_code.replace('igma_', '').replace('MST_', '').replace(/_/g, ' ')}
+                                    {getIndicatorDisplayName(value.indicator_code)}
                                   </span>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p className="text-xs">{value.indicator_code}</p>
+                                  <p className="text-xs font-mono">{value.indicator_code}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
