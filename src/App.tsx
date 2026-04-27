@@ -59,6 +59,7 @@ const TreasureGame = lazy(() => import("./pages/TreasureGame"));
 const MemoryGame = lazy(() => import("./pages/MemoryGame"));
 const Subscription = lazy(() => import("./pages/Subscription"));
 const AdminLicenses = lazy(() => import("./pages/AdminLicenses"));
+const AdminIngestionHealth = lazy(() => import("./pages/AdminIngestionHealth"));
 const TermsAcceptance = lazy(() => import("./pages/TermsAcceptance"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
@@ -428,6 +429,14 @@ const App = () => {
                   element={
                     <AdminRoute>
                       <AdminLicenses />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/ingestoes"
+                  element={
+                    <AdminRoute>
+                      <AdminIngestionHealth />
                     </AdminRoute>
                   }
                 />

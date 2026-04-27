@@ -34,6 +34,7 @@ import {
   Award,
   Map,
   Sparkles,
+  Activity,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -102,6 +103,7 @@ const bottomNavigation: NavItem[] = [
   { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
   { name: 'Ajuda & Tutorial', href: '/ajuda', icon: HelpCircle },
   { name: 'Licenças', href: '/admin/licencas', icon: Shield, requiresAdmin: true },
+  { name: 'Ingestões', href: '/admin/ingestoes', icon: Activity, requiresAdmin: true },
   { name: 'Configurações', href: '/configuracoes', icon: Settings },
 ];
 

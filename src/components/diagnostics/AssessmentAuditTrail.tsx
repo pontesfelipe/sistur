@@ -1,9 +1,11 @@
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 import { Database, FileSearch } from 'lucide-react';
 
 type AuditRow = {
@@ -17,11 +19,11 @@ type AuditRow = {
 };
 
 const SOURCE_BADGE: Record<string, string> = {
-  OFFICIAL_API: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
-  AUTOMATICA: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
-  DERIVED: 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30',
-  MANUAL: 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30',
-  ESTIMADA: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
+  OFFICIAL_API: 'bg-severity-good/15 text-severity-good border-severity-good/30',
+  AUTOMATICA:   'bg-severity-good/15 text-severity-good border-severity-good/30',
+  DERIVED:      'bg-pillar-oe/15 text-pillar-oe border-pillar-oe/30',
+  MANUAL:       'bg-primary/10 text-primary border-primary/30',
+  ESTIMADA:     'bg-severity-moderate/15 text-severity-moderate border-severity-moderate/30',
 };
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -33,6 +35,8 @@ const SOURCE_LABEL: Record<string, string> = {
 };
 
 export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string }) {
+  const [filter, setFilter] = useState<string | null>(null);
+
   const { data, isLoading } = useQuery({
     queryKey: ['assessment-audit', assessmentId],
     queryFn: async () => {
@@ -62,6 +66,11 @@ export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string })
     return acc;
   }, {} as Record<string, number>);
 
+  const rows = useMemo(
+    () => (filter ? data.filter((r) => r.source_type === filter) : data),
+    [data, filter],
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -75,11 +84,29 @@ export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string })
               {data.length} indicadores processados neste cálculo
             </CardDescription>
           </div>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 items-center">
+            {filter && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 px-2 text-xs"
+                onClick={() => setFilter(null)}
+              >
+                Limpar filtro
+              </Button>
+            )}
             {Object.entries(summary).map(([type, count]) => (
-              <Badge key={type} variant="outline" className={SOURCE_BADGE[type] || ''}>
-                {SOURCE_LABEL[type] || type}: {count}
-              </Badge>
+              <button
+                key={type}
+                type="button"
+                onClick={() => setFilter(filter === type ? null : type)}
+                className={`transition-opacity ${filter && filter !== type ? 'opacity-40 hover:opacity-70' : ''}`}
+                aria-pressed={filter === type}
+              >
+                <Badge variant="outline" className={`${SOURCE_BADGE[type] || ''} cursor-pointer`}>
+                  {SOURCE_LABEL[type] || type}: {count}
+                </Badge>
+              </button>
             ))}
           </div>
         </div>
@@ -99,7 +126,7 @@ export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string })
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((r, idx) => (
+              {rows.map((r, idx) => (
                 <TableRow key={`${r.indicator_code}-${idx}`}>
                   <TableCell className="font-mono text-xs">{r.indicator_code}</TableCell>
                   <TableCell>
