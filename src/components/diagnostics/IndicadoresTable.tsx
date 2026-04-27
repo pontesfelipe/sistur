@@ -496,7 +496,7 @@ export function IndicadoresTable({
           // MOBILE CARD VIEW
           <div className="divide-y">
             {filteredIndicators.map((indicator) => {
-              const collectionType = getEffectiveCollection(indicator) as CollectionType;
+              const collectionType = getEffectiveCollection(indicator);
               const isIGMA = (indicator as any).source === 'IGMA';
               const igmaDimension = (indicator as any).igma_dimension;
               const defaultInterpretation = (indicator as any).default_interpretation;
@@ -655,7 +655,7 @@ export function IndicadoresTable({
             </TableHeader>
             <TableBody>
               {filteredIndicators.map((indicator) => {
-                const collectionType = getEffectiveCollection(indicator) as CollectionType;
+                const collectionType = getEffectiveCollection(indicator);
                 const isIGMA = (indicator as any).source === 'IGMA';
                 const igmaDimension = (indicator as any).igma_dimension;
                 const defaultInterpretation = (indicator as any).default_interpretation;
