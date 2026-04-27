@@ -559,8 +559,8 @@ O turismo deve ser compreendido como um sistema aberto (SISTUR) composto por sub
 
 OS TRÊS EIXOS SISTUR:
 1. I-RA — Relações Ambientais: Contexto territorial, meio ambiente, dados demográficos, segurança, saneamento
-2. I-AO — Ações Operacionais: Governança pública, planejamento, orçamento, capacidade institucional
-3. I-OE — Organização Estrutural: Infraestrutura turística, serviços, mercado, qualificação profissional
+2. I-OE — Organização Estrutural: Infraestrutura turística, serviços, mercado, qualificação profissional
+3. I-AO — Ações Operacionais: Governança pública, planejamento, orçamento, capacidade institucional
 
 CLASSIFICAÇÃO (régua oficial 5 níveis):
 - 🟢 EXCELENTE (≥90%): desempenho de referência, padrão a ser preservado
