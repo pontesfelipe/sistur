@@ -889,6 +889,7 @@ const DiagnosticoDetalhe = () => {
 
           {/* Indicadores Tab */}
           <TabsContent value="indicadores" className="space-y-6">
+            <DataProvenancePanel indicatorValues={indicatorValues as any} />
             <IndicatorScoresView indicatorScores={indicatorScores as any} />
           </TabsContent>
 
