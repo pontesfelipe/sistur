@@ -1027,6 +1027,14 @@ serve(async (req) => {
     const enterpriseValues = enterpriseValuesRes.data || [];
     const enterpriseProfile = enterpriseProfileRes.data || null;
 
+    // Fase 5 — Etapa 4: Audit trail (procedência por indicador) para justificar o relatório.
+    // Tabela `assessment_indicator_audit` é populada pelo engine `calculate-assessment`.
+    const { data: auditRows } = await supabase
+      .from('assessment_indicator_audit')
+      .select('indicator_code, pillar, value, normalized_score, source_type, source_detail, weight')
+      .eq('assessment_id', assessmentId);
+    const auditTrail = auditRows || [];
+
     // Catalog indicators by code so we can decorate external benchmarks with
     // names/units from the indicators table.
     const indicatorsByCode = new Map<string, any>();
