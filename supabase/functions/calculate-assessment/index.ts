@@ -958,6 +958,17 @@ serve(async (req) => {
               weight_used: 1.5,
             });
 
+            auditEntries.push({
+              assessment_id,
+              indicator_code: compositeCode,
+              pillar: compositeIndicator.pillar,
+              value: null,
+              normalized_score: compositeScore,
+              source_type: 'DERIVED',
+              source_detail: `composite:${compositeCode} (${rules.length} components)`,
+              weight: 1.5,
+            });
+
             // Add to pillar data
             const pillar = compositeIndicator.pillar;
             if (pillarData[pillar]) {
