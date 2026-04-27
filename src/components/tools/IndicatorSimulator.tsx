@@ -94,10 +94,7 @@ export function IndicatorSimulator() {
       }
     }
 
-    let status = '';
-    if (score >= 0.67) status = 'BOM';
-    else if (score >= 0.34) status = 'MODERADO';
-    else status = 'CRITICO';
+    const status = getSeverityFromScore(score);
 
     const weightedImpact = score * indicator.weight;
     let impact = '';
