@@ -770,6 +770,23 @@ serve(async (req) => {
 
     console.log(`Processing ${filteredIndicatorValues.length} ${isEnterprise ? 'enterprise' : 'territorial'} indicator values (tier: ${assessmentTier})`);
 
+    // Phase 4 — Load org-specific indicator weight overrides
+    const indicatorWeightOverrides = new Map<string, number>();
+    {
+      const { data: weightOverrides } = await supabase
+        .from("org_indicator_weights")
+        .select("indicator_id, weight")
+        .eq("org_id", orgId);
+      if (weightOverrides) {
+        for (const w of weightOverrides) {
+          indicatorWeightOverrides.set(w.indicator_id, Number(w.weight));
+        }
+        if (weightOverrides.length > 0) {
+          console.log(`[Phase4] Applying ${weightOverrides.length} indicator weight overrides for org ${orgId}`);
+        }
+      }
+    }
+
     // 3.1 Fetch composite rules for I_SEMT calculation
     const { data: compositeRules } = await supabase
       .from("igma_composite_rules")
