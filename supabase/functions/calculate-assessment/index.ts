@@ -713,6 +713,51 @@ serve(async (req) => {
             console.log(`Added ${addedCount} validated external indicators to calculation (merged with ${existingIndicatorIds.size} manual entries, ${ignoredIndicatorIds.size} ignored, tier filter bypassed for external data)`);
           }
         }
+
+        // ============================================================
+        // FASE 3 — BLOCO B: INJETAR INDICADORES DERIVADOS (CALCULADOS)
+        // ============================================================
+        // Computa indicadores derivados (ex: guias/10k hab) via RPC SQL,
+        // a partir dos dados oficiais já validados em external_indicator_values.
+        try {
+          const { data: derived, error: derivedErr } = await supabase
+            .rpc('compute_derived_indicators', {
+              p_ibge_code: destinationIbgeCode,
+              p_org_id: orgId,
+            });
+
+          if (derivedErr) {
+            console.error('Error computing derived indicators:', derivedErr);
+          } else if (derived && derived.length > 0) {
+            const derivedCodes = derived.map((d: any) => d.indicator_code);
+            const { data: derivedIndicators } = await supabase
+              .from('indicators')
+              .select('id, code, name, pillar, theme, direction, normalization, min_ref, max_ref, weight, intersectoral_dependency, minimum_tier')
+              .in('code', derivedCodes);
+
+            const codeToDerivedInd = new Map((derivedIndicators || []).map((i: any) => [i.code, i]));
+            const presentIds = new Set(filteredIndicatorValues.map((iv: any) => iv.indicator_id));
+            let derivedAdded = 0;
+            for (const d of derived) {
+              const ind = codeToDerivedInd.get(d.indicator_code);
+              if (ind && !presentIds.has(ind.id)) {
+                filteredIndicatorValues.push({
+                  id: `derived-${d.indicator_code}`,
+                  indicator_id: ind.id,
+                  value_raw: Number(d.raw_value),
+                  indicator: ind,
+                  _source: 'derived',
+                  _external_source: d.source_code,
+                  _reference_year: d.reference_year,
+                });
+                derivedAdded++;
+              }
+            }
+            console.log(`Added ${derivedAdded} derived (calculated) indicators to assessment`);
+          }
+        } catch (e) {
+          console.error('Derived indicators computation failed:', e);
+        }
       }
     }
 

@@ -7869,6 +7869,15 @@ export type Database = {
         Args: { _role: string; _system_access: string; _user_id: string }
         Returns: boolean
       }
+      compute_derived_indicators: {
+        Args: { p_ibge_code: string; p_org_id: string }
+        Returns: {
+          indicator_code: string
+          raw_value: number
+          reference_year: number
+          source_code: string
+        }[]
+      }
       create_lms_audit_log: {
         Args: {
           p_action: string

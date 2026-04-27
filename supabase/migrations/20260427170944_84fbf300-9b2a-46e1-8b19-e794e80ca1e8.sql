@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.compute_derived_indicators(TEXT, UUID) FROM PUBLIC, anon;

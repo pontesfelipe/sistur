@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 12,
+  patch: 13,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.13",
+    date: "2026-04-27",
+    type: "patch" as const,
+    changes: [
+      "Fase 3 — Bloco B (Indicadores Derivados): adicionados 7 indicadores calculados automaticamente a partir das fontes oficiais já carregadas. Pacote A — Densidade da oferta turística (pilar OE): igma_guias_por_10k (CADASTUR÷IBGE×10k), igma_hospedagem_por_10k, igma_agencias_por_10k, igma_empregos_turismo_por_1k (Mapa do Turismo÷IBGE×1k). Pacote B — Fluxo & pressão (pilares AO e RA): igma_despesa_turismo_per_capita (STN×1000÷IBGE), igma_arrecadacao_turismo_per_capita (Mapa do Turismo÷IBGE), igma_visitantes_por_habitante / Taxa de Turistificação (visitantes nacionais+internacionais÷IBGE). Todos marcados como collection_type=ESTIMADA, fonte combinada (ex.: 'CADASTUR+IBGE'), com benchmarks nacionais (min/max/target) e peso ativo (0.020–0.025). Criada função SQL public.compute_derived_indicators(ibge_code, org_id) que devolve os valores calculados a partir de external_indicator_values validados, e o edge function calculate-assessment foi atualizado para chamar essa RPC após o merge dos dados oficiais — os derivados entram automaticamente no cálculo dos pilares com a flag _source='derived'. Função restrita a usuários autenticados (REVOKE para anon). Sem alterações em pesos pilar (RA 35% / OE 30% / AO 35%)."
+    ]
+  },
   {
     version: "1.30.12",
     date: "2026-04-27",
