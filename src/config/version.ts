@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 14,
+  patch: 15,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.15",
+    date: "2026-04-27",
+    type: "patch" as const,
+    changes: [
+      "Transparência admin & frescor de dados — três melhorias curtas. (1) Coluna 'Confiab.' (1–5★) na tabela de Indicadores admin: badge determinístico baseado na coleta efetiva (5★ Automático/API, 4★ Calculado/derivado, 3★ Manual, 2★ Estimado), com tooltip explicando a escala. (2) Filtro 'Calculado' adicionado ao seletor de Coleta no IndicadoresPanel, permitindo isolar os 7 indicadores derivados (igma_guias_por_10k, igma_hospedagem_por_10k, igma_agencias_por_10k, igma_empregos_turismo_por_1k, igma_despesa_turismo_per_capita, igma_arrecadacao_turismo_per_capita, igma_visitantes_por_1k) — eles agora aparecem com badge violeta 'CALCULADO' ao lado do nome. (3) Trigger automático mark_assessments_stale_on_external_data em external_indicator_values: sempre que dados oficiais (IBGE, CADASTUR, STN, MTur) são inseridos ou atualizados para um município, todos os assessments calculados de destinos daquele IBGE são marcados com needs_recalculation=true e data_updated_at=now(), permitindo que o sistema sinalize diagnósticos desatualizados após coletas/refresh de fontes oficiais. Novas colunas em assessments: needs_recalculation (boolean) e data_updated_at (timestamptz), com índice parcial idx_assessments_needs_recalc."
+    ]
+  },
   {
     version: "1.30.14",
     date: "2026-04-27",
