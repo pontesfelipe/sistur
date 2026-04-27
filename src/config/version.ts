@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 10,
+  patch: 11,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.11",
+    date: "2026-04-27",
+    type: "patch" as const,
+    changes: [
+      "Fase 1 do plano de relatórios — motor textual (generate-report): (1) pillarLabel agora normaliza scores em escala 0-1 ou 0-100 antes de classificar, eliminando o relato de usuário de percentuais quebrados (ex.: '6730%') quando o pilar vinha em escala alternativa; (2) toda formatação numérica do prompt enviado à IA passa a usar locale brasileiro — substituição completa de .toFixed() por formatNumberBR/formatPctBR/formatRawIndicatorValue em pipeline 3-camadas (raw → normalized → score%), evidências de gargalos, snapshots de proveniência e benchmarks externos (IBGE/DATASUS/STN/CADASTUR); (3) terminologia oficial padronizada — 'BOM' eliminado em todas as funções e prompts (territorial e enterprise), substituído por 'ADEQUADO' conforme régua canônica; (4) régua oficial de 5 níveis (Crítico/Atenção/Adequado/Forte/Excelente) ativada na ficha técnica e nos system prompts, com cores oficiais 🔴🟠🟡🔵🟢; (5) mapping de final_classification cobre tanto valores legados (BOM, EM_DESENVOLVIMENTO, INSUFICIENTE) quanto rótulos novos; (6) ordem dos pilares na ficha técnica corrigida para RA → OE → AO (canônica), antes estava RA → AO → OE; (7) IGMA flags agora distinguem 'ainda não calculadas' de 'calculadas e sem flags ativas', removendo ambiguidade textual. Próximas fases: motor de dados/origem, templates Executivo/Investidores, modo de prescrição configurável.",
+    ],
+  },
   {
     version: "1.30.10",
     date: "2026-04-27",
