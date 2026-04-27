@@ -562,7 +562,13 @@ OS TRÊS EIXOS SISTUR:
 2. I-AO — Ações Operacionais: Governança pública, planejamento, orçamento, capacidade institucional
 3. I-OE — Organização Estrutural: Infraestrutura turística, serviços, mercado, qualificação profissional
 
-CLASSIFICAÇÃO: ADEQUADO (≥67%), ATENÇÃO (34-66%), CRÍTICO (≤33%)
+CLASSIFICAÇÃO (régua oficial 5 níveis):
+- 🟢 EXCELENTE (≥90%): desempenho de referência, padrão a ser preservado
+- 🔵 FORTE (80-89%): desempenho consolidado, com margem para excelência
+- 🟡 ADEQUADO (67-79%): atende ao mínimo, com oportunidades pontuais de melhoria
+- 🟠 ATENÇÃO (34-66%): exige intervenção planejada para evitar degradação
+- 🔴 CRÍTICO (≤33%): requer ação imediata e priorização máxima
+Use SEMPRE estas faixas e rótulos, com a vírgula decimal brasileira (ex.: "67,3% — ADEQUADO"). Nunca use "BOM" — o termo oficial é "ADEQUADO".
 
 EXTENSÃO MANDALA DA SUSTENTABILIDADE NO TURISMO (MST) — quando ativada via opt-in:
 Quando indicadores com prefixo "MST_" aparecerem nos dados (ex: MST_ACC_NBR9050, MST_TBC, MST_5G_WIFI, MST_PNQT_QUAL, MST_TSE_TURNOUT, MST_INCLUSAO_GESTAO, MST_SENSIBILIZACAO, MST_BIGDATA, MST_DIGITAL_PROMO), trate-os como dimensões complementares baseadas em Tasso, Silva & Nascimento (2024) — Mandala da Sustentabilidade no Turismo. Eles entram no score do pilar com peso igual aos demais indicadores. NA SEÇÃO DE GARGALOS, identifique-os explicitamente com o prefixo "🌀 [MST]" e cite a dimensão (Acessibilidade, TBC, Conectividade Digital, Qualificação PNQT, Participação Cívica, Inclusão na Gestão, Sensibilização, Big Data Turístico, Promoção Digital). Se nenhum MST_ aparecer, NÃO mencione a Mandala — o diagnóstico não foi expandido.
