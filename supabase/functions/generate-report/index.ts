@@ -76,10 +76,29 @@ function formatDateOnlyBR(dateStr: string | null): string {
 
 function pillarLabel(score: number | undefined): string {
   if (score === undefined) return 'N/A';
-  const pct = formatPctBR(score);
-  if (score >= 0.67) return `${pct}% — ADEQUADO`;
-  if (score >= 0.34) return `${pct}% — ATENÇÃO`;
+  // Detect scale: scores can come as 0-1 (canonical) or 0-100 (legacy).
+  // Normalize to 0-1 before classifying so the same threshold rules apply.
+  const scoreNorm = score > 1 ? score / 100 : score;
+  const pct = formatPctBR(scoreNorm);
+  // Régua oficial 5 níveis (Crítico/Atenção/Adequado/Forte/Excelente)
+  // Mantém compatibilidade com a régua 3-níveis quando os scores caem nas
+  // faixas baixas (≤66%) — Forte/Excelente só aparecem quando o pilar
+  // ultrapassa 80% / 90%.
+  if (scoreNorm >= 0.90) return `${pct}% — EXCELENTE`;
+  if (scoreNorm >= 0.80) return `${pct}% — FORTE`;
+  if (scoreNorm >= 0.67) return `${pct}% — ADEQUADO`;
+  if (scoreNorm >= 0.34) return `${pct}% — ATENÇÃO`;
   return `${pct}% — CRÍTICO`;
+}
+
+/** Status canônico para um score em 0-1 (régua 5 níveis) */
+function statusFromScore(score: number): string {
+  const s = score > 1 ? score / 100 : score;
+  if (s >= 0.90) return 'EXCELENTE';
+  if (s >= 0.80) return 'FORTE';
+  if (s >= 0.67) return 'ADEQUADO';
+  if (s >= 0.34) return 'ATENÇÃO';
+  return 'CRÍTICO';
 }
 
 function formatIndicatorScores(indicatorScores: any[]): string {
