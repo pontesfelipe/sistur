@@ -7,10 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calculator, ArrowRight, TrendingUp, TrendingDown, Info } from 'lucide-react';
+import { getSeverityFromScore, type Severity } from '@/types/sistur';
 
 interface NormalizationResult {
   score: number;
-  status: 'CRITICO' | 'MODERADO' | 'BOM';
+  status: Severity;
   formula: string;
 }
 
@@ -61,15 +62,10 @@ export function NormalizationCalculator() {
       formula = `Faixa: ${(score * 100).toFixed(0)}%`;
     }
 
-    let status: 'CRITICO' | 'MODERADO' | 'BOM';
-    if (score >= 0.67) status = 'BOM';
-    else if (score >= 0.34) status = 'MODERADO';
-    else status = 'CRITICO';
-
-    setResult({ score, status, formula });
+    setResult({ score, status: getSeverityFromScore(score), formula });
   };
 
-  const getStatusBadge = (status: 'CRITICO' | 'MODERADO' | 'BOM') => {
+  const getStatusBadge = (status: Severity) => {
     switch (status) {
       case 'BOM':
         return <Badge className="bg-green-500/20 text-green-700 border-green-500/30">Adequado</Badge>;
