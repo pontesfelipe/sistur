@@ -1362,7 +1362,10 @@ serve(async (req) => {
 
     const severityLabels: Record<string, string> = {
       CRITICO: "Crítico",
-      MODERADO: "Atenção"
+      MODERADO: "Atenção",
+      BOM: "Adequado",
+      FORTE: "Forte",
+      EXCELENTE: "Excelente",
     };
 
     let priority = 1;
@@ -1485,7 +1488,7 @@ serve(async (req) => {
       
       // Sort issues by severity (CRITICO first)
       const sortedIssues = [...insertedIssues].sort((a, b) => {
-        const severityOrder: Record<string, number> = { CRITICO: 1, MODERADO: 2, BOM: 3 };
+        const severityOrder: Record<string, number> = { CRITICO: 1, MODERADO: 2, BOM: 3, FORTE: 4, EXCELENTE: 5 };
         return (severityOrder[a.severity] || 99) - (severityOrder[b.severity] || 99);
       });
       
