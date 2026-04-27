@@ -53,6 +53,8 @@ const PILLAR_COLOR_VAR: Record<Pillar, string> = {
 };
 
 const SEVERITY_OPACITY: Record<Severity, number> = {
+  EXCELENTE: 1,
+  FORTE: 1,
   BOM: 1,
   MODERADO: 0.75,
   CRITICO: 0.5,

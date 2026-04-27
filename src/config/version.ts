@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 32,
-  patch: 1,
+  minor: 33,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.33.0",
+    date: "2026-04-27",
+    type: "minor" as const,
+    changes: [
+      "Fase 5 — Etapa 1: Régua oficial SISTUR de 5 níveis (substituição global no engine). (1) Banco: enum public.severity_type estendido com FORTE e EXCELENTE preservando snapshots históricos (CRITICO/MODERADO/BOM continuam válidos); nova função SQL `get_severity_5_levels(numeric)` como referência canônica para queries diretas. (2) Tipo TS `Severity` em src/types/sistur.ts agora cobre os 5 níveis; helper canônico `getSeverityFromScore` retorna EXCELENTE (≥0,90), FORTE (0,80–0,89), BOM/Adequado (0,67–0,79), MODERADO/Atenção (0,34–0,66), CRITICO (<0,34); novo helper `getLegacySeverityFromScore` para pontos que ainda operam em 3 níveis (prescrições/IGMA). SEVERITY_INFO ganha labels Forte/Excelente com tons emerald-600/700. (3) Componentes Dashboard atualizados — EnterpriseCategoriesView, MandalaDestino, PillarGauge — para suportar os 5 níveis sem quebrar styling. (4) Edge function calculate-assessment v1.33.0: tipo SeverityType expandido; getSeverity grava 5 níveis em pillar_scores; severityLabels e severityOrder cobrem Forte/Excelente; classificação final do Score SISTUR alinhada com getSeverity (elimina labels divergentes 'INSUFICIENTE'/'EM_DESENVOLVIMENTO' que agora colapsam para MODERADO). (5) IGMA — bloqueio de Marketing (Regra 5) agora dispara em CRITICO ou ATENÇÃO baixa (<0,40) em RA/AO, com novo helper `isCriticalOrLowAttention`; cadência de revisão estendida (15m em BOM, 18m em FORTE/EXCELENTE). (6) Migração de dados: assessments com final_classification legado normalizados para MODERADO."
+    ]
+  },
   {
     version: "1.32.1",
     date: "2026-04-27",

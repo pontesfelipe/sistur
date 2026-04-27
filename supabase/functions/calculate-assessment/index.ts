@@ -1,4 +1,4 @@
-// SISTUR Calculate Assessment Engine v1.11.3
+// SISTUR Calculate Assessment Engine v1.33.0 — Régua 5 níveis (Fase 5)
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -34,7 +34,11 @@ interface Course {
 }
 
 type TerritorialInterpretation = "ESTRUTURAL" | "GESTAO" | "ENTREGA";
-type SeverityType = "CRITICO" | "MODERADO" | "BOM";
+/**
+ * Régua oficial SISTUR — 5 níveis canônicos (Fase 5).
+ * Snapshots históricos podem trazer apenas CRITICO/MODERADO/BOM.
+ */
+type SeverityType = "CRITICO" | "MODERADO" | "BOM" | "FORTE" | "EXCELENTE";
 type PillarType = "RA" | "OE" | "AO";
 
 // ============================================================
@@ -169,7 +173,8 @@ function interpretIGMA(
   }
 
   // REGRA 5 — TERRITÓRIO ANTES DO MARKETING
-  if (RA?.severity === "CRITICO" || AO?.severity === "CRITICO") {
+  // Fase 5: bloqueio dispara em CRITICO ou ATENÇÃO baixa (<0.40) em RA/AO.
+  if (isCriticalOrLowAttention(RA?.score) || isCriticalOrLowAttention(AO?.score)) {
     flags.MARKETING_BLOCKED = true;
     blockedActions.push("MARKETING");
     
@@ -205,7 +210,10 @@ function interpretIGMA(
     nextReviewMonths = 9;
   } else if (RA?.severity === "MODERADO" || AO?.severity === "MODERADO" || OE?.severity === "MODERADO") {
     nextReviewMonths = 12;
+  } else if (RA?.severity === "BOM" || AO?.severity === "BOM" || OE?.severity === "BOM") {
+    nextReviewMonths = 15;
   } else {
+    // Todos FORTE/EXCELENTE
     nextReviewMonths = 18;
   }
   
@@ -326,12 +334,31 @@ function normalizeValue(
   return score;
 }
 
-// Determine severity based on score (per SISTUR spec)
-// Adequado: ≥0.67, Atenção: 0.34-0.66, Crítico: ≤0.33
-function getSeverity(score: number): "CRITICO" | "MODERADO" | "BOM" {
-  if (score <= 0.33) return "CRITICO";
-  if (score <= 0.66) return "MODERADO";
-  return "BOM";
+/**
+ * Régua oficial SISTUR — 5 níveis (Fase 5).
+ *   EXCELENTE ≥ 0.90
+ *   FORTE     0.80–0.89
+ *   BOM       0.67–0.79  (Adequado)
+ *   MODERADO  0.34–0.66  (Atenção)
+ *   CRITICO   < 0.34
+ */
+function getSeverity(score: number): SeverityType {
+  const s = score > 1 ? score / 100 : score;
+  if (s >= 0.90) return "EXCELENTE";
+  if (s >= 0.80) return "FORTE";
+  if (s >= 0.67) return "BOM";
+  if (s >= 0.34) return "MODERADO";
+  return "CRITICO";
+}
+
+/** Helpers para bloqueios IGMA com limites mais finos (Fase 5). */
+function isCritical(sev: SeverityType | undefined): boolean {
+  return sev === "CRITICO";
+}
+function isCriticalOrLowAttention(score: number | undefined): boolean {
+  if (score === undefined) return false;
+  const s = score > 1 ? score / 100 : score;
+  return s < 0.40; // CRITICO ou ATENÇÃO baixa
 }
 
 serve(async (req) => {
@@ -1335,7 +1362,10 @@ serve(async (req) => {
 
     const severityLabels: Record<string, string> = {
       CRITICO: "Crítico",
-      MODERADO: "Atenção"
+      MODERADO: "Atenção",
+      BOM: "Adequado",
+      FORTE: "Forte",
+      EXCELENTE: "Excelente",
     };
 
     let priority = 1;
@@ -1458,7 +1488,7 @@ serve(async (req) => {
       
       // Sort issues by severity (CRITICO first)
       const sortedIssues = [...insertedIssues].sort((a, b) => {
-        const severityOrder: Record<string, number> = { CRITICO: 1, MODERADO: 2, BOM: 3 };
+        const severityOrder: Record<string, number> = { CRITICO: 1, MODERADO: 2, BOM: 3, FORTE: 4, EXCELENTE: 5 };
         return (severityOrder[a.severity] || 99) - (severityOrder[b.severity] || 99);
       });
       
@@ -1552,15 +1582,15 @@ serve(async (req) => {
 
     console.log(`Created ${recommendations.length} recommendations`);
 
-    // 12. Update assessment with IGMA results + Score Final SISTUR (Etapa 4 do documento)
+    // 12. Update assessment with IGMA results + Score Final SISTUR (Etapa 4)
     // Fórmula canônica: Final = (RA × wRA) + (OE × wOE) + (AO × wAO)
     // Default: RA=0.35, OE=0.30, AO=0.35. Phase 4: pesos customizáveis por organização.
-    // Classificação em 5 faixas:
-    //   CRITICO            0.00–0.39
-    //   INSUFICIENTE       0.40–0.54
-    //   EM_DESENVOLVIMENTO 0.55–0.69
-    //   BOM                0.70–0.84
-    //   EXCELENTE          0.85–1.00
+    // Phase 5 — Régua oficial de 5 níveis (alinhada com getSeverity):
+    //   CRITICO    < 0.34
+    //   MODERADO   0.34–0.66 (Atenção)
+    //   BOM        0.67–0.79 (Adequado)
+    //   FORTE      0.80–0.89
+    //   EXCELENTE  ≥ 0.90
     const raScore = pillarScores.find(p => p.pillar === "RA")?.score ?? 0;
     const oeScore = pillarScores.find(p => p.pillar === "OE")?.score ?? 0;
     const aoScore = pillarScores.find(p => p.pillar === "AO")?.score ?? 0;
@@ -1585,11 +1615,7 @@ serve(async (req) => {
     }
 
     const finalScore = Number(((raScore * wRA) + (oeScore * wOE) + (aoScore * wAO)).toFixed(4));
-    const finalClassification =
-      finalScore < 0.40 ? "CRITICO" :
-      finalScore < 0.55 ? "INSUFICIENTE" :
-      finalScore < 0.70 ? "EM_DESENVOLVIMENTO" :
-      finalScore < 0.85 ? "BOM" : "EXCELENTE";
+    const finalClassification = getSeverity(finalScore);
 
     console.log(`[SISTUR Final] RA=${raScore.toFixed(3)}×${wRA} + OE=${oeScore.toFixed(3)}×${wOE} + AO=${aoScore.toFixed(3)}×${wAO} → Final=${finalScore} (${finalClassification})`);
 
