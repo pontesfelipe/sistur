@@ -1553,7 +1553,8 @@ serve(async (req) => {
     console.log(`Created ${recommendations.length} recommendations`);
 
     // 12. Update assessment with IGMA results + Score Final SISTUR (Etapa 4 do documento)
-    // Fórmula canônica: Final = (RA × 0.35) + (OE × 0.30) + (AO × 0.35)
+    // Fórmula canônica: Final = (RA × wRA) + (OE × wOE) + (AO × wAO)
+    // Default: RA=0.35, OE=0.30, AO=0.35. Phase 4: pesos customizáveis por organização.
     // Classificação em 5 faixas:
     //   CRITICO            0.00–0.39
     //   INSUFICIENTE       0.40–0.54
@@ -1563,14 +1564,34 @@ serve(async (req) => {
     const raScore = pillarScores.find(p => p.pillar === "RA")?.score ?? 0;
     const oeScore = pillarScores.find(p => p.pillar === "OE")?.score ?? 0;
     const aoScore = pillarScores.find(p => p.pillar === "AO")?.score ?? 0;
-    const finalScore = Number(((raScore * 0.35) + (oeScore * 0.30) + (aoScore * 0.35)).toFixed(4));
+
+    // Phase 4 — Load org-specific pillar weights (defaults to 0.35/0.30/0.35 if not set)
+    let wRA = 0.35, wOE = 0.30, wAO = 0.35;
+    try {
+      const { data: pillarW } = await supabase
+        .from("org_pillar_weights")
+        .select("pillar, weight")
+        .eq("org_id", orgId);
+      if (pillarW && pillarW.length > 0) {
+        for (const row of pillarW) {
+          if (row.pillar === 'RA') wRA = Number(row.weight);
+          else if (row.pillar === 'OE') wOE = Number(row.weight);
+          else if (row.pillar === 'AO') wAO = Number(row.weight);
+        }
+        console.log(`[Phase4] Custom pillar weights for org ${orgId}: RA=${wRA} OE=${wOE} AO=${wAO}`);
+      }
+    } catch (e) {
+      console.error("[Phase4] Failed to load pillar weights, using defaults:", e);
+    }
+
+    const finalScore = Number(((raScore * wRA) + (oeScore * wOE) + (aoScore * wAO)).toFixed(4));
     const finalClassification =
       finalScore < 0.40 ? "CRITICO" :
       finalScore < 0.55 ? "INSUFICIENTE" :
       finalScore < 0.70 ? "EM_DESENVOLVIMENTO" :
       finalScore < 0.85 ? "BOM" : "EXCELENTE";
 
-    console.log(`[SISTUR Final] RA=${raScore.toFixed(3)} OE=${oeScore.toFixed(3)} AO=${aoScore.toFixed(3)} → Final=${finalScore} (${finalClassification})`);
+    console.log(`[SISTUR Final] RA=${raScore.toFixed(3)}×${wRA} + OE=${oeScore.toFixed(3)}×${wOE} + AO=${aoScore.toFixed(3)}×${wAO} → Final=${finalScore} (${finalClassification})`);
 
     const { error: updateError } = await supabase
       .from("assessments")
