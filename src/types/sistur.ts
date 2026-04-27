@@ -1,7 +1,12 @@
 // SISTUR Type Definitions
 
 export type Pillar = 'RA' | 'OE' | 'AO';
-export type Severity = 'CRITICO' | 'MODERADO' | 'BOM';
+/**
+ * Régua oficial SISTUR — 5 níveis canônicos (Fase 5).
+ * Snapshots históricos podem conter apenas CRITICO/MODERADO/BOM; o helper
+ * `getSeverityFromScore` continua válido para esses casos legados.
+ */
+export type Severity = 'CRITICO' | 'MODERADO' | 'BOM' | 'FORTE' | 'EXCELENTE';
 export type TerritorialInterpretation = 'ESTRUTURAL' | 'GESTAO' | 'ENTREGA';
 export type AssessmentStatus = 'DRAFT' | 'DATA_READY' | 'CALCULATED';
 export type UserRole = 'ADMIN' | 'ORG_ADMIN' | 'ANALYST' | 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR';
@@ -218,26 +223,46 @@ export const PILLAR_INFO: Record<Pillar, { name: string; fullName: string; descr
   },
 };
 
-// Status labels (Adequado, Atenção, Crítico per spec)
+// Status labels — régua oficial SISTUR de 5 níveis
 export const SEVERITY_INFO: Record<Severity, { label: string; color: string; bgColor: string }> = {
-  CRITICO: { label: 'Crítico', color: 'text-severity-critical', bgColor: 'bg-severity-critical' },
-  MODERADO: { label: 'Atenção', color: 'text-severity-moderate', bgColor: 'bg-severity-moderate' },
-  BOM: { label: 'Adequado', color: 'text-severity-good', bgColor: 'bg-severity-good' },
+  CRITICO:   { label: 'Crítico',   color: 'text-severity-critical', bgColor: 'bg-severity-critical' },
+  MODERADO:  { label: 'Atenção',   color: 'text-severity-moderate', bgColor: 'bg-severity-moderate' },
+  BOM:       { label: 'Adequado',  color: 'text-severity-good',     bgColor: 'bg-severity-good' },
+  FORTE:     { label: 'Forte',     color: 'text-emerald-600',       bgColor: 'bg-emerald-600' },
+  EXCELENTE: { label: 'Excelente', color: 'text-emerald-700',       bgColor: 'bg-emerald-700' },
 };
 
 /**
  * Canonical severity helper from a normalized score (0–1).
- * Régua oficial SISTUR (3 níveis canônicos):
- *   CRITICO   ≤ 0,33   (Crítico)
+ * Régua oficial SISTUR — 5 níveis (Fase 5):
+ *   CRITICO   < 0,34   (Crítico)
  *   MODERADO  0,34–0,66 (Atenção)
- *   BOM       ≥ 0,67   (Adequado)
+ *   BOM       0,67–0,79 (Adequado)
+ *   FORTE     0,80–0,89 (Forte)
+ *   EXCELENTE ≥ 0,90    (Excelente)
  * Use SEMPRE esta função em qualquer ponto da UI/lib que precise classificar
  * um score — nunca duplique limites em componentes individuais.
  */
 export function getSeverityFromScore(score: number): Severity {
-  if (score <= 0.33) return 'CRITICO';
-  if (score <= 0.66) return 'MODERADO';
-  return 'BOM';
+  // Aceita score em escala 0-1 ou 0-100 (legado).
+  const s = score > 1 ? score / 100 : score;
+  if (s >= 0.90) return 'EXCELENTE';
+  if (s >= 0.80) return 'FORTE';
+  if (s >= 0.67) return 'BOM';
+  if (s >= 0.34) return 'MODERADO';
+  return 'CRITICO';
+}
+
+/**
+ * Severidade colapsada para 3 níveis — usada em pontos da régua antiga
+ * (prescrições, IGMA, snapshots históricos) que ainda operam em CRITICO/
+ * MODERADO/BOM. EXCELENTE e FORTE colapsam para BOM (Adequado).
+ */
+export function getLegacySeverityFromScore(score: number): 'CRITICO' | 'MODERADO' | 'BOM' {
+  const s = score > 1 ? score / 100 : score;
+  if (s >= 0.67) return 'BOM';
+  if (s >= 0.34) return 'MODERADO';
+  return 'CRITICO';
 }
 
 /**
