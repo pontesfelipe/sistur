@@ -8415,7 +8415,7 @@ export type Database = {
       question_type: "multiple_choice" | "true_false" | "short_answer" | "essay"
       quiz_origin_type: "existing" | "generated" | "imported"
       recommendation_entity_type: "course" | "live" | "track"
-      severity_type: "CRITICO" | "MODERADO" | "BOM"
+      severity_type: "CRITICO" | "MODERADO" | "BOM" | "FORTE" | "EXCELENTE"
       system_access_type: "ERP" | "EDU"
       target_agent: "GESTORES" | "TECNICOS" | "TRADE"
       territorial_interpretation: "ESTRUTURAL" | "GESTAO" | "ENTREGA"
@@ -8665,7 +8665,7 @@ export const Constants = {
       question_type: ["multiple_choice", "true_false", "short_answer", "essay"],
       quiz_origin_type: ["existing", "generated", "imported"],
       recommendation_entity_type: ["course", "live", "track"],
-      severity_type: ["CRITICO", "MODERADO", "BOM"],
+      severity_type: ["CRITICO", "MODERADO", "BOM", "FORTE", "EXCELENTE"],
       system_access_type: ["ERP", "EDU"],
       target_agent: ["GESTORES", "TECNICOS", "TRADE"],
       territorial_interpretation: ["ESTRUTURAL", "GESTAO", "ENTREGA"],
