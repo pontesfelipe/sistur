@@ -821,7 +821,7 @@ const DiagnosticoDetalhe = () => {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className={cn(
             "grid w-full",
-            isEnterprise ? "max-w-4xl grid-cols-7" : "max-w-3xl grid-cols-6"
+            isEnterprise ? "max-w-5xl grid-cols-8" : "max-w-4xl grid-cols-7"
           )}>
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -848,6 +848,10 @@ const DiagnosticoDetalhe = () => {
             <TabsTrigger value="tratamento" className="gap-2">
               <GraduationCap className="h-4 w-4" />
               <span className="hidden sm:inline">Tratamento</span>
+            </TabsTrigger>
+            <TabsTrigger value="prescricao" className="gap-2">
+              <Target className="h-4 w-4" />
+              <span className="hidden sm:inline">Prescrição</span>
             </TabsTrigger>
             <TabsTrigger value="projeto" className="gap-2">
               <FolderKanban className="h-4 w-4" />
@@ -957,7 +961,17 @@ const DiagnosticoDetalhe = () => {
           {/* Indicadores Tab */}
           <TabsContent value="indicadores" className="space-y-6">
             <DataProvenancePanel indicatorValues={indicatorValues as any} />
-            <IndicatorScoresView indicatorScores={indicatorScores as any} />
+            {prescriptionMode && (
+              <Alert>
+                <Target className="h-4 w-4" />
+                <AlertTitle>Modo Prescrição ativo</AlertTitle>
+                <AlertDescription>
+                  Exibindo apenas indicadores em Atenção ou Crítico
+                  ({displayedIndicatorScores.length} de {indicatorScores.length}).
+                </AlertDescription>
+              </Alert>
+            )}
+            <IndicatorScoresView indicatorScores={displayedIndicatorScores as any} />
             {assessment?.id && assessment?.calculated_at && (
               <AssessmentAuditTrail assessmentId={assessment.id} />
             )}
@@ -965,7 +979,7 @@ const DiagnosticoDetalhe = () => {
 
           {/* Gargalos Tab */}
           <TabsContent value="gargalos" className="space-y-4">
-            <IssuesView issues={issues as any} />
+            <IssuesView issues={displayedIssues as any} />
           </TabsContent>
 
           {/* Tratamento Tab */}
@@ -987,7 +1001,12 @@ const DiagnosticoDetalhe = () => {
             </div>
 
             {/* EDU Recommendations Panel - Now uses prescriptions from DB */}
-            <EduRecommendationsPanel indicatorScores={indicatorScores as any} assessmentId={id} />
+            <EduRecommendationsPanel indicatorScores={displayedIndicatorScores as any} assessmentId={id} />
+          </TabsContent>
+
+          {/* Prescrição Tab — visão consolidada */}
+          <TabsContent value="prescricao" className="space-y-6">
+            <PrescriptionModeView assessmentId={id!} indicatorScores={indicatorScores as any} />
           </TabsContent>
 
           {/* Projeto Tab */}
