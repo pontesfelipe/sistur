@@ -57,11 +57,14 @@ import {
   Globe,
   BarChart3,
   Plus,
+  Calculator,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { INDICATOR_GUIDANCE } from '@/data/enterpriseIndicatorGuidance';
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
+export type EffectiveCollection = 'AUTOMATICA' | 'DERIVED' | 'MANUAL' | 'ESTIMADA';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 type IndicatorScope = 'territorial' | 'enterprise' | 'both';
 
@@ -109,8 +112,35 @@ const MANUAL_ENTRY_CODES = new Set([
   'igma_taxa_escolarizacao',
 ]);
 
-export const getEffectiveCollection = (i: any): CollectionType =>
-  API_FETCHED_CODES.has(i.code) || CADASTUR_SEMI_AUTO_CODES.has(i.code) ? 'AUTOMATICA' : (MANUAL_ENTRY_CODES.has(i.code) ? 'MANUAL' : (i.collection_type || 'MANUAL'));
+// Indicadores derivados (calculados via fórmula a partir de fontes oficiais)
+export const DERIVED_INDICATOR_CODES = new Set([
+  'igma_guias_por_10k',
+  'igma_hospedagem_por_10k',
+  'igma_agencias_por_10k',
+  'igma_empregos_turismo_por_1k',
+  'igma_despesa_turismo_per_capita',
+  'igma_arrecadacao_turismo_per_capita',
+  'igma_visitantes_por_1k',
+]);
+
+export const getEffectiveCollection = (i: any): EffectiveCollection => {
+  if (DERIVED_INDICATOR_CODES.has(i.code)) return 'DERIVED';
+  if (API_FETCHED_CODES.has(i.code) || CADASTUR_SEMI_AUTO_CODES.has(i.code)) return 'AUTOMATICA';
+  if (MANUAL_ENTRY_CODES.has(i.code)) return 'MANUAL';
+  return (i.collection_type || 'MANUAL') as EffectiveCollection;
+};
+
+// Confiabilidade 1-5 baseada na efetiva coleta (regra determinística)
+export const getReliabilityStars = (i: any): number => {
+  const c = getEffectiveCollection(i);
+  switch (c) {
+    case 'AUTOMATICA': return 5;
+    case 'DERIVED': return 4;
+    case 'MANUAL': return 3;
+    case 'ESTIMADA': return 2;
+    default: return 3;
+  }
+};
 
 const directionLabels: Record<string, string> = {
   HIGH_IS_BETTER: '↑ Maior é melhor',
@@ -466,7 +496,7 @@ export function IndicadoresTable({
           // MOBILE CARD VIEW
           <div className="divide-y">
             {filteredIndicators.map((indicator) => {
-              const collectionType = getEffectiveCollection(indicator) as CollectionType;
+              const collectionType = getEffectiveCollection(indicator);
               const isIGMA = (indicator as any).source === 'IGMA';
               const igmaDimension = (indicator as any).igma_dimension;
               const defaultInterpretation = (indicator as any).default_interpretation;
@@ -597,6 +627,18 @@ export function IndicadoresTable({
                 <TableHead>Interpretação</TableHead>
                 <TableHead>
                   <Tooltip>
+                    <TooltipTrigger className="cursor-help">Confiab.</TooltipTrigger>
+                    <TooltipContent>
+                      Confiabilidade da fonte (1-5):<br/>
+                      5★ Automático (API oficial)<br/>
+                      4★ Calculado (derivado oficial)<br/>
+                      3★ Manual (entrada do usuário)<br/>
+                      2★ Estimado
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead>
+                  <Tooltip>
                     <TooltipTrigger className="cursor-help">Tier</TooltipTrigger>
                     <TooltipContent>Clique para editar o nível mínimo</TooltipContent>
                   </Tooltip>
@@ -613,7 +655,7 @@ export function IndicadoresTable({
             </TableHeader>
             <TableBody>
               {filteredIndicators.map((indicator) => {
-                const collectionType = getEffectiveCollection(indicator) as CollectionType;
+                const collectionType = getEffectiveCollection(indicator);
                 const isIGMA = (indicator as any).source === 'IGMA';
                 const igmaDimension = (indicator as any).igma_dimension;
                 const defaultInterpretation = (indicator as any).default_interpretation;
@@ -655,6 +697,11 @@ export function IndicadoresTable({
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-cyan-500/50 text-cyan-600 bg-cyan-500/10">
                                   <Database className="h-3 w-3 mr-0.5" />
                                   CADASTUR
+                                </Badge>
+                              ) : collectionType === 'DERIVED' ? (
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-violet-500/50 text-violet-600 bg-violet-500/10">
+                                  <Calculator className="h-3 w-3 mr-0.5" />
+                                  CALCULADO
                                 </Badge>
                               ) : collectionType === 'AUTOMATICA' && (
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
@@ -702,6 +749,34 @@ export function IndicadoresTable({
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      {(() => {
+                        const stars = getReliabilityStars(indicator);
+                        const colorMap: Record<number, string> = {
+                          5: 'text-severity-good border-severity-good/40 bg-severity-good/10',
+                          4: 'text-violet-600 border-violet-500/40 bg-violet-500/10',
+                          3: 'text-severity-moderate border-severity-moderate/40 bg-severity-moderate/10',
+                          2: 'text-severity-critical border-severity-critical/40 bg-severity-critical/10',
+                          1: 'text-muted-foreground border-muted bg-muted/30',
+                        };
+                        return (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Badge variant="outline" className={cn('gap-1 font-mono text-xs', colorMap[stars])}>
+                                <Star className="h-3 w-3 fill-current" />
+                                {stars}/5
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {collectionType === 'AUTOMATICA' && 'Coletado de API oficial'}
+                              {collectionType === 'DERIVED' && 'Calculado a partir de fontes oficiais'}
+                              {collectionType === 'MANUAL' && 'Entrada manual do usuário'}
+                              {collectionType === 'ESTIMADA' && 'Estimativa sem fonte primária'}
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>{renderTierEditor(indicator)}</TableCell>
                     <TableCell>

@@ -21,6 +21,7 @@ import {
   Hotel,
   Globe,
   Sparkles,
+  Calculator,
 } from 'lucide-react';
 
 interface IndicadoresFiltersProps {
@@ -43,7 +44,7 @@ interface IndicadoresFiltersProps {
   availableThemes: string[];
   tierCounts: { SMALL: number; MEDIUM: number; COMPLETE: number };
   scopeCounts: { territorial: number; enterprise: number; both: number };
-  collectionCounts: { AUTOMATICA: number; MANUAL: number; ESTIMADA: number };
+  collectionCounts: { AUTOMATICA: number; DERIVED: number; MANUAL: number; ESTIMADA: number };
   mandalaCounts: { core: number; mandala: number };
   indicatorsTotal: number;
   onNewIndicator: () => void;
@@ -180,6 +181,12 @@ export function IndicadoresFilters({
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-3 w-3 text-severity-good" />
                 API/Automático ({collectionCounts.AUTOMATICA})
+              </div>
+            </SelectItem>
+            <SelectItem value="DERIVED">
+              <div className="flex items-center gap-2">
+                <Calculator className="h-3 w-3 text-violet-600" />
+                Calculado ({collectionCounts.DERIVED})
               </div>
             </SelectItem>
             <SelectItem value="MANUAL">

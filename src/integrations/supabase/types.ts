@@ -230,6 +230,7 @@ export type Database = {
           calculated_at: string | null
           created_at: string
           creator_user_id: string | null
+          data_updated_at: string | null
           destination_id: string
           diagnostic_type: string | null
           expand_with_mandala: boolean
@@ -241,6 +242,7 @@ export type Database = {
           igma_flags: Json | null
           igma_interpretation: Json | null
           marketing_blocked: boolean | null
+          needs_recalculation: boolean
           next_review_recommended_at: string | null
           org_id: string
           period_end: string | null
@@ -257,6 +259,7 @@ export type Database = {
           calculated_at?: string | null
           created_at?: string
           creator_user_id?: string | null
+          data_updated_at?: string | null
           destination_id: string
           diagnostic_type?: string | null
           expand_with_mandala?: boolean
@@ -268,6 +271,7 @@ export type Database = {
           igma_flags?: Json | null
           igma_interpretation?: Json | null
           marketing_blocked?: boolean | null
+          needs_recalculation?: boolean
           next_review_recommended_at?: string | null
           org_id: string
           period_end?: string | null
@@ -284,6 +288,7 @@ export type Database = {
           calculated_at?: string | null
           created_at?: string
           creator_user_id?: string | null
+          data_updated_at?: string | null
           destination_id?: string
           diagnostic_type?: string | null
           expand_with_mandala?: boolean
@@ -295,6 +300,7 @@ export type Database = {
           igma_flags?: Json | null
           igma_interpretation?: Json | null
           marketing_blocked?: boolean | null
+          needs_recalculation?: boolean
           next_review_recommended_at?: string | null
           org_id?: string
           period_end?: string | null

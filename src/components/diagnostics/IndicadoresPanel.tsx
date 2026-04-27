@@ -116,6 +116,7 @@ export function IndicadoresPanel() {
   // Count by collection type
   const collectionCounts = useMemo(() => ({
     AUTOMATICA: indicators.filter(i => getEffectiveCollection(i) === 'AUTOMATICA').length,
+    DERIVED: indicators.filter(i => getEffectiveCollection(i) === 'DERIVED').length,
     MANUAL: indicators.filter(i => getEffectiveCollection(i) === 'MANUAL').length,
     ESTIMADA: indicators.filter(i => getEffectiveCollection(i) === 'ESTIMADA').length,
   }), [indicators]);
