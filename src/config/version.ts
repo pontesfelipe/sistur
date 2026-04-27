@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 33,
+  minor: 34,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.34.0",
+    date: "2026-04-27",
+    type: "minor" as const,
+    changes: [
+      "Fase 5 — Etapas 2 e 3: Normalizações específicas + Ingestão automática (IQA & Receita Turística). (1) Engine calculate-assessment ganha helper `normalizeSpecific(code, value)` que tem precedência sobre MIN_MAX/BANDS/BINARY: CAPAG mapeia A=1,0 / B=0,75 / C=0,40 / D=0,10 (STN); mínimos constitucionais aplicam bonificação por cumprimento — saúde CF Art.198 (12%→0,50, 15%→0,85, 25%→1,0) e educação CF Art.212 (20%→0,50, 25%→0,85, 35%→1,0); IQA usa faixas oficiais ANA (Ótima ≥79=0,95 / Boa 51–79=0,75 / Aceitável 36–51=0,55 / Ruim 19–36=0,30 / Péssima <19=0,10). (2) Receita turística determinística — nova tabela `tourism_spending_reference` (UF/segmento/origem com gasto médio diário em BRL e permanência média; seed MTur 2023: nacional R$320/4,2 dias, internacional R$540/11,5 dias) e função `compute_tourism_revenue_per_capita(ibge)` calculando (visitantes_nac × gasto_nac × estada_nac + visitantes_intl × gasto_intl × estada_intl) ÷ população, com fallback UF→BR. (3) Pipeline de derivados (`compute_derived_indicators`) agora emite automaticamente `igma_receita_turistica_per_capita` quando há dados de visitantes + população. (4) IQA — função edge ingest-ana já existente passa a alimentar o pipeline; normalização centralizada no engine garante interpretação correta sem dependência de min/max manuais. RLS: tabela de referência tem leitura pública e escrita restrita a ADMIN."
+    ]
+  },
   {
     version: "1.33.0",
     date: "2026-04-27",
