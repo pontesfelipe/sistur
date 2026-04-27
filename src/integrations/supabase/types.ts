@@ -7468,6 +7468,42 @@ export type Database = {
         }
         Relationships: []
       }
+      tourism_spending_reference: {
+        Row: {
+          avg_daily_spending_brl: number
+          avg_stay_days: number
+          created_at: string
+          id: string
+          origin: string
+          reference_year: number
+          segment: string
+          source: string
+          uf: string
+        }
+        Insert: {
+          avg_daily_spending_brl: number
+          avg_stay_days?: number
+          created_at?: string
+          id?: string
+          origin: string
+          reference_year: number
+          segment?: string
+          source?: string
+          uf: string
+        }
+        Update: {
+          avg_daily_spending_brl?: number
+          avg_stay_days?: number
+          created_at?: string
+          id?: string
+          origin?: string
+          reference_year?: number
+          segment?: string
+          source?: string
+          uf?: string
+        }
+        Relationships: []
+      }
       track_instance_items: {
         Row: {
           item_id: string
@@ -8024,6 +8060,10 @@ export type Database = {
           reference_year: number
           source_code: string
         }[]
+      }
+      compute_tourism_revenue_per_capita: {
+        Args: { p_ibge_code: string }
+        Returns: number
       }
       create_lms_audit_log: {
         Args: {
