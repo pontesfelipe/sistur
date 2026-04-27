@@ -14,9 +14,13 @@ import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePane
 import { AssessmentAuditTrail } from '@/components/diagnostics/AssessmentAuditTrail';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
+import { PrescriptionModeView } from '@/components/diagnostics/PrescriptionModeView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -61,6 +65,7 @@ import {
   EyeOff,
   BookOpen,
   RefreshCw,
+  Target,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -119,7 +124,7 @@ const normalizeDisplayScore = (
   return score;
 };
 
-const VALID_TABS = ['radiografia', 'categorias', 'normalizacao', 'indicadores', 'gargalos', 'tratamento', 'projeto'] as const;
+const VALID_TABS = ['radiografia', 'categorias', 'normalizacao', 'indicadores', 'gargalos', 'tratamento', 'prescricao', 'projeto'] as const;
 type DetalheTab = typeof VALID_TABS[number];
 
 const DiagnosticoDetalhe = () => {
@@ -146,6 +151,18 @@ const DiagnosticoDetalhe = () => {
     const params = new URLSearchParams(searchParams);
     if (value === 'radiografia') params.delete('tab');
     else params.set('tab', value);
+    setSearchParams(params, { replace: true });
+  };
+
+  // Modo Prescrição: filtra todas as visualizações para mostrar apenas
+  // indicadores em Atenção/Crítico (gatilhos de prescrição EDU).
+  const prescriptionModeFromUrl = searchParams.get('prescription') === '1';
+  const [prescriptionMode, setPrescriptionMode] = useState(prescriptionModeFromUrl);
+  const togglePrescriptionMode = (enabled: boolean) => {
+    setPrescriptionMode(enabled);
+    const params = new URLSearchParams(searchParams);
+    if (enabled) params.set('prescription', '1');
+    else params.delete('prescription');
     setSearchParams(params, { replace: true });
   };
 
@@ -231,6 +248,12 @@ const DiagnosticoDetalhe = () => {
     return rawIndicatorScores.filter((s: any) => !ignoredIndicatorIds.has(s.indicator_id));
   }, [rawIndicatorScores, ignoredIndicatorIds]);
 
+  // Prescription mode filter: only Atenção/Crítico indicators (score ≤ 0.66)
+  const displayedIndicatorScores = useMemo(() => {
+    if (!prescriptionMode) return indicatorScores;
+    return indicatorScores.filter((s: any) => s.score <= 0.66);
+  }, [indicatorScores, prescriptionMode]);
+
   // Build set of ignored indicator codes for filtering issues/recommendations
   const ignoredIndicatorCodes = useMemo(() => {
     return new Set(ignoredIndicators.map(i => i.code));
@@ -249,6 +272,15 @@ const DiagnosticoDetalhe = () => {
       return hasActiveIndicator;
     });
   }, [rawIssues, ignoredIndicatorCodes]);
+
+  // Issues displayed honor prescription mode (only Atenção/Crítico already by definition,
+  // but we still filter out non-critical/atencao here for safety).
+  const displayedIssues = useMemo(() => {
+    if (!prescriptionMode) return issues;
+    return issues.filter(
+      (i: any) => i.severity === 'CRITICO' || i.severity === 'ATENCAO'
+    );
+  }, [issues, prescriptionMode]);
 
   // Filter recommendations: remove those linked to filtered-out issues
   const filteredIssueIds = useMemo(() => new Set(issues.map((i: any) => i.id)), [issues]);
@@ -493,6 +525,19 @@ const DiagnosticoDetalhe = () => {
           </Link>
         </Button>
         <div className="flex gap-2">
+          {isCalculated && (
+            <div className="flex items-center gap-2 mr-2 px-3 py-1.5 rounded-lg border bg-card">
+              <Target className={cn("h-4 w-4", prescriptionMode ? "text-primary" : "text-muted-foreground")} />
+              <Label htmlFor="prescription-mode" className="text-sm cursor-pointer">
+                Modo Prescrição
+              </Label>
+              <Switch
+                id="prescription-mode"
+                checked={prescriptionMode}
+                onCheckedChange={togglePrescriptionMode}
+              />
+            </div>
+          )}
           {/* Edit / Reset to Draft */}
           {isCalculated && (
             <AlertDialog>
@@ -777,7 +822,7 @@ const DiagnosticoDetalhe = () => {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className={cn(
             "grid w-full",
-            isEnterprise ? "max-w-4xl grid-cols-7" : "max-w-3xl grid-cols-6"
+            isEnterprise ? "max-w-5xl grid-cols-8" : "max-w-4xl grid-cols-7"
           )}>
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -804,6 +849,10 @@ const DiagnosticoDetalhe = () => {
             <TabsTrigger value="tratamento" className="gap-2">
               <GraduationCap className="h-4 w-4" />
               <span className="hidden sm:inline">Tratamento</span>
+            </TabsTrigger>
+            <TabsTrigger value="prescricao" className="gap-2">
+              <Target className="h-4 w-4" />
+              <span className="hidden sm:inline">Prescrição</span>
             </TabsTrigger>
             <TabsTrigger value="projeto" className="gap-2">
               <FolderKanban className="h-4 w-4" />
@@ -913,7 +962,17 @@ const DiagnosticoDetalhe = () => {
           {/* Indicadores Tab */}
           <TabsContent value="indicadores" className="space-y-6">
             <DataProvenancePanel indicatorValues={indicatorValues as any} />
-            <IndicatorScoresView indicatorScores={indicatorScores as any} />
+            {prescriptionMode && (
+              <Alert>
+                <Target className="h-4 w-4" />
+                <AlertTitle>Modo Prescrição ativo</AlertTitle>
+                <AlertDescription>
+                  Exibindo apenas indicadores em Atenção ou Crítico
+                  ({displayedIndicatorScores.length} de {indicatorScores.length}).
+                </AlertDescription>
+              </Alert>
+            )}
+            <IndicatorScoresView indicatorScores={displayedIndicatorScores as any} />
             {assessment?.id && assessment?.calculated_at && (
               <AssessmentAuditTrail assessmentId={assessment.id} />
             )}
@@ -921,7 +980,7 @@ const DiagnosticoDetalhe = () => {
 
           {/* Gargalos Tab */}
           <TabsContent value="gargalos" className="space-y-4">
-            <IssuesView issues={issues as any} />
+            <IssuesView issues={displayedIssues as any} />
           </TabsContent>
 
           {/* Tratamento Tab */}
@@ -943,7 +1002,12 @@ const DiagnosticoDetalhe = () => {
             </div>
 
             {/* EDU Recommendations Panel - Now uses prescriptions from DB */}
-            <EduRecommendationsPanel indicatorScores={indicatorScores as any} assessmentId={id} />
+            <EduRecommendationsPanel indicatorScores={displayedIndicatorScores as any} assessmentId={id} />
+          </TabsContent>
+
+          {/* Prescrição Tab — visão consolidada */}
+          <TabsContent value="prescricao" className="space-y-6">
+            <PrescriptionModeView assessmentId={id!} indicatorScores={indicatorScores as any} />
           </TabsContent>
 
           {/* Projeto Tab */}

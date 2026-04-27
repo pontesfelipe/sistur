@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 31,
+  minor: 32,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.32.0",
+    date: "2026-04-27",
+    type: "minor" as const,
+    changes: [
+      "Fase 4 — Etapa 2: Modo Prescrição. Novo toggle global 'Modo Prescrição' no header do DiagnosticoDetalhe (visível quando o diagnóstico está calculado), com persistência via querystring (?prescription=1) para preservar o estado em refresh e deep-links. Quando ativado, as abas Indicadores, Gargalos e Tratamento são filtradas para mostrar apenas indicadores em Atenção/Crítico (score ≤ 0,66) — gatilhos efetivos do motor de prescrição EDU. A aba Indicadores exibe um Alert informando 'X de Y indicadores' filtrados, e a aba Tratamento usa o mesmo subset para alimentar o EduRecommendationsPanel. Nova aba dedicada 'Prescrição' (Target icon) com componente PrescriptionModeView consolidado: cabeçalho explicativo, KPIs (Gatilhos identificados, Com prescrição EDU, Cobertura %), e listagem agrupada por pilar (RA/OE/AO) mostrando cada indicador disparador com badge de severidade, código, score, justificativa e curso EDU vinculado (com link direto). Indicadores sem curso correspondente recebem badge 'Sem curso' destacando lacunas no catálogo. TabsList ajustado para 7 colunas (territorial) / 8 colunas (enterprise)."
+    ]
+  },
   {
     version: "1.31.0",
     date: "2026-04-27",
