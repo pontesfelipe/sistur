@@ -94,16 +94,13 @@ const categoryIcons: Record<string, React.ComponentType<{ className?: string }>>
   'AO_MARKETING': Megaphone,
 };
 
-const getSeverityFromScore = (score: number): 'CRITICO' | 'MODERADO' | 'BOM' => {
-  if (score < 0.4) return 'CRITICO';
-  if (score < 0.67) return 'MODERADO';
-  return 'BOM';
-};
+import { getSeverityFromScore, SEVERITY_INFO, type Severity } from '@/types/sistur';
 
-const severityConfig = {
-  CRITICO: { label: 'Crítico', color: 'text-severity-critical', bgColor: 'bg-severity-critical/10', progressColor: '[&>div]:bg-severity-critical' },
-  MODERADO: { label: 'Atenção', color: 'text-severity-moderate', bgColor: 'bg-severity-moderate/10', progressColor: '[&>div]:bg-severity-moderate' },
-  BOM: { label: 'Adequado', color: 'text-severity-good', bgColor: 'bg-severity-good/10', progressColor: '[&>div]:bg-severity-good' },
+// UI-specific config (progressColor) extends the canonical SEVERITY_INFO
+const severityConfig: Record<Severity, { label: string; color: string; bgColor: string; progressColor: string }> = {
+  CRITICO: { ...SEVERITY_INFO.CRITICO, bgColor: 'bg-severity-critical/10', progressColor: '[&>div]:bg-severity-critical' },
+  MODERADO: { ...SEVERITY_INFO.MODERADO, bgColor: 'bg-severity-moderate/10', progressColor: '[&>div]:bg-severity-moderate' },
+  BOM: { ...SEVERITY_INFO.BOM, bgColor: 'bg-severity-good/10', progressColor: '[&>div]:bg-severity-good' },
 };
 
 export function EnterpriseCategoriesView({ indicatorScores }: EnterpriseCategoriesViewProps) {
