@@ -1430,6 +1430,29 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         await writer.close();
 
         if (fullContent) {
+          // Fase 5 — Trava de coerência LLM v1.38.0: detecta contradições
+          // entre texto gerado e valores numéricos auditados. Quando há
+          // contradições, prefixa um aviso ao relatório salvo.
+          let finalContent = fullContent;
+          try {
+            const coherenceWarnings = detectCoherenceWarnings(fullContent, auditTrail || []);
+            if (coherenceWarnings.length > 0) {
+              const banner = [
+                '> ⚠️ **Avisos de coerência detectados pelo motor de validação determinística (v1.38.0):**',
+                ...coherenceWarnings.map((w) => `> - ${w}`),
+                '> ',
+                '> Os valores numéricos da tabela de auditoria são a fonte de verdade — o texto narrativo deve ser revisado nos pontos sinalizados.',
+                '',
+                '---',
+                '',
+              ].join('\n');
+              finalContent = banner + fullContent;
+              console.warn('Coherence warnings:', coherenceWarnings);
+            }
+          } catch (cohErr) {
+            console.error('Coherence check failed (non-blocking):', cohErr);
+          }
+
           const { data: existing } = await supabaseAdmin
             .from('generated_reports')
             .select('id')
@@ -1440,14 +1463,14 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           if (existing) {
             const { error } = await supabaseAdmin
               .from('generated_reports')
-              .update({ report_content: fullContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
+              .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
               .eq('id', existing.id);
             if (error) console.error('Error updating report:', error);
             else console.log('Report updated successfully');
           } else {
             const { error } = await supabaseAdmin
               .from('generated_reports')
-              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: fullContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment });
+              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: finalContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment });
             if (error) console.error('Error saving report:', error);
             else console.log('Report saved successfully');
           }
