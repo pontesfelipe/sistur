@@ -235,7 +235,7 @@ function formatActionPlans(actionPlans: any[]): string {
 }
 
 function formatIGMAFlags(flags: Record<string, boolean> | null): string {
-  if (!flags) return 'Nenhuma flag IGMA ativa.';
+  if (!flags) return 'Flags IGMA ainda não calculadas para este diagnóstico.';
   const flagDescriptions: Record<string, string> = {
     RA_LIMITATION: 'Limitação Estrutural do Território - RA crítico bloqueia compensação por outros pilares',
     GOVERNANCE_BLOCK: 'Fragilidade de Governança - AO crítico impede efetividade de ações de mercado',
