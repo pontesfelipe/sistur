@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 9,
+  patch: 10,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.10",
+    date: "2026-04-27",
+    type: "patch" as const,
+    changes: [
+      "Segurança: política de inserção da tabela edu_notifications restrita. Antes, qualquer usuário autenticado podia criar notificações apontando para qualquer outro user_id (WITH CHECK = true), abrindo brecha para falsificar avisos de prova/prazo/certificado para colegas. Agora, inserções diretas pela API só são aceitas se auth.uid() = user_id ou se o autor for ADMIN. Os fluxos automáticos (notify_classroom_assignment_targets, extend_assignment_due_date, grant_extra_attempts e demais triggers/funções) continuam funcionando porque rodam como SECURITY DEFINER e bypassam RLS. Nenhuma mudança de UI necessária.",
+    ],
+  },
   {
     version: "1.30.9",
     date: "2026-04-17",
