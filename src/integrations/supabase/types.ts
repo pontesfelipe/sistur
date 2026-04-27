@@ -8194,6 +8194,10 @@ export type Database = {
         Args: { p_professor_id: string }
         Returns: number
       }
+      get_severity_5_levels: {
+        Args: { p_score: number }
+        Returns: Database["public"]["Enums"]["severity_type"]
+      }
       get_stale_assessments: {
         Args: never
         Returns: {
