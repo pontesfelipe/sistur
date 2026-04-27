@@ -173,7 +173,8 @@ function interpretIGMA(
   }
 
   // REGRA 5 — TERRITÓRIO ANTES DO MARKETING
-  if (RA?.severity === "CRITICO" || AO?.severity === "CRITICO") {
+  // Fase 5: bloqueio dispara em CRITICO ou ATENÇÃO baixa (<0.40) em RA/AO.
+  if (isCriticalOrLowAttention(RA?.score) || isCriticalOrLowAttention(AO?.score)) {
     flags.MARKETING_BLOCKED = true;
     blockedActions.push("MARKETING");
     
@@ -209,7 +210,10 @@ function interpretIGMA(
     nextReviewMonths = 9;
   } else if (RA?.severity === "MODERADO" || AO?.severity === "MODERADO" || OE?.severity === "MODERADO") {
     nextReviewMonths = 12;
+  } else if (RA?.severity === "BOM" || AO?.severity === "BOM" || OE?.severity === "BOM") {
+    nextReviewMonths = 15;
   } else {
+    // Todos FORTE/EXCELENTE
     nextReviewMonths = 18;
   }
   
