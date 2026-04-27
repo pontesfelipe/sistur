@@ -179,11 +179,11 @@ function formatIndicatorsByCategory(indicatorScores: any[]): string {
   for (const [theme, scores] of Object.entries(byTheme)) {
     if (scores.length === 0) continue;
     const avg = scores.reduce((sum, s) => sum + s.score, 0) / scores.length;
-    const status = avg <= 0.33 ? 'CRÍTICO' : avg <= 0.66 ? 'ATENÇÃO' : 'BOM';
+    const status = statusFromScore(avg);
     
     result += `\n## ${theme} (Status: ${status}, Média: ${formatPctBR(avg)}%)\n`;
     scores.forEach((s: any) => {
-      const kpiStatus = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
+      const kpiStatus = statusFromScore(s.score);
       const benchmarkMin = s.indicators?.benchmark_min !== null ? s.indicators.benchmark_min : 'N/A';
       const benchmarkMax = s.indicators?.benchmark_max !== null ? s.indicators.benchmark_max : 'N/A';
       const benchmarkTarget = s.indicators?.benchmark_target !== null ? s.indicators.benchmark_target : 'N/A';
