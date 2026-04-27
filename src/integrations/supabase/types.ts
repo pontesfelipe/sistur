@@ -4381,6 +4381,8 @@ export type Database = {
           direction: Database["public"]["Enums"]["indicator_direction"]
           edu_suggested_titles: Json
           enterprise_category_id: string | null
+          evidence_url: string | null
+          formula: string | null
           id: string
           igma_dimension: string | null
           indicator_scope:
@@ -4429,6 +4431,8 @@ export type Database = {
           direction?: Database["public"]["Enums"]["indicator_direction"]
           edu_suggested_titles?: Json
           enterprise_category_id?: string | null
+          evidence_url?: string | null
+          formula?: string | null
           id?: string
           igma_dimension?: string | null
           indicator_scope?:
@@ -4477,6 +4481,8 @@ export type Database = {
           direction?: Database["public"]["Enums"]["indicator_direction"]
           edu_suggested_titles?: Json
           enterprise_category_id?: string | null
+          evidence_url?: string | null
+          formula?: string | null
           id?: string
           igma_dimension?: string | null
           indicator_scope?:

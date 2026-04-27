@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 37,
+  minor: 38,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.0",
+    date: "2026-04-27",
+    type: "minor" as const,
+    changes: [
+      "Fechamento dos 3 últimos gaps do relatório técnico. (1) Schema dos indicadores: adicionados campos `formula` (texto da fórmula de cálculo) e `evidence_url` (link da fonte oficial) à tabela `indicators`; campos solicitados que já existiam sob outros nomes — `direction` (polaridade), `data_source`/`collection_type` (tipo de dado: API_OFICIAL/MANUAL/CALCULADO/ESTIMADO), `notes` (observação) e `reliability_score` (gerado de collection_type) — receberam COMMENTs explicitando o uso. (2) Renomeação semântica de leitos: o indicador CADASTUR `igma_leitos_por_habitante` foi renomeado para `igma_leitos_hospedagem_por_habitante` (e nome para 'Leitos de Hospedagem por Habitante') para evitar ambiguidade com o indicador hospitalar SUS `igma_leitos_hospitalares_sus_por_mil_habitantes` (DATASUS); referências em external_indicator_values e assessment_indicator_audit foram migradas. (3) Trava de coerência LLM no generate-report: novo helper determinístico `detectCoherenceWarnings` valida o texto gerado pela IA contra os valores numéricos auditados — detecta afirmações falsas sobre cumprimento dos mínimos constitucionais de saúde (CF Art.198, 15%) e educação (CF Art.212, 25%), confusão entre leitos CADASTUR e DATASUS, e contradições de status (ex: 'Adequado' afirmado quando o score é Crítico). Quando há contradições, um banner de aviso é prefixado ao relatório salvo, sinalizando ao leitor que os valores da tabela de auditoria são a fonte de verdade."
+    ]
+  },
   {
     version: "1.37.0",
     date: "2026-04-27",
