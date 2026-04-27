@@ -215,6 +215,8 @@ function formatIndicatorValues(indicatorValues: any[]): string {
     if (iv.indicators?.theme) meta.push(`Tema: ${iv.indicators.theme}`);
     if (iv.indicators?.value_format) meta.push(`Formato: ${iv.indicators.value_format}`);
     if (iv.source) meta.push(`Fonte: ${iv.source}`);
+    const isDerived = iv._source === 'derived' || (typeof iv.source === 'string' && iv.source.includes('+IBGE'));
+    if (isDerived) meta.push('Tipo: CALCULADO (derivado de fontes oficiais)');
     const extras: string[] = [];
     if (iv.value_text) extras.push(`    Evidência: ${iv.value_text}`);
     if (iv.reference_date) extras.push(`    Referência: ${iv.reference_date}`);
