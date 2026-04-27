@@ -59,6 +59,7 @@ import {
   Layers,
   EyeOff,
   BookOpen,
+  RefreshCw,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -679,6 +680,27 @@ const DiagnosticoDetalhe = () => {
         hasReport={!!existingReport}
         hasProjects={!!existingProjects && existingProjects.length > 0}
       />
+
+      {/* Stale banner: dados oficiais atualizados após o último cálculo */}
+      {isCalculated && (assessment as any).needs_recalculation && (
+        <div className="my-6 p-4 rounded-xl border border-amber-500/40 bg-amber-50/50 dark:bg-amber-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium text-amber-700 dark:text-amber-300">
+                Dados oficiais atualizados após o último cálculo
+              </p>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Novos valores de fontes oficiais (IBGE, CADASTUR, STN, MTur) chegaram para este município. Recalcule para incorporá-los.
+              </p>
+            </div>
+          </div>
+          <Button onClick={handleCalculate} disabled={calculating} className="shrink-0">
+            {calculating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+            Recalcular agora
+          </Button>
+        </div>
+      )}
 
       {/* Header Card */}
       <div className="bg-card rounded-xl border p-6 mb-6">

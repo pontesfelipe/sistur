@@ -1517,6 +1517,10 @@ serve(async (req) => {
       .update({
         status: "CALCULATED",
         calculated_at: new Date().toISOString(),
+        // Recálculo concluído — limpa o flag de "precisa recalcular"
+        // que pode ter sido marcado pelo trigger trg_mark_assessments_stale_external_data
+        // quando dados de external_indicator_values foram inseridos/atualizados.
+        needs_recalculation: false,
         next_review_recommended_at: igmaResult.nextReviewRecommendedAt,
         igma_flags: Object.entries(igmaResult.flags)
           .filter(([_, v]) => v)

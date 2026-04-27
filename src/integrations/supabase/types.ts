@@ -7871,6 +7871,10 @@ export type Database = {
       }
       cancel_my_license: { Args: { p_reason: string }; Returns: undefined }
       cleanup_exam_tracking_data: { Args: never; Returns: undefined }
+      clear_assessment_stale_flag: {
+        Args: { p_assessment_id: string }
+        Returns: undefined
+      }
       complete_user_onboarding: {
         Args: { _role: string; _system_access: string; _user_id: string }
         Returns: boolean
@@ -8009,6 +8013,21 @@ export type Database = {
       get_professor_referral_count: {
         Args: { p_professor_id: string }
         Returns: number
+      }
+      get_stale_assessments: {
+        Args: never
+        Returns: {
+          age_hours: number
+          assessment_id: string
+          calculated_at: string
+          data_updated_at: string
+          destination_id: string
+          destination_name: string
+          ibge_code: string
+          org_id: string
+          org_name: string
+          title: string
+        }[]
       }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
       grant_extra_attempts: {

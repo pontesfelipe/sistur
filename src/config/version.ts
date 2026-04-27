@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 15,
+  patch: 16,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.16",
+    date: "2026-04-27",
+    type: "patch" as const,
+    changes: [
+      "Recálculo afetados & comparativo temporal — três melhorias médias. (1) Nova aba 'Recálculo' no painel admin de Indicadores (StaleAssessmentsPanel) que lista todos os diagnósticos marcados com needs_recalculation=true via RPC get_stale_assessments (escopo ADMIN global / ORG_ADMIN local), com botão 'Recalcular todos' em lote (progressivo) e ação individual por linha. Edge function calculate-assessment agora limpa needs_recalculation=false ao concluir o cálculo. (2) Banner stale no topo do DiagnosticoDetalhe quando o assessment está calculado mas needs_recalculation=true, com CTA 'Recalcular agora'. (3) Comparativo temporal no generate-report: busca a rodada anterior calculada do mesmo destination_id e injeta no prompt um bloco COMPARATIVO TEMPORAL com deltas de pilares (I-RA/I-OE/I-AO em pontos percentuais), Score Final e classificação, mais top 8 maiores variações por indicador (≥1 pp) ordenadas por magnitude, com instruções para o LLM dedicar uma seção à evolução, destacar conquistas (≥3 pp) e regressões (≥2 pp), sem inventar comparações entre municípios. Nova RPC clear_assessment_stale_flag(assessment_id) disponível para uso futuro."
+    ]
+  },
   {
     version: "1.30.15",
     date: "2026-04-27",

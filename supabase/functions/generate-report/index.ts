@@ -1030,6 +1030,95 @@ serve(async (req) => {
     // Catalog indicators by code so we can decorate external benchmarks with
     // names/units from the indicators table.
     const indicatorsByCode = new Map<string, any>();
+
+    // ============================================================
+    // COMPARATIVO TEMPORAL — busca rodada anterior do mesmo destino
+    // ============================================================
+    let previousAssessment: any = null;
+    let previousPillarScores: any[] = [];
+    let previousIndicatorScores: any[] = [];
+    if (destinationId && assessment.calculated_at) {
+      const { data: prevA } = await supabase
+        .from('assessments')
+        .select('id, title, calculated_at, period_end, final_score, final_classification')
+        .eq('destination_id', destinationId)
+        .eq('status', 'CALCULATED')
+        .neq('id', assessmentId)
+        .lt('calculated_at', assessment.calculated_at)
+        .order('calculated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (prevA) {
+        previousAssessment = prevA;
+        const [prevPillarsRes, prevIndScoresRes] = await Promise.all([
+          supabase.from('pillar_scores').select('pillar, score, severity').eq('assessment_id', prevA.id),
+          supabase.from('indicator_scores').select('score_pct, indicators(code, name, pillar)').eq('assessment_id', prevA.id),
+        ]);
+        previousPillarScores = prevPillarsRes.data || [];
+        previousIndicatorScores = prevIndScoresRes.data || [];
+      }
+    }
+
+    const temporalComparisonBlock = (() => {
+      if (!previousAssessment) return '';
+      const prevByPillar: Record<string, number> = {};
+      previousPillarScores.forEach((p: any) => { prevByPillar[p.pillar] = Number(p.score) || 0; });
+      const fmtDelta = (cur?: number, prev?: number) => {
+        if (cur === undefined || cur === null || prev === undefined || prev === null) return '—';
+        const d = (cur - prev) * 100;
+        const sign = d > 0 ? '+' : '';
+        const arrow = d > 1 ? '↑' : d < -1 ? '↓' : '→';
+        return `${arrow} ${sign}${d.toFixed(1)} pp`;
+      };
+      const ra = pillarScores?.RA?.score, oe = pillarScores?.OE?.score, ao = pillarScores?.AO?.score;
+      const prevRa = prevByPillar.RA, prevOe = prevByPillar.OE, prevAo = prevByPillar.AO;
+
+      const prevIndByCode: Record<string, number> = {};
+      previousIndicatorScores.forEach((s: any) => {
+        const code = s.indicators?.code;
+        if (code) prevIndByCode[code] = Number(s.score_pct) || 0;
+      });
+      const movers = indicatorScores
+        .map((s: any) => {
+          const code = s.indicators?.code;
+          const prev = prevIndByCode[code];
+          if (prev === undefined || s.score_pct === null || s.score_pct === undefined) return null;
+          const delta = Number(s.score_pct) - prev;
+          return { code, name: s.indicators?.name, pillar: s.indicators?.pillar, cur: Number(s.score_pct), prev, delta };
+        })
+        .filter((x: any) => x && Math.abs(x.delta) >= 1)
+        .sort((a: any, b: any) => Math.abs(b.delta) - Math.abs(a.delta))
+        .slice(0, 8);
+
+      const moversText = movers.length > 0
+        ? movers.map((m: any) => `  - [${m.pillar}] ${m.name} (${m.code}): ${m.prev.toFixed(1)}% → ${m.cur.toFixed(1)}% (${m.delta > 0 ? '+' : ''}${m.delta.toFixed(1)} pp)`).join('\n')
+        : '  Nenhum indicador com variação ≥ 1 pp.';
+
+      const finalDelta = (assessment.final_score !== null && previousAssessment.final_score !== null)
+        ? ` (${(((assessment.final_score || 0) - (previousAssessment.final_score || 0)) * 100).toFixed(1)} pp)`
+        : '';
+
+      return `=== COMPARATIVO TEMPORAL — RODADA ANTERIOR ===
+Rodada anterior: "${previousAssessment.title}" (calculada em ${formatDateOnlyBR(previousAssessment.calculated_at)})
+Score Final SISTUR (interno): ${previousAssessment.final_score !== null ? formatPctBR(previousAssessment.final_score) + '%' : 'N/D'} → ${assessment.final_score !== null ? formatPctBR(assessment.final_score) + '%' : 'N/D'}${finalDelta}
+Classificação: ${previousAssessment.final_classification || 'N/D'} → ${assessment.final_classification || 'N/D'}
+
+Variação por pilar (atual vs anterior):
+- I-RA: ${prevRa !== undefined ? formatPctBR(prevRa) + '%' : 'N/D'} → ${ra !== undefined ? formatPctBR(ra) + '%' : 'N/D'}  ${fmtDelta(ra, prevRa)}
+- I-OE: ${prevOe !== undefined ? formatPctBR(prevOe) + '%' : 'N/D'} → ${oe !== undefined ? formatPctBR(oe) + '%' : 'N/D'}  ${fmtDelta(oe, prevOe)}
+- I-AO: ${prevAo !== undefined ? formatPctBR(prevAo) + '%' : 'N/D'} → ${ao !== undefined ? formatPctBR(ao) + '%' : 'N/D'}  ${fmtDelta(ao, prevAo)}
+
+Maiores variações por indicador (até 8, ordenadas por magnitude absoluta):
+${moversText}
+
+INSTRUÇÕES SOBRE COMPARATIVO TEMPORAL:
+- Dedique uma seção à evolução do destino entre a rodada anterior e a atual.
+- Destaque conquistas (variações positivas ≥ 3 pp) e regressões (variações negativas ≥ 2 pp).
+- Quando houver regressão em pilar inteiro, conecte com possíveis causas estruturais visíveis nos indicadores.
+- NUNCA invente comparações com outros municípios — comparativos só com a rodada anterior do próprio destino.
+`;
+    })();
+
     indicatorScores.forEach((is: any) => {
       if (is.indicators?.code) indicatorsByCode.set(is.indicators.code, is.indicators);
     });
@@ -1087,6 +1176,7 @@ ${formatIGMAFlags(assessment.igma_flags as Record<string, boolean> | null)}
 ALERTAS:
 ${alertsText}
 
+${temporalComparisonBlock}
 INDICADORES:
 ${indicatorsDetail}
 
