@@ -437,8 +437,16 @@ function formatExternalBenchmarks(externalValues: any[], indicatorsById: Map<str
   externalValues.forEach((ev: any) => {
     const indicator = indicatorsById.get(ev.indicator_code);
     const indicatorName = indicator?.name || ev.indicator_code;
-    const unit = indicator?.unit || '';
-    const rawValue = ev.raw_value !== null && ev.raw_value !== undefined ? ev.raw_value : (ev.raw_value_text || 'N/A');
+    // Format respecting indicator's value_format (PERCENTAGE/CURRENCY/COUNT…)
+    let rawValue: string;
+    let unit = indicator?.unit || '';
+    if (ev.raw_value !== null && ev.raw_value !== undefined) {
+      const fmt = formatRawIndicatorValue(ev.raw_value, indicator);
+      rawValue = fmt.display;
+      unit = fmt.unitSuffix;
+    } else {
+      rawValue = ev.raw_value_text || 'N/A';
+    }
     const sourceLabel = sourceLabels[ev.source_code] || ev.source_code;
     const year = ev.reference_year ? ` (${ev.reference_year})` : '';
     const validated = ev.validated ? ' ✓validado' : '';
