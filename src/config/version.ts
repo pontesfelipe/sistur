@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 32,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.32.1",
+    date: "2026-04-27",
+    type: "patch" as const,
+    changes: [
+      "Unificação da nomenclatura de severidade — eliminação de incongruências entre engine (CRITICO/MODERADO/BOM) e UI (Crítico/Atenção/Adequado). (1) Novos helpers canônicos `getSeverityFromScore` e `getSeverityLabel` em `src/types/sistur.ts` como única fonte de verdade para classificar score→severidade e exibir labels — limites oficiais ≤0,33 Crítico, 0,34–0,66 Atenção, ≥0,67 Adequado. (2) Refatorados componentes que duplicavam mapeamento manual: EnterpriseCategoriesView (corrigido também limite incorreto 0.4→0.34), PublicDestinationCard, IndicatorSimulator, NormalizationCalculator, RoundComparisonView, useDashboardData, useEnterpriseDashboardData, pages/Index.tsx — todos agora consomem `getSeverityFromScore` + `SEVERITY_INFO`. (3) Corrigido PrescriptionModeView (criado em v1.32.0) que usava strings inexistentes 'ATENCAO'/'ADEQUADO' fora do enum — agora usa Severity canônica. (4) Marcado `getSeverityFromScore` no igmaEngine.ts como helper interno do motor IGMA, com nota apontando para o canônico em types/sistur. Decisão arquitetural: enum DB permanece CRITICO/MODERADO/BOM (preserva snapshots históricos e prescriptions); apenas a camada de exibição é unificada para Crítico/Atenção/Adequado. Zero mudança no engine de cálculo, prescrições ou IGMA."
+    ]
+  },
   {
     version: "1.32.0",
     date: "2026-04-27",
