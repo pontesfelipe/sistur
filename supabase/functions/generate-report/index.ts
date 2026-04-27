@@ -121,7 +121,7 @@ function formatIndicatorScores(indicatorScores: any[]): string {
     result += `  Críticos: ${critical.length}, Atenção: ${moderate.length}, Adequados: ${scores.length - critical.length - moderate.length}\n`;
 
     scores.forEach((s: any) => {
-      const status = s.score <= 0.33 ? 'CRÍTICO' : s.score <= 0.66 ? 'ATENÇÃO' : 'BOM';
+      const status = statusFromScore(s.score);
       const benchmark = s.indicators?.benchmark_target ? ` (benchmark: ${s.indicators.benchmark_target})` : '';
       const normRefs = (s.min_ref_used !== null && s.min_ref_used !== undefined
         && s.max_ref_used !== null && s.max_ref_used !== undefined)
@@ -139,10 +139,10 @@ function formatIndicatorScores(indicatorScores: any[]): string {
         ? ` | Bruto: ${rawDisplay.unitSuffix ? `${rawDisplay.display} ${rawDisplay.unitSuffix}` : rawDisplay.display}`
         : '';
       const normStr = (s.value_normalized !== null && s.value_normalized !== undefined)
-        ? ` | Índice: ${Number(s.value_normalized).toFixed(3)}`
+        ? ` | Índice: ${formatNumberBR(Number(s.value_normalized), 3)}`
         : '';
       const scoreStr = (s.score_pct !== null && s.score_pct !== undefined)
-        ? `${Number(s.score_pct).toFixed(1)}%`
+        ? `${formatNumberBR(Number(s.score_pct), 1)}%`
         : `${formatPctBR(s.score)}%`;
 
       // ===== Procedência e selo de auditoria =====
