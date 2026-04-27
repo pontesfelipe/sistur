@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 34,
+  minor: 35,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.35.0",
+    date: "2026-04-27",
+    type: "minor" as const,
+    changes: [
+      "Fase 5 — Etapa 4: Motor de relatório com audit trail + BRL canônico. (1) generate-report agora consome `assessment_indicator_audit` (trilha de procedência populada pelo engine calculate-assessment) e injeta tabela markdown com Pilar/Indicador/Valor/Score/Origem/Peso/Detalhe no prompt do LLM, logo após VALORES BRUTOS. (2) Nova instrução obrigatória no prompt: toda conclusão deve citar a origem do dado (OFFICIAL_API → IBGE/DATASUS/STN/CADASTUR/INEP/ANA, DERIVED → fórmula determinística, MANUAL → autodeclarada, ESTIMADA → estimativa interna), com prioridade analítica para fontes oficiais e derivadas. Dados MANUAL/ESTIMADA ficam explicitamente sinalizados como tal no relatório. (3) Padrão BRL canônico reforçado: prefixo R$, vírgula decimal, ponto de milhar (ex: R$ 1.234.567,89) — vetando 'BRL', '$' e notação científica. Os formatadores formatRawIndicatorValue (CURRENCY/CURRENCY_THOUSANDS/CURRENCY_MILLIONS) já emitiam o padrão; agora a regra é também imposta ao LLM via system instruction."
+    ]
+  },
   {
     version: "1.34.0",
     date: "2026-04-27",
