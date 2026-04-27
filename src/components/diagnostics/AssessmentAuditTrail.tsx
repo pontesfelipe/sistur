@@ -48,6 +48,12 @@ export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string })
     retry: false,
   });
 
+  const auditRows = data || [];
+  const rows = useMemo(
+    () => (filter ? auditRows.filter((r) => r.source_type === filter) : auditRows),
+    [auditRows, filter],
+  );
+
   if (isLoading) return <Skeleton className="h-64 w-full" />;
 
   // Silently hide the audit panel for viewers without permission instead of crashing.
@@ -64,7 +70,7 @@ export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string })
     );
   }
 
-  if (!data || data.length === 0) {
+  if (auditRows.length === 0) {
     return (
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground text-sm">
@@ -76,15 +82,10 @@ export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string })
   }
 
   // Summary by source type
-  const summary = data.reduce((acc, r) => {
+  const summary = auditRows.reduce((acc, r) => {
     acc[r.source_type] = (acc[r.source_type] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
-
-  const rows = useMemo(
-    () => (filter ? data.filter((r) => r.source_type === filter) : data),
-    [data, filter],
-  );
 
   return (
     <Card>
@@ -96,7 +97,7 @@ export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string })
               Trilha de Auditoria — Procedência por Indicador
             </CardTitle>
             <CardDescription>
-              {data.length} indicadores processados neste cálculo
+              {auditRows.length} indicadores processados neste cálculo
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-1.5 items-center">
