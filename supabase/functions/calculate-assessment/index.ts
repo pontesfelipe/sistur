@@ -335,6 +335,58 @@ function normalizeValue(
 }
 
 /**
+ * Normalizações específicas (Fase 5 — Etapa 2).
+ * Aplica regras canônicas para indicadores que NÃO seguem MIN_MAX/BANDS/BINARY genérico:
+ *   - CAPAG (A=1.0, B=0.75, C=0.40, D=0.10) — STN
+ *   - Mínimos constitucionais (saúde 15%, educação 25%) — bonificação por cumprimento
+ *   - Receita turística per capita derivada (fluxo × gasto × permanência / população)
+ * Retorna `null` se o código não tiver regra específica → cai para `normalizeValue` padrão.
+ */
+function normalizeSpecific(code: string, value: number | null): number | null {
+  if (value === null || value === undefined) return null;
+  const c = (code || "").toLowerCase();
+
+  // ── CAPAG (Capacidade de Pagamento — STN) ────────────────────────────
+  // Aceita tanto valor numérico (1=A,2=B,3=C,4=D) quanto string já convertida em score
+  if (c.includes("capag")) {
+    // Convenção: valores 1..4 representam A..D
+    if (value >= 1 && value <= 4) {
+      const map: Record<number, number> = { 1: 1.0, 2: 0.75, 3: 0.40, 4: 0.10 };
+      return map[Math.round(value)] ?? 0.40;
+    }
+    // Se já vier como score 0-1, usa direto
+    if (value >= 0 && value <= 1) return value;
+  }
+
+  // ── Mínimo constitucional saúde (CF Art. 198 — 15% RCL) ──────────────
+  if (c.includes("aplicacao_saude") || c.includes("gasto_saude_pct") || c === "igma_saude_minimo") {
+    // value = % aplicado em saúde
+    if (value >= 15) return Math.min(1, 0.85 + ((value - 15) / 10) * 0.15); // 15%→0.85, 25%→1.0
+    if (value >= 12) return 0.50 + ((value - 12) / 3) * 0.35;               // 12%→0.50, 15%→0.85
+    return Math.max(0, value / 12 * 0.50);                                  // <12% inconstitucional
+  }
+
+  // ── Mínimo constitucional educação (CF Art. 212 — 25% impostos) ──────
+  if (c.includes("aplicacao_educacao") || c.includes("gasto_educacao_pct") || c === "igma_educacao_minimo") {
+    if (value >= 25) return Math.min(1, 0.85 + ((value - 25) / 10) * 0.15); // 25%→0.85, 35%→1.0
+    if (value >= 20) return 0.50 + ((value - 20) / 5) * 0.35;               // 20%→0.50, 25%→0.85
+    return Math.max(0, value / 20 * 0.50);                                  // <20% inconstitucional
+  }
+
+  // ── IQA (Índice de Qualidade da Água — ANA, escala 0-100) ────────────
+  if (c.includes("iqa") || c === "igma_qualidade_agua") {
+    // Faixas oficiais ANA: Ótima ≥79, Boa 51-79, Aceitável 36-51, Ruim 19-36, Péssima <19
+    if (value >= 79) return 0.95;
+    if (value >= 51) return 0.75;
+    if (value >= 36) return 0.55;
+    if (value >= 19) return 0.30;
+    return 0.10;
+  }
+
+  return null; // Sem regra específica
+}
+
+/**
  * Régua oficial SISTUR — 5 níveis (Fase 5).
  *   EXCELENTE ≥ 0.90
  *   FORTE     0.80–0.89
