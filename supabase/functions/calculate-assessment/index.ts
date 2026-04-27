@@ -1587,6 +1587,23 @@ serve(async (req) => {
       console.error("Error updating assessment:", updateError);
     }
 
+    // Phase 3 — Persist indicator audit trail
+    try {
+      await supabase
+        .from("assessment_indicator_audit")
+        .delete()
+        .eq("assessment_id", assessment_id);
+      if (auditEntries.length > 0) {
+        const { error: auditErr } = await supabase
+          .from("assessment_indicator_audit")
+          .insert(auditEntries);
+        if (auditErr) console.error("Audit insert error:", auditErr);
+        else console.log(`[Audit] Inserted ${auditEntries.length} audit entries`);
+      }
+    } catch (e) {
+      console.error("Audit trail failed:", e);
+    }
+
     // 12.1 Action plans generation removed — unified with Projects module.
     // See memory: architecture/project-diagnostic-unification
 
