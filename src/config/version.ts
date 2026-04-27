@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 35,
+  minor: 36,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.36.0",
+    date: "2026-04-27",
+    type: "minor" as const,
+    changes: [
+      "Fase 5 — Polimento final: (1) Tokens semânticos `--severity-strong` (HSL 152 65% 32%) e `--severity-excellent` (HSL 158 75% 24%) adicionados ao design system (index.css + tailwind.config.ts); SEVERITY_INFO.FORTE/EXCELENTE e componentes EnterpriseCategoriesView/PillarGauge migrados de `bg-emerald-600/700` (cor crua Tailwind) para classes semânticas `bg-severity-strong/excellent`. (2) Seed completo da `tourism_spending_reference` para as 27 UFs (MTur/Embratur 2023): valores calibrados por região — Norte/Centro-Oeste com permanência menor, Nordeste com maior tempo de estadia internacional (BA/CE/PE ~11–12 dias), Sudeste com maior gasto diário (RJ R$420/dia nacional, R$680/dia internacional). Total: 56 linhas (27 UFs × 2 origens + fallback BR). A função compute_tourism_revenue_per_capita agora usa parâmetros locais reais em vez de cair sempre no fallback BR. (3) Cron jobs (pg_cron + pg_net) agendados para todas as ingestões oficiais: ingest-cadastur (trimestral, 1º de jan/abr/jul/out 03:00 UTC), ingest-mapa-turismo (trimestral 04:00 UTC), ingest-ana (anual, 1º de fevereiro 05:00 UTC), ingest-tse (bienal, 1º de maio 06:00 UTC), ingest-anatel (mensal, dia 5 02:00 UTC). (4) Suíte de testes Vitest para `getSeverityFromScore` (escala 0-1 e 0-100), `getLegacySeverityFromScore` (colapso para 3 níveis) e validação de que SEVERITY_INFO usa apenas tokens `text-severity-*`/`bg-severity-*`. 9 novos testes — todos passam."
+    ]
+  },
   {
     version: "1.35.0",
     date: "2026-04-27",
