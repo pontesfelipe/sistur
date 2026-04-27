@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 36,
+  minor: 37,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.37.0",
+    date: "2026-04-27",
+    type: "minor" as const,
+    changes: [
+      "Operacional Fase 5 — Observabilidade das ingestões oficiais. (1) Nova tabela `ingestion_runs` (histórico unificado de execuções das edge functions ingest-*: function_name, triggered_by cron|manual|admin|system, status running|success|failed|partial, records_processed/failed, duration_ms, error_message, metadata JSON). RLS restrita a ADMIN. (2) Nova RPC `get_ingestion_health()` consolida última execução por função com cadência esperada (CADASTUR/Mapa do Turismo trimestral, ANA anual, TSE bienal, ANATEL mensal) e classifica health em healthy/partial/failed/stale/never_run conforme idade vs janela esperada. (3) Nova RPC `get_mtur_reference_freshness()` para lembrete anual de revisão da `tourism_spending_reference` (sinaliza needs_review quando latest_reference_year < ano-corrente − 2). (4) Nova edge function `trigger-ingestion` com guarda ADMIN — recebe { function_name } da whitelist (5 ingest-*), grava linha 'running' em ingestion_runs, invoca a função-alvo via service-role, atualiza status final + métricas + erro. (5) Nova página admin `/admin/ingestoes` (AdminIngestionHealth) com card de freshness MTur, grid de status por função (badge healthy/partial/failed/stale + botão Smoke test) e tabela das 50 últimas execuções (auto-refresh 30s). Link 'Ingestões' adicionado ao sidebar admin. (6) Filtros clicáveis no AssessmentAuditTrail: cada badge de procedência (OFFICIAL_API/DERIVED/MANUAL/ESTIMADA) agora é um toggle que filtra a tabela; cores migradas para tokens semânticos `severity-good/moderate`, `pillar-oe`, `primary` (sem emerald/violet/blue/amber crus do Tailwind)."
+    ]
+  },
   {
     version: "1.36.0",
     date: "2026-04-27",
