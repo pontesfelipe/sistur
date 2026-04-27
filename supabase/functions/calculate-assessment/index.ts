@@ -848,6 +848,9 @@ serve(async (req) => {
       const isAutoSource = /api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn/i.test(String(ivSource));
       const confidenceLevel = isAutoSource ? 1.0 : 0.7;
 
+      // Phase 4 — Use org-specific weight override when set
+      const effectiveWeight = indicatorWeightOverrides.get(iv.indicator_id) ?? indicator.weight;
+
       indicatorScores.push({
         org_id: orgId,
         assessment_id,
@@ -862,7 +865,7 @@ serve(async (req) => {
         confidence_level: confidenceLevel,
         min_ref_used: indicator.min_ref,
         max_ref_used: indicator.max_ref,
-        weight_used: indicator.weight,
+        weight_used: effectiveWeight,
       });
 
       // Audit entry — classify source
@@ -879,14 +882,14 @@ serve(async (req) => {
         normalized_score: score,
         source_type: sourceType,
         source_detail: ivSource ? String(ivSource).slice(0, 200) : null,
-        weight: indicator.weight,
+        weight: effectiveWeight,
       });
 
       // Aggregate by pillar
       const pillar = indicator.pillar;
       if (pillarData[pillar]) {
         pillarData[pillar].scores.push(score);
-        pillarData[pillar].weights.push(indicator.weight);
+        pillarData[pillar].weights.push(effectiveWeight);
 
         // Aggregate by theme within pillar
         const theme = indicator.theme;
