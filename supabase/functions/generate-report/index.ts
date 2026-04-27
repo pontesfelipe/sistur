@@ -271,6 +271,9 @@ function formatDataSnapshots(snapshots: any[]): string {
     'STN': 'STN / Tesouro Nacional',
     'CADASTUR': 'CADASTUR',
     'MAPA_TURISMO': 'Mapa do Turismo Brasileiro',
+    'CADASTUR+IBGE': 'CADASTUR ÷ IBGE (derivado)',
+    'STN+IBGE': 'STN ÷ IBGE (derivado)',
+    'MAPA_TURISMO+IBGE': 'Mapa do Turismo ÷ IBGE (derivado)',
     'MANUAL': 'Preenchimento Manual',
   };
 
