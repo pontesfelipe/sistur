@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 30,
-  patch: 11,
+  patch: 12,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.30.12",
+    date: "2026-04-27",
+    type: "patch" as const,
+    changes: [
+      "Fase 2 do plano de relatórios — Bloco A (motor de dados): reclassificação de 76 indicadores IGMA que estavam marcados como MANUAL (preenchimento via formulário) para suas fontes oficiais brasileiras corretas. Distribuição final: 63 → IBGE (sustentabilidade, infraestrutura, mobilidade, socioeconômico, segurança pública), 13 → DATASUS (saúde e bem-estar: cobertura vacinal, expectativa de vida, óbitos evitáveis, desnutrição, atenção primária, gasto saúde, mínimo constitucional), 4 → INEP (educação: taxa de escolarização, ensino médio, ensino superior), 2 → STN (finanças públicas), e 2 índices proprietários SISTUR (IPTL e IIET) marcados como ESTIMADA/calculados (derivados de outros indicadores, não digitados manualmente). Impacto: a automação dos indicadores territoriais sobe de ~23% para ~70%; a UI do diagnóstico passará a mostrar 'Fonte oficial: IBGE/DATASUS/INEP/STN' (procedência nível 5) em vez de campo de input manual nesses indicadores; o motor de cálculo (calculate-assessment) já busca esses valores em external_indicator_values automaticamente — agora a metadata bate com o comportamento real. Bloco B (indicadores derivados, ex.: guias por 10 mil habitantes calculados a partir de CADASTUR ÷ IBGE) e Bloco C (pesos por indicador) ficam para iterações seguintes; pesos pilar (RA 35% / OE 30% / AO 35%) permanecem inalterados.",
+    ],
+  },
   {
     version: "1.30.11",
     date: "2026-04-27",
