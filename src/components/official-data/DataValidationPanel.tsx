@@ -107,10 +107,10 @@ export function DataValidationPanel({
   const validateValues = useValidateIndicatorValues();
 
   // Catalog of indicators (used to display friendly names instead of raw codes)
-  const { indicators: indicatorCatalog = [] } = useIndicators({ scope: 'all' }) as any;
+  const { indicators: indicatorCatalog = [] } = useIndicators({ scope: 'all' });
   const indicatorNameByCode = useMemo(() => {
     const map = new Map<string, string>();
-    (indicatorCatalog as Array<{ code: string; name: string }>).forEach((ind) => {
+    indicatorCatalog.forEach((ind) => {
       if (ind?.code && ind?.name) map.set(ind.code.toLowerCase(), ind.name);
     });
     return map;
@@ -471,11 +471,11 @@ export function DataValidationPanel({
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <span className="font-medium cursor-help">
-                                    {value.indicator_code.replace('igma_', '').replace('MST_', '').replace(/_/g, ' ')}
+                                    {getIndicatorDisplayName(value.indicator_code)}
                                   </span>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p className="text-xs">{value.indicator_code}</p>
+                                  <p className="text-xs font-mono">{value.indicator_code}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
