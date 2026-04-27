@@ -57,6 +57,8 @@ import {
   Globe,
   BarChart3,
   Plus,
+  Calculator,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { INDICATOR_GUIDANCE } from '@/data/enterpriseIndicatorGuidance';
@@ -625,6 +627,18 @@ export function IndicadoresTable({
                 <TableHead>Interpretação</TableHead>
                 <TableHead>
                   <Tooltip>
+                    <TooltipTrigger className="cursor-help">Confiab.</TooltipTrigger>
+                    <TooltipContent>
+                      Confiabilidade da fonte (1-5):<br/>
+                      5★ Automático (API oficial)<br/>
+                      4★ Calculado (derivado oficial)<br/>
+                      3★ Manual (entrada do usuário)<br/>
+                      2★ Estimado
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead>
+                  <Tooltip>
                     <TooltipTrigger className="cursor-help">Tier</TooltipTrigger>
                     <TooltipContent>Clique para editar o nível mínimo</TooltipContent>
                   </Tooltip>
@@ -684,6 +698,11 @@ export function IndicadoresTable({
                                   <Database className="h-3 w-3 mr-0.5" />
                                   CADASTUR
                                 </Badge>
+                              ) : collectionType === 'DERIVED' ? (
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-violet-500/50 text-violet-600 bg-violet-500/10">
+                                  <Calculator className="h-3 w-3 mr-0.5" />
+                                  CALCULADO
+                                </Badge>
                               ) : collectionType === 'AUTOMATICA' && (
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
                                   <Zap className="h-3 w-3 mr-0.5" />
@@ -730,6 +749,34 @@ export function IndicadoresTable({
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      {(() => {
+                        const stars = getReliabilityStars(indicator);
+                        const colorMap: Record<number, string> = {
+                          5: 'text-severity-good border-severity-good/40 bg-severity-good/10',
+                          4: 'text-violet-600 border-violet-500/40 bg-violet-500/10',
+                          3: 'text-severity-moderate border-severity-moderate/40 bg-severity-moderate/10',
+                          2: 'text-severity-critical border-severity-critical/40 bg-severity-critical/10',
+                          1: 'text-muted-foreground border-muted bg-muted/30',
+                        };
+                        return (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Badge variant="outline" className={cn('gap-1 font-mono text-xs', colorMap[stars])}>
+                                <Star className="h-3 w-3 fill-current" />
+                                {stars}/5
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {collectionType === 'AUTOMATICA' && 'Coletado de API oficial'}
+                              {collectionType === 'DERIVED' && 'Calculado a partir de fontes oficiais'}
+                              {collectionType === 'MANUAL' && 'Entrada manual do usuário'}
+                              {collectionType === 'ESTIMADA' && 'Estimativa sem fonte primária'}
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>{renderTierEditor(indicator)}</TableCell>
                     <TableCell>
