@@ -913,6 +913,89 @@ ESTRUTURA (MEC/ABNT):
 ## 11. Considerações Finais`;
 }
 
+/**
+ * Fase 5 — Trava de coerência LLM v1.38.0.
+ * Verifica determinísticamente se o texto gerado pela IA contradiz os valores
+ * numéricos auditados. Detecta afirmações sobre mínimos constitucionais
+ * (saúde 15% CF Art.198, educação 25% CF Art.212) inconsistentes com os
+ * valores reais, contradições de status (ex: "atende o mínimo" quando o
+ * valor está abaixo) e cita IGMA/CADASTUR vs DATASUS sem distinção.
+ * Retorna lista de warnings — vazia quando o texto está coerente.
+ */
+function detectCoherenceWarnings(
+  reportText: string,
+  auditRows: any[],
+): string[] {
+  if (!reportText || !auditRows?.length) return [];
+  const warnings: string[] = [];
+  const text = reportText.toLowerCase();
+
+  const findValue = (codeFragment: string): number | null => {
+    const row = auditRows.find((r) =>
+      String(r.indicator_code || '').toLowerCase().includes(codeFragment),
+    );
+    if (!row || row.value === null || row.value === undefined) return null;
+    return Number(row.value);
+  };
+
+  // Saúde — CF Art. 198 (mínimo 15% da receita líquida)
+  const saudeValue = findValue('saude') ?? findValue('saúde');
+  if (saudeValue !== null) {
+    const claimsMeetsMin =
+      /(saúde|saude)[^.]{0,80}(atende|cumpre|acima)[^.]{0,40}(mínimo|minimo|15%)/i.test(reportText) ||
+      /(mínimo|minimo) constitucional[^.]{0,40}(saúde|saude)[^.]{0,40}(atendid|cumprid)/i.test(reportText);
+    if (claimsMeetsMin && saudeValue < 15) {
+      warnings.push(`Texto afirma cumprimento do mínimo constitucional de saúde (15%), mas o valor auditado é ${saudeValue.toFixed(1)}%.`);
+    }
+    const claimsBelowMin = /(saúde|saude)[^.]{0,80}(abaixo|não atende|nao atende)[^.]{0,40}(mínimo|minimo|15%)/i.test(reportText);
+    if (claimsBelowMin && saudeValue >= 15) {
+      warnings.push(`Texto afirma descumprimento do mínimo constitucional de saúde, mas o valor auditado (${saudeValue.toFixed(1)}%) atende os 15%.`);
+    }
+  }
+
+  // Educação — CF Art. 212 (mínimo 25%)
+  const educValue = findValue('educacao') ?? findValue('educação');
+  if (educValue !== null) {
+    const claimsMeetsMin =
+      /(educação|educacao)[^.]{0,80}(atende|cumpre|acima)[^.]{0,40}(mínimo|minimo|25%)/i.test(reportText) ||
+      /(mínimo|minimo) constitucional[^.]{0,40}(educação|educacao)[^.]{0,40}(atendid|cumprid)/i.test(reportText);
+    if (claimsMeetsMin && educValue < 25) {
+      warnings.push(`Texto afirma cumprimento do mínimo constitucional de educação (25%), mas o valor auditado é ${educValue.toFixed(1)}%.`);
+    }
+    const claimsBelowMin = /(educação|educacao)[^.]{0,80}(abaixo|não atende|nao atende)[^.]{0,40}(mínimo|minimo|25%)/i.test(reportText);
+    if (claimsBelowMin && educValue >= 25) {
+      warnings.push(`Texto afirma descumprimento do mínimo constitucional de educação, mas o valor auditado (${educValue.toFixed(1)}%) atende os 25%.`);
+    }
+  }
+
+  // Confusão entre leitos de hospedagem (CADASTUR) e leitos hospitalares (DATASUS/SUS)
+  const hasHospedagemRow = auditRows.some((r) => String(r.indicator_code || '').includes('leitos_hospedagem'));
+  const hasSusRow = auditRows.some((r) => String(r.indicator_code || '').includes('leitos_hospitalares_sus'));
+  if (hasHospedagemRow && hasSusRow) {
+    // Se o texto fala de "leitos" perto de "saúde/SUS" mas o número citado bate com hospedagem, sinaliza
+    const ambiguous = /leitos? (hospital|sus|saúde|saude)[^.]{0,80}cadastur/i.test(reportText) ||
+                      /cadastur[^.]{0,80}leitos? (hospital|sus|saúde|saude)/i.test(reportText);
+    if (ambiguous) {
+      warnings.push('Texto associa CADASTUR a leitos hospitalares/SUS — leitos do CADASTUR são de meios de hospedagem; leitos hospitalares vêm do DATASUS.');
+    }
+  }
+
+  // Status declarado vs status real (Adequado afirmado quando score é Crítico)
+  for (const row of auditRows) {
+    const score = Number(row.normalized_score);
+    if (!Number.isFinite(score)) continue;
+    const code = String(row.indicator_code || '').toLowerCase();
+    if (!code) continue;
+    const escapedCode = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$1');
+    const nearby = new RegExp(`${escapedCode}[^.]{0,120}(adequado|excelente|forte)`, 'i');
+    if (score < 0.34 && nearby.test(reportText)) {
+      warnings.push(`Indicador ${row.indicator_code} é classificado como Crítico (score ${(score * 100).toFixed(0)}%) mas o texto o descreve como Adequado/Forte/Excelente.`);
+    }
+  }
+
+  return warnings;
+}
+
 // ========== MAIN ==========
 
 serve(async (req) => {
