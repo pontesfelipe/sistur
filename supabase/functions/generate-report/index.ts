@@ -1223,6 +1223,14 @@ ${formatIndicatorValues(indicatorValues)}
 ${isEnterprise && enterpriseValues.length > 0 ? formatEnterpriseValues(enterpriseValues) : ''}
 ${!isEnterprise ? formatExternalBenchmarks(externalValues, indicatorsByCode) : ''}
 ${dataSnapshots.length > 0 ? formatDataSnapshots(dataSnapshots) : ''}
+=== TRILHA DE AUDITORIA (PROCEDÊNCIA POR INDICADOR) ===
+Use esta tabela para JUSTIFICAR cada conclusão citando origem do dado e peso aplicado.
+Origens possíveis: OFFICIAL_API (IBGE/DATASUS/STN/CADASTUR/INEP/ANA — máxima confiança),
+DERIVED (calculado por fórmula determinística do engine), ESTIMADA (estimativa interna),
+MANUAL (entrada do usuário — citar como autodeclarada).
+
+${formatAuditTrail(auditTrail)}
+
 GARGALOS (com evidências e indicadores que dispararam cada problema):
 ${issuesText}
 
