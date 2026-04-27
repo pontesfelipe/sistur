@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Activity, AlertTriangle, CalendarClock, CheckCircle2, PlayCircle, RefreshCw, XCircle } from 'lucide-react';
+import { AlertTriangle, CalendarClock, CheckCircle2, PlayCircle, RefreshCw, XCircle, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -135,31 +135,24 @@ export default function AdminIngestionHealth() {
   });
 
   return (
-    <AppLayout>
+    <AppLayout
+      title="Saúde das Ingestões Oficiais"
+      subtitle="Monitoramento e teste manual das funções automáticas que coletam dados oficiais (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo)."
+      actions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            qc.invalidateQueries({ queryKey: ['ingestion-health'] });
+            qc.invalidateQueries({ queryKey: ['ingestion-runs-recent'] });
+            qc.invalidateQueries({ queryKey: ['mtur-freshness'] });
+          }}
+        >
+          <RefreshCw className="h-4 w-4 mr-2" /> Atualizar
+        </Button>
+      }
+    >
       <div className="container mx-auto py-8 space-y-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-              <Activity className="h-6 w-6 text-primary" />
-              Saúde das Ingestões Oficiais
-            </h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              Monitoramento e teste manual das funções automáticas que coletam dados oficiais
-              (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo).
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              qc.invalidateQueries({ queryKey: ['ingestion-health'] });
-              qc.invalidateQueries({ queryKey: ['ingestion-runs-recent'] });
-              qc.invalidateQueries({ queryKey: ['mtur-freshness'] });
-            }}
-          >
-            <RefreshCw className="h-4 w-4 mr-2" /> Atualizar
-          </Button>
-        </div>
 
         {/* MTur reference freshness */}
         {mturQuery.data && (
