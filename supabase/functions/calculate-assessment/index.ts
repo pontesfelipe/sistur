@@ -1,4 +1,4 @@
-// SISTUR Calculate Assessment Engine v1.11.3
+// SISTUR Calculate Assessment Engine v1.33.0 — Régua 5 níveis (Fase 5)
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -34,7 +34,11 @@ interface Course {
 }
 
 type TerritorialInterpretation = "ESTRUTURAL" | "GESTAO" | "ENTREGA";
-type SeverityType = "CRITICO" | "MODERADO" | "BOM";
+/**
+ * Régua oficial SISTUR — 5 níveis canônicos (Fase 5).
+ * Snapshots históricos podem trazer apenas CRITICO/MODERADO/BOM.
+ */
+type SeverityType = "CRITICO" | "MODERADO" | "BOM" | "FORTE" | "EXCELENTE";
 type PillarType = "RA" | "OE" | "AO";
 
 // ============================================================
@@ -326,12 +330,31 @@ function normalizeValue(
   return score;
 }
 
-// Determine severity based on score (per SISTUR spec)
-// Adequado: ≥0.67, Atenção: 0.34-0.66, Crítico: ≤0.33
-function getSeverity(score: number): "CRITICO" | "MODERADO" | "BOM" {
-  if (score <= 0.33) return "CRITICO";
-  if (score <= 0.66) return "MODERADO";
-  return "BOM";
+/**
+ * Régua oficial SISTUR — 5 níveis (Fase 5).
+ *   EXCELENTE ≥ 0.90
+ *   FORTE     0.80–0.89
+ *   BOM       0.67–0.79  (Adequado)
+ *   MODERADO  0.34–0.66  (Atenção)
+ *   CRITICO   < 0.34
+ */
+function getSeverity(score: number): SeverityType {
+  const s = score > 1 ? score / 100 : score;
+  if (s >= 0.90) return "EXCELENTE";
+  if (s >= 0.80) return "FORTE";
+  if (s >= 0.67) return "BOM";
+  if (s >= 0.34) return "MODERADO";
+  return "CRITICO";
+}
+
+/** Helpers para bloqueios IGMA com limites mais finos (Fase 5). */
+function isCritical(sev: SeverityType | undefined): boolean {
+  return sev === "CRITICO";
+}
+function isCriticalOrLowAttention(score: number | undefined): boolean {
+  if (score === undefined) return false;
+  const s = score > 1 ? score / 100 : score;
+  return s < 0.40; // CRITICO ou ATENÇÃO baixa
 }
 
 serve(async (req) => {
