@@ -34,6 +34,7 @@ import {
   useValidateIndicatorValues,
 } from '@/hooks/useOfficialData';
 import { useAuth } from '@/hooks/useAuth';
+import { useIndicators } from '@/hooks/useIndicators';
 import {
   EMPTY_SELECT_VALUE,
   formatIndicatorFieldDisplayValue,
@@ -104,6 +105,23 @@ export function DataValidationPanel({
   const { data: rawValues = [], isLoading } = useExternalIndicatorValues(ibgeCode, orgId);
   const fetchOfficialData = useFetchOfficialData();
   const validateValues = useValidateIndicatorValues();
+
+  // Catalog of indicators (used to display friendly names instead of raw codes)
+  const { indicators: indicatorCatalog = [] } = useIndicators({ scope: 'all' }) as any;
+  const indicatorNameByCode = useMemo(() => {
+    const map = new Map<string, string>();
+    (indicatorCatalog as Array<{ code: string; name: string }>).forEach((ind) => {
+      if (ind?.code && ind?.name) map.set(ind.code.toLowerCase(), ind.name);
+    });
+    return map;
+  }, [indicatorCatalog]);
+
+  const getIndicatorDisplayName = (code: string): string => {
+    const friendly = indicatorNameByCode.get(code.toLowerCase());
+    if (friendly) return friendly;
+    // Fallback: clean up the code if no name is found in the catalog
+    return code.replace('igma_', '').replace('MST_', '').replace(/_/g, ' ');
+  };
 
   // Always fetch fresh data from all sources when the panel mounts for a new diagnostic
   useEffect(() => {
