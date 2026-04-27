@@ -228,8 +228,8 @@ export const SEVERITY_INFO: Record<Severity, { label: string; color: string; bgC
   CRITICO:   { label: 'Crítico',   color: 'text-severity-critical', bgColor: 'bg-severity-critical' },
   MODERADO:  { label: 'Atenção',   color: 'text-severity-moderate', bgColor: 'bg-severity-moderate' },
   BOM:       { label: 'Adequado',  color: 'text-severity-good',     bgColor: 'bg-severity-good' },
-  FORTE:     { label: 'Forte',     color: 'text-emerald-600',       bgColor: 'bg-emerald-600' },
-  EXCELENTE: { label: 'Excelente', color: 'text-emerald-700',       bgColor: 'bg-emerald-700' },
+  FORTE:     { label: 'Forte',     color: 'text-severity-strong',    bgColor: 'bg-severity-strong' },
+  EXCELENTE: { label: 'Excelente', color: 'text-severity-excellent', bgColor: 'bg-severity-excellent' },
 };
 
 /**

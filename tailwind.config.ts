@@ -73,6 +73,8 @@ export default {
           critical: "hsl(var(--severity-critical))",
           moderate: "hsl(var(--severity-moderate))",
           good: "hsl(var(--severity-good))",
+          strong: "hsl(var(--severity-strong))",
+          excellent: "hsl(var(--severity-excellent))",
         },
       },
       borderRadius: {

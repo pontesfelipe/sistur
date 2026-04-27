@@ -66,6 +66,8 @@
     --severity-critical: 3 84% 49%;
     --severity-moderate: 48 100% 45%;
     --severity-good: 145 60% 40%;
+    --severity-strong: 152 65% 32%;
+    --severity-excellent: 158 75% 24%;
 
     /* Sidebar - Dark with brand blue accent */
     --sidebar-background: 0 0% 5%;
