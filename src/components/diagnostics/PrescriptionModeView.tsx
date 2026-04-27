@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, GraduationCap, ExternalLink, Target, ListChecks } from 'lucide-react';
 import { usePrescriptions } from '@/hooks/usePrescriptions';
-import { PILLAR_INFO } from '@/types/sistur';
+import { PILLAR_INFO, SEVERITY_INFO, getSeverityFromScore, type Severity } from '@/types/sistur';
 
 interface Props {
   assessmentId: string;
@@ -18,12 +18,6 @@ interface Props {
     indicator?: { id: string; code: string; name: string; pillar: string };
   }>;
 }
-
-const severityFromScore = (score: number): 'CRITICO' | 'ATENCAO' | 'ADEQUADO' => {
-  if (score <= 0.33) return 'CRITICO';
-  if (score <= 0.66) return 'ATENCAO';
-  return 'ADEQUADO';
-};
 
 /**
  * Modo Prescrição — Aba consolidada
@@ -39,7 +33,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
       .filter((s) => s.score <= 0.66 && s.indicator)
       .map((s) => ({
         ...s,
-        severity: severityFromScore(s.score),
+        severity: getSeverityFromScore(s.score),
       }))
       .sort((a, b) => a.score - b.score);
   }, [indicatorScores]);
@@ -183,7 +177,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
                             variant={trigger.severity === 'CRITICO' ? 'destructive' : 'default'}
                             className="text-xs"
                           >
-                            {trigger.severity === 'CRITICO' ? 'Crítico' : 'Atenção'}
+                            {SEVERITY_INFO[trigger.severity as Severity].label}
                           </Badge>
                           <span className="text-xs text-muted-foreground font-mono">
                             {trigger.indicator?.code}

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { getSeverityFromScore } from '@/types/sistur';
 
 export interface EnterpriseKPIs {
   avgRevPAR: number | null;
@@ -158,10 +159,7 @@ export function useAggregatedEnterprisePillarScores(destinationId?: string) {
 
       const aggregatedScores = Object.entries(pillarAggregates).map(([pillar, data]) => {
         const avgScore = data.scores.reduce((a, b) => a + b, 0) / data.scores.length;
-        let severity: 'CRITICO' | 'MODERADO' | 'BOM' = 'BOM';
-        if (avgScore <= 0.33) severity = 'CRITICO';
-        else if (avgScore <= 0.66) severity = 'MODERADO';
-        
+        const severity = getSeverityFromScore(avgScore);
         return {
           id: pillar,
           pillar: pillar as 'RA' | 'OE' | 'AO',

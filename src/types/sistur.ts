@@ -225,6 +225,29 @@ export const SEVERITY_INFO: Record<Severity, { label: string; color: string; bgC
   BOM: { label: 'Adequado', color: 'text-severity-good', bgColor: 'bg-severity-good' },
 };
 
+/**
+ * Canonical severity helper from a normalized score (0–1).
+ * Régua oficial SISTUR (3 níveis canônicos):
+ *   CRITICO   ≤ 0,33   (Crítico)
+ *   MODERADO  0,34–0,66 (Atenção)
+ *   BOM       ≥ 0,67   (Adequado)
+ * Use SEMPRE esta função em qualquer ponto da UI/lib que precise classificar
+ * um score — nunca duplique limites em componentes individuais.
+ */
+export function getSeverityFromScore(score: number): Severity {
+  if (score <= 0.33) return 'CRITICO';
+  if (score <= 0.66) return 'MODERADO';
+  return 'BOM';
+}
+
+/**
+ * Canonical user-facing label for a severity. Always returns the official
+ * Portuguese term (Crítico / Atenção / Adequado), never the legacy enum key.
+ */
+export function getSeverityLabel(severity: Severity): string {
+  return SEVERITY_INFO[severity].label;
+}
+
 // Territorial interpretation metadata
 export const INTERPRETATION_INFO: Record<TerritorialInterpretation, { label: string; description: string; color: string }> = {
   ESTRUTURAL: {

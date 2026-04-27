@@ -241,8 +241,13 @@ export function interpretIGMA(input: IGMAInput): IGMAOutput {
 }
 
 /**
- * Determina a severidade baseada no score (spec SISTUR)
- * Adequado: ≥0.67, Atenção: 0.34-0.66, Crítico: ≤0.33
+ * Determina a severidade baseada no score (spec SISTUR).
+ * Adequado: ≥0.67, Atenção: 0.34-0.66, Crítico: ≤0.33.
+ *
+ * IMPORTANTE: este é o helper canônico para uso dentro do motor IGMA.
+ * Para componentes de UI fora do igmaEngine, prefira importar
+ * `getSeverityFromScore` de `@/types/sistur` (mesma implementação,
+ * mantida intencionalmente alinhada).
  */
 export function getSeverityFromScore(score: number): SeverityType {
   if (score <= 0.33) return 'CRITICO';

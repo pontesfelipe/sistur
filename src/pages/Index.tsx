@@ -21,6 +21,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { getSeverityFromScore } from '@/types/sistur';
 import { 
   MapPin, 
   ClipboardList, 
@@ -239,7 +240,7 @@ const Index = () => {
           return {
             pillar: pillar as 'RA' | 'OE' | 'AO',
             score: avg,
-            severity: avg <= 0.33 ? 'CRITICO' : avg <= 0.66 ? 'MODERADO' : 'BOM',
+            severity: getSeverityFromScore(avg),
           };
         });
       }
