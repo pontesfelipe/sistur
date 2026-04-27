@@ -18,6 +18,36 @@ function formatPctBR(score: number): string {
 }
 
 /**
+ * Fase 5 — Etapa 4: Tabela de procedência (audit trail) por indicador.
+ * Cada linha alimentada pelo engine garante que a IA consiga justificar
+ * o score citando origem (OFFICIAL_API, DERIVED, MANUAL, ESTIMADA),
+ * valor bruto, score normalizado e peso efetivo aplicado.
+ */
+function formatAuditTrail(rows: any[]): string {
+  if (!rows || rows.length === 0) {
+    return 'Nenhum registro de auditoria encontrado para este diagnóstico.';
+  }
+  const sorted = [...rows].sort((a, b) => {
+    if (a.pillar !== b.pillar) return String(a.pillar || '').localeCompare(String(b.pillar || ''));
+    return String(a.indicator_code || '').localeCompare(String(b.indicator_code || ''));
+  });
+  const header = '| Pilar | Indicador | Valor | Score | Origem | Peso | Detalhe |\n|---|---|---|---|---|---|---|';
+  const body = sorted.map((r) => {
+    const valStr = r.value === null || r.value === undefined
+      ? 'N/A'
+      : Number(r.value).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+    const scoreStr = r.normalized_score === null || r.normalized_score === undefined
+      ? 'N/A'
+      : `${(Number(r.normalized_score) * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}%`;
+    const detail = r.source_detail
+      ? String(r.source_detail).slice(0, 60).replace(/\|/g, ' ')
+      : '—';
+    return `| ${r.pillar || '—'} | ${r.indicator_code || '—'} | ${valStr} | ${scoreStr} | ${r.source_type || 'MANUAL'} | ${r.weight ?? '—'} | ${detail} |`;
+  }).join('\n');
+  return `${header}\n${body}`;
+}
+
+/**
  * Format a raw indicator value for the report based on its semantic
  * `value_format` flag (PERCENTAGE, CURRENCY, COUNT, etc.). Mirrors
  * `src/lib/indicatorValueFormat.ts` since Deno can't import @/lib.
