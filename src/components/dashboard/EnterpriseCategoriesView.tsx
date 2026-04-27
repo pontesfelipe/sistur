@@ -101,6 +101,8 @@ const severityConfig: Record<Severity, { label: string; color: string; bgColor: 
   CRITICO: { ...SEVERITY_INFO.CRITICO, bgColor: 'bg-severity-critical/10', progressColor: '[&>div]:bg-severity-critical' },
   MODERADO: { ...SEVERITY_INFO.MODERADO, bgColor: 'bg-severity-moderate/10', progressColor: '[&>div]:bg-severity-moderate' },
   BOM: { ...SEVERITY_INFO.BOM, bgColor: 'bg-severity-good/10', progressColor: '[&>div]:bg-severity-good' },
+  FORTE: { ...SEVERITY_INFO.FORTE, bgColor: 'bg-emerald-600/10', progressColor: '[&>div]:bg-emerald-600' },
+  EXCELENTE: { ...SEVERITY_INFO.EXCELENTE, bgColor: 'bg-emerald-700/10', progressColor: '[&>div]:bg-emerald-700' },
 };
 
 export function EnterpriseCategoriesView({ indicatorScores }: EnterpriseCategoriesViewProps) {

@@ -21,6 +21,8 @@ export function PillarGauge({ pillar, score, severity, isCritical }: PillarGauge
 
   // Color based on severity (traffic light: green=good, yellow=moderate, red=critical)
   const severityColors: Record<Severity, { stroke: string; bg: string }> = {
+    EXCELENTE: { stroke: 'stroke-emerald-700', bg: 'bg-emerald-700' },
+    FORTE: { stroke: 'stroke-emerald-600', bg: 'bg-emerald-600' },
     BOM: { stroke: 'stroke-severity-good', bg: 'bg-severity-good' },
     MODERADO: { stroke: 'stroke-severity-moderate', bg: 'bg-severity-moderate' },
     CRITICO: { stroke: 'stroke-severity-critical', bg: 'bg-severity-critical' },
