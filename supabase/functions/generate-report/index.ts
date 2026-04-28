@@ -646,12 +646,19 @@ Outras obras de apoio (citar somente se realmente usar):
 - BRASIL. Ministério do Turismo. Plano Nacional de Turismo 2024–2027. Brasília: MTur, 2024.
 - BRASIL. Constituição da República Federativa do Brasil de 1988. (Art. 198 — saúde 15%; Art. 212 — educação 25%).
 
-REGRAS DURAS:
-1. NUNCA atribuir o modelo SISTUR a 2021, 2020 ou qualquer ano diferente de 1997 (origem) ou 2007 (edição revisada).
-2. NUNCA inventar título, editora ou ano de obra de Beni. Se não tiver certeza, use a edição de 1997 ou 2007 desta lista.
-3. Ao citar Beni no corpo do texto: (BENI, 1997) para o modelo original; (BENI, 2007) para a edição revisada.
-4. Toda obra citada no texto DEVE aparecer na seção "Referências" no formato ABNT NBR 6023 desta lista.
-5. Não citar autores fora desta lista a menos que constem nos documentos da Base de Conhecimento entregues no prompt.
+REGRAS DURAS — POLÍTICA "ZERO ALUCINAÇÃO":
+1. NUNCA invente, suponha, estime ou extrapole NADA. Se um dado/ano/número/fonte não estiver presente nas seções de contexto entregues (TABELA DE AUDITORIA, VALORES BRUTOS, BENCHMARKS OFICIAIS, METADADOS DO DESTINO, BASE DE CONHECIMENTO ou nesta BIBLIOGRAFIA CANÔNICA), você NÃO pode usá-lo.
+2. NUNCA atribuir o modelo SISTUR a 2021, 2020 ou qualquer ano diferente de 1997 (origem) ou 2007 (edição revisada).
+3. NUNCA inventar título, editora ou ano de obra de Beni. Se não tiver certeza, use a edição de 1997 ou 2007 desta lista.
+4. Ao citar Beni no corpo do texto: (BENI, 1997) para o modelo original; (BENI, 2007) para a edição revisada.
+5. Toda obra citada no texto DEVE aparecer na seção "Referências" no formato ABNT NBR 6023 desta lista. NÃO cite autor/obra fora desta lista a menos que conste explicitamente nos documentos da Base de Conhecimento entregues no prompt.
+6. NÚMEROS: cada percentual, valor monetário, contagem ou ano referente ao destino DEVE corresponder exatamente a uma linha da TABELA DE AUDITORIA ou da seção VALORES BRUTOS. Se não houver dado validado para sustentar uma afirmação numérica, escreva literalmente "[dado não disponível na base validada]" — NÃO arredonde para um valor "plausível", NÃO use "aproximadamente", NÃO infira tendência sem dado.
+7. ANOS DE REFERÊNCIA: ao citar um valor, use o ano que aparece na trilha de auditoria (campo reference_year/source_detail). Se ausente, omita o ano em vez de inventar.
+8. FONTES: toda tabela/afirmação numérica DEVE indicar a fonte (IBGE, DATASUS, STN, CADASTUR, INEP, ANA, MTur, Mapa do Turismo, Manual etc.) — exatamente como aparece na trilha de auditoria. NÃO atribua um dado MANUAL a uma fonte oficial.
+9. STATUS / CLASSIFICAÇÃO: use SOMENTE a régua oficial (CRÍTICO/ATENÇÃO/ADEQUADO/FORTE/EXCELENTE) e respeite o status já calculado para cada indicador/eixo. NÃO invente "tendência de melhora", "crescimento de X%" ou "comparação histórica" sem dois pontos no tempo presentes nos dados.
+10. COMPARAÇÕES com outros municípios/regiões: somente se o valor comparado constar dos BENCHMARKS OFICIAIS injetados. Caso contrário, omita.
+11. Se faltar dado para uma seção inteira, escreva "Seção sem dados validados suficientes para análise neste ciclo." em vez de preencher com generalidades.
+12. Em caso de dúvida, PREFIRA OMITIR a inventar.
 `;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
