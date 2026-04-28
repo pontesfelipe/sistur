@@ -871,6 +871,8 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                             const valError = validationErrors[indicator.id];
                             const valRules = getValidationForIndicator(indicator as any);
                             const fieldConfig = getIndicatorFieldConfig({ code: indicator.code, normalization: indicator.normalization });
+                            const derivedInfo = getDerivedIndicatorInfo(indicator.code);
+                            const isDerived = !!derivedInfo;
                             
                             return (
                               <div key={indicator.id} className={cn(
@@ -884,6 +886,20 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       "font-medium text-sm leading-tight",
                                       isIgnored && "line-through"
                                     )}>{indicator.name}</span>
+                                    {isDerived && (
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-emerald-500/60 text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 shrink-0">
+                                            <Calculator className="h-2.5 w-2.5 mr-0.5" />
+                                            Calculado
+                                          </Badge>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-xs">
+                                          <p className="text-xs"><strong>Fórmula:</strong> {derivedInfo!.formula}</p>
+                                          <p className="text-xs mt-1 italic">Não preencha manualmente — gerado no recálculo.</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    )}
                                     {indicator.description && (
                                       <Tooltip>
                                         <TooltipTrigger>
@@ -1009,7 +1025,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           : (getIndicatorSelectValue(currentValue, indicator) || EMPTY_SELECT_VALUE)
                                         }
                                         onValueChange={(selectedValue) => handleValueChange(indicator.id, selectedValue)}
-                                        disabled={isIgnored}
+                                        disabled={isIgnored || isDerived}
                                       >
                                         <SelectTrigger
                                           className={cn(
@@ -1017,10 +1033,11 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                             valError && 'border-destructive ring-1 ring-destructive',
                                             !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
                                             !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
-                                            isIgnored && 'bg-muted cursor-not-allowed'
+                                            isIgnored && 'bg-muted cursor-not-allowed',
+                                            isDerived && 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300/60 cursor-not-allowed'
                                           )}
                                         >
-                                          <SelectValue placeholder={isIgnored ? 'Ignorado' : 'Selecionar'} />
+                                          <SelectValue placeholder={isIgnored ? 'Ignorado' : isDerived ? '🧮 Calculado automaticamente' : 'Selecionar'} />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value={EMPTY_SELECT_VALUE}>Não informado</SelectItem>
@@ -1056,16 +1073,17 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                               },
                                             }));
                                           }}
-                                          disabled={isIgnored}
+                                          disabled={isIgnored || isDerived}
                                           className={cn(
                                             'w-full',
                                             isPreFilled && !hasUnsavedChanges && 'pr-8',
                                             valError && 'border-destructive ring-1 ring-destructive',
                                             !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
                                             !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
-                                            isIgnored && 'bg-muted cursor-not-allowed'
+                                            isIgnored && 'bg-muted cursor-not-allowed',
+                                            isDerived && 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300/60 cursor-not-allowed text-emerald-800 dark:text-emerald-200'
                                           )}
-                                          placeholder={isIgnored ? 'Ignorado' : 'Valor'}
+                                          placeholder={isIgnored ? 'Ignorado' : isDerived ? '🧮 Calculado automaticamente' : 'Valor'}
                                         />
                                         {indicator.unit && (
                                           <span className="text-xs text-muted-foreground font-medium whitespace-nowrap shrink-0">

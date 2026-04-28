@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.4",
+    date: "2026-04-28",
+    type: "patch" as const,
+    changes: [
+      "UX — campos calculados claramente sinalizados no painel de pré-preenchimento. (1) DataImportPanel: indicadores derivados (IPCR, IDEB, IPTL, leitos/hab, receita per capita, IIET, I_SEMT) agora exibem badge inline 🧮 Calculado ao lado do nome — visível sem precisar expandir o item — com tooltip mostrando a fórmula e aviso 'Não preencha manualmente'. (2) O input numérico (ou Select) desses indicadores fica desabilitado, com fundo emerald, cursor not-allowed e placeholder '🧮 Calculado automaticamente', impedindo edição acidental. (3) IndicadoresTable (visão mobile): badge 🧮 Calculado adicionado ao card do indicador quando collectionType === 'DERIVED', alinhando com o que o desktop já exibia. Mantido o banner explicativo completo (fórmula + insumos + unidade) na seção expandida e no diálogo de detalhe."
+    ]
+  },
   {
     version: "1.38.3",
     date: "2026-04-28",
