@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.5",
+    date: "2026-04-28",
+    type: "patch" as const,
+    changes: [
+      "Conformidade ABNT restaurada nos exportadores .docx. (1) Novo módulo `src/lib/abntStyle.ts` centraliza constantes MEC/ABNT (NBR 14724/6024/6023): A4, margens 3/2/3/2 cm, Arial 12pt corpo / 14pt H1, entrelinha 1,5, recuo de primeira linha 1,25 cm, títulos em preto e numeração de páginas no rodapé direito. (2) `exportTechnicalDocx.ts` (Documento Técnico): margens trocadas de 1\" (1440 DXA, ~2,54 cm em todos os lados) para o padrão ABNT, corpo migrado de 11pt (size 22) para 12pt (size 24) com entrelinha 1,5, títulos H1/H2/H3 normalizados em preto (não mais azul institucional) e com `outlineLevel` p/ sumário, capa reformulada conforme NBR 14724 (instituição em caixa-alta, título centralizado, natureza do documento à direita, cidade/ano centralizados), parágrafos justificados com recuo de 1,25 cm. Tabelas e diagramas mantêm cores de apoio (permitidos como ilustrações). (3) `exportDocsDocx.ts` (Metodologia + FAQ): mesmas correções — margens, fonte, entrelinha, títulos em preto e parágrafos com recuo. Rodapé com numeração à direita em algarismos arábicos. (4) `exportReportDocx.ts` (Relatórios) já estava conforme — apenas deixado como referência canônica."
+    ]
+  },
   {
     version: "1.38.4",
     date: "2026-04-28",
