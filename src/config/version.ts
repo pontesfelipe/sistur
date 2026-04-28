@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 8,
+  patch: 9,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.9",
+    date: "2026-04-28",
+    type: "patch" as const,
+    changes: [
+      "Política 'Zero Alucinação' na geração de relatórios. (1) `CANONICAL_REFERENCES` reescrito com 12 regras duras: proíbe inventar/estimar/extrapolar qualquer número, ano, fonte ou citação que não esteja no contexto injetado (TABELA DE AUDITORIA / VALORES BRUTOS / BENCHMARKS OFICIAIS / BASE DE CONHECIMENTO / BIBLIOGRAFIA CANÔNICA); obriga usar literalmente '[dado não disponível na base validada]' quando faltar lastro; veta 'aproximadamente/cerca de/estima-se' sem fonte; veta comparações regionais sem benchmark oficial; veta tendência sem dois pontos no tempo; obriga ano de referência da auditoria; obriga fonte exata (proíbe disfarçar MANUAL como IBGE). (2) System prompts territorial e enterprise agora abrem com bloco prioritário 'POLÍTICA ZERO ALUCINAÇÃO' que sobrepõe qualquer outra regra de redação. (3) Agente IA validador (`runReportValidatorAgent`) endurecido — promovido para `gemini-2.5-pro`, limite de issues elevado de 10 para 20, e instruções reescritas com 10 categorias específicas a flagar (números sem lastro, anos divergentes, citações fora da bibliografia canônica, fontes trocadas, status invertido, comparações sem benchmark, frases evasivas que escondem invenção etc.). (4) Mantida toda a infra de auto-correção determinística + persistência em `report_validations` + banner sempre presente — agora com agente bem mais agressivo na detecção. Resultado: relatórios não podem mais 'preencher de qualquer jeito' onde faltam dados — ou citam o valor auditado, ou marcam explicitamente como indisponível."
+    ]
+  },
   {
     version: "1.38.8",
     date: "2026-04-28",
