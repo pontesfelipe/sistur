@@ -50,6 +50,7 @@ const H2_SIZE = 24;         // 12pt
 const H3_SIZE = 24;         // 12pt
 const SMALL_SIZE = 20;      // 10pt
 const LINE_SPACING = 360;   // 1.5
+const LINE_SPACING_SINGLE = 240; // 1,0 (Referências NBR 6023)
 const FIRST_LINE_INDENT = Math.round(1.25 * CM);
 
 const BORDER_COLOR = '000000';
