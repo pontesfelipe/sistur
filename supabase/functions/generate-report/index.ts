@@ -646,12 +646,19 @@ Outras obras de apoio (citar somente se realmente usar):
 - BRASIL. Ministério do Turismo. Plano Nacional de Turismo 2024–2027. Brasília: MTur, 2024.
 - BRASIL. Constituição da República Federativa do Brasil de 1988. (Art. 198 — saúde 15%; Art. 212 — educação 25%).
 
-REGRAS DURAS:
-1. NUNCA atribuir o modelo SISTUR a 2021, 2020 ou qualquer ano diferente de 1997 (origem) ou 2007 (edição revisada).
-2. NUNCA inventar título, editora ou ano de obra de Beni. Se não tiver certeza, use a edição de 1997 ou 2007 desta lista.
-3. Ao citar Beni no corpo do texto: (BENI, 1997) para o modelo original; (BENI, 2007) para a edição revisada.
-4. Toda obra citada no texto DEVE aparecer na seção "Referências" no formato ABNT NBR 6023 desta lista.
-5. Não citar autores fora desta lista a menos que constem nos documentos da Base de Conhecimento entregues no prompt.
+REGRAS DURAS — POLÍTICA "ZERO ALUCINAÇÃO":
+1. NUNCA invente, suponha, estime ou extrapole NADA. Se um dado/ano/número/fonte não estiver presente nas seções de contexto entregues (TABELA DE AUDITORIA, VALORES BRUTOS, BENCHMARKS OFICIAIS, METADADOS DO DESTINO, BASE DE CONHECIMENTO ou nesta BIBLIOGRAFIA CANÔNICA), você NÃO pode usá-lo.
+2. NUNCA atribuir o modelo SISTUR a 2021, 2020 ou qualquer ano diferente de 1997 (origem) ou 2007 (edição revisada).
+3. NUNCA inventar título, editora ou ano de obra de Beni. Se não tiver certeza, use a edição de 1997 ou 2007 desta lista.
+4. Ao citar Beni no corpo do texto: (BENI, 1997) para o modelo original; (BENI, 2007) para a edição revisada.
+5. Toda obra citada no texto DEVE aparecer na seção "Referências" no formato ABNT NBR 6023 desta lista. NÃO cite autor/obra fora desta lista a menos que conste explicitamente nos documentos da Base de Conhecimento entregues no prompt.
+6. NÚMEROS: cada percentual, valor monetário, contagem ou ano referente ao destino DEVE corresponder exatamente a uma linha da TABELA DE AUDITORIA ou da seção VALORES BRUTOS. Se não houver dado validado para sustentar uma afirmação numérica, escreva literalmente "[dado não disponível na base validada]" — NÃO arredonde para um valor "plausível", NÃO use "aproximadamente", NÃO infira tendência sem dado.
+7. ANOS DE REFERÊNCIA: ao citar um valor, use o ano que aparece na trilha de auditoria (campo reference_year/source_detail). Se ausente, omita o ano em vez de inventar.
+8. FONTES: toda tabela/afirmação numérica DEVE indicar a fonte (IBGE, DATASUS, STN, CADASTUR, INEP, ANA, MTur, Mapa do Turismo, Manual etc.) — exatamente como aparece na trilha de auditoria. NÃO atribua um dado MANUAL a uma fonte oficial.
+9. STATUS / CLASSIFICAÇÃO: use SOMENTE a régua oficial (CRÍTICO/ATENÇÃO/ADEQUADO/FORTE/EXCELENTE) e respeite o status já calculado para cada indicador/eixo. NÃO invente "tendência de melhora", "crescimento de X%" ou "comparação histórica" sem dois pontos no tempo presentes nos dados.
+10. COMPARAÇÕES com outros municípios/regiões: somente se o valor comparado constar dos BENCHMARKS OFICIAIS injetados. Caso contrário, omita.
+11. Se faltar dado para uma seção inteira, escreva "Seção sem dados validados suficientes para análise neste ciclo." em vez de preencher com generalidades.
+12. Em caso de dúvida, PREFIRA OMITIR a inventar.
 `;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
@@ -663,6 +670,12 @@ function getSystemPrompt(template: string, isEnterprise: boolean): string {
 
 function getTerritorialSystemPrompt(template: string): string {
   const common = `Você é um analista técnico em turismo público. Gere um relatório seguindo estritamente a metodologia SISTUR.
+
+POLÍTICA "ZERO ALUCINAÇÃO" (PRIORITÁRIA SOBRE QUALQUER OUTRA REGRA):
+- Use APENAS dados presentes nas seções injetadas (TABELA DE AUDITORIA, VALORES BRUTOS, BENCHMARKS OFICIAIS, METADADOS, BASE DE CONHECIMENTO e BIBLIOGRAFIA CANÔNICA).
+- NÃO invente números, anos, taxas, comparações, tendências, autores ou citações.
+- Quando faltar dado validado, escreva literalmente "[dado não disponível na base validada]" e siga em frente. NÃO use "aproximadamente", "estima-se", "cerca de" sem dado de origem.
+- Cada número apresentado DEVE bater com a TABELA DE AUDITORIA (mesmo valor, mesma fonte, mesmo ano). Cada citação bibliográfica DEVE bater com a BIBLIOGRAFIA CANÔNICA.
 
 ${BASE_METHODOLOGY}
 
@@ -846,6 +859,12 @@ ESTRUTURA OBRIGATÓRIA (MEC/ABNT):
 
 function getEnterpriseSystemPrompt(template: string): string {
   const common = `Você é um consultor estratégico em gestão hoteleira e empreendimentos turísticos. Use a metodologia SISTUR adaptada para o setor privado.
+
+POLÍTICA "ZERO ALUCINAÇÃO" (PRIORITÁRIA SOBRE QUALQUER OUTRA REGRA):
+- Use APENAS dados presentes no contexto injetado (PERFIL DO EMPREENDIMENTO, VALORES ENTERPRISE, TABELA DE AUDITORIA, REVIEWS, BASE DE CONHECIMENTO, BIBLIOGRAFIA CANÔNICA).
+- NÃO invente KPIs, ROIs, médias de mercado, tendências ou benchmarks que não estejam no contexto.
+- Quando faltar dado, escreva "[dado não disponível na base validada]" — não preencha com plausibilidade.
+- Cada número e cada citação bibliográfica DEVE corresponder ao contexto/canônico.
 
 OS TRÊS EIXOS SISTUR ENTERPRISE:
 1. I-RA — Responsabilidade Ambiental: Eficiência energética, gestão hídrica, resíduos, certificações ESG
@@ -1140,8 +1159,8 @@ async function runReportValidatorAgent(
       source_detail: r.source_detail,
     }));
 
-    const sys = `Você é um agente de auditoria factual para relatórios técnicos em turismo (SISTUR).
-Sua tarefa: comparar o RELATÓRIO contra os DADOS AUDITADOS e contra a BIBLIOGRAFIA CANÔNICA, e listar APENAS divergências verificáveis.
+    const sys = `Você é um agente de auditoria factual ESTRITO para relatórios técnicos em turismo (SISTUR).
+Sua tarefa: comparar o RELATÓRIO contra os DADOS AUDITADOS e a BIBLIOGRAFIA CANÔNICA, e listar TODA alucinação, suposição ou afirmação sem lastro.
 
 BIBLIOGRAFIA CANÔNICA (qualquer outra data/título para essas obras é ERRO):
 - BENI, M. C. Análise Estrutural do Turismo. SENAC, 1997 (1ª ed., origem do modelo SISTUR) e 2007 (13. ed. revisada).
@@ -1149,12 +1168,23 @@ BIBLIOGRAFIA CANÔNICA (qualquer outra data/título para essas obras é ERRO):
 - BENI, M. C. Política e Planejamento de Turismo no Brasil. Aleph, 2006.
 - TASSO, J. P. F. et al. Mandala da Sustentabilidade no Turismo. UnB, 2024.
 
-REGRAS:
-1. Reporte SOMENTE divergências factuais objetivas (números errados, anos errados, autores errados, status invertido, fonte trocada).
-2. NÃO comente estilo, tom, formatação ou opiniões.
-3. Cada item deve apontar: o que o texto diz × o que está auditado/canônico.
-4. Máx. 10 itens. Se não houver divergências, devolva [].
-5. Devolva ESTRITAMENTE um JSON: {"issues": ["...", "..."]}. Nada mais.`;
+POLÍTICA "ZERO ALUCINAÇÃO" — REPORTE COMO ISSUE TODOS OS CASOS ABAIXO:
+1. Qualquer número (%, R$, contagem, taxa) citado no relatório que NÃO bata com a tabela de DADOS AUDITADOS (tolerância 5%, com escala percentual ↔ decimal).
+2. Qualquer número/estatística que NÃO tenha correspondência alguma na tabela de auditoria (alucinação pura — "inventou um número").
+3. Qualquer ano de referência citado para um indicador que difira do source_detail/reference_year auditado.
+4. Qualquer citação (AUTOR, ANO) com autor/ano fora da bibliografia canônica E que não tenha sido entregue na Base de Conhecimento.
+5. Qualquer ano errado para o modelo SISTUR (correto: 1997 ou 2007 — NUNCA 2001/2020/2021).
+6. Atribuição de fonte trocada (ex.: dado MANUAL apresentado como "IBGE", leitos CADASTUR apresentados como "DATASUS").
+7. Status invertido ou inventado (ex.: "Adequado" quando o score auditado é Crítico/Atenção; "tendência de crescimento" sem dois pontos no tempo).
+8. Comparações com outros municípios/regiões SEM benchmark oficial nos dados auditados.
+9. Afirmações de cumprimento de mínimo constitucional (saúde 15% / educação 25%) que contradigam o valor auditado.
+10. Frases vagas que escondem invenção: "aproximadamente", "cerca de", "estima-se", "tendência indica" — quando NÃO há dado auditado que sustente.
+
+REGRAS DE SAÍDA:
+- NÃO comente estilo, tom, formatação ou opiniões — só fatos.
+- Cada item deve apontar: o que o texto diz × o que está auditado/canônico (com o número/ano/fonte exatos).
+- Máx. 20 itens. Se não houver divergências, devolva {"issues": []}.
+- Devolva ESTRITAMENTE um JSON: {"issues": ["...", "..."]}. Nada mais.`;
 
     const usr = `=== DADOS AUDITADOS (fonte de verdade) ===
 ${JSON.stringify(auditCompact, null, 2)}
@@ -1166,7 +1196,7 @@ ${reportText.slice(0, 18000)}`;
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-2.5-pro',
         messages: [
           { role: 'system', content: sys },
           { role: 'user', content: usr },
@@ -1183,7 +1213,7 @@ ${reportText.slice(0, 18000)}`;
     if (!content) return [];
     const parsed = JSON.parse(content);
     const issues = Array.isArray(parsed?.issues) ? parsed.issues : [];
-    return issues.filter((s: unknown) => typeof s === 'string' && s.length > 0).slice(0, 10);
+    return issues.filter((s: unknown) => typeof s === 'string' && s.length > 0).slice(0, 20);
   } catch (err) {
     console.warn('Validator agent error (non-blocking):', err);
     return [];
