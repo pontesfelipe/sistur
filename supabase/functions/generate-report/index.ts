@@ -1071,6 +1071,52 @@ function detectCoherenceWarnings(
 }
 
 /**
+ * Auto-correção determinística (v1.38.8).
+ * Para cada linha de auditoria com valor numérico, localiza citações próximas
+ * ao código do indicador no texto que divergem >5% do valor auditado e
+ * substitui pelo valor canônico formatado em pt-BR. Retorna o texto corrigido
+ * e a lista de substituições aplicadas.
+ */
+function applyAutoCorrections(
+  reportText: string,
+  auditRows: any[],
+): { text: string; corrections: Array<{ indicator: string; from: string; to: string }> } {
+  if (!reportText || !auditRows?.length) return { text: reportText, corrections: [] };
+  let text = reportText;
+  const corrections: Array<{ indicator: string; from: string; to: string }> = [];
+
+  for (const row of auditRows) {
+    const v = Number(row.value);
+    if (!Number.isFinite(v) || v === 0) continue;
+    const code = String(row.indicator_code || '');
+    if (!code) continue;
+    const friendly = code.replace(/^igma_|^mst_/i, '').replace(/_/g, '[ _-]?');
+    const escaped = friendly.replace(/[.*+?^${}()|[\]\\]/g, (m) => m === '[' || m === ']' ? m : '\\' + m);
+    const re = new RegExp(`(${escaped}[^.]{0,120}?)(\\d{1,3}(?:[.,]\\d{1,3})*(?:[.,]\\d+)?)`, 'i');
+    const m = text.match(re);
+    if (!m) continue;
+    const citedStr = m[2];
+    const numStr = citedStr.replace(/\./g, '').replace(',', '.');
+    const cited = Number(numStr);
+    if (!Number.isFinite(cited) || cited === 0) continue;
+    // Mesma tolerância da validação
+    const r1 = Math.abs(cited - v) / Math.max(Math.abs(v), 1);
+    const r2 = Math.abs(cited - v * 100) / Math.max(Math.abs(v * 100), 1);
+    const r3 = Math.abs(cited * 100 - v) / Math.max(Math.abs(v), 1);
+    if (r1 <= 0.05 || r2 <= 0.05 || r3 <= 0.05) continue;
+    // Decide escala alvo: se a citação parece percentual (≤100 e v≤1), usa v*100
+    let target = v;
+    if (cited <= 100 && v <= 1) target = v * 100;
+    const decimals = /[.,]/.test(citedStr) ? 1 : 0;
+    const formatted = target.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: 2 });
+    text = text.replace(re, `$1${formatted}`);
+    corrections.push({ indicator: code, from: citedStr, to: formatted });
+  }
+
+  return { text, corrections };
+}
+
+/**
  * Agente IA validador (segunda passagem).
  * Recebe o relatório gerado + a tabela de auditoria + bibliografia canônica
  * e devolve uma lista estruturada de divergências factuais.
