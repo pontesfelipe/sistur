@@ -1628,12 +1628,22 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           // entre texto gerado e valores numéricos auditados. Quando há
           // contradições, prefixa um aviso ao relatório salvo.
           let finalContent = fullContent;
+          let validationStatus: 'clean' | 'warnings' | 'auto_corrected' = 'clean';
+          let deterministic: string[] = [];
+          let aiIssues: string[] = [];
+          let autoCorrections: Array<{ indicator: string; from: string; to: string }> = [];
           try {
-            const deterministic = detectCoherenceWarnings(fullContent, auditTrail || []);
+            // 1) Auto-correção determinística de valores numéricos divergentes
+            const corrected = applyAutoCorrections(fullContent, auditTrail || []);
+            const workingText = corrected.text;
+            autoCorrections = corrected.corrections;
+
+            // 2) Validação determinística sobre o texto JÁ corrigido
+            deterministic = detectCoherenceWarnings(workingText, auditTrail || []);
             // Segunda passagem: agente IA validador cruza relatório vs auditoria
             // e bibliografia canônica. Não bloqueante.
-            const aiIssues = await runReportValidatorAgent(
-              fullContent,
+            aiIssues = await runReportValidatorAgent(
+              workingText,
               auditTrail || [],
               LOVABLE_API_KEY,
             );
@@ -1641,22 +1651,37 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               ...deterministic.map((w) => `[determinístico] ${w}`),
               ...aiIssues.map((w) => `[agente IA] ${w}`),
             ];
-            if (allIssues.length > 0) {
-              const banner = [
-                '> ⚠️ **Validação cruzada — divergências encontradas (v1.38.7):**',
-                '> ',
-                '> Camadas: motor determinístico + agente IA validador (cruza texto × tabela de auditoria × bibliografia canônica).',
-                '> ',
-                ...allIssues.map((w) => `> - ${w}`),
-                '> ',
-                '> Os valores numéricos da tabela de auditoria são a fonte de verdade — o texto narrativo deve ser revisado nos pontos sinalizados.',
-                '',
-                '---',
-                '',
-              ].join('\n');
-              finalContent = banner + fullContent;
-              console.warn('Validation issues:', allIssues);
+            const correctionLines = autoCorrections.map(
+              (c) => `[auto-corrigido] ${c.indicator}: ${c.from} → ${c.to}`,
+            );
+            const hasAny = allIssues.length > 0 || correctionLines.length > 0;
+            validationStatus = correctionLines.length > 0
+              ? 'auto_corrected'
+              : (allIssues.length > 0 ? 'warnings' : 'clean');
+
+            // 3) Banner SEMPRE presente (v1.38.8)
+            const headerIcon = hasAny ? '⚠️' : '✅';
+            const headerLabel = hasAny
+              ? 'Validação cruzada — divergências encontradas'
+              : 'Validação cruzada — sem inconsistências';
+            const bannerLines = [
+              `> ${headerIcon} **${headerLabel} (v1.38.8):**`,
+              '> ',
+              '> Camadas: auto-correção determinística + motor de coerência + agente IA validador (cruza texto × tabela de auditoria × bibliografia canônica).',
+              '> ',
+            ];
+            if (hasAny) {
+              bannerLines.push(...correctionLines.map((w) => `> - ${w}`));
+              bannerLines.push(...allIssues.map((w) => `> - ${w}`));
+              bannerLines.push('> ');
+              bannerLines.push('> Os valores numéricos da tabela de auditoria são a fonte de verdade. Substituições foram aplicadas automaticamente quando possível; itens remanescentes exigem revisão manual.');
+            } else {
+              bannerLines.push('> Nenhuma divergência detectada entre o texto narrativo, os valores auditados e a bibliografia canônica.');
             }
+            bannerLines.push('', '---', '');
+            finalContent = bannerLines.join('\n') + workingText;
+
+            if (hasAny) console.warn('Validation issues:', { autoCorrections, allIssues });
           } catch (cohErr) {
             console.error('Coherence check failed (non-blocking):', cohErr);
           }
@@ -1668,19 +1693,39 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             .maybeSingle();
           
           const kbFileIds = kbFiles.map((f: any) => f.id);
+          let savedReportId: string | null = null;
           if (existing) {
             const { error } = await supabaseAdmin
               .from('generated_reports')
               .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
               .eq('id', existing.id);
             if (error) console.error('Error updating report:', error);
-            else console.log('Report updated successfully');
+            else { console.log('Report updated successfully'); savedReportId = existing.id; }
           } else {
-            const { error } = await supabaseAdmin
+            const { data: inserted, error } = await supabaseAdmin
               .from('generated_reports')
               .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: finalContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment });
+              .select('id')
+              .maybeSingle();
             if (error) console.error('Error saving report:', error);
-            else console.log('Report saved successfully');
+            else { console.log('Report saved successfully'); savedReportId = inserted?.id ?? null; }
+          }
+
+          // Persistir validação (não bloqueante)
+          try {
+            await supabaseAdmin.from('report_validations').insert({
+              report_id: savedReportId,
+              assessment_id: assessmentId,
+              org_id: assessment.org_id,
+              status: validationStatus,
+              deterministic_issues: deterministic,
+              ai_issues: aiIssues,
+              auto_corrections: autoCorrections,
+              total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
+              validator_version: 'v1.38.8',
+            });
+          } catch (vErr) {
+            console.error('Failed to persist report_validations:', vErr);
           }
         }
       } catch (err) {
