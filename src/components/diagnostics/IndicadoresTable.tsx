@@ -62,6 +62,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { INDICATOR_GUIDANCE } from '@/data/enterpriseIndicatorGuidance';
+import { getDerivedIndicatorInfo } from '@/data/derivedIndicators';
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
 export type EffectiveCollection = 'AUTOMATICA' | 'DERIVED' | 'MANUAL' | 'ESTIMADA';
