@@ -4377,6 +4377,7 @@ export type Database = {
           criticality: string | null
           data_source: Database["public"]["Enums"]["data_source"] | null
           default_interpretation: string | null
+          deprecated_at: string | null
           description: string | null
           direction: Database["public"]["Enums"]["indicator_direction"]
           edu_suggested_titles: Json
@@ -4406,6 +4407,7 @@ export type Database = {
           pnt_program: string | null
           reference_date: string | null
           reliability_score: number | null
+          replaced_by_code: string | null
           source: string | null
           theme: string
           unit: string | null
@@ -4427,6 +4429,7 @@ export type Database = {
           criticality?: string | null
           data_source?: Database["public"]["Enums"]["data_source"] | null
           default_interpretation?: string | null
+          deprecated_at?: string | null
           description?: string | null
           direction?: Database["public"]["Enums"]["indicator_direction"]
           edu_suggested_titles?: Json
@@ -4456,6 +4459,7 @@ export type Database = {
           pnt_program?: string | null
           reference_date?: string | null
           reliability_score?: number | null
+          replaced_by_code?: string | null
           source?: string | null
           theme: string
           unit?: string | null
@@ -4477,6 +4481,7 @@ export type Database = {
           criticality?: string | null
           data_source?: Database["public"]["Enums"]["data_source"] | null
           default_interpretation?: string | null
+          deprecated_at?: string | null
           description?: string | null
           direction?: Database["public"]["Enums"]["indicator_direction"]
           edu_suggested_titles?: Json
@@ -4506,6 +4511,7 @@ export type Database = {
           pnt_program?: string | null
           reference_date?: string | null
           reliability_score?: number | null
+          replaced_by_code?: string | null
           source?: string | null
           theme?: string
           unit?: string | null
@@ -8505,6 +8511,7 @@ export type Database = {
         | "DATASUS"
         | "STN"
         | "MAPA_TURISMO"
+        | "CALCULATED"
       diagnosis_tier_type: "COMPLETE" | "MEDIUM" | "SMALL"
       enrollment_status_type: "active" | "completed" | "dropped" | "suspended"
       exam_result_type: "passed" | "failed" | "pending"
@@ -8748,6 +8755,7 @@ export const Constants = {
         "DATASUS",
         "STN",
         "MAPA_TURISMO",
+        "CALCULATED",
       ],
       diagnosis_tier_type: ["COMPLETE", "MEDIUM", "SMALL"],
       enrollment_status_type: ["active", "completed", "dropped", "suspended"],

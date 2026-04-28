@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.3",
+    date: "2026-04-28",
+    type: "patch" as const,
+    changes: [
+      "Consolidação de indicadores duplicados. (1) Novos campos `deprecated_at` e `replaced_by_code` na tabela `indicators` permitem marcar indicadores substituídos preservando histórico de diagnósticos antigos. (2) 8 indicadores depreciados: `igma_agencias_turismo`→`igma_agencias_por_10k`, `igma_guias_turismo`→`igma_guias_por_10k`, `igma_meios_hospedagem`→`igma_hospedagem_por_10k`, `OE001` (leitos absoluto)→`igma_leitos_hospedagem_por_habitante`, `igma_despesa_turismo`→`igma_despesa_turismo_per_capita`, `RA006` (taxa emprego turismo)→`igma_empregos_turismo_por_1k`, `igma_visitantes_por_habitante`→`igma_iptl`, `RA002_ARCHIVED`→`ana_iqa`. (3) Reclassificados como CALCULATED (data_source enum estendido): `igma_ideb` (média anos iniciais+finais INEP), `igma_iptl` (visitantes÷população) e `igma_leitos_hospedagem_por_habitante` (leitos CADASTUR÷pop×1000). (4) Função `compute_derived_indicators` estendida para gerar automaticamente esses 3 novos derivados — IDEB com fallback caso só um componente exista. (5) `useIndicators` filtra `deprecated_at IS NULL` para esconder duplicados de novos diagnósticos. (6) Catálogo `src/data/derivedIndicators.ts` documenta as novas fórmulas. (7) Todos os assessments calculados marcados com `needs_recalculation=true` para incorporar os novos valores no próximo cálculo."
+    ]
+  },
   {
     version: "1.38.2",
     date: "2026-04-28",
