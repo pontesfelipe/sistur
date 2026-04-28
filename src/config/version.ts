@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 7,
+  patch: 8,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.8",
+    date: "2026-04-28",
+    type: "patch" as const,
+    changes: [
+      "Validação cruzada na geração de relatórios — sempre roda + auto-correção + persistência. (1) Nova etapa de auto-correção determinística no `generate-report` ANTES da validação: `applyAutoCorrections` percorre cada linha de `assessment_indicator_audit` com valor numérico, localiza citações próximas ao código do indicador no texto gerado e, quando a divergência > 5% (com tolerância para escala percentual ↔ decimal), substitui o número citado pelo valor canônico formatado em pt-BR. As substituições viram entradas `[auto-corrigido] indicator: from → to` no banner. (2) Banner SEMPRE injetado no topo do relatório (antes era só quando havia divergência) — mostra ✅ 'Validação cruzada — sem inconsistências' quando passa limpo, ou ⚠️ com a lista combinada de auto-correções + warnings determinísticos + achados do agente IA quando há ocorrências. (3) Nova tabela `report_validations` (RLS: ADMIN global, ORG_ADMIN da org dona do diagnóstico, service role manage) persistindo para cada geração: report_id, assessment_id, org_id, status (clean/warnings/auto_corrected), deterministic_issues, ai_issues, auto_corrections, total_issues e validator_version. Trilha histórica completa para auditoria, regressão e revisão. (4) Validação determinística e agente IA agora rodam sobre o texto JÁ corrigido, evitando duplicar avisos para divergências que a auto-correção resolveu. Não bloqueante — falha em qualquer etapa apenas loga e segue."
+    ]
+  },
   {
     version: "1.38.7",
     date: "2026-04-28",

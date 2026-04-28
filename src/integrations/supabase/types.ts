@@ -7216,6 +7216,56 @@ export type Database = {
           },
         ]
       }
+      report_validations: {
+        Row: {
+          ai_issues: Json
+          assessment_id: string
+          auto_corrections: Json
+          created_at: string
+          deterministic_issues: Json
+          id: string
+          org_id: string | null
+          report_id: string | null
+          status: string
+          total_issues: number
+          validator_version: string
+        }
+        Insert: {
+          ai_issues?: Json
+          assessment_id: string
+          auto_corrections?: Json
+          created_at?: string
+          deterministic_issues?: Json
+          id?: string
+          org_id?: string | null
+          report_id?: string | null
+          status: string
+          total_issues?: number
+          validator_version?: string
+        }
+        Update: {
+          ai_issues?: Json
+          assessment_id?: string
+          auto_corrections?: Json
+          created_at?: string
+          deterministic_issues?: Json
+          id?: string
+          org_id?: string | null
+          report_id?: string | null
+          status?: string
+          total_issues?: number
+          validator_version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_validations_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "generated_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stakeholder_profiles: {
         Row: {
           created_at: string
