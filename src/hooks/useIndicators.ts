@@ -29,6 +29,7 @@ export function useIndicators(options: UseIndicatorsOptions = {}) {
       let query = supabase
         .from('indicators')
         .select('*')
+        .is('deprecated_at', null)
         .order('pillar', { ascending: true })
         .order('theme', { ascending: true });
 
