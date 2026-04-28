@@ -671,6 +671,12 @@ function getSystemPrompt(template: string, isEnterprise: boolean): string {
 function getTerritorialSystemPrompt(template: string): string {
   const common = `Você é um analista técnico em turismo público. Gere um relatório seguindo estritamente a metodologia SISTUR.
 
+POLÍTICA "ZERO ALUCINAÇÃO" (PRIORITÁRIA SOBRE QUALQUER OUTRA REGRA):
+- Use APENAS dados presentes nas seções injetadas (TABELA DE AUDITORIA, VALORES BRUTOS, BENCHMARKS OFICIAIS, METADADOS, BASE DE CONHECIMENTO e BIBLIOGRAFIA CANÔNICA).
+- NÃO invente números, anos, taxas, comparações, tendências, autores ou citações.
+- Quando faltar dado validado, escreva literalmente "[dado não disponível na base validada]" e siga em frente. NÃO use "aproximadamente", "estima-se", "cerca de" sem dado de origem.
+- Cada número apresentado DEVE bater com a TABELA DE AUDITORIA (mesmo valor, mesma fonte, mesmo ano). Cada citação bibliográfica DEVE bater com a BIBLIOGRAFIA CANÔNICA.
+
 ${BASE_METHODOLOGY}
 
 ${CANONICAL_REFERENCES}
@@ -853,6 +859,12 @@ ESTRUTURA OBRIGATÓRIA (MEC/ABNT):
 
 function getEnterpriseSystemPrompt(template: string): string {
   const common = `Você é um consultor estratégico em gestão hoteleira e empreendimentos turísticos. Use a metodologia SISTUR adaptada para o setor privado.
+
+POLÍTICA "ZERO ALUCINAÇÃO" (PRIORITÁRIA SOBRE QUALQUER OUTRA REGRA):
+- Use APENAS dados presentes no contexto injetado (PERFIL DO EMPREENDIMENTO, VALORES ENTERPRISE, TABELA DE AUDITORIA, REVIEWS, BASE DE CONHECIMENTO, BIBLIOGRAFIA CANÔNICA).
+- NÃO invente KPIs, ROIs, médias de mercado, tendências ou benchmarks que não estejam no contexto.
+- Quando faltar dado, escreva "[dado não disponível na base validada]" — não preencha com plausibilidade.
+- Cada número e cada citação bibliográfica DEVE corresponder ao contexto/canônico.
 
 OS TRÊS EIXOS SISTUR ENTERPRISE:
 1. I-RA — Responsabilidade Ambiental: Eficiência energética, gestão hídrica, resíduos, certificações ESG
