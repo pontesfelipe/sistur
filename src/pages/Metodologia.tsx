@@ -1249,6 +1249,82 @@ export default function Metodologia() {
           </CardContent>
         </Card>
 
+        {/* Tipos de Relatório */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              Tipos de Relatório
+            </CardTitle>
+            <CardDescription>
+              Diferenças entre Completo, Executivo e Investidores
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="prose prose-sm max-w-none dark:prose-invert">
+              <p>
+                O SISTUR gera três templates distintos a partir do mesmo diagnóstico validado.
+                Todos compartilham a mesma base de dados auditados (<code>assessment_indicator_audit</code>),
+                a política <strong>Zero Alucinação</strong> e o pipeline de validação cruzada,
+                mas diferem em público-alvo, tamanho, estrutura e tom.
+              </p>
+
+              <h4>📘 Completo (técnico-acadêmico)</h4>
+              <ul>
+                <li><strong>Público:</strong> equipe técnica e gestores públicos.</li>
+                <li><strong>Tamanho:</strong> mínimo de 2.500 palavras.</li>
+                <li><strong>Norma:</strong> integral MEC/ABNT (NBR 14724, 6024, 6023, 6028, 10520).</li>
+                <li><strong>Estrutura (12 seções):</strong> Resumo + palavras-chave, Introdução,
+                  Contextualização do município, Metodologia, Análise por pilar (RA/OE/AO),
+                  Indicadores críticos, Recomendações, Plano de ação, Conclusão e Referências.</li>
+                <li><strong>Tom:</strong> técnico, fundamentado, com citações diretas a Beni (1997/2007),
+                  IGMA, IBGE, MTur, IGMA-IBT e demais fontes oficiais.</li>
+              </ul>
+
+              <h4>📗 Executivo (síntese para tomada de decisão)</h4>
+              <ul>
+                <li><strong>Público:</strong> alta gestão, secretários, prefeitos, comitês gestores.</li>
+                <li><strong>Tamanho:</strong> 800–1.200 palavras.</li>
+                <li><strong>Estrutura (5 blocos):</strong> Sumário executivo, Diagnóstico consolidado
+                  por pilar, Top 5 indicadores críticos, Recomendações priorizadas e Próximos passos.</li>
+                <li><strong>Tom:</strong> direto, orientado a decisão, com destaque para riscos e
+                  oportunidades. Reduz citações acadêmicas, mantém apenas o essencial para legitimidade.</li>
+              </ul>
+
+              <h4>📙 Investidores (atratividade econômica)</h4>
+              <ul>
+                <li><strong>Público:</strong> investidores, fundos, parceiros privados e captação.</li>
+                <li><strong>Tamanho:</strong> 1.200–1.800 palavras.</li>
+                <li><strong>Estrutura:</strong> Tese de investimento, Contexto de mercado,
+                  Indicadores de atratividade, Riscos e mitigadores, Oportunidades de aporte,
+                  Indicadores de retorno esperado e Pipeline de projetos correlatos.</li>
+                <li><strong>Tom:</strong> profissional-financeiro, com valores monetários no padrão
+                  BRL canônico (R$), foco em ROI, demanda turística, capacidade instalada e
+                  evidências de viabilidade. <strong>Não inclui</strong> recomendações pedagógicas
+                  nem detalhamento metodológico extenso.</li>
+              </ul>
+
+              <h4>Variante Enterprise</h4>
+              <p>
+                Cada um dos três templates possui versão <strong>Enterprise</strong> — acionada quando
+                o diagnóstico é de empreendimento (não destino). Substitui os eixos territoriais
+                (RA/OE/AO) por categorias funcionais (governança, ESG, satisfação do hóspede,
+                ocupação) e troca o foco territorial por KPIs de negócio e ROI.
+              </p>
+
+              <h4>Garantias comuns aos três templates</h4>
+              <ul>
+                <li>Política <strong>Zero Alucinação</strong>: sem invenção de números, anos ou fontes.</li>
+                <li>Auto-correção determinística contra <code>assessment_indicator_audit</code> (divergência &gt; 5%).</li>
+                <li>Validação por agente IA (gemini-2.5-pro) sobre o texto pós-correção.</li>
+                <li>Banner de validação cruzada sempre exibido (limpo, com avisos ou auto-corrigido).</li>
+                <li>Persistência do relatório de validação em <code>report_validations</code>.</li>
+                <li>Status canônico (CRÍTICO/ATENÇÃO/ADEQUADO/FORTE/EXCELENTE) e padrão BRL.</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* References */}
         <Card>
           <CardHeader>
