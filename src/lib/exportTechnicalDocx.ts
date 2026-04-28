@@ -1,5 +1,8 @@
 /**
- * Export SISTUR Technical Document — "Secret Sauce" for application registration
+ * Exporta o Documento Técnico SISTUR ("Secret Sauce") em conformidade com normas
+ * MEC / ABNT (NBR 14724, 6024, 6023). Margens, tipografia e cor dos títulos
+ * vêm de src/lib/abntStyle.ts. Tabelas e diagramas mantêm cores de apoio
+ * (permitidos pela ABNT como ilustrações).
  */
 import {
   Document,
@@ -21,12 +24,14 @@ import {
   PageBreak,
 } from 'docx';
 import { saveAs } from 'file-saver';
+import { ABNT, ABNT_PAGE_PROPS, ABNT_DEFAULT_STYLES } from './abntStyle';
 
-const PRIMARY = '1E40AF';
+const PRIMARY = '1E40AF';      // mantido apenas para ilustrações (tabelas/diagramas)
 const BORDER_COLOR = 'CBD5E1';
 const HEADER_BG = 'EFF6FF';
-const MUTED = '64748B';
+const MUTED = ABNT.COLOR_MUTED;
 const ACCENT = '059669';
+const FONT = ABNT.FONT;
 
 function cellBorders() {
   const b = { style: BorderStyle.SINGLE, size: 1, color: BORDER_COLOR };
@@ -34,24 +39,35 @@ function cellBorders() {
 }
 
 function heading(text: string, level: (typeof HeadingLevel)[keyof typeof HeadingLevel]) {
+  const isH1 = level === HeadingLevel.HEADING_1;
+  const isH3 = level === HeadingLevel.HEADING_3;
   return new Paragraph({
     heading: level,
-    spacing: { before: 300, after: 150 },
-    children: [new TextRun({ text, bold: true, font: 'Arial', color: PRIMARY })],
+    alignment: AlignmentType.LEFT,
+    spacing: { before: 360, after: 200, line: ABNT.LINE_SPACING },
+    children: [new TextRun({
+      text: isH1 ? text.toUpperCase() : text,
+      bold: true,
+      italics: isH3,
+      font: FONT,
+      color: ABNT.COLOR_TEXT,
+    })],
   });
 }
 
 function para(text: string, opts?: { bold?: boolean; italic?: boolean; color?: string; size?: number }) {
   return new Paragraph({
-    spacing: { after: 120 },
+    alignment: AlignmentType.JUSTIFIED,
+    indent: { firstLine: ABNT.FIRST_LINE_INDENT },
+    spacing: { after: 0, line: ABNT.LINE_SPACING },
     children: [
       new TextRun({
         text,
-        font: 'Arial',
-        size: opts?.size ?? 22,
+        font: FONT,
+        size: opts?.size ?? ABNT.BODY_SIZE,
         bold: opts?.bold,
         italics: opts?.italic,
-        color: opts?.color,
+        color: opts?.color ?? ABNT.COLOR_TEXT,
       }),
     ],
   });
@@ -60,8 +76,8 @@ function para(text: string, opts?: { bold?: boolean; italic?: boolean; color?: s
 function bullet(text: string, ref: string, level = 0) {
   return new Paragraph({
     numbering: { reference: ref, level },
-    spacing: { after: 60 },
-    children: [new TextRun({ text, font: 'Arial', size: 22 })],
+    spacing: { after: 60, line: ABNT.LINE_SPACING },
+    children: [new TextRun({ text, font: FONT, size: ABNT.BODY_SIZE })],
   });
 }
 
@@ -162,78 +178,85 @@ export async function exportTechnicalDocx() {
       ],
     },
     styles: {
-      default: { document: { run: { font: 'Arial', size: 22 } } },
+      ...ABNT_DEFAULT_STYLES,
       paragraphStyles: [
         {
           id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true,
-          run: { size: 36, bold: true, font: 'Arial', color: PRIMARY },
-          paragraph: { spacing: { before: 360, after: 200 } },
+          run: { size: ABNT.H1_SIZE, bold: true, font: FONT, color: ABNT.COLOR_TEXT },
+          paragraph: { spacing: { before: 480, after: 240, line: ABNT.LINE_SPACING }, outlineLevel: 0 },
         },
         {
           id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true,
-          run: { size: 28, bold: true, font: 'Arial', color: PRIMARY },
-          paragraph: { spacing: { before: 240, after: 160 } },
+          run: { size: ABNT.H2_SIZE, bold: true, font: FONT, color: ABNT.COLOR_TEXT },
+          paragraph: { spacing: { before: 360, after: 200, line: ABNT.LINE_SPACING }, outlineLevel: 1 },
         },
         {
           id: 'Heading3', name: 'Heading 3', basedOn: 'Normal', next: 'Normal', quickFormat: true,
-          run: { size: 24, bold: true, font: 'Arial' },
-          paragraph: { spacing: { before: 200, after: 120 } },
+          run: { size: ABNT.H3_SIZE, bold: true, italics: true, font: FONT, color: ABNT.COLOR_TEXT },
+          paragraph: { spacing: { before: 240, after: 120, line: ABNT.LINE_SPACING }, outlineLevel: 2 },
         },
       ],
     },
     sections: [{
-      properties: {
-        page: {
-          size: { width: 11906, height: 16838 },
-          margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 },
-        },
-      },
+      properties: ABNT_PAGE_PROPS,
       headers: {
         default: new Header({
           children: [new Paragraph({
             alignment: AlignmentType.RIGHT,
-            children: [new TextRun({ text: 'SISTUR — Documento Técnico Confidencial', font: 'Arial', size: 18, color: MUTED, italics: true })],
+            children: [new TextRun({ text: 'SISTUR — Documento Técnico Confidencial', font: FONT, size: ABNT.SMALL_SIZE, color: MUTED, italics: true })],
           })],
         }),
       },
       footers: {
         default: new Footer({
           children: [new Paragraph({
-            alignment: AlignmentType.CENTER,
+            alignment: AlignmentType.RIGHT,
             children: [
-              new TextRun({ text: 'Página ', font: 'Arial', size: 18, color: MUTED }),
-              new TextRun({ children: [PageNumber.CURRENT], font: 'Arial', size: 18, color: MUTED }),
+              new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: ABNT.SMALL_SIZE, color: ABNT.COLOR_TEXT }),
             ],
           })],
         }),
       },
       children: [
-        // ══════════ CAPA ══════════
-        new Paragraph({ spacing: { before: 3000 } }),
+        // ══════════ CAPA (ABNT NBR 14724) ══════════
         new Paragraph({
           alignment: AlignmentType.CENTER,
-          spacing: { after: 200 },
-          children: [new TextRun({ text: 'SISTUR', bold: true, font: 'Arial', size: 72, color: PRIMARY })],
+          spacing: { after: 600, line: ABNT.LINE_SPACING },
+          children: [new TextRun({ text: 'SISTUR — SISTEMA INTEGRADO DE SUPORTE PARA TURISMO EM REGIÕES', bold: true, font: FONT, size: ABNT.H1_SIZE, color: ABNT.COLOR_TEXT })],
+        }),
+        new Paragraph({ spacing: { before: 2400 }, children: [] }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400, line: ABNT.LINE_SPACING },
+          children: [new TextRun({ text: 'DOCUMENTO TÉCNICO PARA REGISTRO DE SOFTWARE', bold: true, font: FONT, size: 32, color: ABNT.COLOR_TEXT })],
         }),
         new Paragraph({
           alignment: AlignmentType.CENTER,
-          spacing: { after: 100 },
-          children: [new TextRun({ text: 'Sistema Integrado de Suporte para Turismo em Regiões', font: 'Arial', size: 28, color: MUTED })],
+          spacing: { after: 200, line: ABNT.LINE_SPACING },
+          children: [new TextRun({ text: 'Especificação Funcional e Arquitetural', italics: true, font: FONT, size: ABNT.BODY_SIZE, color: MUTED })],
+        }),
+        new Paragraph({ spacing: { before: 2400 }, children: [] }),
+        new Paragraph({
+          alignment: AlignmentType.RIGHT,
+          indent: { left: Math.round(7 * 567) },
+          spacing: { after: 200, line: ABNT.LINE_SPACING },
+          children: [new TextRun({ text: 'Documento técnico elaborado conforme padrões MEC/ABNT (NBR 14724, 6024 e 6023) para fins de registro de software junto ao INPI.', font: FONT, size: ABNT.SMALL_SIZE, italics: true })],
+        }),
+        new Paragraph({ spacing: { before: 2400 }, children: [] }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { line: ABNT.LINE_SPACING },
+          children: [new TextRun({ text: 'Brasil', font: FONT, size: ABNT.BODY_SIZE })],
         }),
         new Paragraph({
           alignment: AlignmentType.CENTER,
-          spacing: { after: 600 },
-          children: [new TextRun({ text: 'Documento Técnico para Registro de Software', font: 'Arial', size: 24, bold: true, color: PRIMARY })],
+          spacing: { after: 200, line: ABNT.LINE_SPACING },
+          children: [new TextRun({ text: `${new Date().getFullYear()}`, font: FONT, size: ABNT.BODY_SIZE })],
         }),
         new Paragraph({
           alignment: AlignmentType.CENTER,
-          spacing: { after: 100 },
-          children: [new TextRun({ text: `Data: ${new Date().toLocaleDateString('pt-BR')}`, font: 'Arial', size: 22, color: MUTED })],
-        }),
-        new Paragraph({
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 100 },
-          children: [new TextRun({ text: 'Classificação: CONFIDENCIAL', font: 'Arial', size: 22, bold: true, color: 'DC2626' })],
+          spacing: { line: ABNT.LINE_SPACING },
+          children: [new TextRun({ text: 'Classificação: CONFIDENCIAL', font: FONT, size: ABNT.SMALL_SIZE, bold: true, color: 'DC2626' })],
         }),
 
         new Paragraph({ children: [new PageBreak()] }),
