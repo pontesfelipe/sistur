@@ -198,9 +198,36 @@ export async function exportReportAsDocx(
   children.push(...buildCoverPage(destinationName, customization));
 
   let i = 0;
+  // ABNT: dentro da seção "Referências" usamos alinhamento à esquerda,
+  // entrelinha simples e espaço duplo ENTRE referências (NBR 6023:2018).
+  let inReferences = false;
 
   while (i < lines.length) {
     const line = lines[i];
+
+    // Detect entry/exit of References section (any heading toggles it)
+    if (/^#{1,4}\s/.test(line)) {
+      const headingText = line.replace(/^#{1,4}\s+/, '').trim().toLowerCase();
+      inReferences = /^refer[êe]ncias?(\b|\s|$)/.test(headingText);
+    }
+
+    // --- Table title (ABNT: "Tabela N — Título" centered ABOVE table) ---
+    if (/^Tabela\s+\d+\s*[—-]/i.test(line.trim())) {
+      children.push(
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 240, after: 60, line: LINE_SPACING },
+          children: [
+            new TextRun({
+              text: line.trim(),
+              font: FONT, size: SMALL_SIZE, bold: true,
+            }),
+          ],
+        }),
+      );
+      i++;
+      continue;
+    }
 
     // --- Table detection ---
     if (line.trim().startsWith('|') && line.trim().endsWith('|')) {
@@ -304,6 +331,19 @@ export async function exportReportAsDocx(
     // --- Bullet list ---
     if (line.match(/^\s*[-*]\s/)) {
       const text = line.replace(/^\s*[-*]\s/, '');
+      // ABNT NBR 6023: cada referência é um parágrafo à esquerda,
+      // entrelinha simples, separadas por espaço duplo entre si.
+      if (inReferences) {
+        children.push(
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            spacing: { before: 0, after: 240, line: LINE_SPACING_SINGLE },
+            children: parseInlineFormatting(text),
+          }),
+        );
+        i++;
+        continue;
+      }
       children.push(
         new Paragraph({
           bullet: { level: 0 },
@@ -354,6 +394,18 @@ export async function exportReportAsDocx(
     }
 
     // --- Regular paragraph (ABNT: 1.25cm indent, justified, 1.5 spacing) ---
+    // Em "Referências": alinhar à esquerda, entrelinha simples, sem recuo.
+    if (inReferences) {
+      children.push(
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          spacing: { before: 0, after: 240, line: LINE_SPACING_SINGLE },
+          children: parseInlineFormatting(line),
+        }),
+      );
+      i++;
+      continue;
+    }
     children.push(
       new Paragraph({
         alignment: AlignmentType.JUSTIFIED,
