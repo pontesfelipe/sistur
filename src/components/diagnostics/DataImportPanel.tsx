@@ -1025,7 +1025,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           : (getIndicatorSelectValue(currentValue, indicator) || EMPTY_SELECT_VALUE)
                                         }
                                         onValueChange={(selectedValue) => handleValueChange(indicator.id, selectedValue)}
-                                        disabled={isIgnored}
+                                        disabled={isIgnored || isDerived}
                                       >
                                         <SelectTrigger
                                           className={cn(
@@ -1033,10 +1033,11 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                             valError && 'border-destructive ring-1 ring-destructive',
                                             !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
                                             !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
-                                            isIgnored && 'bg-muted cursor-not-allowed'
+                                            isIgnored && 'bg-muted cursor-not-allowed',
+                                            isDerived && 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300/60 cursor-not-allowed'
                                           )}
                                         >
-                                          <SelectValue placeholder={isIgnored ? 'Ignorado' : 'Selecionar'} />
+                                          <SelectValue placeholder={isIgnored ? 'Ignorado' : isDerived ? '🧮 Calculado automaticamente' : 'Selecionar'} />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value={EMPTY_SELECT_VALUE}>Não informado</SelectItem>
@@ -1072,16 +1073,17 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                               },
                                             }));
                                           }}
-                                          disabled={isIgnored}
+                                          disabled={isIgnored || isDerived}
                                           className={cn(
                                             'w-full',
                                             isPreFilled && !hasUnsavedChanges && 'pr-8',
                                             valError && 'border-destructive ring-1 ring-destructive',
                                             !valError && hasUnsavedChanges && 'border-accent ring-1 ring-accent',
                                             !valError && isPreFilled && !hasUnsavedChanges && 'border-primary/40 bg-primary/5',
-                                            isIgnored && 'bg-muted cursor-not-allowed'
+                                            isIgnored && 'bg-muted cursor-not-allowed',
+                                            isDerived && 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300/60 cursor-not-allowed text-emerald-800 dark:text-emerald-200'
                                           )}
-                                          placeholder={isIgnored ? 'Ignorado' : 'Valor'}
+                                          placeholder={isIgnored ? 'Ignorado' : isDerived ? '🧮 Calculado automaticamente' : 'Valor'}
                                         />
                                         {indicator.unit && (
                                           <span className="text-xs text-muted-foreground font-medium whitespace-nowrap shrink-0">
