@@ -1704,7 +1704,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           } else {
             const { data: inserted, error } = await supabaseAdmin
               .from('generated_reports')
-              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: finalContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment });
+              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: finalContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment })
               .select('id')
               .maybeSingle();
             if (error) console.error('Error saving report:', error);
