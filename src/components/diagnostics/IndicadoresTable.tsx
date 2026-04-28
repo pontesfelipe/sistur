@@ -561,6 +561,11 @@ export function IndicadoresTable({
                                   <Database className="h-2.5 w-2.5 mr-0.5" />
                                   CADASTUR
                                 </Badge>
+                              ) : collectionType === 'DERIVED' ? (
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-emerald-500/50 text-emerald-700 dark:text-emerald-300 bg-emerald-500/10">
+                                  <Calculator className="h-2.5 w-2.5 mr-0.5" />
+                                  Calculado
+                                </Badge>
                               ) : collectionType === 'AUTOMATICA' && (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
                                   <Zap className="h-2.5 w-2.5 mr-0.5" />
