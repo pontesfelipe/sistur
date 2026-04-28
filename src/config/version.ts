@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.6",
+    date: "2026-04-28",
+    type: "patch" as const,
+    changes: [
+      "Conformidade ABNT estendida ao template e tratamento de fontes do relatório gerado. (1) `exportReportDocx.ts` agora detecta a seção '## Referências' e renderiza cada item conforme NBR 6023:2018 — alinhamento à esquerda (não justificado), entrelinha simples (1,0) e espaço duplo (after: 240) ENTRE referências, sem recuo de primeira linha e sem marcador de bullet, mesmo quando o LLM lista as referências como itens '- '. O toggle é reativado/desativado a cada novo heading, garantindo que apenas a seção Referências siga essa regra. (2) Reconhecimento de títulos de tabela ABNT — linhas no formato 'Tabela N — Título' (ou 'Tabela N - Título') agora são renderizadas centralizadas, em negrito 10pt ACIMA da tabela seguinte, complementando o tratamento já existente de 'Fonte:' ABAIXO (NBR 14724). (3) O prompt do `generate-report` (system + user) já exigia integralmente as normas MEC/ABNT (NBR 14724/6024/6023/6028/10520), seção de Referências em ordem alfabética, citação de fonte em cada dado, tabelas com coluna 'Fonte', formatação numérica brasileira e estrutura textual numerada — agora a renderização DOCX honra essas regras visualmente."
+    ]
+  },
   {
     version: "1.38.5",
     date: "2026-04-28",
