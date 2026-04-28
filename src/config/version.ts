@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 9,
+  patch: 10,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.10",
+    date: "2026-04-28",
+    type: "patch" as const,
+    changes: [
+      "Metodologia — nova seção 'Tipos de Relatório' documentando explicitamente as diferenças entre Completo (técnico-acadêmico, ≥2.500 palavras, ABNT integral, 12 seções), Executivo (síntese decisória, 800–1.200 palavras, 5 blocos para alta gestão) e Investidores (atratividade econômica, 1.200–1.800 palavras, foco em ROI/BRL/risco-mitigador). Inclui também a variante Enterprise (substitui RA/OE/AO por categorias funcionais para empreendimentos) e lista as garantias comuns aos três templates: política Zero Alucinação, auto-correção determinística contra `assessment_indicator_audit`, validação por agente IA (gemini-2.5-pro), banner de validação cruzada sempre visível, persistência em `report_validations` e padrão BRL canônico."
+    ]
+  },
   {
     version: "1.38.9",
     date: "2026-04-28",
