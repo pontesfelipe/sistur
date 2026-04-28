@@ -1147,8 +1147,8 @@ async function runReportValidatorAgent(
       source_detail: r.source_detail,
     }));
 
-    const sys = `Você é um agente de auditoria factual para relatórios técnicos em turismo (SISTUR).
-Sua tarefa: comparar o RELATÓRIO contra os DADOS AUDITADOS e contra a BIBLIOGRAFIA CANÔNICA, e listar APENAS divergências verificáveis.
+    const sys = `Você é um agente de auditoria factual ESTRITO para relatórios técnicos em turismo (SISTUR).
+Sua tarefa: comparar o RELATÓRIO contra os DADOS AUDITADOS e a BIBLIOGRAFIA CANÔNICA, e listar TODA alucinação, suposição ou afirmação sem lastro.
 
 BIBLIOGRAFIA CANÔNICA (qualquer outra data/título para essas obras é ERRO):
 - BENI, M. C. Análise Estrutural do Turismo. SENAC, 1997 (1ª ed., origem do modelo SISTUR) e 2007 (13. ed. revisada).
@@ -1156,12 +1156,23 @@ BIBLIOGRAFIA CANÔNICA (qualquer outra data/título para essas obras é ERRO):
 - BENI, M. C. Política e Planejamento de Turismo no Brasil. Aleph, 2006.
 - TASSO, J. P. F. et al. Mandala da Sustentabilidade no Turismo. UnB, 2024.
 
-REGRAS:
-1. Reporte SOMENTE divergências factuais objetivas (números errados, anos errados, autores errados, status invertido, fonte trocada).
-2. NÃO comente estilo, tom, formatação ou opiniões.
-3. Cada item deve apontar: o que o texto diz × o que está auditado/canônico.
-4. Máx. 10 itens. Se não houver divergências, devolva [].
-5. Devolva ESTRITAMENTE um JSON: {"issues": ["...", "..."]}. Nada mais.`;
+POLÍTICA "ZERO ALUCINAÇÃO" — REPORTE COMO ISSUE TODOS OS CASOS ABAIXO:
+1. Qualquer número (%, R$, contagem, taxa) citado no relatório que NÃO bata com a tabela de DADOS AUDITADOS (tolerância 5%, com escala percentual ↔ decimal).
+2. Qualquer número/estatística que NÃO tenha correspondência alguma na tabela de auditoria (alucinação pura — "inventou um número").
+3. Qualquer ano de referência citado para um indicador que difira do source_detail/reference_year auditado.
+4. Qualquer citação (AUTOR, ANO) com autor/ano fora da bibliografia canônica E que não tenha sido entregue na Base de Conhecimento.
+5. Qualquer ano errado para o modelo SISTUR (correto: 1997 ou 2007 — NUNCA 2001/2020/2021).
+6. Atribuição de fonte trocada (ex.: dado MANUAL apresentado como "IBGE", leitos CADASTUR apresentados como "DATASUS").
+7. Status invertido ou inventado (ex.: "Adequado" quando o score auditado é Crítico/Atenção; "tendência de crescimento" sem dois pontos no tempo).
+8. Comparações com outros municípios/regiões SEM benchmark oficial nos dados auditados.
+9. Afirmações de cumprimento de mínimo constitucional (saúde 15% / educação 25%) que contradigam o valor auditado.
+10. Frases vagas que escondem invenção: "aproximadamente", "cerca de", "estima-se", "tendência indica" — quando NÃO há dado auditado que sustente.
+
+REGRAS DE SAÍDA:
+- NÃO comente estilo, tom, formatação ou opiniões — só fatos.
+- Cada item deve apontar: o que o texto diz × o que está auditado/canônico (com o número/ano/fonte exatos).
+- Máx. 20 itens. Se não houver divergências, devolva {"issues": []}.
+- Devolva ESTRITAMENTE um JSON: {"issues": ["...", "..."]}. Nada mais.`;
 
     const usr = `=== DADOS AUDITADOS (fonte de verdade) ===
 ${JSON.stringify(auditCompact, null, 2)}
@@ -1173,7 +1184,7 @@ ${reportText.slice(0, 18000)}`;
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-2.5-pro',
         messages: [
           { role: 'system', content: sys },
           { role: 'user', content: usr },
@@ -1190,7 +1201,7 @@ ${reportText.slice(0, 18000)}`;
     if (!content) return [];
     const parsed = JSON.parse(content);
     const issues = Array.isArray(parsed?.issues) ? parsed.issues : [];
-    return issues.filter((s: unknown) => typeof s === 'string' && s.length > 0).slice(0, 10);
+    return issues.filter((s: unknown) => typeof s === 'string' && s.length > 0).slice(0, 20);
   } catch (err) {
     console.warn('Validator agent error (non-blocking):', err);
     return [];
