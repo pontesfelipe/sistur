@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.1",
+    date: "2026-04-28",
+    type: "patch" as const,
+    changes: [
+      "IPCR (Índice de Poder de Compra Relativo) agora é calculado automaticamente. Nova tabela `national_reference_values` armazena valores oficiais de referência nacional (IBGE Contas Regionais — PIB per capita Brasil 2020-2023). A função `compute_derived_indicators` foi estendida para gerar `igma_ipcr` deterministicamente: PIB per capita do município (igma_pib_per_capita, IBGE) ÷ PIB per capita do Brasil × 100, marcado com source_code 'IBGE_PIB_PER_CAPITA+REF_NACIONAL'. Caso o ano municipal não tenha referência nacional, faz fallback para o ano mais recente disponível. Diagnósticos calculados foram marcados como `needs_recalculation = true` para incorporar o IPCR automaticamente no próximo cálculo. Resultado: o IPCR sai do preenchimento manual e passa a ter procedência derivada (nível 5), igual aos outros indicadores per capita do CADASTUR/IBGE."
+    ]
+  },
   {
     version: "1.38.0",
     date: "2026-04-27",

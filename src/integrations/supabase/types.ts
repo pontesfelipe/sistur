@@ -5815,6 +5815,36 @@ export type Database = {
         }
         Relationships: []
       }
+      national_reference_values: {
+        Row: {
+          created_at: string
+          id: string
+          indicator_code: string
+          notes: string | null
+          reference_year: number
+          source: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          indicator_code: string
+          notes?: string | null
+          reference_year: number
+          source?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          indicator_code?: string
+          notes?: string | null
+          reference_year?: number
+          source?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
       ods_targets: {
         Row: {
           code: string
