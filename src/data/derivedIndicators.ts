@@ -30,6 +30,21 @@ export const DERIVED_INDICATORS: Record<string, DerivedIndicatorInfo> = {
     resultUnit: 'índice (Brasil = 100)',
     note: 'Calculado no recálculo do diagnóstico. Procedência: derivado IBGE.',
   },
+  igma_ideb: {
+    formula: 'IDEB = média entre IDEB anos iniciais e IDEB anos finais (INEP)',
+    requiredInputs: [
+      'igma_resultado_ideb_anos_iniciais_do_ensino_fundamental (INEP)',
+      'igma_resultado_ideb_anos_finais_do_ensino_fundamental (INEP)',
+    ],
+    resultUnit: 'nota (0–10)',
+    note: 'Substitui o preenchimento manual. Se apenas um dos componentes existir, será usado isoladamente.',
+  },
+  igma_leitos_hospedagem_por_habitante: {
+    formula: 'Leitos por hab. = (leitos de hospedagem CADASTUR ÷ população) × 1000',
+    requiredInputs: ['igma_leitos_hospedagem (CADASTUR)', 'igma_populacao (IBGE)'],
+    resultUnit: 'leitos por mil habitantes',
+    note: 'Não confundir com leitos hospitalares SUS (igma_leitos_hospitalares_sus_por_mil_habitantes — DATASUS).',
+  },
   tourism_revenue_per_capita: {
     formula:
       'Receita per capita = ((visitantes nacionais × gasto médio diário × permanência) + (visitantes internacionais × gasto médio diário × permanência)) ÷ população',
