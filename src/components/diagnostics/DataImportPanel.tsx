@@ -62,6 +62,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { validateIndicatorValue, getValidationForIndicator, INDICATOR_GUIDANCE } from '@/data/enterpriseIndicatorGuidance';
+import { getDerivedIndicatorInfo } from '@/data/derivedIndicators';
 import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
 import {
   EMPTY_SELECT_VALUE,
