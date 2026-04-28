@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 6,
+  patch: 7,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.7",
+    date: "2026-04-28",
+    type: "patch" as const,
+    changes: [
+      "Agente validador de relatórios + bibliografia canônica anti-alucinação. (1) Bloco `CANONICAL_REFERENCES` injetado no system prompt do generate-report (territorial e enterprise) com datas/títulos canônicos das obras de Mario Beni — Análise Estrutural do Turismo (SENAC, 1997, 1ª ed., origem do modelo SISTUR; e 2007, 13. ed. revisada), Globalização do Turismo (Aleph, 2003), Política e Planejamento de Turismo no Brasil (Aleph, 2006) — corrigindo a alucinação recorrente que datava o SISTUR como 2021. Regra dura: NUNCA atribuir o modelo SISTUR a ano diferente de 1997/2007. (2) `detectCoherenceWarnings` expandido com três novas checagens determinísticas: detecção de citações `(BENI, ANO)` com ano fora do conjunto canônico; detecção de SISTUR atribuído a ano errado fora de citação parentética; validação cruzada de números — para cada linha de `assessment_indicator_audit`, procura citações próximas ao código do indicador no texto e sinaliza se o número diverge mais de 5% do valor auditado (com tolerância para escala percentual ↔ decimal). (3) Novo agente IA `runReportValidatorAgent` (segunda passagem, não bloqueante) — recebe relatório + audit trail compacto + bibliografia canônica e devolve JSON com até 10 divergências factuais objetivas (números, anos, autores, status, fontes trocadas). (4) Banner de validação cruzada agora mescla as duas camadas — `[determinístico]` e `[agente IA]` — e é prefixado ao relatório salvo, com o aviso de que a tabela de auditoria é a fonte de verdade. Resultado: chega de relatório dizendo 'BENI, 2021' e de números narrativos divergindo do diagnóstico."
+    ]
+  },
   {
     version: "1.38.6",
     date: "2026-04-28",
