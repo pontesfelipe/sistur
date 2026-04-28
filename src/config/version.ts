@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.2",
+    date: "2026-04-28",
+    type: "patch" as const,
+    changes: [
+      "Indicadores derivados (calculados automaticamente) agora exibem um banner verde claro no painel de pré-preenchimento e no detalhe do indicador, mostrando: (1) a fórmula em português, (2) os insumos necessários (com origem oficial quando aplicável), (3) a unidade do resultado e (4) aviso explícito 'Não preencha manualmente'. Cobre IPCR, I_SEMT, IPTL, IIET e tourism_revenue_per_capita. Novo catálogo central em `src/data/derivedIndicators.ts` consolida fórmulas e dependências, evitando dúvidas sobre qual unidade ou valor o usuário deve fornecer."
+    ]
+  },
   {
     version: "1.38.1",
     date: "2026-04-28",

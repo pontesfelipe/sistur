@@ -62,6 +62,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { INDICATOR_GUIDANCE } from '@/data/enterpriseIndicatorGuidance';
+import { getDerivedIndicatorInfo } from '@/data/derivedIndicators';
 
 type CollectionType = 'AUTOMATICA' | 'MANUAL' | 'ESTIMADA';
 export type EffectiveCollection = 'AUTOMATICA' | 'DERIVED' | 'MANUAL' | 'ESTIMADA';
@@ -285,6 +286,30 @@ export function IndicadoresTable({
               )}
             </div>
           )}
+          {/* Derived (auto-calculated) indicators banner */}
+          {(() => {
+            const derived = getDerivedIndicatorInfo(indicator.code);
+            if (!derived) return null;
+            return (
+              <div className="p-3 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300/60 dark:border-emerald-800/40">
+                <p className="text-sm text-emerald-800 dark:text-emerald-200 font-medium mb-1">🧮 Calculado automaticamente</p>
+                <p className="text-sm text-emerald-700/90 dark:text-emerald-300/90">
+                  <strong>Fórmula:</strong> {derived.formula}
+                </p>
+                <p className="text-sm text-emerald-700/90 dark:text-emerald-300/90 mt-1">
+                  <strong>Resultado em:</strong> {derived.resultUnit}
+                </p>
+                {derived.requiredInputs.length > 0 && (
+                  <p className="text-xs text-emerald-700/80 dark:text-emerald-300/80 mt-1">
+                    <strong>Insumos:</strong> {derived.requiredInputs.join(' · ')}
+                  </p>
+                )}
+                {derived.note && (
+                  <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 mt-1 italic">{derived.note}</p>
+                )}
+              </div>
+            );
+          })()}
           {(indicator as any).notes && (
             <div>
               <span className="text-muted-foreground text-sm">Notas:</span>
