@@ -942,6 +942,36 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       </div>
                                     );
                                   })()}
+                                  {!isIgnored && (() => {
+                                    const derived = getDerivedIndicatorInfo(indicator.code);
+                                    if (!derived) return null;
+                                    return (
+                                      <div className="mt-2 p-2 rounded bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300/60 dark:border-emerald-800/40">
+                                        <p className="text-xs text-emerald-800 dark:text-emerald-200 font-medium flex items-center gap-1">
+                                          🧮 Calculado automaticamente
+                                        </p>
+                                        <p className="text-xs text-emerald-700/90 dark:text-emerald-300/90 mt-1">
+                                          <strong>Fórmula:</strong> {derived.formula}
+                                        </p>
+                                        <p className="text-xs text-emerald-700/90 dark:text-emerald-300/90 mt-1">
+                                          <strong>Resultado em:</strong> {derived.resultUnit}
+                                        </p>
+                                        {derived.requiredInputs.length > 0 && (
+                                          <p className="text-xs text-emerald-700/80 dark:text-emerald-300/80 mt-1">
+                                            <strong>Insumos necessários:</strong> {derived.requiredInputs.join(' · ')}
+                                          </p>
+                                        )}
+                                        {derived.note && (
+                                          <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 mt-1 italic">
+                                            {derived.note}
+                                          </p>
+                                        )}
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                          Não preencha este campo manualmente — o valor é gerado ao recalcular o diagnóstico.
+                                        </p>
+                                      </div>
+                                    );
+                                  })()}
                                   {!isIgnored && currentValue === null && manualPlaceholders[indicator.code] && (() => {
                                     const ph = manualPlaceholders[indicator.code];
                                     const isMandala = indicator.code.startsWith('MST_');
