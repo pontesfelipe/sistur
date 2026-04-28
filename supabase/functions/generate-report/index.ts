@@ -1022,7 +1022,126 @@ function detectCoherenceWarnings(
     }
   }
 
+  // ===== Citações de Beni / SISTUR — anos canônicos =====
+  // Modelo SISTUR foi publicado em 1997; edição revisada 2007. Qualquer outro ano = alucinação.
+  const beniWrongYear = /\bBENI[^)]{0,40},\s*(19[0-8]\d|199[0-6]|2008|2009|201\d|202[0-6])\)/gi;
+  const beniMatches = reportText.match(beniWrongYear);
+  if (beniMatches && beniMatches.length > 0) {
+    const unique = Array.from(new Set(beniMatches));
+    warnings.push(
+      `Citação de Beni com ano não canônico detectada: ${unique.join(', ')}. ` +
+      `Anos válidos: 1997 (Análise Estrutural do Turismo, 1ª ed.), 2003 (Globalização do Turismo), ` +
+      `2006 (Política e Planejamento), 2007 (Análise Estrutural, 13. ed.).`
+    );
+  }
+  // SISTUR atribuído a ano errado fora de citação parentética
+  if (/SISTUR[^.]{0,80}(?:em|de|no ano de|publicad[oa] em)\s*(19[0-8]\d|199[0-6]|201\d|202\d)/i.test(reportText)) {
+    warnings.push('Texto atribui o modelo SISTUR a ano incorreto. O modelo foi publicado por Mario Beni em 1997 (Análise Estrutural do Turismo, SENAC).');
+  }
+
+  // ===== Validação cruzada: valores numéricos citados vs auditoria =====
+  // Para cada linha de auditoria com valor numérico, procura citações próximas
+  // ao código do indicador no texto e checa se o número bate (tolerância 5%).
+  for (const row of auditRows) {
+    const v = Number(row.value);
+    if (!Number.isFinite(v) || v === 0) continue;
+    const code = String(row.indicator_code || '');
+    if (!code) continue;
+    // Procura o nome amigável do indicador (parte após primeiro "_")
+    const friendly = code.replace(/^igma_|^mst_/i, '').replace(/_/g, '[ _-]?');
+    const escaped = friendly.replace(/[.*+?^${}()|[\]\\]/g, (m) => m === '[' || m === ']' ? m : '\\' + m);
+    const re = new RegExp(`${escaped}[^.]{0,120}?(\\d{1,3}(?:[.,]\\d{1,3})*(?:[.,]\\d+)?)`, 'i');
+    const m = reportText.match(re);
+    if (!m) continue;
+    // Normaliza número brasileiro: 45.321,5 -> 45321.5
+    const numStr = m[1].replace(/\./g, '').replace(',', '.');
+    const cited = Number(numStr);
+    if (!Number.isFinite(cited) || cited === 0) continue;
+    const ratio = Math.abs(cited - v) / Math.max(Math.abs(v), 1);
+    // Aceita se difere em <5% OU se for múltiplo (ex.: percentual vs decimal)
+    if (ratio > 0.05 && Math.abs(cited - v * 100) / Math.max(Math.abs(v * 100), 1) > 0.05
+        && Math.abs(cited * 100 - v) / Math.max(Math.abs(v), 1) > 0.05) {
+      warnings.push(
+        `Valor citado para "${code}" (${m[1]}) diverge do valor auditado (${v.toLocaleString('pt-BR')}).`
+      );
+    }
+  }
+
   return warnings;
+}
+
+/**
+ * Agente IA validador (segunda passagem).
+ * Recebe o relatório gerado + a tabela de auditoria + bibliografia canônica
+ * e devolve uma lista estruturada de divergências factuais.
+ * Não bloqueante — falhas retornam lista vazia.
+ */
+async function runReportValidatorAgent(
+  reportText: string,
+  auditRows: any[],
+  apiKey: string,
+): Promise<string[]> {
+  if (!reportText || !apiKey) return [];
+  try {
+    const auditCompact = (auditRows || []).slice(0, 80).map((r) => ({
+      code: r.indicator_code,
+      pillar: r.pillar,
+      value: r.value,
+      score_pct: r.normalized_score !== null && r.normalized_score !== undefined
+        ? Math.round(Number(r.normalized_score) * 100)
+        : null,
+      source: r.source_type,
+      source_detail: r.source_detail,
+    }));
+
+    const sys = `Você é um agente de auditoria factual para relatórios técnicos em turismo (SISTUR).
+Sua tarefa: comparar o RELATÓRIO contra os DADOS AUDITADOS e contra a BIBLIOGRAFIA CANÔNICA, e listar APENAS divergências verificáveis.
+
+BIBLIOGRAFIA CANÔNICA (qualquer outra data/título para essas obras é ERRO):
+- BENI, M. C. Análise Estrutural do Turismo. SENAC, 1997 (1ª ed., origem do modelo SISTUR) e 2007 (13. ed. revisada).
+- BENI, M. C. Globalização do Turismo. Aleph, 2003.
+- BENI, M. C. Política e Planejamento de Turismo no Brasil. Aleph, 2006.
+- TASSO, J. P. F. et al. Mandala da Sustentabilidade no Turismo. UnB, 2024.
+
+REGRAS:
+1. Reporte SOMENTE divergências factuais objetivas (números errados, anos errados, autores errados, status invertido, fonte trocada).
+2. NÃO comente estilo, tom, formatação ou opiniões.
+3. Cada item deve apontar: o que o texto diz × o que está auditado/canônico.
+4. Máx. 10 itens. Se não houver divergências, devolva [].
+5. Devolva ESTRITAMENTE um JSON: {"issues": ["...", "..."]}. Nada mais.`;
+
+    const usr = `=== DADOS AUDITADOS (fonte de verdade) ===
+${JSON.stringify(auditCompact, null, 2)}
+
+=== RELATÓRIO GERADO ===
+${reportText.slice(0, 18000)}`;
+
+    const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: sys },
+          { role: 'user', content: usr },
+        ],
+        response_format: { type: 'json_object' },
+      }),
+    });
+    if (!resp.ok) {
+      console.warn('Validator agent HTTP', resp.status);
+      return [];
+    }
+    const data = await resp.json();
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) return [];
+    const parsed = JSON.parse(content);
+    const issues = Array.isArray(parsed?.issues) ? parsed.issues : [];
+    return issues.filter((s: unknown) => typeof s === 'string' && s.length > 0).slice(0, 10);
+  } catch (err) {
+    console.warn('Validator agent error (non-blocking):', err);
+    return [];
+  }
 }
 
 // ========== MAIN ==========
