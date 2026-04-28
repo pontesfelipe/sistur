@@ -1583,11 +1583,25 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           // contradições, prefixa um aviso ao relatório salvo.
           let finalContent = fullContent;
           try {
-            const coherenceWarnings = detectCoherenceWarnings(fullContent, auditTrail || []);
-            if (coherenceWarnings.length > 0) {
+            const deterministic = detectCoherenceWarnings(fullContent, auditTrail || []);
+            // Segunda passagem: agente IA validador cruza relatório vs auditoria
+            // e bibliografia canônica. Não bloqueante.
+            const aiIssues = await runReportValidatorAgent(
+              fullContent,
+              auditTrail || [],
+              LOVABLE_API_KEY,
+            );
+            const allIssues = [
+              ...deterministic.map((w) => `[determinístico] ${w}`),
+              ...aiIssues.map((w) => `[agente IA] ${w}`),
+            ];
+            if (allIssues.length > 0) {
               const banner = [
-                '> ⚠️ **Avisos de coerência detectados pelo motor de validação determinística (v1.38.0):**',
-                ...coherenceWarnings.map((w) => `> - ${w}`),
+                '> ⚠️ **Validação cruzada — divergências encontradas (v1.38.7):**',
+                '> ',
+                '> Camadas: motor determinístico + agente IA validador (cruza texto × tabela de auditoria × bibliografia canônica).',
+                '> ',
+                ...allIssues.map((w) => `> - ${w}`),
                 '> ',
                 '> Os valores numéricos da tabela de auditoria são a fonte de verdade — o texto narrativo deve ser revisado nos pontos sinalizados.',
                 '',
@@ -1595,7 +1609,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
                 '',
               ].join('\n');
               finalContent = banner + fullContent;
-              console.warn('Coherence warnings:', coherenceWarnings);
+              console.warn('Validation issues:', allIssues);
             }
           } catch (cohErr) {
             console.error('Coherence check failed (non-blocking):', cohErr);
