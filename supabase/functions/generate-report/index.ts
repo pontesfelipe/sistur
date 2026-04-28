@@ -629,6 +629,31 @@ REGRA CRÍTICA E INEGOCIÁVEL DE FONTES:
 
 ${MEC_FORMATTING_RULES}`;
 
+// ========== CANONICAL BIBLIOGRAPHY (anti-hallucination) ==========
+// Datas/títulos canônicos que o LLM DEVE usar quando citar essas obras.
+// Evita erros recorrentes (ex.: SISTUR de 1997, não 2021).
+const CANONICAL_REFERENCES = `
+REFERÊNCIAS CANÔNICAS — USAR EXATAMENTE ESTAS DATAS E TÍTULOS (NUNCA INVENTAR ANO):
+
+Obrigatórias quando citar Mario Beni / SISTUR:
+- BENI, Mario Carlos. Análise estrutural do turismo. São Paulo: SENAC, 1997. (PRIMEIRA edição — origem do modelo SISTUR. Ano: 1997, NÃO 2001, NÃO 2021.)
+- BENI, Mario Carlos. Análise estrutural do turismo. 13. ed. São Paulo: SENAC, 2007. (edição revisada/ampliada de referência mais usada na academia)
+- BENI, Mario Carlos. Política e planejamento de turismo no Brasil. São Paulo: Aleph, 2006.
+- BENI, Mario Carlos. Globalização do turismo: megatendências do setor e a realidade brasileira. São Paulo: Aleph, 2003.
+
+Outras obras de apoio (citar somente se realmente usar):
+- TASSO, J. P. F.; SILVA, L. C. da; NASCIMENTO, A. (Org.). Mandala da Sustentabilidade no Turismo. Brasília: UnB, 2024.
+- BRASIL. Ministério do Turismo. Plano Nacional de Turismo 2024–2027. Brasília: MTur, 2024.
+- BRASIL. Constituição da República Federativa do Brasil de 1988. (Art. 198 — saúde 15%; Art. 212 — educação 25%).
+
+REGRAS DURAS:
+1. NUNCA atribuir o modelo SISTUR a 2021, 2020 ou qualquer ano diferente de 1997 (origem) ou 2007 (edição revisada).
+2. NUNCA inventar título, editora ou ano de obra de Beni. Se não tiver certeza, use a edição de 1997 ou 2007 desta lista.
+3. Ao citar Beni no corpo do texto: (BENI, 1997) para o modelo original; (BENI, 2007) para a edição revisada.
+4. Toda obra citada no texto DEVE aparecer na seção "Referências" no formato ABNT NBR 6023 desta lista.
+5. Não citar autores fora desta lista a menos que constem nos documentos da Base de Conhecimento entregues no prompt.
+`;
+
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
   if (isEnterprise) {
     return getEnterpriseSystemPrompt(template);
