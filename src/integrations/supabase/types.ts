@@ -8505,6 +8505,7 @@ export type Database = {
         | "DATASUS"
         | "STN"
         | "MAPA_TURISMO"
+        | "CALCULATED"
       diagnosis_tier_type: "COMPLETE" | "MEDIUM" | "SMALL"
       enrollment_status_type: "active" | "completed" | "dropped" | "suspended"
       exam_result_type: "passed" | "failed" | "pending"
@@ -8748,6 +8749,7 @@ export const Constants = {
         "DATASUS",
         "STN",
         "MAPA_TURISMO",
+        "CALCULATED",
       ],
       diagnosis_tier_type: ["COMPLETE", "MEDIUM", "SMALL"],
       enrollment_status_type: ["active", "completed", "dropped", "suspended"],
