@@ -666,6 +666,8 @@ function getTerritorialSystemPrompt(template: string): string {
 
 ${BASE_METHODOLOGY}
 
+${CANONICAL_REFERENCES}
+
 REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Comece SEMPRE com o título "# Relatório SISTUR" seguido da tabela de ficha técnica fornecida
 - Use markdown com headers hierárquicos (# ## ###)
@@ -863,6 +865,8 @@ Cada dado apresentado no relatório DEVE conter a fonte entre parênteses. Exemp
 - Se o dado veio de reviews online, indique a plataforma: "(Fonte: Google Reviews)"
 
 ${MEC_FORMATTING_RULES}
+
+${CANONICAL_REFERENCES}
 
 REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Comece SEMPRE com título seguido da tabela de ficha técnica fornecida
