@@ -209,6 +209,27 @@ export default function Relatorios() {
 
     setIsGenerating(true);
     setReport('');
+    setGenerationStage('Conectando ao servidor…');
+
+    // ── Watchdog anti-travamento ───────────────────────────────────
+    // 1) timeout duro absoluto: 240s (relatório longo + LLM)
+    // 2) watchdog de inatividade: aborta se não chegar chunk em 90s
+    const controller = new AbortController();
+    generationAbortRef.current = controller;
+    const HARD_TIMEOUT_MS = 240_000;
+    const IDLE_TIMEOUT_MS = 90_000;
+    const hardTimer = window.setTimeout(() => {
+      controller.abort(new DOMException('hard-timeout', 'AbortError'));
+    }, HARD_TIMEOUT_MS);
+    let idleTimer = window.setTimeout(() => {
+      controller.abort(new DOMException('idle-timeout', 'AbortError'));
+    }, IDLE_TIMEOUT_MS);
+    const resetIdle = () => {
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        controller.abort(new DOMException('idle-timeout', 'AbortError'));
+      }, IDLE_TIMEOUT_MS);
+    };
 
     const pillarScoresMap: Record<string, { score: number; severity: string }> = {};
     pillarScores?.forEach(ps => {
@@ -234,7 +255,10 @@ export default function Relatorios() {
           environment: runInDemo ? 'demo' : 'production',
           enableComparison,
         }),
+        signal: controller.signal,
       });
+      resetIdle();
+      setGenerationStage('Recebendo conteúdo do modelo…');
 
       if (!resp.ok) {
         const errorData = await resp.json();
@@ -270,6 +294,7 @@ export default function Relatorios() {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+        resetIdle();
         
         textBuffer += decoder.decode(value, { stream: true });
 
@@ -324,9 +349,31 @@ export default function Relatorios() {
       queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
       queryClient.invalidateQueries({ queryKey: ['destinations-with-report-data'] });
     } catch (error) {
+      const isAbort = (error as any)?.name === 'AbortError';
+      const reason = (error as any)?.message || '';
       console.error('Error generating report:', error);
-      toast.error(error instanceof Error ? error.message : 'Erro ao gerar relatório');
+      if (isAbort && reason === 'idle-timeout') {
+        toast.error(
+          'O servidor parou de responder. O relatório pode ter sido salvo mesmo assim — verifique o histórico antes de tentar de novo.',
+          { duration: 8000 },
+        );
+        queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
+      } else if (isAbort && reason === 'hard-timeout') {
+        toast.error(
+          'A geração ultrapassou 4 minutos e foi cancelada. Tente novamente — relatórios curtos costumam levar ~60s.',
+          { duration: 8000 },
+        );
+        queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
+      } else if (isAbort) {
+        toast.info('Geração cancelada.');
+      } else {
+        toast.error(error instanceof Error ? error.message : 'Erro ao gerar relatório');
+      }
     } finally {
+      window.clearTimeout(hardTimer);
+      window.clearTimeout(idleTimer);
+      generationAbortRef.current = null;
+      setGenerationStage('');
       setIsGenerating(false);
     }
   };
