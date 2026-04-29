@@ -206,6 +206,7 @@ export default function Relatorios() {
           reportTemplate,
           visibility: reportVisibility,
           environment: runInDemo ? 'demo' : 'production',
+          enableComparison,
         }),
       });
 
