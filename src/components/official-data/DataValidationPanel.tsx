@@ -196,7 +196,10 @@ export function DataValidationPanel({
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(new Set(values.map(v => v.id)));
+      // Only select rows that have NOT yet been confirmed/validated, so the
+      // user doesn't accidentally re-validate (and thus re-stamp) data they
+      // already approved in a previous session.
+      setSelectedIds(new Set(values.filter(v => !confirmedIds.has(v.id)).map(v => v.id)));
     } else {
       setSelectedIds(new Set());
     }
