@@ -396,13 +396,19 @@ export default function Relatorios() {
 <html><head><title>Relatório SISTUR</title>
 <style>
   body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; max-width: 800px; margin: 0 auto; font-size: ${bodyFontSize}; }
-  h1 { font-size: 24px; border-bottom: 2px solid ${color}; padding-bottom: 8px; margin-top: 32px; }
+  h1 { font-size: 24px; color: ${color}; border-bottom: 2px solid ${color}; padding-bottom: 8px; margin-top: 32px; }
   h2 { font-size: 20px; color: ${color}; margin-top: 24px; }
   h3 { font-size: 16px; color: #374151; margin-top: 16px; }
   table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
-  th { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-weight: 600; }
+  th { background: ${color}; color: #ffffff; border: 1px solid ${color}; padding: 8px; text-align: left; font-weight: 600; }
   td { border: 1px solid #cbd5e1; padding: 8px; }
   tr:nth-child(even) { background: #f8fafc; }
+  td.status-excelente { background: #D1FADF; color: #054F31; font-weight: 600; text-align: center; }
+  td.status-forte     { background: #DBEAFE; color: #1E3A8A; font-weight: 600; text-align: center; }
+  td.status-adequado  { background: #FEF3C7; color: #78350F; font-weight: 600; text-align: center; }
+  td.status-atencao   { background: #FFEDD5; color: #7C2D12; font-weight: 600; text-align: center; }
+  td.status-critico   { background: #FEE2E2; color: #7F1D1D; font-weight: 600; text-align: center; }
+  td.status-info      { background: #F1F5F9; color: #334155; font-weight: 600; text-align: center; }
   strong { color: ${color}; }
   hr { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
   ul, ol { padding-left: 24px; }
