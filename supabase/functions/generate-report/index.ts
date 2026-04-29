@@ -1566,8 +1566,37 @@ Use esta tabela para JUSTIFICAR cada conclusão citando origem do dado e peso ap
 Origens possíveis: OFFICIAL_API (IBGE/DATASUS/STN/CADASTUR/INEP/ANA — máxima confiança),
 DERIVED (calculado por fórmula determinística do engine), ESTIMADA (estimativa interna),
 MANUAL (entrada do usuário — citar como autodeclarada).
+Sufixo _CONTEXTUAL = indicador informativo (peso 0): NÃO atribuir status nem incluir em gargalos.
 
 ${formatAuditTrail(auditTrail)}
+
+=== TABELA CANÔNICA DE VALORES (FONTE ÚNICA DA VERDADE) ===
+Esta é a referência ABSOLUTA. Cada número que você escrever no relatório DEVE
+aparecer EXATAMENTE com o valor desta tabela (mesma vírgula decimal, mesma
+unidade, mesma fonte). Se o valor não estiver aqui, escreva
+"[dado não disponível na base validada]" — NÃO arredonde, NÃO infira, NÃO
+converta unidades por conta própria.
+${(() => {
+  const lines = ['| Código | Indicador | Valor Bruto | Score | Fonte | Peso |',
+                 '|---|---|---|---|---|---|'];
+  for (const r of auditTrail) {
+    const ind = indicatorsByCode.get(r.indicator_code);
+    const name = ind?.name || r.indicator_code;
+    const rawDisplay = r.value !== null && r.value !== undefined
+      ? Number(r.value).toLocaleString('pt-BR', { maximumFractionDigits: 4 })
+      : '—';
+    const isCtx = String(r.source_type || '').endsWith('_CONTEXTUAL');
+    const scoreDisplay = isCtx
+      ? 'CONTEXTUAL'
+      : (r.normalized_score !== null && r.normalized_score !== undefined
+          ? formatPctBR(Number(r.normalized_score)) + '%'
+          : '—');
+    const src = r.source_type || 'MANUAL';
+    const w = r.weight !== null && r.weight !== undefined ? Number(r.weight).toFixed(4) : '0';
+    lines.push(`| ${r.indicator_code} | ${name} | ${rawDisplay} | ${scoreDisplay} | ${src} | ${w} |`);
+  }
+  return lines.join('\n');
+})()}
 
 GARGALOS (com evidências e indicadores que dispararam cada problema):
 ${issuesText}
