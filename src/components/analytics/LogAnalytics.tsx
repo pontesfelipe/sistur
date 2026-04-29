@@ -19,7 +19,9 @@ import {
   Users,
   AlertCircle,
   CalendarIcon,
-  RefreshCw
+  RefreshCw,
+  FileText,
+  Sparkles
 } from 'lucide-react';
 import { format, formatDistanceToNow, subDays, startOfDay, endOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -136,6 +138,8 @@ export function LogAnalytics() {
         return <UserCheck className="h-4 w-4" />;
       case 'data_updated':
         return <FileEdit className="h-4 w-4" />;
+      case 'report_generated':
+        return <FileText className="h-4 w-4" />;
       default:
         return <Activity className="h-4 w-4" />;
     }
@@ -151,6 +155,8 @@ export function LogAnalytics() {
         return 'bg-purple-500/10 text-purple-700 border-purple-500/20';
       case 'user_login':
         return 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20';
+      case 'report_generated':
+        return 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20';
       default:
         return 'bg-muted text-muted-foreground';
     }
