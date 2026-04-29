@@ -973,8 +973,9 @@ ESTRUTURA (MEC/ABNT):
 - Destaque tipo de propriedade, capacidade, sazonalidade, público-alvo, certificações, iniciativas de sustentabilidade e recursos de acessibilidade.
 - Se não houver dados de perfil, indique que a ficha cadastral deve ser completada.
 ## 3. Metodologia SISTUR Enterprise
-## 4. Diagnóstico por Categoria Funcional (tabela por categoria com Indicador | Valor | Benchmark | Fonte | Validado | Evidência)
-- A coluna "Validado" vem do campo "Validado em" nos VALORES ENTERPRISE; "Evidência" vem de value_text ou Observações quando presentes
+## 4. Diagnóstico por Categoria Funcional
+- Para cada categoria, use a TABELA CANÔNICA: | Indicador | Valor | Unidade | Status | Fonte |
+- Logo abaixo de cada tabela, em parágrafo, mencione benchmark, validado em (data) e evidência (value_text/Observações) — NÃO crie colunas extras.
 ## 5. Análise de Gargalos Operacionais
 - Tabela: Gargalo | Severidade | Categoria | Indicadores que dispararam | Prescrição
 - A coluna "Indicadores que dispararam" DEVE ser preenchida a partir da evidência de cada gargalo (campo "Indicadores que puxaram pra baixo" na seção GARGALOS)
