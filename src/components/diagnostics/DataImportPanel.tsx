@@ -102,6 +102,14 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean; _rawInput?: string }>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
+  const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editedValuesRef = useRef(editedValues);
+  const validationErrorsRef = useRef(validationErrors);
+  const selectedAssessmentRef = useRef(selectedAssessment);
+  useEffect(() => { editedValuesRef.current = editedValues; }, [editedValues]);
+  useEffect(() => { validationErrorsRef.current = validationErrors; }, [validationErrors]);
+  useEffect(() => { selectedAssessmentRef.current = selectedAssessment; }, [selectedAssessment]);
 
   const { assessments, isLoading: loadingAssessments, updateAssessment } = useAssessments();
   const { values, isLoading: loadingValues, upsertValue, bulkUpsertValues } = useIndicatorValues(selectedAssessment);
