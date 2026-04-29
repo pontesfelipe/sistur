@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 17,
+  patch: 18,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.18",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Correção dos 20 GAPs apontados na auditoria do relatório (v1.38.13). (1) NORMALIZAÇÃO 0–1 (GAPs #1–#6, #15, #19, #20): `calculate-assessment/normalizeValue` agora detecta automaticamente quando o usuário insere um índice em escala 0–1 (ex.: 0,58 para ESG) em indicadores cujo catálogo define faixa 0–100 (ESG, Segurança Hídrica, IEC-M, Transparência, Gestão de Riscos). Antes: 0,58 → (0,58−0)/(100−0) = 0,58% → CRÍTICO falso. Agora: o valor é reescalado linearmente para a faixa do range antes do MIN_MAX, produzindo 58% → ATENÇÃO correto. Heurística: range ≥ 10 + valor ∈ (0,1]. (2) INDICADORES CONTEXTUAIS (GAPs #7, #8): indicadores com peso 0 (População, Área Territorial, Densidade Demográfica) agora são classificados como CONTEXTUAL — não recebem score, status nem entram na média ponderada do pilar. O `source_type` na auditoria recebe o sufixo `_CONTEXTUAL` para que o LLM apresente apenas na ficha técnica como dados informativos. (3) ATRIBUIÇÃO DE FONTE (GAPs #9, #14, #17): novas regras duras no system prompt do `generate-report` mapeando explicitamente Leitos de Hospedagem → CADASTUR (nunca DATASUS), Leitos hospitalares SUS → DATASUS, CAPAG → STN. Coluna 'Evidência' agora deve ser preenchida com fonte real + ano da trilha quando não houver value_text — proibido o placeholder genérico para dados que existem na auditoria. (4) DIVERGÊNCIA DE VALORES (GAPs #11–#13): nova 'TABELA CANÔNICA DE VALORES' injetada no prompt como fonte única da verdade — cada número do relatório deve bater EXATAMENTE com esta tabela (CAPAG B≠C, permanência 2,3 dias≠2,5 dias, GEE 2,4≠2 tCO₂eq/hab.). (5) IGMA EXPANDIDO (GAP #18): primeira menção no relatório obrigatoriamente expande 'Índice de Gestão Municipal Ambiental (IGMA)'. (6) COMPARATIVO OPT-IN (GAP #16): bloco de comparação com rodada anterior agora só é injetado quando o cliente passa `enableComparison: true`. Novo toggle 'Comparativo' na tela de geração (Relatórios → Gerar) com tooltip explicativo, default desativado. Resultado: relatórios de Foz e similares deixam de mostrar status crítico falso, deixam de comparar rodadas sem solicitação e passam a respeitar literalmente os valores validados pelo usuário."
+    ]
+  },
   {
     version: "1.38.17",
     date: "2026-04-29",
