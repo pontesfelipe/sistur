@@ -998,7 +998,12 @@ export default function Relatorios() {
                       {isGenerating && !report && (
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Gerando relatório...
+                          {generationStage || 'Gerando relatório…'} ({generationElapsed}s)
+                        </div>
+                      )}
+                      {isGenerating && generationElapsed >= 60 && !report && (
+                        <div className="mt-3 text-xs text-amber-600 dark:text-amber-400">
+                          A geração está demorando mais que o usual. Aguarde até 4 minutos antes de cancelar — não tente clicar em &quot;Gerar&quot; novamente.
                         </div>
                       )}
                       {report && renderMarkdown(report)}
