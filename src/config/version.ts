@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 19,
+  patch: 20,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.20",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Correção do indicador 'Densidade Demográfica' (e demais contextuais — População e Área Territorial) que aparecia como '0% — Crítico' no painel e nos relatórios. Causa raiz: a coluna `indicator_scores.score` era `NOT NULL`, então quando o `calculate-assessment` tentava gravar `null` para indicadores com peso 0 (contextuais — apenas caracterizam o território, não pontuam), o Postgres rejeitava o insert ou o código upstream caía no fallback `0`, fazendo a densidade real (ex.: 468,51 hab/km²) virar score=0/Crítico. Correção em duas frentes: (1) Migração de schema — `indicator_scores.score`, `value_normalized` e `score_pct` agora aceitam `NULL`; novo CHECK `score IS NULL OR (score BETWEEN 0 AND 1)`; constraint preservada para os pontuáveis. (2) Limpeza retroativa — todos os registros de indicadores com peso=0 (densidade, população, área) tiveram score/normalized/pct setados para NULL e `normalization_method='contextual'`, eliminando os falsos críticos legados nos snapshots. Comentário documental adicionado à coluna. Resultado: densidade aparece com seu valor real e rótulo INFORMATIVO (⚪) tanto no painel quanto nos relatórios; deixa de poluir a média do pilar RA com zero falso."
+    ]
+  },
   {
     version: "1.38.19",
     date: "2026-04-29",
