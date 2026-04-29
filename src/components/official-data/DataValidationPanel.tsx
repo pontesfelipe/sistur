@@ -123,24 +123,45 @@ export function DataValidationPanel({
     return code.replace('igma_', '').replace('MST_', '').replace(/_/g, ' ');
   };
 
-  // Always fetch fresh data from all sources when the panel mounts for a new diagnostic
+  // Only auto-fetch when there is NO cached external data yet. If the user
+  // had already validated indicators in a previous session, refetching would
+  // wipe their progress and force them to re-validate the pre-fill from
+  // scratch. The user can still trigger a refresh manually via "Atualizar".
   useEffect(() => {
-    if (!autoFetched && ibgeCode && orgId) {
+    if (autoFetched || isLoading || !ibgeCode || !orgId) return;
+    if (rawValues && rawValues.length > 0) {
       setAutoFetched(true);
-      // Clear stale cache before fetching fresh data
-      queryClient.removeQueries({ queryKey: ['external-indicator-values', ibgeCode, orgId] });
-      fetchOfficialData.mutate(
-        { ibgeCode, orgId, includeMandala },
-        {
-          onSuccess: (data) => {
-            const iqa = data?.ana_status?.iqa;
-            if (iqa?.status === 'success') setAnaIqaStatus('success');
-            else setAnaIqaStatus('unavailable');
-          },
-        }
-      );
+      return;
     }
-  }, [ibgeCode, orgId, autoFetched, includeMandala]);
+    setAutoFetched(true);
+    fetchOfficialData.mutate(
+      { ibgeCode, orgId, includeMandala },
+      {
+        onSuccess: (data) => {
+          const iqa = data?.ana_status?.iqa;
+          if (iqa?.status === 'success') setAnaIqaStatus('success');
+          else setAnaIqaStatus('unavailable');
+        },
+      }
+    );
+  }, [ibgeCode, orgId, autoFetched, includeMandala, isLoading, rawValues]);
+
+  // Seed `confirmedIds` from values that were already validated in a previous
+  // session so the user doesn't have to re-confirm them on resume.
+  useEffect(() => {
+    if (!rawValues || rawValues.length === 0) return;
+    setConfirmedIds(prev => {
+      const next = new Set(prev);
+      let changed = false;
+      rawValues.forEach(v => {
+        if ((v as any).validated && !next.has(v.id)) {
+          next.add(v.id);
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [rawValues]);
 
   const values = useMemo(
     () => rawValues.filter(isOfficialPreFilledValue),

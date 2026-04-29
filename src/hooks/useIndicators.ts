@@ -273,19 +273,23 @@ export function useIndicatorValues(assessmentId?: string) {
       // Use effective org_id (supports demo mode)
       const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
 
-      // Delete existing values for this assessment
-      await supabase
-        .from('indicator_values')
-        .delete()
-        .eq('assessment_id', values[0]?.assessment_id);
+      if (!values || values.length === 0) return [];
 
-      // Insert new values
+      // IMPORTANT: do NOT delete pre-existing values for this assessment.
+      // Previously we wiped all rows and re-inserted only the edited ones,
+      // which silently destroyed indicators the user had already saved
+      // unitarily (or that came from official pre-fill). We now upsert on
+      // the (assessment_id, indicator_id) unique key so existing values are
+      // updated in place and unrelated rows are preserved.
       const { data, error } = await supabase
         .from('indicator_values')
-        .insert(values.map(v => ({
-          ...v,
-          org_id: effectiveOrgId,
-        })))
+        .upsert(
+          values.map(v => ({
+            ...v,
+            org_id: effectiveOrgId,
+          })),
+          { onConflict: 'assessment_id,indicator_id' }
+        )
         .select();
 
       if (error) throw error;

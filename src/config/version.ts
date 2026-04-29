@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 10,
+  patch: 11,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.11",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico — correção de duas regressões graves no preenchimento de indicadores. (1) `useIndicators.bulkUpsertValues` (acionado pelo botão 'Salvar Todos' do DataImportPanel) NÃO apaga mais todas as linhas existentes da `indicator_values` daquele assessment antes de inserir as editadas. Antes, qualquer indicador previamente salvo unitariamente — ou pré-preenchido pela validação oficial — era silenciosamente destruído. Agora a operação é um upsert com onConflict='assessment_id,indicator_id': as linhas editadas são atualizadas in place e as demais permanecem intactas. (2) `DataValidationPanel` agora preserva o estado de validação entre sessões: o auto-fetch das fontes oficiais só dispara quando NÃO existe nenhum valor em cache para o destino+org (antes refazia o fetch a cada montagem, descartando validações anteriores). Além disso, o conjunto `confirmedIds` é semeado a partir dos valores que já estão marcados como `validated=true` na base, de modo que ao retomar um diagnóstico o usuário não precisa revalidar o que já tinha confirmado. Resultado: o fluxo de retomar diagnóstico mantém pré-preenchimento + validação + valores manuais salvos."
+    ]
+  },
   {
     version: "1.38.10",
     date: "2026-04-28",
