@@ -126,6 +126,30 @@ export default function Relatorios() {
   const [genTypeFilter, setGenTypeFilter] = useState<string>('all');
   const [genTierFilter, setGenTierFilter] = useState<string>('all');
   const [genDestFilter, setGenDestFilter] = useState<string>('all');
+  // Watchdog para evitar UI travada quando o stream SSE para de responder.
+  const generationAbortRef = useRef<AbortController | null>(null);
+  const [generationStage, setGenerationStage] = useState<string>('');
+  const [generationElapsed, setGenerationElapsed] = useState<number>(0);
+
+  // Timer visual durante a geração (se segura ≥30s sem chunk, mostra aviso).
+  useEffect(() => {
+    if (!isGenerating) {
+      setGenerationElapsed(0);
+      return;
+    }
+    const start = Date.now();
+    const id = window.setInterval(() => {
+      setGenerationElapsed(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [isGenerating]);
+
+  const cancelGeneration = () => {
+    if (generationAbortRef.current) {
+      generationAbortRef.current.abort();
+      generationAbortRef.current = null;
+    }
+  };
 
   // Pre-select assessment from URL parameter
   useEffect(() => {
