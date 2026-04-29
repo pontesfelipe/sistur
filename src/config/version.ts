@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 13,
+  patch: 14,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.14",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Geração de Relatórios — Claude Sonnet 4.5 como modelo primário, Gemini como fallback automático. A edge function `generate-report` agora tenta primeiro Anthropic Claude (`claude-sonnet-4-5-20250929`) via API direta com a chave `ANTHROPIC_API_KEY` configurada como secret. O stream SSE da Anthropic é adaptado em tempo real para o formato OpenAI-compatível (`data: {choices:[{delta:{content}}]}`) consumido pelo parser downstream — preservando intactas todas as camadas posteriores (auto-correção determinística, detecção de coerência, agente IA validador `gemini-2.5-pro`, persistência em `report_validations`, banner de validação cruzada). Em caso de erro HTTP, indisponibilidade, créditos esgotados ou exceção de rede do lado Anthropic, o sistema cai automaticamente para o Lovable AI Gateway (`google/gemini-2.5-pro`) sem interromper o usuário — o motivo do fallback é logado (`provider: gemini (fallback after Claude: ...)`). A chave Anthropic NUNCA é exposta no frontend, fica apenas como secret server-side. Resultado: maior rigor factual e qualidade narrativa do Claude para texto analítico longo, com resiliência total via Gemini sempre que necessário."
+    ]
+  },
   {
     version: "1.38.13",
     date: "2026-04-29",
