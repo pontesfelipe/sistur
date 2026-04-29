@@ -184,12 +184,24 @@ export function useFetchOfficialData() {
       indicators?: string[];
       includeMandala?: boolean;
     }) => {
-      // Reset previous validation flags so fresh data is presented for re-validation
-      await supabase
+      // IMPORTANT: do NOT reset previously validated rows. If the user has
+      // already confirmed an indicator in a previous session, that decision
+      // must persist across refetches and across resuming a diagnostic.
+      // The ingestion edge functions upsert by (org_id, municipality_ibge_code,
+      // indicator_code), so unchanged rows naturally keep their validated flag.
+      // We only clear validation for rows that actually receive a NEW value
+      // (handled implicitly when the upsert overwrites raw_value with a
+      // different number — see post-fetch reconciliation below).
+      const { data: previouslyValidated } = await supabase
         .from('external_indicator_values')
-        .update({ validated: false, validated_by: null, validated_at: null })
+        .select('id, indicator_code, raw_value, validated')
         .eq('municipality_ibge_code', ibgeCode)
-        .eq('org_id', orgId);
+        .eq('org_id', orgId)
+        .eq('validated', true);
+      const validatedSnapshot = new Map<string, number | null>();
+      (previouslyValidated || []).forEach((row: any) => {
+        validatedSnapshot.set(row.indicator_code, row.raw_value);
+      });
 
       // Fire core sources in parallel: IBGE + CADASTUR + Mapa do Turismo bridge + ANA
       const corePromises: Promise<any>[] = [
@@ -229,6 +241,40 @@ export function useFetchOfficialData() {
 
       if (official?.error) throw official.error;
       if (!official?.data?.success) throw new Error(official?.data?.error || 'Erro ao buscar dados oficiais');
+
+      // Reconcile: only invalidate rows whose raw_value actually changed
+      // versus the previously validated snapshot. Rows that came back with
+      // the same value keep their validated flag intact.
+      if (validatedSnapshot.size > 0) {
+        const { data: refreshed } = await supabase
+          .from('external_indicator_values')
+          .select('id, indicator_code, raw_value')
+          .eq('municipality_ibge_code', ibgeCode)
+          .eq('org_id', orgId)
+          .in('indicator_code', Array.from(validatedSnapshot.keys()));
+        const toReValidateIds: string[] = [];
+        const toInvalidateIds: string[] = [];
+        (refreshed || []).forEach((row: any) => {
+          const oldVal = validatedSnapshot.get(row.indicator_code);
+          const same = (oldVal === null && row.raw_value === null) ||
+            (oldVal !== null && row.raw_value !== null &&
+             Number(oldVal) === Number(row.raw_value));
+          if (same) toReValidateIds.push(row.id);
+          else toInvalidateIds.push(row.id);
+        });
+        if (toReValidateIds.length > 0) {
+          await supabase
+            .from('external_indicator_values')
+            .update({ validated: true })
+            .in('id', toReValidateIds);
+        }
+        if (toInvalidateIds.length > 0) {
+          await supabase
+            .from('external_indicator_values')
+            .update({ validated: false, validated_by: null, validated_at: null })
+            .in('id', toInvalidateIds);
+        }
+      }
 
       // Merge statuses into response
       const cadasturStatus = cadastur?.data?.results || {};

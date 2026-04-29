@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 12,
+  patch: 13,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.13",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Validação Oficial — persistência definitiva do estado validado entre sessões. Removida a operação destrutiva em `useFetchOfficialData` que zerava `validated=false` em TODA a tabela `external_indicator_values` daquele município/org sempre que o usuário (ou o auto-fetch) acionava 'Atualizar' ou 'Buscar Dados'. Antes, qualquer refetch apagava silenciosamente todas as confirmações anteriores e o usuário era forçado a revalidar o pré-preenchimento ao retomar o diagnóstico. Agora a função tira um snapshot dos valores validados ANTES do fetch e reconcilia depois: linhas cujo `raw_value` retorna idêntico mantêm o flag `validated=true` (re-stamped por segurança); apenas linhas cujo valor mudou de fato são marcadas como `validated=false` para revisão pontual. `DataValidationPanel.handleSelectAll` também foi ajustado para não re-selecionar linhas já confirmadas, evitando re-stamps desnecessários. Combinado com as correções de v1.38.11 (seed de `confirmedIds` a partir do banco + skip de auto-fetch quando há cache) e v1.38.12 (autosave do DataImportPanel), o fluxo de retomar agora preserva integralmente: validações oficiais, pré-preenchimento e indicadores manuais salvos."
+    ]
+  },
   {
     version: "1.38.12",
     date: "2026-04-29",
