@@ -36,7 +36,8 @@ import {
   FlaskConical,
   Filter,
   Building2,
-  Globe
+  Globe,
+  X
 } from 'lucide-react';
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
@@ -125,6 +126,30 @@ export default function Relatorios() {
   const [genTypeFilter, setGenTypeFilter] = useState<string>('all');
   const [genTierFilter, setGenTierFilter] = useState<string>('all');
   const [genDestFilter, setGenDestFilter] = useState<string>('all');
+  // Watchdog para evitar UI travada quando o stream SSE para de responder.
+  const generationAbortRef = useRef<AbortController | null>(null);
+  const [generationStage, setGenerationStage] = useState<string>('');
+  const [generationElapsed, setGenerationElapsed] = useState<number>(0);
+
+  // Timer visual durante a geração (se segura ≥30s sem chunk, mostra aviso).
+  useEffect(() => {
+    if (!isGenerating) {
+      setGenerationElapsed(0);
+      return;
+    }
+    const start = Date.now();
+    const id = window.setInterval(() => {
+      setGenerationElapsed(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [isGenerating]);
+
+  const cancelGeneration = () => {
+    if (generationAbortRef.current) {
+      generationAbortRef.current.abort();
+      generationAbortRef.current = null;
+    }
+  };
 
   // Pre-select assessment from URL parameter
   useEffect(() => {
@@ -184,6 +209,27 @@ export default function Relatorios() {
 
     setIsGenerating(true);
     setReport('');
+    setGenerationStage('Conectando ao servidor…');
+
+    // ── Watchdog anti-travamento ───────────────────────────────────
+    // 1) timeout duro absoluto: 240s (relatório longo + LLM)
+    // 2) watchdog de inatividade: aborta se não chegar chunk em 90s
+    const controller = new AbortController();
+    generationAbortRef.current = controller;
+    const HARD_TIMEOUT_MS = 240_000;
+    const IDLE_TIMEOUT_MS = 90_000;
+    const hardTimer = window.setTimeout(() => {
+      controller.abort(new DOMException('hard-timeout', 'AbortError'));
+    }, HARD_TIMEOUT_MS);
+    let idleTimer = window.setTimeout(() => {
+      controller.abort(new DOMException('idle-timeout', 'AbortError'));
+    }, IDLE_TIMEOUT_MS);
+    const resetIdle = () => {
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        controller.abort(new DOMException('idle-timeout', 'AbortError'));
+      }, IDLE_TIMEOUT_MS);
+    };
 
     const pillarScoresMap: Record<string, { score: number; severity: string }> = {};
     pillarScores?.forEach(ps => {
@@ -209,7 +255,10 @@ export default function Relatorios() {
           environment: runInDemo ? 'demo' : 'production',
           enableComparison,
         }),
+        signal: controller.signal,
       });
+      resetIdle();
+      setGenerationStage('Recebendo conteúdo do modelo…');
 
       if (!resp.ok) {
         const errorData = await resp.json();
@@ -245,6 +294,7 @@ export default function Relatorios() {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+        resetIdle();
         
         textBuffer += decoder.decode(value, { stream: true });
 
@@ -299,9 +349,31 @@ export default function Relatorios() {
       queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
       queryClient.invalidateQueries({ queryKey: ['destinations-with-report-data'] });
     } catch (error) {
+      const isAbort = (error as any)?.name === 'AbortError';
+      const reason = (error as any)?.message || '';
       console.error('Error generating report:', error);
-      toast.error(error instanceof Error ? error.message : 'Erro ao gerar relatório');
+      if (isAbort && reason === 'idle-timeout') {
+        toast.error(
+          'O servidor parou de responder. O relatório pode ter sido salvo mesmo assim — verifique o histórico antes de tentar de novo.',
+          { duration: 8000 },
+        );
+        queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
+      } else if (isAbort && reason === 'hard-timeout') {
+        toast.error(
+          'A geração ultrapassou 4 minutos e foi cancelada. Tente novamente — relatórios curtos costumam levar ~60s.',
+          { duration: 8000 },
+        );
+        queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
+      } else if (isAbort) {
+        toast.info('Geração cancelada.');
+      } else {
+        toast.error(error instanceof Error ? error.message : 'Erro ao gerar relatório');
+      }
     } finally {
+      window.clearTimeout(hardTimer);
+      window.clearTimeout(idleTimer);
+      generationAbortRef.current = null;
+      setGenerationStage('');
       setIsGenerating(false);
     }
   };
@@ -821,7 +893,7 @@ export default function Relatorios() {
                       {isGenerating ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Gerando...
+                          Gerando… {generationElapsed > 0 ? `(${generationElapsed}s)` : ''}
                         </>
                       ) : (
                         <>
@@ -830,6 +902,17 @@ export default function Relatorios() {
                         </>
                       )}
                     </Button>
+                    {isGenerating && (
+                      <Button
+                        variant="outline"
+                        onClick={cancelGeneration}
+                        className="gap-2"
+                        title="Cancelar a geração em andamento"
+                      >
+                        <X className="h-4 w-4" />
+                        Cancelar
+                      </Button>
+                    )}
 
                     {report && (
                       <>
@@ -915,7 +998,12 @@ export default function Relatorios() {
                       {isGenerating && !report && (
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Gerando relatório...
+                          {generationStage || 'Gerando relatório…'} ({generationElapsed}s)
+                        </div>
+                      )}
+                      {isGenerating && generationElapsed >= 60 && !report && (
+                        <div className="mt-3 text-xs text-amber-600 dark:text-amber-400">
+                          A geração está demorando mais que o usual. Aguarde até 4 minutos antes de cancelar — não tente clicar em &quot;Gerar&quot; novamente.
                         </div>
                       )}
                       {report && renderMarkdown(report)}
