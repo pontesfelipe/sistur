@@ -893,7 +893,7 @@ export default function Relatorios() {
                       {isGenerating ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Gerando...
+                          Gerando… {generationElapsed > 0 ? `(${generationElapsed}s)` : ''}
                         </>
                       ) : (
                         <>
@@ -902,6 +902,17 @@ export default function Relatorios() {
                         </>
                       )}
                     </Button>
+                    {isGenerating && (
+                      <Button
+                        variant="outline"
+                        onClick={cancelGeneration}
+                        className="gap-2"
+                        title="Cancelar a geração em andamento"
+                      >
+                        <X className="h-4 w-4" />
+                        Cancelar
+                      </Button>
+                    )}
 
                     {report && (
                       <>
