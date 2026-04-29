@@ -322,8 +322,23 @@ function normalizeValue(
   const max = maxRef ?? 100;
   
   if (max === min) return 0.5;
-  
-  let score = (value - min) / (max - min);
+
+  // GAP-FIX (v1.38.18): Auto-detecção de escala 0-1.
+  // Quando o usuário insere um índice em escala 0–1 (ex.: 0,58 para ESG)
+  // mas o catálogo define min_ref=0 / max_ref=100 (ex.: 0 a 100 pontos),
+  // o cálculo (0.58 - 0) / (100 - 0) = 0,0058 = 0,58% gera CRÍTICO falso.
+  // Heurística canônica:
+  //   - Se o range esperado é >= 10 (claramente escala 0-100, 0-1000, etc.)
+  //   - E o valor bruto está entre 0 e 1 (inclusive)
+  //   - E o valor não é exatamente 0 (poderia ser legítimo)
+  // Então o usuário forneceu um índice 0–1: convertemos para a escala do range.
+  let normalizedValue = value;
+  if (max - min >= 10 && value > 0 && value <= 1) {
+    // Reescala 0–1 para min..max linear (preserva semântica original)
+    normalizedValue = min + value * (max - min);
+  }
+
+  let score = (normalizedValue - min) / (max - min);
   score = Math.max(0, Math.min(1, score)); // Clamp to 0-1
   
   // Invert if lower is better
