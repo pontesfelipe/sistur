@@ -924,10 +924,18 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                           </p>
                         )}
                       </div>
-                      <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending || errorCount > 0}>
-                        <Save className="mr-2 h-4 w-4" />
-                        Salvar Todos
-                      </Button>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1" aria-live="polite">
+                          {autosaveStatus === 'saving' && (<><Loader2 className="h-3 w-3 animate-spin" /> Salvando rascunho…</>)}
+                          {autosaveStatus === 'saved' && (<><CheckCircle2 className="h-3 w-3 text-severity-good" /> Rascunho salvo</>)}
+                          {autosaveStatus === 'error' && (<><AlertCircle className="h-3 w-3 text-destructive" /> Falha no autosave</>)}
+                          {autosaveStatus === 'idle' && Object.keys(editedValues).length > 0 && (<>Alterações pendentes…</>)}
+                        </span>
+                        <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending || errorCount > 0}>
+                          <Save className="mr-2 h-4 w-4" />
+                          Salvar Todos
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
