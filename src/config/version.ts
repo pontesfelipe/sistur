@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 14,
+  patch: 15,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.15",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Logs (Configurações → Logs) — auditoria de geração de relatórios com modelo LLM utilizado. A edge function `generate-report` agora insere um evento `report_generated` em `audit_events` ao final de cada geração bem-sucedida, com metadata contendo: `provider` (claude|gemini), `model` (anthropic/claude-sonnet-4-5-20250929 ou google/gemini-2.5-pro), `fallback_reason` (preenchido quando Claude falhou e caiu para Gemini), `template` (completo/executivo/investidores), `destination_name`, `assessment_id`, `validation_status` e `total_issues`. O painel `LogAnalytics` na aba Logs exibe esses eventos com ícone próprio (FileText), cor indigo, badge colorido do provedor (laranja para Claude, azul para Gemini), nome do destino, template usado e — quando aplicável — badge âmbar com o motivo do fallback. Resultado: o ADMIN consegue auditar em tempo real qual modelo gerou cada relatório e quando houve fallback automático para Gemini."
+    ]
+  },
   {
     version: "1.38.14",
     date: "2026-04-29",

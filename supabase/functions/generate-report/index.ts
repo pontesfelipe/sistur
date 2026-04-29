@@ -1840,6 +1840,32 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           } catch (vErr) {
             console.error('Failed to persist report_validations:', vErr);
           }
+
+          // Audit event — registra qual modelo gerou o relatório (v1.38.15)
+          try {
+            const modelLabel = usedProvider === 'claude'
+              ? 'anthropic/claude-sonnet-4-5-20250929'
+              : 'google/gemini-2.5-pro';
+            await supabaseAdmin.from('audit_events').insert({
+              org_id: assessment.org_id,
+              user_id: userId,
+              event_type: 'report_generated',
+              entity_type: 'generated_report',
+              entity_id: savedReportId,
+              metadata: {
+                provider: usedProvider,
+                model: modelLabel,
+                fallback_reason: claudeFailReason,
+                template: reportTemplate,
+                destination_name: destinationName,
+                assessment_id: assessmentId,
+                validation_status: validationStatus,
+                total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
+              },
+            });
+          } catch (auditErr) {
+            console.error('Failed to insert audit_events for report_generated:', auditErr);
+          }
         }
       } catch (err) {
         console.error('Stream error:', err);

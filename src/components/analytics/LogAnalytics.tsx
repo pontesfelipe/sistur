@@ -19,7 +19,9 @@ import {
   Users,
   AlertCircle,
   CalendarIcon,
-  RefreshCw
+  RefreshCw,
+  FileText,
+  Sparkles
 } from 'lucide-react';
 import { format, formatDistanceToNow, subDays, startOfDay, endOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -136,6 +138,8 @@ export function LogAnalytics() {
         return <UserCheck className="h-4 w-4" />;
       case 'data_updated':
         return <FileEdit className="h-4 w-4" />;
+      case 'report_generated':
+        return <FileText className="h-4 w-4" />;
       default:
         return <Activity className="h-4 w-4" />;
     }
@@ -151,6 +155,8 @@ export function LogAnalytics() {
         return 'bg-purple-500/10 text-purple-700 border-purple-500/20';
       case 'user_login':
         return 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20';
+      case 'report_generated':
+        return 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -392,6 +398,39 @@ export function LogAnalytics() {
                             </Badge>
                           )}
                         </div>
+                        {event.event_type === 'report_generated' && event.metadata && typeof event.metadata === 'object' && (
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {(event.metadata as any).destination_name && (
+                              <span className="text-xs text-foreground/80 font-medium">
+                                {(event.metadata as any).destination_name}
+                              </span>
+                            )}
+                            {(event.metadata as any).provider && (
+                              <Badge
+                                variant="secondary"
+                                className={cn(
+                                  "text-[10px] gap-1",
+                                  (event.metadata as any).provider === 'claude'
+                                    ? "bg-orange-500/15 text-orange-700 border-orange-500/30"
+                                    : "bg-blue-500/15 text-blue-700 border-blue-500/30"
+                                )}
+                              >
+                                <Sparkles className="h-2.5 w-2.5" />
+                                {(event.metadata as any).provider === 'claude' ? 'Claude Sonnet 4.5' : 'Gemini 2.5 Pro'}
+                              </Badge>
+                            )}
+                            {(event.metadata as any).template && (
+                              <Badge variant="outline" className="text-[10px]">
+                                {(event.metadata as any).template}
+                              </Badge>
+                            )}
+                            {(event.metadata as any).fallback_reason && (
+                              <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-700 border-amber-500/30">
+                                fallback: {(event.metadata as any).fallback_reason}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
                         <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                           <Clock className="h-3 w-3" />
                           {formatDistanceToNow(new Date(event.created_at), { 
