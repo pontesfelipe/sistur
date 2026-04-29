@@ -752,7 +752,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                 </p>
               </div>
             </div>
-            <Select value={selectedAssessment} onValueChange={setSelectedAssessment}>
+            <Select value={selectedAssessment} onValueChange={handleAssessmentSwitch}>
               <SelectTrigger className="w-72">
                 <SelectValue placeholder="Selecionar diagnóstico" />
               </SelectTrigger>
