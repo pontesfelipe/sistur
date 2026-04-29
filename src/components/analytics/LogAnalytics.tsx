@@ -412,11 +412,22 @@ export function LogAnalytics() {
                                   "text-[10px] gap-1",
                                   (event.metadata as any).provider === 'claude'
                                     ? "bg-orange-500/15 text-orange-700 border-orange-500/30"
+                                    : (event.metadata as any).provider === 'gemini'
+                                    ? "bg-blue-500/15 text-blue-700 border-blue-500/30"
                                     : "bg-blue-500/15 text-blue-700 border-blue-500/30"
                                 )}
                               >
                                 <Sparkles className="h-2.5 w-2.5" />
-                                {(event.metadata as any).provider === 'claude' ? 'Claude Sonnet 4.5' : 'Gemini 2.5 Pro'}
+                                {(event.metadata as any).provider === 'claude'
+                                  ? 'Claude Sonnet 4.5'
+                                  : (event.metadata as any).provider === 'gemini'
+                                  ? 'Gemini 2.5 Pro'
+                                  : 'Modelo não registrado'}
+                              </Badge>
+                            )}
+                            {(event.metadata as any).model_audit_status === 'not_available_before_logging_fix' && (
+                              <Badge variant="outline" className="text-[10px] bg-muted text-muted-foreground">
+                                histórico sem modelo
                               </Badge>
                             )}
                             {(event.metadata as any).template && (
