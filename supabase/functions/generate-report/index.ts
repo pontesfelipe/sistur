@@ -627,6 +627,22 @@ REGRA CRÍTICA E INEGOCIÁVEL DE FONTES:
 6. O relatório DEVE terminar com uma seção "## Referências" em formato ABNT NBR 6023 listando TODAS as fontes oficiais consultadas
 7. NUNCA apresente um dado sem citar a fonte — se a fonte for desconhecida, indique "(Fonte: Não identificada)"
 
+REGRAS DE ATRIBUIÇÃO CORRETA DE FONTE (anti-troca de origem — GAP v1.38.18):
+- "Leitos de Hospedagem" / "Meios de hospedagem" / "Capacidade hoteleira" → fonte CADASTUR (Ministério do Turismo). NUNCA atribua a DATASUS.
+- "Leitos hospitalares SUS" / "Cobertura de saúde" → fonte DATASUS. NUNCA atribua a CADASTUR.
+- "CAPAG" → fonte STN/Tesouro Nacional. Use a classificação A/B/C/D EXATAMENTE como aparece na TRILHA DE AUDITORIA — NÃO troque B por C nem C por B.
+- "Permanência média" / "Gasto médio diário" / "Receita turística" → fonte CADASTUR/MTur ou base de referência interna. Use o valor EXATO da TRILHA DE AUDITORIA (ex.: se a auditoria mostra 2,3 dias, escreva 2,3 dias — NÃO arredonde para 2,5).
+- "Emissão de gases de efeito estufa" → fonte SEEG/MapBiomas ou Manual. Use o valor numérico EXATO da auditoria (ex.: 2,4 tCO₂eq/hab. — NÃO escreva 2 tCO₂eq/hab.).
+
+IGMA — NOMENCLATURA OBRIGATÓRIA:
+- A primeira menção a "IGMA" no relatório DEVE expandir a sigla: "Índice de Gestão Municipal Ambiental (IGMA)".
+- A partir da segunda menção, pode usar apenas "IGMA". Sempre que aparecer uma flag IGMA, explique o que ela mede em uma frase.
+
+INDICADORES CONTEXTUAIS (peso 0):
+- Indicadores como "População", "Área Territorial" e "Densidade Demográfica" têm peso 0 e são CONTEXTUAIS — apenas caracterizam o destino.
+- Quando aparecerem na trilha de auditoria com source_type terminando em "_CONTEXTUAL" (ou normalized_score = 0 e weight = 0), apresente-os SOMENTE na "Ficha Técnica" / "Caracterização do Destino" como dados informativos.
+- NUNCA atribua status (CRÍTICO/ATENÇÃO/ADEQUADO/EXCELENTE) a indicador contextual. NUNCA inclua na seção de gargalos. NUNCA inclua nas tabelas de pontuação por eixo.
+
 ${MEC_FORMATTING_RULES}`;
 
 // ========== CANONICAL BIBLIOGRAPHY (anti-hallucination) ==========
