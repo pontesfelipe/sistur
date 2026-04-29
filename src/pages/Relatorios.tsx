@@ -728,6 +728,31 @@ export default function Relatorios() {
                     </div>
                   )}
 
+                  <div className="w-44">
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                      Comparativo
+                    </label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={enableComparison ? 'secondary' : 'outline'}
+                            className="w-full gap-2"
+                            onClick={() => setEnableComparison(!enableComparison)}
+                          >
+                            <FileText className="h-4 w-4" />
+                            {enableComparison ? 'Comparar rodadas' : 'Sem comparação'}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {enableComparison
+                            ? 'O relatório incluirá um bloco comparando esta rodada com a anterior do mesmo destino.'
+                            : 'Ative para incluir comparação com a rodada anterior do mesmo destino.'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+
                   <div className="flex items-end gap-2">
                     <Button 
                       onClick={() => generateReport()} 
