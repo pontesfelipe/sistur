@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 16,
+  patch: 17,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.17",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Logs — recuperação dos relatórios gerados antes da correção de auditoria. Foi realizado backfill dos registros existentes em `generated_reports` para `audit_events`, fazendo com que relatórios já salvos apareçam em Configurações → Logs. Como esses relatórios antigos foram criados antes da captura do provedor LLM, a interface agora mostra 'Modelo não registrado' e um badge 'histórico sem modelo' em vez de atribuir incorretamente Claude ou Gemini. Novas gerações continuam registrando o modelo real usado."
+    ]
+  },
   {
     version: "1.38.16",
     date: "2026-04-29",
