@@ -585,6 +585,93 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     toast.success('Todos os valores foram salvos!');
   };
 
+  // ---------------------------------------------------------------------------
+  // Persistência automática (autosave) durante a entrada de indicadores.
+  // Garante que nenhum valor digitado seja perdido por navegação, troca de
+  // assessment, fechamento de aba ou crash. Salva apenas linhas SEM erro de
+  // validação — linhas inválidas continuam pendentes até correção.
+  // ---------------------------------------------------------------------------
+  const flushAutosave = async (silent = true): Promise<boolean> => {
+    const assessmentId = selectedAssessmentRef.current;
+    const edited = editedValuesRef.current;
+    const errors = validationErrorsRef.current;
+    if (!assessmentId) return true;
+    const validEntries = Object.entries(edited).filter(
+      ([id, data]) => !errors[id] && data && (data.value !== undefined)
+    );
+    if (validEntries.length === 0) return true;
+    setAutosaveStatus('saving');
+    try {
+      await bulkUpsertValues.mutateAsync(
+        validEntries.map(([indicatorId, data]) => ({
+          assessment_id: assessmentId,
+          indicator_id: indicatorId,
+          value_raw: data.value,
+          source: data.source || 'Manual',
+        }))
+      );
+      // Limpar somente as linhas que foram efetivamente salvas
+      setEditedValues(prev => {
+        const next = { ...prev };
+        validEntries.forEach(([id]) => delete next[id]);
+        return next;
+      });
+      setAutosaveStatus('saved');
+      if (!silent) toast.success('Rascunho salvo automaticamente');
+      return true;
+    } catch (err) {
+      console.error('[autosave] failed', err);
+      setAutosaveStatus('error');
+      if (!silent) toast.error('Falha ao salvar rascunho automaticamente');
+      return false;
+    }
+  };
+
+  // Debounced autosave on edits (2s after last change)
+  useEffect(() => {
+    if (!selectedAssessment) return;
+    const hasPending = Object.keys(editedValues).length > 0;
+    if (!hasPending) return;
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    autosaveTimerRef.current = setTimeout(() => {
+      flushAutosave(true);
+    }, 2000);
+    return () => {
+      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editedValues, selectedAssessment]);
+
+  // Warn user before leaving with unsaved changes; flush on unmount
+  useEffect(() => {
+    const beforeUnload = (e: BeforeUnloadEvent) => {
+      if (Object.keys(editedValuesRef.current).length > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', beforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', beforeUnload);
+      // best-effort flush on unmount (fire-and-forget)
+      void flushAutosave(true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Flush pending edits before switching assessments
+  const handleAssessmentSwitch = async (newId: string) => {
+    if (newId === selectedAssessment) return;
+    if (Object.keys(editedValuesRef.current).length > 0) {
+      const ok = await flushAutosave(false);
+      if (!ok) {
+        toast.error('Não foi possível salvar antes de trocar — corrija os erros e tente novamente.');
+        return;
+      }
+    }
+    setSelectedAssessment(newId);
+  };
+
   const getValueForIndicator = (indicatorId: string) => {
     if (editedValues[indicatorId] !== undefined) {
       return editedValues[indicatorId].value;
