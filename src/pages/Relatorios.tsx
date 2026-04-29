@@ -113,6 +113,8 @@ export default function Relatorios() {
   const [reportTemplate, setReportTemplate] = useState<string>('completo');
   const [reportVisibility, setReportVisibility] = useState<string>('personal');
   const [runInDemo, setRunInDemo] = useState(false);
+  // GAP-FIX (v1.38.18): Comparação temporal agora é OPT-IN.
+  const [enableComparison, setEnableComparison] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
   const [customizationOpen, setCustomizationOpen] = useState(false);
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
