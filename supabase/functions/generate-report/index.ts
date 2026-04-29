@@ -1712,7 +1712,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
     const writer = writable.getWriter();
     let fullContent = '';
 
-    (async () => {
+    const backgroundTask = (async () => {
       try {
         const reader = response.body!.getReader();
         const decoder = new TextDecoder();
@@ -1872,6 +1872,17 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         await writer.abort(err);
       }
     })();
+
+    // Garante que a persistência (generated_reports + report_validations + audit_events)
+    // continue executando mesmo após o cliente fechar a conexão SSE. Sem isso, o IIFE
+    // era interrompido e o audit_events de 'report_generated' não era inserido.
+    try {
+      // @ts-ignore - EdgeRuntime é global em Supabase Edge Functions (Deno)
+      if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) {
+        // @ts-ignore
+        EdgeRuntime.waitUntil(backgroundTask);
+      }
+    } catch (_e) { /* ignore */ }
 
     return new Response(readable, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },

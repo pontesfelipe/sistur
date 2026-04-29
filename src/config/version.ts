@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 15,
+  patch: 16,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.16",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Logs — correção do registro de auditoria de geração de relatório. Em v1.38.15 o evento `report_generated` não estava sendo gravado em `audit_events` porque o bloco assíncrono que persiste o relatório (generated_reports + report_validations + audit_events) era interrompido quando o cliente fechava a conexão SSE ao terminar o stream. Agora a tarefa de pós-processamento é mantida viva via `EdgeRuntime.waitUntil(...)`, garantindo que o insert do audit chegue ao banco mesmo após o usuário receber o relatório completo. Resultado: a aba Configurações → Logs passa a exibir corretamente cada geração com o modelo LLM utilizado (Claude Sonnet 4.5 ou Gemini 2.5 Pro) e eventual badge de fallback."
+    ]
+  },
   {
     version: "1.38.15",
     date: "2026-04-29",
