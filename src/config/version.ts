@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 20,
+  patch: 21,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.21",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Watchdog anti-travamento na geração de relatórios. Causa do bug: quando a stream SSE do `generate-report` parava de enviar chunks (rede flutua, edge function ainda finalizando, browser perde foco), o `reader.read()` no cliente ficava bloqueado indefinidamente — `isGenerating` nunca voltava a `false`, o botão ficava 'Gerando…' para sempre, e o usuário acabava disparando 3–4 gerações paralelas (todas concluíam no servidor, mas a UI continuava travada). Correção em `src/pages/Relatorios.tsx`: (1) `AbortController` envolvendo o fetch SSE com timeout duro de 240s e watchdog de inatividade de 90s — se nenhum chunk chegar nesse intervalo, a conexão é abortada com motivo `idle-timeout` e a UI é destravada; (2) Botão 'Cancelar' visível durante a geração, permitindo o usuário interromper sem precisar recarregar a página; (3) Contador de tempo decorrido no botão ('Gerando… 47s') e no card do relatório, com aviso amarelo a partir de 60s pedindo paciência e proibindo novo clique; (4) Toast diferenciado quando o erro é `idle-timeout` ou `hard-timeout`, orientando o usuário a checar o histórico antes de tentar de novo (porque o relatório provavelmente foi salvo no servidor mesmo assim) e invalidando a query `generated-reports` para refletir o novo registro automaticamente; (5) Reset garantido de `isGenerating`, timers e AbortController no `finally`, eliminando o cenário em que a UI travava em estado de geração após erro de rede silencioso."
+    ]
+  },
   {
     version: "1.38.20",
     date: "2026-04-29",
