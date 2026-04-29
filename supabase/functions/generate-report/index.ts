@@ -1588,14 +1588,22 @@ ${dataSnapshots.length > 0 ? '9. Use os snapshots de proveniência para rastrear
 ${globalRefs.length > 0 ? `10. Referencie documentos oficiais quando contextualizar resultados e prescrições` : ''}
 ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // === LLM provider selection (v1.38.14) ===
+    // Primary: Anthropic Claude Sonnet (when ANTHROPIC_API_KEY is configured).
+    // Fallback: Lovable AI Gateway (Gemini) on any error / quota / credit exhaustion.
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    let response: Response | null = null;
+    let usedProvider: 'claude' | 'gemini' = 'gemini';
+    let claudeFailReason: string | null = null;
+
+    const callGemini = () => fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -1604,10 +1612,85 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
       }),
     });
 
+    if (ANTHROPIC_API_KEY) {
+      try {
+        const claudeResp = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-5-20250929",
+            max_tokens: 16000,
+            stream: true,
+            system: systemPrompt,
+            messages: [{ role: "user", content: userPrompt }],
+          }),
+        });
+        if (claudeResp.ok && claudeResp.body) {
+          // Adapt Anthropic SSE -> OpenAI-compatible SSE for downstream parser.
+          const adapted = new ReadableStream({
+            async start(controller) {
+              const reader = claudeResp.body!.getReader();
+              const decoder = new TextDecoder();
+              const encoder = new TextEncoder();
+              let buffer = "";
+              try {
+                while (true) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+                  buffer += decoder.decode(value, { stream: true });
+                  let idx: number;
+                  while ((idx = buffer.indexOf("\n")) !== -1) {
+                    const line = buffer.slice(0, idx).trim();
+                    buffer = buffer.slice(idx + 1);
+                    if (!line.startsWith("data:")) continue;
+                    const payload = line.slice(5).trim();
+                    if (!payload) continue;
+                    try {
+                      const evt = JSON.parse(payload);
+                      if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
+                        const chunk = `data: ${JSON.stringify({ choices: [{ delta: { content: evt.delta.text } }] })}\n\n`;
+                        controller.enqueue(encoder.encode(chunk));
+                      } else if (evt.type === "message_stop") {
+                        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                      }
+                    } catch { /* ignore partials */ }
+                  }
+                }
+                controller.close();
+              } catch (e) {
+                console.error("Claude stream adapter error:", e);
+                controller.error(e);
+              }
+            },
+          });
+          response = new Response(adapted, { status: 200, headers: { "Content-Type": "text/event-stream" } });
+          usedProvider = 'claude';
+          console.log("Report generation using provider: claude (claude-sonnet-4-5)");
+        } else {
+          claudeFailReason = `status ${claudeResp.status}`;
+          const errBody = await claudeResp.text().catch(() => "");
+          console.warn(`Claude unavailable (${claudeFailReason}), falling back to Gemini. Body: ${errBody.slice(0, 300)}`);
+        }
+      } catch (e) {
+        claudeFailReason = e instanceof Error ? e.message : String(e);
+        console.warn(`Claude request threw, falling back to Gemini: ${claudeFailReason}`);
+      }
+    }
+
+    if (!response) {
+      response = await callGemini();
+      usedProvider = 'gemini';
+      console.log(`Report generation using provider: gemini${claudeFailReason ? ` (fallback after Claude: ${claudeFailReason})` : ''}`);
+    }
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
-      
+
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
