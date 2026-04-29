@@ -36,7 +36,8 @@ import {
   FlaskConical,
   Filter,
   Building2,
-  Globe
+  Globe,
+  X
 } from 'lucide-react';
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 
