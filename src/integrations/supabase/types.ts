@@ -4219,7 +4219,7 @@ export type Database = {
           normalization_method: string | null
           org_id: string
           polarity: string | null
-          score: number
+          score: number | null
           score_pct: number | null
           value_normalized: number | null
           value_raw: number | null
@@ -4236,7 +4236,7 @@ export type Database = {
           normalization_method?: string | null
           org_id: string
           polarity?: string | null
-          score: number
+          score?: number | null
           score_pct?: number | null
           value_normalized?: number | null
           value_raw?: number | null
@@ -4253,7 +4253,7 @@ export type Database = {
           normalization_method?: string | null
           org_id?: string
           polarity?: string | null
-          score?: number
+          score?: number | null
           score_pct?: number | null
           value_normalized?: number | null
           value_raw?: number | null
