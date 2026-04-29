@@ -1397,7 +1397,7 @@ serve(async (req) => {
     let previousAssessment: any = null;
     let previousPillarScores: any[] = [];
     let previousIndicatorScores: any[] = [];
-    if (destinationId && assessment.calculated_at) {
+    if (enableComparison && destinationId && assessment.calculated_at) {
       const { data: prevA } = await supabase
         .from('assessments')
         .select('id, title, calculated_at, period_end, final_score, final_classification')
