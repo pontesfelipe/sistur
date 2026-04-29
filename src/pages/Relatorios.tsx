@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { exportReportAsDocx } from '@/lib/exportReportDocx';
+import { getStatusStyle, mapIndicatorTableColumns } from '@/lib/reportStatusStyle';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -395,13 +396,19 @@ export default function Relatorios() {
 <html><head><title>Relatório SISTUR</title>
 <style>
   body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; max-width: 800px; margin: 0 auto; font-size: ${bodyFontSize}; }
-  h1 { font-size: 24px; border-bottom: 2px solid ${color}; padding-bottom: 8px; margin-top: 32px; }
+  h1 { font-size: 24px; color: ${color}; border-bottom: 2px solid ${color}; padding-bottom: 8px; margin-top: 32px; }
   h2 { font-size: 20px; color: ${color}; margin-top: 24px; }
   h3 { font-size: 16px; color: #374151; margin-top: 16px; }
   table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
-  th { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-weight: 600; }
+  th { background: ${color}; color: #ffffff; border: 1px solid ${color}; padding: 8px; text-align: left; font-weight: 600; }
   td { border: 1px solid #cbd5e1; padding: 8px; }
   tr:nth-child(even) { background: #f8fafc; }
+  td.status-excelente { background: #D1FADF; color: #054F31; font-weight: 600; text-align: center; }
+  td.status-forte     { background: #DBEAFE; color: #1E3A8A; font-weight: 600; text-align: center; }
+  td.status-adequado  { background: #FEF3C7; color: #78350F; font-weight: 600; text-align: center; }
+  td.status-atencao   { background: #FFEDD5; color: #7C2D12; font-weight: 600; text-align: center; }
+  td.status-critico   { background: #FEE2E2; color: #7F1D1D; font-weight: 600; text-align: center; }
+  td.status-info      { background: #F1F5F9; color: #334155; font-weight: 600; text-align: center; }
   strong { color: ${color}; }
   hr { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
   ul, ol { padding-left: 24px; }
@@ -424,6 +431,24 @@ export default function Relatorios() {
 
   // Improved markdown renderer with table support
   const renderMarkdown = (text: string) => {
+    const primaryColor = reportCustomization.primaryColor || '#1E40AF';
+    const statusClassMap: Record<string, string> = {
+      EXCELENTE: 'status-excelente',
+      FORTE: 'status-forte',
+      ADEQUADO: 'status-adequado',
+      ATENCAO: 'status-atencao',
+      CRITICO: 'status-critico',
+      INFORMATIVO: 'status-info',
+    };
+    // Inline style fallback (used in <td>) so the preview matches the print sheet.
+    const statusInlineMap: Record<string, React.CSSProperties> = {
+      EXCELENTE: { background: '#D1FADF', color: '#054F31', fontWeight: 600, textAlign: 'center' },
+      FORTE:     { background: '#DBEAFE', color: '#1E3A8A', fontWeight: 600, textAlign: 'center' },
+      ADEQUADO:  { background: '#FEF3C7', color: '#78350F', fontWeight: 600, textAlign: 'center' },
+      ATENCAO:   { background: '#FFEDD5', color: '#7C2D12', fontWeight: 600, textAlign: 'center' },
+      CRITICO:   { background: '#FEE2E2', color: '#7F1D1D', fontWeight: 600, textAlign: 'center' },
+      INFORMATIVO:{ background: '#F1F5F9', color: '#334155', fontWeight: 600, textAlign: 'center' },
+    };
     const lines = text.split('\n');
     const elements: JSX.Element[] = [];
     let i = 0;
@@ -445,14 +470,19 @@ export default function Relatorios() {
           // Skip separator row (row with ---)
           const startRow = tableLines[1].includes('---') ? 2 : 1;
           const dataRows = tableLines.slice(startRow).map(parseRow);
+          const colMap = mapIndicatorTableColumns(headers);
 
           elements.push(
             <div key={`table-${i}`} className="overflow-x-auto my-4">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-muted/50">
+                  <tr style={{ background: primaryColor }}>
                     {headers.map((h, hi) => (
-                      <th key={hi} className="border border-border px-3 py-2 text-left font-semibold text-foreground">
+                      <th
+                        key={hi}
+                        className="border px-3 py-2 text-left font-semibold"
+                        style={{ color: '#ffffff', borderColor: primaryColor }}
+                      >
                         {h}
                       </th>
                     ))}
@@ -461,11 +491,28 @@ export default function Relatorios() {
                 <tbody>
                   {dataRows.map((row, ri) => (
                     <tr key={ri} className={ri % 2 === 0 ? '' : 'bg-muted/20'}>
-                      {row.map((cell, ci) => (
-                        <td key={ci} className="border border-border px-3 py-2 text-muted-foreground"
-                          dangerouslySetInnerHTML={{ __html: cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
-                        />
-                      ))}
+                      {row.map((cell, ci) => {
+                        const isStatus = ci === colMap.statusIdx && colMap.statusIdx >= 0;
+                        const style = isStatus ? getStatusStyle(cell) : null;
+                        const key = style ? statusClassMap[
+                          (Object.keys(statusClassMap) as Array<keyof typeof statusClassMap>)
+                            .find(k => style.label.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(k)) || 'INFORMATIVO'
+                        ] : '';
+                        const inline = isStatus && style
+                          ? statusInlineMap[
+                              (Object.keys(statusInlineMap) as Array<keyof typeof statusInlineMap>)
+                                .find(k => style.label.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(k)) || 'INFORMATIVO'
+                            ]
+                          : undefined;
+                        return (
+                          <td
+                            key={ci}
+                            className={`border border-border px-3 py-2 ${isStatus ? '' : 'text-muted-foreground'} ${key}`}
+                            style={inline}
+                            dangerouslySetInnerHTML={{ __html: cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
+                          />
+                        );
+                      })}
                     </tr>
                   ))}
                 </tbody>
@@ -485,11 +532,23 @@ export default function Relatorios() {
 
       // Headers
       if (line.startsWith('# ')) {
-        elements.push(<h1 key={i} className="text-2xl font-bold mt-6 mb-3 text-foreground">{line.slice(2)}</h1>);
+        elements.push(
+          <h1
+            key={i}
+            className="text-2xl font-bold mt-6 mb-3 pb-2 border-b-2"
+            style={{ color: primaryColor, borderColor: primaryColor }}
+          >
+            {line.slice(2)}
+          </h1>
+        );
         i++; continue;
       }
       if (line.startsWith('## ')) {
-        elements.push(<h2 key={i} className="text-xl font-semibold mt-5 mb-2 text-foreground">{line.slice(3)}</h2>);
+        elements.push(
+          <h2 key={i} className="text-xl font-semibold mt-5 mb-2" style={{ color: primaryColor }}>
+            {line.slice(3)}
+          </h2>
+        );
         i++; continue;
       }
       if (line.startsWith('### ')) {

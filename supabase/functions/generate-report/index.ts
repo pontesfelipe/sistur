@@ -702,12 +702,22 @@ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Use markdown com headers hierárquicos (# ## ###)
 - SEMPRE apresente indicadores em TABELAS MARKDOWN (| col1 | col2 |)
 - NUNCA liste indicadores como texto corrido quando puder usar tabela
-- Para cada eixo: tabela com Indicador | Score | Status | Fonte | Observação
+- TEMPLATE CANÔNICO DE INDICADORES (OBRIGATÓRIO — use exatamente estas 5 colunas, nesta ordem, em TODAS as tabelas de indicadores de qualquer eixo/categoria/seção):
+    | Indicador | Valor | Unidade | Status | Fonte |
+  Onde:
+    * Indicador = nome curto do indicador (sem código)
+    * Valor = número formatado em pt-BR (vírgula decimal, ponto de milhar). Exemplos: "65,3" / "45.321" / "R$ 1.234,56" / "2,3" / "B" / "Sim"
+    * Unidade = unidade pura, sem repetir o número. Exemplos: "%", "hab.", "R$", "dias", "score 1-5", "—" (quando não houver)
+    * Status = um dos rótulos canônicos com emoji: "🟢 EXCELENTE" | "🔵 FORTE" | "🟡 ADEQUADO" | "🟠 ATENÇÃO" | "🔴 CRÍTICO" | "⚪ INFORMATIVO" (apenas para contextuais peso 0)
+    * Fonte = sigla oficial conforme TRILHA DE AUDITORIA: IBGE | DATASUS | STN | CADASTUR | MTur | INEP | ANA | ANATEL | TSE | SEEG | Manual | KB
+  É PROIBIDO: adicionar/remover colunas, trocar a ordem, usar "Score" no lugar de "Valor", omitir a Unidade, ou apresentar o status sem o emoji.
+  Se quiser dar contexto adicional (ex.: benchmark, evidência, observação), faça-o em PARÁGRAFO logo abaixo da tabela — NUNCA como coluna extra.
 - Banco de Ações em tabela: Ação | Pilar | Prazo | Responsável | Prioridade
 - Linguagem institucional, clara e objetiva
 - Justifique conclusões com dados. Conecte: dado → impacto → decisão
 - Se estimar dados: "[ESTIMADO]"
-- SEMPRE inclua uma coluna "Fonte" nas tabelas de indicadores, citando a origem dos dados`;
+- SEMPRE inclua a coluna "Fonte" do template canônico nas tabelas de indicadores, citando a origem dos dados
+- NUNCA aplique cores, negrito ou itálico ao texto de Status — a cor é aplicada automaticamente pelo renderizador a partir do rótulo canônico`;
 
   if (template === 'executivo') {
     return `${common}
@@ -811,9 +821,8 @@ ESTRUTURA OBRIGATÓRIA (MEC/ABNT):
 
 ## 4. Diagnóstico por Eixo SISTUR
 ### 4.1. I-RA — Relações Ambientais
-- Tabela: Indicador | Score | Status | Fonte | Valor Bruto | Evidência | Observação
-- Coluna "Evidência" DEVE vir do campo value_text ou Evidência presente nos VALORES BRUTOS quando existir
-- Coluna "Fonte" DEVE vir do campo Fonte presente nos VALORES BRUTOS (IBGE, DATASUS, STN, CADASTUR, Manual, etc.)
+- Tabela CANÔNICA (obrigatória): | Indicador | Valor | Unidade | Status | Fonte |
+- Logo abaixo da tabela, em parágrafo livre, mencione evidências relevantes (campo value_text dos VALORES BRUTOS) e benchmark quando existir — NÃO crie colunas extras.
 - LEITURA TÉCNICA: interpretação dos scores
 - IMPLICAÇÕES: consequências para o destino
 
@@ -837,7 +846,7 @@ ESTRUTURA OBRIGATÓRIA (MEC/ABNT):
 
 ## 8. Benchmarks Externos (Fontes Oficiais)
 - Se houver dados na seção "BENCHMARKS DE FONTES OFICIAIS" do input, SEMPRE renderize esta seção
-- Tabela: Indicador | Valor Observado | Valor Oficial (Fonte) | Ano | Comparação
+- Tabela: | Indicador | Valor Observado | Valor Oficial | Fonte | Ano | (essa é a única exceção ao template canônico de 5 colunas — pois compara duas séries)
 - Compare o valor observado no diagnóstico com o valor oficial para fundamentar conclusões regionais
 - Se não houver dados oficiais, escreva "Nenhum benchmark externo disponível para este destino no momento."
 
@@ -905,14 +914,17 @@ ${CANONICAL_REFERENCES}
 
 REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Comece SEMPRE com título seguido da tabela de ficha técnica fornecida
-- Use tabelas markdown para todos os conjuntos de dados
-- TODAS as tabelas DEVEM ter uma coluna "Fonte"
+- TEMPLATE CANÔNICO DE INDICADORES (OBRIGATÓRIO — use exatamente estas 5 colunas, nesta ordem, em TODAS as tabelas de indicadores/KPIs):
+    | Indicador | Valor | Unidade | Status | Fonte |
+  Status DEVE ser um dos rótulos canônicos com emoji: "🟢 EXCELENTE" | "🔵 FORTE" | "🟡 ADEQUADO" | "🟠 ATENÇÃO" | "🔴 CRÍTICO" | "⚪ INFORMATIVO".
+  Use Valor formatado em pt-BR (vírgula decimal, ponto de milhar). NÃO crie colunas extras — coloque benchmarks/evidências em parágrafo abaixo.
 - Tabelas devem ter título numerado ACIMA: "Tabela 1 — Título"
 - Fonte da tabela ABAIXO: "Fonte: elaboração própria com dados de..."
 - Linguagem institucional e impessoal (3ª pessoa)
 - Conecte: métrica → gap → ação → resultado esperado
 - Se houver dados de reviews/avaliações online, incorpore na análise de satisfação
-- Seção final de Referências em formato ABNT NBR 6023`;
+- Seção final de Referências em formato ABNT NBR 6023
+- NUNCA aplique cores/negrito/itálico ao texto de Status — a cor é aplicada pelo renderizador a partir do rótulo canônico`;
 
   if (template === 'executivo') {
     return `${common}
@@ -961,8 +973,9 @@ ESTRUTURA (MEC/ABNT):
 - Destaque tipo de propriedade, capacidade, sazonalidade, público-alvo, certificações, iniciativas de sustentabilidade e recursos de acessibilidade.
 - Se não houver dados de perfil, indique que a ficha cadastral deve ser completada.
 ## 3. Metodologia SISTUR Enterprise
-## 4. Diagnóstico por Categoria Funcional (tabela por categoria com Indicador | Valor | Benchmark | Fonte | Validado | Evidência)
-- A coluna "Validado" vem do campo "Validado em" nos VALORES ENTERPRISE; "Evidência" vem de value_text ou Observações quando presentes
+## 4. Diagnóstico por Categoria Funcional
+- Para cada categoria, use a TABELA CANÔNICA: | Indicador | Valor | Unidade | Status | Fonte |
+- Logo abaixo de cada tabela, em parágrafo, mencione benchmark, validado em (data) e evidência (value_text/Observações) — NÃO crie colunas extras.
 ## 5. Análise de Gargalos Operacionais
 - Tabela: Gargalo | Severidade | Categoria | Indicadores que dispararam | Prescrição
 - A coluna "Indicadores que dispararam" DEVE ser preenchida a partir da evidência de cada gargalo (campo "Indicadores que puxaram pra baixo" na seção GARGALOS)

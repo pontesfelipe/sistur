@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 18,
+  patch: 19,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.19",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Padronização visual canônica de relatórios (Word, PDF e visualização na tela). Antes, cada geração apresentava colunas, ordens e cores diferentes — alguns vinham com 'Score', outros com 'Valor', alguns coloridos, outros monocromáticos. Agora há um único template forçado em três camadas: (1) Prompt LLM (`generate-report`) — toda tabela de indicadores DEVE usar EXATAMENTE 5 colunas nesta ordem: `Indicador | Valor | Unidade | Status | Fonte`. Status sempre com emoji+rótulo canônico (🟢 EXCELENTE | 🔵 FORTE | 🟡 ADEQUADO | 🟠 ATENÇÃO | 🔴 CRÍTICO | ⚪ INFORMATIVO). Proibido criar colunas extras — benchmark/evidência vão em parágrafo abaixo. Aplica-se também ao Enterprise (Diagnóstico por Categoria Funcional). (2) Renderizador DOCX (`exportReportDocx`) — H1/H2 e cabeçalho de tabela passam a usar a `primaryColor` da Personalização do Relatório (institucional). Células de Status são detectadas e coloridas automaticamente (verde/azul/amarelo/laranja/vermelho/cinza) com texto em negrito centralizado. (3) Preview on-screen + PDF/print (`Relatorios.tsx`) — `renderMarkdown` colore H1/H2 com a cor institucional, `<th>` ganha fundo institucional + texto branco, e células de Status recebem o mesmo esquema de cores fixas (HEX, garantindo paridade com print que não carrega CSS variables). Novo módulo compartilhado `src/lib/reportStatusStyle.ts` é a fonte única da verdade para mapeamento status→cor e detecção de coluna canônica — usado pelo DOCX e pela preview. Resultado: todo relatório, independente de modelo (Claude/Gemini), template (Completo/Executivo/Investidor) ou modo (Territorial/Enterprise), sai com a MESMA estrutura de colunas, MESMA paleta institucional e MESMO sistema de cores de status."
+    ]
+  },
   {
     version: "1.38.18",
     date: "2026-04-29",
