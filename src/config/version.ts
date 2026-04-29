@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 11,
+  patch: 12,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.12",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico — persistência reforçada na entrada de indicadores. Implementado autosave debounced (2s após a última edição) no `DataImportPanel`: cada valor digitado e validado é gravado automaticamente via `bulkUpsertValues` (upsert seguro) sem exigir clique em 'Salvar' ou 'Salvar Todos'. Indicadores com erro de validação ficam pendentes até correção (não são salvos com lixo). Adicionado guard `beforeunload` que avisa o usuário se ele tentar sair da aba com edições não persistidas, e flush automático ao desmontar o componente. A troca de assessment no Select agora também executa flush antes de mudar — evitando perda silenciosa de rascunhos ao alternar entre diagnósticos. Indicador visual ('Salvando rascunho…' / 'Rascunho salvo' / 'Falha no autosave' / 'Alterações pendentes…') exibido junto ao botão Salvar Todos para feedback contínuo ao usuário."
+    ]
+  },
   {
     version: "1.38.11",
     date: "2026-04-29",

@@ -102,6 +102,14 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean; _rawInput?: string }>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
+  const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editedValuesRef = useRef(editedValues);
+  const validationErrorsRef = useRef(validationErrors);
+  const selectedAssessmentRef = useRef(selectedAssessment);
+  useEffect(() => { editedValuesRef.current = editedValues; }, [editedValues]);
+  useEffect(() => { validationErrorsRef.current = validationErrors; }, [validationErrors]);
+  useEffect(() => { selectedAssessmentRef.current = selectedAssessment; }, [selectedAssessment]);
 
   const { assessments, isLoading: loadingAssessments, updateAssessment } = useAssessments();
   const { values, isLoading: loadingValues, upsertValue, bulkUpsertValues } = useIndicatorValues(selectedAssessment);
@@ -577,6 +585,93 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     toast.success('Todos os valores foram salvos!');
   };
 
+  // ---------------------------------------------------------------------------
+  // Persistência automática (autosave) durante a entrada de indicadores.
+  // Garante que nenhum valor digitado seja perdido por navegação, troca de
+  // assessment, fechamento de aba ou crash. Salva apenas linhas SEM erro de
+  // validação — linhas inválidas continuam pendentes até correção.
+  // ---------------------------------------------------------------------------
+  const flushAutosave = async (silent = true): Promise<boolean> => {
+    const assessmentId = selectedAssessmentRef.current;
+    const edited = editedValuesRef.current;
+    const errors = validationErrorsRef.current;
+    if (!assessmentId) return true;
+    const validEntries = Object.entries(edited).filter(
+      ([id, data]) => !errors[id] && data && (data.value !== undefined)
+    );
+    if (validEntries.length === 0) return true;
+    setAutosaveStatus('saving');
+    try {
+      await bulkUpsertValues.mutateAsync(
+        validEntries.map(([indicatorId, data]) => ({
+          assessment_id: assessmentId,
+          indicator_id: indicatorId,
+          value_raw: data.value,
+          source: data.source || 'Manual',
+        }))
+      );
+      // Limpar somente as linhas que foram efetivamente salvas
+      setEditedValues(prev => {
+        const next = { ...prev };
+        validEntries.forEach(([id]) => delete next[id]);
+        return next;
+      });
+      setAutosaveStatus('saved');
+      if (!silent) toast.success('Rascunho salvo automaticamente');
+      return true;
+    } catch (err) {
+      console.error('[autosave] failed', err);
+      setAutosaveStatus('error');
+      if (!silent) toast.error('Falha ao salvar rascunho automaticamente');
+      return false;
+    }
+  };
+
+  // Debounced autosave on edits (2s after last change)
+  useEffect(() => {
+    if (!selectedAssessment) return;
+    const hasPending = Object.keys(editedValues).length > 0;
+    if (!hasPending) return;
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    autosaveTimerRef.current = setTimeout(() => {
+      flushAutosave(true);
+    }, 2000);
+    return () => {
+      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editedValues, selectedAssessment]);
+
+  // Warn user before leaving with unsaved changes; flush on unmount
+  useEffect(() => {
+    const beforeUnload = (e: BeforeUnloadEvent) => {
+      if (Object.keys(editedValuesRef.current).length > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', beforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', beforeUnload);
+      // best-effort flush on unmount (fire-and-forget)
+      void flushAutosave(true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Flush pending edits before switching assessments
+  const handleAssessmentSwitch = async (newId: string) => {
+    if (newId === selectedAssessment) return;
+    if (Object.keys(editedValuesRef.current).length > 0) {
+      const ok = await flushAutosave(false);
+      if (!ok) {
+        toast.error('Não foi possível salvar antes de trocar — corrija os erros e tente novamente.');
+        return;
+      }
+    }
+    setSelectedAssessment(newId);
+  };
+
   const getValueForIndicator = (indicatorId: string) => {
     if (editedValues[indicatorId] !== undefined) {
       return editedValues[indicatorId].value;
@@ -657,7 +752,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                 </p>
               </div>
             </div>
-            <Select value={selectedAssessment} onValueChange={setSelectedAssessment}>
+            <Select value={selectedAssessment} onValueChange={handleAssessmentSwitch}>
               <SelectTrigger className="w-72">
                 <SelectValue placeholder="Selecionar diagnóstico" />
               </SelectTrigger>
@@ -829,10 +924,18 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                           </p>
                         )}
                       </div>
-                      <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending || errorCount > 0}>
-                        <Save className="mr-2 h-4 w-4" />
-                        Salvar Todos
-                      </Button>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1" aria-live="polite">
+                          {autosaveStatus === 'saving' && (<><Loader2 className="h-3 w-3 animate-spin" /> Salvando rascunho…</>)}
+                          {autosaveStatus === 'saved' && (<><CheckCircle2 className="h-3 w-3 text-severity-good" /> Rascunho salvo</>)}
+                          {autosaveStatus === 'error' && (<><AlertCircle className="h-3 w-3 text-destructive" /> Falha no autosave</>)}
+                          {autosaveStatus === 'idle' && Object.keys(editedValues).length > 0 && (<>Alterações pendentes…</>)}
+                        </span>
+                        <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending || errorCount > 0}>
+                          <Save className="mr-2 h-4 w-4" />
+                          Salvar Todos
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
