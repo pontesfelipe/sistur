@@ -113,6 +113,8 @@ export default function Relatorios() {
   const [reportTemplate, setReportTemplate] = useState<string>('completo');
   const [reportVisibility, setReportVisibility] = useState<string>('personal');
   const [runInDemo, setRunInDemo] = useState(false);
+  // GAP-FIX (v1.38.18): Comparação temporal agora é OPT-IN.
+  const [enableComparison, setEnableComparison] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
   const [customizationOpen, setCustomizationOpen] = useState(false);
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
@@ -204,6 +206,7 @@ export default function Relatorios() {
           reportTemplate,
           visibility: reportVisibility,
           environment: runInDemo ? 'demo' : 'production',
+          enableComparison,
         }),
       });
 
@@ -724,6 +727,31 @@ export default function Relatorios() {
                       </TooltipProvider>
                     </div>
                   )}
+
+                  <div className="w-44">
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                      Comparativo
+                    </label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={enableComparison ? 'secondary' : 'outline'}
+                            className="w-full gap-2"
+                            onClick={() => setEnableComparison(!enableComparison)}
+                          >
+                            <FileText className="h-4 w-4" />
+                            {enableComparison ? 'Comparar rodadas' : 'Sem comparação'}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {enableComparison
+                            ? 'O relatório incluirá um bloco comparando esta rodada com a anterior do mesmo destino.'
+                            : 'Ative para incluir comparação com a rodada anterior do mesmo destino.'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
 
                   <div className="flex items-end gap-2">
                     <Button 

@@ -627,6 +627,22 @@ REGRA CRÍTICA E INEGOCIÁVEL DE FONTES:
 6. O relatório DEVE terminar com uma seção "## Referências" em formato ABNT NBR 6023 listando TODAS as fontes oficiais consultadas
 7. NUNCA apresente um dado sem citar a fonte — se a fonte for desconhecida, indique "(Fonte: Não identificada)"
 
+REGRAS DE ATRIBUIÇÃO CORRETA DE FONTE (anti-troca de origem — GAP v1.38.18):
+- "Leitos de Hospedagem" / "Meios de hospedagem" / "Capacidade hoteleira" → fonte CADASTUR (Ministério do Turismo). NUNCA atribua a DATASUS.
+- "Leitos hospitalares SUS" / "Cobertura de saúde" → fonte DATASUS. NUNCA atribua a CADASTUR.
+- "CAPAG" → fonte STN/Tesouro Nacional. Use a classificação A/B/C/D EXATAMENTE como aparece na TRILHA DE AUDITORIA — NÃO troque B por C nem C por B.
+- "Permanência média" / "Gasto médio diário" / "Receita turística" → fonte CADASTUR/MTur ou base de referência interna. Use o valor EXATO da TRILHA DE AUDITORIA (ex.: se a auditoria mostra 2,3 dias, escreva 2,3 dias — NÃO arredonde para 2,5).
+- "Emissão de gases de efeito estufa" → fonte SEEG/MapBiomas ou Manual. Use o valor numérico EXATO da auditoria (ex.: 2,4 tCO₂eq/hab. — NÃO escreva 2 tCO₂eq/hab.).
+
+IGMA — NOMENCLATURA OBRIGATÓRIA:
+- A primeira menção a "IGMA" no relatório DEVE expandir a sigla: "Índice de Gestão Municipal Ambiental (IGMA)".
+- A partir da segunda menção, pode usar apenas "IGMA". Sempre que aparecer uma flag IGMA, explique o que ela mede em uma frase.
+
+INDICADORES CONTEXTUAIS (peso 0):
+- Indicadores como "População", "Área Territorial" e "Densidade Demográfica" têm peso 0 e são CONTEXTUAIS — apenas caracterizam o destino.
+- Quando aparecerem na trilha de auditoria com source_type terminando em "_CONTEXTUAL" (ou normalized_score = 0 e weight = 0), apresente-os SOMENTE na "Ficha Técnica" / "Caracterização do Destino" como dados informativos.
+- NUNCA atribua status (CRÍTICO/ATENÇÃO/ADEQUADO/EXCELENTE) a indicador contextual. NUNCA inclua na seção de gargalos. NUNCA inclua nas tabelas de pontuação por eixo.
+
 ${MEC_FORMATTING_RULES}`;
 
 // ========== CANONICAL BIBLIOGRAPHY (anti-hallucination) ==========
@@ -1254,7 +1270,22 @@ serve(async (req) => {
     const userId = user.id;
     console.log('Authenticated user:', userId);
 
-    const { assessmentId, destinationName, pillarScores, issues, prescriptions, forceRegenerate, reportTemplate = 'completo', visibility = 'personal', environment = 'production' } = await req.json();
+    const {
+      assessmentId,
+      destinationName,
+      pillarScores,
+      issues,
+      prescriptions,
+      forceRegenerate,
+      reportTemplate = 'completo',
+      visibility = 'personal',
+      environment = 'production',
+      // GAP-FIX (v1.38.18): Comparação temporal agora é OPT-IN.
+      // Antes o relatório injetava automaticamente o bloco "rodada anterior",
+      // o que poluía relatórios de primeiro ciclo / KPIs estáveis. Agora o
+      // bloco só é gerado quando o cliente passa enableComparison: true.
+      enableComparison = false,
+    } = await req.json();
     
     // Verify access
     const { data: profile } = await supabase.from('profiles').select('org_id, viewing_demo_org_id').eq('user_id', userId).single();
@@ -1382,7 +1413,7 @@ serve(async (req) => {
     let previousAssessment: any = null;
     let previousPillarScores: any[] = [];
     let previousIndicatorScores: any[] = [];
-    if (destinationId && assessment.calculated_at) {
+    if (enableComparison && destinationId && assessment.calculated_at) {
       const { data: prevA } = await supabase
         .from('assessments')
         .select('id, title, calculated_at, period_end, final_score, final_classification')
@@ -1535,8 +1566,37 @@ Use esta tabela para JUSTIFICAR cada conclusão citando origem do dado e peso ap
 Origens possíveis: OFFICIAL_API (IBGE/DATASUS/STN/CADASTUR/INEP/ANA — máxima confiança),
 DERIVED (calculado por fórmula determinística do engine), ESTIMADA (estimativa interna),
 MANUAL (entrada do usuário — citar como autodeclarada).
+Sufixo _CONTEXTUAL = indicador informativo (peso 0): NÃO atribuir status nem incluir em gargalos.
 
 ${formatAuditTrail(auditTrail)}
+
+=== TABELA CANÔNICA DE VALORES (FONTE ÚNICA DA VERDADE) ===
+Esta é a referência ABSOLUTA. Cada número que você escrever no relatório DEVE
+aparecer EXATAMENTE com o valor desta tabela (mesma vírgula decimal, mesma
+unidade, mesma fonte). Se o valor não estiver aqui, escreva
+"[dado não disponível na base validada]" — NÃO arredonde, NÃO infira, NÃO
+converta unidades por conta própria.
+${(() => {
+  const lines = ['| Código | Indicador | Valor Bruto | Score | Fonte | Peso |',
+                 '|---|---|---|---|---|---|'];
+  for (const r of auditTrail) {
+    const ind = indicatorsByCode.get(r.indicator_code);
+    const name = ind?.name || r.indicator_code;
+    const rawDisplay = r.value !== null && r.value !== undefined
+      ? Number(r.value).toLocaleString('pt-BR', { maximumFractionDigits: 4 })
+      : '—';
+    const isCtx = String(r.source_type || '').endsWith('_CONTEXTUAL');
+    const scoreDisplay = isCtx
+      ? 'CONTEXTUAL'
+      : (r.normalized_score !== null && r.normalized_score !== undefined
+          ? formatPctBR(Number(r.normalized_score)) + '%'
+          : '—');
+    const src = r.source_type || 'MANUAL';
+    const w = r.weight !== null && r.weight !== undefined ? Number(r.weight).toFixed(4) : '0';
+    lines.push(`| ${r.indicator_code} | ${name} | ${rawDisplay} | ${scoreDisplay} | ${src} | ${w} |`);
+  }
+  return lines.join('\n');
+})()}
 
 GARGALOS (com evidências e indicadores que dispararam cada problema):
 ${issuesText}
@@ -1582,6 +1642,8 @@ INSTRUÇÕES SOBRE BASE DE CONHECIMENTO:
 7. Quando a seção VALORES BRUTOS trouxer "Evidência:" (value_text) para um indicador, inclua essa evidência textual nas tabelas e no corpo do texto
 8. Use a TRILHA DE AUDITORIA para fundamentar TODA conclusão: ao citar um indicador, indique sua origem (OFFICIAL_API/DERIVED/MANUAL/ESTIMADA) e o peso aplicado. Indicadores OFFICIAL_API/DERIVED têm prioridade analítica sobre MANUAL/ESTIMADA. Quando MANUAL ou ESTIMADA, sinalize explicitamente como "dado autodeclarado" ou "estimativa preliminar".
 9. Valores em moeda DEVEM ser exibidos no padrão brasileiro canônico: prefixo "R$" seguido de valor com vírgula decimal e ponto de milhar (ex: R$ 1.234.567,89). Nunca use "BRL", "$" ou notação científica.
+10. COLUNA "Evidência" — quando NÃO houver value_text para o indicador, preencha a célula com a fonte real e o ano da TRILHA DE AUDITORIA (ex.: "OFFICIAL_API — IBGE, 2022" ou "MANUAL — autodeclarado pelo gestor"). NUNCA escreva "[dado não disponível na base validada]" como evidência se o dado EXISTE na trilha de auditoria — esse texto é reservado APENAS para afirmações sem fonte.
+11. INDICADORES CONTEXTUAIS (linhas com Score = "CONTEXTUAL" na tabela canônica): apresente APENAS na ficha técnica como dados informativos. NÃO inclua em tabelas de score por eixo, NÃO atribua status, NÃO mencione em gargalos.
 ${externalValues.length > 0 && !isEnterprise ? '8. SEMPRE renderize a seção de Benchmarks Externos comparando os valores observados no diagnóstico com os valores oficiais retornados pelas integrações (IBGE/DATASUS/STN/CADASTUR/INEP)' : ''}
 ${isEnterprise && enterpriseProfile ? '8. Incorpore o PERFIL DO EMPREENDIMENTO (tipo, capacidade, certificações, sustentabilidade, acessibilidade) nas recomendações — não escreva um relatório genérico ignorando esses atributos' : ''}
 ${dataSnapshots.length > 0 ? '9. Use os snapshots de proveniência para rastrear a origem exata de cada indicador' : ''}

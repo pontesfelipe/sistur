@@ -322,8 +322,23 @@ function normalizeValue(
   const max = maxRef ?? 100;
   
   if (max === min) return 0.5;
-  
-  let score = (value - min) / (max - min);
+
+  // GAP-FIX (v1.38.18): Auto-detecção de escala 0-1.
+  // Quando o usuário insere um índice em escala 0–1 (ex.: 0,58 para ESG)
+  // mas o catálogo define min_ref=0 / max_ref=100 (ex.: 0 a 100 pontos),
+  // o cálculo (0.58 - 0) / (100 - 0) = 0,0058 = 0,58% gera CRÍTICO falso.
+  // Heurística canônica:
+  //   - Se o range esperado é >= 10 (claramente escala 0-100, 0-1000, etc.)
+  //   - E o valor bruto está entre 0 e 1 (inclusive)
+  //   - E o valor não é exatamente 0 (poderia ser legítimo)
+  // Então o usuário forneceu um índice 0–1: convertemos para a escala do range.
+  let normalizedValue = value;
+  if (max - min >= 10 && value > 0 && value <= 1) {
+    // Reescala 0–1 para min..max linear (preserva semântica original)
+    normalizedValue = min + value * (max - min);
+  }
+
+  let score = (normalizedValue - min) / (max - min);
   score = Math.max(0, Math.min(1, score)); // Clamp to 0-1
   
   // Invert if lower is better
@@ -934,17 +949,23 @@ serve(async (req) => {
       // Phase 4 — Use org-specific weight override when set
       const effectiveWeight = indicatorWeightOverrides.get(iv.indicator_id) ?? indicator.weight;
 
+      // GAP-FIX (v1.38.18): Indicadores com peso 0 são CONTEXTUAIS
+      // (população, área territorial, densidade demográfica). Eles devem
+      // aparecer no relatório como dados-base/informativos, mas NÃO podem
+      // gerar status (Crítico / Excelente) nem entrar na média do pilar.
+      const isContextual = !effectiveWeight || Number(effectiveWeight) === 0;
+
       indicatorScores.push({
         org_id: orgId,
         assessment_id,
         indicator_id: iv.indicator_id,
-        score,
+        score: isContextual ? null as any : score,
         // 3-layer enrichment (raw → normalized → score%)
         value_raw: iv.value_raw,
-        value_normalized: score,
-        score_pct: score * 100,
+        value_normalized: isContextual ? null as any : score,
+        score_pct: isContextual ? null as any : score * 100,
         polarity: indicator.direction === 'LOW_IS_BETTER' ? 'LOW_IS_BETTER' : 'HIGH_IS_BETTER',
-        normalization_method: indicator.normalization || 'minmax',
+        normalization_method: isContextual ? 'contextual' : (indicator.normalization || 'minmax'),
         confidence_level: confidenceLevel,
         min_ref_used: indicator.min_ref,
         max_ref_used: indicator.max_ref,
@@ -957,18 +978,20 @@ serve(async (req) => {
       if (/derived|derivado|formula/.test(srcRaw)) sourceType = 'DERIVED';
       else if (/api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn/.test(srcRaw)) sourceType = 'OFFICIAL_API';
       else if (/estima/.test(srcRaw)) sourceType = 'ESTIMADA';
+      if (isContextual) sourceType = sourceType + '_CONTEXTUAL';
       auditEntries.push({
         assessment_id,
         indicator_code: indicator.code,
         pillar: indicator.pillar,
         value: iv.value_raw,
-        normalized_score: score,
+        normalized_score: isContextual ? 0 : score,
         source_type: sourceType,
         source_detail: ivSource ? String(ivSource).slice(0, 200) : null,
         weight: effectiveWeight,
       });
 
-      // Aggregate by pillar
+      // Aggregate by pillar — pula contextuais (não entram em média)
+      if (isContextual) continue;
       const pillar = indicator.pillar;
       if (pillarData[pillar]) {
         pillarData[pillar].scores.push(score);
