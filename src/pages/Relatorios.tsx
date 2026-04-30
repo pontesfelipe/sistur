@@ -195,6 +195,42 @@ export default function Relatorios() {
     return true;
   });
 
+  /**
+   * v1.38.30 — Polling de recuperação. A edge function `generate-report` usa
+   * `EdgeRuntime.waitUntil` para finalizar a persistência em background mesmo
+   * quando o cliente perde a conexão SSE (timeout, troca de aba, queda de
+   * rede). Após uma queda do stream, fazemos polling em `generated_reports`
+   * pelo `assessment_id` por até ~3 minutos para recuperar o conteúdo salvo.
+   * Retorna o `report_content` quando encontra um registro novo, ou null.
+   */
+  const pollForBackgroundReport = async (
+    assessmentId: string,
+    streamStartedAt: number,
+  ): Promise<string | null> => {
+    const MAX_WAIT_MS = 180_000; // 3 minutos
+    const INTERVAL_MS = 5_000;
+    const deadline = Date.now() + MAX_WAIT_MS;
+    while (Date.now() < deadline) {
+      try {
+        const { data } = await supabase
+          .from('generated_reports')
+          .select('report_content, created_at')
+          .eq('assessment_id', assessmentId)
+          .maybeSingle();
+        if (data?.report_content) {
+          // Considera recuperado se o registro foi criado/atualizado depois
+          // do início desta tentativa (evita devolver um relatório antigo).
+          const createdAtMs = data.created_at ? new Date(data.created_at).getTime() : 0;
+          if (createdAtMs >= streamStartedAt - 5_000) {
+            return data.report_content;
+          }
+        }
+      } catch (_e) { /* tenta de novo no próximo tick */ }
+      await new Promise((r) => setTimeout(r, INTERVAL_MS));
+    }
+    return null;
+  };
+
   const generateReport = async (forceRegenerate = false) => {
     if (!selectedAssessmentId || !selectedDestination) {
       toast.error('Selecione um diagnóstico calculado');
