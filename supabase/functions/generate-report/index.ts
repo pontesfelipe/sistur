@@ -2032,7 +2032,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           }
         }
         
-        if (shouldStreamToClient) await writer.close();
+        await writer.close();
 
         if (fullContent) {
           // Fase 5 — Trava de coerência LLM v1.38.0: detecta contradições
@@ -2151,7 +2151,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         }
       } catch (err) {
         console.error('Stream error:', err);
-        if (shouldStreamToClient) await writer.abort(err);
+        await writer.abort(err).catch(() => {});
         throw err;
       }
     })();
