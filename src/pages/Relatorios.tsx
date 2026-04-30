@@ -128,7 +128,9 @@ export default function Relatorios() {
   const [genTierFilter, setGenTierFilter] = useState<string>('all');
   const [genDestFilter, setGenDestFilter] = useState<string>('all');
   // Watchdog para evitar UI travada quando o stream SSE para de responder.
-  const generationAbortRef = useRef<AbortController | null>(null);
+  // No modo background (v1.38.31) usamos uma flag para parar o polling local —
+  // o servidor continua finalizando a geração mesmo se o usuário "cancelar".
+  const cancelGenerationRef = useRef<boolean>(false);
   const [generationStage, setGenerationStage] = useState<string>('');
   const [generationElapsed, setGenerationElapsed] = useState<number>(0);
 
@@ -146,10 +148,7 @@ export default function Relatorios() {
   }, [isGenerating]);
 
   const cancelGeneration = () => {
-    if (generationAbortRef.current) {
-      generationAbortRef.current.abort();
-      generationAbortRef.current = null;
-    }
+    cancelGenerationRef.current = true;
   };
 
   // Pre-select assessment from URL parameter
