@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 32,
+  patch: 33,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.33",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção do erro `internal-report-stream-idle-timeout` em jobs de background. Diagnóstico nos logs do edge function: o pipeline interno chamado pelo modo background (HTTP ↔ HTTP) emitia o último chunk SSE, salvava o relatório com sucesso (`Report saved successfully`), mas em seguida ficava silencioso por mais de 2 minutos enquanto rodavam validador determinístico, validador IA cruzando com bibliografia canônica e persistência em `report_validations`/`audit_events`. O watchdog de inatividade do wrapper de background (2min) abortava a conexão e marcava o job como `failed`, embora o relatório já estivesse persistido em `generated_reports` — o usuário via 'erro' apesar do trabalho ter terminado corretamente. Correções em `supabase/functions/generate-report/index.ts`: (1) Idle timeout aumentado de 2min → 4min e hard timeout de 8min → 12min, dando folga para a fase pós-stream do pipeline de validação. (2) Recovery automático no `catch` do `runReportPipeline`: antes de propagar qualquer erro de stream (idle-timeout, hard-timeout, conexão fechada pelo proxy), faz uma consulta em `generated_reports` filtrando por `assessment_id` e `created_at >= streamStartedAt-5s`. Se o relatório já estiver salvo, o job é marcado como `completed` em vez de `failed`, com log explícito 'Stream interrompido, mas relatório foi persistido — recuperando job'. Resultado: relatórios longos como Foz do Iguaçu (112 indicadores) deixam de aparecer como falha quando o servidor já produziu o documento — o background passa a refletir o estado real da persistência, não o estado da conexão HTTP intermediária."
+    ]
+  },
   {
     version: "1.38.32",
     date: "2026-04-30",
