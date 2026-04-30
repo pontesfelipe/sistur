@@ -247,11 +247,12 @@ export function DataValidationPanel({
 
     const codeToId = new Map((indicatorRows || []).map(r => [r.code, r.id]));
     const valuesToPersist = validatedValues
-      .filter(v => v.raw_value !== null && codeToId.has(v.indicator_code))
+      .filter(v => v.raw_value !== null && v.raw_value !== undefined && codeToId.has(v.indicator_code))
       .map(v => ({
         assessment_id: assessmentId,
         indicator_id: codeToId.get(v.indicator_code)!,
         value_raw: Number(v.raw_value),
+        value_text: v.raw_value_text || null,
         source: `Pré-preenchido (${v.source_code})`,
         org_id: orgId,
         reference_date: v.reference_year ? `${v.reference_year}-01-01` : null,
@@ -303,8 +304,10 @@ export function DataValidationPanel({
     });
   };
 
-  const selectableValues = values.filter(v => !confirmedIds.has(v.id));
-  const validatedCount = confirmedIds.size;
+  const isValueConfirmed = (value: ExternalIndicatorValue) => confirmedIds.has(value.id) || isPersistedInAssessment(value);
+
+  const selectableValues = values.filter(v => !isValueConfirmed(v));
+  const validatedCount = values.filter(isValueConfirmed).length;
   const pendingCount = values.length - validatedCount;
   const autoCount = values.length;
 
