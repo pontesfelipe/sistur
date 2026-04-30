@@ -587,6 +587,7 @@ const DiagnosticoDetalhe = () => {
                       ibgeCode={ibgeCode || ''}
                       orgId={orgId || ''}
                       destinationName={assessmentDestination?.name || ''}
+                      assessmentId={id}
                       includeMandala={includeMandala}
                       onValidationComplete={() => {
                         toast.success('Dados validados com sucesso!');

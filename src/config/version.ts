@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 24,
+  patch: 25,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.25",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Fluxo de diagnóstico — persistência correta entre pré-preenchimento e preenchimento manual. A etapa de Validação de Dados Oficiais agora espelha diretamente o estado salvo em `external_indicator_values.validated`, então ao voltar para a fase ou retomar um diagnóstico os indicadores já validados aparecem como confirmados e não exigem nova validação. A validação também persiste imediatamente os valores em `indicator_values` do diagnóstico ativo, garantindo que todos os dados oficiais confirmados apareçam na etapa manual. Foi adicionada a ação `Desvalidar`, que remove o status validado e libera o campo para edição/revalidação. A etapa de preenchimento manual continua exibindo todos os indicadores do nível selecionado, preservando valores já salvos e permitindo alterar existentes ou completar vazios, e ganhou filtro `Não preenchidos` para visualizar rapidamente o que ainda falta. O catálogo manual agora respeita a opção Mandala/MST do diagnóstico, evitando indicadores extras quando a extensão não foi ativada."
+    ]
+  },
   {
     version: "1.38.24",
     date: "2026-04-30",

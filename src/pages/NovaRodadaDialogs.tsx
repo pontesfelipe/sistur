@@ -84,6 +84,7 @@ export function NovaRodadaDialogs({
               ibgeCode={selectedDestinationData.ibge_code}
               orgId={orgId}
               destinationName={selectedDestinationData.name}
+              assessmentId={createdAssessmentId}
               includeMandala={expandWithMandala}
               onValidationComplete={onValidationComplete}
             />

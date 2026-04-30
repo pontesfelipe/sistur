@@ -53,6 +53,7 @@ import {
   Hotel,
   Landmark,
   EyeOff,
+  ListFilter,
 } from 'lucide-react';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -102,6 +103,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean; _rawInput?: string }>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
+  const [fillFilter, setFillFilter] = useState<'all' | 'unfilled'>('all');
   const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const editedValuesRef = useRef(editedValues);
@@ -124,6 +126,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const { indicators, isLoading: loadingIndicators } = useIndicators({
     scope: isEnterpriseAssessment ? 'enterprise' : 'territorial',
     tier: assessmentTier,
+    includeMandala: Boolean((selectedAssessmentData as any)?.expand_with_mandala),
   });
 
   const { profile } = useProfile();
@@ -680,13 +683,6 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     return existing?.value_raw ?? null;
   };
 
-  const indicatorsByPillar = indicators.reduce((acc, ind) => {
-    const pillar = ind.pillar as 'RA' | 'OE' | 'AO';
-    if (!acc[pillar]) acc[pillar] = [];
-    acc[pillar].push(ind);
-    return acc;
-  }, {} as Record<string, typeof indicators>);
-
   const ignoredCount = values.filter(v => v.is_ignored === true).length;
   const activeIndicators = indicators.filter(ind => {
     const existing = values.find(v => v.indicator_id === ind.id);
@@ -698,6 +694,20 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     return value !== null && value !== undefined;
   }).length;
   const fillProgress = activeIndicators.length > 0 ? (filledCount / activeIndicators.length) * 100 : 0;
+  const unfilledCount = activeIndicators.length - filledCount;
+  const visibleIndicators = indicators.filter(ind => {
+    if (fillFilter === 'all') return true;
+    const existing = values.find(v => v.indicator_id === ind.id);
+    if (existing?.is_ignored === true) return false;
+    const value = getValueForIndicator(ind.id);
+    return value === null || value === undefined;
+  });
+  const indicatorsByPillar = visibleIndicators.reduce((acc, ind) => {
+    const pillar = ind.pillar as 'RA' | 'OE' | 'AO';
+    if (!acc[pillar]) acc[pillar] = [];
+    acc[pillar].push(ind);
+    return acc;
+  }, {} as Record<string, typeof indicators>);
 
   // Promote DRAFT assessments to DATA_READY once all active indicators are
   // filled, so they show up under the "Dados Prontos" bucket on the listing
@@ -909,6 +919,31 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
             {/* Form Tab */}
             <TabsContent value="formulario" className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border bg-card p-3">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <ListFilter className="h-4 w-4" />
+                  <span>{unfilledCount} indicador{unfilledCount === 1 ? '' : 'es'} não preenchido{unfilledCount === 1 ? '' : 's'}</span>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={fillFilter === 'all' ? 'default' : 'outline'}
+                    onClick={() => setFillFilter('all')}
+                  >
+                    Todos
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={fillFilter === 'unfilled' ? 'default' : 'outline'}
+                    onClick={() => setFillFilter('unfilled')}
+                  >
+                    Não preenchidos
+                  </Button>
+                </div>
+              </div>
+
               {Object.keys(editedValues).length > 0 && (() => {
                 const errorCount = Object.entries(validationErrors).filter(([id, err]) => err && editedValues[id]).length;
                 return (
