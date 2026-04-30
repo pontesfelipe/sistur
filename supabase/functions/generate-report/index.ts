@@ -1283,6 +1283,11 @@ async function runReportPipeline(args: {
   // então simulamos um avanço logarítmico: 15% ao começar, +5% a cada 30s,
   // travando em 90% antes da persistência final.
   let pct = 15;
+  const streamController = new AbortController();
+  const streamStartedAt = Date.now();
+  let lastStreamChunkAt = Date.now();
+  const STREAM_IDLE_TIMEOUT_MS = 2 * 60 * 1000;
+  const STREAM_HARD_TIMEOUT_MS = 8 * 60 * 1000;
   const progressTimer = setInterval(() => {
     pct = Math.min(90, pct + 5);
     supabaseAdmin.from('report_jobs').update({
@@ -1290,6 +1295,14 @@ async function runReportPipeline(args: {
       stage: pct < 50 ? 'Gerando narrativa com IA' : 'Validando coerência e persistindo',
     }).eq('id', jobId).then(() => {}, () => {});
   }, 30_000);
+  const streamWatchdog = setInterval(() => {
+    const now = Date.now();
+    if (now - lastStreamChunkAt > STREAM_IDLE_TIMEOUT_MS) {
+      streamController.abort('internal-report-stream-idle-timeout');
+    } else if (now - streamStartedAt > STREAM_HARD_TIMEOUT_MS) {
+      streamController.abort('internal-report-stream-hard-timeout');
+    }
+  }, 15_000);
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -1314,7 +1327,9 @@ async function runReportPipeline(args: {
         environment: args.environment,
         enableComparison: args.enableComparison,
         mode: 'stream',
+        backgroundRun: true,
       }),
+      signal: streamController.signal,
     });
     if (!resp.ok) {
       const errText = await resp.text().catch(() => '');
@@ -1327,6 +1342,7 @@ async function runReportPipeline(args: {
       while (true) {
         const { done } = await reader.read();
         if (done) break;
+        lastStreamChunkAt = Date.now();
       }
     }
 
@@ -1345,9 +1361,13 @@ async function runReportPipeline(args: {
       if (row?.id) { reportId = row.id; break; }
       await new Promise((r) => setTimeout(r, 1000));
     }
+    if (!reportId) {
+      throw new Error('Pipeline terminou sem salvar o relatório. A geração foi interrompida antes da persistência final.');
+    }
     return { reportId };
   } finally {
     clearInterval(progressTimer);
+    clearInterval(streamWatchdog);
   }
 }
 
@@ -1409,6 +1429,7 @@ serve(async (req) => {
       // do usuário e respeita a RLS de Admin/Analyst), passa o id aqui e
       // a edge function só atualiza o status.
       jobId: incomingJobId,
+      backgroundRun = false,
     } = await req.json();
     
     // Verify access
@@ -1887,7 +1908,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
       }),
     });
 
-    if (ANTHROPIC_API_KEY) {
+    if (ANTHROPIC_API_KEY && !backgroundRun) {
       try {
         const claudeResp = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
@@ -1985,7 +2006,9 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
     
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
+    const shouldStreamToClient = !backgroundRun;
     let fullContent = '';
+    let persistedReportId: string | null = null;
 
     const backgroundTask = (async () => {
       try {
@@ -1995,7 +2018,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          await writer.write(value);
+          if (shouldStreamToClient) await writer.write(value);
           
           const text = decoder.decode(value, { stream: true });
           for (const line of text.split('\n')) {
@@ -2072,7 +2095,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
               .eq('id', existing.id);
             if (error) console.error('Error updating report:', error);
-            else { console.log('Report updated successfully'); savedReportId = existing.id; }
+            else { console.log('Report updated successfully'); savedReportId = existing.id; persistedReportId = existing.id; }
           } else {
             const { data: inserted, error } = await supabaseAdmin
               .from('generated_reports')
@@ -2080,7 +2103,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               .select('id')
               .maybeSingle();
             if (error) console.error('Error saving report:', error);
-            else { console.log('Report saved successfully'); savedReportId = inserted?.id ?? null; }
+            else { console.log('Report saved successfully'); savedReportId = inserted?.id ?? null; persistedReportId = savedReportId; }
           }
 
           // Persistir validação (não bloqueante)
@@ -2128,9 +2151,17 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         }
       } catch (err) {
         console.error('Stream error:', err);
-        await writer.abort(err);
+        await writer.abort(err).catch(() => {});
+        throw err;
       }
     })();
+
+    if (backgroundRun) {
+      await backgroundTask;
+      return new Response(JSON.stringify({ reportId: persistedReportId }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     // Garante que a persistência (generated_reports + report_validations + audit_events)
     // continue executando mesmo após o cliente fechar a conexão SSE. Sem isso, o IIFE

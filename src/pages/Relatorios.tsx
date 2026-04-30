@@ -950,7 +950,7 @@ export default function Relatorios() {
                       )}
                       {isGenerating && generationElapsed >= 60 && !report && (
                         <div className="mt-3 text-xs text-amber-600 dark:text-amber-400">
-                          A geração está demorando mais que o usual. Aguarde até 4 minutos antes de cancelar — não tente clicar em &quot;Gerar&quot; novamente.
+                          A geração continua no servidor. Se ficar mais de 8 minutos sem avançar, o sistema marcará falha automaticamente para você tentar novamente sem duplicar jobs.
                         </div>
                       )}
                       {report && renderMarkdown(report)}
