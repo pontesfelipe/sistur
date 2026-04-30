@@ -718,13 +718,18 @@ Deno.serve(async (req) => {
     const anacData = await fetchANACFromCache(supabaseClient, ibge_code);
     console.log(`ANAC cache: ${Object.keys(anacData).length} indicators`);
 
+    // 3d. Lê cache CADÚNICO/MDS (atualizado mensalmente por ingest-cadunico)
+    //     — sobrepõe igma_populacao_de_baixa_renda com dado oficial MDS.
+    const caduData = await fetchCADUNICOFromCache(supabaseClient, ibge_code);
+    console.log(`CADÚNICO cache: ${Object.keys(caduData).length} indicators`);
+
     // 4. Fetch Mapa do Turismo data (categoria, região turística)
     const mapaTurismoData = await fetchMapaTurismo(supabaseClient, ibge_code);
     console.log(`Mapa Turismo: ${Object.keys(mapaTurismoData).length} indicators`);
 
     // 5. Merge real data
-    // Ordem importa: DATASUS sobrepõe leitos do IBGE (fonte primária para leitos hospitalares)
-    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...datasusData, ...anacData, ...mapaTurismoData };
+    // Ordem importa: DATASUS sobrepõe leitos do IBGE; CADÚNICO sobrepõe pobreza do IBGE.
+    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...datasusData, ...anacData, ...caduData, ...mapaTurismoData };
     const realCount = Object.keys(realData).length;
     console.log(`Total real: ${realCount} indicators`);
 
