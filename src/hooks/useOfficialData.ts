@@ -422,6 +422,44 @@ export function useValidateIndicatorValues() {
   });
 }
 
+// Reopen previously validated pre-filled values for editing
+export function useUnvalidateIndicatorValues() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ ids }: { ids: string[] }) => {
+      if (!ids.length) return { unvalidated: 0 };
+
+      const { error } = await supabase
+        .from('external_indicator_values')
+        .update({
+          validated: false,
+          validated_by: null,
+          validated_at: null,
+        })
+        .in('id', ids);
+
+      if (error) throw error;
+      return { unvalidated: ids.length };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['external-indicator-values'] });
+      toast({
+        title: 'Validação removida',
+        description: 'O indicador foi liberado para edição e nova validação.',
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Error unvalidating values:', error);
+      toast({
+        title: 'Erro ao desvalidar dado',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
 // Create snapshot when freezing diagnosis
 export function useCreateDataSnapshot() {
   const queryClient = useQueryClient();
