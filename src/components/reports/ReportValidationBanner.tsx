@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { AlertTriangle, CheckCircle2, Info, Wrench, Eye } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
