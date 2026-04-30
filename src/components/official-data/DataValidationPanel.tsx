@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +33,7 @@ import {
   useExternalIndicatorValues,
   useFetchOfficialData,
   useValidateIndicatorValues,
+  useUnvalidateIndicatorValues,
 } from '@/hooks/useOfficialData';
 import { useAuth } from '@/hooks/useAuth';
 import { useIndicators } from '@/hooks/useIndicators';
@@ -48,6 +50,8 @@ interface DataValidationPanelProps {
   orgId: string;
   destinationName: string;
   onValidationComplete: (values: ExternalIndicatorValue[]) => void;
+  /** Assessment receiving the validated values; when provided, values are persisted immediately. */
+  assessmentId?: string | null;
   /** Whether the host assessment opted into the Mandala MST extension. */
   includeMandala?: boolean;
 }
@@ -92,6 +96,7 @@ export function DataValidationPanel({
   orgId,
   destinationName,
   onValidationComplete,
+  assessmentId,
   includeMandala = false,
 }: DataValidationPanelProps) {
   const { user } = useAuth();
@@ -105,6 +110,7 @@ export function DataValidationPanel({
   const { data: rawValues = [], isLoading } = useExternalIndicatorValues(ibgeCode, orgId);
   const fetchOfficialData = useFetchOfficialData();
   const validateValues = useValidateIndicatorValues();
+  const unvalidateValues = useUnvalidateIndicatorValues();
 
   // Catalog of indicators (used to display friendly names instead of raw codes)
   const { indicators: indicatorCatalog = [] } = useIndicators({ scope: 'all' });
@@ -146,21 +152,11 @@ export function DataValidationPanel({
     );
   }, [ibgeCode, orgId, autoFetched, includeMandala, isLoading, rawValues]);
 
-  // Seed `confirmedIds` from values that were already validated in a previous
-  // session so the user doesn't have to re-confirm them on resume.
+  // Mirror the persisted validation state exactly. This keeps rows validated
+  // after returning to this step, and also removes the local confirmation when
+  // the user explicitly devalidates a value to edit it again.
   useEffect(() => {
-    if (!rawValues || rawValues.length === 0) return;
-    setConfirmedIds(prev => {
-      const next = new Set(prev);
-      let changed = false;
-      rawValues.forEach(v => {
-        if ((v as any).validated && !next.has(v.id)) {
-          next.add(v.id);
-          changed = true;
-        }
-      });
-      return changed ? next : prev;
-    });
+    setConfirmedIds(new Set((rawValues || []).filter(v => (v as any).validated).map(v => v.id)));
   }, [rawValues]);
 
   const values = useMemo(
@@ -215,17 +211,54 @@ export function DataValidationPanel({
     setSelectedIds(newSelected);
   };
 
+  const persistValidatedValuesToAssessment = async (validatedValues: ExternalIndicatorValue[]) => {
+    if (!assessmentId || !orgId || validatedValues.length === 0) return;
+
+    const codes = validatedValues.map(v => v.indicator_code);
+    const { data: indicatorRows, error: indErr } = await supabase
+      .from('indicators')
+      .select('id, code')
+      .in('code', codes);
+    if (indErr) throw indErr;
+
+    const codeToId = new Map((indicatorRows || []).map(r => [r.code, r.id]));
+    const valuesToPersist = validatedValues
+      .filter(v => v.raw_value !== null && codeToId.has(v.indicator_code))
+      .map(v => ({
+        assessment_id: assessmentId,
+        indicator_id: codeToId.get(v.indicator_code)!,
+        value_raw: Number(v.raw_value),
+        source: `Pré-preenchido (${v.source_code})`,
+        org_id: orgId,
+        reference_date: v.reference_year ? `${v.reference_year}-01-01` : null,
+      }));
+
+    if (valuesToPersist.length === 0) return;
+    const { error } = await supabase
+      .from('indicator_values')
+      .upsert(valuesToPersist, { onConflict: 'assessment_id,indicator_id' });
+    if (error) throw error;
+    await queryClient.invalidateQueries({ queryKey: ['indicator-values', assessmentId] });
+  };
+
   const handleValidateSelected = async () => {
     if (!user?.id || selectedIds.size === 0) return;
 
-    const valuesToValidate = values
-      .filter(v => selectedIds.has(v.id))
-      .map(v => ({
-        id: v.id,
-        raw_value: editedValues[v.id] !== undefined ? editedValues[v.id] : v.raw_value,
-      }));
+    const selectedValues = values.filter(v => selectedIds.has(v.id));
+    const valuesToValidate = selectedValues.map(v => ({
+      id: v.id,
+      raw_value: editedValues[v.id] !== undefined ? editedValues[v.id] : v.raw_value,
+    }));
 
     await validateValues.mutateAsync({ values: valuesToValidate, userId: user.id });
+    const validatedValues = selectedValues.map(v => ({
+      ...v,
+      raw_value: editedValues[v.id] !== undefined ? editedValues[v.id] : v.raw_value,
+      validated: true,
+      validated_by: user.id,
+      validated_at: new Date().toISOString(),
+    }));
+    await persistValidatedValuesToAssessment(validatedValues);
     
     setConfirmedIds(prev => {
       const next = new Set(prev);
@@ -234,10 +267,19 @@ export function DataValidationPanel({
     });
     setSelectedIds(new Set());
 
-    const validatedValues = values.filter(v => selectedIds.has(v.id));
     onValidationComplete(validatedValues);
   };
 
+  const handleUnvalidate = async (id: string) => {
+    await unvalidateValues.mutateAsync({ ids: [id] });
+    setConfirmedIds(prev => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  };
+
+  const selectableValues = values.filter(v => !confirmedIds.has(v.id));
   const validatedCount = confirmedIds.size;
   const pendingCount = values.length - validatedCount;
   const autoCount = values.length;
@@ -447,7 +489,7 @@ export function DataValidationPanel({
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="select-all"
-                  checked={selectedIds.size === values.length && values.length > 0}
+                  checked={selectableValues.length > 0 && selectedIds.size === selectableValues.length}
                   onCheckedChange={handleSelectAll}
                 />
                 <label htmlFor="select-all" className="text-sm text-muted-foreground cursor-pointer">
@@ -468,6 +510,7 @@ export function DataValidationPanel({
                     <TableHead>Ano</TableHead>
                     <TableHead>Critério</TableHead>
                     <TableHead>Status</TableHead>
+                  <TableHead className="w-24 text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -616,7 +659,7 @@ export function DataValidationPanel({
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p className="text-xs">Dado revisado e confirmado nesta sessão</p>
+                                  <p className="text-xs">Dado revisado, salvo e confirmado</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -634,6 +677,18 @@ export function DataValidationPanel({
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {isConfirmed && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleUnvalidate(value.id)}
+                              disabled={unvalidateValues.isPending}
+                            >
+                              Desvalidar
+                            </Button>
                           )}
                         </TableCell>
                       </TableRow>
