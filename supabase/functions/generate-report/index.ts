@@ -1429,6 +1429,7 @@ serve(async (req) => {
       // do usuário e respeita a RLS de Admin/Analyst), passa o id aqui e
       // a edge function só atualiza o status.
       jobId: incomingJobId,
+      backgroundRun = false,
     } = await req.json();
     
     // Verify access
@@ -1907,7 +1908,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
       }),
     });
 
-    if (ANTHROPIC_API_KEY) {
+    if (ANTHROPIC_API_KEY && !backgroundRun) {
       try {
         const claudeResp = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
@@ -2005,7 +2006,9 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
     
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
+    const shouldStreamToClient = !backgroundRun;
     let fullContent = '';
+    let persistedReportId: string | null = null;
 
     const backgroundTask = (async () => {
       try {
@@ -2015,7 +2018,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          await writer.write(value);
+          if (shouldStreamToClient) await writer.write(value);
           
           const text = decoder.decode(value, { stream: true });
           for (const line of text.split('\n')) {
@@ -2029,7 +2032,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           }
         }
         
-        await writer.close();
+        if (shouldStreamToClient) await writer.close();
 
         if (fullContent) {
           // Fase 5 — Trava de coerência LLM v1.38.0: detecta contradições
@@ -2092,7 +2095,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
               .eq('id', existing.id);
             if (error) console.error('Error updating report:', error);
-            else { console.log('Report updated successfully'); savedReportId = existing.id; }
+            else { console.log('Report updated successfully'); savedReportId = existing.id; persistedReportId = existing.id; }
           } else {
             const { data: inserted, error } = await supabaseAdmin
               .from('generated_reports')
@@ -2100,7 +2103,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               .select('id')
               .maybeSingle();
             if (error) console.error('Error saving report:', error);
-            else { console.log('Report saved successfully'); savedReportId = inserted?.id ?? null; }
+            else { console.log('Report saved successfully'); savedReportId = inserted?.id ?? null; persistedReportId = savedReportId; }
           }
 
           // Persistir validação (não bloqueante)
@@ -2148,9 +2151,17 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         }
       } catch (err) {
         console.error('Stream error:', err);
-        await writer.abort(err);
+        if (shouldStreamToClient) await writer.abort(err);
+        throw err;
       }
     })();
+
+    if (backgroundRun) {
+      await backgroundTask;
+      return new Response(JSON.stringify({ reportId: persistedReportId }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     // Garante que a persistência (generated_reports + report_validations + audit_events)
     // continue executando mesmo após o cliente fechar a conexão SSE. Sem isso, o IIFE
