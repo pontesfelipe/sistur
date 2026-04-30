@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 27,
+  patch: 28,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.28",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — banner de Validação cruzada agora explica claramente o que foi validado e a resolução de cada item. O Dialog 'Ver detalhes' (componente `ReportValidationBanner`) ganhou uma seção introdutória 'O que foi validado' descrevendo as três camadas de checagem (auto-correção numérica determinística contra a tabela oficial de auditoria com fontes IBGE/CADASTUR/STN/DATASUS/INEP, motor de coerência interna e agente IA validador cruzando com a bibliografia canônica Beni/IGMA/PNT/ODS), além de badges com a contagem de itens corrigidos e itens para revisão manual. Cada divergência corrigida automaticamente passa a exibir explicitamente Problema (valor citado pela IA, riscado) e Resolução (substituído pelo valor oficial, já aplicado no texto, sem ação adicional). Avisos determinísticos e do agente IA também ganharam uma frase de Resolução explicando por que ficaram pendentes (não havia valor oficial para substituir / afirmação sem respaldo direto na bibliografia) e o que o usuário deve fazer (confirmar ou ajustar manualmente antes de publicar). O conteúdo do relatório continua limpo — toda essa informação técnica vive exclusivamente na interface."
+    ]
+  },
   {
     version: "1.38.27",
     date: "2026-04-30",
