@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 23,
+  patch: 24,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.24",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "CADÚNICO/MDS — População de baixa renda agora vem AUTOMATICAMENTE da fonte oficial mensal, sem dependência de token federal e sem fallback IBGE. Antes, o indicador `igma_populacao_de_baixa_renda` era preenchido pela tabela 36/30246 do IBGE (Incidência de Pobreza, censo 2010, valor estático e desatualizado) porque a API REST oficial do Cadastro Único exige token MDS solicitado por portal próprio. Solução implementada usando a API pública SAGI Solr (`aplicacoes.mds.gov.br/sagi/servicos/misocial`), que não requer chave: (1) Nova tabela `cadunico_municipio_cache` armazena, por código IBGE de 6 dígitos, métricas oficiais do Cadastro Único — total de famílias e pessoas cadastradas, famílias e pessoas em situação de baixa renda, famílias em extrema pobreza, população de referência e percentual calculado de população em baixa renda — com mês/ano de referência. Tabela auxiliar `cadunico_ingestion_runs` registra cada execução (status, linhas processadas, municípios atualizados, erros). (2) Nova edge function `ingest-cadunico` detecta dinamicamente o último mês com dados populados via probe Solr (`anomes_s desc` filtrado por `cadun_qtd_familias_cadastradas_i:[1 TO *]`) e baixa todos os ~5570 municípios de uma vez em formato CSV streaming, parseando linha-a-linha e fazendo upsert em lotes de 500. Roda como background task via `EdgeRuntime.waitUntil` para responder ao chamador em milissegundos. (3) `fetch-official-data` ganhou `fetchCADUNICOFromCache` que lê o cache e devolve `pct_pop_baixa_renda` como `igma_populacao_de_baixa_renda` com source='CADUNICO' e `real=true`, sobrepondo o IBGE quando disponível. (4) Job pg_cron `ingest-cadunico-monthly` agendado para o dia 7 de cada mês às 04:00 UTC. (5) Seed inicial disparado: tanto `ingest-cadunico` quanto `ingest-anac` foram executados manualmente para popular os caches imediatamente, sem esperar o próximo ciclo agendado. Resultado: novos diagnósticos passam a vir com população em baixa renda atualizada mensalmente, com fonte oficial MDS, sem perder o fallback IBGE para municípios eventualmente ausentes do Solr."
+    ]
+  },
   {
     version: "1.38.23",
     date: "2026-04-30",
