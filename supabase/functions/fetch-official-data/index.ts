@@ -203,6 +203,99 @@ async function fetchIBGEPesquisas(ibgeCode: string, populacao?: number): Promise
   return results;
 }
 
+// ─── 2a. DATASUS DEMAS: Leitos hospitalares e leitos SUS ──────────────
+// API oficial do Ministério da Saúde (DEMAS):
+// https://apidadosabertos.saude.gov.br/static/swagger.json
+// Endpoint: /assistencia-a-saude/hospitais-e-leitos
+//   - retorna até 1000 hospitais por página (offset)
+//   - cada item traz quantidade_total_de_leitos_do_hosptial e _sus_do_hosptial
+//   - paginamos sequencialmente até esgotar o município alvo (em geral 1-2 páginas
+//     já cobrem a fatia do município, mas iteramos até 8 páginas no máximo).
+// Resultado:
+//   - igma_leitos_hospitalares_sus_por_mil_habitantes (leitos SUS / pop * 1000)
+//   - igma_leitos_por_habitante (leitos totais / pop * 1000) — sobrepõe valor IBGE
+//     quando disponível, com source='DATASUS'.
+async function fetchDATASUSLeitos(
+  ibgeCode: string,
+  populacao?: number,
+): Promise<Record<string, IndicatorResult>> {
+  const results: Record<string, IndicatorResult> = {};
+  if (!populacao || populacao <= 0) return results;
+
+  // O endpoint usa código IBGE de 6 dígitos (sem dígito verificador) em
+  // alguns lotes históricos e 7 dígitos no payload mais recente. Aceitar
+  // os dois para casar.
+  const code7 = ibgeCode.length === 7 ? ibgeCode : ibgeCode + '4';
+  const code6 = ibgeCode.length === 7 ? ibgeCode.slice(0, 6) : ibgeCode;
+
+  const PAGE_SIZE = 1000;
+  const MAX_PAGES = 8; // ~8000 hospitais por consulta (Brasil tem ~6800)
+
+  let totalLeitos = 0;
+  let totalLeitosSus = 0;
+  let matched = 0;
+
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const url =
+      `https://apidadosabertos.saude.gov.br/assistencia-a-saude/hospitais-e-leitos` +
+      `?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`;
+    try {
+      console.log(`DATASUS leitos page=${page}:`, url);
+      const resp = await fetchWithTimeout(url, 25000);
+      if (!resp.ok) break;
+      // O servidor às vezes anexa uma quebra de linha extra após o JSON;
+      // truncar até o último '}' garante parse seguro.
+      const text = await resp.text();
+      const lastBrace = text.lastIndexOf('}');
+      if (lastBrace < 0) break;
+      const data = JSON.parse(text.slice(0, lastBrace + 1));
+      const items: any[] = data?.hospitais_leitos ?? [];
+      if (items.length === 0) break;
+      for (const h of items) {
+        const ibge = String(h?.codigo_ibge_do_municipio ?? '');
+        if (ibge === code6 || ibge === code7) {
+          totalLeitos += Number(h?.quantidade_total_de_leitos_do_hosptial ?? 0);
+          totalLeitosSus += Number(h?.quantidade_total_de_leitos_sus_do_hosptial ?? 0);
+          matched += 1;
+        }
+      }
+      if (items.length < PAGE_SIZE) break; // última página
+    } catch (e) {
+      console.warn(`DATASUS leitos page=${page} error:`, e instanceof Error ? e.message : e);
+      break;
+    }
+  }
+
+  if (matched === 0) {
+    console.log(`DATASUS leitos: nenhum hospital encontrado para IBGE ${ibgeCode}`);
+    return results;
+  }
+
+  // Conversão para "por mil habitantes"
+  const leitosPorMil = Math.round((totalLeitos / populacao) * 10000) / 10;
+  const leitosSusPorMil = Math.round((totalLeitosSus / populacao) * 10000) / 10;
+  const year = new Date().getFullYear();
+
+  results['igma_leitos_por_habitante'] = {
+    value: leitosPorMil,
+    year,
+    source: 'DATASUS',
+    real: true,
+  };
+  results['igma_leitos_hospitalares_sus_por_mil_habitantes'] = {
+    value: leitosSusPorMil,
+    year,
+    source: 'DATASUS',
+    real: true,
+  };
+
+  console.log(
+    `DATASUS leitos: ${matched} hospitais, total=${totalLeitos} (${leitosPorMil}/mil), SUS=${totalLeitosSus} (${leitosSusPorMil}/mil)`,
+  );
+
+  return results;
+}
+
 // ─── 2b. SIDRA API: Censo 2010 Saneamento (table 3217) ──────────────
 async function fetchSIDRASaneamento(ibgeCode: string): Promise<Record<string, IndicatorResult>> {
   const results: Record<string, IndicatorResult> = {};
@@ -520,12 +613,17 @@ Deno.serve(async (req) => {
     const sidraData = await fetchSIDRASaneamento(ibge_code);
     console.log(`SIDRA Saneamento: ${Object.keys(sidraData).length} indicators`);
 
+    // 3b. Fetch DATASUS leitos (DEMAS) — sobrepõe leitos IBGE com SUS dedicado
+    const datasusData = await fetchDATASUSLeitos(ibge_code, populacao);
+    console.log(`DATASUS Leitos: ${Object.keys(datasusData).length} indicators`);
+
     // 4. Fetch Mapa do Turismo data (categoria, região turística)
     const mapaTurismoData = await fetchMapaTurismo(supabaseClient, ibge_code);
     console.log(`Mapa Turismo: ${Object.keys(mapaTurismoData).length} indicators`);
 
     // 5. Merge real data
-    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...mapaTurismoData };
+    // Ordem importa: DATASUS sobrepõe leitos do IBGE (fonte primária para leitos hospitalares)
+    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...datasusData, ...mapaTurismoData };
     const realCount = Object.keys(realData).length;
     console.log(`Total real: ${realCount} indicators`);
 

@@ -713,8 +713,9 @@ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
   É PROIBIDO: adicionar/remover colunas, trocar a ordem, usar "Score" no lugar de "Valor", omitir a Unidade, ou apresentar o status sem o emoji.
   Se quiser dar contexto adicional (ex.: benchmark, evidência, observação), faça-o em PARÁGRAFO logo abaixo da tabela — NUNCA como coluna extra.
 - Banco de Ações em tabela: Ação | Pilar | Prazo | Responsável | Prioridade
-- Linguagem institucional, clara e objetiva
-- Justifique conclusões com dados. Conecte: dado → impacto → decisão
+- TOM NARRATIVO (OBRIGATÓRIO): cada seção de análise (Resumo, Diagnóstico por Eixo, Conclusão) DEVE ser apresentada em PARÁGRAFOS CORRIDOS de 3-6 frases, com prosa fluida e técnica em português institucional. Use tabelas APENAS para a ficha técnica, listas de indicadores e banco de ações — NUNCA substitua a análise textual por bullets ou listas de tópicos. Após cada tabela de indicadores, escreva 1-2 parágrafos interpretando os dados (não apenas repetindo-os): conecte dado → causa provável → impacto territorial → decisão recomendada.
+- Linguagem institucional, clara e objetiva — evite jargão acadêmico inflado, marcadores excessivos e frases de uma palavra. Prefira "Foz do Iguaçu apresenta…" a "• Score: X • Status: Y".
+- Justifique conclusões com dados. Conecte sempre: dado → impacto → decisão.
 - Se estimar dados: "[ESTIMADO]"
 - SEMPRE inclua a coluna "Fonte" do template canônico nas tabelas de indicadores, citando a origem dos dados
 - NUNCA aplique cores, negrito ou itálico ao texto de Status — a cor é aplicada automaticamente pelo renderizador a partir do rótulo canônico`;

@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 21,
+  patch: 22,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.22",
+    date: "2026-04-29",
+    type: "patch" as const,
+    changes: [
+      "Restauração de fontes oficiais e do tom narrativo do relatório. (1) DATASUS — Leitos hospitalares: nova função `fetchDATASUSLeitos` no edge `fetch-official-data` consome a API DEMAS oficial (`apidadosabertos.saude.gov.br/assistencia-a-saude/hospitais-e-leitos`), pagina por offset (até 8 páginas × 1000 hospitais), filtra pelo `codigo_ibge_do_municipio` e agrega `quantidade_total_de_leitos_do_hosptial` e `_sus_do_hosptial`. Resultado popula automaticamente `igma_leitos_por_habitante` (sobrepondo o IBGE com source='DATASUS') e `igma_leitos_hospitalares_sus_por_mil_habitantes` (que estava sem coleta automática). (2) ANAC — Conectividade Aérea (OE003): mantida como MANUAL no MVP; o único endpoint público disponível é um CSV de 353 MB (`Dados_Estatisticos.csv`) inviável de baixar/parsear em edge function (limite de memória). Solução pragmática para evitar promessa quebrada — manter o indicador como entrada manual com link direto ao portal ANAC nas próximas iterações. (3) CADÚNICO — População de baixa renda: a API oficial em `gov.br/conecta/catalogo/apis/cadunico-servicos` exige token federal MDS que precisa ser solicitado por portal próprio; mantém-se o fallback IBGE Pesquisas tabela 36/30246 (Incidência de Pobreza) já em produção, marcado como source='IBGE' até o token MDS ser obtido. (4) Tom narrativo restaurado no prompt do `generate-report` — nova regra obrigatória pedindo PARÁGRAFOS CORRIDOS de 3-6 frases nas seções de análise (Resumo, Diagnóstico por Eixo, Conclusão), proibindo substituir prosa por bullets soltos, e exigindo 1-2 parágrafos interpretativos após cada tabela de indicadores conectando dado → causa → impacto → decisão. Restaura o estilo do relatório-referência de Foz do Iguaçu de 27/04/2026 09:41 sem abrir mão da padronização de tabelas/cores/colunas da v1.38.19."
+    ]
+  },
   {
     version: "1.38.21",
     date: "2026-04-29",
