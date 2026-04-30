@@ -1558,6 +1558,7 @@ serve(async (req) => {
             userId,
             jobId: jobId!,
             authHeader: authHeader!,
+            aiProvider: aiProviderOverride,
           });
 
           await supabaseAdmin.from('report_jobs').update({
