@@ -53,6 +53,7 @@ import {
   Hotel,
   Landmark,
   EyeOff,
+  ListFilter,
 } from 'lucide-react';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -102,6 +103,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const [editedValues, setEditedValues] = useState<Record<string, { value: number | null; source: string; is_ignored?: boolean; _rawInput?: string }>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [activeTab, setActiveTab] = useState<string>('formulario');
+  const [fillFilter, setFillFilter] = useState<'all' | 'unfilled'>('all');
   const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const editedValuesRef = useRef(editedValues);
