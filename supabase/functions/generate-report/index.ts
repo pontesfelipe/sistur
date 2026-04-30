@@ -2177,10 +2177,12 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             console.error('Failed to persist report_validations:', vErr);
           }
 
-          // Audit event — registra qual modelo gerou o relatório (v1.38.15)
+          // Audit event — registra qual modelo gerou o relatório (v1.38.34)
           try {
             const modelLabel = usedProvider === 'claude'
               ? 'anthropic/claude-sonnet-4-5-20250929'
+              : usedProvider === 'gpt5'
+              ? 'openai/gpt-5'
               : 'google/gemini-2.5-pro';
             await supabaseAdmin.from('audit_events').insert({
               org_id: assessment.org_id,
@@ -2191,7 +2193,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               metadata: {
                 provider: usedProvider,
                 model: modelLabel,
-                fallback_reason: claudeFailReason,
+                fallback_trail: fallbackTrail,
                 template: reportTemplate,
                 destination_name: destinationName,
                 assessment_id: assessmentId,
