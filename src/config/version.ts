@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 29,
+  patch: 30,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.30",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — recuperação automática de relatórios cuja conexão SSE caiu durante a geração. Causa observada em Foz do Iguaçu: relatórios longos (112 indicadores, 15 gargalos, 35 prescrições) chegavam a ~4 min de stream e a conexão era encerrada pelo proxy/edge runtime com 'Http: connection closed before message completed', deixando o usuário sem documento na tela apesar da edge function `generate-report` já usar `EdgeRuntime.waitUntil` para finalizar a persistência em background. Solução cliente-side em `src/pages/Relatorios.tsx`: quando o stream cai por idle-timeout, hard-timeout ou erro de rede (mas NÃO quando o usuário clica Cancelar), o front entra em modo de recuperação e faz polling em `generated_reports` filtrando por `assessment_id` a cada 5s por até 3 minutos. Se encontrar um registro com `created_at` posterior ao início desta geração, carrega o conteúdo na tela, exibe toast de sucesso ('Relatório recuperado com sucesso! Foi finalizado em segundo plano.') e invalida as queries de histórico/destinos. Quando nada é recuperado dentro da janela, mostra mensagem clara orientando a checar o histórico em alguns minutos antes de gerar de novo (evita disparar regeneração paralela enquanto o background ainda está salvando). Nenhuma alteração na edge function — o pipeline de streaming + waitUntil já estava correto, faltava apenas o cliente saber tirar proveito dele."
+    ]
+  },
   {
     version: "1.38.29",
     date: "2026-04-30",

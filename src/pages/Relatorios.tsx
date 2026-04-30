@@ -195,6 +195,42 @@ export default function Relatorios() {
     return true;
   });
 
+  /**
+   * v1.38.30 — Polling de recuperação. A edge function `generate-report` usa
+   * `EdgeRuntime.waitUntil` para finalizar a persistência em background mesmo
+   * quando o cliente perde a conexão SSE (timeout, troca de aba, queda de
+   * rede). Após uma queda do stream, fazemos polling em `generated_reports`
+   * pelo `assessment_id` por até ~3 minutos para recuperar o conteúdo salvo.
+   * Retorna o `report_content` quando encontra um registro novo, ou null.
+   */
+  const pollForBackgroundReport = async (
+    assessmentId: string,
+    streamStartedAt: number,
+  ): Promise<string | null> => {
+    const MAX_WAIT_MS = 180_000; // 3 minutos
+    const INTERVAL_MS = 5_000;
+    const deadline = Date.now() + MAX_WAIT_MS;
+    while (Date.now() < deadline) {
+      try {
+        const { data } = await supabase
+          .from('generated_reports')
+          .select('report_content, created_at')
+          .eq('assessment_id', assessmentId)
+          .maybeSingle();
+        if (data?.report_content) {
+          // Considera recuperado se o registro foi criado/atualizado depois
+          // do início desta tentativa (evita devolver um relatório antigo).
+          const createdAtMs = data.created_at ? new Date(data.created_at).getTime() : 0;
+          if (createdAtMs >= streamStartedAt - 5_000) {
+            return data.report_content;
+          }
+        }
+      } catch (_e) { /* tenta de novo no próximo tick */ }
+      await new Promise((r) => setTimeout(r, INTERVAL_MS));
+    }
+    return null;
+  };
+
   const generateReport = async (forceRegenerate = false) => {
     if (!selectedAssessmentId || !selectedDestination) {
       toast.error('Selecione um diagnóstico calculado');
@@ -211,6 +247,7 @@ export default function Relatorios() {
     setIsGenerating(true);
     setReport('');
     setGenerationStage('Conectando ao servidor…');
+    const generationStartedAt = Date.now();
 
     // ── Watchdog anti-travamento ───────────────────────────────────
     // 1) timeout duro absoluto: 240s (relatório longo + LLM)
@@ -353,20 +390,42 @@ export default function Relatorios() {
       const isAbort = (error as any)?.name === 'AbortError';
       const reason = (error as any)?.message || '';
       console.error('Error generating report:', error);
-      if (isAbort && reason === 'idle-timeout') {
-        toast.error(
-          'O servidor parou de responder. O relatório pode ter sido salvo mesmo assim — verifique o histórico antes de tentar de novo.',
-          { duration: 8000 },
-        );
-        queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
-      } else if (isAbort && reason === 'hard-timeout') {
-        toast.error(
-          'A geração ultrapassou 4 minutos e foi cancelada. Tente novamente — relatórios curtos costumam levar ~60s.',
-          { duration: 8000 },
-        );
-        queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
-      } else if (isAbort) {
+      // v1.38.30 — Recuperação automática quando o stream SSE cai mas a edge
+      // function continua finalizando em background via EdgeRuntime.waitUntil.
+      // Em vez de só avisar o usuário, fazemos polling em generated_reports
+      // pelo assessment_id por até ~3 min para "pegar" o relatório que terminou
+      // de salvar mesmo após a conexão ser encerrada.
+      const userCanceled = isAbort && reason !== 'idle-timeout' && reason !== 'hard-timeout';
+      if (userCanceled) {
         toast.info('Geração cancelada.');
+      } else if (isAbort || !(error instanceof Error && /4\d\d|5\d\d/.test(error.message))) {
+        // idle-timeout, hard-timeout ou erro de rede — tentar recuperar
+        const recoveryToastId = toast.loading(
+          'A conexão caiu, mas o relatório pode estar sendo finalizado no servidor. Recuperando…',
+          { duration: 180_000 },
+        );
+        setGenerationStage('Recuperando relatório do servidor…');
+        const recovered = await pollForBackgroundReport(selectedAssessmentId, generationStartedAt);
+        toast.dismiss(recoveryToastId);
+        if (recovered) {
+          setReport(recovered);
+          toast.success('Relatório recuperado com sucesso! Foi finalizado em segundo plano.');
+          queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
+          queryClient.invalidateQueries({ queryKey: ['destinations-with-report-data'] });
+        } else {
+          if (isAbort && reason === 'hard-timeout') {
+            toast.error(
+              'A geração ultrapassou 4 minutos e não retornou. Verifique o histórico em alguns minutos antes de tentar de novo.',
+              { duration: 8000 },
+            );
+          } else {
+            toast.error(
+              'Não foi possível recuperar o relatório automaticamente. Verifique o histórico em alguns minutos antes de gerar de novo.',
+              { duration: 8000 },
+            );
+          }
+          queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
+        }
       } else {
         toast.error(error instanceof Error ? error.message : 'Erro ao gerar relatório');
       }
