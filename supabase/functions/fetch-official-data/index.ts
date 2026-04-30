@@ -298,6 +298,7 @@ async function fetchDATASUSLeitos(
 
 // ─── 2b. SIDRA API: Censo 2010 Saneamento (table 3217) ──────────────
 async function fetchSIDRASaneamento(ibgeCode: string): Promise<Record<string, IndicatorResult>> {
+
   const results: Record<string, IndicatorResult> = {};
 
   // Table 3217: Domicílios por abastecimento de água, destino do lixo
