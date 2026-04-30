@@ -675,6 +675,7 @@ REGRAS DURAS — POLÍTICA "ZERO ALUCINAÇÃO":
 10. COMPARAÇÕES com outros municípios/regiões: somente se o valor comparado constar dos BENCHMARKS OFICIAIS injetados. Caso contrário, omita.
 11. Se faltar dado para uma seção inteira, escreva "Seção sem dados validados suficientes para análise neste ciclo." em vez de preencher com generalidades.
 12. Em caso de dúvida, PREFIRA OMITIR a inventar.
+13. CITAÇÃO DE PÁGINA: só inclua número de página de obra (ex.: "BENI, 1997, p. 145") se o trecho do livro estiver LITERALMENTE presente na seção BASE DE CONHECIMENTO DO DESTINO ou DOCUMENTOS DE REFERÊNCIA NACIONAL desta entrega, com a página explicitamente registrada no excerto. Caso contrário, cite somente autor e ano — JAMAIS invente número de página.
 `;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
