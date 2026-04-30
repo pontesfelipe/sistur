@@ -1453,7 +1453,28 @@ serve(async (req) => {
       // a edge function só atualiza o status.
       jobId: incomingJobId,
       backgroundRun = false,
+      // v1.38.35 — Override de provedor de IA (apenas ADMIN).
+      // Valores: 'auto' | 'claude' | 'gpt5' | 'gemini'. Default 'auto'
+      // mantém a cadeia padrão Claude → GPT-5 → Gemini.
+      aiProvider: requestedProvider = 'auto',
     } = await req.json();
+
+    // Valida que somente ADMIN pode forçar provedor — para usuários comuns
+    // o valor é silenciosamente reduzido a 'auto'.
+    let aiProviderOverride: 'auto' | 'claude' | 'gpt5' | 'gemini' = 'auto';
+    if (['claude', 'gpt5', 'gemini', 'auto'].includes(requestedProvider)) {
+      if (requestedProvider === 'auto') {
+        aiProviderOverride = 'auto';
+      } else {
+        const { data: roleRow } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .eq('role', 'ADMIN')
+          .maybeSingle();
+        aiProviderOverride = roleRow ? requestedProvider : 'auto';
+      }
+    }
     
     // Verify access
     const { data: profile } = await supabase.from('profiles').select('org_id, viewing_demo_org_id').eq('user_id', userId).single();
