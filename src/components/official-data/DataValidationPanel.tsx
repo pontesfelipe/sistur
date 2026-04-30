@@ -510,7 +510,7 @@ export function DataValidationPanel({
                     <TableHead>Ano</TableHead>
                     <TableHead>Critério</TableHead>
                     <TableHead>Status</TableHead>
-                  <TableHead className="w-24 text-right">Ações</TableHead>
+                    <TableHead className="w-24 text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
