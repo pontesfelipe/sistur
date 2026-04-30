@@ -806,6 +806,25 @@ export default function Relatorios() {
                     </div>
                   )}
 
+                  {isAdmin && (
+                    <div className="w-52">
+                      <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                        Modelo de IA <span className="text-[10px] uppercase tracking-wide text-amber-600">(admin)</span>
+                      </label>
+                      <Select value={aiProvider} onValueChange={(v) => setAiProvider(v as typeof aiProvider)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="auto">⚙️ Auto (Claude→GPT-5→Gemini)</SelectItem>
+                          <SelectItem value="claude">🟣 Claude Sonnet 4.5</SelectItem>
+                          <SelectItem value="gpt5">🟢 GPT-5</SelectItem>
+                          <SelectItem value="gemini">🔵 Gemini 2.5 Pro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
                   <div className="w-44">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
                       Comparativo
