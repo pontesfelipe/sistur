@@ -118,6 +118,8 @@ export default function Relatorios() {
   const [runInDemo, setRunInDemo] = useState(false);
   // GAP-FIX (v1.38.18): Comparação temporal agora é OPT-IN.
   const [enableComparison, setEnableComparison] = useState(false);
+  // v1.38.35 — Seletor de provedor de IA (apenas ADMIN). 'auto' = cadeia padrão Claude→GPT-5→Gemini.
+  const [aiProvider, setAiProvider] = useState<'auto' | 'claude' | 'gpt5' | 'gemini'>('auto');
   const reportRef = useRef<HTMLDivElement>(null);
   const [customizationOpen, setCustomizationOpen] = useState(false);
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
@@ -244,6 +246,7 @@ export default function Relatorios() {
           environment: runInDemo ? 'demo' : 'production',
           enableComparison,
           mode: 'background',
+          ...(isAdmin && aiProvider !== 'auto' ? { aiProvider } : {}),
         }),
       });
 
