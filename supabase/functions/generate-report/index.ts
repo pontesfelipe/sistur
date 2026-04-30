@@ -1850,30 +1850,11 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               ? 'auto_corrected'
               : (allIssues.length > 0 ? 'warnings' : 'clean');
 
-            // 3) Banner SEMPRE presente (v1.38.8)
-            const headerIcon = hasAny ? '⚠️' : '✅';
-            const headerLabel = hasAny
-              ? 'Validação cruzada — divergências encontradas'
-              : 'Validação cruzada — sem inconsistências';
-            const bannerLines = [
-              `> ${headerIcon} **${headerLabel} (v1.38.8):**`,
-              '> ',
-              '> Camadas: auto-correção determinística + motor de coerência + agente IA validador (cruza texto × tabela de auditoria × bibliografia canônica).',
-              '> ',
-            ];
-            if (hasAny) {
-              bannerLines.push(...correctionLines.map((w) => `> - ${w}`));
-              bannerLines.push(...allIssues.map((w) => `> - ${w}`));
-              bannerLines.push('> ');
-              bannerLines.push('> Os valores numéricos da tabela de auditoria são a fonte de verdade. Substituições foram aplicadas automaticamente quando possível; itens remanescentes exigem revisão manual.');
-            } else {
-              bannerLines.push('> Nenhuma divergência detectada entre o texto narrativo, os valores auditados e a bibliografia canônica.');
-            }
-            // v1.38.26 — banner movido para o RODAPÉ do relatório (estilo v1.38.18: corpo do relatório
-            // começa direto pelo título institucional, sem aviso técnico no topo). Em caso de divergência,
-            // o banner ainda fica visível, mas como apêndice no final.
-            const footerBanner = ['', '---', '', ...bannerLines].join('\n');
-            finalContent = workingText.replace(/\s*$/, '') + footerBanner + '\n';
+            // v1.38.27 — Banner de "Validação cruzada" REMOVIDO do conteúdo do relatório.
+            // O documento agora sai limpo (sem aviso técnico no topo nem no rodapé).
+            // A informação continua persistida em `report_validations` e é exibida
+            // pela UI (página de Relatórios) como mensagem fora do documento.
+            finalContent = workingText.replace(/\s*$/, '') + '\n';
 
             if (hasAny) console.warn('Validation issues:', { autoCorrections, allIssues });
           } catch (cohErr) {

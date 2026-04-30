@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 26,
+  patch: 27,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.27",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — banner de 'Validação cruzada' removido do conteúdo do relatório. O documento agora sai limpo (sem aviso técnico no topo nem no rodapé/apêndice), preservando a leitura institucional e mantendo os exports DOCX/PDF e a cópia em texto puro sem qualquer bloco técnico. A informação de validação continua sendo persistida em `report_validations` (status, auto_corrections, deterministic_issues, ai_issues, total_issues) e passou a ser exibida exclusivamente na interface, FORA do bloco do relatório, através de um novo componente `ReportValidationBanner` (Alert do shadcn) renderizado acima do visualizador tanto na aba de geração quanto no histórico. O banner só aparece quando há divergência ou correção automática a comunicar; é silencioso quando todas as fontes batem. Um botão `Ver detalhes` abre um Dialog listando cada autocorreção (indicador, valor anterior → valor aplicado) e os itens remanescentes que exigem revisão manual, com a versão do validador. Edge function `generate-report` deixou de concatenar o `footerBanner` em `finalContent`."
+    ]
+  },
   {
     version: "1.38.26",
     date: "2026-04-30",
