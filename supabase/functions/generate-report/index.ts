@@ -1122,6 +1122,111 @@ function detectCoherenceWarnings(
 }
 
 /**
+ * Validação determinística de referências inventadas.
+ *
+ * Frente 2 — protege o relatório contra:
+ *  - Indicadores citados que não existem na trilha de auditoria.
+ *  - Atribuição de fonte (IBGE / CADASTUR / DATASUS / etc.) a indicadores
+ *    cuja `source_type` real é MANUAL (sem origem oficial).
+ *  - Anos de fonte fora do `reference_year` registrado na auditoria.
+ *
+ * A função é tolerante: só sinaliza quando há um match razoavelmente forte
+ * entre uma frase e um indicador ou fonte, evitando falsos positivos.
+ */
+function detectInventedReferences(
+  reportText: string,
+  auditRows: any[],
+): string[] {
+  if (!reportText || !auditRows?.length) return [];
+  const warnings: string[] = [];
+
+  // Conjunto canônico de fontes oficiais reconhecidas
+  const KNOWN_SOURCES = [
+    'IBGE', 'DATASUS', 'CADASTUR', 'INEP', 'STN', 'ANAC', 'ANATEL',
+    'ANA', 'TSE', 'CADUNICO', 'MAPA DO TURISMO', 'MTUR', 'IPHAN',
+    'IGMA', 'SISTUR',
+  ];
+
+  // Mapeia source_type por indicator_code
+  const auditByCode = new Map<string, any>();
+  for (const r of auditRows) {
+    const code = String(r.indicator_code || '').toLowerCase();
+    if (code) auditByCode.set(code, r);
+  }
+
+  // 1) Verifica menções a indicadores que NÃO existem na auditoria.
+  //    Procura padrões "indicador X" / "índice Y" e cruza com a base.
+  const indicatorMentions = reportText.match(
+    /\b(?:indicador|índice|indice)\s+["']?([A-Za-zÁ-Úá-ú0-9_\-\s]{4,60}?)["']?(?=[.,;:\)\n])/g,
+  );
+  if (indicatorMentions) {
+    for (const raw of indicatorMentions) {
+      const m = raw.match(/\b(?:indicador|índice|indice)\s+["']?(.+?)["']?$/i);
+      if (!m) continue;
+      const cited = m[1].trim().toLowerCase();
+      // Só checa códigos técnicos com underscore (ex.: igma_xxx)
+      if (!/_/.test(cited)) continue;
+      const codeOnly = cited.split(/\s/)[0];
+      if (codeOnly.length < 4) continue;
+      if (!auditByCode.has(codeOnly)) {
+        warnings.push(
+          `Texto cita o indicador "${codeOnly}" que não existe na trilha de auditoria deste diagnóstico.`
+        );
+      }
+    }
+  }
+
+  // 2) Atribuição de fonte oficial a indicador MANUAL.
+  //    Para cada linha de auditoria com source_type começando em MANUAL,
+  //    se o texto cita o código do indicador junto a uma fonte oficial,
+  //    sinaliza divergência.
+  for (const row of auditRows) {
+    const code = String(row.indicator_code || '');
+    const sourceType = String(row.source_type || '');
+    if (!code || !sourceType.startsWith('MANUAL')) continue;
+    const friendly = code.replace(/^igma_|^mst_/i, '').replace(/_/g, '[ _-]?');
+    const escaped = friendly.replace(/[.*+?^${}()|[\]\\]/g, (ch) =>
+      ch === '[' || ch === ']' ? ch : '\\' + ch,
+    );
+    for (const src of KNOWN_SOURCES) {
+      const re = new RegExp(`${escaped}[^.\\n]{0,140}\\b${src}\\b`, 'i');
+      const reRev = new RegExp(`\\b${src}\\b[^.\\n]{0,140}${escaped}`, 'i');
+      if (re.test(reportText) || reRev.test(reportText)) {
+        warnings.push(
+          `Indicador "${code}" é classificado como MANUAL na auditoria, mas o texto atribui sua origem a "${src}".`
+        );
+        break;
+      }
+    }
+  }
+
+  // 3) Ano de fonte divergente (quando temos source_detail com ano)
+  for (const row of auditRows) {
+    const code = String(row.indicator_code || '');
+    const detail = String(row.source_detail || '');
+    const yearMatch = detail.match(/(20\d{2}|19\d{2})/);
+    if (!code || !yearMatch) continue;
+    const refYear = yearMatch[1];
+    const friendly = code.replace(/^igma_|^mst_/i, '').replace(/_/g, '[ _-]?');
+    const escaped = friendly.replace(/[.*+?^${}()|[\]\\]/g, (ch) =>
+      ch === '[' || ch === ']' ? ch : '\\' + ch,
+    );
+    const re = new RegExp(`${escaped}[^.\\n]{0,160}?(20\\d{2}|19\\d{2})`, 'i');
+    const m = reportText.match(re);
+    if (m && m[1] !== refYear) {
+      // Aceita diferença de até 1 ano (defasagem comum entre publicação e referência)
+      if (Math.abs(Number(m[1]) - Number(refYear)) > 1) {
+        warnings.push(
+          `Texto cita ano ${m[1]} para "${code}", mas o ano de referência registrado na auditoria é ${refYear}.`
+        );
+      }
+    }
+  }
+
+  return warnings;
+}
+
+/**
  * Auto-correção determinística (v1.38.8).
  * Para cada linha de auditoria com valor numérico, localiza citações próximas
  * ao código do indicador no texto que divergem >5% do valor auditado e
