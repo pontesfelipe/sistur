@@ -37,3 +37,5 @@ project_id = "enexnpmkhvgufcervjsv"
     verify_jwt = false
   [functions.ingest-anac]
     verify_jwt = false
+  [functions.ingest-cadunico]
+    verify_jwt = false
