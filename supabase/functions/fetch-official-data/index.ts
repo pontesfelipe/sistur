@@ -349,6 +349,50 @@ async function fetchANACFromCache(
   return results;
 }
 
+// ─── 2d. CADÚNICO/MDS — População de baixa renda (cache mensal) ─────────
+// Lê o cache da tabela `cadunico_municipio_cache` (atualizada mensalmente pela
+// edge function `ingest-cadunico` via API SAGI Solr pública). Sobrepõe o
+// indicador `igma_populacao_de_baixa_renda` que antes vinha do IBGE
+// (Incidência de Pobreza, tabela 36/30246) com dado oficial MDS atualizado
+// mensalmente. Sem necessidade de token federal.
+async function fetchCADUNICOFromCache(
+  supabase: any,
+  ibgeCode: string,
+): Promise<Record<string, IndicatorResult>> {
+  const results: Record<string, IndicatorResult> = {};
+  try {
+    const code7 = ibgeCode.length === 7 ? ibgeCode : ibgeCode.padStart(7, '0');
+    const code6 = code7.slice(0, 6);
+    const { data, error } = await supabase
+      .from('cadunico_municipio_cache')
+      .select('pct_pop_baixa_renda, pessoas_baixa_renda, populacao_referencia, anomes, reference_year')
+      .or(`ibge_code_6.eq.${code6},ibge_code_7.eq.${code7}`)
+      .order('fetched_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) {
+      console.warn('[CADÚNICO cache] read error:', error.message);
+      return results;
+    }
+    if (!data) {
+      console.log(`[CADÚNICO cache] sem registro para IBGE ${ibgeCode}`);
+      return results;
+    }
+    const pct = Number(data.pct_pop_baixa_renda);
+    if (!isFinite(pct) || pct <= 0) return results;
+    results['igma_populacao_de_baixa_renda'] = {
+      value: Math.round(pct * 100) / 100,
+      year: data.reference_year || new Date().getFullYear(),
+      source: 'CADUNICO',
+      real: true,
+    };
+    console.log(`[CADÚNICO cache] igma_populacao_de_baixa_renda = ${pct}% (anomes ${data.anomes})`);
+  } catch (e) {
+    console.warn('[CADÚNICO cache] exception:', e instanceof Error ? e.message : e);
+  }
+  return results;
+}
+
 async function fetchSIDRASaneamento(ibgeCode: string): Promise<Record<string, IndicatorResult>> {
 
   const results: Record<string, IndicatorResult> = {};
