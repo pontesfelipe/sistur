@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 31,
+  patch: 32,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.32",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção do job em background que podia ficar preso em 50–90% após erro de stream do provedor de IA. O modo background agora executa a geração interna em fluxo não-SSE para persistência, usa Gemini diretamente em jobs longos para evitar queda do adaptador Claude, adiciona watchdog de inatividade/tempo máximo e transforma falhas em `status='failed'` com mensagem clara em `report_jobs`, em vez de deixar o usuário olhando uma porcentagem congelada indefinidamente. A UI também passou a informar que jobs sem avanço serão encerrados automaticamente antes de uma nova tentativa."
+    ]
+  },
   {
     version: "1.38.31",
     date: "2026-04-30",
