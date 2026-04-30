@@ -1869,8 +1869,11 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             } else {
               bannerLines.push('> Nenhuma divergência detectada entre o texto narrativo, os valores auditados e a bibliografia canônica.');
             }
-            bannerLines.push('', '---', '');
-            finalContent = bannerLines.join('\n') + workingText;
+            // v1.38.26 — banner movido para o RODAPÉ do relatório (estilo v1.38.18: corpo do relatório
+            // começa direto pelo título institucional, sem aviso técnico no topo). Em caso de divergência,
+            // o banner ainda fica visível, mas como apêndice no final.
+            const footerBanner = ['', '---', '', ...bannerLines].join('\n');
+            finalContent = workingText.replace(/\s*$/, '') + footerBanner + '\n';
 
             if (hasAny) console.warn('Validation issues:', { autoCorrections, allIssues });
           } catch (cohErr) {
