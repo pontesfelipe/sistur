@@ -670,13 +670,17 @@ Deno.serve(async (req) => {
     const datasusData = await fetchDATASUSLeitos(ibge_code, populacao);
     console.log(`DATASUS Leitos: ${Object.keys(datasusData).length} indicators`);
 
+    // 3c. Lê cache ANAC (atualizado mensalmente por ingest-anac) — OE003
+    const anacData = await fetchANACFromCache(supabaseClient, ibge_code);
+    console.log(`ANAC cache: ${Object.keys(anacData).length} indicators`);
+
     // 4. Fetch Mapa do Turismo data (categoria, região turística)
     const mapaTurismoData = await fetchMapaTurismo(supabaseClient, ibge_code);
     console.log(`Mapa Turismo: ${Object.keys(mapaTurismoData).length} indicators`);
 
     // 5. Merge real data
     // Ordem importa: DATASUS sobrepõe leitos do IBGE (fonte primária para leitos hospitalares)
-    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...datasusData, ...mapaTurismoData };
+    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...datasusData, ...anacData, ...mapaTurismoData };
     const realCount = Object.keys(realData).length;
     console.log(`Total real: ${realCount} indicators`);
 
