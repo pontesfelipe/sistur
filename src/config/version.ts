@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 33,
+  patch: 34,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.34",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — cadeia de fallback automática de provedores de IA: Claude Sonnet 4.5 → GPT-5 → Gemini 2.5 Pro. Antes, o `generate-report` só tentava Claude quando NÃO era execução em background, então jobs longos (modo background é o padrão atual para evitar timeouts SSE de browser) caíam direto no Gemini sem nunca tentar Claude. Além disso, quando Claude falhava, o pulo era direto para Gemini, ignorando o GPT-5. Diagnóstico do problema com Claude: (a) o adaptador SSE não tratava eventos `type: error` da API Anthropic, então erros de stream (overload, rate-limit no meio da geração) silenciavam o stream em vez de marcar como falha. (b) a restrição `!backgroundRun` nunca ativava Claude em produção. Correções no `generate-report/index.ts`: (1) Removida a restrição `!backgroundRun` — Claude é tentado sempre que `ANTHROPIC_API_KEY` está configurada, inclusive em background. (2) Adicionada cadeia de fallback de 3 níveis: se Claude falhar (erro HTTP, exceção, ou erro no stream adapter), tenta GPT-5 via Lovable AI Gateway; se GPT-5 falhar, cai para Gemini 2.5 Pro como rede de segurança final. Cada tentativa é registrada em `fallbackTrail` e persistida no `audit_events.metadata.fallback_trail` para diagnóstico. (3) Adaptador Claude agora detecta eventos `type: error` da API Anthropic e propaga corretamente para acionar o fallback em vez de travar. (4) Logs explícitos de qual provedor foi usado e o motivo dos pulos, facilitando observabilidade em jobs longos como Foz do Iguaçu. Resultado: relatórios passam a usar Claude (melhor qualidade narrativa) como primeira opção mesmo em jobs longos, com fallback transparente para GPT-5 (qualidade próxima) e só caem em Gemini quando os dois primeiros estão indisponíveis."
+    ]
+  },
   {
     version: "1.38.33",
     date: "2026-04-30",
