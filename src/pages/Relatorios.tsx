@@ -118,6 +118,8 @@ export default function Relatorios() {
   const [runInDemo, setRunInDemo] = useState(false);
   // GAP-FIX (v1.38.18): Comparação temporal agora é OPT-IN.
   const [enableComparison, setEnableComparison] = useState(false);
+  // v1.38.35 — Seletor de provedor de IA (apenas ADMIN). 'auto' = cadeia padrão Claude→GPT-5→Gemini.
+  const [aiProvider, setAiProvider] = useState<'auto' | 'claude' | 'gpt5' | 'gemini'>('auto');
   const reportRef = useRef<HTMLDivElement>(null);
   const [customizationOpen, setCustomizationOpen] = useState(false);
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
@@ -244,6 +246,7 @@ export default function Relatorios() {
           environment: runInDemo ? 'demo' : 'production',
           enableComparison,
           mode: 'background',
+          ...(isAdmin && aiProvider !== 'auto' ? { aiProvider } : {}),
         }),
       });
 
@@ -800,6 +803,25 @@ export default function Relatorios() {
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+                    </div>
+                  )}
+
+                  {isAdmin && (
+                    <div className="w-52">
+                      <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                        Modelo de IA <span className="text-[10px] uppercase tracking-wide text-amber-600">(admin)</span>
+                      </label>
+                      <Select value={aiProvider} onValueChange={(v) => setAiProvider(v as typeof aiProvider)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="auto">⚙️ Auto (Claude→GPT-5→Gemini)</SelectItem>
+                          <SelectItem value="claude">🟣 Claude Sonnet 4.5</SelectItem>
+                          <SelectItem value="gpt5">🟢 GPT-5</SelectItem>
+                          <SelectItem value="gemini">🔵 Gemini 2.5 Pro</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   )}
 

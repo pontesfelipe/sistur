@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 34,
+  patch: 35,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.35",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — novo seletor 'Modelo de IA' visível APENAS para usuários com role ADMIN na aba Gerar Relatório (ao lado de Ambiente/Comparativo). Permite escolher manualmente qual provedor de IA usar como PRIMÁRIO para esta geração: Auto (cadeia padrão Claude→GPT-5→Gemini), Claude Sonnet 4.5, GPT-5 ou Gemini 2.5 Pro. Útil para A/B testing de qualidade narrativa, debug de provedor específico em produção e contornar instabilidades pontuais. Implementação: (1) Front (`Relatorios.tsx`) ganhou state `aiProvider` com default 'auto', renderiza Select condicionalmente sob `isAdmin`, envia `aiProvider` no body do POST apenas quando admin escolhe valor diferente de auto. (2) Edge function (`generate-report`) lê `aiProvider` do body e re-valida server-side via `user_roles` (role='ADMIN') — usuários comuns que tentem injetar o campo via DevTools têm o valor silenciosamente reduzido a 'auto', impossibilitando bypass. (3) A cadeia de fallback foi refatorada para ordem dinâmica: a partir do provedor escolhido, os demais entram como rede de segurança na ordem padrão (Claude → GPT-5 → Gemini). Exemplo: se admin escolhe GPT-5 e GPT-5 falha, tenta Claude, depois Gemini. (4) `runReportPipeline` propaga o override para a chamada interna em background. (5) Logs explícitos da ordem aplicada (`AI provider order for this report: ...`) e novo retorno HTTP 503 com lista de erros quando todos os provedores falham, em vez de 500 genérico. Auditoria persistida em `audit_events.metadata.fallback_trail`."
+    ]
+  },
   {
     version: "1.38.34",
     date: "2026-04-30",

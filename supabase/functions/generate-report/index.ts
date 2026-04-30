@@ -1276,6 +1276,7 @@ async function runReportPipeline(args: {
   userId: string;
   jobId: string;
   authHeader: string;
+  aiProvider?: 'auto' | 'claude' | 'gpt5' | 'gemini';
 }): Promise<{ reportId: string | null }> {
   const { supabaseAdmin, assessment, assessmentId, destinationName, jobId } = args;
 
@@ -1331,6 +1332,7 @@ async function runReportPipeline(args: {
         enableComparison: args.enableComparison,
         mode: 'stream',
         backgroundRun: true,
+        aiProvider: args.aiProvider ?? 'auto',
       }),
       signal: streamController.signal,
     });
@@ -1453,7 +1455,28 @@ serve(async (req) => {
       // a edge function só atualiza o status.
       jobId: incomingJobId,
       backgroundRun = false,
+      // v1.38.35 — Override de provedor de IA (apenas ADMIN).
+      // Valores: 'auto' | 'claude' | 'gpt5' | 'gemini'. Default 'auto'
+      // mantém a cadeia padrão Claude → GPT-5 → Gemini.
+      aiProvider: requestedProvider = 'auto',
     } = await req.json();
+
+    // Valida que somente ADMIN pode forçar provedor — para usuários comuns
+    // o valor é silenciosamente reduzido a 'auto'.
+    let aiProviderOverride: 'auto' | 'claude' | 'gpt5' | 'gemini' = 'auto';
+    if (['claude', 'gpt5', 'gemini', 'auto'].includes(requestedProvider)) {
+      if (requestedProvider === 'auto') {
+        aiProviderOverride = 'auto';
+      } else {
+        const { data: roleRow } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .eq('role', 'ADMIN')
+          .maybeSingle();
+        aiProviderOverride = roleRow ? requestedProvider : 'auto';
+      }
+    }
     
     // Verify access
     const { data: profile } = await supabase.from('profiles').select('org_id, viewing_demo_org_id').eq('user_id', userId).single();
@@ -1535,6 +1558,7 @@ serve(async (req) => {
             userId,
             jobId: jobId!,
             authHeader: authHeader!,
+            aiProvider: aiProviderOverride,
           });
 
           await supabaseAdmin.from('report_jobs').update({
@@ -1907,13 +1931,25 @@ ${dataSnapshots.length > 0 ? '9. Use os snapshots de proveniência para rastrear
 ${globalRefs.length > 0 ? `10. Referencie documentos oficiais quando contextualizar resultados e prescrições` : ''}
 ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
 
-    // === LLM provider selection (v1.38.34) ===
-    // Cadeia de fallback automática: Claude → GPT-5 → Gemini
-    // Aplica-se inclusive em backgroundRun (jobs longos) — Claude não é mais pulado.
+    // === LLM provider selection (v1.38.35) ===
+    // Cadeia de fallback automática (default): Claude → GPT-5 → Gemini.
+    // Quando ADMIN escolhe um provedor específico via UI, este é tentado
+    // PRIMEIRO; em caso de falha, a cadeia segue na ordem padrão para os
+    // demais (rede de segurança, sem perder o relatório).
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     let response: Response | null = null;
     let usedProvider: 'claude' | 'gpt5' | 'gemini' = 'gemini';
     const fallbackTrail: Array<{ provider: string; reason: string }> = [];
+
+    // Lê override de provedor do body (já validado contra ADMIN no entrypoint).
+    const requestedProviderForStream = (typeof aiProviderOverride === 'string' ? aiProviderOverride : 'auto') as
+      'auto' | 'claude' | 'gpt5' | 'gemini';
+    // Define ordem de tentativa.
+    const defaultOrder: Array<'claude' | 'gpt5' | 'gemini'> = ['claude', 'gpt5', 'gemini'];
+    const providerOrder: Array<'claude' | 'gpt5' | 'gemini'> = requestedProviderForStream === 'auto'
+      ? defaultOrder
+      : [requestedProviderForStream, ...defaultOrder.filter((p) => p !== requestedProviderForStream)];
+    console.log(`AI provider order for this report: ${providerOrder.join(' → ')} (requested: ${requestedProviderForStream})`);
 
     const callLovableGateway = (model: string) => fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -1931,8 +1967,11 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
       }),
     });
 
-    // 1) CLAUDE (primário)
-    if (ANTHROPIC_API_KEY) {
+    const tryClaude = async (): Promise<void> => {
+      if (!ANTHROPIC_API_KEY) {
+        fallbackTrail.push({ provider: 'claude', reason: 'ANTHROPIC_API_KEY not configured' });
+        return;
+      }
       try {
         const claudeResp = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
@@ -1998,43 +2037,69 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           const errBody = await claudeResp.text().catch(() => "");
           const reason = `status ${claudeResp.status}: ${errBody.slice(0, 200)}`;
           fallbackTrail.push({ provider: 'claude', reason });
-          console.warn(`Claude unavailable, will try GPT-5. ${reason}`);
+          console.warn(`Claude unavailable. ${reason}`);
         }
       } catch (e) {
         const reason = e instanceof Error ? e.message : String(e);
         fallbackTrail.push({ provider: 'claude', reason });
-        console.warn(`Claude request threw, will try GPT-5: ${reason}`);
+        console.warn(`Claude request threw: ${reason}`);
       }
-    } else {
-      fallbackTrail.push({ provider: 'claude', reason: 'ANTHROPIC_API_KEY not configured' });
-    }
+    };
 
-    // 2) GPT-5 (fallback secundário via Lovable AI Gateway)
-    if (!response) {
+    const tryGpt5 = async (): Promise<void> => {
       try {
         const gptResp = await callLovableGateway("openai/gpt-5");
         if (gptResp.ok && gptResp.body) {
           response = gptResp;
           usedProvider = 'gpt5';
-          console.log(`Report generation using provider: gpt-5 (fallback after Claude)`);
+          console.log(`Report generation using provider: gpt-5`);
         } else {
           const errBody = await gptResp.text().catch(() => "");
           const reason = `status ${gptResp.status}: ${errBody.slice(0, 200)}`;
           fallbackTrail.push({ provider: 'gpt5', reason });
-          console.warn(`GPT-5 unavailable, will try Gemini. ${reason}`);
+          console.warn(`GPT-5 unavailable. ${reason}`);
         }
       } catch (e) {
         const reason = e instanceof Error ? e.message : String(e);
         fallbackTrail.push({ provider: 'gpt5', reason });
-        console.warn(`GPT-5 request threw, will try Gemini: ${reason}`);
+        console.warn(`GPT-5 request threw: ${reason}`);
       }
+    };
+
+    const tryGemini = async (): Promise<void> => {
+      try {
+        const gemResp = await callLovableGateway("google/gemini-2.5-pro");
+        if (gemResp.ok && gemResp.body) {
+          response = gemResp;
+          usedProvider = 'gemini';
+          console.log(`Report generation using provider: gemini-2.5-pro`);
+        } else {
+          const errBody = await gemResp.text().catch(() => "");
+          const reason = `status ${gemResp.status}: ${errBody.slice(0, 200)}`;
+          fallbackTrail.push({ provider: 'gemini', reason });
+          console.warn(`Gemini unavailable. ${reason}`);
+        }
+      } catch (e) {
+        const reason = e instanceof Error ? e.message : String(e);
+        fallbackTrail.push({ provider: 'gemini', reason });
+        console.warn(`Gemini request threw: ${reason}`);
+      }
+    };
+
+    // Executa a cadeia conforme a ordem definida; para no primeiro sucesso.
+    for (const provider of providerOrder) {
+      if (response) break;
+      if (provider === 'claude') await tryClaude();
+      else if (provider === 'gpt5') await tryGpt5();
+      else if (provider === 'gemini') await tryGemini();
     }
 
-    // 3) GEMINI (fallback final)
     if (!response) {
-      response = await callLovableGateway("google/gemini-2.5-pro");
-      usedProvider = 'gemini';
-      console.log(`Report generation using provider: gemini-2.5-pro (final fallback). Trail: ${JSON.stringify(fallbackTrail)}`);
+      console.error('All providers failed. Trail:', JSON.stringify(fallbackTrail));
+      return new Response(JSON.stringify({
+        error: 'Nenhum provedor de IA conseguiu gerar o relatório. Tente novamente em alguns minutos.',
+        details: fallbackTrail,
+      }), { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
     if (!response.ok) {
