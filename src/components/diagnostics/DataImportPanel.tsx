@@ -682,13 +682,6 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     return existing?.value_raw ?? null;
   };
 
-  const indicatorsByPillar = indicators.reduce((acc, ind) => {
-    const pillar = ind.pillar as 'RA' | 'OE' | 'AO';
-    if (!acc[pillar]) acc[pillar] = [];
-    acc[pillar].push(ind);
-    return acc;
-  }, {} as Record<string, typeof indicators>);
-
   const ignoredCount = values.filter(v => v.is_ignored === true).length;
   const activeIndicators = indicators.filter(ind => {
     const existing = values.find(v => v.indicator_id === ind.id);
@@ -700,6 +693,20 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     return value !== null && value !== undefined;
   }).length;
   const fillProgress = activeIndicators.length > 0 ? (filledCount / activeIndicators.length) * 100 : 0;
+  const unfilledCount = activeIndicators.length - filledCount;
+  const visibleIndicators = indicators.filter(ind => {
+    if (fillFilter === 'all') return true;
+    const existing = values.find(v => v.indicator_id === ind.id);
+    if (existing?.is_ignored === true) return false;
+    const value = getValueForIndicator(ind.id);
+    return value === null || value === undefined;
+  });
+  const indicatorsByPillar = visibleIndicators.reduce((acc, ind) => {
+    const pillar = ind.pillar as 'RA' | 'OE' | 'AO';
+    if (!acc[pillar]) acc[pillar] = [];
+    acc[pillar].push(ind);
+    return acc;
+  }, {} as Record<string, typeof indicators>);
 
   // Promote DRAFT assessments to DATA_READY once all active indicators are
   // filled, so they show up under the "Dados Prontos" bucket on the listing
