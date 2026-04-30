@@ -246,6 +246,7 @@ export default function Relatorios() {
     setIsGenerating(true);
     setReport('');
     setGenerationStage('Enfileirando geração…');
+    cancelGenerationRef.current = false;
 
     const pillarScoresMap: Record<string, { score: number; severity: string }> = {};
     pillarScores?.forEach(ps => {
@@ -310,6 +311,10 @@ export default function Relatorios() {
       let lastStage = '';
       while (Date.now() < pollDeadline) {
         await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+        if (cancelGenerationRef.current) {
+          toast.info('Acompanhamento cancelado. A geração continua no servidor — confira o histórico em alguns minutos.');
+          return;
+        }
         const { data: job } = await supabase
           .from('report_jobs')
           .select('status, stage, progress_pct, report_id, error_message')
