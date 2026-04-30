@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, Wrench, Eye } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
@@ -121,19 +122,66 @@ export function ReportValidationBanner({ reportId, assessmentId }: Props) {
 
           <ScrollArea className="max-h-[60vh] pr-4">
             <div className="space-y-6">
+              {/* O QUE FOI VALIDADO — escopo da auditoria */}
+              <section className="rounded-md border border-border bg-muted/20 p-3 space-y-2">
+                <h4 className="text-sm font-semibold">O que foi validado</h4>
+                <p className="text-xs text-muted-foreground">
+                  Antes de salvar o relatório, o sistema executou três camadas de checagem cruzando
+                  o texto gerado com fontes de verdade independentes:
+                </p>
+                <ul className="list-disc pl-5 space-y-1 text-xs text-muted-foreground">
+                  <li>
+                    <span className="font-medium text-foreground">Auto-correção numérica determinística</span> —
+                    cada valor citado na narrativa é comparado, indicador a indicador, com a tabela
+                    oficial de auditoria do diagnóstico (fontes IBGE, CADASTUR, STN, DATASUS, INEP e
+                    derivados).
+                  </li>
+                  <li>
+                    <span className="font-medium text-foreground">Motor de coerência</span> —
+                    verifica contradições internas, status (Adequado/Atenção/Crítico) coerentes com
+                    os percentuais e citações dentro das faixas permitidas.
+                  </li>
+                  <li>
+                    <span className="font-medium text-foreground">Agente IA validador</span> —
+                    cruza o texto com a bibliografia canônica (Beni, IGMA, PNT, ODS) e sinaliza
+                    afirmações sem respaldo nas fontes anexadas.
+                  </li>
+                </ul>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <Badge variant="secondary" className="gap-1">
+                    <Wrench className="h-3 w-3" />
+                    {correctionsCount} corrigido{correctionsCount === 1 ? '' : 's'} automaticamente
+                  </Badge>
+                  <Badge variant={issuesCount > 0 ? 'destructive' : 'secondary'} className="gap-1">
+                    <Eye className="h-3 w-3" />
+                    {issuesCount} para revisão manual
+                  </Badge>
+                </div>
+              </section>
+
+              {/* PROBLEMAS + RESOLUÇÃO */}
               {correctionsCount > 0 && (
                 <section>
-                  <h4 className="text-sm font-semibold mb-2">
-                    Correções automáticas aplicadas ({correctionsCount})
+                  <h4 className="text-sm font-semibold mb-1">
+                    Divergências corrigidas automaticamente ({correctionsCount})
                   </h4>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    <span className="font-medium text-foreground">Resolução:</span> o valor já foi
+                    substituído pelo número oficial da tabela de auditoria antes do relatório ser
+                    salvo. Nenhuma ação adicional é necessária — o documento já está consistente.
+                  </p>
                   <ul className="space-y-2 text-sm">
                     {corrections.map((c, idx) => (
                       <li key={idx} className="rounded-md border border-border bg-muted/30 px-3 py-2">
                         <div className="font-medium text-foreground">{c.indicator}</div>
-                        <div className="text-muted-foreground">
-                          <span className="line-through">{c.from}</span>
-                          <span className="mx-2">→</span>
-                          <span className="text-foreground">{c.to}</span>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          <span className="font-medium text-foreground">Problema:</span> a IA citou{' '}
+                          <span className="line-through">{c.from}</span>, divergente da tabela oficial.
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          <span className="font-medium text-foreground">Resolução:</span> valor
+                          substituído por <span className="text-foreground font-medium">{c.to}</span>{' '}
+                          (fonte oficial) — aplicado no texto final.
                         </div>
                       </li>
                     ))}
@@ -143,12 +191,19 @@ export function ReportValidationBanner({ reportId, assessmentId }: Props) {
 
               {determIssues.length > 0 && (
                 <section>
-                  <h4 className="text-sm font-semibold mb-2">
+                  <h4 className="text-sm font-semibold mb-1">
                     Avisos determinísticos ({determIssues.length})
                   </h4>
-                  <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    <span className="font-medium text-foreground">Resolução:</span> o motor de
+                    coerência identificou estes pontos mas não tinha um valor oficial a substituir.
+                    Revisão humana recomendada antes de publicar.
+                  </p>
+                  <ul className="space-y-1 text-sm">
                     {determIssues.map((w, idx) => (
-                      <li key={idx}>{w}</li>
+                      <li key={idx} className="rounded-md border border-border bg-muted/20 px-3 py-2 text-muted-foreground">
+                        {w}
+                      </li>
                     ))}
                   </ul>
                 </section>
@@ -156,23 +211,30 @@ export function ReportValidationBanner({ reportId, assessmentId }: Props) {
 
               {aiIssues.length > 0 && (
                 <section>
-                  <h4 className="text-sm font-semibold mb-2">
-                    Avisos do agente IA validador ({aiIssues.length})
+                  <h4 className="text-sm font-semibold mb-1">
+                    Pontos sinalizados pelo agente IA validador ({aiIssues.length})
                   </h4>
-                  <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    <span className="font-medium text-foreground">Resolução:</span> o agente
+                    identificou afirmações que não encontrou respaldo direto na bibliografia ou na
+                    tabela de auditoria. Confirme ou ajuste manualmente antes de publicar — pode
+                    ser tanto um falso positivo quanto uma fragilidade real do texto.
+                  </p>
+                  <ul className="space-y-1 text-sm">
                     {aiIssues.map((w, idx) => (
-                      <li key={idx}>{w}</li>
+                      <li key={idx} className="rounded-md border border-border bg-muted/20 px-3 py-2 text-muted-foreground">
+                        {w}
+                      </li>
                     ))}
                   </ul>
                 </section>
               )}
 
-              {issuesCount > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Os valores numéricos da tabela de auditoria são a fonte de verdade. Itens
-                  remanescentes devem ser revisados manualmente antes de publicar o relatório.
-                </p>
-              )}
+              <p className="text-xs text-muted-foreground border-t border-border pt-3">
+                A tabela de auditoria do diagnóstico é a <span className="font-medium text-foreground">fonte de verdade</span> para
+                valores numéricos. As correções automáticas já foram aplicadas no texto;
+                apenas os itens listados como "para revisão manual" exigem ação.
+              </p>
             </div>
           </ScrollArea>
         </DialogContent>
