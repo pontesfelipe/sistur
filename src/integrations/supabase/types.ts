@@ -557,6 +557,111 @@ export type Database = {
         }
         Relationships: []
       }
+      cadunico_ingestion_runs: {
+        Row: {
+          bytes_downloaded: number | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          municipalities_updated: number | null
+          reference_anomes: string | null
+          rows_processed: number | null
+          source_url: string | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          bytes_downloaded?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          municipalities_updated?: number | null
+          reference_anomes?: string | null
+          rows_processed?: number | null
+          source_url?: string | null
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          bytes_downloaded?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          municipalities_updated?: number | null
+          reference_anomes?: string | null
+          rows_processed?: number | null
+          source_url?: string | null
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      cadunico_municipio_cache: {
+        Row: {
+          anomes: string
+          created_at: string
+          data_source_url: string | null
+          familias_baixa_renda: number | null
+          familias_extrema_pobreza: number | null
+          fetched_at: string
+          ibge_code_6: string
+          ibge_code_7: string | null
+          id: string
+          municipio: string | null
+          pct_pop_baixa_renda: number | null
+          pessoas_baixa_renda: number | null
+          populacao_referencia: number | null
+          reference_month: number
+          reference_year: number
+          total_familias_cadastradas: number | null
+          total_pessoas_cadastradas: number | null
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          anomes: string
+          created_at?: string
+          data_source_url?: string | null
+          familias_baixa_renda?: number | null
+          familias_extrema_pobreza?: number | null
+          fetched_at?: string
+          ibge_code_6: string
+          ibge_code_7?: string | null
+          id?: string
+          municipio?: string | null
+          pct_pop_baixa_renda?: number | null
+          pessoas_baixa_renda?: number | null
+          populacao_referencia?: number | null
+          reference_month: number
+          reference_year: number
+          total_familias_cadastradas?: number | null
+          total_pessoas_cadastradas?: number | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          anomes?: string
+          created_at?: string
+          data_source_url?: string | null
+          familias_baixa_renda?: number | null
+          familias_extrema_pobreza?: number | null
+          fetched_at?: string
+          ibge_code_6?: string
+          ibge_code_7?: string | null
+          id?: string
+          municipio?: string | null
+          pct_pop_baixa_renda?: number | null
+          pessoas_baixa_renda?: number | null
+          populacao_referencia?: number | null
+          reference_month?: number
+          reference_year?: number
+          total_familias_cadastradas?: number | null
+          total_pessoas_cadastradas?: number | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           certificate_id: string
