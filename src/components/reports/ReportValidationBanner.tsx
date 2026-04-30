@@ -92,7 +92,7 @@ export function ReportValidationBanner({ reportId, assessmentId }: Props) {
     <>
       <Alert variant={variant} className="mb-4">
         <Icon className="h-4 w-4" />
-        <AlertTitle>Validação cruzada de fontes</AlertTitle>
+        <AlertTitle>Conferência de dados</AlertTitle>
         <AlertDescription className="space-y-2">
           <p className="text-sm">
             Antes de gerar este relatório, o sistema conferiu os valores citados contra a tabela
@@ -112,7 +112,7 @@ export function ReportValidationBanner({ reportId, assessmentId }: Props) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Validação cruzada — detalhes</DialogTitle>
+            <DialogTitle>Conferência de dados — detalhes</DialogTitle>
             <DialogDescription>
               Esta informação é técnica e fica fora do conteúdo do relatório. Ela documenta o que o
               sistema ajustou ou marcou para revisão antes da geração.

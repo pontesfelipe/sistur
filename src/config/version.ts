@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 35,
+  patch: 36,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.36",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — banner de 'Validação cruzada de fontes' renomeado para 'Conferência de dados' no componente `ReportValidationBanner`. O termo anterior era técnico demais e não comunicava o valor para gestores e técnicos sem formação em metodologia. O novo nome é direto, mantém a seriedade institucional sem virar jargão e combina melhor com o subtítulo dinâmico ('X correções aplicadas, Y pontos para revisão'). Aplicado tanto no título do Alert quanto no título do Dialog 'Ver detalhes'. Nenhuma alteração na lógica de validação, persistência em `report_validations` ou no conteúdo técnico apresentado — apenas o rótulo voltado ao usuário final."
+    ]
+  },
   {
     version: "1.38.35",
     date: "2026-04-30",
