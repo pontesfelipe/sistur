@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 28,
+  patch: 29,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.29",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Diagnósticos — correção da revalidação persistente ao retomar uma rodada. A tela de Validação de Dados Oficiais agora considera o valor já salvo em `indicator_values` do diagnóstico ativo como confirmação válida quando ele coincide com o pré-preenchimento oficial, mesmo que a tabela externa tenha sido regravada posteriormente com `validated=false` por alguma atualização de fonte. Assim, diagnósticos já preenchidos/concluídos, como Foz do Iguaçu, não voltam a mostrar todos os pré-preenchidos como 'Aguardando revisão' ao serem retomados. A ação `Desvalidar` continua funcionando e passa a ter precedência local para liberar o campo para edição manual. O reconciliador de atualização oficial também preserva o ID validado anterior quando uma fonte deixa de retornar temporariamente uma linha, evitando perda silenciosa do estado de confirmação."
+    ]
+  },
   {
     version: "1.38.28",
     date: "2026-04-30",
