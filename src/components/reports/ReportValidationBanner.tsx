@@ -185,7 +185,19 @@ export function ReportValidationBanner({ reportId, assessmentId }: Props) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Conferência de dados — detalhes</DialogTitle>
+            <DialogTitle className="flex items-center justify-between gap-3 pr-6">
+              <span>Conferência de dados — detalhes</span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                onClick={() => handleDownload(corrections, determIssues, aiIssues, data.validator_version)}
+              >
+                <Download className="h-3.5 w-3.5" />
+                Baixar
+              </Button>
+            </DialogTitle>
             <DialogDescription>
               Esta informação é técnica e fica fora do conteúdo do relatório. Ela documenta o que o
               sistema ajustou ou marcou para revisão antes da geração.
