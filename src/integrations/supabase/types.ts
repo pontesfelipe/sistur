@@ -7423,6 +7423,71 @@ export type Database = {
           },
         ]
       }
+      report_jobs: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          created_by: string
+          destination_name: string
+          environment: string
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          org_id: string
+          progress_pct: number
+          report_id: string | null
+          report_template: string
+          stage: string | null
+          started_at: string | null
+          status: string
+          visibility: string
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          created_by: string
+          destination_name: string
+          environment?: string
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          org_id: string
+          progress_pct?: number
+          report_id?: string | null
+          report_template?: string
+          stage?: string | null
+          started_at?: string | null
+          status?: string
+          visibility?: string
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          created_by?: string
+          destination_name?: string
+          environment?: string
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          org_id?: string
+          progress_pct?: number
+          report_id?: string | null
+          report_template?: string
+          stage?: string | null
+          started_at?: string | null
+          status?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_jobs_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "generated_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_validations: {
         Row: {
           ai_issues: Json
