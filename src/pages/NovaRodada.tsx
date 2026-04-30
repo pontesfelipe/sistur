@@ -169,6 +169,10 @@ export default function NovaRodada() {
     v => v.validated && OFFICIAL_COLLECTION_METHODS.includes(v.collection_method)
   )?.length || 0;
 
+  useEffect(() => {
+    setValidatedDataCount(validatedValuesCount);
+  }, [validatedValuesCount]);
+
   // Load resume data
   useEffect(() => {
     // Wait for the indicator count query to resolve so we don't mis-place the
