@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 37,
+  patch: 38,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.38",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — Integridade da trilha de auditoria (Frente 1): indicadores hidratados a partir de `external_indicator_values` (IBGE, CADASTUR, DATASUS, INEP, STN, ANAC, ANATEL, ANA, TSE, CADUNICO, Mapa do Turismo) e de `compute_derived_indicators` deixam de ser persistidos como `MANUAL` no `assessment_indicator_audit` e passam a ser corretamente classificados como `OFFICIAL_API` ou `DERIVED`, com `source_detail` enriquecido no formato `FONTE (ANO)` (ex.: `IBGE (2022)`). Antes a regex de classificação só checava o tag literal `'external'` contra termos como `ibge|datasus|...` e nunca casava, gerando falsos positivos no validador (fontes oficiais sendo flagueadas como inventadas). Agora a classificação prioriza o tag de origem e cai para o `source_code` da integração quando disponível.",
+      "Relatórios — Validador determinístico de referências inventadas (Frente 2): nova função `detectInventedReferences` roda junto com `detectCoherenceWarnings` no pipeline de geração e bloqueia três classes de alucinação antes do agente IA validador: (1) menções a códigos técnicos de indicadores (`igma_*`, `mst_*`) que não existem na trilha de auditoria do diagnóstico, (2) atribuição de fonte oficial (IBGE, DATASUS, CADASTUR, INEP, STN, ANAC, ANATEL, ANA, TSE, CADUNICO, Mapa do Turismo, MTur, IPHAN) a indicadores cuja `source_type` real é MANUAL, e (3) ano de fonte divergente do `reference_year` registrado na auditoria (tolerância de 1 ano para defasagem entre publicação e referência). Os avisos são exibidos no banner 'Conferência de dados' e exportáveis no .txt.",
+      "Relatórios — Validador atualizado para `v1.38.38` no campo `validator_version` da tabela `report_validations`, permitindo rastrear quais relatórios foram validados pela nova régua.",
+    ],
+  },
   {
     version: "1.38.37",
     date: "2026-04-30",

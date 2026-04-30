@@ -942,8 +942,14 @@ serve(async (req) => {
           );
 
       // Compute confidence based on source (manual vs auto)
-      const ivSource = (iv as any)._source || (iv as any).source || '';
-      const isAutoSource = /api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn/i.test(String(ivSource));
+      // Phase: source-integrity fix — preserve original source from external_indicator_values
+      const ivSourceTag = (iv as any)._source || (iv as any).source || '';
+      const ivExternalSource = (iv as any)._external_source || '';
+      const ivReferenceYear = (iv as any)._reference_year || '';
+      const ivSource = ivSourceTag;
+      const isExternalOrigin = ivSourceTag === 'external' || ivSourceTag === 'derived';
+      const isAutoSource = isExternalOrigin
+        || /api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn|anac|anatel|ana|tse|cadunico|mapa.?turismo|mtur/i.test(String(ivExternalSource || ivSourceTag));
       const confidenceLevel = isAutoSource ? 1.0 : 0.7;
 
       // Phase 4 — Use org-specific weight override when set
@@ -973,12 +979,38 @@ serve(async (req) => {
       });
 
       // Audit entry — classify source
-      const srcRaw = String(ivSource || '').toLowerCase();
+      // Source-integrity fix: items hydrated from external_indicator_values (tag === 'external')
+      // or compute_derived_indicators (tag === 'derived') used to be misclassified as MANUAL
+      // because the regex only matched against ivSourceTag (which was the literal 'external').
+      // We now classify from the tag first, then fall back to the external_source code.
+      const srcTag = String(ivSourceTag || '').toLowerCase();
+      const srcExt = String(ivExternalSource || '').toLowerCase();
       let sourceType = 'MANUAL';
-      if (/derived|derivado|formula/.test(srcRaw)) sourceType = 'DERIVED';
-      else if (/api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn/.test(srcRaw)) sourceType = 'OFFICIAL_API';
-      else if (/estima/.test(srcRaw)) sourceType = 'ESTIMADA';
+      if (srcTag === 'derived' || /derived|derivado|formula/.test(srcTag)) {
+        sourceType = 'DERIVED';
+      } else if (
+        srcTag === 'external'
+        || /api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn|anac|anatel|^ana$|tse|cadunico|mapa.?turismo|mtur/.test(srcTag)
+        || /api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn|anac|anatel|^ana$|tse|cadunico|mapa.?turismo|mtur/.test(srcExt)
+      ) {
+        sourceType = 'OFFICIAL_API';
+      } else if (/estima/.test(srcTag)) {
+        sourceType = 'ESTIMADA';
+      }
       if (isContextual) sourceType = sourceType + '_CONTEXTUAL';
+
+      // Build a rich source_detail so the validator can verify the cited source/year
+      let sourceDetail: string | null = null;
+      if (sourceType.startsWith('OFFICIAL_API') && ivExternalSource) {
+        sourceDetail = ivReferenceYear
+          ? `${String(ivExternalSource).toUpperCase()} (${ivReferenceYear})`
+          : String(ivExternalSource).toUpperCase();
+      } else if (sourceType.startsWith('DERIVED') && ivExternalSource) {
+        sourceDetail = `Derivado de ${String(ivExternalSource).toUpperCase()}${ivReferenceYear ? ` (${ivReferenceYear})` : ''}`;
+      } else if (ivSourceTag) {
+        sourceDetail = String(ivSourceTag).slice(0, 200);
+      }
+
       auditEntries.push({
         assessment_id,
         indicator_code: indicator.code,
@@ -986,7 +1018,7 @@ serve(async (req) => {
         value: iv.value_raw,
         normalized_score: isContextual ? 0 : score,
         source_type: sourceType,
-        source_detail: ivSource ? String(ivSource).slice(0, 200) : null,
+        source_detail: sourceDetail,
         weight: effectiveWeight,
       });
 
