@@ -1907,22 +1907,22 @@ ${dataSnapshots.length > 0 ? '9. Use os snapshots de proveniência para rastrear
 ${globalRefs.length > 0 ? `10. Referencie documentos oficiais quando contextualizar resultados e prescrições` : ''}
 ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
 
-    // === LLM provider selection (v1.38.14) ===
-    // Primary: Anthropic Claude Sonnet (when ANTHROPIC_API_KEY is configured).
-    // Fallback: Lovable AI Gateway (Gemini) on any error / quota / credit exhaustion.
+    // === LLM provider selection (v1.38.34) ===
+    // Cadeia de fallback automática: Claude → GPT-5 → Gemini
+    // Aplica-se inclusive em backgroundRun (jobs longos) — Claude não é mais pulado.
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     let response: Response | null = null;
-    let usedProvider: 'claude' | 'gemini' = 'gemini';
-    let claudeFailReason: string | null = null;
+    let usedProvider: 'claude' | 'gpt5' | 'gemini' = 'gemini';
+    const fallbackTrail: Array<{ provider: string; reason: string }> = [];
 
-    const callGemini = () => fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const callLovableGateway = (model: string) => fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -1931,7 +1931,8 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
       }),
     });
 
-    if (ANTHROPIC_API_KEY && !backgroundRun) {
+    // 1) CLAUDE (primário)
+    if (ANTHROPIC_API_KEY) {
       try {
         const claudeResp = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
@@ -1949,7 +1950,6 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           }),
         });
         if (claudeResp.ok && claudeResp.body) {
-          // Adapt Anthropic SSE -> OpenAI-compatible SSE for downstream parser.
           const adapted = new ReadableStream({
             async start(controller) {
               const reader = claudeResp.body!.getReader();
@@ -1975,8 +1975,13 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
                         controller.enqueue(encoder.encode(chunk));
                       } else if (evt.type === "message_stop") {
                         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                      } else if (evt.type === "error") {
+                        throw new Error(`Claude stream error: ${JSON.stringify(evt.error || evt)}`);
                       }
-                    } catch { /* ignore partials */ }
+                    } catch (parseErr) {
+                      if (parseErr instanceof Error && parseErr.message.startsWith("Claude stream error")) throw parseErr;
+                      /* ignore partial JSON */
+                    }
                   }
                 }
                 controller.close();
@@ -1990,20 +1995,46 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           usedProvider = 'claude';
           console.log("Report generation using provider: claude (claude-sonnet-4-5)");
         } else {
-          claudeFailReason = `status ${claudeResp.status}`;
           const errBody = await claudeResp.text().catch(() => "");
-          console.warn(`Claude unavailable (${claudeFailReason}), falling back to Gemini. Body: ${errBody.slice(0, 300)}`);
+          const reason = `status ${claudeResp.status}: ${errBody.slice(0, 200)}`;
+          fallbackTrail.push({ provider: 'claude', reason });
+          console.warn(`Claude unavailable, will try GPT-5. ${reason}`);
         }
       } catch (e) {
-        claudeFailReason = e instanceof Error ? e.message : String(e);
-        console.warn(`Claude request threw, falling back to Gemini: ${claudeFailReason}`);
+        const reason = e instanceof Error ? e.message : String(e);
+        fallbackTrail.push({ provider: 'claude', reason });
+        console.warn(`Claude request threw, will try GPT-5: ${reason}`);
+      }
+    } else {
+      fallbackTrail.push({ provider: 'claude', reason: 'ANTHROPIC_API_KEY not configured' });
+    }
+
+    // 2) GPT-5 (fallback secundário via Lovable AI Gateway)
+    if (!response) {
+      try {
+        const gptResp = await callLovableGateway("openai/gpt-5");
+        if (gptResp.ok && gptResp.body) {
+          response = gptResp;
+          usedProvider = 'gpt5';
+          console.log(`Report generation using provider: gpt-5 (fallback after Claude)`);
+        } else {
+          const errBody = await gptResp.text().catch(() => "");
+          const reason = `status ${gptResp.status}: ${errBody.slice(0, 200)}`;
+          fallbackTrail.push({ provider: 'gpt5', reason });
+          console.warn(`GPT-5 unavailable, will try Gemini. ${reason}`);
+        }
+      } catch (e) {
+        const reason = e instanceof Error ? e.message : String(e);
+        fallbackTrail.push({ provider: 'gpt5', reason });
+        console.warn(`GPT-5 request threw, will try Gemini: ${reason}`);
       }
     }
 
+    // 3) GEMINI (fallback final)
     if (!response) {
-      response = await callGemini();
+      response = await callLovableGateway("google/gemini-2.5-pro");
       usedProvider = 'gemini';
-      console.log(`Report generation using provider: gemini${claudeFailReason ? ` (fallback after Claude: ${claudeFailReason})` : ''}`);
+      console.log(`Report generation using provider: gemini-2.5-pro (final fallback). Trail: ${JSON.stringify(fallbackTrail)}`);
     }
 
     if (!response.ok) {
@@ -2146,10 +2177,12 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             console.error('Failed to persist report_validations:', vErr);
           }
 
-          // Audit event — registra qual modelo gerou o relatório (v1.38.15)
+          // Audit event — registra qual modelo gerou o relatório (v1.38.34)
           try {
             const modelLabel = usedProvider === 'claude'
               ? 'anthropic/claude-sonnet-4-5-20250929'
+              : usedProvider === 'gpt5'
+              ? 'openai/gpt-5'
               : 'google/gemini-2.5-pro';
             await supabaseAdmin.from('audit_events').insert({
               org_id: assessment.org_id,
@@ -2160,7 +2193,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               metadata: {
                 provider: usedProvider,
                 model: modelLabel,
-                fallback_reason: claudeFailReason,
+                fallback_trail: fallbackTrail,
                 template: reportTemplate,
                 destination_name: destinationName,
                 assessment_id: assessmentId,
