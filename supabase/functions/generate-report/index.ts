@@ -675,6 +675,7 @@ REGRAS DURAS — POLÍTICA "ZERO ALUCINAÇÃO":
 10. COMPARAÇÕES com outros municípios/regiões: somente se o valor comparado constar dos BENCHMARKS OFICIAIS injetados. Caso contrário, omita.
 11. Se faltar dado para uma seção inteira, escreva "Seção sem dados validados suficientes para análise neste ciclo." em vez de preencher com generalidades.
 12. Em caso de dúvida, PREFIRA OMITIR a inventar.
+13. CITAÇÃO DE PÁGINA: só inclua número de página de obra (ex.: "BENI, 1997, p. 145") se o trecho do livro estiver LITERALMENTE presente na seção BASE DE CONHECIMENTO DO DESTINO ou DOCUMENTOS DE REFERÊNCIA NACIONAL desta entrega, com a página explicitamente registrada no excerto. Caso contrário, cite somente autor e ano — JAMAIS invente número de página.
 `;
 
 function getSystemPrompt(template: string, isEnterprise: boolean): string {
@@ -714,6 +715,7 @@ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
   Se quiser dar contexto adicional (ex.: benchmark, evidência, observação), faça-o em PARÁGRAFO logo abaixo da tabela — NUNCA como coluna extra.
 - Banco de Ações em tabela: Ação | Pilar | Prazo | Responsável | Prioridade
 - TOM NARRATIVO (OBRIGATÓRIO): cada seção de análise (Resumo, Diagnóstico por Eixo, Conclusão) DEVE ser apresentada em PARÁGRAFOS CORRIDOS de 3-6 frases, com prosa fluida e técnica em português institucional. Use tabelas APENAS para a ficha técnica, listas de indicadores e banco de ações — NUNCA substitua a análise textual por bullets ou listas de tópicos. Após cada tabela de indicadores, escreva 1-2 parágrafos interpretando os dados (não apenas repetindo-os): conecte dado → causa provável → impacto territorial → decisão recomendada.
+- ESTRUTURA FLEXÍVEL DE SUBSEÇÕES: as subseções numeradas (2.1, 2.2, 3.1 etc.) sugeridas no template do relatório são GUIAS de cobertura temática, NÃO cabeçalhos obrigatórios. Prefira blocos narrativos contínuos quando o assunto fluir naturalmente em 2-3 parágrafos consecutivos — não fragmente uma análise coesa em 4 microsseções de 2 frases cada. Use subtítulos `###` apenas quando ajudarem a leitura, não como camisa-de-força ABNT. Resultado esperado: texto que respira como ensaio técnico, não como formulário preenchido.
 - Linguagem institucional, clara e objetiva — evite jargão acadêmico inflado, marcadores excessivos e frases de uma palavra. Prefira "Foz do Iguaçu apresenta…" a "• Score: X • Status: Y".
 - Justifique conclusões com dados. Conecte sempre: dado → impacto → decisão.
 - Se estimar dados: "[ESTIMADO]"
@@ -1867,8 +1869,11 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             } else {
               bannerLines.push('> Nenhuma divergência detectada entre o texto narrativo, os valores auditados e a bibliografia canônica.');
             }
-            bannerLines.push('', '---', '');
-            finalContent = bannerLines.join('\n') + workingText;
+            // v1.38.26 — banner movido para o RODAPÉ do relatório (estilo v1.38.18: corpo do relatório
+            // começa direto pelo título institucional, sem aviso técnico no topo). Em caso de divergência,
+            // o banner ainda fica visível, mas como apêndice no final.
+            const footerBanner = ['', '---', '', ...bannerLines].join('\n');
+            finalContent = workingText.replace(/\s*$/, '') + footerBanner + '\n';
 
             if (hasAny) console.warn('Validation issues:', { autoCorrections, allIssues });
           } catch (cohErr) {
