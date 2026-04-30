@@ -2274,7 +2274,10 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             autoCorrections = corrected.corrections;
 
             // 2) Validação determinística sobre o texto JÁ corrigido
-            deterministic = detectCoherenceWarnings(workingText, auditTrail || []);
+            deterministic = [
+              ...detectCoherenceWarnings(workingText, auditTrail || []),
+              ...detectInventedReferences(workingText, auditTrail || []),
+            ];
             // Segunda passagem: agente IA validador cruza relatório vs auditoria
             // e bibliografia canônica. Não bloqueante.
             aiIssues = await runReportValidatorAgent(
