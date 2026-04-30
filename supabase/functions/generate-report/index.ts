@@ -1301,6 +1301,17 @@ serve(async (req) => {
       // o que poluía relatórios de primeiro ciclo / KPIs estáveis. Agora o
       // bloco só é gerado quando o cliente passa enableComparison: true.
       enableComparison = false,
+      // v1.38.31 — Modo background. Quando 'background', a função cria um
+      // registro em report_jobs, responde 202 com { jobId } imediatamente,
+      // e processa todo o pipeline via EdgeRuntime.waitUntil. O front faz
+      // polling em report_jobs até status 'completed'/'failed'. Default
+      // mantido como 'stream' para preservar retrocompatibilidade de chamadas
+      // antigas que ainda esperam SSE.
+      mode = 'stream',
+      // Quando o cliente já criou o job (porque o INSERT roda com a sessão
+      // do usuário e respeita a RLS de Admin/Analyst), passa o id aqui e
+      // a edge function só atualiza o status.
+      jobId: incomingJobId,
     } = await req.json();
     
     // Verify access
