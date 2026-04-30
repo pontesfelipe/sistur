@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 22,
+  patch: 23,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.23",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "ANAC — Conectividade Aérea (OE003) agora é COLETADA AUTOMATICAMENTE via cache mensal. Antes, o CSV oficial de 353 MB (`Dados_Estatisticos.csv`) era inviável para baixar/parsear na edge function a cada diagnóstico (limite de memória), então o indicador caía como MANUAL e ficava em branco/zerado. Solução implementada: (1) Nova tabela `anac_air_connectivity` armazena, por código IBGE, métricas agregadas dos últimos 12 meses (voos totais/domésticos/internacionais, passageiros, aeroportos ICAO, voos por semana — calculado como coluna gerada). (2) Nova edge function `ingest-anac` baixa o CSV via streaming linha-a-linha (decoder Latin-1, parser CSV com aspas), agrega em memória apenas contadores por município (mapeando aeródromo→IBGE pelo `aerodromos.csv` de 900 KB), filtra os últimos 12 meses pelo cabeçalho ano/mês, faz upsert em lotes de 500. Roda como background task (`EdgeRuntime.waitUntil`) para responder ao chamador em milissegundos enquanto processa em segundo plano. Toda execução é logada na tabela `anac_ingestion_runs` (status, linhas processadas, bytes baixados, municípios atualizados, erro). (3) Job pg_cron `ingest-anac-monthly` agendado para o dia 5 de cada mês às 03:00 UTC, dispara o edge function via pg_net. (4) `fetch-official-data` ganhou nova função `fetchANACFromCache` que lê o cache: se existe registro, devolve `voos/semana` como valor de OE003 com source='ANAC' e `real=true`; se não existe (município sem aeroporto comercial), grava 0 voos/semana também como dado real (em vez de marcar como MANUAL). Resultado: novos diagnósticos passam a vir com OE003 automaticamente preenchido, sem download recorrente de 353 MB e sem promessa quebrada de coleta automática."
+    ]
+  },
   {
     version: "1.38.22",
     date: "2026-04-29",

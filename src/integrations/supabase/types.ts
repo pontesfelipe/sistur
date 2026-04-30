@@ -185,6 +185,108 @@ export type Database = {
           },
         ]
       }
+      anac_air_connectivity: {
+        Row: {
+          airport_count: number | null
+          airport_icao_codes: string[] | null
+          created_at: string
+          data_source_url: string | null
+          domestic_flights_12m: number | null
+          domestic_passengers_12m: number | null
+          fetched_at: string
+          flights_per_week: number | null
+          ibge_code: string
+          international_flights_12m: number | null
+          international_passengers_12m: number | null
+          municipality_name: string | null
+          raw_payload: Json | null
+          reference_period_end: string | null
+          reference_period_start: string | null
+          total_flights_12m: number | null
+          total_passengers_12m: number | null
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          airport_count?: number | null
+          airport_icao_codes?: string[] | null
+          created_at?: string
+          data_source_url?: string | null
+          domestic_flights_12m?: number | null
+          domestic_passengers_12m?: number | null
+          fetched_at?: string
+          flights_per_week?: number | null
+          ibge_code: string
+          international_flights_12m?: number | null
+          international_passengers_12m?: number | null
+          municipality_name?: string | null
+          raw_payload?: Json | null
+          reference_period_end?: string | null
+          reference_period_start?: string | null
+          total_flights_12m?: number | null
+          total_passengers_12m?: number | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          airport_count?: number | null
+          airport_icao_codes?: string[] | null
+          created_at?: string
+          data_source_url?: string | null
+          domestic_flights_12m?: number | null
+          domestic_passengers_12m?: number | null
+          fetched_at?: string
+          flights_per_week?: number | null
+          ibge_code?: string
+          international_flights_12m?: number | null
+          international_passengers_12m?: number | null
+          municipality_name?: string | null
+          raw_payload?: Json | null
+          reference_period_end?: string | null
+          reference_period_start?: string | null
+          total_flights_12m?: number | null
+          total_passengers_12m?: number | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      anac_ingestion_runs: {
+        Row: {
+          bytes_downloaded: number | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          municipalities_updated: number | null
+          rows_processed: number | null
+          source_url: string | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          bytes_downloaded?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          municipalities_updated?: number | null
+          rows_processed?: number | null
+          source_url?: string | null
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          bytes_downloaded?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          municipalities_updated?: number | null
+          rows_processed?: number | null
+          source_url?: string | null
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       anatel_coverage_cache: {
         Row: {
           coverage_4g_pct: number | null

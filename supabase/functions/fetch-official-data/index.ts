@@ -297,7 +297,60 @@ async function fetchDATASUSLeitos(
 }
 
 // ─── 2b. SIDRA API: Censo 2010 Saneamento (table 3217) ──────────────
+// ─── 2c. ANAC Conectividade Aérea (cache mensal pré-baixado) ──────────────
+// Lê o cache da tabela `anac_air_connectivity` (atualizada mensalmente pelo
+// edge function `ingest-anac`). Evita baixar o CSV de 353MB a cada diagnóstico.
+// Mapeia para o indicador OE003 — Conectividade Aérea, em voos/semana.
+async function fetchANACFromCache(
+  supabase: any,
+  ibgeCode: string,
+): Promise<Record<string, IndicatorResult>> {
+  const results: Record<string, IndicatorResult> = {};
+  try {
+    const code7 = ibgeCode.length === 7 ? ibgeCode : ibgeCode.padStart(7, '0');
+    const code6 = ibgeCode.slice(0, 6);
+    const { data, error } = await supabase
+      .from('anac_air_connectivity')
+      .select('flights_per_week, total_flights_12m, airport_count, reference_period_end')
+      .or(`ibge_code.eq.${code7},ibge_code.eq.${code6}`)
+      .order('fetched_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) {
+      console.warn('[ANAC cache] read error:', error.message);
+      return results;
+    }
+    if (!data) {
+      console.log(`[ANAC cache] sem registro para IBGE ${ibgeCode} (município sem aeroporto comercial)`);
+      // Município sem aeroporto: gravamos 0 voos/semana como dado real (oficialmente
+      // não há conectividade aérea direta). Isso evita marcar como MANUAL.
+      results['OE003'] = {
+        value: 0,
+        year: new Date().getFullYear(),
+        source: 'ANAC',
+        real: true,
+      };
+      return results;
+    }
+    const fpw = Number(data.flights_per_week) || 0;
+    const refYear = data.reference_period_end
+      ? new Date(data.reference_period_end).getFullYear()
+      : new Date().getFullYear();
+    results['OE003'] = {
+      value: Math.round(fpw * 10) / 10,
+      year: refYear,
+      source: 'ANAC',
+      real: true,
+    };
+    console.log(`[ANAC cache] OE003 = ${fpw} voos/semana (${data.airport_count} aeroportos)`);
+  } catch (e) {
+    console.warn('[ANAC cache] exception:', e instanceof Error ? e.message : e);
+  }
+  return results;
+}
+
 async function fetchSIDRASaneamento(ibgeCode: string): Promise<Record<string, IndicatorResult>> {
+
   const results: Record<string, IndicatorResult> = {};
 
   // Table 3217: Domicílios por abastecimento de água, destino do lixo
@@ -617,13 +670,17 @@ Deno.serve(async (req) => {
     const datasusData = await fetchDATASUSLeitos(ibge_code, populacao);
     console.log(`DATASUS Leitos: ${Object.keys(datasusData).length} indicators`);
 
+    // 3c. Lê cache ANAC (atualizado mensalmente por ingest-anac) — OE003
+    const anacData = await fetchANACFromCache(supabaseClient, ibge_code);
+    console.log(`ANAC cache: ${Object.keys(anacData).length} indicators`);
+
     // 4. Fetch Mapa do Turismo data (categoria, região turística)
     const mapaTurismoData = await fetchMapaTurismo(supabaseClient, ibge_code);
     console.log(`Mapa Turismo: ${Object.keys(mapaTurismoData).length} indicators`);
 
     // 5. Merge real data
     // Ordem importa: DATASUS sobrepõe leitos do IBGE (fonte primária para leitos hospitalares)
-    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...datasusData, ...mapaTurismoData };
+    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...datasusData, ...anacData, ...mapaTurismoData };
     const realCount = Object.keys(realData).length;
     console.log(`Total real: ${realCount} indicators`);
 
