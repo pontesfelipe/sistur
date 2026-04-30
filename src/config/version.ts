@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 25,
+  patch: 26,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.26",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — recuperação do tom narrativo da v1.38.18 sem perder os ganhos de padronização posteriores. Comparando o relatório Territorial de Foz do Iguaçu de 27/04 09:41 (v1.38.18) com o de 29/04 19:36 (v1.38.25), o usuário relatou que o anterior tinha melhor texto e análise. A auditoria mostrou três diferenças principais: (1) a v18 usava parágrafos longos contínuos, enquanto o atual fragmentava o conteúdo em subseções 2.1/2.2/2.3/3.1/3.2/4.1/4.2 obrigatórias, deixando a leitura travada como formulário ABNT; (2) a v18 não tinha banner amarelo de 'Validação cruzada' antes do título institucional, o atual abria com esse aviso técnico atrapalhando a leitura; (3) a v18 não citava página de livro do Beni — o usuário lembrava disso, mas nenhum relatório nunca puxou página real porque a Base de Conhecimento armazena apenas metadados (file_name, description, category), sem texto extraído nem nº de página. Correções aplicadas no `generate-report`: (a) Nova regra `ESTRUTURA FLEXÍVEL DE SUBSEÇÕES` no system prompt do Territorial — explicita que as subseções numeradas do template são GUIAS de cobertura, não cabeçalhos obrigatórios, instruindo o LLM a preferir blocos narrativos contínuos de 2-3 parágrafos em vez de fragmentar análise coesa em 4 microsseções de 2 frases. (b) Banner de Validação Cruzada (v1.38.8) reposicionado para o RODAPÉ do relatório — o corpo agora começa direto pelo título 'Relatório SISTUR', estilo v18; o banner segue presente para auditoria, mas como apêndice ao final, não como cabeçalho. (c) Nova regra dura nº 13 da política Zero Alucinação: citação de página (ex.: 'BENI, 1997, p. 145') só permitida se o trecho do livro estiver LITERALMENTE presente em BASE DE CONHECIMENTO ou DOCUMENTOS DE REFERÊNCIA com a página explicitamente registrada — caso contrário, omitir página e citar apenas autor+ano. Resultado: novos relatórios passam a abrir como o de 27/04 09:41 (título → ficha técnica → Resumo em prosa fluida), mantêm citações canônicas (BENI, 1997 / 2007 — não mais o erro 'BENI, 2001' do v18), preservam tabelas canônicas de 5 colunas + status colorido (🔴🟠🟡🟢🔵⚪) introduzidos na v1.38.19, e ganham porta aberta para citação de página real quando o pipeline de extração de texto do KB for implementado."
+    ]
+  },
   {
     version: "1.38.25",
     date: "2026-04-30",
