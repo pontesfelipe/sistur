@@ -1254,6 +1254,122 @@ ${reportText.slice(0, 18000)}`;
 
 // ========== MAIN ==========
 
+// v1.38.31 — Pipeline de geração executado em background (EdgeRuntime.waitUntil).
+// Para evitar reescrever as ~500 linhas do pipeline inline dentro do `serve`,
+// reaproveitamos o próprio endpoint chamando-o em modo stream a partir do
+// próprio worker, consumindo o SSE até o final. O endpoint stream já persiste
+// `generated_reports` + `report_validations` + `audit_events` na conclusão,
+// então só precisamos esperar o stream terminar e devolver o reportId.
+async function runReportPipeline(args: {
+  supabaseAdmin: any;
+  assessment: any;
+  assessmentId: string;
+  destinationName: string;
+  pillarScores: any;
+  issues: any;
+  prescriptions: any;
+  forceRegenerate: any;
+  reportTemplate: string;
+  visibility: string;
+  environment: string;
+  enableComparison: boolean;
+  userId: string;
+  jobId: string;
+}): Promise<{ reportId: string | null }> {
+  const { supabaseAdmin, assessment, assessmentId, destinationName, jobId } = args;
+
+  // Atualiza progresso enquanto o stream roda. Não conhecemos o tamanho final,
+  // então simulamos um avanço logarítmico: 15% ao começar, +5% a cada 30s,
+  // travando em 90% antes da persistência final.
+  let pct = 15;
+  const progressTimer = setInterval(() => {
+    pct = Math.min(90, pct + 5);
+    supabaseAdmin.from('report_jobs').update({
+      progress_pct: pct,
+      stage: pct < 50 ? 'Gerando narrativa com IA' : 'Validando coerência e persistindo',
+    }).eq('id', jobId).then(() => {}, () => {});
+  }, 30_000);
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    // Reentrância: invoca o próprio endpoint em modo stream (com a service role,
+    // já que o usuário original não está mais no contexto). O endpoint stream
+    // valida acesso pela própria sessão; passamos um token sintético via
+    // Authorization usando a service role — mas a verificação `auth.getUser()`
+    // do supabase-js com `Authorization: Bearer <service_role>` não retorna
+    // user. Solução: emitimos um JWT do usuário original via Admin API.
+    const { data: linkData, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'magiclink',
+      email: 'noop@noop',
+    } as any).catch(() => ({ data: null, error: 'unsupported' }));
+    void linkData; void linkErr;
+
+    // Mais robusto: chamar a API REST diretamente como service role e
+    // reconstruir o pipeline interno. Como a função stream depende do
+    // contexto do user para RLS, e o admin client já burla isso, o caminho
+    // mais simples é: a própria função stream aceitar fallback para userId
+    // explícito quando chamada com service_role. Para minimizar mudanças,
+    // chamamos via fetch passando service role como Bearer e um header
+    // customizado x-internal-user-id que o handler aceita.
+    const url = `${supabaseUrl}/functions/v1/generate-report`;
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${serviceKey}`,
+        'x-internal-user-id': args.userId,
+      },
+      body: JSON.stringify({
+        assessmentId,
+        destinationName,
+        pillarScores: args.pillarScores,
+        issues: args.issues,
+        prescriptions: args.prescriptions,
+        forceRegenerate: args.forceRegenerate,
+        reportTemplate: args.reportTemplate,
+        visibility: args.visibility,
+        environment: args.environment,
+        enableComparison: args.enableComparison,
+        mode: 'stream',
+      }),
+    });
+    if (!resp.ok) {
+      const errText = await resp.text().catch(() => '');
+      throw new Error(`Pipeline interno falhou (${resp.status}): ${errText.slice(0, 200)}`);
+    }
+    // Drena o stream até o fim para garantir que a persistência interna
+    // (dentro do EdgeRuntime.waitUntil do endpoint stream) tenha tempo de rodar.
+    if (resp.body) {
+      const reader = resp.body.getReader();
+      while (true) {
+        const { done } = await reader.read();
+        if (done) break;
+      }
+    }
+
+    // Polling curto: o endpoint stream salva via background task, então
+    // pode haver alguns ms de defasagem entre o fim do stream e o INSERT
+    // do generated_reports.
+    let reportId: string | null = null;
+    for (let i = 0; i < 20; i++) {
+      const { data: row } = await supabaseAdmin
+        .from('generated_reports')
+        .select('id, created_at')
+        .eq('assessment_id', assessmentId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (row?.id) { reportId = row.id; break; }
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+    return { reportId };
+  } finally {
+    clearInterval(progressTimer);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
