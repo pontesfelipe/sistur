@@ -56,7 +56,7 @@ export function ReportValidationBanner({ reportId, assessmentId }: Props) {
         console.warn('[ReportValidationBanner] read error', error);
         return null;
       }
-      return (rows?.[0] as ReportValidationRow | undefined) ?? null;
+      return ((rows?.[0] as unknown) as ReportValidationRow | undefined) ?? null;
     },
     staleTime: 30_000,
   });
