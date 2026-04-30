@@ -1283,6 +1283,11 @@ async function runReportPipeline(args: {
   // então simulamos um avanço logarítmico: 15% ao começar, +5% a cada 30s,
   // travando em 90% antes da persistência final.
   let pct = 15;
+  const streamController = new AbortController();
+  const streamStartedAt = Date.now();
+  let lastStreamChunkAt = Date.now();
+  const STREAM_IDLE_TIMEOUT_MS = 2 * 60 * 1000;
+  const STREAM_HARD_TIMEOUT_MS = 8 * 60 * 1000;
   const progressTimer = setInterval(() => {
     pct = Math.min(90, pct + 5);
     supabaseAdmin.from('report_jobs').update({
@@ -1290,6 +1295,14 @@ async function runReportPipeline(args: {
       stage: pct < 50 ? 'Gerando narrativa com IA' : 'Validando coerência e persistindo',
     }).eq('id', jobId).then(() => {}, () => {});
   }, 30_000);
+  const streamWatchdog = setInterval(() => {
+    const now = Date.now();
+    if (now - lastStreamChunkAt > STREAM_IDLE_TIMEOUT_MS) {
+      streamController.abort('internal-report-stream-idle-timeout');
+    } else if (now - streamStartedAt > STREAM_HARD_TIMEOUT_MS) {
+      streamController.abort('internal-report-stream-hard-timeout');
+    }
+  }, 15_000);
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -1314,7 +1327,9 @@ async function runReportPipeline(args: {
         environment: args.environment,
         enableComparison: args.enableComparison,
         mode: 'stream',
+        backgroundRun: true,
       }),
+      signal: streamController.signal,
     });
     if (!resp.ok) {
       const errText = await resp.text().catch(() => '');
@@ -1327,6 +1342,7 @@ async function runReportPipeline(args: {
       while (true) {
         const { done } = await reader.read();
         if (done) break;
+        lastStreamChunkAt = Date.now();
       }
     }
 
@@ -1345,9 +1361,13 @@ async function runReportPipeline(args: {
       if (row?.id) { reportId = row.id; break; }
       await new Promise((r) => setTimeout(r, 1000));
     }
+    if (!reportId) {
+      throw new Error('Pipeline terminou sem salvar o relatório. A geração foi interrompida antes da persistência final.');
+    }
     return { reportId };
   } finally {
     clearInterval(progressTimer);
+    clearInterval(streamWatchdog);
   }
 }
 
