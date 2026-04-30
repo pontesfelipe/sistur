@@ -613,12 +613,17 @@ Deno.serve(async (req) => {
     const sidraData = await fetchSIDRASaneamento(ibge_code);
     console.log(`SIDRA Saneamento: ${Object.keys(sidraData).length} indicators`);
 
+    // 3b. Fetch DATASUS leitos (DEMAS) — sobrepõe leitos IBGE com SUS dedicado
+    const datasusData = await fetchDATASUSLeitos(ibge_code, populacao);
+    console.log(`DATASUS Leitos: ${Object.keys(datasusData).length} indicators`);
+
     // 4. Fetch Mapa do Turismo data (categoria, região turística)
     const mapaTurismoData = await fetchMapaTurismo(supabaseClient, ibge_code);
     console.log(`Mapa Turismo: ${Object.keys(mapaTurismoData).length} indicators`);
 
     // 5. Merge real data
-    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...mapaTurismoData };
+    // Ordem importa: DATASUS sobrepõe leitos do IBGE (fonte primária para leitos hospitalares)
+    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...datasusData, ...mapaTurismoData };
     const realCount = Object.keys(realData).length;
     console.log(`Total real: ${realCount} indicators`);
 
