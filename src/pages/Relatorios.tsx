@@ -247,6 +247,7 @@ export default function Relatorios() {
     setIsGenerating(true);
     setReport('');
     setGenerationStage('Conectando ao servidor…');
+    const generationStartedAt = Date.now();
 
     // ── Watchdog anti-travamento ───────────────────────────────────
     // 1) timeout duro absoluto: 240s (relatório longo + LLM)
@@ -404,8 +405,7 @@ export default function Relatorios() {
           { duration: 180_000 },
         );
         setGenerationStage('Recuperando relatório do servidor…');
-        const startedAt = Date.now();
-        const recovered = await pollForBackgroundReport(selectedAssessmentId, startedAt);
+        const recovered = await pollForBackgroundReport(selectedAssessmentId, generationStartedAt);
         toast.dismiss(recoveryToastId);
         if (recovered) {
           setReport(recovered);
