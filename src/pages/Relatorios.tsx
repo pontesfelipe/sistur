@@ -40,6 +40,7 @@ import {
   X
 } from 'lucide-react';
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
+import { ReportValidationBanner } from '@/components/reports/ReportValidationBanner';
 
 const REPORT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`;
 
@@ -993,6 +994,9 @@ export default function Relatorios() {
                   )}
                 </CardHeader>
                 <CardContent>
+                  {report && !isGenerating && selectedAssessmentId && (
+                    <ReportValidationBanner assessmentId={selectedAssessmentId} />
+                  )}
                   <ScrollArea className="h-[600px] pr-4">
                     <div ref={reportRef} className="prose prose-sm max-w-none">
                       {isGenerating && !report && (
@@ -1204,11 +1208,14 @@ export default function Relatorios() {
                 </CardHeader>
                 <CardContent>
                   {selectedHistoryReport ? (
-                    <ScrollArea className="h-[500px] pr-4">
-                      <div className="prose prose-sm max-w-none">
-                        {renderMarkdown(selectedHistoryReport.report_content)}
-                      </div>
-                    </ScrollArea>
+                    <>
+                      <ReportValidationBanner reportId={selectedHistoryReport.id} />
+                      <ScrollArea className="h-[500px] pr-4">
+                        <div className="prose prose-sm max-w-none">
+                          {renderMarkdown(selectedHistoryReport.report_content)}
+                        </div>
+                      </ScrollArea>
+                    </>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
                       <FileText className="h-12 w-12 mb-4 opacity-50" />
