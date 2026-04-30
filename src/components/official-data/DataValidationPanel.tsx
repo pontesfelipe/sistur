@@ -103,6 +103,7 @@ export function DataValidationPanel({
   const [editedValues, setEditedValues] = useState<Record<string, number | null>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmedIds, setConfirmedIds] = useState<Set<string>>(new Set());
+  const [manuallyUnvalidatedIds, setManuallyUnvalidatedIds] = useState<Set<string>>(new Set());
   const [autoFetched, setAutoFetched] = useState(false);
   const [anaIqaStatus, setAnaIqaStatus] = useState<'success' | 'unavailable' | null>(null);
   const queryClient = useQueryClient();
@@ -178,10 +179,10 @@ export function DataValidationPanel({
   useEffect(() => {
     setConfirmedIds(new Set(
       (rawValues || [])
-        .filter(v => (v as any).validated || isPersistedInAssessment(v))
+        .filter(v => !manuallyUnvalidatedIds.has(v.id) && ((v as any).validated || isPersistedInAssessment(v)))
         .map(v => v.id)
     ));
-  }, [rawValues, assessmentValueByCode, assessmentId]);
+  }, [rawValues, assessmentValueByCode, assessmentId, manuallyUnvalidatedIds]);
 
   const values = useMemo(
     () => rawValues.filter(isOfficialPreFilledValue),
@@ -290,6 +291,11 @@ export function DataValidationPanel({
       selectedIds.forEach(id => next.add(id));
       return next;
     });
+    setManuallyUnvalidatedIds(prev => {
+      const next = new Set(prev);
+      selectedIds.forEach(id => next.delete(id));
+      return next;
+    });
     setSelectedIds(new Set());
 
     onValidationComplete(validatedValues);
@@ -302,9 +308,10 @@ export function DataValidationPanel({
       next.delete(id);
       return next;
     });
+    setManuallyUnvalidatedIds(prev => new Set(prev).add(id));
   };
 
-  const isValueConfirmed = (value: ExternalIndicatorValue) => confirmedIds.has(value.id) || isPersistedInAssessment(value);
+  const isValueConfirmed = (value: ExternalIndicatorValue) => !manuallyUnvalidatedIds.has(value.id) && (confirmedIds.has(value.id) || isPersistedInAssessment(value));
 
   const selectableValues = values.filter(v => !isValueConfirmed(v));
   const validatedCount = values.filter(isValueConfirmed).length;
