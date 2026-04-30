@@ -715,7 +715,7 @@ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
   Se quiser dar contexto adicional (ex.: benchmark, evidência, observação), faça-o em PARÁGRAFO logo abaixo da tabela — NUNCA como coluna extra.
 - Banco de Ações em tabela: Ação | Pilar | Prazo | Responsável | Prioridade
 - TOM NARRATIVO (OBRIGATÓRIO): cada seção de análise (Resumo, Diagnóstico por Eixo, Conclusão) DEVE ser apresentada em PARÁGRAFOS CORRIDOS de 3-6 frases, com prosa fluida e técnica em português institucional. Use tabelas APENAS para a ficha técnica, listas de indicadores e banco de ações — NUNCA substitua a análise textual por bullets ou listas de tópicos. Após cada tabela de indicadores, escreva 1-2 parágrafos interpretando os dados (não apenas repetindo-os): conecte dado → causa provável → impacto territorial → decisão recomendada.
-- ESTRUTURA FLEXÍVEL DE SUBSEÇÕES: as subseções numeradas (2.1, 2.2, 3.1 etc.) sugeridas no template do relatório são GUIAS de cobertura temática, NÃO cabeçalhos obrigatórios. Prefira blocos narrativos contínuos quando o assunto fluir naturalmente em 2-3 parágrafos consecutivos — não fragmente uma análise coesa em 4 microsseções de 2 frases cada. Use subtítulos `###` apenas quando ajudarem a leitura, não como camisa-de-força ABNT. Resultado esperado: texto que respira como ensaio técnico, não como formulário preenchido.
+- ESTRUTURA FLEXÍVEL DE SUBSEÇÕES: as subseções numeradas (2.1, 2.2, 3.1 etc.) sugeridas no template do relatório são GUIAS de cobertura temática, NÃO cabeçalhos obrigatórios. Prefira blocos narrativos contínuos quando o assunto fluir naturalmente em 2-3 parágrafos consecutivos — não fragmente uma análise coesa em 4 microsseções de 2 frases cada. Use subtítulos com três jogos-da-velha (###) apenas quando ajudarem a leitura, não como camisa-de-força ABNT. Resultado esperado: texto que respira como ensaio técnico, não como formulário preenchido.
 - Linguagem institucional, clara e objetiva — evite jargão acadêmico inflado, marcadores excessivos e frases de uma palavra. Prefira "Foz do Iguaçu apresenta…" a "• Score: X • Status: Y".
 - Justifique conclusões com dados. Conecte sempre: dado → impacto → decisão.
 - Se estimar dados: "[ESTIMADO]"
@@ -1254,6 +1254,103 @@ ${reportText.slice(0, 18000)}`;
 
 // ========== MAIN ==========
 
+// v1.38.31 — Pipeline de geração executado em background (EdgeRuntime.waitUntil).
+// Para evitar duplicar as ~500 linhas do pipeline inline dentro do `serve`,
+// reaproveitamos o próprio endpoint chamando-o em modo stream a partir do
+// worker (passando o JWT original do usuário). O endpoint stream já persiste
+// `generated_reports` + `report_validations` + `audit_events` na conclusão,
+// então só precisamos esperar o stream terminar e devolver o reportId.
+async function runReportPipeline(args: {
+  supabaseAdmin: any;
+  assessment: any;
+  assessmentId: string;
+  destinationName: string;
+  pillarScores: any;
+  issues: any;
+  prescriptions: any;
+  forceRegenerate: any;
+  reportTemplate: string;
+  visibility: string;
+  environment: string;
+  enableComparison: boolean;
+  userId: string;
+  jobId: string;
+  authHeader: string;
+}): Promise<{ reportId: string | null }> {
+  const { supabaseAdmin, assessment, assessmentId, destinationName, jobId } = args;
+
+  // Atualiza progresso enquanto o stream roda. Não conhecemos o tamanho final,
+  // então simulamos um avanço logarítmico: 15% ao começar, +5% a cada 30s,
+  // travando em 90% antes da persistência final.
+  let pct = 15;
+  const progressTimer = setInterval(() => {
+    pct = Math.min(90, pct + 5);
+    supabaseAdmin.from('report_jobs').update({
+      progress_pct: pct,
+      stage: pct < 50 ? 'Gerando narrativa com IA' : 'Validando coerência e persistindo',
+    }).eq('id', jobId).then(() => {}, () => {});
+  }, 30_000);
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const url = `${supabaseUrl}/functions/v1/generate-report`;
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Reusa o JWT do usuário original — o pipeline stream valida acesso
+        // exatamente como na chamada original.
+        Authorization: args.authHeader,
+      },
+      body: JSON.stringify({
+        assessmentId,
+        destinationName,
+        pillarScores: args.pillarScores,
+        issues: args.issues,
+        prescriptions: args.prescriptions,
+        forceRegenerate: args.forceRegenerate,
+        reportTemplate: args.reportTemplate,
+        visibility: args.visibility,
+        environment: args.environment,
+        enableComparison: args.enableComparison,
+        mode: 'stream',
+      }),
+    });
+    if (!resp.ok) {
+      const errText = await resp.text().catch(() => '');
+      throw new Error(`Pipeline interno falhou (${resp.status}): ${errText.slice(0, 200)}`);
+    }
+    // Drena o stream até o fim para garantir que a persistência interna
+    // (dentro do EdgeRuntime.waitUntil do endpoint stream) tenha tempo de rodar.
+    if (resp.body) {
+      const reader = resp.body.getReader();
+      while (true) {
+        const { done } = await reader.read();
+        if (done) break;
+      }
+    }
+
+    // Polling curto: o endpoint stream salva via background task, então
+    // pode haver alguns ms de defasagem entre o fim do stream e o INSERT
+    // do generated_reports.
+    let reportId: string | null = null;
+    for (let i = 0; i < 20; i++) {
+      const { data: row } = await supabaseAdmin
+        .from('generated_reports')
+        .select('id, created_at')
+        .eq('assessment_id', assessmentId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (row?.id) { reportId = row.id; break; }
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+    return { reportId };
+  } finally {
+    clearInterval(progressTimer);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -1301,6 +1398,17 @@ serve(async (req) => {
       // o que poluía relatórios de primeiro ciclo / KPIs estáveis. Agora o
       // bloco só é gerado quando o cliente passa enableComparison: true.
       enableComparison = false,
+      // v1.38.31 — Modo background. Quando 'background', a função cria um
+      // registro em report_jobs, responde 202 com { jobId } imediatamente,
+      // e processa todo o pipeline via EdgeRuntime.waitUntil. O front faz
+      // polling em report_jobs até status 'completed'/'failed'. Default
+      // mantido como 'stream' para preservar retrocompatibilidade de chamadas
+      // antigas que ainda esperam SSE.
+      mode = 'stream',
+      // Quando o cliente já criou o job (porque o INSERT roda com a sessão
+      // do usuário e respeita a RLS de Admin/Analyst), passa o id aqui e
+      // a edge function só atualiza o status.
+      jobId: incomingJobId,
     } = await req.json();
     
     // Verify access
@@ -1323,6 +1431,95 @@ serve(async (req) => {
     if (!assessment || !allowedOrgIds.includes(assessment.org_id)) {
       return new Response(JSON.stringify({ error: 'Acesso negado' }), {
         status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // ===== v1.38.31 — Modo background =====
+    // Quando o cliente pede background, devolvemos 202 imediatamente e
+    // processamos o pipeline inteiro via EdgeRuntime.waitUntil. O job é
+    // atualizado em report_jobs durante e ao final do processo.
+    if (mode === 'background') {
+      let jobId = incomingJobId as string | null;
+      if (!jobId) {
+        const { data: jobInsert, error: jobErr } = await supabaseAdmin
+          .from('report_jobs')
+          .insert({
+            org_id: assessment.org_id,
+            assessment_id: assessmentId,
+            destination_name: destinationName,
+            report_template: reportTemplate,
+            visibility,
+            environment,
+            status: 'queued',
+            stage: 'Aguardando início',
+            progress_pct: 0,
+            created_by: userId,
+          })
+          .select('id')
+          .maybeSingle();
+        if (jobErr || !jobInsert) {
+          console.error('Failed to create report_jobs row:', jobErr);
+          return new Response(JSON.stringify({ error: 'Não foi possível criar a fila de geração.' }), {
+            status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        jobId = jobInsert.id as string;
+      }
+
+      const backgroundJob = (async () => {
+        try {
+          await supabaseAdmin.from('report_jobs').update({
+            status: 'processing',
+            stage: 'Coletando dados do diagnóstico',
+            progress_pct: 10,
+            started_at: new Date().toISOString(),
+          }).eq('id', jobId);
+
+          const result = await runReportPipeline({
+            supabaseAdmin,
+            assessment,
+            assessmentId,
+            destinationName,
+            pillarScores,
+            issues,
+            prescriptions,
+            forceRegenerate,
+            reportTemplate,
+            visibility,
+            environment,
+            enableComparison,
+            userId,
+            jobId: jobId!,
+            authHeader: authHeader!,
+          });
+
+          await supabaseAdmin.from('report_jobs').update({
+            status: 'completed',
+            stage: 'Concluído',
+            progress_pct: 100,
+            report_id: result.reportId,
+            finished_at: new Date().toISOString(),
+          }).eq('id', jobId);
+        } catch (bgErr) {
+          console.error('Background pipeline failed:', bgErr);
+          await supabaseAdmin.from('report_jobs').update({
+            status: 'failed',
+            error_message: bgErr instanceof Error ? bgErr.message : String(bgErr),
+            finished_at: new Date().toISOString(),
+          }).eq('id', jobId);
+        }
+      })();
+
+      try {
+        // @ts-ignore - EdgeRuntime é global em Supabase Edge Functions
+        if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) {
+          // @ts-ignore
+          EdgeRuntime.waitUntil(backgroundJob);
+        }
+      } catch (_e) { /* ignore */ }
+
+      return new Response(JSON.stringify({ jobId, status: 'queued' }), {
+        status: 202, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 

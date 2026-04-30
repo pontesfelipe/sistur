@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 30,
+  patch: 31,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.31",
+    date: "2026-04-30",
+    type: "minor" as const,
+    changes: [
+      "Relatórios — geração 100% assíncrona em segundo plano. A edge function `generate-report` ganhou um novo modo `background` (default no front a partir desta versão): em vez de manter uma conexão SSE aberta por minutos enquanto o LLM produz o texto (sujeita a quedas de proxy, troca de aba, suspensão do dispositivo), a função agora cria imediatamente um registro na nova tabela `report_jobs` (status, stage, progresso, report_id final, mensagem de erro), responde HTTP 202 com `{ jobId }` em milissegundos e dispara o pipeline pesado dentro de `EdgeRuntime.waitUntil`. O front faz polling em `report_jobs` a cada 4s, exibe o stage e a porcentagem de progresso, e ao detectar `status='completed'` carrega o `report_content` final via `generated_reports`. Quando o usuário clica Cancelar agora, paramos apenas o acompanhamento local — o servidor continua salvando o relatório em background. Resultado: relatórios longos como Foz do Iguaçu (112 indicadores, 15 gargalos, 35 prescrições, ~4 minutos de LLM) deixam de ser interrompidos por timeouts/quedas de conexão; a UI fica leve, imune a fechar/abrir aba e o relatório aparece de forma confiável quando termina."
+    ]
+  },
   {
     version: "1.38.30",
     date: "2026-04-30",

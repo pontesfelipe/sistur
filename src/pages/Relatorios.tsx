@@ -128,7 +128,9 @@ export default function Relatorios() {
   const [genTierFilter, setGenTierFilter] = useState<string>('all');
   const [genDestFilter, setGenDestFilter] = useState<string>('all');
   // Watchdog para evitar UI travada quando o stream SSE para de responder.
-  const generationAbortRef = useRef<AbortController | null>(null);
+  // No modo background (v1.38.31) usamos uma flag para parar o polling local —
+  // o servidor continua finalizando a geração mesmo se o usuário "cancelar".
+  const cancelGenerationRef = useRef<boolean>(false);
   const [generationStage, setGenerationStage] = useState<string>('');
   const [generationElapsed, setGenerationElapsed] = useState<number>(0);
 
@@ -146,10 +148,7 @@ export default function Relatorios() {
   }, [isGenerating]);
 
   const cancelGeneration = () => {
-    if (generationAbortRef.current) {
-      generationAbortRef.current.abort();
-      generationAbortRef.current = null;
-    }
+    cancelGenerationRef.current = true;
   };
 
   // Pre-select assessment from URL parameter
@@ -195,42 +194,6 @@ export default function Relatorios() {
     return true;
   });
 
-  /**
-   * v1.38.30 — Polling de recuperação. A edge function `generate-report` usa
-   * `EdgeRuntime.waitUntil` para finalizar a persistência em background mesmo
-   * quando o cliente perde a conexão SSE (timeout, troca de aba, queda de
-   * rede). Após uma queda do stream, fazemos polling em `generated_reports`
-   * pelo `assessment_id` por até ~3 minutos para recuperar o conteúdo salvo.
-   * Retorna o `report_content` quando encontra um registro novo, ou null.
-   */
-  const pollForBackgroundReport = async (
-    assessmentId: string,
-    streamStartedAt: number,
-  ): Promise<string | null> => {
-    const MAX_WAIT_MS = 180_000; // 3 minutos
-    const INTERVAL_MS = 5_000;
-    const deadline = Date.now() + MAX_WAIT_MS;
-    while (Date.now() < deadline) {
-      try {
-        const { data } = await supabase
-          .from('generated_reports')
-          .select('report_content, created_at')
-          .eq('assessment_id', assessmentId)
-          .maybeSingle();
-        if (data?.report_content) {
-          // Considera recuperado se o registro foi criado/atualizado depois
-          // do início desta tentativa (evita devolver um relatório antigo).
-          const createdAtMs = data.created_at ? new Date(data.created_at).getTime() : 0;
-          if (createdAtMs >= streamStartedAt - 5_000) {
-            return data.report_content;
-          }
-        }
-      } catch (_e) { /* tenta de novo no próximo tick */ }
-      await new Promise((r) => setTimeout(r, INTERVAL_MS));
-    }
-    return null;
-  };
-
   const generateReport = async (forceRegenerate = false) => {
     if (!selectedAssessmentId || !selectedDestination) {
       toast.error('Selecione um diagnóstico calculado');
@@ -246,33 +209,21 @@ export default function Relatorios() {
 
     setIsGenerating(true);
     setReport('');
-    setGenerationStage('Conectando ao servidor…');
-    const generationStartedAt = Date.now();
-
-    // ── Watchdog anti-travamento ───────────────────────────────────
-    // 1) timeout duro absoluto: 240s (relatório longo + LLM)
-    // 2) watchdog de inatividade: aborta se não chegar chunk em 90s
-    const controller = new AbortController();
-    generationAbortRef.current = controller;
-    const HARD_TIMEOUT_MS = 240_000;
-    const IDLE_TIMEOUT_MS = 90_000;
-    const hardTimer = window.setTimeout(() => {
-      controller.abort(new DOMException('hard-timeout', 'AbortError'));
-    }, HARD_TIMEOUT_MS);
-    let idleTimer = window.setTimeout(() => {
-      controller.abort(new DOMException('idle-timeout', 'AbortError'));
-    }, IDLE_TIMEOUT_MS);
-    const resetIdle = () => {
-      window.clearTimeout(idleTimer);
-      idleTimer = window.setTimeout(() => {
-        controller.abort(new DOMException('idle-timeout', 'AbortError'));
-      }, IDLE_TIMEOUT_MS);
-    };
+    setGenerationStage('Enfileirando geração…');
+    cancelGenerationRef.current = false;
 
     const pillarScoresMap: Record<string, { score: number; severity: string }> = {};
     pillarScores?.forEach(ps => {
       pillarScoresMap[ps.pillar] = { score: ps.score, severity: ps.severity };
     });
+
+    // v1.38.31 — Modo BACKGROUND: a edge function cria um job em report_jobs,
+    // responde 202 com { jobId } imediatamente e processa via
+    // EdgeRuntime.waitUntil. O front faz polling em report_jobs até
+    // status 'completed' ou 'failed' — sem manter conexão SSE longa,
+    // imune a timeouts de proxy/aba/rede.
+    const POLL_INTERVAL_MS = 4_000;
+    const POLL_DEADLINE_MS = 10 * 60 * 1000; // 10 minutos de teto
 
     try {
       const resp = await fetch(REPORT_URL, {
@@ -292,147 +243,80 @@ export default function Relatorios() {
           visibility: reportVisibility,
           environment: runInDemo ? 'demo' : 'production',
           enableComparison,
+          mode: 'background',
         }),
-        signal: controller.signal,
       });
-      resetIdle();
-      setGenerationStage('Recebendo conteúdo do modelo…');
 
       if (!resp.ok) {
         const errorData = await resp.json();
         throw new Error(errorData.error || 'Erro ao gerar relatório');
       }
 
-      // Check if the response is JSON (skipped) or SSE stream
-      const contentType = resp.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        const data = await resp.json();
-        if (data.skipped) {
-          toast.info(data.message || 'Não há dados novos. Use "Regenerar" para forçar.', { duration: 5000 });
-          // Load existing report
-          const { data: existing } = await supabase
-            .from('generated_reports')
-            .select('report_content')
-            .eq('assessment_id', selectedAssessmentId)
-            .maybeSingle();
-          if (existing?.report_content) {
-            setReport(existing.report_content);
-          }
+      const enqueued = await resp.json();
+      // Caso o backend tenha pulado (não há dados novos) — mantém atalho.
+      if (enqueued?.skipped) {
+        toast.info(enqueued.message || 'Não há dados novos. Use "Regenerar" para forçar.', { duration: 5000 });
+        const { data: existing } = await supabase
+          .from('generated_reports')
+          .select('report_content')
+          .eq('assessment_id', selectedAssessmentId)
+          .maybeSingle();
+        if (existing?.report_content) setReport(existing.report_content);
+        return;
+      }
+      const jobId = enqueued?.jobId as string | undefined;
+      if (!jobId) throw new Error('Servidor não retornou um identificador de job.');
+
+      setGenerationStage('Geração em andamento no servidor…');
+
+      // Polling do job. O job é atualizado pelo background task da edge function.
+      const pollDeadline = Date.now() + POLL_DEADLINE_MS;
+      let finalReportId: string | null = null;
+      let lastStage = '';
+      while (Date.now() < pollDeadline) {
+        await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+        if (cancelGenerationRef.current) {
+          toast.info('Acompanhamento cancelado. A geração continua no servidor — confira o histórico em alguns minutos.');
           return;
         }
-      }
-
-      if (!resp.body) throw new Error('Resposta sem corpo');
-
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let textBuffer = '';
-      let reportContent = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        resetIdle();
-        
-        textBuffer += decoder.decode(value, { stream: true });
-
-        let newlineIndex: number;
-        while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
-          let line = textBuffer.slice(0, newlineIndex);
-          textBuffer = textBuffer.slice(newlineIndex + 1);
-
-          if (line.endsWith('\r')) line = line.slice(0, -1);
-          if (line.startsWith(':') || line.trim() === '') continue;
-          if (!line.startsWith('data: ')) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === '[DONE]') break;
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              reportContent += content;
-              setReport(reportContent);
-            }
-          } catch {
-            textBuffer = line + '\n' + textBuffer;
-            break;
-          }
+        const { data: job } = await supabase
+          .from('report_jobs')
+          .select('status, stage, progress_pct, report_id, error_message')
+          .eq('id', jobId)
+          .maybeSingle();
+        if (!job) continue;
+        if (job.stage && job.stage !== lastStage) {
+          lastStage = job.stage;
+          setGenerationStage(`${job.stage}${job.progress_pct ? ` (${job.progress_pct}%)` : ''}`);
+        }
+        if (job.status === 'completed') {
+          finalReportId = job.report_id ?? null;
+          break;
+        }
+        if (job.status === 'failed') {
+          throw new Error(job.error_message || 'Falha na geração em segundo plano.');
         }
       }
-
-      // Final flush
-      if (textBuffer.trim()) {
-        for (let raw of textBuffer.split('\n')) {
-          if (!raw) continue;
-          if (raw.endsWith('\r')) raw = raw.slice(0, -1);
-          if (raw.startsWith(':') || raw.trim() === '') continue;
-          if (!raw.startsWith('data: ')) continue;
-          const jsonStr = raw.slice(6).trim();
-          if (jsonStr === '[DONE]') continue;
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              reportContent += content;
-              setReport(reportContent);
-            }
-          } catch { /* ignore */ }
-        }
+      if (!finalReportId) {
+        throw new Error('Geração demorou mais que o esperado. Confira o histórico em alguns minutos.');
       }
+
+      // Carrega conteúdo final
+      const { data: finalReport } = await supabase
+        .from('generated_reports')
+        .select('report_content')
+        .eq('id', finalReportId)
+        .maybeSingle();
+      if (finalReport?.report_content) setReport(finalReport.report_content);
 
       toast.success('Relatório gerado e salvo com sucesso!');
-      // Refresh reports list and destinations with report data
       queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
       queryClient.invalidateQueries({ queryKey: ['destinations-with-report-data'] });
     } catch (error) {
-      const isAbort = (error as any)?.name === 'AbortError';
-      const reason = (error as any)?.message || '';
       console.error('Error generating report:', error);
-      // v1.38.30 — Recuperação automática quando o stream SSE cai mas a edge
-      // function continua finalizando em background via EdgeRuntime.waitUntil.
-      // Em vez de só avisar o usuário, fazemos polling em generated_reports
-      // pelo assessment_id por até ~3 min para "pegar" o relatório que terminou
-      // de salvar mesmo após a conexão ser encerrada.
-      const userCanceled = isAbort && reason !== 'idle-timeout' && reason !== 'hard-timeout';
-      if (userCanceled) {
-        toast.info('Geração cancelada.');
-      } else if (isAbort || !(error instanceof Error && /4\d\d|5\d\d/.test(error.message))) {
-        // idle-timeout, hard-timeout ou erro de rede — tentar recuperar
-        const recoveryToastId = toast.loading(
-          'A conexão caiu, mas o relatório pode estar sendo finalizado no servidor. Recuperando…',
-          { duration: 180_000 },
-        );
-        setGenerationStage('Recuperando relatório do servidor…');
-        const recovered = await pollForBackgroundReport(selectedAssessmentId, generationStartedAt);
-        toast.dismiss(recoveryToastId);
-        if (recovered) {
-          setReport(recovered);
-          toast.success('Relatório recuperado com sucesso! Foi finalizado em segundo plano.');
-          queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
-          queryClient.invalidateQueries({ queryKey: ['destinations-with-report-data'] });
-        } else {
-          if (isAbort && reason === 'hard-timeout') {
-            toast.error(
-              'A geração ultrapassou 4 minutos e não retornou. Verifique o histórico em alguns minutos antes de tentar de novo.',
-              { duration: 8000 },
-            );
-          } else {
-            toast.error(
-              'Não foi possível recuperar o relatório automaticamente. Verifique o histórico em alguns minutos antes de gerar de novo.',
-              { duration: 8000 },
-            );
-          }
-          queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
-        }
-      } else {
-        toast.error(error instanceof Error ? error.message : 'Erro ao gerar relatório');
-      }
+      toast.error(error instanceof Error ? error.message : 'Erro ao gerar relatório');
+      queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
     } finally {
-      window.clearTimeout(hardTimer);
-      window.clearTimeout(idleTimer);
-      generationAbortRef.current = null;
       setGenerationStage('');
       setIsGenerating(false);
     }
