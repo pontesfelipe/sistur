@@ -349,6 +349,50 @@ async function fetchANACFromCache(
   return results;
 }
 
+// ─── 2d. CADÚNICO/MDS — População de baixa renda (cache mensal) ─────────
+// Lê o cache da tabela `cadunico_municipio_cache` (atualizada mensalmente pela
+// edge function `ingest-cadunico` via API SAGI Solr pública). Sobrepõe o
+// indicador `igma_populacao_de_baixa_renda` que antes vinha do IBGE
+// (Incidência de Pobreza, tabela 36/30246) com dado oficial MDS atualizado
+// mensalmente. Sem necessidade de token federal.
+async function fetchCADUNICOFromCache(
+  supabase: any,
+  ibgeCode: string,
+): Promise<Record<string, IndicatorResult>> {
+  const results: Record<string, IndicatorResult> = {};
+  try {
+    const code7 = ibgeCode.length === 7 ? ibgeCode : ibgeCode.padStart(7, '0');
+    const code6 = code7.slice(0, 6);
+    const { data, error } = await supabase
+      .from('cadunico_municipio_cache')
+      .select('pct_pop_baixa_renda, pessoas_baixa_renda, populacao_referencia, anomes, reference_year')
+      .or(`ibge_code_6.eq.${code6},ibge_code_7.eq.${code7}`)
+      .order('fetched_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) {
+      console.warn('[CADÚNICO cache] read error:', error.message);
+      return results;
+    }
+    if (!data) {
+      console.log(`[CADÚNICO cache] sem registro para IBGE ${ibgeCode}`);
+      return results;
+    }
+    const pct = Number(data.pct_pop_baixa_renda);
+    if (!isFinite(pct) || pct <= 0) return results;
+    results['igma_populacao_de_baixa_renda'] = {
+      value: Math.round(pct * 100) / 100,
+      year: data.reference_year || new Date().getFullYear(),
+      source: 'CADUNICO',
+      real: true,
+    };
+    console.log(`[CADÚNICO cache] igma_populacao_de_baixa_renda = ${pct}% (anomes ${data.anomes})`);
+  } catch (e) {
+    console.warn('[CADÚNICO cache] exception:', e instanceof Error ? e.message : e);
+  }
+  return results;
+}
+
 async function fetchSIDRASaneamento(ibgeCode: string): Promise<Record<string, IndicatorResult>> {
 
   const results: Record<string, IndicatorResult> = {};
@@ -674,13 +718,18 @@ Deno.serve(async (req) => {
     const anacData = await fetchANACFromCache(supabaseClient, ibge_code);
     console.log(`ANAC cache: ${Object.keys(anacData).length} indicators`);
 
+    // 3d. Lê cache CADÚNICO/MDS (atualizado mensalmente por ingest-cadunico)
+    //     — sobrepõe igma_populacao_de_baixa_renda com dado oficial MDS.
+    const caduData = await fetchCADUNICOFromCache(supabaseClient, ibge_code);
+    console.log(`CADÚNICO cache: ${Object.keys(caduData).length} indicators`);
+
     // 4. Fetch Mapa do Turismo data (categoria, região turística)
     const mapaTurismoData = await fetchMapaTurismo(supabaseClient, ibge_code);
     console.log(`Mapa Turismo: ${Object.keys(mapaTurismoData).length} indicators`);
 
     // 5. Merge real data
-    // Ordem importa: DATASUS sobrepõe leitos do IBGE (fonte primária para leitos hospitalares)
-    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...datasusData, ...anacData, ...mapaTurismoData };
+    // Ordem importa: DATASUS sobrepõe leitos do IBGE; CADÚNICO sobrepõe pobreza do IBGE.
+    const realData: Record<string, IndicatorResult> = { ...agregadosData, ...pesquisasData, ...sidraData, ...datasusData, ...anacData, ...caduData, ...mapaTurismoData };
     const realCount = Object.keys(realData).length;
     console.log(`Total real: ${realCount} indicators`);
 
