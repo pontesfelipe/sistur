@@ -126,6 +126,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const { indicators, isLoading: loadingIndicators } = useIndicators({
     scope: isEnterpriseAssessment ? 'enterprise' : 'territorial',
     tier: assessmentTier,
+    includeMandala: Boolean((selectedAssessmentData as any)?.expand_with_mandala),
   });
 
   const { profile } = useProfile();
