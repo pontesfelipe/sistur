@@ -247,7 +247,7 @@ export function DataValidationPanel({
 
     const codeToId = new Map((indicatorRows || []).map(r => [r.code, r.id]));
     const valuesToPersist = validatedValues
-      .filter(v => v.raw_value !== null && v.raw_value !== undefined && codeToId.has(v.indicator_code))
+      .filter(v => v.raw_value !== null && v.raw_value !== undefined && Number.isFinite(Number(v.raw_value)) && codeToId.has(v.indicator_code))
       .map(v => ({
         assessment_id: assessmentId,
         indicator_id: codeToId.get(v.indicator_code)!,
