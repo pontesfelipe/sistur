@@ -36,6 +36,79 @@ interface Props {
 export function ReportValidationBanner({ reportId, assessmentId }: Props) {
   const [open, setOpen] = useState(false);
 
+  const buildExportText = (
+    corrections: AutoCorrection[],
+    determIssues: string[],
+    aiIssues: string[],
+    validatorVersion: string | null,
+  ) => {
+    const lines: string[] = [];
+    const now = new Date().toLocaleString('pt-BR');
+    lines.push('CONFERÊNCIA DE DADOS — RELATÓRIO SISTUR');
+    lines.push('='.repeat(60));
+    lines.push(`Exportado em: ${now}`);
+    if (validatorVersion) lines.push(`Validador: ${validatorVersion}`);
+    if (reportId) lines.push(`Relatório: ${reportId}`);
+    if (assessmentId) lines.push(`Diagnóstico: ${assessmentId}`);
+    lines.push('');
+    lines.push(`Correções automáticas aplicadas: ${corrections.length}`);
+    lines.push(`Avisos determinísticos: ${determIssues.length}`);
+    lines.push(`Pontos sinalizados pelo agente IA: ${aiIssues.length}`);
+    lines.push('');
+
+    if (corrections.length > 0) {
+      lines.push('-'.repeat(60));
+      lines.push('DIVERGÊNCIAS CORRIGIDAS AUTOMATICAMENTE');
+      lines.push('-'.repeat(60));
+      corrections.forEach((c, i) => {
+        lines.push(`${i + 1}. ${c.indicator}`);
+        lines.push(`   Problema: IA citou "${c.from}" (divergente da tabela oficial)`);
+        lines.push(`   Resolução: substituído por "${c.to}" (fonte oficial)`);
+        lines.push('');
+      });
+    }
+
+    if (determIssues.length > 0) {
+      lines.push('-'.repeat(60));
+      lines.push('AVISOS DETERMINÍSTICOS (revisão manual)');
+      lines.push('-'.repeat(60));
+      determIssues.forEach((w, i) => lines.push(`${i + 1}. ${w}`));
+      lines.push('');
+    }
+
+    if (aiIssues.length > 0) {
+      lines.push('-'.repeat(60));
+      lines.push('SINALIZADOS PELO AGENTE IA VALIDADOR');
+      lines.push('-'.repeat(60));
+      aiIssues.forEach((w, i) => lines.push(`${i + 1}. ${w}`));
+      lines.push('');
+    }
+
+    lines.push('-'.repeat(60));
+    lines.push('A tabela de auditoria do diagnóstico é a fonte de verdade para valores numéricos.');
+    lines.push('Correções automáticas já foram aplicadas no texto do relatório.');
+    return lines.join('\n');
+  };
+
+  const handleDownload = (
+    corrections: AutoCorrection[],
+    determIssues: string[],
+    aiIssues: string[],
+    validatorVersion: string | null,
+  ) => {
+    const text = buildExportText(corrections, determIssues, aiIssues, validatorVersion);
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `conferencia-de-dados-${stamp}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const { data } = useQuery<ReportValidationRow | null>({
     queryKey: ['report-validation', reportId ?? null, assessmentId ?? null],
     enabled: Boolean(reportId || assessmentId),
