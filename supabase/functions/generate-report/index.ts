@@ -1276,6 +1276,7 @@ async function runReportPipeline(args: {
   userId: string;
   jobId: string;
   authHeader: string;
+  aiProvider?: 'auto' | 'claude' | 'gpt5' | 'gemini';
 }): Promise<{ reportId: string | null }> {
   const { supabaseAdmin, assessment, assessmentId, destinationName, jobId } = args;
 
@@ -1331,6 +1332,7 @@ async function runReportPipeline(args: {
         enableComparison: args.enableComparison,
         mode: 'stream',
         backgroundRun: true,
+        aiProvider: args.aiProvider ?? 'auto',
       }),
       signal: streamController.signal,
     });
