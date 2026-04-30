@@ -918,6 +918,31 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
             {/* Form Tab */}
             <TabsContent value="formulario" className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border bg-card p-3">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <ListFilter className="h-4 w-4" />
+                  <span>{unfilledCount} indicador{unfilledCount === 1 ? '' : 'es'} não preenchido{unfilledCount === 1 ? '' : 's'}</span>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={fillFilter === 'all' ? 'default' : 'outline'}
+                    onClick={() => setFillFilter('all')}
+                  >
+                    Todos
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={fillFilter === 'unfilled' ? 'default' : 'outline'}
+                    onClick={() => setFillFilter('unfilled')}
+                  >
+                    Não preenchidos
+                  </Button>
+                </div>
+              </div>
+
               {Object.keys(editedValues).length > 0 && (() => {
                 const errorCount = Object.entries(validationErrors).filter(([id, err]) => err && editedValues[id]).length;
                 return (
