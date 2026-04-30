@@ -199,8 +199,10 @@ export function useFetchOfficialData() {
         .eq('org_id', orgId)
         .eq('validated', true);
       const validatedSnapshot = new Map<string, number | null>();
+      const validatedIdsByCode = new Map<string, string>();
       (previouslyValidated || []).forEach((row: any) => {
         validatedSnapshot.set(row.indicator_code, row.raw_value);
+        validatedIdsByCode.set(row.indicator_code, row.id);
       });
 
       // Fire core sources in parallel: IBGE + CADASTUR + Mapa do Turismo bridge + ANA
@@ -261,6 +263,11 @@ export function useFetchOfficialData() {
              Number(oldVal) === Number(row.raw_value));
           if (same) toReValidateIds.push(row.id);
           else toInvalidateIds.push(row.id);
+        });
+        Array.from(validatedIdsByCode.entries()).forEach(([code, id]) => {
+          if (!(refreshed || []).some((row: any) => row.indicator_code === code)) {
+            toReValidateIds.push(id);
+          }
         });
         if (toReValidateIds.length > 0) {
           await supabase

@@ -36,7 +36,7 @@ import {
   useUnvalidateIndicatorValues,
 } from '@/hooks/useOfficialData';
 import { useAuth } from '@/hooks/useAuth';
-import { useIndicators } from '@/hooks/useIndicators';
+import { useIndicatorValues, useIndicators } from '@/hooks/useIndicators';
 import {
   EMPTY_SELECT_VALUE,
   formatIndicatorFieldDisplayValue,
@@ -103,6 +103,7 @@ export function DataValidationPanel({
   const [editedValues, setEditedValues] = useState<Record<string, number | null>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmedIds, setConfirmedIds] = useState<Set<string>>(new Set());
+  const [manuallyUnvalidatedIds, setManuallyUnvalidatedIds] = useState<Set<string>>(new Set());
   const [autoFetched, setAutoFetched] = useState(false);
   const [anaIqaStatus, setAnaIqaStatus] = useState<'success' | 'unavailable' | null>(null);
   const queryClient = useQueryClient();
@@ -111,6 +112,7 @@ export function DataValidationPanel({
   const fetchOfficialData = useFetchOfficialData();
   const validateValues = useValidateIndicatorValues();
   const unvalidateValues = useUnvalidateIndicatorValues();
+  const { values: assessmentValues = [] } = useIndicatorValues(assessmentId || undefined);
 
   // Catalog of indicators (used to display friendly names instead of raw codes)
   const { indicators: indicatorCatalog = [] } = useIndicators({ scope: 'all' });
@@ -152,12 +154,35 @@ export function DataValidationPanel({
     );
   }, [ibgeCode, orgId, autoFetched, includeMandala, isLoading, rawValues]);
 
-  // Mirror the persisted validation state exactly. This keeps rows validated
-  // after returning to this step, and also removes the local confirmation when
-  // the user explicitly devalidates a value to edit it again.
+  const assessmentValueByCode = useMemo(() => {
+    const map = new Map<string, number | null>();
+    assessmentValues.forEach((value: any) => {
+      const code = value?.indicator?.code;
+      if (code) map.set(code, value.value_raw ?? null);
+    });
+    return map;
+  }, [assessmentValues]);
+
+  const isPersistedInAssessment = (value: ExternalIndicatorValue) => {
+    if (!assessmentId || !assessmentValueByCode.has(value.indicator_code)) return false;
+    const savedValue = assessmentValueByCode.get(value.indicator_code);
+    if (savedValue === null || savedValue === undefined || value.raw_value === null || value.raw_value === undefined) {
+      return savedValue === value.raw_value;
+    }
+    return Number(savedValue) === Number(value.raw_value);
+  };
+
+  // Mirror the persisted validation state for the source row, but also honor
+  // the current assessment's saved indicator_values. This prevents a resumed
+  // diagnostic from asking for revalidation when the official value was already
+  // accepted and copied into that specific assessment.
   useEffect(() => {
-    setConfirmedIds(new Set((rawValues || []).filter(v => (v as any).validated).map(v => v.id)));
-  }, [rawValues]);
+    setConfirmedIds(new Set(
+      (rawValues || [])
+        .filter(v => !manuallyUnvalidatedIds.has(v.id) && ((v as any).validated || isPersistedInAssessment(v)))
+        .map(v => v.id)
+    ));
+  }, [rawValues, assessmentValueByCode, assessmentId, manuallyUnvalidatedIds]);
 
   const values = useMemo(
     () => rawValues.filter(isOfficialPreFilledValue),
@@ -195,7 +220,7 @@ export function DataValidationPanel({
       // Only select rows that have NOT yet been confirmed/validated, so the
       // user doesn't accidentally re-validate (and thus re-stamp) data they
       // already approved in a previous session.
-      setSelectedIds(new Set(values.filter(v => !confirmedIds.has(v.id)).map(v => v.id)));
+      setSelectedIds(new Set(values.filter(v => !isValueConfirmed(v)).map(v => v.id)));
     } else {
       setSelectedIds(new Set());
     }
@@ -223,11 +248,12 @@ export function DataValidationPanel({
 
     const codeToId = new Map((indicatorRows || []).map(r => [r.code, r.id]));
     const valuesToPersist = validatedValues
-      .filter(v => v.raw_value !== null && codeToId.has(v.indicator_code))
+      .filter(v => v.raw_value !== null && v.raw_value !== undefined && Number.isFinite(Number(v.raw_value)) && codeToId.has(v.indicator_code))
       .map(v => ({
         assessment_id: assessmentId,
         indicator_id: codeToId.get(v.indicator_code)!,
         value_raw: Number(v.raw_value),
+        value_text: v.raw_value_text || null,
         source: `Pré-preenchido (${v.source_code})`,
         org_id: orgId,
         reference_date: v.reference_year ? `${v.reference_year}-01-01` : null,
@@ -265,6 +291,11 @@ export function DataValidationPanel({
       selectedIds.forEach(id => next.add(id));
       return next;
     });
+    setManuallyUnvalidatedIds(prev => {
+      const next = new Set(prev);
+      selectedIds.forEach(id => next.delete(id));
+      return next;
+    });
     setSelectedIds(new Set());
 
     onValidationComplete(validatedValues);
@@ -277,10 +308,13 @@ export function DataValidationPanel({
       next.delete(id);
       return next;
     });
+    setManuallyUnvalidatedIds(prev => new Set(prev).add(id));
   };
 
-  const selectableValues = values.filter(v => !confirmedIds.has(v.id));
-  const validatedCount = confirmedIds.size;
+  const isValueConfirmed = (value: ExternalIndicatorValue) => !manuallyUnvalidatedIds.has(value.id) && (confirmedIds.has(value.id) || isPersistedInAssessment(value));
+
+  const selectableValues = values.filter(v => !isValueConfirmed(v));
+  const validatedCount = values.filter(isValueConfirmed).length;
   const pendingCount = values.length - validatedCount;
   const autoCount = values.length;
 
@@ -518,7 +552,7 @@ export function DataValidationPanel({
                     const sourceInfo = SOURCE_INFO[value.source_code];
                     const isEdited = editedValues[value.id] !== undefined;
                     const displayValue = isEdited ? editedValues[value.id] : value.raw_value;
-                    const isConfirmed = confirmedIds.has(value.id);
+                    const isConfirmed = isValueConfirmed(value);
                     const fieldConfig = getIndicatorFieldConfig({ code: value.indicator_code });
 
                     return (
