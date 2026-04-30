@@ -1286,8 +1286,11 @@ async function runReportPipeline(args: {
   const streamController = new AbortController();
   const streamStartedAt = Date.now();
   let lastStreamChunkAt = Date.now();
-  const STREAM_IDLE_TIMEOUT_MS = 2 * 60 * 1000;
-  const STREAM_HARD_TIMEOUT_MS = 8 * 60 * 1000;
+  // v1.38.33 — Idle timeout aumentado para 4min: Gemini 2.5-pro com prompts
+  // grandes (100+ indicadores) frequentemente passa 2-3min entre chunks
+  // durante validação determinística + persistência. Hard timeout em 12min.
+  const STREAM_IDLE_TIMEOUT_MS = 4 * 60 * 1000;
+  const STREAM_HARD_TIMEOUT_MS = 12 * 60 * 1000;
   const progressTimer = setInterval(() => {
     pct = Math.min(90, pct + 5);
     supabaseAdmin.from('report_jobs').update({
@@ -1365,6 +1368,26 @@ async function runReportPipeline(args: {
       throw new Error('Pipeline terminou sem salvar o relatório. A geração foi interrompida antes da persistência final.');
     }
     return { reportId };
+  } catch (err) {
+    // v1.38.33 — Recovery: se o stream foi abortado por timeout MAS o
+    // relatório já foi salvo (o pipeline interno persiste via background
+    // task antes de terminar de drenar o stream), considera sucesso.
+    const { data: row } = await supabaseAdmin
+      .from('generated_reports')
+      .select('id, created_at')
+      .eq('assessment_id', assessmentId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (row?.id) {
+      const savedAt = new Date(row.created_at).getTime();
+      // Considera apenas relatórios salvos durante esta execução (após start)
+      if (savedAt >= streamStartedAt - 5000) {
+        console.log('Stream interrompido, mas relatório foi persistido — recuperando job:', row.id);
+        return { reportId: row.id };
+      }
+    }
+    throw err;
   } finally {
     clearInterval(progressTimer);
     clearInterval(streamWatchdog);
