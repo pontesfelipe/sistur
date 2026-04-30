@@ -1337,6 +1337,94 @@ serve(async (req) => {
       });
     }
 
+    // ===== v1.38.31 — Modo background =====
+    // Quando o cliente pede background, devolvemos 202 imediatamente e
+    // processamos o pipeline inteiro via EdgeRuntime.waitUntil. O job é
+    // atualizado em report_jobs durante e ao final do processo.
+    if (mode === 'background') {
+      let jobId = incomingJobId as string | null;
+      if (!jobId) {
+        const { data: jobInsert, error: jobErr } = await supabaseAdmin
+          .from('report_jobs')
+          .insert({
+            org_id: assessment.org_id,
+            assessment_id: assessmentId,
+            destination_name: destinationName,
+            report_template: reportTemplate,
+            visibility,
+            environment,
+            status: 'queued',
+            stage: 'Aguardando início',
+            progress_pct: 0,
+            created_by: userId,
+          })
+          .select('id')
+          .maybeSingle();
+        if (jobErr || !jobInsert) {
+          console.error('Failed to create report_jobs row:', jobErr);
+          return new Response(JSON.stringify({ error: 'Não foi possível criar a fila de geração.' }), {
+            status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        jobId = jobInsert.id as string;
+      }
+
+      const backgroundJob = (async () => {
+        try {
+          await supabaseAdmin.from('report_jobs').update({
+            status: 'processing',
+            stage: 'Coletando dados do diagnóstico',
+            progress_pct: 10,
+            started_at: new Date().toISOString(),
+          }).eq('id', jobId);
+
+          const result = await runReportPipeline({
+            supabaseAdmin,
+            assessment,
+            assessmentId,
+            destinationName,
+            pillarScores,
+            issues,
+            prescriptions,
+            forceRegenerate,
+            reportTemplate,
+            visibility,
+            environment,
+            enableComparison,
+            userId,
+            jobId: jobId!,
+          });
+
+          await supabaseAdmin.from('report_jobs').update({
+            status: 'completed',
+            stage: 'Concluído',
+            progress_pct: 100,
+            report_id: result.reportId,
+            finished_at: new Date().toISOString(),
+          }).eq('id', jobId);
+        } catch (bgErr) {
+          console.error('Background pipeline failed:', bgErr);
+          await supabaseAdmin.from('report_jobs').update({
+            status: 'failed',
+            error_message: bgErr instanceof Error ? bgErr.message : String(bgErr),
+            finished_at: new Date().toISOString(),
+          }).eq('id', jobId);
+        }
+      })();
+
+      try {
+        // @ts-ignore - EdgeRuntime é global em Supabase Edge Functions
+        if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) {
+          // @ts-ignore
+          EdgeRuntime.waitUntil(backgroundJob);
+        }
+      } catch (_e) { /* ignore */ }
+
+      return new Response(JSON.stringify({ jobId, status: 'queued' }), {
+        status: 202, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const isEnterprise = assessment.diagnostic_type === 'enterprise';
     console.log('Diagnostic type:', assessment.diagnostic_type, 'Template:', reportTemplate);
 
