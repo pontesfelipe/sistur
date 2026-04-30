@@ -1490,6 +1490,7 @@ serve(async (req) => {
             enableComparison,
             userId,
             jobId: jobId!,
+            authHeader: authHeader!,
           });
 
           await supabaseAdmin.from('report_jobs').update({
