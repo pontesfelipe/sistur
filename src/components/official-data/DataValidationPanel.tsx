@@ -545,7 +545,7 @@ export function DataValidationPanel({
                     const sourceInfo = SOURCE_INFO[value.source_code];
                     const isEdited = editedValues[value.id] !== undefined;
                     const displayValue = isEdited ? editedValues[value.id] : value.raw_value;
-                    const isConfirmed = confirmedIds.has(value.id);
+                    const isConfirmed = isValueConfirmed(value);
                     const fieldConfig = getIndicatorFieldConfig({ code: value.indicator_code });
 
                     return (
