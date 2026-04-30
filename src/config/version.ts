@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 36,
+  patch: 37,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.37",
+    date: "2026-04-30",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — Conferência de dados ganhou botão 'Baixar' no Dialog 'Ver detalhes'. Gera um arquivo .txt formatado (`conferencia-de-dados-YYYY-MM-DD-HH-MM-SS.txt`) contendo: cabeçalho com data/hora de exportação, versão do validador, IDs do relatório e diagnóstico, contagem de correções automáticas, avisos determinísticos e pontos sinalizados pelo agente IA, e três blocos detalhados — (1) divergências corrigidas automaticamente com Problema/Resolução por indicador, (2) avisos determinísticos para revisão manual, (3) sinalizações do agente IA validador. Útil para anexar a atas, processos administrativos ou compartilhar com a equipe técnica sem precisar do acesso ao sistema. Implementação local no componente `ReportValidationBanner` via `Blob` + `URL.createObjectURL`, sem chamada extra ao backend."
+    ]
+  },
   {
     version: "1.38.36",
     date: "2026-04-30",
