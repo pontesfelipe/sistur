@@ -2456,7 +2456,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               ai_issues: aiIssues,
               auto_corrections: autoCorrections,
               total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
-              validator_version: VALIDATOR_VERSION,
+              validator_version: appVersion,
             });
           } catch (vErr) {
             console.error('Failed to persist report_validations:', vErr);
