@@ -2562,17 +2562,20 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           const corrected = applyAutoCorrections(fullContent, auditTrail || []);
           const workingText = corrected.text;
           autoCorrections = corrected.corrections;
+          logger.stage('validation_deterministic_start');
           deterministic = [
             ...detectCoherenceWarnings(workingText, auditTrail || []),
             ...detectInventedReferences(workingText, auditTrail || []),
           ];
           await safeWrite(`: validating ${Date.now()}\n\n`);
+          logger.stage('validation_agent_start');
           aiIssues = await runReportValidatorAgent(
             workingText,
             auditTrail || [],
             LOVABLE_API_KEY,
             globalRefs,
           );
+          logger.stage('validation_agent_done', { aiIssues: aiIssues.length, deterministic: deterministic.length, autoCorrections: autoCorrections.length });
           const allIssues = [
             ...deterministic.map((w) => `[determinístico] ${w}`),
             ...aiIssues.map((w) => `[agente IA] ${w}`),
@@ -2585,11 +2588,12 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             ? 'auto_corrected'
             : (allIssues.length > 0 ? 'warnings' : 'clean');
           finalContent = workingText.replace(/\s*$/, '') + '\n';
-          if (hasAny) console.warn('Validation issues:', { autoCorrections, allIssues });
+          if (hasAny) logger.stage('validation_issues_summary', { autoCorrections: autoCorrections.length, allIssues: allIssues.length, status: validationStatus });
         } catch (cohErr) {
-          console.error('Coherence check failed (non-blocking):', cohErr);
+          logger.error('validation_failed_nonblocking', cohErr);
         }
 
+        logger.stage('persist_lookup_existing');
         const { data: existing } = await supabaseAdmin
           .from('generated_reports')
           .select('id')
@@ -2606,9 +2610,10 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
             .eq('id', existing.id);
           if (error) throw error;
-          console.log('Report updated successfully');
           savedReportId = existing.id;
           persistedReportId = existing.id;
+          logger.setReportId(savedReportId);
+          logger.stage('persist_updated', { id: savedReportId });
         } else {
           const { data: inserted, error } = await supabaseAdmin
             .from('generated_reports')
@@ -2616,9 +2621,10 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             .select('id')
             .maybeSingle();
           if (error) throw error;
-          console.log('Report saved successfully');
           savedReportId = inserted?.id ?? null;
           persistedReportId = savedReportId;
+          logger.setReportId(savedReportId);
+          logger.stage('persist_inserted', { id: savedReportId });
         }
 
         try {
@@ -2633,8 +2639,9 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
             validator_version: appVersion,
           });
+          logger.stage('persist_validations_inserted');
         } catch (vErr) {
-          console.error('Failed to persist report_validations:', vErr);
+          logger.error('persist_validations_failed', vErr);
         }
 
         try {
@@ -2658,10 +2665,12 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               assessment_id: assessmentId,
               validation_status: validationStatus,
               total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
+              trace_id: logger.traceId,
             },
           });
+          logger.stage('persist_audit_inserted');
         } catch (auditErr) {
-          console.error('Failed to insert audit_events for report_generated:', auditErr);
+          logger.error('persist_audit_failed', auditErr);
         }
 
         if (heartbeatTimer !== null) {
@@ -2669,9 +2678,10 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           heartbeatTimer = null;
         }
         await safeWrite(`: done ${Date.now()}\n\n`);
+        logger.stage('stream_closed_ok');
         if (streamOpen) await writer.close();
       } catch (err) {
-        console.error('Stream error:', err);
+        logger.error('stream_task_failed', err, { last_stage: logger.lastStage() });
         if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
         streamOpen = false;
         await writer.abort(err).catch(() => {});
