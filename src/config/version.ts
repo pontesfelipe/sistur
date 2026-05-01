@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 53,
+  patch: 54,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.54",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico → aba Indicadores → painel 'Procedência dos Dados' — classificação de 'Calculados' agora reconhece também os indicadores listados no catálogo `DERIVED_INDICATORS` (igma_ipcr, igma_ideb, igma_iptl, igma_iiet, igma_isemt, igma_leitos_hospedagem_por_habitante, tourism_revenue_per_capita), independentemente do `source` ou da trilha de auditoria. Antes, se o diagnóstico ainda não tivesse sido recalculado depois das versões que populam audit completo, todos os derivados apareciam como zero mesmo quando o valor existia. Observação: se o painel ainda mostrar 0 calculados após este fix, o diagnóstico precisa ser recalculado (botão 'Recalcular') para que a função `calculate-assessment` gere os valores derivados — eles dependem de inputs oficiais (ex.: PIB, população, visitantes) que precisam estar preenchidos primeiro."
+    ],
+  },
   {
     version: "1.38.53",
     date: "2026-05-01",
