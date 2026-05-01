@@ -1539,10 +1539,64 @@ async function runReportPipeline(args: {
     if (contentType.includes('application/json')) {
       const payload = await resp.json().catch(() => null);
       if (payload?.skipped) {
-        throw new Error('A geração foi reutilizada pelo cache interno. Clique em Regenerar para criar uma nova versão.');
+        // v1.38.46 — Não há dados novos desde o último relatório, mas o
+        // usuário explicitamente pediu uma nova geração (clicou em "Gerar
+        // Relatório"). Em vez de exigir uma ação manual de "Regenerar",
+        // refazemos a chamada interna automaticamente forçando regeneração.
+        if (!args.forceRegenerate) {
+          console.log('[runReportPipeline] Pipeline interno respondeu skipped — refazendo com forceRegenerate=true automaticamente.');
+          const retryResp = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: args.authHeader,
+            },
+            body: JSON.stringify({
+              assessmentId,
+              destinationName,
+              pillarScores: args.pillarScores,
+              issues: args.issues,
+              prescriptions: args.prescriptions,
+              forceRegenerate: true,
+              reportTemplate: args.reportTemplate,
+              visibility: args.visibility,
+              environment: args.environment,
+              enableComparison: args.enableComparison,
+              mode: 'stream',
+              backgroundRun: true,
+              aiProvider: args.aiProvider ?? 'auto',
+              appVersion: args.appVersion ?? VALIDATOR_VERSION_FALLBACK,
+            }),
+            signal: streamController.signal,
+          });
+          if (!retryResp.ok) {
+            const errText = await retryResp.text().catch(() => '');
+            throw new Error(`Pipeline interno falhou no retry (${retryResp.status}): ${errText.slice(0, 200)}`);
+          }
+          const retryCt = retryResp.headers.get('Content-Type') || '';
+          if (retryCt.includes('application/json')) {
+            const retryPayload = await retryResp.json().catch(() => null);
+            if (retryPayload?.reportId) return { reportId: retryPayload.reportId };
+            throw new Error('Pipeline interno retornou resposta inesperada no retry.');
+          }
+          // Drena o stream do retry e cai no polling abaixo.
+          if (retryResp.body) {
+            const reader = retryResp.body.getReader();
+            while (true) {
+              const { done } = await reader.read();
+              if (done) break;
+              lastStreamChunkAt = Date.now();
+            }
+          }
+          // Pula para o polling de generated_reports (mesmo fluxo do stream normal).
+        } else {
+          // Já era forceRegenerate=true e ainda assim retornou skipped — devolve o existente.
+          if (payload?.reportId) return { reportId: payload.reportId };
+          throw new Error('Pipeline interno respondeu skipped mesmo com forceRegenerate.');
+        }
       }
-      if (payload?.reportId) return { reportId: payload.reportId };
-      throw new Error('Pipeline interno retornou uma resposta inesperada ao finalizar a geração.');
+      else if (payload?.reportId) return { reportId: payload.reportId };
+      else throw new Error('Pipeline interno retornou uma resposta inesperada ao finalizar a geração.');
     }
     // Drena o stream até o fim para garantir que a persistência interna
     // (dentro do EdgeRuntime.waitUntil do endpoint stream) tenha tempo de rodar.

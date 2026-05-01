@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 46,
+  patch: 47,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.47",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — eliminação do erro 'A geração foi reutilizada pelo cache interno. Clique em Regenerar para criar uma nova versão.' que aparecia ao gerar relatório em background. Causa: quando o pipeline interno (chamada interna em modo `stream` dentro de `runReportPipeline`) detectava que o último relatório salvo era mais novo que `assessment.calculated_at` e `assessment.updated_at`, retornava `{ skipped: true }`. O `runReportPipeline` lançava esse erro pedindo ação manual de 'Regenerar', mas o usuário já havia clicado em 'Gerar Relatório' (intent explícito de nova geração) e a UI do background não expõe um botão 'Regenerar' nesse momento — o erro travava o fluxo sem saída. Correção em `supabase/functions/generate-report/index.ts`: quando o pipeline interno responde `skipped` e a chamada original NÃO veio com `forceRegenerate`, a edge function refaz a chamada interna automaticamente com `forceRegenerate: true` (transparente para o usuário, sem erro, sem ação manual). O caso degenerado de `skipped` mesmo com `forceRegenerate=true` devolve o `reportId` existente em vez de erro."
+    ],
+  },
   {
     version: "1.38.46",
     date: "2026-05-01",
