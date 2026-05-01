@@ -18,6 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { APP_VERSION } from '@/config/version';
 import { 
   FileText, 
   Sparkles, 
@@ -287,6 +288,11 @@ export default function Relatorios() {
           environment: runInDemo ? 'demo' : 'production',
           enableComparison,
           mode: 'background',
+          // v1.38.45 — sempre envia a versão atual do app para que o
+          // validador (`report_validations.validator_version`) reflita
+          // a versão vigente do sistema, evitando confusão com validações
+          // antigas vinculadas ao mesmo diagnóstico.
+          appVersion: `v${APP_VERSION.full}`,
           ...(isAdmin && aiProvider !== 'auto' ? { aiProvider } : {}),
         }),
       });

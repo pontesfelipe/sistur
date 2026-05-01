@@ -6,7 +6,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const VALIDATOR_VERSION = 'v1.38.39';
+// v1.38.45 — `VALIDATOR_VERSION` é apenas o fallback. O cliente envia
+// `appVersion` no body do request (ver `src/pages/Relatorios.tsx`) e esse
+// valor é usado por request, garantindo que a "Conferência de dados"
+// SEMPRE reflita a versão atual do app na hora da geração — sem depender
+// de um string hardcoded que envelhece a cada release.
+const VALIDATOR_VERSION_FALLBACK = 'v1.38.45';
 
 // ========== HELPER FUNCTIONS ==========
 
@@ -1465,6 +1470,7 @@ async function runReportPipeline(args: {
   jobId: string;
   authHeader: string;
   aiProvider?: 'auto' | 'claude' | 'gpt5' | 'gemini';
+  appVersion?: string;
 }): Promise<{ reportId: string | null }> {
   const { supabaseAdmin, assessment, assessmentId, destinationName, jobId } = args;
 
@@ -1521,6 +1527,7 @@ async function runReportPipeline(args: {
         mode: 'stream',
         backgroundRun: true,
         aiProvider: args.aiProvider ?? 'auto',
+        appVersion: args.appVersion ?? VALIDATOR_VERSION_FALLBACK,
       }),
       signal: streamController.signal,
     });
@@ -1657,7 +1664,16 @@ serve(async (req) => {
       // Valores: 'auto' | 'claude' | 'gpt5' | 'gemini'. Default 'auto'
       // mantém a cadeia padrão Claude → GPT-5 → Gemini.
       aiProvider: requestedProvider = 'auto',
+      // v1.38.45 — versão do app vigente no cliente. Usada para carimbar
+      // `report_validations.validator_version` por request, evitando que
+      // a "Conferência de dados" exibida na UI mostre uma string antiga
+      // hardcoded no servidor.
+      appVersion: rawAppVersion,
     } = await req.json();
+
+    const appVersion: string = (typeof rawAppVersion === 'string' && /^v?\d+\.\d+\.\d+/.test(rawAppVersion))
+      ? (rawAppVersion.startsWith('v') ? rawAppVersion : `v${rawAppVersion}`)
+      : VALIDATOR_VERSION_FALLBACK;
 
     // Valida que somente ADMIN pode forçar provedor — para usuários comuns
     // o valor é silenciosamente reduzido a 'auto'.
@@ -1757,6 +1773,7 @@ serve(async (req) => {
             jobId: jobId!,
             authHeader: authHeader!,
             aiProvider: aiProviderOverride,
+            appVersion,
           });
 
           await supabaseAdmin.from('report_jobs').update({
@@ -2442,7 +2459,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               ai_issues: aiIssues,
               auto_corrections: autoCorrections,
               total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
-              validator_version: VALIDATOR_VERSION,
+              validator_version: appVersion,
             });
           } catch (vErr) {
             console.error('Failed to persist report_validations:', vErr);
