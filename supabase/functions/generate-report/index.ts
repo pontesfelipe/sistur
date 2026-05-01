@@ -1533,6 +1533,7 @@ async function runReportPipeline(args: {
       if (payload?.skipped) {
         throw new Error('A geração foi reutilizada pelo cache interno. Clique em Regenerar para criar uma nova versão.');
       }
+      if (payload?.reportId) return { reportId: payload.reportId };
     }
     // Drena o stream até o fim para garantir que a persistência interna
     // (dentro do EdgeRuntime.waitUntil do endpoint stream) tenha tempo de rodar.
@@ -2374,6 +2375,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               workingText,
               auditTrail || [],
               LOVABLE_API_KEY,
+              globalRefs,
             );
             const allIssues = [
               ...deterministic.map((w) => `[determinístico] ${w}`),
