@@ -32,7 +32,7 @@ import {
 } from 'docx';
 import { saveAs } from 'file-saver';
 import type { ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
-import { getStatusStyle, mapIndicatorTableColumns } from '@/lib/reportStatusStyle';
+import { getStatusStyle, mapIndicatorTableColumns, realignIndicatorRow } from '@/lib/reportStatusStyle';
 
 // --- ABNT constants (1cm ≈ 567 DXA, 1pt = 2 half-points) ---
 const CM = 567;
@@ -109,7 +109,10 @@ function parseMarkdownTable(lines: string[], primaryColor: string): (Paragraph |
   const headerFill = tint(primaryColor, 0.78); // soft tint of institutional color
 
   const rows = dataLines.map((line, rowIdx) => {
-    const cells = parseRow(line);
+    const rawCells = parseRow(line);
+    const cells = rowIdx === 0
+      ? rawCells
+      : realignIndicatorRow(rawCells, headers, colMap);
     const isHeader = rowIdx === 0;
     return new TableRow({
       children: Array.from({ length: colCount }, (_, ci) => {
