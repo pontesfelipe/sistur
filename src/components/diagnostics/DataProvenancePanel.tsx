@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Database, CheckCircle2, Calculator, PenLine, Globe2 } from 'lucide-react';
+import { isDerivedIndicator } from '@/data/derivedIndicators';
 
 interface Props {
   indicatorValues: any[];
@@ -38,7 +39,8 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
       const method = (v.collection_method || '').toString().toUpperCase();
       const OFFICIAL_TOKENS = ['IBGE', 'CADASTUR', 'STN', 'DATASUS', 'MAPA_TURISMO', 'MAPA DO TURISMO', 'INEP', 'ANATEL', 'TSE', 'ANA', 'ANAC', 'CADUNICO'];
       const hasOfficialToken = OFFICIAL_TOKENS.some(t => src.includes(t));
-      const isDerived = auditType.startsWith('DERIVED') || src.includes('+IBGE') || src.includes('DERIVADO') || src.includes('CALCULADO') || method === 'DERIVED' || v._source === 'derived';
+      const isInDerivedCatalog = indicatorCode ? isDerivedIndicator(String(indicatorCode)) : false;
+      const isDerived = isInDerivedCatalog || auditType.startsWith('DERIVED') || src.includes('+IBGE') || src.includes('DERIVADO') || src.includes('CALCULADO') || method === 'DERIVED' || v._source === 'derived';
       const isOfficial = !isDerived && (auditType.startsWith('OFFICIAL_API') || hasOfficialToken || src.includes('PRÉ-PREENCHIDO') || src.includes('PRE-PREENCHIDO'));
       const isManual = method === 'MANUAL' || src === 'MANUAL' || src.includes('MANUAL') || (!hasOfficialToken && !isDerived && !isOfficial && src.length > 0);
       return { isDerived, isOfficial, isManual };
