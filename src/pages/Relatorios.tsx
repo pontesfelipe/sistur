@@ -803,12 +803,13 @@ export default function Relatorios() {
                           </SelectItem>
                         ) : (
                           filteredCalculatedAssessments.map((assessment) => {
+                            const meta = assessment as typeof assessment & AssessmentDisplayMeta;
                             const dest = destinations?.find(d => d.id === assessment.destination_id)
-                              ?? { name: (assessment as any).destinations?.name || 'Destino' };
+                              ?? { name: meta.destinations?.name || 'Destino' };
                             const calcDate = assessment.calculated_at 
                               ? format(new Date(assessment.calculated_at), "dd/MM/yy", { locale: ptBR })
                               : format(new Date(assessment.created_at), "dd/MM/yy", { locale: ptBR });
-                            const creatorName = (assessment as any).creator?.full_name;
+                            const creatorName = meta.creator?.full_name;
                             return (
                               <SelectItem key={assessment.id} value={assessment.id}>
                                 <span className="flex items-center gap-2">
