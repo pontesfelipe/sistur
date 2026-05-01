@@ -1527,6 +1527,13 @@ async function runReportPipeline(args: {
       const errText = await resp.text().catch(() => '');
       throw new Error(`Pipeline interno falhou (${resp.status}): ${errText.slice(0, 200)}`);
     }
+    const contentType = resp.headers.get('Content-Type') || '';
+    if (contentType.includes('application/json')) {
+      const payload = await resp.json().catch(() => null);
+      if (payload?.skipped) {
+        throw new Error('A geração foi reutilizada pelo cache interno. Clique em Regenerar para criar uma nova versão.');
+      }
+    }
     // Drena o stream até o fim para garantir que a persistência interna
     // (dentro do EdgeRuntime.waitUntil do endpoint stream) tenha tempo de rodar.
     if (resp.body) {
@@ -1565,6 +1572,7 @@ async function runReportPipeline(args: {
       .from('generated_reports')
       .select('id, created_at')
       .eq('assessment_id', assessmentId)
+      .gte('created_at', new Date(streamStartedAt - 5000).toISOString())
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
