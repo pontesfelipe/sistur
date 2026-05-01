@@ -102,10 +102,26 @@ export function useReportJobWatcher() {
   const pollOnce = useCallback(async (entry: PendingJob) => {
     const { data: job } = await supabase
       .from('report_jobs')
-      .select('status, report_id, error_message')
+      .select('status, report_id, error_message, created_at, started_at, finished_at')
       .eq('id', entry.jobId)
       .maybeSingle();
     if (!job) return;
+    const startedAt = job.started_at ? new Date(job.started_at).getTime() : entry.startedAt;
+    const ageMs = Date.now() - startedAt;
+    if (job.status === 'processing' && !job.finished_at && ageMs > 16 * 60 * 1000) {
+      stopPolling(entry.jobId);
+      removePending(entry.jobId);
+      const dest = entry.destinationName || 'Diagnóstico';
+      const msg = `Geração de ${dest} excedeu o tempo limite`;
+      toast.error(msg, {
+        description: 'O job ficou preso no servidor. Tente gerar novamente; se persistir, o histórico mostrará a falha técnica.',
+        duration: 12_000,
+      });
+      void maybeNotify('SISTUR — Relatório não concluído', msg);
+      queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
+      queryClient.invalidateQueries({ queryKey: ['destinations-with-report-data'] });
+      return;
+    }
     if (job.status === 'completed') {
       stopPolling(entry.jobId);
       removePending(entry.jobId);
