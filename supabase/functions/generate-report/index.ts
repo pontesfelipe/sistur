@@ -13,6 +13,76 @@ const corsHeaders = {
 // de um string hardcoded que envelhece a cada release.
 const VALIDATOR_VERSION_FALLBACK = 'v1.38.50';
 
+// v1.38.52 — Logger estruturado para rastrear o pipeline de geração ponta-a-ponta.
+// Cada chamada estampa traceId (jobId quando disponível, senão um id aleatório),
+// assessmentId, reportId opcional, stage e tempo decorrido desde o início.
+// Também atualiza opcionalmente `report_jobs.stage` para que o estado fique
+// visível por SQL/UI sem depender só dos logs do Edge Function.
+type StageLogger = {
+  traceId: string;
+  startedAt: number;
+  stage: (name: string, extra?: Record<string, unknown>) => void;
+  error: (name: string, err: unknown, extra?: Record<string, unknown>) => void;
+  setReportId: (id: string | null | undefined) => void;
+  setAssessmentId: (id: string | null | undefined) => void;
+  setJobId: (id: string | null | undefined) => void;
+  bumpJobStage: (
+    supabaseAdmin: any,
+    name: string,
+    extra?: { progress_pct?: number },
+  ) => Promise<void>;
+  lastStage: () => string;
+};
+function createStageLogger(initial: {
+  traceId?: string;
+  assessmentId?: string | null;
+  reportId?: string | null;
+  jobId?: string | null;
+}): StageLogger {
+  let assessmentId = initial.assessmentId ?? null;
+  let reportId = initial.reportId ?? null;
+  let jobId = initial.jobId ?? null;
+  const traceId = initial.traceId ?? jobId ?? `trace_${Math.random().toString(36).slice(2, 10)}`;
+  const startedAt = Date.now();
+  let lastStage = 'init';
+  const fmtPrefix = () => {
+    const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
+    return `[trace=${traceId}][+${elapsed}s][asmt=${assessmentId ?? '-'}][report=${reportId ?? '-'}]`;
+  };
+  return {
+    traceId,
+    startedAt,
+    stage(name, extra) {
+      lastStage = name;
+      try {
+        console.log(`${fmtPrefix()}[stage=${name}]`, extra ? JSON.stringify(extra) : '');
+      } catch {
+        console.log(`${fmtPrefix()}[stage=${name}]`);
+      }
+    },
+    error(name, err, extra) {
+      lastStage = `${name}:error`;
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`${fmtPrefix()}[stage=${name}][ERROR] ${msg}`, extra ? JSON.stringify(extra) : '');
+    },
+    setReportId(id) { if (id) reportId = id; },
+    setAssessmentId(id) { if (id) assessmentId = id; },
+    setJobId(id) { if (id) jobId = id; },
+    async bumpJobStage(supabaseAdmin, name, extra) {
+      lastStage = name;
+      if (!jobId) return;
+      try {
+        const patch: Record<string, unknown> = { stage: `[trace=${traceId}] ${name}` };
+        if (extra?.progress_pct !== undefined) patch.progress_pct = extra.progress_pct;
+        await supabaseAdmin.from('report_jobs').update(patch).eq('id', jobId);
+      } catch (e) {
+        console.warn(`${fmtPrefix()}[bumpJobStage failed]`, e instanceof Error ? e.message : String(e));
+      }
+    },
+    lastStage: () => lastStage,
+  };
+}
+
 // ========== HELPER FUNCTIONS ==========
 
 /** Format number using Brazilian standard: comma for decimal, period for thousands */
@@ -1471,8 +1541,13 @@ async function runReportPipeline(args: {
   authHeader: string;
   aiProvider?: 'auto' | 'claude' | 'gpt5' | 'gemini';
   appVersion?: string;
+  logger?: StageLogger;
 }): Promise<{ reportId: string | null }> {
   const { supabaseAdmin, assessment, assessmentId, destinationName, jobId } = args;
+  const logger = args.logger ?? createStageLogger({ jobId, assessmentId, traceId: jobId });
+  logger.setJobId(jobId);
+  logger.setAssessmentId(assessmentId);
+  logger.stage('pipeline_start', { destinationName, template: args.reportTemplate });
 
   // Atualiza progresso enquanto o stream roda. Não conhecemos o tamanho final,
   // então simulamos um avanço logarítmico: 15% ao começar, +5% a cada 30s,
@@ -1490,14 +1565,23 @@ async function runReportPipeline(args: {
     pct = Math.min(90, pct + 5);
     supabaseAdmin.from('report_jobs').update({
       progress_pct: pct,
-      stage: pct < 50 ? 'Gerando narrativa com IA' : 'Validando coerência e persistindo',
+      stage: `[trace=${logger.traceId}] ${pct < 50 ? 'Gerando narrativa com IA' : 'Validando coerência e persistindo'}`,
     }).eq('id', jobId).then(() => {}, () => {});
   }, 30_000);
   const streamWatchdog = setInterval(() => {
     const now = Date.now();
     if (now - lastStreamChunkAt > STREAM_IDLE_TIMEOUT_MS) {
+      const idleSec = Math.round((now - lastStreamChunkAt) / 1000);
+      logger.error('stream_idle_timeout', new Error(`No chunk for ${idleSec}s`), {
+        last_stage: logger.lastStage(),
+        elapsed_sec: Math.round((now - streamStartedAt) / 1000),
+      });
       streamController.abort('internal-report-stream-idle-timeout');
     } else if (now - streamStartedAt > STREAM_HARD_TIMEOUT_MS) {
+      logger.error('stream_hard_timeout', new Error('Hard timeout reached'), {
+        last_stage: logger.lastStage(),
+        elapsed_sec: Math.round((now - streamStartedAt) / 1000),
+      });
       streamController.abort('internal-report-stream-hard-timeout');
     }
   }, 15_000);
@@ -1505,6 +1589,7 @@ async function runReportPipeline(args: {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const url = `${supabaseUrl}/functions/v1/generate-report`;
+    logger.stage('internal_fetch_start');
     const resp = await fetch(url, {
       method: 'POST',
       headers: {
@@ -1512,6 +1597,7 @@ async function runReportPipeline(args: {
         // Reusa o JWT do usuário original — o pipeline stream valida acesso
         // exatamente como na chamada original.
         Authorization: args.authHeader,
+        'x-trace-id': logger.traceId,
       },
       body: JSON.stringify({
         assessmentId,
@@ -1532,11 +1618,14 @@ async function runReportPipeline(args: {
         backgroundRun: false,
         aiProvider: args.aiProvider ?? 'auto',
         appVersion: args.appVersion ?? VALIDATOR_VERSION_FALLBACK,
+        traceId: logger.traceId,
       }),
       signal: streamController.signal,
     });
+    logger.stage('internal_fetch_headers', { status: resp.status, contentType: resp.headers.get('Content-Type') || '' });
     if (!resp.ok) {
       const errText = await resp.text().catch(() => '');
+      logger.error('internal_fetch_failed', new Error(`status ${resp.status}`), { body: errText.slice(0, 200) });
       throw new Error(`Pipeline interno falhou (${resp.status}): ${errText.slice(0, 200)}`);
     }
     const contentType = resp.headers.get('Content-Type') || '';
@@ -1606,17 +1695,22 @@ async function runReportPipeline(args: {
     // Drena o stream até o fim para garantir que a persistência interna
     // (dentro do EdgeRuntime.waitUntil do endpoint stream) tenha tempo de rodar.
     if (resp.body) {
+      logger.stage('drain_stream_start');
       const reader = resp.body.getReader();
+      let chunks = 0;
       while (true) {
         const { done } = await reader.read();
         if (done) break;
+        chunks++;
         lastStreamChunkAt = Date.now();
       }
+      logger.stage('drain_stream_done', { chunks });
     }
 
     // Polling curto: o endpoint stream salva via background task, então
     // pode haver alguns ms de defasagem entre o fim do stream e o INSERT
     // do generated_reports.
+    logger.stage('poll_generated_report_start');
     let reportId: string | null = null;
     for (let i = 0; i < 20; i++) {
       const { data: row } = await supabaseAdmin
@@ -1630,8 +1724,11 @@ async function runReportPipeline(args: {
       await new Promise((r) => setTimeout(r, 1000));
     }
     if (!reportId) {
+      logger.error('poll_generated_report_missed', new Error('Report row not found after stream'));
       throw new Error('Pipeline terminou sem salvar o relatório. A geração foi interrompida antes da persistência final.');
     }
+    logger.setReportId(reportId);
+    logger.stage('pipeline_done_via_polling');
     return { reportId };
   } catch (err) {
     // v1.38.33 — Recovery: se o stream foi abortado por timeout MAS o
@@ -1649,14 +1746,17 @@ async function runReportPipeline(args: {
       const savedAt = new Date(row.created_at).getTime();
       // Considera apenas relatórios salvos durante esta execução (após start)
       if (savedAt >= streamStartedAt - 5000) {
-        console.log('Stream interrompido, mas relatório foi persistido — recuperando job:', row.id);
+        logger.setReportId(row.id);
+        logger.stage('pipeline_recovered_after_abort', { id: row.id, last_stage: logger.lastStage() });
         return { reportId: row.id };
       }
     }
+    logger.error('pipeline_failed', err, { last_stage: logger.lastStage() });
     throw err;
   } finally {
     clearInterval(progressTimer);
     clearInterval(streamWatchdog);
+    logger.stage('pipeline_finally', { elapsed_sec: Math.round((Date.now() - streamStartedAt) / 1000) });
   }
 }
 
@@ -1672,6 +1772,7 @@ serve(async (req) => {
         status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    const incomingTraceId = req.headers.get('x-trace-id') || undefined;
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
@@ -1728,11 +1829,19 @@ serve(async (req) => {
       // a "Conferência de dados" exibida na UI mostre uma string antiga
       // hardcoded no servidor.
       appVersion: rawAppVersion,
+      traceId: bodyTraceId,
     } = await req.json();
 
     const appVersion: string = (typeof rawAppVersion === 'string' && /^v?\d+\.\d+\.\d+/.test(rawAppVersion))
       ? (rawAppVersion.startsWith('v') ? rawAppVersion : `v${rawAppVersion}`)
       : VALIDATOR_VERSION_FALLBACK;
+
+    const logger = createStageLogger({
+      traceId: (typeof bodyTraceId === 'string' && bodyTraceId) || incomingTraceId,
+      assessmentId,
+      jobId: incomingJobId ?? null,
+    });
+    logger.stage('request_received', { mode, backgroundRun, template: reportTemplate, hasIncomingJob: !!incomingJobId });
 
     // Valida que somente ADMIN pode forçar provedor — para usuários comuns
     // o valor é silenciosamente reduzido a 'auto'.
@@ -1791,29 +1900,32 @@ serve(async (req) => {
             visibility,
             environment,
             status: 'queued',
-            stage: 'Aguardando início',
+            stage: `[trace=${logger.traceId}] Aguardando início`,
             progress_pct: 0,
             created_by: userId,
           })
           .select('id')
           .maybeSingle();
         if (jobErr || !jobInsert) {
-          console.error('Failed to create report_jobs row:', jobErr);
+          logger.error('create_report_job_failed', jobErr);
           return new Response(JSON.stringify({ error: 'Não foi possível criar a fila de geração.' }), {
             status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
         }
         jobId = jobInsert.id as string;
+        logger.setJobId(jobId);
+        logger.stage('report_job_created', { jobId });
       }
 
       const backgroundJob = (async () => {
         try {
           await supabaseAdmin.from('report_jobs').update({
             status: 'processing',
-            stage: 'Coletando dados do diagnóstico',
+            stage: `[trace=${logger.traceId}] Coletando dados do diagnóstico`,
             progress_pct: 10,
             started_at: new Date().toISOString(),
           }).eq('id', jobId);
+          logger.stage('background_job_processing');
 
           const result = await runReportPipeline({
             supabaseAdmin,
@@ -1833,20 +1945,23 @@ serve(async (req) => {
             authHeader: authHeader!,
             aiProvider: aiProviderOverride,
             appVersion,
+            logger,
           });
 
           await supabaseAdmin.from('report_jobs').update({
             status: 'completed',
-            stage: 'Concluído',
+            stage: `[trace=${logger.traceId}] Concluído`,
             progress_pct: 100,
             report_id: result.reportId,
             finished_at: new Date().toISOString(),
           }).eq('id', jobId);
+          logger.setReportId(result.reportId);
+          logger.stage('background_job_completed');
         } catch (bgErr) {
-          console.error('Background pipeline failed:', bgErr);
+          logger.error('background_job_failed', bgErr, { last_stage: logger.lastStage() });
           await supabaseAdmin.from('report_jobs').update({
             status: 'failed',
-            error_message: bgErr instanceof Error ? bgErr.message : String(bgErr),
+            error_message: `[trace=${logger.traceId}][last_stage=${logger.lastStage()}] ${bgErr instanceof Error ? bgErr.message : String(bgErr)}`,
             finished_at: new Date().toISOString(),
           }).eq('id', jobId);
         }
@@ -2061,11 +2176,17 @@ INSTRUÇÕES SOBRE COMPARATIVO TEMPORAL:
       }
     });
 
-    console.log('Report data — Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 
-      'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 
-      'KB files:', kbFiles.length, 'Snapshots:', dataSnapshots.length, 
-      'Enterprise values:', enterpriseValues.length,
-      'Enterprise profile:', !!enterpriseProfile, 'Review analysis:', !!enterpriseProfile?.review_analysis);
+    logger.stage('data_collected', {
+      indicators: indicatorScores.length,
+      issues: issues?.length || 0,
+      prescriptions: prescriptions?.length || 0,
+      globalRefs: globalRefs.length,
+      kbFiles: kbFiles.length,
+      snapshots: dataSnapshots.length,
+      enterpriseValues: enterpriseValues.length,
+      hasEnterpriseProfile: !!enterpriseProfile,
+      hasReviewAnalysis: !!enterpriseProfile?.review_analysis,
+    });
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -2243,6 +2364,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             safeWrite(`: heartbeat ${Date.now()}\n\n`);
           }, 15_000);
           await safeWrite(`: started ${Date.now()}\n\n`);
+          logger.stage('stream_started');
         }
 
         const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
@@ -2252,7 +2374,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         const providerOrder: Array<'claude' | 'gpt5' | 'gemini'> = requestedProviderForStream === 'auto'
           ? defaultOrder
           : [requestedProviderForStream, ...defaultOrder.filter((p) => p !== requestedProviderForStream)];
-        console.log(`AI provider order for this report: ${providerOrder.join(' → ')} (requested: ${requestedProviderForStream})`);
+        logger.stage('provider_order_resolved', { order: providerOrder, requested: requestedProviderForStream });
 
         const callLovableGateway = (model: string) => fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -2391,23 +2513,32 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         for (const provider of providerOrder) {
           if (response) break;
           await safeWrite(`: provider ${provider} ${Date.now()}\n\n`);
+          logger.stage('provider_try', { provider });
           if (provider === 'claude') await tryClaude();
           else if (provider === 'gpt5') await tryGpt5();
           else if (provider === 'gemini') await tryGemini();
+          logger.stage('provider_try_result', { provider, ok: !!response });
         }
 
         if (!response) {
-          console.error('All providers failed. Trail:', JSON.stringify(fallbackTrail));
+          logger.error('all_providers_failed', new Error('no provider returned a stream'), { trail: fallbackTrail });
           throw new Error('Nenhum provedor de IA conseguiu gerar o relatório. Tente novamente em alguns minutos.');
         }
 
-        console.log('Streaming report from AI gateway');
+        logger.stage('ai_stream_open', { provider: usedProvider });
         const reader = response.body!.getReader();
         const decoder = new TextDecoder();
+        let firstChunkLogged = false;
+        let chunkCount = 0;
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
+          chunkCount++;
+          if (!firstChunkLogged) {
+            firstChunkLogged = true;
+            logger.stage('ai_first_chunk', { provider: usedProvider });
+          }
           await safeWrite(value);
 
           const text = decoder.decode(value, { stream: true });
@@ -2421,8 +2552,10 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             }
           }
         }
+        logger.stage('ai_stream_done', { chunks: chunkCount, contentChars: fullContent.length });
 
         if (!fullContent) {
+          logger.error('ai_empty_content', new Error('AI returned no content'));
           throw new Error('A IA terminou sem retornar conteúdo para o relatório.');
         }
 
@@ -2435,17 +2568,20 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           const corrected = applyAutoCorrections(fullContent, auditTrail || []);
           const workingText = corrected.text;
           autoCorrections = corrected.corrections;
+          logger.stage('validation_deterministic_start');
           deterministic = [
             ...detectCoherenceWarnings(workingText, auditTrail || []),
             ...detectInventedReferences(workingText, auditTrail || []),
           ];
           await safeWrite(`: validating ${Date.now()}\n\n`);
+          logger.stage('validation_agent_start');
           aiIssues = await runReportValidatorAgent(
             workingText,
             auditTrail || [],
             LOVABLE_API_KEY,
             globalRefs,
           );
+          logger.stage('validation_agent_done', { aiIssues: aiIssues.length, deterministic: deterministic.length, autoCorrections: autoCorrections.length });
           const allIssues = [
             ...deterministic.map((w) => `[determinístico] ${w}`),
             ...aiIssues.map((w) => `[agente IA] ${w}`),
@@ -2458,11 +2594,12 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             ? 'auto_corrected'
             : (allIssues.length > 0 ? 'warnings' : 'clean');
           finalContent = workingText.replace(/\s*$/, '') + '\n';
-          if (hasAny) console.warn('Validation issues:', { autoCorrections, allIssues });
+          if (hasAny) logger.stage('validation_issues_summary', { autoCorrections: autoCorrections.length, allIssues: allIssues.length, status: validationStatus });
         } catch (cohErr) {
-          console.error('Coherence check failed (non-blocking):', cohErr);
+          logger.error('validation_failed_nonblocking', cohErr);
         }
 
+        logger.stage('persist_lookup_existing');
         const { data: existing } = await supabaseAdmin
           .from('generated_reports')
           .select('id')
@@ -2479,9 +2616,10 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
             .eq('id', existing.id);
           if (error) throw error;
-          console.log('Report updated successfully');
           savedReportId = existing.id;
           persistedReportId = existing.id;
+          logger.setReportId(savedReportId);
+          logger.stage('persist_updated', { id: savedReportId });
         } else {
           const { data: inserted, error } = await supabaseAdmin
             .from('generated_reports')
@@ -2489,9 +2627,10 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             .select('id')
             .maybeSingle();
           if (error) throw error;
-          console.log('Report saved successfully');
           savedReportId = inserted?.id ?? null;
           persistedReportId = savedReportId;
+          logger.setReportId(savedReportId);
+          logger.stage('persist_inserted', { id: savedReportId });
         }
 
         try {
@@ -2506,8 +2645,9 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
             validator_version: appVersion,
           });
+          logger.stage('persist_validations_inserted');
         } catch (vErr) {
-          console.error('Failed to persist report_validations:', vErr);
+          logger.error('persist_validations_failed', vErr);
         }
 
         try {
@@ -2531,10 +2671,12 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               assessment_id: assessmentId,
               validation_status: validationStatus,
               total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
+              trace_id: logger.traceId,
             },
           });
+          logger.stage('persist_audit_inserted');
         } catch (auditErr) {
-          console.error('Failed to insert audit_events for report_generated:', auditErr);
+          logger.error('persist_audit_failed', auditErr);
         }
 
         if (heartbeatTimer !== null) {
@@ -2542,9 +2684,10 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           heartbeatTimer = null;
         }
         await safeWrite(`: done ${Date.now()}\n\n`);
+        logger.stage('stream_closed_ok');
         if (streamOpen) await writer.close();
       } catch (err) {
-        console.error('Stream error:', err);
+        logger.error('stream_task_failed', err, { last_stage: logger.lastStage() });
         if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
         streamOpen = false;
         await writer.abort(err).catch(() => {});

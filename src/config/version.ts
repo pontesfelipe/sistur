@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 51,
+  patch: 52,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.52",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — observabilidade de timeout. A geração de relatório agora emite logs estruturados com `traceId` (= jobId quando em background), `assessmentId`, `reportId` e `stage` em cada etapa do pipeline (criação do job, coleta de dados, montagem do prompt, seleção de provedor, primeiro chunk de IA, fim do streaming, validação determinística, validação por agente IA, persistência em `generated_reports`, gravação de `report_validations` e `audit_events`, abort por idle/hard timeout). O `report_jobs.stage` é atualizado em cada transição importante e ganha um marcador `[trace=<jobId>] <stage>` para facilitar o filtro nos logs do edge function. Quando o watchdog interno aborta o stream (idle 4min ou hard 12min), o motivo é registrado com tempo decorrido em segundos e o último stage conhecido, eliminando a necessidade de adivinhar onde o pipeline travou."
+    ],
+  },
   {
     version: "1.38.51",
     date: "2026-05-01",
