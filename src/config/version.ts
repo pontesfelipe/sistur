@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 49,
+  patch: 50,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.50",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção estrutural do `IDLE_TIMEOUT` sem apenas aumentar timeout. Causa: o endpoint interno de geração só devolvia a resposta SSE depois de abrir a conexão com o provedor de IA; quando Claude/GPT/Gemini demoravam mais de 150s para entregar headers ou primeiro token, a requisição interna ficava sem nenhum byte e a infraestrutura encerrava com 504 `IDLE_TIMEOUT`. Correção em `generate-report`: o stream SSE agora é retornado imediatamente, antes das chamadas longas de IA, e os heartbeats começam no início do processamento, incluindo seleção/fallback de provedor, geração, validação e persistência. Assim a fila continua assíncrona e o timeout deixa de ocorrer por conexão ociosa."
+    ],
+  },
   {
     version: "1.38.49",
     date: "2026-05-01",

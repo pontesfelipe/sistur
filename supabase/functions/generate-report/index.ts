@@ -6,12 +6,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// v1.38.45 — `VALIDATOR_VERSION` é apenas o fallback. O cliente envia
+// v1.38.50 — `VALIDATOR_VERSION` é apenas o fallback. O cliente envia
 // `appVersion` no body do request (ver `src/pages/Relatorios.tsx`) e esse
 // valor é usado por request, garantindo que a "Conferência de dados"
 // SEMPRE reflita a versão atual do app na hora da geração — sem depender
 // de um string hardcoded que envelhece a cada release.
-const VALIDATOR_VERSION_FALLBACK = 'v1.38.45';
+const VALIDATOR_VERSION_FALLBACK = 'v1.38.50';
 
 // ========== HELPER FUNCTIONS ==========
 
@@ -2207,222 +2207,209 @@ ${dataSnapshots.length > 0 ? '9. Use os snapshots de proveniência para rastrear
 ${globalRefs.length > 0 ? `10. Referencie documentos oficiais quando contextualizar resultados e prescrições` : ''}
 ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do destino quando aplicável` : ''}`;
 
-    // === LLM provider selection (v1.38.35) ===
-    // Cadeia de fallback automática (default): Claude → GPT-5 → Gemini.
-    // Quando ADMIN escolhe um provedor específico via UI, este é tentado
-    // PRIMEIRO; em caso de falha, a cadeia segue na ordem padrão para os
-    // demais (rede de segurança, sem perder o relatório).
-    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
-    let response: Response | null = null;
-    let usedProvider: 'claude' | 'gpt5' | 'gemini' = 'gemini';
-    const fallbackTrail: Array<{ provider: string; reason: string }> = [];
-
-    // Lê override de provedor do body (já validado contra ADMIN no entrypoint).
-    const requestedProviderForStream = (typeof aiProviderOverride === 'string' ? aiProviderOverride : 'auto') as
-      'auto' | 'claude' | 'gpt5' | 'gemini';
-    // Define ordem de tentativa.
-    const defaultOrder: Array<'claude' | 'gpt5' | 'gemini'> = ['claude', 'gpt5', 'gemini'];
-    const providerOrder: Array<'claude' | 'gpt5' | 'gemini'> = requestedProviderForStream === 'auto'
-      ? defaultOrder
-      : [requestedProviderForStream, ...defaultOrder.filter((p) => p !== requestedProviderForStream)];
-    console.log(`AI provider order for this report: ${providerOrder.join(' → ')} (requested: ${requestedProviderForStream})`);
-
-    const callLovableGateway = (model: string) => fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        stream: true,
-      }),
-    });
-
-    const tryClaude = async (): Promise<void> => {
-      if (!ANTHROPIC_API_KEY) {
-        fallbackTrail.push({ provider: 'claude', reason: 'ANTHROPIC_API_KEY not configured' });
-        return;
-      }
-      try {
-        const claudeResp = await fetch("https://api.anthropic.com/v1/messages", {
-          method: "POST",
-          headers: {
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "claude-sonnet-4-5-20250929",
-            max_tokens: 16000,
-            stream: true,
-            system: systemPrompt,
-            messages: [{ role: "user", content: userPrompt }],
-          }),
-        });
-        if (claudeResp.ok && claudeResp.body) {
-          const adapted = new ReadableStream({
-            async start(controller) {
-              const reader = claudeResp.body!.getReader();
-              const decoder = new TextDecoder();
-              const encoder = new TextEncoder();
-              let buffer = "";
-              try {
-                while (true) {
-                  const { done, value } = await reader.read();
-                  if (done) break;
-                  buffer += decoder.decode(value, { stream: true });
-                  let idx: number;
-                  while ((idx = buffer.indexOf("\n")) !== -1) {
-                    const line = buffer.slice(0, idx).trim();
-                    buffer = buffer.slice(idx + 1);
-                    if (!line.startsWith("data:")) continue;
-                    const payload = line.slice(5).trim();
-                    if (!payload) continue;
-                    try {
-                      const evt = JSON.parse(payload);
-                      if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
-                        const chunk = `data: ${JSON.stringify({ choices: [{ delta: { content: evt.delta.text } }] })}\n\n`;
-                        controller.enqueue(encoder.encode(chunk));
-                      } else if (evt.type === "message_stop") {
-                        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-                      } else if (evt.type === "error") {
-                        throw new Error(`Claude stream error: ${JSON.stringify(evt.error || evt)}`);
-                      }
-                    } catch (parseErr) {
-                      if (parseErr instanceof Error && parseErr.message.startsWith("Claude stream error")) throw parseErr;
-                      /* ignore partial JSON */
-                    }
-                  }
-                }
-                controller.close();
-              } catch (e) {
-                console.error("Claude stream adapter error:", e);
-                controller.error(e);
-              }
-            },
-          });
-          response = new Response(adapted, { status: 200, headers: { "Content-Type": "text/event-stream" } });
-          usedProvider = 'claude';
-          console.log("Report generation using provider: claude (claude-sonnet-4-5)");
-        } else {
-          const errBody = await claudeResp.text().catch(() => "");
-          const reason = `status ${claudeResp.status}: ${errBody.slice(0, 200)}`;
-          fallbackTrail.push({ provider: 'claude', reason });
-          console.warn(`Claude unavailable. ${reason}`);
-        }
-      } catch (e) {
-        const reason = e instanceof Error ? e.message : String(e);
-        fallbackTrail.push({ provider: 'claude', reason });
-        console.warn(`Claude request threw: ${reason}`);
-      }
-    };
-
-    const tryGpt5 = async (): Promise<void> => {
-      try {
-        const gptResp = await callLovableGateway("openai/gpt-5");
-        if (gptResp.ok && gptResp.body) {
-          response = gptResp;
-          usedProvider = 'gpt5';
-          console.log(`Report generation using provider: gpt-5`);
-        } else {
-          const errBody = await gptResp.text().catch(() => "");
-          const reason = `status ${gptResp.status}: ${errBody.slice(0, 200)}`;
-          fallbackTrail.push({ provider: 'gpt5', reason });
-          console.warn(`GPT-5 unavailable. ${reason}`);
-        }
-      } catch (e) {
-        const reason = e instanceof Error ? e.message : String(e);
-        fallbackTrail.push({ provider: 'gpt5', reason });
-        console.warn(`GPT-5 request threw: ${reason}`);
-      }
-    };
-
-    const tryGemini = async (): Promise<void> => {
-      try {
-        const gemResp = await callLovableGateway("google/gemini-2.5-pro");
-        if (gemResp.ok && gemResp.body) {
-          response = gemResp;
-          usedProvider = 'gemini';
-          console.log(`Report generation using provider: gemini-2.5-pro`);
-        } else {
-          const errBody = await gemResp.text().catch(() => "");
-          const reason = `status ${gemResp.status}: ${errBody.slice(0, 200)}`;
-          fallbackTrail.push({ provider: 'gemini', reason });
-          console.warn(`Gemini unavailable. ${reason}`);
-        }
-      } catch (e) {
-        const reason = e instanceof Error ? e.message : String(e);
-        fallbackTrail.push({ provider: 'gemini', reason });
-        console.warn(`Gemini request threw: ${reason}`);
-      }
-    };
-
-    // Executa a cadeia conforme a ordem definida; para no primeiro sucesso.
-    for (const provider of providerOrder) {
-      if (response) break;
-      if (provider === 'claude') await tryClaude();
-      else if (provider === 'gpt5') await tryGpt5();
-      else if (provider === 'gemini') await tryGemini();
-    }
-
-    if (!response) {
-      console.error('All providers failed. Trail:', JSON.stringify(fallbackTrail));
-      return new Response(JSON.stringify({
-        error: 'Nenhum provedor de IA conseguiu gerar o relatório. Tente novamente em alguns minutos.',
-        details: fallbackTrail,
-      }), { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos insuficientes." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      return new Response(JSON.stringify({ error: "Erro ao gerar relatório" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    console.log('Streaming report from AI gateway');
-    
+    // === LLM provider selection + streaming response (v1.38.50) ===
+    // Causa raiz do timeout: este endpoint só retornava o Response SSE DEPOIS de
+    // abrir a conexão com o provedor de IA. Se o provedor demorasse >150s para
+    // entregar headers/primeiro token, a chamada interna do job ficava sem bytes
+    // e caía por IDLE_TIMEOUT. Agora o stream é devolvido imediatamente e os
+    // heartbeats começam antes de qualquer chamada longa de IA.
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
+    const encoder = new TextEncoder();
     const shouldStreamToClient = !backgroundRun;
-    let fullContent = '';
     let persistedReportId: string | null = null;
 
     const backgroundTask = (async () => {
       let heartbeatTimer: number | null = null;
-      try {
-        const reader = response.body!.getReader();
-        const decoder = new TextDecoder();
-        const encoder = new TextEncoder();
+      let fullContent = '';
+      let response: Response | null = null;
+      let usedProvider: 'claude' | 'gpt5' | 'gemini' = 'gemini';
+      const fallbackTrail: Array<{ provider: string; reason: string }> = [];
+      let streamOpen = true;
 
+      const safeWrite = async (chunk: Uint8Array | string) => {
+        if (!shouldStreamToClient || !streamOpen) return;
+        const payload = typeof chunk === 'string' ? encoder.encode(chunk) : chunk;
+        try {
+          await writer.write(payload);
+        } catch {
+          streamOpen = false;
+        }
+      };
+
+      try {
         if (shouldStreamToClient) {
           heartbeatTimer = setInterval(() => {
-            writer.write(encoder.encode(`: heartbeat ${Date.now()}\n\n`)).catch(() => {});
+            safeWrite(`: heartbeat ${Date.now()}\n\n`);
           }, 15_000);
+          await safeWrite(`: started ${Date.now()}\n\n`);
         }
+
+        const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+        const requestedProviderForStream = (typeof aiProviderOverride === 'string' ? aiProviderOverride : 'auto') as
+          'auto' | 'claude' | 'gpt5' | 'gemini';
+        const defaultOrder: Array<'claude' | 'gpt5' | 'gemini'> = ['claude', 'gpt5', 'gemini'];
+        const providerOrder: Array<'claude' | 'gpt5' | 'gemini'> = requestedProviderForStream === 'auto'
+          ? defaultOrder
+          : [requestedProviderForStream, ...defaultOrder.filter((p) => p !== requestedProviderForStream)];
+        console.log(`AI provider order for this report: ${providerOrder.join(' → ')} (requested: ${requestedProviderForStream})`);
+
+        const callLovableGateway = (model: string) => fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            stream: true,
+          }),
+        });
+
+        const tryClaude = async (): Promise<void> => {
+          if (!ANTHROPIC_API_KEY) {
+            fallbackTrail.push({ provider: 'claude', reason: 'ANTHROPIC_API_KEY not configured' });
+            return;
+          }
+          try {
+            const claudeResp = await fetch("https://api.anthropic.com/v1/messages", {
+              method: "POST",
+              headers: {
+                "x-api-key": ANTHROPIC_API_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json",
+              },
+              body: JSON.stringify({
+                model: "claude-sonnet-4-5-20250929",
+                max_tokens: 16000,
+                stream: true,
+                system: systemPrompt,
+                messages: [{ role: "user", content: userPrompt }],
+              }),
+            });
+            if (claudeResp.ok && claudeResp.body) {
+              const adapted = new ReadableStream({
+                async start(controller) {
+                  const reader = claudeResp.body!.getReader();
+                  const decoder = new TextDecoder();
+                  const outEncoder = new TextEncoder();
+                  let buffer = "";
+                  try {
+                    while (true) {
+                      const { done, value } = await reader.read();
+                      if (done) break;
+                      buffer += decoder.decode(value, { stream: true });
+                      let idx: number;
+                      while ((idx = buffer.indexOf("\n")) !== -1) {
+                        const line = buffer.slice(0, idx).trim();
+                        buffer = buffer.slice(idx + 1);
+                        if (!line.startsWith("data:")) continue;
+                        const payload = line.slice(5).trim();
+                        if (!payload) continue;
+                        try {
+                          const evt = JSON.parse(payload);
+                          if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
+                            const chunk = `data: ${JSON.stringify({ choices: [{ delta: { content: evt.delta.text } }] })}\n\n`;
+                            controller.enqueue(outEncoder.encode(chunk));
+                          } else if (evt.type === "message_stop") {
+                            controller.enqueue(outEncoder.encode("data: [DONE]\n\n"));
+                          } else if (evt.type === "error") {
+                            throw new Error(`Claude stream error: ${JSON.stringify(evt.error || evt)}`);
+                          }
+                        } catch (parseErr) {
+                          if (parseErr instanceof Error && parseErr.message.startsWith("Claude stream error")) throw parseErr;
+                        }
+                      }
+                    }
+                    controller.close();
+                  } catch (e) {
+                    console.error("Claude stream adapter error:", e);
+                    controller.error(e);
+                  }
+                },
+              });
+              response = new Response(adapted, { status: 200, headers: { "Content-Type": "text/event-stream" } });
+              usedProvider = 'claude';
+              console.log("Report generation using provider: claude (claude-sonnet-4-5)");
+            } else {
+              const errBody = await claudeResp.text().catch(() => "");
+              const reason = `status ${claudeResp.status}: ${errBody.slice(0, 200)}`;
+              fallbackTrail.push({ provider: 'claude', reason });
+              console.warn(`Claude unavailable. ${reason}`);
+            }
+          } catch (e) {
+            const reason = e instanceof Error ? e.message : String(e);
+            fallbackTrail.push({ provider: 'claude', reason });
+            console.warn(`Claude request threw: ${reason}`);
+          }
+        };
+
+        const tryGpt5 = async (): Promise<void> => {
+          try {
+            const gptResp = await callLovableGateway("openai/gpt-5");
+            if (gptResp.ok && gptResp.body) {
+              response = gptResp;
+              usedProvider = 'gpt5';
+              console.log(`Report generation using provider: gpt-5`);
+            } else {
+              const errBody = await gptResp.text().catch(() => "");
+              const reason = `status ${gptResp.status}: ${errBody.slice(0, 200)}`;
+              fallbackTrail.push({ provider: 'gpt5', reason });
+              console.warn(`GPT-5 unavailable. ${reason}`);
+            }
+          } catch (e) {
+            const reason = e instanceof Error ? e.message : String(e);
+            fallbackTrail.push({ provider: 'gpt5', reason });
+            console.warn(`GPT-5 request threw: ${reason}`);
+          }
+        };
+
+        const tryGemini = async (): Promise<void> => {
+          try {
+            const gemResp = await callLovableGateway("google/gemini-2.5-pro");
+            if (gemResp.ok && gemResp.body) {
+              response = gemResp;
+              usedProvider = 'gemini';
+              console.log(`Report generation using provider: gemini-2.5-pro`);
+            } else {
+              const errBody = await gemResp.text().catch(() => "");
+              const reason = `status ${gemResp.status}: ${errBody.slice(0, 200)}`;
+              fallbackTrail.push({ provider: 'gemini', reason });
+              console.warn(`Gemini unavailable. ${reason}`);
+            }
+          } catch (e) {
+            const reason = e instanceof Error ? e.message : String(e);
+            fallbackTrail.push({ provider: 'gemini', reason });
+            console.warn(`Gemini request threw: ${reason}`);
+          }
+        };
+
+        for (const provider of providerOrder) {
+          if (response) break;
+          await safeWrite(`: provider ${provider} ${Date.now()}\n\n`);
+          if (provider === 'claude') await tryClaude();
+          else if (provider === 'gpt5') await tryGpt5();
+          else if (provider === 'gemini') await tryGemini();
+        }
+
+        if (!response) {
+          console.error('All providers failed. Trail:', JSON.stringify(fallbackTrail));
+          throw new Error('Nenhum provedor de IA conseguiu gerar o relatório. Tente novamente em alguns minutos.');
+        }
+
+        console.log('Streaming report from AI gateway');
+        const reader = response.body!.getReader();
+        const decoder = new TextDecoder();
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          if (shouldStreamToClient) await writer.write(value);
-          
+          await safeWrite(value);
+
           const text = decoder.decode(value, { stream: true });
           for (const line of text.split('\n')) {
             if (line.startsWith('data: ') && line !== 'data: [DONE]') {
@@ -2435,138 +2422,131 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           }
         }
 
-        if (fullContent) {
-          // Fase 5 — Trava de coerência LLM v1.38.0: detecta contradições
-          // entre texto gerado e valores numéricos auditados. Quando há
-          // contradições, prefixa um aviso ao relatório salvo.
-          let finalContent = fullContent;
-          let validationStatus: 'clean' | 'warnings' | 'auto_corrected' = 'clean';
-          let deterministic: string[] = [];
-          let aiIssues: string[] = [];
-          let autoCorrections: Array<{ indicator: string; from: string; to: string }> = [];
-          try {
-            // 1) Auto-correção determinística de valores numéricos divergentes
-            const corrected = applyAutoCorrections(fullContent, auditTrail || []);
-            const workingText = corrected.text;
-            autoCorrections = corrected.corrections;
+        if (!fullContent) {
+          throw new Error('A IA terminou sem retornar conteúdo para o relatório.');
+        }
 
-            // 2) Validação determinística sobre o texto JÁ corrigido
-            deterministic = [
-              ...detectCoherenceWarnings(workingText, auditTrail || []),
-              ...detectInventedReferences(workingText, auditTrail || []),
-            ];
-            // Segunda passagem: agente IA validador cruza relatório vs auditoria
-            // e bibliografia canônica. Não bloqueante.
-            aiIssues = await runReportValidatorAgent(
-              workingText,
-              auditTrail || [],
-              LOVABLE_API_KEY,
-              globalRefs,
-            );
-            const allIssues = [
-              ...deterministic.map((w) => `[determinístico] ${w}`),
-              ...aiIssues.map((w) => `[agente IA] ${w}`),
-            ];
-            const correctionLines = autoCorrections.map(
-              (c) => `[auto-corrigido] ${c.indicator}: ${c.from} → ${c.to}`,
-            );
-            const hasAny = allIssues.length > 0 || correctionLines.length > 0;
-            validationStatus = correctionLines.length > 0
-              ? 'auto_corrected'
-              : (allIssues.length > 0 ? 'warnings' : 'clean');
+        let finalContent = fullContent;
+        let validationStatus: 'clean' | 'warnings' | 'auto_corrected' = 'clean';
+        let deterministic: string[] = [];
+        let aiIssues: string[] = [];
+        let autoCorrections: Array<{ indicator: string; from: string; to: string }> = [];
+        try {
+          const corrected = applyAutoCorrections(fullContent, auditTrail || []);
+          const workingText = corrected.text;
+          autoCorrections = corrected.corrections;
+          deterministic = [
+            ...detectCoherenceWarnings(workingText, auditTrail || []),
+            ...detectInventedReferences(workingText, auditTrail || []),
+          ];
+          await safeWrite(`: validating ${Date.now()}\n\n`);
+          aiIssues = await runReportValidatorAgent(
+            workingText,
+            auditTrail || [],
+            LOVABLE_API_KEY,
+            globalRefs,
+          );
+          const allIssues = [
+            ...deterministic.map((w) => `[determinístico] ${w}`),
+            ...aiIssues.map((w) => `[agente IA] ${w}`),
+          ];
+          const correctionLines = autoCorrections.map(
+            (c) => `[auto-corrigido] ${c.indicator}: ${c.from} → ${c.to}`,
+          );
+          const hasAny = allIssues.length > 0 || correctionLines.length > 0;
+          validationStatus = correctionLines.length > 0
+            ? 'auto_corrected'
+            : (allIssues.length > 0 ? 'warnings' : 'clean');
+          finalContent = workingText.replace(/\s*$/, '') + '\n';
+          if (hasAny) console.warn('Validation issues:', { autoCorrections, allIssues });
+        } catch (cohErr) {
+          console.error('Coherence check failed (non-blocking):', cohErr);
+        }
 
-            // v1.38.27 — Banner de "Validação cruzada" REMOVIDO do conteúdo do relatório.
-            // O documento agora sai limpo (sem aviso técnico no topo nem no rodapé).
-            // A informação continua persistida em `report_validations` e é exibida
-            // pela UI (página de Relatórios) como mensagem fora do documento.
-            finalContent = workingText.replace(/\s*$/, '') + '\n';
+        const { data: existing } = await supabaseAdmin
+          .from('generated_reports')
+          .select('id')
+          .eq('assessment_id', assessmentId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-            if (hasAny) console.warn('Validation issues:', { autoCorrections, allIssues });
-          } catch (cohErr) {
-            console.error('Coherence check failed (non-blocking):', cohErr);
-          }
-
-          const { data: existing } = await supabaseAdmin
+        const kbFileIds = kbFiles.map((f: any) => f.id);
+        let savedReportId: string | null = null;
+        if (existing && !forceRegenerate) {
+          const { error } = await supabaseAdmin
             .from('generated_reports')
+            .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
+            .eq('id', existing.id);
+          if (error) throw error;
+          console.log('Report updated successfully');
+          savedReportId = existing.id;
+          persistedReportId = existing.id;
+        } else {
+          const { data: inserted, error } = await supabaseAdmin
+            .from('generated_reports')
+            .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: finalContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment })
             .select('id')
-            .eq('assessment_id', assessmentId)
-            .order('created_at', { ascending: false })
-            .limit(1)
             .maybeSingle();
-          
-          const kbFileIds = kbFiles.map((f: any) => f.id);
-          let savedReportId: string | null = null;
-          if (existing && !forceRegenerate) {
-            const { error } = await supabaseAdmin
-              .from('generated_reports')
-              .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
-              .eq('id', existing.id);
-            if (error) console.error('Error updating report:', error);
-            else { console.log('Report updated successfully'); savedReportId = existing.id; persistedReportId = existing.id; }
-          } else {
-            const { data: inserted, error } = await supabaseAdmin
-              .from('generated_reports')
-              .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: finalContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment })
-              .select('id')
-              .maybeSingle();
-            if (error) console.error('Error saving report:', error);
-            else { console.log('Report saved successfully'); savedReportId = inserted?.id ?? null; persistedReportId = savedReportId; }
-          }
+          if (error) throw error;
+          console.log('Report saved successfully');
+          savedReportId = inserted?.id ?? null;
+          persistedReportId = savedReportId;
+        }
 
-          // Persistir validação (não bloqueante)
-          try {
-            await supabaseAdmin.from('report_validations').insert({
-              report_id: savedReportId,
+        try {
+          await supabaseAdmin.from('report_validations').insert({
+            report_id: savedReportId,
+            assessment_id: assessmentId,
+            org_id: assessment.org_id,
+            status: validationStatus,
+            deterministic_issues: deterministic,
+            ai_issues: aiIssues,
+            auto_corrections: autoCorrections,
+            total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
+            validator_version: appVersion,
+          });
+        } catch (vErr) {
+          console.error('Failed to persist report_validations:', vErr);
+        }
+
+        try {
+          const modelLabel = usedProvider === 'claude'
+            ? 'anthropic/claude-sonnet-4-5-20250929'
+            : usedProvider === 'gpt5'
+            ? 'openai/gpt-5'
+            : 'google/gemini-2.5-pro';
+          await supabaseAdmin.from('audit_events').insert({
+            org_id: assessment.org_id,
+            user_id: userId,
+            event_type: 'report_generated',
+            entity_type: 'generated_report',
+            entity_id: savedReportId,
+            metadata: {
+              provider: usedProvider,
+              model: modelLabel,
+              fallback_trail: fallbackTrail,
+              template: reportTemplate,
+              destination_name: destinationName,
               assessment_id: assessmentId,
-              org_id: assessment.org_id,
-              status: validationStatus,
-              deterministic_issues: deterministic,
-              ai_issues: aiIssues,
-              auto_corrections: autoCorrections,
+              validation_status: validationStatus,
               total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
-              validator_version: appVersion,
-            });
-          } catch (vErr) {
-            console.error('Failed to persist report_validations:', vErr);
-          }
-
-          // Audit event — registra qual modelo gerou o relatório (v1.38.34)
-          try {
-            const modelLabel = usedProvider === 'claude'
-              ? 'anthropic/claude-sonnet-4-5-20250929'
-              : usedProvider === 'gpt5'
-              ? 'openai/gpt-5'
-              : 'google/gemini-2.5-pro';
-            await supabaseAdmin.from('audit_events').insert({
-              org_id: assessment.org_id,
-              user_id: userId,
-              event_type: 'report_generated',
-              entity_type: 'generated_report',
-              entity_id: savedReportId,
-              metadata: {
-                provider: usedProvider,
-                model: modelLabel,
-                fallback_trail: fallbackTrail,
-                template: reportTemplate,
-                destination_name: destinationName,
-                assessment_id: assessmentId,
-                validation_status: validationStatus,
-                total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
-              },
-            });
-          } catch (auditErr) {
-            console.error('Failed to insert audit_events for report_generated:', auditErr);
-          }
+            },
+          });
+        } catch (auditErr) {
+          console.error('Failed to insert audit_events for report_generated:', auditErr);
         }
 
         if (heartbeatTimer !== null) {
           clearInterval(heartbeatTimer);
           heartbeatTimer = null;
         }
-        await writer.close();
+        await safeWrite(`: done ${Date.now()}\n\n`);
+        if (streamOpen) await writer.close();
       } catch (err) {
         console.error('Stream error:', err);
         if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
+        streamOpen = false;
         await writer.abort(err).catch(() => {});
         throw err;
       }
@@ -2579,9 +2559,6 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
       });
     }
 
-    // Garante que a persistência (generated_reports + report_validations + audit_events)
-    // continue executando mesmo após o cliente fechar a conexão SSE. Sem isso, o IIFE
-    // era interrompido e o audit_events de 'report_generated' não era inserido.
     try {
       // @ts-ignore - EdgeRuntime é global em Supabase Edge Functions (Deno)
       if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) {
@@ -2593,6 +2570,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
     return new Response(readable, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
+
   } catch (error) {
     console.error("Error:", error);
     return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Erro desconhecido" }), {
