@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 38,
+  patch: 39,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.39",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — botão principal passa a gerar nova versão quando já existe relatório salvo para o diagnóstico selecionado, evitando a sensação de que a geração foi concluída rápido demais por reaproveitamento do relatório anterior. O pipeline em background agora também rejeita explicitamente respostas de cache/skip do fluxo interno e só aceita relatórios criados durante a execução atual.",
+      "Relatórios — validação de dados fortalecida: a trilha usada no prompt e no agente validador agora é reconstruída de forma canônica combinando `assessment_indicator_audit`, `indicator_values` e `indicator_scores`, preservando fontes pré-preenchidas como IBGE/DATASUS/STN/MAPA_TURISMO quando a auditoria antiga ainda está marcada como MANUAL. O agente validador deixou de truncar a base auditada nos primeiros 80 indicadores e passa a receber todos os indicadores, evitando falsos avisos como '112 no relatório, 98 na base'.",
+      "Relatórios — validador atualizado para `v1.38.39` e contexto de documentos nacionais fornecidos incluído na checagem bibliográfica, reduzindo falso positivo para referências realmente carregadas na geração.",
+    ],
+  },
   {
     version: "1.38.38",
     date: "2026-04-30",
