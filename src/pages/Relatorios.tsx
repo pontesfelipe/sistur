@@ -287,6 +287,11 @@ export default function Relatorios() {
     setGenerationStage('Enfileirando geração…');
     cancelGenerationRef.current = false;
 
+    // v1.38.55 — Pede permissão de Notification de forma silenciosa.
+    // Se o usuário aceitar, receberá um aviso do navegador quando o job
+    // terminar mesmo se a aba estiver em background ou minimizada.
+    void ensureNotificationPermission();
+
     const pillarScoresMap: Record<string, { score: number; severity: string }> = {};
     pillarScores?.forEach(ps => {
       pillarScoresMap[ps.pillar] = { score: ps.score, severity: ps.severity };
@@ -298,7 +303,12 @@ export default function Relatorios() {
     // status 'completed' ou 'failed' — sem manter conexão SSE longa,
     // imune a timeouts de proxy/aba/rede.
     const POLL_INTERVAL_MS = 4_000;
-    const POLL_DEADLINE_MS = 10 * 60 * 1000; // 10 minutos de teto
+    // v1.38.55 — Aumentado de 10min → 15min porque relatórios completos
+    // (template "completo" com 100+ indicadores) podem levar até ~7min só
+    // na chamada de IA (Claude). O watcher global em background continua
+    // observando o job mesmo se este loop terminar antes — então o teto
+    // aqui não é fatal, é só o limite do feedback inline na tela.
+    const POLL_DEADLINE_MS = 15 * 60 * 1000;
 
     try {
       const resp = await fetch(REPORT_URL, {
