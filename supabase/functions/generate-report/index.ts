@@ -1589,6 +1589,7 @@ async function runReportPipeline(args: {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const url = `${supabaseUrl}/functions/v1/generate-report`;
+    logger.stage('internal_fetch_start');
     const resp = await fetch(url, {
       method: 'POST',
       headers: {
@@ -1596,6 +1597,7 @@ async function runReportPipeline(args: {
         // Reusa o JWT do usuário original — o pipeline stream valida acesso
         // exatamente como na chamada original.
         Authorization: args.authHeader,
+        'x-trace-id': logger.traceId,
       },
       body: JSON.stringify({
         assessmentId,
@@ -1616,11 +1618,14 @@ async function runReportPipeline(args: {
         backgroundRun: false,
         aiProvider: args.aiProvider ?? 'auto',
         appVersion: args.appVersion ?? VALIDATOR_VERSION_FALLBACK,
+        traceId: logger.traceId,
       }),
       signal: streamController.signal,
     });
+    logger.stage('internal_fetch_headers', { status: resp.status, contentType: resp.headers.get('Content-Type') || '' });
     if (!resp.ok) {
       const errText = await resp.text().catch(() => '');
+      logger.error('internal_fetch_failed', new Error(`status ${resp.status}`), { body: errText.slice(0, 200) });
       throw new Error(`Pipeline interno falhou (${resp.status}): ${errText.slice(0, 200)}`);
     }
     const contentType = resp.headers.get('Content-Type') || '';
