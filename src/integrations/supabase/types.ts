@@ -7426,6 +7426,8 @@ export type Database = {
       report_jobs: {
         Row: {
           assessment_id: string
+          attempts: number
+          auth_jwt: string | null
           created_at: string
           created_by: string
           destination_name: string
@@ -7433,7 +7435,9 @@ export type Database = {
           error_message: string | null
           finished_at: string | null
           id: string
+          last_attempt_at: string | null
           org_id: string
+          payload: Json | null
           progress_pct: number
           report_id: string | null
           report_template: string
@@ -7444,6 +7448,8 @@ export type Database = {
         }
         Insert: {
           assessment_id: string
+          attempts?: number
+          auth_jwt?: string | null
           created_at?: string
           created_by: string
           destination_name: string
@@ -7451,7 +7457,9 @@ export type Database = {
           error_message?: string | null
           finished_at?: string | null
           id?: string
+          last_attempt_at?: string | null
           org_id: string
+          payload?: Json | null
           progress_pct?: number
           report_id?: string | null
           report_template?: string
@@ -7462,6 +7470,8 @@ export type Database = {
         }
         Update: {
           assessment_id?: string
+          attempts?: number
+          auth_jwt?: string | null
           created_at?: string
           created_by?: string
           destination_name?: string
@@ -7469,7 +7479,9 @@ export type Database = {
           error_message?: string | null
           finished_at?: string | null
           id?: string
+          last_attempt_at?: string | null
           org_id?: string
+          payload?: Json | null
           progress_pct?: number
           report_id?: string | null
           report_template?: string
@@ -8748,6 +8760,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      requeue_report_job: { Args: { p_job_id: string }; Returns: undefined }
       reset_org_pillar_weights: {
         Args: { p_org_id: string }
         Returns: undefined

@@ -1903,6 +1903,24 @@ serve(async (req) => {
             stage: `[trace=${logger.traceId}] Aguardando início`,
             progress_pct: 0,
             created_by: userId,
+            // v1.38.53 — Persistir payload + JWT para o worker independente
+            // (process-report-job) executar sem depender do request original.
+            payload: {
+              assessmentId,
+              destinationName,
+              pillarScores,
+              issues,
+              prescriptions,
+              forceRegenerate,
+              reportTemplate,
+              visibility,
+              environment,
+              enableComparison,
+              aiProvider: aiProviderOverride,
+              appVersion,
+              traceId: logger.traceId,
+            },
+            auth_jwt: authHeader,
           })
           .select('id')
           .maybeSingle();
@@ -1917,63 +1935,14 @@ serve(async (req) => {
         logger.stage('report_job_created', { jobId });
       }
 
-      const backgroundJob = (async () => {
-        try {
-          await supabaseAdmin.from('report_jobs').update({
-            status: 'processing',
-            stage: `[trace=${logger.traceId}] Coletando dados do diagnóstico`,
-            progress_pct: 10,
-            started_at: new Date().toISOString(),
-          }).eq('id', jobId);
-          logger.stage('background_job_processing');
-
-          const result = await runReportPipeline({
-            supabaseAdmin,
-            assessment,
-            assessmentId,
-            destinationName,
-            pillarScores,
-            issues,
-            prescriptions,
-            forceRegenerate,
-            reportTemplate,
-            visibility,
-            environment,
-            enableComparison,
-            userId,
-            jobId: jobId!,
-            authHeader: authHeader!,
-            aiProvider: aiProviderOverride,
-            appVersion,
-            logger,
-          });
-
-          await supabaseAdmin.from('report_jobs').update({
-            status: 'completed',
-            stage: `[trace=${logger.traceId}] Concluído`,
-            progress_pct: 100,
-            report_id: result.reportId,
-            finished_at: new Date().toISOString(),
-          }).eq('id', jobId);
-          logger.setReportId(result.reportId);
-          logger.stage('background_job_completed');
-        } catch (bgErr) {
-          logger.error('background_job_failed', bgErr, { last_stage: logger.lastStage() });
-          await supabaseAdmin.from('report_jobs').update({
-            status: 'failed',
-            error_message: `[trace=${logger.traceId}][last_stage=${logger.lastStage()}] ${bgErr instanceof Error ? bgErr.message : String(bgErr)}`,
-            finished_at: new Date().toISOString(),
-          }).eq('id', jobId);
-        }
-      })();
-
-      try {
-        // @ts-ignore - EdgeRuntime é global em Supabase Edge Functions
-        if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) {
-          // @ts-ignore
-          EdgeRuntime.waitUntil(backgroundJob);
-        }
-      } catch (_e) { /* ignore */ }
+      // v1.38.53 — O processamento agora é disparado pelo trigger DB
+      // `trg_dispatch_report_job` (pg_net.http_post -> process-report-job),
+      // o que torna a fila resiliente a timeout do request original.
+      // Antes usávamos EdgeRuntime.waitUntil dentro deste mesmo request,
+      // o que dava no problema: se a invocação inicial expirasse no proxy,
+      // o worker era morto junto. Agora o INSERT já dispara o worker
+      // independente; aqui apenas devolvemos 202 com o jobId.
+      logger.stage('background_job_dispatched_via_trigger');
 
       return new Response(JSON.stringify({ jobId, status: 'queued' }), {
         status: 202, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -2510,53 +2479,82 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           }
         };
 
-        for (const provider of providerOrder) {
-          if (response) break;
+        // v1.38.53 — Fallback resiliente entre provedores cobrindo TANTO falha
+        // na abertura quanto falha durante o streaming (chunk error, abort,
+        // resposta vazia, [DONE] sem conteúdo). Para cada provedor da ordem,
+        // tentamos abrir + drenar; se o conteúdo final acumulado for vazio
+        // ou ocorrer erro de leitura, marcamos o trail e seguimos para o
+        // próximo provedor antes de desistir.
+        const tryProviderOnce = async (provider: 'claude' | 'gpt5' | 'gemini') => {
+          response = null;
           await safeWrite(`: provider ${provider} ${Date.now()}\n\n`);
           logger.stage('provider_try', { provider });
           if (provider === 'claude') await tryClaude();
           else if (provider === 'gpt5') await tryGpt5();
           else if (provider === 'gemini') await tryGemini();
-          logger.stage('provider_try_result', { provider, ok: !!response });
-        }
+          logger.stage('provider_try_result', { provider, opened: !!response });
+          return !!response;
+        };
 
-        if (!response) {
-          logger.error('all_providers_failed', new Error('no provider returned a stream'), { trail: fallbackTrail });
-          throw new Error('Nenhum provedor de IA conseguiu gerar o relatório. Tente novamente em alguns minutos.');
-        }
-
-        logger.stage('ai_stream_open', { provider: usedProvider });
-        const reader = response.body!.getReader();
-        const decoder = new TextDecoder();
-        let firstChunkLogged = false;
-        let chunkCount = 0;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunkCount++;
-          if (!firstChunkLogged) {
-            firstChunkLogged = true;
-            logger.stage('ai_first_chunk', { provider: usedProvider });
-          }
-          await safeWrite(value);
-
-          const text = decoder.decode(value, { stream: true });
-          for (const line of text.split('\n')) {
-            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-              try {
-                const json = JSON.parse(line.slice(6));
-                const content = json.choices?.[0]?.delta?.content;
-                if (content) fullContent += content;
-              } catch { /* ignore */ }
+        const drainProviderStream = async (provider: 'claude' | 'gpt5' | 'gemini'): Promise<boolean> => {
+          if (!response) return false;
+          const reader = response.body!.getReader();
+          const decoder = new TextDecoder();
+          let firstChunkLogged = false;
+          let chunkCount = 0;
+          let providerContent = '';
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              chunkCount++;
+              if (!firstChunkLogged) {
+                firstChunkLogged = true;
+                logger.stage('ai_first_chunk', { provider });
+              }
+              await safeWrite(value);
+              const text = decoder.decode(value, { stream: true });
+              for (const line of text.split('\n')) {
+                if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                  try {
+                    const json = JSON.parse(line.slice(6));
+                    const content = json.choices?.[0]?.delta?.content;
+                    if (content) providerContent += content;
+                  } catch { /* ignore partial */ }
+                }
+              }
             }
+          } catch (streamErr) {
+            const reason = streamErr instanceof Error ? streamErr.message : String(streamErr);
+            fallbackTrail.push({ provider, reason: `mid-stream: ${reason}` });
+            logger.error('provider_mid_stream_failed', streamErr, { provider, chunks: chunkCount, partialChars: providerContent.length });
+            return false;
           }
-        }
-        logger.stage('ai_stream_done', { chunks: chunkCount, contentChars: fullContent.length });
+          logger.stage('ai_stream_done', { provider, chunks: chunkCount, contentChars: providerContent.length });
+          if (!providerContent || providerContent.trim().length < 32) {
+            fallbackTrail.push({ provider, reason: `empty content (${providerContent.length} chars)` });
+            logger.error('provider_empty_content', new Error('AI returned no usable content'), { provider, chars: providerContent.length });
+            return false;
+          }
+          fullContent = providerContent;
+          usedProvider = provider;
+          return true;
+        };
 
-        if (!fullContent) {
-          logger.error('ai_empty_content', new Error('AI returned no content'));
-          throw new Error('A IA terminou sem retornar conteúdo para o relatório.');
+        let succeeded = false;
+        for (const provider of providerOrder) {
+          const opened = await tryProviderOnce(provider);
+          if (!opened) continue;
+          // Avisa o cliente que houve troca de provedor caso já tenha emitido bytes
+          await safeWrite(`: switching_provider ${provider} ${Date.now()}\n\n`);
+          logger.stage('ai_stream_open', { provider });
+          succeeded = await drainProviderStream(provider);
+          if (succeeded) break;
+        }
+
+        if (!succeeded) {
+          logger.error('all_providers_failed', new Error('no provider produced usable content'), { trail: fallbackTrail });
+          throw new Error('Nenhum provedor de IA conseguiu gerar o relatório. Tente novamente em alguns minutos.');
         }
 
         let finalContent = fullContent;

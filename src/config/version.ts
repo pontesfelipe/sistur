@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 52,
+  patch: 53,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.53",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — fallback de IA ampliado para falhas mid-stream. Antes a cadeia Claude → GPT-5 → Gemini só tentava o próximo provedor se a abertura da conexão falhasse; se o stream começasse e morresse no meio (chunk error, abort de rede, conteúdo vazio, [DONE] sem texto útil), o pipeline desistia. Agora cada provedor é envolvido em um wrapper que abre + drena + valida o conteúdo final acumulado; se houver erro de leitura ou conteúdo vazio (<32 chars), o trail é registrado e o próximo provedor da ordem é acionado automaticamente, mantendo a regra de prioridade. O cliente streaming recebe marcadores `: switching_provider` para refletir a troca quando ocorrer.",
+      "Relatórios — fila assíncrona reescrita para resistir a timeout do request original. Antes o modo background usava `EdgeRuntime.waitUntil` dentro do mesmo worker da chamada inicial: se a invocação estourasse o timeout do proxy (~150s), o worker era morto e o job ficava preso em 'processing' eternamente. Agora o INSERT em `report_jobs` dispara um trigger DB (`trg_dispatch_report_job` via `pg_net.http_post`) que chama uma nova edge function dedicada `process-report-job` em um worker independente. O endpoint `generate-report` em modo background apenas grava o payload + JWT do criador no job e responde 202 imediatamente; o worker reabre o pipeline interno reusando o JWT (preservando RLS), atualiza progresso/stage durante a execução, faz polling de `generated_reports` para confirmar a persistência e marca 'completed' ou 'failed' com mensagem detalhada incluindo `trace_id` e último stage observado. Suporta retry automático: até 2 tentativas no total antes de desistir, com fire-and-forget para reagendar a si mesmo. Função utilitária `requeue_report_job(uuid)` permite reenfileirar manualmente jobs falhos."
+    ],
+  },
   {
     version: "1.38.52",
     date: "2026-05-01",
