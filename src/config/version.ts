@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 55,
+  patch: 56,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.56",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — paralelização por pilar no template 'completo' (territorial e enterprise). Antes a geração era uma única chamada monolítica de IA com prompt de ~50KB e saída de ~2500 palavras, levando 4-7min só na fase de inferência. Agora o pipeline roda em 2 fases coordenadas: Fase 1 dispara 3 chamadas EM PARALELO (uma para o pilar I-RA, uma para I-OE, uma para I-AO), cada uma com system prompt restrito ao escopo do pilar e instruída a escrever apenas a subseção 4.1/4.2/4.3 com a tabela canônica de indicadores e os parágrafos de leitura técnica/implicações; Fase 2 chama o 'envelope' (introdução, ficha técnica, metodologia, alertas IGMA, análise integrada, gargalos consolidados, benchmarks, prognóstico, banco de ações, fontes, considerações finais, referências, glossário, apêndice) recebendo os 3 textos dos pilares como contexto de leitura para garantir COERÊNCIA — cita os mesmos indicadores, respeita os mesmos status, não contradiz scores. O orquestrador substitui o placeholder `<!-- DIAGNOSTICO_PILARES_PLACEHOLDER -->` no envelope pelos 3 textos dos pilares concatenados na ordem RA → OE → AO. Fallback é GLOBAL (todas as chamadas usam o mesmo provider): se qualquer pilar ou o envelope falhar, aborta as outras chamadas em curso e refaz TODO o pipeline no próximo provider da ordem (claude → gpt5 → gemini), preservando consistência de tom narrativo. Streaming SSE para o cliente é sequencial: o usuário vê eventos de stage (`: stage phase1_pillars_start`, `: stage phase2_envelope_done`) em tempo real durante a geração, e o markdown final montado é emitido em chunks SSE compatíveis com o parser do front. Ganho esperado: tempo de inferência cai de ~6min para ~2-3min (3x mais rápido na fase de IA). Templates 'executivo' e 'investidor' continuam no pipeline monolítico (estrutura curta sem subseções por pilar — paralelizar não compensa). Rede de segurança: se o pipeline paralelo falhar em todos os providers, cai automaticamente no pipeline monolítico antigo, evitando regressão total."
+    ],
+  },
   {
     version: "1.38.55",
     date: "2026-05-01",
