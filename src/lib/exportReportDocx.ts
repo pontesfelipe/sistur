@@ -98,8 +98,13 @@ function parseInlineFormatting(text: string, size = BODY_SIZE): TextRun[] {
 function parseMarkdownTable(lines: string[], primaryColor: string): (Paragraph | Table)[] {
   if (lines.length < 2) return [];
 
+  // IMPORTANT: keep empty cells (do NOT .filter(Boolean)). The realigner relies on
+  // every "|" being preserved so it can detect missing values and reposition the
+  // remaining cells. Stripping empties here was the root cause of out-of-square
+  // rows like "Emissão de gases | (vazio) | % | 🟠 FORTE | Manual" being rendered
+  // as 4-cell rows where the value migrated into the indicator column.
   const parseRow = (line: string) =>
-    line.split('|').map(c => c.trim()).filter(Boolean);
+    line.split('|').slice(1, -1).map(c => c.trim());
 
   const headers = parseRow(lines[0]);
   const colCount = headers.length;
