@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 47,
+  patch: 48,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.48",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico → aba Indicadores → painel 'Procedência dos Dados' aparecia zerado (0 oficiais / 0 calculados / 0 manuais) mesmo em diagnósticos com dados pré-preenchidos via APIs oficiais. Causa: o componente filtrava por `v.value`, mas a tabela `indicator_values` usa `value_raw` — assim a contagem ficava sempre zero; além disso, a detecção de origem oficial buscava prefixos como `IBGE`, `CADASTUR`, `STN`, mas as fontes vêm gravadas como `Pré-preenchido (IBGE)`, `Pré-preenchido (DATASUS)` etc., e portanto nenhuma fonte era reconhecida. Correção em `src/components/diagnostics/DataProvenancePanel.tsx`: o filtro agora aceita `value_raw`, `value` ou `value_text`; a detecção de fontes oficiais usa `includes` em vez de `startsWith` e cobre os tokens `IBGE`, `CADASTUR`, `STN`, `DATASUS`, `MAPA_TURISMO`, `INEP`, `ANATEL`, `TSE`, `ANA`, `ANAC`, `CADUNICO`. A cobertura automática volta a refletir a realidade do diagnóstico."
+    ],
+  },
   {
     version: "1.38.47",
     date: "2026-05-01",
