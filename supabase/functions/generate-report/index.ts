@@ -1354,8 +1354,9 @@ async function runReportValidatorAgent(
 ): Promise<string[]> {
   if (!reportText || !apiKey) return [];
   try {
-    const auditCompact = (auditRows || []).slice(0, 80).map((r) => ({
+    const auditCompact = (auditRows || []).map((r) => ({
       code: r.indicator_code,
+      name: r.indicator_name,
       pillar: r.pillar,
       value: r.value,
       score_pct: r.normalized_score !== null && r.normalized_score !== undefined
@@ -1394,6 +1395,8 @@ REGRAS DE SAÍDA:
 
     const usr = `=== DADOS AUDITADOS (fonte de verdade) ===
 ${JSON.stringify(auditCompact, null, 2)}
+
+Total de indicadores auditados nesta base: ${auditCompact.length}. Não afirme que a base contém menos indicadores do que este total.
 
 === RELATÓRIO GERADO ===
 ${reportText.slice(0, 18000)}`;
