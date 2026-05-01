@@ -2811,6 +2811,12 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           }
         };
 
+        // v1.38.58 — Se esta execução veio do worker assíncrono, mantenha o
+        // status do job vivo durante as fases longas de IA. Antes o job só
+        // recebia updates cosméticos do worker externo; se a conexão interna
+        // caísse depois do stream, o usuário via "processando" indefinido.
+        await logger.bumpJobStage(supabaseAdmin, 'Iniciando geração com IA', { progress_pct: 20 });
+
         // v1.38.53 — Fallback resiliente entre provedores cobrindo TANTO falha
         // na abertura quanto falha durante o streaming (chunk error, abort,
         // resposta vazia, [DONE] sem conteúdo). Para cada provedor da ordem,
@@ -2898,6 +2904,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           for (const provider of providerOrder) {
             await safeWrite(`: parallel_provider ${provider} ${Date.now()}\n\n`);
             logger.stage('parallel_provider_try', { provider });
+            await logger.bumpJobStage(supabaseAdmin, `Gerando diagnóstico por pilares (${provider})`, { progress_pct: 35 });
             const res = await runTwoPhasePipeline({
               provider,
               systemPromptByPillar,
@@ -2908,6 +2915,18 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               anthropicApiKey: ANTHROPIC_API_KEY ?? undefined,
               onStage: (stage, extra) => {
                 logger.stage(stage, extra);
+                const pct = stage === 'phase1_pillars_start'
+                  ? 40
+                  : stage === 'phase1_pillars_done'
+                  ? 62
+                  : stage === 'phase2_envelope_start'
+                  ? 70
+                  : stage === 'phase2_envelope_done'
+                  ? 82
+                  : undefined;
+                if (pct !== undefined) {
+                  logger.bumpJobStage(supabaseAdmin, stage, { progress_pct: pct }).catch(() => {});
+                }
                 // emite heartbeats de stage pro cliente
                 safeWrite(`: stage ${stage} ${Date.now()}\n\n`).catch(() => {});
               },
@@ -2972,12 +2991,14 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           const workingText = corrected.text;
           autoCorrections = corrected.corrections;
           logger.stage('validation_deterministic_start');
+          await logger.bumpJobStage(supabaseAdmin, 'Validando coerência determinística', { progress_pct: 88 });
           deterministic = [
             ...detectCoherenceWarnings(workingText, auditTrail || []),
             ...detectInventedReferences(workingText, auditTrail || []),
           ];
           await safeWrite(`: validating ${Date.now()}\n\n`);
           logger.stage('validation_agent_start');
+          await logger.bumpJobStage(supabaseAdmin, 'Validando coerência com agente IA', { progress_pct: 92 });
           aiIssues = await runReportValidatorAgent(
             workingText,
             auditTrail || [],
@@ -3003,6 +3024,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         }
 
         logger.stage('persist_lookup_existing');
+        await logger.bumpJobStage(supabaseAdmin, 'Persistindo relatório', { progress_pct: 96 });
         const { data: existing } = await supabaseAdmin
           .from('generated_reports')
           .select('id')
@@ -3082,15 +3104,37 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           logger.error('persist_audit_failed', auditErr);
         }
 
+        if (incomingJobId && savedReportId) {
+          await supabaseAdmin.from('report_jobs').update({
+            status: 'completed',
+            stage: `[trace=${logger.traceId}] Concluído`,
+            progress_pct: 100,
+            report_id: savedReportId,
+            finished_at: new Date().toISOString(),
+          }).eq('id', incomingJobId);
+          logger.stage('report_job_marked_completed', { jobId: incomingJobId, reportId: savedReportId });
+        }
+
         if (heartbeatTimer !== null) {
           clearInterval(heartbeatTimer);
           heartbeatTimer = null;
         }
         await safeWrite(`: done ${Date.now()}\n\n`);
+        await logger.bumpJobStage(supabaseAdmin, 'Relatório persistido', { progress_pct: 98 });
         logger.stage('stream_closed_ok');
         if (streamOpen) await writer.close();
       } catch (err) {
         logger.error('stream_task_failed', err, { last_stage: logger.lastStage() });
+        if (incomingJobId) {
+          try {
+            await supabaseAdmin.from('report_jobs').update({
+              status: 'failed',
+              stage: `[trace=${logger.traceId}] Falhou em ${logger.lastStage()}`,
+              error_message: `[trace=${logger.traceId}][last_stage=${logger.lastStage()}] ${err instanceof Error ? err.message : String(err)}`,
+              finished_at: new Date().toISOString(),
+            }).eq('id', incomingJobId);
+          } catch { /* ignore job status update failure */ }
+        }
         if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
         streamOpen = false;
         await writer.abort(err).catch(() => {});

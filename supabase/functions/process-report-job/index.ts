@@ -1,4 +1,4 @@
-// v1.38.57 — Worker assíncrono da fila de geração de relatórios.
+// v1.38.58 — Worker assíncrono da fila de geração de relatórios.
 // (force-redeploy: a versão anterior não propagou para a infra de edge functions,
 // causando 404 ao trigger DB e jobs travados em "processing" para sempre.)
 //
@@ -178,6 +178,7 @@ serve(async (req) => {
           "x-trace-id": traceId,
         },
         body: JSON.stringify({
+          jobId,
           assessmentId: job.assessment_id,
           destinationName: job.destination_name,
           pillarScores: payload.pillarScores,
@@ -217,6 +218,7 @@ serve(async (req) => {
               "x-trace-id": traceId,
             },
             body: JSON.stringify({
+              jobId,
               assessmentId: job.assessment_id,
               destinationName: job.destination_name,
               pillarScores: payload.pillarScores,

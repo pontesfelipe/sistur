@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 57,
+  patch: 58,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.58",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção do job assíncrono que ficava em processamento e não concluía após a paralelização por pilares. O worker agora passa o `jobId` para a execução interna do `generate-report`, permitindo que o logger da pipeline atualize o próprio registro em `report_jobs` durante as fases longas (pilares, envelope, validação e persistência). Isso evita o estado silencioso em que o relatório era gerado no stream interno, mas o job externo não recebia conclusão/erro visível. Também foram adicionados marcos de progresso reais para Fase 1, Fase 2, validação e persistência."
+    ],
+  },
   {
     version: "1.38.57",
     date: "2026-05-01",
