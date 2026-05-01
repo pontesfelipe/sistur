@@ -79,6 +79,7 @@ function buildCanonicalAuditTrail(auditRows: any[], indicatorValues: any[], indi
       const shouldUpgradeSource = String(existing.source_type || 'MANUAL').startsWith('MANUAL') && inferred.source_type !== 'MANUAL';
       byCode.set(code, {
         ...existing,
+        indicator_name: existing.indicator_name || iv.indicators?.name || code,
         value: existing.value ?? iv.value_raw,
         source_type: shouldUpgradeSource ? inferred.source_type : (existing.source_type || inferred.source_type),
         source_detail: shouldUpgradeSource ? source_detail : (existing.source_detail || source_detail),
@@ -86,6 +87,7 @@ function buildCanonicalAuditTrail(auditRows: any[], indicatorValues: any[], indi
     } else {
       byCode.set(code, {
         indicator_code: code,
+        indicator_name: iv.indicators?.name || code,
         pillar: iv.indicators?.pillar || null,
         value: iv.value_raw ?? null,
         normalized_score: null,
@@ -101,6 +103,7 @@ function buildCanonicalAuditTrail(auditRows: any[], indicatorValues: any[], indi
     if (!code || byCode.has(code)) continue;
     byCode.set(code, {
       indicator_code: code,
+      indicator_name: score.indicators?.name || code,
       pillar: score.indicators?.pillar || null,
       value: score.value_raw ?? null,
       normalized_score: score.score ?? (score.score_pct !== null && score.score_pct !== undefined ? Number(score.score_pct) / 100 : null),
