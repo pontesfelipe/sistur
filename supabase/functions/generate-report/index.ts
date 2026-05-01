@@ -1662,7 +1662,16 @@ serve(async (req) => {
       // Valores: 'auto' | 'claude' | 'gpt5' | 'gemini'. Default 'auto'
       // mantém a cadeia padrão Claude → GPT-5 → Gemini.
       aiProvider: requestedProvider = 'auto',
+      // v1.38.45 — versão do app vigente no cliente. Usada para carimbar
+      // `report_validations.validator_version` por request, evitando que
+      // a "Conferência de dados" exibida na UI mostre uma string antiga
+      // hardcoded no servidor.
+      appVersion: rawAppVersion,
     } = await req.json();
+
+    const appVersion: string = (typeof rawAppVersion === 'string' && /^v?\d+\.\d+\.\d+/.test(rawAppVersion))
+      ? (rawAppVersion.startsWith('v') ? rawAppVersion : `v${rawAppVersion}`)
+      : VALIDATOR_VERSION_FALLBACK;
 
     // Valida que somente ADMIN pode forçar provedor — para usuários comuns
     // o valor é silenciosamente reduzido a 'auto'.
