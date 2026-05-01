@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 import { ReportValidationBanner } from '@/components/reports/ReportValidationBanner';
+import { useReportJobWatcher, ensureNotificationPermission } from '@/hooks/useReportJobWatcher';
 
 const REPORT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`;
 
@@ -155,6 +156,7 @@ export default function Relatorios() {
   const [searchParams] = useSearchParams();
   const assessmentFromUrl = searchParams.get('assessment');
   const queryClient = useQueryClient();
+  const { track: trackReportJob } = useReportJobWatcher();
   
   const { assessments, isLoading: assessmentsLoading } = useAssessments();
   const { destinations } = useDestinations();
@@ -285,6 +287,11 @@ export default function Relatorios() {
     setGenerationStage('Enfileirando geração…');
     cancelGenerationRef.current = false;
 
+    // v1.38.55 — Pede permissão de Notification de forma silenciosa.
+    // Se o usuário aceitar, receberá um aviso do navegador quando o job
+    // terminar mesmo se a aba estiver em background ou minimizada.
+    void ensureNotificationPermission();
+
     const pillarScoresMap: Record<string, { score: number; severity: string }> = {};
     pillarScores?.forEach(ps => {
       pillarScoresMap[ps.pillar] = { score: ps.score, severity: ps.severity };
@@ -296,7 +303,12 @@ export default function Relatorios() {
     // status 'completed' ou 'failed' — sem manter conexão SSE longa,
     // imune a timeouts de proxy/aba/rede.
     const POLL_INTERVAL_MS = 4_000;
-    const POLL_DEADLINE_MS = 10 * 60 * 1000; // 10 minutos de teto
+    // v1.38.55 — Aumentado de 10min → 15min porque relatórios completos
+    // (template "completo" com 100+ indicadores) podem levar até ~7min só
+    // na chamada de IA (Claude). O watcher global em background continua
+    // observando o job mesmo se este loop terminar antes — então o teto
+    // aqui não é fatal, é só o limite do feedback inline na tela.
+    const POLL_DEADLINE_MS = 15 * 60 * 1000;
 
     try {
       const resp = await fetch(REPORT_URL, {
@@ -346,6 +358,12 @@ export default function Relatorios() {
       const jobId = enqueued?.jobId as string | undefined;
       if (!jobId) throw new Error('Servidor não retornou um identificador de job.');
 
+      // v1.38.55 — Registra o job no watcher global. Mesmo que o usuário
+      // feche a página de Relatórios, mude de aba ou recarregue a app,
+      // o watcher continuará observando o job em background e mostrará
+      // toast + Notification quando concluir/falhar.
+      trackReportJob(jobId, selectedAssessmentId, selectedDestination.name);
+
       setGenerationStage('Geração em andamento no servidor…');
 
       // Polling do job. O job é atualizado pelo background task da edge function.
@@ -377,7 +395,17 @@ export default function Relatorios() {
         }
       }
       if (!finalReportId) {
-        throw new Error('Geração demorou mais que o esperado. Confira o histórico em alguns minutos.');
+        // v1.38.55 — Não trata como erro: o job pode terminar em
+        // alguns minutos, e o watcher global cuidará da notificação.
+        toast.info(
+          'A geração está demorando mais que o normal e seguirá em segundo plano.',
+          {
+            description:
+              'Você pode fechar esta tela. Avisaremos por toast (e notificação do navegador, se permitida) assim que o relatório ficar pronto.',
+            duration: 10_000,
+          },
+        );
+        return;
       }
 
       // Carrega conteúdo final

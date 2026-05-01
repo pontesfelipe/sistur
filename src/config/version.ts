@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 54,
+  patch: 55,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.55",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — UX da geração em segundo plano resiliente. Antes, quando o relatório demorava mais que ~10min na tela (caso comum no template 'completo' com 100+ indicadores, que pode levar até ~7min só na chamada de IA), o front lançava erro 'Geração demorou mais que o esperado' mesmo com o job ainda rodando normalmente no servidor — confundia o usuário, que via 'erro' apesar de o relatório acabar sendo salvo minutos depois. Correções: (1) deadline do polling inline aumentado de 10min para 15min; (2) ao atingir o deadline, em vez de erro, mostra toast informativo de que a geração continua em segundo plano; (3) novo hook `useReportJobWatcher` global (montado em `App.tsx`) que persiste jobs pendentes em `localStorage` e ressuscita o polling automaticamente quando a app recarrega — assim o usuário recebe toast + Notification do navegador quando o relatório ficar pronto, mesmo se ele fechou a página de Relatórios, mudou de aba do app ou recarregou; (4) permissão de Notification é solicitada de forma silenciosa no clique de 'Gerar Relatório' (uma vez); (5) jobs com mais de 2h são descartados como stale para não alarmar o usuário com sucesso/falha de geração antiga."
+    ],
+  },
   {
     version: "1.38.54",
     date: "2026-05-01",

@@ -14,6 +14,7 @@ import { EduRoute } from "@/components/layout/EduRoute";
 import { LicenseRoute } from "@/components/layout/LicenseRoute";
 import { SplashScreen } from "@/components/SplashScreen";
 import { ClientErrorMonitor } from "@/components/ClientErrorMonitor";
+import { ReportJobWatcherMount } from "@/components/ReportJobWatcherMount";
 
 // Lazy load all page components for code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -120,6 +121,7 @@ const App = () => {
               <ClientErrorMonitor />
               <ProfileProvider>
               <LicenseProvider>
+              <ReportJobWatcherMount />
               <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/auth" element={<Auth />} />
