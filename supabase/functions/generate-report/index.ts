@@ -47,6 +47,72 @@ function formatAuditTrail(rows: any[]): string {
   return `${header}\n${body}`;
 }
 
+function classifyAuditSource(source?: string | null): { source_type: string; source_detail: string | null } {
+  const raw = String(source || '').trim();
+  const lower = raw.toLowerCase();
+  if (!raw) return { source_type: 'MANUAL', source_detail: null };
+  if (/derived|derivado|fórmula|formula/.test(lower)) return { source_type: 'DERIVED', source_detail: raw };
+  if (/estima/.test(lower)) return { source_type: 'ESTIMADA', source_detail: raw };
+  if (/api|pré-preenchido|pre-preenchido|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn|anac|anatel|\bana\b|tse|cadunico|mapa.?turismo|mtur/i.test(raw)) {
+    return { source_type: 'OFFICIAL_API', source_detail: raw };
+  }
+  return { source_type: 'MANUAL', source_detail: raw };
+}
+
+function buildCanonicalAuditTrail(auditRows: any[], indicatorValues: any[], indicatorScores: any[]): any[] {
+  const byCode = new Map<string, any>();
+  for (const row of auditRows || []) {
+    const code = String(row.indicator_code || '');
+    if (code) byCode.set(code, { ...row });
+  }
+
+  for (const iv of indicatorValues || []) {
+    const code = iv.indicators?.code;
+    if (!code) continue;
+    const inferred = classifyAuditSource(iv.source);
+    const refYear = String(iv.reference_date || '').match(/(20\d{2}|19\d{2})/)?.[1];
+    const source_detail = inferred.source_detail
+      ? `${inferred.source_detail}${refYear && !inferred.source_detail.includes(refYear) ? ` (${refYear})` : ''}`
+      : null;
+    const existing = byCode.get(code);
+    if (existing) {
+      const shouldUpgradeSource = String(existing.source_type || 'MANUAL').startsWith('MANUAL') && inferred.source_type !== 'MANUAL';
+      byCode.set(code, {
+        ...existing,
+        value: existing.value ?? iv.value_raw,
+        source_type: shouldUpgradeSource ? inferred.source_type : (existing.source_type || inferred.source_type),
+        source_detail: shouldUpgradeSource ? source_detail : (existing.source_detail || source_detail),
+      });
+    } else {
+      byCode.set(code, {
+        indicator_code: code,
+        pillar: iv.indicators?.pillar || null,
+        value: iv.value_raw ?? null,
+        normalized_score: null,
+        source_type: inferred.source_type,
+        source_detail,
+        weight: null,
+      });
+    }
+  }
+
+  for (const score of indicatorScores || []) {
+    const code = score.indicators?.code;
+    if (!code || byCode.has(code)) continue;
+    byCode.set(code, {
+      indicator_code: code,
+      pillar: score.indicators?.pillar || null,
+      value: score.value_raw ?? null,
+      normalized_score: score.score ?? (score.score_pct !== null && score.score_pct !== undefined ? Number(score.score_pct) / 100 : null),
+      source_type: 'DERIVED',
+      source_detail: score.normalization_method ? `score:${score.normalization_method}` : 'score calculado',
+      weight: score.weight_used ?? null,
+    });
+  }
+
+  return Array.from(byCode.values());
+}
+
 /**
  * Format a raw indicator value for the report based on its semantic
  * `value_format` flag (PERCENTAGE, CURRENCY, COUNT, etc.). Mirrors
