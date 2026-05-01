@@ -220,10 +220,11 @@ export default function Relatorios() {
   const selectedAssessment = assessments?.find(a => a.id === selectedAssessmentId);
   // Use destination from useDestinations first; fall back to the joined destination data
   // from the assessment itself (handles cross-org destinations not visible via RLS)
+  const selectedAssessmentMeta = selectedAssessment as typeof selectedAssessment & AssessmentDisplayMeta;
   const selectedDestination = destinations?.find(d => d.id === selectedAssessment?.destination_id)
     ?? (selectedAssessment ? {
       id: selectedAssessment.destination_id,
-      name: (selectedAssessment as any).destinations?.name || 'Destino',
+      name: selectedAssessmentMeta?.destinations?.name || 'Destino',
       uf: null as string | null,
     } : undefined);
   
@@ -250,12 +251,13 @@ export default function Relatorios() {
   );
 
   const filteredCalculatedAssessments = calculatedAssessments.filter(a => {
+    const meta = a as typeof a & AssessmentDisplayMeta;
     if (genTypeFilter !== 'all') {
-      const type = (a as any).diagnostic_type || 'territorial';
+      const type = meta.diagnostic_type || 'territorial';
       if (genTypeFilter !== type) return false;
     }
     if (genTierFilter !== 'all') {
-      const tier = (a as any).tier || 'SMALL';
+      const tier = meta.tier || 'SMALL';
       const tierMap: Record<string, string> = { essencial: 'SMALL', estrategico: 'MEDIUM', integral: 'COMPLETE' };
       if (tier !== tierMap[genTierFilter]) return false;
     }
