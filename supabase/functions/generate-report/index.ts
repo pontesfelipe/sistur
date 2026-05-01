@@ -1746,14 +1746,17 @@ async function runReportPipeline(args: {
       const savedAt = new Date(row.created_at).getTime();
       // Considera apenas relatórios salvos durante esta execução (após start)
       if (savedAt >= streamStartedAt - 5000) {
-        console.log('Stream interrompido, mas relatório foi persistido — recuperando job:', row.id);
+        logger.setReportId(row.id);
+        logger.stage('pipeline_recovered_after_abort', { id: row.id, last_stage: logger.lastStage() });
         return { reportId: row.id };
       }
     }
+    logger.error('pipeline_failed', err, { last_stage: logger.lastStage() });
     throw err;
   } finally {
     clearInterval(progressTimer);
     clearInterval(streamWatchdog);
+    logger.stage('pipeline_finally', { elapsed_sec: Math.round((Date.now() - streamStartedAt) / 1000) });
   }
 }
 
