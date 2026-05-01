@@ -1903,6 +1903,24 @@ serve(async (req) => {
             stage: `[trace=${logger.traceId}] Aguardando início`,
             progress_pct: 0,
             created_by: userId,
+            // v1.38.53 — Persistir payload + JWT para o worker independente
+            // (process-report-job) executar sem depender do request original.
+            payload: {
+              assessmentId,
+              destinationName,
+              pillarScores,
+              issues,
+              prescriptions,
+              forceRegenerate,
+              reportTemplate,
+              visibility,
+              environment,
+              enableComparison,
+              aiProvider: aiProviderOverride,
+              appVersion,
+              traceId: logger.traceId,
+            },
+            auth_jwt: authHeader,
           })
           .select('id')
           .maybeSingle();
@@ -1917,63 +1935,14 @@ serve(async (req) => {
         logger.stage('report_job_created', { jobId });
       }
 
-      const backgroundJob = (async () => {
-        try {
-          await supabaseAdmin.from('report_jobs').update({
-            status: 'processing',
-            stage: `[trace=${logger.traceId}] Coletando dados do diagnóstico`,
-            progress_pct: 10,
-            started_at: new Date().toISOString(),
-          }).eq('id', jobId);
-          logger.stage('background_job_processing');
-
-          const result = await runReportPipeline({
-            supabaseAdmin,
-            assessment,
-            assessmentId,
-            destinationName,
-            pillarScores,
-            issues,
-            prescriptions,
-            forceRegenerate,
-            reportTemplate,
-            visibility,
-            environment,
-            enableComparison,
-            userId,
-            jobId: jobId!,
-            authHeader: authHeader!,
-            aiProvider: aiProviderOverride,
-            appVersion,
-            logger,
-          });
-
-          await supabaseAdmin.from('report_jobs').update({
-            status: 'completed',
-            stage: `[trace=${logger.traceId}] Concluído`,
-            progress_pct: 100,
-            report_id: result.reportId,
-            finished_at: new Date().toISOString(),
-          }).eq('id', jobId);
-          logger.setReportId(result.reportId);
-          logger.stage('background_job_completed');
-        } catch (bgErr) {
-          logger.error('background_job_failed', bgErr, { last_stage: logger.lastStage() });
-          await supabaseAdmin.from('report_jobs').update({
-            status: 'failed',
-            error_message: `[trace=${logger.traceId}][last_stage=${logger.lastStage()}] ${bgErr instanceof Error ? bgErr.message : String(bgErr)}`,
-            finished_at: new Date().toISOString(),
-          }).eq('id', jobId);
-        }
-      })();
-
-      try {
-        // @ts-ignore - EdgeRuntime é global em Supabase Edge Functions
-        if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) {
-          // @ts-ignore
-          EdgeRuntime.waitUntil(backgroundJob);
-        }
-      } catch (_e) { /* ignore */ }
+      // v1.38.53 — O processamento agora é disparado pelo trigger DB
+      // `trg_dispatch_report_job` (pg_net.http_post -> process-report-job),
+      // o que torna a fila resiliente a timeout do request original.
+      // Antes usávamos EdgeRuntime.waitUntil dentro deste mesmo request,
+      // o que dava no problema: se a invocação inicial expirasse no proxy,
+      // o worker era morto junto. Agora o INSERT já dispara o worker
+      // independente; aqui apenas devolvemos 202 com o jobId.
+      logger.stage('background_job_dispatched_via_trigger');
 
       return new Response(JSON.stringify({ jobId, status: 'queued' }), {
         status: 202, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
