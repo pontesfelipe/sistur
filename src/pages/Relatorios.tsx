@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, type RefObject } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { exportReportAsDocx } from '@/lib/exportReportDocx';
 import { getStatusStyle, mapIndicatorTableColumns, normalizeStatusCellText, realignIndicatorRow } from '@/lib/reportStatusStyle';
@@ -96,15 +96,21 @@ const getReportTierLabel = (tier?: string | null) => {
   return null;
 };
 
-function useGeneratedReports(userId?: string, effectiveOrgId?: string) {
+function useGeneratedReports(userId?: string, orgId?: string, effectiveOrgId?: string) {
   return useQuery({
-    queryKey: ['generated-reports', userId, effectiveOrgId],
+    queryKey: ['generated-reports', userId, orgId, effectiveOrgId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const reportOrgIds = Array.from(new Set([orgId, effectiveOrgId].filter(Boolean))) as string[];
+      let query = supabase
         .from('generated_reports')
         .select('*, assessments(diagnostic_type, tier)')
-        .eq('org_id', effectiveOrgId)
         .order('created_at', { ascending: false });
+
+      if (reportOrgIds.length > 0) {
+        query = query.in('org_id', reportOrgIds);
+      }
+
+      const { data, error } = await query;
       
       if (error) throw error;
       return (data ?? []).map((r: any) => ({
@@ -113,7 +119,7 @@ function useGeneratedReports(userId?: string, effectiveOrgId?: string) {
         tier: r.assessments?.tier ?? null,
       })) as GeneratedReport[];
     },
-    enabled: Boolean(userId && effectiveOrgId),
+    enabled: Boolean(userId && orgId),
   });
 }
 
@@ -125,7 +131,7 @@ export default function Relatorios() {
   const { assessments, isLoading: assessmentsLoading } = useAssessments();
   const { destinations } = useDestinations();
   const { isAdmin, isViewingDemoData, profile, effectiveOrgId, loading: profileLoading } = useProfile();
-  const { data: savedReports, isLoading: reportsLoading } = useGeneratedReports(profile?.user_id, effectiveOrgId);
+  const { data: savedReports, isLoading: reportsLoading } = useGeneratedReports(profile?.user_id, profile?.org_id, effectiveOrgId);
   
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>('');
   const [report, setReport] = useState<string>('');
@@ -140,6 +146,7 @@ export default function Relatorios() {
   // v1.38.35 — Seletor de provedor de IA (apenas ADMIN). 'auto' = cadeia padrão Claude→GPT-5→Gemini.
   const [aiProvider, setAiProvider] = useState<'auto' | 'claude' | 'gpt5' | 'gemini'>('auto');
   const reportRef = useRef<HTMLDivElement>(null);
+  const historyReportRef = useRef<HTMLDivElement>(null);
   const [customizationOpen, setCustomizationOpen] = useState(false);
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
   const [historyTypeFilter, setHistoryTypeFilter] = useState<string>('all');
@@ -379,10 +386,10 @@ export default function Relatorios() {
 
   // MD download removed
 
-  const downloadPDF = () => {
-    if (!reportRef.current) return;
+  const downloadPDF = (targetRef: RefObject<HTMLDivElement> = reportRef) => {
+    if (!targetRef.current) return;
     
-    const content = reportRef.current.innerHTML;
+    const content = targetRef.current.innerHTML;
     
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
@@ -929,7 +936,7 @@ export default function Relatorios() {
                           <Download className="h-4 w-4" />
                           Word
                         </Button>
-                        <Button variant="outline" onClick={downloadPDF} className="gap-2">
+                        <Button variant="outline" onClick={() => downloadPDF()} className="gap-2">
                           <FileText className="h-4 w-4" />
                           PDF
                         </Button>
@@ -1217,7 +1224,7 @@ export default function Relatorios() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={downloadPDF}
+                        onClick={() => downloadPDF(historyReportRef)}
                         className="gap-2"
                       >
                         <FileText className="h-4 w-4" />
@@ -1231,7 +1238,7 @@ export default function Relatorios() {
                     <>
                       <ReportValidationBanner reportId={selectedHistoryReport.id} />
                       <ScrollArea className="h-[500px] pr-4">
-                        <div className="prose prose-sm max-w-none">
+                        <div ref={historyReportRef} className="prose prose-sm max-w-none">
                           {renderMarkdown(selectedHistoryReport.report_content)}
                         </div>
                       </ScrollArea>
