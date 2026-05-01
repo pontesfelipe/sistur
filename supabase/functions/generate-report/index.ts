@@ -2176,11 +2176,17 @@ INSTRUÇÕES SOBRE COMPARATIVO TEMPORAL:
       }
     });
 
-    console.log('Report data — Indicators:', indicatorScores.length, 'Issues:', issues?.length || 0, 
-      'Prescriptions:', prescriptions?.length || 0, 'Global refs:', globalRefs.length, 
-      'KB files:', kbFiles.length, 'Snapshots:', dataSnapshots.length, 
-      'Enterprise values:', enterpriseValues.length,
-      'Enterprise profile:', !!enterpriseProfile, 'Review analysis:', !!enterpriseProfile?.review_analysis);
+    logger.stage('data_collected', {
+      indicators: indicatorScores.length,
+      issues: issues?.length || 0,
+      prescriptions: prescriptions?.length || 0,
+      globalRefs: globalRefs.length,
+      kbFiles: kbFiles.length,
+      snapshots: dataSnapshots.length,
+      enterpriseValues: enterpriseValues.length,
+      hasEnterpriseProfile: !!enterpriseProfile,
+      hasReviewAnalysis: !!enterpriseProfile?.review_analysis,
+    });
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
