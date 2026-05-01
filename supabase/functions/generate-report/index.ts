@@ -13,6 +13,76 @@ const corsHeaders = {
 // de um string hardcoded que envelhece a cada release.
 const VALIDATOR_VERSION_FALLBACK = 'v1.38.50';
 
+// v1.38.52 — Logger estruturado para rastrear o pipeline de geração ponta-a-ponta.
+// Cada chamada estampa traceId (jobId quando disponível, senão um id aleatório),
+// assessmentId, reportId opcional, stage e tempo decorrido desde o início.
+// Também atualiza opcionalmente `report_jobs.stage` para que o estado fique
+// visível por SQL/UI sem depender só dos logs do Edge Function.
+type StageLogger = {
+  traceId: string;
+  startedAt: number;
+  stage: (name: string, extra?: Record<string, unknown>) => void;
+  error: (name: string, err: unknown, extra?: Record<string, unknown>) => void;
+  setReportId: (id: string | null | undefined) => void;
+  setAssessmentId: (id: string | null | undefined) => void;
+  setJobId: (id: string | null | undefined) => void;
+  bumpJobStage: (
+    supabaseAdmin: any,
+    name: string,
+    extra?: { progress_pct?: number },
+  ) => Promise<void>;
+  lastStage: () => string;
+};
+function createStageLogger(initial: {
+  traceId?: string;
+  assessmentId?: string | null;
+  reportId?: string | null;
+  jobId?: string | null;
+}): StageLogger {
+  let assessmentId = initial.assessmentId ?? null;
+  let reportId = initial.reportId ?? null;
+  let jobId = initial.jobId ?? null;
+  const traceId = initial.traceId ?? jobId ?? `trace_${Math.random().toString(36).slice(2, 10)}`;
+  const startedAt = Date.now();
+  let lastStage = 'init';
+  const fmtPrefix = () => {
+    const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
+    return `[trace=${traceId}][+${elapsed}s][asmt=${assessmentId ?? '-'}][report=${reportId ?? '-'}]`;
+  };
+  return {
+    traceId,
+    startedAt,
+    stage(name, extra) {
+      lastStage = name;
+      try {
+        console.log(`${fmtPrefix()}[stage=${name}]`, extra ? JSON.stringify(extra) : '');
+      } catch {
+        console.log(`${fmtPrefix()}[stage=${name}]`);
+      }
+    },
+    error(name, err, extra) {
+      lastStage = `${name}:error`;
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`${fmtPrefix()}[stage=${name}][ERROR] ${msg}`, extra ? JSON.stringify(extra) : '');
+    },
+    setReportId(id) { if (id) reportId = id; },
+    setAssessmentId(id) { if (id) assessmentId = id; },
+    setJobId(id) { if (id) jobId = id; },
+    async bumpJobStage(supabaseAdmin, name, extra) {
+      lastStage = name;
+      if (!jobId) return;
+      try {
+        const patch: Record<string, unknown> = { stage: `[trace=${traceId}] ${name}` };
+        if (extra?.progress_pct !== undefined) patch.progress_pct = extra.progress_pct;
+        await supabaseAdmin.from('report_jobs').update(patch).eq('id', jobId);
+      } catch (e) {
+        console.warn(`${fmtPrefix()}[bumpJobStage failed]`, e instanceof Error ? e.message : String(e));
+      }
+    },
+    lastStage: () => lastStage,
+  };
+}
+
 // ========== HELPER FUNCTIONS ==========
 
 /** Format number using Brazilian standard: comma for decimal, period for thousands */
