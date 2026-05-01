@@ -6,6 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const VALIDATOR_VERSION = 'v1.38.39';
+
 // ========== HELPER FUNCTIONS ==========
 
 /** Format number using Brazilian standard: comma for decimal, period for thousands */
@@ -45,6 +47,75 @@ function formatAuditTrail(rows: any[]): string {
     return `| ${r.pillar || '—'} | ${r.indicator_code || '—'} | ${valStr} | ${scoreStr} | ${r.source_type || 'MANUAL'} | ${r.weight ?? '—'} | ${detail} |`;
   }).join('\n');
   return `${header}\n${body}`;
+}
+
+function classifyAuditSource(source?: string | null): { source_type: string; source_detail: string | null } {
+  const raw = String(source || '').trim();
+  const lower = raw.toLowerCase();
+  if (!raw) return { source_type: 'MANUAL', source_detail: null };
+  if (/derived|derivado|fórmula|formula/.test(lower)) return { source_type: 'DERIVED', source_detail: raw };
+  if (/estima/.test(lower)) return { source_type: 'ESTIMADA', source_detail: raw };
+  if (/api|pré-preenchido|pre-preenchido|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn|anac|anatel|\bana\b|tse|cadunico|mapa.?turismo|mtur/i.test(raw)) {
+    return { source_type: 'OFFICIAL_API', source_detail: raw };
+  }
+  return { source_type: 'MANUAL', source_detail: raw };
+}
+
+function buildCanonicalAuditTrail(auditRows: any[], indicatorValues: any[], indicatorScores: any[]): any[] {
+  const byCode = new Map<string, any>();
+  for (const row of auditRows || []) {
+    const code = String(row.indicator_code || '');
+    if (code) byCode.set(code, { ...row });
+  }
+
+  for (const iv of indicatorValues || []) {
+    const code = iv.indicators?.code;
+    if (!code) continue;
+    const inferred = classifyAuditSource(iv.source);
+    const refYear = String(iv.reference_date || '').match(/(20\d{2}|19\d{2})/)?.[1];
+    const source_detail = inferred.source_detail
+      ? `${inferred.source_detail}${refYear && !inferred.source_detail.includes(refYear) ? ` (${refYear})` : ''}`
+      : null;
+    const existing = byCode.get(code);
+    if (existing) {
+      const shouldUpgradeSource = String(existing.source_type || 'MANUAL').startsWith('MANUAL') && inferred.source_type !== 'MANUAL';
+      byCode.set(code, {
+        ...existing,
+        indicator_name: existing.indicator_name || iv.indicators?.name || code,
+        value: existing.value ?? iv.value_raw,
+        source_type: shouldUpgradeSource ? inferred.source_type : (existing.source_type || inferred.source_type),
+        source_detail: shouldUpgradeSource ? source_detail : (existing.source_detail || source_detail),
+      });
+    } else {
+      byCode.set(code, {
+        indicator_code: code,
+        indicator_name: iv.indicators?.name || code,
+        pillar: iv.indicators?.pillar || null,
+        value: iv.value_raw ?? null,
+        normalized_score: null,
+        source_type: inferred.source_type,
+        source_detail,
+        weight: null,
+      });
+    }
+  }
+
+  for (const score of indicatorScores || []) {
+    const code = score.indicators?.code;
+    if (!code || byCode.has(code)) continue;
+    byCode.set(code, {
+      indicator_code: code,
+      indicator_name: score.indicators?.name || code,
+      pillar: score.indicators?.pillar || null,
+      value: score.value_raw ?? null,
+      normalized_score: score.score ?? (score.score_pct !== null && score.score_pct !== undefined ? Number(score.score_pct) / 100 : null),
+      source_type: 'DERIVED',
+      source_detail: score.normalization_method ? `score:${score.normalization_method}` : 'score calculado',
+      weight: score.weight_used ?? null,
+    });
+  }
+
+  return Array.from(byCode.values());
 }
 
 /**
@@ -1282,11 +1353,13 @@ async function runReportValidatorAgent(
   reportText: string,
   auditRows: any[],
   apiKey: string,
+  globalRefs: any[] = [],
 ): Promise<string[]> {
   if (!reportText || !apiKey) return [];
   try {
-    const auditCompact = (auditRows || []).slice(0, 80).map((r) => ({
+    const auditCompact = (auditRows || []).map((r) => ({
       code: r.indicator_code,
+      name: r.indicator_name,
       pillar: r.pillar,
       value: r.value,
       score_pct: r.normalized_score !== null && r.normalized_score !== undefined
@@ -1295,6 +1368,10 @@ async function runReportValidatorAgent(
       source: r.source_type,
       source_detail: r.source_detail,
     }));
+
+    const providedRefs = (globalRefs || [])
+      .map((ref: any) => `- ${ref.file_name || ref.category || 'Documento'}${ref.category ? ` (${ref.category})` : ''}${ref.description ? ` — ${ref.description}` : ''}`)
+      .join('\n') || '- Nenhum documento nacional adicional fornecido.';
 
     const sys = `Você é um agente de auditoria factual ESTRITO para relatórios técnicos em turismo (SISTUR).
 Sua tarefa: comparar o RELATÓRIO contra os DADOS AUDITADOS e a BIBLIOGRAFIA CANÔNICA, e listar TODA alucinação, suposição ou afirmação sem lastro.
@@ -1305,11 +1382,14 @@ BIBLIOGRAFIA CANÔNICA (qualquer outra data/título para essas obras é ERRO):
 - BENI, M. C. Política e Planejamento de Turismo no Brasil. Aleph, 2006.
 - TASSO, J. P. F. et al. Mandala da Sustentabilidade no Turismo. UnB, 2024.
 
+DOCUMENTOS DE REFERÊNCIA FORNECIDOS NA GERAÇÃO:
+${providedRefs}
+
 POLÍTICA "ZERO ALUCINAÇÃO" — REPORTE COMO ISSUE TODOS OS CASOS ABAIXO:
 1. Qualquer número (%, R$, contagem, taxa) citado no relatório que NÃO bata com a tabela de DADOS AUDITADOS (tolerância 5%, com escala percentual ↔ decimal).
 2. Qualquer número/estatística que NÃO tenha correspondência alguma na tabela de auditoria (alucinação pura — "inventou um número").
 3. Qualquer ano de referência citado para um indicador que difira do source_detail/reference_year auditado.
-4. Qualquer citação (AUTOR, ANO) com autor/ano fora da bibliografia canônica E que não tenha sido entregue na Base de Conhecimento.
+4. Qualquer citação (AUTOR, ANO) com autor/ano fora da bibliografia canônica E que não tenha sido entregue nos DOCUMENTOS DE REFERÊNCIA FORNECIDOS.
 5. Qualquer ano errado para o modelo SISTUR (correto: 1997 ou 2007 — NUNCA 2001/2020/2021).
 6. Atribuição de fonte trocada (ex.: dado MANUAL apresentado como "IBGE", leitos CADASTUR apresentados como "DATASUS").
 7. Status invertido ou inventado (ex.: "Adequado" quando o score auditado é Crítico/Atenção; "tendência de crescimento" sem dois pontos no tempo).
@@ -1325,6 +1405,8 @@ REGRAS DE SAÍDA:
 
     const usr = `=== DADOS AUDITADOS (fonte de verdade) ===
 ${JSON.stringify(auditCompact, null, 2)}
+
+Total de indicadores auditados nesta base: ${auditCompact.length}. Não afirme que a base contém menos indicadores do que este total.
 
 === RELATÓRIO GERADO ===
 ${reportText.slice(0, 18000)}`;
@@ -1445,6 +1527,15 @@ async function runReportPipeline(args: {
       const errText = await resp.text().catch(() => '');
       throw new Error(`Pipeline interno falhou (${resp.status}): ${errText.slice(0, 200)}`);
     }
+    const contentType = resp.headers.get('Content-Type') || '';
+    if (contentType.includes('application/json')) {
+      const payload = await resp.json().catch(() => null);
+      if (payload?.skipped) {
+        throw new Error('A geração foi reutilizada pelo cache interno. Clique em Regenerar para criar uma nova versão.');
+      }
+      if (payload?.reportId) return { reportId: payload.reportId };
+      throw new Error('Pipeline interno retornou uma resposta inesperada ao finalizar a geração.');
+    }
     // Drena o stream até o fim para garantir que a persistência interna
     // (dentro do EdgeRuntime.waitUntil do endpoint stream) tenha tempo de rodar.
     if (resp.body) {
@@ -1483,6 +1574,7 @@ async function runReportPipeline(args: {
       .from('generated_reports')
       .select('id, created_at')
       .eq('assessment_id', assessmentId)
+      .gte('created_at', new Date(streamStartedAt - 5000).toISOString())
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -1787,7 +1879,7 @@ serve(async (req) => {
       .from('assessment_indicator_audit')
       .select('indicator_code, pillar, value, normalized_score, source_type, source_detail, weight')
       .eq('assessment_id', assessmentId);
-    const auditTrail = auditRows || [];
+    const auditTrail = buildCanonicalAuditTrail(auditRows || [], indicatorValues, indicatorScores);
 
     // Catalog indicators by code so we can decorate external benchmarks with
     // names/units from the indicators table.
@@ -2284,6 +2376,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               workingText,
               auditTrail || [],
               LOVABLE_API_KEY,
+              globalRefs,
             );
             const allIssues = [
               ...deterministic.map((w) => `[determinístico] ${w}`),
@@ -2344,7 +2437,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               ai_issues: aiIssues,
               auto_corrections: autoCorrections,
               total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
-              validator_version: 'v1.38.38',
+              validator_version: VALIDATOR_VERSION,
             });
           } catch (vErr) {
             console.error('Failed to persist report_validations:', vErr);

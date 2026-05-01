@@ -531,6 +531,8 @@ serve(async (req) => {
           id,
           indicator_id,
           value_raw,
+            source,
+            reference_date,
           is_ignored,
           indicator:indicators(
             id,
@@ -576,6 +578,8 @@ serve(async (req) => {
             id: iv.id,
             indicator_id: iv.indicator_id,
             value_raw: iv.value_raw,
+            source: iv.source,
+            reference_date: iv.reference_date,
             indicator: {
               id: iv.indicator?.id,
               code: iv.indicator?.code,
@@ -691,6 +695,8 @@ serve(async (req) => {
           id,
           indicator_id,
           value_raw,
+            source,
+            reference_date,
           is_ignored,
           indicator:indicators(
             id,
@@ -945,7 +951,7 @@ serve(async (req) => {
       // Phase: source-integrity fix — preserve original source from external_indicator_values
       const ivSourceTag = (iv as any)._source || (iv as any).source || '';
       const ivExternalSource = (iv as any)._external_source || '';
-      const ivReferenceYear = (iv as any)._reference_year || '';
+      const ivReferenceYear = (iv as any)._reference_year || String((iv as any).reference_date || '').match(/(20\d{2}|19\d{2})/)?.[1] || '';
       const ivSource = ivSourceTag;
       const isExternalOrigin = ivSourceTag === 'external' || ivSourceTag === 'derived';
       const isAutoSource = isExternalOrigin
@@ -1001,12 +1007,13 @@ serve(async (req) => {
 
       // Build a rich source_detail so the validator can verify the cited source/year
       let sourceDetail: string | null = null;
-      if (sourceType.startsWith('OFFICIAL_API') && ivExternalSource) {
+      const sourceDetailBase = ivExternalSource || ivSourceTag;
+      if (sourceType.startsWith('OFFICIAL_API') && sourceDetailBase) {
         sourceDetail = ivReferenceYear
-          ? `${String(ivExternalSource).toUpperCase()} (${ivReferenceYear})`
-          : String(ivExternalSource).toUpperCase();
-      } else if (sourceType.startsWith('DERIVED') && ivExternalSource) {
-        sourceDetail = `Derivado de ${String(ivExternalSource).toUpperCase()}${ivReferenceYear ? ` (${ivReferenceYear})` : ''}`;
+          ? `${String(sourceDetailBase).toUpperCase()} (${ivReferenceYear})`
+          : String(sourceDetailBase).toUpperCase();
+      } else if (sourceType.startsWith('DERIVED') && sourceDetailBase) {
+        sourceDetail = `Derivado de ${String(sourceDetailBase).toUpperCase()}${ivReferenceYear ? ` (${ivReferenceYear})` : ''}`;
       } else if (ivSourceTag) {
         sourceDetail = String(ivSourceTag).slice(0, 200);
       }

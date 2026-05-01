@@ -179,6 +179,9 @@ export default function Relatorios() {
   const prescriptions = assessmentDetails?.prescriptions;
 
   const calculatedAssessments = assessments?.filter(a => a.status === 'CALCULATED') || [];
+  const hasSavedReportForSelected = Boolean(
+    selectedAssessmentId && savedReports?.some((r) => r.assessment_id === selectedAssessmentId),
+  );
 
   const filteredCalculatedAssessments = calculatedAssessments.filter(a => {
     if (genTypeFilter !== 'all') {
@@ -852,7 +855,7 @@ export default function Relatorios() {
 
                   <div className="flex items-end gap-2">
                     <Button 
-                      onClick={() => generateReport()} 
+                      onClick={() => generateReport(hasSavedReportForSelected)} 
                       disabled={!selectedAssessmentId || isGenerating}
                       className="gap-2"
                     >
@@ -864,7 +867,7 @@ export default function Relatorios() {
                       ) : (
                         <>
                           <Sparkles className="h-4 w-4" />
-                          Gerar Relatório
+                          {hasSavedReportForSelected ? 'Gerar nova versão' : 'Gerar Relatório'}
                         </>
                       )}
                     </Button>
