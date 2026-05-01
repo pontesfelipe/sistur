@@ -1695,17 +1695,22 @@ async function runReportPipeline(args: {
     // Drena o stream até o fim para garantir que a persistência interna
     // (dentro do EdgeRuntime.waitUntil do endpoint stream) tenha tempo de rodar.
     if (resp.body) {
+      logger.stage('drain_stream_start');
       const reader = resp.body.getReader();
+      let chunks = 0;
       while (true) {
         const { done } = await reader.read();
         if (done) break;
+        chunks++;
         lastStreamChunkAt = Date.now();
       }
+      logger.stage('drain_stream_done', { chunks });
     }
 
     // Polling curto: o endpoint stream salva via background task, então
     // pode haver alguns ms de defasagem entre o fim do stream e o INSERT
     // do generated_reports.
+    logger.stage('poll_generated_report_start');
     let reportId: string | null = null;
     for (let i = 0; i < 20; i++) {
       const { data: row } = await supabaseAdmin
@@ -1719,8 +1724,11 @@ async function runReportPipeline(args: {
       await new Promise((r) => setTimeout(r, 1000));
     }
     if (!reportId) {
+      logger.error('poll_generated_report_missed', new Error('Report row not found after stream'));
       throw new Error('Pipeline terminou sem salvar o relatório. A geração foi interrompida antes da persistência final.');
     }
+    logger.setReportId(reportId);
+    logger.stage('pipeline_done_via_polling');
     return { reportId };
   } catch (err) {
     // v1.38.33 — Recovery: se o stream foi abortado por timeout MAS o
