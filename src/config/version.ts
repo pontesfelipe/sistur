@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 48,
+  patch: 49,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.49",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção do timeout na geração em segundo plano. Causa confirmada nos `report_jobs`: a chamada interna do pipeline usava `backgroundRun: true`, fazendo o endpoint interno só responder JSON ao final; durante a geração com IA ficava sem enviar bytes por cerca de 150s e a infraestrutura encerrava a requisição com `IDLE_TIMEOUT`. Correção em `supabase/functions/generate-report/index.ts`: a chamada interna agora usa stream real (`backgroundRun: false`) e o stream envia heartbeats a cada 15s enquanto a IA gera e enquanto a validação/persistência final executa. O job externo continua em modo background com polling, mas a conexão interna deixa de ficar ociosa e não deve mais cair por idle timeout."
+    ],
+  },
   {
     version: "1.38.48",
     date: "2026-05-01",
