@@ -3104,6 +3104,17 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           logger.error('persist_audit_failed', auditErr);
         }
 
+        if (incomingJobId && savedReportId) {
+          await supabaseAdmin.from('report_jobs').update({
+            status: 'completed',
+            stage: `[trace=${logger.traceId}] Concluído`,
+            progress_pct: 100,
+            report_id: savedReportId,
+            finished_at: new Date().toISOString(),
+          }).eq('id', incomingJobId);
+          logger.stage('report_job_marked_completed', { jobId: incomingJobId, reportId: savedReportId });
+        }
+
         if (heartbeatTimer !== null) {
           clearInterval(heartbeatTimer);
           heartbeatTimer = null;
@@ -3114,6 +3125,14 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         if (streamOpen) await writer.close();
       } catch (err) {
         logger.error('stream_task_failed', err, { last_stage: logger.lastStage() });
+        if (incomingJobId) {
+          await supabaseAdmin.from('report_jobs').update({
+            status: 'failed',
+            stage: `[trace=${logger.traceId}] Falhou em ${logger.lastStage()}`,
+            error_message: `[trace=${logger.traceId}][last_stage=${logger.lastStage()}] ${err instanceof Error ? err.message : String(err)}`,
+            finished_at: new Date().toISOString(),
+          }).eq('id', incomingJobId).catch(() => {});
+        }
         if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
         streamOpen = false;
         await writer.abort(err).catch(() => {});
