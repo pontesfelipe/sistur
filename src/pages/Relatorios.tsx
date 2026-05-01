@@ -96,15 +96,21 @@ const getReportTierLabel = (tier?: string | null) => {
   return null;
 };
 
-function useGeneratedReports(userId?: string, effectiveOrgId?: string) {
+function useGeneratedReports(userId?: string, orgId?: string, effectiveOrgId?: string) {
   return useQuery({
-    queryKey: ['generated-reports', userId, effectiveOrgId],
+    queryKey: ['generated-reports', userId, orgId, effectiveOrgId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const reportOrgIds = Array.from(new Set([orgId, effectiveOrgId].filter(Boolean))) as string[];
+      let query = supabase
         .from('generated_reports')
         .select('*, assessments(diagnostic_type, tier)')
-        .eq('org_id', effectiveOrgId)
         .order('created_at', { ascending: false });
+
+      if (reportOrgIds.length > 0) {
+        query = query.in('org_id', reportOrgIds);
+      }
+
+      const { data, error } = await query;
       
       if (error) throw error;
       return (data ?? []).map((r: any) => ({
@@ -113,7 +119,7 @@ function useGeneratedReports(userId?: string, effectiveOrgId?: string) {
         tier: r.assessments?.tier ?? null,
       })) as GeneratedReport[];
     },
-    enabled: Boolean(userId && effectiveOrgId),
+    enabled: Boolean(userId && orgId),
   });
 }
 
@@ -125,7 +131,7 @@ export default function Relatorios() {
   const { assessments, isLoading: assessmentsLoading } = useAssessments();
   const { destinations } = useDestinations();
   const { isAdmin, isViewingDemoData, profile, effectiveOrgId, loading: profileLoading } = useProfile();
-  const { data: savedReports, isLoading: reportsLoading } = useGeneratedReports(profile?.user_id, effectiveOrgId);
+  const { data: savedReports, isLoading: reportsLoading } = useGeneratedReports(profile?.user_id, profile?.org_id, effectiveOrgId);
   
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>('');
   const [report, setReport] = useState<string>('');
@@ -140,6 +146,7 @@ export default function Relatorios() {
   // v1.38.35 — Seletor de provedor de IA (apenas ADMIN). 'auto' = cadeia padrão Claude→GPT-5→Gemini.
   const [aiProvider, setAiProvider] = useState<'auto' | 'claude' | 'gpt5' | 'gemini'>('auto');
   const reportRef = useRef<HTMLDivElement>(null);
+  const historyReportRef = useRef<HTMLDivElement>(null);
   const [customizationOpen, setCustomizationOpen] = useState(false);
   const [reportCustomization, setReportCustomization] = useState<ReportCustomization>(loadCustomization);
   const [historyTypeFilter, setHistoryTypeFilter] = useState<string>('all');
