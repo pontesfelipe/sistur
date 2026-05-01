@@ -2507,23 +2507,32 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         for (const provider of providerOrder) {
           if (response) break;
           await safeWrite(`: provider ${provider} ${Date.now()}\n\n`);
+          logger.stage('provider_try', { provider });
           if (provider === 'claude') await tryClaude();
           else if (provider === 'gpt5') await tryGpt5();
           else if (provider === 'gemini') await tryGemini();
+          logger.stage('provider_try_result', { provider, ok: !!response });
         }
 
         if (!response) {
-          console.error('All providers failed. Trail:', JSON.stringify(fallbackTrail));
+          logger.error('all_providers_failed', new Error('no provider returned a stream'), { trail: fallbackTrail });
           throw new Error('Nenhum provedor de IA conseguiu gerar o relatório. Tente novamente em alguns minutos.');
         }
 
-        console.log('Streaming report from AI gateway');
+        logger.stage('ai_stream_open', { provider: usedProvider });
         const reader = response.body!.getReader();
         const decoder = new TextDecoder();
+        let firstChunkLogged = false;
+        let chunkCount = 0;
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
+          chunkCount++;
+          if (!firstChunkLogged) {
+            firstChunkLogged = true;
+            logger.stage('ai_first_chunk', { provider: usedProvider });
+          }
           await safeWrite(value);
 
           const text = decoder.decode(value, { stream: true });
@@ -2537,8 +2546,10 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             }
           }
         }
+        logger.stage('ai_stream_done', { chunks: chunkCount, contentChars: fullContent.length });
 
         if (!fullContent) {
+          logger.error('ai_empty_content', new Error('AI returned no content'));
           throw new Error('A IA terminou sem retornar conteúdo para o relatório.');
         }
 
