@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 import { ReportValidationBanner } from '@/components/reports/ReportValidationBanner';
+import { useReportJobWatcher, ensureNotificationPermission } from '@/hooks/useReportJobWatcher';
 
 const REPORT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`;
 
