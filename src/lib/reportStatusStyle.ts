@@ -105,6 +105,51 @@ const KNOWN_SOURCES = /^(IBGE|DATASUS|STN|CADASTUR|MTUR|MAPA[_ ]?TUR(ISMO)?|INEP
 const STATUS_EMOJI_RE = /[🟢🔵🟡🟠🔴⚪]/u;
 const UNIT_RE = /^(%|R\$|hab\.?|dias?|score [^|]+|nota[^|]*|segmentos?|leitos?|km2?|—|-)$/i;
 
+/**
+ * Map status emoji to its canonical key. Used as a last-resort signal when the
+ * LLM emits a truncated label (e.g. "AT" instead of "ATENÇÃO") but the emoji
+ * itself is correct.
+ */
+const EMOJI_TO_KEY: Record<string, keyof typeof STATUS_STYLES> = {
+  '🟢': 'EXCELENTE',
+  '🔵': 'FORTE',
+  '🟡': 'ADEQUADO',
+  '🟠': 'ATENCAO',
+  '🔴': 'CRITICO',
+  '⚪': 'INFORMATIVO',
+};
+
+/**
+ * Normalize a status table cell so it always reads "<emoji> <CANONICAL_LABEL>".
+ * Fixes cases where the LLM truncates the label (e.g. "🟠 **AT**" instead of
+ * "🟠 **ATENÇÃO**") which leaks the misalignment into the rendered table even
+ * after the row itself is realigned.
+ *
+ * Strategy:
+ *  1. If the cell contains a known status emoji, trust the emoji and rebuild
+ *     the label from STATUS_STYLES (preserving any surrounding markdown bold).
+ *  2. Otherwise, try to canonicalize the textual label.
+ *  3. If neither works, return the original cell unchanged.
+ */
+export function normalizeStatusCellText(raw: string): string {
+  if (!raw) return raw;
+  const emojiMatch = raw.match(STATUS_EMOJI_RE);
+  if (emojiMatch) {
+    const key = EMOJI_TO_KEY[emojiMatch[0]];
+    const style = STATUS_STYLES[key];
+    // Preserve markdown bold if present in the original.
+    const bold = /\*\*/.test(raw);
+    return bold ? `${style.emoji} **${style.label}**` : `${style.emoji} ${style.label}`;
+  }
+  const key = canonicalStatusKey(raw);
+  if (key) {
+    const style = STATUS_STYLES[key];
+    const bold = /\*\*/.test(raw);
+    return bold ? `${style.emoji} **${style.label}**` : `${style.emoji} ${style.label}`;
+  }
+  return raw;
+}
+
 export function realignIndicatorRow(
   row: string[],
   headers: string[],
