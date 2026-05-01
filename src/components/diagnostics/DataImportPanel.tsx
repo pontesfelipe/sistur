@@ -218,8 +218,8 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
         if (!dest?.ibge_code) return;
 
-        const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
-        if (!effectiveOrgId) return;
+        const valueOrgId = selectedAssessmentData.org_id || profile?.org_id || profile?.viewing_demo_org_id;
+        if (!valueOrgId) return;
 
         // Fetch validated external values
         const { data: extValues } = await supabase
@@ -256,7 +256,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
             indicator_id: indicator.id,
             value_raw: Number(ext.raw_value),
             source: `Pré-preenchido (${ext.source_code})`,
-            org_id: effectiveOrgId,
+            org_id: valueOrgId,
             reference_date: ext.reference_year ? `${ext.reference_year}-01-01` : null,
           });
         }
