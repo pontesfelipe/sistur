@@ -104,7 +104,7 @@ function useGeneratedReports(userId?: string, orgId?: string, effectiveOrgId?: s
       const reportOrgIds = Array.from(new Set([orgId, effectiveOrgId].filter(Boolean))) as string[];
       let query = supabase
         .from('generated_reports')
-        .select('*, assessments(diagnostic_type, tier)')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (reportOrgIds.length > 0) {
@@ -114,13 +114,32 @@ function useGeneratedReports(userId?: string, orgId?: string, effectiveOrgId?: s
       const { data, error } = await query;
       
       if (error) throw error;
+      const reports = data ?? [];
+      const assessmentIds = Array.from(new Set(reports.map((r: any) => r.assessment_id).filter(Boolean))) as string[];
+      const assessmentMetaById = new Map<string, { diagnostic_type?: string | null; tier?: string | null }>();
+
+      if (assessmentIds.length > 0) {
+        const { data: assessmentRows, error: assessmentError } = await supabase
+          .from('assessments')
+          .select('id, diagnostic_type, tier')
+          .in('id', assessmentIds);
+
+        if (assessmentError) {
+          console.warn('Não foi possível carregar metadados dos diagnósticos para o histórico:', assessmentError);
+        } else {
+          (assessmentRows ?? []).forEach((a: any) => {
+            assessmentMetaById.set(a.id, { diagnostic_type: a.diagnostic_type, tier: a.tier });
+          });
+        }
+      }
+
       return (data ?? []).map((r: any) => ({
         ...r,
-        diagnostic_type: r.assessments?.diagnostic_type ?? 'territorial',
-        tier: r.assessments?.tier ?? null,
+        diagnostic_type: assessmentMetaById.get(r.assessment_id)?.diagnostic_type ?? 'territorial',
+        tier: assessmentMetaById.get(r.assessment_id)?.tier ?? null,
       })) as GeneratedReport[];
     },
-    enabled: Boolean(userId && orgId),
+    enabled: Boolean(userId && (orgId || effectiveOrgId)),
   });
 }
 
@@ -132,7 +151,7 @@ export default function Relatorios() {
   const { assessments, isLoading: assessmentsLoading } = useAssessments();
   const { destinations } = useDestinations();
   const { isAdmin, isViewingDemoData, profile, effectiveOrgId, loading: profileLoading } = useProfile();
-  const { data: savedReports, isLoading: reportsLoading } = useGeneratedReports(profile?.user_id, profile?.org_id, effectiveOrgId);
+  const { data: savedReports, isLoading: reportsLoading, error: reportsError, refetch: refetchReports } = useGeneratedReports(profile?.user_id, profile?.org_id, effectiveOrgId);
   
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>('');
   const [report, setReport] = useState<string>('');
