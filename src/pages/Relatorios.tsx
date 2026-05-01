@@ -386,10 +386,10 @@ export default function Relatorios() {
 
   // MD download removed
 
-  const downloadPDF = () => {
-    if (!reportRef.current) return;
+  const downloadPDF = (targetRef: React.RefObject<HTMLDivElement> = reportRef) => {
+    if (!targetRef.current) return;
     
-    const content = reportRef.current.innerHTML;
+    const content = targetRef.current.innerHTML;
     
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
@@ -1224,7 +1224,7 @@ export default function Relatorios() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={downloadPDF}
+                        onClick={() => downloadPDF(historyReportRef)}
                         className="gap-2"
                       >
                         <FileText className="h-4 w-4" />
@@ -1238,7 +1238,7 @@ export default function Relatorios() {
                     <>
                       <ReportValidationBanner reportId={selectedHistoryReport.id} />
                       <ScrollArea className="h-[500px] pr-4">
-                        <div className="prose prose-sm max-w-none">
+                        <div ref={historyReportRef} className="prose prose-sm max-w-none">
                           {renderMarkdown(selectedHistoryReport.report_content)}
                         </div>
                       </ScrollArea>
