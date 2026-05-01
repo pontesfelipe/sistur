@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, type RefObject } from 'react';
+import { useState, useRef, useEffect, type RefObject } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { exportReportAsDocx } from '@/lib/exportReportDocx';
 import { getStatusStyle, mapIndicatorTableColumns, normalizeStatusCellText, realignIndicatorRow } from '@/lib/reportStatusStyle';
@@ -31,7 +31,6 @@ import {
   Trash2,
   Calendar,
   Settings2,
-  Eye,
   Lock,
   Users,
   FlaskConical,
@@ -81,6 +80,15 @@ interface GeneratedReport {
   tier: string | null;
 }
 
+type GeneratedReportBase = Omit<GeneratedReport, 'diagnostic_type' | 'tier'>;
+type AssessmentMeta = { id: string; diagnostic_type: string | null; tier: string | null };
+type AssessmentDisplayMeta = {
+  diagnostic_type?: string | null;
+  tier?: string | null;
+  destinations?: { name?: string | null } | null;
+  creator?: { full_name?: string | null } | null;
+};
+
 const normalizeReportTier = (tier?: string | null) => {
   const value = (tier || '').toLowerCase();
   if (value === 'small' || value === 'essencial') return 'essencial';
@@ -114,8 +122,8 @@ function useGeneratedReports(userId?: string, orgId?: string, effectiveOrgId?: s
       const { data, error } = await query;
       
       if (error) throw error;
-      const reports = data ?? [];
-      const assessmentIds = Array.from(new Set(reports.map((r: any) => r.assessment_id).filter(Boolean))) as string[];
+      const reports = (data ?? []) as GeneratedReportBase[];
+      const assessmentIds = Array.from(new Set(reports.map((r) => r.assessment_id).filter(Boolean))) as string[];
       const assessmentMetaById = new Map<string, { diagnostic_type?: string | null; tier?: string | null }>();
 
       if (assessmentIds.length > 0) {
@@ -127,13 +135,13 @@ function useGeneratedReports(userId?: string, orgId?: string, effectiveOrgId?: s
         if (assessmentError) {
           console.warn('Não foi possível carregar metadados dos diagnósticos para o histórico:', assessmentError);
         } else {
-          (assessmentRows ?? []).forEach((a: any) => {
+          ((assessmentRows ?? []) as AssessmentMeta[]).forEach((a) => {
             assessmentMetaById.set(a.id, { diagnostic_type: a.diagnostic_type, tier: a.tier });
           });
         }
       }
 
-      return (data ?? []).map((r: any) => ({
+      return reports.map((r) => ({
         ...r,
         diagnostic_type: assessmentMetaById.get(r.assessment_id)?.diagnostic_type ?? 'territorial',
         tier: assessmentMetaById.get(r.assessment_id)?.tier ?? null,
