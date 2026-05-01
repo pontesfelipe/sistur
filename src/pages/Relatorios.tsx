@@ -68,6 +68,7 @@ function useAssessmentDetails(assessmentId: string | undefined) {
 
 interface GeneratedReport {
   id: string;
+  org_id: string;
   assessment_id: string;
   destination_name: string;
   report_content: string;
@@ -102,6 +103,7 @@ function useGeneratedReports(userId?: string, effectiveOrgId?: string) {
       const { data, error } = await supabase
         .from('generated_reports')
         .select('*, assessments(diagnostic_type, tier)')
+        .eq('org_id', effectiveOrgId)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
