@@ -1900,29 +1900,32 @@ serve(async (req) => {
             visibility,
             environment,
             status: 'queued',
-            stage: 'Aguardando início',
+            stage: `[trace=${logger.traceId}] Aguardando início`,
             progress_pct: 0,
             created_by: userId,
           })
           .select('id')
           .maybeSingle();
         if (jobErr || !jobInsert) {
-          console.error('Failed to create report_jobs row:', jobErr);
+          logger.error('create_report_job_failed', jobErr);
           return new Response(JSON.stringify({ error: 'Não foi possível criar a fila de geração.' }), {
             status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
         }
         jobId = jobInsert.id as string;
+        logger.setJobId(jobId);
+        logger.stage('report_job_created', { jobId });
       }
 
       const backgroundJob = (async () => {
         try {
           await supabaseAdmin.from('report_jobs').update({
             status: 'processing',
-            stage: 'Coletando dados do diagnóstico',
+            stage: `[trace=${logger.traceId}] Coletando dados do diagnóstico`,
             progress_pct: 10,
             started_at: new Date().toISOString(),
           }).eq('id', jobId);
+          logger.stage('background_job_processing');
 
           const result = await runReportPipeline({
             supabaseAdmin,
@@ -1942,20 +1945,23 @@ serve(async (req) => {
             authHeader: authHeader!,
             aiProvider: aiProviderOverride,
             appVersion,
+            logger,
           });
 
           await supabaseAdmin.from('report_jobs').update({
             status: 'completed',
-            stage: 'Concluído',
+            stage: `[trace=${logger.traceId}] Concluído`,
             progress_pct: 100,
             report_id: result.reportId,
             finished_at: new Date().toISOString(),
           }).eq('id', jobId);
+          logger.setReportId(result.reportId);
+          logger.stage('background_job_completed');
         } catch (bgErr) {
-          console.error('Background pipeline failed:', bgErr);
+          logger.error('background_job_failed', bgErr, { last_stage: logger.lastStage() });
           await supabaseAdmin.from('report_jobs').update({
             status: 'failed',
-            error_message: bgErr instanceof Error ? bgErr.message : String(bgErr),
+            error_message: `[trace=${logger.traceId}][last_stage=${logger.lastStage()}] ${bgErr instanceof Error ? bgErr.message : String(bgErr)}`,
             finished_at: new Date().toISOString(),
           }).eq('id', jobId);
         }
