@@ -45,6 +45,14 @@ const PAGE_HEIGHT = 16838;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
 
 const FONT = 'Arial';
+/**
+ * Font used for status emojis (🟢 🔵 🟡 🟠 🔴 ⚪) inside indicator tables.
+ * Arial does NOT carry these glyphs and Word renders them as empty boxes (□).
+ * Segoe UI Emoji is bundled with every modern Windows install and gracefully
+ * falls back on macOS/Linux to the system emoji font.
+ */
+const EMOJI_FONT = 'Segoe UI Emoji';
+const STATUS_EMOJI_RE = /[\u{1F7E2}\u{1F535}\u{1F7E1}\u{1F7E0}\u{1F534}\u{26AA}]/u;
 const BODY_SIZE = 24;       // 12pt
 const H1_SIZE = 28;         // 14pt
 const H2_SIZE = 24;         // 12pt
@@ -98,8 +106,13 @@ function parseInlineFormatting(text: string, size = BODY_SIZE): TextRun[] {
 function parseMarkdownTable(lines: string[], primaryColor: string): (Paragraph | Table)[] {
   if (lines.length < 2) return [];
 
+  // IMPORTANT: keep empty cells (do NOT .filter(Boolean)). The realigner relies on
+  // every "|" being preserved so it can detect missing values and reposition the
+  // remaining cells. Stripping empties here was the root cause of out-of-square
+  // rows like "Emissão de gases | (vazio) | % | 🟠 FORTE | Manual" being rendered
+  // as 4-cell rows where the value migrated into the indicator column.
   const parseRow = (line: string) =>
-    line.split('|').map(c => c.trim()).filter(Boolean);
+    line.split('|').slice(1, -1).map(c => c.trim());
 
   const headers = parseRow(lines[0]);
   const colCount = headers.length;
@@ -129,6 +142,28 @@ function parseMarkdownTable(lines: string[], primaryColor: string): (Paragraph |
           : statusStyle
             ? statusStyle.fg
             : undefined;
+        // Split the cell into emoji + text runs so the emoji renders with an
+        // emoji-capable font while the rest stays in Arial. Without this,
+        // Word shows tofu boxes (□) for 🔵 🟡 ⚪ because Arial lacks those glyphs.
+        const cellRuns: TextRun[] = [];
+        if (isStatusCell && STATUS_EMOJI_RE.test(cellText)) {
+          const m = cellText.match(STATUS_EMOJI_RE)!;
+          const emoji = m[0];
+          const idx = cellText.indexOf(emoji);
+          const before = cellText.slice(0, idx);
+          const after = cellText.slice(idx + emoji.length);
+          if (before) cellRuns.push(new TextRun({ text: before, bold: true, font: FONT, size: SMALL_SIZE, color: cellTextColor }));
+          cellRuns.push(new TextRun({ text: emoji, font: EMOJI_FONT, size: SMALL_SIZE, color: cellTextColor }));
+          if (after) cellRuns.push(new TextRun({ text: after, bold: true, font: FONT, size: SMALL_SIZE, color: cellTextColor }));
+        } else {
+          cellRuns.push(new TextRun({
+            text: cellText,
+            bold: isHeader || isStatusCell,
+            font: FONT,
+            size: SMALL_SIZE,
+            color: cellTextColor,
+          }));
+        }
         return new TableCell({
           borders: cellBorders(),
           width: { size: colWidth, type: WidthType.DXA },
@@ -138,15 +173,7 @@ function parseMarkdownTable(lines: string[], primaryColor: string): (Paragraph |
             new Paragraph({
               alignment: AlignmentType.CENTER,
               spacing: { line: 240 },
-              children: [
-                new TextRun({
-                  text: cellText,
-                  bold: isHeader || isStatusCell,
-                  font: FONT,
-                  size: SMALL_SIZE,
-                  color: cellTextColor,
-                }),
-              ],
+              children: cellRuns,
             }),
           ],
         });

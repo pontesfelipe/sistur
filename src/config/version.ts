@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 40,
+  patch: 41,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.41",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção definitiva do desalinhamento de tabelas no DOCX exportado (caso reportado: linhas 'Emissão de gases de efeito estufa', 'População ocupada' e similares no relatório de Foz do Iguaçu apareciam fora de esquadro, com o valor migrando para o nome do indicador, a fonte caindo na coluna Status e o texto 'ATENÇÃO per capita' colando duas células). Causa raiz: o parser de tabela em `exportReportDocx.ts` aplicava `.split('|').map(c=>c.trim()).filter(Boolean)`, descartando silenciosamente células vazias ANTES de o `realignIndicatorRow` poder agir. Quando o LLM emitia uma linha canônica `| Indicador |  | % | 🟠 ATENÇÃO | Manual |` com a coluna Valor em branco, o filtro reduzia para 4 cells e o realinhador recebia uma entrada já corrompida. Correção: o parser agora usa `.split('|').slice(1, -1).map(c=>c.trim())` (mesma estratégia do preview HTML), preservando todas as células — inclusive vazias — para que o realinhador heurístico (que detecta colunas por emoji de status, sigla de fonte e padrão de unidade) possa reposicionar corretamente cada cell e marcar a faltante com '—'. Resultado: o documento Word exportado passa a sair em esquadro mesmo quando a IA omite uma célula, e a evidência da omissão fica visível como '—' na coluna correta.",
+      "Relatórios — correção dos quadrados '□' no lugar de emojis de status (🔵 🟡 ⚪) dentro das tabelas exportadas em Word. Causa: a fonte Arial usada nas células não carrega os glifos U+1F535 (círculo azul), U+1F7E1 (círculo amarelo) e U+26AA (círculo branco), então o Word renderizava tofu boxes — apenas 🟢 (U+1F7E2) e 🔴 (U+1F534) apareciam por sorte tipográfica. Correção em `exportReportDocx.ts`: o conteúdo da célula de Status agora é dividido em dois `TextRun`s — um com a glifo do emoji renderizada na fonte 'Segoe UI Emoji' (presente em qualquer Windows moderno e com fallback gracioso para a fonte de emoji do sistema em macOS/Linux), e outro com o rótulo (EXCELENTE/FORTE/ADEQUADO/ATENÇÃO/CRÍTICO/INFORMATIVO) mantido em Arial bold com a cor canônica da paleta de status. O preview HTML, o PDF/print e o cabeçalho da tabela permanecem inalterados — a mudança é cirúrgica e específica para a célula de Status do exportador DOCX.",
+    ],
+  },
   {
     version: "1.38.40",
     date: "2026-05-01",
