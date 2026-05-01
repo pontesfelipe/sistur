@@ -120,6 +120,7 @@ const App = () => {
               <ClientErrorMonitor />
               <ProfileProvider>
               <LicenseProvider>
+              <ReportJobWatcherMount />
               <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/auth" element={<Auth />} />
