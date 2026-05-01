@@ -358,6 +358,12 @@ export default function Relatorios() {
       const jobId = enqueued?.jobId as string | undefined;
       if (!jobId) throw new Error('Servidor não retornou um identificador de job.');
 
+      // v1.38.55 — Registra o job no watcher global. Mesmo que o usuário
+      // feche a página de Relatórios, mude de aba ou recarregue a app,
+      // o watcher continuará observando o job em background e mostrará
+      // toast + Notification quando concluir/falhar.
+      trackReportJob(jobId, selectedAssessmentId, selectedDestination.name);
+
       setGenerationStage('Geração em andamento no servidor…');
 
       // Polling do job. O job é atualizado pelo background task da edge function.
@@ -389,7 +395,17 @@ export default function Relatorios() {
         }
       }
       if (!finalReportId) {
-        throw new Error('Geração demorou mais que o esperado. Confira o histórico em alguns minutos.');
+        // v1.38.55 — Não trata como erro: o job pode terminar em
+        // alguns minutos, e o watcher global cuidará da notificação.
+        toast.info(
+          'A geração está demorando mais que o normal e seguirá em segundo plano.',
+          {
+            description:
+              'Você pode fechar esta tela. Avisaremos por toast (e notificação do navegador, se permitida) assim que o relatório ficar pronto.',
+            duration: 10_000,
+          },
+        );
+        return;
       }
 
       // Carrega conteúdo final
