@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 39,
+  patch: 40,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.40",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção do desalinhamento de linhas em tabelas de indicadores (caso reportado: 'Taxa de abandono' em Foz do Iguaçu apareceu fora de esquadro, com a unidade migrando para a coluna Valor, o status para Unidade e a fonte para Status). Causa: o LLM ocasionalmente emite uma linha do template canônico (Indicador|Valor|Unidade|Status|Fonte) com uma célula faltando — geralmente o Valor numérico — e o renderizador montava `<td>`s na ordem em que vinham, deslocando todas as colunas seguintes. Correções: (1) Nova função `realignIndicatorRow` em `reportStatusStyle.ts` que detecta heuristicamente quais colunas estão presentes em uma linha incompleta usando os emojis de status (🟢🔵🟡🟠🔴⚪), as siglas conhecidas de fonte (IBGE/DATASUS/STN/CADASTUR/MTUR/INEP/ANA/ANATEL/TSE/SEEG/MAPA_TURISMO/MANUAL/KB/PESQUISA_LOCAL) e padrões de unidade (%, R$, hab., dias, nota, etc.), reposicionando cada cell na coluna correta e preenchendo as faltantes com '—'. (2) Aplicação da função tanto no preview HTML (`Relatorios.tsx`) quanto no export DOCX (`exportReportDocx.ts`), garantindo que o documento exportado também saia em esquadro. (3) Reforço no prompt do `generate-report` com regra explícita 'INTEGRIDADE DE LINHA' proibindo células vazias, exigindo '[dado não disponível na base validada]' na coluna Valor quando o indicador não tem número auditado, e instruindo a NÃO colapsar variações distintas (ex.: anos iniciais vs anos finais do ensino fundamental) em uma linha única sem valor — devem virar duas linhas separadas. Resultado: mesmo se a IA voltar a omitir uma célula, a tabela renderiza alinhada e a evidência da omissão aparece como '—' visível em vez de quebrar o layout.",
+    ],
+  },
   {
     version: "1.38.39",
     date: "2026-05-01",

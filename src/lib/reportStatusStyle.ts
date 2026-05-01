@@ -85,3 +85,101 @@ export function mapIndicatorTableColumns(headers: string[]): TableColumnMap {
     sourceIdx: norm.findIndex(h => h === 'fonte' || h.startsWith('fonte')),
   };
 }
+
+/**
+ * Defensive realigner for the canonical indicator table:
+ * | Indicador | Valor | Unidade | Status | Fonte |
+ *
+ * The LLM occasionally emits a row with a missing cell (typically the
+ * numeric "Valor"), which causes every subsequent column to shift one to
+ * the left in the rendered table (out-of-square row).
+ *
+ * This function detects that case heuristically — based on emoji, known
+ * source codes and unit patterns — and reinserts a placeholder ("—") at
+ * the missing position so the row aligns with the header again.
+ *
+ * Returns the row unchanged when the table is not the canonical one or
+ * when the cell count already matches the header.
+ */
+const KNOWN_SOURCES = /^(IBGE|DATASUS|STN|CADASTUR|MTUR|MAPA[_ ]?TUR(ISMO)?|INEP|ANA|ANATEL|TSE|SEEG|ANAC|CADUNICO|MANUAL|KB|PESQUISA[_ ]?LOCAL|DERIVADO|OFICIAL.*)$/i;
+const STATUS_EMOJI_RE = /[🟢🔵🟡🟠🔴⚪]/u;
+const UNIT_RE = /^(%|R\$|hab\.?|dias?|score [^|]+|nota[^|]*|segmentos?|leitos?|km2?|—|-)$/i;
+
+export function realignIndicatorRow(
+  row: string[],
+  headers: string[],
+  colMap: TableColumnMap,
+): string[] {
+  const expected = headers.length;
+  if (row.length === expected) return row;
+  if (row.length > expected) return row.slice(0, expected);
+
+  // Only realign the canonical indicator table — needs at least Status + Fonte.
+  const isCanonical = colMap.statusIdx >= 0 && colMap.sourceIdx >= 0 && colMap.valueIdx >= 0;
+  if (!isCanonical) {
+    // Pad to the right with em dashes to keep columns square.
+    return [...row, ...Array(expected - row.length).fill('—')];
+  }
+
+  // Identify which header each existing cell most likely matches.
+  const out: string[] = Array(expected).fill('');
+  const used: boolean[] = Array(row.length).fill(false);
+
+  // 1) Indicador = first cell with letters and not an emoji/source/unit.
+  const indicadorIdx = 0; // header position for "Indicador"
+  for (let i = 0; i < row.length; i++) {
+    const c = row[i].trim();
+    if (c && !STATUS_EMOJI_RE.test(c) && !KNOWN_SOURCES.test(c) && !UNIT_RE.test(c)) {
+      out[indicadorIdx] = c;
+      used[i] = true;
+      break;
+    }
+  }
+
+  // 2) Status = cell with status emoji.
+  for (let i = 0; i < row.length; i++) {
+    if (used[i]) continue;
+    if (STATUS_EMOJI_RE.test(row[i])) {
+      out[colMap.statusIdx] = row[i].trim();
+      used[i] = true;
+      break;
+    }
+  }
+
+  // 3) Fonte = cell matching a known source code.
+  for (let i = row.length - 1; i >= 0; i--) {
+    if (used[i]) continue;
+    if (KNOWN_SOURCES.test(row[i].trim())) {
+      out[colMap.sourceIdx] = row[i].trim();
+      used[i] = true;
+      break;
+    }
+  }
+
+  // 4) Unidade = remaining short cell matching unit pattern.
+  if (colMap.unitIdx >= 0) {
+    for (let i = 0; i < row.length; i++) {
+      if (used[i]) continue;
+      if (UNIT_RE.test(row[i].trim())) {
+        out[colMap.unitIdx] = row[i].trim();
+        used[i] = true;
+        break;
+      }
+    }
+  }
+
+  // 5) Valor = remaining cell (numeric or fallback).
+  for (let i = 0; i < row.length; i++) {
+    if (used[i]) continue;
+    if (!out[colMap.valueIdx]) {
+      out[colMap.valueIdx] = row[i].trim();
+      used[i] = true;
+    }
+  }
+
+  // Fill any still-empty cell with em dash placeholder.
+  for (let i = 0; i < expected; i++) {
+    if (!out[i]) out[i] = '—';
+  }
+  return out;
+}

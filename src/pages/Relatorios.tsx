@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { exportReportAsDocx } from '@/lib/exportReportDocx';
-import { getStatusStyle, mapIndicatorTableColumns } from '@/lib/reportStatusStyle';
+import { getStatusStyle, mapIndicatorTableColumns, realignIndicatorRow } from '@/lib/reportStatusStyle';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -491,8 +491,11 @@ export default function Relatorios() {
           const headers = parseRow(tableLines[0]);
           // Skip separator row (row with ---)
           const startRow = tableLines[1].includes('---') ? 2 : 1;
-          const dataRows = tableLines.slice(startRow).map(parseRow);
           const colMap = mapIndicatorTableColumns(headers);
+          const dataRows = tableLines
+            .slice(startRow)
+            .map(parseRow)
+            .map(r => realignIndicatorRow(r, headers, colMap));
 
           elements.push(
             <div key={`table-${i}`} className="overflow-x-auto my-4">
