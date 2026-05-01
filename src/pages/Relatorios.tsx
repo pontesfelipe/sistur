@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { exportReportAsDocx } from '@/lib/exportReportDocx';
-import { getStatusStyle, mapIndicatorTableColumns, realignIndicatorRow } from '@/lib/reportStatusStyle';
+import { getStatusStyle, mapIndicatorTableColumns, normalizeStatusCellText, realignIndicatorRow } from '@/lib/reportStatusStyle';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -526,7 +526,13 @@ export default function Relatorios() {
           const dataRows = tableLines
             .slice(startRow)
             .map(parseRow)
-            .map(r => realignIndicatorRow(r, headers, colMap));
+            .map(r => {
+              const aligned = realignIndicatorRow(r, headers, colMap);
+              if (colMap.statusIdx >= 0 && aligned[colMap.statusIdx]) {
+                aligned[colMap.statusIdx] = normalizeStatusCellText(aligned[colMap.statusIdx]);
+              }
+              return aligned;
+            });
 
           elements.push(
             <div key={`table-${i}`} className="overflow-x-auto my-4">
