@@ -1773,6 +1773,7 @@ serve(async (req) => {
             jobId: jobId!,
             authHeader: authHeader!,
             aiProvider: aiProviderOverride,
+            appVersion,
           });
 
           await supabaseAdmin.from('report_jobs').update({
