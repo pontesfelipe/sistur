@@ -1140,6 +1140,338 @@ ESTRUTURA (MEC/ABNT):
 ## 11. Considerações Finais`;
 }
 
+// ============================================================
+// v1.38.56 — PIPELINE PARALELO POR PILAR (apenas template "completo")
+// ============================================================
+// Estratégia em 2 fases:
+//   Fase 1: 3 chamadas em PARALELO, uma por pilar (RA/OE/AO). Cada uma
+//           recebe o MESMO contexto base (auditoria, valores, gargalos),
+//           mas é instruída a escrever APENAS as subseções daquele pilar.
+//   Fase 2: 1 chamada SEQUENCIAL "envelope" que recebe os 3 textos dos
+//           pilares como contexto e escreve intro, metodologia, alertas,
+//           análise integrada, gargalos consolidados, banco de ações,
+//           prognóstico, considerações finais e referências.
+//
+// Fallback GLOBAL: todas as chamadas usam o MESMO provider. Se qualquer
+// uma falhar (status != ok, conteúdo vazio, throw), aborta TODAS, marca
+// o provider como caído no fallbackTrail e refaz tudo no próximo provider
+// da ordem (claude → gpt5 → gemini). Isso garante coerência de tom.
+//
+// Streaming SSE para o cliente: SEQUENCIAL por seção. Mostramos eventos
+// de stage (": stage RA_done", ": stage OE_done") e quando cada peça
+// termina, escrevemos seu markdown no stream — o cliente vê o relatório
+// se montando RA → OE → AO → envelope, na ordem natural de leitura.
+//
+// Por que NÃO aplicar nos templates curtos (executivo/investidor)?
+// Eles têm 1000-2000 palavras e estrutura achatada (sem subseções por
+// pilar). Paralelizar adicionaria latência de coordenação sem ganho real.
+
+function getPillarSystemPrompt(pillar: 'RA' | 'OE' | 'AO', isEnterprise: boolean): string {
+  const pillarLong = pillar === 'RA'
+    ? (isEnterprise ? 'I-RA — Responsabilidade Ambiental' : 'I-RA — Relações Ambientais')
+    : pillar === 'OE'
+    ? (isEnterprise ? 'I-OE — Organização Estrutural (qualidade, satisfação, ocupação)' : 'I-OE — Organização Estrutural')
+    : (isEnterprise ? 'I-AO — Ações Operacionais (governança, finanças, tecnologia)' : 'I-AO — Ações Operacionais');
+
+  return `Você é um analista técnico em turismo ${isEnterprise ? 'empresarial' : 'público territorial'}, especialista em metodologia SISTUR.
+
+ESCOPO DESTA CHAMADA — ATENÇÃO CRÍTICA:
+Você está escrevendo APENAS a subseção referente ao pilar **${pillarLong}**.
+NÃO escreva título principal do relatório, ficha técnica, introdução, metodologia, gargalos consolidados, banco de ações, conclusão ou referências — outras chamadas cuidarão disso.
+Sua saída DEVE começar exatamente com o cabeçalho de seção do pilar e conter SOMENTE o conteúdo daquele pilar.
+
+POLÍTICA "ZERO ALUCINAÇÃO" (PRIORITÁRIA):
+- Use APENAS dados presentes nas seções injetadas (TABELA DE AUDITORIA, VALORES BRUTOS, BENCHMARKS OFICIAIS, METADADOS, BASE DE CONHECIMENTO).
+- NÃO invente números, anos, taxas, comparações, tendências, autores ou citações.
+- Quando faltar dado validado, escreva "[dado não disponível na base validada]" e siga em frente.
+- Cada número apresentado DEVE bater com a TABELA DE AUDITORIA (mesmo valor, mesma fonte, mesmo ano).
+
+TEMPLATE CANÔNICO DE INDICADORES (OBRIGATÓRIO — use EXATAMENTE estas 5 colunas, nesta ordem):
+    | Indicador | Valor | Unidade | Status | Fonte |
+- Valor em pt-BR (vírgula decimal, ponto de milhar). Exemplos: "65,3" / "45.321" / "R$ 1.234,56".
+- Unidade pura, sem repetir o número. Exemplos: "%", "hab.", "R$", "dias", "—".
+- Status com emoji canônico POR EXTENSO em maiúsculas: "🟢 EXCELENTE" | "🔵 FORTE" | "🟡 ADEQUADO" | "🟠 ATENÇÃO" | "🔴 CRÍTICO" | "⚪ INFORMATIVO".
+- Fonte oficial: IBGE | DATASUS | STN | CADASTUR | MTur | INEP | ANA | ANATEL | TSE | SEEG | Manual | KB.
+- INTEGRIDADE DE LINHA: TODA linha DEVE ter EXATAMENTE 5 células separadas por "|". Nunca deixe célula vazia. Sem valor → "[dado não disponível na base validada]" + Unidade "—".
+- PROIBIDO adicionar/remover colunas, trocar a ordem, abreviar status ou aplicar negrito/itálico/cor ao status.
+
+TOM NARRATIVO OBRIGATÓRIO:
+- Após a tabela de indicadores, escreva 2-3 parágrafos de prosa institucional fluida (3-6 frases cada).
+- Conecte sempre: dado → causa provável → impacto territorial → decisão recomendada.
+- NUNCA substitua a análise por bullets ou listas curtas.
+- Indicadores CONTEXTUAIS (Score = "CONTEXTUAL" na auditoria): NÃO atribua status nem mencione em gargalos.
+- Valores em moeda no padrão brasileiro: "R$ 1.234.567,89" (nunca "BRL" ou "$").
+- Cite a procedência: ao mencionar um indicador, indique sua origem (OFFICIAL_API/DERIVED/MANUAL/ESTIMADA) e o peso aplicado.
+
+ESTRUTURA OBRIGATÓRIA DA SUA SAÍDA — comece exatamente com este cabeçalho:
+
+### ${isEnterprise ? '4.1' : '4.' + (pillar === 'RA' ? '1' : pillar === 'OE' ? '2' : '3')}. ${pillarLong}
+
+**Tabela de Indicadores do Pilar**
+| Indicador | Valor | Unidade | Status | Fonte |
+| --- | --- | --- | --- | --- |
+(linhas: APENAS indicadores deste pilar, extraídos da seção INDICADORES e VALORES BRUTOS)
+
+**Leitura Técnica**
+(2-3 parágrafos fluidos interpretando os scores deste pilar — não apenas repetindo a tabela)
+
+**Implicações para o Destino**
+(1-2 parágrafos sobre consequências práticas, conexões com outros pilares quando óbvio, e prioridades emergentes deste pilar)
+
+REGRA FINAL: NÃO inclua nada além desta única subseção. Não escreva preâmbulo, despedida, ou referências a "outras seções a seguir".`;
+}
+
+function getEnvelopeSystemPrompt(template: string, isEnterprise: boolean): string {
+  if (isEnterprise) {
+    return `Você é um consultor estratégico em gestão de empreendimentos turísticos. Está escrevendo o ENVELOPE de um relatório SISTUR Enterprise — todas as seções EXCETO o Diagnóstico por Categoria Funcional, que já foi escrito por outras chamadas e será inserido pelo orquestrador.
+
+ESCOPO DESTA CHAMADA: você escreve título, ficha técnica, sumário executivo, perfil do empreendimento, metodologia, análise de gargalos consolidados, planos de ação, recomendações estratégicas, prescrições, roadmap, fontes/referências e considerações finais. NÃO REESCREVA as subseções do diagnóstico por categoria — você as recebe como contexto de leitura.
+
+POLÍTICA "ZERO ALUCINAÇÃO": use apenas dados presentes no contexto. Quando faltar, escreva "[dado não disponível na base validada]". Cada número e citação DEVE bater com a TABELA DE AUDITORIA / BIBLIOGRAFIA CANÔNICA.
+
+CONSISTÊNCIA COM OS DIAGNÓSTICOS POR CATEGORIA: você recebe os textos das categorias na seção "DIAGNÓSTICO POR CATEGORIA (JÁ ESCRITO)". Os gargalos, recomendações e roadmap que você escrever DEVEM ser COERENTES com aqueles textos — cite os mesmos indicadores, mantenha as mesmas conclusões, não contradiga.
+
+ESTRUTURA OBRIGATÓRIA DA SUA SAÍDA — escreva nesta ordem EXATA:
+# Relatório SISTUR Enterprise — [Nome]
+[Tabela de Ficha Técnica fornecida]
+## 1. Sumário Executivo para Gestão
+## 2. Perfil do Empreendimento
+## 3. Metodologia SISTUR Enterprise
+## 4. Diagnóstico por Categoria Funcional
+
+<!-- DIAGNOSTICO_PILARES_PLACEHOLDER -->
+
+## 5. Análise de Gargalos Operacionais
+(Tabela: Gargalo | Severidade | Categoria | Indicadores que dispararam | Prescrição)
+## 6. Planos de Ação em Andamento
+## 7. Recomendações Estratégicas (curto/médio/longo prazo)
+## 8. Prescrições de Capacitação
+## 9. Roadmap de Implementação (tabela: Ação | Categoria | Investimento | Prazo | KPI)
+## 10. Fontes e Referências
+## 11. Considerações Finais
+## Referências (ABNT NBR 6023:2018, ordem alfabética)
+
+IMPORTANTE: escreva LITERALMENTE o comentário HTML "<!-- DIAGNOSTICO_PILARES_PLACEHOLDER -->" no lugar indicado — o orquestrador o substituirá pelos textos das categorias. NÃO escreva subseções "4.1", "4.2", "4.3" — elas já existem nos textos das categorias.
+
+TOM: institucional, impessoal (3ª pessoa). Conecte: métrica → gap → ação → resultado esperado. Status sempre nos rótulos canônicos com emoji.`;
+  }
+
+  return `Você é um analista técnico em turismo público. Está escrevendo o ENVELOPE de um relatório SISTUR territorial COMPLETO — todas as seções EXCETO o Diagnóstico por Eixo, que já foi escrito por outras chamadas e será inserido pelo orquestrador.
+
+ESCOPO DESTA CHAMADA: você escreve título, ficha técnica, resumo, introdução, contextualização do município, metodologia, alertas IGMA, análise integrada, gargalos consolidados, benchmarks externos, prognóstico, banco de ações, fontes, considerações finais, referências, glossário e apêndice. NÃO REESCREVA as subseções 4.1/4.2/4.3 (RA/OE/AO) — você as recebe como contexto de leitura para garantir coerência.
+
+POLÍTICA "ZERO ALUCINAÇÃO": use APENAS dados presentes no contexto injetado. NÃO invente. Quando faltar, escreva "[dado não disponível na base validada]". Cada número DEVE bater com a TABELA DE AUDITORIA. Cada citação bibliográfica DEVE bater com a BIBLIOGRAFIA CANÔNICA.
+
+CONSISTÊNCIA COM OS DIAGNÓSTICOS POR EIXO: você recebe os textos dos 3 pilares na seção "DIAGNÓSTICO POR EIXO (JÁ ESCRITO)". Os gargalos, prognóstico, banco de ações e considerações finais que você escrever DEVEM ser COERENTES com aqueles textos — cite os mesmos indicadores, respeite as mesmas conclusões, não contradiga scores ou status.
+
+TEMPLATE CANÔNICO DE INDICADORES quando precisar usar tabelas: | Indicador | Valor | Unidade | Status | Fonte |. Status canônico com emoji: 🟢 EXCELENTE | 🔵 FORTE | 🟡 ADEQUADO | 🟠 ATENÇÃO | 🔴 CRÍTICO | ⚪ INFORMATIVO. Valores em pt-BR (vírgula decimal). Moeda: "R$ 1.234,56".
+
+ESTRUTURA OBRIGATÓRIA DA SUA SAÍDA — escreva nesta ordem EXATA (MEC/ABNT):
+# Relatório SISTUR — [Nome do Destino]
+[Tabela de Ficha Técnica fornecida]
+
+## Resumo
+(até 500 palavras conforme NBR 6028; termine com **Palavras-chave**: Turismo. SISTUR. Diagnóstico Territorial. [Nome]. [UF].)
+
+## 1 Introdução
+## 2 Contextualização do Município
+## 3. Metodologia SISTUR
+## 4. Diagnóstico por Eixo SISTUR
+
+<!-- DIAGNOSTICO_PILARES_PLACEHOLDER -->
+
+## 5. Alertas Sistêmicos IGMA
+## 6 Análise Integrada
+(Inter-relação entre os eixos, efeitos cascata identificados — referencie os achados das subseções 4.1/4.2/4.3)
+## 7. Gargalos e Prescrições
+(Tabela: Gargalo | Severidade | Pilar | Indicadores que dispararam | Prescrição | Agente Responsável. A coluna "Indicadores que dispararam" DEVE ser preenchida a partir da seção GARGALOS do contexto.)
+## 8. Benchmarks Externos (Fontes Oficiais)
+(Se houver dados em "BENCHMARKS DE FONTES OFICIAIS", renderize Tabela: | Indicador | Valor Observado | Valor Oficial | Fonte | Ano |. Caso contrário, escreva "Nenhum benchmark externo disponível para este destino no momento.")
+## 9. Prognóstico e Diretrizes
+## 10. Banco de Ações
+(Tabela: Ação | Pilar | Prazo | Responsável | Prioridade | Status)
+## 11. Fontes e Referências
+## 12. Considerações Finais
+(Próxima revisão recomendada: data e justificativa)
+
+## Referências
+(ABNT NBR 6023:2018, ordem alfabética. Inclua TODAS as fontes oficiais, KB e referências nacionais utilizadas.)
+
+## Glossário
+(SISTUR, IGMA, I-RA, I-AO, I-OE, I-SISTUR e demais siglas usadas)
+
+## Apêndice
+(Documentos da Base de Conhecimento consultados, se houver; notas metodológicas adicionais)
+
+IMPORTANTE: escreva LITERALMENTE o comentário HTML "<!-- DIAGNOSTICO_PILARES_PLACEHOLDER -->" no lugar indicado — o orquestrador o substituirá pelos textos dos 3 pilares. NÃO escreva as subseções "4.1", "4.2", "4.3" — elas já existem nos textos dos pilares.
+
+TOM: institucional, técnico, ABNT. Justifique conclusões com dados. Sem jargão acadêmico inflado. Sem cor/negrito/itásico aplicado a status.`;
+}
+
+// Wrapper não-streaming sobre o gateway de IA: dispara a chamada com
+// stream:false (mais simples de paralelizar e validar conteúdo) e retorna
+// o texto final acumulado. Aceita AbortSignal para cancelamento global
+// quando outro pilar paralelo falha e queremos refazer no próximo provider.
+async function callProviderNonStreaming(args: {
+  provider: 'claude' | 'gpt5' | 'gemini';
+  systemPrompt: string;
+  userPrompt: string;
+  lovableApiKey: string;
+  anthropicApiKey?: string;
+  signal?: AbortSignal;
+  maxTokens?: number;
+}): Promise<{ ok: true; content: string } | { ok: false; reason: string }> {
+  const { provider, systemPrompt, userPrompt, lovableApiKey, anthropicApiKey, signal, maxTokens = 16000 } = args;
+  try {
+    if (provider === 'claude') {
+      if (!anthropicApiKey) return { ok: false, reason: 'ANTHROPIC_API_KEY not configured' };
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': anthropicApiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5-20250929',
+          max_tokens: maxTokens,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }],
+        }),
+        signal,
+      });
+      if (!resp.ok) {
+        const txt = await resp.text().catch(() => '');
+        return { ok: false, reason: `claude status ${resp.status}: ${txt.slice(0, 200)}` };
+      }
+      const j = await resp.json();
+      const blocks: any[] = j?.content || [];
+      const text = blocks.filter((b) => b?.type === 'text').map((b) => b.text || '').join('');
+      if (!text || text.trim().length < 32) return { ok: false, reason: `claude empty content (${text.length})` };
+      return { ok: true, content: text };
+    }
+    const model = provider === 'gpt5' ? 'openai/gpt-5' : 'google/gemini-2.5-pro';
+    const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+      }),
+      signal,
+    });
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => '');
+      return { ok: false, reason: `${provider} status ${resp.status}: ${txt.slice(0, 200)}` };
+    }
+    const j = await resp.json();
+    const text = j?.choices?.[0]?.message?.content ?? '';
+    if (!text || text.trim().length < 32) return { ok: false, reason: `${provider} empty content (${text.length})` };
+    return { ok: true, content: text };
+  } catch (e) {
+    const reason = e instanceof Error ? e.message : String(e);
+    return { ok: false, reason: `${provider} threw: ${reason}` };
+  }
+}
+
+// Roda o pipeline em 2 fases para um provider específico. Retorna o texto
+// completo concatenado ou { ok: false } se qualquer fase falhar.
+async function runTwoPhasePipeline(args: {
+  provider: 'claude' | 'gpt5' | 'gemini';
+  systemPromptByPillar: { RA: string; OE: string; AO: string };
+  envelopeSystemPrompt: string;
+  pillarUserPrompt: (pillar: 'RA' | 'OE' | 'AO') => string;
+  envelopeUserPrompt: (pillarTexts: { RA: string; OE: string; AO: string }) => string;
+  lovableApiKey: string;
+  anthropicApiKey?: string;
+  onStage: (stage: string, extra?: Record<string, unknown>) => void;
+  onSectionReady: (label: string, markdown: string) => Promise<void>;
+}): Promise<{ ok: true; content: string } | { ok: false; reason: string }> {
+  const { provider, systemPromptByPillar, envelopeSystemPrompt, pillarUserPrompt, envelopeUserPrompt, lovableApiKey, anthropicApiKey, onStage, onSectionReady } = args;
+
+  // Fase 1: 3 chamadas em paralelo. Se qualquer uma falhar, abortamos as outras.
+  const controller = new AbortController();
+  onStage('phase1_pillars_start', { provider });
+  const pillarPromises = (['RA', 'OE', 'AO'] as const).map((p) =>
+    callProviderNonStreaming({
+      provider,
+      systemPrompt: systemPromptByPillar[p],
+      userPrompt: pillarUserPrompt(p),
+      lovableApiKey,
+      anthropicApiKey,
+      signal: controller.signal,
+      maxTokens: 8000,
+    }).then((res) => ({ pillar: p, ...res }))
+  );
+  const pillarResults = await Promise.all(pillarPromises);
+  const failed = pillarResults.find((r) => !r.ok);
+  if (failed) {
+    controller.abort('peer-failed');
+    return { ok: false, reason: `pillar ${failed.pillar} failed: ${(failed as any).reason}` };
+  }
+  const pillarTexts = {
+    RA: (pillarResults.find((r) => r.pillar === 'RA') as any).content as string,
+    OE: (pillarResults.find((r) => r.pillar === 'OE') as any).content as string,
+    AO: (pillarResults.find((r) => r.pillar === 'AO') as any).content as string,
+  };
+  onStage('phase1_pillars_done', {
+    provider,
+    chars: { RA: pillarTexts.RA.length, OE: pillarTexts.OE.length, AO: pillarTexts.AO.length },
+  });
+
+  // Fase 2: envelope sequencial recebendo os 3 pilares como contexto.
+  onStage('phase2_envelope_start', { provider });
+  const envRes = await callProviderNonStreaming({
+    provider,
+    systemPrompt: envelopeSystemPrompt,
+    userPrompt: envelopeUserPrompt(pillarTexts),
+    lovableApiKey,
+    anthropicApiKey,
+    maxTokens: 16000,
+  });
+  if (!envRes.ok) return { ok: false, reason: `envelope failed: ${envRes.reason}` };
+  onStage('phase2_envelope_done', { provider, chars: envRes.content.length });
+
+  // Monta o documento final substituindo o placeholder pelos pilares na ordem RA → OE → AO.
+  const pillarsBlock = `${pillarTexts.RA.trim()}\n\n${pillarTexts.OE.trim()}\n\n${pillarTexts.AO.trim()}\n`;
+  const placeholder = '<!-- DIAGNOSTICO_PILARES_PLACEHOLDER -->';
+  let finalText: string;
+  if (envRes.content.includes(placeholder)) {
+    finalText = envRes.content.replace(placeholder, pillarsBlock);
+  } else {
+    // Fallback: anexa os pilares logo após o cabeçalho "## 4." se possível,
+    // senão junta no final.
+    const idx = envRes.content.search(/##\s*4\.?\s*Diagn[oó]stico/i);
+    if (idx >= 0) {
+      // procura o próximo cabeçalho ## 5
+      const after = envRes.content.slice(idx);
+      const next5 = after.search(/\n##\s*5/i);
+      if (next5 > 0) {
+        finalText = envRes.content.slice(0, idx + next5) + '\n\n' + pillarsBlock + '\n\n' + envRes.content.slice(idx + next5);
+      } else {
+        finalText = envRes.content + '\n\n' + pillarsBlock;
+      }
+    } else {
+      finalText = envRes.content + '\n\n' + pillarsBlock;
+    }
+  }
+
+  // Streaming sequencial pro cliente: emite cada peça em ordem natural.
+  // Para manter UX previsível, não emitimos "cabeçalho parcial" — emitimos
+  // o documento final montado de uma vez (mais robusto que tentar fatiar
+  // o envelope manualmente). O usuário já viu os heartbeats e os stage
+  // events durante a geração.
+  await onSectionReady('full_document', finalText);
+
+  return { ok: true, content: finalText };
+}
+
 /**
  * Fase 5 — Trava de coerência LLM v1.38.0.
  * Verifica determinísticamente se o texto gerado pela IA contradiz os valores
