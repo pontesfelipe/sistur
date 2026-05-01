@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 50,
+  patch: 51,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.51",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico → aba Indicadores → Procedência dos Dados — correção definitiva para diagnósticos existentes e futuros. Causa raiz: ao pré-preencher valores em modo Demo, alguns `indicator_values` eram salvos com o `org_id` da organização demonstrativa, embora pertencessem a diagnósticos da organização real; pelas regras de acesso, a página do diagnóstico enxergava o diagnóstico, mas não enxergava esses valores, deixando a procedência zerada. Além disso, a trilha `assessment_indicator_audit` antiga havia sido gravada como MANUAL mesmo para fontes `Pré-preenchido (IBGE/DATASUS/STN/MAPA_TURISMO/ANATEL)`. Correções: valores existentes foram realinhados ao `org_id` do diagnóstico; auditorias existentes foram reclassificadas conforme a fonte real; o painel agora também usa a trilha de auditoria como fallback; e os fluxos de gravação passaram a persistir valores usando a organização dona do diagnóstico, não a organização Demo ativa."
+    ],
+  },
   {
     version: "1.38.50",
     date: "2026-05-01",

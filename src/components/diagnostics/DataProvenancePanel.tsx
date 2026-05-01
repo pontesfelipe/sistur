@@ -6,6 +6,7 @@ import { Database, CheckCircle2, Calculator, PenLine, Globe2 } from 'lucide-reac
 
 interface Props {
   indicatorValues: any[];
+  auditRows?: any[];
 }
 
 /**
@@ -13,8 +14,11 @@ interface Props {
  * Mostra a procedência de cada indicador preenchido (oficial / derivado / manual)
  * com cobertura automática e badge de confiabilidade. Não altera dados, apenas exibe.
  */
-export function DataProvenancePanel({ indicatorValues }: Props) {
+export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) {
   const analysis = useMemo(() => {
+    const auditByCode = new Map(
+      (auditRows || []).map((row: any) => [String(row.indicator_code || ''), row]),
+    );
     const filled = (indicatorValues || []).filter((v: any) => {
       if (v.is_ignored) return false;
       const val = v.value_raw ?? v.value ?? v.value_text;
@@ -26,14 +30,21 @@ export function DataProvenancePanel({ indicatorValues }: Props) {
       manual: [] as any[],
       other: [] as any[],
     };
-    filled.forEach((v: any) => {
-      const src = (v.source || v.source_type || '').toString().toUpperCase();
+    const classify = (v: any) => {
+      const indicatorCode = v.indicator?.code || v.indicators?.code || v.indicator_code;
+      const audit = indicatorCode ? auditByCode.get(String(indicatorCode)) : null;
+      const src = (v.source || audit?.source_detail || v.source_type || audit?.source_type || '').toString().toUpperCase();
+      const auditType = (audit?.source_type || '').toString().toUpperCase();
       const method = (v.collection_method || '').toString().toUpperCase();
       const OFFICIAL_TOKENS = ['IBGE', 'CADASTUR', 'STN', 'DATASUS', 'MAPA_TURISMO', 'MAPA DO TURISMO', 'INEP', 'ANATEL', 'TSE', 'ANA', 'ANAC', 'CADUNICO'];
       const hasOfficialToken = OFFICIAL_TOKENS.some(t => src.includes(t));
-      const isDerived = src.includes('+IBGE') || src.includes('DERIVADO') || src.includes('CALCULADO') || method === 'DERIVED' || v._source === 'derived';
-      const isManual = method === 'MANUAL' || src === 'MANUAL' || src.includes('MANUAL') || (!hasOfficialToken && !isDerived && src.length > 0 && !src.includes('PRÉ-PREENCHIDO') && !src.includes('PRE-PREENCHIDO'));
-      const isOfficial = !isDerived && hasOfficialToken;
+      const isDerived = auditType.startsWith('DERIVED') || src.includes('+IBGE') || src.includes('DERIVADO') || src.includes('CALCULADO') || method === 'DERIVED' || v._source === 'derived';
+      const isOfficial = !isDerived && (auditType.startsWith('OFFICIAL_API') || hasOfficialToken || src.includes('PRÉ-PREENCHIDO') || src.includes('PRE-PREENCHIDO'));
+      const isManual = method === 'MANUAL' || src === 'MANUAL' || src.includes('MANUAL') || (!hasOfficialToken && !isDerived && !isOfficial && src.length > 0);
+      return { isDerived, isOfficial, isManual };
+    };
+    filled.forEach((v: any) => {
+      const { isDerived, isOfficial, isManual } = classify(v);
       if (isDerived) buckets.derived.push(v);
       else if (isOfficial) buckets.official.push(v);
       else if (isManual) buckets.manual.push(v);
@@ -43,7 +54,7 @@ export function DataProvenancePanel({ indicatorValues }: Props) {
     const automated = buckets.official.length + buckets.derived.length;
     const coveragePct = total > 0 ? Math.round((automated / total) * 100) : 0;
     return { ...buckets, total, automated, coveragePct };
-  }, [indicatorValues]);
+  }, [indicatorValues, auditRows]);
 
   const sourceLabel = (src: string) => {
     const map: Record<string, string> = {

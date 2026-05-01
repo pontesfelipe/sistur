@@ -153,6 +153,15 @@ export function useIndicators(options: UseIndicatorsOptions = {}) {
 export function useIndicatorValues(assessmentId?: string) {
   const queryClient = useQueryClient();
 
+  const getAssessmentOrgId = async (targetAssessmentId: string, fallbackOrgId: string) => {
+    const { data } = await supabase
+      .from('assessments')
+      .select('org_id')
+      .eq('id', targetAssessmentId)
+      .maybeSingle();
+    return data?.org_id || fallbackOrgId;
+  };
+
   const { data: values = [], isLoading, error } = useQuery({
     queryKey: ['indicator-values', assessmentId],
     queryFn: async () => {
@@ -195,8 +204,11 @@ export function useIndicatorValues(assessmentId?: string) {
 
       if (!profile) throw new Error('Perfil não encontrado');
 
-      // Use effective org_id (supports demo mode)
+      // Use the assessment owner org for persisted values. In demo mode,
+      // reading can use effectiveOrgId, but writing values with the demo org
+      // into a real-org assessment breaks RLS visibility on the detail page.
       const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
+      const valueOrgId = await getAssessmentOrgId(value.assessment_id, effectiveOrgId);
 
       // Check if value exists
       const { data: existing } = await supabase
@@ -230,7 +242,7 @@ export function useIndicatorValues(assessmentId?: string) {
       } else {
         const insertData: Record<string, any> = {
           ...value,
-          org_id: effectiveOrgId,
+          org_id: valueOrgId,
         };
 
         const { data, error } = await supabase
@@ -270,8 +282,9 @@ export function useIndicatorValues(assessmentId?: string) {
 
       if (!profile) throw new Error('Perfil não encontrado');
 
-      // Use effective org_id (supports demo mode)
+      // Persist using the assessment owner org, not the current demo org.
       const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
+      const valueOrgId = await getAssessmentOrgId(values[0]?.assessment_id, effectiveOrgId);
 
       if (!values || values.length === 0) return [];
 
@@ -286,7 +299,7 @@ export function useIndicatorValues(assessmentId?: string) {
         .upsert(
           values.map(v => ({
             ...v,
-            org_id: effectiveOrgId,
+            org_id: valueOrgId,
           })),
           { onConflict: 'assessment_id,indicator_id' }
         )
