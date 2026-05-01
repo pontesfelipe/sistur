@@ -2358,6 +2358,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             safeWrite(`: heartbeat ${Date.now()}\n\n`);
           }, 15_000);
           await safeWrite(`: started ${Date.now()}\n\n`);
+          logger.stage('stream_started');
         }
 
         const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
@@ -2367,7 +2368,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         const providerOrder: Array<'claude' | 'gpt5' | 'gemini'> = requestedProviderForStream === 'auto'
           ? defaultOrder
           : [requestedProviderForStream, ...defaultOrder.filter((p) => p !== requestedProviderForStream)];
-        console.log(`AI provider order for this report: ${providerOrder.join(' → ')} (requested: ${requestedProviderForStream})`);
+        logger.stage('provider_order_resolved', { order: providerOrder, requested: requestedProviderForStream });
 
         const callLovableGateway = (model: string) => fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
