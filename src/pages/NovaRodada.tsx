@@ -244,6 +244,12 @@ export default function NovaRodada() {
       if (indErr) throw indErr;
       if (indicatorRows && indicatorRows.length > 0) {
         const codeToId = new Map(indicatorRows.map(r => [r.code, r.id]));
+        const { data: assessmentRow } = await supabase
+          .from('assessments')
+          .select('org_id')
+          .eq('id', createdAssessmentId)
+          .maybeSingle();
+        const valueOrgId = assessmentRow?.org_id || effectiveOrgId;
         const valuesToInsert = validatedValues
           .filter(v => v.raw_value !== null && codeToId.has(v.indicator_code))
           .map(v => ({
@@ -251,7 +257,7 @@ export default function NovaRodada() {
             indicator_id: codeToId.get(v.indicator_code)!,
             value_raw: Number(v.raw_value),
             source: `Pré-preenchido (${v.source_code})`,
-            org_id: effectiveOrgId,
+            org_id: valueOrgId,
             reference_date: v.reference_year ? `${v.reference_year}-01-01` : null,
           }));
         if (valuesToInsert.length > 0) {
