@@ -15,7 +15,11 @@ interface Props {
  */
 export function DataProvenancePanel({ indicatorValues }: Props) {
   const analysis = useMemo(() => {
-    const filled = (indicatorValues || []).filter((v: any) => !v.is_ignored && v.value != null);
+    const filled = (indicatorValues || []).filter((v: any) => {
+      if (v.is_ignored) return false;
+      const val = v.value_raw ?? v.value ?? v.value_text;
+      return val !== null && val !== undefined && val !== '';
+    });
     const buckets = {
       official: [] as any[],
       derived: [] as any[],
@@ -25,13 +29,11 @@ export function DataProvenancePanel({ indicatorValues }: Props) {
     filled.forEach((v: any) => {
       const src = (v.source || v.source_type || '').toString().toUpperCase();
       const method = (v.collection_method || '').toString().toUpperCase();
-      const isDerived = src.includes('+IBGE') || method === 'DERIVED' || v._source === 'derived';
-      const isManual = method === 'MANUAL' || src === 'MANUAL';
-      const isOfficial = !isDerived && !isManual && (
-        src.startsWith('IBGE') || src.startsWith('CADASTUR') || src.startsWith('STN') ||
-        src.startsWith('DATASUS') || src.startsWith('MAPA_TURISMO') || src.startsWith('INEP') ||
-        src.startsWith('ANATEL') || src.startsWith('TSE') || src.startsWith('ANA')
-      );
+      const OFFICIAL_TOKENS = ['IBGE', 'CADASTUR', 'STN', 'DATASUS', 'MAPA_TURISMO', 'MAPA DO TURISMO', 'INEP', 'ANATEL', 'TSE', 'ANA', 'ANAC', 'CADUNICO'];
+      const hasOfficialToken = OFFICIAL_TOKENS.some(t => src.includes(t));
+      const isDerived = src.includes('+IBGE') || src.includes('DERIVADO') || src.includes('CALCULADO') || method === 'DERIVED' || v._source === 'derived';
+      const isManual = method === 'MANUAL' || src === 'MANUAL' || src.includes('MANUAL') || (!hasOfficialToken && !isDerived && src.length > 0 && !src.includes('PRÉ-PREENCHIDO') && !src.includes('PRE-PREENCHIDO'));
+      const isOfficial = !isDerived && hasOfficialToken;
       if (isDerived) buckets.derived.push(v);
       else if (isOfficial) buckets.official.push(v);
       else if (isManual) buckets.manual.push(v);
