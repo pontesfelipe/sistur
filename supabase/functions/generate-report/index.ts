@@ -6,7 +6,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const VALIDATOR_VERSION = 'v1.38.39';
+// v1.38.45 — `VALIDATOR_VERSION` é apenas o fallback. O cliente envia
+// `appVersion` no body do request (ver `src/pages/Relatorios.tsx`) e esse
+// valor é usado por request, garantindo que a "Conferência de dados"
+// SEMPRE reflita a versão atual do app na hora da geração — sem depender
+// de um string hardcoded que envelhece a cada release.
+const VALIDATOR_VERSION_FALLBACK = 'v1.38.45';
 
 // ========== HELPER FUNCTIONS ==========
 
