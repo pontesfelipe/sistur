@@ -2406,11 +2406,11 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
     let persistedReportId: string | null = null;
 
     const backgroundTask = (async () => {
+      let heartbeatTimer: number | null = null;
       try {
         const reader = response.body!.getReader();
         const decoder = new TextDecoder();
         const encoder = new TextEncoder();
-        let heartbeatTimer: number | null = null;
 
         if (shouldStreamToClient) {
           heartbeatTimer = setInterval(() => {
@@ -2418,28 +2418,22 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           }, 15_000);
         }
 
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            if (shouldStreamToClient) await writer.write(value);
-            
-            const text = decoder.decode(value, { stream: true });
-            for (const line of text.split('\n')) {
-              if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-                try {
-                  const json = JSON.parse(line.slice(6));
-                  const content = json.choices?.[0]?.delta?.content;
-                  if (content) fullContent += content;
-                } catch { /* ignore */ }
-              }
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          if (shouldStreamToClient) await writer.write(value);
+          
+          const text = decoder.decode(value, { stream: true });
+          for (const line of text.split('\n')) {
+            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+              try {
+                const json = JSON.parse(line.slice(6));
+                const content = json.choices?.[0]?.delta?.content;
+                if (content) fullContent += content;
+              } catch { /* ignore */ }
             }
           }
-        } finally {
-          if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
         }
-        
-        await writer.close();
 
         if (fullContent) {
           // Fase 5 — Trava de coerência LLM v1.38.0: detecta contradições
