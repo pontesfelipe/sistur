@@ -1797,6 +1797,8 @@ serve(async (req) => {
       .from('generated_reports')
       .select('id, created_at')
       .eq('assessment_id', assessmentId)
+      .order('created_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (existingReport && !forceRegenerate) {
@@ -2406,11 +2408,13 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             .from('generated_reports')
             .select('id')
             .eq('assessment_id', assessmentId)
+            .order('created_at', { ascending: false })
+            .limit(1)
             .maybeSingle();
           
           const kbFileIds = kbFiles.map((f: any) => f.id);
           let savedReportId: string | null = null;
-          if (existing) {
+          if (existing && !forceRegenerate) {
             const { error } = await supabaseAdmin
               .from('generated_reports')
               .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })

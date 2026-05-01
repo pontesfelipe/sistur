@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 41,
+  patch: 42,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.42",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção do histórico vazio mesmo com relatórios salvos. A consulta deixou de usar join obrigatório com diagnósticos, evitando ocultar relatórios antigos quando o diagnóstico relacionado não está acessível pela política atual. O histórico agora espera o perfil/organização ativa antes de buscar dados, conta apenas relatórios visíveis ao usuário e mostra mensagem específica quando os filtros zeram a lista, além de normalizar os níveis SMALL/MEDIUM/COMPLETE para Essencial/Estratégico/Integral nos filtros e badges.",
+      "Relatórios — 'Gerar nova versão' agora cria um novo registro no histórico em vez de sobrescrever o relatório anterior. A checagem de cache e a recuperação do relatório mais recente também passaram a ordenar por data, evitando erro quando há múltiplas versões para o mesmo diagnóstico."
+    ],
+  },
   {
     version: "1.38.41",
     date: "2026-05-01",
