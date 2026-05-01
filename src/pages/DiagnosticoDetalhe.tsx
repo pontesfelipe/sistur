@@ -218,6 +218,22 @@ const DiagnosticoDetalhe = () => {
   const { data: rawIndicatorScores = [], refetch: refetchIndicatorScores } = useIndicatorScores(id, diagnosticType);
   const { data: rawIssues = [], refetch: refetchIssues } = useIssues(id);
   const { data: rawRecommendations = [], refetch: refetchRecommendations } = useRecommendations(id);
+  const { data: auditRows = [] } = useQuery({
+    queryKey: ['assessment-indicator-audit', id],
+    queryFn: async () => {
+      if (!id) return [];
+      const { data, error } = await supabase
+        .from('assessment_indicator_audit')
+        .select('indicator_code, source_type, source_detail')
+        .eq('assessment_id', id);
+      if (error) {
+        console.warn('Não foi possível carregar auditoria de procedência:', error);
+        return [];
+      }
+      return data || [];
+    },
+    enabled: !!id,
+  });
   
   // Use appropriate indicator values based on diagnostic type
   const { values: territorialIndicatorValues = [] } = useIndicatorValues(id);
@@ -962,7 +978,7 @@ const DiagnosticoDetalhe = () => {
 
           {/* Indicadores Tab */}
           <TabsContent value="indicadores" className="space-y-6">
-            <DataProvenancePanel indicatorValues={indicatorValues as any} />
+            <DataProvenancePanel indicatorValues={indicatorValues as any} auditRows={auditRows as any} />
             {prescriptionMode && (
               <Alert>
                 <Target className="h-4 w-4" />
