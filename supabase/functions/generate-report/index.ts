@@ -1541,8 +1541,13 @@ async function runReportPipeline(args: {
   authHeader: string;
   aiProvider?: 'auto' | 'claude' | 'gpt5' | 'gemini';
   appVersion?: string;
+  logger?: StageLogger;
 }): Promise<{ reportId: string | null }> {
   const { supabaseAdmin, assessment, assessmentId, destinationName, jobId } = args;
+  const logger = args.logger ?? createStageLogger({ jobId, assessmentId, traceId: jobId });
+  logger.setJobId(jobId);
+  logger.setAssessmentId(assessmentId);
+  logger.stage('pipeline_start', { destinationName, template: args.reportTemplate });
 
   // Atualiza progresso enquanto o stream roda. Não conhecemos o tamanho final,
   // então simulamos um avanço logarítmico: 15% ao começar, +5% a cada 30s,
