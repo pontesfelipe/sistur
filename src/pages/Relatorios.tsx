@@ -1088,9 +1088,11 @@ export default function Relatorios() {
                     Relatórios Salvos
                   </CardTitle>
                   <CardDescription>
-                    {hasActiveHistoryFilters
-                      ? `${filteredSavedReports.length} de ${visibleSavedReports.length} relatório(s) exibido(s)`
-                      : `${visibleSavedReports.length} relatório(s) no histórico`}
+                    {reportsError
+                      ? 'Não foi possível carregar o histórico'
+                      : hasActiveHistoryFilters
+                        ? `${filteredSavedReports.length} de ${visibleSavedReports.length} relatório(s) exibido(s)`
+                        : `${visibleSavedReports.length} relatório(s) no histórico`}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -1144,7 +1146,15 @@ export default function Relatorios() {
                     )}
                   </div>
 
-                  {isHistoryLoading ? (
+                  {reportsError ? (
+                    <div className="text-center py-8 text-muted-foreground space-y-3">
+                      <AlertTriangle className="h-8 w-8 mx-auto text-destructive" />
+                      <p>Falha ao carregar relatórios salvos.</p>
+                      <Button variant="outline" size="sm" onClick={() => refetchReports()}>
+                        Tentar novamente
+                      </Button>
+                    </div>
+                  ) : isHistoryLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                     </div>
