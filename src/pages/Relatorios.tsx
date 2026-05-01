@@ -287,6 +287,11 @@ export default function Relatorios() {
           environment: runInDemo ? 'demo' : 'production',
           enableComparison,
           mode: 'background',
+          // v1.38.45 — sempre envia a versão atual do app para que o
+          // validador (`report_validations.validator_version`) reflita
+          // a versão vigente do sistema, evitando confusão com validações
+          // antigas vinculadas ao mesmo diagnóstico.
+          appVersion: `v${APP_VERSION.full}`,
           ...(isAdmin && aiProvider !== 'auto' ? { aiProvider } : {}),
         }),
       });
