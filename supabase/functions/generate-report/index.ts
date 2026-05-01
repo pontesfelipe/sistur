@@ -2409,22 +2409,34 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
       try {
         const reader = response.body!.getReader();
         const decoder = new TextDecoder();
+        const encoder = new TextEncoder();
+        let heartbeatTimer: number | null = null;
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          if (shouldStreamToClient) await writer.write(value);
-          
-          const text = decoder.decode(value, { stream: true });
-          for (const line of text.split('\n')) {
-            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-              try {
-                const json = JSON.parse(line.slice(6));
-                const content = json.choices?.[0]?.delta?.content;
-                if (content) fullContent += content;
-              } catch { /* ignore */ }
+        if (shouldStreamToClient) {
+          heartbeatTimer = setInterval(() => {
+            writer.write(encoder.encode(`: heartbeat ${Date.now()}\n\n`)).catch(() => {});
+          }, 15_000);
+        }
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (shouldStreamToClient) await writer.write(value);
+            
+            const text = decoder.decode(value, { stream: true });
+            for (const line of text.split('\n')) {
+              if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                try {
+                  const json = JSON.parse(line.slice(6));
+                  const content = json.choices?.[0]?.delta?.content;
+                  if (content) fullContent += content;
+                } catch { /* ignore */ }
+              }
             }
           }
+        } finally {
+          if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
         }
         
         await writer.close();
