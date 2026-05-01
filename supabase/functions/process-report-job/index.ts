@@ -1,4 +1,6 @@
-// v1.38.53 — Worker assíncrono da fila de geração de relatórios.
+// v1.38.57 — Worker assíncrono da fila de geração de relatórios.
+// (force-redeploy: a versão anterior não propagou para a infra de edge functions,
+// causando 404 ao trigger DB e jobs travados em "processing" para sempre.)
 //
 // Por que essa função existe?
 // Antes, o modo `mode=background` do `generate-report` enfileirava o job e
