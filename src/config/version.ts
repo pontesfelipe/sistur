@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 44,
+  patch: 45,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.45",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — `validator_version` da Conferência de dados agora é dinâmico por request. Antes a edge function `generate-report` carimbava `report_validations.validator_version` com uma string hardcoded ('v1.38.39'), que envelhecia a cada release e dava a impressão ao usuário de que o validador estava 'travado' em uma versão antiga mesmo após novas gerações. Agora o cliente envia `appVersion: vX.Y.Z` (lido de `APP_VERSION.full`) no body de cada chamada — modo `background` propaga o valor para o pipeline interno via `runReportPipeline` → fetch interno → handler `stream`, garantindo que toda nova geração registre a versão vigente do app. Validação server-side: aceita apenas formato `v?\\d+\\.\\d+\\.\\d+`, com fallback determinístico para `VALIDATOR_VERSION_FALLBACK` (v1.38.45) caso o cliente omita ou envie valor inválido. Resultado: o banner 'Conferência de dados' e o .txt exportado pelo `ReportValidationBanner` sempre exibem a versão real do validador que rodou naquela geração específica."
+    ],
+  },
   {
     version: "1.38.44",
     date: "2026-05-01",
