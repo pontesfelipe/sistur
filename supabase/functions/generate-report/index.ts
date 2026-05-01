@@ -2558,8 +2558,15 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             console.error('Failed to insert audit_events for report_generated:', auditErr);
           }
         }
+
+        if (heartbeatTimer !== null) {
+          clearInterval(heartbeatTimer);
+          heartbeatTimer = null;
+        }
+        await writer.close();
       } catch (err) {
         console.error('Stream error:', err);
+        if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
         await writer.abort(err).catch(() => {});
         throw err;
       }
