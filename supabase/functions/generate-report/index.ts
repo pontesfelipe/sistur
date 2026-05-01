@@ -1525,7 +1525,11 @@ async function runReportPipeline(args: {
         environment: args.environment,
         enableComparison: args.enableComparison,
         mode: 'stream',
-        backgroundRun: true,
+        // v1.38.49 — NÃO usar backgroundRun aqui. Quando true, o endpoint
+        // interno só responde JSON após todo o relatório/validação terminar,
+        // ficando sem bytes por ~150s e estourando IDLE_TIMEOUT. Mantemos
+        // stream real + heartbeat e drenamos até a persistência final.
+        backgroundRun: false,
         aiProvider: args.aiProvider ?? 'auto',
         appVersion: args.appVersion ?? VALIDATOR_VERSION_FALLBACK,
       }),
@@ -1563,7 +1567,8 @@ async function runReportPipeline(args: {
               environment: args.environment,
               enableComparison: args.enableComparison,
               mode: 'stream',
-              backgroundRun: true,
+              // Mantém o retry também em stream real para evitar idle timeout.
+              backgroundRun: false,
               aiProvider: args.aiProvider ?? 'auto',
               appVersion: args.appVersion ?? VALIDATOR_VERSION_FALLBACK,
             }),
