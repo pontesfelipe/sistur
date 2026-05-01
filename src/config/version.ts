@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 42,
+  patch: 43,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.43",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção do rótulo de status truncado (caso 'Autonomia fiscal' do relatório de Foz do Iguaçu, que saía como '🟠 AT' em vez de '🟠 ATENÇÃO'). Causa: o realinhador de linhas conserta a POSIÇÃO das células, mas não o TEXTO interno — quando o LLM emitia a célula já abreviada ('AT', 'CRIT', 'EXC' etc.), o conteúdo errado era propagado para o DOCX e para o preview, mesmo com a tabela em esquadro. Correções: (1) Nova função `normalizeStatusCellText` em `reportStatusStyle.ts` que detecta o emoji de status (🟢🔵🟡🟠🔴⚪) e reconstrói o rótulo canônico ('EXCELENTE/FORTE/ADEQUADO/ATENÇÃO/CRÍTICO/INFORMATIVO') a partir do mapa oficial, preservando o **bold** markdown se presente. Quando não há emoji, tenta `canonicalStatusKey` sobre o texto e reescreve o rótulo. (2) Aplicação no preview HTML (`Relatorios.tsx`) e no exportador DOCX (`exportReportDocx.ts`), garantindo o rótulo correto em ambas as superfícies. (3) Reforço no prompt do `generate-report` proibindo explicitamente abreviar o status ('AT', 'CRIT', 'EXC', 'ADEQ' etc.) e exigindo o rótulo por extenso, com acento e emoji."
+    ],
+  },
   {
     version: "1.38.42",
     date: "2026-05-01",
