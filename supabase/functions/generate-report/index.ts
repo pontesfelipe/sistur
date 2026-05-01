@@ -1565,14 +1565,23 @@ async function runReportPipeline(args: {
     pct = Math.min(90, pct + 5);
     supabaseAdmin.from('report_jobs').update({
       progress_pct: pct,
-      stage: pct < 50 ? 'Gerando narrativa com IA' : 'Validando coerência e persistindo',
+      stage: `[trace=${logger.traceId}] ${pct < 50 ? 'Gerando narrativa com IA' : 'Validando coerência e persistindo'}`,
     }).eq('id', jobId).then(() => {}, () => {});
   }, 30_000);
   const streamWatchdog = setInterval(() => {
     const now = Date.now();
     if (now - lastStreamChunkAt > STREAM_IDLE_TIMEOUT_MS) {
+      const idleSec = Math.round((now - lastStreamChunkAt) / 1000);
+      logger.error('stream_idle_timeout', new Error(`No chunk for ${idleSec}s`), {
+        last_stage: logger.lastStage(),
+        elapsed_sec: Math.round((now - streamStartedAt) / 1000),
+      });
       streamController.abort('internal-report-stream-idle-timeout');
     } else if (now - streamStartedAt > STREAM_HARD_TIMEOUT_MS) {
+      logger.error('stream_hard_timeout', new Error('Hard timeout reached'), {
+        last_stage: logger.lastStage(),
+        elapsed_sec: Math.round((now - streamStartedAt) / 1000),
+      });
       streamController.abort('internal-report-stream-hard-timeout');
     }
   }, 15_000);
