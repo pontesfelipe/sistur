@@ -79,13 +79,29 @@ interface GeneratedReport {
   tier: string | null;
 }
 
-function useGeneratedReports() {
+const normalizeReportTier = (tier?: string | null) => {
+  const value = (tier || '').toLowerCase();
+  if (value === 'small' || value === 'essencial') return 'essencial';
+  if (value === 'medium' || value === 'estrategico' || value === 'estratégico') return 'estrategico';
+  if (value === 'complete' || value === 'integral') return 'integral';
+  return null;
+};
+
+const getReportTierLabel = (tier?: string | null) => {
+  const normalized = normalizeReportTier(tier);
+  if (normalized === 'essencial') return '⚡ Essencial';
+  if (normalized === 'estrategico') return '📊 Estratégico';
+  if (normalized === 'integral') return '🎯 Integral';
+  return null;
+};
+
+function useGeneratedReports(userId?: string, effectiveOrgId?: string) {
   return useQuery({
-    queryKey: ['generated-reports'],
+    queryKey: ['generated-reports', userId, effectiveOrgId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('generated_reports')
-        .select('*, assessments!inner(diagnostic_type, tier)')
+        .select('*, assessments(diagnostic_type, tier)')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -95,6 +111,7 @@ function useGeneratedReports() {
         tier: r.assessments?.tier ?? null,
       })) as GeneratedReport[];
     },
+    enabled: Boolean(userId && effectiveOrgId),
   });
 }
 
@@ -105,8 +122,8 @@ export default function Relatorios() {
   
   const { assessments, isLoading: assessmentsLoading } = useAssessments();
   const { destinations } = useDestinations();
-  const { data: savedReports, isLoading: reportsLoading } = useGeneratedReports();
-  const { isAdmin, isViewingDemoData, profile } = useProfile();
+  const { isAdmin, isViewingDemoData, profile, effectiveOrgId, loading: profileLoading } = useProfile();
+  const { data: savedReports, isLoading: reportsLoading } = useGeneratedReports(profile?.user_id, effectiveOrgId);
   
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>('');
   const [report, setReport] = useState<string>('');
@@ -179,8 +196,20 @@ export default function Relatorios() {
   const prescriptions = assessmentDetails?.prescriptions;
 
   const calculatedAssessments = assessments?.filter(a => a.status === 'CALCULATED') || [];
+  const visibleSavedReports = (savedReports ?? []).filter((r) => {
+    if (r.visibility === 'personal' && r.created_by !== profile?.user_id) return false;
+    return true;
+  });
+  const filteredSavedReports = visibleSavedReports.filter((r) => {
+    if (historyTypeFilter !== 'all' && r.diagnostic_type !== historyTypeFilter) return false;
+    if (historyTierFilter !== 'all' && normalizeReportTier(r.tier) !== historyTierFilter) return false;
+    if (historyOwnerFilter === 'mine' && r.created_by !== profile?.user_id) return false;
+    return true;
+  });
+  const hasActiveHistoryFilters = historyTypeFilter !== 'all' || historyTierFilter !== 'all' || historyOwnerFilter !== 'all';
+  const isHistoryLoading = profileLoading || reportsLoading;
   const hasSavedReportForSelected = Boolean(
-    selectedAssessmentId && savedReports?.some((r) => r.assessment_id === selectedAssessmentId),
+    selectedAssessmentId && visibleSavedReports.some((r) => r.assessment_id === selectedAssessmentId),
   );
 
   const filteredCalculatedAssessments = calculatedAssessments.filter(a => {
@@ -1019,7 +1048,9 @@ export default function Relatorios() {
                     Relatórios Salvos
                   </CardTitle>
                   <CardDescription>
-                    {savedReports?.length || 0} relatório(s) no histórico
+                    {hasActiveHistoryFilters
+                      ? `${filteredSavedReports.length} de ${visibleSavedReports.length} relatório(s) exibido(s)`
+                      : `${visibleSavedReports.length} relatório(s) no histórico`}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -1061,24 +1092,33 @@ export default function Relatorios() {
                         </SelectItem>
                       </SelectContent>
                     </Select>
+                    {hasActiveHistoryFilters && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 justify-start px-2 text-xs"
+                        onClick={() => { setHistoryTypeFilter('all'); setHistoryTierFilter('all'); setHistoryOwnerFilter('all'); }}
+                      >
+                        Limpar filtros
+                      </Button>
+                    )}
                   </div>
 
-                  {reportsLoading ? (
+                  {isHistoryLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                     </div>
-                  ) : savedReports && savedReports.length > 0 ? (
+                  ) : visibleSavedReports.length > 0 ? (
                     <ScrollArea className="h-[450px]">
                       <div className="space-y-2 pr-4">
-                        {savedReports
-                          .filter(r => {
-                            if (r.visibility === 'personal' && r.created_by !== profile?.user_id) return false;
-                            if (historyTypeFilter !== 'all' && r.diagnostic_type !== historyTypeFilter) return false;
-                            if (historyTierFilter !== 'all' && r.tier !== historyTierFilter) return false;
-                            if (historyOwnerFilter === 'mine' && r.created_by !== profile?.user_id) return false;
-                            return true;
-                          })
-                          .map((r) => (
+                        {filteredSavedReports.length === 0 ? (
+                          <div className="text-center py-8 text-muted-foreground">
+                            <Filter className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                            <p>Nenhum relatório combina com os filtros</p>
+                          </div>
+                        ) : filteredSavedReports.map((r) => {
+                          const tierLabel = getReportTierLabel(r.tier);
+                          return (
                           <div
                             key={r.id}
                             className={`p-3 rounded-lg border cursor-pointer transition-colors ${
@@ -1096,9 +1136,9 @@ export default function Relatorios() {
                                     {r.diagnostic_type === 'enterprise' ? <Building2 className="h-2.5 w-2.5" /> : <Globe className="h-2.5 w-2.5" />}
                                     {r.diagnostic_type === 'enterprise' ? 'Enterprise' : 'Territorial'}
                                   </Badge>
-                                  {r.tier && (
+                                  {tierLabel && (
                                     <Badge variant="secondary" className="text-[10px] shrink-0">
-                                      {r.tier === 'essencial' ? '⚡' : r.tier === 'estrategico' ? '📊' : '🎯'} {r.tier.charAt(0).toUpperCase() + r.tier.slice(1)}
+                                      {tierLabel}
                                     </Badge>
                                   )}
                                   {r.visibility === 'org' ? (
@@ -1128,7 +1168,8 @@ export default function Relatorios() {
                               </Button>
                             </div>
                           </div>
-                        ))}
+                        );
+                        })}
                       </div>
                     </ScrollArea>
                   ) : (
