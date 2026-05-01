@@ -1534,6 +1534,7 @@ async function runReportPipeline(args: {
         throw new Error('A geração foi reutilizada pelo cache interno. Clique em Regenerar para criar uma nova versão.');
       }
       if (payload?.reportId) return { reportId: payload.reportId };
+      throw new Error('Pipeline interno retornou uma resposta inesperada ao finalizar a geração.');
     }
     // Drena o stream até o fim para garantir que a persistência interna
     // (dentro do EdgeRuntime.waitUntil do endpoint stream) tenha tempo de rodar.
