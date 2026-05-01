@@ -2276,6 +2276,34 @@ serve(async (req) => {
       // independente; aqui apenas devolvemos 202 com o jobId.
       logger.stage('background_job_dispatched_via_trigger');
 
+      // v1.38.59 — Fallback imediato: em alguns ambientes o pg_net que dispara
+      // o worker encerra a chamada em 5s e não mantém o processo vivo para
+      // relatórios longos. Mantemos o trigger como caminho principal, mas também
+      // acordamos o worker via EdgeRuntime.waitUntil no request que já está
+      // aberto. O worker faz claim atômico do job, então chamadas duplicadas não
+      // geram relatórios duplicados.
+      try {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const wakeWorker = fetch(`${supabaseUrl}/functions/v1/process-report-job`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${supabaseServiceKey}`,
+          },
+          body: JSON.stringify({ jobId }),
+        }).catch((wakeErr) => {
+          logger.error('background_worker_wake_failed_nonblocking', wakeErr);
+        });
+        // @ts-ignore - EdgeRuntime é global no runtime de funções.
+        if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) {
+          // @ts-ignore
+          EdgeRuntime.waitUntil(wakeWorker);
+        }
+      } catch (wakeErr) {
+        logger.error('background_worker_wake_setup_failed_nonblocking', wakeErr);
+      }
+
       return new Response(JSON.stringify({ jobId, status: 'queued' }), {
         status: 202, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

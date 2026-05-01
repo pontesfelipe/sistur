@@ -1,4 +1,4 @@
-// v1.38.58 — Worker assíncrono da fila de geração de relatórios.
+// v1.38.59 — Worker assíncrono da fila de geração de relatórios.
 // (force-redeploy: a versão anterior não propagou para a infra de edge functions,
 // causando 404 ao trigger DB e jobs travados em "processing" para sempre.)
 //
@@ -101,30 +101,38 @@ serve(async (req) => {
     traceId = (job.payload as any)?.traceId ?? jobId;
     log("worker_started", { status: job.status, attempts: job.attempts });
 
-    // Idempotência: só processa se status for 'queued' (ou retry de 'processing' órfão > 15min)
+    // Idempotência: só processa jobs explicitamente enfileirados. A função pode
+    // ser chamada por dois caminhos (trigger DB + fallback waitUntil do endpoint
+    // inicial); por isso a transição queued → processing precisa ser atômica.
     if (job.status === "completed") {
       log("already_completed_skip");
       return new Response(JSON.stringify({ ok: true, skipped: "already completed" }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    if (job.status === "processing") {
-      log("already_processing_skip");
-      return new Response(JSON.stringify({ ok: true, skipped: "already processing" }), {
+    if (job.status !== "queued") {
+      log("not_queued_skip", { status: job.status });
+      return new Response(JSON.stringify({ ok: true, skipped: `status ${job.status}` }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const attempts = (job.attempts ?? 0) + 1;
 
-    await supabaseAdmin.from("report_jobs").update({
+    const { data: claimed, error: claimErr } = await supabaseAdmin.from("report_jobs").update({
       status: "processing",
       stage: `[trace=${traceId}] Coletando dados do diagnóstico (tentativa ${attempts})`,
       progress_pct: 10,
       started_at: new Date().toISOString(),
       attempts,
       last_attempt_at: new Date().toISOString(),
-    }).eq("id", jobId);
+    }).eq("id", jobId).eq("status", "queued").select("id").maybeSingle();
+    if (claimErr || !claimed) {
+      log("claim_lost_skip", { error: claimErr?.message });
+      return new Response(JSON.stringify({ ok: true, skipped: "claim lost" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     log("marked_processing", { attempts });
 
     if (!job.payload || !job.auth_jwt) {

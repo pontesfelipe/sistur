@@ -303,12 +303,15 @@ export default function Relatorios() {
     // status 'completed' ou 'failed' — sem manter conexão SSE longa,
     // imune a timeouts de proxy/aba/rede.
     const POLL_INTERVAL_MS = 4_000;
+    // v1.38.59 — Mantém acompanhamento até o teto técnico do worker. Se passar
+    // disso, mostramos falha explícita em vez de uma mensagem neutra que deixava
+    // a impressão de processamento infinito.
     // v1.38.55 — Aumentado de 10min → 15min porque relatórios completos
     // (template "completo" com 100+ indicadores) podem levar até ~7min só
     // na chamada de IA (Claude). O watcher global em background continua
     // observando o job mesmo se este loop terminar antes — então o teto
     // aqui não é fatal, é só o limite do feedback inline na tela.
-    const POLL_DEADLINE_MS = 15 * 60 * 1000;
+    const POLL_DEADLINE_MS = 16 * 60 * 1000;
 
     try {
       const resp = await fetch(REPORT_URL, {
@@ -395,17 +398,16 @@ export default function Relatorios() {
         }
       }
       if (!finalReportId) {
-        // v1.38.55 — Não trata como erro: o job pode terminar em
-        // alguns minutos, e o watcher global cuidará da notificação.
-        toast.info(
-          'A geração está demorando mais que o normal e seguirá em segundo plano.',
-          {
-            description:
-              'Você pode fechar esta tela. Avisaremos por toast (e notificação do navegador, se permitida) assim que o relatório ficar pronto.',
-            duration: 10_000,
-          },
-        );
-        return;
+        const { data: stuckJob } = await supabase
+          .from('report_jobs')
+          .select('status, stage, progress_pct, error_message')
+          .eq('id', jobId)
+          .maybeSingle();
+        if (stuckJob?.status === 'failed') {
+          throw new Error(stuckJob.error_message || 'Falha na geração em segundo plano.');
+        }
+        const stageText = stuckJob?.stage ? ` Última etapa: ${stuckJob.stage}` : '';
+        throw new Error(`A geração excedeu o tempo limite sem concluir.${stageText}`);
       }
 
       // Carrega conteúdo final

@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 58,
+  patch: 59,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.59",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção real do travamento pós-fila: a análise dos jobs mostrou que o disparo via banco chamava o worker, mas a chamada HTTP interna era encerrada em 5s, deixando o job em 'processing' sem conclusão nem erro. O disparo do banco agora usa timeout longo e o endpoint de enfileiramento também acorda o worker por `EdgeRuntime.waitUntil`, com claim atômico no worker para evitar processamento duplicado. Jobs presos foram liberados para nova tentativa. A tela de Relatórios e o watcher global agora exibem falha explícita quando um job excede o limite técnico, em vez de sumir silenciosamente em segundo plano."
+    ],
+  },
   {
     version: "1.38.58",
     date: "2026-05-01",
