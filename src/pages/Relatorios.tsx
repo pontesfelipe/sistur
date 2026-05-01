@@ -156,6 +156,7 @@ export default function Relatorios() {
   const [searchParams] = useSearchParams();
   const assessmentFromUrl = searchParams.get('assessment');
   const queryClient = useQueryClient();
+  const { track: trackReportJob } = useReportJobWatcher();
   
   const { assessments, isLoading: assessmentsLoading } = useAssessments();
   const { destinations } = useDestinations();
