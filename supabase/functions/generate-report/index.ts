@@ -1525,7 +1525,11 @@ async function runReportPipeline(args: {
         environment: args.environment,
         enableComparison: args.enableComparison,
         mode: 'stream',
-        backgroundRun: true,
+        // v1.38.49 — NÃO usar backgroundRun aqui. Quando true, o endpoint
+        // interno só responde JSON após todo o relatório/validação terminar,
+        // ficando sem bytes por ~150s e estourando IDLE_TIMEOUT. Mantemos
+        // stream real + heartbeat e drenamos até a persistência final.
+        backgroundRun: false,
         aiProvider: args.aiProvider ?? 'auto',
         appVersion: args.appVersion ?? VALIDATOR_VERSION_FALLBACK,
       }),
@@ -1563,7 +1567,8 @@ async function runReportPipeline(args: {
               environment: args.environment,
               enableComparison: args.enableComparison,
               mode: 'stream',
-              backgroundRun: true,
+              // Mantém o retry também em stream real para evitar idle timeout.
+              backgroundRun: false,
               aiProvider: args.aiProvider ?? 'auto',
               appVersion: args.appVersion ?? VALIDATOR_VERSION_FALLBACK,
             }),
@@ -2401,9 +2406,17 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
     let persistedReportId: string | null = null;
 
     const backgroundTask = (async () => {
+      let heartbeatTimer: number | null = null;
       try {
         const reader = response.body!.getReader();
         const decoder = new TextDecoder();
+        const encoder = new TextEncoder();
+
+        if (shouldStreamToClient) {
+          heartbeatTimer = setInterval(() => {
+            writer.write(encoder.encode(`: heartbeat ${Date.now()}\n\n`)).catch(() => {});
+          }, 15_000);
+        }
 
         while (true) {
           const { done, value } = await reader.read();
@@ -2421,8 +2434,6 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             }
           }
         }
-        
-        await writer.close();
 
         if (fullContent) {
           // Fase 5 — Trava de coerência LLM v1.38.0: detecta contradições
@@ -2547,8 +2558,15 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             console.error('Failed to insert audit_events for report_generated:', auditErr);
           }
         }
+
+        if (heartbeatTimer !== null) {
+          clearInterval(heartbeatTimer);
+          heartbeatTimer = null;
+        }
+        await writer.close();
       } catch (err) {
         console.error('Stream error:', err);
+        if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
         await writer.abort(err).catch(() => {});
         throw err;
       }
