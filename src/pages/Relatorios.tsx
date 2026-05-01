@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, type RefObject } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { exportReportAsDocx } from '@/lib/exportReportDocx';
 import { getStatusStyle, mapIndicatorTableColumns, normalizeStatusCellText, realignIndicatorRow } from '@/lib/reportStatusStyle';
@@ -386,7 +386,7 @@ export default function Relatorios() {
 
   // MD download removed
 
-  const downloadPDF = (targetRef: React.RefObject<HTMLDivElement> = reportRef) => {
+  const downloadPDF = (targetRef: RefObject<HTMLDivElement> = reportRef) => {
     if (!targetRef.current) return;
     
     const content = targetRef.current.innerHTML;
