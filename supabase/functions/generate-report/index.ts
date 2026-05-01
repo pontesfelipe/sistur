@@ -1353,6 +1353,7 @@ async function runReportValidatorAgent(
   reportText: string,
   auditRows: any[],
   apiKey: string,
+  globalRefs: any[] = [],
 ): Promise<string[]> {
   if (!reportText || !apiKey) return [];
   try {
@@ -1368,6 +1369,10 @@ async function runReportValidatorAgent(
       source_detail: r.source_detail,
     }));
 
+    const providedRefs = (globalRefs || [])
+      .map((ref: any) => `- ${ref.file_name || ref.category || 'Documento'}${ref.category ? ` (${ref.category})` : ''}${ref.description ? ` — ${ref.description}` : ''}`)
+      .join('\n') || '- Nenhum documento nacional adicional fornecido.';
+
     const sys = `Você é um agente de auditoria factual ESTRITO para relatórios técnicos em turismo (SISTUR).
 Sua tarefa: comparar o RELATÓRIO contra os DADOS AUDITADOS e a BIBLIOGRAFIA CANÔNICA, e listar TODA alucinação, suposição ou afirmação sem lastro.
 
@@ -1377,11 +1382,14 @@ BIBLIOGRAFIA CANÔNICA (qualquer outra data/título para essas obras é ERRO):
 - BENI, M. C. Política e Planejamento de Turismo no Brasil. Aleph, 2006.
 - TASSO, J. P. F. et al. Mandala da Sustentabilidade no Turismo. UnB, 2024.
 
+DOCUMENTOS DE REFERÊNCIA FORNECIDOS NA GERAÇÃO:
+${providedRefs}
+
 POLÍTICA "ZERO ALUCINAÇÃO" — REPORTE COMO ISSUE TODOS OS CASOS ABAIXO:
 1. Qualquer número (%, R$, contagem, taxa) citado no relatório que NÃO bata com a tabela de DADOS AUDITADOS (tolerância 5%, com escala percentual ↔ decimal).
 2. Qualquer número/estatística que NÃO tenha correspondência alguma na tabela de auditoria (alucinação pura — "inventou um número").
 3. Qualquer ano de referência citado para um indicador que difira do source_detail/reference_year auditado.
-4. Qualquer citação (AUTOR, ANO) com autor/ano fora da bibliografia canônica E que não tenha sido entregue na Base de Conhecimento.
+4. Qualquer citação (AUTOR, ANO) com autor/ano fora da bibliografia canônica E que não tenha sido entregue nos DOCUMENTOS DE REFERÊNCIA FORNECIDOS.
 5. Qualquer ano errado para o modelo SISTUR (correto: 1997 ou 2007 — NUNCA 2001/2020/2021).
 6. Atribuição de fonte trocada (ex.: dado MANUAL apresentado como "IBGE", leitos CADASTUR apresentados como "DATASUS").
 7. Status invertido ou inventado (ex.: "Adequado" quando o score auditado é Crítico/Atenção; "tendência de crescimento" sem dois pontos no tempo).
