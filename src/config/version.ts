@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 56,
+  patch: 57,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.57",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção crítica: jobs ficavam travados em 'processing' (80%) sem nunca terminar nem dar erro. Causa raiz identificada via `net._http_response`: o trigger DB `trg_dispatch_report_job` chamava `/functions/v1/process-report-job` e recebia HTTP 404 ('Requested function was not found') porque a edge function `process-report-job` (criada na v1.38.53) nunca foi propagada para a infraestrutura de edge functions, apesar de existir no repositório e estar declarada em `supabase/config.toml`. Sem worker para executar, o job ficava em 'queued', recebia uma única atualização cosmética para 'processing' e nunca mais era tocado. Correção: bump de versão no header do worker força redeploy da função; job travado existente foi liberado via migration; daqui em diante o trigger consegue acionar o worker e o pipeline assíncrono volta a funcionar de ponta a ponta."
+    ],
+  },
   {
     version: "1.38.56",
     date: "2026-05-01",
