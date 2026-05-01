@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 43,
+  patch: 44,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.44",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção do histórico vazio no modo Demo. A lista de relatórios salvos agora busca tanto a organização real do usuário quanto a organização efetiva do Demo, evitando ocultar relatórios pessoais e organizacionais já gerados quando o usuário está visualizando dados demonstrativos. O export PDF do visualizador histórico também passou a usar o conteúdo do relatório selecionado, e não o painel de geração atual."
+    ],
+  },
   {
     version: "1.38.43",
     date: "2026-05-01",
