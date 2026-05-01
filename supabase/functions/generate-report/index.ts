@@ -3126,12 +3126,14 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
       } catch (err) {
         logger.error('stream_task_failed', err, { last_stage: logger.lastStage() });
         if (incomingJobId) {
-          await supabaseAdmin.from('report_jobs').update({
-            status: 'failed',
-            stage: `[trace=${logger.traceId}] Falhou em ${logger.lastStage()}`,
-            error_message: `[trace=${logger.traceId}][last_stage=${logger.lastStage()}] ${err instanceof Error ? err.message : String(err)}`,
-            finished_at: new Date().toISOString(),
-          }).eq('id', incomingJobId).catch(() => {});
+          try {
+            await supabaseAdmin.from('report_jobs').update({
+              status: 'failed',
+              stage: `[trace=${logger.traceId}] Falhou em ${logger.lastStage()}`,
+              error_message: `[trace=${logger.traceId}][last_stage=${logger.lastStage()}] ${err instanceof Error ? err.message : String(err)}`,
+              finished_at: new Date().toISOString(),
+            }).eq('id', incomingJobId);
+          } catch { /* ignore job status update failure */ }
         }
         if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
         streamOpen = false;
