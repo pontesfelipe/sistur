@@ -1829,11 +1829,19 @@ serve(async (req) => {
       // a "Conferência de dados" exibida na UI mostre uma string antiga
       // hardcoded no servidor.
       appVersion: rawAppVersion,
+      traceId: bodyTraceId,
     } = await req.json();
 
     const appVersion: string = (typeof rawAppVersion === 'string' && /^v?\d+\.\d+\.\d+/.test(rawAppVersion))
       ? (rawAppVersion.startsWith('v') ? rawAppVersion : `v${rawAppVersion}`)
       : VALIDATOR_VERSION_FALLBACK;
+
+    const logger = createStageLogger({
+      traceId: (typeof bodyTraceId === 'string' && bodyTraceId) || incomingTraceId,
+      assessmentId,
+      jobId: incomingJobId ?? null,
+    });
+    logger.stage('request_received', { mode, backgroundRun, template: reportTemplate, hasIncomingJob: !!incomingJobId });
 
     // Valida que somente ADMIN pode forçar provedor — para usuários comuns
     // o valor é silenciosamente reduzido a 'auto'.
