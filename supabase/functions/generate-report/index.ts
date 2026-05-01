@@ -2874,14 +2874,87 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         };
 
         let succeeded = false;
-        for (const provider of providerOrder) {
-          const opened = await tryProviderOnce(provider);
-          if (!opened) continue;
-          // Avisa o cliente que houve troca de provedor caso já tenha emitido bytes
-          await safeWrite(`: switching_provider ${provider} ${Date.now()}\n\n`);
-          logger.stage('ai_stream_open', { provider });
-          succeeded = await drainProviderStream(provider);
-          if (succeeded) break;
+        // v1.38.56 — Para o template "completo" (territorial OU enterprise),
+        // tenta primeiro o pipeline paralelo em 2 fases. Se falhar em todos
+        // os providers, cai no pipeline monolítico antigo como rede de
+        // segurança (mesma ordem de fallback).
+        const useParallelPipeline = reportTemplate === 'completo';
+        if (useParallelPipeline) {
+          logger.stage('parallel_pipeline_enabled', { template: reportTemplate, isEnterprise });
+          const systemPromptByPillar = {
+            RA: getPillarSystemPrompt('RA', isEnterprise),
+            OE: getPillarSystemPrompt('OE', isEnterprise),
+            AO: getPillarSystemPrompt('AO', isEnterprise),
+          };
+          const envelopeSystemPrompt = getEnvelopeSystemPrompt(reportTemplate, isEnterprise);
+
+          // O userPrompt já contém TODO o contexto. Para os pilares, mandamos
+          // o mesmo userPrompt — o systemPrompt é que restringe o escopo.
+          // Para o envelope, anexamos os textos dos pilares como contexto.
+          const pillarUserPrompt = (_p: 'RA' | 'OE' | 'AO') => userPrompt;
+          const envelopeUserPrompt = (texts: { RA: string; OE: string; AO: string }) =>
+            `${userPrompt}\n\n=== DIAGNÓSTICO POR EIXO (JÁ ESCRITO PELOS AGENTES PARALELOS) ===\nUse estes textos para garantir COERÊNCIA — cite os mesmos indicadores, mantenha as mesmas conclusões. NÃO os reescreva.\n\n--- I-RA ---\n${texts.RA}\n\n--- I-OE ---\n${texts.OE}\n\n--- I-AO ---\n${texts.AO}\n`;
+
+          for (const provider of providerOrder) {
+            await safeWrite(`: parallel_provider ${provider} ${Date.now()}\n\n`);
+            logger.stage('parallel_provider_try', { provider });
+            const res = await runTwoPhasePipeline({
+              provider,
+              systemPromptByPillar,
+              envelopeSystemPrompt,
+              pillarUserPrompt,
+              envelopeUserPrompt,
+              lovableApiKey: LOVABLE_API_KEY,
+              anthropicApiKey: ANTHROPIC_API_KEY ?? undefined,
+              onStage: (stage, extra) => {
+                logger.stage(stage, extra);
+                // emite heartbeats de stage pro cliente
+                safeWrite(`: stage ${stage} ${Date.now()}\n\n`).catch(() => {});
+              },
+              onSectionReady: async (label, markdown) => {
+                // Streaming sequencial: emite o markdown final montado em
+                // chunks SSE compatíveis com o parser do cliente
+                // (data: {choices:[{delta:{content:"..."}}]}).
+                const CHUNK = 2048;
+                for (let i = 0; i < markdown.length; i += CHUNK) {
+                  const piece = markdown.slice(i, i + CHUNK);
+                  const sseLine = `data: ${JSON.stringify({ choices: [{ delta: { content: piece } }] })}\n\n`;
+                  await safeWrite(sseLine);
+                }
+                logger.stage('parallel_section_streamed', { label, chars: markdown.length });
+              },
+            });
+            if (res.ok) {
+              fullContent = res.content;
+              usedProvider = provider;
+              succeeded = true;
+              await safeWrite(`data: [DONE]\n\n`);
+              logger.stage('parallel_pipeline_success', { provider, chars: fullContent.length });
+              break;
+            }
+            fallbackTrail.push({ provider, reason: `parallel: ${res.reason}` });
+            logger.error('parallel_provider_failed', new Error(res.reason), { provider });
+          }
+
+          // Se o pipeline paralelo falhou em todos os providers, cai no
+          // monolítico (modo legado). Isso protege contra regressão total
+          // se o gateway tiver problemas pontuais com requests longos.
+          if (!succeeded) {
+            logger.stage('parallel_pipeline_failed_falling_back_to_monolithic');
+            await safeWrite(`: parallel_failed_fallback_monolithic ${Date.now()}\n\n`);
+          }
+        }
+
+        if (!succeeded) {
+          for (const provider of providerOrder) {
+            const opened = await tryProviderOnce(provider);
+            if (!opened) continue;
+            // Avisa o cliente que houve troca de provedor caso já tenha emitido bytes
+            await safeWrite(`: switching_provider ${provider} ${Date.now()}\n\n`);
+            logger.stage('ai_stream_open', { provider });
+            succeeded = await drainProviderStream(provider);
+            if (succeeded) break;
+          }
         }
 
         if (!succeeded) {
