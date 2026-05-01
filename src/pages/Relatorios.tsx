@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, type RefObject } from 'react';
+import { useState, useRef, useEffect, type RefObject } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { exportReportAsDocx } from '@/lib/exportReportDocx';
 import { getStatusStyle, mapIndicatorTableColumns, normalizeStatusCellText, realignIndicatorRow } from '@/lib/reportStatusStyle';
@@ -31,7 +31,6 @@ import {
   Trash2,
   Calendar,
   Settings2,
-  Eye,
   Lock,
   Users,
   FlaskConical,
@@ -81,6 +80,15 @@ interface GeneratedReport {
   tier: string | null;
 }
 
+type GeneratedReportBase = Omit<GeneratedReport, 'diagnostic_type' | 'tier'>;
+type AssessmentMeta = { id: string; diagnostic_type: string | null; tier: string | null };
+type AssessmentDisplayMeta = {
+  diagnostic_type?: string | null;
+  tier?: string | null;
+  destinations?: { name?: string | null } | null;
+  creator?: { full_name?: string | null } | null;
+};
+
 const normalizeReportTier = (tier?: string | null) => {
   const value = (tier || '').toLowerCase();
   if (value === 'small' || value === 'essencial') return 'essencial';
@@ -104,7 +112,7 @@ function useGeneratedReports(userId?: string, orgId?: string, effectiveOrgId?: s
       const reportOrgIds = Array.from(new Set([orgId, effectiveOrgId].filter(Boolean))) as string[];
       let query = supabase
         .from('generated_reports')
-        .select('*, assessments(diagnostic_type, tier)')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (reportOrgIds.length > 0) {
@@ -114,13 +122,32 @@ function useGeneratedReports(userId?: string, orgId?: string, effectiveOrgId?: s
       const { data, error } = await query;
       
       if (error) throw error;
-      return (data ?? []).map((r: any) => ({
+      const reports = (data ?? []) as GeneratedReportBase[];
+      const assessmentIds = Array.from(new Set(reports.map((r) => r.assessment_id).filter(Boolean))) as string[];
+      const assessmentMetaById = new Map<string, { diagnostic_type?: string | null; tier?: string | null }>();
+
+      if (assessmentIds.length > 0) {
+        const { data: assessmentRows, error: assessmentError } = await supabase
+          .from('assessments')
+          .select('id, diagnostic_type, tier')
+          .in('id', assessmentIds);
+
+        if (assessmentError) {
+          console.warn('Não foi possível carregar metadados dos diagnósticos para o histórico:', assessmentError);
+        } else {
+          ((assessmentRows ?? []) as AssessmentMeta[]).forEach((a) => {
+            assessmentMetaById.set(a.id, { diagnostic_type: a.diagnostic_type, tier: a.tier });
+          });
+        }
+      }
+
+      return reports.map((r) => ({
         ...r,
-        diagnostic_type: r.assessments?.diagnostic_type ?? 'territorial',
-        tier: r.assessments?.tier ?? null,
+        diagnostic_type: assessmentMetaById.get(r.assessment_id)?.diagnostic_type ?? 'territorial',
+        tier: assessmentMetaById.get(r.assessment_id)?.tier ?? null,
       })) as GeneratedReport[];
     },
-    enabled: Boolean(userId && orgId),
+    enabled: Boolean(userId && (orgId || effectiveOrgId)),
   });
 }
 
@@ -132,7 +159,7 @@ export default function Relatorios() {
   const { assessments, isLoading: assessmentsLoading } = useAssessments();
   const { destinations } = useDestinations();
   const { isAdmin, isViewingDemoData, profile, effectiveOrgId, loading: profileLoading } = useProfile();
-  const { data: savedReports, isLoading: reportsLoading } = useGeneratedReports(profile?.user_id, profile?.org_id, effectiveOrgId);
+  const { data: savedReports, isLoading: reportsLoading, error: reportsError, refetch: refetchReports } = useGeneratedReports(profile?.user_id, profile?.org_id, effectiveOrgId);
   
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>('');
   const [report, setReport] = useState<string>('');
@@ -193,10 +220,11 @@ export default function Relatorios() {
   const selectedAssessment = assessments?.find(a => a.id === selectedAssessmentId);
   // Use destination from useDestinations first; fall back to the joined destination data
   // from the assessment itself (handles cross-org destinations not visible via RLS)
+  const selectedAssessmentMeta = selectedAssessment as typeof selectedAssessment & AssessmentDisplayMeta;
   const selectedDestination = destinations?.find(d => d.id === selectedAssessment?.destination_id)
     ?? (selectedAssessment ? {
       id: selectedAssessment.destination_id,
-      name: (selectedAssessment as any).destinations?.name || 'Destino',
+      name: selectedAssessmentMeta?.destinations?.name || 'Destino',
       uf: null as string | null,
     } : undefined);
   
@@ -223,12 +251,13 @@ export default function Relatorios() {
   );
 
   const filteredCalculatedAssessments = calculatedAssessments.filter(a => {
+    const meta = a as typeof a & AssessmentDisplayMeta;
     if (genTypeFilter !== 'all') {
-      const type = (a as any).diagnostic_type || 'territorial';
+      const type = meta.diagnostic_type || 'territorial';
       if (genTypeFilter !== type) return false;
     }
     if (genTierFilter !== 'all') {
-      const tier = (a as any).tier || 'SMALL';
+      const tier = meta.tier || 'SMALL';
       const tierMap: Record<string, string> = { essencial: 'SMALL', estrategico: 'MEDIUM', integral: 'COMPLETE' };
       if (tier !== tierMap[genTierFilter]) return false;
     }
@@ -774,12 +803,13 @@ export default function Relatorios() {
                           </SelectItem>
                         ) : (
                           filteredCalculatedAssessments.map((assessment) => {
+                            const meta = assessment as typeof assessment & AssessmentDisplayMeta;
                             const dest = destinations?.find(d => d.id === assessment.destination_id)
-                              ?? { name: (assessment as any).destinations?.name || 'Destino' };
+                              ?? { name: meta.destinations?.name || 'Destino' };
                             const calcDate = assessment.calculated_at 
                               ? format(new Date(assessment.calculated_at), "dd/MM/yy", { locale: ptBR })
                               : format(new Date(assessment.created_at), "dd/MM/yy", { locale: ptBR });
-                            const creatorName = (assessment as any).creator?.full_name;
+                            const creatorName = meta.creator?.full_name;
                             return (
                               <SelectItem key={assessment.id} value={assessment.id}>
                                 <span className="flex items-center gap-2">
@@ -1069,9 +1099,11 @@ export default function Relatorios() {
                     Relatórios Salvos
                   </CardTitle>
                   <CardDescription>
-                    {hasActiveHistoryFilters
-                      ? `${filteredSavedReports.length} de ${visibleSavedReports.length} relatório(s) exibido(s)`
-                      : `${visibleSavedReports.length} relatório(s) no histórico`}
+                    {reportsError
+                      ? 'Não foi possível carregar o histórico'
+                      : hasActiveHistoryFilters
+                        ? `${filteredSavedReports.length} de ${visibleSavedReports.length} relatório(s) exibido(s)`
+                        : `${visibleSavedReports.length} relatório(s) no histórico`}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -1125,7 +1157,15 @@ export default function Relatorios() {
                     )}
                   </div>
 
-                  {isHistoryLoading ? (
+                  {reportsError ? (
+                    <div className="text-center py-8 text-muted-foreground space-y-3">
+                      <AlertTriangle className="h-8 w-8 mx-auto text-destructive" />
+                      <p>Falha ao carregar relatórios salvos.</p>
+                      <Button variant="outline" size="sm" onClick={() => refetchReports()}>
+                        Tentar novamente
+                      </Button>
+                    </div>
+                  ) : isHistoryLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                     </div>

@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 45,
+  patch: 46,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.46",
+    date: "2026-05-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção do carregamento do Histórico. A consulta deixou de depender de relacionamento embutido com diagnósticos (`assessments(...)`), que podia falhar silenciosamente quando não havia FK explícita ou quando a política do diagnóstico bloqueava o join, impedindo a lista inteira de relatórios salvos de aparecer. Agora o histórico carrega `generated_reports` diretamente, busca os metadados dos diagnósticos em uma segunda consulta não bloqueante e exibe um estado de erro com botão de tentar novamente quando houver falha real."
+    ],
+  },
   {
     version: "1.38.45",
     date: "2026-05-01",
