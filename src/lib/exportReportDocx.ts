@@ -32,7 +32,7 @@ import {
 } from 'docx';
 import { saveAs } from 'file-saver';
 import type { ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
-import { getStatusStyle, mapIndicatorTableColumns, realignIndicatorRow } from '@/lib/reportStatusStyle';
+import { getStatusStyle, mapIndicatorTableColumns, normalizeStatusCellText, realignIndicatorRow } from '@/lib/reportStatusStyle';
 
 // --- ABNT constants (1cm ≈ 567 DXA, 1pt = 2 half-points) ---
 const CM = 567;
@@ -123,9 +123,16 @@ function parseMarkdownTable(lines: string[], primaryColor: string): (Paragraph |
 
   const rows = dataLines.map((line, rowIdx) => {
     const rawCells = parseRow(line);
-    const cells = rowIdx === 0
+    let cells = rowIdx === 0
       ? rawCells
       : realignIndicatorRow(rawCells, headers, colMap);
+    // Normalize the status cell so a truncated label like "🟠 **AT**" becomes
+    // "🟠 **ATENÇÃO**". The realigner only fixes column position; it does not
+    // rewrite the label text itself.
+    if (rowIdx > 0 && colMap.statusIdx >= 0 && cells[colMap.statusIdx]) {
+      cells = [...cells];
+      cells[colMap.statusIdx] = normalizeStatusCellText(cells[colMap.statusIdx]);
+    }
     const isHeader = rowIdx === 0;
     return new TableRow({
       children: Array.from({ length: colCount }, (_, ci) => {
