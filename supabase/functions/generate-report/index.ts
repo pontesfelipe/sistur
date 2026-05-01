@@ -6,6 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const VALIDATOR_VERSION = 'v1.38.39';
+
 // ========== HELPER FUNCTIONS ==========
 
 /** Format number using Brazilian standard: comma for decimal, period for thousands */
@@ -1859,7 +1861,7 @@ serve(async (req) => {
       .from('assessment_indicator_audit')
       .select('indicator_code, pillar, value, normalized_score, source_type, source_detail, weight')
       .eq('assessment_id', assessmentId);
-    const auditTrail = auditRows || [];
+    const auditTrail = buildCanonicalAuditTrail(auditRows || [], indicatorValues, indicatorScores);
 
     // Catalog indicators by code so we can decorate external benchmarks with
     // names/units from the indicators table.
