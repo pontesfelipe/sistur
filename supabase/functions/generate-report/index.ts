@@ -2253,6 +2253,8 @@ serve(async (req) => {
       assessmentId,
       jobId: incomingJobId ?? null,
     });
+    logger.setSupabaseAdmin(supabaseAdmin);
+    logger.setUserId(user.id);
     logger.stage('request_received', { mode, backgroundRun, template: reportTemplate, hasIncomingJob: !!incomingJobId });
 
     // Valida que somente ADMIN pode forçar provedor — para usuários comuns
