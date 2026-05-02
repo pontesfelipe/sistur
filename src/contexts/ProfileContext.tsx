@@ -123,12 +123,14 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   }, [user, initialized, profile]);
 
   useEffect(() => {
-    // Only fetch if user changes
-    if (user?.id !== lastUserId.current) {
+    // Fetch when user changes, OR on first run when user is null
+    // (so `initialized` flips to true and guards can redirect to /auth
+    // instead of being stuck on the loader forever).
+    if (user?.id !== lastUserId.current || !initialized) {
       setLoading(true);
       fetchProfile();
     }
-  }, [user?.id, fetchProfile]);
+  }, [user?.id, fetchProfile, initialized]);
 
   const derived = useMemo(() => {
     const hasRoleFn = (role: UserRole['role']) => roles.some(r => r.role === role);
