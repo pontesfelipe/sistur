@@ -853,8 +853,8 @@ export default function Relatorios() {
                   )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4">
+                  <div className="flex-1 min-w-[260px]">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
                       Diagnóstico
                     </label>
@@ -863,8 +863,8 @@ export default function Relatorios() {
                       onValueChange={setSelectedAssessmentId}
                       disabled={assessmentsLoading}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um diagnóstico calculado" />
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione um diagnóstico calculado" className="truncate" />
                       </SelectTrigger>
                       <SelectContent>
                         {filteredCalculatedAssessments.length === 0 ? (
@@ -882,9 +882,9 @@ export default function Relatorios() {
                             const creatorName = meta.creator?.full_name;
                             return (
                               <SelectItem key={assessment.id} value={assessment.id}>
-                                <span className="flex items-center gap-2">
-                                  <span>{assessment.title} — {dest?.name || 'Destino'}</span>
-                                  <span className="text-muted-foreground text-xs">
+                                <span className="flex items-center gap-2 max-w-full">
+                                  <span className="truncate">{assessment.title} — {dest?.name || 'Destino'}</span>
+                                  <span className="text-muted-foreground text-xs whitespace-nowrap">
                                     {calcDate}{creatorName ? ` · ${creatorName}` : ''}
                                   </span>
                                 </span>
