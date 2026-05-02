@@ -4805,6 +4805,7 @@ export type Database = {
           investor_profile_id: string
           notes: string | null
           opportunity_id: string
+          share_with_owner: boolean
           updated_at: string
           user_id: string
         }
@@ -4815,6 +4816,7 @@ export type Database = {
           investor_profile_id: string
           notes?: string | null
           opportunity_id: string
+          share_with_owner?: boolean
           updated_at?: string
           user_id: string
         }
@@ -4825,6 +4827,7 @@ export type Database = {
           investor_profile_id?: string
           notes?: string | null
           opportunity_id?: string
+          share_with_owner?: boolean
           updated_at?: string
           user_id?: string
         }
