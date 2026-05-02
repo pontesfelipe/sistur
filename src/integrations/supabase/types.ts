@@ -8538,6 +8538,12 @@ export type Database = {
         Returns: number
       }
       cleanup_exam_tracking_data: { Args: never; Returns: undefined }
+      cleanup_stuck_report_jobs: {
+        Args: never
+        Returns: {
+          cleaned_count: number
+        }[]
+      }
       clear_assessment_stale_flag: {
         Args: { p_assessment_id: string }
         Returns: undefined
