@@ -24,6 +24,7 @@ import { HealthCheckPanel } from '@/components/tools/HealthCheckPanel';
 import MapaTurismoPanel from '@/components/official-data/MapaTurismoPanel';
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
 import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSearch';
+import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
@@ -598,6 +599,15 @@ export default function Configuracoes() {
 
             {/* Global References - Admin only */}
             {isAdmin && <GlobalReferencesPanel />}
+
+            {/* Ingestões oficiais - Admin only */}
+            {isAdmin && (
+              <Card>
+                <CardContent className="pt-6">
+                  <IngestionHealthPanel />
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>
