@@ -2298,6 +2298,7 @@ serve(async (req) => {
         status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    logger.setOrgId(assessment.org_id);
 
     // ===== v1.38.31 — Modo background =====
     // Quando o cliente pede background, devolvemos 202 imediatamente e
