@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 68,
+  patch: 69,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.69",
+    date: "2026-05-02",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — housekeeping automático de jobs travados. Nova função `cleanup_stuck_report_jobs()` (SECURITY DEFINER) marca como 'failed' qualquer job em status 'processing' cujo `last_attempt_at` esteja há mais de 15 minutos sem progresso, anexando mensagem `[auto-cleanup]` ao `error_message` e preenchendo `finished_at`. Agendada via `pg_cron` para rodar a cada 5 minutos (job `cleanup-stuck-report-jobs`). EXECUTE revogado de PUBLIC/anon/authenticated — só roda via cron ou superuser. Resolve o caso do usuário em que o worker era morto pelo proxy a meio do estágio 'Validando coerência com agente IA' e o job ficava preso indefinidamente, deixando a UI em 'Gerando...' eterno sem opção de retry."
+    ]
+  },
   {
     version: "1.38.68",
     date: "2026-05-02",
