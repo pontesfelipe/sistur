@@ -3093,10 +3093,17 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
 
         const kbFileIds = kbFiles.map((f: any) => f.id);
         let savedReportId: string | null = null;
+        const modelLabelForPersist = usedProvider === 'claude'
+          ? 'anthropic/claude-sonnet-4-5-20250929'
+          : usedProvider === 'gpt5'
+          ? 'openai/gpt-5'
+          : usedProvider === 'gemini'
+          ? 'google/gemini-2.5-pro'
+          : null;
         if (existing && !forceRegenerate) {
           const { error } = await supabaseAdmin
             .from('generated_reports')
-            .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment })
+            .update({ report_content: finalContent, created_at: new Date().toISOString(), kb_file_ids: kbFileIds, visibility, environment, ai_provider: usedProvider ?? null, ai_model: modelLabelForPersist })
             .eq('id', existing.id);
           if (error) throw error;
           savedReportId = existing.id;
@@ -3106,7 +3113,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         } else {
           const { data: inserted, error } = await supabaseAdmin
             .from('generated_reports')
-            .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: finalContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment })
+            .insert({ org_id: assessment.org_id, assessment_id: assessmentId, destination_name: destinationName, report_content: finalContent, created_by: userId, kb_file_ids: kbFileIds, visibility, environment, ai_provider: usedProvider ?? null, ai_model: modelLabelForPersist })
             .select('id')
             .maybeSingle();
           if (error) throw error;
