@@ -26,6 +26,10 @@ type StageLogger = {
   setReportId: (id: string | null | undefined) => void;
   setAssessmentId: (id: string | null | undefined) => void;
   setJobId: (id: string | null | undefined) => void;
+  setOrgId: (id: string | null | undefined) => void;
+  setUserId: (id: string | null | undefined) => void;
+  setProvider: (provider: string | null | undefined, model?: string | null | undefined) => void;
+  setSupabaseAdmin: (client: any) => void;
   bumpJobStage: (
     supabaseAdmin: any,
     name: string,
@@ -42,12 +46,48 @@ function createStageLogger(initial: {
   let assessmentId = initial.assessmentId ?? null;
   let reportId = initial.reportId ?? null;
   let jobId = initial.jobId ?? null;
+  let orgId: string | null = null;
+  let userId: string | null = null;
+  let providerName: string | null = null;
+  let providerModel: string | null = null;
+  let supabaseAdminRef: any = null;
   const traceId = initial.traceId ?? jobId ?? `trace_${Math.random().toString(36).slice(2, 10)}`;
   const startedAt = Date.now();
   let lastStage = 'init';
   const fmtPrefix = () => {
     const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
     return `[trace=${traceId}][+${elapsed}s][asmt=${assessmentId ?? '-'}][report=${reportId ?? '-'}]`;
+  };
+  const persist = (
+    level: 'info' | 'warn' | 'error',
+    stageName: string,
+    message: string | null,
+    extra?: Record<string, unknown>,
+  ) => {
+    if (!supabaseAdminRef) return;
+    try {
+      const row = {
+        job_id: jobId,
+        report_id: reportId,
+        assessment_id: assessmentId,
+        org_id: orgId,
+        user_id: userId,
+        trace_id: traceId,
+        provider: providerName,
+        model: providerModel,
+        level,
+        stage: stageName,
+        message,
+        duration_ms: Date.now() - startedAt,
+        metadata: extra ? (extra as any) : null,
+      };
+      // Fire-and-forget — never block the pipeline because of log persistence.
+      const p = supabaseAdminRef.from('report_generation_logs').insert(row);
+      // @ts-ignore — Promise compatibility for both PostgREST builders and Promises.
+      if (p && typeof p.then === 'function') p.then(() => {}).catch(() => {});
+    } catch {
+      // ignore
+    }
   };
   return {
     traceId,
@@ -59,15 +99,24 @@ function createStageLogger(initial: {
       } catch {
         console.log(`${fmtPrefix()}[stage=${name}]`);
       }
+      persist('info', name, null, extra);
     },
     error(name, err, extra) {
       lastStage = `${name}:error`;
       const msg = err instanceof Error ? err.message : String(err);
       console.error(`${fmtPrefix()}[stage=${name}][ERROR] ${msg}`, extra ? JSON.stringify(extra) : '');
+      persist('error', name, msg, extra);
     },
     setReportId(id) { if (id) reportId = id; },
     setAssessmentId(id) { if (id) assessmentId = id; },
     setJobId(id) { if (id) jobId = id; },
+    setOrgId(id) { if (id) orgId = id; },
+    setUserId(id) { if (id) userId = id; },
+    setProvider(provider, model) {
+      if (provider !== undefined) providerName = provider ?? null;
+      if (model !== undefined) providerModel = model ?? null;
+    },
+    setSupabaseAdmin(client) { supabaseAdminRef = client; },
     async bumpJobStage(supabaseAdmin, name, extra) {
       lastStage = name;
       if (!jobId) return;
@@ -78,6 +127,7 @@ function createStageLogger(initial: {
       } catch (e) {
         console.warn(`${fmtPrefix()}[bumpJobStage failed]`, e instanceof Error ? e.message : String(e));
       }
+      persist('info', `bump:${name}`, null, extra as any);
     },
     lastStage: () => lastStage,
   };
