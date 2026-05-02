@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 65,
+  patch: 66,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.66",
+    date: "2026-05-02",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — histórico: badge de provedor IA agora aparece SEMPRE para admins, mesmo quando o relatório não tem `ai_provider`/`ai_model` registrados (relatórios gerados antes da v1.38.62, que introduziu a persistência dessas colunas). Nesses casos exibe 'IA n/d' com tooltip explicativo ('Provedor não registrado (relatório anterior à v1.38.62)'), em vez de simplesmente esconder a tag — comportamento anterior dava impressão de bug, pois admins viam relatórios sem nenhum indicativo de modelo. Relatórios novos continuam exibindo Claude/GPT-5/Gemini normalmente. Sem mudança de schema, edge function ou backend — alteração apenas em `Relatorios.tsx` (`getProviderLabel` retorna 'IA n/d' quando ambos NULL e a renderização da badge perdeu o guard `&&`)."
+    ]
+  },
   {
     version: "1.38.65",
     date: "2026-05-02",
