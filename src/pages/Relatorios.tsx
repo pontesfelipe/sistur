@@ -79,6 +79,8 @@ interface GeneratedReport {
   created_by: string;
   diagnostic_type: string;
   tier: string | null;
+  ai_provider?: string | null;
+  ai_model?: string | null;
 }
 
 type GeneratedReportBase = Omit<GeneratedReport, 'diagnostic_type' | 'tier'>;
@@ -104,6 +106,16 @@ const getReportTierLabel = (tier?: string | null) => {
   if (normalized === 'estrategico') return '📊 Estratégico';
   if (normalized === 'integral') return '🎯 Integral';
   return null;
+};
+
+const getProviderLabel = (provider?: string | null, model?: string | null) => {
+  if (!provider && !model) return null;
+  const p = (provider || '').toLowerCase();
+  if (p === 'claude') return 'Claude';
+  if (p === 'gpt5' || p === 'gpt-5') return 'GPT-5';
+  if (p === 'gemini') return 'Gemini';
+  if (model) return model.split('/').pop() || model;
+  return provider || null;
 };
 
 function useGeneratedReports(userId?: string, orgId?: string, effectiveOrgId?: string) {
@@ -1239,6 +1251,16 @@ export default function Relatorios() {
                                   )}
                                   {r.environment === 'demo' && (
                                     <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0 border-amber-500 text-amber-600"><FlaskConical className="h-2.5 w-2.5" />Demo</Badge>
+                                  )}
+                                  {isAdmin && getProviderLabel(r.ai_provider, r.ai_model) && (
+                                    <Badge
+                                      variant="outline"
+                                      className="text-[10px] gap-0.5 shrink-0 border-primary/40 text-primary"
+                                      title={r.ai_model || r.ai_provider || ''}
+                                    >
+                                      <Sparkles className="h-2.5 w-2.5" />
+                                      {getProviderLabel(r.ai_provider, r.ai_model)}
+                                    </Badge>
                                   )}
                                 </div>
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">

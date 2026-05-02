@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 60,
+  patch: 61,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.61",
+    date: "2026-05-02",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — histórico passa a registrar e exibir o provider/modelo de IA usado em cada geração. Novos campos `ai_provider` e `ai_model` em `generated_reports` são preenchidos pelo `generate-report` no momento da persistência (insert e update). No tile do histórico, um badge com ícone de sparkles mostra o nome curto (Claude, GPT-5, Gemini) e o modelo completo aparece no tooltip. O badge é visível APENAS para administradores (ADMIN), seguindo o mesmo padrão do seletor de provider exclusivo de admin já existente na geração."
+    ],
+  },
   {
     version: "1.38.60",
     date: "2026-05-02",

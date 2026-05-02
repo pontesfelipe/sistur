@@ -4066,6 +4066,8 @@ export type Database = {
       }
       generated_reports: {
         Row: {
+          ai_model: string | null
+          ai_provider: string | null
           assessment_id: string
           created_at: string
           created_by: string
@@ -4078,6 +4080,8 @@ export type Database = {
           visibility: string
         }
         Insert: {
+          ai_model?: string | null
+          ai_provider?: string | null
           assessment_id: string
           created_at?: string
           created_by: string
@@ -4090,6 +4094,8 @@ export type Database = {
           visibility?: string
         }
         Update: {
+          ai_model?: string | null
+          ai_provider?: string | null
           assessment_id?: string
           created_at?: string
           created_by?: string
