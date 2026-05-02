@@ -26,6 +26,10 @@ type StageLogger = {
   setReportId: (id: string | null | undefined) => void;
   setAssessmentId: (id: string | null | undefined) => void;
   setJobId: (id: string | null | undefined) => void;
+  setOrgId: (id: string | null | undefined) => void;
+  setUserId: (id: string | null | undefined) => void;
+  setProvider: (provider: string | null | undefined, model?: string | null | undefined) => void;
+  setSupabaseAdmin: (client: any) => void;
   bumpJobStage: (
     supabaseAdmin: any,
     name: string,
@@ -42,12 +46,48 @@ function createStageLogger(initial: {
   let assessmentId = initial.assessmentId ?? null;
   let reportId = initial.reportId ?? null;
   let jobId = initial.jobId ?? null;
+  let orgId: string | null = null;
+  let userId: string | null = null;
+  let providerName: string | null = null;
+  let providerModel: string | null = null;
+  let supabaseAdminRef: any = null;
   const traceId = initial.traceId ?? jobId ?? `trace_${Math.random().toString(36).slice(2, 10)}`;
   const startedAt = Date.now();
   let lastStage = 'init';
   const fmtPrefix = () => {
     const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
     return `[trace=${traceId}][+${elapsed}s][asmt=${assessmentId ?? '-'}][report=${reportId ?? '-'}]`;
+  };
+  const persist = (
+    level: 'info' | 'warn' | 'error',
+    stageName: string,
+    message: string | null,
+    extra?: Record<string, unknown>,
+  ) => {
+    if (!supabaseAdminRef) return;
+    try {
+      const row = {
+        job_id: jobId,
+        report_id: reportId,
+        assessment_id: assessmentId,
+        org_id: orgId,
+        user_id: userId,
+        trace_id: traceId,
+        provider: providerName,
+        model: providerModel,
+        level,
+        stage: stageName,
+        message,
+        duration_ms: Date.now() - startedAt,
+        metadata: extra ? (extra as any) : null,
+      };
+      // Fire-and-forget — never block the pipeline because of log persistence.
+      const p = supabaseAdminRef.from('report_generation_logs').insert(row);
+      // @ts-ignore — Promise compatibility for both PostgREST builders and Promises.
+      if (p && typeof p.then === 'function') p.then(() => {}).catch(() => {});
+    } catch {
+      // ignore
+    }
   };
   return {
     traceId,
@@ -59,15 +99,24 @@ function createStageLogger(initial: {
       } catch {
         console.log(`${fmtPrefix()}[stage=${name}]`);
       }
+      persist('info', name, null, extra);
     },
     error(name, err, extra) {
       lastStage = `${name}:error`;
       const msg = err instanceof Error ? err.message : String(err);
       console.error(`${fmtPrefix()}[stage=${name}][ERROR] ${msg}`, extra ? JSON.stringify(extra) : '');
+      persist('error', name, msg, extra);
     },
     setReportId(id) { if (id) reportId = id; },
     setAssessmentId(id) { if (id) assessmentId = id; },
     setJobId(id) { if (id) jobId = id; },
+    setOrgId(id) { if (id) orgId = id; },
+    setUserId(id) { if (id) userId = id; },
+    setProvider(provider, model) {
+      if (provider !== undefined) providerName = provider ?? null;
+      if (model !== undefined) providerModel = model ?? null;
+    },
+    setSupabaseAdmin(client) { supabaseAdminRef = client; },
     async bumpJobStage(supabaseAdmin, name, extra) {
       lastStage = name;
       if (!jobId) return;
@@ -78,6 +127,7 @@ function createStageLogger(initial: {
       } catch (e) {
         console.warn(`${fmtPrefix()}[bumpJobStage failed]`, e instanceof Error ? e.message : String(e));
       }
+      persist('info', `bump:${name}`, null, extra as any);
     },
     lastStage: () => lastStage,
   };
@@ -1909,6 +1959,8 @@ async function runReportPipeline(args: {
   const logger = args.logger ?? createStageLogger({ jobId, assessmentId, traceId: jobId });
   logger.setJobId(jobId);
   logger.setAssessmentId(assessmentId);
+  logger.setSupabaseAdmin(supabaseAdmin);
+  if (assessment?.org_id) logger.setOrgId(assessment.org_id);
   logger.stage('pipeline_start', { destinationName, template: args.reportTemplate });
 
   // Atualiza progresso enquanto o stream roda. Não conhecemos o tamanho final,
@@ -2203,6 +2255,8 @@ serve(async (req) => {
       assessmentId,
       jobId: incomingJobId ?? null,
     });
+    logger.setSupabaseAdmin(supabaseAdmin);
+    logger.setUserId(user.id);
     logger.stage('request_received', { mode, backgroundRun, template: reportTemplate, hasIncomingJob: !!incomingJobId });
 
     // Valida que somente ADMIN pode forçar provedor — para usuários comuns
@@ -2244,6 +2298,7 @@ serve(async (req) => {
         status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    logger.setOrgId(assessment.org_id);
 
     // ===== v1.38.31 — Modo background =====
     // Quando o cliente pede background, devolvemos 202 imediatamente e
@@ -2816,16 +2871,20 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               response = new Response(adapted, { status: 200, headers: { "Content-Type": "text/event-stream" } });
               usedProvider = 'claude';
               console.log("Report generation using provider: claude (claude-sonnet-4-5)");
+              logger.setProvider('claude', 'anthropic/claude-sonnet-4-5-20250929');
+              logger.stage('provider_selected', { provider: 'claude', model: 'anthropic/claude-sonnet-4-5-20250929' });
             } else {
               const errBody = await claudeResp.text().catch(() => "");
               const reason = `status ${claudeResp.status}: ${errBody.slice(0, 200)}`;
               fallbackTrail.push({ provider: 'claude', reason });
               console.warn(`Claude unavailable. ${reason}`);
+              logger.error('provider_failed', new Error(reason), { provider: 'claude', model: 'anthropic/claude-sonnet-4-5-20250929' });
             }
           } catch (e) {
             const reason = e instanceof Error ? e.message : String(e);
             fallbackTrail.push({ provider: 'claude', reason });
             console.warn(`Claude request threw: ${reason}`);
+            logger.error('provider_failed', e, { provider: 'claude', model: 'anthropic/claude-sonnet-4-5-20250929' });
           }
         };
 
@@ -2836,16 +2895,20 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               response = gptResp;
               usedProvider = 'gpt5';
               console.log(`Report generation using provider: gpt-5`);
+              logger.setProvider('gpt5', 'openai/gpt-5');
+              logger.stage('provider_selected', { provider: 'gpt5', model: 'openai/gpt-5' });
             } else {
               const errBody = await gptResp.text().catch(() => "");
               const reason = `status ${gptResp.status}: ${errBody.slice(0, 200)}`;
               fallbackTrail.push({ provider: 'gpt5', reason });
               console.warn(`GPT-5 unavailable. ${reason}`);
+              logger.error('provider_failed', new Error(reason), { provider: 'gpt5', model: 'openai/gpt-5' });
             }
           } catch (e) {
             const reason = e instanceof Error ? e.message : String(e);
             fallbackTrail.push({ provider: 'gpt5', reason });
             console.warn(`GPT-5 request threw: ${reason}`);
+            logger.error('provider_failed', e, { provider: 'gpt5', model: 'openai/gpt-5' });
           }
         };
 
@@ -2856,16 +2919,20 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               response = gemResp;
               usedProvider = 'gemini';
               console.log(`Report generation using provider: gemini-2.5-pro`);
+              logger.setProvider('gemini', 'google/gemini-2.5-pro');
+              logger.stage('provider_selected', { provider: 'gemini', model: 'google/gemini-2.5-pro' });
             } else {
               const errBody = await gemResp.text().catch(() => "");
               const reason = `status ${gemResp.status}: ${errBody.slice(0, 200)}`;
               fallbackTrail.push({ provider: 'gemini', reason });
               console.warn(`Gemini unavailable. ${reason}`);
+              logger.error('provider_failed', new Error(reason), { provider: 'gemini', model: 'google/gemini-2.5-pro' });
             }
           } catch (e) {
             const reason = e instanceof Error ? e.message : String(e);
             fallbackTrail.push({ provider: 'gemini', reason });
             console.warn(`Gemini request threw: ${reason}`);
+            logger.error('provider_failed', e, { provider: 'gemini', model: 'google/gemini-2.5-pro' });
           }
         };
 
