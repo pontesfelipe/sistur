@@ -237,6 +237,40 @@ export const faqItems: FAQItem[] = [
     answer: 'É a visualização circular dos 3 conjuntos de Mario Beni (RA / OE / AO) com seus subsistemas explícitos (Ecológico, Social, Econômico, Cultural; Superestrutura, Infraestrutura; Mercado, Oferta, Demanda, Distribuição). Quando o diagnóstico tem MST ativo, um anel externo mostra as 4 dimensões adicionais (Tecnologia, Inclusão, TBC, Sensibilização). O Score Final SISTUR aparece no centro da mandala como média dos pilares.',
     category: 'general',
   },
+
+  // Relatórios IA — pipeline, providers e observabilidade (v1.38.x)
+  {
+    question: 'Qual modelo de IA gera os relatórios do SISTUR?',
+    answer: 'A geração usa três provedores em ordem de prioridade: (1) Claude Sonnet 4.5 (Anthropic) como padrão, escolhido pela qualidade narrativa e respeito rigoroso a fontes; (2) GPT-5 (OpenAI) como fallback primário; (3) Gemini 2.5 Pro (Google) como fallback final. Se o provider escolhido falhar (timeout, abort, conteúdo vazio mid-stream), o pipeline cai automaticamente para o próximo, mantendo o mesmo prompt e os mesmos dados auditados. Administradores podem ver o modelo usado em cada relatório do histórico através do badge ao lado do título.',
+    category: 'erp',
+  },
+  {
+    question: 'Por que a geração de relatório agora roda em segundo plano?',
+    answer: 'Relatórios completos (template "Completo" com 100+ indicadores) levam de 2 a 7 minutos só na fase de inferência da IA. Para evitar que a aba do navegador fique presa esperando a resposta — e que timeouts intermediários do proxy interrompam a geração — o SISTUR enfileira o pedido em report_jobs e dispara um worker dedicado (process-report-job) por trigger de banco. Você pode fechar a aba ou navegar livremente: quando o relatório ficar pronto, o sistema dispara um toast e uma notificação do navegador (se permitida). O histórico mostra o relatório recém-criado automaticamente.',
+    category: 'erp',
+  },
+  {
+    question: 'O que é a "pré-visualização ao vivo" do relatório?',
+    answer: 'Enquanto a IA escreve o relatório completo (pipeline em 2 fases), o conteúdo aparece progressivamente no card de geração à medida que cada subseção fica pronta: primeiro o pilar RA, depois OE, depois AO, e por fim o envelope (introdução, ficha técnica, alertas IGMA, banco de ações, fontes, considerações finais). Uma barra de progresso e um badge "Pré-visualização ao vivo" ficam visíveis durante todo o processo. Isso elimina a sensação de "spinner sem fim" — você consegue começar a ler enquanto o resto ainda está sendo gerado. PDF e DOCX continuam disponíveis apenas após a persistência do relatório final (não exporta versões inacabadas).',
+    category: 'erp',
+  },
+  {
+    question: 'Como funciona a validação cruzada do relatório?',
+    answer: 'Todo relatório passa por duas etapas obrigatórias antes de ser persistido: (1) Auto-correção determinística — o pipeline compara cada número citado pelo texto contra a tabela canônica de assessment_indicator_audit; divergências acima de 5% são corrigidas automaticamente. (2) Validação por agente IA (gemini-2.5-pro) que relê o texto pós-correção e produz um relatório de validação salvo em report_validations. O resultado aparece como um banner no topo do relatório (limpo, com avisos ou auto-corrigido). Esta é a política Zero Alucinação: nenhum número, ano ou fonte pode ser inventado pela IA.',
+    category: 'erp',
+  },
+  {
+    question: 'Onde acompanho problemas na geração de relatórios?',
+    answer: 'Administradores têm acesso ao painel "Logs do Gerador de Relatórios" em /admin/report-logs (botão na página de Logs de Auditoria). Mostra eventos e erros da edge function generate-report agrupados por provider (Claude / GPT-5 / Gemini), com filtros por nível, busca livre, dialog de detalhes (metadata + duração + job/report id) e auto-refresh a cada 15s. Quando o filtro é Claude (default) ou Todos, aparece também um bloco "Pipeline Claude — Tempo Real" que agrupa eventos por trace_id e mapeia para 4 fases visíveis: Pilares (RA·OE·AO), Envelope, Validação e Persistência — útil para detectar stalls de stream.',
+    category: 'erp',
+  },
+
+  // Troubleshooting geral
+  {
+    question: 'O sistema fica em "Carregando..." e não abre as páginas. O que faço?',
+    answer: 'Após login, o sistema valida sessão, perfil, papéis e licença antes de permitir acesso às páginas. Se ficar travado por mais de ~10 segundos, tente: (1) Hard refresh (Ctrl+Shift+R no Windows/Linux ou Cmd+Shift+R no macOS) para forçar recarregamento sem cache; (2) Limpar cookies/cache do domínio sistur.app e fazer login novamente; (3) Verificar sua conexão com a internet (relatórios e diagnósticos exigem chamadas ao backend). A v1.38.67 corrigiu um caso específico em que o estado de sessão deslogada não inicializava corretamente, prendendo os route guards no spinner. Se o problema persistir após o refresh, contate o suporte informando a rota e o horário.',
+    category: 'general',
+  },
 ];
 
 export default function FAQ() {
