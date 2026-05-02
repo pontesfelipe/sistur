@@ -28,8 +28,10 @@ import {
   LogIn,
   LogOut,
   Plus,
+  Sparkles,
 } from 'lucide-react';
 import { useLMSAuditLogs, type LMSAuditLog } from '@/hooks/useLMSAudit';
+import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
@@ -217,6 +219,12 @@ const AuditLogs = () => {
             <Button variant="outline" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
               Exportar CSV
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/admin/report-logs">
+                <Sparkles className="h-4 w-4 mr-2" />
+                Logs do Gerador
+              </Link>
             </Button>
           </div>
         </div>
