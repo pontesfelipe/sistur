@@ -3406,6 +3406,9 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             progress_pct: 100,
             report_id: savedReportId,
             finished_at: new Date().toISOString(),
+            // v1.38.65 — Limpa o buffer transitório do live preview agora
+            // que o markdown final está em generated_reports.report_content.
+            partial_content: null,
           }).eq('id', incomingJobId);
           logger.stage('report_job_marked_completed', { jobId: incomingJobId, reportId: savedReportId });
         }
