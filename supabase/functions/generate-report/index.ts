@@ -1325,30 +1325,60 @@ async function callProviderNonStreaming(args: {
   try {
     if (provider === 'claude') {
       if (!anthropicApiKey) return { ok: false, reason: 'ANTHROPIC_API_KEY not configured' };
+      // Anthropic recomenda streaming para gerações longas (max_tokens alto).
+      // Sem stream, o proxy corta a conexão antes da resposta — gerando o
+      // sintoma de "travado" em jobs longos. Usamos SSE e acumulamos o texto
+      // para manter a interface não-streaming dessa função.
       const resp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
           'x-api-key': anthropicApiKey,
           'anthropic-version': '2023-06-01',
           'content-type': 'application/json',
+          accept: 'text/event-stream',
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-5-20250929',
           max_tokens: maxTokens,
+          stream: true,
           system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }],
         }),
         signal,
       });
-      if (!resp.ok) {
+      if (!resp.ok || !resp.body) {
         const txt = await resp.text().catch(() => '');
         return { ok: false, reason: `claude status ${resp.status}: ${txt.slice(0, 200)}` };
       }
-      const j = await resp.json();
-      const blocks: any[] = j?.content || [];
-      const text = blocks.filter((b) => b?.type === 'text').map((b) => b.text || '').join('');
-      if (!text || text.trim().length < 32) return { ok: false, reason: `claude empty content (${text.length})` };
-      return { ok: true, content: text };
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let acc = '';
+      let streamErr: string | null = null;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        let idx: number;
+        while ((idx = buffer.indexOf('\n')) !== -1) {
+          const line = buffer.slice(0, idx).trim();
+          buffer = buffer.slice(idx + 1);
+          if (!line.startsWith('data:')) continue;
+          const payload = line.slice(5).trim();
+          if (!payload) continue;
+          try {
+            const evt = JSON.parse(payload);
+            if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+              acc += evt.delta.text || '';
+            } else if (evt.type === 'error') {
+              streamErr = `claude stream error: ${JSON.stringify(evt.error || evt).slice(0, 200)}`;
+            }
+          } catch { /* parcial — ignora */ }
+        }
+      }
+      if (streamErr) return { ok: false, reason: streamErr };
+      if (!acc || acc.trim().length < 32) return { ok: false, reason: `claude empty content (${acc.length})` };
+      return { ok: true, content: acc };
     }
     const model = provider === 'gpt5' ? 'openai/gpt-5' : 'google/gemini-2.5-pro';
     const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
