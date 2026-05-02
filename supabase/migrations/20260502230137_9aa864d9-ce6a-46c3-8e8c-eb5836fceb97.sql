@@ -1,0 +1,1 @@
+REVOKE SELECT (ip_address, user_agent) ON public.exam_attempts FROM authenticated, anon;
