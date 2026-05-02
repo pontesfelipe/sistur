@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 59,
+  patch: 60,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.60",
+    date: "2026-05-02",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — correção da geração no provider Claude (Anthropic). No pipeline em 2 fases (template 'completo'), as 3 chamadas paralelas de pilar e a chamada de envelope eram feitas SEM streaming na API da Anthropic com `max_tokens` alto (8000–16000). Como Claude retém todo o output até finalizar e a Anthropic recomenda streaming para gerações longas, a conexão ficava ociosa por minutos sem nenhum byte e o proxy do edge function cortava antes do JSON chegar — sintoma: GPT-5 e Gemini terminavam normalmente, só Claude travava. Correção em `callProviderNonStreaming`: para o provider 'claude', a chamada agora usa `stream: true` com `accept: text/event-stream`, lê os eventos `content_block_delta` e acumula o texto, mantendo a interface não-streaming da função. Mantém o mesmo modelo (`claude-sonnet-4-5-20250929`) e o mesmo `max_tokens`. Fallback global por provider continua intacto."
+    ],
+  },
   {
     version: "1.38.59",
     date: "2026-05-01",
