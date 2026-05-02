@@ -2942,6 +2942,23 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             return;
           }
           try {
+            // v1.38.63 — orçamento dinâmico
+            const claudeBudget = pickClaudeBudget({
+              phase: 'monolithic',
+              template: reportTemplate,
+              tier: assessment?.tier as ClaudeBudgetTier,
+              indicatorCount: Array.isArray(auditTrail) ? auditTrail.length : 0,
+              systemPrompt,
+              userPrompt,
+            });
+            logger.stage('claude_budget_monolithic', claudeBudget);
+            if (claudeBudget.shouldTruncateInput) {
+              logger.error(
+                'claude_input_near_limit',
+                new Error('Input estimated above safe Claude window'),
+                claudeBudget,
+              );
+            }
             const claudeResp = await fetch("https://api.anthropic.com/v1/messages", {
               method: "POST",
               headers: {
@@ -2951,7 +2968,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               },
               body: JSON.stringify({
                 model: "claude-sonnet-4-5-20250929",
-                max_tokens: 16000,
+                max_tokens: claudeBudget.maxTokens,
                 stream: true,
                 system: systemPrompt,
                 messages: [{ role: "user", content: userPrompt }],
