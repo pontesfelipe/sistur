@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 67,
+  patch: 68,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.68",
+    date: "2026-05-02",
+    type: "patch" as const,
+    changes: [
+      "Documentação — auditoria das páginas Metodologia e FAQ contra as últimas evoluções do motor de relatórios IA (v1.38.51 a v1.38.67) revelou lacunas significativas: nenhuma das duas páginas mencionava providers de IA, fila assíncrona, pipeline em 2 fases por pilar, pré-visualização ao vivo, painel de logs administrativo nem badge de modelo no histórico. Atualizações: (1) FAQ ganha 5 novas perguntas no módulo ERP cobrindo 'Qual modelo de IA gera os relatórios', 'Por que a geração roda em segundo plano', 'O que é a pré-visualização ao vivo', 'Como funciona a validação cruzada' e 'Onde acompanho problemas na geração' (com link para /admin/report-logs); (2) FAQ ganha pergunta geral de troubleshooting 'O sistema fica em Carregando...' explicando hard refresh, limpar cache e mencionando o fix da v1.38.67; (3) Metodologia → seção 'Tipos de Relatório' ganha 4 subseções novas: 'Pipeline de geração — providers, fila e streaming' (descreve ordem Claude → GPT-5 → Gemini, fallback global, fase 1 paralela por pilar + fase 2 envelope, calibração dinâmica de max_tokens para Claude, fila report_jobs + worker process-report-job, useReportJobWatcher global) e 'Observabilidade e auditoria' (descreve report_generation_logs com schema completo, painel /admin/report-logs com bloco Pipeline Claude Tempo Real, e campos ai_provider/ai_model em generated_reports). README e CLAUDE.md não exigiram ajuste — README é template padrão Lovable e CLAUDE.md já reflete a arquitetura corretamente."
+    ]
+  },
   {
     version: "1.38.67",
     date: "2026-05-02",
