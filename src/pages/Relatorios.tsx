@@ -79,6 +79,8 @@ interface GeneratedReport {
   created_by: string;
   diagnostic_type: string;
   tier: string | null;
+  ai_provider?: string | null;
+  ai_model?: string | null;
 }
 
 type GeneratedReportBase = Omit<GeneratedReport, 'diagnostic_type' | 'tier'>;
