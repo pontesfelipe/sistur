@@ -3216,6 +3216,19 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
                   await safeWrite(sseLine);
                 }
                 logger.stage('parallel_section_streamed', { label, chars: markdown.length });
+                // v1.38.65 — Live preview: persiste o markdown acumulado em
+                // report_jobs.partial_content para que o cliente em modo
+                // background (polling) consiga renderizar progressivamente
+                // o relatório enquanto Claude/GPT-5/Gemini ainda terminam o
+                // envelope. Fire-and-forget — nunca bloqueia o pipeline.
+                if (incomingJobId) {
+                  supabaseAdmin
+                    .from('report_jobs')
+                    .update({ partial_content: markdown })
+                    .eq('id', incomingJobId)
+                    .then(() => {})
+                    .catch(() => {});
+                }
               },
             });
             if (res.ok) {
@@ -3393,6 +3406,9 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             progress_pct: 100,
             report_id: savedReportId,
             finished_at: new Date().toISOString(),
+            // v1.38.65 — Limpa o buffer transitório do live preview agora
+            // que o markdown final está em generated_reports.report_content.
+            partial_content: null,
           }).eq('id', incomingJobId);
           logger.stage('report_job_marked_completed', { jobId: incomingJobId, reportId: savedReportId });
         }
