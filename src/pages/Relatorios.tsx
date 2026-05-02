@@ -1252,6 +1252,16 @@ export default function Relatorios() {
                                   {r.environment === 'demo' && (
                                     <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0 border-amber-500 text-amber-600"><FlaskConical className="h-2.5 w-2.5" />Demo</Badge>
                                   )}
+                                  {isAdmin && getProviderLabel(r.ai_provider, r.ai_model) && (
+                                    <Badge
+                                      variant="outline"
+                                      className="text-[10px] gap-0.5 shrink-0 border-primary/40 text-primary"
+                                      title={r.ai_model || r.ai_provider || ''}
+                                    >
+                                      <Sparkles className="h-2.5 w-2.5" />
+                                      {getProviderLabel(r.ai_provider, r.ai_model)}
+                                    </Badge>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                                   <Calendar className="h-3 w-3" />
