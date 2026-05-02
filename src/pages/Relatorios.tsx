@@ -853,8 +853,8 @@ export default function Relatorios() {
                   )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4">
+                  <div className="flex-1 min-w-[260px]">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
                       Diagnóstico
                     </label>
