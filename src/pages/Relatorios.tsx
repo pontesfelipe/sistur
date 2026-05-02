@@ -882,9 +882,9 @@ export default function Relatorios() {
                             const creatorName = meta.creator?.full_name;
                             return (
                               <SelectItem key={assessment.id} value={assessment.id}>
-                                <span className="flex items-center gap-2">
-                                  <span>{assessment.title} — {dest?.name || 'Destino'}</span>
-                                  <span className="text-muted-foreground text-xs">
+                                <span className="flex items-center gap-2 max-w-full">
+                                  <span className="truncate">{assessment.title} — {dest?.name || 'Destino'}</span>
+                                  <span className="text-muted-foreground text-xs whitespace-nowrap">
                                     {calcDate}{creatorName ? ` · ${creatorName}` : ''}
                                   </span>
                                 </span>
