@@ -863,8 +863,8 @@ export default function Relatorios() {
                       onValueChange={setSelectedAssessmentId}
                       disabled={assessmentsLoading}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um diagnóstico calculado" />
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione um diagnóstico calculado" className="truncate" />
                       </SelectTrigger>
                       <SelectContent>
                         {filteredCalculatedAssessments.length === 0 ? (
