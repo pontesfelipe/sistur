@@ -1959,6 +1959,8 @@ async function runReportPipeline(args: {
   const logger = args.logger ?? createStageLogger({ jobId, assessmentId, traceId: jobId });
   logger.setJobId(jobId);
   logger.setAssessmentId(assessmentId);
+  logger.setSupabaseAdmin(supabaseAdmin);
+  if (assessment?.org_id) logger.setOrgId(assessment.org_id);
   logger.stage('pipeline_start', { destinationName, template: args.reportTemplate });
 
   // Atualiza progresso enquanto o stream roda. Não conhecemos o tamanho final,
