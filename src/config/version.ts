@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 64,
+  patch: 65,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.65",
+    date: "2026-05-02",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — pré-visualização ao vivo do relatório enquanto Claude (e qualquer provider que use o pipeline paralelo de pilares) ainda está escrevendo. Antes, o card 'Plano de Desenvolvimento' mostrava só um spinner com tempo decorrido até o relatório inteiro ficar pronto (3–7 min em diagnósticos completos), e o usuário ficava sem saber se algo estava progredindo. Mudanças: (1) nova coluna `partial_content text` em `report_jobs` (migração) atua como buffer transitório; (2) a edge function `generate-report`, em `runTwoPhasePipeline.onSectionReady`, além de emitir SSE pro stream síncrono, agora também faz fire-and-forget UPDATE em `report_jobs.partial_content` com o markdown acumulado a cada seção concluída (RA → OE → AO → envelope). Quando o relatório final é persistido em `generated_reports`, a coluna é zerada (`partial_content: null`) junto com o `status: 'completed'`; (3) no front (`Relatorios.tsx`), o polling de jobs agora seleciona também `partial_content` e mantém um estado `livePartial` que cresce conforme novas seções aparecem (nunca encolhe). O card de geração ganhou uma barra de progresso fina ligada a `progress_pct`, badge animada 'Pré-visualização ao vivo' (com dot pulsante) e troca o spinner solitário pelo markdown parcial renderizado em tempo real. Quando o job completa, troca-se naturalmente para o `report_content` definitivo carregado de `generated_reports`, evitando flicker. PDF e DOCX continuam disponíveis apenas após o relatório final estar persistido (a renderização parcial é só visual — não exporta versões inacabadas). GPT-5 e Gemini também se beneficiam do live preview quando o pipeline paralelo é usado; em fallback monolítico, o card mostra apenas a barra de progresso até o conteúdo final chegar."
+    ]
+  },
   {
     version: "1.38.64",
     date: "2026-05-02",
