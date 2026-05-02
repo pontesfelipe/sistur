@@ -108,6 +108,16 @@ const getReportTierLabel = (tier?: string | null) => {
   return null;
 };
 
+const getProviderLabel = (provider?: string | null, model?: string | null) => {
+  if (!provider && !model) return null;
+  const p = (provider || '').toLowerCase();
+  if (p === 'claude') return 'Claude';
+  if (p === 'gpt5' || p === 'gpt-5') return 'GPT-5';
+  if (p === 'gemini') return 'Gemini';
+  if (model) return model.split('/').pop() || model;
+  return provider || null;
+};
+
 function useGeneratedReports(userId?: string, orgId?: string, effectiveOrgId?: string) {
   return useQuery({
     queryKey: ['generated-reports', userId, orgId, effectiveOrgId],
