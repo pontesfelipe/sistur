@@ -1,0 +1,2 @@
+ALTER TABLE public.report_jobs ADD COLUMN IF NOT EXISTS partial_content text;
+COMMENT ON COLUMN public.report_jobs.partial_content IS 'Markdown parcial publicado pela edge function generate-report enquanto o pipeline paralelo (Claude/GPT-5/Gemini) finaliza cada seção. Permite preview ao vivo no card de geração. Limpa-se quando o relatório final é persistido em generated_reports.';
