@@ -3168,6 +3168,9 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               envelopeUserPrompt,
               lovableApiKey: LOVABLE_API_KEY,
               anthropicApiKey: ANTHROPIC_API_KEY ?? undefined,
+              template: reportTemplate,
+              tier: assessment?.tier as ClaudeBudgetTier,
+              indicatorCount: Array.isArray(auditTrail) ? auditTrail.length : 0,
               onStage: (stage, extra) => {
                 logger.stage(stage, extra);
                 const pct = stage === 'phase1_pillars_start'
