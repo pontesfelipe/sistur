@@ -2931,6 +2931,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             const reason = e instanceof Error ? e.message : String(e);
             fallbackTrail.push({ provider: 'gemini', reason });
             console.warn(`Gemini request threw: ${reason}`);
+            logger.error('provider_failed', e, { provider: 'gemini', model: 'google/gemini-2.5-pro' });
           }
         };
 
