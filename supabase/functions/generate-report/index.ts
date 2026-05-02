@@ -1362,6 +1362,111 @@ TOM: institucional, técnico, ABNT. Justifique conclusões com dados. Sem jargã
 // stream:false (mais simples de paralelizar e validar conteúdo) e retorna
 // o texto final acumulado. Aceita AbortSignal para cancelamento global
 // quando outro pilar paralelo falha e queremos refazer no próximo provider.
+// ============================================================================
+// v1.38.63 — Orçamento dinâmico de tokens para Claude.
+// Calcula `max_tokens` e detecta risco de estouro de janela com base em:
+//   - template do relatório (executivo / investidor / completo)
+//   - tier do diagnóstico (essencial / estrategico / integral)
+//   - quantidade real de indicadores no auditTrail
+//   - tamanho real do prompt (system + user) em chars
+//   - fase do pipeline 2-fases (pillar paralela vs envelope)
+// Objetivo: evitar timeouts (max_tokens muito alto = stream longo, idle do
+// proxy) e respostas parciais (max_tokens muito baixo = corte no meio do
+// markdown). Claude Sonnet 4.5 tem janela de 200k tokens — devolve `truncate`
+// quando o input estoura ~150k para que o caller possa avisar / fazer fallback.
+// ============================================================================
+const CLAUDE_MAX_CONTEXT_TOKENS = 200_000;
+const CLAUDE_HARD_OUTPUT_CAP = 16_000;
+const CLAUDE_MIN_OUTPUT = 2_500;
+const CLAUDE_INPUT_SAFETY_TOKENS = 8_000; // margem para tool-use / metadata
+
+/** Estimativa conservadora (1 token ≈ 3.6 chars em PT-BR + markdown).
+ *  Mais alto que o típico inglês (4 chars/token) porque PT acentuado e
+ *  tabelas markdown subdividem mais. */
+function estimateTokens(text: string | undefined | null): number {
+  if (!text) return 0;
+  return Math.ceil(text.length / 3.6);
+}
+
+type ClaudeBudgetPhase = 'monolithic' | 'pillar' | 'envelope';
+type ClaudeBudgetTier = 'essencial' | 'estrategico' | 'integral' | string | null | undefined;
+
+/** Devolve max_tokens recomendado para Claude e indica se o input precisa
+ *  ser truncado por causa da janela de contexto. */
+function pickClaudeBudget(args: {
+  phase: ClaudeBudgetPhase;
+  template?: string;
+  tier?: ClaudeBudgetTier;
+  indicatorCount?: number;
+  systemPrompt?: string;
+  userPrompt?: string;
+}): {
+  maxTokens: number;
+  inputTokensEstimated: number;
+  shouldTruncateInput: boolean;
+  rationale: string;
+} {
+  const { phase, template, tier, indicatorCount = 0, systemPrompt, userPrompt } = args;
+  const inputTokens =
+    estimateTokens(systemPrompt) + estimateTokens(userPrompt);
+
+  // Tier multiplier — relatórios mais profundos pedem mais saída.
+  const tierMul =
+    tier === 'integral' ? 1.0 :
+    tier === 'estrategico' ? 0.78 :
+    tier === 'essencial' ? 0.55 :
+    0.85;
+
+  // Template multiplier — executivo/investidor são curtos.
+  const tmplMul =
+    template === 'executivo' ? 0.45 :
+    template === 'investidor' ? 0.55 :
+    1.0;
+
+  // Indicator-density bonus — cada indicador adiciona texto explicativo.
+  // Saturado em 80 indicadores para não estourar.
+  const indicatorBonus = Math.min(indicatorCount, 80) * 35; // tokens
+
+  let base: number;
+  if (phase === 'pillar') {
+    // 1 dos 3 pilares — escopo restrito a ~1/3 dos indicadores.
+    base = 3_500;
+  } else if (phase === 'envelope') {
+    // Envelope cobre intro + ficha + metodologia + benchmarks + plano +
+    // referências; é a chamada mais longa.
+    base = 9_000;
+  } else {
+    // Pipeline monolítico (executivo/investidor) — texto único.
+    base = 7_000;
+  }
+
+  let maxTokens = Math.round(base * tierMul * tmplMul + indicatorBonus);
+
+  // Janela: garanta espaço para a saída. Se o input + output estourarem,
+  // reduzimos o output até o piso e marcamos truncate.
+  const available = CLAUDE_MAX_CONTEXT_TOKENS - inputTokens - CLAUDE_INPUT_SAFETY_TOKENS;
+  let shouldTruncateInput = false;
+  if (available < CLAUDE_MIN_OUTPUT) {
+    shouldTruncateInput = true;
+    maxTokens = CLAUDE_MIN_OUTPUT;
+  } else if (maxTokens > available) {
+    maxTokens = Math.max(CLAUDE_MIN_OUTPUT, available);
+  }
+
+  // Cap absoluto — Anthropic recomenda streaming para >8k; já estamos em
+  // streaming, mas acima de 16k a latência idle-per-chunk passa do timeout
+  // do proxy de edge function em janelas longas.
+  if (maxTokens > CLAUDE_HARD_OUTPUT_CAP) maxTokens = CLAUDE_HARD_OUTPUT_CAP;
+  if (maxTokens < CLAUDE_MIN_OUTPUT) maxTokens = CLAUDE_MIN_OUTPUT;
+
+  return {
+    maxTokens,
+    inputTokensEstimated: inputTokens,
+    shouldTruncateInput,
+    rationale: `phase=${phase} tier=${tier ?? '-'} tmpl=${template ?? '-'} ind=${indicatorCount} input≈${inputTokens}tk → max_tokens=${maxTokens}${shouldTruncateInput ? ' [INPUT_NEAR_LIMIT]' : ''}`,
+  };
+}
+
 async function callProviderNonStreaming(args: {
   provider: 'claude' | 'gpt5' | 'gemini';
   systemPrompt: string;
