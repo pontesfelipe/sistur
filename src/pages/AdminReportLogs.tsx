@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import {
   AlertTriangle, RefreshCw, Search, Sparkles, FileText, Filter, CheckCircle2, AlertCircle,
+  Layers, Mail, ShieldCheck, Database, Activity,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -52,6 +53,239 @@ const PROVIDER_LABEL: Record<string, string> = {
   gpt5: 'GPT-5',
   gemini: 'Gemini',
 };
+
+// Mapeamento dos stages emitidos pela edge function `generate-report`
+// para as 4 fases visíveis no painel quando o provider é Claude.
+type PhaseKey = 'pillars' | 'envelope' | 'validation' | 'persistence';
+
+const PHASE_DEFS: Array<{
+  key: PhaseKey;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  startStages: string[];
+  doneStages: string[];
+  inFlightStages?: string[];
+}> = [
+  {
+    key: 'pillars',
+    label: 'Pilares (RA · OE · AO)',
+    description: 'Geração paralela das 3 subseções por pilar',
+    icon: <Layers className="h-4 w-4" />,
+    startStages: ['phase1_pillars_start', 'parallel_pipeline_enabled', 'parallel_provider_try'],
+    doneStages: ['phase1_pillars_done'],
+    inFlightStages: ['claude_budget_pillar', 'parallel_section_streamed'],
+  },
+  {
+    key: 'envelope',
+    label: 'Envelope (capa, sumário, fechamento)',
+    description: 'Montagem sequencial unindo os pilares',
+    icon: <Mail className="h-4 w-4" />,
+    startStages: ['phase2_envelope_start'],
+    doneStages: ['phase2_envelope_done', 'parallel_pipeline_success'],
+    inFlightStages: ['claude_budget_envelope'],
+  },
+  {
+    key: 'validation',
+    label: 'Validação (determinística + IA)',
+    description: 'Coerência numérica e revisão por agente',
+    icon: <ShieldCheck className="h-4 w-4" />,
+    startStages: ['validation_deterministic_start', 'validation_agent_start'],
+    doneStages: ['validation_agent_done', 'validation_issues_summary'],
+  },
+  {
+    key: 'persistence',
+    label: 'Persistência',
+    description: 'Gravação do relatório, validações e auditoria',
+    icon: <Database className="h-4 w-4" />,
+    startStages: ['persist_lookup_existing'],
+    doneStages: ['persist_inserted', 'persist_updated', 'stream_closed_ok', 'report_job_marked_completed'],
+    inFlightStages: ['persist_validations_inserted', 'persist_audit_inserted'],
+  },
+];
+
+type PhaseStatus = 'pending' | 'running' | 'done' | 'error';
+
+type PhaseState = {
+  status: PhaseStatus;
+  startedAt?: string;
+  finishedAt?: string;
+  durationMs?: number;
+  lastEvent?: string;
+  errorMsg?: string;
+};
+
+function buildLiveTimeline(rows: LogRow[]) {
+  // Agrupar pelos jobs/traces mais recentes (Claude) para mostrar a execução "ao vivo".
+  const claudeRows = rows
+    .filter((r) => r.provider === 'claude')
+    .slice() // não mutar
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+  if (claudeRows.length === 0) return null;
+
+  // Pega o trace_id (ou job_id como fallback) do evento mais recente.
+  const latest = claudeRows[claudeRows.length - 1];
+  const groupKey = latest.trace_id || latest.job_id || latest.report_id;
+  if (!groupKey) return null;
+
+  const groupRows = claudeRows.filter(
+    (r) => (r.trace_id || r.job_id || r.report_id) === groupKey,
+  );
+
+  const phases: Record<PhaseKey, PhaseState> = {
+    pillars: { status: 'pending' },
+    envelope: { status: 'pending' },
+    validation: { status: 'pending' },
+    persistence: { status: 'pending' },
+  };
+
+  for (const row of groupRows) {
+    if (!row.stage) continue;
+    for (const def of PHASE_DEFS) {
+      const isStart = def.startStages.includes(row.stage);
+      const isDone = def.doneStages.includes(row.stage);
+      const isInFlight = def.inFlightStages?.includes(row.stage);
+      const isError = row.level === 'error' && (isStart || isDone || isInFlight);
+
+      if (isStart || isDone || isInFlight) {
+        const ph = phases[def.key];
+        if (!ph.startedAt) ph.startedAt = row.created_at;
+        ph.lastEvent = row.stage;
+        if (isError) {
+          ph.status = 'error';
+          ph.errorMsg = row.message ?? 'Erro reportado pela edge function';
+        } else if (isDone) {
+          ph.status = 'done';
+          ph.finishedAt = row.created_at;
+          if (ph.startedAt) {
+            ph.durationMs = new Date(ph.finishedAt).getTime() - new Date(ph.startedAt).getTime();
+          }
+        } else if (ph.status !== 'done' && ph.status !== 'error') {
+          ph.status = 'running';
+        }
+      }
+    }
+  }
+
+  // Idade do último evento — se >2min sem novo evento e nada concluído, marcamos como stale.
+  const lastEventAt = new Date(groupRows[groupRows.length - 1].created_at).getTime();
+  const ageSec = Math.round((Date.now() - lastEventAt) / 1000);
+
+  return {
+    groupKey,
+    traceId: latest.trace_id,
+    jobId: latest.job_id,
+    reportId: latest.report_id,
+    model: latest.model,
+    startedAt: groupRows[0].created_at,
+    lastEventAt: groupRows[groupRows.length - 1].created_at,
+    ageSec,
+    phases,
+    rowCount: groupRows.length,
+  };
+}
+
+const PHASE_STATUS_STYLES: Record<PhaseStatus, string> = {
+  pending: 'border-muted bg-muted/20 text-muted-foreground',
+  running: 'border-primary/40 bg-primary/10 text-primary animate-pulse',
+  done: 'border-severity-good/40 bg-severity-good/10 text-severity-good',
+  error: 'border-destructive/40 bg-destructive/10 text-destructive',
+};
+
+function ClaudeLivePipeline({ rows }: { rows: LogRow[] }) {
+  const live = useMemo(() => buildLiveTimeline(rows), [rows]);
+
+  if (!live) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Activity className="h-4 w-4" />
+            Pipeline Claude — Tempo Real
+          </CardTitle>
+          <CardDescription>
+            Nenhuma execução recente do Claude detectada. Gere um relatório com Claude para visualizar o progresso por etapa.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  const completed = Object.values(live.phases).filter((p) => p.status === 'done').length;
+  const hasError = Object.values(live.phases).some((p) => p.status === 'error');
+  const overallPct = Math.round((completed / PHASE_DEFS.length) * 100);
+  const isStale = live.ageSec > 120 && completed < PHASE_DEFS.length && !hasError;
+
+  return (
+    <Card className="border-primary/20">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Activity className={`h-4 w-4 ${!hasError && completed < PHASE_DEFS.length ? 'text-primary animate-pulse' : ''}`} />
+              Pipeline Claude — Tempo Real
+            </CardTitle>
+            <CardDescription className="text-xs mt-1">
+              Trace {live.traceId?.slice(0, 14) ?? '—'} • {live.rowCount} eventos •{' '}
+              último há {live.ageSec}s
+              {isStale && <span className="ml-2 text-severity-moderate">• sem novos eventos</span>}
+              {hasError && <span className="ml-2 text-destructive">• erro detectado</span>}
+            </CardDescription>
+          </div>
+          <Badge variant="outline" className="font-mono text-[10px]">
+            {completed}/{PHASE_DEFS.length} etapas • {overallPct}%
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="h-1.5 bg-muted rounded overflow-hidden">
+          <div
+            className={`h-full transition-all duration-500 ${hasError ? 'bg-destructive' : 'bg-primary'}`}
+            style={{ width: `${overallPct}%` }}
+          />
+        </div>
+        <div className="grid gap-2 md:grid-cols-2">
+          {PHASE_DEFS.map((def) => {
+            const ph = live.phases[def.key];
+            const dur = ph.durationMs != null
+              ? `${(ph.durationMs / 1000).toFixed(1)}s`
+              : ph.startedAt && ph.status === 'running'
+                ? `${Math.round((Date.now() - new Date(ph.startedAt).getTime()) / 1000)}s…`
+                : '—';
+            return (
+              <div
+                key={def.key}
+                className={`rounded-lg border p-3 transition-colors ${PHASE_STATUS_STYLES[ph.status]}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {def.icon}
+                    <span className="text-sm font-medium truncate">{def.label}</span>
+                  </div>
+                  <Badge variant="outline" className="text-[10px] shrink-0">
+                    {ph.status === 'pending' && 'aguardando'}
+                    {ph.status === 'running' && 'em execução'}
+                    {ph.status === 'done' && 'concluído'}
+                    {ph.status === 'error' && 'erro'}
+                  </Badge>
+                </div>
+                <p className="text-[11px] mt-1 opacity-80">{def.description}</p>
+                <div className="flex items-center justify-between mt-2 text-[10px] font-mono opacity-80">
+                  <span className="truncate">{ph.lastEvent ?? '—'}</span>
+                  <span>{dur}</span>
+                </div>
+                {ph.errorMsg && (
+                  <p className="text-[11px] mt-1 text-destructive break-words">{ph.errorMsg}</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function AdminReportLogs() {
   // Default focus: Claude (motivo do painel: investigar a edge function quando usada por Claude).
@@ -109,6 +343,11 @@ export default function AdminReportLogs() {
       subtitle="Eventos e erros da edge function generate-report (filtrado por provedor de IA)"
     >
       <div className="space-y-6">
+        {/* Live pipeline tracker — visível somente quando filtrando por Claude (default). */}
+        {(providerFilter === 'claude' || providerFilter === 'all') && (
+          <ClaudeLivePipeline rows={data ?? []} />
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card>

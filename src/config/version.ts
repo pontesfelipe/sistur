@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 63,
+  patch: 64,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.64",
+    date: "2026-05-02",
+    type: "patch" as const,
+    changes: [
+      "Painel `Logs do Gerador de Relatórios` — novo bloco 'Pipeline Claude — Tempo Real' no topo, exibido quando o filtro de provider é Claude (default) ou Todos. Agrupa os eventos da execução mais recente do Claude por trace_id e mapeia para 4 fases visíveis: Pilares (RA · OE · AO), Envelope, Validação (determinística + IA) e Persistência. Cada cartão mostra status (aguardando/em execução/concluído/erro), último stage emitido pela edge function (`phase1_pillars_start`, `claude_budget_pillar`, `phase2_envelope_done`, `validation_agent_done`, `persist_inserted`, `stream_closed_ok`, etc.) e duração calculada a partir dos timestamps. Barra geral de progresso (n/4 etapas) muda para vermelha em caso de erro e marca 'sem novos eventos' quando o último evento tem >120s sem progresso (sinal típico de stall do stream). Atualização automática a cada 15s acompanha o refetch do painel."
+    ]
+  },
   {
     version: "1.38.63",
     date: "2026-05-02",
