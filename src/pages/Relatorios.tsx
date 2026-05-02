@@ -1094,7 +1094,7 @@ export default function Relatorios() {
             </Card>
 
             {/* Report Display */}
-            {(report || isGenerating) && (
+            {(report || isGenerating || livePartial) && (
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
@@ -1102,9 +1102,20 @@ export default function Relatorios() {
                       <FileText className="h-5 w-5 text-primary" />
                       Plano de Desenvolvimento
                       {selectedDestination && ` - ${selectedDestination.name}`}
+                      {isGenerating && livePartial && (
+                        <Badge variant="outline" className="gap-1 border-primary/40 bg-primary/10 text-primary">
+                          <span className="relative flex h-2 w-2">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60"></span>
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
+                          </span>
+                          Pré-visualização ao vivo
+                        </Badge>
+                      )}
                     </CardTitle>
                     <CardDescription>
-                      Relatório gerado pela Mente Sistur com base no diagnóstico
+                      {isGenerating && livePartial
+                        ? 'O texto abaixo está sendo escrito pela Mente Sistur agora — seções podem ser revisadas até a conclusão.'
+                        : 'Relatório gerado pela Mente Sistur com base no diagnóstico'}
                     </CardDescription>
                   </div>
                   {report && !isGenerating && (
@@ -1115,24 +1126,48 @@ export default function Relatorios() {
                   )}
                 </CardHeader>
                 <CardContent>
+                  {isGenerating && (
+                    <div className="mb-4 space-y-2">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          {generationStage || 'Gerando relatório…'}
+                        </span>
+                        <span className="font-mono">
+                          {generationProgressPct}% · {generationElapsed}s
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full bg-muted rounded overflow-hidden">
+                        <div
+                          className="h-full bg-primary transition-all duration-500"
+                          style={{ width: `${Math.max(5, generationProgressPct)}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                   {report && !isGenerating && selectedAssessmentId && (
                     <ReportValidationBanner assessmentId={selectedAssessmentId} />
                   )}
                   <ScrollArea className="h-[600px] pr-4">
                     <div ref={reportRef} className="prose prose-sm max-w-none">
-                      {isGenerating && !report && (
+                      {isGenerating && !report && !livePartial && (
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Loader2 className="h-4 w-4 animate-spin" />
                           {generationStage || 'Gerando relatório…'} ({generationElapsed}s)
                         </div>
                       )}
-                      {isGenerating && generationElapsed >= 60 && !report && (
+                      {isGenerating && generationElapsed >= 60 && !report && !livePartial && (
                         <div className="mt-3 text-xs text-amber-600 dark:text-amber-400">
                           A geração continua no servidor. Se ficar mais de 8 minutos sem avançar, o sistema marcará falha automaticamente para você tentar novamente sem duplicar jobs.
                         </div>
                       )}
+                      {/* v1.38.65 — Quando isGenerating + livePartial: renderiza o
+                          markdown parcial publicado pela edge function. Quando
+                          completed: troca para o `report` final carregado de
+                          generated_reports. */}
+                      {!report && livePartial && renderMarkdown(livePartial)}
                       {report && renderMarkdown(report)}
-                      {isGenerating && report && (
+                      {isGenerating && (report || livePartial) && (
                         <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1" />
                       )}
                     </div>
@@ -1142,7 +1177,7 @@ export default function Relatorios() {
             )}
 
             {/* Empty State */}
-            {!report && !isGenerating && (
+            {!report && !isGenerating && !livePartial && (
               <Card className="border-dashed">
                 <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
