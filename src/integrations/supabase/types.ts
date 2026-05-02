@@ -7429,6 +7429,60 @@ export type Database = {
           },
         ]
       }
+      report_generation_logs: {
+        Row: {
+          assessment_id: string | null
+          created_at: string
+          duration_ms: number | null
+          id: string
+          job_id: string | null
+          level: string
+          message: string | null
+          metadata: Json | null
+          model: string | null
+          org_id: string | null
+          provider: string | null
+          report_id: string | null
+          stage: string | null
+          trace_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          assessment_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          job_id?: string | null
+          level?: string
+          message?: string | null
+          metadata?: Json | null
+          model?: string | null
+          org_id?: string | null
+          provider?: string | null
+          report_id?: string | null
+          stage?: string | null
+          trace_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          assessment_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          job_id?: string | null
+          level?: string
+          message?: string | null
+          metadata?: Json | null
+          model?: string | null
+          org_id?: string | null
+          provider?: string | null
+          report_id?: string | null
+          stage?: string | null
+          trace_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       report_jobs: {
         Row: {
           assessment_id: string
