@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 61,
+  patch: 62,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.62",
+    date: "2026-05-02",
+    type: "minor" as const,
+    changes: [
+      "Admin → novo painel `Logs do Gerador de Relatórios` em `/admin/report-logs` (acessível via botão na página de Logs de Auditoria). Mostra eventos e erros da edge function `generate-report` por provedor de IA — filtro padrão é Claude (Anthropic), com chips para GPT-5 e Gemini também. Tabela com nível (info/warn/error), stage, mensagem, trace, com busca livre, dialog de detalhes (metadata + duração + job/report id) e auto-refresh a 15s. Cards de KPI: total, erros, warns, providers selecionados e providers que falharam.",
+      "Edge function `generate-report` — logger estruturado agora persiste todos os stages e erros na nova tabela `report_generation_logs` (RLS apenas ADMIN). Cada evento carrega `provider`, `model`, `trace_id`, `job_id`, `report_id`, `org_id`, `user_id`, `duration_ms` e `metadata`. Inserções são fire-and-forget para nunca bloquear o pipeline. Novos stages explícitos `provider_selected` e `provider_failed` cobrem cada tentativa de Claude / GPT-5 / Gemini, permitindo investigar exatamente por que e quando o fallback foi acionado."
+    ],
+  },
   {
     version: "1.38.61",
     date: "2026-05-02",
