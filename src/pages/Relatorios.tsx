@@ -203,6 +203,13 @@ export default function Relatorios() {
   const cancelGenerationRef = useRef<boolean>(false);
   const [generationStage, setGenerationStage] = useState<string>('');
   const [generationElapsed, setGenerationElapsed] = useState<number>(0);
+  // v1.38.65 — Buffer do markdown parcial publicado pela edge function
+  // (`report_jobs.partial_content`) durante o pipeline paralelo do Claude.
+  // Permite renderizar o relatório aparecendo seção a seção (RA → OE → AO →
+  // envelope) em vez de só no final. É descartado quando o relatório final
+  // é carregado de `generated_reports`.
+  const [livePartial, setLivePartial] = useState<string>('');
+  const [generationProgressPct, setGenerationProgressPct] = useState<number>(0);
 
   // Timer visual durante a geração (se segura ≥30s sem chunk, mostra aviso).
   useEffect(() => {
@@ -297,6 +304,8 @@ export default function Relatorios() {
     setIsGenerating(true);
     setReport('');
     setGenerationStage('Enfileirando geração…');
+    setLivePartial('');
+    setGenerationProgressPct(0);
     cancelGenerationRef.current = false;
 
     // v1.38.55 — Pede permissão de Notification de forma silenciosa.
@@ -385,6 +394,7 @@ export default function Relatorios() {
       const pollDeadline = Date.now() + POLL_DEADLINE_MS;
       let finalReportId: string | null = null;
       let lastStage = '';
+      let lastPartialLen = 0;
       while (Date.now() < pollDeadline) {
         await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
         if (cancelGenerationRef.current) {
@@ -393,13 +403,25 @@ export default function Relatorios() {
         }
         const { data: job } = await supabase
           .from('report_jobs')
-          .select('status, stage, progress_pct, report_id, error_message')
+          .select('status, stage, progress_pct, report_id, error_message, partial_content')
           .eq('id', jobId)
           .maybeSingle();
         if (!job) continue;
         if (job.stage && job.stage !== lastStage) {
           lastStage = job.stage;
           setGenerationStage(`${job.stage}${job.progress_pct ? ` (${job.progress_pct}%)` : ''}`);
+        }
+        if (typeof job.progress_pct === 'number') {
+          setGenerationProgressPct(job.progress_pct);
+        }
+        // v1.38.65 — Live preview do markdown parcial. Só atualiza quando
+        // o conteúdo cresceu (a edge function publica markdown acumulado
+        // por seção; nunca encolhe). Mantemos `report` vazio até o final
+        // para preservar o fluxo "salvo de generated_reports".
+        const partial = (job as any).partial_content as string | null | undefined;
+        if (partial && partial.length > lastPartialLen) {
+          lastPartialLen = partial.length;
+          setLivePartial(partial);
         }
         if (job.status === 'completed') {
           finalReportId = job.report_id ?? null;
@@ -429,6 +451,8 @@ export default function Relatorios() {
         .eq('id', finalReportId)
         .maybeSingle();
       if (finalReport?.report_content) setReport(finalReport.report_content);
+      setLivePartial('');
+      setGenerationProgressPct(100);
 
       toast.success('Relatório gerado e salvo com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
@@ -440,6 +464,10 @@ export default function Relatorios() {
     } finally {
       setGenerationStage('');
       setIsGenerating(false);
+      // mantém livePartial limpo; se houve erro antes do final, usuário vê
+      // a mensagem de erro normalmente (toast) e o card volta ao empty state.
+      setLivePartial('');
+      setGenerationProgressPct(0);
     }
   };
 
