@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 62,
+  patch: 63,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.63",
+    date: "2026-05-02",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — orçamento dinâmico de `max_tokens` e detecção de janela de contexto para Claude (Anthropic). Antes, todas as chamadas usavam um teto fixo: 16000 tokens no pipeline monolítico (executivo/investidor) e no envelope da pipeline 2-fases, e 8000 fixos por pilar — independente do tamanho real do diagnóstico. Em diagnósticos pequenos isso desperdiçava latência (Claude reservava saída longa que nunca usaria, prolongando o stream e expondo o proxy a idle timeout); em diagnósticos integrais com 100+ indicadores, o envelope às vezes era cortado no meio (resposta parcial). Nova função `pickClaudeBudget(phase, template, tier, indicatorCount, systemPrompt, userPrompt)` calcula o teto recomendado por chamada combinando: tier (essencial 0.55x, estratégico 0.78x, integral 1.0x), template (executivo 0.45x, investidor 0.55x, completo 1.0x), bônus por indicador (35tk/indicador, saturado em 80) e fase do pipeline (pillar=3.5k base, envelope=9k base, monolítico=7k base). O resultado é piso em 2.5k e teto absoluto em 16k. Também estima o tamanho do input (`chars/3.6` aproximação PT-BR + markdown) e, se input + output ameaçar a janela de 200k tokens do Claude Sonnet 4.5, reduz o output até o piso e marca `shouldTruncateInput` para alerta no log. Aplicado nas 3 chamadas Claude: streaming monolítico (executivo/investidor), 3 pillares paralelos (Phase 1) e envelope (Phase 2). Cada decisão emite um stage `claude_budget_*` no painel `Logs do Gerador de Relatórios` com a rationale completa, permitindo auditar o orçamento por trace. GPT-5 e Gemini não são afetados — eles têm comportamento de streaming e janelas diferentes que já cabem no fluxo atual."
+    ],
+  },
   {
     version: "1.38.62",
     date: "2026-05-02",
