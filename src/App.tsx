@@ -51,6 +51,7 @@ const Certificates = lazy(() => import("./pages/Certificates"));
 const VerifyCertificate = lazy(() => import("./pages/VerifyCertificate"));
 const OnDemandRequests = lazy(() => import("./pages/OnDemandRequests"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
+const AdminReportLogs = lazy(() => import("./pages/AdminReportLogs"));
 const Projetos = lazy(() => import("./pages/Projetos"));
 const Forum = lazy(() => import("./pages/Forum"));
 const GamesHub = lazy(() => import("./pages/GamesHub"));
@@ -359,6 +360,14 @@ const App = () => {
                   element={
                     <AdminRoute>
                       <AuditLogs />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/report-logs"
+                  element={
+                    <AdminRoute>
+                      <AdminReportLogs />
                     </AdminRoute>
                   }
                 />
