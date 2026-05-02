@@ -2870,16 +2870,20 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               response = new Response(adapted, { status: 200, headers: { "Content-Type": "text/event-stream" } });
               usedProvider = 'claude';
               console.log("Report generation using provider: claude (claude-sonnet-4-5)");
+              logger.setProvider('claude', 'anthropic/claude-sonnet-4-5-20250929');
+              logger.stage('provider_selected', { provider: 'claude', model: 'anthropic/claude-sonnet-4-5-20250929' });
             } else {
               const errBody = await claudeResp.text().catch(() => "");
               const reason = `status ${claudeResp.status}: ${errBody.slice(0, 200)}`;
               fallbackTrail.push({ provider: 'claude', reason });
               console.warn(`Claude unavailable. ${reason}`);
+              logger.error('provider_failed', new Error(reason), { provider: 'claude', model: 'anthropic/claude-sonnet-4-5-20250929' });
             }
           } catch (e) {
             const reason = e instanceof Error ? e.message : String(e);
             fallbackTrail.push({ provider: 'claude', reason });
             console.warn(`Claude request threw: ${reason}`);
+            logger.error('provider_failed', e, { provider: 'claude', model: 'anthropic/claude-sonnet-4-5-20250929' });
           }
         };
 
@@ -2890,16 +2894,20 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               response = gptResp;
               usedProvider = 'gpt5';
               console.log(`Report generation using provider: gpt-5`);
+              logger.setProvider('gpt5', 'openai/gpt-5');
+              logger.stage('provider_selected', { provider: 'gpt5', model: 'openai/gpt-5' });
             } else {
               const errBody = await gptResp.text().catch(() => "");
               const reason = `status ${gptResp.status}: ${errBody.slice(0, 200)}`;
               fallbackTrail.push({ provider: 'gpt5', reason });
               console.warn(`GPT-5 unavailable. ${reason}`);
+              logger.error('provider_failed', new Error(reason), { provider: 'gpt5', model: 'openai/gpt-5' });
             }
           } catch (e) {
             const reason = e instanceof Error ? e.message : String(e);
             fallbackTrail.push({ provider: 'gpt5', reason });
             console.warn(`GPT-5 request threw: ${reason}`);
+            logger.error('provider_failed', e, { provider: 'gpt5', model: 'openai/gpt-5' });
           }
         };
 
@@ -2910,11 +2918,14 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               response = gemResp;
               usedProvider = 'gemini';
               console.log(`Report generation using provider: gemini-2.5-pro`);
+              logger.setProvider('gemini', 'google/gemini-2.5-pro');
+              logger.stage('provider_selected', { provider: 'gemini', model: 'google/gemini-2.5-pro' });
             } else {
               const errBody = await gemResp.text().catch(() => "");
               const reason = `status ${gemResp.status}: ${errBody.slice(0, 200)}`;
               fallbackTrail.push({ provider: 'gemini', reason });
               console.warn(`Gemini unavailable. ${reason}`);
+              logger.error('provider_failed', new Error(reason), { provider: 'gemini', model: 'google/gemini-2.5-pro' });
             }
           } catch (e) {
             const reason = e instanceof Error ? e.message : String(e);
