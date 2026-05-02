@@ -1577,22 +1577,39 @@ async function runTwoPhasePipeline(args: {
   anthropicApiKey?: string;
   onStage: (stage: string, extra?: Record<string, unknown>) => void;
   onSectionReady: (label: string, markdown: string) => Promise<void>;
+  // v1.38.63 — contexto para orçamento dinâmico Claude
+  template?: string;
+  tier?: ClaudeBudgetTier;
+  indicatorCount?: number;
 }): Promise<{ ok: true; content: string } | { ok: false; reason: string }> {
-  const { provider, systemPromptByPillar, envelopeSystemPrompt, pillarUserPrompt, envelopeUserPrompt, lovableApiKey, anthropicApiKey, onStage, onSectionReady } = args;
+  const { provider, systemPromptByPillar, envelopeSystemPrompt, pillarUserPrompt, envelopeUserPrompt, lovableApiKey, anthropicApiKey, onStage, onSectionReady, template, tier, indicatorCount } = args;
 
   // Fase 1: 3 chamadas em paralelo. Se qualquer uma falhar, abortamos as outras.
   const controller = new AbortController();
   onStage('phase1_pillars_start', { provider });
   const pillarPromises = (['RA', 'OE', 'AO'] as const).map((p) =>
-    callProviderNonStreaming({
-      provider,
-      systemPrompt: systemPromptByPillar[p],
-      userPrompt: pillarUserPrompt(p),
-      lovableApiKey,
-      anthropicApiKey,
-      signal: controller.signal,
-      maxTokens: 8000,
-    }).then((res) => ({ pillar: p, ...res }))
+    (() => {
+      const sp = systemPromptByPillar[p];
+      const up = pillarUserPrompt(p);
+      const budget = provider === 'claude'
+        ? pickClaudeBudget({
+            phase: 'pillar', template, tier,
+            // ~1/3 dos indicadores por pilar
+            indicatorCount: Math.ceil((indicatorCount ?? 0) / 3),
+            systemPrompt: sp, userPrompt: up,
+          })
+        : null;
+      if (budget) onStage('claude_budget_pillar', { pillar: p, ...budget });
+      return callProviderNonStreaming({
+        provider,
+        systemPrompt: sp,
+        userPrompt: up,
+        lovableApiKey,
+        anthropicApiKey,
+        signal: controller.signal,
+        maxTokens: budget ? budget.maxTokens : 8000,
+      }).then((res) => ({ pillar: p, ...res }));
+    })()
   );
   const pillarResults = await Promise.all(pillarPromises);
   const failed = pillarResults.find((r) => !r.ok);
@@ -1612,13 +1629,21 @@ async function runTwoPhasePipeline(args: {
 
   // Fase 2: envelope sequencial recebendo os 3 pilares como contexto.
   onStage('phase2_envelope_start', { provider });
+  const envUserPrompt = envelopeUserPrompt(pillarTexts);
+  const envBudget = provider === 'claude'
+    ? pickClaudeBudget({
+        phase: 'envelope', template, tier, indicatorCount,
+        systemPrompt: envelopeSystemPrompt, userPrompt: envUserPrompt,
+      })
+    : null;
+  if (envBudget) onStage('claude_budget_envelope', envBudget);
   const envRes = await callProviderNonStreaming({
     provider,
     systemPrompt: envelopeSystemPrompt,
-    userPrompt: envelopeUserPrompt(pillarTexts),
+    userPrompt: envUserPrompt,
     lovableApiKey,
     anthropicApiKey,
-    maxTokens: 16000,
+    maxTokens: envBudget ? envBudget.maxTokens : 16000,
   });
   if (!envRes.ok) return { ok: false, reason: `envelope failed: ${envRes.reason}` };
   onStage('phase2_envelope_done', { provider, chars: envRes.content.length });
