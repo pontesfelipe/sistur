@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 66,
+  patch: 67,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.67",
+    date: "2026-05-02",
+    type: "patch" as const,
+    changes: [
+      "Correção crítica de carregamento — após o splash o app ficava preso em 'Carregando...' indefinidamente em rotas protegidas quando o usuário ainda não tinha sessão ativa. Causa raiz: o `useEffect` do `ProfileContext` só disparava `fetchProfile()` quando `user?.id !== lastUserId.current`. No primeiro render com `user = null` e `lastUserId.current = null`, ambos eram iguais, `fetchProfile` nunca rodava, `initialized` permanecia `false`, e os guards (`ProtectedRoute`, `LicenseRoute`, `AdminRoute`) continuavam mostrando o loader 'Carregando...' / 'Verificando licença...' eternamente em vez de redirecionar para `/auth`. Correção: o efeito agora também dispara quando `initialized === false`, garantindo que o estado deslogado seja inicializado corretamente e os guards possam decidir o redirecionamento."
+    ]
+  },
   {
     version: "1.38.66",
     date: "2026-05-02",
