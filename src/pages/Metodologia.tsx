@@ -1321,6 +1321,87 @@ export default function Metodologia() {
                 <li>Persistência do relatório de validação em <code>report_validations</code>.</li>
                 <li>Status canônico (CRÍTICO/ATENÇÃO/ADEQUADO/FORTE/EXCELENTE) e padrão BRL.</li>
               </ul>
+
+              <h4>Pipeline de geração — providers, fila e streaming</h4>
+              <p>
+                A geração não depende de um único modelo. O orquestrador tenta os
+                provedores na ordem <strong>Claude Sonnet 4.5</strong> →{' '}
+                <strong>GPT-5</strong> → <strong>Gemini 2.5 Pro</strong>. Se qualquer
+                chamada falhar (timeout, abort, conteúdo vazio mid-stream ou erro de
+                stream parcial), o trail é registrado e o próximo provedor da ordem é
+                acionado automaticamente, mantendo o mesmo prompt e dados auditados —
+                a regra de fallback é <strong>global</strong> (nunca mistura textos de
+                provedores diferentes em um mesmo relatório).
+              </p>
+              <p>
+                No template <strong>Completo</strong>, o pipeline roda em duas fases:
+                <strong> Fase 1</strong> dispara três chamadas paralelas (uma por pilar
+                I-RA, I-OE, I-AO), cada uma restrita ao seu escopo; <strong>Fase 2</strong>
+                gera o envelope (introdução, ficha técnica, metodologia, alertas IGMA,
+                análise integrada, gargalos, benchmarks, prognóstico, banco de ações,
+                fontes, considerações finais, referências, glossário, apêndice) recebendo
+                os textos dos pilares como contexto de leitura para garantir
+                <strong> coerência narrativa</strong>. Para Claude, o orçamento de
+                <code>max_tokens</code> e a janela de contexto são calibrados
+                dinamicamente por tier (essencial / estratégico / integral), template e
+                quantidade real de indicadores, evitando tanto respostas truncadas em
+                diagnósticos integrais quanto reservas excessivas em diagnósticos pequenos.
+                Templates Executivo e Investidor mantêm pipeline monolítico (estrutura
+                curta sem subseções por pilar).
+              </p>
+              <p>
+                Para resistir a timeouts do proxy em gerações longas, o pedido é
+                enfileirado em <code>report_jobs</code> e processado por um worker
+                dedicado (<code>process-report-job</code>) acionado por trigger de
+                banco. O cliente recebe o <code>jobId</code> imediatamente (HTTP 202)
+                e faz polling. Mesmo se o usuário fechar a aba ou navegar para outra
+                página, o <code>useReportJobWatcher</code> global mantém o
+                acompanhamento via <code>localStorage</code> e dispara toast +
+                Notification do navegador quando o relatório fica pronto.
+              </p>
+              <p>
+                Durante a geração, o card "Plano de Desenvolvimento" exibe
+                <strong> pré-visualização ao vivo</strong>: a edge function persiste
+                progressivamente o markdown acumulado em
+                <code>report_jobs.partial_content</code> a cada subseção concluída
+                (RA → OE → AO → envelope), e a tela renderiza esse conteúdo parcial
+                em tempo real, com barra de progresso e badge animado. Quando o job
+                completa, troca-se naturalmente para o conteúdo final persistido em
+                <code>generated_reports</code> — sem flicker. PDF e DOCX só são
+                liberados após a persistência final (não exporta versões inacabadas).
+              </p>
+
+              <h4>Observabilidade e auditoria</h4>
+              <ul>
+                <li>
+                  Todos os eventos do pipeline são gravados em
+                  <code> report_generation_logs</code> (RLS apenas ADMIN) com
+                  <code> provider</code>, <code>model</code>, <code>trace_id</code>,
+                  <code> job_id</code>, <code>report_id</code>,
+                  <code> duration_ms</code>, <code>stage</code> e
+                  <code> metadata</code>. Stages explícitos
+                  (<code>provider_selected</code>, <code>provider_failed</code>,
+                  <code> phase1_pillars_start</code>, <code>claude_budget_pillar</code>,
+                  <code> phase2_envelope_done</code>,
+                  <code> validation_agent_done</code>, <code>persist_inserted</code>,
+                  <code> stream_closed_ok</code>) cobrem cada tentativa de Claude /
+                  GPT-5 / Gemini, permitindo auditar quando e por que o fallback foi
+                  acionado.
+                </li>
+                <li>
+                  Painel administrativo em <code>/admin/report-logs</code> exibe os
+                  logs com filtros por provider, busca livre, dialog de detalhes e
+                  auto-refresh a 15s, além do bloco "Pipeline Claude — Tempo Real"
+                  com as 4 fases mapeadas (Pilares, Envelope, Validação,
+                  Persistência) e barra de progresso geral.
+                </li>
+                <li>
+                  Os campos <code>ai_provider</code> e <code>ai_model</code> em
+                  <code> generated_reports</code> registram em qual modelo cada
+                  relatório foi efetivamente gerado; o histórico exibe um badge
+                  com essa informação para administradores.
+                </li>
+              </ul>
             </div>
           </CardContent>
         </Card>
