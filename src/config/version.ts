@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 69,
+  patch: 70,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.70",
+    date: "2026-05-02",
+    type: "patch" as const,
+    changes: [
+      "Navegação — item 'Ingestões' removido da sidebar. O painel de Saúde das Ingestões Oficiais (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo) foi movido para Configurações → aba Ferramentas (visível apenas para ADMIN), reduzindo poluição do menu lateral. A rota `/admin/ingestoes` continua funcional para links existentes."
+    ]
+  },
   {
     version: "1.38.69",
     date: "2026-05-02",
