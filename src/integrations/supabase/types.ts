@@ -8533,6 +8533,10 @@ export type Database = {
         Returns: Json
       }
       cancel_my_license: { Args: { p_reason: string }; Returns: undefined }
+      cleanup_email_send_log: {
+        Args: { p_retention_days?: number }
+        Returns: number
+      }
       cleanup_exam_tracking_data: { Args: never; Returns: undefined }
       clear_assessment_stale_flag: {
         Args: { p_assessment_id: string }
