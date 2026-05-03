@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 47,
+  minor: 48,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.48.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Streak diário agora é incrementado automaticamente em `awardXP` (campos `current_streak`, `longest_streak`, `last_activity_date` em `edu_user_xp`). Sequência reinicia se o aluno passar mais de um dia sem ganhar XP. Já era exibido em `/edu/conquistas`; agora atualiza em tempo real.",
+      "EDU — Recompensas desbloqueáveis: nova tabela `edu_rewards` (avatares e temas) e página `/edu/recompensas` (`EduRecompensas`) com catálogo gating por nível. Aluno pode equipar avatar/tema; preferência salva em `edu_user_xp.equipped_avatar` / `equipped_theme`. Seed com 6 avatares e 4 temas.",
+      "EDU — Compartilhamento social de conquistas: utilitário `shareAchievementImage` gera imagem 1080×1080 (canvas) com nível ou badge e dispara Web Share API (com fallback para download). Botões em `/edu/conquistas` para compartilhar progresso geral e cada badge conquistada.",
+      "EDU — Notificações por email em marcos: novos templates transacionais `edu-level-up` e `edu-badge-earned` enviados automaticamente quando aluno sobe de nível ou conquista uma badge (idempotência por nível/badge para evitar duplicatas)."
+    ]
+  },
   {
     version: "1.47.0",
     date: "2026-05-03",
