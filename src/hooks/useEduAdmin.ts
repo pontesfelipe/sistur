@@ -27,6 +27,17 @@ export interface TrainingFormData {
   modules?: unknown[];
   free_preview_seconds?: number;
   active?: boolean;
+  // Plano de Ensino (syllabus)
+  ementa?: string;
+  competencias?: string[];
+  habilidades?: string[];
+  carga_horaria_teorica?: number;
+  carga_horaria_pratica?: number;
+  bibliografia_basica?: { autor?: string; titulo?: string; ano?: string | number; link?: string }[];
+  bibliografia_complementar?: { autor?: string; titulo?: string; ano?: string | number; link?: string }[];
+  metodologia?: string;
+  criterios_avaliacao?: string;
+  prerequisitos?: string[];
 }
 
 // ============================================
