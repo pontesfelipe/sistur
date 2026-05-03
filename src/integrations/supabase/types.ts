@@ -905,18 +905,21 @@ export type Database = {
           classroom_id: string
           enrolled_at: string
           id: string
+          leaderboard_opt_in: boolean
           student_id: string
         }
         Insert: {
           classroom_id: string
           enrolled_at?: string
           id?: string
+          leaderboard_opt_in?: boolean
           student_id: string
         }
         Update: {
           classroom_id?: string
           enrolled_at?: string
           id?: string
+          leaderboard_opt_in?: boolean
           student_id?: string
         }
         Relationships: [
@@ -9139,6 +9142,17 @@ export type Database = {
           student_name: string
           total_active_minutes: number
           total_sessions: number
+        }[]
+      }
+      get_classroom_weekly_leaderboard: {
+        Args: { p_classroom_id: string }
+        Returns: {
+          display_name: string
+          level: number
+          rank: number
+          total_xp: number
+          user_id: string
+          xp_week: number
         }[]
       }
       get_dashboard_org_access_flags: {
