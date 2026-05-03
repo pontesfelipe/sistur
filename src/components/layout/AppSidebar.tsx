@@ -37,6 +37,7 @@ import {
   Map,
   Sparkles,
   Activity,
+  CalendarDays,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -83,6 +84,7 @@ const navGroups: NavGroup[] = [
       { name: 'Trilhas', href: '/edu/trilhas', icon: Map, requiresEDU: true },
       { name: 'Trilhas Adaptativas', href: '/edu/trilhas-adaptativas', icon: Sparkles, requiresEDU: true },
       { name: 'Minhas Conquistas', href: '/edu/conquistas', icon: Award, requiresEDU: true },
+      { name: 'Calendário Acadêmico', href: '/edu/calendario', icon: CalendarDays, requiresEDU: true },
       { name: 'Minhas Provas', href: '/edu/historico', icon: ScrollText, requiresEDU: true },
       { name: 'Histórico Escolar', href: '/edu/boletim', icon: ScrollText, requiresEDU: true },
       { name: 'Mensagens', href: '/edu/mensagens', icon: MessageCircle, requiresEDU: true },

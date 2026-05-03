@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 44,
+  minor: 45,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.45.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Auto-claim de badges: ao concluir o primeiro módulo de treinamento o aluno recebe `first_course`; ao se matricular em uma trilha adaptativa recebe `path_starter`; ao concluir 100% das etapas obrigatórias recebe `path_finisher`; ao tirar 100% em uma prova recebe `exam_ace`. Helper `autoClaimBadge` (`src/lib/autoClaimBadge.ts`) é idempotente, integrado em `useEnrollInPath`, `useUpdateStepProgress` (trilhas), `submitExam` (provas) e `useProgressMutations.upsertProgress` (módulos). Cada badge concedida soma seu XP de recompensa via `awardXP(source: 'badge_earned')`.",
+      "EDU — Calendário Acadêmico unificado: nova página `/edu/calendario` (`EduCalendario`) consolida lives futuras, prazos de atribuições de turma e exames dos próximos 90 dias, agrupados por dia. Botão 'Exportar .ics' gera arquivo iCalendar (RFC 5545) compatível com Google Calendar, Outlook e Apple Calendar via helper `src/lib/icsExport.ts`. Item 'Calendário Acadêmico' adicionado à sidebar de Educação."
+    ]
+  },
   {
     version: "1.44.0",
     date: "2026-05-03",

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { awardXP, XP_VALUES } from '@/lib/awardXP';
+import { autoClaimBadge } from '@/lib/autoClaimBadge';
 
 export interface AdaptivePath {
   id: string;
@@ -140,6 +141,7 @@ export function useEnrollInPath() {
     onSuccess: (_, pathId) => {
       toast.success('Matriculado na trilha!');
       qc.invalidateQueries({ queryKey: ['adaptive-enrollment', pathId] });
+      autoClaimBadge('path_starter');
     },
     onError: (e: any) => toast.error(e.message ?? 'Erro ao matricular'),
   });
@@ -201,6 +203,7 @@ export function useUpdateStepProgress() {
             reference_id: input.enrollment_id,
             description: 'Trilha concluída',
           });
+          autoClaimBadge('path_finisher');
         }
       }
     },

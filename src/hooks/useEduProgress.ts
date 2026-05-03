@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { awardXP, XP_VALUES } from '@/lib/awardXP';
+import { autoClaimBadge, countCompletedCourses } from '@/lib/autoClaimBadge';
 
 export interface DetailedProgress {
   id: string;
@@ -132,6 +133,10 @@ export function useProgressMutations() {
           points: XP_VALUES.COURSE_COMPLETED,
           reference_id: vars.training_id,
           description: 'Módulo de treinamento concluído',
+        });
+        // Auto-claim: primeira conclusão concede a badge "first_course"
+        countCompletedCourses().then((n) => {
+          if (n >= 1) autoClaimBadge('first_course');
         });
       }
     },
