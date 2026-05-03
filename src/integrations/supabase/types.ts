@@ -8663,6 +8663,23 @@ export type Database = {
         Args: { p_assignment_id: string }
         Returns: Json
       }
+      get_classroom_diary: {
+        Args: { p_classroom_id: string }
+        Returns: {
+          assignments_completed: number
+          assignments_total: number
+          attendance_days: number
+          best_exam_score: number
+          enrolled_at: string
+          exam_attempts: number
+          fraud_flags: number
+          last_seen_at: string
+          student_id: string
+          student_name: string
+          total_active_minutes: number
+          total_sessions: number
+        }[]
+      }
       get_dashboard_org_access_flags: {
         Args: never
         Returns: {
