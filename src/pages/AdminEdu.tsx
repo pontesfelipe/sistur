@@ -73,6 +73,7 @@ import { QuestionBankPanel } from '@/components/admin/QuestionBankPanel';
 import { SyllabusEditor } from '@/components/admin/SyllabusEditor';
 import { AdaptivePathEditor } from '@/components/edu/AdaptivePathEditor';
 import { BadgesAdminPanel } from '@/components/edu/BadgesAdminPanel';
+import { GamificationAdminDashboard } from '@/components/edu/GamificationAdminDashboard';
 
 const defaultFormData: TrainingFormData = {
   training_id: '',
@@ -256,7 +257,7 @@ const AdminEdu = () => {
       subtitle="Gerenciamento de treinamentos, vídeos e analytics"
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-5xl grid-cols-7">
+        <TabsList className="grid w-full max-w-6xl grid-cols-8">
           <TabsTrigger value="trainings" className="gap-2">
             <GraduationCap className="h-4 w-4" />
             Treinamentos
@@ -284,6 +285,10 @@ const AdminEdu = () => {
           <TabsTrigger value="badges" className="gap-2">
             <Award className="h-4 w-4" />
             Badges
+          </TabsTrigger>
+          <TabsTrigger value="gamification" className="gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Gamificação
           </TabsTrigger>
         </TabsList>
 
@@ -692,6 +697,10 @@ const AdminEdu = () => {
         {/* BADGES TAB */}
         <TabsContent value="badges" className="space-y-6">
           <BadgesAdminPanel />
+        </TabsContent>
+
+        <TabsContent value="gamification" className="space-y-6">
+          <GamificationAdminDashboard />
         </TabsContent>
 
         {/* ANALYTICS TAB */}
