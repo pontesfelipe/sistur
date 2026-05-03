@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 71,
+  patch: 72,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.72",
+    date: "2026-05-03",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — Conferência de dados ganhou botão 'Autofix' no Alert e dentro do Dialog 'Ver detalhes'. Ao clicar, o sistema aplica em lote o valor oficial sugerido para cada divergência diretamente em `indicator_values` (upsert por `assessment_id+indicator_id`, fonte 'Autofix — Conferência de dados'), pulando itens cujo valor sugerido não é numérico. Após o autofix basta recalcular o diagnóstico e regenerar o relatório."
+    ]
+  },
   {
     version: "1.38.71",
     date: "2026-05-03",
