@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 72,
+  patch: 73,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.73",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Plano de Ensino formal nos cursos: novos campos em `edu_trainings` (ementa, competências, habilidades, carga horária teórica/prática, bibliografia básica/complementar, metodologia, critérios de avaliação, pré-requisitos). Renderizado via novo `SyllabusPanel` na página do treinamento.",
+      "EDU — Histórico Escolar (boletim): nova página `/edu/boletim` consolida cursos cursados, status, progresso, melhor nota, tentativas e certificados, com KPIs de carga horária total e média ponderada. Função RPC `get_student_transcript` (SECURITY DEFINER) com permissão para o próprio aluno e para ADMIN/ORG_ADMIN/PROFESSOR.",
+      "Sidebar — Item 'Histórico Escolar' adicionado na seção Educação."
+    ]
+  },
   {
     version: "1.38.72",
     date: "2026-05-03",
