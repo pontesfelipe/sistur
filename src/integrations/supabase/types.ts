@@ -2580,24 +2580,34 @@ export type Database = {
         Row: {
           active: boolean
           aliases: Json
+          bibliografia_basica: Json
+          bibliografia_complementar: Json
+          carga_horaria_pratica: number | null
+          carga_horaria_teorica: number | null
+          competencias: Json
           course_code: string | null
           created_at: string
           created_by: string | null
+          criterios_avaliacao: string | null
           curriculum_level: number | null
           description: string | null
           duration_minutes: number | null
+          ementa: string | null
           free_preview_seconds: number | null
+          habilidades: Json
           ingestion_confidence: number | null
           ingestion_metadata: Json | null
           ingestion_source: string | null
           language: string | null
           level: string | null
           materials: Json | null
+          metodologia: string | null
           modules: Json
           objective: string | null
           objectives: string | null
           org_id: string | null
           pillar: string
+          prerequisitos: Json
           published_at: string | null
           slug: string | null
           source: string | null
@@ -2616,24 +2626,34 @@ export type Database = {
         Insert: {
           active?: boolean
           aliases?: Json
+          bibliografia_basica?: Json
+          bibliografia_complementar?: Json
+          carga_horaria_pratica?: number | null
+          carga_horaria_teorica?: number | null
+          competencias?: Json
           course_code?: string | null
           created_at?: string
           created_by?: string | null
+          criterios_avaliacao?: string | null
           curriculum_level?: number | null
           description?: string | null
           duration_minutes?: number | null
+          ementa?: string | null
           free_preview_seconds?: number | null
+          habilidades?: Json
           ingestion_confidence?: number | null
           ingestion_metadata?: Json | null
           ingestion_source?: string | null
           language?: string | null
           level?: string | null
           materials?: Json | null
+          metodologia?: string | null
           modules?: Json
           objective?: string | null
           objectives?: string | null
           org_id?: string | null
           pillar: string
+          prerequisitos?: Json
           published_at?: string | null
           slug?: string | null
           source?: string | null
@@ -2652,24 +2672,34 @@ export type Database = {
         Update: {
           active?: boolean
           aliases?: Json
+          bibliografia_basica?: Json
+          bibliografia_complementar?: Json
+          carga_horaria_pratica?: number | null
+          carga_horaria_teorica?: number | null
+          competencias?: Json
           course_code?: string | null
           created_at?: string
           created_by?: string | null
+          criterios_avaliacao?: string | null
           curriculum_level?: number | null
           description?: string | null
           duration_minutes?: number | null
+          ementa?: string | null
           free_preview_seconds?: number | null
+          habilidades?: Json
           ingestion_confidence?: number | null
           ingestion_metadata?: Json | null
           ingestion_source?: string | null
           language?: string | null
           level?: string | null
           materials?: Json | null
+          metodologia?: string | null
           modules?: Json
           objective?: string | null
           objectives?: string | null
           org_id?: string | null
           pillar?: string
+          prerequisitos?: Json
           published_at?: string | null
           slug?: string | null
           source?: string | null
@@ -8781,6 +8811,24 @@ export type Database = {
           org_id: string
           org_name: string
           title: string
+        }[]
+      }
+      get_student_transcript: {
+        Args: { p_user_id?: string }
+        Returns: {
+          attempts_count: number
+          best_score: number
+          certificate_id: string
+          certificate_issued_at: string
+          completed_at: string
+          course_title: string
+          curriculum_level: number
+          duration_minutes: number
+          pillar: string
+          progress_percent: number
+          started_at: string
+          status: string
+          training_id: string
         }[]
       }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
