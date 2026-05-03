@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/accordion';
 import { toast } from 'sonner';
 import { CheckCircle, Clock, FileText, Save, User } from 'lucide-react';
+import { RubricDisplay } from '@/components/edu/Rubric';
 
 interface EssayAnswer {
   attempt_id: string;
