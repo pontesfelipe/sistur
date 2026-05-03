@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { awardXP, XP_VALUES } from '@/lib/awardXP';
 
 export interface DetailedProgress {
   id: string;
@@ -122,6 +123,17 @@ export function useProgressMutations() {
       queryClient.invalidateQueries({ queryKey: ['edu-all-detailed-progress'] });
       queryClient.invalidateQueries({ queryKey: ['edu-recently-accessed'] });
       queryClient.invalidateQueries({ queryKey: ['edu-user-xp'] });
+      queryClient.invalidateQueries({ queryKey: ['my-xp'] });
+
+      // Gamificação: XP quando o módulo é marcado como concluído pela primeira vez
+      if (vars.completed_at) {
+        awardXP({
+          source: 'course_completed',
+          points: XP_VALUES.COURSE_COMPLETED,
+          reference_id: vars.training_id,
+          description: 'Módulo de treinamento concluído',
+        });
+      }
     },
   });
 
