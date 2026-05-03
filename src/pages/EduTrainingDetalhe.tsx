@@ -31,6 +31,8 @@ import { VideoPlayer } from '@/components/edu/VideoPlayer';
 import { TrainingRatingWidget } from '@/components/edu/TrainingRatingWidget';
 import { TrainingNotesPanel } from '@/components/edu/TrainingNotesPanel';
 import { SyllabusPanel } from '@/components/edu/SyllabusPanel';
+import { CourseDiscussionsPanel } from '@/components/edu/CourseDiscussionsPanel';
+import { useAuth } from '@/hooks/useAuth';
 
 interface TrainingMaterial {
   id: string;
@@ -67,6 +69,7 @@ const getFileExtension = (filename: string): string => {
 const EduTrainingDetalhe = () => {
   const { id } = useParams<{ id: string }>();
   const { data: training, isLoading, error } = useEduTraining(id);
+  const { user } = useAuth();
 
   // AVA Compliance: session tracking
   useEduSessionTracker({
@@ -402,6 +405,14 @@ const EduTrainingDetalhe = () => {
           {/* Notes Panel */}
           <TrainingNotesPanel trainingId={training.training_id} />
         </div>
+      </div>
+
+      {/* Discussion Forum (full width) */}
+      <div className="mt-6">
+        <CourseDiscussionsPanel
+          trainingId={training.training_id}
+          isInstructor={user?.id === (training as any).created_by}
+        />
       </div>
     </AppLayout>
   );

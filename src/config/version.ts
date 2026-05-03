@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 76,
+  patch: 77,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.77",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Fórum de Dúvidas por curso: novo painel `CourseDiscussionsPanel` exibido no detalhe de cada treinamento (`/edu/treinamentos/:id`). Alunos abrem tópicos com título e descrição; instrutores e demais alunos respondem em thread; autor do tópico (ou instrutor/admin) marca uma resposta como ‘aceita’, fechando a dúvida (`status = resolved`). Respostas de instrutor recebem badge `Instrutor`. Novas tabelas `course_discussions` e `course_discussion_replies` com RLS (visível a autenticados, edição/exclusão restrita ao autor/instrutor/ADMIN) e trigger automático de `reply_count`. Também criada `edu_messages` para mensageria 1:1 aluno↔professor (UI dedicada virá no próximo módulo)."
+    ]
+  },
   {
     version: "1.38.76",
     date: "2026-05-03",
