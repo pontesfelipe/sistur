@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 52,
-  patch: 4,
+  minor: 53,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.53.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "Indicadores — Normalização global dos pesos por pilar para totalizar 100% mantendo proporções relativas. Antes: RA 232%, OE 220%, AO 164%. Depois: RA/OE/AO ≈ 100% cada. Como o engine `calculate-assessment` já usa média ponderada normalizada `Σ(score×peso)/Σ(pesos)`, scores históricos não mudam (snapshots preservados). Diagnósticos existentes ficam marcados `needs_recalculation` pelo trigger; ao recalcular, o resultado é matematicamente idêntico ao anterior (apenas alinhamento à convenção da UI).",
+      "Performance — Ícones `lucide-react` agora são agrupados em um único chunk `vendor-icons`, eliminando ~80 micro-requests (~1KB cada) que inflavam a Network Dependency Tree do Lighthouse.",
+      "Performance — Desativada a geração automática de `<link rel=\"modulepreload\">` (Vite `modulePreload: false`). Antes, ~400KB de chunks de rotas lazy (FileSaver, BarChart/recharts, Configuracoes, Subscription etc.) eram pré-carregados na inicialização mesmo quando o usuário não visitava aquelas rotas. Os chunks continuam sendo baixados sob demanda via `React.lazy()`. Sem mudança de UX.",
+    ],
+  },
   {
     version: "1.52.4",
     date: "2026-05-03",
