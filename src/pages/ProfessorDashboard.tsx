@@ -32,6 +32,7 @@ import { ClassroomDiaryPanel } from '@/components/edu/ClassroomDiaryPanel';
 import { ProfessorAnalyticsPanel } from '@/components/edu/ProfessorAnalyticsPanel';
 import { ClassroomAnnouncementsPanel } from '@/components/edu/ClassroomAnnouncementsPanel';
 import { ClassroomLeaderboardPanel } from '@/components/edu/ClassroomLeaderboardPanel';
+import { ProfessorOverviewPanel } from '@/components/edu/ProfessorOverviewPanel';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
