@@ -23,6 +23,12 @@ export default defineConfig(({ mode }) => ({
     css: false,
   },
   build: {
+    // Disable automatic modulepreload of every transitive dynamic-import chunk.
+    // Default behavior preloads ~400KB of route code (FileSaver, recharts,
+    // Configuracoes, etc.) that the user may never navigate to, inflating the
+    // "unused JavaScript" Lighthouse metric. Lazy chunks are still fetched on
+    // demand when their route is visited.
+    modulePreload: { polyfill: false },
     rollupOptions: {
       output: {
         manualChunks(id) {
