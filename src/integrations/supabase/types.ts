@@ -1703,6 +1703,42 @@ export type Database = {
           },
         ]
       }
+      edu_badges: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          criteria: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          criteria?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          title: string
+          xp_reward?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          criteria?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       edu_courses: {
         Row: {
           audience: Database["public"]["Enums"]["target_agent"] | null
@@ -3121,6 +3157,35 @@ export type Database = {
         }
         Relationships: []
       }
+      edu_user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "edu_badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       edu_user_xp: {
         Row: {
           current_streak: number | null
@@ -3150,6 +3215,36 @@ export type Database = {
           longest_streak?: number | null
           total_xp?: number | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      edu_xp_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          points: number
+          reference_id: string | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          points: number
+          reference_id?: string | null
+          source: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          points?: number
+          reference_id?: string | null
+          source?: string
           user_id?: string
         }
         Relationships: []
