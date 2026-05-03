@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 40,
+  minor: 41,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.41.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Anúncios da Turma: nova tabela `classroom_announcements` (título, corpo, fixado, autor) com RLS (professor dono e ADMIN gerenciam; alunos matriculados visualizam). Novo `ClassroomAnnouncementsPanel` integrado ao detalhe da sala em `/professor/dashboard` (professor publica, fixa/desafixa e remove avisos).",
+      "EDU — Minhas Turmas (visão do aluno): nova página `/edu/turmas` (`EduMinhasTurmas`) lista as turmas em que o aluno está matriculado e exibe os anúncios do professor selecionado. Item 'Minhas Turmas' adicionado à sidebar de Educação."
+    ]
+  },
   {
     version: "1.40.0",
     date: "2026-05-03",
