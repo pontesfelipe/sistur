@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 52,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.52.1",
+    date: "2026-05-03",
+    type: "patch" as const,
+    changes: [
+      "Mensagens — `list_message_contacts` agora também inclui membros aprovados da mesma organização (além das turmas), permitindo que professores, administradores e usuários sem turma iniciem conversas. Continuam excluídos: contas pendentes e organizações padrão Autônomo/Temporário.",
+    ],
+  },
   {
     version: "1.52.0",
     date: "2026-05-03",
