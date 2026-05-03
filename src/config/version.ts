@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 48,
+  minor: 49,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.49.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Missões diárias: nova tabela `edu_daily_missions` (RLS por aluno) com 3 desafios rotativos por dia sorteados deterministicamente a partir de `user_id + data` a partir de um catálogo fixo (`MISSION_CATALOG` em `src/hooks/useDailyMissions.ts`). Helper `progressDailyMissions(source)` é chamado em fire-and-forget pelo `awardXP` e avança automaticamente as missões compatíveis com a fonte do XP (módulo, curso, prova, badge). Ao concluir, missão paga XP bônus uma única vez (`bonus_awarded`). Painel `DailyMissionsPanel` adicionado ao topo de `/edu/conquistas`.",
+      "EDU — Dashboard admin de Gamificação: nova aba 'Gamificação' em `/admin/edu` (`GamificationAdminDashboard`) consolida totais (alunos com XP, badges concedidas, missões 7d), gráfico de missões diárias concluídas nos últimos 7 dias, ranking Top 10 de XP (com nível e streak) e ranking de badges mais conquistadas. Lê de `edu_user_xp`, `edu_user_badges`, `edu_badges`, `edu_daily_missions` e `profiles`."
+    ]
+  },
   {
     version: "1.48.0",
     date: "2026-05-03",

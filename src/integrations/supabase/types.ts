@@ -1795,6 +1795,51 @@ export type Database = {
           },
         ]
       }
+      edu_daily_missions: {
+        Row: {
+          bonus_awarded: boolean
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          mission_code: string
+          mission_date: string
+          progress: number
+          target: number
+          title: string
+          user_id: string
+          xp_reward: number
+        }
+        Insert: {
+          bonus_awarded?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          mission_code: string
+          mission_date?: string
+          progress?: number
+          target?: number
+          title: string
+          user_id: string
+          xp_reward?: number
+        }
+        Update: {
+          bonus_awarded?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          mission_code?: string
+          mission_date?: string
+          progress?: number
+          target?: number
+          title?: string
+          user_id?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       edu_detailed_progress: {
         Row: {
           completed_at: string | null

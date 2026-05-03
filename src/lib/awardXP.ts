@@ -80,6 +80,13 @@ export async function awardXP(input: {
         });
       } catch {}
     }
+
+    // Avanço de missões diárias compatíveis com a fonte do XP
+    if (input.source !== 'manual') {
+      import('@/hooks/useDailyMissions')
+        .then(({ progressDailyMissions }) => progressDailyMissions(input.source as any))
+        .catch(() => {});
+    }
   } catch (e) {
     console.warn('[awardXP] falhou silenciosamente:', e);
   }
