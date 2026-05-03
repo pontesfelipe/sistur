@@ -70,6 +70,7 @@ import { ImportReviewQueue } from '@/components/edu/ImportReviewQueue';
 import { EssayGradingPanel } from '@/components/admin/EssayGradingPanel';
 import { QuestionBankPanel } from '@/components/admin/QuestionBankPanel';
 import { SyllabusEditor } from '@/components/admin/SyllabusEditor';
+import { AdaptivePathEditor } from '@/components/edu/AdaptivePathEditor';
 
 const defaultFormData: TrainingFormData = {
   training_id: '',
@@ -253,10 +254,14 @@ const AdminEdu = () => {
       subtitle="Gerenciamento de treinamentos, vídeos e analytics"
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-3xl grid-cols-5">
+        <TabsList className="grid w-full max-w-4xl grid-cols-6">
           <TabsTrigger value="trainings" className="gap-2">
             <GraduationCap className="h-4 w-4" />
             Treinamentos
+          </TabsTrigger>
+          <TabsTrigger value="paths" className="gap-2">
+            <FileText className="h-4 w-4" />
+            Trilhas
           </TabsTrigger>
           <TabsTrigger value="quizzes" className="gap-2">
             <CheckCircle className="h-4 w-4" />
