@@ -411,7 +411,7 @@ const EduTrainingDetalhe = () => {
       <div className="mt-6">
         <CourseDiscussionsPanel
           trainingId={training.training_id}
-          isInstructor={user?.id === training.created_by}
+          isInstructor={user?.id === (training as any).created_by}
         />
       </div>
     </AppLayout>
