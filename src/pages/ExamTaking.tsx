@@ -464,6 +464,7 @@ const ExamTaking = () => {
           <CardContent>
             {isEssayQuestion ? (
               <div className="space-y-3">
+                <RubricDisplay rubric={(currentQuestion as any)?.rubric} />
                 <Textarea
                   placeholder="Digite sua resposta dissertativa..."
                   value={answers[currentQuestionId || ''] || ''}
