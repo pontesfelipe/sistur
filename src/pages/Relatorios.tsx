@@ -1417,6 +1417,15 @@ export default function Relatorios() {
                           {renderMarkdown(selectedHistoryReport.report_content)}
                         </div>
                       </ScrollArea>
+                      <div className="mt-6">
+                        <CommentsPanel
+                          entityType="report"
+                          entityId={selectedHistoryReport.id}
+                          orgId={selectedHistoryReport.org_id}
+                          title="Comentários do relatório"
+                          description="Discuta este relatório com sua equipe. Use @ para mencionar colegas da organização."
+                        />
+                      </div>
                     </>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
