@@ -4,6 +4,8 @@ import { Badge as UIBadge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Trophy, Star, Flag, Map as MapIcon, Flame, Sparkles, Award } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { useMemo } from 'react';
 import {
   useMyXP,
   useMyXPEvents,
@@ -30,6 +32,25 @@ export default function EduConquistas() {
   );
 
   const earnedSet = new Set((mine ?? []).map((m) => m.badge_id));
+
+  // XP por mês (últimos 6 meses) a partir dos eventos
+  const monthlyXP = useMemo(() => {
+    const now = new Date();
+    const buckets: { key: string; label: string; xp: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const label = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+      buckets.push({ key, label, xp: 0 });
+    }
+    (events ?? []).forEach((e) => {
+      const d = new Date(e.created_at);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const b = buckets.find((x) => x.key === key);
+      if (b) b.xp += e.points;
+    });
+    return buckets;
+  }, [events]);
 
   return (
     <AppLayout title="Minhas Conquistas">
@@ -112,6 +133,27 @@ export default function EduConquistas() {
             <CardTitle className="text-base">Histórico de XP</CardTitle>
             <CardDescription>Últimos 50 eventos</CardDescription>
           </CardHeader>
+          <CardContent className="pb-0">
+            <div className="h-44">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyXP} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
+                    formatter={(v: any) => [`${v} XP`, 'Ganho no mês']}
+                  />
+                  <Bar dataKey="xp" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
           <CardContent>
             {!events?.length ? (
               <p className="text-sm text-muted-foreground py-4 text-center">Sem eventos ainda. Conclua cursos e etapas para começar.</p>

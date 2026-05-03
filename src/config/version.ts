@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 46,
+  minor: 47,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.47.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Painel admin de Badges: nova aba 'Badges' em `/admin/edu` (`BadgesAdminPanel`) permite criar, editar e remover badges customizadas (código, título, descrição, critério, ícone, XP de recompensa, ativa/inativa). Cache de catálogo invalidado automaticamente para refletir nas páginas dos alunos. Novas badges criadas pelo admin podem ser concedidas via `autoClaimBadge(code)` em qualquer fluxo futuro.",
+      "EDU — Histórico mensal de XP em `/edu/conquistas`: novo gráfico de barras (Recharts) mostra XP ganho por mês nos últimos 6 meses, calculado a partir de `edu_xp_events`. Permite ao aluno visualizar progresso e identificar períodos de maior engajamento."
+    ]
+  },
   {
     version: "1.46.0",
     date: "2026-05-03",
