@@ -668,6 +668,11 @@ const AdminEdu = () => {
           <EssayGradingPanel />
         </TabsContent>
 
+        {/* ADAPTIVE PATHS TAB */}
+        <TabsContent value="paths" className="space-y-6">
+          <AdaptivePathEditor />
+        </TabsContent>
+
         {/* QUIZZES TAB */}
         <TabsContent value="quizzes" className="space-y-6">
           <QuestionBankPanel />

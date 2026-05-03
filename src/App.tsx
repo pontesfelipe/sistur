@@ -282,6 +282,14 @@ const App = () => {
                   }
                 />
                 <Route
+                  path="/edu/conquistas"
+                  element={
+                    <EduRoute>
+                      <EduConquistas />
+                    </EduRoute>
+                  }
+                />
+                <Route
                   path="/configuracoes"
                   element={
                     <AdminRoute>
