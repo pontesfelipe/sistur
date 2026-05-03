@@ -527,6 +527,11 @@ const AdminEdu = () => {
                       </div>
                     )}
                   </div>
+
+                  <SyllabusEditor
+                    value={formData}
+                    onChange={(patch) => setFormData(prev => ({ ...prev, ...patch }))}
+                  />
                 </div>
                 <div className="flex justify-end gap-3">
                   <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
