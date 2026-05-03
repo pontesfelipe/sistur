@@ -1037,6 +1037,16 @@ const DiagnosticoDetalhe = () => {
           <TabsContent value="projeto">
             <CreateProjectFromDiagnosticView assessmentId={id!} destinationId={assessment?.destination_id} />
           </TabsContent>
+
+          <TabsContent value="comentarios">
+            <CommentsPanel
+              entityType="assessment"
+              entityId={id!}
+              orgId={assessment.org_id}
+              title="Discussão sobre o diagnóstico"
+              description="Compartilhe observações com sua equipe e marque colegas com @ para envolvê-los."
+            />
+          </TabsContent>
         </Tabs>
       ) : (
         /* Pre-calculation state */
