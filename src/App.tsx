@@ -70,6 +70,7 @@ const Tutorial = lazy(() => import("./pages/Tutorial"));
 const TutorialDetail = lazy(() => import("./pages/TutorialDetail"));
 const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
 const MinhasAtividades = lazy(() => import("./pages/MinhasAtividades"));
+const EduHistoricoEscolar = lazy(() => import("./pages/EduHistoricoEscolar"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
