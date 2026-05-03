@@ -1241,6 +1241,97 @@ export type Database = {
           },
         ]
       }
+      course_discussion_replies: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          discussion_id: string
+          id: string
+          is_accepted: boolean
+          is_instructor_reply: boolean
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          discussion_id: string
+          id?: string
+          is_accepted?: boolean
+          is_instructor_reply?: boolean
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          discussion_id?: string
+          id?: string
+          is_accepted?: boolean
+          is_instructor_reply?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_discussion_replies_discussion_id_fkey"
+            columns: ["discussion_id"]
+            isOneToOne: false
+            referencedRelation: "course_discussions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_discussions: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          org_id: string | null
+          pinned: boolean
+          reply_count: number
+          status: string
+          title: string
+          training_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          org_id?: string | null
+          pinned?: boolean
+          reply_count?: number
+          status?: string
+          title: string
+          training_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          org_id?: string | null
+          pinned?: boolean
+          reply_count?: number
+          status?: string
+          title?: string
+          training_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_discussions_training_id_fkey"
+            columns: ["training_id"]
+            isOneToOne: false
+            referencedRelation: "edu_trainings"
+            referencedColumns: ["training_id"]
+          },
+        ]
+      }
       course_prerequisites: {
         Row: {
           course_id: string
@@ -2001,6 +2092,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      edu_messages: {
+        Row: {
+          body: string
+          context_classroom_id: string | null
+          context_training_id: string | null
+          created_at: string
+          id: string
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          context_classroom_id?: string | null
+          context_training_id?: string | null
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          context_classroom_id?: string | null
+          context_training_id?: string | null
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: []
       }
       edu_module_lives: {
         Row: {
