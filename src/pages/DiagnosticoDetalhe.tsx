@@ -841,7 +841,7 @@ const DiagnosticoDetalhe = () => {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className={cn(
             "grid w-full",
-            isEnterprise ? "max-w-5xl grid-cols-8" : "max-w-4xl grid-cols-7"
+            isEnterprise ? "max-w-6xl grid-cols-9" : "max-w-5xl grid-cols-8"
           )}>
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
