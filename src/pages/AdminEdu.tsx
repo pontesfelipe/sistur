@@ -69,6 +69,7 @@ import {
 import { ImportReviewQueue } from '@/components/edu/ImportReviewQueue';
 import { EssayGradingPanel } from '@/components/admin/EssayGradingPanel';
 import { QuestionBankPanel } from '@/components/admin/QuestionBankPanel';
+import { SyllabusEditor } from '@/components/admin/SyllabusEditor';
 
 const defaultFormData: TrainingFormData = {
   training_id: '',
@@ -139,6 +140,16 @@ const AdminEdu = () => {
       language: training.language || 'pt-BR',
       video_url: training.video_url || '',
       video_provider: (training.video_provider as 'supabase' | 'mux' | 'vimeo' | 'youtube') || 'supabase',
+      ementa: (training as any).ementa || '',
+      competencias: Array.isArray((training as any).competencias) ? (training as any).competencias : [],
+      habilidades: Array.isArray((training as any).habilidades) ? (training as any).habilidades : [],
+      carga_horaria_teorica: (training as any).carga_horaria_teorica ?? undefined,
+      carga_horaria_pratica: (training as any).carga_horaria_pratica ?? undefined,
+      bibliografia_basica: Array.isArray((training as any).bibliografia_basica) ? (training as any).bibliografia_basica : [],
+      bibliografia_complementar: Array.isArray((training as any).bibliografia_complementar) ? (training as any).bibliografia_complementar : [],
+      metodologia: (training as any).metodologia || '',
+      criterios_avaliacao: (training as any).criterios_avaliacao || '',
+      prerequisitos: Array.isArray((training as any).prerequisitos) ? (training as any).prerequisitos : [],
     });
     setIsDialogOpen(true);
   };
@@ -516,6 +527,11 @@ const AdminEdu = () => {
                       </div>
                     )}
                   </div>
+
+                  <SyllabusEditor
+                    value={formData}
+                    onChange={(patch) => setFormData(prev => ({ ...prev, ...patch }))}
+                  />
                 </div>
                 <div className="flex justify-end gap-3">
                   <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
