@@ -80,6 +80,7 @@ const navGroups: NavGroup[] = [
       { name: 'Catálogo', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true },
       { name: 'Trilhas', href: '/edu/trilhas', icon: Map, requiresEDU: true },
       { name: 'Minhas Provas', href: '/edu/historico', icon: ScrollText, requiresEDU: true },
+      { name: 'Histórico Escolar', href: '/edu/boletim', icon: ScrollText, requiresEDU: true },
       { name: 'Meus Certificados', href: '/certificados', icon: Award, requiresEDU: true },
       { name: 'Treinamento Sob Demanda', href: '/edu/solicitacoes', icon: Sparkles, requiresEDU: true },
       { name: 'Gestão de Treinamentos', href: '/professor', icon: BookOpen, requiresProfessor: true },
