@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download, Pencil, Save, Loader2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download, Pencil, Save, Loader2, Zap } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -57,6 +57,7 @@ export function ReportValidationBanner({
   const [editDraft, setEditDraft] = useState<string>('');
   const [savingReport, setSavingReport] = useState(false);
   const [fixIndicator, setFixIndicator] = useState<AutoCorrection | null>(null);
+  const [autofixing, setAutofixing] = useState(false);
   const { profile, isAdmin } = useProfileContext();
   const queryClient = useQueryClient();
 
@@ -67,6 +68,89 @@ export function ReportValidationBanner({
       (isAdmin || (reportOwnerId && reportOwnerId === profile.user_id)),
   );
   const canFixIndicator = Boolean(assessmentId && (isAdmin || profile?.user_id));
+
+  /**
+   * Tenta extrair um número a partir do texto sugerido pela validação
+   * (ex.: "R$ 1.234,56", "42,5%", "12 mil"). Retorna null se não der.
+   */
+  const parseSuggestedNumber = (raw: string): number | null => {
+    if (!raw) return null;
+    const cleaned = raw
+      .replace(/[R$\s%]/gi, '')
+      .replace(/\.(?=\d{3}(\D|$))/g, '') // remove milhar
+      .replace(',', '.')
+      .match(/-?\d+(\.\d+)?/);
+    if (!cleaned) return null;
+    const n = Number(cleaned[0]);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const runAutofix = async (corrections: AutoCorrection[]) => {
+    if (!assessmentId || corrections.length === 0) return;
+    setAutofixing(true);
+    try {
+      // Resolve org + códigos -> indicator_id
+      const { data: a } = await supabase
+        .from('assessments')
+        .select('org_id')
+        .eq('id', assessmentId)
+        .maybeSingle();
+      const orgId = a?.org_id;
+      if (!orgId) {
+        toast.error('Diagnóstico não encontrado.');
+        return;
+      }
+      const codes = Array.from(new Set(corrections.map((c) => c.indicator)));
+      const { data: inds } = await supabase
+        .from('indicators')
+        .select('id, code')
+        .in('code', codes);
+      const byCode = new Map((inds ?? []).map((i: any) => [i.code, i.id]));
+
+      const rows: any[] = [];
+      const skipped: string[] = [];
+      for (const c of corrections) {
+        const indicatorId = byCode.get(c.indicator);
+        if (!indicatorId) {
+          skipped.push(`${c.indicator} (não encontrado no catálogo)`);
+          continue;
+        }
+        const numeric = parseSuggestedNumber(c.to);
+        if (numeric === null) {
+          skipped.push(`${c.indicator} (valor "${c.to}" não numérico)`);
+          continue;
+        }
+        rows.push({
+          org_id: orgId,
+          assessment_id: assessmentId,
+          indicator_id: indicatorId,
+          value_raw: numeric,
+          value_text: c.to,
+          source: 'Autofix — Conferência de dados',
+        });
+      }
+
+      if (rows.length === 0) {
+        toast.warning('Nenhuma correção pôde ser aplicada automaticamente.');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('indicator_values')
+        .upsert(rows, { onConflict: 'assessment_id,indicator_id' });
+      if (error) {
+        toast.error(error.message || 'Falha ao aplicar autofix.');
+        return;
+      }
+      const msg = `${rows.length} indicador(es) corrigido(s) na tabela de auditoria.${
+        skipped.length ? ` ${skipped.length} ignorado(s).` : ''
+      } Recalcule o diagnóstico e regenere o relatório.`;
+      toast.success(msg);
+      queryClient.invalidateQueries({ queryKey: ['indicator-values', assessmentId] });
+    } finally {
+      setAutofixing(false);
+    }
+  };
 
   useEffect(() => {
     if (editReportOpen) setEditDraft(reportContent ?? '');
@@ -233,6 +317,23 @@ export function ReportValidationBanner({
             <Button type="button" variant="outline" size="sm" onClick={() => setOpen(true)}>
               Ver detalhes
             </Button>
+            {canFixIndicator && correctionsCount > 0 && (
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                className="gap-1"
+                onClick={() => runAutofix(corrections)}
+                disabled={autofixing}
+              >
+                {autofixing ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Zap className="h-3.5 w-3.5" />
+                )}
+                Autofix ({correctionsCount})
+              </Button>
+            )}
             {canEditReport && (
               <Button
                 type="button"
