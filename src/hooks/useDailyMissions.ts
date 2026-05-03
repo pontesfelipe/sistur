@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -109,7 +109,9 @@ export function useDailyMissions() {
  * Quando a missão atinge o alvo, paga o XP bônus uma única vez.
  * Chamado fire-and-forget após eventos de XP.
  */
-export async function progressDailyMissions(source: DailyMission extends never ? never : 'step_completed' | 'course_completed' | 'exam_passed' | 'badge_earned') {
+export async function progressDailyMissions(
+  source: 'step_completed' | 'course_completed' | 'exam_passed' | 'badge_earned',
+) {
   try {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
