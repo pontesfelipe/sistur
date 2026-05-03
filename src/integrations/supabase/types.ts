@@ -7319,6 +7319,7 @@ export type Database = {
           pillar: string
           question_type: Database["public"]["Enums"]["question_type"]
           quiz_id: string
+          rubric: Json | null
           stem: string
           theme: string | null
           updated_at: string
@@ -7336,6 +7337,7 @@ export type Database = {
           pillar: string
           question_type?: Database["public"]["Enums"]["question_type"]
           quiz_id?: string
+          rubric?: Json | null
           stem: string
           theme?: string | null
           updated_at?: string
@@ -7353,6 +7355,7 @@ export type Database = {
           pillar?: string
           question_type?: Database["public"]["Enums"]["question_type"]
           quiz_id?: string
+          rubric?: Json | null
           stem?: string
           theme?: string | null
           updated_at?: string
