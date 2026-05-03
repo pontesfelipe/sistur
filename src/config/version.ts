@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 39,
-  patch: 1,
+  minor: 40,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,11 +23,19 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.40.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Mensageria 1:1 aluno↔instrutor: nova página `/edu/mensagens` (`EduMensagens`) com lista de conversas (busca, contagem de não lidas, prévia da última mensagem) e thread de mensagens (envio com Enter, marcação automática como lida ao abrir). Integra a tabela `edu_messages`. Hooks `useConversations`, `useConversationMessages`, `useSendMessage`, `useUnreadMessageCount`. Atalho 'Falar com instrutor' adicionado no detalhe do treinamento (quando o usuário não é o próprio instrutor) e item 'Mensagens' na sidebar de Educação."
+    ]
+  },
+  {
     version: "1.39.1",
     date: "2026-05-03",
     type: "patch" as const,
     changes: [
-      "EDU — Mensageria 1:1 aluno↔instrutor: nova página `/edu/mensagens` (`EduMensagens`) com lista de conversas (busca, contagem de não lidas, prévia da última mensagem) e thread de mensagens (envio com Enter, marcação automática como lida ao abrir). Integra a tabela `edu_messages` já existente. Hooks `useConversations`, `useConversationMessages`, `useSendMessage`, `useUnreadMessageCount`. Atalho 'Falar com instrutor' adicionado no detalhe do treinamento (quando o usuário não é o próprio instrutor) e item 'Mensagens' na sidebar de Educação."
+      "(Reagrupado em 1.40.0)"
     ]
   },
   {
