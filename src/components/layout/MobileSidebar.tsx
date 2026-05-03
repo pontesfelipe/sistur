@@ -29,6 +29,7 @@ import {
   Map,
   Sparkles,
   Shield,
+  Users,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { Button } from '@/components/ui/button';
