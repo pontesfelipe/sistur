@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 42,
+  minor: 43,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.43.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Editor admin de Trilhas Adaptativas: nova aba 'Trilhas' em `/admin/edu` (`AdaptivePathEditor`) permite criar, editar (título, descrição, pilar, nível, adaptativa, publicada) e remover trilhas; gerenciar etapas com ordem, curso vinculado, gatilho por status do diagnóstico (Atenção/Crítico/any), nota mínima e flag opcional.",
+      "EDU — Gamificação (fundação): novas tabelas `edu_xp_events`, `edu_badges` e `edu_user_badges` (RLS: aluno vê o seu, ADMIN vê tudo; catálogo público para autenticados; gestão restrita ao ADMIN). Seed de 5 badges iniciais (first_course, path_starter, path_finisher, exam_ace, week_streak). Hooks `useMyXP`, `useMyXPEvents`, `useBadges`, `useMyBadges`, `useAwardXP`, `useClaimBadge` com curva de nível `xp = round(100 * level^1.5)`.",
+      "EDU — Nova página `/edu/conquistas` (`EduConquistas`) exibe nível atual, XP totais, progresso para o próximo nível, streak de estudo, catálogo completo de badges (conquistadas vs disponíveis com critério) e histórico dos últimos 50 eventos de XP. Item 'Minhas Conquistas' adicionado à sidebar de Educação."
+    ]
+  },
   {
     version: "1.42.0",
     date: "2026-05-03",
