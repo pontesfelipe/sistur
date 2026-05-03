@@ -40,6 +40,18 @@ export async function autoClaimBadge(code: string) {
         description: `Badge: ${badge.title}`,
       });
     }
+
+    // Email de badge conquistada (best-effort)
+    try {
+      await supabase.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'edu-badge-earned',
+          recipientEmail: u.user.email,
+          idempotencyKey: `badge-${uid}-${badge.id}`,
+          templateData: { badgeTitle: badge.title, xpReward: badge.xp_reward },
+        },
+      });
+    } catch {}
   } catch (e) {
     console.warn('[autoClaimBadge] falhou silenciosamente:', e);
   }
