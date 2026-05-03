@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 45,
+  minor: 46,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.46.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Placar semanal opt-in da turma: nova flag `leaderboard_opt_in` em `classroom_students` (padrão desligado, privacy-first). RPC `get_classroom_weekly_leaderboard` retorna ranking de XP dos últimos 7 dias somando apenas alunos que optaram por participar; acesso liberado ao professor dono, ADMIN e alunos opt-in da turma. Componente `ClassroomLeaderboardPanel` com switch de opt-in para o aluno, exibido em `/edu/turmas` (visão aluno) e em cada sala no `/professor/dashboard` (visão professor, sem switch).",
+      "EDU — Notificação automática de badge: trigger `notify_badge_earned` em `edu_user_badges` cria notificação in-app (`edu_notifications`) com link para `/edu/conquistas` sempre que uma badge é concedida (manual ou via auto-claim). Aluno é avisado sem precisar atualizar a página."
+    ]
+  },
   {
     version: "1.45.0",
     date: "2026-05-03",
