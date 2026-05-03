@@ -25,12 +25,22 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Only keep framework essentials as shared vendor chunks
-          // Charts, Supabase, and UI libs are split automatically into
-          // the lazy-loaded page chunks that import them
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-query': ['@tanstack/react-query'],
+        manualChunks(id) {
+          // Framework essentials
+          if (id.includes('node_modules/react-router-dom') ||
+              id.includes('node_modules/react-dom') ||
+              (id.includes('node_modules/react/') && !id.includes('react-'))) {
+            return 'vendor-react';
+          }
+          if (id.includes('node_modules/@tanstack/react-query')) {
+            return 'vendor-query';
+          }
+          // Collapse all lucide-react icon files into one chunk
+          // (otherwise each icon becomes its own ~1KB request, inflating
+          // the network dependency tree dramatically).
+          if (id.includes('node_modules/lucide-react')) {
+            return 'vendor-icons';
+          }
         },
       },
     },
