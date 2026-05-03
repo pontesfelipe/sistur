@@ -1146,7 +1146,12 @@ export default function Relatorios() {
                     </div>
                   )}
                   {report && !isGenerating && selectedAssessmentId && (
-                    <ReportValidationBanner assessmentId={selectedAssessmentId} />
+                    <ReportValidationBanner
+                      assessmentId={selectedAssessmentId}
+                      reportContent={report}
+                      reportOwnerId={profile?.user_id}
+                      onReportContentSaved={(c) => setReport(c)}
+                    />
                   )}
                   <ScrollArea className="h-[600px] pr-4">
                     <div ref={reportRef} className="prose prose-sm max-w-none">
@@ -1397,7 +1402,15 @@ export default function Relatorios() {
                 <CardContent>
                   {selectedHistoryReport ? (
                     <>
-                      <ReportValidationBanner reportId={selectedHistoryReport.id} />
+                      <ReportValidationBanner
+                        reportId={selectedHistoryReport.id}
+                        assessmentId={selectedHistoryReport.assessment_id}
+                        reportContent={selectedHistoryReport.report_content}
+                        reportOwnerId={selectedHistoryReport.created_by}
+                        onReportContentSaved={(c) =>
+                          setSelectedHistoryReport({ ...selectedHistoryReport, report_content: c })
+                        }
+                      />
                       <ScrollArea className="h-[500px] pr-4">
                         <div ref={historyReportRef} className="prose prose-sm max-w-none">
                           {renderMarkdown(selectedHistoryReport.report_content)}
