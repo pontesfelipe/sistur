@@ -44,6 +44,7 @@ import {
   Play,
   Youtube,
   FileText,
+  Award,
 } from 'lucide-react';
 import { useAdminTrainings, useAdminTrainingMutations, useVideoUpload, type TrainingFormData } from '@/hooks/useEduAdmin';
 import { useAdminEnrollmentStats, useAdminEventStats } from '@/hooks/useEduEnrollments';
