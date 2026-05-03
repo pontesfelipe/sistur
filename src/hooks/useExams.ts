@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { awardXP, XP_VALUES } from '@/lib/awardXP';
 
 // ============================================
 // TYPES
@@ -551,17 +552,29 @@ export function useExamAnswerMutations() {
       });
 
       if (error) throw error;
-      return data as {
+      const result = data as {
         attempt_id: string;
         score_pct: number;
         result: 'passed' | 'failed' | 'pending';
         grading_mode: 'automatic' | 'hybrid' | 'manual';
         certificate_id: string | null;
       };
+
+      // Gamificação: XP por prova aprovada (não conta para hybrid pendente)
+      if (result.result === 'passed') {
+        awardXP({
+          source: 'exam_passed',
+          points: XP_VALUES.EXAM_PASSED,
+          reference_id: result.attempt_id,
+          description: `Prova aprovada (${result.score_pct.toFixed(0)}%)`,
+        });
+      }
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['exam-attempt'] });
       queryClient.invalidateQueries({ queryKey: ['user-exams'] });
+      queryClient.invalidateQueries({ queryKey: ['my-xp'] });
       toast.success('Prova enviada com sucesso!');
     },
     onError: (error) => {
