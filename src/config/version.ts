@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 38,
-  patch: 77,
+  minor: 39,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,9 +23,23 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.38.77",
+    version: "1.39.0",
     date: "2026-05-03",
     type: "minor" as const,
+    changes: [
+      "EDU — Consolidação do LMS como sistema educacional completo. Bump MINOR agrupando as novas capacidades entregues nesta linha (anteriormente registradas como patch):",
+      "• Plano de Ensino formal por curso (ementa, competências, habilidades, carga horária teórica/prática, metodologia, critérios de avaliação, bibliografia básica/complementar, pré-requisitos) com `SyllabusPanel` no detalhe do treinamento e `SyllabusEditor` no painel administrativo.",
+      "• Histórico Escolar / Boletim do aluno em `/edu/boletim` com cursos cursados, status, progresso, melhor nota, tentativas, certificados, carga horária total e média ponderada (RPC `get_student_transcript`).",
+      "• Diário de Classe consolidado (`ClassroomDiaryPanel`) no detalhe da sala em `/professor/dashboard`: presença, tempo ativo, atividades concluídas, melhor nota e alertas de fraude por aluno; KPIs e exportação CSV (Excel-BR). RPC `get_classroom_diary`.",
+      "• Rubricas de avaliação para questões dissertativas: coluna `rubric` (jsonb) em `quiz_questions`, `RubricEditor` no banco de questões, exibição obrigatória ao corretor e opcional ao aluno antes da resposta.",
+      "• Fórum de Dúvidas por curso (`CourseDiscussionsPanel`) com tópicos, respostas em thread, badge de Instrutor e marcação de resposta aceita (fecha como `resolved`). Tabelas `course_discussions` e `course_discussion_replies` com RLS e trigger automático de `reply_count`.",
+      "• Fundação para mensageria 1:1 aluno↔professor: tabela `edu_messages` criada com RLS (UI dedicada será entregue na próxima minor)."
+    ]
+  },
+  {
+    version: "1.38.77",
+    date: "2026-05-03",
+    type: "patch" as const,
     changes: [
       "EDU — Fórum de Dúvidas por curso: novo painel `CourseDiscussionsPanel` exibido no detalhe de cada treinamento (`/edu/treinamentos/:id`). Alunos abrem tópicos com título e descrição; instrutores e demais alunos respondem em thread; autor do tópico (ou instrutor/admin) marca uma resposta como ‘aceita’, fechando a dúvida (`status = resolved`). Respostas de instrutor recebem badge `Instrutor`. Novas tabelas `course_discussions` e `course_discussion_replies` com RLS (visível a autenticados, edição/exclusão restrita ao autor/instrutor/ADMIN) e trigger automático de `reply_count`. Também criada `edu_messages` para mensageria 1:1 aluno↔professor (UI dedicada virá no próximo módulo)."
     ]
