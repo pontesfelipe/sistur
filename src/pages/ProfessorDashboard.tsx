@@ -247,6 +247,8 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
     <div className="space-y-6">
       <Button variant="ghost" onClick={onBack}>← Voltar</Button>
 
+      <ClassroomDiaryPanel classroomId={classroomId} />
+
       {/* Members */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
