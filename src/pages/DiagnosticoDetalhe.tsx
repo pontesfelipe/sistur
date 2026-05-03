@@ -8,6 +8,7 @@ import { IssuesView } from '@/components/dashboard/IssuesView';
 import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendationsPanel';
 import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
 import { CreateProjectFromDiagnosticView } from '@/components/dashboard/CreateProjectFromDiagnosticView';
+import { CommentsPanel } from '@/components/discussions/CommentsPanel';
 import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
 import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculationChecklist';
 import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePanel';
@@ -66,6 +67,7 @@ import {
   BookOpen,
   RefreshCw,
   Target,
+  MessageSquare,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -839,7 +841,7 @@ const DiagnosticoDetalhe = () => {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className={cn(
             "grid w-full",
-            isEnterprise ? "max-w-5xl grid-cols-8" : "max-w-4xl grid-cols-7"
+            isEnterprise ? "max-w-6xl grid-cols-9" : "max-w-5xl grid-cols-8"
           )}>
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -874,6 +876,10 @@ const DiagnosticoDetalhe = () => {
             <TabsTrigger value="projeto" className="gap-2">
               <FolderKanban className="h-4 w-4" />
               <span className="hidden sm:inline">Projeto</span>
+            </TabsTrigger>
+            <TabsTrigger value="comentarios" className="gap-2">
+              <MessageSquare className="h-4 w-4" />
+              <span className="hidden sm:inline">Comentários</span>
             </TabsTrigger>
           </TabsList>
 
@@ -1030,6 +1036,16 @@ const DiagnosticoDetalhe = () => {
           {/* Projeto Tab */}
           <TabsContent value="projeto">
             <CreateProjectFromDiagnosticView assessmentId={id!} destinationId={assessment?.destination_id} />
+          </TabsContent>
+
+          <TabsContent value="comentarios">
+            <CommentsPanel
+              entityType="assessment"
+              entityId={id!}
+              orgId={assessment.org_id}
+              title="Discussão sobre o diagnóstico"
+              description="Compartilhe observações com sua equipe e marque colegas com @ para envolvê-los."
+            />
           </TabsContent>
         </Tabs>
       ) : (

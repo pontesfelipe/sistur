@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 50,
+  minor: 51,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.51.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "Discussões — Comentários com menções @ em diagnósticos e relatórios. Nova tabela `discussion_comments` (polimórfica via `entity_type`/`entity_id`), com RLS que só permite ler/escrever a membros aprovados (`pending_approval = false`) da mesma organização do conteúdo. Usuários das organizações padrão `Autônomo` e `Temporário`, bem como contas pendentes, ficam impedidos via função `can_comment_on_org`.",
+      "Discussões — Menções: novo RPC `list_mentionable_members` (somente membros elegíveis da org). Trigger `notify_comment_mentions` cria notificação in-app (`edu_notifications`, tipo `comment_mention`) com link direto para o diagnóstico (`/diagnosticos/:id`) ou relatório (`/relatorios?reportId=...`).",
+      "UI — Nova aba 'Comentários' em `/diagnosticos/:id` e bloco de comentários abaixo do relatório selecionado em `/relatorios`, ambos usando o componente reutilizável `CommentsPanel` com autocomplete de @menção."
+    ]
+  },
   {
     version: "1.50.0",
     date: "2026-05-03",

@@ -1706,6 +1706,66 @@ export type Database = {
           },
         ]
       }
+      discussion_comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          deleted_at: string | null
+          edited_at: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          mentioned_user_ids: string[]
+          org_id: string
+          parent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          deleted_at?: string | null
+          edited_at?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          mentioned_user_ids?: string[]
+          org_id: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          edited_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          mentioned_user_ids?: string[]
+          org_id?: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_comments_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discussion_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "discussion_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       edu_badges: {
         Row: {
           active: boolean
@@ -9118,6 +9178,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      can_comment_on_org: {
+        Args: { p_org_id: string; p_user_id?: string }
+        Returns: boolean
+      }
       can_student_start_assignment: {
         Args: { p_assignment_id: string }
         Returns: Json
@@ -9476,6 +9540,13 @@ export type Database = {
         Returns: boolean
       }
       link_user_to_org_by_code: { Args: { p_code: string }; Returns: boolean }
+      list_mentionable_members: {
+        Args: { p_org_id: string; p_search?: string }
+        Returns: {
+          full_name: string
+          user_id: string
+        }[]
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
