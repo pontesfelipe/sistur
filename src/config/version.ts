@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 73,
+  patch: 74,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.74",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Editor de Plano de Ensino no painel administrativo (`/admin/edu`). Novo componente `SyllabusEditor` adicionado ao dialog de criação/edição de treinamento permite preencher sem SQL: ementa, carga horária teórica/prática, competências, habilidades, pré-requisitos, metodologia, critérios de avaliação e bibliografia básica/complementar (autor/título/ano/link). Os campos são persistidos em `edu_trainings` e renderizados pelo `SyllabusPanel` na página do curso. Hook `useEduAdmin` atualizado (`TrainingFormData` + insert/update mapeando os novos campos)."
+    ]
+  },
   {
     version: "1.38.73",
     date: "2026-05-03",
