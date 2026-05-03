@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 52,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.52.3",
+    date: "2026-05-03",
+    type: "patch" as const,
+    changes: [
+      "Performance — Build agora agrupa todos os ícones `lucide-react` em um único chunk `vendor-icons`, eliminando ~80 micro-requests (~1KB cada) que inflavam a árvore de dependências de rede e degradavam a métrica de Network Dependency Tree do Lighthouse. Sem mudanças visuais ou de UX.",
+    ],
+  },
   {
     version: "1.52.2",
     date: "2026-05-03",
