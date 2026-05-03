@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { eduJornadaNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -70,7 +71,7 @@ const EduDashboard = () => {
   };
 
   return (
-    <AppLayout
+    <AppLayout subNav={eduJornadaNav}
       title="Minha Jornada"
       subtitle="Acompanhe seu progresso de aprendizado"
     >

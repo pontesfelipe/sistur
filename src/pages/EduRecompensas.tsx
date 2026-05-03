@@ -1,4 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout';
+import { eduJornadaNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -57,7 +58,7 @@ export default function EduRecompensas() {
   );
 
   return (
-    <AppLayout title="Recompensas" subtitle="Avatares e temas desbloqueáveis pelo seu progresso">
+    <AppLayout subNav={eduJornadaNav} title="Recompensas" subtitle="Avatares e temas desbloqueáveis pelo seu progresso">
       <div className="container mx-auto p-4 sm:p-6 space-y-6 max-w-5xl">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10"><Sparkles className="w-6 h-6 text-primary" /></div>

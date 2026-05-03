@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { eduAprenderNav } from '@/components/layout/eduSubNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -234,7 +235,7 @@ const EduCatalogo = () => {
   };
 
   return (
-    <AppLayout 
+    <AppLayout subNav={eduAprenderNav} 
       title="SISTUR EDU" 
       subtitle="Catálogo de cursos e lives baseado em diagnóstico IGMA"
     >

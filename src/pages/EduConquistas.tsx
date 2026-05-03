@@ -1,4 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout';
+import { eduJornadaNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge as UIBadge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -57,7 +58,7 @@ export default function EduConquistas() {
   }, [events]);
 
   return (
-    <AppLayout title="Minhas Conquistas">
+    <AppLayout subNav={eduJornadaNav} title="Minhas Conquistas">
       <div className="container mx-auto p-4 sm:p-6 space-y-6 max-w-5xl">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">

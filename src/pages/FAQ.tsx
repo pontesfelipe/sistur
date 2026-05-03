@@ -1,4 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout';
+import { ajudaNav } from '@/components/layout/eduSubNav';
 import {
   Accordion,
   AccordionContent,
@@ -320,7 +321,7 @@ export default function FAQ() {
   const tabCount = [showEDUTab, showERPTab, showEnterpriseTab].filter(Boolean).length;
 
   return (
-    <AppLayout
+    <AppLayout subNav={ajudaNav}
       title="Perguntas Frequentes"
       subtitle="Tire suas dúvidas sobre o SISTUR"
     >

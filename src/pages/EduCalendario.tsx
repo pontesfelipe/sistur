@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { eduTurmasNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -106,7 +107,7 @@ export default function EduCalendario() {
     );
 
   return (
-    <AppLayout
+    <AppLayout subNav={eduTurmasNav}
       title="Calendário Acadêmico"
       subtitle="Lives, prazos e exames dos próximos 90 dias"
       actions={

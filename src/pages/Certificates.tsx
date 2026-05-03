@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { eduJornadaNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -77,7 +78,7 @@ const Certificates = () => {
 
   if (isLoading) {
     return (
-      <AppLayout title="Meus Certificados" subtitle="Carregando...">
+      <AppLayout subNav={eduJornadaNav} title="Meus Certificados" subtitle="Carregando...">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-48" />
@@ -88,7 +89,7 @@ const Certificates = () => {
   }
 
   return (
-    <AppLayout 
+    <AppLayout subNav={eduJornadaNav} 
       title="Meus Certificados" 
       subtitle="Certificados de conclusão de cursos e trilhas"
     >

@@ -6,15 +6,17 @@ import { MobileBottomNav } from './MobileBottomNav';
 import { TrialBanner } from '@/components/TrialBanner';
 import { useTrialNotifications } from '@/hooks/useTrialNotifications';
 import { cn } from '@/lib/utils';
+import { SubNav, type SubNavItem } from './SubNav';
 
 interface AppLayoutProps {
   children: ReactNode;
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  subNav?: SubNavItem[];
 }
 
-export function AppLayout({ children, title, subtitle, actions }: AppLayoutProps) {
+export function AppLayout({ children, title, subtitle, actions, subNav }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   useTrialNotifications();
 
@@ -44,6 +46,7 @@ export function AppLayout({ children, title, subtitle, actions }: AppLayoutProps
           actions={actions}
         />
         <main id="main-content" className="p-3 sm:p-4 md:p-6 pb-20 md:pb-6 animate-in fade-in-0 duration-300 ease-out scroll-momentum" role="main">
+          {subNav && subNav.length > 0 && <SubNav items={subNav} />}
           {children}
         </main>
       </div>

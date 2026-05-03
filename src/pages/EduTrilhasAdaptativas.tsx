@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { eduAprenderNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +31,7 @@ export default function EduTrilhasAdaptativas() {
   const { data: paths, isLoading } = useAdaptivePaths();
 
   return (
-    <AppLayout title="Trilhas Adaptativas">
+    <AppLayout subNav={eduAprenderNav} title="Trilhas Adaptativas">
       <div className="container mx-auto p-4 sm:p-6 space-y-6">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
@@ -103,7 +104,7 @@ export function EduTrilhaAdaptativaDetalhe() {
 
   if (isLoading) {
     return (
-      <AppLayout title="Trilhas Adaptativas">
+      <AppLayout subNav={eduAprenderNav} title="Trilhas Adaptativas">
         <div className="container mx-auto p-6 space-y-4">
           <Skeleton className="h-8 w-2/3" />
           <Skeleton className="h-32 w-full" />
@@ -114,7 +115,7 @@ export function EduTrilhaAdaptativaDetalhe() {
 
   if (!data?.path) {
     return (
-      <AppLayout title="Trilhas Adaptativas">
+      <AppLayout subNav={eduAprenderNav} title="Trilhas Adaptativas">
         <div className="container mx-auto p-6 text-center text-muted-foreground">Trilha não encontrada.</div>
       </AppLayout>
     );
@@ -130,7 +131,7 @@ export function EduTrilhaAdaptativaDetalhe() {
   };
 
   return (
-    <AppLayout title="Trilhas Adaptativas">
+    <AppLayout subNav={eduAprenderNav} title="Trilhas Adaptativas">
       <div className="container mx-auto p-4 sm:p-6 space-y-6 max-w-4xl">
         <Button variant="ghost" size="sm" asChild>
           <Link to="/edu/trilhas-adaptativas"><ChevronLeft className="w-4 h-4 mr-1" />Voltar</Link>

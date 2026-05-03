@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { eduTurmasNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -66,7 +67,7 @@ const EduMinhasTurmas = () => {
   }, [activeId, classrooms]);
 
   return (
-    <AppLayout title="Minhas Turmas">
+    <AppLayout subNav={eduTurmasNav} title="Minhas Turmas">
       <div className="container max-w-5xl py-6 space-y-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">

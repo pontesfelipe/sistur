@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { eduAvaliacoesNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -120,7 +121,7 @@ const ExamHistory = () => {
   };
 
   return (
-    <AppLayout title="Histórico de Provas" subtitle="Consulte seus resultados e gerencie recursos">
+    <AppLayout subNav={eduAvaliacoesNav} title="Histórico de Provas" subtitle="Consulte seus resultados e gerencie recursos">
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         <Card>
