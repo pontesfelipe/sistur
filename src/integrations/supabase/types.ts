@@ -2025,6 +2025,204 @@ export type Database = {
           },
         ]
       }
+      edu_learning_path_enrollments: {
+        Row: {
+          completed_at: string | null
+          current_step_id: string | null
+          enrolled_at: string
+          id: string
+          path_id: string
+          status: string
+          triggered_by: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          current_step_id?: string | null
+          enrolled_at?: string
+          id?: string
+          path_id: string
+          status?: string
+          triggered_by?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          current_step_id?: string | null
+          enrolled_at?: string
+          id?: string
+          path_id?: string
+          status?: string
+          triggered_by?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_learning_path_enrollments_current_step_id_fkey"
+            columns: ["current_step_id"]
+            isOneToOne: false
+            referencedRelation: "edu_learning_path_steps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edu_learning_path_enrollments_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "edu_learning_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_learning_path_progress: {
+        Row: {
+          completed_at: string | null
+          enrollment_id: string
+          id: string
+          score: number | null
+          started_at: string | null
+          status: string
+          step_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          enrollment_id: string
+          id?: string
+          score?: number | null
+          started_at?: string | null
+          status?: string
+          step_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          enrollment_id?: string
+          id?: string
+          score?: number | null
+          started_at?: string | null
+          status?: string
+          step_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_learning_path_progress_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "edu_learning_path_enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edu_learning_path_progress_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "edu_learning_path_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_learning_path_steps: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_optional: boolean
+          min_score: number | null
+          order_index: number
+          path_id: string
+          prerequisite_step_id: string | null
+          required_status: string | null
+          title: string
+          training_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_optional?: boolean
+          min_score?: number | null
+          order_index?: number
+          path_id: string
+          prerequisite_step_id?: string | null
+          required_status?: string | null
+          title: string
+          training_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_optional?: boolean
+          min_score?: number | null
+          order_index?: number
+          path_id?: string
+          prerequisite_step_id?: string | null
+          required_status?: string | null
+          title?: string
+          training_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_learning_path_steps_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "edu_learning_paths"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edu_learning_path_steps_prerequisite_step_id_fkey"
+            columns: ["prerequisite_step_id"]
+            isOneToOne: false
+            referencedRelation: "edu_learning_path_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_learning_paths: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_adaptive: boolean
+          level: string | null
+          org_id: string | null
+          pillar: string | null
+          published: boolean
+          target_audience: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_adaptive?: boolean
+          level?: string | null
+          org_id?: string | null
+          pillar?: string | null
+          published?: boolean
+          target_audience?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_adaptive?: boolean
+          level?: string | null
+          org_id?: string | null
+          pillar?: string | null
+          published?: boolean
+          target_audience?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       edu_learning_sessions: {
         Row: {
           active_seconds: number | null

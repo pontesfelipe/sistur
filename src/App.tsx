@@ -35,6 +35,8 @@ const EduTrilhaDetalhe = lazy(() => import("./pages/EduTrilhas").then(m => ({ de
 const EduTrainingDetalhe = lazy(() => import("./pages/EduTrainingDetalhe"));
 const EduMensagens = lazy(() => import("./pages/EduMensagens"));
 const EduMinhasTurmas = lazy(() => import("./pages/EduMinhasTurmas"));
+const EduTrilhasAdaptativas = lazy(() => import("./pages/EduTrilhasAdaptativas"));
+const EduTrilhaAdaptativaDetalhe = lazy(() => import("./pages/EduTrilhasAdaptativas").then(m => ({ default: m.EduTrilhaAdaptativaDetalhe })));
 
 const Configuracoes = lazy(() => import("./pages/Configuracoes"));
 const Relatorios = lazy(() => import("./pages/Relatorios"));
@@ -260,6 +262,22 @@ const App = () => {
                   element={
                     <EduRoute>
                       <EduMinhasTurmas />
+                    </EduRoute>
+                  }
+                />
+                <Route
+                  path="/edu/trilhas-adaptativas"
+                  element={
+                    <EduRoute>
+                      <EduTrilhasAdaptativas />
+                    </EduRoute>
+                  }
+                />
+                <Route
+                  path="/edu/trilhas-adaptativas/:id"
+                  element={
+                    <EduRoute>
+                      <EduTrilhaAdaptativaDetalhe />
                     </EduRoute>
                   }
                 />

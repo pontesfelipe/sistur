@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 41,
+  minor: 42,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.42.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Trilhas Adaptativas (fundação): novas tabelas `edu_learning_paths`, `edu_learning_path_steps`, `edu_learning_path_enrollments` e `edu_learning_path_progress` com RLS multi-tenant (autor/ADMIN gerenciam; alunos enxergam suas matrículas e trilhas publicadas). Suporte a pré-requisitos por etapa, nota mínima e gatilho por status do diagnóstico (Atenção/Crítico/any).",
+      "EDU — Nova página `/edu/trilhas-adaptativas` (catálogo) e `/edu/trilhas-adaptativas/:id` (detalhe com matrícula, progresso por etapa, desbloqueio sequencial e atalho para o curso da etapa). Item 'Trilhas Adaptativas' adicionado à sidebar de Educação. Hooks `useAdaptivePaths`, `useAdaptivePath`, `useMyEnrollment`, `useEnrollmentProgress`, `useEnrollInPath`, `useUpdateStepProgress`."
+    ]
+  },
   {
     version: "1.41.0",
     date: "2026-05-03",
