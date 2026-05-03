@@ -1,12 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download, Pencil, Save, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useProfileContext } from '@/contexts/ProfileContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AutoCorrection {
   indicator: string;
@@ -26,6 +32,12 @@ interface ReportValidationRow {
 interface Props {
   reportId?: string | null;
   assessmentId?: string | null;
+  /** Markdown atual do relatório — necessário para editar o texto. */
+  reportContent?: string | null;
+  /** Dono do relatório (`generated_reports.created_by`). Usado para liberar edição. */
+  reportOwnerId?: string | null;
+  /** Callback após salvar edição manual do relatório. */
+  onReportContentSaved?: (newContent: string) => void;
 }
 
 /**
@@ -33,8 +45,54 @@ interface Props {
  * Lê de `report_validations` e mostra apenas se houver algo relevante a comunicar.
  * Nunca é incluído no markdown exportado (DOCX/PDF/cópia).
  */
-export function ReportValidationBanner({ reportId, assessmentId }: Props) {
+export function ReportValidationBanner({
+  reportId,
+  assessmentId,
+  reportContent,
+  reportOwnerId,
+  onReportContentSaved,
+}: Props) {
   const [open, setOpen] = useState(false);
+  const [editReportOpen, setEditReportOpen] = useState(false);
+  const [editDraft, setEditDraft] = useState<string>('');
+  const [savingReport, setSavingReport] = useState(false);
+  const [fixIndicator, setFixIndicator] = useState<AutoCorrection | null>(null);
+  const { profile, isAdmin } = useProfileContext();
+  const queryClient = useQueryClient();
+
+  const canEditReport = Boolean(
+    reportId &&
+      reportContent &&
+      profile?.user_id &&
+      (isAdmin || (reportOwnerId && reportOwnerId === profile.user_id)),
+  );
+  const canFixIndicator = Boolean(assessmentId && (isAdmin || profile?.user_id));
+
+  useEffect(() => {
+    if (editReportOpen) setEditDraft(reportContent ?? '');
+  }, [editReportOpen, reportContent]);
+
+  const saveReportEdit = async () => {
+    if (!reportId) return;
+    setSavingReport(true);
+    const { error } = await supabase
+      .from('generated_reports')
+      .update({
+        report_content: editDraft,
+        edited_at: new Date().toISOString(),
+        edited_by: profile?.user_id ?? null,
+      } as any)
+      .eq('id', reportId);
+    setSavingReport(false);
+    if (error) {
+      toast.error('Não foi possível salvar a edição do relatório.');
+      return;
+    }
+    toast.success('Relatório atualizado.');
+    onReportContentSaved?.(editDraft);
+    queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
+    setEditReportOpen(false);
+  };
 
   const buildExportText = (
     corrections: AutoCorrection[],
@@ -171,14 +229,23 @@ export function ReportValidationBanner({ reportId, assessmentId }: Props) {
             Antes de gerar este relatório, o sistema conferiu os valores citados contra a tabela
             de auditoria e a bibliografia canônica. {summaryParts.join(' e ')}.
           </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setOpen(true)}
-          >
-            Ver detalhes
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => setOpen(true)}>
+              Ver detalhes
+            </Button>
+            {canEditReport && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                onClick={() => setEditReportOpen(true)}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Editar relatório
+              </Button>
+            )}
+          </div>
         </AlertDescription>
       </Alert>
 
@@ -268,6 +335,35 @@ export function ReportValidationBanner({ reportId, assessmentId }: Props) {
                           substituído por <span className="text-foreground font-medium">{c.to}</span>{' '}
                           (fonte oficial) — aplicado no texto final.
                         </div>
+                        <div className="flex flex-wrap gap-2 pt-2">
+                          {canEditReport && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 h-7 text-xs"
+                              onClick={() => {
+                                setOpen(false);
+                                setEditReportOpen(true);
+                              }}
+                            >
+                              <Pencil className="h-3 w-3" />
+                              Editar no relatório
+                            </Button>
+                          )}
+                          {canFixIndicator && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 h-7 text-xs"
+                              onClick={() => setFixIndicator(c)}
+                            >
+                              <Wrench className="h-3 w-3" />
+                              Corrigir indicador
+                            </Button>
+                          )}
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -324,6 +420,188 @@ export function ReportValidationBanner({ reportId, assessmentId }: Props) {
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog: edição manual do markdown do relatório */}
+      <Dialog open={editReportOpen} onOpenChange={setEditReportOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Editar conteúdo do relatório</DialogTitle>
+            <DialogDescription>
+              Ajuste o texto manualmente. A alteração é salva no relatório atual e refletida em
+              exportações (DOCX/PDF/cópia). O histórico de quem editou fica registrado.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={editDraft}
+            onChange={(e) => setEditDraft(e.target.value)}
+            className="min-h-[60vh] font-mono text-xs"
+            spellCheck={false}
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={() => setEditReportOpen(false)} disabled={savingReport}>
+              Cancelar
+            </Button>
+            <Button size="sm" className="gap-1" onClick={saveReportEdit} disabled={savingReport || !editDraft}>
+              {savingReport ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+              Salvar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog: corrigir valor do indicador na tabela de auditoria */}
+      <IndicatorFixDialog
+        correction={fixIndicator}
+        assessmentId={assessmentId ?? null}
+        onClose={() => setFixIndicator(null)}
+        onSaved={() => {
+          setFixIndicator(null);
+          queryClient.invalidateQueries({ queryKey: ['indicator-values', assessmentId] });
+        }}
+      />
     </>
+  );
+}
+
+/** Dialog interno — atualiza `indicator_values` para o indicador citado. */
+function IndicatorFixDialog({
+  correction,
+  assessmentId,
+  onClose,
+  onSaved,
+}: {
+  correction: AutoCorrection | null;
+  assessmentId: string | null;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [valueRaw, setValueRaw] = useState<string>('');
+  const [valueText, setValueText] = useState<string>('');
+  const [source, setSource] = useState<string>('Correção manual via Conferência de dados');
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [indicatorId, setIndicatorId] = useState<string | null>(null);
+  const [indicatorName, setIndicatorName] = useState<string>('');
+  const [orgId, setOrgId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!correction || !assessmentId) return;
+    let cancelled = false;
+    setLoading(true);
+    setIndicatorId(null);
+    (async () => {
+      // Resolve assessment org and current value
+      const { data: a } = await supabase
+        .from('assessments')
+        .select('org_id')
+        .eq('id', assessmentId)
+        .maybeSingle();
+      const { data: ind } = await supabase
+        .from('indicators')
+        .select('id, name')
+        .eq('code', correction.indicator)
+        .limit(1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (!ind) {
+        setLoading(false);
+        toast.error(`Indicador "${correction.indicator}" não encontrado no catálogo.`);
+        return;
+      }
+      setIndicatorId(ind.id);
+      setIndicatorName(ind.name);
+      setOrgId(a?.org_id ?? null);
+      const { data: existing } = await supabase
+        .from('indicator_values')
+        .select('value_raw, value_text, source')
+        .eq('assessment_id', assessmentId)
+        .eq('indicator_id', ind.id)
+        .maybeSingle();
+      if (cancelled) return;
+      setValueRaw(existing?.value_raw != null ? String(existing.value_raw) : '');
+      setValueText(existing?.value_text ?? '');
+      if (existing?.source) setSource(existing.source);
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [correction, assessmentId]);
+
+  const save = async () => {
+    if (!assessmentId || !indicatorId || !orgId) return;
+    setSaving(true);
+    const numeric = valueRaw.trim() === '' ? null : Number(valueRaw.replace(',', '.'));
+    if (valueRaw.trim() !== '' && Number.isNaN(numeric)) {
+      setSaving(false);
+      toast.error('Valor numérico inválido.');
+      return;
+    }
+    const payload = {
+      org_id: orgId,
+      assessment_id: assessmentId,
+      indicator_id: indicatorId,
+      value_raw: numeric,
+      value_text: valueText || null,
+      source,
+    };
+    const { error } = await supabase
+      .from('indicator_values')
+      .upsert(payload as any, { onConflict: 'assessment_id,indicator_id' });
+    setSaving(false);
+    if (error) {
+      toast.error(error.message || 'Não foi possível salvar o valor.');
+      return;
+    }
+    toast.success('Valor do indicador atualizado. Recalcule o diagnóstico para refletir no relatório.');
+    onSaved();
+  };
+
+  return (
+    <Dialog open={!!correction} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Corrigir valor do indicador</DialogTitle>
+          <DialogDescription>
+            {correction?.indicator}
+            {indicatorName ? ` — ${indicatorName}` : ''}
+          </DialogDescription>
+        </DialogHeader>
+        {loading ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground py-6 justify-center">
+            <Loader2 className="h-4 w-4 animate-spin" /> Carregando valor atual…
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="rounded-md border border-border bg-muted/30 p-2 text-xs">
+              <div>IA citou: <span className="line-through">{correction?.from}</span></div>
+              <div>Sugestão oficial: <span className="font-medium">{correction?.to}</span></div>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="vraw" className="text-xs">Valor numérico</Label>
+              <Input id="vraw" value={valueRaw} onChange={(e) => setValueRaw(e.target.value)} placeholder="ex.: 42.5" />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="vtext" className="text-xs">Valor textual (opcional)</Label>
+              <Input id="vtext" value={valueText} onChange={(e) => setValueText(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="vsrc" className="text-xs">Fonte</Label>
+              <Input id="vsrc" value={source} onChange={(e) => setSource(e.target.value)} />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Para refletir no relatório: após salvar, recalcule o diagnóstico e regenere o relatório.
+            </p>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" size="sm" onClick={onClose} disabled={saving}>Cancelar</Button>
+              <Button size="sm" className="gap-1" onClick={save} disabled={saving || !indicatorId}>
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                Salvar
+              </Button>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

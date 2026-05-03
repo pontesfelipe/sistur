@@ -4072,6 +4072,8 @@ export type Database = {
           created_at: string
           created_by: string
           destination_name: string
+          edited_at: string | null
+          edited_by: string | null
           environment: string
           id: string
           kb_file_ids: string[] | null
@@ -4086,6 +4088,8 @@ export type Database = {
           created_at?: string
           created_by: string
           destination_name: string
+          edited_at?: string | null
+          edited_by?: string | null
           environment?: string
           id?: string
           kb_file_ids?: string[] | null
@@ -4100,6 +4104,8 @@ export type Database = {
           created_at?: string
           created_by?: string
           destination_name?: string
+          edited_at?: string | null
+          edited_by?: string | null
           environment?: string
           id?: string
           kb_file_ids?: string[] | null
