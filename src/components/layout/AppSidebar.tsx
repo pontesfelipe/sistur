@@ -80,18 +80,9 @@ const navGroups: NavGroup[] = [
     icon: GraduationCap,
     items: [
       { name: 'Minha Jornada', href: '/edu', icon: GraduationCap, requiresEDU: true },
-      { name: 'Catálogo', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true },
-      { name: 'Trilhas', href: '/edu/trilhas', icon: Map, requiresEDU: true },
-      { name: 'Trilhas Adaptativas', href: '/edu/trilhas-adaptativas', icon: Sparkles, requiresEDU: true },
-      { name: 'Minhas Conquistas', href: '/edu/conquistas', icon: Award, requiresEDU: true },
-      { name: 'Recompensas', href: '/edu/recompensas', icon: Sparkles, requiresEDU: true },
-      { name: 'Calendário Acadêmico', href: '/edu/calendario', icon: CalendarDays, requiresEDU: true },
-      { name: 'Minhas Provas', href: '/edu/minhas-provas', icon: ScrollText, requiresEDU: true },
-      { name: 'Histórico Escolar', href: '/edu/boletim', icon: ScrollText, requiresEDU: true },
-      { name: 'Mensagens', href: '/edu/mensagens', icon: MessageCircle, requiresEDU: true },
-      { name: 'Minhas Turmas', href: '/edu/turmas', icon: Users, requiresEDU: true },
-      { name: 'Meus Certificados', href: '/certificados', icon: Award, requiresEDU: true },
-      { name: 'Treinamento Sob Demanda', href: '/edu/solicitacoes', icon: Sparkles, requiresEDU: true },
+      { name: 'Aprender', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true },
+      { name: 'Avaliações', href: '/edu/minhas-provas', icon: ScrollText, requiresEDU: true },
+      { name: 'Turmas & Mensagens', href: '/edu/turmas', icon: Users, requiresEDU: true },
       { name: 'Gestão de Treinamentos', href: '/professor', icon: BookOpen, requiresProfessor: true },
       { name: 'Admin EDU', href: '/admin/edu', icon: Shield, requiresAdmin: true },
     ],
@@ -103,15 +94,13 @@ const navGroups: NavGroup[] = [
       { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
       { name: 'Social Turismo', href: '/forum', icon: MessageSquare },
       { name: 'Jogos Educacionais', href: '/game', icon: Gamepad2 },
-      { name: 'Metodologia', href: '/metodologia', icon: BookMarked, requiresAdmin: true },
     ],
   },
 ];
 
 const bottomNavigation: NavItem[] = [
   { name: 'Planos', href: '/assinatura', icon: CreditCard },
-  { name: 'FAQ', href: '/faq', icon: MessageCircleQuestion },
-  { name: 'Ajuda & Tutorial', href: '/ajuda', icon: HelpCircle },
+  { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
   { name: 'Licenças', href: '/admin/licencas', icon: Shield, requiresAdmin: true },
   { name: 'Configurações', href: '/configuracoes', icon: Settings },
 ];
