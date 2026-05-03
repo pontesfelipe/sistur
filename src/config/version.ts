@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 52,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.52.4",
+    date: "2026-05-03",
+    type: "patch" as const,
+    changes: [
+      "Performance — Desativada a geração automática de `<link rel=\"modulepreload\">` no build (Vite `modulePreload: false`). Antes, ~400KB de chunks de rotas lazy (FileSaver, BarChart/recharts, Configuracoes, Subscription etc.) eram pré-carregados na inicialização mesmo quando o usuário não visitava aquelas rotas, gerando o aviso 'Unused JavaScript' do Lighthouse. Os chunks continuam sendo baixados sob demanda quando a rota é visitada via `React.lazy()`. Sem mudança de UX.",
+    ],
+  },
   {
     version: "1.52.3",
     date: "2026-05-03",
