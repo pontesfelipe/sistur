@@ -230,6 +230,14 @@ const App = () => {
                   }
                 />
                 <Route
+                  path="/edu/historico"
+                  element={
+                    <EduRoute>
+                      <EduHistoricoEscolar />
+                    </EduRoute>
+                  }
+                />
+                <Route
                   path="/configuracoes"
                   element={
                     <AdminRoute>
