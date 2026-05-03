@@ -24,6 +24,7 @@ import {
   MessageSquarePlus,
   MessageSquare,
   MessageCircle,
+  Users,
   FolderKanban,
   Gamepad2,
   Shield,
