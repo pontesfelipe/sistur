@@ -230,6 +230,14 @@ const App = () => {
                   }
                 />
                 <Route
+                  path="/edu/boletim"
+                  element={
+                    <EduRoute>
+                      <EduHistoricoEscolar />
+                    </EduRoute>
+                  }
+                />
+                <Route
                   path="/edu/historico"
                   element={
                     <EduRoute>
