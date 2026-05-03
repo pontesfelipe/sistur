@@ -29,6 +29,7 @@ import { ComplianceReportPanel } from '@/components/edu/ComplianceReportPanel';
 import { AssignmentFormDialog } from '@/components/edu/AssignmentFormDialog';
 import { AssignmentProgressDialog } from '@/components/edu/AssignmentProgressDialog';
 import { ClassroomDiaryPanel } from '@/components/edu/ClassroomDiaryPanel';
+import { ProfessorAnalyticsPanel } from '@/components/edu/ProfessorAnalyticsPanel';
 import { ClassroomAnnouncementsPanel } from '@/components/edu/ClassroomAnnouncementsPanel';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -710,6 +711,9 @@ export default function ProfessorDashboard() {
             <TabsTrigger value="groups" className="flex items-center gap-2">
               <School className="h-4 w-4" /> {groupLabel}
             </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" /> Analytics
+            </TabsTrigger>
             {canManageContent && (
               <TabsTrigger value="exams" className="flex items-center gap-2">
                 <ClipboardList className="h-4 w-4" /> Gestão de Provas
@@ -741,6 +745,10 @@ export default function ProfessorDashboard() {
 
           <TabsContent value="groups">
             <ClassroomsPanel />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <ProfessorAnalyticsPanel />
           </TabsContent>
 
           {(isProfessor || isAdmin) && (
