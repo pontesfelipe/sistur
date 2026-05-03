@@ -4,6 +4,8 @@ import { Badge as UIBadge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Trophy, Star, Flag, Map as MapIcon, Flame, Sparkles, Award } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { useMemo } from 'react';
 import {
   useMyXP,
   useMyXPEvents,
@@ -30,6 +32,25 @@ export default function EduConquistas() {
   );
 
   const earnedSet = new Set((mine ?? []).map((m) => m.badge_id));
+
+  // XP por mês (últimos 6 meses) a partir dos eventos
+  const monthlyXP = useMemo(() => {
+    const now = new Date();
+    const buckets: { key: string; label: string; xp: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const label = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+      buckets.push({ key, label, xp: 0 });
+    }
+    (events ?? []).forEach((e) => {
+      const d = new Date(e.created_at);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const b = buckets.find((x) => x.key === key);
+      if (b) b.xp += e.points;
+    });
+    return buckets;
+  }, [events]);
 
   return (
     <AppLayout title="Minhas Conquistas">
