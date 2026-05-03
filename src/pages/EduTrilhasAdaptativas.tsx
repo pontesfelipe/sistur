@@ -217,6 +217,7 @@ export function EduTrilhaAdaptativaDetalhe() {
                             enrollment_id: enrollment.id,
                             step_id: step.id,
                             status: 'concluida',
+                            path_id: path.id,
                           })}
                           disabled={updateStep.isPending}
                         >

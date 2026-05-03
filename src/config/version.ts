@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 43,
+  minor: 44,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.44.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Gamificação automática: conclusão de módulo de treinamento, etapa de Trilha Adaptativa e prova aprovada agora concedem XP e atualizam nível do aluno automaticamente. Quando todas as etapas obrigatórias de uma trilha são concluídas, a matrícula é fechada (`status = concluida`) e o aluno recebe bônus de 150 XP. Helper `awardXP` (`src/lib/awardXP.ts`) integrado em `useUpdateStepProgress` (trilhas), `submitExam` (provas) e `useProgressMutations.upsertProgress` (módulos). Valores: 25 XP por etapa, 50 XP por módulo, 75 XP por prova aprovada, 150 XP por trilha concluída.",
+      "EDU — Painel de Analytics do Professor: nova aba 'Analytics' em `/professor/dashboard` (`ProfessorAnalyticsPanel`) consolida métricas de todas as turmas do professor — conclusão média, nota média, alunos ativos nos últimos 7 dias e contagem de alunos em risco por turma. Identificação automática de risco: alunos sem atividade há 14+ dias, conclusão de atividades abaixo de 30% ou alertas de fraude pendentes. Tabela detalhada lista até 10 alunos em risco por turma com badge de conclusão, última atividade e flags de fraude."
+    ]
+  },
   {
     version: "1.43.0",
     date: "2026-05-03",
