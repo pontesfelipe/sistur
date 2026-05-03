@@ -31,6 +31,7 @@ import { AssignmentProgressDialog } from '@/components/edu/AssignmentProgressDia
 import { ClassroomDiaryPanel } from '@/components/edu/ClassroomDiaryPanel';
 import { ProfessorAnalyticsPanel } from '@/components/edu/ProfessorAnalyticsPanel';
 import { ClassroomAnnouncementsPanel } from '@/components/edu/ClassroomAnnouncementsPanel';
+import { ClassroomLeaderboardPanel } from '@/components/edu/ClassroomLeaderboardPanel';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -252,6 +253,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
       <ClassroomDiaryPanel classroomId={classroomId} />
 
       <ClassroomAnnouncementsPanel classroomId={classroomId} canManage />
+      <ClassroomLeaderboardPanel classroomId={classroomId} showOptInToggle={false} />
 
       {/* Members */}
       <Card>
