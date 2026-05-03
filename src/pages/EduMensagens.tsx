@@ -18,6 +18,8 @@ import {
   useSendMessage,
 } from '@/hooks/useEduMessages';
 import { useAuth } from '@/hooks/useAuth';
+import { NewMessageDialog } from '@/components/edu/NewMessageDialog';
+import { useMessageContacts } from '@/hooks/useClassroomEvents';
 
 const EduMensagens = () => {
   const { user } = useAuth();
@@ -31,6 +33,7 @@ const EduMensagens = () => {
   const { data: conversations = [], isLoading: loadingConvs } = useConversations();
   const { data: messages = [], isLoading: loadingMsgs } = useConversationMessages(activePeer);
   const send = useSendMessage();
+  const { data: contacts = [] } = useMessageContacts();
 
   const filtered = useMemo(
     () =>
@@ -41,8 +44,11 @@ const EduMensagens = () => {
   );
 
   const activePeerName = useMemo(
-    () => conversations.find((c) => c.peer_id === activePeer)?.peer_name ?? 'Conversa',
-    [conversations, activePeer],
+    () =>
+      conversations.find((c) => c.peer_id === activePeer)?.peer_name
+      ?? contacts.find((c) => c.user_id === activePeer)?.full_name
+      ?? 'Conversa',
+    [conversations, contacts, activePeer],
   );
 
   useEffect(() => {
@@ -77,7 +83,10 @@ const EduMensagens = () => {
           {/* Conversations sidebar */}
           <Card className="md:col-span-1 flex flex-col overflow-hidden">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Conversas</CardTitle>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="text-base">Conversas</CardTitle>
+                <NewMessageDialog onPick={(peerId) => setActivePeer(peerId)} />
+              </div>
               <div className="relative">
                 <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
