@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { CommentsPanel } from '@/components/discussions/CommentsPanel';
 import { useAssessments } from '@/hooks/useAssessments';
 import { useDestinations } from '@/hooks/useDestinations';
 import { useProfile } from '@/hooks/useProfile';
