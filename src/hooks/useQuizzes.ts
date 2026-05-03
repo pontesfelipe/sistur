@@ -24,6 +24,7 @@ export interface QuizQuestion {
   created_at: string;
   updated_at: string;
   options?: QuizOption[];
+  rubric?: unknown;
 }
 
 export interface QuizOption {
@@ -184,6 +185,8 @@ export function useQuizMutations() {
       options 
     }: { 
       question: { pillar: string; level: number; question_type: 'multiple_choice' | 'true_false' | 'essay'; stem: string; explanation?: string; difficulty?: number; is_active?: boolean };
+      // Optional rubric (essay-only) — kept loose to avoid coupling the JSONB shape.
+      // Cast in caller; the migration sets DEFAULT NULL.
       options: { option_label: string; option_text: string; is_correct: boolean }[];
     }) => {
       // Create question
