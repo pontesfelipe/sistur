@@ -74,6 +74,7 @@ import { SyllabusEditor } from '@/components/admin/SyllabusEditor';
 import { AdaptivePathEditor } from '@/components/edu/AdaptivePathEditor';
 import { BadgesAdminPanel } from '@/components/edu/BadgesAdminPanel';
 import { GamificationAdminDashboard } from '@/components/edu/GamificationAdminDashboard';
+import { OrgClassroomRankingPanel } from '@/components/edu/OrgClassroomRankingPanel';
 
 const defaultFormData: TrainingFormData = {
   training_id: '',
@@ -289,6 +290,10 @@ const AdminEdu = () => {
           <TabsTrigger value="gamification" className="gap-2">
             <TrendingUp className="h-4 w-4" />
             Gamificação
+          </TabsTrigger>
+          <TabsTrigger value="ranking" className="gap-2">
+            <Award className="h-4 w-4" />
+            Ranking de Turmas
           </TabsTrigger>
         </TabsList>
 
@@ -701,6 +706,10 @@ const AdminEdu = () => {
 
         <TabsContent value="gamification" className="space-y-6">
           <GamificationAdminDashboard />
+        </TabsContent>
+
+        <TabsContent value="ranking" className="space-y-6">
+          <OrgClassroomRankingPanel />
         </TabsContent>
 
         {/* ANALYTICS TAB */}
