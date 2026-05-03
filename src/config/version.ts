@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 51,
-  patch: 1,
+  minor: 52,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.52.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "Calendário Acadêmico — Professores podem agendar eventos por turma (aula, prova, prazo, reunião, live, evento) com horário de início/fim, local, link e alarme configurável (no horário, 15min, 30min, 1h, 2h ou 1 dia antes). Nova tabela `classroom_calendar_events` com RLS: professor gerencia os eventos das suas turmas e alunos matriculados visualizam. Trigger `notify_classroom_event_students` envia notificação automática a todos os alunos da turma assim que o evento é criado.",
+      "Mensagens — Adicionada lista de contatos para iniciar novas conversas. Botão 'Nova mensagem' abre um diretório com todos os professores e colegas das turmas em que o usuário participa (alunos) ou todos os alunos das turmas que leciona (professores), via RPC `list_message_contacts`.",
+    ],
+  },
   {
     version: "1.51.1",
     date: "2026-05-03",

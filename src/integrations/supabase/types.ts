@@ -900,6 +900,65 @@ export type Database = {
           },
         ]
       }
+      classroom_calendar_events: {
+        Row: {
+          alarm_minutes_before: number
+          classroom_id: string
+          color: string | null
+          created_at: string
+          description: string | null
+          ends_at: string | null
+          event_type: string
+          id: string
+          link_url: string | null
+          location: string | null
+          professor_id: string
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          alarm_minutes_before?: number
+          classroom_id: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          event_type?: string
+          id?: string
+          link_url?: string | null
+          location?: string | null
+          professor_id: string
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          alarm_minutes_before?: number
+          classroom_id?: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          event_type?: string
+          id?: string
+          link_url?: string | null
+          location?: string | null
+          professor_id?: string
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_calendar_events_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classroom_students: {
         Row: {
           classroom_id: string
@@ -9405,6 +9464,26 @@ export type Database = {
           training_id: string
         }[]
       }
+      get_my_classroom_events: {
+        Args: { p_from?: string; p_to?: string }
+        Returns: {
+          alarm_minutes_before: number
+          classroom_id: string
+          classroom_name: string
+          color: string
+          description: string
+          ends_at: string
+          event_type: string
+          id: string
+          is_owner: boolean
+          link_url: string
+          location: string
+          professor_id: string
+          professor_name: string
+          starts_at: string
+          title: string
+        }[]
+      }
       get_org_classroom_ranking: {
         Args: never
         Returns: {
@@ -9544,6 +9623,16 @@ export type Database = {
         Args: { p_org_id: string; p_search?: string }
         Returns: {
           full_name: string
+          user_id: string
+        }[]
+      }
+      list_message_contacts: {
+        Args: never
+        Returns: {
+          classroom_id: string
+          classroom_name: string
+          full_name: string
+          role: string
           user_id: string
         }[]
       }
