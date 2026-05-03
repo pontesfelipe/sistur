@@ -23,6 +23,7 @@ import {
   Bot,
   MessageSquarePlus,
   MessageSquare,
+  MessageCircle,
   FolderKanban,
   Gamepad2,
   Shield,
