@@ -29,6 +29,7 @@ import { ComplianceReportPanel } from '@/components/edu/ComplianceReportPanel';
 import { AssignmentFormDialog } from '@/components/edu/AssignmentFormDialog';
 import { AssignmentProgressDialog } from '@/components/edu/AssignmentProgressDialog';
 import { ClassroomDiaryPanel } from '@/components/edu/ClassroomDiaryPanel';
+import { ClassroomAnnouncementsPanel } from '@/components/edu/ClassroomAnnouncementsPanel';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -248,6 +249,8 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
       <Button variant="ghost" onClick={onBack}>← Voltar</Button>
 
       <ClassroomDiaryPanel classroomId={classroomId} />
+
+      <ClassroomAnnouncementsPanel classroomId={classroomId} canManage />
 
       {/* Members */}
       <Card>
