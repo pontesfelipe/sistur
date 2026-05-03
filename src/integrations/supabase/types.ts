@@ -9341,6 +9341,22 @@ export type Database = {
           training_id: string
         }[]
       }
+      get_org_classroom_ranking: {
+        Args: never
+        Returns: {
+          active_streaks: number
+          at_risk_count: number
+          avg_exam_score: number
+          avg_total_xp: number
+          classroom_id: string
+          classroom_name: string
+          completion_rate: number
+          professor_id: string
+          professor_name: string
+          rank: number
+          students_count: number
+        }[]
+      }
       get_org_indicator_weights: {
         Args: { p_org_id: string }
         Returns: {
@@ -9370,6 +9386,19 @@ export type Database = {
           is_custom: boolean
           pillar: string
           weight: number
+        }[]
+      }
+      get_professor_classroom_overview: {
+        Args: { p_professor_id?: string }
+        Returns: {
+          active_streaks: number
+          at_risk_count: number
+          avg_exam_score: number
+          avg_total_xp: number
+          classroom_id: string
+          classroom_name: string
+          completion_rate: number
+          students_count: number
         }[]
       }
       get_professor_referral_count: {

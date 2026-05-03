@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 49,
+  minor: 50,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.50.0",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Visão Geral do Professor: nova aba padrão em `/professor` (`ProfessorOverviewPanel`) consolida métricas agregadas de todas as turmas do professor — total de alunos, XP médio, streaks ativos, alunos em risco (sem atividade há 7+ dias), nota média em provas e taxa de conclusão. Lê via novo RPC `get_professor_classroom_overview` (SECURITY DEFINER, restrito ao próprio professor ou ADMIN).",
+      "ADMIN — Ranking de Turmas: nova aba 'Ranking de Turmas' em `/admin/edu` (`OrgClassroomRankingPanel`) lista todas as turmas ativas da organização ordenadas por XP médio, com pódio (1º–3º destacados) e métricas comparativas (alunos, streaks, em risco, conclusão, nota média). Lê via novo RPC `get_org_classroom_ranking` (SECURITY DEFINER, restrito a ADMIN/ORG_ADMIN)."
+    ]
+  },
   {
     version: "1.49.0",
     date: "2026-05-03",

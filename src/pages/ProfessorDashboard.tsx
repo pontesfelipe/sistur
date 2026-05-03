@@ -19,7 +19,7 @@ import {
   Users, Copy, Gift, Plus, School, BookOpen, ClipboardList,
   Trash2, Calendar, Loader2, Check, X, UserPlus, FileText,
   Building2, GraduationCap, Target, BarChart3, Settings,
-  MoreVertical, Pencil, Shield, Eye
+  MoreVertical, Pencil, Shield, Eye, LayoutDashboard
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DeleteConfirmDialog } from '@/components/projects/DeleteConfirmDialog';
@@ -32,6 +32,7 @@ import { ClassroomDiaryPanel } from '@/components/edu/ClassroomDiaryPanel';
 import { ProfessorAnalyticsPanel } from '@/components/edu/ProfessorAnalyticsPanel';
 import { ClassroomAnnouncementsPanel } from '@/components/edu/ClassroomAnnouncementsPanel';
 import { ClassroomLeaderboardPanel } from '@/components/edu/ClassroomLeaderboardPanel';
+import { ProfessorOverviewPanel } from '@/components/edu/ProfessorOverviewPanel';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -703,8 +704,11 @@ export default function ProfessorDashboard() {
           </p>
         </div>
 
-        <Tabs defaultValue={canManageContent ? 'content' : 'groups'} className="space-y-6">
+        <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="flex-wrap">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <LayoutDashboard className="h-4 w-4" /> Visão Geral
+            </TabsTrigger>
             {canManageContent && (
               <TabsTrigger value="content" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" /> Gestão de Conteúdo
@@ -732,6 +736,10 @@ export default function ProfessorDashboard() {
               </TabsTrigger>
             )}
           </TabsList>
+
+          <TabsContent value="overview">
+            <ProfessorOverviewPanel />
+          </TabsContent>
 
           {canManageContent && (
             <TabsContent value="content">
