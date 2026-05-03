@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useProfile } from '@/contexts/ProfileContext';
+import { useProfileContext } from '@/contexts/ProfileContext';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface AutoCorrection {
@@ -57,7 +57,7 @@ export function ReportValidationBanner({
   const [editDraft, setEditDraft] = useState<string>('');
   const [savingReport, setSavingReport] = useState(false);
   const [fixIndicator, setFixIndicator] = useState<AutoCorrection | null>(null);
-  const { profile, isAdmin } = useProfile();
+  const { profile, isAdmin } = useProfileContext();
   const queryClient = useQueryClient();
 
   const canEditReport = Boolean(
