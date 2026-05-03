@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { awardXP, XP_VALUES } from '@/lib/awardXP';
+import { autoClaimBadge } from '@/lib/autoClaimBadge';
 
 // ============================================
 // TYPES
@@ -568,6 +569,9 @@ export function useExamAnswerMutations() {
           reference_id: result.attempt_id,
           description: `Prova aprovada (${result.score_pct.toFixed(0)}%)`,
         });
+        if (result.score_pct >= 100) {
+          autoClaimBadge('exam_ace');
+        }
       }
       return result;
     },
