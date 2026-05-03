@@ -24,6 +24,7 @@ export interface QuizQuestion {
   created_at: string;
   updated_at: string;
   options?: QuizOption[];
+  rubric?: unknown;
 }
 
 export interface QuizOption {
@@ -183,13 +184,13 @@ export function useQuizMutations() {
       question, 
       options 
     }: { 
-      question: { pillar: string; level: number; question_type: 'multiple_choice' | 'true_false' | 'essay'; stem: string; explanation?: string; difficulty?: number; is_active?: boolean };
+      question: { pillar: string; level: number; question_type: 'multiple_choice' | 'true_false' | 'essay'; stem: string; explanation?: string; difficulty?: number; is_active?: boolean; rubric?: unknown };
       options: { option_label: string; option_text: string; is_correct: boolean }[];
     }) => {
       // Create question
       const { data: quiz, error: quizError } = await supabase
         .from('quiz_questions')
-        .insert([question])
+        .insert([question as any])
         .select()
         .single();
       
@@ -228,13 +229,13 @@ export function useQuizMutations() {
       options 
     }: { 
       quizId: string;
-      question: { pillar?: string; level?: number; stem?: string; explanation?: string; difficulty?: number; is_active?: boolean }; 
+      question: { pillar?: string; level?: number; stem?: string; explanation?: string; difficulty?: number; is_active?: boolean; rubric?: unknown }; 
       options?: { option_label: string; option_text: string; is_correct: boolean }[];
     }) => {
       // Update question
       const { error: quizError } = await supabase
         .from('quiz_questions')
-        .update({ ...question, updated_at: new Date().toISOString() })
+        .update({ ...question, updated_at: new Date().toISOString() } as any)
         .eq('quiz_id', quizId);
       
       if (quizError) throw quizError;

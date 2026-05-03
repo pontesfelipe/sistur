@@ -42,6 +42,7 @@ import {
   useQuizMutations,
   type QuizQuestion 
 } from '@/hooks/useQuizzes';
+import { RubricEditor, EMPTY_RUBRIC, isRubric, type Rubric } from '@/components/edu/Rubric';
 import { PILLAR_INFO, type Pillar } from '@/types/sistur';
 import {
   Table,
@@ -70,6 +71,7 @@ interface QuestionFormData {
   level: number;
   explanation?: string;
   options: { text: string; is_correct: boolean }[];
+  rubric?: Rubric;
 }
 
 const defaultFormData: QuestionFormData = {
@@ -85,6 +87,7 @@ const defaultFormData: QuestionFormData = {
     { text: '', is_correct: false },
     { text: '', is_correct: false },
   ],
+  rubric: undefined,
 };
 
 export function QuestionBankPanel() {
@@ -144,6 +147,7 @@ export function QuestionBankPanel() {
         { text: '', is_correct: false },
         { text: '', is_correct: false },
       ],
+      rubric: isRubric((question as any).rubric) ? (question as any).rubric as Rubric : undefined,
     });
     setIsDialogOpen(true);
   };
@@ -166,6 +170,7 @@ export function QuestionBankPanel() {
             pillar: formData.pillar,
             difficulty: formData.difficulty,
             explanation: formData.explanation,
+            rubric: formData.question_type === 'essay' ? (formData.rubric ?? null) : null,
           },
           options: optionsFormatted,
         });
@@ -179,6 +184,7 @@ export function QuestionBankPanel() {
             level: formData.level,
             difficulty: formData.difficulty,
             explanation: formData.explanation,
+            rubric: formData.question_type === 'essay' ? (formData.rubric ?? null) : null,
           },
           options: optionsFormatted,
         });
@@ -401,6 +407,13 @@ export function QuestionBankPanel() {
                         </div>
                       ))}
                     </div>
+                  )}
+
+                  {formData.question_type === 'essay' && (
+                    <RubricEditor
+                      value={formData.rubric ?? EMPTY_RUBRIC}
+                      onChange={(r) => setFormData(prev => ({ ...prev, rubric: r }))}
+                    />
                   )}
 
                   <div className="space-y-2">

@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 75,
+  patch: 76,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.76",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Rubricas de avaliação para questões dissertativas. Nova coluna `rubric` (jsonb) em `quiz_questions` com estrutura `{ criteria: [{ name, max_points, descriptors[] }], total_max_points, visible_to_student }`. No banco de questões (`QuestionBankPanel`), ao escolher tipo 'Dissertativa' aparece o `RubricEditor` permitindo definir critérios, pontos e descritores por nível, com toggle de visibilidade ao aluno. O `EssayGradingPanel` exibe a rubrica completa ao corretor (sempre visível). Em `ExamTaking`, o aluno vê os critérios antes de responder quando `visible_to_student` está ativo, eliminando ambiguidade na nota."
+    ]
+  },
   {
     version: "1.38.75",
     date: "2026-05-03",

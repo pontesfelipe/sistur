@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/accordion';
 import { toast } from 'sonner';
 import { CheckCircle, Clock, FileText, Save, User } from 'lucide-react';
+import { RubricDisplay } from '@/components/edu/Rubric';
 
 interface EssayAnswer {
   attempt_id: string;
@@ -38,7 +39,7 @@ interface PendingAttempt {
   user_name: string;
   user_email: string;
   course_title: string;
-  essay_answers: (EssayAnswer & { stem: string; max_points: number })[];
+  essay_answers: (EssayAnswer & { stem: string; max_points: number; rubric?: unknown })[];
 }
 
 type AttemptRow = {
@@ -94,7 +95,7 @@ function usePendingEssayAttempts() {
           if (allQuizIds.length === 0) return { data: [] as { quiz_id: string; stem: string; question_type: string }[] };
           return supabase
             .from('quiz_questions')
-            .select('quiz_id, stem, question_type')
+            .select('quiz_id, stem, question_type, rubric')
             .in('quiz_id', allQuizIds);
         })(),
       ]);
@@ -122,6 +123,7 @@ function usePendingEssayAttempts() {
             ...a,
             stem: questionMap.get(a.quiz_id)?.stem || 'Questão',
             max_points: pointsPerQuestion,
+            rubric: (questionMap.get(a.quiz_id) as any)?.rubric ?? null,
           }));
 
         if (essayAnswers.length === 0) continue;
@@ -280,6 +282,9 @@ export function EssayGradingPanel() {
                         <CardDescription>{answer.stem}</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
+                        {/* Rubric (always visible to grader, ignoring visible_to_student) */}
+                        <RubricDisplay rubric={answer.rubric} hideIfNotVisible={false} title="Rubrica de avaliação" />
+
                         {/* Student's answer */}
                         <div>
                           <Label className="text-xs text-muted-foreground mb-1 block">Resposta do aluno:</Label>

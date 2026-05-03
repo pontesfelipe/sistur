@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useExam, useExamAttempt, useExamMutations, useExamAnswerMutations } from '@/hooks/useExams';
 import { useQuizQuestion } from '@/hooks/useQuizzes';
+import { RubricDisplay } from '@/components/edu/Rubric';
 import { useEduSessionTracker } from '@/hooks/useEduSessionTracker';
 import {
   AlertDialog,
@@ -463,6 +464,7 @@ const ExamTaking = () => {
           <CardContent>
             {isEssayQuestion ? (
               <div className="space-y-3">
+                <RubricDisplay rubric={(currentQuestion as any)?.rubric} />
                 <Textarea
                   placeholder="Digite sua resposta dissertativa..."
                   value={answers[currentQuestionId || ''] || ''}
