@@ -689,6 +689,11 @@ const AdminEdu = () => {
           <ImportReviewQueue />
         </TabsContent>
 
+        {/* BADGES TAB */}
+        <TabsContent value="badges" className="space-y-6">
+          <BadgesAdminPanel />
+        </TabsContent>
+
         {/* ANALYTICS TAB */}
         <TabsContent value="analytics" className="space-y-6">
           {/* Stats Cards */}
