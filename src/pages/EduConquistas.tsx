@@ -133,6 +133,27 @@ export default function EduConquistas() {
             <CardTitle className="text-base">Histórico de XP</CardTitle>
             <CardDescription>Últimos 50 eventos</CardDescription>
           </CardHeader>
+          <CardContent className="pb-0">
+            <div className="h-44">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyXP} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
+                    formatter={(v: any) => [`${v} XP`, 'Ganho no mês']}
+                  />
+                  <Bar dataKey="xp" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
           <CardContent>
             {!events?.length ? (
               <p className="text-sm text-muted-foreground py-4 text-center">Sem eventos ainda. Conclua cursos e etapas para começar.</p>
