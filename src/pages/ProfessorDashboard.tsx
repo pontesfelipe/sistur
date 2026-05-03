@@ -19,7 +19,7 @@ import {
   Users, Copy, Gift, Plus, School, BookOpen, ClipboardList,
   Trash2, Calendar, Loader2, Check, X, UserPlus, FileText,
   Building2, GraduationCap, Target, BarChart3, Settings,
-  MoreVertical, Pencil, Shield, Eye
+  MoreVertical, Pencil, Shield, Eye, LayoutDashboard
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DeleteConfirmDialog } from '@/components/projects/DeleteConfirmDialog';
