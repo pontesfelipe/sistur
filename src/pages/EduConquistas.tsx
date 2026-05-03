@@ -7,6 +7,7 @@ import { Trophy, Star, Flag, Map as MapIcon, Flame, Sparkles, Award } from 'luci
 import { Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { shareAchievementImage } from '@/lib/shareAchievement';
+import { DailyMissionsPanel } from '@/components/edu/DailyMissionsPanel';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useMemo } from 'react';
 import {
