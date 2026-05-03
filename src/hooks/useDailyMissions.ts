@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { awardXP } from '@/lib/awardXP';
 import { toast } from 'sonner';
 
 export interface DailyMission {
@@ -141,6 +140,7 @@ export async function progressDailyMissions(source: DailyMission extends never ?
         .eq('id', m.id);
 
       if (completed && !m.bonus_awarded) {
+        const { awardXP } = await import('@/lib/awardXP');
         await awardXP({
           source: 'manual',
           points: m.xp_reward,
