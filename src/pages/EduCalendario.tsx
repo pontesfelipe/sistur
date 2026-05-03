@@ -106,23 +106,17 @@ export default function EduCalendario() {
     );
 
   return (
-    <AppLayout>
+    <AppLayout
+      title="Calendário Acadêmico"
+      subtitle="Lives, prazos e exames dos próximos 90 dias"
+      actions={
+        <Button onClick={handleExport} disabled={events.length === 0}>
+          <Download className="h-4 w-4 mr-2" />
+          Exportar .ics
+        </Button>
+      }
+    >
       <div className="container mx-auto p-4 md:p-6 space-y-4">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Calendar className="h-6 w-6 text-primary" />
-              Calendário Acadêmico
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Lives, prazos e exames dos próximos 90 dias.
-            </p>
-          </div>
-          <Button onClick={handleExport} disabled={events.length === 0}>
-            <Download className="h-4 w-4 mr-2" />
-            Exportar .ics
-          </Button>
-        </div>
 
         <Card>
           <CardHeader className="pb-2">
