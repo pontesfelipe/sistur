@@ -30,6 +30,7 @@ import { PILLAR_INFO } from '@/types/sistur';
 import { VideoPlayer } from '@/components/edu/VideoPlayer';
 import { TrainingRatingWidget } from '@/components/edu/TrainingRatingWidget';
 import { TrainingNotesPanel } from '@/components/edu/TrainingNotesPanel';
+import { SyllabusPanel } from '@/components/edu/SyllabusPanel';
 
 interface TrainingMaterial {
   id: string;
@@ -265,6 +266,9 @@ const EduTrainingDetalhe = () => {
               </CardContent>
             </Card>
           )}
+
+          {/* Plano de Ensino formal */}
+          <SyllabusPanel training={training as any} />
         </div>
 
         {/* Sidebar */}

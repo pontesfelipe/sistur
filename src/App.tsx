@@ -70,6 +70,7 @@ const Tutorial = lazy(() => import("./pages/Tutorial"));
 const TutorialDetail = lazy(() => import("./pages/TutorialDetail"));
 const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
 const MinhasAtividades = lazy(() => import("./pages/MinhasAtividades"));
+const EduHistoricoEscolar = lazy(() => import("./pages/EduHistoricoEscolar"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
@@ -225,6 +226,22 @@ const App = () => {
                   element={
                     <EduRoute>
                       <MinhasAtividades />
+                    </EduRoute>
+                  }
+                />
+                <Route
+                  path="/edu/boletim"
+                  element={
+                    <EduRoute>
+                      <EduHistoricoEscolar />
+                    </EduRoute>
+                  }
+                />
+                <Route
+                  path="/edu/historico"
+                  element={
+                    <EduRoute>
+                      <EduHistoricoEscolar />
                     </EduRoute>
                   }
                 />
