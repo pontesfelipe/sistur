@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 51,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.51.1",
+    date: "2026-05-03",
+    type: "patch" as const,
+    changes: [
+      "Sidebar — Consolidação do menu Educação em 4 hubs (Minha Jornada, Aprender, Avaliações, Turmas & Mensagens) e do bottom nav (FAQ + Tutorial + Metodologia → Ajuda). Cada hub agora exibe uma sub-navegação por abas no topo da página, mantendo todas as rotas existentes intactas. Mensagens volta a ficar visível sem rolagem.",
+    ],
+  },
   {
     version: "1.51.0",
     date: "2026-05-03",
