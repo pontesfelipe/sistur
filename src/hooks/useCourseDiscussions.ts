@@ -44,9 +44,9 @@ export function useCourseDiscussions(trainingId?: string) {
       if (ids.length) {
         const { data: profs } = await supabase
           .from('profiles')
-          .select('id, full_name')
-          .in('id', ids);
-        const map = new Map((profs ?? []).map((p: any) => [p.id, p.full_name]));
+          .select('user_id, full_name')
+          .in('user_id', ids);
+        const map = new Map((profs ?? []).map((p: any) => [p.user_id, p.full_name]));
         rows.forEach((r) => { r.author_name = map.get(r.author_id) ?? 'Usuário'; });
       }
       return rows;
@@ -71,9 +71,9 @@ export function useDiscussionReplies(discussionId?: string) {
       if (ids.length) {
         const { data: profs } = await supabase
           .from('profiles')
-          .select('id, full_name')
-          .in('id', ids);
-        const map = new Map((profs ?? []).map((p: any) => [p.id, p.full_name]));
+          .select('user_id, full_name')
+          .in('user_id', ids);
+        const map = new Map((profs ?? []).map((p: any) => [p.user_id, p.full_name]));
         rows.forEach((r) => { r.author_name = map.get(r.author_id) ?? 'Usuário'; });
       }
       return rows;
