@@ -321,7 +321,7 @@ export default function FAQ() {
   const tabCount = [showEDUTab, showERPTab, showEnterpriseTab].filter(Boolean).length;
 
   return (
-    <AppLayout
+    <AppLayout subNav={ajudaNav}
       title="Perguntas Frequentes"
       subtitle="Tire suas dúvidas sobre o SISTUR"
     >

@@ -62,7 +62,7 @@ const EduMensagens = () => {
   };
 
   return (
-    <AppLayout title="Mensagens">
+    <AppLayout subNav={eduTurmasNav} title="Mensagens">
       <div className="container max-w-6xl py-6 space-y-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">

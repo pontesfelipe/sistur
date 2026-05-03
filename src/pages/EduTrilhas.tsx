@@ -363,7 +363,7 @@ const EduTrilhas = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   return (
-    <AppLayout 
+    <AppLayout subNav={eduAprenderNav} 
       title="Trilhas Formativas" 
       subtitle="Percursos estruturados de capacitação com certificação"
     >
@@ -582,7 +582,7 @@ export const EduTrilhaDetalhe = () => {
 
   if (isLoading) {
     return (
-      <AppLayout title="Carregando..." subtitle="">
+      <AppLayout subNav={eduAprenderNav} title="Carregando..." subtitle="">
         <Skeleton className="h-64" />
       </AppLayout>
     );
@@ -590,7 +590,7 @@ export const EduTrilhaDetalhe = () => {
 
   if (!track) {
     return (
-      <AppLayout title="Trilha não encontrada" subtitle="">
+      <AppLayout subNav={eduAprenderNav} title="Trilha não encontrada" subtitle="">
         <div className="text-center py-16">
           <Route className="mx-auto h-12 w-12 text-muted-foreground/50" />
           <p className="mt-4 text-muted-foreground">Esta trilha não existe ou foi removida.</p>
@@ -603,7 +603,7 @@ export const EduTrilhaDetalhe = () => {
   }
 
   return (
-    <AppLayout 
+    <AppLayout subNav={eduAprenderNav} 
       title={track.name} 
       subtitle={track.objective || 'Trilha formativa SISTUR EDU'}
     >

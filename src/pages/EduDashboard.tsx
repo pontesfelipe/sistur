@@ -71,7 +71,7 @@ const EduDashboard = () => {
   };
 
   return (
-    <AppLayout
+    <AppLayout subNav={eduJornadaNav}
       title="Minha Jornada"
       subtitle="Acompanhe seu progresso de aprendizado"
     >

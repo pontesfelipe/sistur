@@ -368,7 +368,7 @@ const enterpriseCategories = [
 
 export default function Metodologia() {
   return (
-    <AppLayout
+    <AppLayout subNav={ajudaNav}
       title="Metodologia Mario Beni"
       subtitle="Princípios sistêmicos do turismo sustentável"
     >

@@ -107,7 +107,7 @@ export default function EduCalendario() {
     );
 
   return (
-    <AppLayout
+    <AppLayout subNav={eduTurmasNav}
       title="Calendário Acadêmico"
       subtitle="Lives, prazos e exames dos próximos 90 dias"
       actions={

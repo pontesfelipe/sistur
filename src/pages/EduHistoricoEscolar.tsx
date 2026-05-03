@@ -23,7 +23,7 @@ export default function EduHistoricoEscolar() {
   const stats = transcriptStats(rows);
 
   return (
-    <AppLayout
+    <AppLayout subNav={eduAvaliacoesNav}
       title="Histórico Escolar"
       subtitle="Boletim consolidado dos seus cursos, exames e certificados"
     >

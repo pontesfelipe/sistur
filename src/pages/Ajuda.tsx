@@ -58,7 +58,7 @@ export default function Ajuda() {
     : [userRole];
 
   return (
-    <AppLayout
+    <AppLayout subNav={ajudaNav}
       title="Ajuda & Tutorial"
       subtitle="Aprenda a usar o SISTUR passo a passo"
     >

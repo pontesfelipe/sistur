@@ -58,7 +58,7 @@ export default function EduConquistas() {
   }, [events]);
 
   return (
-    <AppLayout title="Minhas Conquistas">
+    <AppLayout subNav={eduJornadaNav} title="Minhas Conquistas">
       <div className="container mx-auto p-4 sm:p-6 space-y-6 max-w-5xl">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">

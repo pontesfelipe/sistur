@@ -235,7 +235,7 @@ const EduCatalogo = () => {
   };
 
   return (
-    <AppLayout 
+    <AppLayout subNav={eduAprenderNav} 
       title="SISTUR EDU" 
       subtitle="Catálogo de cursos e lives baseado em diagnóstico IGMA"
     >
