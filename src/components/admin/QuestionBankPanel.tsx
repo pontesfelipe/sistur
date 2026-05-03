@@ -42,6 +42,7 @@ import {
   useQuizMutations,
   type QuizQuestion 
 } from '@/hooks/useQuizzes';
+import { RubricEditor, EMPTY_RUBRIC, isRubric, type Rubric } from '@/components/edu/Rubric';
 import { PILLAR_INFO, type Pillar } from '@/types/sistur';
 import {
   Table,
@@ -70,6 +71,7 @@ interface QuestionFormData {
   level: number;
   explanation?: string;
   options: { text: string; is_correct: boolean }[];
+  rubric?: Rubric;
 }
 
 const defaultFormData: QuestionFormData = {
@@ -85,6 +87,7 @@ const defaultFormData: QuestionFormData = {
     { text: '', is_correct: false },
     { text: '', is_correct: false },
   ],
+  rubric: undefined,
 };
 
 export function QuestionBankPanel() {
