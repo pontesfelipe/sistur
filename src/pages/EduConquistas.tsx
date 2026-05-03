@@ -4,6 +4,9 @@ import { Badge as UIBadge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Trophy, Star, Flag, Map as MapIcon, Flame, Sparkles, Award } from 'lucide-react';
+import { Share2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { shareAchievementImage } from '@/lib/shareAchievement';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useMemo } from 'react';
 import {
@@ -93,6 +96,21 @@ export default function EduConquistas() {
                     ) : null}
                   </div>
                 ) : null}
+                <div className="pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      shareAchievementImage({
+                        title: `Nível ${level} no SISTUR EDU`,
+                        subtitle: `${totalXp} XP acumulados`,
+                        emoji: '⭐',
+                      })
+                    }
+                  >
+                    <Share2 className="w-4 h-4 mr-2" /> Compartilhar progresso
+                  </Button>
+                </div>
               </>
             )}
           </CardContent>
@@ -120,6 +138,16 @@ export default function EduConquistas() {
                         <p className="text-xs mt-1"><span className="text-muted-foreground">Critério:</span> {b.criteria}</p>
                       )}
                       <div className="text-xs text-primary mt-1">+{b.xp_reward} XP</div>
+                      {earned && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="mt-2 h-7 px-2 text-xs"
+                          onClick={() => shareAchievementImage({ title: b.title, subtitle: b.description ?? undefined, emoji: '🏆' })}
+                        >
+                          <Share2 className="w-3 h-3 mr-1" /> Compartilhar
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

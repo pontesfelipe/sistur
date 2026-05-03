@@ -29,15 +29,57 @@ export async function awardXP(input: {
 
     const { data: cur } = await supabase
       .from('edu_user_xp')
-      .select('total_xp')
+      .select('total_xp, level, current_streak, longest_streak, last_activity_date')
       .eq('user_id', uid)
       .maybeSingle();
-    const newTotal = (cur?.total_xp ?? 0) + input.points;
+    const prevTotal = cur?.total_xp ?? 0;
+    const prevLevel = cur?.level ?? 1;
+    const newTotal = prevTotal + input.points;
     const newLevel = levelFromXP(newTotal);
+
+    // Streak: contar dia local (UTC offset do navegador)
+    const today = new Date();
+    const todayStr = today.toISOString().slice(0, 10);
+    const last = cur?.last_activity_date ? String(cur.last_activity_date) : null;
+    let currentStreak = cur?.current_streak ?? 0;
+    if (last === todayStr) {
+      // mesmo dia — mantém
+      currentStreak = currentStreak || 1;
+    } else {
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      const yStr = yesterday.toISOString().slice(0, 10);
+      currentStreak = last === yStr ? currentStreak + 1 : 1;
+    }
+    const longestStreak = Math.max(cur?.longest_streak ?? 0, currentStreak);
 
     await supabase
       .from('edu_user_xp')
-      .upsert({ user_id: uid, total_xp: newTotal, level: newLevel }, { onConflict: 'user_id' });
+      .upsert(
+        {
+          user_id: uid,
+          total_xp: newTotal,
+          level: newLevel,
+          current_streak: currentStreak,
+          longest_streak: longestStreak,
+          last_activity_date: todayStr,
+        },
+        { onConflict: 'user_id' },
+      );
+
+    // Email de level up (somente se subiu de nível e não é a fonte 'badge_earned' que já dispara seu próprio email)
+    if (newLevel > prevLevel) {
+      try {
+        await supabase.functions.invoke('send-transactional-email', {
+          body: {
+            templateName: 'edu-level-up',
+            recipientEmail: u.user.email,
+            idempotencyKey: `levelup-${uid}-${newLevel}`,
+            templateData: { level: newLevel, totalXp: newTotal },
+          },
+        });
+      } catch {}
+    }
   } catch (e) {
     console.warn('[awardXP] falhou silenciosamente:', e);
   }
