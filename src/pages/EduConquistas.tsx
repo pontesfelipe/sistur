@@ -1,4 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout';
+import { eduJornadaNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge as UIBadge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';

@@ -1,4 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout';
+import { ajudaNav } from '@/components/layout/eduSubNav';
 import {
   Accordion,
   AccordionContent,
