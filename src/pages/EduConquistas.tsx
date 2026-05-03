@@ -69,6 +69,8 @@ export default function EduConquistas() {
           </div>
         </div>
 
+        <DailyMissionsPanel />
+
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Progressão</CardTitle>
