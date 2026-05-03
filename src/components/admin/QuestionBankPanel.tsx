@@ -409,6 +409,13 @@ export function QuestionBankPanel() {
                     </div>
                   )}
 
+                  {formData.question_type === 'essay' && (
+                    <RubricEditor
+                      value={formData.rubric ?? EMPTY_RUBRIC}
+                      onChange={(r) => setFormData(prev => ({ ...prev, rubric: r }))}
+                    />
+                  )}
+
                   <div className="space-y-2">
                     <Label htmlFor="explanation">Explicação (opcional)</Label>
                     <Textarea 
