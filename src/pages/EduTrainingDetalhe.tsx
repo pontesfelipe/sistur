@@ -404,6 +404,15 @@ const EduTrainingDetalhe = () => {
 
           {/* Notes Panel */}
           <TrainingNotesPanel trainingId={training.training_id} />
+
+          {/* Contact instructor */}
+          {(training as any).created_by && user?.id !== (training as any).created_by && (
+            <Button asChild variant="outline" className="w-full">
+              <Link to={`/edu/mensagens?peer=${(training as any).created_by}`}>
+                Falar com instrutor
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
 
