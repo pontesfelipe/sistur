@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 52,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.52.2",
+    date: "2026-05-03",
+    type: "patch" as const,
+    changes: [
+      "Indicadores — Normalização global dos pesos por pilar para totalizar 100% mantendo proporções. Antes: RA 232%, OE 220%, AO 164%. Depois: RA/OE/AO ≈ 100% cada. Como o engine `calculate-assessment` já usa média ponderada normalizada `Σ(score×peso)/Σ(pesos)`, scores históricos não mudam (snapshots preservados). Diagnósticos existentes ficam marcados `needs_recalculation` pelo trigger; ao recalcular, o resultado é matematicamente idêntico ao anterior (apenas alinhamento à convenção da UI).",
+    ],
+  },
   {
     version: "1.52.1",
     date: "2026-05-03",
