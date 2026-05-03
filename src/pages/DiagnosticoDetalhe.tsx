@@ -67,6 +67,7 @@ import {
   BookOpen,
   RefreshCw,
   Target,
+  MessageSquare,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
