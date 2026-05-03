@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { levelFromXP } from '@/hooks/useGamification';
+import { progressDailyMissions } from '@/hooks/useDailyMissions';
 
 type Source = 'course_completed' | 'step_completed' | 'exam_passed' | 'badge_earned' | 'manual';
 
@@ -79,6 +80,11 @@ export async function awardXP(input: {
           },
         });
       } catch {}
+    }
+
+    // Avanço de missões diárias compatíveis com a fonte do XP
+    if (input.source !== 'manual') {
+      progressDailyMissions(input.source as any).catch(() => {});
     }
   } catch (e) {
     console.warn('[awardXP] falhou silenciosamente:', e);
