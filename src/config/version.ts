@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 74,
+  patch: 75,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.75",
+    date: "2026-05-03",
+    type: "minor" as const,
+    changes: [
+      "EDU — Diário de Classe consolidado: novo painel `ClassroomDiaryPanel` exibido no detalhe de cada sala (`/professor/dashboard` → Salas → abrir sala). Mostra por aluno: presença (sessões e dias com heartbeat), tempo ativo, atividades concluídas vs atribuídas, melhor nota em provas e alertas de fraude pendentes. KPIs no topo (alunos, ativos 7d, conclusão média, nota média, alertas) e exportação CSV (UTF-8 com BOM, separador `;` p/ Excel-BR). Função RPC `get_classroom_diary(p_classroom_id)` (SECURITY DEFINER) restrita ao professor dono da sala, ADMIN ou ORG_ADMIN — agrega `edu_learning_sessions`, `assignment_progress`, `exam_attempts` e `edu_fraud_flags`."
+    ]
+  },
   {
     version: "1.38.74",
     date: "2026-05-03",
