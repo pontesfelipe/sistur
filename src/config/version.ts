@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 38,
-  patch: 70,
+  patch: 71,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.38.71",
+    date: "2026-05-03",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — Conferência de dados ganhou ações de correção. No Dialog 'Ver detalhes', cada divergência listada agora oferece dois botões: 'Editar no relatório' (abre editor de markdown do relatório atual e salva direto em `generated_reports.report_content`, refletindo em DOCX/PDF/cópia) e 'Corrigir indicador' (atualiza o valor oficial em `indicator_values` para o indicador citado, com pré-carregamento do valor atual e campo de fonte). Também há um botão 'Editar relatório' direto no Alert. Permissão: dono do relatório (`created_by = auth.uid()`) ou ADMIN — controlado por nova policy de UPDATE em `generated_reports` e auditado em colunas `edited_at`/`edited_by`."
+    ]
+  },
   {
     version: "1.38.70",
     date: "2026-05-02",
