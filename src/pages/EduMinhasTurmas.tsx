@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { ClassroomAnnouncementsPanel } from '@/components/edu/ClassroomAnnouncementsPanel';
+import { ClassroomLeaderboardPanel } from '@/components/edu/ClassroomLeaderboardPanel';
 
 interface StudentClassroom {
   classroom_id: string;
@@ -103,6 +104,7 @@ const EduMinhasTurmas = () => {
               )}
             </Card>
             <ClassroomAnnouncementsPanel classroomId={active.classroom_id} canManage={false} />
+            <ClassroomLeaderboardPanel classroomId={active.classroom_id} showOptInToggle />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
