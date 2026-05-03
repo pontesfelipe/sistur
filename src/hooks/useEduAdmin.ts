@@ -117,6 +117,16 @@ export function useAdminTrainingMutations() {
         source: 'admin',
         active: data.active !== false,
         org_id: orgId,
+        ementa: data.ementa || null,
+        competencias: data.competencias || [],
+        habilidades: data.habilidades || [],
+        carga_horaria_teorica: data.carga_horaria_teorica ?? null,
+        carga_horaria_pratica: data.carga_horaria_pratica ?? null,
+        bibliografia_basica: data.bibliografia_basica || [],
+        bibliografia_complementar: data.bibliografia_complementar || [],
+        metodologia: data.metodologia || null,
+        criterios_avaliacao: data.criterios_avaliacao || null,
+        prerequisitos: data.prerequisitos || [],
       };
       
       const { data: training, error } = await supabase
