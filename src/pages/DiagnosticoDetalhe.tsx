@@ -877,6 +877,10 @@ const DiagnosticoDetalhe = () => {
               <FolderKanban className="h-4 w-4" />
               <span className="hidden sm:inline">Projeto</span>
             </TabsTrigger>
+            <TabsTrigger value="comentarios" className="gap-2">
+              <MessageSquare className="h-4 w-4" />
+              <span className="hidden sm:inline">Comentários</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Radiografia Tab */}
