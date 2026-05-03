@@ -86,7 +86,7 @@ const navGroups: NavGroup[] = [
       { name: 'Minhas Conquistas', href: '/edu/conquistas', icon: Award, requiresEDU: true },
       { name: 'Recompensas', href: '/edu/recompensas', icon: Sparkles, requiresEDU: true },
       { name: 'Calendário Acadêmico', href: '/edu/calendario', icon: CalendarDays, requiresEDU: true },
-      { name: 'Minhas Provas', href: '/edu/historico', icon: ScrollText, requiresEDU: true },
+      { name: 'Minhas Provas', href: '/edu/minhas-provas', icon: ScrollText, requiresEDU: true },
       { name: 'Histórico Escolar', href: '/edu/boletim', icon: ScrollText, requiresEDU: true },
       { name: 'Mensagens', href: '/edu/mensagens', icon: MessageCircle, requiresEDU: true },
       { name: 'Minhas Turmas', href: '/edu/turmas', icon: Users, requiresEDU: true },
