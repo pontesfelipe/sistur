@@ -402,7 +402,7 @@ const App = () => {
                   }
                 />
                 <Route
-                  path="/edu/historico"
+                  path="/edu/minhas-provas"
                   element={
                     <EduRoute>
                       <ExamHistory />
