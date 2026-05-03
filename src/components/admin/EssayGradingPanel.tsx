@@ -281,6 +281,9 @@ export function EssayGradingPanel() {
                         <CardDescription>{answer.stem}</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
+                        {/* Rubric (always visible to grader, ignoring visible_to_student) */}
+                        <RubricDisplay rubric={answer.rubric} hideIfNotVisible={false} title="Rubrica de avaliação" />
+
                         {/* Student's answer */}
                         <div>
                           <Label className="text-xs text-muted-foreground mb-1 block">Resposta do aluno:</Label>
