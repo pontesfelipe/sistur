@@ -266,6 +266,9 @@ const EduTrainingDetalhe = () => {
               </CardContent>
             </Card>
           )}
+
+          {/* Plano de Ensino formal */}
+          <SyllabusPanel training={training as any} />
         </div>
 
         {/* Sidebar */}
