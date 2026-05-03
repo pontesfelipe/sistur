@@ -2647,6 +2647,45 @@ export type Database = {
           },
         ]
       }
+      edu_rewards: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          type: string
+          unlock_level: number
+          value: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          type: string
+          unlock_level?: number
+          value: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          type?: string
+          unlock_level?: number
+          value?: string
+        }
+        Relationships: []
+      }
       edu_student_profiles: {
         Row: {
           available_hours_per_week: number | null
@@ -3192,6 +3231,8 @@ export type Database = {
       edu_user_xp: {
         Row: {
           current_streak: number | null
+          equipped_avatar: string | null
+          equipped_theme: string | null
           id: string
           last_activity_date: string | null
           level: number | null
@@ -3202,6 +3243,8 @@ export type Database = {
         }
         Insert: {
           current_streak?: number | null
+          equipped_avatar?: string | null
+          equipped_theme?: string | null
           id?: string
           last_activity_date?: string | null
           level?: number | null
@@ -3212,6 +3255,8 @@ export type Database = {
         }
         Update: {
           current_streak?: number | null
+          equipped_avatar?: string | null
+          equipped_theme?: string | null
           id?: string
           last_activity_date?: string | null
           level?: number | null
