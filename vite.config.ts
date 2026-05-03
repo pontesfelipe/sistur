@@ -23,12 +23,12 @@ export default defineConfig(({ mode }) => ({
     css: false,
   },
   build: {
-    // Disable automatic modulepreload of every transitive dynamic-import chunk.
-    // Default behavior preloads ~400KB of route code (FileSaver, recharts,
-    // Configuracoes, etc.) that the user may never navigate to, inflating the
-    // "unused JavaScript" Lighthouse metric. Lazy chunks are still fetched on
-    // demand when their route is visited.
-    modulePreload: { polyfill: false },
+    // Disable automatic <link rel="modulepreload"> generation for lazy chunks.
+    // Vite's default preloads every transitively-imported dynamic chunk
+    // (FileSaver, recharts BarChart, Configuracoes, etc.) on initial page load
+    // — ~400KB of code the user may never actually navigate to. Lazy chunks
+    // are still fetched on demand when their React.lazy() route resolves.
+    modulePreload: false,
     rollupOptions: {
       output: {
         manualChunks(id) {
