@@ -82,6 +82,7 @@ const navGroups: NavGroup[] = [
       { name: 'Catálogo', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true },
       { name: 'Trilhas', href: '/edu/trilhas', icon: Map, requiresEDU: true },
       { name: 'Trilhas Adaptativas', href: '/edu/trilhas-adaptativas', icon: Sparkles, requiresEDU: true },
+      { name: 'Minhas Conquistas', href: '/edu/conquistas', icon: Award, requiresEDU: true },
       { name: 'Minhas Provas', href: '/edu/historico', icon: ScrollText, requiresEDU: true },
       { name: 'Histórico Escolar', href: '/edu/boletim', icon: ScrollText, requiresEDU: true },
       { name: 'Mensagens', href: '/edu/mensagens', icon: MessageCircle, requiresEDU: true },
