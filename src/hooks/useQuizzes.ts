@@ -190,7 +190,7 @@ export function useQuizMutations() {
       // Create question
       const { data: quiz, error: quizError } = await supabase
         .from('quiz_questions')
-        .insert([question])
+        .insert([question as any])
         .select()
         .single();
       
@@ -235,7 +235,7 @@ export function useQuizMutations() {
       // Update question
       const { error: quizError } = await supabase
         .from('quiz_questions')
-        .update({ ...question, updated_at: new Date().toISOString() })
+        .update({ ...question, updated_at: new Date().toISOString() } as any)
         .eq('quiz_id', quizId);
       
       if (quizError) throw quizError;
