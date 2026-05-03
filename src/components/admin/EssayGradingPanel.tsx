@@ -38,7 +38,7 @@ interface PendingAttempt {
   user_name: string;
   user_email: string;
   course_title: string;
-  essay_answers: (EssayAnswer & { stem: string; max_points: number })[];
+  essay_answers: (EssayAnswer & { stem: string; max_points: number; rubric?: unknown })[];
 }
 
 type AttemptRow = {
@@ -94,7 +94,7 @@ function usePendingEssayAttempts() {
           if (allQuizIds.length === 0) return { data: [] as { quiz_id: string; stem: string; question_type: string }[] };
           return supabase
             .from('quiz_questions')
-            .select('quiz_id, stem, question_type')
+            .select('quiz_id, stem, question_type, rubric')
             .in('quiz_id', allQuizIds);
         })(),
       ]);
@@ -122,6 +122,7 @@ function usePendingEssayAttempts() {
             ...a,
             stem: questionMap.get(a.quiz_id)?.stem || 'Questão',
             max_points: pointsPerQuestion,
+            rubric: (questionMap.get(a.quiz_id) as any)?.rubric ?? null,
           }));
 
         if (essayAnswers.length === 0) continue;
