@@ -109,6 +109,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const editedValuesRef = useRef(editedValues);
   const validationErrorsRef = useRef(validationErrors);
   const selectedAssessmentRef = useRef(selectedAssessment);
+  const promotedAssessmentRef = useRef<string | null>(null);
   useEffect(() => { editedValuesRef.current = editedValues; }, [editedValues]);
   useEffect(() => { validationErrorsRef.current = validationErrors; }, [validationErrors]);
   useEffect(() => { selectedAssessmentRef.current = selectedAssessment; }, [selectedAssessment]);
@@ -721,9 +722,20 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     if (fillProgress < 100) return;
     if (Object.keys(editedValues).length > 0) return;
     if (updateAssessment.isPending) return;
+    // Guard: only promote ONCE per assessment to avoid the success toast
+    // looping when the assessments query is invalidated and the cached
+    // status briefly remains DRAFT before refetch lands.
+    if (promotedAssessmentRef.current === selectedAssessment) return;
+    promotedAssessmentRef.current = selectedAssessment;
 
     updateAssessment.mutate({ id: selectedAssessment, status: 'DATA_READY' });
-  }, [selectedAssessment, selectedAssessmentData, activeIndicators.length, fillProgress, editedValues, updateAssessment]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAssessment, selectedAssessmentData?.status, activeIndicators.length, fillProgress, editedValues]);
+
+  // Reset the promotion guard whenever the user switches assessments.
+  useEffect(() => {
+    promotedAssessmentRef.current = null;
+  }, [selectedAssessment]);
 
   const preFilledCount = values.filter(v => {
     if (v.is_ignored) return false;
