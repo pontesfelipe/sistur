@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 53,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.53.4",
+    date: "2026-05-05",
+    type: "patch" as const,
+    changes: [
+      "Indicadores — Corrigido loop da notificação 'Diagnóstico atualizado com sucesso!' ao salvar todos os valores. O efeito que promove DRAFT → DATA_READY no `DataImportPanel` tinha o objeto `updateAssessment` no array de dependências; após o sucesso, o React Query invalidava a lista de assessments, o objeto era reinstanciado e o efeito disparava de novo antes de o cache refletir o novo status, gerando toasts em cadeia. Agora a promoção é guardada por uma ref por assessment (executa uma única vez) e as deps foram reduzidas a `selectedAssessmentData?.status`.",
+    ],
+  },
   {
     version: "1.53.3",
     date: "2026-05-05",
