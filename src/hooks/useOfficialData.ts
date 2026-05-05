@@ -400,13 +400,17 @@ export function useValidateIndicatorValues() {
             validated_at: new Date().toISOString(),
           })
           .eq('id', v.id)
+          .select('id')
       );
 
       const results = await Promise.all(updates);
       const errors = results.filter(r => r.error);
-      
       if (errors.length > 0) {
         throw new Error(`Failed to validate ${errors.length} values`);
+      }
+      const blocked = results.filter(r => !r.error && (!r.data || r.data.length === 0));
+      if (blocked.length > 0) {
+        throw new Error(`Validação bloqueada para ${blocked.length} indicador(es) por permissão (RLS).`);
       }
 
       return { validated: values.length };

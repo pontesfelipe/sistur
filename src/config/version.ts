@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 53,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.53.3",
+    date: "2026-05-05",
+    type: "patch" as const,
+    changes: [
+      "Validação de Dados Oficiais — Corrigido caso em que o status seguia como 'Aguardando revisão' mesmo após o usuário clicar em validar. A política RLS de `external_indicator_values` exigia que o registro pertencesse à organização do usuário; quando ADMIN/ANALYST estava no Modo Demo, os registros eram da org demo e o UPDATE afetava 0 linhas silenciosamente (sem erro). Agora a regra autoriza tanto `user_belongs_to_org` quanto `org_id = get_effective_org_id()`. Adicionalmente, o hook `useValidateIndicatorValues` agora detecta updates bloqueados por RLS (0 linhas) e exibe erro explícito em vez de aparentar sucesso.",
+    ],
+  },
   {
     version: "1.53.2",
     date: "2026-05-05",
