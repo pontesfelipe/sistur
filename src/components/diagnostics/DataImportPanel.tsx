@@ -109,6 +109,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
   const editedValuesRef = useRef(editedValues);
   const validationErrorsRef = useRef(validationErrors);
   const selectedAssessmentRef = useRef(selectedAssessment);
+  const promotedAssessmentRef = useRef<string | null>(null);
   useEffect(() => { editedValuesRef.current = editedValues; }, [editedValues]);
   useEffect(() => { validationErrorsRef.current = validationErrors; }, [validationErrors]);
   useEffect(() => { selectedAssessmentRef.current = selectedAssessment; }, [selectedAssessment]);
