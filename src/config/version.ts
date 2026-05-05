@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 53,
-  patch: 0,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.53.2",
+    date: "2026-05-05",
+    type: "patch" as const,
+    changes: [
+      "Diagnósticos — Corrigido erro 'Validação salva com falha parcial: alguns indicadores não puderam ser pré-preenchidos' que ocorria quando ADMIN/ANALYST estava com Modo Demo ativado e tentava salvar valores em um diagnóstico da sua organização real. As políticas RLS de INSERT/UPDATE/DELETE em `indicator_values` agora autorizam por `user_belongs_to_org(auth.uid(), org_id)` em vez de exigir `org_id = get_effective_org_id()`, permitindo gravar nos dados reais da org mesmo enquanto se navega no dataset demo. Leitura dos dados demo continua isolada via SELECT por `get_effective_org_id()`.",
+    ],
+  },
   {
     version: "1.53.0",
     date: "2026-05-03",
