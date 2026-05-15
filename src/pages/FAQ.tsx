@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ajudaNav } from '@/components/layout/eduSubNav';
 import {
@@ -321,6 +322,24 @@ export default function FAQ() {
   const tabCount = [showEDUTab, showERPTab, showEnterpriseTab].filter(Boolean).length;
 
   return (
+    <>
+    <Helmet>
+      <title>FAQ — Perguntas Frequentes | SISTUR</title>
+      <meta name="description" content="Tire dúvidas sobre o SISTUR: pilares RA/OE/AO, Motor IGMA, trilhas EDU, certificados, indicadores territoriais e Enterprise." />
+      <link rel="canonical" href="https://sistur.lovable.app/faq" />
+      <meta property="og:title" content="FAQ — Perguntas Frequentes | SISTUR" />
+      <meta property="og:description" content="Respostas oficiais sobre diagnósticos territoriais, Motor IGMA e capacitação no SISTUR." />
+      <meta property="og:url" content="https://sistur.lovable.app/faq" />
+      <script type="application/ld+json">{JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqItems.map(i => ({
+          "@type": "Question",
+          "name": i.question,
+          "acceptedAnswer": { "@type": "Answer", "text": i.answer }
+        }))
+      })}</script>
+    </Helmet>
     <AppLayout subNav={ajudaNav}
       title="Perguntas Frequentes"
       subtitle="Tire suas dúvidas sobre o SISTUR"
@@ -413,5 +432,6 @@ export default function FAQ() {
         </Card>
       </div>
     </AppLayout>
+    </>
   );
 }
