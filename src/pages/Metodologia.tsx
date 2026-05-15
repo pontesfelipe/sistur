@@ -1480,5 +1480,6 @@ export default function Metodologia() {
         </Card>
       </div>
     </AppLayout>
+    </>
   );
 }
