@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ajudaNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -368,6 +369,15 @@ const enterpriseCategories = [
 
 export default function Metodologia() {
   return (
+    <>
+    <Helmet>
+      <title>Metodologia Mario Beni — Motor IGMA | SISTUR</title>
+      <meta name="description" content="Princípios sistêmicos de Mario Beni aplicados ao turismo: pilares RA, OE e AO, regras IGMA e interpretação territorial dos diagnósticos." />
+      <link rel="canonical" href="https://sistur.lovable.app/metodologia" />
+      <meta property="og:title" content="Metodologia Mario Beni — Motor IGMA | SISTUR" />
+      <meta property="og:description" content="Como o SISTUR aplica a teoria sistêmica do turismo de Mario Beni: pilares, regras IGMA e interpretação territorial." />
+      <meta property="og:url" content="https://sistur.lovable.app/metodologia" />
+    </Helmet>
     <AppLayout subNav={ajudaNav}
       title="Metodologia Mario Beni"
       subtitle="Princípios sistêmicos do turismo sustentável"
