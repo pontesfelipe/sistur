@@ -1,0 +1,18 @@
+# SISTUR
+
+> Sistema Integrado de Suporte para Turismo em Regiões — diagnóstico territorial, capacitação e gestão científica de destinos turísticos com base nos princípios sistêmicos de Mario Beni.
+
+SISTUR transforma indicadores públicos em decisões estratégicas e capacitação aplicada, fechando o ciclo entre diagnóstico, ação e resultado. Combina três pilares (RA — Relações Ambientais, OE — Organização Estrutural, AO — Ações Operacionais) com o Motor IGMA (6 regras sistêmicas de Mario Beni) e uma plataforma de educação (SISTUR EDU) com trilhas, exames e certificados verificáveis.
+
+## Pages
+
+- [Início](/): Visão geral da plataforma SISTUR.
+- [Metodologia](/metodologia): Teoria sistêmica de Mario Beni, pilares RA/OE/AO e regras do Motor IGMA.
+- [FAQ](/faq): Perguntas frequentes sobre diagnósticos, EDU, Enterprise e Motor IGMA.
+- [Ajuda](/ajuda): Centro de ajuda e tutoriais do SISTUR.
+- [Destinos certificados](/destinos): Lista pública de destinos turísticos avaliados pela metodologia SISTUR.
+- [Verificar certificado](/verificar-certificado): Verificação pública de autenticidade de certificados emitidos pelo SISTUR EDU.
+
+## Optional
+
+- [Login](/auth): Acesso a área autenticada (gestores, técnicos, professores, estudantes).
