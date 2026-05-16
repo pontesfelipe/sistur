@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 53,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.53.5",
+    date: "2026-05-16",
+    type: "patch" as const,
+    changes: [
+      "SEO — Conectado Google Search Console ao domínio publicado (sistur.lovable.app). Meta tag de verificação adicionada ao index.html.",
+    ],
+  },
   {
     version: "1.53.4",
     date: "2026-05-05",
