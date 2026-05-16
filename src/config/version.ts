@@ -23,6 +23,14 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.53.5",
+    date: "2026-05-16",
+    type: "patch" as const,
+    changes: [
+      "SEO — Conectado Google Search Console ao domínio publicado (sistur.lovable.app). Meta tag de verificação adicionada ao index.html.",
+    ],
+  },
+  {
     version: "1.53.4",
     date: "2026-05-05",
     type: "patch" as const,
