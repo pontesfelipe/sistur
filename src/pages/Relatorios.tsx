@@ -691,7 +691,7 @@ export default function Relatorios() {
                             key={ci}
                             className={`border border-border px-3 py-2 ${isStatus ? '' : 'text-muted-foreground'} ${key}`}
                             style={inline}
-                            dangerouslySetInnerHTML={{ __html: cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')) }}
                           />
                         );
                       })}
@@ -748,7 +748,7 @@ export default function Relatorios() {
       // List items
       if (line.startsWith('- ')) {
         elements.push(
-          <li key={i} className="ml-4 text-muted-foreground list-disc" dangerouslySetInnerHTML={{ __html: processedLine.slice(2) }} />
+          <li key={i} className="ml-4 text-muted-foreground list-disc" dangerouslySetInnerHTML={{ __html: sanitizeHtml(processedLine.slice(2)) }} />
         );
         i++; continue;
       }
@@ -757,7 +757,7 @@ export default function Relatorios() {
       const numberedMatch = line.match(/^(\d+)\.\s/);
       if (numberedMatch) {
         elements.push(
-          <li key={i} className="ml-4 text-muted-foreground list-decimal" dangerouslySetInnerHTML={{ __html: processedLine.slice(numberedMatch[0].length) }} />
+          <li key={i} className="ml-4 text-muted-foreground list-decimal" dangerouslySetInnerHTML={{ __html: sanitizeHtml(processedLine.slice(numberedMatch[0].length)) }} />
         );
         i++; continue;
       }
@@ -769,7 +769,7 @@ export default function Relatorios() {
       }
 
       // Regular paragraphs
-      elements.push(<p key={i} className="text-muted-foreground mb-2" dangerouslySetInnerHTML={{ __html: processedLine }} />);
+      elements.push(<p key={i} className="text-muted-foreground mb-2" dangerouslySetInnerHTML={{ __html: sanitizeHtml(processedLine) }} />);
       i++;
     }
 
