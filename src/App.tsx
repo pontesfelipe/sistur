@@ -22,6 +22,12 @@ import { ReportJobWatcherMount } from "@/components/ReportJobWatcherMount";
 // hard reload so the user fetches the latest index.html + chunks instead
 // of seeing a blank screen.
 const RELOAD_KEY = "sistur:chunk-reload";
+if (typeof window !== "undefined") {
+  window.addEventListener("load", () => {
+    // Successful boot — allow future stale-chunk recovery to reload again.
+    setTimeout(() => sessionStorage.removeItem(RELOAD_KEY), 5000);
+  });
+}
 function lazyWithReload<T extends { default: React.ComponentType<any> }>(
   factory: () => Promise<T>
 ) {
