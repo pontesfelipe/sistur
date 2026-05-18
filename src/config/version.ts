@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 53,
-  patch: 5,
+  minor: 54,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.54.0",
+    date: "2026-05-18",
+    type: "minor" as const,
+    changes: [
+      "Segurança — Auditoria completa de scan: (a) 18 edge functions agora exigem JWT, papel ADMIN ou service_role conforme o caso (beni-chat, elevenlabs-tts, moderate-image, moderate-kb-upload, generate-project-structure, calculate-assessment, fetch-official-data, process-report-job, ingest-* x6, run-health-check, cleanup-exam-tracking, sync-test-registry) via novo helper `supabase/functions/_shared/auth.ts`. (b) `report_jobs`: SELECT restrito ao criador/ADMIN/ORG_ADMIN e coluna `auth_jwt` revogada de `authenticated`/`anon`. (c) `mapa_turismo_sync_log`: INSERT só para ADMIN/service_role. (d) `assessment_indicator_audit`: INSERT só para service_role (fim do `WITH CHECK true` em public). (e) Storage `forum-attachments`: INSERT/UPDATE limitados à pasta do próprio usuário. (f) Relatórios: HTML gerado por IA agora é sanitizado com DOMPurify (allowlist mínima) antes do `dangerouslySetInnerHTML`, neutralizando XSS armazenado.",
+    ],
+  },
   {
     version: "1.53.5",
     date: "2026-05-16",
