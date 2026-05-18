@@ -11,6 +11,7 @@
 // (Public, no API key required.)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireAdminOrServiceRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -93,6 +94,9 @@ function intOrNull(s: string | undefined): number | null {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const authResult = await requireAdminOrServiceRole(req);
+  if (authResult instanceof Response) return authResult;
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
