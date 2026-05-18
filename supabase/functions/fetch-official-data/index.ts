@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { requireUser, forbidden } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -680,6 +681,9 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const authResult = await requireUser(req);
+  if (authResult instanceof Response) return authResult;
+
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -693,6 +697,19 @@ Deno.serve(async (req) => {
         JSON.stringify({ success: false, error: 'ibge_code and org_id are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Authorisation: caller must belong to the target org (or be ADMIN).
+    const { data: belongs } = await supabaseClient.rpc("user_belongs_to_org", {
+      _user_id: authResult.user.id,
+      _org_id: org_id,
+    });
+    if (!belongs) {
+      const { data: isAdmin } = await supabaseClient.rpc("has_role", {
+        _user_id: authResult.user.id,
+        _role: "ADMIN",
+      });
+      if (!isAdmin) return forbidden("Caller does not belong to this org");
     }
 
     console.log(`Fetching official data for IBGE code: ${ibge_code}, org: ${org_id}`);

@@ -8,6 +8,7 @@
 // Aerodrome → IBGE map: https://siros.anac.gov.br/siros/registros/aerodromo/aerodromos.csv
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireAdminOrServiceRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -116,6 +117,9 @@ async function loadAerodromeMap(): Promise<Map<string, { ibge: string; name: str
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const authResult = await requireAdminOrServiceRole(req);
+  if (authResult instanceof Response) return authResult;
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,

@@ -10,6 +10,7 @@
 // Resultado: indicador MST_TSE_TURNOUT preenchido automaticamente com o
 // % de comparecimento do último pleito disponível.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { requireAdminOrServiceRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -113,6 +114,9 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const authResult = await requireAdminOrServiceRole(req);
+  if (authResult instanceof Response) return authResult;
 
   try {
     const body = (await req.json()) as RequestBody;

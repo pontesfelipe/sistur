@@ -17,6 +17,13 @@ import { useDestinations } from '@/hooks/useDestinations';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
+
+// Sanitize AI-generated HTML before injection — defends against stored XSS
+// in case destination names, indicator descriptions or other user-controlled
+// fields are echoed verbatim by the AI into the report.
+const sanitizeHtml = (html: string) =>
+  DOMPurify.sanitize(html, { ALLOWED_TAGS: ['strong', 'em', 'b', 'i', 'br'], ALLOWED_ATTR: [] });
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { APP_VERSION } from '@/config/version';

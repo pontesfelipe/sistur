@@ -1,6 +1,7 @@
 // SISTUR Calculate Assessment Engine v1.33.0 — Régua 5 níveis (Fase 5)
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { requireUser, forbidden } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -434,6 +435,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const authResult = await requireUser(req);
+  if (authResult instanceof Response) return authResult;
+
   try {
     const { assessment_id } = await req.json();
     
@@ -467,6 +471,19 @@ serve(async (req) => {
     }
 
     const orgId = assessment.org_id;
+
+    // Authorisation: caller must belong to the assessment's org (or be ADMIN).
+    const { data: belongs } = await supabase.rpc("user_belongs_to_org", {
+      _user_id: authResult.user.id,
+      _org_id: orgId,
+    });
+    if (!belongs) {
+      const { data: isAdmin } = await supabase.rpc("has_role", {
+        _user_id: authResult.user.id,
+        _role: "ADMIN",
+      });
+      if (!isAdmin) return forbidden("Caller does not belong to this assessment's org");
+    }
     const assessmentTier = assessment.tier || 'COMPLETE';
     const diagnosticType = assessment.diagnostic_type || 'territorial';
     const isEnterprise = diagnosticType === 'enterprise';
