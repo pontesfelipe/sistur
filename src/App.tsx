@@ -16,9 +16,36 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { ClientErrorMonitor } from "@/components/ClientErrorMonitor";
 import { ReportJobWatcherMount } from "@/components/ReportJobWatcherMount";
 
+// Wrap React.lazy to auto-recover from stale chunk errors after a redeploy.
+// When the browser has a cached index.html referencing an old hashed chunk
+// that no longer exists, the dynamic import fails. We force a one-time
+// hard reload so the user fetches the latest index.html + chunks instead
+// of seeing a blank screen.
+const RELOAD_KEY = "sistur:chunk-reload";
+function lazyWithReload<T extends { default: React.ComponentType<any> }>(
+  factory: () => Promise<T>
+) {
+  return lazy(() =>
+    factory().catch((err) => {
+      const msg = String(err?.message || err);
+      const isChunkError =
+        msg.includes("Failed to fetch dynamically imported module") ||
+        msg.includes("Importing a module script failed") ||
+        msg.includes("error loading dynamically imported module");
+      if (isChunkError && !sessionStorage.getItem(RELOAD_KEY)) {
+        sessionStorage.setItem(RELOAD_KEY, "1");
+        window.location.reload();
+        // Return a never-resolving promise so Suspense holds until reload.
+        return new Promise<T>(() => {});
+      }
+      throw err;
+    })
+  );
+}
+
 // Lazy load all page components for code splitting
-const Index = lazy(() => import("./pages/Index"));
-const Auth = lazy(() => import("./pages/Auth"));
+const Index = lazyWithReload(() => import("./pages/Index"));
+const Auth = lazyWithReload(() => import("./pages/Auth"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const PendingApproval = lazy(() => import("./pages/PendingApproval"));
 const Destinos = lazy(() => import("./pages/Destinos"));
