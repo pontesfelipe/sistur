@@ -1,0 +1,1 @@
+ALTER TABLE public.report_jobs ADD COLUMN IF NOT EXISTS partial_pillars jsonb;
