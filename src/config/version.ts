@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 54,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.54.1",
+    date: "2026-05-28",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — Retomada de geração: cada pilar (RA/OE/AO) concluído é persistido em `report_jobs.partial_pillars` assim que a IA termina. Em caso de falha por timeout do provedor ou do worker, o retry automático reaproveita os pilares já gerados e refaz só o que faltou — antes, toda falha reiniciava do zero. Pipeline já era paralelo na Fase 1; agora ficou também resiliente entre tentativas.",
+      "Relatórios — Mensagem do watcher: falhas transitórias (auto-cleanup, idle/hard timeout, 504/gateway) agora aparecem como aviso (\"demorou mais que o esperado, tente novamente em alguns minutos — os trechos já gerados serão reaproveitados\") em vez de erro genérico.",
+    ],
+  },
   {
     version: "1.54.0",
     date: "2026-05-18",
