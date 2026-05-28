@@ -3206,6 +3206,29 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               template: reportTemplate,
               tier: assessment?.tier as ClaudeBudgetTier,
               indicatorCount: Array.isArray(auditTrail) ? auditTrail.length : 0,
+              cachedPillars: (incomingPartialPillars && typeof incomingPartialPillars === 'object')
+                ? incomingPartialPillars as Partial<{ RA: string; OE: string; AO: string }>
+                : undefined,
+              onPillarReady: (pillar, text) => {
+                if (!incomingJobId) return;
+                // Fire-and-forget: persiste o pilar concluído em
+                // report_jobs.partial_pillars para retomada em retry.
+                supabaseAdmin.rpc('jsonb_set' as never, {} as never).catch(() => {});
+                supabaseAdmin
+                  .from('report_jobs')
+                  .select('partial_pillars')
+                  .eq('id', incomingJobId)
+                  .maybeSingle()
+                  .then(({ data }) => {
+                    const merged = { ...(data?.partial_pillars as object || {}), [pillar]: text };
+                    return supabaseAdmin
+                      .from('report_jobs')
+                      .update({ partial_pillars: merged })
+                      .eq('id', incomingJobId);
+                  })
+                  .then(() => {})
+                  .catch(() => {});
+              },
               onStage: (stage, extra) => {
                 logger.stage(stage, extra);
                 const pct = stage === 'phase1_pillars_start'
