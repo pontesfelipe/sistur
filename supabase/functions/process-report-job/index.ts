@@ -93,7 +93,7 @@ serve(async (req) => {
     // Lê o job
     const { data: job, error: jobErr } = await supabaseAdmin
       .from("report_jobs")
-      .select("id, org_id, assessment_id, destination_name, report_template, visibility, environment, status, payload, auth_jwt, attempts, created_by")
+      .select("id, org_id, assessment_id, destination_name, report_template, visibility, environment, status, payload, auth_jwt, attempts, created_by, partial_pillars")
       .eq("id", jobId)
       .maybeSingle();
     if (jobErr || !job) {
