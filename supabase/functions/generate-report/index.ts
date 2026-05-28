@@ -3213,7 +3213,6 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
                 if (!incomingJobId) return;
                 // Fire-and-forget: persiste o pilar concluído em
                 // report_jobs.partial_pillars para retomada em retry.
-                supabaseAdmin.rpc('jsonb_set' as never, {} as never).catch(() => {});
                 supabaseAdmin
                   .from('report_jobs')
                   .select('partial_pillars')
