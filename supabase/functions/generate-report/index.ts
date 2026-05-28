@@ -1581,14 +1581,25 @@ async function runTwoPhasePipeline(args: {
   template?: string;
   tier?: ClaudeBudgetTier;
   indicatorCount?: number;
+  // v1.54.1 — Resume support: pilares já gerados em tentativa anterior.
+  cachedPillars?: Partial<{ RA: string; OE: string; AO: string }>;
+  // Callback invocado quando um pilar termina (para persistir parcial).
+  onPillarReady?: (pillar: 'RA' | 'OE' | 'AO', text: string) => void;
 }): Promise<{ ok: true; content: string } | { ok: false; reason: string }> {
-  const { provider, systemPromptByPillar, envelopeSystemPrompt, pillarUserPrompt, envelopeUserPrompt, lovableApiKey, anthropicApiKey, onStage, onSectionReady, template, tier, indicatorCount } = args;
+  const { provider, systemPromptByPillar, envelopeSystemPrompt, pillarUserPrompt, envelopeUserPrompt, lovableApiKey, anthropicApiKey, onStage, onSectionReady, template, tier, indicatorCount, cachedPillars, onPillarReady } = args;
 
   // Fase 1: 3 chamadas em paralelo. Se qualquer uma falhar, abortamos as outras.
   const controller = new AbortController();
-  onStage('phase1_pillars_start', { provider });
+  const cachedKeys = (['RA', 'OE', 'AO'] as const).filter((p) => typeof cachedPillars?.[p] === 'string' && (cachedPillars![p] as string).length > 0);
+  onStage('phase1_pillars_start', { provider, cached: cachedKeys });
   const pillarPromises = (['RA', 'OE', 'AO'] as const).map((p) =>
     (() => {
+      // v1.54.1 — Resume: reaproveita pilar já gerado em tentativa anterior.
+      const cached = cachedPillars?.[p];
+      if (typeof cached === 'string' && cached.length > 0) {
+        onStage('pillar_cached_reused', { pillar: p, chars: cached.length });
+        return Promise.resolve({ pillar: p, ok: true as const, content: cached });
+      }
       const sp = systemPromptByPillar[p];
       const up = pillarUserPrompt(p);
       const budget = provider === 'claude'
@@ -1608,7 +1619,12 @@ async function runTwoPhasePipeline(args: {
         anthropicApiKey,
         signal: controller.signal,
         maxTokens: budget ? budget.maxTokens : 8000,
-      }).then((res) => ({ pillar: p, ...res }));
+      }).then((res) => {
+        if (res.ok && onPillarReady) {
+          try { onPillarReady(p, res.content); } catch { /* ignore */ }
+        }
+        return { pillar: p, ...res };
+      });
     })()
   );
   const pillarResults = await Promise.all(pillarPromises);
@@ -2374,6 +2390,8 @@ serve(async (req) => {
       // hardcoded no servidor.
       appVersion: rawAppVersion,
       traceId: bodyTraceId,
+      // v1.54.1 — Pilares já gerados em tentativa anterior (resume).
+      partialPillars: incomingPartialPillars,
     } = await req.json();
 
     const appVersion: string = (typeof rawAppVersion === 'string' && /^v?\d+\.\d+\.\d+/.test(rawAppVersion))
@@ -3188,6 +3206,28 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               template: reportTemplate,
               tier: assessment?.tier as ClaudeBudgetTier,
               indicatorCount: Array.isArray(auditTrail) ? auditTrail.length : 0,
+              cachedPillars: (incomingPartialPillars && typeof incomingPartialPillars === 'object')
+                ? incomingPartialPillars as Partial<{ RA: string; OE: string; AO: string }>
+                : undefined,
+              onPillarReady: (pillar, text) => {
+                if (!incomingJobId) return;
+                // Fire-and-forget: persiste o pilar concluído em
+                // report_jobs.partial_pillars para retomada em retry.
+                supabaseAdmin
+                  .from('report_jobs')
+                  .select('partial_pillars')
+                  .eq('id', incomingJobId)
+                  .maybeSingle()
+                  .then(({ data }) => {
+                    const merged = { ...(data?.partial_pillars as object || {}), [pillar]: text };
+                    return supabaseAdmin
+                      .from('report_jobs')
+                      .update({ partial_pillars: merged })
+                      .eq('id', incomingJobId);
+                  })
+                  .then(() => {})
+                  .catch(() => {});
+              },
               onStage: (stage, extra) => {
                 logger.stage(stage, extra);
                 const pct = stage === 'phase1_pillars_start'

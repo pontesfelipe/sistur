@@ -93,7 +93,7 @@ serve(async (req) => {
     // Lê o job
     const { data: job, error: jobErr } = await supabaseAdmin
       .from("report_jobs")
-      .select("id, org_id, assessment_id, destination_name, report_template, visibility, environment, status, payload, auth_jwt, attempts, created_by")
+      .select("id, org_id, assessment_id, destination_name, report_template, visibility, environment, status, payload, auth_jwt, attempts, created_by, partial_pillars")
       .eq("id", jobId)
       .maybeSingle();
     if (jobErr || !job) {
@@ -181,7 +181,11 @@ serve(async (req) => {
     try {
       const payload = job.payload as any;
       const url = `${supabaseUrl}/functions/v1/generate-report`;
-      log("internal_fetch_start", { url });
+      const partialPillars = (job as any).partial_pillars && typeof (job as any).partial_pillars === 'object'
+        ? (job as any).partial_pillars
+        : undefined;
+      const cachedCount = partialPillars ? Object.keys(partialPillars).length : 0;
+      log("internal_fetch_start", { url, cachedPillars: cachedCount });
       const resp = await fetch(url, {
         method: "POST",
         headers: {
@@ -207,6 +211,7 @@ serve(async (req) => {
           aiProvider: payload.aiProvider ?? "auto",
           appVersion: payload.appVersion,
           traceId,
+          partialPillars,
         }),
         signal: controller.signal,
       });
@@ -247,6 +252,7 @@ serve(async (req) => {
               aiProvider: payload.aiProvider ?? "auto",
               appVersion: payload.appVersion,
               traceId,
+            partialPillars,
             }),
             signal: controller.signal,
           });

@@ -138,12 +138,26 @@ export function useReportJobWatcher() {
       stopPolling(entry.jobId);
       removePending(entry.jobId);
       const dest = entry.destinationName || 'Diagnóstico';
-      const msg = `Falha ao gerar relatório de ${dest}`;
-      toast.error(msg, {
-        description: job.error_message?.slice(0, 200) || 'Tente novamente.',
-        duration: 12_000,
-      });
-      void maybeNotify('SISTUR — Falha no relatório', msg);
+      const errText = job.error_message || '';
+      // v1.54.1 — Reconhece falhas transitórias de timeout/gateway e mostra
+      // mensagem mais branda, encorajando nova tentativa (com retomada
+      // automática dos pilares já gerados).
+      const isTransient = /auto-cleanup|excedeu o limite|worker-(idle|hard)-timeout|504|gateway/i.test(errText);
+      if (isTransient) {
+        const msg = `Geração de ${dest} demorou mais que o esperado`;
+        toast.warning(msg, {
+          description: 'O provedor de IA está lento agora. Tente novamente em alguns minutos — os trechos já gerados serão reaproveitados.',
+          duration: 14_000,
+        });
+        void maybeNotify('SISTUR — Geração interrompida', msg);
+      } else {
+        const msg = `Falha ao gerar relatório de ${dest}`;
+        toast.error(msg, {
+          description: errText.slice(0, 200) || 'Tente novamente.',
+          duration: 12_000,
+        });
+        void maybeNotify('SISTUR — Falha no relatório', msg);
+      }
     }
   }, [queryClient, stopPolling]);
 

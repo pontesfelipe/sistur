@@ -8210,6 +8210,7 @@ export type Database = {
           last_attempt_at: string | null
           org_id: string
           partial_content: string | null
+          partial_pillars: Json | null
           payload: Json | null
           progress_pct: number
           report_id: string | null
@@ -8233,6 +8234,7 @@ export type Database = {
           last_attempt_at?: string | null
           org_id: string
           partial_content?: string | null
+          partial_pillars?: Json | null
           payload?: Json | null
           progress_pct?: number
           report_id?: string | null
@@ -8256,6 +8258,7 @@ export type Database = {
           last_attempt_at?: string | null
           org_id?: string
           partial_content?: string | null
+          partial_pillars?: Json | null
           payload?: Json | null
           progress_pct?: number
           report_id?: string | null
