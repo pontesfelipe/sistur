@@ -2390,6 +2390,8 @@ serve(async (req) => {
       // hardcoded no servidor.
       appVersion: rawAppVersion,
       traceId: bodyTraceId,
+      // v1.54.1 — Pilares já gerados em tentativa anterior (resume).
+      partialPillars: incomingPartialPillars,
     } = await req.json();
 
     const appVersion: string = (typeof rawAppVersion === 'string' && /^v?\d+\.\d+\.\d+/.test(rawAppVersion))
