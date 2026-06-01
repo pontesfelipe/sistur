@@ -645,10 +645,7 @@ async function runCalculationCore(
 
         if (enterpriseError) {
           console.error("Error fetching enterprise indicator values:", enterpriseError);
-          return new Response(
-            JSON.stringify({ error: "Failed to fetch enterprise indicator values" }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+          throw new CalcError("Failed to fetch enterprise indicator values", 500);
         }
 
         // Transform to common structure and filter by tier
@@ -725,10 +722,7 @@ async function runCalculationCore(
 
       if (valuesError) {
         console.error("Error fetching indicator values:", valuesError);
-        return new Response(
-          JSON.stringify({ error: "Failed to fetch indicator values" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        throw new CalcError("Failed to fetch indicator values", 500);
       }
 
       // Filter indicator values based on tier
@@ -869,9 +863,9 @@ async function runCalculationCore(
     }
 
     if (!filteredIndicatorValues || filteredIndicatorValues.length === 0) {
-      return new Response(
-        JSON.stringify({ error: `No indicator values found for this ${isEnterprise ? 'enterprise' : 'territorial'} assessment and tier level` }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      throw new CalcError(
+        `No indicator values found for this ${isEnterprise ? 'enterprise' : 'territorial'} assessment and tier level`,
+        400,
       );
     }
 
