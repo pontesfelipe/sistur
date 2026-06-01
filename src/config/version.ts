@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 60,
-  patch: 6,
+  minor: 61,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.61.0",
+    date: "2026-06-01",
+    type: "minor" as const,
+    changes: [
+      "Observatório — Métricas de declínio desejado: `empregos_desligados` marcado com `higher_is_better=false` e adicionadas 4 novas métricas (sazonalidade Gini, reclamações de turistas, cancelamentos de reservas, incidentes de segurança turística) já configuradas para disparar alerta de regressão quando o valor SOBE. A função `detect_observatory_regression` (existente) honra a flag automaticamente.",
+      "Observatório — Notificação por e-mail para alertas críticos: nova edge function `notify-observatory-alert` envia template transacional `observatory-critical-alert` para ORG_ADMINs da org + ADMINs globais quando um alerta `severity=critical` é detectado. Idempotente via colunas `email_sent_at` / `email_recipients_count` em `observatory_alerts`. Disparo automático do client via `RegressionAlertsPanel`.",
+      "Observatório — Export CSV (separador `;`, BOM UTF-8 para Excel BR) e Export PDF (via motor de impressão do navegador) acessíveis no header da página `/observatorio` para todos os usuários autenticados.",
+      "Observatório — Gráfico de série temporal por indicador: novo `MetricHistoryDialog` (Recharts) acessível pelo ícone de gráfico ao lado de cada métrica; mostra todos os anos/meses registrados para a org efetiva, respeitando `effectiveOrgId` (demo mode safe).",
+    ],
+  },
   {
     version: "1.60.6",
     date: "2026-06-01",

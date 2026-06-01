@@ -16,13 +16,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Bed, CalendarDays, DollarSign, Briefcase, Plus, Trash2, Loader2 } from "lucide-react";
+import { Activity, Bed, CalendarDays, DollarSign, Briefcase, Plus, Trash2, Loader2, FileSpreadsheet, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfileContext } from "@/contexts/ProfileContext";
 import { toast } from "sonner";
 import { Download } from "lucide-react";
+import { buildObservatoryCsv, downloadCsv } from "@/lib/observatoryExport";
+import { MetricHistoryDialog } from "@/components/observatorio/MetricHistoryDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { CsvImportDialog } from "@/components/observatorio/CsvImportDialog";
 import { RegressionAlertsPanel } from "@/components/observatorio/RegressionAlertsPanel";
@@ -52,7 +54,7 @@ const MONTHS = [
 export default function Observatorio() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
-  const { roles } = useProfileContext();
+  const { roles, profile } = useProfileContext();
   const queryClient = useQueryClient();
   const isAdmin = roles.some((r) => r.role === "ADMIN" || r.role === "ORG_ADMIN");
   const [ingesting, setIngesting] = useState(false);
@@ -134,6 +136,22 @@ export default function Observatorio() {
     setNewEvent({ name: "", description: "", category: "cultural", start_date: "", end_date: "", estimated_attendance: "", estimated_revenue: "" });
   };
 
+  const handleExportCsv = () => {
+    const csv = buildObservatoryCsv({
+      orgName: (profile as any)?.org?.name ?? (profile as any)?.orgs?.name ?? "Destino",
+      year,
+      metrics,
+      summary,
+    });
+    downloadCsv(`observatorio-${year}.csv`, csv);
+    toast.success("CSV exportado");
+  };
+
+  const handlePrintPdf = () => {
+    // Usa o motor de impressão do navegador para gerar PDF da página atual
+    window.print();
+  };
+
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -153,6 +171,12 @@ export default function Observatorio() {
               <CsvImportDialog metrics={metrics} />
             </>
           )}
+          <Button size="sm" variant="outline" onClick={handleExportCsv}>
+            <FileSpreadsheet className="h-4 w-4 mr-2" /> CSV
+          </Button>
+          <Button size="sm" variant="outline" onClick={handlePrintPdf}>
+            <Printer className="h-4 w-4 mr-2" /> PDF
+          </Button>
           <Label className="text-sm">Ano de referência</Label>
           <Select value={String(year)} onValueChange={(v) => setYear(parseInt(v))}>
             <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
@@ -234,9 +258,12 @@ export default function Observatorio() {
                                 {hasData ? `${formatValue(Number(s!.total_value), m.unit)} · ${s!.data_points} ${s!.data_points === 1 ? "registro" : "registros"}` : "Sem dados em " + year}
                               </p>
                             </div>
-                            <Button size="sm" variant="outline" onClick={() => setMeasureDialog({ metricId: m.id, name: m.name, unit: m.unit })}>
-                              <Plus className="h-3 w-3 mr-1" /> Registrar
-                            </Button>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <MetricHistoryDialog metricId={m.id} metricName={m.name} unit={m.unit} />
+                              <Button size="sm" variant="outline" onClick={() => setMeasureDialog({ metricId: m.id, name: m.name, unit: m.unit })}>
+                                <Plus className="h-3 w-3 mr-1" /> Registrar
+                              </Button>
+                            </div>
                           </div>
                         );
                       })}
