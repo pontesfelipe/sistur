@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -23,6 +24,8 @@ interface AlertRow {
   is_read: boolean;
   is_dismissed: boolean;
   created_at: string;
+  email_sent_at: string | null;
+  email_recipients_count: number;
   observatory_metrics?: { name: string; unit: string; code: string } | null;
 }
 
@@ -61,6 +64,27 @@ export function RegressionAlertsPanel() {
       </Card>
     );
   }
+
+  // Dispara e-mail para alertas críticos ainda não notificados (idempotente: a edge function checa email_sent_at)
+  const notifiedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const pending = alerts.filter(
+      (a) => a.severity === "critical" && !a.email_sent_at && !notifiedRef.current.has(a.id)
+    );
+    if (pending.length === 0) return;
+    pending.forEach(async (a) => {
+      notifiedRef.current.add(a.id);
+      try {
+        await supabase.functions.invoke("notify-observatory-alert", {
+          body: { alert_id: a.id },
+        });
+        qc.invalidateQueries({ queryKey: ["observatory", "alerts"] });
+      } catch (e) {
+        // silencioso — não interrompe o usuário
+        console.error("notify-observatory-alert falhou", e);
+      }
+    });
+  }, [alerts, qc]);
 
   if (alerts.length === 0) return null;
 
