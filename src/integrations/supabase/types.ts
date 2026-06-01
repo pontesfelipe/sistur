@@ -326,6 +326,63 @@ export type Database = {
         }
         Relationships: []
       }
+      assessment_calc_jobs: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          org_id: string | null
+          requested_by: string | null
+          result: Json | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          org_id?: string | null
+          requested_by?: string | null
+          result?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          org_id?: string | null
+          requested_by?: string | null
+          result?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_calc_jobs_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_calc_jobs_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+        ]
+      }
       assessment_indicator_audit: {
         Row: {
           assessment_id: string
@@ -9781,6 +9838,7 @@ export type Database = {
           ra_score: number
         }[]
       }
+      expire_stuck_calc_jobs: { Args: never; Returns: number }
       expire_trial_licenses: { Args: never; Returns: undefined }
       extend_assignment_due_date: {
         Args: { p_assignment_id: string; p_new_due_date: string }
