@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 60,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.60.6",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Consórcios — Gating por plano pago aplicado. Novo prop `requirePaid` em `LicenseRoute` redireciona para `/assinatura` quando o plano efetivo não é Basic, Pro ou Enterprise (trial expirado ou usuário sem licença paga). Rotas `/consorcios` e `/consorcios/:id` agora envoltas em `LicenseRoute requirePaid` (além de `ERPRoute` + `ModuleRoute`), confirmando a regra: feature disponível em todos os planos pagos, indisponível em trial. ADMIN global continua passando por bypass canônico em `LicenseRoute`. Fecha a confirmação pendente do plano ERP Regional / Consórcios.",
+    ],
+  },
   {
     version: "1.60.5",
     date: "2026-06-01",
