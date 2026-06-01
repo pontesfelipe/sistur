@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 61,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.61.1",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico — Cálculo agora é assíncrono (job + polling) para não travar a interface em diagnósticos COMPLETE com 100+ indicadores. Nova tabela `assessment_calc_jobs` registra cada execução (pending/running/completed/failed). `calculate-assessment` responde 202 imediato com `job_id` e processa em background via `EdgeRuntime.waitUntil`; hook `useCalculateAssessment` faz polling a cada 2s por até 5 min, exibindo toast de progresso e erro real do servidor em caso de falha. Função `expire_stuck_calc_jobs()` marca como falhos jobs presos há mais de 10 min. Resolve o sintoma 'fica carregando para sempre' relatado em Barretos/Foz.",
+      "Relatórios — Indicadores BINÁRIOS (OE007 Plano de Turismo, COMTUR, Fundo Municipal, etc.) agora aparecem na TABELA CANÔNICA injetada no LLM como 'SIM (1) — possui' ou 'NÃO (0) — não possui' em vez do número cru. Nova regra dura no prompt proíbe afirmar ausência/presença divergente do valor literal. Corrige relato falso de 'sem Plano de Turismo' para Barretos quando o valor preenchido é 1 (possui)."
+    ]
+  },
   {
     version: "1.61.0",
     date: "2026-06-01",
