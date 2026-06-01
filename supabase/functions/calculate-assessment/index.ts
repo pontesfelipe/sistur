@@ -2084,36 +2084,153 @@ async function runCalculationCore(
       },
     });
 
-    // Return result
-    return new Response(
-      JSON.stringify({
-        success: true,
-        assessment_id,
-        pillar_scores: pillarScores,
-        critical_pillar: criticalPillar?.pillar,
-        critical_score: criticalPillar?.score,
-        issues_created: insertedIssues.length,
-        recommendations_created: recommendations.length,
-        final_score: finalScore,
-        final_classification: finalClassification,
-        igma: {
-          flags: igmaResult.flags,
-          allowedActions: igmaResult.allowedActions,
-          blockedActions: igmaResult.blockedActions,
-          uiMessages: igmaResult.uiMessages,
-          nextReviewRecommendedAt: igmaResult.nextReviewRecommendedAt,
-        },
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    // Return result object
+    return {
+      success: true,
+      assessment_id,
+      pillar_scores: pillarScores,
+      critical_pillar: criticalPillar?.pillar,
+      critical_score: criticalPillar?.score,
+      issues_created: insertedIssues.length,
+      recommendations_created: recommendations.length,
+      final_score: finalScore,
+      final_classification: finalClassification,
+      igma: {
+        flags: igmaResult.flags,
+        allowedActions: igmaResult.allowedActions,
+        blockedActions: igmaResult.blockedActions,
+        uiMessages: igmaResult.uiMessages,
+        nextReviewRecommendedAt: igmaResult.nextReviewRecommendedAt,
+      },
+    };
+  }
+}
 
-  } catch (error) {
-    console.error("Calculation error:", error);
+// ============================================================
+// HTTP handler — async job pattern
+// Modo padrão: cria job em assessment_calc_jobs e responde 202 imediatamente,
+// rodando runCalculationCore em background via EdgeRuntime.waitUntil.
+// Modo sync (testes/admin): body { sync: true } executa em primeiro plano.
+// ============================================================
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const authResult = await requireUser(req);
+  if (authResult instanceof Response) return authResult;
+
+  let body: { assessment_id?: string; sync?: boolean } = {};
+  try { body = await req.json(); } catch { /* noop */ }
+  const assessment_id = body.assessment_id;
+
+  if (!assessment_id) {
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: "assessment_id is required" }),
+      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  const userId = authResult.user.id;
+
+  // Modo síncrono (somente para testes internos)
+  if (body.sync === true) {
+    try {
+      const result = await runCalculationCore(supabase as any, userId, assessment_id);
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    } catch (err) {
+      const status = err instanceof CalcError ? err.status : 500;
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("Sync calculation error:", err);
+      return new Response(JSON.stringify({ error: message }), {
+        status, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  // Descobrir org_id do assessment (para popular o job e satisfazer RLS de leitura)
+  const { data: assessmentRow, error: assessmentErr } = await supabase
+    .from("assessments")
+    .select("org_id")
+    .eq("id", assessment_id)
+    .maybeSingle();
+
+  if (assessmentErr || !assessmentRow) {
+    return new Response(
+      JSON.stringify({ error: "Assessment not found" }),
+      { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  // Cria job em estado pending
+  const { data: job, error: jobErr } = await supabase
+    .from("assessment_calc_jobs")
+    .insert({
+      assessment_id,
+      org_id: assessmentRow.org_id,
+      requested_by: userId,
+      status: "pending",
+    })
+    .select("id")
+    .single();
+
+  if (jobErr || !job) {
+    console.error("Failed to create calc job:", jobErr);
+    return new Response(
+      JSON.stringify({ error: "Failed to create calculation job" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  const jobId = job.id as string;
+
+  // Dispatcher assíncrono: atualiza job ao final
+  const runner = (async () => {
+    await supabase
+      .from("assessment_calc_jobs")
+      .update({ status: "running", started_at: new Date().toISOString() })
+      .eq("id", jobId);
+
+    try {
+      const result = await runCalculationCore(supabase as any, userId, assessment_id);
+      await supabase
+        .from("assessment_calc_jobs")
+        .update({
+          status: "completed",
+          result,
+          finished_at: new Date().toISOString(),
+        })
+        .eq("id", jobId);
+    } catch (err) {
+      console.error(`Calc job ${jobId} failed:`, err);
+      const message = err instanceof Error ? err.message : "Unknown error";
+      await supabase
+        .from("assessment_calc_jobs")
+        .update({
+          status: "failed",
+          error_message: message,
+          finished_at: new Date().toISOString(),
+        })
+        .eq("id", jobId);
+    }
+  })();
+
+  // Mantém a função viva até o runner terminar, sem bloquear a resposta
+  // @ts-ignore — EdgeRuntime existe em runtime Deno Deploy/Supabase Edge
+  if (typeof EdgeRuntime !== "undefined" && typeof EdgeRuntime.waitUntil === "function") {
+    // @ts-ignore
+    EdgeRuntime.waitUntil(runner);
+  }
+
+  return new Response(
+    JSON.stringify({ job_id: jobId, status: "pending" }),
+    { status: 202, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+  );
 });
 
 // Generate a descriptive issue title including interpretation
