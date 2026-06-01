@@ -3,6 +3,7 @@
 // (Cadastur, ANAC, etc.) que já populam `external_indicator_values`.
 // Composes-on, em vez de scrapear novamente — preserva linhagem e provenance.
 
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { requireAdminOrServiceRole, corsHeaders } from "../_shared/auth.ts";
 
 // Mapeamento: indicator_code externo -> métrica do observatório
@@ -22,9 +23,25 @@ const MAPPINGS: Array<{
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const guard = await requireAdminOrServiceRole(req);
-  if (guard instanceof Response) return guard;
-  const admin = guard.admin;
+  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+  const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+
+  // Auth: aceita (a) ADMIN/service_role via JWT  OU  (b) cabeçalho x-cron-secret válido
+  const cronHeader = req.headers.get("x-cron-secret") ?? "";
+  let authorized = false;
+  if (cronHeader) {
+    const { data: secretRow } = await admin
+      .from("internal_cron_secrets")
+      .select("value")
+      .eq("name", "ingest_observatory_cron_secret")
+      .maybeSingle();
+    if (secretRow?.value && secretRow.value === cronHeader) authorized = true;
+  }
+  if (!authorized) {
+    const guard = await requireAdminOrServiceRole(req);
+    if (guard instanceof Response) return guard;
+  }
 
   let body: { smoke_test?: boolean; year?: number; month?: number | null } = {};
   try { body = await req.json(); } catch { /* noop */ }
