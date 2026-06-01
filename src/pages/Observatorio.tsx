@@ -20,7 +20,7 @@ import { Activity, Bed, CalendarDays, DollarSign, Briefcase, Plus, Trash2, Loade
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfile } from "@/contexts/ProfileContext";
+import { useProfileContext } from "@/contexts/ProfileContext";
 import { toast } from "sonner";
 import { Download } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -50,7 +50,7 @@ const MONTHS = [
 export default function Observatorio() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
-  const { profile } = useProfile();
+  const { profile } = useProfileContext();
   const queryClient = useQueryClient();
   const isAdmin = profile?.role === "ADMIN" || profile?.role === "ORG_ADMIN";
   const [ingesting, setIngesting] = useState(false);
