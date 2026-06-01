@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 57,
+  minor: 58,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.58.0",
+    date: "2026-06-01",
+    type: "minor" as const,
+    changes: [
+      "Observatório Turístico Permanente — Novo módulo separado do diagnóstico, focado em monitoramento contínuo do destino. Catálogo público de 15 métricas (`observatory_metrics`) organizadas em 5 categorias: Fluxo (visitantes totais, nacionais, internacionais, permanência média), Ocupação (taxa hoteleira, diária média, leitos), Eventos (realizados, participantes), Receita (turística total, ISS, gasto médio) e Empregos (formais, admissões, desligamentos). Tabela `observatory_measurements` armazena medições por organização com referência ano/mês (ou anual), valor, fonte e notas. Tabela `observatory_events` mantém calendário de eventos turísticos com público e receita estimada/realizada. RPC `get_observatory_summary(org_id, year)` agrega totais e médias por métrica. Página `/observatorio` (acesso ERP) exibe KPIs por categoria, lista de indicadores com botão de registro rápido por mês, e calendário de eventos com criação/exclusão. RLS: membros da org (via profiles.org_id) e ADMIN global. Produto recorrente anual conforme o roadmap comercial.",
+    ],
+  },
   {
     version: "1.57.0",
     date: "2026-06-01",

@@ -6957,6 +6957,149 @@ export type Database = {
         }
         Relationships: []
       }
+      observatory_events: {
+        Row: {
+          actual_attendance: number | null
+          actual_revenue: number | null
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string
+          estimated_attendance: number | null
+          estimated_revenue: number | null
+          id: string
+          name: string
+          org_id: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          actual_attendance?: number | null
+          actual_revenue?: number | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date: string
+          estimated_attendance?: number | null
+          estimated_revenue?: number | null
+          id?: string
+          name: string
+          org_id: string
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          actual_attendance?: number | null
+          actual_revenue?: number | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string
+          estimated_attendance?: number | null
+          estimated_revenue?: number | null
+          id?: string
+          name?: string
+          org_id?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      observatory_measurements: {
+        Row: {
+          created_at: string
+          id: string
+          metric_id: string
+          notes: string | null
+          org_id: string
+          recorded_by: string | null
+          reference_month: number | null
+          reference_year: number
+          source: string | null
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metric_id: string
+          notes?: string | null
+          org_id: string
+          recorded_by?: string | null
+          reference_month?: number | null
+          reference_year: number
+          source?: string | null
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metric_id?: string
+          notes?: string | null
+          org_id?: string
+          recorded_by?: string | null
+          reference_month?: number | null
+          reference_year?: number
+          source?: string | null
+          updated_at?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "observatory_measurements_metric_id_fkey"
+            columns: ["metric_id"]
+            isOneToOne: false
+            referencedRelation: "observatory_metrics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      observatory_metrics: {
+        Row: {
+          active: boolean
+          aggregation: string
+          category: string
+          code: string
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          name: string
+          unit: string
+        }
+        Insert: {
+          active?: boolean
+          aggregation?: string
+          category: string
+          code: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          name: string
+          unit: string
+        }
+        Update: {
+          active?: boolean
+          aggregation?: string
+          category?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          name?: string
+          unit?: string
+        }
+        Relationships: []
+      }
       ods_targets: {
         Row: {
           code: string
@@ -9747,6 +9890,18 @@ export type Database = {
           title: string
         }[]
       }
+      get_observatory_summary: {
+        Args: { _org_id: string; _year: number }
+        Returns: {
+          avg_value: number
+          category: string
+          data_points: number
+          metric_code: string
+          metric_name: string
+          total_value: number
+          unit: string
+        }[]
+      }
       get_org_classroom_ranking: {
         Args: never
         Returns: {
@@ -9969,6 +10124,10 @@ export type Database = {
       }
       user_has_training_access: {
         Args: { p_training_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      user_in_org: {
+        Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
       verify_certificate_by_code: {
