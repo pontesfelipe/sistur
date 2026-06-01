@@ -256,6 +256,9 @@ export default function Configuracoes() {
             {/* Any user can join an org by code */}
             <JoinOrgByCodePanel />
 
+            {/* Convites de consórcio pendentes para a org */}
+            <PendingConsortiumInvitesPanel />
+
             {isAdmin && <ActAsUserPanel />}
           </TabsContent>
 
