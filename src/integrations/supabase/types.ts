@@ -1180,6 +1180,145 @@ export type Database = {
           },
         ]
       }
+      consortia: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          lead_org_id: string
+          name: string
+          slug: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          lead_org_id: string
+          name: string
+          slug: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          lead_org_id?: string
+          name?: string
+          slug?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consortia_lead_org_id_fkey"
+            columns: ["lead_org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consortium_members: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          consortium_id: string
+          created_at: string
+          declined_at: string | null
+          declined_by: string | null
+          id: string
+          invited_at: string
+          invited_by: string
+          member_role: string
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          consortium_id: string
+          created_at?: string
+          declined_at?: string | null
+          declined_by?: string | null
+          id?: string
+          invited_at?: string
+          invited_by: string
+          member_role?: string
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          consortium_id?: string
+          created_at?: string
+          declined_at?: string | null
+          declined_by?: string | null
+          id?: string
+          invited_at?: string
+          invited_by?: string
+          member_role?: string
+          org_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consortium_members_consortium_id_fkey"
+            columns: ["consortium_id"]
+            isOneToOne: false
+            referencedRelation: "consortia"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consortium_members_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consortium_user_roles: {
+        Row: {
+          consortium_id: string
+          created_at: string
+          granted_by: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          consortium_id: string
+          created_at?: string
+          granted_by: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          consortium_id?: string
+          created_at?: string
+          granted_by?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consortium_user_roles_consortium_id_fkey"
+            columns: ["consortium_id"]
+            isOneToOne: false
+            referencedRelation: "consortia"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_items: {
         Row: {
           abstract: string | null
@@ -9248,6 +9387,10 @@ export type Database = {
         Args: { p_assignment_id: string }
         Returns: Json
       }
+      can_view_consortium: {
+        Args: { _consortium_id: string; _user_id: string }
+        Returns: boolean
+      }
       cancel_my_license: { Args: { p_reason: string }; Returns: undefined }
       cleanup_email_send_log: {
         Args: { p_retention_days?: number }
@@ -9369,6 +9512,25 @@ export type Database = {
           total_xp: number
           user_id: string
           xp_week: number
+        }[]
+      }
+      get_consortium_comparison: {
+        Args: { _consortium_id: string }
+        Returns: {
+          ao_score: number
+          ao_status: string
+          destination_name: string
+          final_classification: string
+          final_score: number
+          last_calculated_at: string
+          latitude: number
+          longitude: number
+          oe_score: number
+          oe_status: string
+          org_id: string
+          org_name: string
+          ra_score: number
+          ra_status: string
         }[]
       }
       get_dashboard_org_access_flags: {
@@ -9614,6 +9776,14 @@ export type Database = {
           _access: Database["public"]["Enums"]["system_access_type"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_consortium_admin: {
+        Args: { _consortium_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_org_admin_of: {
+        Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
       is_sistur_admin: { Args: { _user_id: string }; Returns: boolean }
