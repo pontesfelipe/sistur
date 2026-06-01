@@ -116,10 +116,32 @@ function parseMarkdownTable(lines: string[], primaryColor: string): (Paragraph |
 
   const headers = parseRow(lines[0]);
   const colCount = headers.length;
-  const colWidth = Math.floor(CONTENT_WIDTH / colCount);
   const dataLines = lines.filter((_, i) => i !== 1); // skip separator
   const colMap = mapIndicatorTableColumns(headers);
   const headerFill = tint(primaryColor, 0.78); // soft tint of institutional color
+
+  // --- Weighted column widths (ABNT-friendly) ---
+  // The previous implementation gave every column the same width, which made
+  // the "Indicador" / "Fonte" columns wrap aggressively while "Valor"/"Unidade"
+  // sat almost empty. We now distribute the available width by content role:
+  //  - Indicador: 3.0   - Fonte: 1.6   - Status: 1.4
+  //  - Valor: 0.9       - Unidade: 0.7 - outras (default): 1.2
+  const weightFor = (idx: number): number => {
+    if (idx === colMap.statusIdx) return 1.4;
+    if (idx === colMap.valueIdx) return 0.9;
+    if (idx === colMap.unitIdx) return 0.7;
+    if (idx === colMap.sourceIdx) return 1.6;
+    const h = (headers[idx] || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (h.startsWith('indicador') || h.startsWith('descric') || h.startsWith('observ')) return 3.0;
+    if (h.startsWith('peso') || h.startsWith('meta') || h.startsWith('ano')) return 0.8;
+    return 1.2;
+  };
+  const weights = headers.map((_, i) => weightFor(i));
+  const totalWeight = weights.reduce((a, b) => a + b, 0) || colCount;
+  const colWidths = weights.map(w => Math.floor((CONTENT_WIDTH * w) / totalWeight));
+  // Adjust last column to absorb rounding so the sum matches CONTENT_WIDTH exactly.
+  const widthSum = colWidths.reduce((a, b) => a + b, 0);
+  if (colWidths.length > 0) colWidths[colWidths.length - 1] += CONTENT_WIDTH - widthSum;
 
   const rows = dataLines.map((line, rowIdx) => {
     const rawCells = parseRow(line);
@@ -173,12 +195,19 @@ function parseMarkdownTable(lines: string[], primaryColor: string): (Paragraph |
         }
         return new TableCell({
           borders: cellBorders(),
-          width: { size: colWidth, type: WidthType.DXA },
+          width: { size: colWidths[ci], type: WidthType.DXA },
           shading: cellShading,
           margins: { top: 40, bottom: 40, left: 80, right: 80 },
           children: [
             new Paragraph({
-              alignment: AlignmentType.CENTER,
+              // Descriptive columns read better left-aligned; numeric/status
+              // columns stay centered so the table grid feels balanced.
+              alignment:
+                ci === colMap.statusIdx ||
+                ci === colMap.valueIdx ||
+                ci === colMap.unitIdx
+                  ? AlignmentType.CENTER
+                  : AlignmentType.LEFT,
               spacing: { line: 240 },
               children: cellRuns,
             }),
@@ -190,7 +219,7 @@ function parseMarkdownTable(lines: string[], primaryColor: string): (Paragraph |
 
   const table = new Table({
     width: { size: CONTENT_WIDTH, type: WidthType.DXA },
-    columnWidths: Array(colCount).fill(colWidth),
+    columnWidths: colWidths,
     rows,
   });
 

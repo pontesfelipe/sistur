@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 61,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.61.2",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — Exportação PDF (via Salvar como PDF do navegador) agora segue ABNT/NBR 14724: papel A4, margens 3cm sup/esq e 2cm inf/dir, Arial 12pt, entrelinha 1,5, parágrafos justificados com recuo de 1,25cm, numeração de página no rodapé direito e cabeçalho de tabela em 10pt com bordas finas. Corrige perda de formatação ABNT relatada ao gerar PDF do relatório.",
+      "Relatórios — Exportação Word (.docx): largura das colunas das tabelas agora é distribuída por PESO de conteúdo em vez de igualitária. 'Indicador' (3x), 'Fonte' (1.6x), 'Status' (1.4x), 'Valor' (0.9x), 'Unidade' (0.7x). Colunas descritivas alinhadas à esquerda; status/valor/unidade centralizados. Resolve tabelas desconfiguradas em que o nome do indicador quebrava em 4 linhas enquanto 'Unidade' ficava quase vazia."
+    ]
+  },
   {
     version: "1.61.1",
     date: "2026-06-01",
