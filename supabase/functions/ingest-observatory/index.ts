@@ -59,8 +59,10 @@ Deno.serve(async (req) => {
   const refYear = body.year ?? now.getFullYear();
   const refMonth = body.month === undefined ? (now.getMonth() + 1) : body.month;
 
-  // Self-log run em ingestion_runs (cron + manual)
-  const triggeredBy = (body.triggered_by ?? (cronHeader ? "cron" : "admin")).slice(0, 32);
+  // Self-log run em ingestion_runs (cron + manual). Constraint: cron|manual|admin|system
+  const allowed = new Set(["cron", "manual", "admin", "system"]);
+  const requested = body.triggered_by ?? (cronHeader ? "cron" : "admin");
+  const triggeredBy = allowed.has(requested) ? requested : (cronHeader ? "cron" : "admin");
   const { data: runRow } = await admin
     .from("ingestion_runs")
     .insert({
