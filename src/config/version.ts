@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 60,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.60.3",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Observatório — Backfill histórico e observabilidade da ingestão. (1) A função `ingest-observatory` agora itera sobre TODOS os anos disponíveis em `external_indicator_values` (não só o ano corrente), populando retroativamente o histórico do Observatório a cada execução. Fontes anuais (IGMA/Cadastur/CAGED/Tesouro) usam sentinela `reference_month=12` (snapshot ano-fim) para evitar colisão por NULL no UNIQUE constraint. (2) A função agora registra cada execução em `ingestion_runs` (running → success/partial/failed) com duração, registros processados e detalhes por métrica — disparos por cron (`triggered_by=cron`) e manuais (`triggered_by=admin`) ficam visíveis. (3) `ingest-observatory` adicionada ao RPC `get_ingestion_health` (cadência mensal, alerta após 40 dias sem rodar) e ao painel `/admin/ingestion-health` (Saúde das Ingestões Oficiais). Próxima execução do cron mensal já populará o histórico completo automaticamente.",
+    ],
+  },
   {
     version: "1.60.2",
     date: "2026-06-01",
