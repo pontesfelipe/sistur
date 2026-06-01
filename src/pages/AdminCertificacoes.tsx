@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Layout } from "@/components/layout/Layout";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -104,7 +104,7 @@ export default function AdminCertificacoes() {
   };
 
   return (
-    <Layout>
+    <AppLayout title="Certificação Institucional">
       <div className="space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
@@ -279,6 +279,6 @@ export default function AdminCertificacoes() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Layout>
+    </AppLayout>
   );
 }
