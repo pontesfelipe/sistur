@@ -3,6 +3,8 @@ project_id = "enexnpmkhvgufcervjsv"
 [functions]
   [functions.auth-email-hook]
     verify_jwt = false
+  [functions.ingest-observatory]
+    verify_jwt = false
   [functions.calculate-assessment]
     verify_jwt = false
   [functions.fetch-official-data]
