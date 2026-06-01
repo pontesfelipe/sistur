@@ -19,6 +19,11 @@ import { Badge } from "@/components/ui/badge";
 import { Activity, Bed, CalendarDays, DollarSign, Briefcase, Plus, Trash2, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { supabase } from "@/integrations/supabase/client";
+import { useProfile } from "@/contexts/ProfileContext";
+import { toast } from "sonner";
+import { Download } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const CATEGORY_META: Record<string, { label: string; icon: any; color: string }> = {
   fluxo: { label: "Fluxo Turístico", icon: Activity, color: "text-blue-600" },
@@ -45,6 +50,27 @@ const MONTHS = [
 export default function Observatorio() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
+  const { profile } = useProfile();
+  const queryClient = useQueryClient();
+  const isAdmin = profile?.role === "ADMIN" || profile?.role === "ORG_ADMIN";
+  const [ingesting, setIngesting] = useState(false);
+
+  const runIngestion = async () => {
+    setIngesting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ingest-observatory", {
+        body: { year },
+      });
+      if (error) throw error;
+      toast.success(`Ingestão concluída — ${data?.processed ?? 0} medições atualizadas`);
+      queryClient.invalidateQueries({ queryKey: ["observatory"] });
+    } catch (e: any) {
+      toast.error("Falha na ingestão: " + (e.message ?? "erro desconhecido"));
+    } finally {
+      setIngesting(false);
+    }
+  };
+
   const { data: metrics = [], isLoading: loadingMetrics } = useObservatoryMetrics();
   const { data: summary = [], isLoading: loadingSummary } = useObservatorySummary(year);
   const { data: events = [], isLoading: loadingEvents } = useObservatoryEvents(year);
@@ -116,6 +142,12 @@ export default function Observatorio() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Button size="sm" variant="outline" onClick={runIngestion} disabled={ingesting}>
+              {ingesting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
+              Atualizar de fontes oficiais
+            </Button>
+          )}
           <Label className="text-sm">Ano de referência</Label>
           <Select value={String(year)} onValueChange={(v) => setYear(parseInt(v))}>
             <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
