@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 61,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.61.4",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Catálogo de indicadores — Reclassificação de pilar conforme a Matriz de Parametrização oficial (auditoria comparativa do XLSX 'MATRIZ DE PARAMETRIZAÇÃO - CONFERENCIA'). IPTL (Índice de Pressão Turística Local), IPCR (Índice de Poder de Compra Relativo), IIET (Índice de Intensidade Econômica do Turismo) e I_SEMT (Sustentabilidade Econômica do Mercado Turístico) movidos para o pilar AO › Turismo e Mercado (antes estavam em RA/OE). IDEB renomeado para 'IDEB Consolidado' e movido para AO › Educação (antes em RA › Social). Pesos e fórmulas inalterados; apenas o enquadramento por pilar foi corrigido, refletindo na composição dos scores RA/OE/AO do diagnóstico territorial."
+    ]
+  },
   {
     version: "1.61.3",
     date: "2026-06-01",
