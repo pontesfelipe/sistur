@@ -16,13 +16,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Bed, CalendarDays, DollarSign, Briefcase, Plus, Trash2, Loader2 } from "lucide-react";
+import { Activity, Bed, CalendarDays, DollarSign, Briefcase, Plus, Trash2, Loader2, FileSpreadsheet, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfileContext } from "@/contexts/ProfileContext";
 import { toast } from "sonner";
 import { Download } from "lucide-react";
+import { buildObservatoryCsv, downloadCsv } from "@/lib/observatoryExport";
+import { MetricHistoryDialog } from "@/components/observatorio/MetricHistoryDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { CsvImportDialog } from "@/components/observatorio/CsvImportDialog";
 import { RegressionAlertsPanel } from "@/components/observatorio/RegressionAlertsPanel";
@@ -53,6 +55,7 @@ export default function Observatorio() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
   const { roles } = useProfileContext();
+  const { profile } = useProfileContext();
   const queryClient = useQueryClient();
   const isAdmin = roles.some((r) => r.role === "ADMIN" || r.role === "ORG_ADMIN");
   const [ingesting, setIngesting] = useState(false);
