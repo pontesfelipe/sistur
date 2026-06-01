@@ -641,6 +641,7 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               </Suspense>
+              </OrgModulesProvider>
               </LicenseProvider>
               </ProfileProvider>
             </AuthProvider>
