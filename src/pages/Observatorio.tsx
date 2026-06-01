@@ -54,8 +54,7 @@ const MONTHS = [
 export default function Observatorio() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
-  const { roles } = useProfileContext();
-  const { profile } = useProfileContext();
+  const { roles, profile } = useProfileContext();
   const queryClient = useQueryClient();
   const isAdmin = roles.some((r) => r.role === "ADMIN" || r.role === "ORG_ADMIN");
   const [ingesting, setIngesting] = useState(false);
