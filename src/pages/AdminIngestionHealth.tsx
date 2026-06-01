@@ -59,6 +59,7 @@ const FN_DISPLAY: Record<string, string> = {
   'ingest-ana': 'ANA — IQA (Qualidade da Água)',
   'ingest-tse': 'TSE (Eleições)',
   'ingest-anatel': 'ANATEL (Cobertura)',
+  'ingest-observatory': 'Observatório (derivação automática de métricas)',
 };
 
 function formatDate(iso: string | null) {
