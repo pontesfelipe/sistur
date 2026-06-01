@@ -258,9 +258,12 @@ export default function Observatorio() {
                                 {hasData ? `${formatValue(Number(s!.total_value), m.unit)} · ${s!.data_points} ${s!.data_points === 1 ? "registro" : "registros"}` : "Sem dados em " + year}
                               </p>
                             </div>
-                            <Button size="sm" variant="outline" onClick={() => setMeasureDialog({ metricId: m.id, name: m.name, unit: m.unit })}>
-                              <Plus className="h-3 w-3 mr-1" /> Registrar
-                            </Button>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <MetricHistoryDialog metricId={m.id} metricName={m.name} unit={m.unit} />
+                              <Button size="sm" variant="outline" onClick={() => setMeasureDialog({ metricId: m.id, name: m.name, unit: m.unit })}>
+                                <Plus className="h-3 w-3 mr-1" /> Registrar
+                              </Button>
+                            </div>
                           </div>
                         );
                       })}
