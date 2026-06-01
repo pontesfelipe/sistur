@@ -429,30 +429,23 @@ function isCriticalOrLowAttention(score: number | undefined): boolean {
   return s < 0.40; // CRITICO ou ATENÇÃO baixa
 }
 
-serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+// Erro tipado para curto-circuitar o pipeline com um status HTTP específico
+class CalcError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
   }
+}
 
-  const authResult = await requireUser(req);
-  if (authResult instanceof Response) return authResult;
-
-  try {
-    const { assessment_id } = await req.json();
-    
-    if (!assessment_id) {
-      return new Response(
-        JSON.stringify({ error: "assessment_id is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Create Supabase client with service role for admin operations
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
+// Núcleo de cálculo — extraído para permitir execução assíncrona via job.
+// Retorna o objeto de resultado em sucesso; lança CalcError em falha controlada.
+async function runCalculationCore(
+  supabase: ReturnType<typeof createClient>,
+  authUserId: string,
+  assessment_id: string,
+): Promise<Record<string, unknown>> {
+  {
     console.log(`Starting calculation for assessment: ${assessment_id}`);
 
     // 1. Get assessment details
