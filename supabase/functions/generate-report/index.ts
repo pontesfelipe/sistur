@@ -2822,9 +2822,16 @@ ${(() => {
   for (const r of auditTrail) {
     const ind = indicatorsByCode.get(r.indicator_code);
     const name = ind?.name || r.indicator_code;
-    const rawDisplay = r.value !== null && r.value !== undefined
-      ? Number(r.value).toLocaleString('pt-BR', { maximumFractionDigits: 4 })
-      : '—';
+    let rawDisplay: string;
+    if (r.value === null || r.value === undefined) {
+      rawDisplay = '—';
+    } else if (ind?.normalization === 'BINARY' || ind?.value_format === 'BINARY') {
+      // Indicadores binários: tradução explícita para impedir alucinação do LLM
+      // (1 = possui / Sim, 0 = não possui / Não)
+      rawDisplay = Number(r.value) >= 0.5 ? 'SIM (1) — possui' : 'NÃO (0) — não possui';
+    } else {
+      rawDisplay = Number(r.value).toLocaleString('pt-BR', { maximumFractionDigits: 4 });
+    }
     const isCtx = String(r.source_type || '').endsWith('_CONTEXTUAL');
     const scoreDisplay = isCtx
       ? 'CONTEXTUAL'
