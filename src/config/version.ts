@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 60,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.60.4",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Observatório — Importação manual por CSV para fontes sem API pública. Novo botão 'Importar CSV' no header de `/observatorio` (ADMIN/ORG_ADMIN) abre diálogo com parser client-side: aceita colunas `metric_code, reference_year, reference_month, value, source, notes`, valida cada linha contra o catálogo de métricas, mostra prévia com contagem de válidas vs. erros, e dispara upsert idempotente via `useUpsertMeasurement` (RLS-safe por `effectiveOrgId`). Suporta separador `,` ou `;`, números em formato BR (vírgula decimal) e mês vazio para medições anuais. Inclui botão 'Baixar modelo' com CSV exemplo. Cobre fontes FOHB (ocupação hoteleira), CGE/SECTUR estaduais e qualquer outra que não esteja na ingestão automática.",
+    ],
+  },
   {
     version: "1.60.3",
     date: "2026-06-01",
