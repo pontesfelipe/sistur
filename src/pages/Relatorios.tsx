@@ -568,25 +568,44 @@ export default function Relatorios() {
     return `<!DOCTYPE html>
 <html><head><title>Relatório SISTUR</title>
 <style>
-  body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; max-width: 800px; margin: 0 auto; font-size: ${bodyFontSize}; }
-  h1 { font-size: 24px; color: ${color}; border-bottom: 2px solid ${color}; padding-bottom: 8px; margin-top: 32px; }
-  h2 { font-size: 20px; color: ${color}; margin-top: 24px; }
-  h3 { font-size: 16px; color: #374151; margin-top: 16px; }
-  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
-  th { background: ${color}; color: #ffffff; border: 1px solid ${color}; padding: 8px; text-align: left; font-weight: 600; }
-  td { border: 1px solid #cbd5e1; padding: 8px; }
-  tr:nth-child(even) { background: #f8fafc; }
+  /* ===== ABNT / MEC (NBR 14724, 6024, 6023, 10520) ===== */
+  /* Papel A4, margens 3cm sup/esq e 2cm inf/dir, Arial 12pt, entrelinha 1,5,
+     parágrafos justificados com recuo de 1,25cm e numeração de página no
+     rodapé direito. Cores institucionais permanecem apenas nos cabeçalhos
+     de tabela e no destaque "strong" — corpo de texto fica em preto. */
+  @page { size: A4; margin: 3cm 2cm 2cm 3cm; @bottom-right { content: counter(page); font-family: Arial, sans-serif; font-size: 10pt; color: #000; } }
+  html, body { background: #fff; color: #000; }
+  body { font-family: Arial, 'Helvetica', sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; margin: 0; padding: 0; }
+  p { text-indent: 1.25cm; margin: 0 0 6pt 0; }
+  h1, h2, h3, h4 { font-family: Arial, sans-serif; color: #000; text-align: left; text-indent: 0; page-break-after: avoid; }
+  h1 { font-size: 14pt; font-weight: bold; text-transform: uppercase; margin: 18pt 0 12pt 0; }
+  h2 { font-size: 13pt; font-weight: bold; margin: 14pt 0 10pt 0; }
+  h3 { font-size: 12pt; font-weight: bold; margin: 12pt 0 8pt 0; }
+  h4 { font-size: 12pt; font-style: italic; font-weight: normal; margin: 10pt 0 6pt 0; }
+  /* Tabelas ABNT: centralizadas, sem bordas verticais externas, fonte 10pt,
+     entrelinha simples, cabeçalho com fundo institucional sutil. */
+  table { width: 100%; border-collapse: collapse; margin: 12pt auto; font-size: 10pt; line-height: 1.15; page-break-inside: avoid; }
+  caption { caption-side: top; text-align: center; font-size: 10pt; font-weight: bold; padding-bottom: 4pt; }
+  th { background: ${color}; color: #ffffff; border: 0.75pt solid #000; padding: 4pt 6pt; text-align: left; font-weight: bold; }
+  td { border: 0.5pt solid #000; padding: 4pt 6pt; vertical-align: top; }
+  tr:nth-child(even) td { background: #f4f4f4; }
   td.status-excelente { background: #D1FADF; color: #054F31; font-weight: 600; text-align: center; }
   td.status-forte     { background: #DBEAFE; color: #1E3A8A; font-weight: 600; text-align: center; }
   td.status-adequado  { background: #FEF3C7; color: #78350F; font-weight: 600; text-align: center; }
   td.status-atencao   { background: #FFEDD5; color: #7C2D12; font-weight: 600; text-align: center; }
   td.status-critico   { background: #FEE2E2; color: #7F1D1D; font-weight: 600; text-align: center; }
   td.status-info      { background: #F1F5F9; color: #334155; font-weight: 600; text-align: center; }
-  strong { color: ${color}; }
-  hr { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
-  ul, ol { padding-left: 24px; }
-  li { margin-bottom: 4px; }
-  @media print { body { padding: 20px; } @page { margin: 1.5cm; } }
+  strong { color: #000; font-weight: bold; }
+  em { font-style: italic; }
+  blockquote { margin: 10pt 0 10pt 4cm; font-size: 10pt; line-height: 1.0; text-indent: 0; }
+  hr { border: none; border-top: 0.5pt solid #000; margin: 18pt 0; }
+  ul, ol { padding-left: 1.25cm; margin: 6pt 0; }
+  li { margin-bottom: 3pt; text-align: justify; }
+  /* Cabeçalho institucional aparece somente na 1ª página */
+  .abnt-cover { text-align: center; margin-bottom: 24pt; }
+  .abnt-cover img { max-height: 60pt; max-width: 220pt; }
+  /* Modo tela (preview) recebe o mesmo layout, mas com fundo do navegador */
+  @media screen { body { max-width: 17cm; margin: 0 auto; padding: 2cm; } }
 </style>
 </head><body>${logoHtml}${orgHtml}${headerHtml}${bodyContent}${notesHtml}${footerHtml}</body></html>`;
   };
