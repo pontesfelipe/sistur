@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 60,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.60.5",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Observatório — Alertas automáticos de regressão. Nova tabela `observatory_alerts` registra quedas (>10%) ou altas indevidas em métricas do Observatório, comparando cada medição com o período anterior (mês ou ano). Trigger `detect_observatory_regression` roda após cada INSERT/UPDATE em `observatory_measurements` e, com base no novo flag `higher_is_better` do catálogo de métricas, classifica como `warning` (>10%) ou `critical` (>25%). Quando o valor retorna ao normal, o alerta correspondente é removido automaticamente. Novo painel `RegressionAlertsPanel` aparece no topo de `/observatorio` para membros da org, permitindo marcar como lido ou dispensar (`is_read`, `is_dismissed`). RLS isola alertas por `effectiveOrgId`/`user_in_org`. Fecha o último item do roadmap do Observatório (backfill, observabilidade, CSV manual e agora alertas).",
+    ],
+  },
   {
     version: "1.60.4",
     date: "2026-06-01",
