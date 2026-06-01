@@ -113,6 +113,8 @@ const MinhasAtividades = lazyWithReload(() => import("./pages/MinhasAtividades")
 const EduHistoricoEscolar = lazyWithReload(() => import("./pages/EduHistoricoEscolar"));
 const Consorcios = lazyWithReload(() => import("./pages/Consorcios"));
 const ConsorcioDetalhe = lazyWithReload(() => import("./pages/ConsorcioDetalhe"));
+const AdminCertificacoes = lazyWithReload(() => import("./pages/AdminCertificacoes"));
+const VerificarCertificado = lazyWithReload(() => import("./pages/VerificarCertificado"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
