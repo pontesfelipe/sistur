@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 54,
-  patch: 1,
+  minor: 55,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.55.0",
+    date: "2026-06-01",
+    type: "minor" as const,
+    changes: [
+      "ERP Regional / Consórcios (MVP) — Nova entidade para agrupar municípios em consórcios ou regiões turísticas. Inclui: criação por ORG_ADMIN do município-líder, convite e aceite formal de cada município (consent explícito antes de compartilhar diagnóstico), painel comparativo privado por pilar (RA/OE/AO) entre os membros aceitos, gestão de membros e tabelas `consortia`, `consortium_members`, `consortium_user_roles` com RLS. Acessível em `/consorcios`. A comparação é restrita aos membros do próprio consórcio — sem ranking público, alinhado à constraint de privacidade.",
+    ],
+  },
   {
     version: "1.54.1",
     date: "2026-05-28",

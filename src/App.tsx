@@ -111,6 +111,8 @@ const TutorialDetail = lazyWithReload(() => import("./pages/TutorialDetail"));
 const KnowledgeBase = lazyWithReload(() => import("./pages/KnowledgeBase"));
 const MinhasAtividades = lazyWithReload(() => import("./pages/MinhasAtividades"));
 const EduHistoricoEscolar = lazyWithReload(() => import("./pages/EduHistoricoEscolar"));
+const Consorcios = lazyWithReload(() => import("./pages/Consorcios"));
+const ConsorcioDetalhe = lazyWithReload(() => import("./pages/ConsorcioDetalhe"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
@@ -489,6 +491,22 @@ const App = () => {
                   element={
                     <ERPRoute>
                       <Projetos />
+                    </ERPRoute>
+                  }
+                />
+                <Route
+                  path="/consorcios"
+                  element={
+                    <ERPRoute>
+                      <Consorcios />
+                    </ERPRoute>
+                  }
+                />
+                <Route
+                  path="/consorcios/:id"
+                  element={
+                    <ERPRoute>
+                      <ConsorcioDetalhe />
                     </ERPRoute>
                   }
                 />

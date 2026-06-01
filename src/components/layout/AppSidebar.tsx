@@ -38,6 +38,7 @@ import {
   Sparkles,
   Activity,
   CalendarDays,
+  Network,
 } from 'lucide-react';
 import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -71,6 +72,7 @@ const navGroups: NavGroup[] = [
       { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
       { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
       { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
+      { name: 'Consórcios', href: '/consorcios', icon: Network, requiresERP: true },
       { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
       { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
     ],
