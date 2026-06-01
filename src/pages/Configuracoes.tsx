@@ -17,6 +17,7 @@ import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPan
 import { ActAsUserPanel } from '@/components/settings/ActAsUserPanel';
 import { FeedbackManagementPanel } from '@/components/settings/FeedbackManagementPanel';
 import { ForumPrivacySettings } from '@/components/settings/ForumPrivacySettings';
+import { PendingConsortiumInvitesPanel } from '@/components/consortia/PendingConsortiumInvitesPanel';
 import { ContentModerationPanel } from '@/components/settings/ContentModerationPanel';
 import { PerformanceMetricsPanel } from '@/components/settings/PerformanceMetricsPanel';
 import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel';
