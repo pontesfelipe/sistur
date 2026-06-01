@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 58,
+  minor: 59,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.59.0",
+    date: "2026-06-01",
+    type: "minor" as const,
+    changes: [
+      "Empacotamento ERP Modular — Gating real aplicado. Novo `OrgModulesProvider` (`src/contexts/OrgModulesContext.tsx`) carrega `org_module_overrides` da org efetiva e expõe `isModuleEnabled(key)`. Novo `ModuleRoute` (`src/components/layout/ModuleRoute.tsx`) bloqueia rotas com tela de 'Módulo não habilitado' quando o override está `false`. Aplicado em `/diagnosticos`, `/diagnosticos/:id`, `/projetos`, `/relatorios`, `/consorcios`, `/consorcios/:id` e `/observatorio`. Sidebar também esconde itens cujo módulo está desabilitado (campo `module` no NavItem). ADMIN global sempre passa, mantendo o bypass canônico. Default segue habilitado quando não há override — comportamento idêntico ao anterior para orgs sem configuração customizada.",
+      "Consórcios no Dashboard — Novo card `MyConsortiaCard` (`src/components/consortia/MyConsortiaCard.tsx`) lista os consórcios em que o usuário/org participa, com link direto para o painel regional. Aparece apenas quando há ao menos 1 consórcio (RLS já filtra) e fica abaixo do bloco ERP Stats no Dashboard.",
+      "Convites de Consórcio em /configuracoes — Novo painel `PendingConsortiumInvitesPanel` (`src/components/consortia/PendingConsortiumInvitesPanel.tsx`) exibido na aba Geral para `ORG_ADMIN`/`ADMIN`, com convites pendentes da própria organização e botões Aceitar/Recusar. Inclui aviso explícito sobre o impacto do consent (compartilhamento da pontuação por pilar com demais membros). Apenas convites com `accepted_at` e `declined_at` nulos.",
+    ],
+  },
   {
     version: "1.58.0",
     date: "2026-06-01",

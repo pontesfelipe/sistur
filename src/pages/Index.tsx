@@ -10,6 +10,7 @@ import { DestinationComparison } from '@/components/dashboard/DestinationCompari
 import { DestinationTrend } from '@/components/dashboard/DestinationTrend';
 import { EnterpriseKPICards } from '@/components/dashboard/EnterpriseKPICards';
 import { ERPStatsCards } from '@/components/erp/ERPStatsCards';
+import { MyConsortiaCard } from '@/components/consortia/MyConsortiaCard';
 import { ProjectsOverviewCard } from '@/components/erp/ProjectsOverviewCard';
 import { PillarProgressChart } from '@/components/erp/PillarProgressChart';
 import { CycleEvolutionChart } from '@/components/erp/CycleEvolutionChart';
@@ -335,6 +336,13 @@ const Index = () => {
       {isEnabled('erp-stats') && (hasERPAccess || isAdmin) && !isEnterprise && (
         <div className="mb-6">
           <ERPStatsCards stats={erpStats} isLoading={erpStatsLoading} />
+        </div>
+      )}
+
+      {/* Consórcios em que participo (só aparece se houver pelo menos um) */}
+      {(hasERPAccess || isAdmin) && !isEnterprise && (
+        <div className="mb-6">
+          <MyConsortiaCard />
         </div>
       )}
 

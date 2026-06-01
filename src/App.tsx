@@ -7,11 +7,13 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProfileProvider } from "@/contexts/ProfileContext";
 import { LicenseProvider } from "@/contexts/LicenseContext";
+import { OrgModulesProvider } from "@/contexts/OrgModulesContext";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { AdminRoute } from "@/components/layout/AdminRoute";
 import { ERPRoute } from "@/components/layout/ERPRoute";
 import { EduRoute } from "@/components/layout/EduRoute";
 import { LicenseRoute } from "@/components/layout/LicenseRoute";
+import { ModuleRoute } from "@/components/layout/ModuleRoute";
 import { SplashScreen } from "@/components/SplashScreen";
 import { ClientErrorMonitor } from "@/components/ClientErrorMonitor";
 import { ReportJobWatcherMount } from "@/components/ReportJobWatcherMount";
@@ -169,6 +171,7 @@ const App = () => {
               <ClientErrorMonitor />
               <ProfileProvider>
               <LicenseProvider>
+              <OrgModulesProvider>
               <ReportJobWatcherMount />
               <Suspense fallback={<PageLoader />}>
               <Routes>
@@ -198,7 +201,9 @@ const App = () => {
                   path="/diagnosticos"
                   element={
                     <ERPRoute>
-                      <Diagnosticos />
+                      <ModuleRoute module="diagnostico">
+                        <Diagnosticos />
+                      </ModuleRoute>
                     </ERPRoute>
                   }
                 />
@@ -206,7 +211,9 @@ const App = () => {
                   path="/diagnosticos/:id"
                   element={
                     <ERPRoute>
-                      <DiagnosticoDetalhe />
+                      <ModuleRoute module="diagnostico">
+                        <DiagnosticoDetalhe />
+                      </ModuleRoute>
                     </ERPRoute>
                   }
                 />
@@ -378,7 +385,9 @@ const App = () => {
                   element={
                     <ERPRoute>
                       <LicenseRoute requiredFeature="reports">
-                        <Relatorios />
+                        <ModuleRoute module="relatorios">
+                          <Relatorios />
+                        </ModuleRoute>
                       </LicenseRoute>
                     </ERPRoute>
                   }
@@ -512,7 +521,9 @@ const App = () => {
                   path="/projetos"
                   element={
                     <ERPRoute>
-                      <Projetos />
+                      <ModuleRoute module="projetos">
+                        <Projetos />
+                      </ModuleRoute>
                     </ERPRoute>
                   }
                 />
@@ -520,7 +531,9 @@ const App = () => {
                   path="/consorcios"
                   element={
                     <ERPRoute>
-                      <Consorcios />
+                      <ModuleRoute module="consorcios">
+                        <Consorcios />
+                      </ModuleRoute>
                     </ERPRoute>
                   }
                 />
@@ -528,7 +541,9 @@ const App = () => {
                   path="/consorcios/:id"
                   element={
                     <ERPRoute>
-                      <ConsorcioDetalhe />
+                      <ModuleRoute module="consorcios">
+                        <ConsorcioDetalhe />
+                      </ModuleRoute>
                     </ERPRoute>
                   }
                 />
@@ -536,7 +551,9 @@ const App = () => {
                   path="/observatorio"
                   element={
                     <ERPRoute>
-                      <Observatorio />
+                      <ModuleRoute module="observatorio">
+                        <Observatorio />
+                      </ModuleRoute>
                     </ERPRoute>
                   }
                 />
@@ -638,6 +655,7 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               </Suspense>
+              </OrgModulesProvider>
               </LicenseProvider>
               </ProfileProvider>
             </AuthProvider>

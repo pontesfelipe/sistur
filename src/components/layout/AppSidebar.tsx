@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { useLicense } from '@/contexts/LicenseContext';
 import { useForumNotifications, useMarkForumAsSeen } from '@/hooks/useForumNotifications';
+import { useOrgModulesContext, ModuleKey } from '@/contexts/OrgModulesContext';
 import {
   ScrollText,
   LayoutDashboard,
@@ -56,6 +57,7 @@ interface NavItem {
   requiresProfessor?: boolean;
   requiresAdmin?: boolean;
   requiredFeature?: string;
+  module?: ModuleKey;
 }
 
 interface NavGroup {
@@ -70,11 +72,11 @@ const navGroups: NavGroup[] = [
     icon: Briefcase,
     items: [
       { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
-      { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
-      { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
-      { name: 'Consórcios', href: '/consorcios', icon: Network, requiresERP: true },
-      { name: 'Observatório', href: '/observatorio', icon: Activity, requiresERP: true },
-      { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
+      { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true, module: 'diagnostico' },
+      { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true, module: 'projetos' },
+      { name: 'Consórcios', href: '/consorcios', icon: Network, requiresERP: true, module: 'consorcios' },
+      { name: 'Observatório', href: '/observatorio', icon: Activity, requiresERP: true, module: 'observatorio' },
+      { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports', module: 'relatorios' },
       { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
     ],
   },
@@ -120,6 +122,7 @@ export function AppSidebar() {
   const { signOut } = useAuth();
   const { isAdmin, isOrgAdmin, isProfessor, isAnalyst, hasERPAccess, hasEDUAccess, isEstudante, initialized, loading } = useProfileContext();
   const { hasFeature, isTrialActive } = useLicense();
+  const { isModuleEnabled } = useOrgModulesContext();
   const { data: forumNotifications } = useForumNotifications();
   const markForumAsSeen = useMarkForumAsSeen();
   const [collapsed, setCollapsed] = useState(false);
@@ -149,8 +152,9 @@ export function AppSidebar() {
     if (item.requiresProfessor && !isProfessor && !isAdmin && !isOrgAdmin && !(hasERPAccess && isAnalyst)) return false;
     if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
     if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
+    if (item.module && !isModuleEnabled(item.module)) return false;
     return true;
-  }, [initialized, isAdmin, isOrgAdmin, isAnalyst, isProfessor, hasERPAccess, hasEDUAccess]);
+  }, [initialized, isAdmin, isOrgAdmin, isAnalyst, isProfessor, hasERPAccess, hasEDUAccess, isModuleEnabled]);
 
   // Filter groups — only show groups that have at least one visible item
   const filteredGroups = useMemo(() => {
