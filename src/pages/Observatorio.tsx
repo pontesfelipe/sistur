@@ -24,6 +24,7 @@ import { useProfileContext } from "@/contexts/ProfileContext";
 import { toast } from "sonner";
 import { Download } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { CsvImportDialog } from "@/components/observatorio/CsvImportDialog";
 
 const CATEGORY_META: Record<string, { label: string; icon: any; color: string }> = {
   fluxo: { label: "Fluxo Turístico", icon: Activity, color: "text-blue-600" },
@@ -143,10 +144,13 @@ export default function Observatorio() {
         </div>
         <div className="flex items-center gap-2">
           {isAdmin && (
-            <Button size="sm" variant="outline" onClick={runIngestion} disabled={ingesting}>
-              {ingesting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
-              Atualizar de fontes oficiais
-            </Button>
+            <>
+              <Button size="sm" variant="outline" onClick={runIngestion} disabled={ingesting}>
+                {ingesting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
+                Atualizar de fontes oficiais
+              </Button>
+              <CsvImportDialog metrics={metrics} />
+            </>
           )}
           <Label className="text-sm">Ano de referência</Label>
           <Select value={String(year)} onValueChange={(v) => setYear(parseInt(v))}>
