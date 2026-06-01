@@ -8,20 +8,18 @@ import { requireAdminOrServiceRole, corsHeaders } from "../_shared/auth.ts";
 
 // Mapeamento: indicator_code externo -> métrica do observatório
 // Cada entrada também declara como tratar (sum/last/identity) e source label.
+// cadence: "annual" -> month sentinel 12 (snapshot anual); "monthly" -> usa mês corrente
 const MAPPINGS: Array<{
   external_indicator: string;
   metric_code: string;
   source_label: string;
+  cadence: "annual" | "monthly";
 }> = [
-  // Cadastur: soma de leitos por município (OE001) -> leitos disponíveis
-  { external_indicator: "OE001", metric_code: "ocupacao_leitos_disponiveis", source_label: "Cadastur/MTur (auto)" },
-  // IGMA/ANAC: visitantes consolidados por município
-  { external_indicator: "igma_visitantes_internacionais", metric_code: "fluxo_visitantes_internacionais", source_label: "IGMA/ANAC (auto)" },
-  { external_indicator: "igma_visitantes_nacionais", metric_code: "fluxo_visitantes_nacionais", source_label: "IGMA/ANAC (auto)" },
-  // CAGED/RAIS via IGMA: empregos formais no turismo
-  { external_indicator: "igma_empregos_turismo", metric_code: "empregos_formais", source_label: "CAGED/RAIS via IGMA (auto)" },
-  // Tesouro/SEFAZ via IGMA: arrecadação ISS turismo
-  { external_indicator: "igma_arrecadacao_turismo", metric_code: "receita_arrecadacao_iss", source_label: "Tesouro/SEFAZ via IGMA (auto)" },
+  { external_indicator: "OE001", metric_code: "ocupacao_leitos_disponiveis", source_label: "Cadastur/MTur (auto)", cadence: "annual" },
+  { external_indicator: "igma_visitantes_internacionais", metric_code: "fluxo_visitantes_internacionais", source_label: "IGMA/ANAC (auto)", cadence: "annual" },
+  { external_indicator: "igma_visitantes_nacionais", metric_code: "fluxo_visitantes_nacionais", source_label: "IGMA/ANAC (auto)", cadence: "annual" },
+  { external_indicator: "igma_empregos_turismo", metric_code: "empregos_formais", source_label: "CAGED/RAIS via IGMA (auto)", cadence: "annual" },
+  { external_indicator: "igma_arrecadacao_turismo", metric_code: "receita_arrecadacao_iss", source_label: "Tesouro/SEFAZ via IGMA (auto)", cadence: "annual" },
 ];
 
 Deno.serve(async (req) => {
@@ -47,7 +45,7 @@ Deno.serve(async (req) => {
     if (guard instanceof Response) return guard;
   }
 
-  let body: { smoke_test?: boolean; year?: number; month?: number | null } = {};
+  let body: { smoke_test?: boolean; year?: number; month?: number | null; triggered_by?: string } = {};
   try { body = await req.json(); } catch { /* noop */ }
 
   if (body.smoke_test) {
@@ -60,6 +58,23 @@ Deno.serve(async (req) => {
   const now = new Date();
   const refYear = body.year ?? now.getFullYear();
   const refMonth = body.month === undefined ? (now.getMonth() + 1) : body.month;
+
+  // Self-log run em ingestion_runs (cron + manual). Constraint: cron|manual|admin|system
+  const allowed = new Set(["cron", "manual", "admin", "system"]);
+  const requested = body.triggered_by ?? (cronHeader ? "cron" : "admin");
+  const triggeredBy = allowed.has(requested) ? requested : (cronHeader ? "cron" : "admin");
+  const { data: runRow } = await admin
+    .from("ingestion_runs")
+    .insert({
+      function_name: "ingest-observatory",
+      triggered_by: triggeredBy,
+      status: "running",
+      metadata: { source: "ingest-observatory", mode: "backfill_annual" },
+    })
+    .select("id")
+    .single();
+  const runId = runRow?.id as string | undefined;
+  const startedAt = Date.now();
 
   // Carrega catálogo de métricas para resolver code -> id
   const { data: metrics, error: mErr } = await admin
@@ -114,6 +129,8 @@ Deno.serve(async (req) => {
       const value = Number(row.raw_value);
       if (!Number.isFinite(value)) continue;
       const yr = row.reference_year ?? refYear;
+      // Para fontes anuais, fixa mês=12 (snapshot ano-fim) para evitar colisão por NULL no UNIQUE
+      const mo = map.cadence === "annual" ? 12 : refMonth;
 
       for (const orgId of orgs) {
         const { error: upErr } = await admin
@@ -122,7 +139,7 @@ Deno.serve(async (req) => {
             org_id: orgId,
             metric_id: metricId,
             reference_year: yr,
-            reference_month: refMonth,
+            reference_month: mo,
             value,
             source: map.source_label,
             notes: `Auto-derivado de ${map.external_indicator}`,
@@ -131,6 +148,19 @@ Deno.serve(async (req) => {
       }
     }
     details.push({ metric: map.metric_code, count: inserted });
+  }
+
+  // Finaliza run
+  if (runId) {
+    const finalStatus = failed > 0 && processed > 0 ? "partial" : failed > 0 ? "failed" : "success";
+    await admin.from("ingestion_runs").update({
+      status: finalStatus,
+      finished_at: new Date().toISOString(),
+      duration_ms: Date.now() - startedAt,
+      records_processed: processed,
+      records_failed: failed,
+      metadata: { source: "ingest-observatory", details },
+    }).eq("id", runId);
   }
 
   return new Response(
