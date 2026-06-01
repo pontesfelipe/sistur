@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 59,
+  minor: 60,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.60.0",
+    date: "2026-06-01",
+    type: "minor" as const,
+    changes: [
+      "Observatório — Ingestão automática a partir das fontes oficiais já integradas. Nova edge function `ingest-observatory` deriva medições do Observatório (`observatory_measurements`) a partir de `external_indicator_values` populado pelas ingestões existentes (Cadastur, ANAC etc.), preservando provenance. Mapeamentos iniciais: Cadastur `OE001` (soma de leitos) → `ocupacao_leitos_disponiveis`; ANAC `igma_passageiros_internacionais` → `fluxo_visitantes_internacionais`; ANAC `igma_passageiros_nacionais` → `fluxo_visitantes_nacionais`. Upsert idempotente por (org, métrica, ano, mês). Novo botão 'Atualizar de fontes oficiais' no header de `/observatorio` (ADMIN/ORG_ADMIN). Função protegida via `requireAdminOrServiceRole` para permitir disparo manual e agendamento por cron quando configurado. Adicionada à allowlist de `trigger-ingestion`.",
+    ],
+  },
   {
     version: "1.59.0",
     date: "2026-06-01",
