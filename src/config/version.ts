@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 60,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.60.1",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Observatório — Cron mensal funcional. Nova tabela privada `internal_cron_secrets` (sem acesso via Data API, somente service_role) guarda um token compartilhado. A função `ingest-observatory` agora aceita autenticação por (a) ADMIN/service_role via JWT (uso manual) OU (b) cabeçalho `x-cron-secret` igual ao valor armazenado em `internal_cron_secrets` (uso pelo cron). Job `ingest-observatory-monthly` agendado em `pg_cron` para rodar todo dia 1 às 06:00 UTC, lendo o token diretamente do banco. Testado em produção com retorno HTTP 200 e payload válido. `verify_jwt = false` adicionado em `supabase/config.toml` para a função, já que a autenticação é feita internamente.",
+    ],
+  },
   {
     version: "1.60.0",
     date: "2026-06-01",
