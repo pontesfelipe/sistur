@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 61,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.61.3",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Dados oficiais — `fetch-official-data` agora resolve a UF do município direto pelo prefixo do código IBGE (ex.: 35 → SP) e faz UMA única chamada a `localidadesDaUfSemShape`, em vez de varrer sequencialmente todas as 27 UFs do `mapa.turismo.gov.br`. A varredura anterior podia baixar 27 × 10 MB de GeoJSON e ultrapassar o timeout de 150 s da edge function, retornando 'Edge function returned a non-2xx status code' (sintoma relatado em Atibaia/SP). Também foi adicionado timeout de 15 s à chamada POST `regionalizacao/pesquisar` (antes sem timeout). Cidades sem cache local agora carregam os dados do Mapa do Turismo em segundos."
+    ]
+  },
   {
     version: "1.61.2",
     date: "2026-06-01",

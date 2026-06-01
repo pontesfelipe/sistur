@@ -475,31 +475,75 @@ async function fetchMapaTurismo(
   const results: Record<string, IndicatorResult> = {};
   const currentYear = new Date().getFullYear();
 
+  // Map IBGE UF code (first 2 digits of the municipality code) to its UF
+  // acronym. The Mapa do Turismo API uses `sgUf` and an internal `nuUf` ID
+  // that does NOT match the IBGE UF code, so we look up the UF entry by
+  // acronym after fetching `listaUF` ONCE.
+  const IBGE_UF: Record<string, string> = {
+    '11': 'RO', '12': 'AC', '13': 'AM', '14': 'RR', '15': 'PA', '16': 'AP', '17': 'TO',
+    '21': 'MA', '22': 'PI', '23': 'CE', '24': 'RN', '25': 'PB', '26': 'PE', '27': 'AL',
+    '28': 'SE', '29': 'BA',
+    '31': 'MG', '32': 'ES', '33': 'RJ', '35': 'SP',
+    '41': 'PR', '42': 'SC', '43': 'RS',
+    '50': 'MS', '51': 'MT', '52': 'GO', '53': 'DF',
+  };
+  const ufSigla = IBGE_UF[ibgeCode.slice(0, 2)];
+
   // Strategy 1: Try the live REST API from mapa.turismo.gov.br
+  // IMPORTANT: previous implementation iterated ALL 27 UFs sequentially,
+  // each call returning ~10MB+ of GeoJSON. For municipalities not present
+  // in the local DB cache (e.g. Atibaia/SP) this consistently exceeded the
+  // 150s Edge Function timeout and surfaced as
+  //   "Edge function returned a non-2xx status code".
+  // We now resolve the UF deterministically from the IBGE code and make
+  // a single `localidadesDaUfSemShape` call, with a tight timeout on the
+  // final POST (which previously had no timeout at all).
   try {
-    // First get nuUf and nuLocalidade by looking up the IBGE code
-    const ufListResp = await fetchWithTimeout('https://www.mapa.turismo.gov.br/mapa/rest/publico/dne/listaUF');
+    if (!ufSigla) {
+      console.warn(`Mapa Turismo: unknown UF prefix for IBGE code ${ibgeCode}, skipping live API`);
+      throw new Error('unknown UF');
+    }
+    // 1) Resolve nuUf for the target state only (15s is enough — the payload
+    //    is large but we only need it once and skip everything else).
+    const ufListResp = await fetchWithTimeout(
+      'https://www.mapa.turismo.gov.br/mapa/rest/publico/dne/listaUF',
+      15000,
+    );
     if (ufListResp.ok) {
       const ufList: any[] = await ufListResp.json();
-
-      // Try each UF to find our municipality by IBGE code
-      for (const uf of ufList) {
+      const uf = ufList.find((u: any) => u.sgUf === ufSigla);
+      if (uf) {
+        // 2) Single localidades call scoped to the matched UF.
         const locResp = await fetchWithTimeout(
-          `https://www.mapa.turismo.gov.br/mapa/rest/publico/dne/localidadesDaUfSemShape?nuUf=${uf.nuUf}`
+          `https://www.mapa.turismo.gov.br/mapa/rest/publico/dne/localidadesDaUfSemShape?nuUf=${uf.nuUf}`,
+          15000,
         );
-        if (!locResp.ok) continue;
-        const localidades: any[] = await locResp.json();
-        const match = localidades.find((l: any) => l.nuMunicipioIbge === ibgeCode);
-
-        if (match) {
+        if (locResp.ok) {
+          const localidades: any[] = await locResp.json();
+          // The API sometimes returns the IBGE code as number; normalize both sides.
+          const match = localidades.find(
+            (l: any) => String(l.nuMunicipioIbge) === String(ibgeCode),
+          );
+          if (match) {
           console.log(`Found municipality in API: ${match.noLocalidade} (${uf.sgUf}), nuLocalidade=${match.nuLocalidade}`);
 
-          // Now fetch the full data
-          const searchResp = await fetch('https://www.mapa.turismo.gov.br/mapa/rest/publico/regionalizacao/pesquisar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({ nuUf: uf.nuUf, nuLocalidade: match.nuLocalidade }),
-          });
+          // Now fetch the full data — with a timeout (was missing before).
+          const searchController = new AbortController();
+          const searchTimer = setTimeout(() => searchController.abort(), 15000);
+          let searchResp: Response;
+          try {
+            searchResp = await fetch(
+              'https://www.mapa.turismo.gov.br/mapa/rest/publico/regionalizacao/pesquisar',
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ nuUf: uf.nuUf, nuLocalidade: match.nuLocalidade }),
+                signal: searchController.signal,
+              },
+            );
+          } finally {
+            clearTimeout(searchTimer);
+          }
 
           if (searchResp.ok) {
             const data: any[] = await searchResp.json();
@@ -580,8 +624,12 @@ async function fetchMapaTurismo(
               return results;
             }
           }
-          break;
+          }
+        } else {
+          console.warn(`Mapa Turismo localidades returned ${locResp.status} for UF ${ufSigla}`);
         }
+      } else {
+        console.warn(`Mapa Turismo: UF ${ufSigla} not found in listaUF`);
       }
     }
   } catch (e) {
