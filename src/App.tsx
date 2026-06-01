@@ -7,11 +7,13 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProfileProvider } from "@/contexts/ProfileContext";
 import { LicenseProvider } from "@/contexts/LicenseContext";
+import { OrgModulesProvider } from "@/contexts/OrgModulesContext";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { AdminRoute } from "@/components/layout/AdminRoute";
 import { ERPRoute } from "@/components/layout/ERPRoute";
 import { EduRoute } from "@/components/layout/EduRoute";
 import { LicenseRoute } from "@/components/layout/LicenseRoute";
+import { ModuleRoute } from "@/components/layout/ModuleRoute";
 import { SplashScreen } from "@/components/SplashScreen";
 import { ClientErrorMonitor } from "@/components/ClientErrorMonitor";
 import { ReportJobWatcherMount } from "@/components/ReportJobWatcherMount";
@@ -169,6 +171,7 @@ const App = () => {
               <ClientErrorMonitor />
               <ProfileProvider>
               <LicenseProvider>
+              <OrgModulesProvider>
               <ReportJobWatcherMount />
               <Suspense fallback={<PageLoader />}>
               <Routes>
