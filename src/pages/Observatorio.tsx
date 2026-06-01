@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { Download } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { CsvImportDialog } from "@/components/observatorio/CsvImportDialog";
+import { RegressionAlertsPanel } from "@/components/observatorio/RegressionAlertsPanel";
 
 const CATEGORY_META: Record<string, { label: string; icon: any; color: string }> = {
   fluxo: { label: "Fluxo Turístico", icon: Activity, color: "text-blue-600" },
@@ -163,6 +164,8 @@ export default function Observatorio() {
           </Select>
         </div>
       </div>
+
+      <RegressionAlertsPanel />
 
       {/* KPI cards por categoria */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">

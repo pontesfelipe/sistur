@@ -6975,6 +6975,75 @@ export type Database = {
         }
         Relationships: []
       }
+      observatory_alerts: {
+        Row: {
+          created_at: string
+          current_value: number
+          delta_pct: number
+          id: string
+          is_dismissed: boolean
+          is_read: boolean
+          message: string
+          metric_id: string
+          org_id: string
+          previous_month: number | null
+          previous_value: number
+          previous_year: number
+          reference_month: number | null
+          reference_year: number
+          severity: string
+        }
+        Insert: {
+          created_at?: string
+          current_value: number
+          delta_pct: number
+          id?: string
+          is_dismissed?: boolean
+          is_read?: boolean
+          message: string
+          metric_id: string
+          org_id: string
+          previous_month?: number | null
+          previous_value: number
+          previous_year: number
+          reference_month?: number | null
+          reference_year: number
+          severity?: string
+        }
+        Update: {
+          created_at?: string
+          current_value?: number
+          delta_pct?: number
+          id?: string
+          is_dismissed?: boolean
+          is_read?: boolean
+          message?: string
+          metric_id?: string
+          org_id?: string
+          previous_month?: number | null
+          previous_value?: number
+          previous_year?: number
+          reference_month?: number | null
+          reference_year?: number
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "observatory_alerts_metric_id_fkey"
+            columns: ["metric_id"]
+            isOneToOne: false
+            referencedRelation: "observatory_metrics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "observatory_alerts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       observatory_events: {
         Row: {
           actual_attendance: number | null
@@ -7088,6 +7157,7 @@ export type Database = {
           created_at: string
           description: string | null
           display_order: number
+          higher_is_better: boolean
           id: string
           name: string
           unit: string
@@ -7100,6 +7170,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number
+          higher_is_better?: boolean
           id?: string
           name: string
           unit: string
@@ -7112,6 +7183,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number
+          higher_is_better?: boolean
           id?: string
           name?: string
           unit?: string
