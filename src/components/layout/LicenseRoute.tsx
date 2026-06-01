@@ -9,12 +9,13 @@ interface LicenseRouteProps {
   children: React.ReactNode;
   requiredFeature?: string;
   allowExpired?: boolean;
+  requirePaid?: boolean;
 }
 
-export function LicenseRoute({ children, requiredFeature, allowExpired = false }: LicenseRouteProps) {
+export function LicenseRoute({ children, requiredFeature, allowExpired = false, requirePaid = false }: LicenseRouteProps) {
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, initialized: profileInit } = useProfileContext();
-  const { loading: licenseLoading, initialized: licenseInit, isLicenseValid, hasFeature } = useLicense();
+  const { loading: licenseLoading, initialized: licenseInit, isLicenseValid, hasFeature, isPaidPlan } = useLicense();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
 
   const isInitialLoad = (authLoading && user === null) || !profileInit || !licenseInit || (!!user && termsLoading);
@@ -35,6 +36,7 @@ export function LicenseRoute({ children, requiredFeature, allowExpired = false }
   if (isAdmin) return <>{children}</>;
   if (!isLicenseValid && !allowExpired) return <Navigate to="/assinatura" replace />;
   if (requiredFeature && !hasFeature(requiredFeature)) return <Navigate to="/assinatura" replace />;
+  if (requirePaid && !isPaidPlan) return <Navigate to="/assinatura" replace />;
 
   return <>{children}</>;
 }
