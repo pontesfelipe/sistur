@@ -78,7 +78,7 @@ export function useCalculateAssessment() {
           throw new Error(job.error_message || 'O cálculo falhou no servidor.');
         }
         if (job.status === 'completed') {
-          const result = (job.result || {}) as CalculationResult;
+          const result = (job.result ?? {}) as unknown as CalculationResult;
           if (result.success !== true) {
             throw new Error('O serviço de cálculo concluiu sem sinalizar sucesso.');
           }
