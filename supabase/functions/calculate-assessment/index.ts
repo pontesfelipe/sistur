@@ -457,25 +457,22 @@ async function runCalculationCore(
 
     if (assessmentError || !assessment) {
       console.error("Assessment not found:", assessmentError);
-      return new Response(
-        JSON.stringify({ error: "Assessment not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      throw new CalcError("Assessment not found", 404);
     }
 
     const orgId = assessment.org_id;
 
     // Authorisation: caller must belong to the assessment's org (or be ADMIN).
     const { data: belongs } = await supabase.rpc("user_belongs_to_org", {
-      _user_id: authResult.user.id,
+      _user_id: authUserId,
       _org_id: orgId,
     });
     if (!belongs) {
       const { data: isAdmin } = await supabase.rpc("has_role", {
-        _user_id: authResult.user.id,
+        _user_id: authUserId,
         _role: "ADMIN",
       });
-      if (!isAdmin) return forbidden("Caller does not belong to this assessment's org");
+      if (!isAdmin) throw new CalcError("Caller does not belong to this assessment's org", 403);
     }
     const assessmentTier = assessment.tier || 'COMPLETE';
     const diagnosticType = assessment.diagnostic_type || 'territorial';
