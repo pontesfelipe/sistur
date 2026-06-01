@@ -15,9 +15,13 @@ const MAPPINGS: Array<{
 }> = [
   // Cadastur: soma de leitos por município (OE001) -> leitos disponíveis
   { external_indicator: "OE001", metric_code: "ocupacao_leitos_disponiveis", source_label: "Cadastur/MTur (auto)" },
-  // ANAC: passageiros internacionais por aeroporto consolidado por município
-  { external_indicator: "igma_passageiros_internacionais", metric_code: "fluxo_visitantes_internacionais", source_label: "ANAC (auto)" },
-  { external_indicator: "igma_passageiros_nacionais", metric_code: "fluxo_visitantes_nacionais", source_label: "ANAC (auto)" },
+  // IGMA/ANAC: visitantes consolidados por município
+  { external_indicator: "igma_visitantes_internacionais", metric_code: "fluxo_visitantes_internacionais", source_label: "IGMA/ANAC (auto)" },
+  { external_indicator: "igma_visitantes_nacionais", metric_code: "fluxo_visitantes_nacionais", source_label: "IGMA/ANAC (auto)" },
+  // CAGED/RAIS via IGMA: empregos formais no turismo
+  { external_indicator: "igma_empregos_turismo", metric_code: "empregos_formais", source_label: "CAGED/RAIS via IGMA (auto)" },
+  // Tesouro/SEFAZ via IGMA: arrecadação ISS turismo
+  { external_indicator: "igma_arrecadacao_turismo", metric_code: "receita_arrecadacao_iss", source_label: "Tesouro/SEFAZ via IGMA (auto)" },
 ];
 
 Deno.serve(async (req) => {
