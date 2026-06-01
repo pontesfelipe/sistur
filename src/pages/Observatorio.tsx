@@ -136,6 +136,22 @@ export default function Observatorio() {
     setNewEvent({ name: "", description: "", category: "cultural", start_date: "", end_date: "", estimated_attendance: "", estimated_revenue: "" });
   };
 
+  const handleExportCsv = () => {
+    const csv = buildObservatoryCsv({
+      orgName: (profile as any)?.org?.name ?? (profile as any)?.orgs?.name ?? "Destino",
+      year,
+      metrics,
+      summary,
+    });
+    downloadCsv(`observatorio-${year}.csv`, csv);
+    toast.success("CSV exportado");
+  };
+
+  const handlePrintPdf = () => {
+    // Usa o motor de impressão do navegador para gerar PDF da página atual
+    window.print();
+  };
+
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
