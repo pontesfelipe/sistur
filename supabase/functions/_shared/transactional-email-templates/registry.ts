@@ -14,6 +14,7 @@ import { template as accessRequested } from './access-requested.tsx'
 import { template as customMessage } from './custom-message.tsx'
 import { template as eduLevelUp } from './edu-level-up.tsx'
 import { template as eduBadgeEarned } from './edu-badge-earned.tsx'
+import { template as observatoryCriticalAlert } from './observatory-critical-alert.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'access-approved': accessApproved,
@@ -21,4 +22,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'custom-message': customMessage,
   'edu-level-up': eduLevelUp,
   'edu-badge-earned': eduBadgeEarned,
+  'observatory-critical-alert': observatoryCriticalAlert,
 }
