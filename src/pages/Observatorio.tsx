@@ -171,6 +171,12 @@ export default function Observatorio() {
               <CsvImportDialog metrics={metrics} />
             </>
           )}
+          <Button size="sm" variant="outline" onClick={handleExportCsv}>
+            <FileSpreadsheet className="h-4 w-4 mr-2" /> CSV
+          </Button>
+          <Button size="sm" variant="outline" onClick={handlePrintPdf}>
+            <Printer className="h-4 w-4 mr-2" /> PDF
+          </Button>
           <Label className="text-sm">Ano de referência</Label>
           <Select value={String(year)} onValueChange={(v) => setYear(parseInt(v))}>
             <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
