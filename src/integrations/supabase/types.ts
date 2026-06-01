@@ -7215,6 +7215,47 @@ export type Database = {
           },
         ]
       }
+      org_module_overrides: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          module_key: string
+          org_id: string
+          reason: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          enabled: boolean
+          id?: string
+          module_key: string
+          org_id: string
+          reason?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          module_key?: string
+          org_id?: string
+          reason?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_module_overrides_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       org_pillar_weights: {
         Row: {
           created_at: string
@@ -9874,6 +9915,10 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      org_has_module: {
+        Args: { _module: string; _org_id: string }
+        Returns: boolean
       }
       owns_classroom: {
         Args: { p_classroom_id: string; p_user_id: string }
