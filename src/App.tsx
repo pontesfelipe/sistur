@@ -174,6 +174,8 @@ const App = () => {
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/pending-approval" element={<PendingApproval />} />
                 <Route path="/termos" element={<TermsAcceptance />} />
+                <Route path="/verificar-certificado" element={<VerificarCertificado />} />
+                <Route path="/verificar-certificado/:code" element={<VerificarCertificado />} />
                 <Route
                   path="/"
                   element={
@@ -214,6 +216,14 @@ const App = () => {
                   element={
                     <AdminRoute>
                       <AdminEdu />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/certificacoes"
+                  element={
+                    <AdminRoute>
+                      <AdminCertificacoes />
                     </AdminRoute>
                   }
                 />
