@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 61,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.61.5",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Dados oficiais — Corrigidas FK violations em `external_indicator_values` para as fontes CADÚNICO e ANAC, que não existiam em `external_data_sources`. Sintoma: o `fetch-official-data` rodava com sucesso (24 indicadores para Atibaia/3504107), mas os valores de população de baixa renda (CADÚNICO) e voos por semana (ANAC) eram silenciosamente descartados no upsert (`violates foreign key constraint external_indicator_values_source_code_fkey`). Agora ambas as fontes estão cadastradas e os indicadores são persistidos corretamente no diagnóstico territorial."
+    ]
+  },
   {
     version: "1.61.4",
     date: "2026-06-01",
