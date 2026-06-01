@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 55,
+  minor: 57,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,22 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.57.0",
+    date: "2026-06-01",
+    type: "minor" as const,
+    changes: [
+      "Empacotamento ERP Modular — Nova tabela `org_module_overrides` permite habilitar/desabilitar módulos individuais do ERP por organização (diagnóstico, indicadores, cadastro, mapa de oportunidades, certificação, projetos, relatórios, consórcios, observatório, EDU). Função `org_has_module(org_id, module)` retorna se o módulo está disponível para a org — override explícito tem precedência sobre o padrão (habilitado). Painel admin em `/admin/empacotamento` permite ao ADMIN configurar pacotes customizados por contrato (ex: ICP A só com diagnóstico). Hook `useOrgHasModule` disponível para integração futura nas rotas/UI. RLS: membros da org veem suas configurações; somente ADMIN altera.",
+    ],
+  },
+  {
+    version: "1.56.0",
+    date: "2026-06-01",
+    type: "minor" as const,
+    changes: [
+      "Certificação Institucional do Destino (Selo SISTUR) — Novo sistema de selo oficial para destinos turísticos com quatro níveis: Bronze, Prata, Ouro e Diamante. Cada nível tem pontuação mínima geral e por pilar (RA/OE/AO) e validade configurável (12 a 36 meses). Inclui: tabela `destination_certification_levels` com critérios, tabela `destination_certifications` com snapshot das pontuações no momento da emissão, código público de verificação único por certificado, status (ativo/expirado/revogado/suspenso) e motivo de revogação. Avaliação automática de elegibilidade via RPC `evaluate_destination_certification_eligibility` que retorna o maior nível compatível com o diagnóstico mais recente. Página pública `/verificar-certificado/:code` permite a qualquer pessoa validar a autenticidade do selo. Painel admin em `/admin/certificacoes` para emissão e revogação por ADMIN global. RLS: membros da org veem seus certificados; somente ADMIN emite/revoga.",
+    ],
+  },
   {
     version: "1.55.0",
     date: "2026-06-01",

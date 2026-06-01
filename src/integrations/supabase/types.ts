@@ -1684,57 +1684,123 @@ export type Database = {
         }
         Relationships: []
       }
-      destination_certifications: {
+      destination_certification_levels: {
         Row: {
-          ao_score: number
-          assessment_id: string
-          badge_url: string | null
-          certification_level: string
-          certified_at: string
+          active: boolean
+          badge_color: string | null
           created_at: string
-          destination_id: string
-          expires_at: string | null
+          description: string | null
+          display_name: string
           id: string
-          is_active: boolean
-          oe_score: number
-          org_id: string
-          previous_certification_id: string | null
-          ra_score: number
-          territorial_impact_index: number
+          level: Database["public"]["Enums"]["certification_level"]
+          min_ao_score: number
+          min_oe_score: number
+          min_overall_score: number
+          min_ra_score: number
+          sort_order: number
+          updated_at: string
+          validity_months: number
         }
         Insert: {
-          ao_score: number
-          assessment_id: string
-          badge_url?: string | null
-          certification_level: string
-          certified_at?: string
+          active?: boolean
+          badge_color?: string | null
           created_at?: string
-          destination_id: string
-          expires_at?: string | null
+          description?: string | null
+          display_name: string
           id?: string
-          is_active?: boolean
-          oe_score: number
-          org_id: string
-          previous_certification_id?: string | null
-          ra_score: number
-          territorial_impact_index: number
+          level: Database["public"]["Enums"]["certification_level"]
+          min_ao_score: number
+          min_oe_score: number
+          min_overall_score: number
+          min_ra_score: number
+          sort_order?: number
+          updated_at?: string
+          validity_months?: number
         }
         Update: {
-          ao_score?: number
-          assessment_id?: string
-          badge_url?: string | null
-          certification_level?: string
-          certified_at?: string
+          active?: boolean
+          badge_color?: string | null
           created_at?: string
-          destination_id?: string
-          expires_at?: string | null
+          description?: string | null
+          display_name?: string
           id?: string
-          is_active?: boolean
-          oe_score?: number
+          level?: Database["public"]["Enums"]["certification_level"]
+          min_ao_score?: number
+          min_oe_score?: number
+          min_overall_score?: number
+          min_ra_score?: number
+          sort_order?: number
+          updated_at?: string
+          validity_months?: number
+        }
+        Relationships: []
+      }
+      destination_certifications: {
+        Row: {
+          ao_score_snapshot: number | null
+          assessment_id: string | null
+          created_at: string
+          criteria_snapshot: Json | null
+          id: string
+          issued_at: string
+          issued_by: string | null
+          level: Database["public"]["Enums"]["certification_level"]
+          notes: string | null
+          oe_score_snapshot: number | null
+          org_id: string
+          overall_score_snapshot: number | null
+          ra_score_snapshot: number | null
+          revocation_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          status: Database["public"]["Enums"]["certification_status"]
+          updated_at: string
+          valid_until: string
+          verification_code: string
+        }
+        Insert: {
+          ao_score_snapshot?: number | null
+          assessment_id?: string | null
+          created_at?: string
+          criteria_snapshot?: Json | null
+          id?: string
+          issued_at?: string
+          issued_by?: string | null
+          level: Database["public"]["Enums"]["certification_level"]
+          notes?: string | null
+          oe_score_snapshot?: number | null
+          org_id: string
+          overall_score_snapshot?: number | null
+          ra_score_snapshot?: number | null
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: Database["public"]["Enums"]["certification_status"]
+          updated_at?: string
+          valid_until: string
+          verification_code: string
+        }
+        Update: {
+          ao_score_snapshot?: number | null
+          assessment_id?: string | null
+          created_at?: string
+          criteria_snapshot?: Json | null
+          id?: string
+          issued_at?: string
+          issued_by?: string | null
+          level?: Database["public"]["Enums"]["certification_level"]
+          notes?: string | null
+          oe_score_snapshot?: number | null
           org_id?: string
-          previous_certification_id?: string | null
-          ra_score?: number
-          territorial_impact_index?: number
+          overall_score_snapshot?: number | null
+          ra_score_snapshot?: number | null
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: Database["public"]["Enums"]["certification_status"]
+          updated_at?: string
+          valid_until?: string
+          verification_code?: string
         }
         Relationships: [
           {
@@ -1752,31 +1818,10 @@ export type Database = {
             referencedColumns: ["latest_assessment_id"]
           },
           {
-            foreignKeyName: "destination_certifications_destination_id_fkey"
-            columns: ["destination_id"]
-            isOneToOne: false
-            referencedRelation: "destinations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "destination_certifications_destination_id_fkey"
-            columns: ["destination_id"]
-            isOneToOne: false
-            referencedRelation: "public_destination_summary"
-            referencedColumns: ["destination_id"]
-          },
-          {
             foreignKeyName: "destination_certifications_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "destination_certifications_previous_certification_id_fkey"
-            columns: ["previous_certification_id"]
-            isOneToOne: false
-            referencedRelation: "destination_certifications"
             referencedColumns: ["id"]
           },
         ]
@@ -7170,6 +7215,47 @@ export type Database = {
           },
         ]
       }
+      org_module_overrides: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          module_key: string
+          org_id: string
+          reason: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          enabled: boolean
+          id?: string
+          module_key: string
+          org_id: string
+          reason?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          module_key?: string
+          org_id?: string
+          reason?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_module_overrides_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       org_pillar_weights: {
         Row: {
           created_at: string
@@ -9444,6 +9530,18 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      evaluate_destination_certification_eligibility: {
+        Args: { _org_id: string }
+        Returns: {
+          ao_score: number
+          assessment_id: string
+          details: Json
+          eligible_level: Database["public"]["Enums"]["certification_level"]
+          oe_score: number
+          overall_score: number
+          ra_score: number
+        }[]
+      }
       expire_trial_licenses: { Args: never; Returns: undefined }
       extend_assignment_due_date: {
         Args: { p_assignment_id: string; p_new_due_date: string }
@@ -9818,6 +9916,10 @@ export type Database = {
         }
         Returns: number
       }
+      org_has_module: {
+        Args: { _module: string; _org_id: string }
+        Returns: boolean
+      }
       owns_classroom: {
         Args: { p_classroom_id: string; p_user_id: string }
         Returns: boolean
@@ -9885,6 +9987,23 @@ export type Database = {
           user_name: string
         }[]
       }
+      verify_destination_certification: {
+        Args: { _code: string }
+        Returns: {
+          ao_score: number
+          is_valid: boolean
+          issued_at: string
+          level: Database["public"]["Enums"]["certification_level"]
+          level_display_name: string
+          oe_score: number
+          org_name: string
+          overall_score: number
+          ra_score: number
+          status: Database["public"]["Enums"]["certification_status"]
+          valid_until: string
+          verification_code: string
+        }[]
+      }
     }
     Enums: {
       app_role:
@@ -9896,6 +10015,8 @@ export type Database = {
         | "ORG_ADMIN"
       assessment_status: "DRAFT" | "DATA_READY" | "CALCULATED"
       certificate_status_type: "active" | "revoked" | "expired"
+      certification_level: "bronze" | "prata" | "ouro" | "diamante"
+      certification_status: "ativo" | "expirado" | "revogado" | "suspenso"
       collection_type: "AUTOMATICA" | "MANUAL" | "ESTIMADA"
       content_status: "draft" | "validated" | "published" | "archived"
       content_type:
@@ -10139,6 +10260,8 @@ export const Constants = {
       ],
       assessment_status: ["DRAFT", "DATA_READY", "CALCULATED"],
       certificate_status_type: ["active", "revoked", "expired"],
+      certification_level: ["bronze", "prata", "ouro", "diamante"],
+      certification_status: ["ativo", "expirado", "revogado", "suspenso"],
       collection_type: ["AUTOMATICA", "MANUAL", "ESTIMADA"],
       content_status: ["draft", "validated", "published", "archived"],
       content_type: [

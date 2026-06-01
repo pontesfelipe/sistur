@@ -113,6 +113,9 @@ const MinhasAtividades = lazyWithReload(() => import("./pages/MinhasAtividades")
 const EduHistoricoEscolar = lazyWithReload(() => import("./pages/EduHistoricoEscolar"));
 const Consorcios = lazyWithReload(() => import("./pages/Consorcios"));
 const ConsorcioDetalhe = lazyWithReload(() => import("./pages/ConsorcioDetalhe"));
+const AdminCertificacoes = lazyWithReload(() => import("./pages/AdminCertificacoes"));
+const VerificarCertificado = lazyWithReload(() => import("./pages/VerificarCertificado"));
+const AdminEmpacotamento = lazyWithReload(() => import("./pages/AdminEmpacotamento"));
 
 // Preload frequently visited pages after initial render
 const preloadPages = () => {
@@ -172,6 +175,8 @@ const App = () => {
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/pending-approval" element={<PendingApproval />} />
                 <Route path="/termos" element={<TermsAcceptance />} />
+                <Route path="/verificar-certificado" element={<VerificarCertificado />} />
+                <Route path="/verificar-certificado/:code" element={<VerificarCertificado />} />
                 <Route
                   path="/"
                   element={
@@ -212,6 +217,22 @@ const App = () => {
                   element={
                     <AdminRoute>
                       <AdminEdu />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/certificacoes"
+                  element={
+                    <AdminRoute>
+                      <AdminCertificacoes />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/empacotamento"
+                  element={
+                    <AdminRoute>
+                      <AdminEmpacotamento />
                     </AdminRoute>
                   }
                 />
