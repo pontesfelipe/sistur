@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 60,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.60.2",
+    date: "2026-06-01",
+    type: "patch" as const,
+    changes: [
+      "Observatório — Ampliação dos mapeamentos automáticos de ingestão. Corrigidos códigos IGMA reais (`igma_visitantes_internacionais`, `igma_visitantes_nacionais`) e adicionados novos mapeamentos: CAGED/RAIS via IGMA (`igma_empregos_turismo` → `empregos_formais`) e Tesouro/SEFAZ via IGMA (`igma_arrecadacao_turismo` → `receita_arrecadacao_iss`). Cada métrica preserva a fonte original no campo `source` para auditoria/provenance. O cron mensal e o botão manual no `/observatorio` agora populam automaticamente 5 métricas-chave do painel a partir das ingestões oficiais existentes.",
+    ],
+  },
   {
     version: "1.60.1",
     date: "2026-06-01",
