@@ -531,9 +531,11 @@ const App = () => {
                   path="/consorcios"
                   element={
                     <ERPRoute>
-                      <ModuleRoute module="consorcios">
-                        <Consorcios />
-                      </ModuleRoute>
+                      <LicenseRoute requirePaid>
+                        <ModuleRoute module="consorcios">
+                          <Consorcios />
+                        </ModuleRoute>
+                      </LicenseRoute>
                     </ERPRoute>
                   }
                 />
@@ -541,9 +543,11 @@ const App = () => {
                   path="/consorcios/:id"
                   element={
                     <ERPRoute>
-                      <ModuleRoute module="consorcios">
-                        <ConsorcioDetalhe />
-                      </ModuleRoute>
+                      <LicenseRoute requirePaid>
+                        <ModuleRoute module="consorcios">
+                          <ConsorcioDetalhe />
+                        </ModuleRoute>
+                      </LicenseRoute>
                     </ERPRoute>
                   }
                 />
