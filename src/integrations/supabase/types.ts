@@ -6980,6 +6980,8 @@ export type Database = {
           created_at: string
           current_value: number
           delta_pct: number
+          email_recipients_count: number
+          email_sent_at: string | null
           id: string
           is_dismissed: boolean
           is_read: boolean
@@ -6997,6 +6999,8 @@ export type Database = {
           created_at?: string
           current_value: number
           delta_pct: number
+          email_recipients_count?: number
+          email_sent_at?: string | null
           id?: string
           is_dismissed?: boolean
           is_read?: boolean
@@ -7014,6 +7018,8 @@ export type Database = {
           created_at?: string
           current_value?: number
           delta_pct?: number
+          email_recipients_count?: number
+          email_sent_at?: string | null
           id?: string
           is_dismissed?: boolean
           is_read?: boolean
