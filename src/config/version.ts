@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.1",
+    date: "2026-06-02",
+    type: "patch" as const,
+    changes: [
+      "Camada Semântica — Export/Import em `/admin/semantica`. Botão **Exportar** gera backup completo (ou apenas o filtro atual) em **JSON** (estrutura `{schema, version, exported_at, entries[]}`) ou **CSV** (com BOM UTF-8 para Excel BR). Botão **Importar** aceita JSON ou CSV, parseia client-side, mostra pré-visualização com badge `inserir`/`atualizar` por chave e dois modos: **Merge** (insere novos + atualiza existentes, preserva os demais) ou **Substituir** (insere/atualiza do arquivo e desativa as entradas ativas ausentes — sem excluir, permitindo reverter). Cada upsert respeita as triggers de versionamento e histórico (`report_semantic_entry_history`), então toda importação fica rastreada. Permite backup, versionamento externo (git) e migração entre ambientes (staging → produção)."
+    ]
+  },
   {
     version: "1.62.0",
     date: "2026-06-02",
