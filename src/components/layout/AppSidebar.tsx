@@ -101,6 +101,14 @@ const navGroups: NavGroup[] = [
       { name: 'Jogos Educacionais', href: '/game', icon: Gamepad2 },
     ],
   },
+  {
+    label: 'Configurações',
+    icon: Settings,
+    items: [
+      { name: 'Configurações Gerais', href: '/configuracoes', icon: Settings },
+      { name: 'Camada Semântica', href: '/admin/semantica', icon: ScrollText, requiresAdmin: true },
+    ],
+  },
 ];
 
 const bottomNavigation: NavItem[] = [
