@@ -707,9 +707,54 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     {draft.section_header ? `${draft.section_header}:\n${draft.content ?? ""}` : (draft.content ?? "")}
                   </div>
                 </TabsContent>
+                <TabsContent value="example" className="mt-4 space-y-3">
+                  <div className="flex items-start gap-2 rounded-md border bg-muted/30 p-3 text-xs">
+                    <Info className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                    <p>
+                      Esta é uma <b>regra válida</b> de exemplo. Use como modelo. Para carregá-la no editor, clique em <b>Inserir exemplo</b> no topo do painel.
+                    </p>
+                  </div>
+                  <div className="rounded-md border overflow-hidden">
+                    <div className="bg-muted px-3 py-2 text-xs font-medium">Campos do formulário</div>
+                    <table className="w-full text-xs">
+                      <tbody>
+                        {([
+                          ["Chave canônica", EXAMPLE_DRAFT.key],
+                          ["Categoria", EXAMPLE_DRAFT.category],
+                          ["Título", EXAMPLE_DRAFT.title],
+                          ["Cabeçalho da seção", EXAMPLE_DRAFT.section_header],
+                          ["Aplica-se a", EXAMPLE_DRAFT.applies_to],
+                          ["Ordem de injeção", String(EXAMPLE_DRAFT.injection_order)],
+                          ["Ativa", EXAMPLE_DRAFT.active ? "sim" : "não"],
+                        ] as [string, any][]).map(([k, v]) => (
+                          <tr key={k} className="border-t">
+                            <td className="p-2 w-48 text-muted-foreground">{k}</td>
+                            <td className="p-2 font-mono break-all">{v as string}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Conteúdo (markdown injetado no prompt)</Label>
+                    <pre className="mt-1 rounded-md border bg-muted/30 p-3 text-xs whitespace-pre-wrap font-mono">{EXAMPLE_DRAFT.content}</pre>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Equivalente em JSON (para importação em lote)</Label>
+                    <pre className="mt-1 rounded-md border bg-muted/30 p-3 text-xs whitespace-pre-wrap font-mono overflow-x-auto">{JSON.stringify(EXAMPLE_DRAFT, null, 2)}</pre>
+                  </div>
+                </TabsContent>
               </Tabs>
             ) : (
-              <p className="text-sm text-muted-foreground">Selecione uma entrada na lista ou clique em "Nova entrada".</p>
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">Selecione uma entrada na lista ou clique no botão abaixo para adicionar uma nova regra.</p>
+                <Button
+                  variant="outline"
+                  onClick={() => { setCreating(true); setSelected(null); setDraft(emptyDraft()); }}
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Nova regra
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>
