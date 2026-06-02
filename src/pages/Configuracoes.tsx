@@ -152,7 +152,7 @@ export default function Configuracoes() {
             className={cn(
               'grid w-full max-w-4xl',
               isAdmin
-                ? 'grid-cols-6'
+                ? 'grid-cols-7'
                 : isOrgAdmin
                   ? 'grid-cols-4'
                   : 'grid-cols-3'
@@ -188,6 +188,12 @@ export default function Configuracoes() {
               <Wrench className="h-4 w-4" />
               <span className="hidden sm:inline">Ferramentas</span>
             </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="semantica" className="flex items-center gap-2">
+                <ScrollText className="h-4 w-4" />
+                <span className="hidden sm:inline">Semântica</span>
+              </TabsTrigger>
+            )}
           </TabsList>
 
           {/* GERAL TAB */}
@@ -306,6 +312,15 @@ export default function Configuracoes() {
           <TabsContent value="logs" className="space-y-6">
             <LogAnalytics />
           </TabsContent>
+
+          {/* SEMANTICA TAB */}
+          {isAdmin && (
+            <TabsContent value="semantica" className="space-y-6">
+              <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando camada semântica…</div>}>
+                <AdminSemanticLayer embedded />
+              </Suspense>
+            </TabsContent>
+          )}
 
           <TabsContent value="documentacao" className="space-y-6">
             {/* Principles */}
