@@ -6,6 +6,78 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// ============================================================
+// Semantic Layer (camada semântica editável por ADMIN)
+// Carrega entradas de `report_semantic_entries` no início do request
+// e substitui os blocos hardcoded BASE_METHODOLOGY / CANONICAL_REFERENCES
+// / MEC_FORMATTING_RULES quando há entradas ativas. Se a tabela estiver
+// vazia ou a query falhar, o fallback são as constantes embutidas — sem
+// regressão de comportamento.
+// ============================================================
+type SemanticOverrides = {
+  methodology?: string;     // substitui BASE_METHODOLOGY (+ MEC_FORMATTING_RULES)
+  references?: string;      // substitui CANONICAL_REFERENCES
+  formatting?: string;      // substitui MEC_FORMATTING_RULES isolado (enterprise)
+};
+let SEMANTIC_OVERRIDES: SemanticOverrides = {};
+
+async function loadSemanticLayer(
+  supabaseAdmin: any,
+  mode: 'territorial' | 'enterprise',
+): Promise<SemanticOverrides> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('report_semantic_entries')
+      .select('key, category, title, content, section_header, applies_to, injection_order, active, scope')
+      .eq('active', true)
+      .eq('scope', 'global')
+      .in('applies_to', [mode, 'both'])
+      .order('injection_order', { ascending: true });
+    if (error || !data || data.length === 0) return {};
+
+    const fmt = (rows: any[]) =>
+      rows
+        .map((r) =>
+          r.section_header
+            ? `${r.section_header}:\n${r.content}`
+            : r.content,
+        )
+        .join('\n\n');
+
+    const methodologyCats = new Set([
+      'methodology', 'classification', 'sources', 'glossary', 'mst_extension',
+    ]);
+    const formattingCats = new Set(['formatting']);
+    const referenceCats = new Set(['bibliography', 'anti_hallucination']);
+
+    const methodologyRows = data.filter((r: any) => methodologyCats.has(r.category));
+    const formattingRows = data.filter((r: any) => formattingCats.has(r.category));
+    const referenceRows  = data.filter((r: any) => referenceCats.has(r.category));
+
+    const methodologyBlock = methodologyRows.length
+      ? `${fmt(methodologyRows)}\n\n${fmt(formattingRows)}`
+      : undefined;
+
+    return {
+      methodology: methodologyBlock,
+      references: referenceRows.length ? fmt(referenceRows) : undefined,
+      formatting: formattingRows.length ? fmt(formattingRows) : undefined,
+    };
+  } catch (_e) {
+    return {};
+  }
+}
+
+function semanticMethodology(fallback: string): string {
+  return SEMANTIC_OVERRIDES.methodology ?? fallback;
+}
+function semanticReferences(fallback: string): string {
+  return SEMANTIC_OVERRIDES.references ?? fallback;
+}
+function semanticFormatting(fallback: string): string {
+  return SEMANTIC_OVERRIDES.formatting ?? fallback;
+}
+
 // v1.38.50 — `VALIDATOR_VERSION` é apenas o fallback. O cliente envia
 // `appVersion` no body do request (ver `src/pages/Relatorios.tsx`) e esse
 // valor é usado por request, garantindo que a "Conferência de dados"
