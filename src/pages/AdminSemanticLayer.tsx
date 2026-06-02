@@ -14,7 +14,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { ArrowLeft, History, Plus, Save, Trash2, Download, Upload } from "lucide-react";
+import { ArrowLeft, History, Plus, Save, Trash2, Download, Upload, FileUp, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
