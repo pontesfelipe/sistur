@@ -226,6 +226,12 @@ const AuditLogs = () => {
                 Logs do Gerador
               </Link>
             </Button>
+            <Button variant="outline" asChild>
+              <Link to="/admin/semantica">
+                <Sparkles className="h-4 w-4 mr-2" />
+                Camada Semântica
+              </Link>
+            </Button>
           </div>
         </div>
 

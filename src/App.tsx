@@ -94,6 +94,7 @@ const VerifyCertificate = lazyWithReload(() => import("./pages/VerifyCertificate
 const OnDemandRequests = lazyWithReload(() => import("./pages/OnDemandRequests"));
 const AuditLogs = lazyWithReload(() => import("./pages/AuditLogs"));
 const AdminReportLogs = lazyWithReload(() => import("./pages/AdminReportLogs"));
+const AdminSemanticLayer = lazyWithReload(() => import("./pages/AdminSemanticLayer"));
 const Projetos = lazyWithReload(() => import("./pages/Projetos"));
 const Forum = lazyWithReload(() => import("./pages/Forum"));
 const GamesHub = lazyWithReload(() => import("./pages/GamesHub"));
@@ -514,6 +515,14 @@ const App = () => {
                   element={
                     <AdminRoute>
                       <AdminReportLogs />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/semantica"
+                  element={
+                    <AdminRoute>
+                      <AdminSemanticLayer />
                     </AdminRoute>
                   }
                 />
