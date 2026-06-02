@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { ArrowLeft, History, Plus, Save, Trash2, Download, Upload, FileUp, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Sparkles, Info } from "lucide-react";
+import { Sparkles, Info, ShieldCheck, FileText, Loader2, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 
 type Entry = {
   id: string;
