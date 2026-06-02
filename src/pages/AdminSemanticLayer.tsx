@@ -110,32 +110,28 @@ export default function AdminSemanticLayer() {
   };
 
   useEffect(() => {
-    const el = dropRef.current;
-    if (!el) return;
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault();
-      e.stopPropagation();
       setIsDragging(true);
     };
     const handleDragLeave = (e: DragEvent) => {
       e.preventDefault();
-      e.stopPropagation();
-      if (!el.contains(e.relatedTarget as Node)) setIsDragging(false);
+      // Only hide if leaving the document entirely, not entering a child
+      if (!e.relatedTarget) setIsDragging(false);
     };
     const handleDrop = (e: DragEvent) => {
       e.preventDefault();
-      e.stopPropagation();
       setIsDragging(false);
       const file = e.dataTransfer?.files?.[0];
       if (file) handleFile(file);
     };
-    el.addEventListener("dragover", handleDragOver);
-    el.addEventListener("dragleave", handleDragLeave);
-    el.addEventListener("drop", handleDrop);
+    document.addEventListener("dragover", handleDragOver);
+    document.addEventListener("dragleave", handleDragLeave);
+    document.addEventListener("drop", handleDrop);
     return () => {
-      el.removeEventListener("dragover", handleDragOver);
-      el.removeEventListener("dragleave", handleDragLeave);
-      el.removeEventListener("drop", handleDrop);
+      document.removeEventListener("dragover", handleDragOver);
+      document.removeEventListener("dragleave", handleDragLeave);
+      document.removeEventListener("drop", handleDrop);
     };
   }, [entries]);
 
