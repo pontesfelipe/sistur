@@ -826,6 +826,166 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
           </CardContent>
         </Card>
       </div>
+        </TabsContent>
+
+        <TabsContent value="audit" className="mt-4 space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-primary" /> Auditoria semântica de relatório
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                Envie um relatório (arquivo texto ou colado abaixo) e a IA confronta o conteúdo com todas as regras <b>ativas</b> da camada semântica, retornando aprovações, alertas e violações com trechos citados.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_220px] gap-3 items-end">
+                <div>
+                  <Label className="text-xs">Arquivo do relatório</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Button variant="outline" size="sm" onClick={() => auditFileInputRef.current?.click()}>
+                      <Upload className="h-4 w-4 mr-2" /> Selecionar arquivo
+                    </Button>
+                    <input
+                      ref={auditFileInputRef}
+                      type="file"
+                      accept=".txt,.md,.markdown,.json,.html,.htm,.csv,.log,text/*"
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleAuditFile(f); }}
+                    />
+                    {auditFileName && (
+                      <span className="text-xs text-muted-foreground self-center truncate">
+                        {auditFileName} — {auditText.length.toLocaleString("pt-BR")} chars
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    Formatos suportados: .txt, .md, .json, .html, .csv. Para PDF/DOCX, copie o texto e cole na caixa abaixo.
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-xs">Escopo das regras</Label>
+                  <Select value={auditScope} onValueChange={(v: any) => setAuditScope(v)}>
+                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="both">Todas (territorial + enterprise)</SelectItem>
+                      <SelectItem value="territorial">Apenas territorial</SelectItem>
+                      <SelectItem value="enterprise">Apenas enterprise</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs">Conteúdo do relatório</Label>
+                <Textarea
+                  value={auditText}
+                  onChange={(e) => { setAuditText(e.target.value); if (!e.target.value) setAuditFileName(""); }}
+                  rows={12}
+                  placeholder="Cole aqui o conteúdo bruto do relatório (markdown, texto extraído de PDF, etc.)…"
+                  className="font-mono text-xs mt-1"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Button onClick={runAudit} disabled={auditRunning || auditText.trim().length < 30}>
+                  {auditRunning ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ShieldCheck className="h-4 w-4 mr-2" />}
+                  {auditRunning ? "Auditando…" : "Conferir conformidade"}
+                </Button>
+                {auditText && (
+                  <Button variant="ghost" size="sm" onClick={() => { setAuditText(""); setAuditFileName(""); setAuditResult(null); setAuditMeta(null); }}>
+                    <X className="h-4 w-4 mr-2" /> Limpar
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {auditResult && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div>
+                    <CardTitle className="text-base">Resultado da auditoria</CardTitle>
+                    {auditMeta && (
+                      <p className="text-[11px] text-muted-foreground mt-1">
+                        {auditMeta.rules_evaluated} regra(s) avaliada(s) · {auditMeta.report_chars.toLocaleString("pt-BR")} caracteres analisados
+                        {auditMeta.truncated ? " · ⚠ relatório truncado para auditoria" : ""}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`text-2xl font-bold ${auditResult.score >= 85 ? "text-green-600" : auditResult.score >= 60 ? "text-yellow-600" : "text-destructive"}`}>
+                      {Math.round(auditResult.score)}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">conformidade</div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm">{auditResult.summary}</p>
+
+                <div className="flex flex-wrap gap-2 text-xs">
+                  {(["all", "fail", "warn", "pass"] as const).map((f) => {
+                    const count = f === "all" ? auditResult.findings.length : auditResult.findings.filter((x) => x.status === f).length;
+                    return (
+                      <Button
+                        key={f}
+                        size="sm"
+                        variant={auditFilter === f ? "default" : "outline"}
+                        onClick={() => setAuditFilter(f)}
+                      >
+                        {f === "all" ? "Todas" : f === "fail" ? "Violações" : f === "warn" ? "Alertas" : "OK"} ({count})
+                      </Button>
+                    );
+                  })}
+                </div>
+
+                <div className="space-y-2">
+                  {auditResult.findings
+                    .filter((f) => auditFilter === "all" || f.status === auditFilter)
+                    .sort((a, b) => {
+                      const order = { fail: 0, warn: 1, pass: 2 } as const;
+                      return order[a.status] - order[b.status];
+                    })
+                    .map((f, i) => {
+                      const Icon = f.status === "pass" ? CheckCircle2 : f.status === "warn" ? AlertTriangle : XCircle;
+                      const color =
+                        f.status === "pass" ? "text-green-600 border-green-600/30 bg-green-50/40 dark:bg-green-950/20" :
+                        f.status === "warn" ? "text-yellow-700 border-yellow-600/30 bg-yellow-50/40 dark:bg-yellow-950/20" :
+                        "text-destructive border-destructive/30 bg-destructive/5";
+                      return (
+                        <div key={i} className={`rounded-md border p-3 ${color}`}>
+                          <div className="flex items-start gap-2">
+                            <Icon className="h-4 w-4 mt-0.5 shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-medium text-sm">{f.rule_title}</span>
+                                <code className="text-[10px] text-muted-foreground">{f.rule_key}</code>
+                                <Badge variant="outline" className="text-[10px] uppercase">{f.status}</Badge>
+                              </div>
+                              <p className="text-xs mt-1 text-foreground">{f.explanation}</p>
+                              {f.evidence && (
+                                <blockquote className="mt-2 border-l-2 border-current/40 pl-2 text-xs italic text-muted-foreground">
+                                  "{f.evidence}"
+                                </blockquote>
+                              )}
+                              {f.suggested_fix && (
+                                <p className="mt-2 text-xs">
+                                  <b>Sugestão:</b> {f.suggested_fix}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={showHistory} onOpenChange={setShowHistory}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
