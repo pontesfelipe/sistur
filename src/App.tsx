@@ -519,6 +519,14 @@ const App = () => {
                   }
                 />
                 <Route
+                  path="/admin/semantica"
+                  element={
+                    <AdminRoute>
+                      <AdminSemanticLayer />
+                    </AdminRoute>
+                  }
+                />
+                <Route
                   path="/projetos"
                   element={
                     <ERPRoute>
