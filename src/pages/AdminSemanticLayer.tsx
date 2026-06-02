@@ -585,6 +585,21 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
             <CardTitle className="text-base">
               {creating ? "Nova entrada" : selected ? `Editar: ${selected.title}` : "Selecione uma entrada"}
             </CardTitle>
+            {creating && (
+              <div className="flex items-center justify-between gap-2 mt-2">
+                <p className="text-xs text-muted-foreground">
+                  Cada regra é injetada como bloco de texto no prompt do gerador de relatórios. Preencha os campos abaixo, ou clique em <b>Inserir exemplo</b> para carregar uma regra válida.
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setDraft({ ...EXAMPLE_DRAFT })}
+                  title="Preencher o formulário com um exemplo válido"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" /> Inserir exemplo
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent>
             {(creating || selected) ? (
@@ -592,6 +607,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                 <TabsList>
                   <TabsTrigger value="edit">Editor</TabsTrigger>
                   <TabsTrigger value="preview">Preview</TabsTrigger>
+                  <TabsTrigger value="example">Exemplo</TabsTrigger>
                 </TabsList>
                 <TabsContent value="edit" className="space-y-4 mt-4">
                   <div className="grid grid-cols-2 gap-3">
@@ -603,6 +619,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                         onChange={(e) => setDraft({ ...draft, key: e.target.value })}
                         placeholder="ex.: classification.scale_5_levels"
                       />
+                      <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.key}</p>
                     </div>
                     <div>
                       <Label>Categoria</Label>
@@ -612,11 +629,13 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                           {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                         </SelectContent>
                       </Select>
+                      <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.category}</p>
                     </div>
                   </div>
                   <div>
                     <Label>Título</Label>
                     <Input value={draft.title ?? ""} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+                    <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.title}</p>
                   </div>
                   <div>
                     <Label>Cabeçalho da seção (opcional)</Label>
@@ -625,6 +644,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                       onChange={(e) => setDraft({ ...draft, section_header: e.target.value })}
                       placeholder="ex.: CLASSIFICAÇÃO (régua oficial 5 níveis)"
                     />
+                    <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.section_header}</p>
                   </div>
                   <div>
                     <Label>Conteúdo (markdown)</Label>
@@ -634,6 +654,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                       rows={16}
                       className="font-mono text-sm"
                     />
+                    <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.content}</p>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
@@ -646,6 +667,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                           <SelectItem value="enterprise">Enterprise</SelectItem>
                         </SelectContent>
                       </Select>
+                      <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.applies_to}</p>
                     </div>
                     <div>
                       <Label>Ordem de injeção</Label>
@@ -654,6 +676,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                         value={draft.injection_order ?? 100}
                         onChange={(e) => setDraft({ ...draft, injection_order: Number(e.target.value) })}
                       />
+                      <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.injection_order}</p>
                     </div>
                     <div className="flex items-end gap-2">
                       <Switch
