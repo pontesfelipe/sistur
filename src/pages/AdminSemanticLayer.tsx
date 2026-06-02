@@ -396,6 +396,7 @@ export default function AdminSemanticLayer() {
     if (failed) msgs.push(`${failed} com erro`);
     if (failed > 0) toast.error("Importação concluída com erros: " + msgs.join(", "));
     else toast.success("Importação concluída: " + msgs.join(", "));
+    saveLastImport(importPreview.filename, rows.length, importMode);
     setImportPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
     await load();
