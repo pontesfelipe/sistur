@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -49,9 +50,12 @@ import {
   Clock,
   Search,
   Map,
+  ScrollText,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+
+const AdminSemanticLayer = lazy(() => import('@/pages/AdminSemanticLayer'));
 
 // Helper component for downloadable documents
 function DocumentDownloadItem({ 
