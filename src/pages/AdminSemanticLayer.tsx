@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { ArrowLeft, History, Plus, Save, Trash2, Download, Upload, FileUp, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Sparkles, Info } from "lucide-react";
 
 type Entry = {
   id: string;
@@ -71,6 +72,41 @@ function emptyDraft(): Partial<Entry> {
     active: true,
   };
 }
+
+// Exemplo canônico de uma regra/entrada válida da camada semântica.
+// Usado para o botão "Inserir exemplo" e para o painel de referência.
+const EXAMPLE_DRAFT: Partial<Entry> = {
+  key: "classification.scale_5_levels",
+  category: "classification",
+  scope: "global",
+  title: "Régua oficial de classificação (5 níveis)",
+  section_header: "CLASSIFICAÇÃO (régua oficial 5 níveis)",
+  applies_to: "both",
+  injection_order: 200,
+  active: true,
+  content: `Use SEMPRE estes 5 níveis ao classificar indicadores e pilares:
+- Crítico: 0–33%
+- Atenção: 34–66%
+- Adequado: 67–84%
+- Bom: 85–94%
+- Excelente: 95–100%
+
+Regras:
+1. Exiba sempre em percentual inteiro (ex.: 72%), nunca decimais.
+2. Nunca invente categorias fora desta régua.
+3. Não use rankings comparativos entre municípios.`,
+};
+
+const FIELD_HELP: Record<string, string> = {
+  key: "Identificador único e estável. Use snake_case com prefixo da categoria. Ex.: methodology.beni_3_pilares, anti_hallucination.no_rankings.",
+  category: "Tipo da regra. 'methodology' = base teórica; 'classification' = réguas/limiares; 'anti_hallucination' = regras de proibição; 'formatting' = formato de saída; 'sources' = fontes oficiais; 'glossary' = definições.",
+  title: "Nome curto para a UI. Ex.: 'Régua oficial 5 níveis', 'Proibição de rankings'.",
+  section_header: "Cabeçalho impresso no prompt do LLM antes do conteúdo. Opcional. Ex.: 'REGRAS ANTI-ALUCINAÇÃO:'.",
+  content: "Texto/markdown injetado no prompt do gerador de relatórios. Seja imperativo e direto (use 'sempre', 'nunca', listas numeradas).",
+  applies_to: "Em qual fluxo de relatório a regra entra: 'territorial' (destinos/municípios), 'enterprise' (empresas) ou 'both'.",
+  injection_order: "Ordem de injeção no prompt (menor = mais cedo). Use 100 para metodologia, 200 para classificação, 300 para anti-alucinação, 400 para formatação.",
+  active: "Se desligada, a regra é mantida no histórico mas não é usada nos próximos relatórios.",
+};
 
 export default function AdminSemanticLayer({ embedded = false }: { embedded?: boolean } = {}) {
   const { user } = useAuth();
@@ -497,7 +533,17 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
       <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Entradas</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Entradas</CardTitle>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => { setCreating(true); setSelected(null); setDraft(emptyDraft()); }}
+                title="Adicionar nova regra"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
             <div className="flex gap-2 mt-2">
               <Select value={filter} onValueChange={setFilter}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -539,6 +585,21 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
             <CardTitle className="text-base">
               {creating ? "Nova entrada" : selected ? `Editar: ${selected.title}` : "Selecione uma entrada"}
             </CardTitle>
+            {creating && (
+              <div className="flex items-center justify-between gap-2 mt-2">
+                <p className="text-xs text-muted-foreground">
+                  Cada regra é injetada como bloco de texto no prompt do gerador de relatórios. Preencha os campos abaixo, ou clique em <b>Inserir exemplo</b> para carregar uma regra válida.
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setDraft({ ...EXAMPLE_DRAFT })}
+                  title="Preencher o formulário com um exemplo válido"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" /> Inserir exemplo
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent>
             {(creating || selected) ? (
@@ -546,6 +607,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                 <TabsList>
                   <TabsTrigger value="edit">Editor</TabsTrigger>
                   <TabsTrigger value="preview">Preview</TabsTrigger>
+                  <TabsTrigger value="example">Exemplo</TabsTrigger>
                 </TabsList>
                 <TabsContent value="edit" className="space-y-4 mt-4">
                   <div className="grid grid-cols-2 gap-3">
@@ -557,6 +619,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                         onChange={(e) => setDraft({ ...draft, key: e.target.value })}
                         placeholder="ex.: classification.scale_5_levels"
                       />
+                      <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.key}</p>
                     </div>
                     <div>
                       <Label>Categoria</Label>
@@ -566,11 +629,13 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                           {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                         </SelectContent>
                       </Select>
+                      <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.category}</p>
                     </div>
                   </div>
                   <div>
                     <Label>Título</Label>
                     <Input value={draft.title ?? ""} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+                    <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.title}</p>
                   </div>
                   <div>
                     <Label>Cabeçalho da seção (opcional)</Label>
@@ -579,6 +644,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                       onChange={(e) => setDraft({ ...draft, section_header: e.target.value })}
                       placeholder="ex.: CLASSIFICAÇÃO (régua oficial 5 níveis)"
                     />
+                    <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.section_header}</p>
                   </div>
                   <div>
                     <Label>Conteúdo (markdown)</Label>
@@ -588,6 +654,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                       rows={16}
                       className="font-mono text-sm"
                     />
+                    <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.content}</p>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
@@ -600,6 +667,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                           <SelectItem value="enterprise">Enterprise</SelectItem>
                         </SelectContent>
                       </Select>
+                      <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.applies_to}</p>
                     </div>
                     <div>
                       <Label>Ordem de injeção</Label>
@@ -608,6 +676,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                         value={draft.injection_order ?? 100}
                         onChange={(e) => setDraft({ ...draft, injection_order: Number(e.target.value) })}
                       />
+                      <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.injection_order}</p>
                     </div>
                     <div className="flex items-end gap-2">
                       <Switch
@@ -638,9 +707,54 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     {draft.section_header ? `${draft.section_header}:\n${draft.content ?? ""}` : (draft.content ?? "")}
                   </div>
                 </TabsContent>
+                <TabsContent value="example" className="mt-4 space-y-3">
+                  <div className="flex items-start gap-2 rounded-md border bg-muted/30 p-3 text-xs">
+                    <Info className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                    <p>
+                      Esta é uma <b>regra válida</b> de exemplo. Use como modelo. Para carregá-la no editor, clique em <b>Inserir exemplo</b> no topo do painel.
+                    </p>
+                  </div>
+                  <div className="rounded-md border overflow-hidden">
+                    <div className="bg-muted px-3 py-2 text-xs font-medium">Campos do formulário</div>
+                    <table className="w-full text-xs">
+                      <tbody>
+                        {([
+                          ["Chave canônica", EXAMPLE_DRAFT.key],
+                          ["Categoria", EXAMPLE_DRAFT.category],
+                          ["Título", EXAMPLE_DRAFT.title],
+                          ["Cabeçalho da seção", EXAMPLE_DRAFT.section_header],
+                          ["Aplica-se a", EXAMPLE_DRAFT.applies_to],
+                          ["Ordem de injeção", String(EXAMPLE_DRAFT.injection_order)],
+                          ["Ativa", EXAMPLE_DRAFT.active ? "sim" : "não"],
+                        ] as [string, any][]).map(([k, v]) => (
+                          <tr key={k} className="border-t">
+                            <td className="p-2 w-48 text-muted-foreground">{k}</td>
+                            <td className="p-2 font-mono break-all">{v as string}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Conteúdo (markdown injetado no prompt)</Label>
+                    <pre className="mt-1 rounded-md border bg-muted/30 p-3 text-xs whitespace-pre-wrap font-mono">{EXAMPLE_DRAFT.content}</pre>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Equivalente em JSON (para importação em lote)</Label>
+                    <pre className="mt-1 rounded-md border bg-muted/30 p-3 text-xs whitespace-pre-wrap font-mono overflow-x-auto">{JSON.stringify(EXAMPLE_DRAFT, null, 2)}</pre>
+                  </div>
+                </TabsContent>
               </Tabs>
             ) : (
-              <p className="text-sm text-muted-foreground">Selecione uma entrada na lista ou clique em "Nova entrada".</p>
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">Selecione uma entrada na lista ou clique no botão abaixo para adicionar uma nova regra.</p>
+                <Button
+                  variant="outline"
+                  onClick={() => { setCreating(true); setSelected(null); setDraft(emptyDraft()); }}
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Nova regra
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>
