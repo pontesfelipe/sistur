@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.3",
+    date: "2026-06-02",
+    type: "patch" as const,
+    changes: [
+      "Navegação — `Configurações` voltou para o rodapé do menu lateral (junto com Planos, Ajuda, Licenças, etc.). A `Camada Semântica` deixou de ser link separado e agora é uma aba dentro de `Configurações` (visível apenas para ADMIN), ao lado de Geral, Usuários, Feedback, Logs, Docs e Ferramentas. A rota `/admin/semantica` continua funcionando para acesso direto e links existentes."
+    ]
+  },
   {
     version: "1.62.2",
     date: "2026-06-02",
