@@ -86,6 +86,59 @@ export default function AdminSemanticLayer() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [importMode, setImportMode] = useState<"merge" | "replace">("merge");
   const [importPreview, setImportPreview] = useState<{ rows: Partial<Entry>[]; format: "json" | "csv"; filename: string } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dropRef = useRef<HTMLDivElement | null>(null);
+
+  const LAST_IMPORT_KEY = "sistur.semantic.lastImport";
+  const [lastImport, setLastImport] = useState<{ filename: string; date: string; count: number; mode: string } | null>(() => {
+    try {
+      const raw = localStorage.getItem(LAST_IMPORT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  });
+
+  const saveLastImport = (filename: string, count: number, mode: string) => {
+    const record = { filename, date: new Date().toISOString(), count, mode };
+    localStorage.setItem(LAST_IMPORT_KEY, JSON.stringify(record));
+    setLastImport(record);
+  };
+
+  const clearLastImport = () => {
+    localStorage.removeItem(LAST_IMPORT_KEY);
+    setLastImport(null);
+    toast.success("Histórico de importação removido.");
+  };
+
+  useEffect(() => {
+    const el = dropRef.current;
+    if (!el) return;
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(true);
+    };
+    const handleDragLeave = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!el.contains(e.relatedTarget as Node)) setIsDragging(false);
+    };
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
+      const file = e.dataTransfer?.files?.[0];
+      if (file) handleFile(file);
+    };
+    el.addEventListener("dragover", handleDragOver);
+    el.addEventListener("dragleave", handleDragLeave);
+    el.addEventListener("drop", handleDrop);
+    return () => {
+      el.removeEventListener("dragover", handleDragOver);
+      el.removeEventListener("dragleave", handleDragLeave);
+      el.removeEventListener("drop", handleDrop);
+    };
+  }, [entries]);
+
 
   const load = async () => {
     setLoading(true);
