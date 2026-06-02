@@ -145,6 +145,66 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
     toast.success("Histórico de importação removido.");
   };
 
+  // ===== Auditoria de relatório =====
+  type Finding = {
+    rule_key: string;
+    rule_title: string;
+    status: "pass" | "warn" | "fail";
+    evidence: string | null;
+    explanation: string;
+    suggested_fix: string | null;
+  };
+  type AuditResult = { summary: string; score: number; findings: Finding[] };
+  const [auditText, setAuditText] = useState("");
+  const [auditFileName, setAuditFileName] = useState<string>("");
+  const [auditScope, setAuditScope] = useState<"both" | "territorial" | "enterprise">("both");
+  const [auditRunning, setAuditRunning] = useState(false);
+  const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
+  const [auditMeta, setAuditMeta] = useState<{ truncated: boolean; report_chars: number; rules_evaluated: number } | null>(null);
+  const [auditFilter, setAuditFilter] = useState<"all" | "fail" | "warn" | "pass">("all");
+  const auditFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleAuditFile = async (file: File) => {
+    const name = file.name.toLowerCase();
+    const isTextual = /\.(txt|md|markdown|json|html|htm|csv|log)$/.test(name) || file.type.startsWith("text/");
+    if (!isTextual) {
+      toast.error("Formato não suportado para extração automática. Converta para .txt/.md ou cole o conteúdo na caixa abaixo.");
+      return;
+    }
+    try {
+      const text = await file.text();
+      setAuditText(text);
+      setAuditFileName(file.name);
+      toast.success(`Arquivo ${file.name} carregado (${text.length.toLocaleString("pt-BR")} caracteres).`);
+    } catch (e: any) {
+      toast.error("Falha ao ler arquivo: " + (e?.message ?? String(e)));
+    }
+  };
+
+  const runAudit = async () => {
+    if (!auditText || auditText.trim().length < 30) {
+      toast.error("Cole ou envie um relatório com no mínimo 30 caracteres.");
+      return;
+    }
+    setAuditRunning(true);
+    setAuditResult(null);
+    setAuditMeta(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("check-report-semantic", {
+        body: { reportText: auditText, reportName: auditFileName || null, appliesTo: auditScope },
+      });
+      if (error) throw error;
+      if (!data?.ok) throw new Error(data?.error || "Falha desconhecida");
+      setAuditResult(data.result as AuditResult);
+      setAuditMeta({ truncated: !!data.truncated, report_chars: data.report_chars, rules_evaluated: data.rules_evaluated });
+      toast.success("Auditoria concluída.");
+    } catch (e: any) {
+      toast.error("Erro na auditoria: " + (e?.message ?? String(e)));
+    } finally {
+      setAuditRunning(false);
+    }
+  };
+
   useEffect(() => {
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault();
