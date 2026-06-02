@@ -533,7 +533,17 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
       <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Entradas</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Entradas</CardTitle>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => { setCreating(true); setSelected(null); setDraft(emptyDraft()); }}
+                title="Adicionar nova regra"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
             <div className="flex gap-2 mt-2">
               <Select value={filter} onValueChange={setFilter}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
