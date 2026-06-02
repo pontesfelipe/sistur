@@ -552,8 +552,15 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
         </div>
       </div>
 
-      {/* Dropzone + last import history */}
-      <div className="mb-6">
+      <Tabs defaultValue="rules" className="w-full">
+        <TabsList>
+          <TabsTrigger value="rules"><FileText className="h-4 w-4 mr-2" /> Regras</TabsTrigger>
+          <TabsTrigger value="audit"><ShieldCheck className="h-4 w-4 mr-2" /> Conferir relatório</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="rules" className="mt-4 space-y-6">
+          {/* Dropzone + last import history */}
+          <div>
         <div
           ref={dropRef}
           className={`relative rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
