@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.2",
+    date: "2026-06-02",
+    type: "patch" as const,
+    changes: [
+      "Camada Semântica — Importação por drag-and-drop e histórico de último arquivo. A página `/admin/semantica` agora aceita arquivos JSON/CSV arrastados de qualquer lugar da janela (overlay visual indica a zona de drop). O nome do arquivo, data, quantidade de entradas e modo de importação do último upload são persistidos em `localStorage` e exibidos como badge removível abaixo da zona de drop, facilitando auditoria e rastreabilidade entre sessões."
+    ]
+  },
   {
     version: "1.62.1",
     date: "2026-06-02",

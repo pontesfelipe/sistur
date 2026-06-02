@@ -14,7 +14,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { ArrowLeft, History, Plus, Save, Trash2, Download, Upload } from "lucide-react";
+import { ArrowLeft, History, Plus, Save, Trash2, Download, Upload, FileUp, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
@@ -86,6 +86,55 @@ export default function AdminSemanticLayer() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [importMode, setImportMode] = useState<"merge" | "replace">("merge");
   const [importPreview, setImportPreview] = useState<{ rows: Partial<Entry>[]; format: "json" | "csv"; filename: string } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dropRef = useRef<HTMLDivElement | null>(null);
+
+  const LAST_IMPORT_KEY = "sistur.semantic.lastImport";
+  const [lastImport, setLastImport] = useState<{ filename: string; date: string; count: number; mode: string } | null>(() => {
+    try {
+      const raw = localStorage.getItem(LAST_IMPORT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  });
+
+  const saveLastImport = (filename: string, count: number, mode: string) => {
+    const record = { filename, date: new Date().toISOString(), count, mode };
+    localStorage.setItem(LAST_IMPORT_KEY, JSON.stringify(record));
+    setLastImport(record);
+  };
+
+  const clearLastImport = () => {
+    localStorage.removeItem(LAST_IMPORT_KEY);
+    setLastImport(null);
+    toast.success("Histórico de importação removido.");
+  };
+
+  useEffect(() => {
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault();
+      setIsDragging(true);
+    };
+    const handleDragLeave = (e: DragEvent) => {
+      e.preventDefault();
+      // Only hide if leaving the document entirely, not entering a child
+      if (!e.relatedTarget) setIsDragging(false);
+    };
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+      const file = e.dataTransfer?.files?.[0];
+      if (file) handleFile(file);
+    };
+    document.addEventListener("dragover", handleDragOver);
+    document.addEventListener("dragleave", handleDragLeave);
+    document.addEventListener("drop", handleDrop);
+    return () => {
+      document.removeEventListener("dragover", handleDragOver);
+      document.removeEventListener("dragleave", handleDragLeave);
+      document.removeEventListener("drop", handleDrop);
+    };
+  }, [entries]);
+
 
   const load = async () => {
     setLoading(true);
@@ -343,6 +392,7 @@ export default function AdminSemanticLayer() {
     if (failed) msgs.push(`${failed} com erro`);
     if (failed > 0) toast.error("Importação concluída com erros: " + msgs.join(", "));
     else toast.success("Importação concluída: " + msgs.join(", "));
+    saveLastImport(importPreview.filename, rows.length, importMode);
     setImportPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
     await load();
@@ -392,6 +442,44 @@ export default function AdminSemanticLayer() {
           <Button onClick={() => { setCreating(true); setSelected(null); setDraft(emptyDraft()); }}>
             <Plus className="h-4 w-4 mr-2" /> Nova entrada
           </Button>
+        </div>
+      </div>
+
+      {/* Dropzone + last import history */}
+      <div className="mb-6">
+        <div
+          ref={dropRef}
+          className={`relative rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
+            isDragging ? "border-primary bg-primary/5" : "border-border bg-muted/30"
+          }`}
+        >
+          {isDragging ? (
+            <div className="flex flex-col items-center gap-2 text-primary">
+              <FileUp className="h-8 w-8" />
+              <p className="font-medium">Solte o arquivo aqui para importar</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <FileUp className="h-6 w-6" />
+              <p className="text-sm">
+                Arraste e solte um arquivo JSON ou CSV aqui, ou use o botão <b>Importar</b> acima.
+              </p>
+              {lastImport && (
+                <div className="mt-3 flex items-center gap-3 rounded-md border bg-background px-3 py-2 text-xs text-foreground shadow-sm">
+                  <div className="flex flex-col items-start gap-0.5">
+                    <span className="font-medium">Última importação</span>
+                    <span className="text-muted-foreground">
+                      {lastImport.filename} — {lastImport.count} entrada(s) — modo {lastImport.mode} —{" "}
+                      {new Date(lastImport.date).toLocaleString("pt-BR")}
+                    </span>
+                  </div>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0 ml-auto" onClick={clearLastImport}>
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
