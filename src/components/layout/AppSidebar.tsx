@@ -117,7 +117,6 @@ const bottomNavigation: NavItem[] = [
   { name: 'Licenças', href: '/admin/licencas', icon: Shield, requiresAdmin: true },
   { name: 'Certificações', href: '/admin/certificacoes', icon: Award, requiresAdmin: true },
   { name: 'Empacotamento', href: '/admin/empacotamento', icon: Briefcase, requiresAdmin: true },
-  { name: 'Configurações', href: '/configuracoes', icon: Settings },
 ];
 
 const staticBottomNavItems = bottomNavigation.filter(item =>
