@@ -2825,6 +2825,17 @@ INSTRUÇÕES SOBRE COMPARATIVO TEMPORAL:
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
+    // Camada semântica editável: carrega overrides antes de montar o systemPrompt.
+    SEMANTIC_OVERRIDES = await loadSemanticLayer(
+      supabaseAdmin,
+      isEnterprise ? 'enterprise' : 'territorial',
+    );
+    logger.stage('semantic_layer_loaded', {
+      hasMethodology: !!SEMANTIC_OVERRIDES.methodology,
+      hasReferences: !!SEMANTIC_OVERRIDES.references,
+      hasFormatting: !!SEMANTIC_OVERRIDES.formatting,
+    });
+
     // Build prompts
     const systemPrompt = getSystemPrompt(reportTemplate, isEnterprise);
 
