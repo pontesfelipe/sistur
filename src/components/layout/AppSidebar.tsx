@@ -101,6 +101,14 @@ const navGroups: NavGroup[] = [
       { name: 'Jogos Educacionais', href: '/game', icon: Gamepad2 },
     ],
   },
+  {
+    label: 'Configurações',
+    icon: Settings,
+    items: [
+      { name: 'Configurações Gerais', href: '/configuracoes', icon: Settings },
+      { name: 'Camada Semântica', href: '/admin/semantica', icon: ScrollText, requiresAdmin: true },
+    ],
+  },
 ];
 
 const bottomNavigation: NavItem[] = [
@@ -109,7 +117,6 @@ const bottomNavigation: NavItem[] = [
   { name: 'Licenças', href: '/admin/licencas', icon: Shield, requiresAdmin: true },
   { name: 'Certificações', href: '/admin/certificacoes', icon: Award, requiresAdmin: true },
   { name: 'Empacotamento', href: '/admin/empacotamento', icon: Briefcase, requiresAdmin: true },
-  { name: 'Configurações', href: '/configuracoes', icon: Settings },
 ];
 
 const staticBottomNavItems = bottomNavigation.filter(item =>
