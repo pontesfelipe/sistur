@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.5",
+    date: "2026-06-02",
+    type: "minor" as const,
+    changes: [
+      "Camada Semântica — Nova aba `Conferir relatório` (Configurações › Semântica): admin envia um arquivo de texto (.txt/.md/.json/.html/.csv) ou cola o conteúdo de um relatório e uma IA confronta o texto com todas as regras ativas da camada semântica, retornando score de conformidade (0–100), resumo e lista de findings categorizados em OK / Alerta / Violação, cada um com regra associada, trecho citado do relatório e sugestão de correção. Filtro por status e escopo (territorial/enterprise/ambos). Backend: nova edge function `check-report-semantic` (admin-only) usando Lovable AI Gateway (google/gemini-2.5-pro, JSON mode)."
+    ]
+  },
   {
     version: "1.62.4",
     date: "2026-06-02",
