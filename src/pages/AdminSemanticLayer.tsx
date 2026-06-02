@@ -72,7 +72,7 @@ function emptyDraft(): Partial<Entry> {
   };
 }
 
-export default function AdminSemanticLayer() {
+export default function AdminSemanticLayer({ embedded = false }: { embedded?: boolean } = {}) {
   const { user } = useAuth();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
