@@ -14,7 +14,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { ArrowLeft, History, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, History, Plus, Save, Trash2, Download, Upload } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
+import { useRef } from "react";
 
 type Entry = {
   id: string;
@@ -81,6 +83,9 @@ export default function AdminSemanticLayer() {
   const [search, setSearch] = useState("");
   const [history, setHistory] = useState<HistoryRow[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [importMode, setImportMode] = useState<"merge" | "replace">("merge");
+  const [importPreview, setImportPreview] = useState<{ rows: Partial<Entry>[]; format: "json" | "csv"; filename: string } | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -176,6 +181,173 @@ export default function AdminSemanticLayer() {
     setShowHistory(true);
   };
 
+  // ===== Export =====
+  const EXPORT_FIELDS: (keyof Entry)[] = [
+    "key", "category", "scope", "title", "content", "section_header",
+    "applies_to", "injection_order", "active",
+  ];
+
+  const downloadBlob = (filename: string, mime: string, content: string) => {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportJSON = () => {
+    const source = (filter === "all" && !search.trim()) ? entries : filtered;
+    const payload = {
+      schema: "sistur.report_semantic_entries",
+      version: 1,
+      exported_at: new Date().toISOString(),
+      count: source.length,
+      entries: source.map((e) => Object.fromEntries(EXPORT_FIELDS.map((k) => [k, (e as any)[k]]))),
+    };
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    downloadBlob(`sistur-semantic-layer-${stamp}.json`, "application/json", JSON.stringify(payload, null, 2));
+    toast.success(`${source.length} entrada(s) exportada(s) em JSON.`);
+  };
+
+  const csvEscape = (v: any) => {
+    if (v === null || v === undefined) return "";
+    const s = String(v);
+    if (/[",\n;]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  };
+
+  const exportCSV = () => {
+    const source = (filter === "all" && !search.trim()) ? entries : filtered;
+    const header = EXPORT_FIELDS.join(",");
+    const lines = source.map((e) => EXPORT_FIELDS.map((k) => csvEscape((e as any)[k])).join(","));
+    const csv = "\uFEFF" + [header, ...lines].join("\n");
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    downloadBlob(`sistur-semantic-layer-${stamp}.csv`, "text/csv;charset=utf-8", csv);
+    toast.success(`${source.length} entrada(s) exportada(s) em CSV.`);
+  };
+
+  // ===== Import =====
+  const parseCSV = (text: string): Partial<Entry>[] => {
+    // Strip BOM
+    if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
+    const rows: string[][] = [];
+    let cur: string[] = [];
+    let field = "";
+    let inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else inQuotes = false;
+        } else field += c;
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ",") { cur.push(field); field = ""; }
+        else if (c === "\n" || c === "\r") {
+          if (c === "\r" && text[i + 1] === "\n") i++;
+          cur.push(field); field = "";
+          if (cur.length > 1 || cur[0] !== "") rows.push(cur);
+          cur = [];
+        } else field += c;
+      }
+    }
+    if (field.length > 0 || cur.length > 0) { cur.push(field); rows.push(cur); }
+    if (rows.length === 0) return [];
+    const header = rows[0].map((h) => h.trim());
+    return rows.slice(1).map((r) => {
+      const obj: any = {};
+      header.forEach((h, idx) => { obj[h] = r[idx] ?? ""; });
+      if (obj.injection_order !== undefined && obj.injection_order !== "") obj.injection_order = Number(obj.injection_order);
+      if (obj.active !== undefined) obj.active = String(obj.active).toLowerCase() === "true" || obj.active === "1";
+      return obj;
+    });
+  };
+
+  const handleFile = async (file: File) => {
+    const text = await file.text();
+    let rows: Partial<Entry>[] = [];
+    let format: "json" | "csv" = "json";
+    try {
+      if (file.name.toLowerCase().endsWith(".csv")) {
+        rows = parseCSV(text);
+        format = "csv";
+      } else {
+        const parsed = JSON.parse(text);
+        rows = Array.isArray(parsed) ? parsed : (parsed.entries ?? []);
+        format = "json";
+      }
+    } catch (err: any) {
+      toast.error("Falha ao ler o arquivo: " + err.message);
+      return;
+    }
+    const valid = rows.filter((r) => r.key && r.title && r.content && r.category);
+    if (valid.length === 0) {
+      toast.error("Nenhuma entrada válida encontrada (campos obrigatórios: key, title, content, category).");
+      return;
+    }
+    setImportPreview({ rows: valid, format, filename: file.name });
+  };
+
+  const confirmImport = async () => {
+    if (!importPreview) return;
+    const rows = importPreview.rows;
+    let inserted = 0, updated = 0, deactivated = 0, failed = 0;
+
+    if (importMode === "replace") {
+      const importedKeys = new Set(rows.map((r) => r.key));
+      const toDeactivate = entries.filter((e) => e.active && !importedKeys.has(e.key));
+      if (toDeactivate.length > 0) {
+        const { error } = await supabase
+          .from("report_semantic_entries")
+          .update({ active: false, updated_by: user?.id ?? null })
+          .in("id", toDeactivate.map((e) => e.id));
+        if (error) toast.error("Erro ao desativar entradas removidas: " + error.message);
+        else deactivated = toDeactivate.length;
+      }
+    }
+
+    for (const r of rows) {
+      const existing = entries.find((e) => e.key === r.key);
+      const payload: any = {
+        key: r.key,
+        category: r.category,
+        scope: r.scope ?? "global",
+        title: r.title,
+        content: r.content,
+        section_header: r.section_header || null,
+        applies_to: r.applies_to ?? "both",
+        injection_order: Number(r.injection_order) || 100,
+        active: r.active ?? true,
+        updated_by: user?.id ?? null,
+      };
+      if (existing) {
+        const { error } = await supabase
+          .from("report_semantic_entries")
+          .update(payload)
+          .eq("id", existing.id);
+        if (error) { failed++; console.error("update", r.key, error); } else updated++;
+      } else {
+        payload.created_by = user?.id ?? null;
+        const { error } = await supabase.from("report_semantic_entries").insert(payload);
+        if (error) { failed++; console.error("insert", r.key, error); } else inserted++;
+      }
+    }
+
+    const msgs = [`${inserted} inserida(s)`, `${updated} atualizada(s)`];
+    if (deactivated) msgs.push(`${deactivated} desativada(s)`);
+    if (failed) msgs.push(`${failed} com erro`);
+    if (failed > 0) toast.error("Importação concluída com erros: " + msgs.join(", "));
+    else toast.success("Importação concluída: " + msgs.join(", "));
+    setImportPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    await load();
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="flex items-center justify-between mb-6">
@@ -190,9 +362,37 @@ export default function AdminSemanticLayer() {
             Edite as peças de conhecimento (metodologia, régua, fontes, bibliografia, regras anti-alucinação) usadas para gerar os relatórios. Alterações entram em vigor no próximo relatório gerado.
           </p>
         </div>
-        <Button onClick={() => { setCreating(true); setSelected(null); setDraft(emptyDraft()); }}>
-          <Plus className="h-4 w-4 mr-2" /> Nova entrada
-        </Button>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Exportar</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                {(filter === "all" && !search.trim()) ? `Todas (${entries.length})` : `Filtradas (${filtered.length})`}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={exportJSON}>JSON (backup completo)</DropdownMenuItem>
+              <DropdownMenuItem onClick={exportCSV}>CSV (Excel/planilha)</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+            <Upload className="h-4 w-4 mr-2" /> Importar
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,.csv,application/json,text/csv"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFile(f);
+            }}
+          />
+          <Button onClick={() => { setCreating(true); setSelected(null); setDraft(emptyDraft()); }}>
+            <Plus className="h-4 w-4 mr-2" /> Nova entrada
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-6">
