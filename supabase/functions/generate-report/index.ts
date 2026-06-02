@@ -962,9 +962,9 @@ POLÍTICA "ZERO ALUCINAÇÃO" (PRIORITÁRIA SOBRE QUALQUER OUTRA REGRA):
 - Quando faltar dado validado, escreva literalmente "[dado não disponível na base validada]" e siga em frente. NÃO use "aproximadamente", "estima-se", "cerca de" sem dado de origem.
 - Cada número apresentado DEVE bater com a TABELA DE AUDITORIA (mesmo valor, mesma fonte, mesmo ano). Cada citação bibliográfica DEVE bater com a BIBLIOGRAFIA CANÔNICA.
 
-${BASE_METHODOLOGY}
+${semanticMethodology(BASE_METHODOLOGY)}
 
-${CANONICAL_REFERENCES}
+${semanticReferences(CANONICAL_REFERENCES)}
 
 REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - Comece SEMPRE com o título "# Relatório SISTUR" seguido da tabela de ficha técnica fornecida
