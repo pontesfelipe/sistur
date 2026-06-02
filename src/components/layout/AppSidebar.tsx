@@ -101,17 +101,10 @@ const navGroups: NavGroup[] = [
       { name: 'Jogos Educacionais', href: '/game', icon: Gamepad2 },
     ],
   },
-  {
-    label: 'Configurações',
-    icon: Settings,
-    items: [
-      { name: 'Configurações Gerais', href: '/configuracoes', icon: Settings },
-      { name: 'Camada Semântica', href: '/admin/semantica', icon: ScrollText, requiresAdmin: true },
-    ],
-  },
 ];
 
 const bottomNavigation: NavItem[] = [
+  { name: 'Configurações', href: '/configuracoes', icon: Settings },
   { name: 'Planos', href: '/assinatura', icon: CreditCard },
   { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
   { name: 'Licenças', href: '/admin/licencas', icon: Shield, requiresAdmin: true },

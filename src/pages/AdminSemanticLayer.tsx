@@ -72,7 +72,7 @@ function emptyDraft(): Partial<Entry> {
   };
 }
 
-export default function AdminSemanticLayer() {
+export default function AdminSemanticLayer({ embedded = false }: { embedded?: boolean } = {}) {
   const { user } = useAuth();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -399,18 +399,29 @@ export default function AdminSemanticLayer() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className={embedded ? "" : "container mx-auto px-4 py-8 max-w-7xl"}>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <Button variant="ghost" size="sm" asChild className="mb-2">
-            <Link to="/admin/audit">
-              <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
-            </Link>
-          </Button>
-          <h1 className="text-3xl font-display font-bold">Camada Semântica de Relatórios</h1>
-          <p className="text-muted-foreground mt-1">
-            Edite as peças de conhecimento (metodologia, régua, fontes, bibliografia, regras anti-alucinação) usadas para gerar os relatórios. Alterações entram em vigor no próximo relatório gerado.
-          </p>
+          {!embedded && (
+            <Button variant="ghost" size="sm" asChild className="mb-2">
+              <Link to="/admin/audit">
+                <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
+              </Link>
+            </Button>
+          )}
+          {!embedded && (
+            <>
+              <h1 className="text-3xl font-display font-bold">Camada Semântica de Relatórios</h1>
+              <p className="text-muted-foreground mt-1">
+                Edite as peças de conhecimento (metodologia, régua, fontes, bibliografia, regras anti-alucinação) usadas para gerar os relatórios. Alterações entram em vigor no próximo relatório gerado.
+              </p>
+            </>
+          )}
+          {embedded && (
+            <p className="text-sm text-muted-foreground">
+              Edite as peças de conhecimento (metodologia, régua, fontes, bibliografia, regras anti-alucinação) usadas para gerar os relatórios. Alterações entram em vigor no próximo relatório gerado.
+            </p>
+          )}
         </div>
         <div className="flex gap-2">
           <DropdownMenu>
