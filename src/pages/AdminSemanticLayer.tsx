@@ -449,6 +449,44 @@ export default function AdminSemanticLayer() {
         </div>
       </div>
 
+      {/* Dropzone + last import history */}
+      <div className="mb-6">
+        <div
+          ref={dropRef}
+          className={`relative rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
+            isDragging ? "border-primary bg-primary/5" : "border-border bg-muted/30"
+          }`}
+        >
+          {isDragging ? (
+            <div className="flex flex-col items-center gap-2 text-primary">
+              <FileUp className="h-8 w-8" />
+              <p className="font-medium">Solte o arquivo aqui para importar</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <FileUp className="h-6 w-6" />
+              <p className="text-sm">
+                Arraste e solte um arquivo JSON ou CSV aqui, ou use o botão <b>Importar</b> acima.
+              </p>
+              {lastImport && (
+                <div className="mt-3 flex items-center gap-3 rounded-md border bg-background px-3 py-2 text-xs text-foreground shadow-sm">
+                  <div className="flex flex-col items-start gap-0.5">
+                    <span className="font-medium">Última importação</span>
+                    <span className="text-muted-foreground">
+                      {lastImport.filename} — {lastImport.count} entrada(s) — modo {lastImport.mode} —{" "}
+                      {new Date(lastImport.date).toLocaleString("pt-BR")}
+                    </span>
+                  </div>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0 ml-auto" onClick={clearLastImport}>
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-6">
         <Card>
           <CardHeader>
