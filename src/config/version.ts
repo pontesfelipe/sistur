@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.4",
+    date: "2026-06-02",
+    type: "patch" as const,
+    changes: [
+      "Camada Semântica — Formulário de Nova Regra ampliado: botão `Inserir exemplo` que pré-preenche o draft com uma regra válida canônica (régua de classificação 5 níveis), texto de ajuda contextual abaixo de cada campo (chave, categoria, título, cabeçalho, conteúdo, aplica-se a, ordem de injeção, ativa) e nova aba `Exemplo` exibindo a regra de referência como tabela de campos + markdown + equivalente JSON para importação em lote. Empty-state ganhou CTA secundária `Nova regra`."
+    ]
+  },
   {
     version: "1.62.3",
     date: "2026-06-02",
