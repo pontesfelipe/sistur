@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 61,
-  patch: 5,
+  minor: 62,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.0",
+    date: "2026-06-02",
+    type: "minor" as const,
+    changes: [
+      "Camada Semântica de Relatórios — Nova feature administrável em `/admin/semantica` (acesso via Logs de Auditoria → 'Camada Semântica'). Move o conhecimento usado para gerar relatórios (fundamentos Beni, régua de classificação, regras de fontes, atribuição anti-troca, bibliografia canônica, política Zero Alucinação, glossário IGMA, MST opt-in, formatação ABNT/pt-BR) das constantes hardcoded do edge function `generate-report` para a tabela `report_semantic_entries`, com versionamento automático e histórico completo (`report_semantic_entry_history`). ADMIN pode editar, ativar/desativar, criar novas entradas e ajustar a ordem de injeção — alterações entram em vigor no próximo relatório gerado, sem deploy. Edge function carrega a camada por request (territorial vs enterprise), com fallback automático para as constantes embutidas se a tabela estiver vazia ou a query falhar (zero regressão). Seed inicial replica fielmente o conteúdo em produção."
+    ]
+  },
   {
     version: "1.61.5",
     date: "2026-06-01",
