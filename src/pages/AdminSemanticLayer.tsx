@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { ArrowLeft, History, Plus, Save, Trash2, Download, Upload, FileUp, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Sparkles, Info } from "lucide-react";
 
 type Entry = {
   id: string;
@@ -71,6 +72,41 @@ function emptyDraft(): Partial<Entry> {
     active: true,
   };
 }
+
+// Exemplo canônico de uma regra/entrada válida da camada semântica.
+// Usado para o botão "Inserir exemplo" e para o painel de referência.
+const EXAMPLE_DRAFT: Partial<Entry> = {
+  key: "classification.scale_5_levels",
+  category: "classification",
+  scope: "global",
+  title: "Régua oficial de classificação (5 níveis)",
+  section_header: "CLASSIFICAÇÃO (régua oficial 5 níveis)",
+  applies_to: "both",
+  injection_order: 200,
+  active: true,
+  content: `Use SEMPRE estes 5 níveis ao classificar indicadores e pilares:
+- Crítico: 0–33%
+- Atenção: 34–66%
+- Adequado: 67–84%
+- Bom: 85–94%
+- Excelente: 95–100%
+
+Regras:
+1. Exiba sempre em percentual inteiro (ex.: 72%), nunca decimais.
+2. Nunca invente categorias fora desta régua.
+3. Não use rankings comparativos entre municípios.`,
+};
+
+const FIELD_HELP: Record<string, string> = {
+  key: "Identificador único e estável. Use snake_case com prefixo da categoria. Ex.: methodology.beni_3_pilares, anti_hallucination.no_rankings.",
+  category: "Tipo da regra. 'methodology' = base teórica; 'classification' = réguas/limiares; 'anti_hallucination' = regras de proibição; 'formatting' = formato de saída; 'sources' = fontes oficiais; 'glossary' = definições.",
+  title: "Nome curto para a UI. Ex.: 'Régua oficial 5 níveis', 'Proibição de rankings'.",
+  section_header: "Cabeçalho impresso no prompt do LLM antes do conteúdo. Opcional. Ex.: 'REGRAS ANTI-ALUCINAÇÃO:'.",
+  content: "Texto/markdown injetado no prompt do gerador de relatórios. Seja imperativo e direto (use 'sempre', 'nunca', listas numeradas).",
+  applies_to: "Em qual fluxo de relatório a regra entra: 'territorial' (destinos/municípios), 'enterprise' (empresas) ou 'both'.",
+  injection_order: "Ordem de injeção no prompt (menor = mais cedo). Use 100 para metodologia, 200 para classificação, 300 para anti-alucinação, 400 para formatação.",
+  active: "Se desligada, a regra é mantida no histórico mas não é usada nos próximos relatórios.",
+};
 
 export default function AdminSemanticLayer({ embedded = false }: { embedded?: boolean } = {}) {
   const { user } = useAuth();
