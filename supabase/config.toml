@@ -43,3 +43,5 @@ project_id = "enexnpmkhvgufcervjsv"
     verify_jwt = false
   [functions.ingest-cadunico]
     verify_jwt = false
+  [functions.check-report-semantic]
+    verify_jwt = false
