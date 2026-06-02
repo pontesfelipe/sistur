@@ -8799,6 +8799,110 @@ export type Database = {
           },
         ]
       }
+      report_semantic_entries: {
+        Row: {
+          active: boolean
+          applies_to: string
+          category: string
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          injection_order: number
+          key: string
+          org_id: string | null
+          scope: string
+          section_header: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          applies_to?: string
+          category: string
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          injection_order?: number
+          key: string
+          org_id?: string | null
+          scope?: string
+          section_header?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          applies_to?: string
+          category?: string
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          injection_order?: number
+          key?: string
+          org_id?: string | null
+          scope?: string
+          section_header?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: []
+      }
+      report_semantic_entry_history: {
+        Row: {
+          active_after: boolean
+          active_before: boolean | null
+          changed_at: string
+          changed_by: string | null
+          content_after: string
+          content_before: string | null
+          entry_id: string
+          entry_key: string
+          id: string
+          version: number
+        }
+        Insert: {
+          active_after: boolean
+          active_before?: boolean | null
+          changed_at?: string
+          changed_by?: string | null
+          content_after: string
+          content_before?: string | null
+          entry_id: string
+          entry_key: string
+          id?: string
+          version: number
+        }
+        Update: {
+          active_after?: boolean
+          active_before?: boolean | null
+          changed_at?: string
+          changed_by?: string | null
+          content_after?: string
+          content_before?: string | null
+          entry_id?: string
+          entry_key?: string
+          id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_semantic_entry_history_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "report_semantic_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_validations: {
         Row: {
           ai_issues: Json
