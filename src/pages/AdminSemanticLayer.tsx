@@ -573,6 +573,73 @@ export default function AdminSemanticLayer() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!importPreview} onOpenChange={(o) => !o && setImportPreview(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Pré-visualização da importação</DialogTitle>
+          </DialogHeader>
+          {importPreview && (
+            <div className="space-y-4">
+              <div className="text-sm text-muted-foreground">
+                Arquivo <code className="text-foreground">{importPreview.filename}</code> — formato <b>{importPreview.format.toUpperCase()}</b> — {importPreview.rows.length} entrada(s) válida(s).
+              </div>
+
+              <div className="rounded-md border max-h-64 overflow-y-auto">
+                <table className="w-full text-xs">
+                  <thead className="bg-muted sticky top-0">
+                    <tr>
+                      <th className="text-left p-2">Chave</th>
+                      <th className="text-left p-2">Categoria</th>
+                      <th className="text-left p-2">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {importPreview.rows.map((r, i) => {
+                      const exists = entries.some((e) => e.key === r.key);
+                      return (
+                        <tr key={i} className="border-t">
+                          <td className="p-2 font-mono">{r.key}</td>
+                          <td className="p-2">{r.category}</td>
+                          <td className="p-2">
+                            <Badge variant={exists ? "secondary" : "default"} className="text-[10px]">
+                              {exists ? "atualizar" : "inserir"}
+                            </Badge>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div>
+                <Label className="text-sm">Modo de importação</Label>
+                <RadioGroup value={importMode} onValueChange={(v: any) => setImportMode(v)} className="mt-2 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <RadioGroupItem value="merge" id="imp-merge" className="mt-1" />
+                    <Label htmlFor="imp-merge" className="font-normal cursor-pointer">
+                      <span className="font-medium">Merge (recomendado)</span> — insere novas chaves e atualiza existentes. Entradas atuais não presentes no arquivo são mantidas.
+                    </Label>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <RadioGroupItem value="replace" id="imp-replace" className="mt-1" />
+                    <Label htmlFor="imp-replace" className="font-normal cursor-pointer">
+                      <span className="font-medium">Substituir</span> — insere/atualiza do arquivo e <b>desativa</b> entradas ativas que não estão no arquivo (não exclui, permite reverter).
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setImportPreview(null)}>Cancelar</Button>
+            <Button onClick={confirmImport}>
+              <Upload className="h-4 w-4 mr-2" /> Confirmar importação
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
