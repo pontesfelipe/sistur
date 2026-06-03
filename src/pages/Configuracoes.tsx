@@ -156,7 +156,7 @@ export default function Configuracoes() {
             className={cn(
               'grid w-full max-w-4xl',
               isAdmin
-                ? 'grid-cols-7'
+                ? 'grid-cols-8'
                 : isOrgAdmin
                   ? 'grid-cols-4'
                   : 'grid-cols-3'
@@ -196,6 +196,12 @@ export default function Configuracoes() {
               <TabsTrigger value="semantica" className="flex items-center gap-2">
                 <ScrollText className="h-4 w-4" />
                 <span className="hidden sm:inline">Semântica</span>
+              </TabsTrigger>
+            )}
+            {isAdmin && (
+              <TabsTrigger value="estrutura" className="flex items-center gap-2">
+                <ListOrdered className="h-4 w-4" />
+                <span className="hidden sm:inline">Estrutura</span>
               </TabsTrigger>
             )}
           </TabsList>
