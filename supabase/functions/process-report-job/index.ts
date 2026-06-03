@@ -33,7 +33,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const MAX_ATTEMPTS = 2;
+// v1.62.6 — auto-retry silencioso removido. Reexecutar o pipeline na mesma
+// sessão fazia o cliente (que faz polling de partial_content) enxergar o
+// relatório "voltando a ser gerado do zero" — exatamente o sintoma reportado
+// pela Chris (faz tabela → resumo → tabela → reinicia). Agora, em falha, o
+// job é marcado como failed e o usuário decide refazer.
+const MAX_ATTEMPTS = 1;
 const STREAM_IDLE_TIMEOUT_MS = 4 * 60 * 1000;
 const STREAM_HARD_TIMEOUT_MS = 12 * 60 * 1000;
 
@@ -131,6 +136,7 @@ serve(async (req) => {
       started_at: new Date().toISOString(),
       attempts,
       last_attempt_at: new Date().toISOString(),
+      partial_content: null,
     }).eq("id", jobId).eq("status", "queued").select("id").maybeSingle();
     if (claimErr || !claimed) {
       log("claim_lost_skip", { error: claimErr?.message });
