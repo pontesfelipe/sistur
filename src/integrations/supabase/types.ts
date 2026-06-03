@@ -8903,6 +8903,48 @@ export type Database = {
           },
         ]
       }
+      report_structure_templates: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          scope: string
+          sections: Json
+          template: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          scope: string
+          sections?: Json
+          template?: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          scope?: string
+          sections?: Json
+          template?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
       report_validations: {
         Row: {
           ai_issues: Json
