@@ -332,6 +332,14 @@ export default function Configuracoes() {
             </TabsContent>
           )}
 
+          {isAdmin && (
+            <TabsContent value="estrutura" className="space-y-6">
+              <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando estrutura do relatório…</div>}>
+                <ReportStructurePanel />
+              </Suspense>
+            </TabsContent>
+          )}
+
           <TabsContent value="documentacao" className="space-y-6">
             {/* Principles */}
             <Card className="border-primary/20 bg-primary/5">
