@@ -51,11 +51,15 @@ import {
   Search,
   Map,
   ScrollText,
+  ListOrdered,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const AdminSemanticLayer = lazy(() => import('@/pages/AdminSemanticLayer'));
+const ReportStructurePanel = lazy(() =>
+  import('@/components/admin/ReportStructurePanel').then(m => ({ default: m.ReportStructurePanel }))
+);
 
 // Helper component for downloadable documents
 function DocumentDownloadItem({ 
@@ -152,7 +156,7 @@ export default function Configuracoes() {
             className={cn(
               'grid w-full max-w-4xl',
               isAdmin
-                ? 'grid-cols-7'
+                ? 'grid-cols-8'
                 : isOrgAdmin
                   ? 'grid-cols-4'
                   : 'grid-cols-3'
@@ -192,6 +196,12 @@ export default function Configuracoes() {
               <TabsTrigger value="semantica" className="flex items-center gap-2">
                 <ScrollText className="h-4 w-4" />
                 <span className="hidden sm:inline">Semântica</span>
+              </TabsTrigger>
+            )}
+            {isAdmin && (
+              <TabsTrigger value="estrutura" className="flex items-center gap-2">
+                <ListOrdered className="h-4 w-4" />
+                <span className="hidden sm:inline">Estrutura</span>
               </TabsTrigger>
             )}
           </TabsList>
@@ -318,6 +328,14 @@ export default function Configuracoes() {
             <TabsContent value="semantica" className="space-y-6">
               <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando camada semântica…</div>}>
                 <AdminSemanticLayer embedded />
+              </Suspense>
+            </TabsContent>
+          )}
+
+          {isAdmin && (
+            <TabsContent value="estrutura" className="space-y-6">
+              <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando estrutura do relatório…</div>}>
+                <ReportStructurePanel />
               </Suspense>
             </TabsContent>
           )}

@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.6",
+    date: "2026-06-03",
+    type: "minor" as const,
+    changes: [
+      "Estrutura Canônica do Relatório — nova aba `Estrutura` em Configurações (admin-only) com editor de seções por escopo (territorial/enterprise) e template (completo/executivo/investidor). Cada seção tem título e descrição-contrato, podendo ser reordenada, adicionada, removida ou desativada. Os defaults seedados refletem a ordem oficial SISTUR (Ficha Técnica → Sumário → Contexto → Metodologia → Alertas IGMA → Diagnóstico RA/OE/AO → Análise Integrada → Benchmarks → Prognóstico → Banco de Ações → Fontes → Considerações Finais → Referências). Nova tabela `report_structure_templates` (RLS: leitura autenticada, escrita ADMIN).",
+      "Geração de relatório — o systemPrompt (e o envelope do pipeline paralelo) agora recebe a estrutura ativa como CONTRATO numerado com regras anti-loop explícitas: cada seção UMA única vez, sem reescrever, sem voltar a seções anteriores, sem repetir Ficha Técnica/Sumário/Tabela de scores. Resolve o relato da usuária Chris (Atibaia): relatório que repetia tabela → metodologia → resumo e travava regenerando a primeira parte.",
+      "Worker de relatórios (`process-report-job`) — auto-retry silencioso removido (MAX_ATTEMPTS=2 → 1) e `partial_content` é zerado ao reivindicar o job. O retry automático fazia o pipeline reexecutar do zero na mesma sessão e o cliente, que faz polling de `partial_content`, enxergava o relatório `voltando a se gerar` — exatamente o sintoma reportado."
+    ]
+  },
   {
     version: "1.62.5",
     date: "2026-06-02",
