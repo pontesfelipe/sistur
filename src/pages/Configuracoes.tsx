@@ -51,11 +51,15 @@ import {
   Search,
   Map,
   ScrollText,
+  ListOrdered,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const AdminSemanticLayer = lazy(() => import('@/pages/AdminSemanticLayer'));
+const ReportStructurePanel = lazy(() =>
+  import('@/components/admin/ReportStructurePanel').then(m => ({ default: m.ReportStructurePanel }))
+);
 
 // Helper component for downloadable documents
 function DocumentDownloadItem({ 
