@@ -21,6 +21,53 @@ type SemanticOverrides = {
 };
 let SEMANTIC_OVERRIDES: SemanticOverrides = {};
 
+// v1.62.6 — Estrutura canônica do relatório (contrato de seções)
+// Carregada de `report_structure_templates`. Injetada no systemPrompt como
+// lista numerada que o LLM DEVE seguir UMA única vez, sem repetir, sem voltar.
+let REPORT_STRUCTURE_BLOCK: string = '';
+
+async function loadReportStructure(
+  supabaseAdmin: any,
+  scope: 'territorial' | 'enterprise',
+  template: string,
+): Promise<string> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('report_structure_templates')
+      .select('name, description, sections, active, scope, template')
+      .eq('active', true)
+      .in('scope', [scope, 'both'])
+      .in('template', [template, 'any'])
+      .order('updated_at', { ascending: false })
+      .limit(1);
+    if (error || !data || data.length === 0) return '';
+    const t = data[0];
+    const sections = Array.isArray(t.sections) ? t.sections : [];
+    if (sections.length === 0) return '';
+    const list = sections
+      .map((s: any, i: number) =>
+        `  ${i + 1}. **${String(s.title || '').trim()}** — ${String(s.description || '').trim()}`)
+      .join('\n');
+    return `
+=== ESTRUTURA CANÔNICA OBRIGATÓRIA DO RELATÓRIO (${t.name}) ===
+Você DEVE escrever as seções abaixo NA ORDEM EXATA, cada uma UMA ÚNICA VEZ.
+REGRAS ANTI-LOOP (não negociáveis):
+- NUNCA repita uma seção já escrita.
+- NUNCA volte a uma seção anterior depois de avançar.
+- NUNCA reescreva a Ficha Técnica, o Sumário Executivo nem a tabela de scores em mais de um lugar.
+- Quando terminar a última seção, finalize o documento — não recomece.
+- Se sentir necessidade de "resumir" ou "reapresentar dados", isso é proibido: o sumário já foi feito no início.
+
+Seções na ordem obrigatória:
+${list}
+
+Cada cabeçalho ## deve corresponder ao título da seção acima. Sem seções extras.
+`;
+  } catch (_e) {
+    return '';
+  }
+}
+
 async function loadSemanticLayer(
   supabaseAdmin: any,
   mode: 'territorial' | 'enterprise',
