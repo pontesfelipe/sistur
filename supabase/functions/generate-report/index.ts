@@ -2883,8 +2883,16 @@ INSTRUÇÕES SOBRE COMPARATIVO TEMPORAL:
       hasFormatting: !!SEMANTIC_OVERRIDES.formatting,
     });
 
+    // v1.62.6 — Estrutura canônica (contrato de seções) editável por ADMIN.
+    REPORT_STRUCTURE_BLOCK = await loadReportStructure(
+      supabaseAdmin,
+      isEnterprise ? 'enterprise' : 'territorial',
+      reportTemplate,
+    );
+    logger.stage('report_structure_loaded', { hasStructure: !!REPORT_STRUCTURE_BLOCK, chars: REPORT_STRUCTURE_BLOCK.length });
+
     // Build prompts
-    const systemPrompt = getSystemPrompt(reportTemplate, isEnterprise);
+    const systemPrompt = getSystemPrompt(reportTemplate, isEnterprise) + (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
 
     const prescriptionsText = prescriptions?.length > 0 
       ? prescriptions.map((p: any) => `- [${p.status}] ${p.justification} (Pilar: ${p.pillar}, Agente: ${p.target_agent}, Prioridade: ${p.priority || 'N/A'})`).join('\n')
