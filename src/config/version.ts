@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 9,
+  patch: 10,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.10",
+    date: "2026-06-04",
+    type: "patch" as const,
+    changes: [
+      "Deep links autenticados (fix) — `Auth.tsx` ignorava o parâmetro `?redirect=` no fluxo de login com email/senha e mandava todo mundo para `/` após autenticar. Agora o handler `handleSignIn` lê e valida o redirect (mesmo origem, prefixo `/`) e navega direto para o destino original, fechando o gap deixado em 1.62.9. Resolve o caso reportado em `sistur.app/observatorio` que continuava caindo na raiz após login."
+    ]
+  },
   {
     version: "1.62.9",
     date: "2026-06-04",
