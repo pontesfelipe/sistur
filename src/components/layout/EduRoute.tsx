@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
@@ -15,6 +15,7 @@ export function EduRoute({ children, requireProfessor = false }: EduRouteProps) 
   const { hasEDUAccess, isProfessor, isAdmin, isOrgAdmin, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const { isLicenseValid, initialized: licenseInit } = useLicense();
+  const location = useLocation();
 
   const isInitialLoad = (authLoading && user === null) || (!initialized && profile === null) || (!!user && termsLoading && !hasAcceptedTerms) || (!!user && !licenseInit);
 
@@ -32,7 +33,10 @@ export function EduRoute({ children, requireProfessor = false }: EduRouteProps) 
     );
   }
 
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) {
+    const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`/auth?redirect=${redirect}`} replace />;
+  }
   if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
   if (awaitingApproval) return <Navigate to="/pending-approval" replace />;
