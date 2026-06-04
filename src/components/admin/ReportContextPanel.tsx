@@ -191,14 +191,27 @@ export function ReportContextPanel() {
                 <Input value={p.description ?? ""} onChange={e => update(p.id, { description: e.target.value })} />
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">
-                  Contexto (persona, audiência, tom, foco, prioridades, restrições)
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Contexto (persona, audiência, tom, foco, prioridades, restrições)
+                  </label>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => toggleEdit(p.id)}
+                    className="h-7 text-xs gap-1"
+                  >
+                    {editingIds.has(p.id)
+                      ? <><Pencil className="h-3 w-3" /> Cancelar edição</>
+                      : <><Pencil className="h-3 w-3" /> Editar</>}
+                  </Button>
+                </div>
                 <Textarea
                   value={p.context}
                   onChange={e => update(p.id, { context: e.target.value })}
                   rows={16}
-                  className="font-mono text-sm"
+                  readOnly={!editingIds.has(p.id)}
+                  className={`font-mono text-sm ${!editingIds.has(p.id) ? "bg-muted/40 cursor-default opacity-80" : ""}`}
                 />
                 <p className="text-[11px] text-muted-foreground mt-1">
                   Sugestão de seções: <strong>Persona</strong>, <strong>Audiência</strong>, <strong>Tom</strong>, <strong>Foco analítico</strong>, <strong>Prioridades editoriais</strong>, <strong>Restrições</strong>.
