@@ -28,6 +28,7 @@ import { MetricHistoryDialog } from "@/components/observatorio/MetricHistoryDial
 import { useQueryClient } from "@tanstack/react-query";
 import { CsvImportDialog } from "@/components/observatorio/CsvImportDialog";
 import { RegressionAlertsPanel } from "@/components/observatorio/RegressionAlertsPanel";
+import { AppLayout } from "@/components/layout/AppLayout";
 
 const CATEGORY_META: Record<string, { label: string; icon: any; color: string }> = {
   fluxo: { label: "Fluxo Turístico", icon: Activity, color: "text-blue-600" },
@@ -153,6 +154,7 @@ export default function Observatorio() {
   };
 
   return (
+    <AppLayout title="Observatório Turístico" subtitle="Monitoramento permanente de fluxo, ocupação, eventos, receita e empregos">
     <div className="container mx-auto py-8 space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
@@ -421,5 +423,6 @@ export default function Observatorio() {
         </DialogContent>
       </Dialog>
     </div>
+    </AppLayout>
   );
 }
