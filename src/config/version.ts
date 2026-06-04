@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 8,
+  patch: 9,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.9",
+    date: "2026-06-04",
+    type: "patch" as const,
+    changes: [
+      "Deep links autenticados — rotas protegidas (ex.: /observatorio, /relatorios, /diagnosticos) agora preservam o caminho original via `?redirect=` ao mandar o usuário para /auth. Após o login, o usuário é levado direto para a página solicitada em vez de cair sempre na raiz. Corrige o sintoma 'a URL não leva a lugar nenhum' reportado para sistur.app/observatorio quando o usuário não está autenticado."
+    ]
+  },
   {
     version: "1.62.8",
     date: "2026-06-04",
