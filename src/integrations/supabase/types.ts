@@ -8662,6 +8662,56 @@ export type Database = {
           },
         ]
       }
+      report_context_profiles: {
+        Row: {
+          active: boolean
+          context: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          org_id: string | null
+          scope: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          context: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          org_id?: string | null
+          scope: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          context?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          org_id?: string | null
+          scope?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_context_profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_generation_logs: {
         Row: {
           assessment_id: string | null
