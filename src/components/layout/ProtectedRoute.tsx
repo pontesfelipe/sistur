@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
@@ -28,6 +28,7 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true, skipLic
   } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const { isLicenseValid, initialized: licenseInit, loading: licenseLoading } = useLicense();
+  const location = useLocation();
 
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -62,7 +63,8 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true, skipLic
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`/auth?redirect=${redirect}`} replace />;
   }
 
   // Check terms acceptance before anything else
