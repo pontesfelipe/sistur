@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { useLicense } from '@/contexts/LicenseContext';
@@ -17,6 +17,7 @@ export function LicenseRoute({ children, requiredFeature, allowExpired = false, 
   const { isAdmin, initialized: profileInit } = useProfileContext();
   const { loading: licenseLoading, initialized: licenseInit, isLicenseValid, hasFeature, isPaidPlan } = useLicense();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
+  const location = useLocation();
 
   const isInitialLoad = (authLoading && user === null) || !profileInit || !licenseInit || (!!user && termsLoading);
 
@@ -31,7 +32,10 @@ export function LicenseRoute({ children, requiredFeature, allowExpired = false, 
     );
   }
 
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) {
+    const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`/auth?redirect=${redirect}`} replace />;
+  }
   if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
   if (isAdmin) return <>{children}</>;
   if (!isLicenseValid && !allowExpired) return <Navigate to="/assinatura" replace />;
