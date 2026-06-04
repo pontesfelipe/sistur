@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 10,
+  patch: 11,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.11",
+    date: "2026-06-04",
+    type: "patch" as const,
+    changes: [
+      "Observatório — Página `/observatorio` agora é renderizada dentro do `AppLayout` (header + sidebar). Antes o componente retornava apenas um `<div container>`, o que deixava a tela sem chrome de navegação e parecia 'em branco' depois do login. Padroniza com Diagnósticos/Relatórios e corrige o sintoma 'abre e fica tudo branco'."
+    ]
+  },
   {
     version: "1.62.10",
     date: "2026-06-04",
