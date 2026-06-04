@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Plus, Save, Loader2, Trash2, Building2, Globe2 } from "lucide-react";
+import { Sparkles, Plus, Save, Loader2, Trash2, Building2, Globe2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 type Profile = {
@@ -32,6 +32,15 @@ export function ReportContextPanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string>("");
+  const [editingIds, setEditingIds] = useState<Set<string>>(new Set());
+
+  const toggleEdit = (id: string) => {
+    setEditingIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
 
   const load = async () => {
     setLoading(true);
@@ -68,7 +77,7 @@ export function ReportContextPanel() {
       .eq("id", p.id);
     setSaving(null);
     if (error) toast.error("Erro ao salvar", { description: error.message });
-    else { toast.success("Contexto atualizado — vale para os próximos relatórios."); load(); }
+    else { toast.success("Contexto atualizado — vale para os próximos relatórios."); setEditingIds(prev => { const next = new Set(prev); next.delete(p.id); return next; }); load(); }
   };
 
   const createForOrg = async (orgId: string | null, scope: "territorial" | "enterprise") => {
@@ -182,14 +191,27 @@ export function ReportContextPanel() {
                 <Input value={p.description ?? ""} onChange={e => update(p.id, { description: e.target.value })} />
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">
-                  Contexto (persona, audiência, tom, foco, prioridades, restrições)
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Contexto (persona, audiência, tom, foco, prioridades, restrições)
+                  </label>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => toggleEdit(p.id)}
+                    className="h-7 text-xs gap-1"
+                  >
+                    {editingIds.has(p.id)
+                      ? <><Pencil className="h-3 w-3" /> Cancelar edição</>
+                      : <><Pencil className="h-3 w-3" /> Editar</>}
+                  </Button>
+                </div>
                 <Textarea
                   value={p.context}
                   onChange={e => update(p.id, { context: e.target.value })}
                   rows={16}
-                  className="font-mono text-sm"
+                  readOnly={!editingIds.has(p.id)}
+                  className={`font-mono text-sm ${!editingIds.has(p.id) ? "bg-muted/40 cursor-default opacity-80" : ""}`}
                 />
                 <p className="text-[11px] text-muted-foreground mt-1">
                   Sugestão de seções: <strong>Persona</strong>, <strong>Audiência</strong>, <strong>Tom</strong>, <strong>Foco analítico</strong>, <strong>Prioridades editoriais</strong>, <strong>Restrições</strong>.
