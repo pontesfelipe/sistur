@@ -3377,12 +3377,14 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         if (useParallelPipeline) {
           logger.stage('parallel_pipeline_enabled', { template: reportTemplate, isEnterprise });
           const systemPromptByPillar = {
-            RA: getPillarSystemPrompt('RA', isEnterprise),
-            OE: getPillarSystemPrompt('OE', isEnterprise),
-            AO: getPillarSystemPrompt('AO', isEnterprise),
+            RA: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('RA', isEnterprise),
+            OE: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('OE', isEnterprise),
+            AO: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('AO', isEnterprise),
           };
-          const envelopeSystemPrompt = getEnvelopeSystemPrompt(reportTemplate, isEnterprise)
-            + (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
+          const envelopeSystemPrompt =
+            (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') +
+            getEnvelopeSystemPrompt(reportTemplate, isEnterprise) +
+            (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
 
           // O userPrompt já contém TODO o contexto. Para os pilares, mandamos
           // o mesmo userPrompt — o systemPrompt é que restringe o escopo.
