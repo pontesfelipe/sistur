@@ -2933,8 +2933,19 @@ INSTRUÇÕES SOBRE COMPARATIVO TEMPORAL:
     );
     logger.stage('report_structure_loaded', { hasStructure: !!REPORT_STRUCTURE_BLOCK, chars: REPORT_STRUCTURE_BLOCK.length });
 
+    // v1.62.7 — Contexto editorial por organização (persona/audiência/tom/foco).
+    REPORT_CONTEXT_BLOCK = await loadReportContext(
+      supabaseAdmin,
+      isEnterprise ? 'enterprise' : 'territorial',
+      assessment?.org_id ?? null,
+    );
+    logger.stage('report_context_loaded', { hasContext: !!REPORT_CONTEXT_BLOCK, chars: REPORT_CONTEXT_BLOCK.length });
+
     // Build prompts
-    const systemPrompt = getSystemPrompt(reportTemplate, isEnterprise) + (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
+    const systemPrompt =
+      (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') +
+      getSystemPrompt(reportTemplate, isEnterprise) +
+      (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
 
     const prescriptionsText = prescriptions?.length > 0 
       ? prescriptions.map((p: any) => `- [${p.status}] ${p.justification} (Pilar: ${p.pillar}, Agente: ${p.target_agent}, Prioridade: ${p.priority || 'N/A'})`).join('\n')
