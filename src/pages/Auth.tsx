@@ -172,7 +172,20 @@ const Auth = () => {
 
     if (!error) {
       toast.success('Login realizado com sucesso!');
-      navigate('/');
+      // Honor ?redirect=<path> so deep links survive login.
+      const raw = searchParams.get('redirect');
+      let target = '/';
+      if (raw) {
+        try {
+          const decoded = decodeURIComponent(raw);
+          if (decoded.startsWith('/') && !decoded.startsWith('//')) {
+            target = decoded;
+          }
+        } catch {
+          target = '/';
+        }
+      }
+      navigate(target);
       return;
     }
 
