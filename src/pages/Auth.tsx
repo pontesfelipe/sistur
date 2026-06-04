@@ -43,11 +43,23 @@ const Auth = () => {
   // Don't navigate directly - let ProtectedRoute handle proper redirects based on profile state
   useEffect(() => {
     if (user && mode !== 'reset') {
-      // Just trigger a navigation to root - ProtectedRoute will handle 
-      // onboarding/pending-approval redirects based on profile state
-      navigate('/');
+      // Honor ?redirect=<path> when present so deep links survive login.
+      const raw = searchParams.get('redirect');
+      let target = '/';
+      if (raw) {
+        try {
+          const decoded = decodeURIComponent(raw);
+          // Only allow same-origin relative paths
+          if (decoded.startsWith('/') && !decoded.startsWith('//')) {
+            target = decoded;
+          }
+        } catch {
+          target = '/';
+        }
+      }
+      navigate(target);
     }
-  }, [user, navigate, mode]);
+  }, [user, navigate, mode, searchParams]);
 
   const validateLoginForm = () => {
     const newErrors: { email?: string; password?: string } = {};
