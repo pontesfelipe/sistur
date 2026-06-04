@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Plus, Save, Loader2, Trash2, Building2, Globe2 } from "lucide-react";
+import { Sparkles, Plus, Save, Loader2, Trash2, Building2, Globe2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 type Profile = {
@@ -32,6 +32,15 @@ export function ReportContextPanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string>("");
+  const [editingIds, setEditingIds] = useState<Set<string>>(new Set());
+
+  const toggleEdit = (id: string) => {
+    setEditingIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
 
   const load = async () => {
     setLoading(true);
@@ -68,7 +77,7 @@ export function ReportContextPanel() {
       .eq("id", p.id);
     setSaving(null);
     if (error) toast.error("Erro ao salvar", { description: error.message });
-    else { toast.success("Contexto atualizado — vale para os próximos relatórios."); load(); }
+    else { toast.success("Contexto atualizado — vale para os próximos relatórios."); setEditingIds(prev => { const next = new Set(prev); next.delete(p.id); return next; }); load(); }
   };
 
   const createForOrg = async (orgId: string | null, scope: "territorial" | "enterprise") => {
