@@ -26,6 +26,48 @@ let SEMANTIC_OVERRIDES: SemanticOverrides = {};
 // lista numerada que o LLM DEVE seguir UMA única vez, sem repetir, sem voltar.
 let REPORT_STRUCTURE_BLOCK: string = '';
 
+// Camada de contexto editorial por organização (persona, audiência, tom, foco).
+// Carregada de `report_context_profiles`: prioriza o perfil ativo da org;
+// faz fallback para o perfil global (org_id IS NULL) do mesmo escopo.
+let REPORT_CONTEXT_BLOCK: string = '';
+
+async function loadReportContext(
+  supabaseAdmin: any,
+  scope: 'territorial' | 'enterprise',
+  orgId: string | null,
+): Promise<string> {
+  try {
+    const orFilter = orgId
+      ? `org_id.eq.${orgId},org_id.is.null`
+      : `org_id.is.null`;
+    const { data, error } = await supabaseAdmin
+      .from('report_context_profiles')
+      .select('name, context, scope, org_id, updated_at')
+      .eq('active', true)
+      .in('scope', [scope, 'both'])
+      .or(orFilter);
+    if (error || !data || data.length === 0) return '';
+    // Prefer org-specific over global.
+    const sorted = [...data].sort((a: any, b: any) => {
+      const orgPriority = (a.org_id ? 0 : 1) - (b.org_id ? 0 : 1);
+      if (orgPriority !== 0) return orgPriority;
+      const scopePriority = (a.scope === scope ? 0 : 1) - (b.scope === scope ? 0 : 1);
+      if (scopePriority !== 0) return scopePriority;
+      return String(b.updated_at || '').localeCompare(String(a.updated_at || ''));
+    });
+    const chosen = sorted[0];
+    const text = String(chosen.context || '').trim();
+    if (!text) return '';
+    return `=== CONTEXTO EDITORIAL DA ORGANIZAÇÃO (${chosen.name}) ===
+Aplique a persona, audiência, tom e prioridades abaixo a TODAS as seções do relatório. Estas diretrizes são CUMULATIVAS com a metodologia SISTUR e a camada semântica — não as substituem.
+
+${text}
+`;
+  } catch (_e) {
+    return '';
+  }
+}
+
 async function loadReportStructure(
   supabaseAdmin: any,
   scope: 'territorial' | 'enterprise',
