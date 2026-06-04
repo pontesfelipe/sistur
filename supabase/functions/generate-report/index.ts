@@ -26,6 +26,48 @@ let SEMANTIC_OVERRIDES: SemanticOverrides = {};
 // lista numerada que o LLM DEVE seguir UMA única vez, sem repetir, sem voltar.
 let REPORT_STRUCTURE_BLOCK: string = '';
 
+// Camada de contexto editorial por organização (persona, audiência, tom, foco).
+// Carregada de `report_context_profiles`: prioriza o perfil ativo da org;
+// faz fallback para o perfil global (org_id IS NULL) do mesmo escopo.
+let REPORT_CONTEXT_BLOCK: string = '';
+
+async function loadReportContext(
+  supabaseAdmin: any,
+  scope: 'territorial' | 'enterprise',
+  orgId: string | null,
+): Promise<string> {
+  try {
+    const orFilter = orgId
+      ? `org_id.eq.${orgId},org_id.is.null`
+      : `org_id.is.null`;
+    const { data, error } = await supabaseAdmin
+      .from('report_context_profiles')
+      .select('name, context, scope, org_id, updated_at')
+      .eq('active', true)
+      .in('scope', [scope, 'both'])
+      .or(orFilter);
+    if (error || !data || data.length === 0) return '';
+    // Prefer org-specific over global.
+    const sorted = [...data].sort((a: any, b: any) => {
+      const orgPriority = (a.org_id ? 0 : 1) - (b.org_id ? 0 : 1);
+      if (orgPriority !== 0) return orgPriority;
+      const scopePriority = (a.scope === scope ? 0 : 1) - (b.scope === scope ? 0 : 1);
+      if (scopePriority !== 0) return scopePriority;
+      return String(b.updated_at || '').localeCompare(String(a.updated_at || ''));
+    });
+    const chosen = sorted[0];
+    const text = String(chosen.context || '').trim();
+    if (!text) return '';
+    return `=== CONTEXTO EDITORIAL DA ORGANIZAÇÃO (${chosen.name}) ===
+Aplique a persona, audiência, tom e prioridades abaixo a TODAS as seções do relatório. Estas diretrizes são CUMULATIVAS com a metodologia SISTUR e a camada semântica — não as substituem.
+
+${text}
+`;
+  } catch (_e) {
+    return '';
+  }
+}
+
 async function loadReportStructure(
   supabaseAdmin: any,
   scope: 'territorial' | 'enterprise',
@@ -2891,8 +2933,19 @@ INSTRUÇÕES SOBRE COMPARATIVO TEMPORAL:
     );
     logger.stage('report_structure_loaded', { hasStructure: !!REPORT_STRUCTURE_BLOCK, chars: REPORT_STRUCTURE_BLOCK.length });
 
+    // v1.62.7 — Contexto editorial por organização (persona/audiência/tom/foco).
+    REPORT_CONTEXT_BLOCK = await loadReportContext(
+      supabaseAdmin,
+      isEnterprise ? 'enterprise' : 'territorial',
+      assessment?.org_id ?? null,
+    );
+    logger.stage('report_context_loaded', { hasContext: !!REPORT_CONTEXT_BLOCK, chars: REPORT_CONTEXT_BLOCK.length });
+
     // Build prompts
-    const systemPrompt = getSystemPrompt(reportTemplate, isEnterprise) + (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
+    const systemPrompt =
+      (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') +
+      getSystemPrompt(reportTemplate, isEnterprise) +
+      (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
 
     const prescriptionsText = prescriptions?.length > 0 
       ? prescriptions.map((p: any) => `- [${p.status}] ${p.justification} (Pilar: ${p.pillar}, Agente: ${p.target_agent}, Prioridade: ${p.priority || 'N/A'})`).join('\n')
@@ -3324,12 +3377,14 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         if (useParallelPipeline) {
           logger.stage('parallel_pipeline_enabled', { template: reportTemplate, isEnterprise });
           const systemPromptByPillar = {
-            RA: getPillarSystemPrompt('RA', isEnterprise),
-            OE: getPillarSystemPrompt('OE', isEnterprise),
-            AO: getPillarSystemPrompt('AO', isEnterprise),
+            RA: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('RA', isEnterprise),
+            OE: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('OE', isEnterprise),
+            AO: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('AO', isEnterprise),
           };
-          const envelopeSystemPrompt = getEnvelopeSystemPrompt(reportTemplate, isEnterprise)
-            + (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
+          const envelopeSystemPrompt =
+            (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') +
+            getEnvelopeSystemPrompt(reportTemplate, isEnterprise) +
+            (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
 
           // O userPrompt já contém TODO o contexto. Para os pilares, mandamos
           // o mesmo userPrompt — o systemPrompt é que restringe o escopo.

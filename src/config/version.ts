@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 6,
+  patch: 7,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.7",
+    date: "2026-06-04",
+    type: "minor" as const,
+    changes: [
+      "Camada de Contexto do Relatório — nova aba `Contexto` em Configurações com editor de persona/audiência/tom/foco/prioridades/restrições aplicado pela IA em todo relatório gerado. Defaults globais (territorial e enterprise) já pré-preenchidos com a contextualização atual. Cada organização pode criar seu próprio contexto, que prevalece sobre o global ao gerar relatórios daquela org. Acesso: ADMIN gerencia tudo, ORG_ADMIN gerencia apenas a própria org.",
+      "Nova tabela `report_context_profiles` (org_id nulo = global) com RLS, índice por (scope, active, org_id) e seed inicial.",
+      "Edge function `generate-report` — carrega o contexto ativo da organização (com fallback para o global) e injeta-o no systemPrompt da geração monolítica E no envelope/pilares do pipeline paralelo. Contexto é cumulativo com a metodologia SISTUR, a camada semântica e a estrutura canônica — não as substitui."
+    ]
+  },
   {
     version: "1.62.6",
     date: "2026-06-03",
