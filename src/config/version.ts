@@ -23,6 +23,14 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.62.8",
+    date: "2026-06-04",
+    type: "patch" as const,
+    changes: [
+      "Camada de Contexto do Relatório — o campo de texto `Contexto` na aba Configurações › Contexto agora é somente-leitura por padrão. O usuário deve clicar no botão `Editar` (lápis) para habilitar a edição, e só então pode alterar o conteúdo. Após salvar, o campo volta ao modo somente-leitura. Evita edições acidentais no prompt de persona/audiência/tom/foco/prioridades/restrições."
+    ]
+  },
+  {
     version: "1.62.7",
     date: "2026-06-04",
     type: "minor" as const,
