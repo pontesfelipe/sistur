@@ -74,6 +74,90 @@ function bullet(text: string, ref: string, level = 0) {
   });
 }
 
+function buildAndSave(opts: {
+  filename: string;
+  headerLabel: string;
+  title: string;
+  subtitle?: string;
+  body: Paragraph[];
+}) {
+  const children: Paragraph[] = [
+    new Paragraph({
+      heading: HeadingLevel.TITLE,
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 400, line: ABNT.LINE_SPACING },
+      children: [new TextRun({ text: opts.title.toUpperCase(), bold: true, font: FONT, size: 32, color: ABNT.COLOR_TEXT })],
+    }),
+  ];
+  if (opts.subtitle) {
+    children.push(new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 240, line: ABNT.LINE_SPACING },
+      children: [new TextRun({ text: opts.subtitle, italics: true, font: FONT, size: ABNT.BODY_SIZE, color: MUTED })],
+    }));
+  }
+  children.push(...opts.body);
+
+  const doc = new Document({
+    numbering: {
+      config: [
+        {
+          reference: 'bullets',
+          levels: [{
+            level: 0,
+            format: LevelFormat.BULLET,
+            text: '\u2022',
+            alignment: AlignmentType.LEFT,
+            style: { paragraph: { indent: { left: 720, hanging: 360 } } },
+          }],
+        },
+      ],
+    },
+    styles: {
+      ...ABNT_DEFAULT_STYLES,
+      paragraphStyles: [
+        {
+          id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+          run: { size: ABNT.H1_SIZE, bold: true, font: FONT, color: ABNT.COLOR_TEXT },
+          paragraph: { spacing: { before: 480, after: 240, line: ABNT.LINE_SPACING }, outlineLevel: 0 },
+        },
+        {
+          id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+          run: { size: ABNT.H2_SIZE, bold: true, font: FONT, color: ABNT.COLOR_TEXT },
+          paragraph: { spacing: { before: 360, after: 200, line: ABNT.LINE_SPACING }, outlineLevel: 1 },
+        },
+        {
+          id: 'Heading3', name: 'Heading 3', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+          run: { size: ABNT.H3_SIZE, bold: true, italics: true, font: FONT, color: ABNT.COLOR_TEXT },
+          paragraph: { spacing: { before: 240, after: 120, line: ABNT.LINE_SPACING }, outlineLevel: 2 },
+        },
+      ],
+    },
+    sections: [{
+      properties: ABNT_PAGE_PROPS,
+      headers: {
+        default: new Header({
+          children: [new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            children: [new TextRun({ text: opts.headerLabel, font: FONT, size: ABNT.SMALL_SIZE, color: MUTED, italics: true })],
+          })],
+        }),
+      },
+      footers: {
+        default: new Footer({
+          children: [new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            children: [new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: ABNT.SMALL_SIZE, color: ABNT.COLOR_TEXT })],
+          })],
+        }),
+      },
+      children,
+    }],
+  });
+
+  return Packer.toBlob(doc).then((b) => saveAs(b, opts.filename));
+}
+
 // ─── Metodologia Export ──────────────────────────────────────────────
 export async function exportMetodologiaDocx() {
   const doc = new Document({
