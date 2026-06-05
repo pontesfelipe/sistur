@@ -7002,6 +7002,48 @@ export type Database = {
         }
         Relationships: []
       }
+      municipal_socioeconomic_context: {
+        Row: {
+          created_at: string
+          fetched_at: string
+          ibge_code: string
+          id: string
+          pib_per_capita_brl: number | null
+          pib_total_brl: number | null
+          population: number | null
+          reference_year: number
+          source: string
+          source_tables: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fetched_at?: string
+          ibge_code: string
+          id?: string
+          pib_per_capita_brl?: number | null
+          pib_total_brl?: number | null
+          population?: number | null
+          reference_year: number
+          source?: string
+          source_tables?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fetched_at?: string
+          ibge_code?: string
+          id?: string
+          pib_per_capita_brl?: number | null
+          pib_total_brl?: number | null
+          population?: number | null
+          reference_year?: number
+          source?: string
+          source_tables?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       national_reference_values: {
         Row: {
           created_at: string
