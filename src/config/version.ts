@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 11,
+  patch: 12,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.12",
+    date: "2026-06-05",
+    type: "patch" as const,
+    changes: [
+      "ErrorBoundary global — adicionado em `src/components/ErrorBoundary.tsx` e envolvendo todas as rotas no `App.tsx`. Substitui a tela totalmente branca (causada por erros de render não capturados) por uma mensagem amigável com o motivo real do erro, botão de recarregar e link para o início. Também loga o erro completo no console para diagnóstico — usado para investigar o sintoma de `/observatorio` 'piscar e ficar em branco' após login."
+    ]
+  },
   {
     version: "1.62.11",
     date: "2026-06-04",
