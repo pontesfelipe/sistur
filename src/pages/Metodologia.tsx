@@ -1448,6 +1448,10 @@ export default function Metodologia() {
                 Disponível em: apisidra.ibge.gov.br
               </li>
               <li>
+                <strong>IBGE.</strong> API SIDRA / Agregados — População estimada anual (tabela 6579, variável 9324) e PIB municipal a preços correntes (tabela 5938, variáveis 37 PIB total e 39 PIB per capita). Usadas pelo Observatório para enriquecimento socioeconômico automático por município.
+                Disponível em: servicodados.ibge.gov.br/api/v3/agregados
+              </li>
+              <li>
                 <strong>IBGE.</strong> API de Pesquisas Municipais — IDH, Gini, Hospedagem, Finanças. 
                 Disponível em: servicodados.ibge.gov.br/api/v1/pesquisas
               </li>
@@ -1474,6 +1478,10 @@ export default function Metodologia() {
               <li>
                 <strong>Ministério do Turismo.</strong> Mapa do Turismo Brasileiro — API REST de Regionalização. 
                 Disponível em: mapa.turismo.gov.br
+              </li>
+              <li>
+                <strong>Ministério do Trabalho e Emprego (MTE).</strong> Novo CAGED — Estatísticas mensais de admissões e desligamentos formais (CNAEs do turismo). Usado pelo Observatório como base anual via IGMA, com baseline mensal estimado (valor anual ÷ 12) quando não há série mensal carregada.
+                Disponível em: gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/novo-caged
               </li>
             </ul>
           </CardContent>
