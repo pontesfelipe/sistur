@@ -363,14 +363,23 @@ export default function Observatorio() {
                       {catMetrics.map((m) => {
                         const s = catSummary.find((r) => r.metric_code === m.code);
                         const hasData = s && s.data_points > 0;
+                        const period = periodByMetric[m.id];
                         return (
                           <div key={m.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/40 transition-colors">
                             <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium truncate">{m.name}</p>
-                              <p className="text-xs text-muted-foreground">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="text-sm font-medium truncate">{m.name}</p>
+                                {period && (
+                                  <Badge variant="outline" className="text-[10px] font-normal py-0 h-5">
+                                    {period}
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5">
                                 {hasData ? `${formatValue(Number(s!.total_value), m.unit)} · ${s!.data_points} ${s!.data_points === 1 ? "registro" : "registros"}` : "Sem dados em " + year}
                               </p>
                             </div>
+
                             <div className="flex items-center gap-1 shrink-0">
                               <MetricHistoryDialog metricId={m.id} metricName={m.name} unit={m.unit} />
                               <Button size="sm" variant="outline" disabled={!isViewingOwn} onClick={() => setMeasureDialog({ metricId: m.id, name: m.name, unit: m.unit })}>
