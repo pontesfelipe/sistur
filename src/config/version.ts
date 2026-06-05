@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 15,
+  patch: 16,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.62.16",
+    date: "2026-06-05",
+    type: "patch" as const,
+    changes: [
+      "Observatório Turístico — período avaliado visível por indicador: cada métrica agora exibe um badge com o período coberto pelos dados do ano selecionado (ex.: 'Jan/2025', 'Jan–Mar/2025', '2025 (anual)', '5 meses em 2025'). O cálculo deriva das medições reais via novo `useObservatoryMeasurements` na página e do helper `buildPeriodLabel`, sem alterar schema. Facilita identificar lacunas temporais e diferenciar snapshots anuais de séries mensais."
+    ]
+  },
+  {
     version: "1.62.15",
     date: "2026-06-05",
     type: "minor" as const,
@@ -30,6 +38,7 @@ export const VERSION_HISTORY = [
       "Observatório Turístico — clareza de escopo: novo cabeçalho mostra o destino vinculado (Nome/UF) com ícone de localização e texto introdutório explicando que o módulo é o monitor permanente do destino (complementar ao diagnóstico cíclico). Adicionado seletor de destino visível apenas para ADMIN/ORG_ADMIN, permitindo alternar a visualização entre destinos sem trocar de conta; em modo visualização, botões de escrita (Registrar/Novo Evento) ficam desativados para evitar gravação em destino errado. Hooks `useObservatorySummary`, `useObservatoryEvents` e `useObservatoryMeasurements` agora aceitam parâmetro opcional `orgIdOverride`."
     ]
   },
+
   {
     version: "1.62.14",
     date: "2026-06-05",
