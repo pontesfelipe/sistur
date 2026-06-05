@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 62,
-  patch: 16,
+  minor: 63,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.63.0",
+    date: "2026-06-05",
+    type: "minor" as const,
+    changes: [
+      "Observatório — descoberta automática de eventos: nova edge function `discover-municipal-events` usa Firecrawl (search + JSON extraction) para consultar sites oficiais (prefeitura, secretaria de turismo via `site:gov.br`) e sugerir eventos turísticos do município no ano selecionado. Novo componente `DiscoverEventsDialog` na aba Eventos abre fluxo de aprovação humana: lista candidatos (nome, datas, categoria, descrição, link da fonte), permite seleção múltipla via checkbox e importa em lote para `observatory_events`. A fonte é preservada no campo `description` para auditoria. Nenhuma inserção automática — sempre requer revisão. Bloqueado em modo visualização (admin vendo outro destino)."
+    ]
+  },
   {
     version: "1.62.16",
     date: "2026-06-05",
