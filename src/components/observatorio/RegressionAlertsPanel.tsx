@@ -55,16 +55,6 @@ export function RegressionAlertsPanel() {
     onError: (e: any) => toast.error("Erro: " + (e?.message ?? "desconhecido")),
   });
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="py-6 flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Verificando alertas...
-        </CardContent>
-      </Card>
-    );
-  }
-
   // Dispara e-mail para alertas críticos ainda não notificados (idempotente: a edge function checa email_sent_at)
   const notifiedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
@@ -85,6 +75,16 @@ export function RegressionAlertsPanel() {
       }
     });
   }, [alerts, qc]);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="py-6 flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Verificando alertas...
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (alerts.length === 0) return null;
 
