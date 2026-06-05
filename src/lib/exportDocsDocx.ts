@@ -425,3 +425,219 @@ export async function exportFAQDocx(items: FAQEntry[]) {
   const buffer = await Packer.toBlob(doc);
   saveAs(buffer, 'SISTUR_FAQ.docx');
 }
+
+// ─── Manual do Usuário ───────────────────────────────────────────────
+export async function exportManualUsuarioDocx() {
+  return buildAndSave({
+    filename: 'SISTUR_Manual_do_Usuario.docx',
+    headerLabel: 'SISTUR — Manual do Usuário',
+    title: 'Manual do Usuário SISTUR',
+    subtitle: 'Guia completo de navegação e uso do sistema',
+    body: [
+      heading('1. Primeiros Passos', HeadingLevel.HEADING_1),
+      para('O SISTUR é o Sistema de Inteligência Territorial para o Turismo. Após o login, você será direcionado ao Dashboard, que reúne os principais indicadores e atalhos para os módulos contratados pela sua organização.'),
+      heading('1.1 Login e Recuperação de Senha', HeadingLevel.HEADING_2),
+      para('Acesse pela tela inicial usando e-mail e senha cadastrados. Caso tenha esquecido a senha, utilize a opção "Esqueceu a senha?" para receber um link de redefinição. Contas novas passam por aprovação de um administrador antes do primeiro acesso.'),
+      heading('1.2 Estrutura da Interface', HeadingLevel.HEADING_2),
+      bullet('Barra lateral: navegação entre os módulos disponíveis (ERP, EDU, Enterprise, Observatório, Fórum, Configurações).', 'bullets'),
+      bullet('Cabeçalho: título da página, notificações, perfil e troca rápida entre organizações (para usuários multi-org).', 'bullets'),
+      bullet('Conteúdo principal: cards, tabelas e formulários específicos de cada módulo.', 'bullets'),
+
+      heading('2. Módulos Principais', HeadingLevel.HEADING_1),
+      heading('2.1 SISTUR ERP', HeadingLevel.HEADING_2),
+      para('Plataforma de diagnóstico territorial baseada nos três pilares (RA, OE e AO) da Análise Estrutural de Mario Beni. Permite criar rodadas, preencher indicadores, calcular o I-SISTUR e gerar relatórios.'),
+      heading('2.2 SISTUR EDU', HeadingLevel.HEADING_2),
+      para('Ambiente de capacitação com trilhas, cursos, exames e certificações. As prescrições de aprendizado são geradas automaticamente a partir dos resultados do diagnóstico (gatilho em Atenção/Crítico).'),
+      heading('2.3 SISTUR Enterprise', HeadingLevel.HEADING_2),
+      para('Diagnóstico para empreendimentos privados (hotéis, agências, restaurantes). Usa 22 indicadores especializados e segue a mesma régua de status (Adequado/Atenção/Crítico).'),
+      heading('2.4 Observatório Turístico', HeadingLevel.HEADING_2),
+      para('Monitoramento permanente de fluxo, ocupação, eventos, receita e empregos. Permite ingestão automática a partir de fontes oficiais e exportação em CSV/PDF.'),
+      heading('2.5 Fórum e Base de Conhecimento', HeadingLevel.HEADING_2),
+      para('Espaço de troca entre gestores, técnicos e trade. A base de conhecimento aceita documentos da organização (PDF, DOCX, XLSX, CSV, TXT) e referências globais.'),
+
+      heading('3. Fluxo Típico de Trabalho', HeadingLevel.HEADING_1),
+      bullet('1. Cadastrar destinos / empreendimentos.', 'bullets'),
+      bullet('2. Criar uma rodada de diagnóstico no nível adequado (Essencial, Estratégico ou Integral).', 'bullets'),
+      bullet('3. Preencher os indicadores manualmente ou via importação CSV.', 'bullets'),
+      bullet('4. Calcular o diagnóstico — o status (Adequado/Atenção/Crítico) é gerado automaticamente.', 'bullets'),
+      bullet('5. Consultar prescrições de capacitação no SISTUR EDU.', 'bullets'),
+      bullet('6. Gerar relatórios e planos de ação.', 'bullets'),
+      bullet('7. Monitorar evolução pelo Observatório.', 'bullets'),
+
+      heading('4. Permissões e Papéis', HeadingLevel.HEADING_1),
+      bullet('ADMIN: acesso global, bypass de limites de licença.', 'bullets'),
+      bullet('ORG_ADMIN: gestão local da organização.', 'bullets'),
+      bullet('ANALYST: leitura e edição de diagnósticos no plano Pro.', 'bullets'),
+      bullet('VIEWER: somente leitura.', 'bullets'),
+      bullet('PROFESSOR / ESTUDANTE: módulos EDU (turmas, cursos, exames).', 'bullets'),
+
+      heading('5. Suporte', HeadingLevel.HEADING_1),
+      para('Para dúvidas técnicas, use o FAQ disponível em Ajuda. Solicitações de melhoria ou bugs devem ser registradas no Fórum interno ou diretamente com o administrador da organização.'),
+    ],
+  });
+}
+
+// ─── Glossário de Indicadores ────────────────────────────────────────
+export async function exportGlossarioIndicadoresDocx() {
+  return buildAndSave({
+    filename: 'SISTUR_Glossario_de_Indicadores.docx',
+    headerLabel: 'SISTUR — Glossário de Indicadores',
+    title: 'Glossário de Indicadores SISTUR',
+    subtitle: 'Definição, fonte oficial, periodicidade e pilar de cada indicador',
+    body: [
+      heading('1. Organização do Glossário', HeadingLevel.HEADING_1),
+      para('Os indicadores do SISTUR são organizados pelos três pilares da Análise Estrutural do Turismo (RA, OE e AO) e classificados em três níveis de diagnóstico: Essencial, Estratégico e Integral. Cada indicador possui uma fonte oficial (provenance 1 a 5), unidade de medida, direção (maior é melhor / menor é melhor) e periodicidade de atualização.'),
+
+      heading('2. Pilar RA — Relações Ambientais', HeadingLevel.HEADING_1),
+      heading('2.1 Qualidade da Água (IQA)', HeadingLevel.HEADING_2),
+      para('Mede a qualidade dos corpos hídricos do município. Fonte: ANA / órgãos estaduais. Periodicidade: anual. Direção: maior é melhor.'),
+      heading('2.2 Áreas Protegidas (%)', HeadingLevel.HEADING_2),
+      para('Percentual do território coberto por unidades de conservação. Fonte: MMA / CNUC. Periodicidade: anual.'),
+      heading('2.3 Gestão de Resíduos Sólidos', HeadingLevel.HEADING_2),
+      para('Cobertura de coleta seletiva e destinação adequada. Fonte: SNIS. Periodicidade: anual.'),
+      heading('2.4 Patrimônio Histórico Tombado', HeadingLevel.HEADING_2),
+      para('Existência e estado de conservação de bens tombados (IPHAN, estaduais, municipais). Fonte: IPHAN. Periodicidade: bienal.'),
+
+      heading('3. Pilar OE — Organização Estrutural', HeadingLevel.HEADING_1),
+      heading('3.1 Rede Hoteleira (UH/1.000 hab.)', HeadingLevel.HEADING_2),
+      para('Número de unidades habitacionais por mil habitantes. Fonte: Mapa do Turismo / CADASTUR. Periodicidade: trimestral.'),
+      heading('3.2 Transporte e Acessos', HeadingLevel.HEADING_2),
+      para('Disponibilidade de rodoviária, aeroporto e qualidade de acessos. Fonte: ANTT / ANAC / DNIT. Periodicidade: anual.'),
+      heading('3.3 Sinalização Turística', HeadingLevel.HEADING_2),
+      para('Cobertura de sinalização indicativa e interpretativa. Fonte: levantamento local. Provenance 1/5.'),
+      heading('3.4 Equipamentos de Apoio', HeadingLevel.HEADING_2),
+      para('Centros de atendimento ao turista, banheiros públicos, postos de saúde próximos a atrativos. Fonte: Secretaria de Turismo. Periodicidade: anual.'),
+
+      heading('4. Pilar AO — Ações Operacionais', HeadingLevel.HEADING_1),
+      heading('4.1 Conselho Municipal de Turismo', HeadingLevel.HEADING_2),
+      para('Existência e regularidade de reuniões do COMTUR. Fonte: Mapa do Turismo Brasileiro. Periodicidade: anual.'),
+      heading('4.2 Plano Municipal de Turismo', HeadingLevel.HEADING_2),
+      para('Existência, vigência e indicadores de execução. Fonte: Secretaria de Turismo. Periodicidade: quadrienal.'),
+      heading('4.3 Despesa Municipal com Turismo', HeadingLevel.HEADING_2),
+      para('Percentual do orçamento dedicado à função 23 (Comércio e Serviços / Turismo). Fonte: FINBRA / SICONFI. Periodicidade: anual.'),
+      heading('4.4 Qualificação Profissional', HeadingLevel.HEADING_2),
+      para('Horas de capacitação por trabalhador do setor. Fonte: SISTUR EDU + RAIS. Periodicidade: anual.'),
+      heading('4.5 Marketing Turístico', HeadingLevel.HEADING_2),
+      para('Existência de plano de marketing, presença digital, campanhas ativas. Fonte: Secretaria de Turismo. Periodicidade: anual.'),
+
+      heading('5. Indicadores Derivados', HeadingLevel.HEADING_1),
+      para('Alguns indicadores são calculados de forma determinística a partir de variáveis primárias, como Receita Turística per capita, Densidade Hoteleira, Índice de Capacidade de Pagamento (CAPAG) e cumprimento de mínimos constitucionais de Saúde e Educação.'),
+
+      heading('6. Régua de Status', HeadingLevel.HEADING_1),
+      bullet('Adequado: pontuação ≥ 67% — manter monitoramento.', 'bullets'),
+      bullet('Atenção: pontuação 34–66% — dispara prescrições EDU e plano de ação.', 'bullets'),
+      bullet('Crítico: pontuação ≤ 33% — bloqueio operacional e prioridade máxima.', 'bullets'),
+
+      heading('7. Fontes Oficiais Utilizadas', HeadingLevel.HEADING_1),
+      bullet('IBGE — servicodados.ibge.gov.br', 'bullets'),
+      bullet('Mapa do Turismo Brasileiro — mapa.turismo.gov.br', 'bullets'),
+      bullet('CADASTUR — cadastur.turismo.gov.br', 'bullets'),
+      bullet('SNIS — snis.gov.br', 'bullets'),
+      bullet('FINBRA / SICONFI — siconfi.tesouro.gov.br', 'bullets'),
+      bullet('IPHAN — gov.br/iphan', 'bullets'),
+      bullet('INEP / IDEB — gov.br/inep', 'bullets'),
+      bullet('DataSUS — datasus.saude.gov.br', 'bullets'),
+    ],
+  });
+}
+
+// ─── Guia SISTUR EDU ─────────────────────────────────────────────────
+export async function exportGuiaEduDocx() {
+  return buildAndSave({
+    filename: 'SISTUR_Guia_EDU.docx',
+    headerLabel: 'SISTUR — Guia EDU',
+    title: 'Guia do SISTUR EDU',
+    subtitle: 'Sistema de prescrição determinística de capacitação',
+    body: [
+      heading('1. Visão Geral', HeadingLevel.HEADING_1),
+      para('O SISTUR EDU é o módulo de capacitação do sistema. Diferentemente de plataformas EAD genéricas, suas trilhas e cursos são prescritos automaticamente a partir do diagnóstico territorial, garantindo conexão direta entre lacuna identificada e ação formativa.'),
+
+      heading('2. Princípios da Prescrição', HeadingLevel.HEADING_1),
+      para('Toda prescrição obedece a três condições obrigatórias:'),
+      bullet('Gatilho diagnóstico: o indicador associado precisa estar em Atenção ou Crítico.', 'bullets'),
+      bullet('Correspondência exata de pilar: cursos de RA só são prescritos para indicadores RA, e assim por diante.', 'bullets'),
+      bullet('Interpretação territorial compatível (Estrutural, Gestão ou Entrega).', 'bullets'),
+      para('A justificativa da prescrição é gerada por regra (não por LLM) para garantir rastreabilidade e auditabilidade.'),
+
+      heading('3. Estrutura Pedagógica', HeadingLevel.HEADING_1),
+      heading('3.1 Níveis de Currículo', HeadingLevel.HEADING_2),
+      bullet('Nível 1 — Sensibilização: conceitos introdutórios e linguagem comum.', 'bullets'),
+      bullet('Nível 2 — Capacitação: instrumentos práticos de gestão e operação.', 'bullets'),
+      bullet('Nível 3 — Aprofundamento: análise técnica e estudos de caso.', 'bullets'),
+      bullet('Nível 4 — Especialização: liderança, formulação de políticas e métricas avançadas.', 'bullets'),
+      heading('3.2 Pré-requisitos', HeadingLevel.HEADING_2),
+      para('Os níveis são sequenciais: para acessar um nível superior é necessário concluir os anteriores com aproveitamento mínimo.'),
+
+      heading('4. Avaliação e Certificação', HeadingLevel.HEADING_1),
+      heading('4.1 Exames Objetivos', HeadingLevel.HEADING_2),
+      para('Corrigidos automaticamente. Aprovação a partir da nota mínima definida no curso. Possuem banco de questões versionado e sorteio aleatório.'),
+      heading('4.2 Exames Dissertativos', HeadingLevel.HEADING_2),
+      para('Corrigidos por RPC com auxílio de IA + revisão humana opcional. Permitem recurso (appeal) em prazo determinado.'),
+      heading('4.3 Certificados', HeadingLevel.HEADING_2),
+      para('Emitidos automaticamente após aprovação. Possuem código público para verificação em /verificar-certificado.'),
+
+      heading('5. Compliance e Anti-fraude', HeadingLevel.HEADING_1),
+      bullet('Heartbeats periódicos durante exames.', 'bullets'),
+      bullet('Detecção de troca de aba e tempo anômalo.', 'bullets'),
+      bullet('Alertas registrados em log auditável.', 'bullets'),
+
+      heading('6. Papel do Professor', HeadingLevel.HEADING_1),
+      para('Professores gerenciam turmas, prazos, diário de classe e podem indicar novos alunos via código de referência. Têm acesso a leaderboard, mensagens e relatórios de aproveitamento.'),
+
+      heading('7. Boas Práticas', HeadingLevel.HEADING_1),
+      bullet('Concluir o diagnóstico antes de matricular a equipe — assim as prescrições aparecem corretamente.', 'bullets'),
+      bullet('Revisar trilhas adaptativas a cada novo cálculo de diagnóstico.', 'bullets'),
+      bullet('Acompanhar o painel unificado de gestão (admin/professor) para detectar inatividade.', 'bullets'),
+    ],
+  });
+}
+
+// ─── Manual de Diagnósticos ──────────────────────────────────────────
+export async function exportManualDiagnosticosDocx() {
+  return buildAndSave({
+    filename: 'SISTUR_Manual_de_Diagnosticos.docx',
+    headerLabel: 'SISTUR — Manual de Diagnósticos',
+    title: 'Manual de Diagnósticos Territoriais',
+    subtitle: 'Como criar, calcular e interpretar diagnósticos no SISTUR',
+    body: [
+      heading('1. O que é um Diagnóstico SISTUR', HeadingLevel.HEADING_1),
+      para('Um diagnóstico é a fotografia estruturada de um destino turístico em um determinado momento, baseado nos pilares RA, OE e AO. Pode ser Territorial (município, região turística, consórcio) ou Enterprise (empreendimento privado).'),
+
+      heading('2. Níveis Disponíveis', HeadingLevel.HEADING_1),
+      bullet('Essencial — 9 indicadores, 30–45 minutos. Ideal para primeira avaliação.', 'bullets'),
+      bullet('Estratégico — 19 indicadores, 2–3 horas. Equilibra profundidade e prática.', 'bullets'),
+      bullet('Integral — 96 indicadores, 1–2 semanas. Recomendado para certificações e planos diretores.', 'bullets'),
+
+      heading('3. Passo a Passo', HeadingLevel.HEADING_1),
+      heading('3.1 Criação da Rodada', HeadingLevel.HEADING_2),
+      para('Vá em Diagnósticos → Nova Rodada, escolha o destino/empreendimento, o nível e o período de referência.'),
+      heading('3.2 Preenchimento de Indicadores', HeadingLevel.HEADING_2),
+      para('Indicadores com provenance 5/5 são preenchidos automaticamente via API oficial. Indicadores manuais devem ser preenchidos pela equipe técnica. O sistema aceita importação CSV em formato brasileiro (UTF-8 ou Latin-1, vírgula decimal).'),
+      heading('3.3 Auditoria Pré-Cálculo', HeadingLevel.HEADING_2),
+      para('Antes do cálculo, o sistema apresenta uma tela de confirmação com valores destacados (outliers, ausências e mudanças expressivas em relação à rodada anterior).'),
+      heading('3.4 Cálculo', HeadingLevel.HEADING_2),
+      para('O cálculo é executado por uma edge function unificada que aplica normalização, ponderação, status (Adequado/Atenção/Crítico) e as 6 regras do Motor IGMA. Snapshots são gerados a cada cálculo; rodadas antigas não são alteradas retroativamente.'),
+
+      heading('4. Interpretação Territorial', HeadingLevel.HEADING_1),
+      para('Cada indicador é classificado em uma das três Interpretações Territoriais:'),
+      bullet('Estrutural — depende de infraestrutura e investimento.', 'bullets'),
+      bullet('Gestão — depende de organização institucional, planejamento e governança.', 'bullets'),
+      bullet('Entrega — depende de execução, qualidade do serviço e da experiência.', 'bullets'),
+      para('Essa classificação direciona quais prescrições EDU e quais ações de plano são sugeridas.'),
+
+      heading('5. Bloqueios Sistêmicos', HeadingLevel.HEADING_1),
+      bullet('RA Crítico bloqueia expansão estrutural (OE) e marketing.', 'bullets'),
+      bullet('AO Crítico bloqueia todo o sistema (sem governança não há execução).', 'bullets'),
+      bullet('Externalidades negativas (OE melhora às custas de RA) disparam alerta.', 'bullets'),
+
+      heading('6. Relatórios e Plano de Ação', HeadingLevel.HEADING_1),
+      para('A partir do diagnóstico calculado é possível gerar relatórios (Completo, Executivo, Investidores) com cabeçalho/rodapé personalizáveis, e converter os gargalos em Projetos com tarefas e marcos.'),
+
+      heading('7. Alertas de Regressão', HeadingLevel.HEADING_1),
+      para('Quando um indicador regride mais de 2% em dois ciclos consecutivos, o sistema dispara alerta automático para gestores e registra evento auditável no painel.'),
+
+      heading('8. Privacidade e Comparações', HeadingLevel.HEADING_1),
+      para('O SISTUR não publica rankings entre municípios. O índice I-SISTUR agregado é de uso interno. Cada destino enxerga apenas seus próprios dados — comparações regionais só ocorrem via consórcios autorizados.'),
+    ],
+  });
+}
