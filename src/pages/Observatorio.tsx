@@ -3,10 +3,12 @@ import {
   useObservatoryMetrics,
   useObservatorySummary,
   useObservatoryEvents,
+  useObservatoryMeasurements,
   useUpsertMeasurement,
   useCreateObservatoryEvent,
   useDeleteObservatoryEvent,
 } from "@/hooks/useObservatorio";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -45,6 +47,29 @@ function formatValue(value: number, unit: string) {
   if (unit === "%") return `${value.toFixed(1)}%`;
   return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 }).format(value);
 }
+
+const MONTH_ABBR = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+/** Build human period label from a list of measurements for a single metric. */
+function buildPeriodLabel(rows: Array<{ reference_month: number | null; reference_year: number }>, year: number): string | null {
+  if (!rows || rows.length === 0) return null;
+  const inYear = rows.filter((r) => r.reference_year === year);
+  if (inYear.length === 0) return null;
+  const hasAnnual = inYear.some((r) => r.reference_month === null);
+  const months = inYear.map((r) => r.reference_month).filter((m): m is number => m !== null).sort((a, b) => a - b);
+  if (months.length === 0 && hasAnnual) return `${year} (anual)`;
+  if (months.length === 1) return `${MONTH_ABBR[months[0] - 1]}/${year}`;
+  if (months.length > 1) {
+    const min = months[0], max = months[months.length - 1];
+    const contiguous = max - min + 1 === months.length;
+    const label = contiguous
+      ? `${MONTH_ABBR[min - 1]}–${MONTH_ABBR[max - 1]}/${year}`
+      : `${months.length} meses em ${year}`;
+    return hasAnnual ? `${label} + anual` : label;
+  }
+  return `${year}`;
+}
+
 
 const MONTHS = [
   { v: null as number | null, label: "Anual" },
@@ -108,7 +133,9 @@ export default function Observatorio() {
 
   const { data: metrics = [], isLoading: loadingMetrics } = useObservatoryMetrics();
   const { data: summary = [], isLoading: loadingSummary } = useObservatorySummary(year, selectedOrgId);
+  const { data: measurements = [] } = useObservatoryMeasurements(year, selectedOrgId);
   const { data: events = [], isLoading: loadingEvents } = useObservatoryEvents(year, selectedOrgId);
+
   const upsert = useUpsertMeasurement();
   const createEvent = useCreateObservatoryEvent();
   const deleteEvent = useDeleteObservatoryEvent();
@@ -132,6 +159,21 @@ export default function Observatorio() {
     });
     return map;
   }, [summary]);
+
+  // Period label per metric_id (e.g. "Jan–Mar/2025") — derived from measurements
+  const periodByMetric = useMemo(() => {
+    const groups: Record<string, Array<{ reference_month: number | null; reference_year: number }>> = {};
+    (measurements as any[]).forEach((m) => {
+      if (!groups[m.metric_id]) groups[m.metric_id] = [];
+      groups[m.metric_id].push({ reference_month: m.reference_month, reference_year: m.reference_year });
+    });
+    const out: Record<string, string | null> = {};
+    Object.entries(groups).forEach(([id, rows]) => {
+      out[id] = buildPeriodLabel(rows, year);
+    });
+    return out;
+  }, [measurements, year]);
+
 
   const categories = Object.keys(CATEGORY_META);
 
@@ -321,14 +363,23 @@ export default function Observatorio() {
                       {catMetrics.map((m) => {
                         const s = catSummary.find((r) => r.metric_code === m.code);
                         const hasData = s && s.data_points > 0;
+                        const period = periodByMetric[m.id];
                         return (
                           <div key={m.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/40 transition-colors">
                             <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium truncate">{m.name}</p>
-                              <p className="text-xs text-muted-foreground">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="text-sm font-medium truncate">{m.name}</p>
+                                {period && (
+                                  <Badge variant="outline" className="text-[10px] font-normal py-0 h-5">
+                                    {period}
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5">
                                 {hasData ? `${formatValue(Number(s!.total_value), m.unit)} · ${s!.data_points} ${s!.data_points === 1 ? "registro" : "registros"}` : "Sem dados em " + year}
                               </p>
                             </div>
+
                             <div className="flex items-center gap-1 shrink-0">
                               <MetricHistoryDialog metricId={m.id} metricName={m.name} unit={m.unit} />
                               <Button size="sm" variant="outline" disabled={!isViewingOwn} onClick={() => setMeasureDialog({ metricId: m.id, name: m.name, unit: m.unit })}>
