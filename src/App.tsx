@@ -669,6 +669,7 @@ const App = () => {
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </ErrorBoundary>
               </Suspense>
               </OrgModulesProvider>
               </LicenseProvider>
