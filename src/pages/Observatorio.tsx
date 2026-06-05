@@ -331,7 +331,7 @@ export default function Observatorio() {
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
                               <MetricHistoryDialog metricId={m.id} metricName={m.name} unit={m.unit} />
-                              <Button size="sm" variant="outline" onClick={() => setMeasureDialog({ metricId: m.id, name: m.name, unit: m.unit })}>
+                              <Button size="sm" variant="outline" disabled={!isViewingOwn} onClick={() => setMeasureDialog({ metricId: m.id, name: m.name, unit: m.unit })}>
                                 <Plus className="h-3 w-3 mr-1" /> Registrar
                               </Button>
                             </div>
@@ -350,7 +350,7 @@ export default function Observatorio() {
           <div className="flex justify-end">
             <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
               <DialogTrigger asChild>
-                <Button><Plus className="h-4 w-4 mr-2" /> Novo Evento</Button>
+                <Button disabled={!isViewingOwn}><Plus className="h-4 w-4 mr-2" /> Novo Evento</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader><DialogTitle>Novo Evento Turístico</DialogTitle></DialogHeader>
