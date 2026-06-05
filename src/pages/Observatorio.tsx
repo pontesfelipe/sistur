@@ -29,6 +29,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CsvImportDialog } from "@/components/observatorio/CsvImportDialog";
 import { RegressionAlertsPanel } from "@/components/observatorio/RegressionAlertsPanel";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { useDestinations } from "@/hooks/useDestinations";
+import { MapPin, Info } from "lucide-react";
 
 const CATEGORY_META: Record<string, { label: string; icon: any; color: string }> = {
   fluxo: { label: "Fluxo Turístico", icon: Activity, color: "text-blue-600" },
@@ -60,6 +62,34 @@ export default function Observatorio() {
   const isAdmin = roles.some((r) => r.role === "ADMIN" || r.role === "ORG_ADMIN");
   const [ingesting, setIngesting] = useState(false);
 
+  // Destinations list (RLS scoped: admin sees all; user sees own org)
+  const { destinations = [] } = useDestinations() as any;
+  const { effectiveOrgId } = useProfileContext();
+  const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(undefined);
+  const viewingOrgId = selectedOrgId || effectiveOrgId;
+  const isViewingOwn = !selectedOrgId || selectedOrgId === effectiveOrgId;
+
+  const orgDestinations = useMemo(() => {
+    // Unique by org_id with display label "Nome/UF"
+    const map = new Map<string, { org_id: string; label: string }>();
+    (destinations as any[]).forEach((d) => {
+      if (!d?.org_id) return;
+      if (!map.has(d.org_id)) {
+        map.set(d.org_id, { org_id: d.org_id, label: `${d.name}${d.uf ? "/" + d.uf : ""}` });
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
+  }, [destinations]);
+
+  const currentDestination = useMemo(() => {
+    const list = destinations as any[];
+    return (
+      list.find((d) => d?.org_id === viewingOrgId) ||
+      list.find((d) => d?.org_id === effectiveOrgId) ||
+      null
+    );
+  }, [destinations, viewingOrgId, effectiveOrgId]);
+
   const runIngestion = async () => {
     setIngesting(true);
     try {
@@ -77,8 +107,8 @@ export default function Observatorio() {
   };
 
   const { data: metrics = [], isLoading: loadingMetrics } = useObservatoryMetrics();
-  const { data: summary = [], isLoading: loadingSummary } = useObservatorySummary(year);
-  const { data: events = [], isLoading: loadingEvents } = useObservatoryEvents(year);
+  const { data: summary = [], isLoading: loadingSummary } = useObservatorySummary(year, selectedOrgId);
+  const { data: events = [], isLoading: loadingEvents } = useObservatoryEvents(year, selectedOrgId);
   const upsert = useUpsertMeasurement();
   const createEvent = useCreateObservatoryEvent();
   const deleteEvent = useDeleteObservatoryEvent();
@@ -156,12 +186,39 @@ export default function Observatorio() {
   return (
     <AppLayout title="Observatório Turístico" subtitle="Monitoramento permanente de fluxo, ocupação, eventos, receita e empregos">
     <div className="container mx-auto py-8 space-y-6">
+      {/* Cabeçalho com destino e ações */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Observatório Turístico</h1>
-          <p className="text-muted-foreground mt-1">
-            Acompanhamento permanente de fluxo, ocupação, eventos, receita e empregos no destino.
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+            <MapPin className="h-4 w-4" />
+            <span>Observatório do destino</span>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight truncate">
+            {currentDestination ? `${currentDestination.name}${currentDestination.uf ? " / " + currentDestination.uf : ""}` : "Destino não vinculado"}
+          </h1>
+          <p className="text-muted-foreground mt-1 max-w-2xl">
+            Painel contínuo deste destino — séries de fluxo, ocupação, eventos, receita e empregos.
+            Distinto do diagnóstico cíclico: aqui acompanha-se o que está acontecendo agora.
           </p>
+          {isAdmin && orgDestinations.length > 1 && (
+            <div className="mt-3 flex items-center gap-2">
+              <Label className="text-xs text-muted-foreground">Visualizar destino:</Label>
+              <Select
+                value={viewingOrgId ?? ""}
+                onValueChange={(v) => setSelectedOrgId(v === effectiveOrgId ? undefined : v)}
+              >
+                <SelectTrigger className="w-64 h-8 text-sm"><SelectValue placeholder="Selecionar..." /></SelectTrigger>
+                <SelectContent>
+                  {orgDestinations.map((d) => (
+                    <SelectItem key={d.org_id} value={d.org_id}>{d.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {!isViewingOwn && (
+                <Badge variant="outline" className="text-xs">Modo visualização</Badge>
+              )}
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {isAdmin && (
@@ -190,6 +247,18 @@ export default function Observatorio() {
           </Select>
         </div>
       </div>
+
+      {/* Card explicativo curto */}
+      <Card className="border-dashed">
+        <CardContent className="py-3 flex items-start gap-3 text-sm text-muted-foreground">
+          <Info className="h-4 w-4 mt-0.5 shrink-0" />
+          <p>
+            O Observatório é o <strong>monitor permanente</strong> deste destino: alimenta-se de fontes oficiais
+            (Cadastur, ANAC, CAGED, IGMA) e de registros manuais. Complementa o Diagnóstico (que avalia capacidade
+            estrutural em ciclos) acompanhando os <strong>resultados operacionais contínuos</strong>.
+          </p>
+        </CardContent>
+      </Card>
 
       <RegressionAlertsPanel />
 
