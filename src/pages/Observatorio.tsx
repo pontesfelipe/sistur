@@ -133,7 +133,9 @@ export default function Observatorio() {
 
   const { data: metrics = [], isLoading: loadingMetrics } = useObservatoryMetrics();
   const { data: summary = [], isLoading: loadingSummary } = useObservatorySummary(year, selectedOrgId);
+  const { data: measurements = [] } = useObservatoryMeasurements(year, selectedOrgId);
   const { data: events = [], isLoading: loadingEvents } = useObservatoryEvents(year, selectedOrgId);
+
   const upsert = useUpsertMeasurement();
   const createEvent = useCreateObservatoryEvent();
   const deleteEvent = useDeleteObservatoryEvent();
