@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 13,
+  patch: 14,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.14",
+    date: "2026-06-05",
+    type: "patch" as const,
+    changes: [
+      "Correção do erro React #310 em `/observatorio` — em `src/components/observatorio/RegressionAlertsPanel.tsx`, os hooks `useRef` e `useEffect` estavam declarados depois de um `return` condicional (`if (isLoading) return …`), o que fazia o React executar uma quantidade diferente de hooks entre renders e quebrar a página com tela branca. Os hooks foram movidos para antes de qualquer return, respeitando as Regras dos Hooks."
+    ]
+  },
   {
     version: "1.62.13",
     date: "2026-06-05",
