@@ -31,6 +31,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CsvImportDialog } from "@/components/observatorio/CsvImportDialog";
 import { RegressionAlertsPanel } from "@/components/observatorio/RegressionAlertsPanel";
 import { DiscoverEventsDialog } from "@/components/observatorio/DiscoverEventsDialog";
+import { SocioeconomicContextPanel } from "@/components/observatorio/SocioeconomicContextPanel";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useDestinations } from "@/hooks/useDestinations";
 import { MapPin, Info } from "lucide-react";
@@ -304,6 +305,11 @@ export default function Observatorio() {
       </Card>
 
       <RegressionAlertsPanel />
+
+      <SocioeconomicContextPanel
+        ibgeCode={currentDestination?.ibge_code}
+        canRefresh={isAdmin && isViewingOwn}
+      />
 
       {/* KPI cards por categoria */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">

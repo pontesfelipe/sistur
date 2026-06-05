@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 63,
+  minor: 64,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.0",
+    date: "2026-06-05",
+    type: "minor" as const,
+    changes: [
+      "Observatório — baseline anualizado: a edge function `ingest-observatory` agora, ao derivar valores de fontes anuais (Cadastur/IGMA/CAGED-RAIS/Tesouro), também popula automaticamente os meses 1–11 com `valor_anual / 12` marcados como `estimativa mensal` no campo `notes` e `source`. Isso elimina gráficos mensais vazios quando só há dado anual disponível. Estimativas são preservadas até serem substituídas por dado real (inserção manual ou ingestão mensal) — nunca sobrescrevem valores reais existentes.",
+      "Observatório — integração IBGE/SIDRA: nova edge function `enrich-municipality-sidra` consulta a API pública SIDRA do IBGE (tabelas 6579 população estimada, 5938 PIB municipal var. 37 total e var. 39 per capita) e popula a nova tabela `municipal_socioeconomic_context` por `ibge_code`. Sem credenciais, sem custo, sem fragilidade — API REST oficial. Novo card `SocioeconomicContextPanel` exibe população, PIB total e PIB per capita do município no topo do Observatório, com botão de atualização para admins.",
+    ],
+  },
   {
     version: "1.63.0",
     date: "2026-06-05",
