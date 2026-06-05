@@ -478,6 +478,12 @@ export default function Configuracoes() {
                   />
 
                   <ExternalReferenceItem
+                    title="IBGE / SIDRA"
+                    description="API oficial — população estimada (tab. 6579) e PIB municipal (tab. 5938) usados no Observatório"
+                    url="https://servicodados.ibge.gov.br/api/v3/agregados"
+                  />
+
+                  <ExternalReferenceItem
                     title="CADASTUR"
                     description="Cadastro nacional de prestadores de serviços turísticos"
                     url="https://cadastur.turismo.gov.br"
@@ -493,6 +499,12 @@ export default function Configuracoes() {
                     title="INEP / IDEB"
                     description="Índice de Desenvolvimento da Educação Básica"
                     url="https://www.gov.br/inep"
+                  />
+
+                  <ExternalReferenceItem
+                    title="Novo CAGED / MTE"
+                    description="Empregos formais no turismo (base anual via IGMA; baseline mensal estimado pelo Observatório)"
+                    url="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/novo-caged"
                   />
                 </CardContent>
               </Card>
