@@ -399,7 +399,8 @@ export default function Observatorio() {
         </TabsContent>
 
         <TabsContent value="eventos" className="space-y-4">
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <DiscoverEventsDialog orgId={viewingOrgId} year={year} disabled={!isViewingOwn} />
             <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
               <DialogTrigger asChild>
                 <Button disabled={!isViewingOwn}><Plus className="h-4 w-4 mr-2" /> Novo Evento</Button>
