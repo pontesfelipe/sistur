@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.1",
+    date: "2026-06-05",
+    type: "patch" as const,
+    changes: [
+      "Documentação — adicionadas as novas fontes oficiais consumidas pelo Observatório nas páginas de Configurações (Referências Oficiais) e Metodologia (Referências Bibliográficas): IBGE/SIDRA tabelas 6579 (população estimada anual) e 5938 (PIB municipal — variáveis 37 total e 39 per capita), e Novo CAGED/MTE como base do baseline mensal estimado de empregos formais. Garantia de rastreabilidade e transparência metodológica.",
+    ],
+  },
   {
     version: "1.64.0",
     date: "2026-06-05",
