@@ -69,8 +69,9 @@ export function useObservatoryMetrics() {
   });
 }
 
-export function useObservatoryMeasurements(year: number) {
-  const { effectiveOrgId } = useProfileContext();
+export function useObservatoryMeasurements(year: number, orgIdOverride?: string) {
+  const { effectiveOrgId: ctxOrgId } = useProfileContext();
+  const effectiveOrgId = orgIdOverride || ctxOrgId;
   return useQuery({
     queryKey: ["observatory-measurements", effectiveOrgId, year],
     enabled: !!effectiveOrgId,
@@ -87,8 +88,9 @@ export function useObservatoryMeasurements(year: number) {
   });
 }
 
-export function useObservatorySummary(year: number) {
-  const { effectiveOrgId } = useProfileContext();
+export function useObservatorySummary(year: number, orgIdOverride?: string) {
+  const { effectiveOrgId: ctxOrgId } = useProfileContext();
+  const effectiveOrgId = orgIdOverride || ctxOrgId;
   return useQuery({
     queryKey: ["observatory-summary", effectiveOrgId, year],
     enabled: !!effectiveOrgId,
@@ -103,8 +105,9 @@ export function useObservatorySummary(year: number) {
   });
 }
 
-export function useObservatoryEvents(year: number) {
-  const { effectiveOrgId } = useProfileContext();
+export function useObservatoryEvents(year: number, orgIdOverride?: string) {
+  const { effectiveOrgId: ctxOrgId } = useProfileContext();
+  const effectiveOrgId = orgIdOverride || ctxOrgId;
   return useQuery({
     queryKey: ["observatory-events", effectiveOrgId, year],
     enabled: !!effectiveOrgId,

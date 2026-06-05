@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 14,
+  patch: 15,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.15",
+    date: "2026-06-05",
+    type: "minor" as const,
+    changes: [
+      "Observatório Turístico — clareza de escopo: novo cabeçalho mostra o destino vinculado (Nome/UF) com ícone de localização e texto introdutório explicando que o módulo é o monitor permanente do destino (complementar ao diagnóstico cíclico). Adicionado seletor de destino visível apenas para ADMIN/ORG_ADMIN, permitindo alternar a visualização entre destinos sem trocar de conta; em modo visualização, botões de escrita (Registrar/Novo Evento) ficam desativados para evitar gravação em destino errado. Hooks `useObservatorySummary`, `useObservatoryEvents` e `useObservatoryMeasurements` agora aceitam parâmetro opcional `orgIdOverride`."
+    ]
+  },
   {
     version: "1.62.14",
     date: "2026-06-05",
