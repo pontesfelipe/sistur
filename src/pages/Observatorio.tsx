@@ -48,6 +48,29 @@ function formatValue(value: number, unit: string) {
   return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 }).format(value);
 }
 
+const MONTH_ABBR = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+/** Build human period label from a list of measurements for a single metric. */
+function buildPeriodLabel(rows: Array<{ reference_month: number | null; reference_year: number }>, year: number): string | null {
+  if (!rows || rows.length === 0) return null;
+  const inYear = rows.filter((r) => r.reference_year === year);
+  if (inYear.length === 0) return null;
+  const hasAnnual = inYear.some((r) => r.reference_month === null);
+  const months = inYear.map((r) => r.reference_month).filter((m): m is number => m !== null).sort((a, b) => a - b);
+  if (months.length === 0 && hasAnnual) return `${year} (anual)`;
+  if (months.length === 1) return `${MONTH_ABBR[months[0] - 1]}/${year}`;
+  if (months.length > 1) {
+    const min = months[0], max = months[months.length - 1];
+    const contiguous = max - min + 1 === months.length;
+    const label = contiguous
+      ? `${MONTH_ABBR[min - 1]}–${MONTH_ABBR[max - 1]}/${year}`
+      : `${months.length} meses em ${year}`;
+    return hasAnnual ? `${label} + anual` : label;
+  }
+  return `${year}`;
+}
+
+
 const MONTHS = [
   { v: null as number | null, label: "Anual" },
   { v: 1, label: "Jan" }, { v: 2, label: "Fev" }, { v: 3, label: "Mar" },
