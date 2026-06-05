@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 62,
-  patch: 12,
+  patch: 13,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.62.13",
+    date: "2026-06-05",
+    type: "minor" as const,
+    changes: [
+      "Configurações → Documentação — todos os documentos agora geram .docx em conformidade ABNT (Arial 12, A4, margens 3/2/3/2 cm, entrelinha 1,5, numeração de páginas). Foram adicionados quatro novos exportadores: `exportManualUsuarioDocx`, `exportGlossarioIndicadoresDocx`, `exportGuiaEduDocx` e `exportManualDiagnosticosDocx` em `src/lib/exportDocsDocx.ts` (via novo helper compartilhado `buildAndSave`). `src/pages/Configuracoes.tsx` foi atualizado para ligar cada item da lista de Guias e Manuais ao seu exportador e exibir todos com a versão corrente do app — encerrando o estado de \"Documento em preparação\" para Manual do Usuário, Glossário, Guia EDU e Manual de Diagnósticos."
+    ]
+  },
   {
     version: "1.62.12",
     date: "2026-06-05",
