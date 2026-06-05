@@ -17,6 +17,7 @@ import { ModuleRoute } from "@/components/layout/ModuleRoute";
 import { SplashScreen } from "@/components/SplashScreen";
 import { ClientErrorMonitor } from "@/components/ClientErrorMonitor";
 import { ReportJobWatcherMount } from "@/components/ReportJobWatcherMount";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Wrap React.lazy to auto-recover from stale chunk errors after a redeploy.
 // When the browser has a cached index.html referencing an old hashed chunk
@@ -175,6 +176,7 @@ const App = () => {
               <OrgModulesProvider>
               <ReportJobWatcherMount />
               <Suspense fallback={<PageLoader />}>
+              <ErrorBoundary label="routes">
               <Routes>
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/onboarding" element={<Onboarding />} />
