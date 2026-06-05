@@ -30,6 +30,7 @@ import { MetricHistoryDialog } from "@/components/observatorio/MetricHistoryDial
 import { useQueryClient } from "@tanstack/react-query";
 import { CsvImportDialog } from "@/components/observatorio/CsvImportDialog";
 import { RegressionAlertsPanel } from "@/components/observatorio/RegressionAlertsPanel";
+import { DiscoverEventsDialog } from "@/components/observatorio/DiscoverEventsDialog";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useDestinations } from "@/hooks/useDestinations";
 import { MapPin, Info } from "lucide-react";
