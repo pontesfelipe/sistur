@@ -160,6 +160,21 @@ export default function Observatorio() {
     return map;
   }, [summary]);
 
+  // Period label per metric_id (e.g. "Jan–Mar/2025") — derived from measurements
+  const periodByMetric = useMemo(() => {
+    const groups: Record<string, Array<{ reference_month: number | null; reference_year: number }>> = {};
+    (measurements as any[]).forEach((m) => {
+      if (!groups[m.metric_id]) groups[m.metric_id] = [];
+      groups[m.metric_id].push({ reference_month: m.reference_month, reference_year: m.reference_year });
+    });
+    const out: Record<string, string | null> = {};
+    Object.entries(groups).forEach(([id, rows]) => {
+      out[id] = buildPeriodLabel(rows, year);
+    });
+    return out;
+  }, [measurements, year]);
+
+
   const categories = Object.keys(CATEGORY_META);
 
   const handleSaveMeasurement = async () => {
