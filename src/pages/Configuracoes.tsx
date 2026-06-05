@@ -30,7 +30,14 @@ import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
-import { exportMetodologiaDocx, exportFAQDocx } from '@/lib/exportDocsDocx';
+import {
+  exportMetodologiaDocx,
+  exportFAQDocx,
+  exportManualUsuarioDocx,
+  exportGlossarioIndicadoresDocx,
+  exportGuiaEduDocx,
+  exportManualDiagnosticosDocx,
+} from '@/lib/exportDocsDocx';
 import { exportTechnicalDocx } from '@/lib/exportTechnicalDocx';
 import { 
   BookOpen, 
@@ -390,7 +397,8 @@ export default function Configuracoes() {
                   <DocumentDownloadItem
                     title="Manual do Usuário SISTUR"
                     description="Guia completo de navegação e uso do sistema"
-                    version="v1.0"
+                    version={`v${APP_VERSION.full}`}
+                    onDownload={() => exportManualUsuarioDocx()}
                   />
                   
                   <DocumentDownloadItem
@@ -403,19 +411,22 @@ export default function Configuracoes() {
                   <DocumentDownloadItem
                     title="Glossário de Indicadores"
                     description="41 indicadores com definição, fonte oficial e periodicidade"
-                    version="v1.2"
+                    version={`v${APP_VERSION.full}`}
+                    onDownload={() => exportGlossarioIndicadoresDocx()}
                   />
 
                   <DocumentDownloadItem
                     title="Guia SISTUR EDU"
                     description="Sistema de prescrição determinística de capacitação"
-                    version="v1.0"
+                    version={`v${APP_VERSION.full}`}
+                    onDownload={() => exportGuiaEduDocx()}
                   />
 
                   <DocumentDownloadItem
                     title="Manual de Diagnósticos"
                     description="Como criar, calcular e interpretar diagnósticos territoriais"
-                    version="v1.1"
+                    version={`v${APP_VERSION.full}`}
+                    onDownload={() => exportManualDiagnosticosDocx()}
                   />
 
                   <DocumentDownloadItem
