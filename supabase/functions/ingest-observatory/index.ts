@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     if (guard instanceof Response) return guard;
   }
 
-  let body: { smoke_test?: boolean; year?: number; month?: number | null; triggered_by?: string } = {};
+  let body: { smoke_test?: boolean; year?: number; month?: number | null; triggered_by?: string; baseline_monthly?: boolean } = {};
   try { body = await req.json(); } catch { /* noop */ }
 
   if (body.smoke_test) {
@@ -145,6 +145,36 @@ Deno.serve(async (req) => {
             notes: `Auto-derivado de ${map.external_indicator}`,
           }, { onConflict: "org_id,metric_id,reference_year,reference_month" });
         if (upErr) { failed += 1; } else { inserted += 1; processed += 1; }
+
+        // Baseline anualizado: para fontes anuais, distribui valor/12 nos meses 1..11
+        // marcando como estimativa. Não sobrescreve valores reais já existentes.
+        if (map.cadence === "annual" && body.baseline_monthly !== false) {
+          const monthlyEstimate = value / 12;
+          for (let m = 1; m <= 11; m++) {
+            // Só insere se não existir registro real para esse mês
+            const { data: existing } = await admin
+              .from("observatory_measurements")
+              .select("id, notes")
+              .eq("org_id", orgId)
+              .eq("metric_id", metricId)
+              .eq("reference_year", yr)
+              .eq("reference_month", m)
+              .maybeSingle();
+            if (existing && !(existing.notes ?? "").includes("estimativa mensal")) continue;
+            const { error: estErr } = await admin
+              .from("observatory_measurements")
+              .upsert({
+                org_id: orgId,
+                metric_id: metricId,
+                reference_year: yr,
+                reference_month: m,
+                value: monthlyEstimate,
+                source: `${map.source_label} (estimativa mensal)`,
+                notes: `Baseline anualizado: valor anual de ${map.external_indicator} dividido por 12 (estimativa mensal). Será substituído por dado real quando disponível.`,
+              }, { onConflict: "org_id,metric_id,reference_year,reference_month" });
+            if (estErr) { failed += 1; } else { inserted += 1; processed += 1; }
+          }
+        }
       }
     }
     details.push({ metric: map.metric_code, count: inserted });
