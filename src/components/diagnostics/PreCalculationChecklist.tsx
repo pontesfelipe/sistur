@@ -20,17 +20,23 @@ const PILLAR_META = {
 export function PreCalculationChecklist({ indicators, indicatorValues, tier, isEnterprise }: Props) {
   const analysis = useMemo(() => {
     const filledCodes = new Set(indicatorValues.filter((v: any) => !v.is_ignored && v.value != null).map((v: any) => v.indicator?.code || v.indicator_id));
-    
-    const filteredIndicators = tier 
-      ? indicators.filter((ind: any) => {
-          const indTier = ind.tier || 'essential';
-          if (tier === 'essential') return indTier === 'essential';
-          if (tier === 'strategic') return indTier === 'essential' || indTier === 'strategic';
-          return true;
-        })
-      : indicators;
 
-    const byPillar: Record<string, { total: number; filled: number; missing: string[] }> = {};
+    // Tier semantics must match the manual entry form (DataImportPanel +
+    // useIndicators hook): SMALL ⊂ MEDIUM ⊂ COMPLETE on `minimum_tier`.
+    // Accept legacy lowercase values just in case.
+    const normalizedTier = String(tier || 'COMPLETE').toUpperCase();
+    const allowedTiers: Set<string> =
+      normalizedTier === 'SMALL' || normalizedTier === 'ESSENTIAL'
+        ? new Set(['SMALL'])
+        : normalizedTier === 'MEDIUM' || normalizedTier === 'STRATEGIC'
+          ? new Set(['SMALL', 'MEDIUM'])
+          : new Set(['SMALL', 'MEDIUM', 'COMPLETE']);
+    const filteredIndicators = indicators.filter((ind: any) => {
+      const indTier = (ind.minimum_tier || ind.tier || 'SMALL').toUpperCase();
+      return allowedTiers.has(indTier);
+    });
+
+    const byPillar: Record<string, { total: number; filled: number; missing: { code: string; name: string }[] }> = {};
     
     filteredIndicators.forEach((ind: any) => {
       const pillar = ind.pillar || 'RA';
@@ -39,7 +45,7 @@ export function PreCalculationChecklist({ indicators, indicatorValues, tier, isE
       if (filledCodes.has(ind.code) || filledCodes.has(ind.id)) {
         byPillar[pillar].filled++;
       } else {
-        byPillar[pillar].missing.push(ind.name || ind.code);
+        byPillar[pillar].missing.push({ code: ind.code, name: ind.name || ind.code });
       }
     });
 
@@ -110,20 +116,28 @@ export function PreCalculationChecklist({ indicators, indicatorValues, tier, isE
                   </span>
                 </div>
                 <Progress value={pct} className="h-1.5 mb-2" />
-                {data.missing.length > 0 && data.missing.length <= 5 && (
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {data.missing.slice(0, 5).map((name, i) => (
-                      <span key={i} className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Circle className="h-2.5 w-2.5" />
-                        {name}
-                      </span>
-                    ))}
+                {data.missing.length > 0 && (
+                  <div className="mt-1 space-y-1">
+                    <p className="text-[11px] font-medium text-muted-foreground">
+                      Faltam preencher ({data.missing.length}):
+                    </p>
+                    <ul className="space-y-0.5 max-h-32 overflow-auto pr-1">
+                      {data.missing.map((item, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-1 text-xs text-muted-foreground"
+                          title={`Código: ${item.code}`}
+                        >
+                          <Circle className="h-2.5 w-2.5 mt-1 shrink-0" />
+                          <span className="leading-snug">
+                            <span className="font-mono text-[10px] text-foreground/70">{item.code}</span>
+                            {' — '}
+                            {item.name}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                )}
-                {data.missing.length > 5 && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    +{data.missing.length - 5} indicadores faltantes
-                  </p>
                 )}
               </div>
             );

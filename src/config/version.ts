@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.2",
+    date: "2026-06-15",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico — corrigida divergência entre o painel \"Validação Pré-Cálculo\" e o formulário de entrada manual. O contador de completude agora considera apenas indicadores compatíveis com o tier (SMALL/MEDIUM/COMPLETE) e o escopo (territorial/enterprise) realmente exibidos no formulário, eliminando o resíduo de ~3% que travava o preenchimento em 97% sem campos visíveis para completar.",
+      "Diagnóstico — o checklist pré-cálculo agora lista TODOS os indicadores faltantes por pilar (com código e nome) em vez de truncar em 5, permitindo localizar rapidamente cada campo a preencher na aba Dados (filtro \"Faltantes\").",
+    ],
+  },
   {
     version: "1.64.1",
     date: "2026-06-05",
