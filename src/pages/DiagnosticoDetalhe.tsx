@@ -138,8 +138,13 @@ const DiagnosticoDetalhe = () => {
   // Read assessment first to know whether MST extension is enabled
   const { data: assessment, isLoading: loadingAssessment, refetch: refetchAssessment } = useAssessment(id);
   const includeMandala = (assessment as any)?.expand_with_mandala === true;
-  const { indicators } = useIndicators({ includeMandala });
-  const { indicators: enterpriseIndicators = [] } = useIndicators({ scope: 'enterprise', includeMandala });
+  // Use the SAME scope+tier as the manual entry form (DataImportPanel) so the
+  // "X de Y indicadores preenchidos" counter doesn't include indicators that
+  // the user can't actually see/fill in their tier. Otherwise the completeness
+  // bar gets stuck below 100% with no visible field to fill.
+  const assessmentTier = ((assessment as any)?.tier || 'COMPLETE') as 'SMALL' | 'MEDIUM' | 'COMPLETE';
+  const { indicators } = useIndicators({ scope: 'territorial', tier: assessmentTier, includeMandala });
+  const { indicators: enterpriseIndicators = [] } = useIndicators({ scope: 'enterprise', tier: assessmentTier, includeMandala });
   const { user } = useAuth();
   const [isPreFillOpen, setIsPreFillOpen] = useState(false);
   const [orgId, setOrgId] = useState<string | undefined>();
