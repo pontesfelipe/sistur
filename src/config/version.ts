@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.3",
+    date: "2026-06-15",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — corrigido falso \"[auto-cleanup] Worker excedeu o limite\" que marcava como `failed` jobs de geração de relatório ainda em execução. O worker (`process-report-job`) agora envia heartbeat de `last_attempt_at` a cada 30s junto com o progresso, evitando que o cron `cleanup_stuck_report_jobs` (gatilho >15 min) mate jobs vivos durante a validação final pós-pilar — sintoma reportado nos destinos Piracaia, Atibaia e Barretos, onde os 3 pilares (RA/OE/AO) já estavam cacheados em `partial_pillars` mas a coerência final demorava mais que a janela do cleanup.",
+    ],
+  },
   {
     version: "1.64.2",
     date: "2026-06-15",
