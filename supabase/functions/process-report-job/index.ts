@@ -174,13 +174,19 @@ serve(async (req) => {
       }
     }, 15_000);
 
-    // Atualizador de progresso
+    // Atualizador de progresso + heartbeat.
+    // v1.64.3 — também atualiza `last_attempt_at` para evitar que o cron
+    // `cleanup_stuck_report_jobs` (gatilho >15 min) mate jobs que ainda
+    // estão vivos. Sem este heartbeat, validações longas (pós-pilar) eram
+    // marcadas como `[auto-cleanup] Worker excedeu o limite` mesmo estando
+    // ativas — sintoma observado em Piracaia, Atibaia e Barretos.
     let pct = 15;
     const progressTimer = setInterval(() => {
       pct = Math.min(90, pct + 5);
       supabaseAdmin.from("report_jobs").update({
         progress_pct: pct,
         stage: `[trace=${traceId}] ${pct < 50 ? "Gerando narrativa com IA" : "Validando coerência e persistindo"}`,
+        last_attempt_at: new Date().toISOString(),
       }).eq("id", jobId).then(() => {}, () => {});
     }, 30_000);
 
