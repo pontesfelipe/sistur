@@ -13,6 +13,7 @@ import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCateg
 import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculationChecklist';
 import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePanel';
 import { AssessmentAuditTrail } from '@/components/diagnostics/AssessmentAuditTrail';
+import { DataLineageView } from '@/components/diagnostics/DataLineageView';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { PrescriptionModeView } from '@/components/diagnostics/PrescriptionModeView';
@@ -68,6 +69,7 @@ import {
   RefreshCw,
   Target,
   MessageSquare,
+  GitBranch,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -846,7 +848,7 @@ const DiagnosticoDetalhe = () => {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className={cn(
             "grid w-full",
-            isEnterprise ? "max-w-6xl grid-cols-9" : "max-w-5xl grid-cols-8"
+            isEnterprise ? "max-w-6xl grid-cols-10" : "max-w-5xl grid-cols-9"
           )}>
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -885,6 +887,10 @@ const DiagnosticoDetalhe = () => {
             <TabsTrigger value="comentarios" className="gap-2">
               <MessageSquare className="h-4 w-4" />
               <span className="hidden sm:inline">Comentários</span>
+            </TabsTrigger>
+            <TabsTrigger value="linhagem" className="gap-2">
+              <GitBranch className="h-4 w-4" />
+              <span className="hidden sm:inline">Linhagem</span>
             </TabsTrigger>
           </TabsList>
 
@@ -1050,6 +1056,20 @@ const DiagnosticoDetalhe = () => {
               orgId={assessment.org_id}
               title="Discussão sobre o diagnóstico"
               description="Compartilhe observações com sua equipe e marque colegas com @ para envolvê-los."
+            />
+          </TabsContent>
+
+          {/* Linhagem dos Dados Tab */}
+          <TabsContent value="linhagem" className="space-y-4">
+            <DataLineageView
+              auditRows={auditRows as any}
+              indicatorValues={indicatorValues as any}
+              pillarScores={pillarScores as any}
+              finalScore={
+                pillarScores.length > 0
+                  ? pillarScores.reduce((sum: number, p: any) => sum + (Number(p.score) || 0), 0) / pillarScores.length
+                  : null
+              }
             />
           </TabsContent>
         </Tabs>

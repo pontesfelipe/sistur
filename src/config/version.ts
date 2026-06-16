@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 65,
-  patch: 5,
+  minor: 66,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.0",
+    date: "2026-06-16",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico — nova aba 'Linhagem' (Data Lineage) na tela de detalhes do diagnóstico. Visualização em fluxo de 4 colunas (Fontes → Indicadores por tipo → Pilares → Score Final) que rastreia a procedência de cada indicador desde a origem (IBGE, CADASTUR, STN, DATASUS, INEP, manual, derivado) até a composição final do score. Inclui contadores por fonte, distribuição percentual oficial/derivado/manual em cada pilar, barra empilhada por pilar e legenda de cores consistente com o painel de Procedência.",
+    ],
+  },
   {
     version: "1.65.5",
     date: "2026-06-16",
