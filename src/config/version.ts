@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 12,
+  patch: 13,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.13",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Professor Beni — regra de desambiguação: quando o usuário pedir análise sobre \"um diagnóstico\", \"o relatório\", \"esse\", \"aquele\" ou termos genéricos, Beni agora sempre lista os diagnósticos/relatórios acessíveis pelo nome exato (com destino entre parênteses, em formato TTS-friendly: \"primeira opção...\", \"segunda opção...\") e pergunta qual deles analisar antes de responder. Só pula a confirmação quando o usuário citou o nome exato na mesma frase ou quando há apenas um item acessível (nesse caso confirma com \"você quer que eu analise [nome]?\").",
+    ],
+  },
   {
     version: "1.64.12",
     date: "2026-06-16",
