@@ -114,29 +114,29 @@ export default function GamesHub() {
 
   return (
     <AppLayout title="Jogos Educacionais">
-      <div className="max-w-4xl mx-auto relative">
+      <div className="max-w-4xl mx-auto relative px-1 sm:px-0">
         <FloatingBgParticles />
 
-        <div className="mb-8 relative z-10">
-          <h1 className="text-3xl font-display font-bold text-foreground flex items-center gap-3">
-            <SpriteOrEmoji emoji="🎮" className="w-8 h-8" /> Jogos Educacionais
+        <div className="mb-5 sm:mb-8 relative z-10">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
+            <SpriteOrEmoji emoji="🎮" className="w-7 h-7 sm:w-8 sm:h-8" /> Jogos Educacionais
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm sm:text-base text-muted-foreground mt-1.5 sm:mt-2">
             Aprenda sobre sustentabilidade e gestão territorial de forma divertida
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 relative z-10">
           {games.map((game, i) => (
             <motion.button
               key={game.id}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.15 }}
+              transition={{ delay: i * 0.1, type: 'spring', stiffness: 220, damping: 22 }}
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => navigate(game.href)}
-              className={`relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br ${game.gradient} p-8 text-left text-white shadow-xl hover:shadow-2xl transition-shadow group`}
+              className={`relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${game.gradient} p-5 sm:p-8 text-left text-white shadow-xl hover:shadow-2xl transition-shadow group min-h-[180px] active:scale-[0.98] touch-manipulation`}
             >
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
               {/* Shimmer effect on hover */}
@@ -148,23 +148,23 @@ export default function GamesHub() {
               />
               <div className="relative z-10">
                 {/* Tags row */}
-                <div className="flex items-center gap-2 mb-3 flex-wrap">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${game.difficultyColor}`}>
-                    <Star className="h-2.5 w-2.5 inline mr-0.5 -mt-px" />{game.difficulty}
+                <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${game.difficultyColor} inline-flex items-center gap-0.5`}>
+                    <Star className="h-2.5 w-2.5" />{game.difficulty}
                   </span>
-                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${game.tagColor}`}>
-                    <Zap className="h-2.5 w-2.5 inline mr-0.5 -mt-px" />{game.tag}
+                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${game.tagColor} inline-flex items-center gap-0.5`}>
+                    <Zap className="h-2.5 w-2.5" />{game.tag}
                   </span>
-                  <span className="text-[10px] text-white/50 flex items-center gap-0.5 ml-auto">
+                  <span className="text-[10px] text-white/60 flex items-center gap-0.5 ml-auto">
                     <Clock className="h-2.5 w-2.5" />{game.duration}
                   </span>
                 </div>
 
-                <div className="mb-4">
-                  <SpriteOrEmoji emoji={game.emoji} className="w-14 h-14" />
+                <div className="mb-3 sm:mb-4">
+                  <SpriteOrEmoji emoji={game.emoji} className="w-12 h-12 sm:w-14 sm:h-14" />
                 </div>
-                <h3 className="text-2xl font-bold mb-2">{game.title}</h3>
-                <p className="text-sm text-white/80 leading-relaxed">{game.description}</p>
+                <h3 className="text-xl sm:text-2xl font-bold mb-1.5 sm:mb-2 leading-tight">{game.title}</h3>
+                <p className="text-[13px] sm:text-sm text-white/80 leading-relaxed line-clamp-3 sm:line-clamp-none">{game.description}</p>
                 <div className="mt-4 inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-sm font-medium backdrop-blur group-hover:bg-white/30 transition-colors">
                   <game.icon className="h-4 w-4" />
                   Jogar
@@ -177,11 +177,11 @@ export default function GamesHub() {
                   </motion.span>
                 </div>
               </div>
-              <div className="absolute -bottom-4 -right-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <div className="absolute -bottom-4 -right-4 opacity-[0.08] group-hover:opacity-20 transition-opacity pointer-events-none">
                 {getEmojiSprite(game.emoji) ? (
-                  <img src={getEmojiSprite(game.emoji)!} alt="" className="w-32 h-32 object-contain" draggable={false} />
+                  <img src={getEmojiSprite(game.emoji)!} alt="" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" draggable={false} />
                 ) : (
-                  <span className="text-[120px]">{game.emoji}</span>
+                  <span className="text-[96px] sm:text-[120px]">{game.emoji}</span>
                 )}
               </div>
             </motion.button>
