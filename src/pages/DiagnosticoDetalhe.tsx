@@ -1058,6 +1058,20 @@ const DiagnosticoDetalhe = () => {
               description="Compartilhe observações com sua equipe e marque colegas com @ para envolvê-los."
             />
           </TabsContent>
+
+          {/* Linhagem dos Dados Tab */}
+          <TabsContent value="linhagem" className="space-y-4">
+            <DataLineageView
+              auditRows={auditRows as any}
+              indicatorValues={indicatorValues as any}
+              pillarScores={pillarScores as any}
+              finalScore={
+                pillarScores.length > 0
+                  ? pillarScores.reduce((sum: number, p: any) => sum + (Number(p.score) || 0), 0) / pillarScores.length
+                  : null
+              }
+            />
+          </TabsContent>
         </Tabs>
       ) : (
         /* Pre-calculation state */
