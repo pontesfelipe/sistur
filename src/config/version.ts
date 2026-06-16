@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 10,
+  patch: 11,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.11",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Configurações — nova aba \"Beni\" exibindo as regras de conversa, persona, formato TTS-friendly, base teórica injetada, contexto dinâmico, guardrails de escopo e infraestrutura (modelo Gemini via Lovable AI Gateway) usados pelo Professor Beni Chat. Painel é informativo: o prompt real continua na edge function beni-chat para evitar prompt injection pelo cliente.",
+    ],
+  },
   {
     version: "1.64.10",
     date: "2026-06-16",
