@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 8,
+  patch: 9,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.9",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Hotfix — abrir um relatório no histórico (/relatorios) quebrava com React error #310 (\"Rendered more hooks than during the previous render\"). Causa: na v1.64.7 adicionei `useMemo` + `useQuery` para resolver os nomes dos indicadores DEPOIS do `if (!data) return null` no `ReportValidationBanner`, violando as Rules of Hooks. Movidos os dois hooks para ANTES do early-return.",
+    ],
+  },
   {
     version: "1.64.8",
     date: "2026-06-16",
