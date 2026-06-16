@@ -23,9 +23,9 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.64.14",
+    version: "1.65.0",
     date: "2026-06-16",
-    type: "patch" as const,
+    type: "minor" as const,
     changes: [
       "Professor Beni — nova seção 'O que você pode perguntar' na sidebar da página /beni, listando explicitamente: diagnósticos e relatórios acessíveis (com confirmação de nome), metodologia (RA/OE/AO, IGMA), prescrições/cursos, e turismo sustentável. Inclui também os limites de escopo (não responde sobre programação, saúde, política, religião ou temas fora do turismo/SISTUR).",
     ],
