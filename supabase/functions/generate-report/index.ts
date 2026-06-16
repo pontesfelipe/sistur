@@ -2149,6 +2149,8 @@ async function runReportValidatorAgent(
   auditRows: any[],
   apiKey: string,
   globalRefs: any[] = [],
+  validatorProvider: 'claude' | 'gpt5' | 'gemini' = 'gemini',
+  anthropicApiKey?: string,
 ): Promise<string[]> {
   if (!reportText || !apiKey) return [];
   try {
@@ -2214,30 +2216,67 @@ ${reportText.slice(0, 18000)}`;
     // relatório segue para persistência normalmente.
     const validatorAbort = new AbortController();
     const validatorTimer = setTimeout(() => validatorAbort.abort('validator-timeout-75s'), 75_000);
-    let resp: Response;
+    // v1.64.5 — Validador usa o MESMO provider escolhido pelo usuário para
+    // gerar o relatório (Claude / GPT-5 / Gemini). Mantém consistência factual
+    // (mesmo modelo que escreveu o texto faz a checagem) e evita pendurar em
+    // gemini-2.5-pro quando o usuário escolheu outro modelo. Claude vai direto
+    // na Anthropic; demais vão pelo Lovable Gateway.
+    let content: string | null = null;
     try {
-      resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-pro',
-          messages: [
-            { role: 'system', content: sys },
-            { role: 'user', content: usr },
-          ],
-          response_format: { type: 'json_object' },
-        }),
-        signal: validatorAbort.signal,
-      });
+      if (validatorProvider === 'claude' && anthropicApiKey) {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': anthropicApiKey,
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-5-20250929',
+            max_tokens: 2000,
+            system: sys + '\n\nIMPORTANTE: devolva ESTRITAMENTE um JSON válido no formato {"issues": ["...", "..."]} — nada antes, nada depois.',
+            messages: [{ role: 'user', content: usr }],
+          }),
+          signal: validatorAbort.signal,
+        });
+        if (!resp.ok) {
+          console.warn('Validator (claude) HTTP', resp.status);
+          return [];
+        }
+        const data = await resp.json();
+        const raw = data?.content?.[0]?.text;
+        if (typeof raw === 'string') {
+          // Claude pode envolver com texto extra — extrai o primeiro objeto JSON
+          const m = raw.match(/\{[\s\S]*\}/);
+          content = m ? m[0] : raw;
+        }
+      } else {
+        const model = validatorProvider === 'gpt5'
+          ? 'openai/gpt-5'
+          : 'google/gemini-2.5-pro';
+        const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: 'system', content: sys },
+              { role: 'user', content: usr },
+            ],
+            response_format: { type: 'json_object' },
+          }),
+          signal: validatorAbort.signal,
+        });
+        if (!resp.ok) {
+          console.warn(`Validator (${validatorProvider}) HTTP`, resp.status);
+          return [];
+        }
+        const data = await resp.json();
+        content = data?.choices?.[0]?.message?.content ?? null;
+      }
     } finally {
       clearTimeout(validatorTimer);
     }
-    if (!resp.ok) {
-      console.warn('Validator agent HTTP', resp.status);
-      return [];
-    }
-    const data = await resp.json();
-    const content = data?.choices?.[0]?.message?.content;
     if (!content) return [];
     const parsed = JSON.parse(content);
     const issues = Array.isArray(parsed?.issues) ? parsed.issues : [];
@@ -3557,6 +3596,8 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               auditTrail || [],
               LOVABLE_API_KEY,
               globalRefs,
+              usedProvider,
+              ANTHROPIC_API_KEY ?? undefined,
             );
           } finally {
             clearInterval(validatorHeartbeat);

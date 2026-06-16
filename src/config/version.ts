@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.5",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — o agente validador de coerência (passo 92%) agora usa o MESMO modelo escolhido pelo usuário para gerar o relatório (Claude / GPT-5 / Gemini). Antes era sempre gemini-2.5-pro, independentemente da escolha — o que causava troca de provider no meio do pipeline e podia pendurar a validação quando o usuário tinha selecionado Claude/GPT-5. Claude vai direto na Anthropic (claude-sonnet-4-5), GPT-5 e Gemini seguem pelo Lovable Gateway. Mantém o timeout duro de 75s e heartbeat SSE de 20s (v1.64.4). Validação continua não-bloqueante.",
+    ],
+  },
   {
     version: "1.64.4",
     date: "2026-06-16",
