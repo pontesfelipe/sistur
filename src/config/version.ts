@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 65,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.65.2",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Jogos Educacionais — TCG (Guardião do Território): refinamento visual. Top bar mais compacto em mobile (440px) com título encurtado para 'GUARDIÃO', botões com hit area 40x40 e hover state âmbar, badges separados para moedas e turno. Background atmosférico com vinheta radial âmbar no topo. Toast de feedback animado com Framer Motion (spring). Overlays de vitória e derrota com motion + glow âmbar/vermelho, troféu pulsando, caveira sacudindo. Mantida toda a lógica de jogo.",
+    ],
+  },
   {
     version: "1.65.1",
     date: "2026-06-16",
