@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download, Pencil, Save, Loader2, Zap } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -284,6 +284,29 @@ export function ReportValidationBanner({
   const aiIssues = Array.isArray(data.ai_issues) ? data.ai_issues : [];
   const issuesCount = determIssues.length + aiIssues.length;
   const correctionsCount = corrections.length;
+
+  // Busca o nome legível dos indicadores citados nas correções (ex.: OE007 -> "Taxa de ocupação hoteleira")
+  const correctionCodes = useMemo(
+    () => Array.from(new Set(corrections.map((c) => c.indicator).filter(Boolean))),
+    [corrections],
+  );
+  const { data: indicatorNameMap } = useQuery<Record<string, string>>({
+    queryKey: ['indicator-names-by-code', correctionCodes],
+    enabled: correctionCodes.length > 0,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data: inds, error } = await supabase
+        .from('indicators')
+        .select('code, name')
+        .in('code', correctionCodes);
+      if (error) return {};
+      const map: Record<string, string> = {};
+      (inds ?? []).forEach((i: any) => {
+        if (i?.code) map[i.code] = i.name ?? '';
+      });
+      return map;
+    },
+  });
 
   // Silencioso quando tudo bate
   if (issuesCount === 0 && correctionsCount === 0) return null;
