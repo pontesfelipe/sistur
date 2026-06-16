@@ -503,15 +503,43 @@ export function ReportValidationBanner({
                     automaticamente.
                   </p>
                   <ul className="space-y-2 text-sm">
-                    {corrections.map((c, idx) => (
-                      <li key={idx} className="rounded-md border border-border bg-muted/30 px-3 py-2">
-                        <div className="font-medium text-foreground">
-                          {c.indicator}
+                    {corrections.map((c, idx) => {
+                      const fix = appliedFixes?.[c.indicator];
+                      const isApplied = Boolean(fix);
+                      return (
+                      <li
+                        key={idx}
+                        className={`rounded-md border px-3 py-2 ${
+                          isApplied
+                            ? 'border-severity-good/40 bg-severity-good/5'
+                            : 'border-border bg-muted/30'
+                        }`}
+                      >
+                        <div className="font-medium text-foreground flex items-center gap-2 flex-wrap">
+                          <span>{c.indicator}</span>
                           {indicatorNameMap?.[c.indicator] ? (
                             <span className="text-muted-foreground font-normal">
-                              {' '}— {indicatorNameMap[c.indicator]}
+                              — {indicatorNameMap[c.indicator]}
                             </span>
                           ) : null}
+                          {isApplied ? (
+                            <Badge
+                              variant="outline"
+                              className="gap-1 border-severity-good/40 bg-severity-good/15 text-severity-good"
+                              title={
+                                fix?.collected_at
+                                  ? `Fixado em ${new Date(fix.collected_at).toLocaleString('pt-BR')}`
+                                  : 'Fixado na tabela de auditoria'
+                              }
+                            >
+                              <BadgeCheck className="h-3 w-3" />
+                              Corrigido na auditoria
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="gap-1 text-muted-foreground">
+                              Pendente de fixação
+                            </Badge>
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
                           <span className="font-medium text-foreground">Problema:</span> a IA citou{' '}
@@ -522,6 +550,14 @@ export function ReportValidationBanner({
                           substituído por <span className="text-foreground font-medium">{c.to}</span>{' '}
                           (fonte oficial) — aplicado no texto final.
                         </div>
+                        {isApplied && fix?.source ? (
+                          <div className="text-[11px] text-muted-foreground mt-1">
+                            Origem da correção: <span className="text-foreground">{fix.source}</span>
+                            {fix.collected_at
+                              ? ` · ${new Date(fix.collected_at).toLocaleString('pt-BR')}`
+                              : ''}
+                          </div>
+                        ) : null}
                         <div className="flex flex-wrap gap-2 pt-2">
                           {canEditReport && (
                             <Button
@@ -547,12 +583,13 @@ export function ReportValidationBanner({
                               onClick={() => setFixIndicator(c)}
                             >
                               <Wrench className="h-3 w-3" />
-                              Corrigir indicador
+                              {isApplied ? 'Revisar valor fixado' : 'Corrigir indicador'}
                             </Button>
                           )}
                         </div>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 </section>
               )}
