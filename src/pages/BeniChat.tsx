@@ -107,15 +107,45 @@ export default function BeniChat() {
             </CardContent>
           </Card>
 
-          {/* Info Alert */}
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertTitle>Dica</AlertTitle>
-            <AlertDescription className="text-sm">
-              Você pode perguntar sobre qualquer aspecto da metodologia sistêmica, 
-              desde conceitos básicos até interpretações avançadas de diagnósticos.
-            </AlertDescription>
-          </Alert>
+          {/* What to Ask Card */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Info className="h-4 w-4 text-primary" />
+                O que você pode perguntar
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm text-muted-foreground space-y-3">
+              <p className="text-foreground font-medium">
+                O Professor Beni pode responder sobre os temas abaixo, sempre com base na metodologia SISTUR:
+              </p>
+              <ul className="space-y-2">
+                <li className="flex gap-2">
+                  <span className="shrink-0 text-primary">•</span>
+                  <span><strong className="text-foreground">Seus diagnósticos:</strong> pergunte sobre diagnósticos que você já realizou. O Beni vai confirmar o nome exato antes de analisar.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="shrink-0 text-primary">•</span>
+                  <span><strong className="text-foreground">Seus relatórios:</strong> pergunte sobre relatórios gerados no sistema. O Beni vai confirmar o nome exato antes de analisar.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="shrink-0 text-primary">•</span>
+                  <span><strong className="text-foreground">Metodologia:</strong> conceitos dos pilares RA, OE e AO, as 6 regras do IGMA, teoria sistêmica do turismo.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="shrink-0 text-primary">•</span>
+                  <span><strong className="text-foreground">Prescrições e cursos:</strong> recomendações de formação baseadas em indicadores em Atenção ou Crítico.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="shrink-0 text-primary">•</span>
+                  <span><strong className="text-foreground">Turismo sustentável:</strong> boas práticas, governança, planejamento e gestão de destinos.</span>
+                </li>
+              </ul>
+              <div className="pt-1 text-xs border-t border-border pt-2">
+                <strong className="text-foreground">Limites:</strong> o Beni não responde sobre programação, saúde, política, religião ou temas fora do turismo e da metodologia SISTUR.
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </AppLayout>
