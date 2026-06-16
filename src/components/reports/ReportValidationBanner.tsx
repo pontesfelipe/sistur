@@ -446,10 +446,25 @@ export function ReportValidationBanner({
                     substituído pelo número oficial da tabela de auditoria antes do relatório ser
                     salvo. Nenhuma ação adicional é necessária — o documento já está consistente.
                   </p>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    <span className="font-medium text-foreground">O que é a "tabela oficial":</span>{' '}
+                    é a tabela de auditoria do diagnóstico (<code>indicator_values</code>) — onde
+                    ficam os valores numéricos confirmados por você ou importados das fontes
+                    oficiais (IBGE, CADASTUR, STN, DATASUS, INEP etc.). Quando a IA cita um número
+                    diferente do que está nessa tabela, o sistema substitui pelo valor oficial
+                    automaticamente.
+                  </p>
                   <ul className="space-y-2 text-sm">
                     {corrections.map((c, idx) => (
                       <li key={idx} className="rounded-md border border-border bg-muted/30 px-3 py-2">
-                        <div className="font-medium text-foreground">{c.indicator}</div>
+                        <div className="font-medium text-foreground">
+                          {c.indicator}
+                          {indicatorNameMap?.[c.indicator] ? (
+                            <span className="text-muted-foreground font-normal">
+                              {' '}— {indicatorNameMap[c.indicator]}
+                            </span>
+                          ) : null}
+                        </div>
                         <div className="text-xs text-muted-foreground mt-1">
                           <span className="font-medium text-foreground">Problema:</span> a IA citou{' '}
                           <span className="line-through">{c.from}</span>, divergente da tabela oficial.
