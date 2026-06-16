@@ -3543,12 +3543,24 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           await safeWrite(`: validating ${Date.now()}\n\n`);
           logger.stage('validation_agent_start');
           await logger.bumpJobStage(supabaseAdmin, 'Validando coerência com agente IA', { progress_pct: 92 });
-          aiIssues = await runReportValidatorAgent(
-            workingText,
-            auditTrail || [],
-            LOVABLE_API_KEY,
-            globalRefs,
-          );
+          // v1.64.4 — Heartbeat de keepalive (a cada 20s) durante a validação
+          // com agente IA. O worker (`process-report-job`) aborta o stream se
+          // ficar mais de 4 min sem chunks; como a validação é uma única call
+          // bloqueante de até ~75s, emitimos comentários SSE periódicos para
+          // que o `lastChunkAt` do worker continue avançando.
+          const validatorHeartbeat = setInterval(() => {
+            safeWrite(`: validator_heartbeat ${Date.now()}\n\n`).catch(() => {});
+          }, 20_000);
+          try {
+            aiIssues = await runReportValidatorAgent(
+              workingText,
+              auditTrail || [],
+              LOVABLE_API_KEY,
+              globalRefs,
+            );
+          } finally {
+            clearInterval(validatorHeartbeat);
+          }
           logger.stage('validation_agent_done', { aiIssues: aiIssues.length, deterministic: deterministic.length, autoCorrections: autoCorrections.length });
           const allIssues = [
             ...deterministic.map((w) => `[determinístico] ${w}`),
