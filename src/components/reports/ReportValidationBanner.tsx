@@ -277,19 +277,13 @@ export function ReportValidationBanner({
     staleTime: 30_000,
   });
 
-  if (!data) return null;
+  // Códigos de indicador citados nas correções automáticas (ex.: OE007).
+  // Calculado SEMPRE (antes de qualquer early-return) para respeitar as regras de hooks.
+  const correctionCodes = useMemo(() => {
+    const list = Array.isArray(data?.auto_corrections) ? data!.auto_corrections : [];
+    return Array.from(new Set(list.map((c) => c.indicator).filter(Boolean)));
+  }, [data]);
 
-  const corrections = Array.isArray(data.auto_corrections) ? data.auto_corrections : [];
-  const determIssues = Array.isArray(data.deterministic_issues) ? data.deterministic_issues : [];
-  const aiIssues = Array.isArray(data.ai_issues) ? data.ai_issues : [];
-  const issuesCount = determIssues.length + aiIssues.length;
-  const correctionsCount = corrections.length;
-
-  // Busca o nome legível dos indicadores citados nas correções (ex.: OE007 -> "Taxa de ocupação hoteleira")
-  const correctionCodes = useMemo(
-    () => Array.from(new Set(corrections.map((c) => c.indicator).filter(Boolean))),
-    [corrections],
-  );
   const { data: indicatorNameMap } = useQuery<Record<string, string>>({
     queryKey: ['indicator-names-by-code', correctionCodes],
     enabled: correctionCodes.length > 0,
@@ -307,6 +301,14 @@ export function ReportValidationBanner({
       return map;
     },
   });
+
+  if (!data) return null;
+
+  const corrections = Array.isArray(data.auto_corrections) ? data.auto_corrections : [];
+  const determIssues = Array.isArray(data.deterministic_issues) ? data.deterministic_issues : [];
+  const aiIssues = Array.isArray(data.ai_issues) ? data.ai_issues : [];
+  const issuesCount = determIssues.length + aiIssues.length;
+  const correctionsCount = corrections.length;
 
   // Silencioso quando tudo bate
   if (issuesCount === 0 && correctionsCount === 0) return null;
