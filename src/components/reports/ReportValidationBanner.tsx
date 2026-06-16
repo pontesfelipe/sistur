@@ -277,6 +277,31 @@ export function ReportValidationBanner({
     staleTime: 30_000,
   });
 
+  // Códigos de indicador citados nas correções automáticas (ex.: OE007).
+  // Calculado SEMPRE (antes de qualquer early-return) para respeitar as regras de hooks.
+  const correctionCodes = useMemo(() => {
+    const list = Array.isArray(data?.auto_corrections) ? data!.auto_corrections : [];
+    return Array.from(new Set(list.map((c) => c.indicator).filter(Boolean)));
+  }, [data]);
+
+  const { data: indicatorNameMap } = useQuery<Record<string, string>>({
+    queryKey: ['indicator-names-by-code', correctionCodes],
+    enabled: correctionCodes.length > 0,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data: inds, error } = await supabase
+        .from('indicators')
+        .select('code, name')
+        .in('code', correctionCodes);
+      if (error) return {};
+      const map: Record<string, string> = {};
+      (inds ?? []).forEach((i: any) => {
+        if (i?.code) map[i.code] = i.name ?? '';
+      });
+      return map;
+    },
+  });
+
   if (!data) return null;
 
   const corrections = Array.isArray(data.auto_corrections) ? data.auto_corrections : [];
