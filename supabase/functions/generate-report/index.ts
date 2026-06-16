@@ -2206,18 +2206,32 @@ Total de indicadores auditados nesta base: ${auditCompact.length}. Não afirme q
 === RELATÓRIO GERADO ===
 ${reportText.slice(0, 18000)}`;
 
-    const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-pro',
-        messages: [
-          { role: 'system', content: sys },
-          { role: 'user', content: usr },
-        ],
-        response_format: { type: 'json_object' },
-      }),
-    });
+    // v1.64.4 — Timeout duro de 75s no agente validador. Antes a chamada podia
+    // ficar pendurada indefinidamente no gateway (especialmente com
+    // gemini-2.5-pro em horários de pico), o que combinado com o watchdog do
+    // worker (4 min de idle) matava o job inteiro em 92% "Validando coerência
+    // com agente IA". Validação é não-bloqueante: timeout aqui devolve [] e o
+    // relatório segue para persistência normalmente.
+    const validatorAbort = new AbortController();
+    const validatorTimer = setTimeout(() => validatorAbort.abort('validator-timeout-75s'), 75_000);
+    let resp: Response;
+    try {
+      resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-pro',
+          messages: [
+            { role: 'system', content: sys },
+            { role: 'user', content: usr },
+          ],
+          response_format: { type: 'json_object' },
+        }),
+        signal: validatorAbort.signal,
+      });
+    } finally {
+      clearTimeout(validatorTimer);
+    }
     if (!resp.ok) {
       console.warn('Validator agent HTTP', resp.status);
       return [];
