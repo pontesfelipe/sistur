@@ -474,28 +474,36 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* HUD */}
-      <div className="relative z-10 flex flex-col gap-1.5 px-3 py-2 bg-black/30 backdrop-blur-sm border-b border-white/5 text-xs">
+      <div className="relative z-10 flex flex-col gap-1.5 px-3 py-2 bg-black/40 backdrop-blur-md border-b border-white/5 text-xs">
+        {/* Row 1: health + score + treasures */}
         <div className="flex items-center gap-3">
           <HealthBar health={state.health} maxHealth={state.maxHealth} />
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2.5 flex-shrink-0">
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20">
               <Trophy className="h-3.5 w-3.5 text-amber-400" />
-              <motion.span key={state.score} animate={{ scale: [1.3, 1] }} className="font-bold tabular-nums">{state.score}</motion.span>
+              <motion.span key={state.score} animate={{ scale: [1.3, 1] }} className="font-bold tabular-nums text-amber-200">{state.score}</motion.span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20">
               <MapPin className="h-3.5 w-3.5 text-emerald-400" />
-              <span className="font-medium tabular-nums">{state.treasuresCollected}/{state.totalTreasures}</span>
+              <span className="font-medium tabular-nums text-emerald-200">{state.treasuresCollected}/{state.totalTreasures}</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3 justify-between">
-          <div className={cn('flex items-center gap-1', state.timeRemaining <= 30 && !isRiddlePaused && 'text-red-400')}>
+        {/* Row 2: timer + compass + danger + errors + moves (wraps gracefully on small screens) */}
+        <div className="flex items-center gap-x-3 gap-y-1.5 flex-wrap">
+          <div
+            className={cn(
+              'flex items-center gap-1 font-bold tabular-nums px-1.5 py-0.5 rounded-md bg-black/30 border border-white/5',
+              state.timeRemaining <= 30 && !isRiddlePaused && 'text-red-400 border-red-500/30 bg-red-500/10',
+              isRiddlePaused && 'text-amber-400 border-amber-500/30 bg-amber-500/10',
+            )}
+          >
             <Clock className="h-3.5 w-3.5" />
-            <span className="font-bold tabular-nums">
+            <span>
               {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')}
             </span>
             {isRiddlePaused && (
-              <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1.2, repeat: Infinity }} className="text-amber-400">
+              <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1.2, repeat: Infinity }}>
                 <Pause className="h-3 w-3 inline" />
               </motion.span>
             )}
@@ -503,17 +511,20 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
               <motion.span animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="text-[10px]">⚠️</motion.span>
             )}
           </div>
-          {/* Compass to exit */}
           <ExitCompass playerRow={state.player.row} playerCol={state.player.col} map={state.map} />
-          {/* Danger proximity warning */}
           <DangerWarning playerRow={state.player.row} playerCol={state.player.col} map={state.map} />
-          <div className={cn('flex items-center gap-1', state.riddleErrors >= state.maxRiddleErrors - 1 && 'text-red-400')}>
-            <XCircle className="h-3.5 w-3.5" />
-            <span className="font-medium tabular-nums">{state.riddleErrors}/{state.maxRiddleErrors}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Footprints className="h-3.5 w-3.5 text-blue-400" />
-            <span className="font-medium tabular-nums">{state.moves}</span>
+          <div className="flex items-center gap-2.5 ml-auto">
+            <div className={cn(
+              'flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/30 border border-white/5',
+              state.riddleErrors >= state.maxRiddleErrors - 1 && 'text-red-400 border-red-500/30 bg-red-500/10',
+            )}>
+              <XCircle className="h-3.5 w-3.5" />
+              <span className="font-medium tabular-nums">{state.riddleErrors}/{state.maxRiddleErrors}</span>
+            </div>
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/30 border border-white/5">
+              <Footprints className="h-3.5 w-3.5 text-blue-400" />
+              <span className="font-medium tabular-nums">{state.moves}</span>
+            </div>
           </div>
         </div>
       </div>
