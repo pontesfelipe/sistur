@@ -393,14 +393,16 @@ export function ReportValidationBanner({
                 size="sm"
                 className="gap-1"
                 onClick={() => runAutofix(corrections)}
-                disabled={autofixing}
+                disabled={autofixing || pendingCount === 0}
               >
                 {autofixing ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
                   <Zap className="h-3.5 w-3.5" />
                 )}
-                Autofix ({correctionsCount})
+                {pendingCount === 0
+                  ? `Todas corrigidas (${correctionsCount})`
+                  : `Autofix (${pendingCount})`}
               </Button>
             )}
             {canEditReport && (
