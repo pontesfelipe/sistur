@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download, Pencil, Save, Loader2, Zap } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download, Pencil, Save, Loader2, Zap, BadgeCheck } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -147,6 +147,7 @@ export function ReportValidationBanner({
       } Recalcule o diagnóstico e regenere o relatório.`;
       toast.success(msg);
       queryClient.invalidateQueries({ queryKey: ['indicator-values', assessmentId] });
+      queryClient.invalidateQueries({ queryKey: ['applied-fixes-by-code', assessmentId] });
     } finally {
       setAutofixing(false);
     }
@@ -302,6 +303,43 @@ export function ReportValidationBanner({
     },
   });
 
+  // Quais indicadores citados pela validação já foram efetivamente corrigidos
+  // na tabela de auditoria (Autofix ou correção manual via Conferência).
+  // Marcamos quando `indicator_values.source` começa com "Autofix — Conferência"
+  // ou "Correção manual via Conferência".
+  const { data: appliedFixes } = useQuery<Record<string, { source: string; collected_at: string | null }>>({
+    queryKey: ['applied-fixes-by-code', assessmentId ?? null, correctionCodes],
+    enabled: Boolean(assessmentId) && correctionCodes.length > 0,
+    staleTime: 30_000,
+    queryFn: async () => {
+      const { data: inds } = await supabase
+        .from('indicators')
+        .select('id, code')
+        .in('code', correctionCodes);
+      const idToCode = new Map((inds ?? []).map((i: any) => [i.id, i.code]));
+      const ids = (inds ?? []).map((i: any) => i.id);
+      if (ids.length === 0) return {};
+      const { data: vals } = await supabase
+        .from('indicator_values')
+        .select('indicator_id, source, collected_at')
+        .eq('assessment_id', assessmentId)
+        .in('indicator_id', ids);
+      const map: Record<string, { source: string; collected_at: string | null }> = {};
+      (vals ?? []).forEach((v: any) => {
+        const code = idToCode.get(v.indicator_id);
+        const src = String(v?.source ?? '');
+        if (!code) return;
+        if (
+          src.startsWith('Autofix — Conferência') ||
+          src.startsWith('Correção manual via Conferência')
+        ) {
+          map[code] = { source: src, collected_at: v.collected_at ?? null };
+        }
+      });
+      return map;
+    },
+  });
+
   if (!data) return null;
 
   const corrections = Array.isArray(data.auto_corrections) ? data.auto_corrections : [];
@@ -309,6 +347,8 @@ export function ReportValidationBanner({
   const aiIssues = Array.isArray(data.ai_issues) ? data.ai_issues : [];
   const issuesCount = determIssues.length + aiIssues.length;
   const correctionsCount = corrections.length;
+  const appliedCount = correctionCodes.filter((c) => appliedFixes?.[c]).length;
+  const pendingCount = Math.max(0, correctionsCount - appliedCount);
 
   // Silencioso quando tudo bate
   if (issuesCount === 0 && correctionsCount === 0) return null;
@@ -321,6 +361,11 @@ export function ReportValidationBanner({
     summaryParts.push(
       `${correctionsCount} ${correctionsCount === 1 ? 'correção automática aplicada' : 'correções automáticas aplicadas'}`,
     );
+    if (appliedCount > 0) {
+      summaryParts.push(
+        `${appliedCount} ${appliedCount === 1 ? 'já fixada' : 'já fixadas'} na tabela de auditoria`,
+      );
+    }
   }
   if (issuesCount > 0) {
     summaryParts.push(
@@ -349,14 +394,16 @@ export function ReportValidationBanner({
                 size="sm"
                 className="gap-1"
                 onClick={() => runAutofix(corrections)}
-                disabled={autofixing}
+                disabled={autofixing || pendingCount === 0}
               >
                 {autofixing ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
                   <Zap className="h-3.5 w-3.5" />
                 )}
-                Autofix ({correctionsCount})
+                {pendingCount === 0
+                  ? `Todas corrigidas (${correctionsCount})`
+                  : `Autofix (${pendingCount})`}
               </Button>
             )}
             {canEditReport && (
@@ -457,15 +504,43 @@ export function ReportValidationBanner({
                     automaticamente.
                   </p>
                   <ul className="space-y-2 text-sm">
-                    {corrections.map((c, idx) => (
-                      <li key={idx} className="rounded-md border border-border bg-muted/30 px-3 py-2">
-                        <div className="font-medium text-foreground">
-                          {c.indicator}
+                    {corrections.map((c, idx) => {
+                      const fix = appliedFixes?.[c.indicator];
+                      const isApplied = Boolean(fix);
+                      return (
+                      <li
+                        key={idx}
+                        className={`rounded-md border px-3 py-2 ${
+                          isApplied
+                            ? 'border-severity-good/40 bg-severity-good/5'
+                            : 'border-border bg-muted/30'
+                        }`}
+                      >
+                        <div className="font-medium text-foreground flex items-center gap-2 flex-wrap">
+                          <span>{c.indicator}</span>
                           {indicatorNameMap?.[c.indicator] ? (
                             <span className="text-muted-foreground font-normal">
-                              {' '}— {indicatorNameMap[c.indicator]}
+                              — {indicatorNameMap[c.indicator]}
                             </span>
                           ) : null}
+                          {isApplied ? (
+                            <Badge
+                              variant="outline"
+                              className="gap-1 border-severity-good/40 bg-severity-good/15 text-severity-good"
+                              title={
+                                fix?.collected_at
+                                  ? `Fixado em ${new Date(fix.collected_at).toLocaleString('pt-BR')}`
+                                  : 'Fixado na tabela de auditoria'
+                              }
+                            >
+                              <BadgeCheck className="h-3 w-3" />
+                              Corrigido na auditoria
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="gap-1 text-muted-foreground">
+                              Pendente de fixação
+                            </Badge>
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
                           <span className="font-medium text-foreground">Problema:</span> a IA citou{' '}
@@ -476,6 +551,14 @@ export function ReportValidationBanner({
                           substituído por <span className="text-foreground font-medium">{c.to}</span>{' '}
                           (fonte oficial) — aplicado no texto final.
                         </div>
+                        {isApplied && fix?.source ? (
+                          <div className="text-[11px] text-muted-foreground mt-1">
+                            Origem da correção: <span className="text-foreground">{fix.source}</span>
+                            {fix.collected_at
+                              ? ` · ${new Date(fix.collected_at).toLocaleString('pt-BR')}`
+                              : ''}
+                          </div>
+                        ) : null}
                         <div className="flex flex-wrap gap-2 pt-2">
                           {canEditReport && (
                             <Button
@@ -501,12 +584,13 @@ export function ReportValidationBanner({
                               onClick={() => setFixIndicator(c)}
                             >
                               <Wrench className="h-3 w-3" />
-                              Corrigir indicador
+                              {isApplied ? 'Revisar valor fixado' : 'Corrigir indicador'}
                             </Button>
                           )}
                         </div>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 </section>
               )}
@@ -598,6 +682,7 @@ export function ReportValidationBanner({
         onSaved={() => {
           setFixIndicator(null);
           queryClient.invalidateQueries({ queryKey: ['indicator-values', assessmentId] });
+          queryClient.invalidateQueries({ queryKey: ['applied-fixes-by-code', assessmentId] });
         }}
       />
     </>

@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 9,
+  patch: 10,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.10",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Conferência de dados — cada divergência citada agora exibe uma flag visual de status: \"Corrigido na auditoria\" (badge verde com data e origem da correção — Autofix ou correção manual via Conferência) ou \"Pendente de fixação\". O botão Autofix passa a mostrar somente o contador pendente e fica desabilitado quando tudo já foi fixado. O resumo do banner também acrescenta \"X já fixadas na tabela de auditoria\" quando aplicável.",
+    ],
+  },
   {
     version: "1.64.9",
     date: "2026-06-16",
