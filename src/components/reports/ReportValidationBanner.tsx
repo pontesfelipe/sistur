@@ -285,29 +285,6 @@ export function ReportValidationBanner({
   const issuesCount = determIssues.length + aiIssues.length;
   const correctionsCount = corrections.length;
 
-  // Busca o nome legível dos indicadores citados nas correções (ex.: OE007 -> "Taxa de ocupação hoteleira")
-  const correctionCodes = useMemo(
-    () => Array.from(new Set(corrections.map((c) => c.indicator).filter(Boolean))),
-    [corrections],
-  );
-  const { data: indicatorNameMap } = useQuery<Record<string, string>>({
-    queryKey: ['indicator-names-by-code', correctionCodes],
-    enabled: correctionCodes.length > 0,
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data: inds, error } = await supabase
-        .from('indicators')
-        .select('code, name')
-        .in('code', correctionCodes);
-      if (error) return {};
-      const map: Record<string, string> = {};
-      (inds ?? []).forEach((i: any) => {
-        if (i?.code) map[i.code] = i.name ?? '';
-      });
-      return map;
-    },
-  });
-
   // Silencioso quando tudo bate
   if (issuesCount === 0 && correctionsCount === 0) return null;
 
