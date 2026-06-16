@@ -115,6 +115,15 @@ export function BeniContextPanel() {
             <li>Diagnóstico selecionado: título, destino, status, tipo (Territorial/Empresarial), scores dos pilares, flags IGMA e interpretação</li>
             <li>Treinamentos disponíveis: título, pilar, tipo (Curso/Live)</li>
             <li>Projetos do usuário: nome, status, metodologia, destino vinculado</li>
+            <li>
+              <strong className="text-foreground">Diagnósticos acessíveis ao usuário</strong> (até 10 mais recentes):
+              título, destino, tipo, status, score final, scores por pilar e flags IGMA — filtrados via RLS
+              pelo JWT do usuário (somente o que ele pode ver na sua organização).
+            </li>
+            <li>
+              <strong className="text-foreground">Relatórios gerados acessíveis ao usuário</strong> (até 5 mais recentes):
+              destino, data, modelo de IA e trecho de até 1500 caracteres do conteúdo — também filtrados por RLS.
+            </li>
           </ul>
         </CardContent>
       </Card>
