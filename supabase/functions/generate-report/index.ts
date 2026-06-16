@@ -3596,6 +3596,8 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               auditTrail || [],
               LOVABLE_API_KEY,
               globalRefs,
+              usedProvider,
+              ANTHROPIC_API_KEY ?? undefined,
             );
           } finally {
             clearInterval(validatorHeartbeat);
