@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 65,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.65.3",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Jogos Educacionais — RPG (Missão Bioma): refinamento mobile. Header compactado em 440px com botões 'Outro Bioma' e 'Reiniciar' colapsando para ícone-only (texto reaparece em sm+). Hit areas ampliadas (h-8 → h-9). Título e capítulo com truncate para não quebrar layout. Barra de progresso engrossada (h-1.5 → h-2) com gradiente e glow primário sutil. Ambient gradient do bioma reforçado (0.04 → 0.06) + vinheta radial primária no topo. Padding lateral responsivo (px-3 em mobile, px-4 em sm+).",
+    ],
+  },
   {
     version: "1.65.2",
     date: "2026-06-16",
