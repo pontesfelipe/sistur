@@ -3580,32 +3580,15 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             ...detectInventedReferences(workingText, auditTrail || []),
           ];
           await safeWrite(`: validating ${Date.now()}\n\n`);
-          logger.stage('validation_agent_start');
-          await logger.bumpJobStage(supabaseAdmin, 'Validando coerência com agente IA', { progress_pct: 92 });
-          // v1.64.4 — Heartbeat de keepalive (a cada 20s) durante a validação
-          // com agente IA. O worker (`process-report-job`) aborta o stream se
-          // ficar mais de 4 min sem chunks; como a validação é uma única call
-          // bloqueante de até ~75s, emitimos comentários SSE periódicos para
-          // que o `lastChunkAt` do worker continue avançando.
-          const validatorHeartbeat = setInterval(() => {
-            safeWrite(`: validator_heartbeat ${Date.now()}\n\n`).catch(() => {});
-          }, 20_000);
-          try {
-            aiIssues = await runReportValidatorAgent(
-              workingText,
-              auditTrail || [],
-              LOVABLE_API_KEY,
-              globalRefs,
-              usedProvider,
-              ANTHROPIC_API_KEY ?? undefined,
-            );
-          } finally {
-            clearInterval(validatorHeartbeat);
-          }
-          logger.stage('validation_agent_done', { aiIssues: aiIssues.length, deterministic: deterministic.length, autoCorrections: autoCorrections.length });
+          // v1.64.6 — O agente IA validador foi MOVIDO para pós-persistência
+          // (background task). Aqui mantemos apenas a validação determinística
+          // + auto-correções (rápidas, locais, sem chamada de rede). Isso
+          // garante que o relatório NUNCA fique preso em 92% por causa do
+          // validador IA: o conteúdo é persistido imediatamente, o job é
+          // marcado como concluído, e o validador IA roda de forma
+          // assíncrona atualizando depois a linha em `report_validations`.
           const allIssues = [
             ...deterministic.map((w) => `[determinístico] ${w}`),
-            ...aiIssues.map((w) => `[agente IA] ${w}`),
           ];
           const correctionLines = autoCorrections.map(
             (c) => `[auto-corrigido] ${c.indicator}: ${c.from} → ${c.to}`,
@@ -3669,10 +3652,14 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             org_id: assessment.org_id,
             status: validationStatus,
             deterministic_issues: deterministic,
-            ai_issues: aiIssues,
+            ai_issues: [],
             auto_corrections: autoCorrections,
-            total_issues: deterministic.length + aiIssues.length + autoCorrections.length,
+            total_issues: deterministic.length + autoCorrections.length,
             validator_version: appVersion,
+            // v1.64.6 — `ai_validation_status: 'pending'` indica que o agente
+            // IA será executado em background e esta linha será ATUALIZADA
+            // depois com `ai_issues` e `total_issues` consolidados.
+            ai_validation_status: 'pending',
           });
           logger.stage('persist_validations_inserted');
         } catch (vErr) {
@@ -3730,6 +3717,62 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         await logger.bumpJobStage(supabaseAdmin, 'Relatório persistido', { progress_pct: 98 });
         logger.stage('stream_closed_ok');
         if (streamOpen) await writer.close();
+
+        // v1.64.6 — Validação IA pós-persistência (background, não bloqueante).
+        // O relatório já está salvo e o job já foi marcado como `completed`;
+        // este bloco roda depois do fechamento do stream para evitar travar
+        // a UI/worker. Falhas ou timeouts aqui apenas marcam
+        // `ai_validation_status='failed'` na linha de report_validations —
+        // o relatório segue válido com a validação determinística.
+        if (savedReportId) {
+          const runAiValidatorBg = async () => {
+            try {
+              const bgAiIssues = await runReportValidatorAgent(
+                finalContent,
+                auditTrail || [],
+                LOVABLE_API_KEY,
+                globalRefs,
+                usedProvider,
+                ANTHROPIC_API_KEY ?? undefined,
+              );
+              const newTotal = deterministic.length + bgAiIssues.length + autoCorrections.length;
+              const newStatus: 'clean' | 'warnings' | 'auto_corrected' =
+                autoCorrections.length > 0
+                  ? 'auto_corrected'
+                  : (deterministic.length + bgAiIssues.length > 0 ? 'warnings' : 'clean');
+              await supabaseAdmin
+                .from('report_validations')
+                .update({
+                  ai_issues: bgAiIssues,
+                  total_issues: newTotal,
+                  status: newStatus,
+                  ai_validation_status: 'completed',
+                })
+                .eq('report_id', savedReportId);
+              console.log(`[validator-bg] report ${savedReportId} validated: ${bgAiIssues.length} ai issues`);
+            } catch (bgErr) {
+              console.warn('[validator-bg] failed (non-blocking):', bgErr);
+              try {
+                await supabaseAdmin
+                  .from('report_validations')
+                  .update({ ai_validation_status: 'failed' })
+                  .eq('report_id', savedReportId);
+              } catch { /* ignore */ }
+            }
+          };
+          try {
+            // @ts-ignore - EdgeRuntime é global em Supabase Edge Functions (Deno)
+            if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) {
+              // @ts-ignore
+              EdgeRuntime.waitUntil(runAiValidatorBg());
+            } else {
+              // Fallback: dispara sem await (best-effort)
+              runAiValidatorBg().catch(() => {});
+            }
+          } catch (_e) {
+            runAiValidatorBg().catch(() => {});
+          }
+        }
       } catch (err) {
         logger.error('stream_task_failed', err, { last_stage: logger.lastStage() });
         if (incomingJobId) {
