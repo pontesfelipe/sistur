@@ -13,6 +13,7 @@ import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCateg
 import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculationChecklist';
 import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePanel';
 import { AssessmentAuditTrail } from '@/components/diagnostics/AssessmentAuditTrail';
+import { DataLineageView } from '@/components/diagnostics/DataLineageView';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { PrescriptionModeView } from '@/components/diagnostics/PrescriptionModeView';
