@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, HelpCircle, Trophy, XCircle, Clock, Sparkles, Brain, Eye, Flame, Star } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Trophy, XCircle, Clock, Sparkles, Brain, Eye, Flame, Star, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { generateMemoryCards, getGridColumns } from '../cardGenerator';
@@ -390,25 +390,46 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
       <LottieOverlay type="match" show={showMatchLottie} onComplete={() => setShowMatchLottie(false)} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" size={100} />
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-3 py-2 bg-black/40 backdrop-blur-xl border-b border-white/5 flex-shrink-0">
-        <button onClick={onBack} className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200 min-h-[44px] px-1">
+      <div className="relative z-10 flex items-center justify-between gap-2 px-2 sm:px-3 py-2 bg-black/50 backdrop-blur-xl border-b border-white/5 flex-shrink-0">
+        <button
+          onClick={onBack}
+          aria-label="Voltar"
+          className="flex items-center justify-center min-h-[40px] min-w-[40px] rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-colors"
+        >
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <div className="flex items-center gap-2">
-          <Brain className={cn('h-5 w-5', visuals.accentColor)} />
-          <h1 className="text-sm font-bold text-amber-300 drop-shadow">Memória Ecológica</h1>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Brain className={cn('h-5 w-5 flex-shrink-0 drop-shadow-[0_0_6px_currentColor]', visuals.accentColor)} />
+          <h1 className="text-sm font-bold text-amber-300 drop-shadow truncate">
+            <span className="sm:hidden">Memória</span>
+            <span className="hidden sm:inline">Memória Ecológica</span>
+          </h1>
         </div>
-        <button onClick={() => setShowTutorial(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-200">
-          <HelpCircle className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={handleRestart}
+            aria-label="Reiniciar"
+            title="Reiniciar"
+            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-slate-400 hover:text-amber-300 hover:bg-white/5 transition-colors"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setShowTutorial(true)}
+            aria-label="Tutorial"
+            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-slate-400 hover:text-amber-300 hover:bg-white/5 transition-colors"
+          >
+            <HelpCircle className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* HUD */}
-      <div className="relative z-10 flex flex-col gap-1.5 px-3 py-2 bg-black/30 backdrop-blur-sm border-b border-white/5 text-xs">
-        <div className="flex items-center gap-3 justify-between">
-          <div className="flex items-center gap-2">
+      <div className="relative z-10 flex flex-col gap-1.5 px-3 py-2 bg-black/40 backdrop-blur-md border-b border-white/5 text-xs">
+        <div className="flex items-center gap-2 justify-between flex-wrap">
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20">
             <Trophy className="h-3.5 w-3.5 text-amber-400" />
-            <motion.span key={state.score} animate={{ scale: [1.3, 1] }} className="font-bold tabular-nums">{state.score}</motion.span>
+            <motion.span key={state.score} animate={{ scale: [1.3, 1] }} className="font-bold tabular-nums text-amber-200">{state.score}</motion.span>
           </div>
           {/* Combo indicator */}
           <AnimatePresence>
@@ -427,16 +448,19 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="flex items-center gap-1">
+          <div className={cn('flex items-center gap-1 px-1.5 py-0.5 rounded-md border', 'bg-emerald-500/10 border-emerald-500/20')}>
             <Sparkles className={cn('h-3.5 w-3.5', visuals.accentColor)} />
-            <span className="font-bold tabular-nums">{state.matchedPairs}/{state.totalPairs}</span>
-            <span className="text-white/50">pares</span>
+            <span className="font-bold tabular-nums text-emerald-200">{state.matchedPairs}/{state.totalPairs}</span>
+            <span className="text-white/40">pares</span>
           </div>
         </div>
-        <div className="flex items-center gap-3 justify-between">
-          <div className={cn('flex items-center gap-1', state.timeRemaining <= 30 && 'text-red-400')}>
+        <div className="flex items-center gap-x-2 gap-y-1.5 flex-wrap">
+          <div className={cn(
+            'flex items-center gap-1 font-bold tabular-nums px-1.5 py-0.5 rounded-md bg-black/30 border border-white/5',
+            state.timeRemaining <= 30 && 'text-red-400 border-red-500/30 bg-red-500/10',
+          )}>
             <Clock className="h-3.5 w-3.5" />
-            <span className="font-bold tabular-nums">
+            <span>
               {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')}
             </span>
             {state.timeRemaining <= 30 && (
@@ -457,7 +481,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
             <Eye className="h-3 w-3" />
             <span className="font-medium">{MAX_HINTS - hintsUsed}</span>
           </button>
-          <div className="flex items-center gap-1.5 flex-1 max-w-[120px]">
+          <div className="flex items-center gap-1.5 flex-1 min-w-[100px]">
             <XCircle className={cn('h-3.5 w-3.5 flex-shrink-0', state.errors >= state.maxErrors - 2 ? 'text-red-400' : 'text-white/50')} />
             <div className="flex-1 h-2.5 bg-black/40 rounded-full overflow-hidden border border-white/10">
               <motion.div
@@ -470,7 +494,9 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
               {state.errors}/{state.maxErrors}
             </span>
           </div>
-          <div className="text-white/40 font-medium tabular-nums">{state.moves}</div>
+          <div className="text-white/50 font-medium tabular-nums text-[11px] px-1.5 py-0.5 rounded-md bg-black/20 border border-white/5">
+            <span className="text-white/30 mr-0.5">♟</span>{state.moves}
+          </div>
         </div>
       </div>
 
