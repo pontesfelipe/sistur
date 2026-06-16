@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.4",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — corrigido travamento em 92% (\"Validando coerência com agente IA\"). O agente validador (gemini-2.5-pro) podia ficar pendurado no gateway por mais tempo que o watchdog do worker (4 min de idle), fazendo o job inteiro ser abortado mesmo com o conteúdo já gerado. Agora a chamada tem timeout duro de 75s (em caso de estouro, a validação é tratada como não-bloqueante e o relatório segue para persistência) e um heartbeat SSE é emitido a cada 20s durante a validação para evitar que o worker considere o stream ocioso. Sintoma reportado em Piracaia (mensagem \"A geração excedeu o tempo limite sem concluir. Última etapa: Validando coerência com agente IA\").",
+    ],
+  },
   {
     version: "1.64.3",
     date: "2026-06-15",
