@@ -29,6 +29,7 @@ import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSear
 import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
+import { BeniContextPanel } from '@/components/settings/BeniContextPanel';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import {
   exportMetodologiaDocx,
@@ -60,6 +61,7 @@ import {
   ScrollText,
   ListOrdered,
   Sparkles,
+  Bot,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -167,10 +169,10 @@ export default function Configuracoes() {
             className={cn(
               'grid w-full max-w-4xl',
               isAdmin
-                ? 'grid-cols-9'
+                ? 'grid-cols-10'
                 : isOrgAdmin
-                  ? 'grid-cols-5'
-                  : 'grid-cols-3'
+                  ? 'grid-cols-6'
+                  : 'grid-cols-4'
             )}
           >
             <TabsTrigger value="geral" className="flex items-center gap-2">
@@ -221,6 +223,10 @@ export default function Configuracoes() {
                 <span className="hidden sm:inline">Contexto</span>
               </TabsTrigger>
             )}
+            <TabsTrigger value="beni" className="flex items-center gap-2">
+              <Bot className="h-4 w-4" />
+              <span className="hidden sm:inline">Beni</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* GERAL TAB */}
@@ -364,6 +370,11 @@ export default function Configuracoes() {
               </Suspense>
             </TabsContent>
           )}
+
+          {/* BENI TAB — regras de conversa e contexto do Professor Beni Chat */}
+          <TabsContent value="beni" className="space-y-6">
+            <BeniContextPanel />
+          </TabsContent>
 
           <TabsContent value="documentacao" className="space-y-6">
             {/* Principles */}
