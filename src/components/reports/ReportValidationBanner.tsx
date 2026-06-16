@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download, Pencil, Save, Loader2, Zap } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download, Pencil, Save, Loader2, Zap, BadgeCheck } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -302,6 +302,43 @@ export function ReportValidationBanner({
     },
   });
 
+  // Quais indicadores citados pela validação já foram efetivamente corrigidos
+  // na tabela de auditoria (Autofix ou correção manual via Conferência).
+  // Marcamos quando `indicator_values.source` começa com "Autofix — Conferência"
+  // ou "Correção manual via Conferência".
+  const { data: appliedFixes } = useQuery<Record<string, { source: string; collected_at: string | null }>>({
+    queryKey: ['applied-fixes-by-code', assessmentId ?? null, correctionCodes],
+    enabled: Boolean(assessmentId) && correctionCodes.length > 0,
+    staleTime: 30_000,
+    queryFn: async () => {
+      const { data: inds } = await supabase
+        .from('indicators')
+        .select('id, code')
+        .in('code', correctionCodes);
+      const idToCode = new Map((inds ?? []).map((i: any) => [i.id, i.code]));
+      const ids = (inds ?? []).map((i: any) => i.id);
+      if (ids.length === 0) return {};
+      const { data: vals } = await supabase
+        .from('indicator_values')
+        .select('indicator_id, source, collected_at')
+        .eq('assessment_id', assessmentId)
+        .in('indicator_id', ids);
+      const map: Record<string, { source: string; collected_at: string | null }> = {};
+      (vals ?? []).forEach((v: any) => {
+        const code = idToCode.get(v.indicator_id);
+        const src = String(v?.source ?? '');
+        if (!code) return;
+        if (
+          src.startsWith('Autofix — Conferência') ||
+          src.startsWith('Correção manual via Conferência')
+        ) {
+          map[code] = { source: src, collected_at: v.collected_at ?? null };
+        }
+      });
+      return map;
+    },
+  });
+
   if (!data) return null;
 
   const corrections = Array.isArray(data.auto_corrections) ? data.auto_corrections : [];
@@ -309,6 +346,8 @@ export function ReportValidationBanner({
   const aiIssues = Array.isArray(data.ai_issues) ? data.ai_issues : [];
   const issuesCount = determIssues.length + aiIssues.length;
   const correctionsCount = corrections.length;
+  const appliedCount = correctionCodes.filter((c) => appliedFixes?.[c]).length;
+  const pendingCount = Math.max(0, correctionsCount - appliedCount);
 
   // Silencioso quando tudo bate
   if (issuesCount === 0 && correctionsCount === 0) return null;
@@ -321,6 +360,11 @@ export function ReportValidationBanner({
     summaryParts.push(
       `${correctionsCount} ${correctionsCount === 1 ? 'correção automática aplicada' : 'correções automáticas aplicadas'}`,
     );
+    if (appliedCount > 0) {
+      summaryParts.push(
+        `${appliedCount} ${appliedCount === 1 ? 'já fixada' : 'já fixadas'} na tabela de auditoria`,
+      );
+    }
   }
   if (issuesCount > 0) {
     summaryParts.push(
