@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 65,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.65.5",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Jogos Educacionais — Memória Ecológica: refinamento mobile e consistência visual com os outros jogos. Header com título encurtado para 'Memória' em <640px, ícone Brain com glow, hit areas 40x40, novo botão Reiniciar no header (antes só disponível no game over). HUD em badges semânticos consistentes com Caça ao Tesouro (pontuação âmbar, pares esmeralda, timer com state vermelho <30s). Linha 2 com flex-wrap evita overflow. Contador de jogadas em badge sutil.",
+    ],
+  },
   {
     version: "1.65.4",
     date: "2026-06-16",
