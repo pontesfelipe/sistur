@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 65,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.65.4",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Jogos Educacionais — Caça ao Tesouro: refinamento HUD em mobile (440px). HUD reorganizado em duas linhas com badges semânticos: linha 1 (saúde + pontuação âmbar + tesouros esmeralda), linha 2 (timer + bússola + perigo + erros + movimentos) com flex-wrap para evitar overflow. Timer com states visuais (vermelho <30s, âmbar quando pausado por enigma). Backdrop blur reforçado (sm → md) e bg-black/30 → /40 para melhor legibilidade sobre o background do bioma. Cada métrica com border + bg sutil para hierarquia visual clara.",
+    ],
+  },
   {
     version: "1.65.3",
     date: "2026-06-16",
