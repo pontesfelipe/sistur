@@ -68,6 +68,7 @@ import {
   RefreshCw,
   Target,
   MessageSquare,
+  GitBranch,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
