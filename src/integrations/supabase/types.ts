@@ -9040,6 +9040,7 @@ export type Database = {
       report_validations: {
         Row: {
           ai_issues: Json
+          ai_validation_status: string
           assessment_id: string
           auto_corrections: Json
           created_at: string
@@ -9053,6 +9054,7 @@ export type Database = {
         }
         Insert: {
           ai_issues?: Json
+          ai_validation_status?: string
           assessment_id: string
           auto_corrections?: Json
           created_at?: string
@@ -9066,6 +9068,7 @@ export type Database = {
         }
         Update: {
           ai_issues?: Json
+          ai_validation_status?: string
           assessment_id?: string
           auto_corrections?: Json
           created_at?: string
