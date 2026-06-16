@@ -141,60 +141,80 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Subtle biome-themed ambient gradient */}
-      <div className={`fixed inset-0 pointer-events-none z-0 bg-gradient-to-b ${biomeInfo.gradient} opacity-[0.04]`} />
+      {/* Biome-themed ambient gradient + soft vignette */}
+      <div className={`fixed inset-0 pointer-events-none z-0 bg-gradient-to-b ${biomeInfo.gradient} opacity-[0.06]`} />
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, hsl(var(--primary) / 0.04), transparent 60%)' }}
+      />
 
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border">
-        <div className="max-w-3xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={onBack} className="h-8 w-8">
+      <div className="sticky top-0 z-20 bg-background/85 backdrop-blur-md border-b border-border/60 shadow-sm">
+        <div className="max-w-3xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
+          <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Button variant="ghost" size="icon" onClick={onBack} className="h-9 w-9 flex-shrink-0" aria-label="Voltar">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <div>
-                <h1 className="text-sm font-bold flex items-center gap-1.5">
+              <div className="min-w-0">
+                <h1 className="text-sm font-bold flex items-center gap-1.5 truncate">
                   {getEmojiSprite(biomeInfo.emoji) ? (
-                    <img src={getEmojiSprite(biomeInfo.emoji)!} alt="" className="w-4 h-4 object-contain" draggable={false} />
-                  ) : biomeInfo.emoji}
-                  {' '}{biomeInfo.name}
+                    <img src={getEmojiSprite(biomeInfo.emoji)!} alt="" className="w-4 h-4 object-contain flex-shrink-0" draggable={false} />
+                  ) : <span className="flex-shrink-0">{biomeInfo.emoji}</span>}
+                  <span className="truncate">{biomeInfo.name}</span>
                 </h1>
-                <p className="text-xs text-muted-foreground">
-                  Capítulo {currentScene.chapter} • {state.choicesMade} decisões
+                <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
+                  Cap. {currentScene.chapter} • {state.choicesMade} decisões
                 </p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1 sm:gap-2 flex-shrink-0">
               {state.finished && (
-                <Button variant="outline" size="sm" onClick={handleNewBiome} className="gap-1.5 text-xs">
-                  <BookOpen className="h-3.5 w-3.5" /> Outro Bioma
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleNewBiome}
+                  className="h-9 w-9 sm:w-auto sm:px-3 sm:gap-1.5 text-xs"
+                  aria-label="Outro Bioma"
+                  title="Outro Bioma"
+                >
+                  <BookOpen className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Outro Bioma</span>
                 </Button>
               )}
-              <Button variant="outline" size="sm" onClick={handleRestart} className="gap-1.5 text-xs">
-                <RotateCcw className="h-3.5 w-3.5" /> Reiniciar
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleRestart}
+                className="h-9 w-9 sm:w-auto sm:px-3 sm:gap-1.5 text-xs"
+                aria-label="Reiniciar"
+                title="Reiniciar"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Reiniciar</span>
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} className="h-8 w-8">
+              <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} className="h-9 w-9" aria-label="Tutorial">
                 <HelpCircle className="h-4 w-4" />
               </Button>
             </div>
           </div>
           <RPGStatusBar stats={state.stats} />
           {/* Story progress bar */}
-          <div className="mt-2 flex items-center gap-2">
-            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+          <div className="mt-2.5 flex items-center gap-2">
+            <div className="flex-1 h-2 bg-muted/60 rounded-full overflow-hidden relative">
               <motion.div
-                className="h-full bg-primary/60 rounded-full"
+                className="h-full bg-gradient-to-r from-primary/70 to-primary rounded-full shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
                 animate={{ width: `${progressPct}%` }}
                 transition={{ type: 'spring', stiffness: 100 }}
               />
             </div>
-            <span className="text-[10px] text-muted-foreground tabular-nums">{progressPct}%</span>
+            <span className="text-[10px] font-medium text-muted-foreground tabular-nums w-9 text-right">{progressPct}%</span>
           </div>
         </div>
       </div>
 
       {/* Story Content */}
-      <div className="max-w-3xl mx-auto px-4 py-6 relative z-10">
+      <div className="max-w-3xl mx-auto px-3 sm:px-4 py-5 sm:py-6 relative z-10">
         <StoryScene
           scene={currentScene}
           chapter={currentScene.chapter}
