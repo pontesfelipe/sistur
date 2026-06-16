@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 6,
+  patch: 7,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.7",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Conferência de dados — cada indicador citado (ex.: OE007, AO003) agora aparece com o NOME legível ao lado do código, buscado da tabela `indicators`. Adicionada também explicação do termo \"tabela oficial\": é a tabela de auditoria do diagnóstico (`indicator_values`), onde ficam os valores numéricos confirmados pelo usuário ou importados das fontes oficiais (IBGE, CADASTUR, STN, DATASUS, INEP). Quando a IA cita número divergente, o sistema substitui pelo valor dessa tabela automaticamente.",
+    ],
+  },
   {
     version: "1.64.6",
     date: "2026-06-16",

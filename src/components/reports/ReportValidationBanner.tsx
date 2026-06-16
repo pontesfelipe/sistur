@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download, Pencil, Save, Loader2, Zap } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -285,6 +285,29 @@ export function ReportValidationBanner({
   const issuesCount = determIssues.length + aiIssues.length;
   const correctionsCount = corrections.length;
 
+  // Busca o nome legível dos indicadores citados nas correções (ex.: OE007 -> "Taxa de ocupação hoteleira")
+  const correctionCodes = useMemo(
+    () => Array.from(new Set(corrections.map((c) => c.indicator).filter(Boolean))),
+    [corrections],
+  );
+  const { data: indicatorNameMap } = useQuery<Record<string, string>>({
+    queryKey: ['indicator-names-by-code', correctionCodes],
+    enabled: correctionCodes.length > 0,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data: inds, error } = await supabase
+        .from('indicators')
+        .select('code, name')
+        .in('code', correctionCodes);
+      if (error) return {};
+      const map: Record<string, string> = {};
+      (inds ?? []).forEach((i: any) => {
+        if (i?.code) map[i.code] = i.name ?? '';
+      });
+      return map;
+    },
+  });
+
   // Silencioso quando tudo bate
   if (issuesCount === 0 && correctionsCount === 0) return null;
 
@@ -423,10 +446,25 @@ export function ReportValidationBanner({
                     substituído pelo número oficial da tabela de auditoria antes do relatório ser
                     salvo. Nenhuma ação adicional é necessária — o documento já está consistente.
                   </p>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    <span className="font-medium text-foreground">O que é a "tabela oficial":</span>{' '}
+                    é a tabela de auditoria do diagnóstico (<code>indicator_values</code>) — onde
+                    ficam os valores numéricos confirmados por você ou importados das fontes
+                    oficiais (IBGE, CADASTUR, STN, DATASUS, INEP etc.). Quando a IA cita um número
+                    diferente do que está nessa tabela, o sistema substitui pelo valor oficial
+                    automaticamente.
+                  </p>
                   <ul className="space-y-2 text-sm">
                     {corrections.map((c, idx) => (
                       <li key={idx} className="rounded-md border border-border bg-muted/30 px-3 py-2">
-                        <div className="font-medium text-foreground">{c.indicator}</div>
+                        <div className="font-medium text-foreground">
+                          {c.indicator}
+                          {indicatorNameMap?.[c.indicator] ? (
+                            <span className="text-muted-foreground font-normal">
+                              {' '}— {indicatorNameMap[c.indicator]}
+                            </span>
+                          ) : null}
+                        </div>
                         <div className="text-xs text-muted-foreground mt-1">
                           <span className="font-medium text-foreground">Problema:</span> a IA citou{' '}
                           <span className="line-through">{c.from}</span>, divergente da tabela oficial.
