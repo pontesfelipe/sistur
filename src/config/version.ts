@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 65,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.65.1",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Jogos Educacionais — Hub: refinamento mobile (440px). Padding reduzido (p-8 → p-5 em telas pequenas), tipografia escalonada (h1 2xl→3xl, título do card xl→2xl), gap dos cards 4→6, ícone do emoji 12→14, descrição com line-clamp-3 no mobile, tags com flex inline (sem desalinhamento de ícones), borda translúcida, touch-manipulation e active scale para feedback tátil, decoração de fundo do card escalonada 24→32.",
+    ],
+  },
   {
     version: "1.65.0",
     date: "2026-06-16",
