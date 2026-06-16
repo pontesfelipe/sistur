@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.6",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — o agente IA validador (passo 92%) foi movido para EXECUÇÃO PÓS-PERSISTÊNCIA em background (EdgeRuntime.waitUntil). Antes, mesmo com timeout de 75s + heartbeat, a validação ficava no caminho crítico antes da persistência: se a chamada de rede ao gateway/Anthropic demorasse, podia travar o job em 92%. Agora o fluxo é: (1) validação determinística + auto-correções inline (locais, rápidas, sem rede), (2) persistência imediata do relatório, (3) job marcado como `completed` em 100%, (4) agente IA roda em background e ATUALIZA a linha em `report_validations` quando termina. Resultado: o relatório NUNCA mais fica preso em 92% por causa do validador IA, e o usuário recebe o conteúdo final imediatamente. Nova coluna `report_validations.ai_validation_status` (pending | completed | failed | skipped) rastreia o resultado da validação assíncrona.",
+    ],
+  },
   {
     version: "1.64.5",
     date: "2026-06-16",
