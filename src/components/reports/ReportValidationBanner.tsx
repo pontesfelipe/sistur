@@ -147,6 +147,7 @@ export function ReportValidationBanner({
       } Recalcule o diagnóstico e regenere o relatório.`;
       toast.success(msg);
       queryClient.invalidateQueries({ queryKey: ['indicator-values', assessmentId] });
+      queryClient.invalidateQueries({ queryKey: ['applied-fixes-by-code', assessmentId] });
     } finally {
       setAutofixing(false);
     }
@@ -681,6 +682,7 @@ export function ReportValidationBanner({
         onSaved={() => {
           setFixIndicator(null);
           queryClient.invalidateQueries({ queryKey: ['indicator-values', assessmentId] });
+          queryClient.invalidateQueries({ queryKey: ['applied-fixes-by-code', assessmentId] });
         }}
       />
     </>
