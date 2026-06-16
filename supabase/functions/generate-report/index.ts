@@ -2206,18 +2206,32 @@ Total de indicadores auditados nesta base: ${auditCompact.length}. Não afirme q
 === RELATÓRIO GERADO ===
 ${reportText.slice(0, 18000)}`;
 
-    const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-pro',
-        messages: [
-          { role: 'system', content: sys },
-          { role: 'user', content: usr },
-        ],
-        response_format: { type: 'json_object' },
-      }),
-    });
+    // v1.64.4 — Timeout duro de 75s no agente validador. Antes a chamada podia
+    // ficar pendurada indefinidamente no gateway (especialmente com
+    // gemini-2.5-pro em horários de pico), o que combinado com o watchdog do
+    // worker (4 min de idle) matava o job inteiro em 92% "Validando coerência
+    // com agente IA". Validação é não-bloqueante: timeout aqui devolve [] e o
+    // relatório segue para persistência normalmente.
+    const validatorAbort = new AbortController();
+    const validatorTimer = setTimeout(() => validatorAbort.abort('validator-timeout-75s'), 75_000);
+    let resp: Response;
+    try {
+      resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-pro',
+          messages: [
+            { role: 'system', content: sys },
+            { role: 'user', content: usr },
+          ],
+          response_format: { type: 'json_object' },
+        }),
+        signal: validatorAbort.signal,
+      });
+    } finally {
+      clearTimeout(validatorTimer);
+    }
     if (!resp.ok) {
       console.warn('Validator agent HTTP', resp.status);
       return [];
@@ -3529,12 +3543,24 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           await safeWrite(`: validating ${Date.now()}\n\n`);
           logger.stage('validation_agent_start');
           await logger.bumpJobStage(supabaseAdmin, 'Validando coerência com agente IA', { progress_pct: 92 });
-          aiIssues = await runReportValidatorAgent(
-            workingText,
-            auditTrail || [],
-            LOVABLE_API_KEY,
-            globalRefs,
-          );
+          // v1.64.4 — Heartbeat de keepalive (a cada 20s) durante a validação
+          // com agente IA. O worker (`process-report-job`) aborta o stream se
+          // ficar mais de 4 min sem chunks; como a validação é uma única call
+          // bloqueante de até ~75s, emitimos comentários SSE periódicos para
+          // que o `lastChunkAt` do worker continue avançando.
+          const validatorHeartbeat = setInterval(() => {
+            safeWrite(`: validator_heartbeat ${Date.now()}\n\n`).catch(() => {});
+          }, 20_000);
+          try {
+            aiIssues = await runReportValidatorAgent(
+              workingText,
+              auditTrail || [],
+              LOVABLE_API_KEY,
+              globalRefs,
+            );
+          } finally {
+            clearInterval(validatorHeartbeat);
+          }
           logger.stage('validation_agent_done', { aiIssues: aiIssues.length, deterministic: deterministic.length, autoCorrections: autoCorrections.length });
           const allIssues = [
             ...deterministic.map((w) => `[determinístico] ${w}`),
