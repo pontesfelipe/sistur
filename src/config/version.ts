@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 11,
+  patch: 12,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.12",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Professor Beni agora responde sobre diagnósticos e relatórios do usuário — a edge function beni-chat injeta no prompt os 10 diagnósticos mais recentes (título, destino, tipo, status, score final, pilares com %/severidade e flags IGMA) e os 5 relatórios gerados mais recentes (destino, data, modelo e trecho de até 1500 chars do conteúdo). A consulta usa o JWT do usuário, então RLS limita automaticamente aos itens que ele pode ver na sua organização. Beni é instruído a nunca inventar diagnósticos/relatórios fora dessa lista. Painel Configurações > Beni atualizado para refletir o novo contexto dinâmico.",
+    ],
+  },
   {
     version: "1.64.11",
     date: "2026-06-16",
