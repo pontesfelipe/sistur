@@ -44,14 +44,14 @@ Deno.serve(async (req) => {
   const { data: membership } = await admin
     .from("profiles")
     .select("org_id")
-    .eq("id", user.id)
+    .eq("user_id", user.id)
     .maybeSingle();
   const { data: rolesData } = await admin
     .from("user_roles")
     .select("role")
     .eq("user_id", user.id);
-  const isAdmin = (rolesData ?? []).some((r: any) => r.role === "ADMIN" || r.role === "ORG_ADMIN");
-  if (!isAdmin && membership?.org_id !== body.org_id) {
+  const isGlobalAdmin = (rolesData ?? []).some((r: any) => r.role === "ADMIN");
+  if (!isGlobalAdmin && membership?.org_id !== body.org_id) {
     return new Response(JSON.stringify({ error: "Sem permissão para esta organização" }), {
       status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
