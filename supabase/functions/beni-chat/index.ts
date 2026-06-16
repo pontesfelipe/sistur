@@ -60,6 +60,7 @@ Você SOMENTE responde sobre temas relacionados a:
 - Políticas públicas de turismo
 - Patrimônio cultural e ambiental no contexto turístico
 - Economia do turismo e desenvolvimento territorial
+- Diagnósticos e relatórios gerados aos quais o usuário tem acesso (apresentados abaixo no contexto). Você pode discutir, comparar, interpretar e responder dúvidas sobre esses diagnósticos e relatórios específicos, citando títulos, destinos, scores dos pilares e trechos do conteúdo. NUNCA invente diagnósticos ou relatórios que não apareçam explicitamente listados no contexto — se o usuário perguntar sobre algo que não está listado, diga que você não tem acesso àquele item.
 
 Se a pergunta NÃO for relacionada a nenhum desses temas, responda educadamente:
 "Agradeço sua curiosidade, mas minha especialidade é exclusivamente a área de turismo e a metodologia sistêmica do SISTUR. Posso ajudá-lo com qualquer questão sobre planejamento turístico, diagnósticos territoriais, os pilares RA, OE e AO, ou as regras do Motor IGMA. Como posso ajudá-lo nessas áreas?"
@@ -74,6 +75,7 @@ serve(async (req) => {
 
   const authResult = await requireUser(req);
   if (authResult instanceof Response) return authResult;
+  const { client: userClient } = authResult;
 
   try {
     const { messages, context } = await req.json();
@@ -85,6 +87,101 @@ serve(async (req) => {
 
     // Build context-aware system prompt
     let systemPrompt = BENI_SYSTEM_PROMPT;
+
+    // ----------------------------------------------------------------
+    // Fetch user-accessible diagnostics (assessments) and reports.
+    // The userClient is scoped to the caller's JWT, so RLS automatically
+    // limits results to what the user is allowed to see (their org's data
+    // plus anything explicitly shared with them).
+    // ----------------------------------------------------------------
+    try {
+      const [{ data: assessments }, { data: reports }] = await Promise.all([
+        userClient
+          .from("assessments")
+          .select(
+            "id, title, status, diagnostic_type, final_score, final_classification, calculated_at, igma_flags, destinations(name, uf)"
+          )
+          .order("calculated_at", { ascending: false, nullsFirst: false })
+          .limit(10),
+        userClient
+          .from("generated_reports")
+          .select("id, destination_name, created_at, report_content, ai_model, assessment_id")
+          .order("created_at", { ascending: false })
+          .limit(5),
+      ]);
+
+      if (assessments && assessments.length > 0) {
+        // Fetch pillar scores for these assessments in one batch
+        const ids = assessments.map((a: any) => a.id);
+        const { data: pillars } = await userClient
+          .from("pillar_scores")
+          .select("assessment_id, pillar, score, severity")
+          .in("assessment_id", ids);
+
+        const pillarsByAssessment: Record<string, any[]> = {};
+        (pillars ?? []).forEach((p: any) => {
+          (pillarsByAssessment[p.assessment_id] ||= []).push(p);
+        });
+
+        systemPrompt += `\n\nDIAGNÓSTICOS ACESSÍVEIS AO USUÁRIO (${assessments.length}):\n`;
+        assessments.forEach((a: any, idx: number) => {
+          const dest = a.destinations?.name
+            ? `${a.destinations.name}${a.destinations.uf ? `/${a.destinations.uf}` : ""}`
+            : "(sem destino)";
+          systemPrompt += `\n[D${idx + 1}] "${a.title ?? "Sem título"}" — Destino: ${dest}\n`;
+          systemPrompt += `  - Tipo: ${a.diagnostic_type === "enterprise" ? "Empresarial" : "Territorial"}\n`;
+          systemPrompt += `  - Status: ${a.status ?? "n/d"}\n`;
+          if (a.calculated_at) {
+            systemPrompt += `  - Calculado em: ${new Date(a.calculated_at).toLocaleDateString("pt-BR")}\n`;
+          }
+          if (a.final_score != null) {
+            const pct = (Number(a.final_score) * 100).toFixed(1);
+            systemPrompt += `  - Score final: ${pct}% (${a.final_classification ?? "n/d"})\n`;
+          }
+          const ps = pillarsByAssessment[a.id];
+          if (ps && ps.length > 0) {
+            systemPrompt += `  - Pilares: `;
+            systemPrompt += ps
+              .map((p) => {
+                const pct = (Number(p.score) * 100).toFixed(0);
+                return `${p.pillar} ${pct}% (${p.severity})`;
+              })
+              .join(", ");
+            systemPrompt += `\n`;
+          }
+          if (a.igma_flags && typeof a.igma_flags === "object") {
+            const active = Object.entries(a.igma_flags as Record<string, unknown>)
+              .filter(([, v]) => v)
+              .map(([k]) => k);
+            if (active.length > 0) {
+              systemPrompt += `  - Flags IGMA ativas: ${active.join(", ")}\n`;
+            }
+          }
+        });
+      }
+
+      if (reports && reports.length > 0) {
+        systemPrompt += `\n\nRELATÓRIOS GERADOS ACESSÍVEIS AO USUÁRIO (${reports.length} mais recentes):\n`;
+        reports.forEach((r: any, idx: number) => {
+          systemPrompt += `\n[R${idx + 1}] "${r.destination_name ?? "Sem destino"}"\n`;
+          systemPrompt += `  - Criado em: ${new Date(r.created_at).toLocaleDateString("pt-BR")}\n`;
+          if (r.ai_model) systemPrompt += `  - Modelo: ${r.ai_model}\n`;
+          if (r.report_content) {
+            // Strip HTML tags and truncate to keep prompt size reasonable
+            const plain = String(r.report_content)
+              .replace(/<[^>]+>/g, " ")
+              .replace(/\s+/g, " ")
+              .trim();
+            const snippet = plain.slice(0, 1500);
+            systemPrompt += `  - Trecho: ${snippet}${plain.length > 1500 ? "…" : ""}\n`;
+          }
+        });
+        systemPrompt += `\nUse esses trechos para responder perguntas sobre o conteúdo dos relatórios. Se o usuário pedir algo que não está no trecho, oriente-o a abrir o relatório completo em /relatorios.\n`;
+      }
+    } catch (fetchErr) {
+      console.error("beni-chat: failed to fetch user diagnostics/reports", fetchErr);
+      // Non-fatal: continue without injected user data
+    }
     
     if (context) {
       systemPrompt += `\n\nCONTEXTO ATUAL DO USUÁRIO (use estas informações para personalizar suas respostas):\n`;
