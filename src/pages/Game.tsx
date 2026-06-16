@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { fireVictoryConfetti, fireDefeatEffect } from '@/game/vfx/confetti';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type GamePhase = 'picker' | 'setup' | 'playing';
 
@@ -255,39 +256,74 @@ export default function Game() {
 
   // Phase: Playing
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col text-foreground">
+    <div className="min-h-screen relative flex flex-col text-foreground bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 overflow-hidden">
+      {/* Atmospheric background: radial vignette + amber glow */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(251,191,36,0.06), transparent 60%), radial-gradient(ellipse 100% 60% at 50% 100%, rgba(15,23,42,0.8), transparent 70%)',
+        }}
+      />
+
       {/* Top bar */}
-      <div className="flex items-center justify-between px-3 py-2 bg-slate-900/90 backdrop-blur-sm border-b border-slate-700/50 flex-shrink-0">
-        <button onClick={() => navigate('/')} className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200 min-h-[44px] px-1 transition-colors">
+      <div className="relative z-10 flex items-center justify-between gap-2 px-2 sm:px-3 py-2 bg-slate-900/80 backdrop-blur-md border-b border-amber-500/10 flex-shrink-0 shadow-[0_1px_0_0_rgba(251,191,36,0.05)]">
+        <button
+          onClick={() => navigate('/')}
+          aria-label="Voltar"
+          className="flex items-center justify-center text-slate-400 hover:text-amber-300 min-h-[40px] min-w-[40px] rounded-lg hover:bg-slate-800/60 transition-colors"
+        >
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <div className="flex items-center gap-2">
-          <Swords className="h-4 w-4 text-amber-400" />
-          <h1 className="text-sm sm:text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-500">
-            GUARDIÃO DO TERRITÓRIO
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Swords className="h-4 w-4 text-amber-400 flex-shrink-0 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]" />
+          <h1 className="text-[11px] sm:text-base font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-400 truncate">
+            <span className="sm:hidden">GUARDIÃO</span>
+            <span className="hidden sm:inline">GUARDIÃO DO TERRITÓRIO</span>
           </h1>
         </div>
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-slate-400 font-bold mr-1">💰{game.state.coins}</span>
-          <span className="text-xs text-slate-400">T{game.state.turn}</span>
-          <button onClick={handleManualSave} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors" title="Salvar">
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          <span className="text-[11px] sm:text-xs font-bold px-1.5 py-1 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20">
+            💰{game.state.coins}
+          </span>
+          <span className="text-[11px] sm:text-xs px-1.5 py-1 rounded-md bg-slate-800/60 text-slate-300 border border-slate-700/40">
+            T{game.state.turn}
+          </span>
+          <button
+            onClick={handleManualSave}
+            aria-label="Salvar"
+            className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-amber-300 rounded-lg hover:bg-slate-800/60 transition-colors"
+            title="Salvar"
+          >
             <Save className="h-4 w-4" />
           </button>
-          <button onClick={() => setShowTutorial(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors">
+          <button
+            onClick={() => setShowTutorial(true)}
+            aria-label="Tutorial"
+            className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-amber-300 rounded-lg hover:bg-slate-800/60 transition-colors"
+          >
             <HelpCircle className="h-4 w-4" />
           </button>
         </div>
       </div>
 
       {/* Feedback toast */}
-      {lastFeedback && (
-        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-40 bg-slate-800 rounded-xl shadow-2xl px-5 py-3 animate-in slide-in-from-top-4 duration-300 max-w-sm text-center border border-amber-500/30">
-          <p className="text-sm font-medium text-slate-200">{lastFeedback}</p>
-        </div>
-      )}
+      <AnimatePresence>
+        {lastFeedback && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+            className="fixed top-16 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md rounded-xl shadow-2xl px-5 py-3 max-w-[90vw] sm:max-w-sm text-center border border-amber-500/40 shadow-amber-500/10"
+          >
+            <p className="text-sm font-medium text-slate-100">{lastFeedback}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main game area */}
-      <div className="flex-1 flex flex-col gap-2 p-2 sm:p-3 max-w-[1200px] mx-auto w-full min-h-0 overflow-y-auto">
+      <div className="relative z-10 flex-1 flex flex-col gap-2 p-2 sm:p-3 max-w-[1200px] mx-auto w-full min-h-0 overflow-y-auto">
         {/* Battle Board */}
         <BattleBoard
           playerBoard={{
@@ -363,7 +399,7 @@ export default function Game() {
 
       {/* Mobile bottom nav */}
       {isMobile && (
-        <div className="flex-shrink-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700/50 px-2 py-1 safe-bottom">
+        <div className="relative z-10 flex-shrink-0 bg-slate-900/95 backdrop-blur-lg border-t border-amber-500/10 px-2 py-1 safe-bottom">
           <div className="flex items-center justify-center gap-4">
             <button
               onClick={() => setMobilePanel(mobilePanel === 'log' ? null : 'log')}
@@ -412,46 +448,66 @@ export default function Game() {
 
       {/* Game Over Overlay */}
       {game.state.isGameOver && !game.state.isVictory && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300 border border-red-800/50">
-            <div className="text-6xl">💀</div>
-            <h2 className="text-2xl font-black text-red-400">Fim de Jogo!</h2>
-            <p className="text-sm text-slate-400">{game.state.gameOverReason || 'O destino turístico colapsou.'}</p>
-            <div className="bg-slate-800/50 rounded-xl p-3 space-y-1 text-xs text-left text-slate-300">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+        >
+          <motion.div
+            initial={{ scale: 0.9, y: 20, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 240, damping: 22 }}
+            className="relative bg-gradient-to-b from-slate-900 to-slate-950 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 border border-red-500/30 shadow-red-500/10"
+          >
+            <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background: 'radial-gradient(ellipse at top, rgba(239,68,68,0.15), transparent 60%)' }} />
+            <motion.div animate={{ rotate: [0, -8, 8, -4, 0] }} transition={{ duration: 0.6 }} className="relative text-6xl">💀</motion.div>
+            <h2 className="relative text-2xl font-black text-red-400">Fim de Jogo!</h2>
+            <p className="relative text-sm text-slate-400">{game.state.gameOverReason || 'O destino turístico colapsou.'}</p>
+            <div className="relative bg-slate-800/50 rounded-xl p-3 space-y-1 text-xs text-left text-slate-300 border border-slate-700/40">
               <p><strong>Turnos:</strong> {game.state.turn}</p>
               <p><strong>Pontuação:</strong> {game.state.totalScore}/{game.state.victoryTarget}</p>
               <p><strong>Equilíbrio:</strong> {Math.round(equilibrium)}%</p>
               <p><strong>Cartas jogadas:</strong> {game.state.totalCardsPlayed}</p>
               <p><strong>Ameaças enfrentadas:</strong> {game.state.activeThreats.length}</p>
             </div>
-            <div className="flex gap-3">
+            <div className="relative flex gap-3">
               <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors">📋 Sessões</button>
               <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:opacity-90 transition-opacity">🔄 Nova Batalha</button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Victory Overlay */}
       {game.state.isVictory && (
-        <div className="fixed inset-0 z-50 bg-background/90 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-gradient-to-b from-amber-950 to-yellow-950 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 animate-in zoom-in-95 duration-300 border-2 border-amber-400">
-            <div className="text-7xl animate-bounce">🏆</div>
-            <h2 className="text-2xl font-black text-amber-300">Você Venceu!</h2>
-            <p className="text-sm text-amber-400">{game.state.victoryReason || 'Você equilibrou o destino!'}</p>
-            <div className="bg-black/20 rounded-xl p-3 space-y-2 text-xs text-left text-amber-200">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+        >
+          <motion.div
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+            className="relative bg-gradient-to-b from-amber-950 to-yellow-950 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center space-y-4 border-2 border-amber-400/60 shadow-amber-500/30"
+          >
+            <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background: 'radial-gradient(ellipse at top, rgba(251,191,36,0.25), transparent 60%)' }} />
+            <motion.div animate={{ y: [0, -8, 0], scale: [1, 1.08, 1] }} transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }} className="relative text-7xl drop-shadow-[0_0_18px_rgba(251,191,36,0.6)]">🏆</motion.div>
+            <h2 className="relative text-2xl font-black text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]">Você Venceu!</h2>
+            <p className="relative text-sm text-amber-400">{game.state.victoryReason || 'Você equilibrou o destino!'}</p>
+            <div className="relative bg-black/30 rounded-xl p-3 space-y-2 text-xs text-left text-amber-200 border border-amber-500/20">
               <p><strong>Pontuação final:</strong> {game.state.totalScore}</p>
               <p><strong>Turnos:</strong> {game.state.turn}</p>
               <p><strong>Equilíbrio:</strong> {Math.round(equilibrium)}%</p>
               <p><strong>Cartas jogadas:</strong> {game.state.totalCardsPlayed}</p>
               <p><strong>Perfil:</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
             </div>
-            <div className="flex gap-3">
+            <div className="relative flex gap-3">
               <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-amber-600 text-sm font-bold text-amber-300 hover:bg-amber-900/50 transition-colors">📋 Sessões</button>
               <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors">🌟 Nova Batalha</button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Reward Picker */}
