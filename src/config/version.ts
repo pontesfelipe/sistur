@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 64,
-  patch: 7,
+  patch: 8,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.64.8",
+    date: "2026-06-16",
+    type: "patch" as const,
+    changes: [
+      "Segurança — bloco de correções: (1) `report_jobs.auth_jwt` deixa de ser legível por usuários autenticados (column-level GRANT, apenas service_role lê o token); (2) `forum_post_likes` e `forum_reply_likes` agora exigem login para SELECT (sem enumeração anônima); (3) edge function `discover-municipal-events` corrigida — checava `profiles.id` em vez de `profiles.user_id`, permitindo que ORG_ADMINs disparassem buscas Firecrawl em qualquer organização; (4) edge function `notify-observatory-alert` agora valida JWT e exige que o chamador seja ADMIN global ou membro da org do alerta antes de enviar e-mails. Memória de segurança atualizada.",
+    ],
+  },
   {
     version: "1.64.7",
     date: "2026-06-16",

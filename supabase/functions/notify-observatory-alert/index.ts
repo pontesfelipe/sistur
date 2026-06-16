@@ -18,6 +18,33 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    // ----- Authn / Authz -----
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, serviceKey);
+
+    const authClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claims, error: claimsErr } = await authClient.auth.getClaims(token);
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const callerId = claims.claims.sub as string;
+
     const { alert_id } = await req.json();
     if (!alert_id || typeof alert_id !== "string") {
       return new Response(JSON.stringify({ error: "alert_id obrigatório" }), {
@@ -25,10 +52,6 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, serviceKey);
 
     // Carrega alerta
     const { data: alert, error: alertErr } = await supabase
@@ -40,6 +63,20 @@ Deno.serve(async (req) => {
     if (alertErr || !alert) {
       return new Response(JSON.stringify({ error: "Alerta não encontrado" }), {
         status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Authorization: caller deve ser ADMIN global OU pertencer à org do alerta
+    const { data: callerRoles } = await supabase
+      .from("user_roles")
+      .select("role, org_id")
+      .eq("user_id", callerId);
+    const isGlobalAdmin = (callerRoles ?? []).some((r: any) => r.role === "ADMIN" && !r.org_id);
+    const isOrgMember = (callerRoles ?? []).some((r: any) => r.org_id === alert.org_id);
+    if (!isGlobalAdmin && !isOrgMember) {
+      return new Response(JSON.stringify({ error: "Sem permissão para este alerta" }), {
+        status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
