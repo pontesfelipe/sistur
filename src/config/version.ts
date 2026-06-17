@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 12,
+  patch: 13,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.13",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Geração de Relatórios — corrigida truncagem do envelope no template 'completo' que fazia o relatório parar dentro da seção 10 (Banco de Ações). Orçamento de saída do Claude (envelope) elevado: base 12k → 18k tokens, saturação por densidade de indicadores 80 → 130 (com bônus 35 → 40 tokens/indicador) e cap absoluto 20k → 32k. Diagnósticos com 100+ indicadores agora completam as seções 10 e 11 (Fontes e Referências) sem cortar.",
+    ],
+  },
   {
     version: "1.66.12",
     date: "2026-06-17",
