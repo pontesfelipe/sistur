@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 10,
+  patch: 11,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.11",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Procedência dos Dados — lista de 'Indicadores calculados' agora exibe o nome legível do indicador (ex.: 'Índice de Permanência do Turista no Local') em vez do código técnico (ex.: 'igma_iptl'). Código fica como tooltip para referência.",
+    ],
+  },
   {
     version: "1.66.10",
     date: "2026-06-17",
