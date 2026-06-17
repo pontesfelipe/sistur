@@ -1543,7 +1543,7 @@ const CLAUDE_MAX_CONTEXT_TOKENS = 200_000;
 // (sintoma reportado por Christiana em Piracaia: tabela do "Banco de
 // Ações" cortada no meio da última linha; relatório marcado como
 // "concluído" porque a truncagem por max_tokens passava silenciosamente).
-const CLAUDE_HARD_OUTPUT_CAP = 20_000;
+const CLAUDE_HARD_OUTPUT_CAP = 32_000;
 const CLAUDE_MIN_OUTPUT = 2_500;
 const CLAUDE_INPUT_SAFETY_TOKENS = 8_000; // margem para tool-use / metadata
 
@@ -1591,8 +1591,10 @@ function pickClaudeBudget(args: {
     1.0;
 
   // Indicator-density bonus — cada indicador adiciona texto explicativo.
-  // Saturado em 80 indicadores para não estourar.
-  const indicatorBonus = Math.min(indicatorCount, 80) * 35; // tokens
+  // v1.66.13: saturação elevada de 80 → 130 indicadores para acomodar
+  // diagnósticos completos (118+ indicadores) sem cortar a seção 10
+  // (Banco de Ações) no envelope.
+  const indicatorBonus = Math.min(indicatorCount, 130) * 40; // tokens
 
   let base: number;
   if (phase === 'pillar') {
@@ -1600,10 +1602,11 @@ function pickClaudeBudget(args: {
     base = 3_500;
   } else if (phase === 'envelope') {
     // Envelope cobre intro + ficha + metodologia + benchmarks + prognóstico
-    // + plano de ação + referências; é a chamada mais longa. v1.66.8: base
-    // elevada de 9k → 12k para acomodar a seção 10 (Banco de Ações) com
-    // 20–30 linhas de tabela sem truncar.
-    base = 12_000;
+    // + plano de ação + referências; é a chamada mais longa. v1.66.13: base
+    // elevada de 12k → 18k porque relatórios "completo" com 100+ indicadores
+    // estavam parando dentro da seção 10 (Banco de Ações) — o envelope
+    // gerava ~32k chars e terminava antes da seção 11 (Fontes).
+    base = 18_000;
   } else {
     // Pipeline monolítico (executivo/investidor) — texto único.
     base = 7_000;
