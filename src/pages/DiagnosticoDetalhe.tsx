@@ -996,7 +996,7 @@ const DiagnosticoDetalhe = () => {
 
           {/* Indicadores Tab */}
           <TabsContent value="indicadores" className="space-y-6">
-            <DataProvenancePanel indicatorValues={indicatorValues as any} auditRows={auditRows as any} />
+            <DataProvenancePanel indicatorValues={indicatorValues as any} auditRows={auditRows as any} indicatorCatalogByCode={indicatorCatalogByCode} />
             {prescriptionMode && (
               <Alert>
                 <Target className="h-4 w-4" />

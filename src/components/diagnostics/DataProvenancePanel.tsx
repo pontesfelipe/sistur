@@ -8,6 +8,7 @@ import { isDerivedIndicator } from '@/data/derivedIndicators';
 interface Props {
   indicatorValues: any[];
   auditRows?: any[];
+  indicatorCatalogByCode?: Map<string, any>;
 }
 
 /**
@@ -15,7 +16,7 @@ interface Props {
  * Mostra a procedência de cada indicador preenchido (oficial / derivado / manual)
  * com cobertura automática e badge de confiabilidade. Não altera dados, apenas exibe.
  */
-export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) {
+export function DataProvenancePanel({ indicatorValues, auditRows = [], indicatorCatalogByCode }: Props) {
   const analysis = useMemo(() => {
     const valuesByCode = new Map<string, any>();
     (indicatorValues || []).forEach((v: any) => {
@@ -37,9 +38,11 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
       auditRows.forEach((row: any) => {
         const code = String(row.indicator_code || '');
         const val = valuesByCode.get(code);
+        const catalogEntry = indicatorCatalogByCode?.get(code);
+        const friendlyName = val?.indicator?.name || val?.indicators?.name || catalogEntry?.name || catalogEntry?.label || code;
         const enriched = {
           indicator_code: code,
-          indicator: val?.indicator || val?.indicators || { code, name: code },
+          indicator: { code, name: friendlyName },
           source: row.source_detail || val?.source || '',
           source_type: row.source_type,
         };
@@ -75,7 +78,7 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
     const automated = buckets.official.length + buckets.derived.length;
     const coveragePct = total > 0 ? Math.round((automated / total) * 100) : 0;
     return { ...buckets, total, automated, coveragePct };
-  }, [indicatorValues, auditRows]);
+  }, [indicatorValues, auditRows, indicatorCatalogByCode]);
 
   const sourceLabel = (src: string) => {
     const map: Record<string, string> = {
@@ -146,7 +149,9 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
             <div className="space-y-1">
               {analysis.derived.slice(0, 8).map((v: any, i: number) => (
                 <div key={i} className="flex items-center justify-between text-xs">
-                  <span className="truncate">{v.indicator?.name || v.indicators?.name || v.indicator_id}</span>
+                  <span className="truncate" title={v.indicator?.code || v.indicator_code}>
+                    {v.indicator?.name || v.indicators?.name || v.indicator_code || v.indicator_id}
+                  </span>
                   <Badge variant="outline" className="text-[10px] ml-2 shrink-0">
                     {sourceLabel(v.source || 'CALCULADO')}
                   </Badge>
