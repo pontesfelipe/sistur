@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 11,
+  patch: 12,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.12",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Linhagem dos Dados — painel de 'Indicadores neste nó' agora prioriza o nome legível do indicador (ex.: 'Agências de Turismo') em vez do código técnico (ex.: 'igma_agencias_turismo'). Quando o catálogo não traz nome, o código é convertido em rótulo amigável; código completo fica disponível em fonte menor / tooltip.",
+    ],
+  },
   {
     version: "1.66.11",
     date: "2026-06-17",

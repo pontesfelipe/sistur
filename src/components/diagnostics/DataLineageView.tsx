@@ -74,6 +74,24 @@ function displaySourceName(token: string): string {
   return SOURCE_DISPLAY_NAMES[token.toUpperCase()] || token;
 }
 
+/**
+ * Converts a raw indicator code (e.g. "igma_agencias_turismo") into a friendly
+ * Title Case label ("Agências de Turismo") for display when the catalog does
+ * not provide an explicit name.
+ */
+function prettifyCode(code: string): string {
+  if (!code) return '';
+  const cleaned = code
+    .replace(/^igma[_-]/i, '')
+    .replace(/^ind[_-]/i, '')
+    .replace(/[_-]+/g, ' ')
+    .trim();
+  return cleaned
+    .split(' ')
+    .map((w) => (w.length <= 2 ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()))
+    .join(' ');
+}
+
 function classifyRow(row: any): { kind: SourceKind; sourceName: string } {
   const code = String(row.indicator_code || '');
   const type = String(row.source_type || '').toUpperCase();
@@ -683,7 +701,7 @@ function SelectionPanel({ selected, lineage, indicatorCatalogByCode, onClose }: 
     const ind = indicatorCatalogByCode?.get(code);
     grouped.set(code, {
       code,
-      name: ind?.name || ind?.label,
+      name: ind?.name || ind?.label || prettifyCode(code),
       pillar: ind?.pillar ? String(ind.pillar).trim().toUpperCase() : undefined,
     });
   });
@@ -730,8 +748,12 @@ function SelectionPanel({ selected, lineage, indicatorCatalogByCode, onClose }: 
                     {it.pillar}
                   </Badge>
                 )}
-                <code className="font-mono text-[11px] text-muted-foreground shrink-0">{it.code}</code>
-                <span className="flex-1 truncate">{it.name || '—'}</span>
+                <span className="flex-1 truncate font-medium text-foreground" title={it.code}>
+                  {it.name || prettifyCode(it.code)}
+                </span>
+                <code className="font-mono text-[10px] text-muted-foreground/70 shrink-0 hidden md:inline">
+                  {it.code}
+                </code>
               </li>
             ))}
           </ul>
