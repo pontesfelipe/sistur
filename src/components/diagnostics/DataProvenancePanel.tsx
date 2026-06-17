@@ -149,7 +149,9 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [], indicator
             <div className="space-y-1">
               {analysis.derived.slice(0, 8).map((v: any, i: number) => (
                 <div key={i} className="flex items-center justify-between text-xs">
-                  <span className="truncate">{v.indicator?.name || v.indicators?.name || v.indicator_id}</span>
+                  <span className="truncate" title={v.indicator?.code || v.indicator_code}>
+                    {v.indicator?.name || v.indicators?.name || v.indicator_code || v.indicator_id}
+                  </span>
                   <Badge variant="outline" className="text-[10px] ml-2 shrink-0">
                     {sourceLabel(v.source || 'CALCULADO')}
                   </Badge>
