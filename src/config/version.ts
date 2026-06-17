@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 6,
+  patch: 7,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.7",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Trilha de Auditoria — agora exibe o nome do indicador (com o código abaixo, em fonte menor), em vez de apenas o código técnico.",
+      "Procedência dos Dados — categoria 'Contextuais' incorporada em 'Oficiais' para eliminar a divergência com o painel de Linhagem dos Dados (agora ambos exibem o mesmo total de fontes oficiais).",
+    ],
+  },
   {
     version: "1.66.6",
     date: "2026-06-17",

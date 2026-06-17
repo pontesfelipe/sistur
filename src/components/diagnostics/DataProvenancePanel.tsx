@@ -27,7 +27,6 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
       official: [] as any[],
       derived: [] as any[],
       manual: [] as any[],
-      contextual: [] as any[],
       other: [] as any[],
     };
 
@@ -47,7 +46,6 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
         const type = String(row.source_type || '').toUpperCase();
         const isInDerivedCatalog = isDerivedIndicator(code);
         if (type.startsWith('DERIVED') || isInDerivedCatalog) buckets.derived.push(enriched);
-        else if (type === 'OFFICIAL_API_CONTEXTUAL') buckets.contextual.push(enriched);
         else if (type.startsWith('OFFICIAL_API')) buckets.official.push(enriched);
         else if (type === 'MANUAL') buckets.manual.push(enriched);
         else buckets.other.push(enriched);
@@ -70,8 +68,8 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
       });
     }
 
-    const total = buckets.official.length + buckets.derived.length + buckets.manual.length + buckets.contextual.length + buckets.other.length;
-    const automated = buckets.official.length + buckets.derived.length + buckets.contextual.length;
+    const total = buckets.official.length + buckets.derived.length + buckets.manual.length + buckets.other.length;
+    const automated = buckets.official.length + buckets.derived.length;
     const coveragePct = total > 0 ? Math.round((automated / total) * 100) : 0;
     return { ...buckets, total, automated, coveragePct };
   }, [indicatorValues, auditRows]);
@@ -109,7 +107,7 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
           <Progress value={analysis.coveragePct} className="h-2" />
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <div className="p-3 rounded-lg border bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900">
             <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
               <Globe2 className="h-4 w-4" />
@@ -125,14 +123,6 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
             </div>
             <p className="text-2xl font-bold mt-1">{analysis.derived.length}</p>
             <p className="text-[10px] text-muted-foreground">Fórmulas sobre dados oficiais</p>
-          </div>
-          <div className="p-3 rounded-lg border bg-teal-50 dark:bg-teal-950/30 border-teal-200 dark:border-teal-900">
-            <div className="flex items-center gap-2 text-teal-700 dark:text-teal-400">
-              <Globe2 className="h-4 w-4" />
-              <span className="text-xs font-medium">Contextuais</span>
-            </div>
-            <p className="text-2xl font-bold mt-1">{analysis.contextual.length}</p>
-            <p className="text-[10px] text-muted-foreground">APIs oficiais (referência)</p>
           </div>
           <div className="p-3 rounded-lg border bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900">
             <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">

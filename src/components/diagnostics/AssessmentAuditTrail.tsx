@@ -34,7 +34,13 @@ const SOURCE_LABEL: Record<string, string> = {
   ESTIMADA: 'Estimada',
 };
 
-export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string }) {
+export function AssessmentAuditTrail({
+  assessmentId,
+  indicatorCatalogByCode,
+}: {
+  assessmentId: string;
+  indicatorCatalogByCode?: Map<string, any>;
+}) {
   const [filter, setFilter] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery({
@@ -144,7 +150,21 @@ export function AssessmentAuditTrail({ assessmentId }: { assessmentId: string })
             <TableBody>
               {rows.map((r, idx) => (
                 <TableRow key={`${r.indicator_code}-${idx}`}>
-                  <TableCell className="font-mono text-xs">{r.indicator_code}</TableCell>
+                  <TableCell className="text-xs max-w-[280px]">
+                    {(() => {
+                      const meta = indicatorCatalogByCode?.get(r.indicator_code);
+                      const name = meta?.name || meta?.label;
+                      if (name) {
+                        return (
+                          <div className="flex flex-col">
+                            <span className="truncate font-medium" title={name}>{name}</span>
+                            <span className="font-mono text-[10px] text-muted-foreground">{r.indicator_code}</span>
+                          </div>
+                        );
+                      }
+                      return <span className="font-mono">{r.indicator_code}</span>;
+                    })()}
+                  </TableCell>
                   <TableCell>
                     {r.pillar && <Badge variant="outline" className="text-xs">{r.pillar}</Badge>}
                   </TableCell>
