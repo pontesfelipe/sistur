@@ -124,10 +124,11 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
     const sources = new Map<string, { kind: SourceKind; count: number; codes: string[]; byPillar: Record<string, number> }>();
     const byPillar: Record<string, { OFFICIAL: number; DERIVED: number; MANUAL: number; total: number }> = {};
     const kindTotals = { OFFICIAL: 0, DERIVED: 0, MANUAL: 0 };
-    /** kind → pillar → count, used to draw the Indicador → Pilar connections */
     const kindByPillar: Record<SourceKind, Record<string, number>> = {
       OFFICIAL: {}, DERIVED: {}, MANUAL: {},
     };
+    const kindCodes: Record<SourceKind, string[]> = { OFFICIAL: [], DERIVED: [], MANUAL: [] };
+    const pillarCodes: Record<string, string[]> = {};
 
     (auditRows || []).forEach((r) => {
       const { kind, sourceName } = classifyRow(r);
@@ -135,7 +136,7 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
       const key = `${kind}::${sourceName}`;
       const entry = sources.get(key) || { kind, count: 0, codes: [], byPillar: {} };
       entry.count += 1;
-      if (entry.codes.length < 8 && r.indicator_code) entry.codes.push(r.indicator_code);
+      if (r.indicator_code) entry.codes.push(r.indicator_code);
 
       const pillar = resolvePillar(r, indicatorCatalogByCode);
       entry.byPillar[pillar] = (entry.byPillar[pillar] || 0) + 1;
@@ -145,13 +146,18 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
       byPillar[pillar][kind] += 1;
       byPillar[pillar].total += 1;
       kindByPillar[kind][pillar] = (kindByPillar[kind][pillar] || 0) + 1;
+      if (r.indicator_code) {
+        kindCodes[kind].push(r.indicator_code);
+        if (!pillarCodes[pillar]) pillarCodes[pillar] = [];
+        pillarCodes[pillar].push(r.indicator_code);
+      }
     });
 
     const sourceList = Array.from(sources.entries())
       .map(([key, v]) => ({ key, name: key.split('::')[1], ...v }))
       .sort((a, b) => b.count - a.count);
 
-    return { sourceList, byPillar, kindTotals, kindByPillar, total: (auditRows || []).length };
+    return { sourceList, byPillar, kindTotals, kindByPillar, kindCodes, pillarCodes, total: (auditRows || []).length };
   }, [auditRows, indicatorCatalogByCode]);
 
   if (!lineage.total) {
@@ -175,6 +181,7 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
       pillarKeys={pillarKeys}
       pillarScores={pillarScores}
       finalScore={finalScore}
+      indicatorCatalogByCode={indicatorCatalogByCode}
     />
   );
 }
@@ -189,11 +196,14 @@ interface DiagramProps {
     byPillar: Record<string, { OFFICIAL: number; DERIVED: number; MANUAL: number; total: number }>;
     kindTotals: { OFFICIAL: number; DERIVED: number; MANUAL: number };
     kindByPillar: Record<SourceKind, Record<string, number>>;
+    kindCodes: Record<SourceKind, string[]>;
+    pillarCodes: Record<string, string[]>;
     total: number;
   };
   pillarKeys: string[];
   pillarScores: PillarScore[];
   finalScore: number | null;
+  indicatorCatalogByCode?: Map<string, any>;
 }
 
 function buildEmptyLineage() {
@@ -205,7 +215,7 @@ interface Anchor {
   y: number;
 }
 
-function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore }: DiagramProps) {
+function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicatorCatalogByCode }: DiagramProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sourceRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const kindRefs = useRef<Map<SourceKind, HTMLDivElement>>(new Map());
@@ -220,6 +230,29 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore }: Diagr
     | { type: 'pillar'; pillar: string }
     | null
   >(null);
+  type Selection =
+    | { type: 'source'; key: string }
+    | { type: 'kind'; kind: SourceKind }
+    | { type: 'pillar'; pillar: string }
+    | null;
+  const [selected, setSelected] = useState<Selection>(null);
+
+  function toggleSelect(next: NonNullable<Selection>) {
+    setSelected((curr) => {
+      if (!curr) return next;
+      if (curr.type !== next.type) return next;
+      if (curr.type === 'source' && next.type === 'source' && curr.key === next.key) return null;
+      if (curr.type === 'kind' && next.type === 'kind' && curr.kind === next.kind) return null;
+      if (curr.type === 'pillar' && next.type === 'pillar' && curr.pillar === next.pillar) return null;
+      return next;
+    });
+  }
+
+  // Recompute SVG when selection toggles (panel expansion changes layout heights)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setTick((t) => t + 1));
+    return () => cancelAnimationFrame(id);
+  }, [selected]);
 
   useLayoutEffect(() => {
     const el = containerRef.current;
@@ -387,10 +420,16 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore }: Diagr
                       }}
                       onMouseEnter={() => setHover({ type: 'source', key: s.key })}
                       onMouseLeave={() => setHover(null)}
-                      className={`rounded-lg border px-2.5 py-2 ${meta.tone} flex items-center gap-2 cursor-default transition-all ${
-                        isHovered ? `ring-2 ${meta.ring} shadow-md` : ''
+                      onClick={() => toggleSelect({ type: 'source', key: s.key })}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selected?.type === 'source' && selected.key === s.key}
+                      className={`rounded-lg border px-2.5 py-2 ${meta.tone} flex items-center gap-2 cursor-pointer transition-all ${
+                        isHovered || (selected?.type === 'source' && selected.key === s.key)
+                          ? `ring-2 ${meta.ring} shadow-md`
+                          : ''
                       }`}
-                      title={s.codes.join(', ')}
+                      title="Clique para ver os indicadores"
                     >
                       <Icon className="h-3.5 w-3.5 shrink-0" />
                       <span className="text-xs font-medium flex-1 leading-snug">{s.name}</span>
@@ -422,8 +461,14 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore }: Diagr
                       }}
                       onMouseEnter={() => setHover({ type: 'kind', kind: k })}
                       onMouseLeave={() => setHover(null)}
-                      className={`rounded-lg border ${meta.tone} p-3 cursor-default transition-all ${
-                        isHovered ? `ring-2 ${meta.ring} shadow-md` : ''
+                      onClick={() => toggleSelect({ type: 'kind', kind: k })}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selected?.type === 'kind' && selected.kind === k}
+                      className={`rounded-lg border ${meta.tone} p-3 cursor-pointer transition-all ${
+                        isHovered || (selected?.type === 'kind' && selected.kind === k)
+                          ? `ring-2 ${meta.ring} shadow-md`
+                          : ''
                       }`}
                     >
                       <div className="flex items-center gap-2 mb-1.5">
@@ -465,8 +510,14 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore }: Diagr
                       }}
                       onMouseEnter={() => setHover({ type: 'pillar', pillar: pk })}
                       onMouseLeave={() => setHover(null)}
-                      className={`rounded-lg border bg-card p-3 cursor-default transition-all ${
-                        isHovered ? 'ring-2 ring-primary/50 shadow-md' : ''
+                      onClick={() => toggleSelect({ type: 'pillar', pillar: pk })}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selected?.type === 'pillar' && selected.pillar === pk}
+                      className={`rounded-lg border bg-card p-3 cursor-pointer transition-all ${
+                        isHovered || (selected?.type === 'pillar' && selected.pillar === pk)
+                          ? 'ring-2 ring-primary/50 shadow-md'
+                          : ''
                       }`}
                       style={{ borderLeft: `4px solid ${PILLAR_COLOR[pk] || 'hsl(220 15% 55%)'}` }}
                     >
@@ -551,6 +602,14 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore }: Diagr
             </div>
           </div>
 
+          {/* Painel de detalhes do nó selecionado */}
+          <SelectionPanel
+            selected={selected}
+            lineage={lineage}
+            indicatorCatalogByCode={indicatorCatalogByCode}
+            onClose={() => setSelected(null)}
+          />
+
           {/* Legenda */}
           <div className="mt-8 pt-4 border-t flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
             <span className="font-medium">Legenda:</span>
@@ -569,6 +628,119 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore }: Diagr
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Selection details panel                                                    */
+/* -------------------------------------------------------------------------- */
+
+interface SelectionPanelProps {
+  selected:
+    | { type: 'source'; key: string }
+    | { type: 'kind'; kind: SourceKind }
+    | { type: 'pillar'; pillar: string }
+    | null;
+  lineage: DiagramProps['lineage'];
+  indicatorCatalogByCode?: Map<string, any>;
+  onClose: () => void;
+}
+
+function SelectionPanel({ selected, lineage, indicatorCatalogByCode, onClose }: SelectionPanelProps) {
+  if (!selected) return null;
+
+  let title = '';
+  let subtitle = '';
+  let codes: string[] = [];
+  let accent = 'hsl(220 15% 55%)';
+
+  if (selected.type === 'source') {
+    const src = lineage.sourceList.find((s) => s.key === selected.key);
+    if (!src) return null;
+    title = src.name;
+    subtitle = `${SOURCE_META[src.kind].label} · ${src.count} indicador${src.count === 1 ? '' : 'es'}`;
+    codes = src.codes;
+    accent = KIND_COLOR[src.kind];
+  } else if (selected.type === 'kind') {
+    const meta = SOURCE_META[selected.kind];
+    title = meta.label;
+    const c = lineage.kindCodes[selected.kind] || [];
+    subtitle = `${c.length} indicador${c.length === 1 ? '' : 'es'} desta categoria`;
+    codes = c;
+    accent = KIND_COLOR[selected.kind];
+  } else if (selected.type === 'pillar') {
+    title = `Pilar ${selected.pillar}`;
+    subtitle = PILLAR_LABEL[selected.pillar] || selected.pillar;
+    codes = lineage.pillarCodes[selected.pillar] || [];
+    accent = PILLAR_COLOR[selected.pillar] || 'hsl(220 15% 55%)';
+  }
+
+  // Group codes by pillar for richer context, dedupe display while keeping counts
+  const grouped = new Map<string, { code: string; name?: string; pillar?: string }>();
+  codes.forEach((code) => {
+    if (grouped.has(code)) return;
+    const ind = indicatorCatalogByCode?.get(code);
+    grouped.set(code, {
+      code,
+      name: ind?.name || ind?.label,
+      pillar: ind?.pillar ? String(ind.pillar).trim().toUpperCase() : undefined,
+    });
+  });
+  const items = Array.from(grouped.values()).sort((a, b) =>
+    (a.pillar || 'ZZZ').localeCompare(b.pillar || 'ZZZ') || a.code.localeCompare(b.code),
+  );
+
+  return (
+    <div
+      className="mt-6 rounded-xl border bg-card overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+      style={{ borderTop: `3px solid ${accent}` }}
+    >
+      <div className="flex items-start justify-between gap-4 px-4 py-3 border-b bg-muted/30">
+        <div className="min-w-0">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+            Indicadores neste nó
+          </p>
+          <h4 className="text-sm font-semibold truncate">{title}</h4>
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
+        </div>
+        <button
+          onClick={onClose}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          aria-label="Fechar"
+        >
+          Fechar ✕
+        </button>
+      </div>
+      {items.length === 0 ? (
+        <p className="p-6 text-sm text-muted-foreground text-center">
+          Nenhum código de indicador disponível para este nó.
+        </p>
+      ) : (
+        <div className="max-h-[360px] overflow-auto">
+          <ul className="divide-y">
+            {items.map((it) => (
+              <li key={it.code} className="px-4 py-2 flex items-center gap-3 text-xs hover:bg-muted/40 transition-colors">
+                {it.pillar && (
+                  <Badge
+                    variant="outline"
+                    className="tabular-nums text-[10px] shrink-0"
+                    style={{ borderColor: PILLAR_COLOR[it.pillar], color: PILLAR_COLOR[it.pillar] }}
+                  >
+                    {it.pillar}
+                  </Badge>
+                )}
+                <code className="font-mono text-[11px] text-muted-foreground shrink-0">{it.code}</code>
+                <span className="flex-1 truncate">{it.name || '—'}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div className="px-4 py-2 border-t bg-muted/20 text-[10px] text-muted-foreground flex items-center justify-between">
+        <span>{items.length} indicador{items.length === 1 ? '' : 'es'} único{items.length === 1 ? '' : 's'}</span>
+        <span className="italic">Clique novamente no nó para fechar</span>
+      </div>
     </div>
   );
 }

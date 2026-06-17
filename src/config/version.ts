@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.5",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico — Linhagem dos Dados: os nós (fontes, tipos e pilares) agora são clicáveis. Ao clicar, abre-se logo abaixo do diagrama um painel com a lista completa dos indicadores daquele nó (código, nome e pilar), com cabeçalho contextual, contagem total e botão de fechar. Clicar novamente no mesmo nó fecha o painel.",
+    ],
+  },
   {
     version: "1.66.4",
     date: "2026-06-17",
