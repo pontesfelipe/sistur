@@ -124,10 +124,11 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
     const sources = new Map<string, { kind: SourceKind; count: number; codes: string[]; byPillar: Record<string, number> }>();
     const byPillar: Record<string, { OFFICIAL: number; DERIVED: number; MANUAL: number; total: number }> = {};
     const kindTotals = { OFFICIAL: 0, DERIVED: 0, MANUAL: 0 };
-    /** kind → pillar → count, used to draw the Indicador → Pilar connections */
     const kindByPillar: Record<SourceKind, Record<string, number>> = {
       OFFICIAL: {}, DERIVED: {}, MANUAL: {},
     };
+    const kindCodes: Record<SourceKind, string[]> = { OFFICIAL: [], DERIVED: [], MANUAL: [] };
+    const pillarCodes: Record<string, string[]> = {};
 
     (auditRows || []).forEach((r) => {
       const { kind, sourceName } = classifyRow(r);
@@ -135,7 +136,7 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
       const key = `${kind}::${sourceName}`;
       const entry = sources.get(key) || { kind, count: 0, codes: [], byPillar: {} };
       entry.count += 1;
-      if (entry.codes.length < 8 && r.indicator_code) entry.codes.push(r.indicator_code);
+      if (r.indicator_code) entry.codes.push(r.indicator_code);
 
       const pillar = resolvePillar(r, indicatorCatalogByCode);
       entry.byPillar[pillar] = (entry.byPillar[pillar] || 0) + 1;
@@ -145,13 +146,18 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
       byPillar[pillar][kind] += 1;
       byPillar[pillar].total += 1;
       kindByPillar[kind][pillar] = (kindByPillar[kind][pillar] || 0) + 1;
+      if (r.indicator_code) {
+        kindCodes[kind].push(r.indicator_code);
+        if (!pillarCodes[pillar]) pillarCodes[pillar] = [];
+        pillarCodes[pillar].push(r.indicator_code);
+      }
     });
 
     const sourceList = Array.from(sources.entries())
       .map(([key, v]) => ({ key, name: key.split('::')[1], ...v }))
       .sort((a, b) => b.count - a.count);
 
-    return { sourceList, byPillar, kindTotals, kindByPillar, total: (auditRows || []).length };
+    return { sourceList, byPillar, kindTotals, kindByPillar, kindCodes, pillarCodes, total: (auditRows || []).length };
   }, [auditRows, indicatorCatalogByCode]);
 
   if (!lineage.total) {
@@ -175,6 +181,7 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
       pillarKeys={pillarKeys}
       pillarScores={pillarScores}
       finalScore={finalScore}
+      indicatorCatalogByCode={indicatorCatalogByCode}
     />
   );
 }
@@ -189,11 +196,14 @@ interface DiagramProps {
     byPillar: Record<string, { OFFICIAL: number; DERIVED: number; MANUAL: number; total: number }>;
     kindTotals: { OFFICIAL: number; DERIVED: number; MANUAL: number };
     kindByPillar: Record<SourceKind, Record<string, number>>;
+    kindCodes: Record<SourceKind, string[]>;
+    pillarCodes: Record<string, string[]>;
     total: number;
   };
   pillarKeys: string[];
   pillarScores: PillarScore[];
   finalScore: number | null;
+  indicatorCatalogByCode?: Map<string, any>;
 }
 
 function buildEmptyLineage() {
