@@ -1009,7 +1009,7 @@ const DiagnosticoDetalhe = () => {
             )}
             <IndicatorScoresView indicatorScores={displayedIndicatorScores as any} />
             {assessment?.id && assessment?.calculated_at && (
-              <AssessmentAuditTrail assessmentId={assessment.id} />
+              <AssessmentAuditTrail assessmentId={assessment.id} indicatorCatalogByCode={indicatorCatalogByCode} />
             )}
           </TabsContent>
 
