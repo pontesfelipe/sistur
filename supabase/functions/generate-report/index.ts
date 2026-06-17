@@ -1537,7 +1537,13 @@ TOM: institucional, técnico, ABNT. Justifique conclusões com dados. Sem jargã
 // quando o input estoura ~150k para que o caller possa avisar / fazer fallback.
 // ============================================================================
 const CLAUDE_MAX_CONTEXT_TOKENS = 200_000;
-const CLAUDE_HARD_OUTPUT_CAP = 16_000;
+// v1.66.8 — Cap elevado de 16k → 20k. O envelope (intro + ficha +
+// metodologia + benchmarks + prognóstico + plano de ação com 24 itens)
+// estava sendo truncado a ~16k em destinos com muitos indicadores
+// (sintoma reportado por Christiana em Piracaia: tabela do "Banco de
+// Ações" cortada no meio da última linha; relatório marcado como
+// "concluído" porque a truncagem por max_tokens passava silenciosamente).
+const CLAUDE_HARD_OUTPUT_CAP = 20_000;
 const CLAUDE_MIN_OUTPUT = 2_500;
 const CLAUDE_INPUT_SAFETY_TOKENS = 8_000; // margem para tool-use / metadata
 
@@ -1593,9 +1599,11 @@ function pickClaudeBudget(args: {
     // 1 dos 3 pilares — escopo restrito a ~1/3 dos indicadores.
     base = 3_500;
   } else if (phase === 'envelope') {
-    // Envelope cobre intro + ficha + metodologia + benchmarks + plano +
-    // referências; é a chamada mais longa.
-    base = 9_000;
+    // Envelope cobre intro + ficha + metodologia + benchmarks + prognóstico
+    // + plano de ação + referências; é a chamada mais longa. v1.66.8: base
+    // elevada de 9k → 12k para acomodar a seção 10 (Banco de Ações) com
+    // 20–30 linhas de tabela sem truncar.
+    base = 12_000;
   } else {
     // Pipeline monolítico (executivo/investidor) — texto único.
     base = 7_000;
@@ -1671,6 +1679,12 @@ async function callProviderNonStreaming(args: {
       let buffer = '';
       let acc = '';
       let streamErr: string | null = null;
+      // v1.66.8 — captura `stop_reason` do evento `message_delta` para
+      // detectar truncagem por `max_tokens`. Sem isso, o conteúdo era
+      // devolvido como sucesso mesmo quando Claude parava no meio de uma
+      // tabela/parágrafo, e o relatório saía marcado como "concluído"
+      // com texto cortado (caso Piracaia / Christiana).
+      let stopReason: string | null = null;
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -1688,12 +1702,24 @@ async function callProviderNonStreaming(args: {
               acc += evt.delta.text || '';
             } else if (evt.type === 'error') {
               streamErr = `claude stream error: ${JSON.stringify(evt.error || evt).slice(0, 200)}`;
+            } else if (evt.type === 'message_delta' && evt.delta?.stop_reason) {
+              stopReason = String(evt.delta.stop_reason);
+            } else if (evt.type === 'message_stop' && evt['amazon-bedrock-invocationMetrics']) {
+              // alguns proxies emitem stop_reason aqui
+              stopReason = stopReason || evt.stop_reason || null;
             }
           } catch { /* parcial — ignora */ }
         }
       }
       if (streamErr) return { ok: false, reason: streamErr };
       if (!acc || acc.trim().length < 32) return { ok: false, reason: `claude empty content (${acc.length})` };
+      if (stopReason && stopReason !== 'end_turn' && stopReason !== 'stop_sequence') {
+        // max_tokens, tool_use, refusal, etc. — conteúdo provavelmente
+        // incompleto. Devolve falha para que o orquestrador caia no
+        // próximo provedor (GPT-5 → Gemini) em vez de persistir um
+        // relatório truncado e marcar o job como concluído.
+        return { ok: false, reason: `claude truncated (stop_reason=${stopReason}, chars=${acc.length}, max_tokens=${maxTokens})` };
+      }
       return { ok: true, content: acc };
     }
     const model = provider === 'gpt5' ? 'openai/gpt-5' : 'google/gemini-2.5-pro';
@@ -1718,7 +1744,14 @@ async function callProviderNonStreaming(args: {
     }
     const j = await resp.json();
     const text = j?.choices?.[0]?.message?.content ?? '';
+    const finishReason: string | null = j?.choices?.[0]?.finish_reason ?? null;
     if (!text || text.trim().length < 32) return { ok: false, reason: `${provider} empty content (${text.length})` };
+    if (finishReason && finishReason !== 'stop' && finishReason !== 'end_turn') {
+      // 'length' = truncado por max_tokens; 'content_filter' = bloqueio;
+      // qualquer outro = conteúdo possivelmente incompleto. Cai no próximo
+      // provedor em vez de devolver texto truncado como sucesso.
+      return { ok: false, reason: `${provider} truncated (finish_reason=${finishReason}, chars=${text.length})` };
+    }
     return { ok: true, content: text };
   } catch (e) {
     const reason = e instanceof Error ? e.message : String(e);
