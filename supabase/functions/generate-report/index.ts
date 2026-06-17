@@ -3736,6 +3736,12 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           throw new Error('Nenhum provedor de IA conseguiu gerar o relatório. Tente novamente em alguns minutos.');
         }
 
+        fullContent = ensureDeterministicReportTail(fullContent, {
+          auditRows: auditTrail || [],
+          globalRefs,
+          kbFiles,
+          isEnterprise,
+        });
         let finalContent = fullContent;
         let validationStatus: 'clean' | 'warnings' | 'auto_corrected' = 'clean';
         let deterministic: string[] = [];
