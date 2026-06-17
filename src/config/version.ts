@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.6",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico — Procedência dos Dados: painel agora usa a trilha de auditoria (assessment_indicator_audit) como fonte da verdade, alinhando o total com o número real de indicadores calculados (ex.: 118 em vez de 112). Indicadores derivados (IPCR, I_SEMT, IPTL, leitos por hab., etc.) deixam de aparecer como zero e passam a ser contados corretamente na categoria 'Calculados'. Nova categoria 'Contextuais' para APIs oficiais de referência (PIB nacional, etc.).",
+    ],
+  },
   {
     version: "1.66.5",
     date: "2026-06-17",
