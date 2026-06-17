@@ -1905,8 +1905,9 @@ async function runTwoPhasePipeline(args: {
   cachedPillars?: Partial<{ RA: string; OE: string; AO: string }>;
   // Callback invocado quando um pilar termina (para persistir parcial).
   onPillarReady?: (pillar: 'RA' | 'OE' | 'AO', text: string) => void;
+  finalizeReportTail?: (markdown: string) => string;
 }): Promise<{ ok: true; content: string } | { ok: false; reason: string }> {
-  const { provider, systemPromptByPillar, envelopeSystemPrompt, pillarUserPrompt, envelopeUserPrompt, lovableApiKey, anthropicApiKey, onStage, onSectionReady, template, tier, indicatorCount, cachedPillars, onPillarReady } = args;
+  const { provider, systemPromptByPillar, envelopeSystemPrompt, pillarUserPrompt, envelopeUserPrompt, lovableApiKey, anthropicApiKey, onStage, onSectionReady, template, tier, indicatorCount, cachedPillars, onPillarReady, finalizeReportTail } = args;
 
   // Fase 1: 3 chamadas em paralelo. Se qualquer uma falhar, abortamos as outras.
   const controller = new AbortController();
@@ -2011,7 +2012,7 @@ async function runTwoPhasePipeline(args: {
     }
   }
 
-  finalText = ensureDeterministicReportTail(finalText, { auditRows: [], globalRefs: [], kbFiles: [] });
+  if (finalizeReportTail) finalText = finalizeReportTail(finalText);
 
   // Streaming sequencial pro cliente: emite cada peça em ordem natural.
   // Para manter UX previsível, não emitimos "cabeçalho parcial" — emitimos
