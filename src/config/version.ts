@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 13,
+  patch: 14,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.14",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Geração de Relatórios — corrigida truncagem na seção final de Referências. O relatório agora substitui/fecha deterministicamente Referências, Glossário e Apêndice a partir da trilha de auditoria e das fontes oficiais detectadas, evitando bibliografia cortada no meio (ex.: ANAC). Também envia max_tokens explícito para fallback GPT/Gemini no envelope.",
+    ],
+  },
   {
     version: "1.66.13",
     date: "2026-06-17",
