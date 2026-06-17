@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 8,
+  patch: 9,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.9",
+    date: "2026-06-17",
+    type: "minor" as const,
+    changes: [
+      "Auditoria Semântica — refatorada para execução em LOTES paralelos. As regras agora são avaliadas em grupos por categoria (até 6 regras por chamada) em vez de uma única chamada gigante. Reduz risco de o modelo 'pular' regras conforme a camada semântica cresce e diminui o tempo total de auditoria.",
+      "Auditoria Semântica — adicionadas 6 checagens DETERMINÍSTICAS (sem custo de IA) executadas antes dos lotes LLM: marcas de truncagem/placeholder (TODO, max_tokens), tabelas markdown duplicadas, régua de classificação oficial, formatação BRL canônica (R$ 1.234,56), expansão obrigatória de IGMA na 1ª ocorrência e proibição de ranking público entre municípios.",
+      "Auditoria Semântica — tolerância a falha por lote: se uma chamada falhar por timeout/429/402, apenas aquele lote é marcado como 'warn' com explicação, em vez de derrubar a auditoria inteira. Pool de paralelismo limitado a 6 requisições simultâneas para respeitar rate-limit do gateway.",
+      "Auditoria Semântica — resposta passa a incluir contadores 'batches' e 'deterministic_checks' para diagnóstico, mantendo o schema compatível com o painel atual.",
+    ],
+  },
   {
     version: "1.66.8",
     date: "2026-06-17",
