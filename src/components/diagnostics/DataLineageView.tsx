@@ -631,3 +631,116 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
     </div>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*  Selection details panel                                                    */
+/* -------------------------------------------------------------------------- */
+
+interface SelectionPanelProps {
+  selected:
+    | { type: 'source'; key: string }
+    | { type: 'kind'; kind: SourceKind }
+    | { type: 'pillar'; pillar: string }
+    | null;
+  lineage: DiagramProps['lineage'];
+  indicatorCatalogByCode?: Map<string, any>;
+  onClose: () => void;
+}
+
+function SelectionPanel({ selected, lineage, indicatorCatalogByCode, onClose }: SelectionPanelProps) {
+  if (!selected) return null;
+
+  let title = '';
+  let subtitle = '';
+  let codes: string[] = [];
+  let accent = 'hsl(220 15% 55%)';
+
+  if (selected.type === 'source') {
+    const src = lineage.sourceList.find((s) => s.key === selected.key);
+    if (!src) return null;
+    title = src.name;
+    subtitle = `${SOURCE_META[src.kind].label} · ${src.count} indicador${src.count === 1 ? '' : 'es'}`;
+    codes = src.codes;
+    accent = KIND_COLOR[src.kind];
+  } else if (selected.type === 'kind') {
+    const meta = SOURCE_META[selected.kind];
+    title = meta.label;
+    const c = lineage.kindCodes[selected.kind] || [];
+    subtitle = `${c.length} indicador${c.length === 1 ? '' : 'es'} desta categoria`;
+    codes = c;
+    accent = KIND_COLOR[selected.kind];
+  } else if (selected.type === 'pillar') {
+    title = `Pilar ${selected.pillar}`;
+    subtitle = PILLAR_LABEL[selected.pillar] || selected.pillar;
+    codes = lineage.pillarCodes[selected.pillar] || [];
+    accent = PILLAR_COLOR[selected.pillar] || 'hsl(220 15% 55%)';
+  }
+
+  // Group codes by pillar for richer context, dedupe display while keeping counts
+  const grouped = new Map<string, { code: string; name?: string; pillar?: string }>();
+  codes.forEach((code) => {
+    if (grouped.has(code)) return;
+    const ind = indicatorCatalogByCode?.get(code);
+    grouped.set(code, {
+      code,
+      name: ind?.name || ind?.label,
+      pillar: ind?.pillar ? String(ind.pillar).trim().toUpperCase() : undefined,
+    });
+  });
+  const items = Array.from(grouped.values()).sort((a, b) =>
+    (a.pillar || 'ZZZ').localeCompare(b.pillar || 'ZZZ') || a.code.localeCompare(b.code),
+  );
+
+  return (
+    <div
+      className="mt-6 rounded-xl border bg-card overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+      style={{ borderTop: `3px solid ${accent}` }}
+    >
+      <div className="flex items-start justify-between gap-4 px-4 py-3 border-b bg-muted/30">
+        <div className="min-w-0">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+            Indicadores neste nó
+          </p>
+          <h4 className="text-sm font-semibold truncate">{title}</h4>
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
+        </div>
+        <button
+          onClick={onClose}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          aria-label="Fechar"
+        >
+          Fechar ✕
+        </button>
+      </div>
+      {items.length === 0 ? (
+        <p className="p-6 text-sm text-muted-foreground text-center">
+          Nenhum código de indicador disponível para este nó.
+        </p>
+      ) : (
+        <div className="max-h-[360px] overflow-auto">
+          <ul className="divide-y">
+            {items.map((it) => (
+              <li key={it.code} className="px-4 py-2 flex items-center gap-3 text-xs hover:bg-muted/40 transition-colors">
+                {it.pillar && (
+                  <Badge
+                    variant="outline"
+                    className="tabular-nums text-[10px] shrink-0"
+                    style={{ borderColor: PILLAR_COLOR[it.pillar], color: PILLAR_COLOR[it.pillar] }}
+                  >
+                    {it.pillar}
+                  </Badge>
+                )}
+                <code className="font-mono text-[11px] text-muted-foreground shrink-0">{it.code}</code>
+                <span className="flex-1 truncate">{it.name || '—'}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div className="px-4 py-2 border-t bg-muted/20 text-[10px] text-muted-foreground flex items-center justify-between">
+        <span>{items.length} indicador{items.length === 1 ? '' : 'es'} único{items.length === 1 ? '' : 's'}</span>
+        <span className="italic">Clique novamente no nó para fechar</span>
+      </div>
+    </div>
+  );
+}
