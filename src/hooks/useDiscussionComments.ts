@@ -4,6 +4,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 export type CommentEntityType = 'assessment' | 'report';
+export type CommentAnchorType = 'general' | 'pillar' | 'indicator';
+export type CommentStatus = 'open' | 'resolved';
 
 export interface DiscussionComment {
   id: string;
@@ -16,6 +18,12 @@ export interface DiscussionComment {
   mentioned_user_ids: string[];
   edited_at: string | null;
   created_at: string;
+  anchor_type: CommentAnchorType | null;
+  anchor_ref: string | null;
+  status: CommentStatus;
+  assignee_id: string | null;
+  resolved_at: string | null;
+  resolved_by: string | null;
 }
 
 export interface MentionableMember {
@@ -30,7 +38,7 @@ export function useDiscussionComments(entityType: CommentEntityType, entityId?: 
     queryFn: async () => {
       const { data, error } = await supabase
         .from('discussion_comments' as any)
-        .select('id, org_id, entity_type, entity_id, author_id, body, mentioned_user_ids, edited_at, created_at')
+        .select('id, org_id, entity_type, entity_id, author_id, body, mentioned_user_ids, edited_at, created_at, anchor_type, anchor_ref, status, assignee_id, resolved_at, resolved_by')
         .eq('entity_type', entityType)
         .eq('entity_id', entityId!)
         .is('deleted_at', null)
@@ -92,6 +100,9 @@ export function useCreateComment() {
       org_id: string;
       body: string;
       mentioned_user_ids?: string[];
+      anchor_type?: CommentAnchorType | null;
+      anchor_ref?: string | null;
+      assignee_id?: string | null;
     }) => {
       if (!user?.id) throw new Error('Não autenticado');
       const body = input.body.trim();
@@ -106,6 +117,9 @@ export function useCreateComment() {
           author_id: user.id,
           body,
           mentioned_user_ids: input.mentioned_user_ids ?? [],
+          anchor_type: input.anchor_type ?? 'general',
+          anchor_ref: input.anchor_ref ?? null,
+          assignee_id: input.assignee_id ?? null,
         })
         .select()
         .single();
@@ -134,5 +148,23 @@ export function useDeleteComment(entityType: CommentEntityType, entityId: string
       toast.success('Comentário removido');
     },
     onError: () => toast.error('Não foi possível remover o comentário'),
+  });
+}
+
+export function useSetCommentStatus(entityType: CommentEntityType, entityId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (vars: { comment_id: string; status: CommentStatus }) => {
+      const { error } = await (supabase.rpc as any)('set_discussion_comment_status', {
+        p_comment_id: vars.comment_id,
+        p_status: vars.status,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ['discussion-comments', entityType, entityId] });
+      toast.success(vars.status === 'resolved' ? 'Marcado como resolvido' : 'Reaberto');
+    },
+    onError: (e: any) => toast.error(e?.message ?? 'Não foi possível atualizar o status'),
   });
 }
