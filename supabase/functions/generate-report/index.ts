@@ -1973,13 +1973,16 @@ async function runTwoPhasePipeline(args: {
       })
     : null;
   if (envBudget) onStage('claude_budget_envelope', envBudget);
+  const envelopeMaxTokens = provider === 'claude'
+    ? (envBudget ? envBudget.maxTokens : 16000)
+    : 32000;
   const envRes = await callProviderNonStreaming({
     provider,
     systemPrompt: envelopeSystemPrompt,
     userPrompt: envUserPrompt,
     lovableApiKey,
     anthropicApiKey,
-    maxTokens: envBudget ? envBudget.maxTokens : 16000,
+    maxTokens: envelopeMaxTokens,
   });
   if (!envRes.ok) return { ok: false, reason: `envelope failed: ${envRes.reason}` };
   onStage('phase2_envelope_done', { provider, chars: envRes.content.length });
@@ -2007,6 +2010,8 @@ async function runTwoPhasePipeline(args: {
       finalText = envRes.content + '\n\n' + pillarsBlock;
     }
   }
+
+  finalText = ensureDeterministicReportTail(finalText, { auditRows: [], globalRefs: [], kbFiles: [] });
 
   // Streaming sequencial pro cliente: emite cada peça em ordem natural.
   // Para manter UX previsível, não emitimos "cabeçalho parcial" — emitimos
