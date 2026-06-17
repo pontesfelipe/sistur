@@ -48,6 +48,30 @@ const SOURCE_META: Record<SourceKind, { label: string; icon: any; tone: string; 
 
 const OFFICIAL_TOKENS = ['IBGE', 'CADASTUR', 'STN', 'DATASUS', 'MAPA_TURISMO', 'MAPA DO TURISMO', 'INEP', 'ANATEL', 'TSE', 'ANA', 'ANAC', 'CADUNICO', 'RAIS', 'CAGED'];
 
+/**
+ * Commercial / full names shown to the user instead of acronyms.
+ */
+const SOURCE_DISPLAY_NAMES: Record<string, string> = {
+  IBGE: 'IBGE — Instituto Brasileiro de Geografia e Estatística',
+  CADASTUR: 'CADASTUR — Cadastro dos Prestadores de Serviços Turísticos (MTur)',
+  STN: 'STN — Secretaria do Tesouro Nacional',
+  DATASUS: 'DATASUS — Ministério da Saúde',
+  MAPA_TURISMO: 'Mapa do Turismo Brasileiro (MTur)',
+  'MAPA DO TURISMO': 'Mapa do Turismo Brasileiro (MTur)',
+  INEP: 'INEP — Instituto Nacional de Estudos e Pesquisas Educacionais',
+  ANATEL: 'ANATEL — Agência Nacional de Telecomunicações',
+  TSE: 'TSE — Tribunal Superior Eleitoral',
+  ANA: 'ANA — Agência Nacional de Águas e Saneamento',
+  ANAC: 'ANAC — Agência Nacional de Aviação Civil',
+  CADUNICO: 'CadÚnico — Ministério do Desenvolvimento Social',
+  RAIS: 'RAIS — Relação Anual de Informações Sociais (MTE)',
+  CAGED: 'CAGED — Cadastro Geral de Empregados e Desempregados (MTE)',
+};
+
+function displaySourceName(token: string): string {
+  return SOURCE_DISPLAY_NAMES[token.toUpperCase()] || token;
+}
+
 function classifyRow(row: any): { kind: SourceKind; sourceName: string } {
   const code = String(row.indicator_code || '');
   const type = String(row.source_type || '').toUpperCase();
@@ -58,10 +82,10 @@ function classifyRow(row: any): { kind: SourceKind; sourceName: string } {
   }
   if (type.startsWith('OFFICIAL_API') || type === 'AUTOMATICA') {
     const token = OFFICIAL_TOKENS.find((t) => detail.includes(t));
-    return { kind: 'OFFICIAL', sourceName: token || 'Fonte Oficial' };
+    return { kind: 'OFFICIAL', sourceName: token ? displaySourceName(token) : 'Fonte Oficial' };
   }
   const token = OFFICIAL_TOKENS.find((t) => detail.includes(t));
-  if (token) return { kind: 'OFFICIAL', sourceName: token };
+  if (token) return { kind: 'OFFICIAL', sourceName: displaySourceName(token) };
   if (type === 'ESTIMADA') return { kind: 'DERIVED', sourceName: 'Estimativa' };
   return { kind: 'MANUAL', sourceName: 'Equipe local' };
 }
@@ -81,7 +105,7 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
       if (entry.codes.length < 8 && r.indicator_code) entry.codes.push(r.indicator_code);
       sources.set(key, entry);
 
-      const pillar = r.pillar || 'OUTROS';
+      const pillar = String(r.pillar || 'OUTROS').trim().toUpperCase();
       if (!byPillar[pillar]) byPillar[pillar] = { OFFICIAL: 0, DERIVED: 0, MANUAL: 0, total: 0 };
       byPillar[pillar][kind] += 1;
       byPillar[pillar].total += 1;
@@ -106,7 +130,7 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
   }
 
   const pillarKeys = pillarScores.length
-    ? pillarScores.map((p) => p.pillar)
+    ? pillarScores.map((p) => String(p.pillar).trim().toUpperCase())
     : Object.keys(lineage.byPillar);
 
   return (
