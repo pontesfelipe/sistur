@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 7,
+  patch: 8,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.8",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Relatórios — corrigida truncagem silenciosa do envelope (Banco de Ações cortado no meio da tabela). Agora detectamos `stop_reason=max_tokens` (Claude) e `finish_reason=length` (GPT-5/Gemini) e fazemos fallback automático para o próximo provedor, em vez de persistir conteúdo incompleto marcado como 'concluído' (caso Piracaia / Christiana).",
+      "Relatórios — orçamento de saída do envelope elevado (base 9k → 12k tokens; teto 16k → 20k) para acomodar Plano de Ação com 20+ linhas sem cortar em destinos com muitos indicadores.",
+    ],
+  },
   {
     version: "1.66.7",
     date: "2026-06-17",
