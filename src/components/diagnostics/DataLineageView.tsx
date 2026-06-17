@@ -215,7 +215,7 @@ interface Anchor {
   y: number;
 }
 
-function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore }: DiagramProps) {
+function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicatorCatalogByCode }: DiagramProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sourceRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const kindRefs = useRef<Map<SourceKind, HTMLDivElement>>(new Map());
@@ -230,6 +230,29 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore }: Diagr
     | { type: 'pillar'; pillar: string }
     | null
   >(null);
+  type Selection =
+    | { type: 'source'; key: string }
+    | { type: 'kind'; kind: SourceKind }
+    | { type: 'pillar'; pillar: string }
+    | null;
+  const [selected, setSelected] = useState<Selection>(null);
+
+  function toggleSelect(next: NonNullable<Selection>) {
+    setSelected((curr) => {
+      if (!curr) return next;
+      if (curr.type !== next.type) return next;
+      if (curr.type === 'source' && next.type === 'source' && curr.key === next.key) return null;
+      if (curr.type === 'kind' && next.type === 'kind' && curr.kind === next.kind) return null;
+      if (curr.type === 'pillar' && next.type === 'pillar' && curr.pillar === next.pillar) return null;
+      return next;
+    });
+  }
+
+  // Recompute SVG when selection toggles (panel expansion changes layout heights)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setTick((t) => t + 1));
+    return () => cancelAnimationFrame(id);
+  }, [selected]);
 
   useLayoutEffect(() => {
     const el = containerRef.current;
