@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.4",
+    date: "2026-06-17",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico — Linhagem dos Dados reformulada como um diagrama de fluxo (Sankey-like): conexões em curvas SVG ligam Fontes → Tipo de indicador → Pilares → Score final, com espessura proporcional ao volume de indicadores e cores por tipo (oficial/derivado/manual) e por pilar (RA/OE/AO). Ao passar o mouse sobre qualquer nó, o fluxo correspondente é destacado e os demais ficam atenuados. Cada pilar agora exibe a quebra por tipo de fonte (X of. / Y der. / Z man.) e o card de Resultado lista o score individual de RA/OE/AO. Corrigida a contagem '0 indicadores' nos pilares: agora o pilar é resolvido pelo catálogo de indicadores quando a auditoria não traz o campo, com fallback heurístico pelo código.",
+    ],
+  },
   {
     version: "1.66.3",
     date: "2026-06-17",

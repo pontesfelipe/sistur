@@ -1071,6 +1071,7 @@ const DiagnosticoDetalhe = () => {
               auditRows={auditRows as any}
               indicatorValues={indicatorValues as any}
               pillarScores={pillarScores as any}
+              indicatorCatalogByCode={indicatorCatalogByCode}
               finalScore={
                 pillarScores.length > 0
                   ? pillarScores.reduce((sum: number, p: any) => sum + (Number(p.score) || 0), 0) / pillarScores.length
