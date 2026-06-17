@@ -1861,6 +1861,7 @@ async function callProviderNonStreaming(args: {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
+        max_tokens: maxTokens,
       }),
       signal,
     });
