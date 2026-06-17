@@ -164,7 +164,7 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
                       title={s.codes.join(', ')}
                     >
                       <Icon className="h-3.5 w-3.5 shrink-0" />
-                      <span className="text-xs font-medium truncate flex-1">{s.name}</span>
+                      <span className="text-xs font-medium flex-1 leading-snug">{s.name}</span>
                       <span className="text-[10px] tabular-nums font-bold opacity-80">{s.count}</span>
                     </div>
                   );
