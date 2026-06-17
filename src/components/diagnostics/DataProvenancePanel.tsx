@@ -44,9 +44,12 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
           source_type: row.source_type,
         };
         const type = String(row.source_type || '').toUpperCase();
+        const detail = String(row.source_detail || '').toUpperCase();
         const isInDerivedCatalog = isDerivedIndicator(code);
+        const detailHasOfficialToken = OFFICIAL_TOKENS.some((t) => detail.includes(t));
+        const isPrefilledOfficial = (detail.includes('PRÉ-PREENCHIDO') || detail.includes('PRE-PREENCHIDO')) && detailHasOfficialToken;
         if (type.startsWith('DERIVED') || isInDerivedCatalog) buckets.derived.push(enriched);
-        else if (type.startsWith('OFFICIAL_API')) buckets.official.push(enriched);
+        else if (type.startsWith('OFFICIAL_API') || type === 'AUTOMATICA' || isPrefilledOfficial || (detailHasOfficialToken && type !== 'MANUAL')) buckets.official.push(enriched);
         else if (type === 'MANUAL') buckets.manual.push(enriched);
         else buckets.other.push(enriched);
       });

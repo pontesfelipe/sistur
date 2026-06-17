@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 9,
+  patch: 10,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.10",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Procedência dos Dados — corrigida divergência de 1 indicador em relação ao painel de Linhagem (caso Piracaia: 20 vs 21). Indicadores marcados como 'Pré-preenchido (ANA/IBGE/…)' com source_type=MANUAL passam a ser contabilizados como Oficiais (alinhado à classificação já usada em Linhagem dos Dados), em vez de aparecerem indevidamente em 'Manuais'.",
+    ],
+  },
   {
     version: "1.66.9",
     date: "2026-06-17",
