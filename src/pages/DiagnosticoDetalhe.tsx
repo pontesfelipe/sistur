@@ -9,6 +9,7 @@ import { EduRecommendationsPanel } from '@/components/dashboard/EduRecommendatio
 import { IGMAWarningsPanel } from '@/components/dashboard/IGMAWarningsPanel';
 import { CreateProjectFromDiagnosticView } from '@/components/dashboard/CreateProjectFromDiagnosticView';
 import { CommentsPanel } from '@/components/discussions/CommentsPanel';
+import { AssessmentReviewPanel } from '@/components/discussions/AssessmentReviewPanel';
 import { EnterpriseCategoriesView } from '@/components/dashboard/EnterpriseCategoriesView';
 import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculationChecklist';
 import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePanel';
@@ -1050,12 +1051,17 @@ const DiagnosticoDetalhe = () => {
           </TabsContent>
 
           <TabsContent value="comentarios">
-            <CommentsPanel
-              entityType="assessment"
-              entityId={id!}
+            <AssessmentReviewPanel
+              assessmentId={id!}
               orgId={assessment.org_id}
-              title="Discussão sobre o diagnóstico"
-              description="Compartilhe observações com sua equipe e marque colegas com @ para envolvê-los."
+              pillarKeys={pillarScores.map((p: any) => p.pillar)}
+              indicators={Array.from(indicatorCatalogByCode.values())
+                .filter((i: any) => i?.code)
+                .map((i: any) => ({
+                  code: i.code,
+                  label: `${i.code} — ${i.name || i.label || i.code}`,
+                  pillar: i.pillar ?? null,
+                }))}
             />
           </TabsContent>
 

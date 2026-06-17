@@ -2008,6 +2008,9 @@ export type Database = {
       }
       discussion_comments: {
         Row: {
+          anchor_ref: string | null
+          anchor_type: string | null
+          assignee_id: string | null
           author_id: string
           body: string
           created_at: string
@@ -2019,9 +2022,15 @@ export type Database = {
           mentioned_user_ids: string[]
           org_id: string
           parent_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
           updated_at: string
         }
         Insert: {
+          anchor_ref?: string | null
+          anchor_type?: string | null
+          assignee_id?: string | null
           author_id: string
           body: string
           created_at?: string
@@ -2033,9 +2042,15 @@ export type Database = {
           mentioned_user_ids?: string[]
           org_id: string
           parent_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
           updated_at?: string
         }
         Update: {
+          anchor_ref?: string | null
+          anchor_type?: string | null
+          assignee_id?: string | null
           author_id?: string
           body?: string
           created_at?: string
@@ -2047,6 +2062,9 @@ export type Database = {
           mentioned_user_ids?: string[]
           org_id?: string
           parent_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: [
@@ -10500,6 +10518,10 @@ export type Database = {
         Returns: number
       }
       set_demo_org_id: { Args: { target_org_id: string }; Returns: undefined }
+      set_discussion_comment_status: {
+        Args: { p_comment_id: string; p_status: string }
+        Returns: undefined
+      }
       set_org_indicator_weight: {
         Args: { p_indicator_id: string; p_org_id: string; p_weight: number }
         Returns: undefined
