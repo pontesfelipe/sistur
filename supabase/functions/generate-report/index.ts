@@ -3626,6 +3626,12 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               template: reportTemplate,
               tier: assessment?.tier as ClaudeBudgetTier,
               indicatorCount: Array.isArray(auditTrail) ? auditTrail.length : 0,
+              finalizeReportTail: (markdown) => ensureDeterministicReportTail(markdown, {
+                auditRows: auditTrail || [],
+                globalRefs,
+                kbFiles,
+                isEnterprise,
+              }),
               cachedPillars: (incomingPartialPillars && typeof incomingPartialPillars === 'object')
                 ? incomingPartialPillars as Partial<{ RA: string; OE: string; AO: string }>
                 : undefined,
