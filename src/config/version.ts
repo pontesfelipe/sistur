@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.3",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico — Linhagem dos Dados: corrigida a contagem por pilar (RA/OE/AO), que aparecia como '0 indicadores' por divergência de capitalização entre os dados de auditoria e os scores dos pilares. Coluna 'Fontes' passa a exibir o nome comercial das fontes oficiais (ex.: 'IBGE — Instituto Brasileiro de Geografia e Estatística', 'Mapa do Turismo Brasileiro (MTur)') em vez das siglas.",
+    ],
+  },
   {
     version: "1.66.2",
     date: "2026-06-17",
