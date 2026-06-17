@@ -420,10 +420,16 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
                       }}
                       onMouseEnter={() => setHover({ type: 'source', key: s.key })}
                       onMouseLeave={() => setHover(null)}
-                      className={`rounded-lg border px-2.5 py-2 ${meta.tone} flex items-center gap-2 cursor-default transition-all ${
-                        isHovered ? `ring-2 ${meta.ring} shadow-md` : ''
+                      onClick={() => toggleSelect({ type: 'source', key: s.key })}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selected?.type === 'source' && selected.key === s.key}
+                      className={`rounded-lg border px-2.5 py-2 ${meta.tone} flex items-center gap-2 cursor-pointer transition-all ${
+                        isHovered || (selected?.type === 'source' && selected.key === s.key)
+                          ? `ring-2 ${meta.ring} shadow-md`
+                          : ''
                       }`}
-                      title={s.codes.join(', ')}
+                      title="Clique para ver os indicadores"
                     >
                       <Icon className="h-3.5 w-3.5 shrink-0" />
                       <span className="text-xs font-medium flex-1 leading-snug">{s.name}</span>
@@ -455,8 +461,14 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
                       }}
                       onMouseEnter={() => setHover({ type: 'kind', kind: k })}
                       onMouseLeave={() => setHover(null)}
-                      className={`rounded-lg border ${meta.tone} p-3 cursor-default transition-all ${
-                        isHovered ? `ring-2 ${meta.ring} shadow-md` : ''
+                      onClick={() => toggleSelect({ type: 'kind', kind: k })}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selected?.type === 'kind' && selected.kind === k}
+                      className={`rounded-lg border ${meta.tone} p-3 cursor-pointer transition-all ${
+                        isHovered || (selected?.type === 'kind' && selected.kind === k)
+                          ? `ring-2 ${meta.ring} shadow-md`
+                          : ''
                       }`}
                     >
                       <div className="flex items-center gap-2 mb-1.5">
@@ -498,8 +510,14 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
                       }}
                       onMouseEnter={() => setHover({ type: 'pillar', pillar: pk })}
                       onMouseLeave={() => setHover(null)}
-                      className={`rounded-lg border bg-card p-3 cursor-default transition-all ${
-                        isHovered ? 'ring-2 ring-primary/50 shadow-md' : ''
+                      onClick={() => toggleSelect({ type: 'pillar', pillar: pk })}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selected?.type === 'pillar' && selected.pillar === pk}
+                      className={`rounded-lg border bg-card p-3 cursor-pointer transition-all ${
+                        isHovered || (selected?.type === 'pillar' && selected.pillar === pk)
+                          ? 'ring-2 ring-primary/50 shadow-md'
+                          : ''
                       }`}
                       style={{ borderLeft: `4px solid ${PILLAR_COLOR[pk] || 'hsl(220 15% 55%)'}` }}
                     >
@@ -583,6 +601,14 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
             </div>
             </div>
           </div>
+
+          {/* Painel de detalhes do nó selecionado */}
+          <SelectionPanel
+            selected={selected}
+            lineage={lineage}
+            indicatorCatalogByCode={indicatorCatalogByCode}
+            onClose={() => setSelected(null)}
+          />
 
           {/* Legenda */}
           <div className="mt-8 pt-4 border-t flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
