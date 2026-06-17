@@ -847,6 +847,129 @@ function formatExternalBenchmarks(externalValues: any[], indicatorsById: Map<str
   return lines.join('\n') + '\n';
 }
 
+function normalizeForSourceMatch(value: string): string {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase();
+}
+
+function formatAccessDateBR(date = new Date()): string {
+  const month = ['jan.', 'fev.', 'mar.', 'abr.', 'maio', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'][date.getMonth()];
+  return `${date.getDate()} ${month} ${date.getFullYear()}`;
+}
+
+function detectReferenceSourceCodes(auditRows: any[]): Set<string> {
+  const found = new Set<string>();
+  const addIf = (code: string, re: RegExp, text: string) => { if (re.test(text)) found.add(code); };
+
+  for (const row of auditRows || []) {
+    const hay = normalizeForSourceMatch(`${row.indicator_code || ''} ${row.indicator_name || ''} ${row.source_type || ''} ${row.source_detail || ''}`);
+    addIf('ANA', /\bANA\b|IQA|QUALIDADE DA AGUA|RECURSOS HIDRICOS|SNIRH/, hay);
+    addIf('ANAC', /\bANAC\b|AEREO|AEROPORT|VOOS?|TRANSPORTE AEREO/, hay);
+    addIf('ANATEL', /\bANATEL\b|CONECTIVIDADE|BANDA LARGA|\b5G\b|TELECOM/, hay);
+    addIf('IBGE', /\bIBGE\b|POPULACAO|DENSIDADE|AREA|PIB|IDH|GINI|MORTALIDADE INFANTIL/, hay);
+    addIf('DATASUS', /DATASUS|SAUDE|LEITOS? HOSPITAL|COBERTURA DE SAUDE|MORTALIDADE GERAL/, hay);
+    addIf('STN', /\bSTN\b|TESOURO|CAPAG|RECEITA|DESPESA|FISCAL|LRF|PESSOAL EXECUTIVO|LEGISLATIVO/, hay);
+    addIf('CADASTUR', /CADASTUR|GUIAS? DE TURISMO|AGENCIAS? DE TURISMO|MEIOS? DE HOSPEDAGEM|LEITOS? DE HOSPEDAGEM/, hay);
+    addIf('MTUR', /MAPA DO TURISMO|\bMTUR\b|MINISTERIO DO TURISMO|REGIAO TURISTICA|CATEGORIA|VISITANTES|ARRECADACAO TURISTICA|EMPREGOS FORMAIS/, hay);
+    addIf('INEP', /\bINEP\b|IDEB|ESCOLARIZACAO|EDUCACAO/, hay);
+    addIf('TSE', /\bTSE\b|ELEITORAL|PARTICIPACAO CIVICA|TURNOUT/, hay);
+    addIf('CADUNICO', /CADUNICO|CADUNICO|CADASTRO UNICO|POBREZA|VULNERABILIDADE/, hay);
+    addIf('SEEG', /\bSEEG\b|MAPBIOMAS|EMISSAO|GASES|CO2|CO₂/, hay);
+  }
+
+  if ([...found].length === 0 && (auditRows || []).some((r) => String(r.source_type || '').includes('OFFICIAL'))) {
+    found.add('IBGE');
+  }
+  return found;
+}
+
+function buildDeterministicReferences(args: {
+  auditRows: any[];
+  globalRefs?: any[];
+  kbFiles?: any[];
+}): string {
+  const accessDate = formatAccessDateBR();
+  const sources = detectReferenceSourceCodes(args.auditRows || []);
+  const refs: string[] = [
+    'BENI, Mario Carlos. Análise estrutural do turismo. São Paulo: SENAC, 1997.',
+    'BENI, Mario Carlos. Análise estrutural do turismo. 13. ed. São Paulo: SENAC, 2007.',
+    'BENI, Mario Carlos. Política e planejamento de turismo no Brasil. São Paulo: Aleph, 2006.',
+    'BRASIL. Ministério do Turismo. Plano Nacional de Turismo 2024–2027. Brasília: MTur, 2024.',
+  ];
+  const official: Record<string, string> = {
+    ANA: `AGÊNCIA NACIONAL DE ÁGUAS E SANEAMENTO BÁSICO (ANA). Sistema Nacional de Informações sobre Recursos Hídricos: Índice de Qualidade da Água (IQA). Brasília: ANA. Disponível em: https://www.snirh.gov.br/portal/snirh. Acesso em: ${accessDate}.`,
+    ANAC: `AGÊNCIA NACIONAL DE AVIAÇÃO CIVIL (ANAC). Anuário do Transporte Aéreo. Brasília: ANAC. Disponível em: https://www.gov.br/anac/pt-br/assuntos/dados-e-estatisticas. Acesso em: ${accessDate}.`,
+    ANATEL: `AGÊNCIA NACIONAL DE TELECOMUNICAÇÕES (ANATEL). Dados abertos de telecomunicações. Brasília: ANATEL. Disponível em: https://dados.gov.br/dados/organizacoes/visualizar/agencia-nacional-de-telecomunicacoes-anatel. Acesso em: ${accessDate}.`,
+    CADASTUR: `BRASIL. Ministério do Turismo. CADASTUR: cadastro de prestadores de serviços turísticos. Brasília: MTur. Disponível em: https://cadastur.turismo.gov.br/. Acesso em: ${accessDate}.`,
+    CADUNICO: `BRASIL. Ministério do Desenvolvimento e Assistência Social, Família e Combate à Fome. Cadastro Único para Programas Sociais. Brasília: MDS. Disponível em: https://www.gov.br/mds/pt-br/acoes-e-programas/cadastro-unico. Acesso em: ${accessDate}.`,
+    DATASUS: `BRASIL. Ministério da Saúde. DATASUS: informações de saúde. Brasília: Ministério da Saúde. Disponível em: https://datasus.saude.gov.br/. Acesso em: ${accessDate}.`,
+    IBGE: `INSTITUTO BRASILEIRO DE GEOGRAFIA E ESTATÍSTICA (IBGE). Cidades e Estados. Rio de Janeiro: IBGE. Disponível em: https://www.ibge.gov.br/cidades-e-estados. Acesso em: ${accessDate}.`,
+    INEP: `INSTITUTO NACIONAL DE ESTUDOS E PESQUISAS EDUCACIONAIS ANÍSIO TEIXEIRA (INEP). Indicadores Educacionais. Brasília: INEP. Disponível em: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos. Acesso em: ${accessDate}.`,
+    MTUR: `BRASIL. Ministério do Turismo. Mapa do Turismo Brasileiro. Brasília: MTur. Disponível em: https://www.mapa.turismo.gov.br/. Acesso em: ${accessDate}.`,
+    SEEG: `SISTEMA DE ESTIMATIVAS DE EMISSÕES E REMOÇÕES DE GASES DE EFEITO ESTUFA (SEEG). Plataforma de dados. Observatório do Clima. Disponível em: https://seeg.eco.br/. Acesso em: ${accessDate}.`,
+    STN: `BRASIL. Secretaria do Tesouro Nacional. Sistema de Informações Contábeis e Fiscais do Setor Público Brasileiro — SICONFI. Brasília: STN. Disponível em: https://siconfi.tesouro.gov.br/. Acesso em: ${accessDate}.`,
+    TSE: `TRIBUNAL SUPERIOR ELEITORAL (TSE). Dados eleitorais. Brasília: TSE. Disponível em: https://dadosabertos.tse.jus.br/. Acesso em: ${accessDate}.`,
+  };
+  for (const key of Object.keys(official).sort()) {
+    if (sources.has(key)) refs.push(official[key]);
+  }
+  for (const ref of args.globalRefs || []) {
+    const name = String(ref.file_name || '').trim();
+    if (name) refs.push(`BRASIL. ${name}. Documento de referência nacional utilizado no SISTUR.`);
+  }
+  for (const file of args.kbFiles || []) {
+    const name = String(file.file_name || '').trim();
+    if (name) refs.push(`BASE DE CONHECIMENTO DO DESTINO. ${name}. Documento local associado ao diagnóstico SISTUR.`);
+  }
+  return refs
+    .map((r) => r.replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .filter((r, i, arr) => arr.indexOf(r) === i)
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+    .join('\n\n');
+}
+
+function buildDeterministicTail(args: { auditRows: any[]; globalRefs?: any[]; kbFiles?: any[]; isEnterprise?: boolean }): string {
+  const references = buildDeterministicReferences(args);
+  const kbList = (args.kbFiles || []).map((f: any) => `- ${f.file_name}${f.category ? ` (${f.category})` : ''}`).join('\n') || '- Nenhum documento local da Base de Conhecimento foi associado a este relatório.';
+  return `## Referências
+
+${references}
+
+## Glossário
+
+| Termo | Definição |
+|---|---|
+| SISTUR | Sistema Integrado de Suporte para Turismo em Regiões, baseado na leitura sistêmica do turismo. |
+| IGMA | Índice de Gestão Municipal Ambiental, usado como camada interpretativa de governança e sustentabilidade territorial. |
+| I-RA | Relações Ambientais: eixo territorial, ambiental, demográfico, sanitário e de segurança. |
+| I-OE | Organização Estrutural: eixo de infraestrutura turística, serviços, mercado e qualificação. |
+| I-AO | Ações Operacionais: eixo de governança, planejamento, orçamento e capacidade institucional. |
+| I-SISTUR | Índice interno de leitura consolidada do diagnóstico SISTUR, sem finalidade de ranking público. |
+
+## Apêndice
+
+### Documentos da Base de Conhecimento consultados
+
+${kbList}
+
+### Nota de integridade
+
+As referências finais foram consolidadas deterministicamente a partir da trilha de auditoria, das fontes oficiais presentes no diagnóstico e dos documentos associados ao relatório, para evitar corte ou bibliografia incompleta na etapa final de geração.`;
+}
+
+function ensureDeterministicReportTail(reportText: string, args: { auditRows: any[]; globalRefs?: any[]; kbFiles?: any[]; isEnterprise?: boolean }): string {
+  const text = String(reportText || '').trimEnd();
+  const tail = buildDeterministicTail(args);
+  const refMatch = [...text.matchAll(/^##\s*Refer[eê]ncias(?:\s*\([^\n]*\))?\s*$/gim)].pop();
+  if (refMatch?.index !== undefined) {
+    return `${text.slice(0, refMatch.index).trimEnd()}\n\n${tail}\n`;
+  }
+  return `${text}\n\n${tail}\n`;
+}
+
 // ========== COVER TABLE (mandatory for all templates) ==========
 
 function buildCoverBlock(destinationName: string, assessment: any, pillarScores: any, template: string): string {
