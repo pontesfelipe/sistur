@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.2",
+    date: "2026-06-17",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico — aba 'Comentários' reformulada como Revisão técnica: cada comentário pode ser ancorado no diagnóstico, em um pilar (RA/OE/AO) ou em um indicador específico, ter um responsável atribuído e status aberto/resolvido. Inclui filtros por status e por âncora, contadores no cabeçalho e botão de resolver/reabrir (autor, responsável, ADMIN ou ORG_ADMIN/ANALYST da mesma organização). Backend: novas colunas em discussion_comments e RPC set_discussion_comment_status com checagem de autorização.",
+    ],
+  },
   {
     version: "1.66.1",
     date: "2026-06-17",
