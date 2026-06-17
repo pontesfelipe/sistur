@@ -74,6 +74,24 @@ function displaySourceName(token: string): string {
   return SOURCE_DISPLAY_NAMES[token.toUpperCase()] || token;
 }
 
+/**
+ * Converts a raw indicator code (e.g. "igma_agencias_turismo") into a friendly
+ * Title Case label ("Agências de Turismo") for display when the catalog does
+ * not provide an explicit name.
+ */
+function prettifyCode(code: string): string {
+  if (!code) return '';
+  const cleaned = code
+    .replace(/^igma[_-]/i, '')
+    .replace(/^ind[_-]/i, '')
+    .replace(/[_-]+/g, ' ')
+    .trim();
+  return cleaned
+    .split(' ')
+    .map((w) => (w.length <= 2 ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()))
+    .join(' ');
+}
+
 function classifyRow(row: any): { kind: SourceKind; sourceName: string } {
   const code = String(row.indicator_code || '');
   const type = String(row.source_type || '').toUpperCase();
