@@ -1537,7 +1537,13 @@ TOM: institucional, técnico, ABNT. Justifique conclusões com dados. Sem jargã
 // quando o input estoura ~150k para que o caller possa avisar / fazer fallback.
 // ============================================================================
 const CLAUDE_MAX_CONTEXT_TOKENS = 200_000;
-const CLAUDE_HARD_OUTPUT_CAP = 16_000;
+// v1.66.8 — Cap elevado de 16k → 20k. O envelope (intro + ficha +
+// metodologia + benchmarks + prognóstico + plano de ação com 24 itens)
+// estava sendo truncado a ~16k em destinos com muitos indicadores
+// (sintoma reportado por Christiana em Piracaia: tabela do "Banco de
+// Ações" cortada no meio da última linha; relatório marcado como
+// "concluído" porque a truncagem por max_tokens passava silenciosamente).
+const CLAUDE_HARD_OUTPUT_CAP = 20_000;
 const CLAUDE_MIN_OUTPUT = 2_500;
 const CLAUDE_INPUT_SAFETY_TOKENS = 8_000; // margem para tool-use / metadata
 
@@ -1593,9 +1599,11 @@ function pickClaudeBudget(args: {
     // 1 dos 3 pilares — escopo restrito a ~1/3 dos indicadores.
     base = 3_500;
   } else if (phase === 'envelope') {
-    // Envelope cobre intro + ficha + metodologia + benchmarks + plano +
-    // referências; é a chamada mais longa.
-    base = 9_000;
+    // Envelope cobre intro + ficha + metodologia + benchmarks + prognóstico
+    // + plano de ação + referências; é a chamada mais longa. v1.66.8: base
+    // elevada de 9k → 12k para acomodar a seção 10 (Banco de Ações) com
+    // 20–30 linhas de tabela sem truncar.
+    base = 12_000;
   } else {
     // Pipeline monolítico (executivo/investidor) — texto único.
     base = 7_000;
