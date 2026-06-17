@@ -17,43 +17,61 @@ interface Props {
  */
 export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) {
   const analysis = useMemo(() => {
-    const auditByCode = new Map(
-      (auditRows || []).map((row: any) => [String(row.indicator_code || ''), row]),
-    );
-    const filled = (indicatorValues || []).filter((v: any) => {
-      if (v.is_ignored) return false;
-      const val = v.value_raw ?? v.value ?? v.value_text;
-      return val !== null && val !== undefined && val !== '';
+    const valuesByCode = new Map<string, any>();
+    (indicatorValues || []).forEach((v: any) => {
+      const code = v.indicator?.code || v.indicators?.code || v.indicator_code;
+      if (code) valuesByCode.set(String(code), v);
     });
+
     const buckets = {
       official: [] as any[],
       derived: [] as any[],
       manual: [] as any[],
+      contextual: [] as any[],
       other: [] as any[],
     };
-    const classify = (v: any) => {
-      const indicatorCode = v.indicator?.code || v.indicators?.code || v.indicator_code;
-      const audit = indicatorCode ? auditByCode.get(String(indicatorCode)) : null;
-      const src = (v.source || audit?.source_detail || v.source_type || audit?.source_type || '').toString().toUpperCase();
-      const auditType = (audit?.source_type || '').toString().toUpperCase();
-      const method = (v.collection_method || '').toString().toUpperCase();
-      const OFFICIAL_TOKENS = ['IBGE', 'CADASTUR', 'STN', 'DATASUS', 'MAPA_TURISMO', 'MAPA DO TURISMO', 'INEP', 'ANATEL', 'TSE', 'ANA', 'ANAC', 'CADUNICO'];
-      const hasOfficialToken = OFFICIAL_TOKENS.some(t => src.includes(t));
-      const isInDerivedCatalog = indicatorCode ? isDerivedIndicator(String(indicatorCode)) : false;
-      const isDerived = isInDerivedCatalog || auditType.startsWith('DERIVED') || src.includes('+IBGE') || src.includes('DERIVADO') || src.includes('CALCULADO') || method === 'DERIVED' || v._source === 'derived';
-      const isOfficial = !isDerived && (auditType.startsWith('OFFICIAL_API') || hasOfficialToken || src.includes('PRÉ-PREENCHIDO') || src.includes('PRE-PREENCHIDO'));
-      const isManual = method === 'MANUAL' || src === 'MANUAL' || src.includes('MANUAL') || (!hasOfficialToken && !isDerived && !isOfficial && src.length > 0);
-      return { isDerived, isOfficial, isManual };
-    };
-    filled.forEach((v: any) => {
-      const { isDerived, isOfficial, isManual } = classify(v);
-      if (isDerived) buckets.derived.push(v);
-      else if (isOfficial) buckets.official.push(v);
-      else if (isManual) buckets.manual.push(v);
-      else buckets.other.push(v);
-    });
-    const total = filled.length;
-    const automated = buckets.official.length + buckets.derived.length;
+
+    const OFFICIAL_TOKENS = ['IBGE', 'CADASTUR', 'STN', 'DATASUS', 'MAPA_TURISMO', 'MAPA DO TURISMO', 'INEP', 'ANATEL', 'TSE', 'ANA', 'ANAC', 'CADUNICO', 'RAIS', 'CAGED'];
+
+    // PRIMARY PATH — use auditRows (one row per scored indicator, deterministic source_type)
+    if (auditRows && auditRows.length > 0) {
+      auditRows.forEach((row: any) => {
+        const code = String(row.indicator_code || '');
+        const val = valuesByCode.get(code);
+        const enriched = {
+          indicator_code: code,
+          indicator: val?.indicator || val?.indicators || { code, name: code },
+          source: row.source_detail || val?.source || '',
+          source_type: row.source_type,
+        };
+        const type = String(row.source_type || '').toUpperCase();
+        const isInDerivedCatalog = isDerivedIndicator(code);
+        if (type.startsWith('DERIVED') || isInDerivedCatalog) buckets.derived.push(enriched);
+        else if (type === 'OFFICIAL_API_CONTEXTUAL') buckets.contextual.push(enriched);
+        else if (type.startsWith('OFFICIAL_API')) buckets.official.push(enriched);
+        else if (type === 'MANUAL') buckets.manual.push(enriched);
+        else buckets.other.push(enriched);
+      });
+    } else {
+      // FALLBACK — derive from indicator_values when audit is unavailable
+      const filled = (indicatorValues || []).filter((v: any) => {
+        if (v.is_ignored) return false;
+        const val = v.value_raw ?? v.value ?? v.value_text;
+        return val !== null && val !== undefined && val !== '';
+      });
+      filled.forEach((v: any) => {
+        const code = v.indicator?.code || v.indicators?.code || v.indicator_code || '';
+        const src = String(v.source || '').toUpperCase();
+        const hasOfficialToken = OFFICIAL_TOKENS.some(t => src.includes(t));
+        const isInDerivedCatalog = isDerivedIndicator(String(code));
+        if (isInDerivedCatalog || src.includes('DERIVADO') || src.includes('CALCULADO')) buckets.derived.push(v);
+        else if (hasOfficialToken || src.includes('PRÉ-PREENCHIDO') || src.includes('PRE-PREENCHIDO')) buckets.official.push(v);
+        else buckets.manual.push(v);
+      });
+    }
+
+    const total = buckets.official.length + buckets.derived.length + buckets.manual.length + buckets.contextual.length + buckets.other.length;
+    const automated = buckets.official.length + buckets.derived.length + buckets.contextual.length;
     const coveragePct = total > 0 ? Math.round((automated / total) * 100) : 0;
     return { ...buckets, total, automated, coveragePct };
   }, [indicatorValues, auditRows]);
@@ -91,7 +109,7 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
           <Progress value={analysis.coveragePct} className="h-2" />
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="p-3 rounded-lg border bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900">
             <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
               <Globe2 className="h-4 w-4" />
@@ -107,6 +125,14 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [] }: Props) 
             </div>
             <p className="text-2xl font-bold mt-1">{analysis.derived.length}</p>
             <p className="text-[10px] text-muted-foreground">Fórmulas sobre dados oficiais</p>
+          </div>
+          <div className="p-3 rounded-lg border bg-teal-50 dark:bg-teal-950/30 border-teal-200 dark:border-teal-900">
+            <div className="flex items-center gap-2 text-teal-700 dark:text-teal-400">
+              <Globe2 className="h-4 w-4" />
+              <span className="text-xs font-medium">Contextuais</span>
+            </div>
+            <p className="text-2xl font-bold mt-1">{analysis.contextual.length}</p>
+            <p className="text-[10px] text-muted-foreground">APIs oficiais (referência)</p>
           </div>
           <div className="p-3 rounded-lg border bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900">
             <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
