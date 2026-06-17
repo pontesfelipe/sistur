@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.1",
+    date: "2026-06-17",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico — corrigido deep-link das abas 'Linhagem' e 'Comentários' (ex.: ?tab=linhagem). As novas abas não estavam na lista de tabs válidos e caíam de volta na Radiografia ao abrir a URL diretamente.",
+    ],
+  },
   {
     version: "1.66.0",
     date: "2026-06-16",

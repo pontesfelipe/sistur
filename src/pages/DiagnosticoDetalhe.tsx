@@ -128,7 +128,7 @@ const normalizeDisplayScore = (
   return score;
 };
 
-const VALID_TABS = ['radiografia', 'categorias', 'normalizacao', 'indicadores', 'gargalos', 'tratamento', 'prescricao', 'projeto'] as const;
+const VALID_TABS = ['radiografia', 'categorias', 'normalizacao', 'indicadores', 'gargalos', 'tratamento', 'prescricao', 'projeto', 'comentarios', 'linhagem'] as const;
 type DetalheTab = typeof VALID_TABS[number];
 
 const DiagnosticoDetalhe = () => {
