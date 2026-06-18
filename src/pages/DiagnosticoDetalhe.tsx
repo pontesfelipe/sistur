@@ -168,11 +168,21 @@ const DiagnosticoDetalhe = () => {
   // indicadores em Atenção/Crítico (gatilhos de prescrição EDU).
   const prescriptionModeFromUrl = searchParams.get('prescription') === '1';
   const [prescriptionMode, setPrescriptionMode] = useState(prescriptionModeFromUrl);
+  // Abas afetadas pelo Modo Prescrição
+  const PRESCRIPTION_AFFECTED_TABS = ['indicadores', 'gargalos', 'tratamento'];
   const togglePrescriptionMode = (enabled: boolean) => {
     setPrescriptionMode(enabled);
     const params = new URLSearchParams(searchParams);
     if (enabled) params.set('prescription', '1');
     else params.delete('prescription');
+    // Ao ativar em uma aba que não reage ao filtro, redireciona o usuário
+    // para a aba "Indicadores" para que a mudança seja visível imediatamente.
+    if (enabled) {
+      const currentTab = params.get('tab') || 'radiografia';
+      if (!PRESCRIPTION_AFFECTED_TABS.includes(currentTab)) {
+        params.set('tab', 'indicadores');
+      }
+    }
     setSearchParams(params, { replace: true });
   };
 
@@ -847,6 +857,17 @@ const DiagnosticoDetalhe = () => {
 
       {isCalculated && pillarScores.length > 0 ? (
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+          {prescriptionMode && (
+            <Alert className="border-primary/40 bg-primary/5">
+              <Target className="h-4 w-4 text-primary" />
+              <AlertTitle>Modo Prescrição ativo</AlertTitle>
+              <AlertDescription>
+                Exibindo apenas indicadores em <strong>Atenção</strong> ou <strong>Crítico</strong> (score ≤ 66%).
+                Afeta as abas <strong>Indicadores</strong>, <strong>Gargalos</strong> e <strong>Tratamento</strong>.
+                As demais abas (Radiografia, Normalização, Projeto, Comentários, Linhagem) não são filtradas.
+              </AlertDescription>
+            </Alert>
+          )}
           <TabsList className={cn(
             "grid w-full",
             isEnterprise ? "max-w-6xl grid-cols-10" : "max-w-5xl grid-cols-9"
