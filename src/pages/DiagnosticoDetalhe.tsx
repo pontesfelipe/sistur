@@ -168,11 +168,21 @@ const DiagnosticoDetalhe = () => {
   // indicadores em Atenção/Crítico (gatilhos de prescrição EDU).
   const prescriptionModeFromUrl = searchParams.get('prescription') === '1';
   const [prescriptionMode, setPrescriptionMode] = useState(prescriptionModeFromUrl);
+  // Abas afetadas pelo Modo Prescrição
+  const PRESCRIPTION_AFFECTED_TABS = ['indicadores', 'gargalos', 'tratamento'];
   const togglePrescriptionMode = (enabled: boolean) => {
     setPrescriptionMode(enabled);
     const params = new URLSearchParams(searchParams);
     if (enabled) params.set('prescription', '1');
     else params.delete('prescription');
+    // Ao ativar em uma aba que não reage ao filtro, redireciona o usuário
+    // para a aba "Indicadores" para que a mudança seja visível imediatamente.
+    if (enabled) {
+      const currentTab = params.get('tab') || 'radiografia';
+      if (!PRESCRIPTION_AFFECTED_TABS.includes(currentTab)) {
+        params.set('tab', 'indicadores');
+      }
+    }
     setSearchParams(params, { replace: true });
   };
 
