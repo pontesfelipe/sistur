@@ -857,6 +857,17 @@ const DiagnosticoDetalhe = () => {
 
       {isCalculated && pillarScores.length > 0 ? (
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+          {prescriptionMode && (
+            <Alert className="border-primary/40 bg-primary/5">
+              <Target className="h-4 w-4 text-primary" />
+              <AlertTitle>Modo Prescrição ativo</AlertTitle>
+              <AlertDescription>
+                Exibindo apenas indicadores em <strong>Atenção</strong> ou <strong>Crítico</strong> (score ≤ 66%).
+                Afeta as abas <strong>Indicadores</strong>, <strong>Gargalos</strong> e <strong>Tratamento</strong>.
+                As demais abas (Radiografia, Normalização, Projeto, Comentários, Linhagem) não são filtradas.
+              </AlertDescription>
+            </Alert>
+          )}
           <TabsList className={cn(
             "grid w-full",
             isEnterprise ? "max-w-6xl grid-cols-10" : "max-w-5xl grid-cols-9"
