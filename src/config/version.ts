@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 14,
+  patch: 15,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.15",
+    date: "2026-06-18",
+    type: "patch" as const,
+    changes: [
+      "Modo Prescrição — feedback visual aprimorado. Agora exibe um banner persistente no topo do diagnóstico quando ativado, explicando o critério (score ≤ 66%) e listando explicitamente as abas afetadas (Indicadores, Gargalos, Tratamento). Ao ativar em uma aba que não reage ao filtro (Radiografia, Normalização, Projeto, etc.), o usuário é automaticamente redirecionado para a aba 'Indicadores' para que a mudança seja imediatamente visível.",
+    ],
+  },
   {
     version: "1.66.14",
     date: "2026-06-17",
