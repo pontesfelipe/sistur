@@ -618,6 +618,10 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="indicators" className="space-y-4">
+          <IndicatorImpactPanel projectId={projectId} assessmentId={project.assessment_id} />
+        </TabsContent>
       </Tabs>
 
       {/* Project Dialogs */}
