@@ -26,6 +26,24 @@ export interface ModuleManifest {
     ui?: string[];
   };
   supabaseTables?: string[];
+  /**
+   * Edge functions Supabase associadas ao módulo (caminhos relativos a
+   * `supabase/functions/<name>/index.ts`).
+   */
+  edgeFunctions?: string[];
+  /**
+   * Rotas registradas em `src/App.tsx` que o módulo serve.
+   */
+  routes?: string[];
+  /**
+   * Palavras-chave para localizar migrations em `supabase/migrations/`.
+   * Use o nome da tabela ou um identificador inequívoco do CREATE TABLE.
+   */
+  migrationKeywords?: string[];
+  /**
+   * Secrets / variáveis de ambiente exigidas em runtime (gateway, APIs).
+   */
+  secrets?: string[];
 }
 
 export interface ModuleSection {
