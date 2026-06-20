@@ -646,6 +646,7 @@ export function buildModuleManifestJson(m: ModuleManifest): string {
     {
       module: m.module,
       category: m.category,
+      version: m.version ?? '1.0.0',
       description: m.description,
       files: m.files,
       dependencies: m.dependencies ?? {},
