@@ -238,10 +238,6 @@ function isUiPrimitive(filePath: string): boolean {
 
 export async function scanModuleIntegrity(m: ModuleManifest): Promise<IntegrityReport> {
   const ownership = buildOwnershipIndex();
-  const moduleFilesResolved = Array.from(new Set(m.files.flatMap(resolveFiles))).map((p) =>
-    p.replace(/^\//, ''),
-  );
-
   const report: IntegrityReport = {
     module: m.module,
     filesScanned: 0,
