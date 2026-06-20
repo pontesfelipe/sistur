@@ -92,7 +92,8 @@ function interpretIGMA(
   pillarScores: PillarContext[],
   previousPillarScores: PillarContext[] | null,
   assessmentDate: Date,
-  intersectoralCount: number
+  intersectoralCount: number,
+  isEnterprise: boolean = false
 ): IGMAOutput {
   const flags: IGMAFlags = {
     RA_LIMITATION: false,
@@ -133,8 +134,10 @@ function interpretIGMA(
     uiMessages.push({
       type: "critical",
       flag: "RA_LIMITATION",
-      title: "Limitação Estrutural do Território",
-      message: "O território apresenta limitações estruturais que comprometem a sustentabilidade do turismo, independentemente de ações de mercado ou gestão isoladas.",
+      title: isEnterprise ? "Risco ESG / Sustentabilidade Crítica" : "Limitação Estrutural do Território",
+      message: isEnterprise
+        ? "O empreendimento apresenta indicadores ambientais críticos (energia, água, resíduos, carbono ou conformidade ESG). Reputação online e captação de hóspedes conscientes ficam comprometidas até que esses pontos sejam endereçados."
+        : "O território apresenta limitações estruturais que comprometem a sustentabilidade do turismo, independentemente de ações de mercado ou gestão isoladas.",
       icon: "AlertTriangle",
     });
   }
@@ -149,8 +152,10 @@ function interpretIGMA(
     uiMessages.push({
       type: "critical",
       flag: "GOVERNANCE_BLOCK",
-      title: "Fragilidade de Governança",
-      message: "Fragilidades de governança comprometem a efetividade de ações de mercado e investimento no turismo.",
+      title: isEnterprise ? "Operação Crítica" : "Fragilidade de Governança",
+      message: isEnterprise
+        ? "Indicadores operacionais críticos (ocupação, satisfação, NPS, qualidade de serviço, reviews) comprometem a viabilidade comercial. Priorizar estabilização da operação antes de qualquer expansão ou investimento em marketing."
+        : "Fragilidades de governança comprometem a efetividade de ações de mercado e investimento no turismo.",
       icon: "ShieldAlert",
     });
   }
@@ -166,8 +171,10 @@ function interpretIGMA(
       uiMessages.push({
         type: "warning",
         flag: "EXTERNALITY_WARNING",
-        title: "Alerta de Externalidades Negativas",
-        message: "O crescimento da oferta turística está ocorrendo sem a correspondente sustentabilidade territorial.",
+        title: isEnterprise ? "Crescimento Sem Sustentabilidade" : "Alerta de Externalidades Negativas",
+        message: isEnterprise
+          ? "A estrutura/governança do empreendimento melhorou, mas indicadores ambientais (energia, água, resíduos) pioraram. Há risco de crescimento operacional descolado da responsabilidade ESG."
+          : "O crescimento da oferta turística está ocorrendo sem a correspondente sustentabilidade territorial.",
         icon: "TrendingUp",
       });
     }
@@ -182,14 +189,16 @@ function interpretIGMA(
     uiMessages.push({
       type: "warning",
       flag: "MARKETING_BLOCKED",
-      title: "Marketing Bloqueado",
-      message: "A promoção turística deve ser precedida pela consolidação territorial e institucional.",
+      title: isEnterprise ? "Investimento em Marketing Bloqueado" : "Marketing Bloqueado",
+      message: isEnterprise
+        ? "Antes de aumentar CAC e investimento em mídia paga, é necessário estabilizar operação e/ou indicadores ESG. Captar mais hóspedes em uma operação deficitária ou com baixa satisfação amplia o prejuízo."
+        : "A promoção turística deve ser precedida pela consolidação territorial e institucional.",
       icon: "Ban",
     });
   }
 
   // REGRA 6 — INTERSETORIALIDADE
-  if (intersectoralCount > 0) {
+  if (intersectoralCount > 0 && !isEnterprise) {
     flags.INTERSECTORAL_DEPENDENCY = true;
     
     uiMessages.push({
