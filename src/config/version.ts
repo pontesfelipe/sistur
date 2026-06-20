@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 15,
+  patch: 16,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.16",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Gerenciamento de Projetos (Frente 1) — integração diagnóstico↔projeto com trilha de impacto. Modo Prescrição agora permite selecionar gatilhos (checkbox) e clicar em 'Criar projeto', abrindo o diálogo de criação já travado no diagnóstico de origem. Nova tabela project_indicator_links registra o score-baseline de cada indicador no momento da criação. Aba 'Indicadores' no detalhe do projeto exibe a Trilha de Impacto: baseline vs score atual, delta em pontos percentuais, contadores de Melhoraram/Regrediram/Atingiram meta. Projetos antigos veem estado vazio com instrução para recriar pelo diagnóstico.",
+    ],
+  },
   {
     version: "1.66.15",
     date: "2026-06-18",
