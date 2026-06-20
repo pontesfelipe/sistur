@@ -223,6 +223,26 @@ serve(async (req) => {
         });
         systemPrompt += `\nUse esses trechos para responder perguntas sobre o conteúdo dos relatórios. Se o usuário pedir algo que não está no trecho, oriente-o a abrir o relatório completo em /relatorios.\n`;
       }
+
+      // Inject Global References (knowledge base curated by admins)
+      try {
+        const { data: globalRefs } = await userClient
+          .from("global_reference_files")
+          .select("file_name, category, summary, description")
+          .eq("is_active", true)
+          .not("summary", "is", null)
+          .limit(40);
+        if (globalRefs && globalRefs.length > 0) {
+          systemPrompt += `\n\nREFERÊNCIAS GLOBAIS DA BASE DE CONHECIMENTO (${globalRefs.length}):\nUse esses materiais oficiais para fundamentar respostas. Cite o nome do arquivo quando relevante.\n`;
+          globalRefs.forEach((r: any, idx: number) => {
+            systemPrompt += `\n[G${idx + 1}] ${r.file_name}${r.category ? ` (${r.category})` : ""}\n`;
+            if (r.summary) systemPrompt += `  Resumo: ${String(r.summary).slice(0, 800)}\n`;
+            if (r.description) systemPrompt += `  Descrição: ${String(r.description).slice(0, 300)}\n`;
+          });
+        }
+      } catch (refErr) {
+        console.error("beni-chat: failed to fetch global references", refErr);
+      }
     } catch (fetchErr) {
       console.error("beni-chat: failed to fetch user diagnostics/reports", fetchErr);
       // Non-fatal: continue without injected user data
