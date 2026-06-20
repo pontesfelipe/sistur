@@ -97,6 +97,7 @@ const AuditLogs = lazyWithReload(() => import("./pages/AuditLogs"));
 const AdminReportLogs = lazyWithReload(() => import("./pages/AdminReportLogs"));
 const AdminSemanticLayer = lazyWithReload(() => import("./pages/AdminSemanticLayer"));
 const Projetos = lazyWithReload(() => import("./pages/Projetos"));
+const MinhasTarefas = lazyWithReload(() => import("./pages/MinhasTarefas"));
 const Forum = lazyWithReload(() => import("./pages/Forum"));
 const GamesHub = lazyWithReload(() => import("./pages/GamesHub"));
 const Game = lazyWithReload(() => import("./pages/Game"));
@@ -535,6 +536,14 @@ const App = () => {
                       <ModuleRoute module="projetos">
                         <Projetos />
                       </ModuleRoute>
+                    </ERPRoute>
+                  }
+                />
+                <Route
+                  path="/minhas-tarefas"
+                  element={
+                    <ERPRoute>
+                      <MinhasTarefas />
                     </ERPRoute>
                   }
                 />

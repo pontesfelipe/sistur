@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 20,
+  patch: 21,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.21",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Projetos — colaboração em equipe. Nova aba 'Equipe' no detalhe do projeto: lista de membros com papel Dono/Editor/Visualizador (apenas Donos gerenciam). O criador do projeto vira Dono automaticamente. Atribuição de tarefa agora usa combobox com os usuários reais da organização (assignee_id + nome), em vez de texto livre. Diálogo de edição de tarefa ganha aba 'Equipe e Comentários' com: matriz RACI por usuário (R/A/C/I, adicionar/remover), comentários encadeados (Ctrl+Enter envia, autor pode excluir) e histórico automático de criação, mudança de status e troca de responsável. Kanban exibe responsável no card. Nova página /minhas-tarefas lista todas as tarefas em que o usuário é responsável ou aprovador (RACI R/A) em qualquer projeto da organização, agrupadas por status, com alerta de atraso. RLS de project_tasks refinado: visualizar = qualquer membro da org; criar/editar = Dono ou Editor do projeto (ou Responsável/Aprovador da tarefa, ou ADMIN/ORG_ADMIN); excluir = Dono do projeto e administradores. Projetos legados sem membros mantêm o comportamento atual (compatibilidade). Novas tabelas: project_members, project_task_comments, project_task_activity. Novas funções: can_edit_project_task, can_manage_project, get_project_member_role.",
+    ],
+  },
   {
     version: "1.66.20",
     date: "2026-06-20",

@@ -8338,6 +8338,44 @@ export type Database = {
           },
         ]
       }
+      project_members: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          id: string
+          project_id: string
+          role: Database["public"]["Enums"]["project_member_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          project_id: string
+          role?: Database["public"]["Enums"]["project_member_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          project_id?: string
+          role?: Database["public"]["Enums"]["project_member_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_milestones: {
         Row: {
           completed_date: string | null
@@ -8434,6 +8472,111 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_task_activity: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string
+          field: string | null
+          id: string
+          metadata: Json | null
+          new_value: string | null
+          old_value: string | null
+          project_id: string
+          task_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          field?: string | null
+          id?: string
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          project_id: string
+          task_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          field?: string | null
+          id?: string
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          project_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_task_activity_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_task_activity_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "project_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_task_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          project_id: string
+          task_id: string
+          updated_at: string
+          user_id: string
+          user_name: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          project_id: string
+          task_id: string
+          updated_at?: string
+          user_id: string
+          user_name?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          project_id?: string
+          task_id?: string
+          updated_at?: string
+          user_id?: string
+          user_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_task_comments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_task_comments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "project_tasks"
             referencedColumns: ["id"]
           },
         ]
@@ -10398,6 +10541,14 @@ export type Database = {
         Args: { p_org_id: string; p_user_id?: string }
         Returns: boolean
       }
+      can_edit_project_task: {
+        Args: { _task_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_manage_project: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_student_start_assignment: {
         Args: { p_assignment_id: string }
         Returns: Json
@@ -10753,6 +10904,10 @@ export type Database = {
         Args: { p_professor_id: string }
         Returns: number
       }
+      get_project_member_role: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: Database["public"]["Enums"]["project_member_role"]
+      }
       get_severity_5_levels: {
         Args: { p_score: number }
         Returns: Database["public"]["Enums"]["severity_type"]
@@ -10824,6 +10979,10 @@ export type Database = {
       }
       is_org_admin_of: {
         Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_project_member: {
+        Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
       is_sistur_admin: { Args: { _user_id: string }; Returns: boolean }
@@ -11051,6 +11210,7 @@ export type Database = {
       org_type: "PUBLIC" | "PRIVATE"
       pillar_scope_type: "RA" | "OE" | "AO" | "INTEGRATED"
       pillar_type: "RA" | "OE" | "AO"
+      project_member_role: "owner" | "editor" | "viewer"
       question_type: "multiple_choice" | "true_false" | "short_answer" | "essay"
       quiz_origin_type: "existing" | "generated" | "imported"
       recommendation_entity_type: "course" | "live" | "track"
@@ -11304,6 +11464,7 @@ export const Constants = {
       org_type: ["PUBLIC", "PRIVATE"],
       pillar_scope_type: ["RA", "OE", "AO", "INTEGRATED"],
       pillar_type: ["RA", "OE", "AO"],
+      project_member_role: ["owner", "editor", "viewer"],
       question_type: ["multiple_choice", "true_false", "short_answer", "essay"],
       quiz_origin_type: ["existing", "generated", "imported"],
       recommendation_entity_type: ["course", "live", "track"],

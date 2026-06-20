@@ -30,6 +30,10 @@ import {
   PRIORITY_INFO,
 } from '@/hooks/useProjects';
 import { Loader2 } from 'lucide-react';
+import { TaskAssigneeCombobox } from './TaskAssigneeCombobox';
+import { TaskCollaborationPanel } from './TaskCollaborationPanel';
+import { useMyProjectRole } from '@/hooks/useProjectCollab';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface TaskFormDialogProps {
   projectId: string;
@@ -68,6 +72,7 @@ export function TaskFormDialog({
   const [status, setStatus] = useState<TaskStatus>('todo');
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [assigneeName, setAssigneeName] = useState('');
+  const [assigneeId, setAssigneeId] = useState<string | null>(null);
   const [estimatedHours, setEstimatedHours] = useState<string>('');
   const [storyPoints, setStoryPoints] = useState<string>('');
   const [plannedStartDate, setPlannedStartDate] = useState('');
@@ -82,6 +87,7 @@ export function TaskFormDialog({
       setStatus(task.status);
       setPriority(task.priority);
       setAssigneeName(task.assignee_name || '');
+      setAssigneeId(task.assignee_id || null);
       setEstimatedHours(task.estimated_hours?.toString() || '');
       setStoryPoints(task.story_points?.toString() || '');
       setPlannedStartDate(task.planned_start_date?.split('T')[0] || '');
@@ -94,6 +100,7 @@ export function TaskFormDialog({
       setStatus('todo');
       setPriority('medium');
       setAssigneeName('');
+      setAssigneeId(null);
       setEstimatedHours('');
       setStoryPoints('');
       setPlannedStartDate('');
@@ -111,6 +118,7 @@ export function TaskFormDialog({
       task_type: taskType,
       status,
       priority,
+      assignee_id: assigneeId,
       assignee_name: assigneeName || null,
       estimated_hours: estimatedHours ? parseFloat(estimatedHours) : null,
       story_points: storyPoints ? parseInt(storyPoints) : null,
@@ -127,7 +135,6 @@ export function TaskFormDialog({
       await createTask.mutateAsync({
         project_id: projectId,
         parent_task_id: null,
-        assignee_id: null,
         actual_hours: null,
         actual_start_date: null,
         actual_end_date: null,
@@ -143,10 +150,11 @@ export function TaskFormDialog({
   };
 
   const isPending = createTask.isPending || updateTask.isPending;
+  const { canEditProject } = useMyProjectRole(projectId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className={isEditing ? "max-w-3xl max-h-[90vh] overflow-y-auto" : "max-w-lg max-h-[90vh] overflow-y-auto"}>
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Editar Tarefa' : 'Nova Tarefa'}</DialogTitle>
           <DialogDescription>
@@ -154,6 +162,32 @@ export function TaskFormDialog({
           </DialogDescription>
         </DialogHeader>
 
+        {isEditing && task ? (
+          <Tabs defaultValue="details">
+            <TabsList>
+              <TabsTrigger value="details">Detalhes</TabsTrigger>
+              <TabsTrigger value="collab">Equipe e Comentários</TabsTrigger>
+            </TabsList>
+            <TabsContent value="details">
+              {renderForm()}
+            </TabsContent>
+            <TabsContent value="collab">
+              <TaskCollaborationPanel
+                taskId={task.id}
+                projectId={projectId}
+                canEdit={canEditProject}
+              />
+            </TabsContent>
+          </Tabs>
+        ) : (
+          renderForm()
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+
+  function renderForm() {
+    return (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="task-title">Título *</Label>
@@ -248,11 +282,14 @@ export function TaskFormDialog({
 
           <div className="space-y-2">
             <Label htmlFor="task-assignee">Responsável</Label>
-            <Input
-              id="task-assignee"
-              value={assigneeName}
-              onChange={(e) => setAssigneeName(e.target.value)}
-              placeholder="Nome do responsável"
+            <TaskAssigneeCombobox
+              value={assigneeId}
+              displayName={assigneeName}
+              onChange={(u) => {
+                setAssigneeId(u?.user_id || null);
+                setAssigneeName(u?.full_name || '');
+              }}
+              placeholder="Atribuir a um membro da organização..."
             />
           </div>
 
@@ -314,7 +351,6 @@ export function TaskFormDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
-  );
+    );
+  }
 }
