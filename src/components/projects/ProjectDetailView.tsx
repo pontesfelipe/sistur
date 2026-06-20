@@ -57,6 +57,8 @@ import { PhaseFormDialog } from './PhaseFormDialog';
 import { TaskFormDialog } from './TaskFormDialog';
 import { MilestoneFormDialog } from './MilestoneFormDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { useProjectIndicatorImpact } from '@/hooks/useProjectIndicatorLinks';
+import { ArrowDown, ArrowUp, Minus, TrendingUp } from 'lucide-react';
 
 interface ProjectDetailViewProps {
   projectId: string;
@@ -327,6 +329,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <TabsTrigger value="phases">Fases ({phases?.length || 0})</TabsTrigger>
           <TabsTrigger value="tasks">Tarefas ({tasks?.length || 0})</TabsTrigger>
           <TabsTrigger value="milestones">Marcos ({milestones?.length || 0})</TabsTrigger>
+          <TabsTrigger value="indicators">Indicadores</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
