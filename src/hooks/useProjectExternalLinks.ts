@@ -123,7 +123,7 @@ export function useLinkCandidates(orgId: string | undefined, destinationId: stri
         orgId
           ? supabase
               .from("issues")
-              .select("id, title, severity, status")
+              .select("id, title, severity, theme")
               .eq("org_id", orgId)
               .order("created_at", { ascending: false })
               .limit(50)
