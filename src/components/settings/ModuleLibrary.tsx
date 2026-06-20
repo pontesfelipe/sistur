@@ -10,11 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Copy, FileCode, Library, Search, ClipboardCopy } from 'lucide-react';
+import { Copy, FileCode, Library, Search, ClipboardCopy, Sparkles, Route, Database, Zap, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   MODULE_LIBRARY,
   buildModuleManifestJson,
+  buildModuleMigrationPrompt,
   type ModuleCategory,
   type ModuleManifest,
   type ModuleSection,
@@ -50,6 +51,9 @@ function filterSections(sections: ModuleSection[], query: string): ModuleSection
           m.category,
           ...(m.files ?? []),
           ...(m.supabaseTables ?? []),
+          ...(m.edgeFunctions ?? []),
+          ...(m.routes ?? []),
+          ...(m.migrationKeywords ?? []),
         ]
           .join(' ')
           .toLowerCase();
@@ -74,20 +78,35 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
             </div>
             <CardDescription className="text-xs">{m.description}</CardDescription>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              copyToClipboard(
-                buildModuleManifestJson(m),
-                `Manifesto de "${m.module}" copiado`,
-              )
-            }
-            className="shrink-0"
-          >
-            <ClipboardCopy className="h-3.5 w-3.5" />
-            Manifesto
-          </Button>
+          <div className="flex shrink-0 flex-col gap-1.5">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() =>
+                copyToClipboard(
+                  buildModuleMigrationPrompt(m),
+                  `Prompt de migração de "${m.module}" copiado — cole em outro projeto Lovable`,
+                )
+              }
+              title="Gera prompt em linguagem natural para portar este módulo a outro projeto Lovable"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Prompt
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                copyToClipboard(
+                  buildModuleManifestJson(m),
+                  `Manifesto de "${m.module}" copiado`,
+                )
+              }
+            >
+              <ClipboardCopy className="h-3.5 w-3.5" />
+              JSON
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-3 pt-0">
@@ -112,15 +131,75 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
           </div>
         </div>
 
+        {m.routes && m.routes.length > 0 && (
+          <div>
+            <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <Route className="h-3 w-3" /> Rotas
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {m.routes.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => copyToClipboard(r, `Rota copiada: ${r}`)}
+                  className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-2 py-0.5 font-mono text-[11px] text-foreground/80 hover:bg-muted"
+                  title={`Copiar ${r}`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {m.supabaseTables && m.supabaseTables.length > 0 && (
           <div>
-            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Tabelas Supabase
+            <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <Database className="h-3 w-3" /> Tabelas Supabase
             </p>
             <div className="flex flex-wrap gap-1.5">
               {m.supabaseTables.map((t) => (
                 <Badge key={t} variant="secondary" className="font-mono text-[10px]">
                   {t}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {m.edgeFunctions && m.edgeFunctions.length > 0 && (
+          <div>
+            <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <Zap className="h-3 w-3" /> Edge Functions
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {m.edgeFunctions.map((fn) => {
+                const path = `supabase/functions/${fn}/index.ts`;
+                return (
+                  <button
+                    key={fn}
+                    type="button"
+                    onClick={() => copyToClipboard(path, `Path copiado: ${path}`)}
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-2 py-0.5 font-mono text-[11px] text-foreground/80 hover:bg-muted"
+                    title={`Copiar ${path}`}
+                  >
+                    {fn}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {m.secrets && m.secrets.length > 0 && (
+          <div>
+            <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <KeyRound className="h-3 w-3" /> Secrets necessários
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {m.secrets.map((s) => (
+                <Badge key={s} variant="outline" className="font-mono text-[10px]">
+                  {s}
                 </Badge>
               ))}
             </div>

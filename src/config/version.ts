@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 77,
+  minor: 78,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.78.0",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Biblioteca de Módulos — Pacote A: enriquecimento do manifesto e prompt de migração entre projetos. Cada módulo agora declara, além dos arquivos e tabelas, suas rotas em src/App.tsx, edge functions associadas (supabase/functions/*), palavras-chave para localizar as migrations correspondentes e secrets exigidos em runtime (LOVABLE_API_KEY, FIRECRAWL_API_KEY, ELEVENLABS_API_KEY etc.). Novos blocos no card exibem rotas, edge functions e secrets como badges clicáveis (cópia de path em 1 clique).",
+      "Novo botão 'Prompt' em cada módulo (em destaque) que copia para o clipboard um prompt em linguagem natural pronto para colar em outro projeto Lovable. O prompt instrui o agente a (1) copiar os arquivos preservando paths, (2) registrar as rotas, (3) criar as tabelas com RLS/GRANT, (4) implantar as edge functions, (5) pedir os secrets necessários e (6) listar dependências internas. Inclui o manifesto JSON anexo como referência canônica. Busca da Biblioteca agora também varre rotas, edge functions e palavras-chave de migration.",
+    ],
+  },
   {
     version: "1.77.0",
     date: "2026-06-20",
