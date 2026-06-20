@@ -189,9 +189,17 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
     const timeoutId = setTimeout(() => controller.abort(), 60000);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Sessão expirada. Faça login novamente para conversar com o Professor Beni.');
+      }
       const response = await fetch(CHAT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({ messages: [...messages, userMsg], context: beniContext }),
         signal: controller.signal,
       });
