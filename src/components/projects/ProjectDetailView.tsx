@@ -63,6 +63,8 @@ import { ProjectKanban } from './ProjectKanban';
 import { ProjectTimeline } from './ProjectTimeline';
 import { ProjectGovernance } from './ProjectGovernance';
 import { ProjectEduPanel } from './ProjectEduPanel';
+import { ProjectBudgetPanel } from './ProjectBudgetPanel';
+import { ProjectLinksPanel } from './ProjectLinksPanel';
 
 interface ProjectDetailViewProps {
   projectId: string;
@@ -338,6 +340,8 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <TabsTrigger value="indicators">Indicadores</TabsTrigger>
           <TabsTrigger value="governance">Governança</TabsTrigger>
           <TabsTrigger value="edu">Capacitação</TabsTrigger>
+          <TabsTrigger value="budget">Orçamento</TabsTrigger>
+          <TabsTrigger value="links">Vínculos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -648,6 +652,14 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
 
         <TabsContent value="edu" className="space-y-4">
           <ProjectEduPanel projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="budget" className="space-y-4">
+          <ProjectBudgetPanel projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="links" className="space-y-4">
+          <ProjectLinksPanel projectId={projectId} />
         </TabsContent>
       </Tabs>
 
