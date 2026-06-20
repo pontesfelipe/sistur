@@ -196,12 +196,19 @@ export default function NovaRodada() {
       // jump directly to the report step.
       const savedIndicatorCount = resumeIndicatorCount ?? 0;
       const status = resumeAssessment.status as string | null;
+      const resumeDiagnosticType = ((resumeAssessment as any).diagnostic_type as DiagnosticType) || diagnosticType;
       let resumeStep = 4;
       if (status === 'CALCULATED') {
         resumeStep = 7;
       } else if (status === 'DATA_READY') {
         resumeStep = 6;
-      } else if (savedIndicatorCount > 0 || validatedValuesCount > 0) {
+      } else if (
+        resumeDiagnosticType !== 'enterprise' &&
+        (savedIndicatorCount > 0 || validatedValuesCount > 0)
+      ) {
+        // Para Enterprise sempre passamos pela etapa 4 (Pré-preenchimento + Perfil),
+        // mesmo se já houver indicadores, para garantir que a busca de reviews
+        // (auto-fill) possa ser executada e o perfil revisado.
         resumeStep = 5;
       }
 
