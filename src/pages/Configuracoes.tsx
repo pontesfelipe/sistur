@@ -167,7 +167,7 @@ export default function Configuracoes() {
           they can manage their org members via OrgAdminUsersPanel.
         */}
         <Tabs defaultValue="geral" className="space-y-6">
-          <TabsList className="flex flex-wrap gap-2 w-full h-auto p-1">
+          <TabsList className="flex overflow-x-auto gap-3 w-full h-auto p-1 pb-2 scrollbar-hide">
 
             <TabsTrigger value="geral" className="flex items-center gap-2 shrink-0">
               <Settings2 className="h-4 w-4" />
