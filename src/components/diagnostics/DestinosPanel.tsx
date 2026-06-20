@@ -21,6 +21,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 import { EnterpriseProfilePanel } from '@/components/enterprise/EnterpriseProfilePanel';
+import { EnterpriseRevenuePanel } from '@/components/enterprise/EnterpriseRevenuePanel';
 import {
   DropdownMenu,
   DropdownMenuContent,
