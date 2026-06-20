@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 73,
+  minor: 74,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.74.0",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — Pacote Receita (2/4): mix de canais e sazonalidade real. Novo painel 'Receita & Canais' no diálogo do empreendimento, com duas abas: (1) Canais de Distribuição — cadastro de cada canal de venda (nome, tipo Direto/OTA/Agência/Corporativo/Eventos/Outro, % de share nas reservas, % de comissão) com totais agregados (soma do share, comissão média ponderada, % vendas diretas) e alerta quando a soma sai de 100%; (2) Sazonalidade Mensal — preenchimento mês a mês de ocupação % e ADR (R$) por ano, com cálculo automático do índice de sazonalidade (coeficiente de variação da ocupação) e classificação em 5 níveis (Muito estável → Muito alta).",
+      "Diagnóstico Enterprise — 5 novos indicadores entram no catálogo: ENT_LTV (Lifetime Value do Hóspede, R$), ENT_BREAKEVEN_OCC (% Ocupação de Breakeven, LOW_IS_BETTER), ENT_COMMISSION_AVG (Comissão Média Ponderada, derivado automaticamente do mix de canais), ENT_DIRECT_SALES_PCT (% Vendas Diretas, derivado), ENT_SEASONALITY_INDEX (Índice de Sazonalidade, derivado da tabela mensal). Os três indicadores derivados são injetados pelo edge function 'calculate-assessment' a partir das tabelas 'enterprise_distribution_channels' e 'enterprise_seasonality_months' — o usuário não precisa preencher esses valores manualmente, eles aparecem no score com origem '_source: derived'.",
+      "Novas tabelas com RLS por organização: 'enterprise_distribution_channels' (canal por destino, share/comissão, período) e 'enterprise_seasonality_months' (ocupação/ADR/RevPAR por mês, único por destino+ano+mês). Acessíveis pelos membros da org via get_effective_org_id (compatível com modo demo) e por ADMIN globalmente. Novo enum 'enterprise_channel_type'.",
+    ],
+  },
   {
     version: "1.73.0",
     date: "2026-06-20",
