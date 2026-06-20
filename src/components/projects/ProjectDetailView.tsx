@@ -61,6 +61,8 @@ import { useProjectIndicatorImpact } from '@/hooks/useProjectIndicatorLinks';
 import { ArrowDown, ArrowUp, Minus, TrendingUp } from 'lucide-react';
 import { ProjectKanban } from './ProjectKanban';
 import { ProjectTimeline } from './ProjectTimeline';
+import { ProjectGovernance } from './ProjectGovernance';
+import { ProjectEduPanel } from './ProjectEduPanel';
 
 interface ProjectDetailViewProps {
   projectId: string;
@@ -334,6 +336,8 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="milestones">Marcos ({milestones?.length || 0})</TabsTrigger>
           <TabsTrigger value="indicators">Indicadores</TabsTrigger>
+          <TabsTrigger value="governance">Governança</TabsTrigger>
+          <TabsTrigger value="edu">Capacitação</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
