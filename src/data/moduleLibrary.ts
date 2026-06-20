@@ -503,6 +503,9 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/components/forum/',
         ],
         supabaseTables: ['forum_posts', 'forum_comments', 'forum_reactions'],
+        routes: ['/forum'],
+        migrationKeywords: ['forum_posts', 'forum_comments', 'forum_reactions'],
+        edgeFunctions: ['moderate-image'],
       },
       {
         module: 'Feedback',
@@ -514,6 +517,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/components/feedback/',
         ],
         supabaseTables: ['user_feedback', 'community_feedback'],
+        migrationKeywords: ['user_feedback', 'community_feedback'],
       },
     ],
   },
@@ -534,6 +538,9 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useTermsAcceptance.ts',
         ],
         supabaseTables: ['profiles', 'terms_acceptance'],
+        routes: ['/auth', '/onboarding', '/termos', '/pending-approval'],
+        edgeFunctions: ['auth-email-hook', 'send-transactional-email', 'process-email-queue', 'handle-email-suppression', 'handle-email-unsubscribe', 'preview-transactional-email'],
+        migrationKeywords: ['profiles', 'terms_acceptance', 'complete_user_onboarding'],
       },
       {
         module: 'Perfil & Roles',
@@ -545,6 +552,8 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/services/profiles.ts',
         ],
         supabaseTables: ['profiles', 'user_roles', 'organizations'],
+        migrationKeywords: ['user_roles', 'app_role', 'has_role', 'organizations', 'get_effective_org_id'],
+        edgeFunctions: ['manage-users'],
       },
       {
         module: 'Licenciamento',
@@ -555,6 +564,8 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/components/layout/LicenseRoute.tsx',
         ],
         supabaseTables: ['licenses', 'license_features'],
+        routes: ['/assinatura', '/admin/licencas'],
+        migrationKeywords: ['licenses', 'license_features', 'expire_trial_licenses', 'upgrade_license'],
       },
       {
         module: 'Módulos por Org',
@@ -565,6 +576,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useOrgModules.ts',
         ],
         supabaseTables: ['org_modules'],
+        migrationKeywords: ['org_modules'],
       },
       {
         module: 'Notificações',
@@ -575,6 +587,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useTrialNotifications.ts',
         ],
         supabaseTables: ['notifications'],
+        migrationKeywords: ['notifications'],
       },
       {
         module: 'Auditoria',
@@ -587,6 +600,9 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useClientErrorMonitor.ts',
         ],
         supabaseTables: ['audit_logs', 'client_errors'],
+        routes: ['/admin/audit', '/admin/report-logs', '/admin/ingestoes'],
+        migrationKeywords: ['audit_logs', 'client_errors'],
+        edgeFunctions: ['run-health-check', 'sync-test-registry'],
       },
       {
         module: 'Chat Beni',
@@ -598,6 +614,9 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'supabase/functions/beni-chat/index.ts',
           'supabase/functions/elevenlabs-tts/index.ts',
         ],
+        routes: ['/professor-beni'],
+        edgeFunctions: ['beni-chat', 'elevenlabs-tts'],
+        secrets: ['LOVABLE_API_KEY', 'ELEVENLABS_API_KEY'],
       },
       {
         module: 'Base de Conhecimento',
@@ -608,6 +627,9 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useKnowledgeBase.ts',
         ],
         supabaseTables: ['knowledge_base_documents'],
+        routes: ['/base-conhecimento'],
+        migrationKeywords: ['knowledge_base_documents'],
+        edgeFunctions: ['moderate-kb-upload'],
       },
     ],
   },
