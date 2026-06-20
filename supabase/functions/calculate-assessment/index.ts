@@ -1289,7 +1289,8 @@ async function runCalculationCore(
       currentPillarContexts,
       previousPillarContexts,
       new Date(),
-      intersectoralCount
+      intersectoralCount,
+      isEnterprise
     );
 
     console.log("IGMA Result:", JSON.stringify(igmaResult, null, 2));
