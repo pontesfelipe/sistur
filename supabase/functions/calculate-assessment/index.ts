@@ -2034,7 +2034,47 @@ async function runCalculationCore(
 
     // 16. Auto-create diagnosis_data_snapshots for provenance tracking
     // This ensures ALL external data used in the calculation is persisted for reports and analysis
-    if (!isEnterprise) {
+    if (isEnterprise) {
+      // Enterprise: snapshot dos valores manuais e auto-preenchidos (reviews) usados no cálculo
+      try {
+        await supabase
+          .from("diagnosis_data_snapshots")
+          .delete()
+          .eq("assessment_id", assessment_id);
+
+        const entSnapshots = (filteredIndicatorValues || [])
+          .filter((iv: any) => iv?.indicator?.code)
+          .map((iv: any) => {
+            const src = (iv.source || "").toString().toUpperCase();
+            const isReview = src.includes("REVIEW") || src.includes("FIRECRAWL") || src.includes("AUTO");
+            return {
+              assessment_id,
+              indicator_code: iv.indicator.code,
+              value_used: typeof iv.value_raw === "number" ? iv.value_raw : Number(iv.value_raw) || null,
+              value_used_text: typeof iv.value_raw === "number" ? null : (iv.value_raw?.toString() || null),
+              source_code: isReview ? "REVIEW_SEARCH" : "MANUAL_ENTRY",
+              reference_year: iv.reference_date ? new Date(iv.reference_date).getFullYear() : new Date().getFullYear(),
+              confidence_level: isReview ? 2 : 1,
+              was_manually_adjusted: !isReview,
+              org_id: orgId,
+            };
+          });
+
+        if (entSnapshots.length > 0) {
+          const { error: entSnapErr } = await supabase
+            .from("diagnosis_data_snapshots")
+            .insert(entSnapshots);
+          if (entSnapErr) {
+            console.error("Error creating enterprise data snapshots:", entSnapErr);
+          } else {
+            const reviewCount = entSnapshots.filter((s: any) => s.source_code === "REVIEW_SEARCH").length;
+            console.log(`Created ${entSnapshots.length} enterprise snapshots (${reviewCount} from review search, ${entSnapshots.length - reviewCount} manual)`);
+          }
+        }
+      } catch (e) {
+        console.error("Enterprise snapshots block failed:", e);
+      }
+    } else {
       const destinationIbgeCode = assessment.destination?.ibge_code;
       if (destinationIbgeCode) {
         // Delete existing snapshots for this assessment to avoid duplicates on recalculation
