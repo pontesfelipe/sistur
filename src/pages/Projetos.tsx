@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useProjects, PROJECT_STATUS_INFO, METHODOLOGY_INFO, PRIORITY_INFO } from '@/hooks/useProjects';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,30 @@ export default function Projetos() {
   const { data: projects, isLoading } = useProjects();
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Deep-link: /projetos?fromAssessment=<id>&indicators=CODE1,CODE2
+  // — opens the create dialog already locked to that assessment and pre-filters
+  // which indicators become baseline links. Used by Modo Prescrição.
+  const fromAssessment = searchParams.get('fromAssessment') || undefined;
+  const prefilledCodes = useMemo(() => {
+    const raw = searchParams.get('indicators');
+    return raw ? raw.split(',').map((s) => s.trim()).filter(Boolean) : undefined;
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (fromAssessment) setCreateDialogOpen(true);
+  }, [fromAssessment]);
+
+  const handleDialogChange = (open: boolean) => {
+    setCreateDialogOpen(open);
+    if (!open && fromAssessment) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('fromAssessment');
+      next.delete('indicators');
+      setSearchParams(next, { replace: true });
+    }
+  };
 
   const activeProjects = projects?.filter((p) => p.status === 'in_progress') || [];
   const planningProjects = projects?.filter((p) => p.status === 'planning') || [];
@@ -162,7 +187,9 @@ export default function Projetos() {
 
       <CreateProjectDialog
         open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
+        onOpenChange={handleDialogChange}
+        lockedAssessmentId={fromAssessment}
+        prefilledIndicatorCodes={prefilledCodes}
       />
     </AppLayout>
   );
