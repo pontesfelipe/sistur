@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 74,
+  minor: 75,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.75.0",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — Pacote Reputação (3/4): histórico de reviews e benchmarking competitivo. Novo painel 'Reputação Competitiva' no diálogo do empreendimento com duas abas: (1) Histórico de Reviews — registro periódico de snapshots por fonte (Google, TripAdvisor, Booking, Expedia, Decolar, Airbnb), capturando nota (0-10), volume de reviews, % de resposta e % de sentimento positivo, com timeline reverso; (2) Concorrentes — captura automática via Firecrawl de até 5 concorrentes no destino (com base no tipo de empreendimento do perfil), extraindo nome, nota e volume de reviews de Booking/TripAdvisor/Google; suporte a adição manual; cards-resumo com sua nota, média dos concorrentes e gap competitivo.",
+      "Diagnóstico Enterprise — novo indicador derivado ENT_COMP_GAP (Gap Competitivo de Reputação, pilar AO, tema Satisfação do Hóspede, faixa -2 a +2 pontos). Calculado pelo edge function 'calculate-assessment' a partir da diferença entre o snapshot mais recente do próprio empreendimento e a média das notas dos concorrentes capturados. Valor positivo indica vantagem competitiva e impacta diretamente o score do pilar AO.",
+      "Nova edge function 'search-competitors' (verify_jwt em código, CORS, sem entrada SQL direta) que consulta Firecrawl em 3 queries paralelas (Booking, TripAdvisor, Google Maps em pt-BR), faz parse de nota (5→10 ou 10) e volume de reviews a partir do título/descrição, deduplica e exclui o próprio empreendimento. Reescreve a lista de concorrentes auto-capturados (is_manual=false) preservando os manuais. Requer o connector Firecrawl ativo.",
+      "Novas tabelas com RLS por organização: 'enterprise_review_snapshots' (snapshot histórico por fonte com nota/volume/resposta/sentimento) e 'enterprise_competitors' (cadastro de concorrentes com flag is_manual para distinguir captura automática de inserção manual). Ambas usam get_effective_org_id para compatibilidade com modo demo.",
+    ],
+  },
   {
     version: "1.74.0",
     date: "2026-06-20",

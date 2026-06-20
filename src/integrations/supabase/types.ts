@@ -3807,6 +3807,81 @@ export type Database = {
         }
         Relationships: []
       }
+      enterprise_competitors: {
+        Row: {
+          captured_at: string
+          created_at: string
+          created_by: string | null
+          destination_id: string
+          distance_km: number | null
+          id: string
+          is_manual: boolean
+          location: string | null
+          name: string
+          notes: string | null
+          org_id: string
+          property_type: string | null
+          rating: number | null
+          review_volume: number | null
+          source_name: string | null
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          captured_at?: string
+          created_at?: string
+          created_by?: string | null
+          destination_id: string
+          distance_km?: number | null
+          id?: string
+          is_manual?: boolean
+          location?: string | null
+          name: string
+          notes?: string | null
+          org_id: string
+          property_type?: string | null
+          rating?: number | null
+          review_volume?: number | null
+          source_name?: string | null
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          captured_at?: string
+          created_at?: string
+          created_by?: string | null
+          destination_id?: string
+          distance_km?: number | null
+          id?: string
+          is_manual?: boolean
+          location?: string | null
+          name?: string
+          notes?: string | null
+          org_id?: string
+          property_type?: string | null
+          rating?: number | null
+          review_volume?: number | null
+          source_name?: string | null
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_competitors_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_competitors_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
+        ]
+      }
       enterprise_distribution_channels: {
         Row: {
           channel_name: string
@@ -4210,6 +4285,69 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "orgs"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      enterprise_review_snapshots: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          destination_id: string
+          id: string
+          org_id: string
+          rating: number | null
+          raw_data: Json | null
+          response_rate: number | null
+          review_volume: number | null
+          sentiment_positive_pct: number | null
+          snapshot_date: string
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          destination_id: string
+          id?: string
+          org_id: string
+          rating?: number | null
+          raw_data?: Json | null
+          response_rate?: number | null
+          review_volume?: number | null
+          sentiment_positive_pct?: number | null
+          snapshot_date?: string
+          source: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          destination_id?: string
+          id?: string
+          org_id?: string
+          rating?: number | null
+          raw_data?: Json | null
+          response_rate?: number | null
+          review_volume?: number | null
+          sentiment_positive_pct?: number | null
+          snapshot_date?: string
+          source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_review_snapshots_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_review_snapshots_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
           },
         ]
       }
