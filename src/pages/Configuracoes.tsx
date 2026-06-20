@@ -30,6 +30,7 @@ import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
 import { BeniContextPanel } from '@/components/settings/BeniContextPanel';
+import { ModuleLibrary } from '@/components/settings/ModuleLibrary';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import {
   exportMetodologiaDocx,
@@ -62,6 +63,7 @@ import {
   ListOrdered,
   Sparkles,
   Bot,
+  Library,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -169,10 +171,10 @@ export default function Configuracoes() {
             className={cn(
               'grid w-full max-w-4xl',
               isAdmin
-                ? 'grid-cols-10'
+                ? 'grid-cols-11'
                 : isOrgAdmin
-                  ? 'grid-cols-6'
-                  : 'grid-cols-4'
+                  ? 'grid-cols-7'
+                  : 'grid-cols-5'
             )}
           >
             <TabsTrigger value="geral" className="flex items-center gap-2">
@@ -200,6 +202,10 @@ export default function Configuracoes() {
             <TabsTrigger value="documentacao" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Docs</span>
+            </TabsTrigger>
+            <TabsTrigger value="biblioteca" className="flex items-center gap-2">
+              <Library className="h-4 w-4" />
+              <span className="hidden sm:inline">Biblioteca</span>
             </TabsTrigger>
             <TabsTrigger value="ferramentas" className="flex items-center gap-2">
               <Wrench className="h-4 w-4" />
@@ -575,6 +581,11 @@ export default function Configuracoes() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* BIBLIOTECA TAB — catálogo interno de módulos */}
+          <TabsContent value="biblioteca" className="space-y-6">
+            <ModuleLibrary />
           </TabsContent>
 
           {/* FERRAMENTAS TAB */}

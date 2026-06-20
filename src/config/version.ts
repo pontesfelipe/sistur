@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 76,
+  minor: 77,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.77.0",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Nova aba 'Biblioteca' em Configurações (visível a todos os usuários, posicionada após 'Docs') com um catálogo interno e navegável dos módulos lógicos do SISTUR. Organizado em 6 seções via accordion (ERP, EDU, Games, Enterprise, Comunidade, Plataforma) com 33 módulos cobrindo páginas, hooks, componentes, libs e tabelas Supabase. Cada módulo é um card compacto com badges de arquivos clicáveis (copiam o path para o clipboard com um clique), badges das tabelas Supabase, dependências (hooks/contexts/UI) e botão 'Manifesto' que copia um JSON estruturado com module/category/description/files/dependencies/supabaseTables — pronto para reutilização programática em outros projetos ou prompts de IA.",
+      "Busca livre no topo da Biblioteca filtra módulos por nome, descrição, arquivo ou tabela. Dados estáticos isolados em 'src/data/moduleLibrary.ts' (tipado) para facilitar manutenção e referência programática. Sem novas rotas, sem novas dependências, sem alterações em módulos existentes além da inserção da aba.",
+    ],
+  },
   {
     version: "1.76.0",
     date: "2026-06-20",
