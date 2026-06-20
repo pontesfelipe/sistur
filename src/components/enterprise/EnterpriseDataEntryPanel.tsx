@@ -473,6 +473,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                       const benchmarkStatus = getBenchmarkStatus(indicator, numericValue);
                       const benchmarkTarget = (indicator as any).benchmark_target;
                       const isIgnored = ignoredIds.has(indicator.id);
+                      const isAutoFilled = autoFilledIds.has(indicator.id);
                       const guidance = INDICATOR_GUIDANCE[(indicator as any).code];
                       const valError = validationErrors[indicator.id];
                       const existing = existingByIndicator.get(indicator.id);
@@ -499,6 +500,12 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                                 <Badge variant="outline" className="text-xs border-destructive/50 text-destructive">
                                   <EyeOff className="h-3 w-3 mr-1" />
                                   Ignorado
+                                </Badge>
+                              )}
+                              {!isIgnored && isAutoFilled && (
+                                <Badge variant="outline" className="text-xs border-primary/50 text-primary gap-1">
+                                  <Sparkles className="h-3 w-3" />
+                                  Pré-preenchido (Reviews)
                                 </Badge>
                               )}
                               {!isIgnored && benchmarkStatus === 'good' && (
