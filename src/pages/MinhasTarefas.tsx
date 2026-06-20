@@ -21,17 +21,11 @@ export default function MinhasTarefas() {
   };
 
   return (
-    <AppLayout>
+    <AppLayout
+      title="Minhas tarefas"
+      subtitle="Tarefas em que você é responsável ou aprovador, em todos os projetos da sua organização."
+    >
       <div className="container max-w-5xl py-6 space-y-6">
-        <div className="flex items-center gap-3">
-          <ListChecks className="h-7 w-7 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Minhas tarefas</h1>
-            <p className="text-sm text-muted-foreground">
-              Tarefas em que você é responsável ou aprovador, em todos os projetos da sua organização.
-            </p>
-          </div>
-        </div>
 
         {isLoading ? (
           <div className="flex justify-center py-12">
