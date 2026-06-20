@@ -266,10 +266,10 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
             size="sm"
             onClick={() => setAiSuggestOpen(true)}
             className="gap-1"
-            title="Sugerir tarefas com IA"
+            title="Sugerir tarefas com inteligência SISTUR"
           >
             <Sparkles className="h-4 w-4" />
-            <span className="hidden sm:inline">IA</span>
+            <span className="hidden sm:inline">Inteligência SISTUR</span>
           </Button>
           <Button
             variant="outline"

@@ -77,7 +77,7 @@ export function AISuggestTasksDialog({
         linked_issue_id: null,
         linked_prescription_id: null,
         linked_action_plan_id: null,
-        tags: [...(s.tags ?? []), ...(s.indicator_code ? [s.indicator_code] : []), "IA"],
+        tags: [...(s.tags ?? []), ...(s.indicator_code ? [s.indicator_code] : []), "Inteligência SISTUR"],
       }));
     if (toCreate.length === 0) {
       toast.info("Selecione ao menos uma sugestão.");
@@ -100,9 +100,9 @@ export function AISuggestTasksDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /> Sugerir tarefas com IA</DialogTitle>
+          <DialogTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /> Sugerir tarefas com inteligência SISTUR</DialogTitle>
           <DialogDescription>
-            A IA do SISTUR analisa indicadores vinculados, fases e tarefas existentes para sugerir novas tarefas acionáveis.
+            A inteligência SISTUR analisa indicadores vinculados, fases e tarefas existentes para sugerir novas tarefas acionáveis.
           </DialogDescription>
         </DialogHeader>
 
