@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { useProfile } from '@/contexts/ProfileContext';
+import { useProfileContext } from '@/contexts/ProfileContext';
 
 // =========================================================
 // Types
@@ -69,7 +69,7 @@ export interface TaskRaciEntry {
 // Org users (people that can be assigned)
 // =========================================================
 export function useOrgUsers() {
-  const { profile } = useProfile();
+  const { profile } = useProfileContext();
   const orgId = profile?.org_id;
   return useQuery({
     queryKey: ['org-users', orgId],
@@ -221,7 +221,7 @@ export function useTaskComments(taskId: string | undefined) {
 export function useAddTaskComment() {
   const qc = useQueryClient();
   const { user } = useAuth();
-  const { profile } = useProfile();
+  const { profile } = useProfileContext();
   const { toast } = useToast();
   return useMutation({
     mutationFn: async ({ taskId, projectId, body }: { taskId: string; projectId: string; body: string }) => {
