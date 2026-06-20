@@ -176,7 +176,7 @@ export function BeniContextPanel() {
           <CardTitle className="text-base">Modelo & Infraestrutura</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-1">
-          <p>Modelo: <Badge variant="outline">google/gemini-3-flash-preview</Badge> via Lovable AI Gateway</p>
+          <p>Modelo: <Badge variant="outline">google/gemini-3-flash-preview</Badge> via gateway de IA gerenciado</p>
           <p>Edge function: <code className="text-xs">beni-chat</code> (streaming SSE, JWT obrigatório)</p>
           <p>TTS: ElevenLabs via edge function <code className="text-xs">elevenlabs-tts</code></p>
         </CardContent>
