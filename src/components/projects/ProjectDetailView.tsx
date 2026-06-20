@@ -641,6 +641,14 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
         <TabsContent value="timeline" className="space-y-4">
           <ProjectTimeline project={project} phases={phases || []} milestones={milestones || []} />
         </TabsContent>
+
+        <TabsContent value="governance" className="space-y-4">
+          <ProjectGovernance projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="edu" className="space-y-4">
+          <ProjectEduPanel projectId={projectId} />
+        </TabsContent>
       </Tabs>
 
       {/* Project Dialogs */}
