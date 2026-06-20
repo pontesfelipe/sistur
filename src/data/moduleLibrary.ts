@@ -20,6 +20,12 @@ export interface ModuleManifest {
   category: ModuleCategory;
   description: string;
   files: string[];
+  /**
+   * Versão semântica do módulo dentro da Biblioteca. Independente da
+   * versão global do app — bump quando os arquivos, contrato de dados
+   * ou rotas do módulo mudarem de forma incompatível.
+   */
+  version?: string;
   dependencies?: {
     hooks?: string[];
     contexts?: string[];
