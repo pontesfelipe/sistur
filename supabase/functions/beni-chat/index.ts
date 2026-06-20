@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUser } from "../_shared/auth.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -222,6 +223,32 @@ serve(async (req) => {
           }
         });
         systemPrompt += `\nUse esses trechos para responder perguntas sobre o conteúdo dos relatórios. Se o usuário pedir algo que não está no trecho, oriente-o a abrir o relatório completo em /relatorios.\n`;
+      }
+
+      // Inject Global References (admin-curated knowledge base).
+      // RLS restricts SELECT to admins, so use service role to make refs available
+      // to every Beni user (refs are intentionally project-wide, not user-scoped).
+      try {
+        const adminRefClient = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+        );
+        const { data: globalRefs } = await adminRefClient
+          .from("global_reference_files")
+          .select("file_name, category, summary, description")
+          .eq("is_active", true)
+          .not("summary", "is", null)
+          .limit(40);
+        if (globalRefs && globalRefs.length > 0) {
+          systemPrompt += `\n\nREFERÊNCIAS GLOBAIS DA BASE DE CONHECIMENTO (${globalRefs.length}):\nUse esses materiais oficiais para fundamentar respostas. Cite o nome do arquivo quando relevante.\n`;
+          globalRefs.forEach((r: any, idx: number) => {
+            systemPrompt += `\n[G${idx + 1}] ${r.file_name}${r.category ? ` (${r.category})` : ""}\n`;
+            if (r.summary) systemPrompt += `  Resumo: ${String(r.summary).slice(0, 800)}\n`;
+            if (r.description) systemPrompt += `  Descrição: ${String(r.description).slice(0, 300)}\n`;
+          });
+        }
+      } catch (refErr) {
+        console.error("beni-chat: failed to fetch global references", refErr);
       }
     } catch (fetchErr) {
       console.error("beni-chat: failed to fetch user diagnostics/reports", fetchErr);
