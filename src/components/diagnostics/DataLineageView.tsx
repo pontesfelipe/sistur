@@ -138,6 +138,32 @@ function resolvePillar(row: any, catalog?: Map<string, any>): string {
 }
 
 export function DataLineageView({ auditRows, pillarScores = [], finalScore = null, indicatorCatalogByCode }: Props) {
+  // Fallback: when audit trail is not yet persisted (e.g. assessment ainda não
+  // foi calculado, ou trail antigo perdido), montamos a linhagem direto a
+  // partir dos `indicator_values` carregados — assim o usuário enxerga a
+  // procedência das fontes que JÁ alimentaram o diagnóstico, sem precisar
+  // esperar um recálculo.
+  const effectiveAuditRows = useMemo(() => {
+    if (auditRows && auditRows.length > 0) return auditRows;
+    const ivs = (arguments[0] as any)?.indicatorValues as any[] | undefined;
+    if (!ivs || ivs.length === 0) return [];
+    return ivs
+      .filter((v) => !v.is_ignored && v.indicator)
+      .map((v) => {
+        const src = String(v.source || '').toUpperCase();
+        let source_type = 'MANUAL';
+        if (/DERIV|AUTO|API|IBGE|CADASTUR|STN|DATASUS|INEP|ANATEL|TSE|ANA|ANAC|CADUNICO|MAPA|MTUR|RAIS|CAGED|REVIEW/.test(src)) {
+          source_type = /DERIV/.test(src) ? 'DERIVED' : 'OFFICIAL_API';
+        }
+        return {
+          indicator_code: v.indicator?.code,
+          pillar: v.indicator?.pillar,
+          source_type,
+          source_detail: v.source || null,
+        };
+      });
+  }, [auditRows, (arguments[0] as any)?.indicatorValues]);
+
   const lineage = useMemo(() => {
     const sources = new Map<string, { kind: SourceKind; count: number; codes: string[]; byPillar: Record<string, number> }>();
     const byPillar: Record<string, { OFFICIAL: number; DERIVED: number; MANUAL: number; total: number }> = {};
@@ -148,7 +174,7 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
     const kindCodes: Record<SourceKind, string[]> = { OFFICIAL: [], DERIVED: [], MANUAL: [] };
     const pillarCodes: Record<string, string[]> = {};
 
-    (auditRows || []).forEach((r) => {
+    (effectiveAuditRows || []).forEach((r) => {
       const { kind, sourceName } = classifyRow(r);
       kindTotals[kind] += 1;
       const key = `${kind}::${sourceName}`;
@@ -175,15 +201,15 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
       .map(([key, v]) => ({ key, name: key.split('::')[1], ...v }))
       .sort((a, b) => b.count - a.count);
 
-    return { sourceList, byPillar, kindTotals, kindByPillar, kindCodes, pillarCodes, total: (auditRows || []).length };
-  }, [auditRows, indicatorCatalogByCode]);
+    return { sourceList, byPillar, kindTotals, kindByPillar, kindCodes, pillarCodes, total: (effectiveAuditRows || []).length };
+  }, [effectiveAuditRows, indicatorCatalogByCode]);
 
   if (!lineage.total) {
     return (
       <Card>
         <CardContent className="py-10 text-center text-sm text-muted-foreground">
           <GitBranch className="h-8 w-8 mx-auto mb-2 opacity-40" />
-          A linhagem dos dados estará disponível após o recálculo do diagnóstico.
+          A linhagem dos dados ficará disponível assim que houver indicadores preenchidos neste diagnóstico.
         </CardContent>
       </Card>
     );
