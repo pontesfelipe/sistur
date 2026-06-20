@@ -18,7 +18,6 @@ import {
   type EduEnrollmentStatus,
 } from '@/hooks/useProjectGovernance';
 import { useProjectIndicatorImpact } from '@/hooks/useProjectIndicatorLinks';
-import { useEduRecommendationsForAssessment } from '@/hooks/useEduRecommendationsForAssessment';
 import { useProject } from '@/hooks/useProjects';
 
 interface Props {
@@ -28,8 +27,7 @@ interface Props {
 export function ProjectEduPanel({ projectId }: Props) {
   const { data: project } = useProject(projectId);
   const { data: enrollments = [] } = useProjectEduEnrollments(projectId);
-  const { data: impact } = useProjectIndicatorImpact(projectId);
-  const { data: recommendations = [] } = useEduRecommendationsForAssessment(project?.assessment_id);
+  const { data: impact = [] } = useProjectIndicatorImpact(projectId, project?.assessment_id);
   const create = useCreateEduEnrollment();
   const update = useUpdateEduEnrollment();
   const del = useDeleteEduEnrollment();
@@ -37,8 +35,8 @@ export function ProjectEduPanel({ projectId }: Props) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ course_title: '', target_audience: 'Gestores', user_name: '', is_mandatory: false, indicator_code: '' });
 
-  const linkedIndicators = (impact?.indicators || []).map((i: any) => i.indicator_code);
-  const relevantRecs = (recommendations as any[]).filter(r => linkedIndicators.includes(r.indicator_code));
+  const linkedIndicators = impact.map(i => i.indicator_code);
+  const relevantRecs: any[] = [];
 
   const completed = enrollments.filter(e => e.enrollment_status === 'completed').length;
   const mandatoryPending = enrollments.filter(e => e.is_mandatory && e.enrollment_status !== 'completed' && e.enrollment_status !== 'waived').length;
