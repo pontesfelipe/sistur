@@ -151,8 +151,17 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
       if (data?.analysis && onAutoFill) {
         const values: Record<string, number> = {};
         if (data.analysis.review_score !== null) values['ENT_REVIEW_SCORE'] = data.analysis.review_score;
+        if (data.analysis.review_count !== null && data.analysis.review_count !== undefined) {
+          values['ENT_REVIEW_VOL'] = data.analysis.review_count;
+        }
         if (data.analysis.digital_maturity !== null) values['ENT_TECH_SCORE'] = data.analysis.digital_maturity;
-        if (data.analysis.sentiment_score !== null) values['ENT_SENTIMENT_SCORE'] = data.analysis.sentiment_score;
+        if (data.analysis.sentiment_score !== null && data.analysis.sentiment_score !== undefined) {
+          // sentiment_score is 0-5 → ENT_GUEST_SATISFACTION é 0-10
+          values['ENT_GUEST_SATISFACTION'] = Number((data.analysis.sentiment_score * 2).toFixed(2));
+          // NPS derivado: (sentiment - 3) * 50 ∈ [-100, 100]
+          const nps = Math.max(-100, Math.min(100, Math.round((data.analysis.sentiment_score - 3) * 50)));
+          values['ENT_NPS'] = nps;
+        }
         if (Object.keys(values).length > 0) {
           onAutoFill(values);
           toast.success('Perfil e indicadores preenchidos automaticamente');
@@ -175,11 +184,16 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
       if (result.analysis.review_score !== null) {
         values['ENT_REVIEW_SCORE'] = result.analysis.review_score;
       }
+      if (result.analysis.review_count !== null && result.analysis.review_count !== undefined) {
+        values['ENT_REVIEW_VOL'] = result.analysis.review_count;
+      }
       if (result.analysis.digital_maturity !== null) {
         values['ENT_TECH_SCORE'] = result.analysis.digital_maturity;
       }
       if (result.analysis.sentiment_score !== null) {
-        values['ENT_SENTIMENT_SCORE'] = result.analysis.sentiment_score;
+        values['ENT_GUEST_SATISFACTION'] = Number((result.analysis.sentiment_score * 2).toFixed(2));
+        const nps = Math.max(-100, Math.min(100, Math.round((result.analysis.sentiment_score - 3) * 50)));
+        values['ENT_NPS'] = nps;
       }
 
       if (Object.keys(values).length > 0) {
