@@ -644,8 +644,75 @@ export function buildModuleManifestJson(m: ModuleManifest): string {
       files: m.files,
       dependencies: m.dependencies ?? {},
       supabaseTables: m.supabaseTables ?? [],
+      edgeFunctions: m.edgeFunctions ?? [],
+      routes: m.routes ?? [],
+      migrationKeywords: m.migrationKeywords ?? [],
+      secrets: m.secrets ?? [],
     },
     null,
     2,
   );
+}
+
+/**
+ * Gera um prompt em linguagem natural pronto para colar em outro projeto
+ * Lovable. O prompt instrui o agente a portar o módulo, listando exatamente
+ * o que precisa ser copiado, migrado, configurado e quais segredos pedir.
+ */
+export function buildModuleMigrationPrompt(m: ModuleManifest): string {
+  const lines: string[] = [];
+  lines.push(
+    `Porte o módulo "${m.module}" (categoria: ${m.category}) do projeto SISTUR para este projeto.`,
+  );
+  lines.push('');
+  lines.push(`Descrição: ${m.description}`);
+  lines.push('');
+
+  lines.push('1) Copie os arquivos abaixo do projeto de origem, preservando o caminho:');
+  m.files.forEach((f) => lines.push(`   - ${f}`));
+
+  if (m.routes?.length) {
+    lines.push('');
+    lines.push('2) Registre as rotas em src/App.tsx (lazy-load + ProtectedRoute quando aplicável):');
+    m.routes.forEach((r) => lines.push(`   - ${r}`));
+  }
+
+  if (m.supabaseTables?.length || m.migrationKeywords?.length) {
+    lines.push('');
+    lines.push('3) Banco de dados (Lovable Cloud / Supabase) — crie as tabelas abaixo via migration única, com RLS habilitado, policies por org_id/user_id e GRANTs apropriados (authenticated + service_role):');
+    (m.supabaseTables ?? []).forEach((t) => lines.push(`   - public.${t}`));
+    if (m.migrationKeywords?.length) {
+      lines.push(`   Procure no projeto de origem migrations que contenham: ${m.migrationKeywords.join(', ')}`);
+    }
+  }
+
+  if (m.edgeFunctions?.length) {
+    lines.push('');
+    lines.push('4) Edge functions — copie e implante:');
+    m.edgeFunctions.forEach((fn) => lines.push(`   - supabase/functions/${fn}/index.ts`));
+  }
+
+  if (m.secrets?.length) {
+    lines.push('');
+    lines.push('5) Secrets necessários (peça ao usuário se ainda não existirem):');
+    m.secrets.forEach((s) => lines.push(`   - ${s}`));
+  }
+
+  const dep = m.dependencies;
+  if (dep && (dep.hooks?.length || dep.contexts?.length || dep.ui?.length)) {
+    lines.push('');
+    lines.push('6) Dependências internas obrigatórias:');
+    if (dep.contexts?.length) lines.push(`   - Contexts: ${dep.contexts.join(', ')}`);
+    if (dep.hooks?.length) lines.push(`   - Hooks: ${dep.hooks.join(', ')}`);
+    if (dep.ui?.length) lines.push(`   - UI/Libs: ${dep.ui.join(', ')}`);
+  }
+
+  lines.push('');
+  lines.push('Validação final: rode build/typecheck, abra cada rota nova e confirme que as queries retornam dados (RLS pode bloquear silenciosamente se faltar GRANT).');
+
+  lines.push('');
+  lines.push('--- MANIFESTO JSON DE REFERÊNCIA ---');
+  lines.push(buildModuleManifestJson(m));
+
+  return lines.join('\n');
 }
