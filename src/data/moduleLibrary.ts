@@ -250,6 +250,8 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/components/edu/',
         ],
         supabaseTables: ['trainings', 'learning_paths', 'lessons', 'enrollments'],
+        routes: ['/edu', '/edu/catalogo', '/edu/trilhas', '/edu/trilhas-adaptativas', '/edu/training/:id'],
+        migrationKeywords: ['trainings', 'learning_paths', 'lessons', 'enrollments'],
       },
       {
         module: 'Provas & Quizzes',
@@ -266,6 +268,9 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/components/admin/',
         ],
         supabaseTables: ['exams', 'exam_questions', 'exam_attempts', 'quizzes'],
+        routes: ['/edu/exam/:examId', '/edu/exam-review/:attemptId', '/edu/minhas-provas'],
+        migrationKeywords: ['exams', 'exam_questions', 'exam_attempts', 'quizzes'],
+        edgeFunctions: ['cleanup-exam-tracking'],
       },
       {
         module: 'Turmas & Salas',
@@ -281,6 +286,8 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useClassroomOverview.ts',
         ],
         supabaseTables: ['classrooms', 'classroom_members', 'classroom_announcements', 'classroom_diary'],
+        routes: ['/edu/turmas'],
+        migrationKeywords: ['classrooms', 'classroom_members', 'classroom_diary'],
       },
       {
         module: 'Gamificação',
@@ -297,6 +304,8 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/lib/shareAchievement.ts',
         ],
         supabaseTables: ['user_xp', 'badges', 'user_badges', 'daily_missions', 'rewards'],
+        routes: ['/edu/conquistas', '/edu/recompensas'],
+        migrationKeywords: ['badges', 'user_badges', 'daily_missions', 'rewards', 'user_xp'],
       },
       {
         module: 'Certificados',
@@ -309,6 +318,8 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useCertificates.ts',
         ],
         supabaseTables: ['certificates'],
+        routes: ['/certificados', '/verificar-certificado', '/verificar-certificado/:code'],
+        migrationKeywords: ['certificates'],
       },
       {
         module: 'Progresso & Boletim',
@@ -324,6 +335,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useAssignmentProgress.ts',
         ],
         supabaseTables: ['student_progress', 'student_grades', 'student_notes'],
+        routes: ['/edu/historico', '/edu/boletim', '/edu/minhas-atividades'],
       },
       {
         module: 'Mensagens',
@@ -335,6 +347,8 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useEduNotifications.ts',
         ],
         supabaseTables: ['edu_messages', 'edu_notifications'],
+        routes: ['/edu/mensagens'],
+        migrationKeywords: ['edu_messages', 'edu_notifications'],
       },
       {
         module: 'Painel do Professor',
@@ -345,6 +359,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useEduAdmin.ts',
           'src/hooks/useProfessorReferral.ts',
         ],
+        routes: ['/professor', '/admin/edu', '/admin/certificacoes', '/admin/empacotamento'],
       },
     ],
   },
