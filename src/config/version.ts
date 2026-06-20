@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 19,
+  patch: 20,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.20",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Gerenciamento de Projetos (Frente 5) — IA, exportações e portfólio. Novo botão 'IA' no detalhe do projeto abre o diálogo 'Sugerir tarefas com IA', que envia indicadores vinculados, fases e tarefas existentes ao gateway Lovable AI (google/gemini-2.5-flash) e devolve de 4 a 8 sugestões de tarefas com prioridade, fase, horas estimadas e código de indicador-alvo; o usuário seleciona quais importar. Novo botão '.ics' exporta um calendário iCalendar com marcos e tarefas do projeto (para Google/Outlook/Apple). Nova exportação 'CSV do portfólio' na página de Projetos com todas as colunas executivas. Nova edge function 'suggest-project-tasks' (verify_jwt true) com tratamento de 429/402 e parsing robusto de JSON.",
+    ],
+  },
   {
     version: "1.66.19",
     date: "2026-06-20",
