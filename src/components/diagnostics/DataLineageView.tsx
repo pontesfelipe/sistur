@@ -137,7 +137,7 @@ function resolvePillar(row: any, catalog?: Map<string, any>): string {
   return 'OUTROS';
 }
 
-export function DataLineageView({ auditRows, pillarScores = [], finalScore = null, indicatorCatalogByCode }: Props) {
+export function DataLineageView({ auditRows, indicatorValues, pillarScores = [], finalScore = null, indicatorCatalogByCode }: Props) {
   // Fallback: when audit trail is not yet persisted (e.g. assessment ainda não
   // foi calculado, ou trail antigo perdido), montamos a linhagem direto a
   // partir dos `indicator_values` carregados — assim o usuário enxerga a
@@ -145,9 +145,8 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
   // esperar um recálculo.
   const effectiveAuditRows = useMemo(() => {
     if (auditRows && auditRows.length > 0) return auditRows;
-    const ivs = (arguments[0] as any)?.indicatorValues as any[] | undefined;
-    if (!ivs || ivs.length === 0) return [];
-    return ivs
+    if (!indicatorValues || indicatorValues.length === 0) return [];
+    return indicatorValues
       .filter((v) => !v.is_ignored && v.indicator)
       .map((v) => {
         const src = String(v.source || '').toUpperCase();
@@ -162,7 +161,7 @@ export function DataLineageView({ auditRows, pillarScores = [], finalScore = nul
           source_detail: v.source || null,
         };
       });
-  }, [auditRows, (arguments[0] as any)?.indicatorValues]);
+  }, [auditRows, indicatorValues]);
 
   const lineage = useMemo(() => {
     const sources = new Map<string, { kind: SourceKind; count: number; codes: string[]; byPillar: Record<string, number> }>();
