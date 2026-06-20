@@ -21,6 +21,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 import { EnterpriseProfilePanel } from '@/components/enterprise/EnterpriseProfilePanel';
+import { EnterpriseRevenuePanel } from '@/components/enterprise/EnterpriseRevenuePanel';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -293,11 +294,17 @@ export function DestinosPanel() {
       >
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           {enterpriseProfileDestination && (
-            <EnterpriseProfilePanel
-              destinationId={enterpriseProfileDestination.id}
-              destinationName={enterpriseProfileDestination.name}
-              onClose={() => setEnterpriseProfileDestination(null)}
-            />
+            <div className="space-y-6">
+              <EnterpriseProfilePanel
+                destinationId={enterpriseProfileDestination.id}
+                destinationName={enterpriseProfileDestination.name}
+                onClose={() => setEnterpriseProfileDestination(null)}
+              />
+              <EnterpriseRevenuePanel
+                destinationId={enterpriseProfileDestination.id}
+                destinationName={enterpriseProfileDestination.name}
+              />
+            </div>
           )}
         </DialogContent>
       </Dialog>

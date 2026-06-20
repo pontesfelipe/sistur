@@ -700,6 +700,108 @@ async function runCalculationCore(
         const sampleThemes = filteredIndicatorValues.slice(0, 3).map((iv: any) => iv.indicator?.theme);
         console.log(`Sample Enterprise themes: ${JSON.stringify(sampleThemes)}`);
       }
+
+      // ============================================================
+      // PACOTE RECEITA — INJETAR INDICADORES DERIVADOS ENTERPRISE
+      // ENT_COMMISSION_AVG, ENT_DIRECT_SALES_PCT, ENT_SEASONALITY_INDEX
+      // calculados a partir de enterprise_distribution_channels e
+      // enterprise_seasonality_months.
+      // ============================================================
+      try {
+        const destinationIdForRevenue = assessment.destination_id;
+        const presentIds = new Set(filteredIndicatorValues.map((iv: any) => iv.indicator_id));
+
+        // 1) Channels → ENT_COMMISSION_AVG + ENT_DIRECT_SALES_PCT
+        const { data: channels } = await supabase
+          .from('enterprise_distribution_channels')
+          .select('channel_type, share_pct, commission_pct')
+          .eq('destination_id', destinationIdForRevenue);
+
+        if (channels && channels.length > 0) {
+          const totalShare = channels.reduce((s: number, c: any) => s + Number(c.share_pct || 0), 0);
+          const weightedComm = totalShare > 0
+            ? channels.reduce((s: number, c: any) => s + (Number(c.share_pct) * Number(c.commission_pct)), 0) / totalShare
+            : 0;
+          const directShare = channels
+            .filter((c: any) => c.channel_type === 'DIRETO')
+            .reduce((s: number, c: any) => s + Number(c.share_pct || 0), 0);
+
+          const derivedRevCodes = [
+            { code: 'ENT_COMMISSION_AVG', value: weightedComm },
+            { code: 'ENT_DIRECT_SALES_PCT', value: directShare },
+          ];
+
+          const { data: revInds } = await supabase
+            .from('indicators')
+            .select('id, code, name, pillar, theme, direction, normalization, min_ref, max_ref, weight, intersectoral_dependency, minimum_tier')
+            .in('code', derivedRevCodes.map((d) => d.code));
+
+          for (const d of derivedRevCodes) {
+            const ind = (revInds || []).find((i: any) => i.code === d.code);
+            if (ind && !presentIds.has(ind.id)) {
+              filteredIndicatorValues.push({
+                id: `derived-${d.code}`,
+                indicator_id: ind.id,
+                value_raw: Number(d.value.toFixed(2)),
+                indicator: { ...ind, theme: ind.theme || 'Receita' },
+                _source: 'derived',
+                _external_source: 'ENTERPRISE_CHANNELS',
+              });
+              presentIds.add(ind.id);
+            }
+          }
+          console.log(`[Revenue] Injected derived channel indicators (comm=${weightedComm.toFixed(2)}%, direct=${directShare.toFixed(2)}%)`);
+        }
+
+        // 2) Seasonality months → ENT_SEASONALITY_INDEX (CV de ocupação)
+        const { data: seasonRows } = await supabase
+          .from('enterprise_seasonality_months')
+          .select('year, month, occupancy_rate')
+          .eq('destination_id', destinationIdForRevenue);
+
+        if (seasonRows && seasonRows.length >= 3) {
+          // Use most recent year with >=3 filled months
+          const byYear = new Map<number, number[]>();
+          for (const r of seasonRows) {
+            const occ = Number(r.occupancy_rate);
+            if (!isNaN(occ) && occ > 0) {
+              const arr = byYear.get(r.year) || [];
+              arr.push(occ);
+              byYear.set(r.year, arr);
+            }
+          }
+          const years = [...byYear.keys()].sort((a, b) => b - a);
+          const chosenYear = years.find((y) => (byYear.get(y) || []).length >= 3);
+          if (chosenYear) {
+            const occ = byYear.get(chosenYear)!;
+            const mean = occ.reduce((a, b) => a + b, 0) / occ.length;
+            const variance = occ.reduce((s, v) => s + (v - mean) ** 2, 0) / occ.length;
+            const std = Math.sqrt(variance);
+            const cv = mean > 0 ? std / mean : 0;
+
+            const { data: seasInd } = await supabase
+              .from('indicators')
+              .select('id, code, name, pillar, theme, direction, normalization, min_ref, max_ref, weight, intersectoral_dependency, minimum_tier')
+              .eq('code', 'ENT_SEASONALITY_INDEX')
+              .maybeSingle();
+
+            if (seasInd && !presentIds.has(seasInd.id)) {
+              filteredIndicatorValues.push({
+                id: `derived-ENT_SEASONALITY_INDEX`,
+                indicator_id: seasInd.id,
+                value_raw: Number(cv.toFixed(3)),
+                indicator: { ...seasInd, theme: seasInd.theme || 'Sazonalidade' },
+                _source: 'derived',
+                _external_source: 'ENTERPRISE_SEASONALITY',
+                _reference_year: chosenYear,
+              });
+              console.log(`[Revenue] Injected ENT_SEASONALITY_INDEX = ${cv.toFixed(3)} (year ${chosenYear}, ${occ.length} months)`);
+            }
+          }
+        }
+      } catch (revErr) {
+        console.error('[Revenue] Derived enterprise revenue indicators failed:', revErr);
+      }
     } else {
       // TERRITORIAL: Use standard indicator_values
       const { data: indicatorValues, error: valuesError } = await supabase

@@ -3807,6 +3807,69 @@ export type Database = {
         }
         Relationships: []
       }
+      enterprise_distribution_channels: {
+        Row: {
+          channel_name: string
+          channel_type: Database["public"]["Enums"]["enterprise_channel_type"]
+          commission_pct: number
+          created_at: string
+          created_by: string | null
+          destination_id: string
+          id: string
+          notes: string | null
+          org_id: string
+          period_end: string | null
+          period_start: string | null
+          share_pct: number
+          updated_at: string
+        }
+        Insert: {
+          channel_name: string
+          channel_type?: Database["public"]["Enums"]["enterprise_channel_type"]
+          commission_pct?: number
+          created_at?: string
+          created_by?: string | null
+          destination_id: string
+          id?: string
+          notes?: string | null
+          org_id: string
+          period_end?: string | null
+          period_start?: string | null
+          share_pct?: number
+          updated_at?: string
+        }
+        Update: {
+          channel_name?: string
+          channel_type?: Database["public"]["Enums"]["enterprise_channel_type"]
+          commission_pct?: number
+          created_at?: string
+          created_by?: string | null
+          destination_id?: string
+          id?: string
+          notes?: string | null
+          org_id?: string
+          period_end?: string | null
+          period_start?: string | null
+          share_pct?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_distribution_channels_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_distribution_channels_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
+        ]
+      }
       enterprise_indicator_categories: {
         Row: {
           code: string
@@ -4147,6 +4210,66 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "orgs"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      enterprise_seasonality_months: {
+        Row: {
+          adr: number | null
+          created_at: string
+          created_by: string | null
+          destination_id: string
+          id: string
+          month: number
+          notes: string | null
+          occupancy_rate: number | null
+          org_id: string
+          revpar: number | null
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          adr?: number | null
+          created_at?: string
+          created_by?: string | null
+          destination_id: string
+          id?: string
+          month: number
+          notes?: string | null
+          occupancy_rate?: number | null
+          org_id: string
+          revpar?: number | null
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          adr?: number | null
+          created_at?: string
+          created_by?: string | null
+          destination_id?: string
+          id?: string
+          month?: number
+          notes?: string | null
+          occupancy_rate?: number | null
+          org_id?: string
+          revpar?: number | null
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_seasonality_months_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_seasonality_months_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
           },
         ]
       }
@@ -11153,6 +11276,13 @@ export type Database = {
         | "CALCULATED"
       diagnosis_tier_type: "COMPLETE" | "MEDIUM" | "SMALL"
       enrollment_status_type: "active" | "completed" | "dropped" | "suspended"
+      enterprise_channel_type:
+        | "DIRETO"
+        | "OTA"
+        | "AGENCIA"
+        | "CORPORATIVO"
+        | "EVENTOS"
+        | "OUTRO"
       exam_result_type: "passed" | "failed" | "pending"
       exam_status_type:
         | "generated"
@@ -11401,6 +11531,14 @@ export const Constants = {
       ],
       diagnosis_tier_type: ["COMPLETE", "MEDIUM", "SMALL"],
       enrollment_status_type: ["active", "completed", "dropped", "suspended"],
+      enterprise_channel_type: [
+        "DIRETO",
+        "OTA",
+        "AGENCIA",
+        "CORPORATIVO",
+        "EVENTOS",
+        "OUTRO",
+      ],
       exam_result_type: ["passed", "failed", "pending"],
       exam_status_type: [
         "generated",
