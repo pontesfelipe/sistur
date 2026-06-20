@@ -680,6 +680,10 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <ProjectGovernance projectId={projectId} />
         </TabsContent>
 
+        <TabsContent value="team" className="space-y-4">
+          <ProjectMembersPanel projectId={projectId} />
+        </TabsContent>
+
         <TabsContent value="edu" className="space-y-4">
           <ProjectEduPanel projectId={projectId} />
         </TabsContent>
