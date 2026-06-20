@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -43,23 +43,33 @@ import {
 import { cn } from '@/lib/utils';
 import { MAX_AI_ITEMS } from '@/lib/projectGeneration';
 import { useToast } from '@/hooks/use-toast';
+import { useCreateIndicatorLinks } from '@/hooks/useProjectIndicatorLinks';
 
 interface CreateProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /**
+   * When provided, baseline links will only be persisted for these indicator
+   * codes (selected from Modo Prescrição). When omitted, ALL triggers (score
+   * ≤ 0.66) of the assessment are linked as baselines.
+   */
+  prefilledIndicatorCodes?: string[];
+  /** Pre-select this assessment and skip the selection step. */
+  lockedAssessmentId?: string;
 }
 
-export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogProps) {
+export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCodes, lockedAssessmentId }: CreateProjectDialogProps) {
   const { data: availableDestinations, isLoading: loadingDestinations } = useDestinationsWithReportData();
   const { profile } = useProfile();
   const createProject = useCreateProject();
   const createPhases = useCreatePhases();
   const createTasks = useCreateTasks();
   const createMilestones = useCreateMilestones();
+  const createLinks = useCreateIndicatorLinks();
   const { toast } = useToast();
 
-  const [step, setStep] = useState<'select' | 'configure' | 'generate'>('select');
-  const [selectedAssessment, setSelectedAssessment] = useState<string>('');
+  const [step, setStep] = useState<'select' | 'configure' | 'generate'>(lockedAssessmentId ? 'configure' : 'select');
+  const [selectedAssessment, setSelectedAssessment] = useState<string>(lockedAssessmentId || '');
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
   const [methodology, setMethodology] = useState<ProjectMethodology>('waterfall');
@@ -70,6 +80,14 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
   const [generationProgress, setGenerationProgress] = useState('');
 
   const selectedData = availableDestinations?.find((d) => d.assessment_id === selectedAssessment);
+
+  // When opened with a locked assessment (from Modo Prescrição), seed name once
+  // the destination data resolves.
+  useEffect(() => {
+    if (lockedAssessmentId && selectedData && !projectName) {
+      setProjectName(`Projeto ${selectedData.destination_name}`);
+    }
+  }, [lockedAssessmentId, selectedData, projectName]);
 
   const handleSelectContinue = () => {
     if (!selectedData) return;
@@ -336,6 +354,43 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
 
       if (tasks.length > 0) {
         await createTasks.mutateAsync(tasks);
+      }
+
+      // ---- Frente 1: persist baseline indicator links so future re-calculations
+      // can compute delta/impact for this project. We snapshot the score *now*.
+      try {
+        const codeFilter = prefilledIndicatorCodes && prefilledIndicatorCodes.length > 0
+          ? new Set(prefilledIndicatorCodes)
+          : null;
+        const linkRows = (indicatorScoresRes.data || [])
+          .filter((is: any) => {
+            const code = is.indicator?.code;
+            if (!code) return false;
+            if (codeFilter) return codeFilter.has(code);
+            // Default: link every trigger (Atenção/Crítico).
+            return typeof is.score === 'number' && is.score <= 0.66;
+          })
+          .map((is: any) => {
+            const score = Number(is.score);
+            const status = score >= 0.67 ? 'ADEQUADO' : score >= 0.34 ? 'ATENCAO' : 'CRITICO';
+            return {
+              project_id: project.id,
+              indicator_id: is.indicator_id || null,
+              indicator_code: is.indicator.code,
+              indicator_name: is.indicator.name || null,
+              pillar: is.indicator.pillar || null,
+              baseline_score: score,
+              baseline_status: status,
+              target_score: 0.67,
+              notes: null,
+            };
+          });
+        if (linkRows.length > 0) {
+          await createLinks.mutateAsync(linkRows as any);
+        }
+      } catch (linkErr) {
+        // Non-fatal: project + tasks already exist. Surface as warning.
+        console.warn('[CreateProjectDialog] indicator links failed:', linkErr);
       }
 
       setGenerationProgress('Criando marcos...');

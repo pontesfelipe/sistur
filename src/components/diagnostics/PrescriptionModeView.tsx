@@ -1,11 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Link } from 'react-router-dom';
-import { AlertTriangle, GraduationCap, ExternalLink, Target, ListChecks } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AlertTriangle, GraduationCap, ExternalLink, Target, ListChecks, FolderKanban } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { usePrescriptions } from '@/hooks/usePrescriptions';
 import { PILLAR_INFO, SEVERITY_INFO, getSeverityFromScore, type Severity } from '@/types/sistur';
 
@@ -26,6 +27,16 @@ interface Props {
  */
 export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
   const { data: prescriptions = [], isLoading } = usePrescriptions(assessmentId);
+  const navigate = useNavigate();
+  const [selectedCodes, setSelectedCodes] = useState<Set<string>>(new Set());
+
+  const toggleCode = (code: string) =>
+    setSelectedCodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(code)) next.delete(code);
+      else next.add(code);
+      return next;
+    });
 
   // Triggers: indicators in Atenção or Crítico (score ≤ 0.66)
   const triggers = useMemo(() => {
@@ -64,6 +75,22 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
     prescriptionsByIndicator.has(t.indicator_id)
   ).length;
   const coverage = totalTriggers > 0 ? (triggersWithPrescription / totalTriggers) * 100 : 100;
+
+  const allCodes = useMemo(
+    () => triggers.map((t) => t.indicator?.code).filter(Boolean) as string[],
+    [triggers],
+  );
+  const selectAll = () => setSelectedCodes(new Set(allCodes));
+  const clearAll = () => setSelectedCodes(new Set());
+
+  const goToCreateProject = () => {
+    const codes = selectedCodes.size > 0 ? Array.from(selectedCodes) : allCodes;
+    const params = new URLSearchParams({
+      fromAssessment: assessmentId,
+      indicators: codes.join(','),
+    });
+    navigate(`/projetos?${params.toString()}`);
+  };
 
   if (isLoading) {
     return (
@@ -139,6 +166,34 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
         </Alert>
       )}
 
+      {/* Action bar — turn the selected (or all) triggers into a new project */}
+      {totalTriggers > 0 && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-6">
+            <div className="text-sm">
+              <p className="font-medium flex items-center gap-2">
+                <FolderKanban className="h-4 w-4 text-primary" />
+                Transformar gatilhos em projeto
+              </p>
+              <p className="text-muted-foreground text-xs mt-1">
+                {selectedCodes.size > 0
+                  ? `${selectedCodes.size} indicador(es) selecionado(s) — vira(m) o baseline do novo projeto.`
+                  : `Sem seleção, todos os ${totalTriggers} gatilhos viram baseline.`}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" variant="ghost" onClick={selectAll}>Selecionar todos</Button>
+              <Button size="sm" variant="ghost" onClick={clearAll} disabled={selectedCodes.size === 0}>
+                Limpar
+              </Button>
+              <Button size="sm" onClick={goToCreateProject}>
+                <FolderKanban className="h-4 w-4 mr-1" /> Criar projeto
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Lista por pilar */}
       {(['RA', 'OE', 'AO'] as const).map((pillar) => {
         const items = triggersByPillar[pillar] || [];
@@ -165,13 +220,23 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
               {items.map((trigger) => {
                 const prescriptionsForInd = prescriptionsByIndicator.get(trigger.indicator_id) || [];
                 const hasCourse = prescriptionsForInd.length > 0;
+                const code = trigger.indicator?.code;
                 return (
                   <div
                     key={trigger.id}
                     className="border rounded-lg p-4 space-y-2 bg-card"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 flex gap-3">
+                        {code && (
+                          <Checkbox
+                            checked={selectedCodes.has(code)}
+                            onCheckedChange={() => toggleCode(code)}
+                            className="mt-1"
+                            aria-label={`Selecionar ${code} para o projeto`}
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge
                             variant={trigger.severity === 'CRITICO' ? 'destructive' : 'default'}
@@ -189,6 +254,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
                         <p className="font-medium text-sm mt-1">
                           {trigger.indicator?.name}
                         </p>
+                        </div>
                       </div>
                       {!hasCourse && (
                         <Badge variant="outline" className="text-xs gap-1">
