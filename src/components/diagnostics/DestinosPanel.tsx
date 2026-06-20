@@ -294,11 +294,17 @@ export function DestinosPanel() {
       >
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           {enterpriseProfileDestination && (
-            <EnterpriseProfilePanel
-              destinationId={enterpriseProfileDestination.id}
-              destinationName={enterpriseProfileDestination.name}
-              onClose={() => setEnterpriseProfileDestination(null)}
-            />
+            <div className="space-y-6">
+              <EnterpriseProfilePanel
+                destinationId={enterpriseProfileDestination.id}
+                destinationName={enterpriseProfileDestination.name}
+                onClose={() => setEnterpriseProfileDestination(null)}
+              />
+              <EnterpriseRevenuePanel
+                destinationId={enterpriseProfileDestination.id}
+                destinationName={enterpriseProfileDestination.name}
+              />
+            </div>
           )}
         </DialogContent>
       </Dialog>
