@@ -860,6 +860,62 @@ async function runCalculationCore(
       } catch (repErr) {
         console.error('[Reputation] Derived ENT_COMP_GAP failed:', repErr);
       }
+
+      // ============================================================
+      // PACOTE CONFORMIDADE — INJETAR ENT_COMPLIANCE_RATE
+      // Calculado a partir do checklist enterprise_compliance_items.
+      // Itens 'nao_aplicavel' são excluídos do denominador.
+      // ============================================================
+      try {
+        const destinationIdForComp = assessment.destination_id;
+        const presentIds3 = new Set(filteredIndicatorValues.map((iv: any) => iv.indicator_id));
+
+        const { data: profileRow } = await supabase
+          .from('enterprise_profiles')
+          .select('id')
+          .eq('destination_id', destinationIdForComp)
+          .maybeSingle();
+
+        if (profileRow?.id) {
+          const { data: complianceRows } = await supabase
+            .from('enterprise_compliance_items')
+            .select('status, expires_at')
+            .eq('enterprise_profile_id', profileRow.id);
+
+          const applicable = (complianceRows || []).filter((r: any) => r.status !== 'nao_aplicavel');
+          if (applicable.length > 0) {
+            const now = Date.now();
+            const valid = applicable.filter((r: any) => {
+              if (r.status === 'valido') {
+                if (!r.expires_at) return true;
+                return new Date(r.expires_at).getTime() >= now;
+              }
+              return false;
+            }).length;
+            const rate = (valid / applicable.length) * 100;
+
+            const { data: compInd } = await supabase
+              .from('indicators')
+              .select('id, code, name, pillar, theme, direction, normalization, min_ref, max_ref, weight, intersectoral_dependency, minimum_tier')
+              .eq('code', 'ENT_COMPLIANCE_RATE')
+              .maybeSingle();
+
+            if (compInd && !presentIds3.has(compInd.id)) {
+              filteredIndicatorValues.push({
+                id: 'derived-ENT_COMPLIANCE_RATE',
+                indicator_id: compInd.id,
+                value_raw: Number(rate.toFixed(2)),
+                indicator: { ...compInd, theme: compInd.theme || 'Conformidade & Regulatório' },
+                _source: 'derived',
+                _external_source: 'ENTERPRISE_COMPLIANCE',
+              });
+              console.log(`[Compliance] Injected ENT_COMPLIANCE_RATE=${rate.toFixed(2)}% (${valid}/${applicable.length} itens válidos)`);
+            }
+          }
+        }
+      } catch (compErr) {
+        console.error('[Compliance] Derived ENT_COMPLIANCE_RATE failed:', compErr);
+      }
     } else {
       // TERRITORIAL: Use standard indicator_values
       const { data: indicatorValues, error: valuesError } = await supabase
