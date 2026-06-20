@@ -614,6 +614,42 @@ export type Database = {
         }
         Relationships: []
       }
+      beni_settings: {
+        Row: {
+          base_theory: string | null
+          created_at: string
+          dynamic_context: string | null
+          id: boolean
+          model: string
+          output_format: string | null
+          persona: string | null
+          scope_guardrails: string | null
+          updated_at: string
+        }
+        Insert: {
+          base_theory?: string | null
+          created_at?: string
+          dynamic_context?: string | null
+          id?: boolean
+          model?: string
+          output_format?: string | null
+          persona?: string | null
+          scope_guardrails?: string | null
+          updated_at?: string
+        }
+        Update: {
+          base_theory?: string | null
+          created_at?: string
+          dynamic_context?: string | null
+          id?: boolean
+          model?: string
+          output_format?: string | null
+          persona?: string | null
+          scope_guardrails?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cadunico_ingestion_runs: {
         Row: {
           bytes_downloaded: number | null

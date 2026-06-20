@@ -79,6 +79,17 @@ Se a pergunta NÃO for relacionada a nenhum desses temas, responda educadamente:
 
 NÃO responda perguntas sobre: programação, receitas culinárias, saúde médica, direito, matemática geral, entretenimento, esportes, política partidária, religião, ou qualquer outro tema fora do turismo e da metodologia SISTUR. Seja firme mas educado na recusa.`;
 
+const ALLOWED_MODELS = new Set([
+  "google/gemini-3-flash-preview",
+  "google/gemini-3.1-flash-lite",
+  "google/gemini-3.5-flash",
+  "google/gemini-2.5-flash",
+  "google/gemini-2.5-flash-lite",
+  "google/gemini-2.5-pro",
+  "openai/gpt-5",
+  "openai/gpt-5-mini",
+  "openai/gpt-5-nano",
+]);
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -97,8 +108,30 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Build context-aware system prompt
+    // Build context-aware system prompt. Allow admin overrides via beni_settings.
     let systemPrompt = BENI_SYSTEM_PROMPT;
+    let selectedModel = "google/gemini-3-flash-preview";
+    try {
+      const { data: settings } = await userClient
+        .from("beni_settings")
+        .select("persona, output_format, base_theory, dynamic_context, scope_guardrails, model")
+        .eq("id", true)
+        .maybeSingle();
+      if (settings) {
+        const parts: string[] = [];
+        if (settings.persona) parts.push(`PERSONA:\n${settings.persona}`);
+        if (settings.output_format) parts.push(`FORMATO DE SAÍDA:\n${settings.output_format}`);
+        if (settings.base_theory) parts.push(`BASE TEÓRICA:\n${settings.base_theory}`);
+        if (settings.dynamic_context) parts.push(`CONTEXTO DINÂMICO:\n${settings.dynamic_context}`);
+        if (settings.scope_guardrails) parts.push(`ESCOPO E GUARDRAILS:\n${settings.scope_guardrails}`);
+        if (parts.length > 0) systemPrompt = parts.join("\n\n");
+        if (settings.model && ALLOWED_MODELS.has(settings.model)) {
+          selectedModel = settings.model;
+        }
+      }
+    } catch (settingsErr) {
+      console.error("beni-chat: failed to load beni_settings", settingsErr);
+    }
 
     // ----------------------------------------------------------------
     // Fetch user-accessible diagnostics (assessments) and reports.
@@ -250,7 +283,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: selectedModel,
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
