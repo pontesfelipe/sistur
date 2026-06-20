@@ -1376,9 +1376,11 @@ POLÍTICA "ZERO ALUCINAÇÃO" (PRIORITÁRIA SOBRE QUALQUER OUTRA REGRA):
 - Cada número e cada citação bibliográfica DEVE corresponder ao contexto/canônico.
 
 OS TRÊS EIXOS SISTUR ENTERPRISE:
-1. I-RA — Responsabilidade Ambiental: Eficiência energética, gestão hídrica, resíduos, certificações ESG
-2. I-AO — Ações Operacionais: Governança corporativa, saúde financeira, maturidade tecnológica, parcerias
-3. I-OE — Organização Estrutural: Qualidade de serviço, satisfação do hóspede, ocupação, capacitação
+1. I-RA — Relações Ambientais (Responsabilidade ESG): Eficiência energética, gestão hídrica, resíduos, pegada de carbono, impacto na comunidade, fornecedores e empregos locais, certificações ambientais
+2. I-OE — Organização Estrutural (Governança e Estrutura): Governança corporativa e compliance, saúde financeira (GOP, GOPPAR, margem, TRevPAR), maturidade tecnológica, qualidade da infraestrutura, rede de parcerias e canais de distribuição
+3. I-AO — Ações Operacionais (Mercado e Hóspede): Taxa de ocupação, RevPAR, ADR, satisfação do hóspede, NPS, reviews online, qualidade de serviço, capacitação da equipe, efetividade de marketing
+
+IMPORTANTE: NÃO confunda os pilares. OE concentra Governança/Financeiro/Tecnologia/Infraestrutura/Parcerias. AO concentra Operação/Satisfação/Marketing/Capacitação. Recomendações classificadas no pilar errado serão consideradas incorretas.
 
 CLASSIFICAÇÃO (régua oficial 5 níveis — usar SEMPRE estes rótulos, nunca "BOM"):
 - 🟢 EXCELENTE (≥90%) | 🔵 FORTE (80-89%) | 🟡 ADEQUADO (67-79%) | 🟠 ATENÇÃO (34-66%) | 🔴 CRÍTICO (≤33%)
