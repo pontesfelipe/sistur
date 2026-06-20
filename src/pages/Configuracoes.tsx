@@ -107,7 +107,7 @@ function DocumentDownloadItem({
   return (
     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
       <div className="flex-1">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <p className="font-medium text-sm">{title}</p>
           <Badge variant="outline" className="text-xs">{version}</Badge>
           {isReady && <Badge className="bg-green-600 text-white text-[10px]">DOCX</Badge>}
@@ -169,59 +169,59 @@ export default function Configuracoes() {
         <Tabs defaultValue="geral" className="space-y-6">
           <TabsList className="flex flex-wrap gap-2 w-full h-auto p-1">
 
-            <TabsTrigger value="geral" className="flex items-center gap-2">
+            <TabsTrigger value="geral" className="flex items-center gap-2 shrink-0">
               <Settings2 className="h-4 w-4" />
               <span className="hidden sm:inline">Geral</span>
             </TabsTrigger>
             {(isAdmin || isOrgAdmin) && (
-              <TabsTrigger value="usuarios" className="flex items-center gap-2">
+              <TabsTrigger value="usuarios" className="flex items-center gap-2 shrink-0">
                 <Shield className="h-4 w-4" />
                 <span className="hidden sm:inline">Usuários</span>
               </TabsTrigger>
             )}
             {isAdmin && (
-              <TabsTrigger value="feedback" className="flex items-center gap-2">
+              <TabsTrigger value="feedback" className="flex items-center gap-2 shrink-0">
                 <MessageSquare className="h-4 w-4" />
                 <span className="hidden sm:inline">Feedback</span>
               </TabsTrigger>
             )}
             {isAdmin && (
-              <TabsTrigger value="logs" className="flex items-center gap-2">
+              <TabsTrigger value="logs" className="flex items-center gap-2 shrink-0">
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">Logs</span>
               </TabsTrigger>
             )}
-            <TabsTrigger value="documentacao" className="flex items-center gap-2">
+            <TabsTrigger value="documentacao" className="flex items-center gap-2 shrink-0">
               <BookOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Docs</span>
             </TabsTrigger>
-            <TabsTrigger value="biblioteca" className="flex items-center gap-2">
+            <TabsTrigger value="biblioteca" className="flex items-center gap-2 shrink-0">
               <Library className="h-4 w-4" />
               <span className="hidden sm:inline">Biblioteca</span>
             </TabsTrigger>
-            <TabsTrigger value="ferramentas" className="flex items-center gap-2">
+            <TabsTrigger value="ferramentas" className="flex items-center gap-2 shrink-0">
               <Wrench className="h-4 w-4" />
               <span className="hidden sm:inline">Ferramentas</span>
             </TabsTrigger>
             {isAdmin && (
-              <TabsTrigger value="semantica" className="flex items-center gap-2">
+              <TabsTrigger value="semantica" className="flex items-center gap-2 shrink-0">
                 <ScrollText className="h-4 w-4" />
                 <span className="hidden sm:inline">Semântica</span>
               </TabsTrigger>
             )}
             {isAdmin && (
-              <TabsTrigger value="estrutura" className="flex items-center gap-2">
+              <TabsTrigger value="estrutura" className="flex items-center gap-2 shrink-0">
                 <ListOrdered className="h-4 w-4" />
                 <span className="hidden sm:inline">Estrutura</span>
               </TabsTrigger>
             )}
             {(isAdmin || isOrgAdmin) && (
-              <TabsTrigger value="contexto" className="flex items-center gap-2">
+              <TabsTrigger value="contexto" className="flex items-center gap-2 shrink-0">
                 <Sparkles className="h-4 w-4" />
                 <span className="hidden sm:inline">Contexto</span>
               </TabsTrigger>
             )}
-            <TabsTrigger value="beni" className="flex items-center gap-2">
+            <TabsTrigger value="beni" className="flex items-center gap-2 shrink-0">
               <Bot className="h-4 w-4" />
               <span className="hidden sm:inline">Beni</span>
             </TabsTrigger>
@@ -232,7 +232,7 @@ export default function Configuracoes() {
             {/* Version Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 shrink-0">
                   <Info className="h-5 w-5 text-primary" />
                   Versão do Sistema
                 </CardTitle>
@@ -327,7 +327,7 @@ export default function Configuracoes() {
             ) : (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 shrink-0">
                     <MessageSquare className="h-5 w-5 text-primary" />
                     Feedback
                   </CardTitle>
@@ -394,7 +394,7 @@ export default function Configuracoes() {
             <div className="grid gap-6 md:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 shrink-0">
                     <FileText className="h-5 w-5 text-primary" />
                     Guias e Manuais
                   </CardTitle>
@@ -459,7 +459,7 @@ export default function Configuracoes() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 shrink-0">
                     <BookOpen className="h-5 w-5 text-primary" />
                     Referências Oficiais
                   </CardTitle>
@@ -521,7 +521,7 @@ export default function Configuracoes() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 shrink-0">
                   <Info className="h-5 w-5 text-primary" />
                   Sobre o SISTUR
                 </CardTitle>
@@ -584,7 +584,7 @@ export default function Configuracoes() {
           <TabsContent value="ferramentas" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 shrink-0">
                   <Wrench className="h-5 w-5 text-primary" />
                   Ferramentas de Análise
                 </CardTitle>
@@ -674,7 +674,7 @@ export default function Configuracoes() {
             {isAdmin && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 shrink-0">
                     <Map className="h-5 w-5 text-primary" />
                     Mapa do Turismo Brasileiro
                   </CardTitle>
