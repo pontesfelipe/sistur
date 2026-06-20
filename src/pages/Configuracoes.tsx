@@ -583,25 +583,13 @@ export default function Configuracoes() {
             </Card>
           </TabsContent>
 
-          {/* FERRAMENTAS TAB */}
-          <TabsContent value="ferramentas" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Wrench className="h-5 w-5 text-primary" />
-                  Ferramentas de Análise
-                </CardTitle>
-              </CardHeader>
-            </Card>
-          </TabsContent>
-
           {/* BIBLIOTECA TAB — catálogo interno de módulos */}
           <TabsContent value="biblioteca" className="space-y-6">
             <ModuleLibrary />
           </TabsContent>
 
-          {/* (re-open Ferramentas) */}
-          <TabsContent value="ferramentas_full_replaced" className="space-y-6">
+          {/* FERRAMENTAS TAB */}
+          <TabsContent value="ferramentas" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
