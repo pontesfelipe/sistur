@@ -761,3 +761,101 @@ function TaskRow({ task, onStatusChange, onEdit, onDelete }: TaskRowProps) {
     </div>
   );
 }
+
+/**
+ * Frente 1: shows the indicators this project pledged to improve, with the
+ * baseline score captured at creation vs the current score in the linked
+ * assessment. Renders an arrow + delta so users can see impact at a glance.
+ */
+function IndicatorImpactPanel({ projectId, assessmentId }: { projectId: string; assessmentId: string }) {
+  const { data, isLoading } = useProjectIndicatorImpact(projectId, assessmentId);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+          <TrendingUp className="h-10 w-10 text-muted-foreground/50 mb-3" />
+          <p className="font-medium">Nenhum indicador vinculado</p>
+          <p className="text-sm text-muted-foreground max-w-md mt-1">
+            Projetos criados pelo Modo Prescrição do diagnóstico já trazem os indicadores-alvo
+            com baseline registrado. Para projetos antigos, recrie a partir do diagnóstico para
+            ativar a trilha de impacto.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const improved = data.filter((d) => (d.delta ?? 0) > 0.01).length;
+  const regressed = data.filter((d) => (d.delta ?? 0) < -0.01).length;
+  const reachedTarget = data.filter((d) => (d.current_score ?? 0) >= (d.target_score ?? 0.67)).length;
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Vinculados</p><p className="text-2xl font-bold">{data.length}</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Melhoraram</p><p className="text-2xl font-bold text-emerald-600">{improved}</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Regrediram</p><p className="text-2xl font-bold text-red-600">{regressed}</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Atingiram meta</p><p className="text-2xl font-bold text-primary">{reachedTarget}</p></CardContent></Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Trilha de Impacto</CardTitle>
+          <CardDescription>
+            Baseline registrado na criação do projeto vs score atual do diagnóstico vinculado.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {data.map((item) => {
+            const baselinePct = item.baseline_score !== null ? Math.round(Number(item.baseline_score) * 100) : null;
+            const currentPct = item.current_score !== null ? Math.round(item.current_score * 100) : null;
+            const deltaPct = item.delta !== null ? Math.round(item.delta * 100) : null;
+            const trend = (item.delta ?? 0) > 0.01 ? 'up' : (item.delta ?? 0) < -0.01 ? 'down' : 'flat';
+            return (
+              <div key={item.id} className="flex items-center justify-between gap-3 border rounded-lg p-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {item.pillar && <Badge variant="outline" className="text-xs">{item.pillar}</Badge>}
+                    <span className="font-mono text-xs text-muted-foreground">{item.indicator_code}</span>
+                    {item.baseline_status && <Badge variant="secondary" className="text-[10px]">{item.baseline_status}</Badge>}
+                  </div>
+                  <p className="text-sm font-medium truncate mt-1">{item.indicator_name || item.indicator_code}</p>
+                </div>
+                <div className="flex items-center gap-3 text-sm shrink-0">
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">Baseline</p>
+                    <p className="font-semibold">{baselinePct !== null ? `${baselinePct}%` : '—'}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">Atual</p>
+                    <p className="font-semibold">{currentPct !== null ? `${currentPct}%` : '—'}</p>
+                  </div>
+                  <div className={cn(
+                    'flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold',
+                    trend === 'up' && 'bg-emerald-100 text-emerald-700',
+                    trend === 'down' && 'bg-red-100 text-red-700',
+                    trend === 'flat' && 'bg-muted text-muted-foreground',
+                  )}>
+                    {trend === 'up' && <ArrowUp className="h-3 w-3" />}
+                    {trend === 'down' && <ArrowDown className="h-3 w-3" />}
+                    {trend === 'flat' && <Minus className="h-3 w-3" />}
+                    {deltaPct !== null ? `${deltaPct > 0 ? '+' : ''}${deltaPct}pp` : 'sem dado'}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
