@@ -802,6 +802,64 @@ async function runCalculationCore(
       } catch (revErr) {
         console.error('[Revenue] Derived enterprise revenue indicators failed:', revErr);
       }
+
+      // ============================================================
+      // PACOTE REPUTAÇÃO — INJETAR ENT_COMP_GAP (gap competitivo)
+      // Calculado a partir do snapshot mais recente de reviews
+      // (próprio) menos a média das notas dos concorrentes capturados.
+      // ============================================================
+      try {
+        const destinationIdForRep = assessment.destination_id;
+        const presentIds2 = new Set(filteredIndicatorValues.map((iv: any) => iv.indicator_id));
+
+        const [{ data: ownSnapshots }, { data: competitorRows }] = await Promise.all([
+          supabase
+            .from('enterprise_review_snapshots')
+            .select('rating, snapshot_date')
+            .eq('destination_id', destinationIdForRep)
+            .not('rating', 'is', null)
+            .order('snapshot_date', { ascending: false })
+            .limit(10),
+          supabase
+            .from('enterprise_competitors')
+            .select('rating')
+            .eq('destination_id', destinationIdForRep)
+            .not('rating', 'is', null),
+        ]);
+
+        const ownRating = ownSnapshots && ownSnapshots.length > 0
+          ? Number(ownSnapshots[0].rating)
+          : 0;
+        const compRatings = (competitorRows || [])
+          .map((c: any) => Number(c.rating))
+          .filter((v: number) => !isNaN(v) && v > 0);
+        const avgComp = compRatings.length > 0
+          ? compRatings.reduce((a: number, b: number) => a + b, 0) / compRatings.length
+          : 0;
+
+        if (ownRating > 0 && avgComp > 0) {
+          const gap = ownRating - avgComp;
+          const { data: gapInd } = await supabase
+            .from('indicators')
+            .select('id, code, name, pillar, theme, direction, normalization, min_ref, max_ref, weight, intersectoral_dependency, minimum_tier')
+            .eq('code', 'ENT_COMP_GAP')
+            .maybeSingle();
+
+          if (gapInd && !presentIds2.has(gapInd.id)) {
+            filteredIndicatorValues.push({
+              id: 'derived-ENT_COMP_GAP',
+              indicator_id: gapInd.id,
+              value_raw: Number(gap.toFixed(2)),
+              indicator: { ...gapInd, theme: gapInd.theme || 'Satisfação do Hóspede' },
+              _source: 'derived',
+              _external_source: 'ENTERPRISE_REPUTATION',
+            });
+            console.log(`[Reputation] Injected ENT_COMP_GAP=${gap.toFixed(2)} (own=${ownRating.toFixed(2)}, avgComp=${avgComp.toFixed(2)}, n=${compRatings.length})`);
+          }
+        }
+      } catch (repErr) {
+        console.error('[Reputation] Derived ENT_COMP_GAP failed:', repErr);
+      }
     } else {
       // TERRITORIAL: Use standard indicator_values
       const { data: indicatorValues, error: valuesError } = await supabase
