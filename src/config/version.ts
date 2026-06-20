@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 75,
+  minor: 76,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.76.0",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — Pacote Conformidade (4/4): checklist legal e validação de CNPJ. Novo painel 'Conformidade Legal' no diálogo do empreendimento com checklist padrão de 8 itens (CADASTUR, Alvará Municipal, AVCB, Sanitário, LGPD, Ambiental, Acessibilidade NBR 9050, Seguro RC) agrupados por categoria. Cada item registra status (Pendente/Válido/Vencido/N/A), número do documento e data de vencimento; o status é recalculado automaticamente a partir da data de vencimento. Cards-resumo exibem taxa de conformidade, válidos, vencidos e pendentes em tempo real, com barra de progresso.",
+      "Diagnóstico Enterprise — novo indicador derivado ENT_COMPLIANCE_RATE (Taxa de Conformidade Legal, pilar OE, tema Conformidade & Regulatório, 0-100%). Calculado pelo edge function 'calculate-assessment' como percentual de itens válidos sobre itens aplicáveis (exclui 'Não aplicável') do checklist. Itens com data de vencimento expirada são automaticamente contabilizados como vencidos. Impacta diretamente o score do pilar OE no diagnóstico.",
+      "Nova edge function 'validate-cnpj' (JWT validado em código, CORS, sem entrada SQL direta) que consulta a BrasilAPI (Receita Federal) com checksum de CNPJ validado localmente, cache de 24h em 'cnpj_validation_cache' para reduzir chamadas externas e classificação automática de relevância CADASTUR a partir do CNAE principal (códigos 5510/5590/7911/7912/7990/9319/9329 → 'requer_verificacao_manual'; demais → 'nao_aplicavel'). Quando o CNPJ é validado e classificado como turismo, o item CADASTUR do checklist é marcado automaticamente.",
+      "Novas tabelas com RLS por organização: 'enterprise_compliance_items' (checklist por perfil enterprise, único por enterprise_profile_id + item_code, com flag auto_checked e auto_check_source para rastrear validações automáticas) e 'cnpj_validation_cache' (cache global de consultas de CNPJ, legível por autenticados e gravável só por serviço). Ambas usam get_effective_org_id para compatibilidade com modo demo.",
+      "Conclusão da iniciativa 'Melhorias do Diagnóstico Enterprise' (4/4 pacotes): Dados (1.73), Receita (1.74), Reputação (1.75) e Conformidade (1.76). O diagnóstico enterprise agora cobre 100% do schema previsto, com 20+ indicadores derivados automaticamente a partir de fontes estruturadas (canais, sazonalidade, reviews, concorrentes, conformidade).",
+    ],
+  },
   {
     version: "1.75.0",
     date: "2026-06-20",

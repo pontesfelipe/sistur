@@ -23,6 +23,7 @@ import { DestinationFormDialog } from '@/components/destinations/DestinationForm
 import { EnterpriseProfilePanel } from '@/components/enterprise/EnterpriseProfilePanel';
 import { EnterpriseRevenuePanel } from '@/components/enterprise/EnterpriseRevenuePanel';
 import { EnterpriseReputationPanel } from '@/components/enterprise/EnterpriseReputationPanel';
+import { EnterpriseCompliancePanel } from '@/components/enterprise/EnterpriseCompliancePanel';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -306,6 +307,10 @@ export function DestinosPanel() {
                 destinationName={enterpriseProfileDestination.name}
               />
               <EnterpriseReputationPanel
+                destinationId={enterpriseProfileDestination.id}
+                destinationName={enterpriseProfileDestination.name}
+              />
+              <EnterpriseCompliancePanel
                 destinationId={enterpriseProfileDestination.id}
                 destinationName={enterpriseProfileDestination.name}
               />

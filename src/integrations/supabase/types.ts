@@ -1134,6 +1134,48 @@ export type Database = {
           },
         ]
       }
+      cnpj_validation_cache: {
+        Row: {
+          cadastur_status: string | null
+          cnae_descricao: string | null
+          cnae_principal: string | null
+          cnpj: string
+          data_situacao: string | null
+          endereco: Json | null
+          fetched_at: string
+          nome_fantasia: string | null
+          raw_response: Json | null
+          razao_social: string | null
+          situacao_cadastral: string | null
+        }
+        Insert: {
+          cadastur_status?: string | null
+          cnae_descricao?: string | null
+          cnae_principal?: string | null
+          cnpj: string
+          data_situacao?: string | null
+          endereco?: Json | null
+          fetched_at?: string
+          nome_fantasia?: string | null
+          raw_response?: Json | null
+          razao_social?: string | null
+          situacao_cadastral?: string | null
+        }
+        Update: {
+          cadastur_status?: string | null
+          cnae_descricao?: string | null
+          cnae_principal?: string | null
+          cnpj?: string
+          data_situacao?: string | null
+          endereco?: Json | null
+          fetched_at?: string
+          nome_fantasia?: string | null
+          raw_response?: Json | null
+          razao_social?: string | null
+          situacao_cadastral?: string | null
+        }
+        Relationships: []
+      }
       community_feedback: {
         Row: {
           age_group: string | null
@@ -3879,6 +3921,77 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_destination_summary"
             referencedColumns: ["destination_id"]
+          },
+        ]
+      }
+      enterprise_compliance_items: {
+        Row: {
+          auto_check_source: string | null
+          auto_checked: boolean
+          category: string
+          created_at: string
+          document_number: string | null
+          document_url: string | null
+          enterprise_profile_id: string
+          expires_at: string | null
+          id: string
+          issued_at: string | null
+          item_code: string
+          item_label: string
+          notes: string | null
+          org_id: string
+          status: string
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          auto_check_source?: string | null
+          auto_checked?: boolean
+          category: string
+          created_at?: string
+          document_number?: string | null
+          document_url?: string | null
+          enterprise_profile_id: string
+          expires_at?: string | null
+          id?: string
+          issued_at?: string | null
+          item_code: string
+          item_label: string
+          notes?: string | null
+          org_id: string
+          status?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          auto_check_source?: string | null
+          auto_checked?: boolean
+          category?: string
+          created_at?: string
+          document_number?: string | null
+          document_url?: string | null
+          enterprise_profile_id?: string
+          expires_at?: string | null
+          id?: string
+          issued_at?: string | null
+          item_code?: string
+          item_label?: string
+          notes?: string | null
+          org_id?: string
+          status?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_compliance_items_enterprise_profile_id_fkey"
+            columns: ["enterprise_profile_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
