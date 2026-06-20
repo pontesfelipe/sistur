@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 67,
+  minor: 72,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,10 +23,11 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.67.0",
+    version: "1.72.0",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
+      "Correção de versionamento — recalculada a numeração para refletir corretamente a política MAJOR.MINOR.PATCH. As 5 frentes de Gerenciamento de Projetos publicadas como 1.66.16–1.66.20 eram, na prática, bumps minor (novas funcionalidades, novas tabelas) e não patches. As entradas históricas foram mantidas como publicadas para preservar a trilha de auditoria; a versão atual passa de 1.67.0 para 1.72.0 para contabilizar: Frente 1 (1.67), Frente 2 (1.68), Frente 3 (1.69), Frente 4 (1.70), Frente 5 (1.71) e Colaboração em equipe (1.72). A partir de agora, qualquer mudança que adiciona tabela, edge function, rota, módulo ou feature visível ao usuário exige bump minor; o patch fica reservado a correções de bug e ajustes micro.",
       "Projetos — colaboração em equipe. Nova aba 'Equipe' no detalhe do projeto: lista de membros com papel Dono/Editor/Visualizador (apenas Donos gerenciam). O criador do projeto vira Dono automaticamente. Atribuição de tarefa agora usa combobox com os usuários reais da organização (assignee_id + nome), em vez de texto livre. Diálogo de edição de tarefa ganha aba 'Equipe e Comentários' com: matriz RACI por usuário (R/A/C/I, adicionar/remover), comentários encadeados (Ctrl+Enter envia, autor pode excluir) e histórico automático de criação, mudança de status e troca de responsável. Kanban exibe responsável no card. Nova página /minhas-tarefas lista todas as tarefas em que o usuário é responsável ou aprovador (RACI R/A) em qualquer projeto da organização, agrupadas por status, com alerta de atraso. RLS de project_tasks refinado: visualizar = qualquer membro da org; criar/editar = Dono ou Editor do projeto (ou Responsável/Aprovador da tarefa, ou ADMIN/ORG_ADMIN); excluir = Dono do projeto e administradores. Projetos legados sem membros mantêm o comportamento atual (compatibilidade). Novas tabelas: project_members, project_task_comments, project_task_activity. Novas funções: can_edit_project_task, can_manage_project, get_project_member_role.",
     ],
   },
