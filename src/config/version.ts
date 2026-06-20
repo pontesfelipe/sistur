@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 66,
-  patch: 21,
+  minor: 67,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,7 +23,7 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "1.66.21",
+    version: "1.67.0",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
