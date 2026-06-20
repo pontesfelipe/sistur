@@ -167,16 +167,8 @@ export default function Configuracoes() {
           they can manage their org members via OrgAdminUsersPanel.
         */}
         <Tabs defaultValue="geral" className="space-y-6">
-          <TabsList
-            className={cn(
-              'grid w-full max-w-4xl',
-              isAdmin
-                ? 'grid-cols-11'
-                : isOrgAdmin
-                  ? 'grid-cols-7'
-                  : 'grid-cols-5'
-            )}
-          >
+          <TabsList className="flex flex-wrap gap-2 w-full h-auto p-1">
+
             <TabsTrigger value="geral" className="flex items-center gap-2">
               <Settings2 className="h-4 w-4" />
               <span className="hidden sm:inline">Geral</span>
