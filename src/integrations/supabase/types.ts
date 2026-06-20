@@ -4345,6 +4345,7 @@ export type Database = {
           certifications: string[] | null
           created_at: string
           destination_id: string
+          digital_presence_analysis: Json | null
           employee_count: number | null
           id: string
           notes: string | null
@@ -4370,6 +4371,7 @@ export type Database = {
           certifications?: string[] | null
           created_at?: string
           destination_id: string
+          digital_presence_analysis?: Json | null
           employee_count?: number | null
           id?: string
           notes?: string | null
@@ -4395,6 +4397,7 @@ export type Database = {
           certifications?: string[] | null
           created_at?: string
           destination_id?: string
+          digital_presence_analysis?: Json | null
           employee_count?: number | null
           id?: string
           notes?: string | null

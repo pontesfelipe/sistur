@@ -1,0 +1,1 @@
+ALTER TABLE public.enterprise_profiles ADD COLUMN IF NOT EXISTS digital_presence_analysis JSONB DEFAULT NULL;
