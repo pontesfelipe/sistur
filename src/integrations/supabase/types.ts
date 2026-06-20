@@ -8012,6 +8012,72 @@ export type Database = {
           },
         ]
       }
+      project_budget_lines: {
+        Row: {
+          actual_amount: number
+          category: string
+          created_at: string
+          created_by: string
+          currency: string
+          description: string
+          funding_source: string | null
+          id: string
+          notes: string | null
+          phase_id: string | null
+          planned_amount: number
+          project_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          actual_amount?: number
+          category: string
+          created_at?: string
+          created_by: string
+          currency?: string
+          description: string
+          funding_source?: string | null
+          id?: string
+          notes?: string | null
+          phase_id?: string | null
+          planned_amount?: number
+          project_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          actual_amount?: number
+          category?: string
+          created_at?: string
+          created_by?: string
+          currency?: string
+          description?: string
+          funding_source?: string | null
+          id?: string
+          notes?: string | null
+          phase_id?: string | null
+          planned_amount?: number
+          project_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_budget_lines_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "project_phases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_budget_lines_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_checkpoints: {
         Row: {
           approved_at: string | null
@@ -8158,6 +8224,50 @@ export type Database = {
             columns: ["task_id"]
             isOneToOne: false
             referencedRelation: "project_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_external_links: {
+        Row: {
+          created_at: string
+          created_by: string
+          external_id: string
+          id: string
+          label: string | null
+          link_type: string
+          notes: string | null
+          project_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          external_id: string
+          id?: string
+          label?: string | null
+          link_type: string
+          notes?: string | null
+          project_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          external_id?: string
+          id?: string
+          label?: string | null
+          link_type?: string
+          notes?: string | null
+          project_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_external_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
