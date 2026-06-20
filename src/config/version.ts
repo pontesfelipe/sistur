@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 16,
+  patch: 17,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.17",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Gerenciamento de Projetos (Frente 2) — visualizações executivas. Nova aba 'Kanban' no detalhe do projeto com drag-and-drop nativo entre colunas (Backlog, A Fazer, Em Progresso, Em Revisão, Concluído, Bloqueado) e atualização instantânea do status. Nova aba 'Timeline' com Gantt simplificado: barras proporcionais das fases com datas planejadas, faixa de marcos posicionados sobre a linha do tempo, e janela total do projeto. Lista de Projetos agora exibe card de Impacto Agregado do Portfólio: total de indicadores vinculados, melhoraram, regrediram e atingiram meta, somando todos os projetos do usuário.",
+    ],
+  },
   {
     version: "1.66.16",
     date: "2026-06-20",

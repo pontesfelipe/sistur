@@ -22,6 +22,8 @@ import { ptBR } from 'date-fns/locale';
 import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';
 import { ProjectDetailView } from '@/components/projects/ProjectDetailView';
 import { cn } from '@/lib/utils';
+import { useProjectsPortfolioImpact } from '@/hooks/useProjectsPortfolio';
+import { TrendingUp, TrendingDown, Target as TargetIcon } from 'lucide-react';
 
 export default function Projetos() {
   const { data: projects, isLoading } = useProjects();
@@ -56,6 +58,7 @@ export default function Projetos() {
   const planningProjects = projects?.filter((p) => p.status === 'planning') || [];
   const completedProjects = projects?.filter((p) => p.status === 'completed') || [];
   const otherProjects = projects?.filter((p) => ['on_hold', 'cancelled'].includes(p.status)) || [];
+  const { data: portfolio } = useProjectsPortfolioImpact();
 
   if (selectedProjectId) {
     return (
@@ -135,6 +138,41 @@ export default function Projetos() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Portfolio impact rollup (Frente 1+2) */}
+        {portfolio && portfolio.total > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                Impacto agregado do portfólio
+              </CardTitle>
+              <CardDescription>
+                Indicadores monitorados em {portfolio.projectsWithLinks} projeto(s) com baseline registrado.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">Indicadores vinculados</p>
+                  <p className="text-2xl font-bold">{portfolio.total}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-600" /> Melhoraram</p>
+                  <p className="text-2xl font-bold text-emerald-600">{portfolio.improved}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><TrendingDown className="h-3 w-3 text-red-600" /> Regrediram</p>
+                  <p className="text-2xl font-bold text-red-600">{portfolio.regressed}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><TargetIcon className="h-3 w-3 text-primary" /> Atingiram meta</p>
+                  <p className="text-2xl font-bold text-primary">{portfolio.reachedTarget}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Projects Tabs */}
         <Tabs defaultValue="all" className="space-y-4">

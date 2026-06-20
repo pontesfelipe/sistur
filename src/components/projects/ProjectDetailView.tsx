@@ -59,6 +59,8 @@ import { MilestoneFormDialog } from './MilestoneFormDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { useProjectIndicatorImpact } from '@/hooks/useProjectIndicatorLinks';
 import { ArrowDown, ArrowUp, Minus, TrendingUp } from 'lucide-react';
+import { ProjectKanban } from './ProjectKanban';
+import { ProjectTimeline } from './ProjectTimeline';
 
 interface ProjectDetailViewProps {
   projectId: string;
@@ -328,6 +330,8 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="phases">Fases ({phases?.length || 0})</TabsTrigger>
           <TabsTrigger value="tasks">Tarefas ({tasks?.length || 0})</TabsTrigger>
+          <TabsTrigger value="kanban">Kanban</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="milestones">Marcos ({milestones?.length || 0})</TabsTrigger>
           <TabsTrigger value="indicators">Indicadores</TabsTrigger>
         </TabsList>
@@ -621,6 +625,17 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
 
         <TabsContent value="indicators" className="space-y-4">
           <IndicatorImpactPanel projectId={projectId} assessmentId={project.assessment_id} />
+        </TabsContent>
+
+        <TabsContent value="kanban" className="space-y-4">
+          <ProjectKanban
+            tasks={tasks || []}
+            onEdit={(t) => { setEditingTask(t); setTaskFormOpen(true); }}
+          />
+        </TabsContent>
+
+        <TabsContent value="timeline" className="space-y-4">
+          <ProjectTimeline project={project} phases={phases || []} milestones={milestones || []} />
         </TabsContent>
       </Tabs>
 
