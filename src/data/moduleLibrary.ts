@@ -380,6 +380,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/game/components/',
           'src/game/threatCards.ts',
         ],
+        routes: ['/game', '/game/tcg'],
       },
       {
         module: 'RPG',
@@ -390,6 +391,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/rpg/types.ts',
           'src/rpg/components/',
         ],
+        routes: ['/game/rpg'],
       },
       {
         module: 'Treasure Hunt',
@@ -401,6 +403,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/treasure/types.ts',
           'src/treasure/components/',
         ],
+        routes: ['/game/treasure'],
       },
       {
         module: 'Memory',
@@ -412,6 +415,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/memory/types.ts',
           'src/memory/components/',
         ],
+        routes: ['/game/memory'],
       },
       {
         module: 'Persistência de Jogos',
@@ -422,6 +426,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/hooks/useGameSessions.ts',
         ],
         supabaseTables: ['game_sessions'],
+        migrationKeywords: ['game_sessions'],
       },
     ],
   },
@@ -439,6 +444,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/components/enterprise/',
         ],
         supabaseTables: ['enterprise_profiles'],
+        migrationKeywords: ['enterprise_profiles'],
       },
       {
         module: 'Receita & KPIs',
@@ -450,6 +456,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/components/enterprise/EnterpriseRevenuePanel.tsx',
         ],
         supabaseTables: ['enterprise_distribution_channels', 'enterprise_seasonality_months'],
+        migrationKeywords: ['enterprise_distribution_channels', 'enterprise_seasonality_months'],
       },
       {
         module: 'Reputação',
@@ -461,6 +468,9 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'supabase/functions/search-competitors/index.ts',
         ],
         supabaseTables: ['enterprise_review_snapshots', 'enterprise_competitors'],
+        edgeFunctions: ['search-competitors', 'search-business-reviews'],
+        migrationKeywords: ['enterprise_review_snapshots', 'enterprise_competitors'],
+        secrets: ['FIRECRAWL_API_KEY'],
       },
       {
         module: 'Compliance',
@@ -472,6 +482,8 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'supabase/functions/validate-cnpj/index.ts',
         ],
         supabaseTables: ['enterprise_compliance_items', 'cnpj_validation_cache'],
+        edgeFunctions: ['validate-cnpj'],
+        migrationKeywords: ['enterprise_compliance_items', 'cnpj_validation_cache'],
       },
     ],
   },
