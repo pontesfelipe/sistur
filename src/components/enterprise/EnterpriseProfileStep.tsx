@@ -27,6 +27,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { BusinessReviewSearch } from './BusinessReviewSearch';
+import { DigitalPresenceSearch } from './DigitalPresenceSearch';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -64,6 +65,8 @@ const TARGET_MARKETS = [
 export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill }: EnterpriseProfileStepProps) {
   const [reviewAutoFilled, setReviewAutoFilled] = useState(false);
   const [reviewAnalysisData, setReviewAnalysisData] = useState<Record<string, any> | null>(null);
+  const [digitalAnalysisData, setDigitalAnalysisData] = useState<Record<string, any> | null>(null);
+  const [digitalAutoFilled, setDigitalAutoFilled] = useState(false);
 
   const handleReviewAutoFill = (values: Record<string, number>) => {
     setReviewAutoFilled(true);
@@ -85,6 +88,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
   const handleReviewAnalysisCapture = (fullAnalysis: Record<string, any>) => {
     setReviewAnalysisData(fullAnalysis);
+  };
+
+  const handleDigitalAutoFill = (values: Record<string, number>) => {
+    setDigitalAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
+
+  const handleDigitalAnalysisCapture = (fullAnalysis: Record<string, any>) => {
+    setDigitalAnalysisData(fullAnalysis);
   };
   const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
@@ -124,6 +136,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         destination_id: destinationId,
         org_id: effectiveOrgId,
         review_analysis: reviewAnalysisData,
+        digital_presence_analysis: digitalAnalysisData,
       };
       
       const { data, error } = await supabase
@@ -213,6 +226,43 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             onAnalysisCapture={handleReviewAnalysisCapture}
             defaultLocation={destinationName}
             compact
+          />
+        </CardContent>
+      </Card>
+
+      {/* 1.5) Presença Digital Automática */}
+      <Card className="border-blue-500/30 bg-gradient-to-br from-blue-50/50 to-cyan-50/30 dark:from-blue-950/20 dark:to-cyan-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-500/10">
+              <Search className="h-5 w-5 text-blue-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Presença Digital Automática
+                <Badge variant="secondary" className="text-[10px]">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Auto
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Detecta site oficial, Google Business, OTAs e redes sociais — preenche maturidade digital e canal direto
+              </CardDescription>
+            </div>
+            {digitalAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <DigitalPresenceSearch
+            businessName={destinationName}
+            location={destinationName}
+            onAutoFill={handleDigitalAutoFill}
+            onAnalysisCapture={handleDigitalAnalysisCapture}
           />
         </CardContent>
       </Card>
