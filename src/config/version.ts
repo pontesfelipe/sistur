@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 72,
+  minor: 73,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.73.0",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — Pacote Dados (1/4): fechamento de gaps do schema. 14 novos indicadores entram no engine de cálculo (antes existiam só como dica na UI e eram descartados): ENT_LEGAL_DOCS (Documentos Legais), ENT_SEASONALITY (Índice de Sazonalidade), ENT_STAFF_RATIO (Funcionários por UH), ENT_GOPPAR, ENT_TREVPAR, ENT_DIGITAL_CHECKIN, ENT_REVIEW_VOL (Volume de Reviews), ENT_RESPONSE_RATE (% Resposta a Reviews), ENT_GUEST_SATISFACTION (NPS interno 0-10), ENT_REPEAT_GUEST (% Hóspedes Recorrentes), ENT_ENERGY (kWh/pernoite), ENT_CARBON (kgCO2e/pernoite), ENT_WASTE (kg/pernoite), ENT_ACCESSIBLE_ROOMS. Cada indicador inclui direção (HIGH/LOW), faixa min/max, meta de benchmark, pilar e categoria Enterprise corretas.",
+      "Diagnóstico Enterprise — Motor IGMA adaptado ao contexto privado. As regras sistêmicas de Mario Beni continuam aplicadas, mas as mensagens passam a falar a linguagem do empreendedor: 'Limitação Estrutural do Território' → 'Risco ESG/Sustentabilidade Crítica'; 'Fragilidade de Governança' → 'Operação Crítica' (ocupação, NPS, reviews comprometendo viabilidade); 'Marketing Bloqueado' → 'Investimento em Marketing Bloqueado' (priorizar estabilização antes de aumentar CAC); 'Externalidades Negativas' → 'Crescimento Sem Sustentabilidade'. Regra 6 (intersetorialidade) — específica de territórios públicos — não dispara mais em diagnósticos enterprise.",
+      "Diagnóstico Enterprise — Trilha de proveniência ativada. O bloco 'if (!isEnterprise)' que pulava a criação de diagnosis_data_snapshots foi substituído por uma rotina específica que registra cada valor enterprise usado no cálculo, distinguindo origem 'MANUAL_ENTRY' (preenchimento manual pelo empresário) de 'REVIEW_SEARCH' (auto-preenchimento via Firecrawl/LLM). O relatório enterprise passa a ter rastreabilidade real por indicador, equivalente ao territorial.",
+      "Relatório Enterprise — Correção do mapeamento dos pilares no prompt do LLM. Antes, a descrição verbal dos eixos no system prompt invertia OE e AO (OE descrito como 'qualidade/satisfação' e AO como 'governança/financeiro'), o que levava o modelo a classificar recomendações no pilar errado. Mapeamento canônico restaurado: I-RA = ESG, I-OE = Governança/Financeiro/Tecnologia/Infraestrutura/Parcerias, I-AO = Operação/Satisfação/Marketing/Capacitação, com aviso explícito ao modelo contra a confusão.",
+    ],
+  },
   {
     version: "1.72.0",
     date: "2026-06-20",

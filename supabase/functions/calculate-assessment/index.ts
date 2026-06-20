@@ -92,7 +92,8 @@ function interpretIGMA(
   pillarScores: PillarContext[],
   previousPillarScores: PillarContext[] | null,
   assessmentDate: Date,
-  intersectoralCount: number
+  intersectoralCount: number,
+  isEnterprise: boolean = false
 ): IGMAOutput {
   const flags: IGMAFlags = {
     RA_LIMITATION: false,
@@ -133,8 +134,10 @@ function interpretIGMA(
     uiMessages.push({
       type: "critical",
       flag: "RA_LIMITATION",
-      title: "Limitação Estrutural do Território",
-      message: "O território apresenta limitações estruturais que comprometem a sustentabilidade do turismo, independentemente de ações de mercado ou gestão isoladas.",
+      title: isEnterprise ? "Risco ESG / Sustentabilidade Crítica" : "Limitação Estrutural do Território",
+      message: isEnterprise
+        ? "O empreendimento apresenta indicadores ambientais críticos (energia, água, resíduos, carbono ou conformidade ESG). Reputação online e captação de hóspedes conscientes ficam comprometidas até que esses pontos sejam endereçados."
+        : "O território apresenta limitações estruturais que comprometem a sustentabilidade do turismo, independentemente de ações de mercado ou gestão isoladas.",
       icon: "AlertTriangle",
     });
   }
@@ -149,8 +152,10 @@ function interpretIGMA(
     uiMessages.push({
       type: "critical",
       flag: "GOVERNANCE_BLOCK",
-      title: "Fragilidade de Governança",
-      message: "Fragilidades de governança comprometem a efetividade de ações de mercado e investimento no turismo.",
+      title: isEnterprise ? "Operação Crítica" : "Fragilidade de Governança",
+      message: isEnterprise
+        ? "Indicadores operacionais críticos (ocupação, satisfação, NPS, qualidade de serviço, reviews) comprometem a viabilidade comercial. Priorizar estabilização da operação antes de qualquer expansão ou investimento em marketing."
+        : "Fragilidades de governança comprometem a efetividade de ações de mercado e investimento no turismo.",
       icon: "ShieldAlert",
     });
   }
@@ -166,8 +171,10 @@ function interpretIGMA(
       uiMessages.push({
         type: "warning",
         flag: "EXTERNALITY_WARNING",
-        title: "Alerta de Externalidades Negativas",
-        message: "O crescimento da oferta turística está ocorrendo sem a correspondente sustentabilidade territorial.",
+        title: isEnterprise ? "Crescimento Sem Sustentabilidade" : "Alerta de Externalidades Negativas",
+        message: isEnterprise
+          ? "A estrutura/governança do empreendimento melhorou, mas indicadores ambientais (energia, água, resíduos) pioraram. Há risco de crescimento operacional descolado da responsabilidade ESG."
+          : "O crescimento da oferta turística está ocorrendo sem a correspondente sustentabilidade territorial.",
         icon: "TrendingUp",
       });
     }
@@ -182,14 +189,16 @@ function interpretIGMA(
     uiMessages.push({
       type: "warning",
       flag: "MARKETING_BLOCKED",
-      title: "Marketing Bloqueado",
-      message: "A promoção turística deve ser precedida pela consolidação territorial e institucional.",
+      title: isEnterprise ? "Investimento em Marketing Bloqueado" : "Marketing Bloqueado",
+      message: isEnterprise
+        ? "Antes de aumentar CAC e investimento em mídia paga, é necessário estabilizar operação e/ou indicadores ESG. Captar mais hóspedes em uma operação deficitária ou com baixa satisfação amplia o prejuízo."
+        : "A promoção turística deve ser precedida pela consolidação territorial e institucional.",
       icon: "Ban",
     });
   }
 
   // REGRA 6 — INTERSETORIALIDADE
-  if (intersectoralCount > 0) {
+  if (intersectoralCount > 0 && !isEnterprise) {
     flags.INTERSECTORAL_DEPENDENCY = true;
     
     uiMessages.push({
@@ -1280,7 +1289,8 @@ async function runCalculationCore(
       currentPillarContexts,
       previousPillarContexts,
       new Date(),
-      intersectoralCount
+      intersectoralCount,
+      isEnterprise
     );
 
     console.log("IGMA Result:", JSON.stringify(igmaResult, null, 2));
@@ -2024,7 +2034,47 @@ async function runCalculationCore(
 
     // 16. Auto-create diagnosis_data_snapshots for provenance tracking
     // This ensures ALL external data used in the calculation is persisted for reports and analysis
-    if (!isEnterprise) {
+    if (isEnterprise) {
+      // Enterprise: snapshot dos valores manuais e auto-preenchidos (reviews) usados no cálculo
+      try {
+        await supabase
+          .from("diagnosis_data_snapshots")
+          .delete()
+          .eq("assessment_id", assessment_id);
+
+        const entSnapshots = (filteredIndicatorValues || [])
+          .filter((iv: any) => iv?.indicator?.code)
+          .map((iv: any) => {
+            const src = (iv.source || "").toString().toUpperCase();
+            const isReview = src.includes("REVIEW") || src.includes("FIRECRAWL") || src.includes("AUTO");
+            return {
+              assessment_id,
+              indicator_code: iv.indicator.code,
+              value_used: typeof iv.value_raw === "number" ? iv.value_raw : Number(iv.value_raw) || null,
+              value_used_text: typeof iv.value_raw === "number" ? null : (iv.value_raw?.toString() || null),
+              source_code: isReview ? "REVIEW_SEARCH" : "MANUAL_ENTRY",
+              reference_year: iv.reference_date ? new Date(iv.reference_date).getFullYear() : new Date().getFullYear(),
+              confidence_level: isReview ? 2 : 1,
+              was_manually_adjusted: !isReview,
+              org_id: orgId,
+            };
+          });
+
+        if (entSnapshots.length > 0) {
+          const { error: entSnapErr } = await supabase
+            .from("diagnosis_data_snapshots")
+            .insert(entSnapshots);
+          if (entSnapErr) {
+            console.error("Error creating enterprise data snapshots:", entSnapErr);
+          } else {
+            const reviewCount = entSnapshots.filter((s: any) => s.source_code === "REVIEW_SEARCH").length;
+            console.log(`Created ${entSnapshots.length} enterprise snapshots (${reviewCount} from review search, ${entSnapshots.length - reviewCount} manual)`);
+          }
+        }
+      } catch (e) {
+        console.error("Enterprise snapshots block failed:", e);
+      }
+    } else {
       const destinationIbgeCode = assessment.destination?.ibge_code;
       if (destinationIbgeCode) {
         // Delete existing snapshots for this assessment to avoid duplicates on recalculation
