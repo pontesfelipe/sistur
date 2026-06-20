@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 17,
+  patch: 18,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.18",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Gerenciamento de Projetos (Frente 3) — governança e capacitação. Nova aba 'Governança' no detalhe do projeto: matriz RACI por tarefa (Responsável/Aprovador/Consultado/Informado) e checkpoints obrigatórios por pilar (RA/OE/AO/Geral) com fluxo de submissão de evidência → aprovação/rejeição. Nova aba 'Capacitação' com vinculação de cursos EDU ao projeto, marcação de obrigatoriedade, status de matrícula (sugerido → matriculado → em andamento → concluído) e sumário de pendências. Novas tabelas: project_task_raci, project_checkpoints, project_edu_enrollments — todas com RLS por organização.",
+    ],
+  },
   {
     version: "1.66.17",
     date: "2026-06-20",
