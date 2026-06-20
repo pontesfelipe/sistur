@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Copy, FileCode, Library, Search, ClipboardCopy, Sparkles, Route, Database, Zap, KeyRound, Download, ShieldCheck, AlertTriangle, Loader2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
