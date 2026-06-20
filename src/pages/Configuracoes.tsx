@@ -174,7 +174,7 @@ export default function Configuracoes() {
                 ? 'grid-cols-11'
                 : isOrgAdmin
                   ? 'grid-cols-7'
-                  : 'grid-cols-4'
+                  : 'grid-cols-5'
             )}
           >
             <TabsTrigger value="geral" className="flex items-center gap-2">
