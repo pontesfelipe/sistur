@@ -585,6 +585,10 @@ export default function Configuracoes() {
 
           {/* FERRAMENTAS TAB */}
           <TabsContent value="ferramentas" className="space-y-6">
+          </TabsContent>
+
+          {/* BIBLIOTECA TAB — placeholder to be replaced */}
+          <TabsContent value="__noop_biblioteca_marker" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
