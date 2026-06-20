@@ -292,10 +292,10 @@ export async function exportTechnicalDocx() {
             tableRow([{ text: 'Estado', width: 2500 }, { text: 'React Context (Auth, Profile, License) + TanStack React Query v5', width: 6526 }]),
             tableRow([{ text: 'Backend', width: 2500 }, { text: 'Supabase (PostgreSQL 15 + Edge Functions Deno)', width: 6526 }]),
             tableRow([{ text: 'Autenticação', width: 2500 }, { text: 'Supabase Auth (email/password) com Row Level Security', width: 6526 }]),
-            tableRow([{ text: 'IA', width: 2500 }, { text: 'Lovable AI Gateway (GPT-5, Gemini 2.5) para relatórios e chat', width: 6526 }]),
+            tableRow([{ text: 'IA', width: 2500 }, { text: 'Gateway de IA gerenciado (GPT-5, Gemini 2.5) para relatórios e chat', width: 6526 }]),
             tableRow([{ text: 'Gráficos', width: 2500 }, { text: 'Recharts (dashboards) + Three.js/R3F (jogos 3D)', width: 6526 }]),
             tableRow([{ text: 'Formulários', width: 2500 }, { text: 'React Hook Form + Zod validation', width: 6526 }]),
-            tableRow([{ text: 'Hospedagem', width: 2500 }, { text: 'Lovable Cloud (CDN global, SSL automático)', width: 6526 }]),
+            tableRow([{ text: 'Hospedagem', width: 2500 }, { text: 'Cloud gerenciado (CDN global, SSL automático)', width: 6526 }]),
           ],
         }),
 
