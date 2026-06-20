@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Copy, FileCode, Library, Search, ClipboardCopy, Sparkles, Route, Database, Zap, KeyRound } from 'lucide-react';
+import { Copy, FileCode, Library, Search, ClipboardCopy, Sparkles, Route, Database, Zap, KeyRound, Download, ShieldCheck, AlertTriangle, Loader2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   MODULE_LIBRARY,
@@ -20,6 +20,7 @@ import {
   type ModuleManifest,
   type ModuleSection,
 } from '@/data/moduleLibrary';
+import { buildModuleBundle, downloadBundle, scanModuleIntegrity, type IntegrityReport } from '@/lib/moduleBundle';
 
 const CATEGORY_BADGE: Record<ModuleCategory, string> = {
   ERP: 'bg-pillar-oe/10 text-pillar-oe border-pillar-oe/20',
@@ -65,6 +66,50 @@ function filterSections(sections: ModuleSection[], query: string): ModuleSection
 }
 
 function ModuleCard({ m }: { m: ModuleManifest }) {
+  const [bundleLoading, setBundleLoading] = useState(false);
+  const [scanLoading, setScanLoading] = useState(false);
+  const [report, setReport] = useState<IntegrityReport | null>(null);
+
+  const version = m.version ?? '1.0.0';
+
+  async function handleBundle() {
+    setBundleLoading(true);
+    try {
+      const bundle = await buildModuleBundle(m);
+      if (bundle.filesIncluded.length === 0) {
+        toast.error(`Nenhum arquivo do módulo "${m.module}" foi encontrado no bundle`);
+        return;
+      }
+      downloadBundle(bundle);
+      toast.success(
+        `Bundle de "${m.module}" gerado — ${bundle.filesIncluded.length} arquivos, ${bundle.migrationsIncluded.length} migrations`,
+      );
+    } catch (e) {
+      toast.error(`Falha ao gerar bundle: ${(e as Error).message}`);
+    } finally {
+      setBundleLoading(false);
+    }
+  }
+
+  async function handleScan() {
+    setScanLoading(true);
+    setReport(null);
+    try {
+      const r = await scanModuleIntegrity(m);
+      setReport(r);
+      const total = r.undeclared.length + r.missing.length + r.declaredElsewhere.length;
+      if (total === 0) {
+        toast.success(`"${m.module}" íntegro — nenhuma dependência oculta detectada`);
+      } else {
+        toast.warning(`"${m.module}": ${total} alerta(s) de integridade — veja detalhes no card`);
+      }
+    } catch (e) {
+      toast.error(`Falha no scan: ${(e as Error).message}`);
+    } finally {
+      setScanLoading(false);
+    }
+  }
+
   return (
     <Card className="border-muted">
       <CardHeader className="pb-3">
@@ -74,6 +119,9 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
               <CardTitle className="text-base font-bold">{m.module}</CardTitle>
               <Badge variant="outline" className={CATEGORY_BADGE[m.category]}>
                 {m.category}
+              </Badge>
+              <Badge variant="outline" className="font-mono text-[10px]">
+                v{version}
               </Badge>
             </div>
             <CardDescription className="text-xs">{m.description}</CardDescription>
@@ -105,6 +153,34 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
             >
               <ClipboardCopy className="h-3.5 w-3.5" />
               JSON
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleBundle}
+              disabled={bundleLoading}
+              title="Baixa um .txt com manifesto + código completo + migrations deste módulo"
+            >
+              {bundleLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Download className="h-3.5 w-3.5" />
+              )}
+              Bundle
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleScan}
+              disabled={scanLoading}
+              title="Detecta imports @/... fora do escopo declarado do módulo"
+            >
+              {scanLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <ShieldCheck className="h-3.5 w-3.5" />
+              )}
+              Scan
             </Button>
           </div>
         </div>
@@ -243,8 +319,91 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
               )}
             </div>
           )}
+
+        {report && <IntegrityPanel report={report} />}
       </CardContent>
     </Card>
+  );
+}
+
+function IntegrityPanel({ report }: { report: IntegrityReport }) {
+  const total =
+    report.undeclared.length + report.missing.length + report.declaredElsewhere.length;
+
+  if (total === 0) {
+    return (
+      <div className="flex items-center gap-2 rounded-md border border-severity-bom/30 bg-severity-bom/5 p-2 text-[11px] text-severity-bom">
+        <CheckCircle2 className="h-3.5 w-3.5" />
+        Íntegro — {report.filesScanned} arquivos escaneados, {report.totalImports} imports
+        verificados.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2 rounded-md border border-severity-moderado/30 bg-severity-moderado/5 p-2">
+      <div className="flex items-center gap-2 text-[11px] font-semibold text-severity-moderado">
+        <AlertTriangle className="h-3.5 w-3.5" />
+        {total} alerta(s) de integridade ({report.filesScanned} arquivos,{' '}
+        {report.totalImports} imports)
+      </div>
+
+      {report.missing.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Arquivos declarados inexistentes ({report.missing.length})
+          </p>
+          <ul className="ml-3 list-disc text-[11px] text-foreground/80">
+            {report.missing.map((f) => (
+              <li key={f} className="font-mono">
+                {f}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {report.declaredElsewhere.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Acoplamento com outros módulos ({report.declaredElsewhere.length})
+          </p>
+          <ul className="ml-3 list-disc text-[11px] text-foreground/80">
+            {report.declaredElsewhere.slice(0, 8).map((d) => (
+              <li key={d.import}>
+                <span className="font-mono">{d.import}</span> →{' '}
+                <span className="font-semibold">{d.ownedBy}</span>
+              </li>
+            ))}
+            {report.declaredElsewhere.length > 8 && (
+              <li className="text-muted-foreground">
+                … +{report.declaredElsewhere.length - 8} outros
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
+
+      {report.undeclared.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Imports órfãos — não declarados em nenhum módulo ({report.undeclared.length})
+          </p>
+          <ul className="ml-3 list-disc text-[11px] text-foreground/80">
+            {report.undeclared.slice(0, 8).map((f) => (
+              <li key={f} className="font-mono">
+                {f}
+              </li>
+            ))}
+            {report.undeclared.length > 8 && (
+              <li className="text-muted-foreground">
+                … +{report.undeclared.length - 8} outros
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
 
