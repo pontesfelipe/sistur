@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -83,9 +83,11 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
 
   // When opened with a locked assessment (from Modo Prescrição), seed name once
   // the destination data resolves.
-  if (lockedAssessmentId && selectedData && !projectName) {
-    setProjectName(`Projeto ${selectedData.destination_name}`);
-  }
+  useEffect(() => {
+    if (lockedAssessmentId && selectedData && !projectName) {
+      setProjectName(`Projeto ${selectedData.destination_name}`);
+    }
+  }, [lockedAssessmentId, selectedData, projectName]);
 
   const handleSelectContinue = () => {
     if (!selectedData) return;
