@@ -23,7 +23,8 @@ import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';
 import { ProjectDetailView } from '@/components/projects/ProjectDetailView';
 import { cn } from '@/lib/utils';
 import { useProjectsPortfolioImpact } from '@/hooks/useProjectsPortfolio';
-import { TrendingUp, TrendingDown, Target as TargetIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target as TargetIcon, Download } from 'lucide-react';
+import { exportPortfolioCSV } from '@/lib/projectExports';
 
 export default function Projetos() {
   const { data: projects, isLoading } = useProjects();
@@ -85,10 +86,38 @@ export default function Projetos() {
               Crie e gerencie projetos baseados em diagnósticos e relatórios
             </p>
           </div>
-          <Button onClick={() => setCreateDialogOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Novo Projeto
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              disabled={!projects || projects.length === 0}
+              onClick={() => {
+                if (!projects) return;
+                exportPortfolioCSV(
+                  projects.map((p) => ({
+                    nome: p.name,
+                    status: PROJECT_STATUS_INFO[p.status]?.label ?? p.status,
+                    metodologia: METHODOLOGY_INFO[p.methodology]?.name ?? p.methodology,
+                    prioridade: PRIORITY_INFO[p.priority]?.label ?? p.priority,
+                    destino: p.destination?.name ?? '',
+                    uf: p.destination?.uf ?? '',
+                    inicio_planejado: p.planned_start_date ?? '',
+                    fim_planejado: p.planned_end_date ?? '',
+                    orcamento_estimado: p.budget_estimated ?? '',
+                    orcamento_realizado: p.budget_actual ?? '',
+                    criado_em: p.created_at,
+                  })),
+                );
+              }}
+            >
+              <Download className="h-4 w-4" />
+              Exportar CSV
+            </Button>
+            <Button onClick={() => setCreateDialogOpen(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Novo Projeto
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
