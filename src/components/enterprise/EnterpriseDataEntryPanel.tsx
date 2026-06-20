@@ -27,6 +27,7 @@ import {
   Database as DatabaseIcon,
   Calendar,
   MessageSquare,
+  Sparkles,
 } from 'lucide-react';
 import { useIndicators, useIndicatorValues } from '@/hooks/useIndicators';
 import { useProfile } from '@/hooks/useProfile';
@@ -86,6 +87,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
+  const [autoFilledIds, setAutoFilledIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
 
   const formatNumberBR = useCallback((value: number | null | undefined, indicator?: Indicator) => {
@@ -167,13 +169,22 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
     setLocalValues(prev => {
       const updated = { ...prev };
       let applied = false;
+      const newlyFilled: string[] = [];
       Object.entries(initialAutoFillValues).forEach(([code, value]) => {
         const id = codeToId.get(code);
         if (id && !updated[id]) {
           updated[id] = formatNumberBR(value, codeToIndicator.get(code));
           applied = true;
+          newlyFilled.push(id);
         }
       });
+      if (newlyFilled.length > 0) {
+        setAutoFilledIds(prevIds => {
+          const next = new Set(prevIds);
+          newlyFilled.forEach(id => next.add(id));
+          return next;
+        });
+      }
       return applied ? updated : prev;
     });
   }, [initialAutoFillValues, indicators, formatNumberBR]);
@@ -245,6 +256,13 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   }, [indicators, localValues, ignoredIds]);
   
   const handleValueChange = (indicatorId: string, value: string, indicator: Indicator) => {
+    // Edição manual remove o status de pré-preenchimento automático
+    setAutoFilledIds(prev => {
+      if (!prev.has(indicatorId)) return prev;
+      const next = new Set(prev);
+      next.delete(indicatorId);
+      return next;
+    });
     const fieldConfig = getIndicatorFieldConfig({ code: (indicator as any).code, normalization: indicator.normalization });
 
     if (fieldConfig.kind === 'select') {
@@ -290,7 +308,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
         assessment_id: assessmentId,
         indicator_id: indicatorId,
         value_raw: parseLocalValue(value, indicatorById.get(indicatorId)),
-        source: 'Manual (Enterprise)',
+        source: autoFilledIds.has(indicatorId) ? 'Reviews Online (Auto)' : 'Manual (Enterprise)',
       }));
     
     await bulkUpsertValues.mutateAsync(values);
@@ -455,6 +473,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                       const benchmarkStatus = getBenchmarkStatus(indicator, numericValue);
                       const benchmarkTarget = (indicator as any).benchmark_target;
                       const isIgnored = ignoredIds.has(indicator.id);
+                      const isAutoFilled = autoFilledIds.has(indicator.id);
                       const guidance = INDICATOR_GUIDANCE[(indicator as any).code];
                       const valError = validationErrors[indicator.id];
                       const existing = existingByIndicator.get(indicator.id);
@@ -481,6 +500,12 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                                 <Badge variant="outline" className="text-xs border-destructive/50 text-destructive">
                                   <EyeOff className="h-3 w-3 mr-1" />
                                   Ignorado
+                                </Badge>
+                              )}
+                              {!isIgnored && isAutoFilled && (
+                                <Badge variant="outline" className="text-xs border-primary/50 text-primary gap-1">
+                                  <Sparkles className="h-3 w-3" />
+                                  Pré-preenchido (Reviews)
                                 </Badge>
                               )}
                               {!isIgnored && benchmarkStatus === 'good' && (
