@@ -62,6 +62,7 @@ import { ArrowDown, ArrowUp, Minus, TrendingUp } from 'lucide-react';
 import { ProjectKanban } from './ProjectKanban';
 import { ProjectTimeline } from './ProjectTimeline';
 import { ProjectGovernance } from './ProjectGovernance';
+import { ProjectMembersPanel } from './ProjectMembersPanel';
 import { ProjectEduPanel } from './ProjectEduPanel';
 import { ProjectBudgetPanel } from './ProjectBudgetPanel';
 import { ProjectLinksPanel } from './ProjectLinksPanel';
@@ -367,6 +368,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <TabsTrigger value="milestones">Marcos ({milestones?.length || 0})</TabsTrigger>
           <TabsTrigger value="indicators">Indicadores</TabsTrigger>
           <TabsTrigger value="governance">Governança</TabsTrigger>
+          <TabsTrigger value="team">Equipe</TabsTrigger>
           <TabsTrigger value="edu">Capacitação</TabsTrigger>
           <TabsTrigger value="budget">Orçamento</TabsTrigger>
           <TabsTrigger value="links">Vínculos</TabsTrigger>

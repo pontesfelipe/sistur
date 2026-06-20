@@ -9,7 +9,7 @@ import {
   PRIORITY_INFO,
   useUpdateTask,
 } from '@/hooks/useProjects';
-import { GripVertical, AlertTriangle } from 'lucide-react';
+import { GripVertical, AlertTriangle, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const COLUMNS: TaskStatus[] = ['backlog', 'todo', 'in_progress', 'review', 'done', 'blocked'];
@@ -116,6 +116,11 @@ export function ProjectKanban({ tasks, onEdit }: { tasks: ProjectTask[]; onEdit?
                             <Badge variant="secondary" className={cn('text-[10px] text-white', pinfo.color)}>
                               {pinfo.label}
                             </Badge>
+                            {task.assignee_name && (
+                              <Badge variant="outline" className="text-[10px] gap-0.5">
+                                <User className="h-2.5 w-2.5" /> {task.assignee_name.split(' ')[0]}
+                              </Badge>
+                            )}
                             {task.tags?.slice(0, 2).map((tag) => (
                               <Badge key={tag} variant="outline" className="text-[10px]">{tag}</Badge>
                             ))}
