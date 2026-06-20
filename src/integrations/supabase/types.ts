@@ -8012,6 +8012,156 @@ export type Database = {
           },
         ]
       }
+      project_checkpoints: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          checkpoint_order: number
+          created_at: string
+          description: string | null
+          due_date: string | null
+          evidence_notes: string | null
+          evidence_url: string | null
+          id: string
+          is_mandatory: boolean
+          name: string
+          phase_id: string | null
+          pillar: string | null
+          project_id: string
+          rejection_reason: string | null
+          status: string
+          submitted_at: string | null
+          submitted_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          checkpoint_order?: number
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          evidence_notes?: string | null
+          evidence_url?: string | null
+          id?: string
+          is_mandatory?: boolean
+          name: string
+          phase_id?: string | null
+          pillar?: string | null
+          project_id: string
+          rejection_reason?: string | null
+          status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          checkpoint_order?: number
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          evidence_notes?: string | null
+          evidence_url?: string | null
+          id?: string
+          is_mandatory?: boolean
+          name?: string
+          phase_id?: string | null
+          pillar?: string | null
+          project_id?: string
+          rejection_reason?: string | null
+          status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_checkpoints_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "project_phases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_checkpoints_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_edu_enrollments: {
+        Row: {
+          certificate_id: string | null
+          completed_at: string | null
+          course_id: string | null
+          course_title: string
+          created_at: string
+          enrollment_status: string
+          id: string
+          indicator_code: string | null
+          is_mandatory: boolean
+          project_id: string
+          target_audience: string | null
+          task_id: string | null
+          updated_at: string
+          user_id: string | null
+          user_name: string | null
+        }
+        Insert: {
+          certificate_id?: string | null
+          completed_at?: string | null
+          course_id?: string | null
+          course_title: string
+          created_at?: string
+          enrollment_status?: string
+          id?: string
+          indicator_code?: string | null
+          is_mandatory?: boolean
+          project_id: string
+          target_audience?: string | null
+          task_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          certificate_id?: string | null
+          completed_at?: string | null
+          course_id?: string | null
+          course_title?: string
+          created_at?: string
+          enrollment_status?: string
+          id?: string
+          indicator_code?: string | null
+          is_mandatory?: boolean
+          project_id?: string
+          target_audience?: string | null
+          task_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_edu_enrollments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_edu_enrollments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "project_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_indicator_links: {
         Row: {
           baseline_captured_at: string
@@ -8174,6 +8324,54 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_task_raci: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          project_id: string
+          role: string
+          task_id: string
+          user_id: string
+          user_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          project_id: string
+          role: string
+          task_id: string
+          user_id: string
+          user_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          project_id?: string
+          role?: string
+          task_id?: string
+          user_id?: string
+          user_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_task_raci_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_task_raci_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "project_tasks"
             referencedColumns: ["id"]
           },
         ]
