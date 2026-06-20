@@ -65,6 +65,10 @@ import { ProjectGovernance } from './ProjectGovernance';
 import { ProjectEduPanel } from './ProjectEduPanel';
 import { ProjectBudgetPanel } from './ProjectBudgetPanel';
 import { ProjectLinksPanel } from './ProjectLinksPanel';
+import { AISuggestTasksDialog } from './AISuggestTasksDialog';
+import { exportProjectCalendar } from '@/lib/projectExports';
+import { Sparkles, Download } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ProjectDetailViewProps {
   projectId: string;
@@ -86,6 +90,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
   const [activeTab, setActiveTab] = useState('overview');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [aiSuggestOpen, setAiSuggestOpen] = useState(false);
 
   // Phase dialogs
   const [phaseFormOpen, setPhaseFormOpen] = useState(false);
@@ -256,6 +261,29 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAiSuggestOpen(true)}
+            className="gap-1"
+            title="Sugerir tarefas com IA"
+          >
+            <Sparkles className="h-4 w-4" />
+            <span className="hidden sm:inline">IA</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const ok = exportProjectCalendar(project, milestones || [], tasks || []);
+              if (!ok) toast.info('Nenhum marco ou tarefa com data planejada para exportar.');
+            }}
+            className="gap-1"
+            title="Exportar calendário (.ics)"
+          >
+            <Download className="h-4 w-4" />
+            <span className="hidden sm:inline">.ics</span>
+          </Button>
           <Select value={project.status} onValueChange={handleStatusChange}>
             <SelectTrigger className="w-40">
               <SelectValue />
@@ -674,6 +702,11 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onDeleted={onBack}
+      />
+      <AISuggestTasksDialog
+        projectId={projectId}
+        open={aiSuggestOpen}
+        onOpenChange={setAiSuggestOpen}
       />
 
       {/* Phase Dialogs */}
