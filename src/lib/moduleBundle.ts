@@ -309,5 +309,3 @@ export async function scanModuleIntegrity(m: ModuleManifest): Promise<IntegrityR
 
   return report;
 }
-
-void moduleFilesResolved; // (eslint placeholder removed at runtime)
