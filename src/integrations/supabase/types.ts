@@ -8012,6 +8012,72 @@ export type Database = {
           },
         ]
       }
+      project_indicator_links: {
+        Row: {
+          baseline_captured_at: string
+          baseline_score: number | null
+          baseline_status: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          indicator_code: string
+          indicator_id: string | null
+          indicator_name: string | null
+          notes: string | null
+          pillar: string | null
+          project_id: string
+          target_score: number | null
+          updated_at: string
+        }
+        Insert: {
+          baseline_captured_at?: string
+          baseline_score?: number | null
+          baseline_status?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          indicator_code: string
+          indicator_id?: string | null
+          indicator_name?: string | null
+          notes?: string | null
+          pillar?: string | null
+          project_id: string
+          target_score?: number | null
+          updated_at?: string
+        }
+        Update: {
+          baseline_captured_at?: string
+          baseline_score?: number | null
+          baseline_status?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          indicator_code?: string
+          indicator_id?: string | null
+          indicator_name?: string | null
+          notes?: string | null
+          pillar?: string | null
+          project_id?: string
+          target_score?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_indicator_links_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_indicator_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_milestones: {
         Row: {
           completed_date: string | null
