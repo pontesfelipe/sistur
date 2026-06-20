@@ -102,7 +102,7 @@ export function AISuggestTasksDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /> Sugerir tarefas com IA</DialogTitle>
           <DialogDescription>
-            A IA Lovable analisa indicadores vinculados, fases e tarefas existentes para sugerir novas tarefas acionáveis.
+            A IA do SISTUR analisa indicadores vinculados, fases e tarefas existentes para sugerir novas tarefas acionáveis.
           </DialogDescription>
         </DialogHeader>
 
