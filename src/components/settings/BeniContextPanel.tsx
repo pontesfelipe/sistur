@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Bot, ShieldAlert, BookOpen, Volume2, Pencil, Save, X, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useProfile } from '@/contexts/ProfileContext';
+import { useProfileContext } from '@/contexts/ProfileContext';
 
 type SectionKey = 'persona' | 'output_format' | 'base_theory' | 'dynamic_context' | 'scope_guardrails';
 
@@ -55,7 +55,7 @@ const MODEL_OPTIONS: { value: string; label: string; hint: string }[] = [
 ];
 
 export function BeniContextPanel() {
-  const { isAdmin } = useProfile();
+  const { isAdmin } = useProfileContext();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [settings, setSettings] = useState<BeniSettings | null>(null);
