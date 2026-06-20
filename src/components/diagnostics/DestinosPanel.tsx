@@ -22,6 +22,7 @@ import { useProfileContext } from '@/contexts/ProfileContext';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
 import { EnterpriseProfilePanel } from '@/components/enterprise/EnterpriseProfilePanel';
 import { EnterpriseRevenuePanel } from '@/components/enterprise/EnterpriseRevenuePanel';
+import { EnterpriseReputationPanel } from '@/components/enterprise/EnterpriseReputationPanel';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -301,6 +302,10 @@ export function DestinosPanel() {
                 onClose={() => setEnterpriseProfileDestination(null)}
               />
               <EnterpriseRevenuePanel
+                destinationId={enterpriseProfileDestination.id}
+                destinationName={enterpriseProfileDestination.name}
+              />
+              <EnterpriseReputationPanel
                 destinationId={enterpriseProfileDestination.id}
                 destinationName={enterpriseProfileDestination.name}
               />
