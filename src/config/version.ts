@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 66,
-  patch: 18,
+  patch: 19,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.66.19",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Gerenciamento de Projetos (Frente 4) — orçamento e vínculos externos. Nova aba 'Orçamento' no detalhe do projeto: linhas por categoria/fase com valores planejado e realizado em BRL, fonte de financiamento, status (Planejado/Aprovado/Empenhado/Executado/Cancelado), totais agregados, saldo e percentual de execução. Nova aba 'Vínculos' que conecta o projeto a Oportunidades de Investimento (mesmo destino), Consórcios regionais, Alertas do Observatório (mesma org, não dispensados) e Issues do diagnóstico — com seleção a partir de itens existentes, evitando duplicação. Novas tabelas: project_budget_lines e project_external_links, ambas com RLS por organização.",
+    ],
+  },
   {
     version: "1.66.18",
     date: "2026-06-20",
