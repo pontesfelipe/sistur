@@ -100,6 +100,10 @@ function classifyRow(row: any): { kind: SourceKind; sourceName: string } {
   if (type.startsWith('DERIVED') || isDerivedIndicator(code)) {
     return { kind: 'DERIVED', sourceName: 'Cálculo Interno' };
   }
+  // Enterprise auto-fill from online reviews → tratar como fonte oficial automática
+  if (/REVIEW|GOOGLE|TRIPADVISOR|BOOKING|\(AUTO\)|AUTOMÁTIC|AUTOMATIC/.test(detail)) {
+    return { kind: 'OFFICIAL', sourceName: 'Reviews Online (Google / TripAdvisor / Booking)' };
+  }
   if (type.startsWith('OFFICIAL_API') || type === 'AUTOMATICA') {
     const token = OFFICIAL_TOKENS.find((t) => detail.includes(t));
     return { kind: 'OFFICIAL', sourceName: token ? displaySourceName(token) : 'Fonte Oficial' };

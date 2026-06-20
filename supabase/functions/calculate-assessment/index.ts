@@ -1222,8 +1222,8 @@ async function runCalculationCore(
         sourceType = 'DERIVED';
       } else if (
         srcTag === 'external'
-        || /api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn|anac|anatel|^ana$|tse|cadunico|mapa.?turismo|mtur/.test(srcTag)
-        || /api|automatica|automática|ibge|datasus|cadastur|sismapa|inep|stn|anac|anatel|^ana$|tse|cadunico|mapa.?turismo|mtur/.test(srcExt)
+        || /api|auto|automatica|automática|review|google|tripadvisor|booking|ibge|datasus|cadastur|sismapa|inep|stn|anac|anatel|^ana$|tse|cadunico|mapa.?turismo|mtur/.test(srcTag)
+        || /api|auto|automatica|automática|review|google|tripadvisor|booking|ibge|datasus|cadastur|sismapa|inep|stn|anac|anatel|^ana$|tse|cadunico|mapa.?turismo|mtur/.test(srcExt)
       ) {
         sourceType = 'OFFICIAL_API';
       } else if (/estima/.test(srcTag)) {
