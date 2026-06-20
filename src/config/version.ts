@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 78,
+  minor: 79,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.79.0",
+    date: "2026-06-20",
+    type: "minor" as const,
+    changes: [
+      "Biblioteca de Módulos — Pacote B: novo botão 'Bundle' em cada módulo baixa um .txt único contendo o manifesto JSON, todos os arquivos-chave (incluindo expansão de diretórios como src/components/diagnostics/), edge functions associadas e migrations correspondentes (detectadas por palavra-chave em supabase/migrations/*.sql). Conteúdo lido em runtime via import.meta.glob raw do Vite — sem novas dependências. Nome do arquivo: sistur-module-<slug>-v<versão>.txt, pronto para colar em outro projeto Lovable.",
+      "Biblioteca de Módulos — Pacote C: novo botão 'Scan' executa auto-detecção de acoplamentos ocultos. Faz parsing dos imports `@/...` de cada arquivo do módulo e classifica em três categorias: (1) arquivos declarados que não existem mais, (2) imports que pertencem a OUTRO módulo (acoplamento cruzado), (3) imports órfãos que nenhum módulo reivindica. Resultado exibido inline no card com contagem e top 8 ocorrências por categoria. Primitivos shadcn-ui (src/components/ui/*) e src/lib/utils são ignorados por design.",
+      "Cada módulo agora declara campo opcional 'version' (semver, default v1.0.0) exibido como badge no header do card e incluído no manifesto JSON e no nome do bundle — permite versionar evoluções incompatíveis do módulo independente da versão global do app.",
+    ],
+  },
   {
     version: "1.78.0",
     date: "2026-06-20",
