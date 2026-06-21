@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 80,
-  patch: 1,
+  minor: 81,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.81.0",
+    date: "2026-06-21",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — botão 'Rodar todos' no Step 4. Foi criado um registro global de blocos automáticos (src/lib/autoFillRunner.ts) e cada um dos 14 componentes de busca (Digital Presence, Destination Context, Public Complaints, Competitors, Sustainability, Pricing, Local Events, Tourism Safety, Climate Comfort, Local Transport, Brand Strength, Demand Trends, Consolidated Reputation, Social Media) se auto-registra via o hook useAutoFillRunner. O cartão de resumo no topo do Step 4 ganhou um botão 'Rodar todos' que dispara os blocos sequencialmente com 800 ms de espaçamento (respeitando limites de Firecrawl) e exibe progresso ao vivo ('Executando bloco X (i/n)'). Reviews e CNPJ continuam manuais por exigirem entrada do usuário."
+    ]
+  },
   {
     version: "1.80.1",
     date: "2026-06-21",
