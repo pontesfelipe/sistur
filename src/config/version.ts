@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 82,
-  patch: 1,
+  minor: 83,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.83.0",
+    date: "2026-06-21",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — Fase 1 do plano de finalização (UX e validação do pré-preenchimento automático). (1) `autoFillRunner` ganhou store reativo via useSyncExternalStore: cada bloco mantém status (idle/running/success/error), erro, timestamp e duração — exposto via `useAutoFillStatuses`. (2) Toasts granulares: 'Rodar todos' agora emite um toast por bloco (✓/✗) e um resumo final no formato 'X OK • Y falharam'. (3) Retry individual: blocos com erro mostram badge vermelho com ícone de refresh; clicar reexecuta só aquele bloco via `runOneAutoFill`. (4) Tooltip por badge revela a fonte de dados (ex.: 'Booking + TripAdvisor + Google', 'ANAC anac_air_connectivity', 'Derivado: demanda + eventos + ADR') e a mensagem de erro quando aplicável — metadados registrados via `setAutoFillMeta`. (5) Persistência de estado: nova coluna `enterprise_profiles.autofill_run_state` (jsonb) guarda o snapshot dos 18 blocos; ao retomar o diagnóstico, `hydrateAutoFillState` restaura o progresso (estados 'running' viram 'idle' para não travar a UI). (6) Salvar perfil grava `autofill_run_state` no payload; após cada 'Rodar todos' ou retry, o snapshot é persistido por upsert direto. Total de blocos automáticos: 18 + CNPJ."
+    ]
+  },
   {
     version: "1.82.1",
     date: "2026-06-21",
