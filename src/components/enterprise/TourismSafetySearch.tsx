@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Shield, ShieldAlert, ShieldCheck, Loader2, Search, ExternalLink, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 interface Analysis {
   safety_score: number;
@@ -64,6 +65,8 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
 
   const lvl = analysis ? LEVEL_MAP[analysis.safety_level] : null;
   const LvlIcon = lvl?.icon;
+
+  useAutoFillRunner('safety', run);
 
   return (
     <div className="space-y-4">

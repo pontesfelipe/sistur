@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Bus, Loader2, Search, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 interface Analysis {
   modes_available: { key: string; label: string }[];
@@ -45,6 +46,8 @@ export function LocalTransportSearch({ destinationName, state, onAutoFill, onAna
       console.error(e); toast.error(e?.message || 'Falha ao analisar transporte');
     } finally { setLoading(false); }
   };
+
+  useAutoFillRunner('transport', run);
 
   return (
     <div className="space-y-4">

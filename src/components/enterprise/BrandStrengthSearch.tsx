@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { TrendingUp, Loader2, Search, Newspaper, Globe, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 interface Analysis {
   brand_strength_score: number;
@@ -53,6 +54,8 @@ export function BrandStrengthSearch({ businessName, location, onAutoFill, onAnal
       console.error(e); toast.error(e?.message || 'Falha ao analisar marca');
     } finally { setLoading(false); }
   };
+
+  useAutoFillRunner('brand', run);
 
   return (
     <div className="space-y-4">

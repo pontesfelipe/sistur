@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Loader2, Search, Trophy, ExternalLink, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 interface Props {
   destinationId: string;
@@ -40,6 +41,8 @@ export function CompetitorsAutoSearch({ destinationId, businessName, location, p
       setLoading(false);
     }
   };
+
+  useAutoFillRunner('competitors', run);
 
   return (
     <div className="space-y-4">

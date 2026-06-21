@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Star, Loader2, Search, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 interface SourceData { rating: number; count: number; samples: string[] }
 interface Analysis {
@@ -52,6 +53,8 @@ export function ConsolidatedReputationSearch({ businessName, location, onAutoFil
       console.error(e); toast.error(e?.message || 'Falha ao analisar reputação');
     } finally { setLoading(false); }
   };
+
+  useAutoFillRunner('reputation', run);
 
   return (
     <div className="space-y-4">

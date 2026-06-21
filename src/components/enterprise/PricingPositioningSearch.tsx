@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { DollarSign, Loader2, Search, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 interface PriceStats { min: number | null; max: number | null; avg: number | null; median: number | null; count: number; samples?: number[] }
 interface Analysis {
@@ -64,6 +65,8 @@ export function PricingPositioningSearch({ businessName, location, onAutoFill, o
 
   const pos = analysis ? POSITIONING_MAP[analysis.positioning] : null;
   const PosIcon = pos?.icon;
+
+  useAutoFillRunner('pricing', run);
 
   return (
     <div className="space-y-4">
