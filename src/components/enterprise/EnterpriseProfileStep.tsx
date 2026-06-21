@@ -372,6 +372,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const handleTariffSeasonalityAutoFill = (v: Record<string, number>) => { setTariffSeasonalityAutoFilled(true); onReviewAutoFill?.(v); };
   const handleTariffSeasonalityCapture = (a: Record<string, any>) => setTariffSeasonalityData(a);
 
+  const handleTelecomAutoFill = (v: Record<string, number>) => { setTelecomAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleTelecomCapture = (a: Record<string, any>) => setTelecomData(a);
+
+  const handleAccessibilityAutoFill = (v: Record<string, number>) => { setAccessibilityAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleAccessibilityCapture = (a: Record<string, any>) => setAccessibilityData(a);
+
+  const handleHealthAutoFill = (v: Record<string, number>) => { setHealthAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleHealthCapture = (a: Record<string, any>) => setHealthData(a);
+
   const handleCnpjValidated = ({ cnpj, record, yearsInOperation }: { cnpj: string; record: any; yearsInOperation: number | null }) => {
     setCnpjValue(cnpj);
     setCnpjData(record);
