@@ -161,9 +161,11 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const statuses = useAutoFillStatuses();
   const statusById = new Map(statuses.map((s) => [s.id, s]));
 
-  const blockToast = ({ label, status, error }: { label: string; status: 'success' | 'error'; error?: string }) => {
+  const blockToast = ({ label, status, error }: { label: string; status: 'success' | 'error' | 'no_data'; error?: string }) => {
     if (status === 'success') {
       toast.success(`✓ ${label}`);
+    } else if (status === 'no_data') {
+      toast.warning(`ⓘ ${label}: sem informações disponíveis${error ? ` — ${error}` : ''}`);
     } else {
       toast.error(`✗ ${label}${error ? `: ${error}` : ''}`);
     }
@@ -176,6 +178,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     toast.info('Iniciando preenchimento automático...');
     let okCount = 0;
     let failCount = 0;
+    let noDataCount = 0;
     try {
       await runAllAutoFills({
         delayMs: 800,
@@ -183,13 +186,16 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         onBlockComplete: (info) => {
           blockToast(info);
           if (info.status === 'success') okCount++;
+          else if (info.status === 'no_data') noDataCount++;
           else failCount++;
         },
       });
-      if (failCount === 0) {
+      if (failCount === 0 && noDataCount === 0) {
         toast.success(`Todos os ${okCount} blocos foram executados com sucesso`);
+      } else if (failCount === 0) {
+        toast.info(`${okCount} OK • ${noDataCount} sem informações disponíveis`);
       } else {
-        toast.warning(`${okCount} blocos OK • ${failCount} falharam — use "Tentar novamente" em cada um`);
+        toast.warning(`${okCount} OK • ${noDataCount} sem dados • ${failCount} falharam — use "Tentar novamente"`);
       }
       persistRunState();
     } catch (e: any) {
