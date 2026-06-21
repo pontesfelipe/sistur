@@ -4385,6 +4385,85 @@ export type Database = {
           },
         ]
       }
+      enterprise_pms_imports: {
+        Row: {
+          applied_at: string | null
+          assessment_id: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          imported_at: string
+          imported_by: string | null
+          org_id: string
+          parsed_metrics: Json
+          period_end: string | null
+          period_start: string | null
+          raw_payload: Json
+          rows_count: number
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applied_at?: string | null
+          assessment_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          imported_at?: string
+          imported_by?: string | null
+          org_id: string
+          parsed_metrics?: Json
+          period_end?: string | null
+          period_start?: string | null
+          raw_payload?: Json
+          rows_count?: number
+          source: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applied_at?: string | null
+          assessment_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          imported_at?: string
+          imported_by?: string | null
+          org_id?: string
+          parsed_metrics?: Json
+          period_end?: string | null
+          period_start?: string | null
+          raw_payload?: Json
+          rows_count?: number
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_pms_imports_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_pms_imports_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
+            foreignKeyName: "enterprise_pms_imports_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       enterprise_profiles: {
         Row: {
           accessibility_features: string[] | null

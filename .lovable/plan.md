@@ -34,7 +34,7 @@ Liga os dados coletados ao pipeline existente.
 - **Relatório AI no modo Enterprise**: ativar `generate-report` em modo Enterprise, consumindo os 21 blocos + perfil do empreendimento, com a Semantic Layer (`report_semantic_entries` com `applies_to=enterprise`) já existente. Validar trilha de auditoria (`indicator_calculation_trail`) para cada `ENT_*`.
 - **Snapshot da rodada**: assegurar que `diagnosis_data_snapshots` grava o estado completo dos 21 blocos na hora do cálculo (regra de "snapshots não retroativos").
 
-### Fase 4 — Importação de dados operacionais (PMS/CSV) (v1.86.0) ← próxima
+### Fase 4 — Importação de dados operacionais (PMS/CSV) (v1.86.0) ✅
 
 Última frente: os indicadores internos que hoje são 100% manuais.
 

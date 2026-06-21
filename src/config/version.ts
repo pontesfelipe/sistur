@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 85,
+  minor: 86,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.86.0",
+    date: "2026-06-21",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — Fase 4 (final) do plano de finalização: importação operacional via CSV/PMS. (1) Nova tabela `enterprise_pms_imports` (org_id, assessment_id, source ∈ {opera, cloudbeds, stays, csv_generic}, period_start, period_end, raw_payload jsonb, parsed_metrics jsonb, status, rows_count, imported_by, applied_at) com RLS multi-tenant por `get_effective_org_id()` e service_role full. (2) Novo componente `PmsCsvImportPanel` montado opcionalmente no Step 5 Enterprise (acima do `EnterpriseDataEntryPanel`): drag-and-drop CSV, parsing client-side compatível com Brasil/Excel (UTF-8 → fallback Windows-1252, detecção automática de `;` vs `,`, vírgula decimal, strip de R$/%, BOM removido), preview tabular com média/linhas válidas/fora-do-range por métrica. (3) Template canônico SISTUR (`template_pms_sistur.csv`) com colunas `period_month, occupancy_pct, adr_brl, revpar_brl, gop_pct, nps, turnover_pct, training_hours, energy_kwh, water_l, repeat_guest_pct` e botão de download embutido. (4) Validação de bounds rigorosa por coluna (occupancy 0–100, NPS -100 a 100, GOP -50 a 100, etc.) — valores fora do range são descartados com alerta e contagem visível. (5) Mapeamento canônico CSV → ENT_*: `ENT_OCUPACAO, ENT_ADR, ENT_REVPAR, ENT_GOP, ENT_NPS, ENT_TURNOVER, ENT_HORAS_TREINO, ENT_ENERGIA_KWH, ENT_AGUA_LITROS, ENT_RETORNO` — todos já catalogados em `enterprise_indicators` com benchmarks calibrados (Fases anteriores). (6) Aplicação grava o lote em `enterprise_pms_imports` (status='applied') e faz upsert (delete-then-insert filtrado por `source LIKE 'PMS CSV%'`) em `enterprise_indicator_values` com média mensal por indicador, source='PMS CSV (origem)', validated=true, reference_date no fim do período — reconhecido pelo `calculate-assessment` (caminho enterprise legacy). (7) Sem integração nativa com APIs de PMS nesta entrega: qualquer Opera/Cloudbeds/Stays/CM pode exportar CSV equivalente. (8) Plano `.lovable/plan.md` marcado como concluído — todas as 4 fases entregues."
+    ]
+  },
   {
     version: "1.85.0",
     date: "2026-06-21",
