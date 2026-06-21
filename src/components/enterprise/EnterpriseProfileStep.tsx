@@ -34,6 +34,8 @@ import { PublicComplaintsSearch } from './PublicComplaintsSearch';
 import { CompetitorsAutoSearch } from './CompetitorsAutoSearch';
 import { SustainabilitySearch } from './SustainabilitySearch';
 import { PricingPositioningSearch } from './PricingPositioningSearch';
+import { LocalEventsSearch } from './LocalEventsSearch';
+import { TourismSafetySearch } from './TourismSafetySearch';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -84,6 +86,10 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [sustainabilityAutoFilled, setSustainabilityAutoFilled] = useState(false);
   const [pricingData, setPricingData] = useState<Record<string, any> | null>(null);
   const [pricingAutoFilled, setPricingAutoFilled] = useState(false);
+  const [eventsData, setEventsData] = useState<Record<string, any> | null>(null);
+  const [eventsAutoFilled, setEventsAutoFilled] = useState(false);
+  const [safetyData, setSafetyData] = useState<Record<string, any> | null>(null);
+  const [safetyAutoFilled, setSafetyAutoFilled] = useState(false);
 
   const handleReviewAutoFill = (values: Record<string, number>) => {
     setReviewAutoFilled(true);
@@ -140,6 +146,21 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   };
   const handlePricingCapture = (a: Record<string, any>) => setPricingData(a);
 
+  const handleEventsAutoFill = (values: Record<string, number>) => {
+    setEventsAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
+  const handleEventsCapture = (a: Record<string, any>) => setEventsData(a);
+  const handleSeasonalitySuggestion = (pattern: string, _peakMonths: number[]) => {
+    setFormData((prev) => (prev.seasonality ? prev : { ...prev, seasonality: pattern }));
+  };
+
+  const handleSafetyAutoFill = (values: Record<string, number>) => {
+    setSafetyAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
+  const handleSafetyCapture = (a: Record<string, any>) => setSafetyData(a);
+
   const handleCnpjValidated = ({ cnpj, record, yearsInOperation }: { cnpj: string; record: any; yearsInOperation: number | null }) => {
     setCnpjValue(cnpj);
     setCnpjData(record);
@@ -183,6 +204,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.digital_presence_analysis) setDigitalAnalysisData(ep.digital_presence_analysis);
       if (ep.sustainability_analysis) setSustainabilityData(ep.sustainability_analysis);
       if (ep.pricing_analysis) setPricingData(ep.pricing_analysis);
+      if (ep.events_analysis) setEventsData(ep.events_analysis);
+      if (ep.safety_analysis) setSafetyData(ep.safety_analysis);
     }
   }, [existingProfile]);
 
@@ -202,6 +225,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         cnpj_data: cnpjData,
         sustainability_analysis: sustainabilityData,
         pricing_analysis: pricingData,
+        events_analysis: eventsData,
+        safety_analysis: safetyData,
       };
       
       const { data, error } = await supabase
@@ -510,6 +535,67 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             location={destinationName}
             onAutoFill={handlePricingAutoFill}
             onAnalysisCapture={handlePricingCapture}
+          />
+        </CardContent>
+      </Card>
+
+      {/* 1.12) Eventos & Sazonalidade Local */}
+      <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-sky-50/30 dark:from-cyan-950/20 dark:to-sky-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-cyan-500/10">
+              <Calendar className="h-5 w-5 text-cyan-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Eventos & Sazonalidade Local
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Calendário de eventos públicos e observatório — detecta meses de pico e padrão sazonal</CardDescription>
+            </div>
+            {eventsAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <LocalEventsSearch
+            destinationId={destinationId}
+            onAutoFill={handleEventsAutoFill}
+            onAnalysisCapture={handleEventsCapture}
+            onSeasonalitySuggestion={handleSeasonalitySuggestion}
+          />
+        </CardContent>
+      </Card>
+
+      {/* 1.13) Segurança Turística */}
+      <Card className="border-red-500/30 bg-gradient-to-br from-red-50/50 to-rose-50/30 dark:from-red-950/20 dark:to-rose-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-red-500/10">
+              <Search className="h-5 w-5 text-red-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Segurança Turística
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Sinais públicos de segurança: notícias, presença de polícia turística e alertas ativos</CardDescription>
+            </div>
+            {safetyAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <TourismSafetySearch
+            destinationName={destinationName}
+            onAutoFill={handleSafetyAutoFill}
+            onAnalysisCapture={handleSafetyCapture}
           />
         </CardContent>
       </Card>
