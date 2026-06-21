@@ -39,6 +39,9 @@ import { TourismSafetySearch } from './TourismSafetySearch';
 import { ClimateComfortSearch } from './ClimateComfortSearch';
 import { LocalTransportSearch } from './LocalTransportSearch';
 import { BrandStrengthSearch } from './BrandStrengthSearch';
+import { DemandTrendsSearch } from './DemandTrendsSearch';
+import { ConsolidatedReputationSearch } from './ConsolidatedReputationSearch';
+import { SocialMediaSearch } from './SocialMediaSearch';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -99,6 +102,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [transportAutoFilled, setTransportAutoFilled] = useState(false);
   const [brandData, setBrandData] = useState<Record<string, any> | null>(null);
   const [brandAutoFilled, setBrandAutoFilled] = useState(false);
+  const [demandData, setDemandData] = useState<Record<string, any> | null>(null);
+  const [demandAutoFilled, setDemandAutoFilled] = useState(false);
+  const [reputationData, setReputationData] = useState<Record<string, any> | null>(null);
+  const [reputationAutoFilled, setReputationAutoFilled] = useState(false);
+  const [socialData, setSocialData] = useState<Record<string, any> | null>(null);
+  const [socialAutoFilled, setSocialAutoFilled] = useState(false);
 
   const handleReviewAutoFill = (values: Record<string, number>) => {
     setReviewAutoFilled(true);
@@ -179,6 +188,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const handleBrandAutoFill = (v: Record<string, number>) => { setBrandAutoFilled(true); onReviewAutoFill?.(v); };
   const handleBrandCapture = (a: Record<string, any>) => setBrandData(a);
 
+  const handleDemandAutoFill = (v: Record<string, number>) => { setDemandAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleDemandCapture = (a: Record<string, any>) => setDemandData(a);
+
+  const handleReputationAutoFill = (v: Record<string, number>) => { setReputationAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleReputationCapture = (a: Record<string, any>) => setReputationData(a);
+
+  const handleSocialAutoFill = (v: Record<string, number>) => { setSocialAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleSocialCapture = (a: Record<string, any>) => setSocialData(a);
+
   const handleCnpjValidated = ({ cnpj, record, yearsInOperation }: { cnpj: string; record: any; yearsInOperation: number | null }) => {
     setCnpjValue(cnpj);
     setCnpjData(record);
@@ -227,6 +245,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.climate_analysis) setClimateData(ep.climate_analysis);
       if (ep.transport_analysis) setTransportData(ep.transport_analysis);
       if (ep.brand_strength_analysis) setBrandData(ep.brand_strength_analysis);
+      if (ep.demand_trends_analysis) setDemandData(ep.demand_trends_analysis);
+      if (ep.consolidated_reputation_analysis) setReputationData(ep.consolidated_reputation_analysis);
+      if (ep.social_media_analysis) setSocialData(ep.social_media_analysis);
     }
   }, [existingProfile]);
 
@@ -251,6 +272,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         climate_analysis: climateData,
         transport_analysis: transportData,
         brand_strength_analysis: brandData,
+        demand_trends_analysis: demandData,
+        consolidated_reputation_analysis: reputationData,
+        social_media_analysis: socialData,
       };
       
       const { data, error } = await supabase
@@ -687,6 +711,72 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardHeader>
         <CardContent className="pt-0">
           <BrandStrengthSearch businessName={destinationName} location={destinationName} onAutoFill={handleBrandAutoFill} onAnalysisCapture={handleBrandCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.17) Demanda & Tendências */}
+      <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-sky-50/30 dark:from-cyan-950/20 dark:to-sky-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-cyan-500/10"><Sparkles className="h-5 w-5 text-cyan-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Demanda & Tendências
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Volume orgânico, sinais transacionais em OTAs, distribuição mensal e picos de interesse</CardDescription>
+            </div>
+            {demandAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <DemandTrendsSearch businessName={destinationName} location={destinationName} onAutoFill={handleDemandAutoFill} onAnalysisCapture={handleDemandCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.18) Reputação Consolidada Multi-OTA */}
+      <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-50/50 to-amber-50/30 dark:from-yellow-950/20 dark:to-amber-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-yellow-500/10"><Sparkles className="h-5 w-5 text-yellow-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Reputação Consolidada
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Nota agregada de Booking, Google, TripAdvisor, Airbnb e demais OTAs em escala 0-10</CardDescription>
+            </div>
+            {reputationAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ConsolidatedReputationSearch businessName={destinationName} location={destinationName} onAutoFill={handleReputationAutoFill} onAnalysisCapture={handleReputationCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.19) Presença em Redes Sociais */}
+      <Card className="border-fuchsia-500/30 bg-gradient-to-br from-fuchsia-50/50 to-pink-50/30 dark:from-fuchsia-950/20 dark:to-pink-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-fuchsia-500/10"><Sparkles className="h-5 w-5 text-fuchsia-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Presença em Redes Sociais
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Instagram, Facebook, TikTok, YouTube e LinkedIn: perfis ativos e base estimada de seguidores</CardDescription>
+            </div>
+            {socialAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <SocialMediaSearch businessName={destinationName} location={destinationName} onAutoFill={handleSocialAutoFill} onAnalysisCapture={handleSocialCapture} />
         </CardContent>
       </Card>
 

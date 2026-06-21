@@ -4348,8 +4348,10 @@ export type Database = {
           cnpj: string | null
           cnpj_data: Json | null
           complaints_analysis: Json | null
+          consolidated_reputation_analysis: Json | null
           context_analysis: Json | null
           created_at: string
+          demand_trends_analysis: Json | null
           destination_id: string
           digital_presence_analysis: Json | null
           employee_count: number | null
@@ -4365,6 +4367,7 @@ export type Database = {
           room_count: number | null
           safety_analysis: Json | null
           seasonality: string | null
+          social_media_analysis: Json | null
           star_rating: number | null
           suite_count: number | null
           sustainability_analysis: Json | null
@@ -4385,8 +4388,10 @@ export type Database = {
           cnpj?: string | null
           cnpj_data?: Json | null
           complaints_analysis?: Json | null
+          consolidated_reputation_analysis?: Json | null
           context_analysis?: Json | null
           created_at?: string
+          demand_trends_analysis?: Json | null
           destination_id: string
           digital_presence_analysis?: Json | null
           employee_count?: number | null
@@ -4402,6 +4407,7 @@ export type Database = {
           room_count?: number | null
           safety_analysis?: Json | null
           seasonality?: string | null
+          social_media_analysis?: Json | null
           star_rating?: number | null
           suite_count?: number | null
           sustainability_analysis?: Json | null
@@ -4422,8 +4428,10 @@ export type Database = {
           cnpj?: string | null
           cnpj_data?: Json | null
           complaints_analysis?: Json | null
+          consolidated_reputation_analysis?: Json | null
           context_analysis?: Json | null
           created_at?: string
+          demand_trends_analysis?: Json | null
           destination_id?: string
           digital_presence_analysis?: Json | null
           employee_count?: number | null
@@ -4439,6 +4447,7 @@ export type Database = {
           room_count?: number | null
           safety_analysis?: Json | null
           seasonality?: string | null
+          social_media_analysis?: Json | null
           star_rating?: number | null
           suite_count?: number | null
           sustainability_analysis?: Json | null
