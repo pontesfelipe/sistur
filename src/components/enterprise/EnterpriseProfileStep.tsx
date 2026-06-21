@@ -42,6 +42,8 @@ import { BrandStrengthSearch } from './BrandStrengthSearch';
 import { DemandTrendsSearch } from './DemandTrendsSearch';
 import { ConsolidatedReputationSearch } from './ConsolidatedReputationSearch';
 import { SocialMediaSearch } from './SocialMediaSearch';
+import { AirConnectivitySearch } from './AirConnectivitySearch';
+import { TariffSeasonalitySearch } from './TariffSeasonalitySearch';
 import { runAllAutoFills } from '@/lib/autoFillRunner';
 import { Play } from 'lucide-react';
 
