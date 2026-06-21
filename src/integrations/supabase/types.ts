@@ -4342,7 +4342,9 @@ export type Database = {
           accessibility_features: string[] | null
           average_daily_rate: number | null
           average_occupancy_rate: number | null
+          brand_strength_analysis: Json | null
           certifications: string[] | null
+          climate_analysis: Json | null
           cnpj: string | null
           cnpj_data: Json | null
           complaints_analysis: Json | null
@@ -4369,6 +4371,7 @@ export type Database = {
           sustainability_initiatives: string[] | null
           target_market: string[] | null
           total_capacity: number | null
+          transport_analysis: Json | null
           updated_at: string
           years_in_operation: number | null
         }
@@ -4376,7 +4379,9 @@ export type Database = {
           accessibility_features?: string[] | null
           average_daily_rate?: number | null
           average_occupancy_rate?: number | null
+          brand_strength_analysis?: Json | null
           certifications?: string[] | null
+          climate_analysis?: Json | null
           cnpj?: string | null
           cnpj_data?: Json | null
           complaints_analysis?: Json | null
@@ -4403,6 +4408,7 @@ export type Database = {
           sustainability_initiatives?: string[] | null
           target_market?: string[] | null
           total_capacity?: number | null
+          transport_analysis?: Json | null
           updated_at?: string
           years_in_operation?: number | null
         }
@@ -4410,7 +4416,9 @@ export type Database = {
           accessibility_features?: string[] | null
           average_daily_rate?: number | null
           average_occupancy_rate?: number | null
+          brand_strength_analysis?: Json | null
           certifications?: string[] | null
+          climate_analysis?: Json | null
           cnpj?: string | null
           cnpj_data?: Json | null
           complaints_analysis?: Json | null
@@ -4437,6 +4445,7 @@ export type Database = {
           sustainability_initiatives?: string[] | null
           target_market?: string[] | null
           total_capacity?: number | null
+          transport_analysis?: Json | null
           updated_at?: string
           years_in_operation?: number | null
         }

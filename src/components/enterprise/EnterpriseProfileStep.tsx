@@ -36,6 +36,9 @@ import { SustainabilitySearch } from './SustainabilitySearch';
 import { PricingPositioningSearch } from './PricingPositioningSearch';
 import { LocalEventsSearch } from './LocalEventsSearch';
 import { TourismSafetySearch } from './TourismSafetySearch';
+import { ClimateComfortSearch } from './ClimateComfortSearch';
+import { LocalTransportSearch } from './LocalTransportSearch';
+import { BrandStrengthSearch } from './BrandStrengthSearch';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -90,6 +93,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [eventsAutoFilled, setEventsAutoFilled] = useState(false);
   const [safetyData, setSafetyData] = useState<Record<string, any> | null>(null);
   const [safetyAutoFilled, setSafetyAutoFilled] = useState(false);
+  const [climateData, setClimateData] = useState<Record<string, any> | null>(null);
+  const [climateAutoFilled, setClimateAutoFilled] = useState(false);
+  const [transportData, setTransportData] = useState<Record<string, any> | null>(null);
+  const [transportAutoFilled, setTransportAutoFilled] = useState(false);
+  const [brandData, setBrandData] = useState<Record<string, any> | null>(null);
+  const [brandAutoFilled, setBrandAutoFilled] = useState(false);
 
   const handleReviewAutoFill = (values: Record<string, number>) => {
     setReviewAutoFilled(true);
@@ -161,6 +170,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   };
   const handleSafetyCapture = (a: Record<string, any>) => setSafetyData(a);
 
+  const handleClimateAutoFill = (v: Record<string, number>) => { setClimateAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleClimateCapture = (a: Record<string, any>) => setClimateData(a);
+
+  const handleTransportAutoFill = (v: Record<string, number>) => { setTransportAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleTransportCapture = (a: Record<string, any>) => setTransportData(a);
+
+  const handleBrandAutoFill = (v: Record<string, number>) => { setBrandAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleBrandCapture = (a: Record<string, any>) => setBrandData(a);
+
   const handleCnpjValidated = ({ cnpj, record, yearsInOperation }: { cnpj: string; record: any; yearsInOperation: number | null }) => {
     setCnpjValue(cnpj);
     setCnpjData(record);
@@ -206,6 +224,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.pricing_analysis) setPricingData(ep.pricing_analysis);
       if (ep.events_analysis) setEventsData(ep.events_analysis);
       if (ep.safety_analysis) setSafetyData(ep.safety_analysis);
+      if (ep.climate_analysis) setClimateData(ep.climate_analysis);
+      if (ep.transport_analysis) setTransportData(ep.transport_analysis);
+      if (ep.brand_strength_analysis) setBrandData(ep.brand_strength_analysis);
     }
   }, [existingProfile]);
 
@@ -227,6 +248,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         pricing_analysis: pricingData,
         events_analysis: eventsData,
         safety_analysis: safetyData,
+        climate_analysis: climateData,
+        transport_analysis: transportData,
+        brand_strength_analysis: brandData,
       };
       
       const { data, error } = await supabase
@@ -597,6 +621,72 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             onAutoFill={handleSafetyAutoFill}
             onAnalysisCapture={handleSafetyCapture}
           />
+        </CardContent>
+      </Card>
+
+      {/* 1.14) Conforto Climático */}
+      <Card className="border-sky-500/30 bg-gradient-to-br from-sky-50/50 to-blue-50/30 dark:from-sky-950/20 dark:to-blue-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-sky-500/10"><Sparkles className="h-5 w-5 text-sky-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Conforto Climático
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Open-Meteo (5 anos): temperatura, chuva e melhores meses do destino</CardDescription>
+            </div>
+            {climateAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ClimateComfortSearch destinationId={destinationId} onAutoFill={handleClimateAutoFill} onAnalysisCapture={handleClimateCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.15) Transporte Intra-Destino */}
+      <Card className="border-orange-500/30 bg-gradient-to-br from-orange-50/50 to-amber-50/30 dark:from-orange-950/20 dark:to-amber-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-orange-500/10"><Sparkles className="h-5 w-5 text-orange-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Transporte Intra-Destino
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Apps, transporte público, transfer e alternativos disponíveis no destino</CardDescription>
+            </div>
+            {transportAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <LocalTransportSearch destinationName={destinationName} onAutoFill={handleTransportAutoFill} onAnalysisCapture={handleTransportCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.16) Força da Marca */}
+      <Card className="border-pink-500/30 bg-gradient-to-br from-pink-50/50 to-fuchsia-50/30 dark:from-pink-950/20 dark:to-fuchsia-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-pink-500/10"><Sparkles className="h-5 w-5 text-pink-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Força da Marca
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Visibilidade orgânica: resultados de busca, autoridade de domínios, mídia e OTAs</CardDescription>
+            </div>
+            {brandAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <BrandStrengthSearch businessName={destinationName} location={destinationName} onAutoFill={handleBrandAutoFill} onAnalysisCapture={handleBrandCapture} />
         </CardContent>
       </Card>
 
