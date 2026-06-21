@@ -467,6 +467,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         social_media_analysis: socialData,
         air_connectivity_analysis: airConnData,
         tariff_seasonality_analysis: tariffSeasonalityData,
+        telecom_coverage_analysis: telecomData,
+        urban_accessibility_analysis: accessibilityData,
+        health_infrastructure_analysis: healthData,
         autofill_run_state: getAutoFillSnapshot() as any,
       };
       
