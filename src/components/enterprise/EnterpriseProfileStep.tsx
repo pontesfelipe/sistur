@@ -350,6 +350,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         demand_trends_analysis: demandData,
         consolidated_reputation_analysis: reputationData,
         social_media_analysis: socialData,
+        air_connectivity_analysis: airConnData,
+        tariff_seasonality_analysis: tariffSeasonalityData,
       };
       
       const { data, error } = await supabase
