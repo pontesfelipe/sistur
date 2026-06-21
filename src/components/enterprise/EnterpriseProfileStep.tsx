@@ -34,6 +34,8 @@ import { PublicComplaintsSearch } from './PublicComplaintsSearch';
 import { CompetitorsAutoSearch } from './CompetitorsAutoSearch';
 import { SustainabilitySearch } from './SustainabilitySearch';
 import { PricingPositioningSearch } from './PricingPositioningSearch';
+import { LocalEventsSearch } from './LocalEventsSearch';
+import { TourismSafetySearch } from './TourismSafetySearch';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -84,6 +86,10 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [sustainabilityAutoFilled, setSustainabilityAutoFilled] = useState(false);
   const [pricingData, setPricingData] = useState<Record<string, any> | null>(null);
   const [pricingAutoFilled, setPricingAutoFilled] = useState(false);
+  const [eventsData, setEventsData] = useState<Record<string, any> | null>(null);
+  const [eventsAutoFilled, setEventsAutoFilled] = useState(false);
+  const [safetyData, setSafetyData] = useState<Record<string, any> | null>(null);
+  const [safetyAutoFilled, setSafetyAutoFilled] = useState(false);
 
   const handleReviewAutoFill = (values: Record<string, number>) => {
     setReviewAutoFilled(true);
@@ -140,6 +146,21 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   };
   const handlePricingCapture = (a: Record<string, any>) => setPricingData(a);
 
+  const handleEventsAutoFill = (values: Record<string, number>) => {
+    setEventsAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
+  const handleEventsCapture = (a: Record<string, any>) => setEventsData(a);
+  const handleSeasonalitySuggestion = (pattern: string, _peakMonths: number[]) => {
+    setFormData((prev) => (prev.seasonality ? prev : { ...prev, seasonality: pattern }));
+  };
+
+  const handleSafetyAutoFill = (values: Record<string, number>) => {
+    setSafetyAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
+  const handleSafetyCapture = (a: Record<string, any>) => setSafetyData(a);
+
   const handleCnpjValidated = ({ cnpj, record, yearsInOperation }: { cnpj: string; record: any; yearsInOperation: number | null }) => {
     setCnpjValue(cnpj);
     setCnpjData(record);
@@ -183,6 +204,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.digital_presence_analysis) setDigitalAnalysisData(ep.digital_presence_analysis);
       if (ep.sustainability_analysis) setSustainabilityData(ep.sustainability_analysis);
       if (ep.pricing_analysis) setPricingData(ep.pricing_analysis);
+      if (ep.events_analysis) setEventsData(ep.events_analysis);
+      if (ep.safety_analysis) setSafetyData(ep.safety_analysis);
     }
   }, [existingProfile]);
 
@@ -202,6 +225,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         cnpj_data: cnpjData,
         sustainability_analysis: sustainabilityData,
         pricing_analysis: pricingData,
+        events_analysis: eventsData,
+        safety_analysis: safetyData,
       };
       
       const { data, error } = await supabase
