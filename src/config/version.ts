@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 81,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.81.1",
+    date: "2026-06-21",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Enterprise — fix de deploy + auto-cascata. (1) As 15 edge functions de pré-preenchimento (search-digital-presence, search-destination-context, search-public-complaints, search-competitors, search-sustainability-signals, search-pricing-positioning, search-local-events, search-tourism-safety, search-climate-comfort, search-local-transport, search-brand-strength, search-demand-trends, search-consolidated-reputation, search-social-media, search-business-reviews) não tinham sido deployadas, o que causava 'Failed to send a request to the Edge Function' em todos os blocos exceto CNPJ. Todas foram deployadas. (2) Assim que a busca de Reviews (onde o usuário digita o nome do hotel) conclui com sucesso, o EnterpriseProfileStep dispara automaticamente o 'Rodar todos' uma única vez, executando os 13 blocos restantes em sequência sem clique adicional."
+    ]
+  },
   {
     version: "1.81.0",
     date: "2026-06-21",
