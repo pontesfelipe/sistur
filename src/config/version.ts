@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 83,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.83.1",
+    date: "2026-06-21",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Enterprise — fix bloco 'Eventos & Sazonalidade Local'. A edge function `search-local-events` selecionava `destinations.state` (coluna inexistente; o schema usa `uf`), o que retornava `dest` nulo e respondia 404 'Destino não encontrado'. Trocado para `uf` na query e na string de busca Firecrawl. Bônus defensivo: o filtro `.or()` em `observatory_events` agora só inclui `ibge_code.eq.<valor>` quando o destino tem IBGE — evita 400 do PostgREST em destinos sem código IBGE preenchido."
+    ]
+  },
   {
     version: "1.83.0",
     date: "2026-06-21",
