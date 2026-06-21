@@ -4341,6 +4341,7 @@ export type Database = {
         Row: {
           accessibility_features: string[] | null
           air_connectivity_analysis: Json | null
+          autofill_run_state: Json | null
           average_daily_rate: number | null
           average_occupancy_rate: number | null
           brand_strength_analysis: Json | null
@@ -4383,6 +4384,7 @@ export type Database = {
         Insert: {
           accessibility_features?: string[] | null
           air_connectivity_analysis?: Json | null
+          autofill_run_state?: Json | null
           average_daily_rate?: number | null
           average_occupancy_rate?: number | null
           brand_strength_analysis?: Json | null
@@ -4425,6 +4427,7 @@ export type Database = {
         Update: {
           accessibility_features?: string[] | null
           air_connectivity_analysis?: Json | null
+          autofill_run_state?: Json | null
           average_daily_rate?: number | null
           average_occupancy_rate?: number | null
           brand_strength_analysis?: Json | null
