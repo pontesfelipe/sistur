@@ -77,6 +77,38 @@ const PILLAR_CONFIG = {
   },
 };
 
+/**
+ * Mapa de proveniência por código de indicador para os 16 blocos de
+ * pré-preenchimento automático do Step 4 (Enterprise). Permite registrar
+ * em `enterprise_indicator_values.source` a fonte real de cada valor
+ * (Firecrawl/Open-Meteo/BrasilAPI/etc.) em vez de uma string genérica.
+ * Ver mem://features/enterprise/auto-fill-catalog
+ */
+const ENT_AUTOFILL_SOURCE_MAP: Record<string, string> = {
+  // Reviews / reputação
+  ENT_NPS: 'Reviews Online — Firecrawl + LLM (Auto)',
+  ENT_AVAL_GOOGLE: 'Reviews Online — Firecrawl + LLM (Auto)',
+  ENT_TAXA_SOLUCAO: 'Reclame Aqui / Procon — Firecrawl (Auto)',
+  ENT_COMP_GAP: 'Booking/TripAdvisor/Google — Firecrawl (Auto)',
+  ENT_REPUTACAO_CONSOLIDADA: 'Booking + Google + TripAdvisor + Airbnb — Firecrawl (Auto)',
+  // Presença e marca
+  ENT_PRESENCA_WEB: 'Presença Digital — Firecrawl (Auto)',
+  ENT_PRESENCA_DIGITAL: 'Instagram/Facebook/TikTok — Firecrawl (Auto)',
+  ENT_FORCA_MARCA: 'SERP / Mídia — Firecrawl (Auto)',
+  // Contexto territorial
+  ENT_CONTEXTO_DESTINO: 'IBGE/ANAC/ANATEL/Mapa Turismo (Auto)',
+  ENT_DEMANDA_EVENTOS: 'Agenda Cultural Local — Firecrawl (Auto)',
+  ENT_SEGURANCA_DESTINO: 'Segurança Turística — Firecrawl (Auto)',
+  ENT_CONFORTO_CLIMATICO: 'Open-Meteo ERA5 — 5 anos (Auto)',
+  ENT_TRANSPORTE_COBERTURA: 'Transporte Local — Firecrawl (Auto)',
+  // Mercado
+  ENT_POSICAO_PRECO: 'OTAs / Preço — Firecrawl (Auto)',
+  ENT_DEMANDA_INTERESSE: 'Demanda & Trends — Firecrawl (Auto)',
+  ENT_SUSTENTABILIDADE: 'Sinais de Sustentabilidade — Firecrawl (Auto)',
+  // Conformidade
+  ENT_COMPLIANCE_RATE: 'BrasilAPI / Receita Federal (Auto)',
+};
+
 export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initialAutoFillValues }: EnterpriseDataEntryPanelProps) {
   const { profile } = useProfile();
   
