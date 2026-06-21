@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 79,
+  minor: 80,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.80.0",
+    date: "2026-06-21",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — Step 4 (Pré-preenchimento) ganha painel-resumo no topo mostrando 'X/16 blocos preenchidos' com barra de progresso percentual e badges verdes para cada bloco já executado (Reviews, Presença Digital, Contexto Municipal, CNPJ, Reclamações, Concorrentes, Sustentabilidade, Preço/Posicionamento, Eventos Locais, Segurança, Clima/Conforto, Transporte, Força da Marca, Demanda/Trends, Reputação OTAs, Redes Sociais). Permite ao usuário ver de relance o quanto do perfil já foi automatizado antes de avançar para o preenchimento manual dos KPIs.",
+      "Catálogo final de blocos automáticos do Enterprise consolidado: 16 fontes externas integradas (Firecrawl, Open-Meteo ERA5, BrasilAPI/Receita Federal, IBGE, Reclame Aqui/Procon, Booking, TripAdvisor, Google Maps, Instagram, Facebook, TikTok, OTAs), 13 colunas JSONB de análise em 'enterprise_profiles' e 16 edge functions dedicadas — cobrindo perfil estrutural, reputação, contexto territorial, sustentabilidade, preço, demanda e presença digital.",
+    ],
+  },
   {
     version: "1.79.0",
     date: "2026-06-20",
