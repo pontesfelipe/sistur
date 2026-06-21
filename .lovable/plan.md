@@ -4,7 +4,7 @@ Hoje temos 18 blocos automáticos de pré-preenchimento + CNPJ. O que falta é e
 
 ---
 
-### Fase 1 — Validação e UX do fluxo atual (v1.83.0)
+### Fase 1 — Validação e UX do fluxo atual (v1.83.0) ✅
 
 Foco em deixar os 18 blocos existentes confiáveis antes de adicionar mais.
 
@@ -14,7 +14,7 @@ Foco em deixar os 18 blocos existentes confiáveis antes de adicionar mais.
 - **Auditoria de mapeamento**: script de verificação (rodado uma vez) que confere se cada bloco grava todos os `ENT_*` que declara e se não há indicador órfão entre catálogo e blocos.
 - **Estado persistente do "Rodar todos"**: progresso fica salvo em `enterprise_profiles` (campo `autofill_run_state` jsonb) para que se o usuário sair e voltar veja o que já rodou.
 
-### Fase 2 — Blocos contextuais extras (v1.84.0)
+### Fase 2 — Blocos contextuais extras (v1.84.0) ✅
 
 Cobertura externa marginal — adiciona 3 blocos novos, totalizando 21.
 
