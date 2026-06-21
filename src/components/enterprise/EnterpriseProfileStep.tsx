@@ -407,6 +407,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.social_media_analysis) setSocialData(ep.social_media_analysis);
       if (ep.air_connectivity_analysis) setAirConnData(ep.air_connectivity_analysis);
       if (ep.tariff_seasonality_analysis) setTariffSeasonalityData(ep.tariff_seasonality_analysis);
+      if (ep.autofill_run_state) hydrateAutoFillState(ep.autofill_run_state as AutoFillEntry[]);
     }
   }, [existingProfile]);
 
@@ -436,6 +437,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         social_media_analysis: socialData,
         air_connectivity_analysis: airConnData,
         tariff_seasonality_analysis: tariffSeasonalityData,
+        autofill_run_state: getAutoFillSnapshot() as any,
       };
       
       const { data, error } = await supabase
