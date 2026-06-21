@@ -48,6 +48,8 @@ export interface EnterpriseProfile {
   demand_trends_analysis: Record<string, any> | null;
   consolidated_reputation_analysis: Record<string, any> | null;
   social_media_analysis: Record<string, any> | null;
+  air_connectivity_analysis: Record<string, any> | null;
+  tariff_seasonality_analysis: Record<string, any> | null;
   created_at: string;
   updated_at: string;
 }

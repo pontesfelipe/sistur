@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 81,
-  patch: 1,
+  minor: 82,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.82.0",
+    date: "2026-06-21",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — 2 novos blocos automáticos elevam o total para 18. Bloco 20 'Conectividade Aérea': consome a tabela `anac_air_connectivity` (já ingerida pelo cron ANAC) via a edge function `search-air-connectivity` e classifica o destino em hub/forte/média/baixa/mínima conforme voos por semana, derivando ENT_CONECTIVIDADE_AEREA. Bloco 21 'Sazonalidade Tarifária' é derivado: cruza `demand_trends_analysis` (distribuição mensal), `events_analysis` (eventos locais) e `pricing_analysis` (ADR mensal) sem rede adicional, calcula amplitude pico-vs-baixa e atribui ENT_SAZONALIDADE_TARIFARIA. Migration adicionou as colunas `air_connectivity_analysis` e `tariff_seasonality_analysis` em `enterprise_profiles`. Ambos os blocos se auto-registram via useAutoFillRunner e participam do 'Rodar todos' + auto-cascata pós-reviews. Painel de resumo atualizado para 18 blocos."
+    ]
+  },
   {
     version: "1.81.1",
     date: "2026-06-21",
