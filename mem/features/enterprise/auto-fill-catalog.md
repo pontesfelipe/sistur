@@ -31,3 +31,9 @@ Cada bloco roda independentemente e persiste em uma coluna JSONB de `enterprise_
 **Secrets necessários:** `FIRECRAWL_API_KEY`, `LOVABLE_API_KEY` (para `beni-chat` em análises com LLM).
 
 **Constraint:** todo valor auto-preenchido deve ser editável pelo usuário antes da persistência final em `enterprise_indicator_values` (provenance = 'auto' até confirmação).
+## Blocos 17-18 (v1.82.0)
+
+| # | Bloco | Edge function | Coluna JSONB | Indicadores | Fonte |
+|---|-------|---------------|--------------|-------------|-------|
+| 17 | Conectividade Aérea | search-air-connectivity | air_connectivity_analysis | ENT_CONECTIVIDADE_AEREA | ANAC (tabela anac_air_connectivity) |
+| 18 | Sazonalidade Tarifária | (derivada client-side) | tariff_seasonality_analysis | ENT_SAZONALIDADE_TARIFARIA | Cruzamento demand + events + pricing |
