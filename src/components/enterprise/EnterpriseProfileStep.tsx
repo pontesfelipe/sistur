@@ -112,6 +112,10 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [reputationAutoFilled, setReputationAutoFilled] = useState(false);
   const [socialData, setSocialData] = useState<Record<string, any> | null>(null);
   const [socialAutoFilled, setSocialAutoFilled] = useState(false);
+  const [airConnData, setAirConnData] = useState<Record<string, any> | null>(null);
+  const [airConnAutoFilled, setAirConnAutoFilled] = useState(false);
+  const [tariffSeasonalityData, setTariffSeasonalityData] = useState<Record<string, any> | null>(null);
+  const [tariffSeasonalityAutoFilled, setTariffSeasonalityAutoFilled] = useState(false);
 
   // "Rodar todos": orquestra os blocos auto registrados via useAutoFillRunner
   const [runAllLoading, setRunAllLoading] = useState(false);
