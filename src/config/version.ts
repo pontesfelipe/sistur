@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 80,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.80.1",
+    date: "2026-06-21",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Enterprise — proveniência granular nos indicadores auto-preenchidos. Em vez de salvar todos os valores automáticos com a fonte genérica 'Reviews Online (Auto)', o EnterpriseDataEntryPanel agora consulta um mapa código→fonte (ENT_AUTOFILL_SOURCE_MAP) e grava em `enterprise_indicator_values.source` a origem real de cada indicador: 'Open-Meteo ERA5 — 5 anos (Auto)' para conforto climático, 'BrasilAPI / Receita Federal (Auto)' para compliance, 'Booking + Google + TripAdvisor + Airbnb — Firecrawl (Auto)' para reputação consolidada, e assim por diante para os 16 blocos. O campo já é consumido por generate-report, então a auditoria e o relatório passam a citar a fonte correta de cada indicador automaticamente.",
+    ],
+  },
   {
     version: "1.80.0",
     date: "2026-06-21",
