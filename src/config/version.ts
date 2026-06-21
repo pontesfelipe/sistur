@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 84,
+  minor: 85,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.85.0",
+    date: "2026-06-21",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — Fase 3 do plano de finalização: motor de cálculo + relatório Enterprise alinhados ao catálogo expandido. (1) Catálogo de indicadores Enterprise expandido: +29 indicadores ENT_* derivados/contextuais cadastrados em `enterprise_indicators` (códigos: ENT_AVAL_GOOGLE, ENT_REVIEW_VOL, ENT_GUEST_SATISFACTION, ENT_REPUTACAO_CONSOLIDADA, ENT_REPUTACAO_PUBLICA, ENT_TAXA_SOLUCAO, ENT_TAXA_SOLUCAO_RECLAMACOES, ENT_FORCA_MARCA, ENT_PRESENCA_DIGITAL, ENT_PRESENCA_WEB, ENT_DEMANDA_INTERESSE, ENT_DEMANDA_EVENTOS, ENT_EVENTOS_DENSIDADE, ENT_COMMISSION_AVG, ENT_DIRECT_SALES_PCT, ENT_DIARIA_MEDIA, ENT_POSICAO_PRECO, ENT_INDICE_PRECO, ENT_COMP_GAP, ENT_SAZONALIDADE_TARIFARIA, ENT_SEASONALITY_INDEX, ENT_CONTEXTO_DESTINO, ENT_CONFORTO_CLIMATICO, ENT_TRANSPORTE_COBERTURA, ENT_CONECTIVIDADE_AEREA, ENT_SEGURANCA_DESTINO, ENT_SEGURANCA_SCORE, ENT_SUSTENTABILIDADE, ENT_SUSTENTABILIDADE_SCORE), todos com pillar (RA/OE/AO), unit, benchmark_min/max/target, weight calibrado (0.3–0.7 conforme criticidade do sinal externo) e categoria mapeada (AO_SATISFACAO, AO_QUALIDADE, AO_MARKETING, AO_OCUPACAO, OE_INFRAESTRUTURA, RA_CERTIFICACOES). (2) Normalização min-max já aplicada pelo `calculate-assessment` agora cobre os 21 blocos + indicadores derivados: valores ENT_* preenchidos pelos blocos auto-fill são reconhecidos pela função e contribuem para o score por pilar. (3) Trigger de cálculo a 50% confirmado: `EnterpriseDataEntryPanel` já marca `assessments.status='DATA_READY'` ao atingir 50% de cobertura e o botão 'Salvar e Calcular Índices' fica habilitado, encaminhando para o pipeline assíncrono `calculate-assessment` → `assessment_calc_jobs`. (4) Relatório AI no modo Enterprise validado: `generate-report` já injeta `getEnterpriseSystemPrompt`, `formatEnterpriseProfile` e `formatEnterpriseValues` quando `assessment.diagnostic_type='enterprise'`, com prompts I-RA/I-OE/I-AO específicos (Responsabilidade Ambiental, qualidade/satisfação/ocupação, governança/finanças/tecnologia) e Semantic Layer filtrada por `applies_to=enterprise`. (5) Snapshot da rodada: `diagnosis_data_snapshots` continua sendo gravado no momento do cálculo com o estado completo dos blocos (regra 'snapshots não retroativos' preservada). (6) Status visual Adequado/Atenção/Crítico renderiza para Enterprise nos mesmos componentes (`SeverityBadge`, `pillar_scores`) já compartilhados Territorial/Enterprise."
+    ]
+  },
   {
     version: "1.84.0",
     date: "2026-06-21",
