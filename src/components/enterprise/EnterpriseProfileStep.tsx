@@ -264,6 +264,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const handleSocialAutoFill = (v: Record<string, number>) => { setSocialAutoFilled(true); onReviewAutoFill?.(v); };
   const handleSocialCapture = (a: Record<string, any>) => setSocialData(a);
 
+  const handleAirConnAutoFill = (v: Record<string, number>) => { setAirConnAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleAirConnCapture = (a: Record<string, any>) => setAirConnData(a);
+
+  const handleTariffSeasonalityAutoFill = (v: Record<string, number>) => { setTariffSeasonalityAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleTariffSeasonalityCapture = (a: Record<string, any>) => setTariffSeasonalityData(a);
+
   const handleCnpjValidated = ({ cnpj, record, yearsInOperation }: { cnpj: string; record: any; yearsInOperation: number | null }) => {
     setCnpjValue(cnpj);
     setCnpjData(record);
