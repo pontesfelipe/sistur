@@ -4351,6 +4351,7 @@ export type Database = {
           destination_id: string
           digital_presence_analysis: Json | null
           employee_count: number | null
+          events_analysis: Json | null
           id: string
           notes: string | null
           org_id: string
@@ -4360,6 +4361,7 @@ export type Database = {
           property_type: string
           review_analysis: Json | null
           room_count: number | null
+          safety_analysis: Json | null
           seasonality: string | null
           star_rating: number | null
           suite_count: number | null
@@ -4383,6 +4385,7 @@ export type Database = {
           destination_id: string
           digital_presence_analysis?: Json | null
           employee_count?: number | null
+          events_analysis?: Json | null
           id?: string
           notes?: string | null
           org_id: string
@@ -4392,6 +4395,7 @@ export type Database = {
           property_type?: string
           review_analysis?: Json | null
           room_count?: number | null
+          safety_analysis?: Json | null
           seasonality?: string | null
           star_rating?: number | null
           suite_count?: number | null
@@ -4415,6 +4419,7 @@ export type Database = {
           destination_id?: string
           digital_presence_analysis?: Json | null
           employee_count?: number | null
+          events_analysis?: Json | null
           id?: string
           notes?: string | null
           org_id?: string
@@ -4424,6 +4429,7 @@ export type Database = {
           property_type?: string
           review_analysis?: Json | null
           room_count?: number | null
+          safety_analysis?: Json | null
           seasonality?: string | null
           star_rating?: number | null
           suite_count?: number | null
