@@ -87,6 +87,8 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
     }
   };
 
+  useAutoFillRunner('digital-presence', runSearch);
+
   const renderOk = (ok: boolean) =>
     ok ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-muted-foreground/40" />;
 
