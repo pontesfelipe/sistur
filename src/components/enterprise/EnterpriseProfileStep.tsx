@@ -162,6 +162,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.cnpj_data) setCnpjData(ep.cnpj_data);
       if (ep.context_analysis) setContextAnalysisData(ep.context_analysis);
       if (ep.complaints_analysis) setComplaintsAnalysisData(ep.complaints_analysis);
+      if (ep.digital_presence_analysis) setDigitalAnalysisData(ep.digital_presence_analysis);
     }
   }, [existingProfile]);
 
