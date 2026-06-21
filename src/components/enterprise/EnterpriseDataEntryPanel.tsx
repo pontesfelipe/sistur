@@ -107,6 +107,9 @@ const ENT_AUTOFILL_SOURCE_MAP: Record<string, string> = {
   ENT_SUSTENTABILIDADE: 'Sinais de Sustentabilidade — Firecrawl (Auto)',
   // Conformidade
   ENT_COMPLIANCE_RATE: 'BrasilAPI / Receita Federal (Auto)',
+  // Conectividade e sazonalidade
+  ENT_CONECTIVIDADE_AEREA: 'ANAC — Voos e Passageiros 12m (Auto)',
+  ENT_SAZONALIDADE_TARIFARIA: 'Derivado: Demanda + Eventos + ADR (Auto)',
 };
 
 export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initialAutoFillValues }: EnterpriseDataEntryPanelProps) {
