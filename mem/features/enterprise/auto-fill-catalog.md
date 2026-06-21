@@ -47,3 +47,19 @@ Cada bloco roda independentemente e persiste em uma coluna JSONB de `enterprise_
 | 21 | Infra. de Saúde do Entorno | search-health-infrastructure | health_infrastructure_analysis | ENT_SAUDE_ENTORNO | DATASUS/CNES (tabela datasus_health_cache) — composto 50% leitos/1k (ref. OMS 3/1k) + 30% PS 24h + 20% nº hospitais |
 
 Todos os 3 retornam `{ no_data: true, reason }` quando a fonte está vazia; o componente lança `NoDataError(reason)` e o orquestrador mostra badge âmbar "sem informações disponíveis — {causa}" (reuso da v1.83.2).
+
+## Sincronização do catálogo unificado (v1.87.0)
+
+A Fase 3 cadastrou 30 indicadores `ENT_*` derivados/contextuais APENAS em `enterprise_indicators` (catálogo legado). O motor `calculate-assessment` prioriza a tabela unificada `public.indicators` filtrando por `indicator_scope IN ('enterprise','both')`, então valores coletados pelos blocos automáticos para esses códigos eram descartados silenciosamente (não entravam em score por pilar nem na linhagem `indicator_calculation_trail`).
+
+**Correção (v1.87.0):** migration de sincronização populou os 30 códigos em `public.indicators` copiando do catálogo legado:
+- Pilar (RA/OE/AO), benchmarks (min/max/target), peso e tier preservados.
+- `data_source = 'CALCULATED'`, `collection_type = 'AUTOMATICA'`, `indicator_scope = 'enterprise'`.
+- `theme` = nome da categoria Enterprise (Satisfação do Hóspede, Marketing & Vendas, Ocupação & Receita, Infraestrutura, Sustentabilidade).
+- Operação idempotente (`NOT EXISTS`) — não altera indicadores já presentes.
+
+**Total Enterprise no catálogo unificado:** 73 códigos `ENT_*` (43 anteriores + 30 sincronizados).
+
+**Indicadores 100% derivados (calculados pelo próprio `calculate-assessment`):** `ENT_COMMISSION_AVG`, `ENT_DIRECT_SALES_PCT`, `ENT_SEASONALITY_INDEX`, `ENT_COMP_GAP`, `ENT_COMPLIANCE_RATE`. Esses são injetados em tempo de cálculo a partir de `enterprise_distribution_channels`, `enterprise_seasonality_months`, `enterprise_competitors` e `enterprise_compliance_items` — **não exigem entrada manual nem auto-fill via Firecrawl** (evita duplicidade). A flag `data_source='CALCULATED'` no catálogo serve de sinal para a UI marcar esses campos como informativos.
+
+**Regra anti-duplicidade:** códigos `ENT_*` com `data_source='CALCULATED'` ou `'AUTOMATICA'` não devem ser editados manualmente pelo usuário — a fonte autoritativa é o bloco automático (provenance gravada em `enterprise_indicator_values.source`) ou a derivação do motor.
