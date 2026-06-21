@@ -4355,6 +4355,7 @@ export type Database = {
           notes: string | null
           org_id: string
           peak_months: string[] | null
+          pricing_analysis: Json | null
           primary_source_markets: string[] | null
           property_type: string
           review_analysis: Json | null
@@ -4362,6 +4363,7 @@ export type Database = {
           seasonality: string | null
           star_rating: number | null
           suite_count: number | null
+          sustainability_analysis: Json | null
           sustainability_initiatives: string[] | null
           target_market: string[] | null
           total_capacity: number | null
@@ -4385,6 +4387,7 @@ export type Database = {
           notes?: string | null
           org_id: string
           peak_months?: string[] | null
+          pricing_analysis?: Json | null
           primary_source_markets?: string[] | null
           property_type?: string
           review_analysis?: Json | null
@@ -4392,6 +4395,7 @@ export type Database = {
           seasonality?: string | null
           star_rating?: number | null
           suite_count?: number | null
+          sustainability_analysis?: Json | null
           sustainability_initiatives?: string[] | null
           target_market?: string[] | null
           total_capacity?: number | null
@@ -4415,6 +4419,7 @@ export type Database = {
           notes?: string | null
           org_id?: string
           peak_months?: string[] | null
+          pricing_analysis?: Json | null
           primary_source_markets?: string[] | null
           property_type?: string
           review_analysis?: Json | null
@@ -4422,6 +4427,7 @@ export type Database = {
           seasonality?: string | null
           star_rating?: number | null
           suite_count?: number | null
+          sustainability_analysis?: Json | null
           sustainability_initiatives?: string[] | null
           target_market?: string[] | null
           total_capacity?: number | null

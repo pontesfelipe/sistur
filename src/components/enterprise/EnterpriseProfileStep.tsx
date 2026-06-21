@@ -32,6 +32,8 @@ import { DestinationContextSearch } from './DestinationContextSearch';
 import { CnpjValidationSearch } from './CnpjValidationSearch';
 import { PublicComplaintsSearch } from './PublicComplaintsSearch';
 import { CompetitorsAutoSearch } from './CompetitorsAutoSearch';
+import { SustainabilitySearch } from './SustainabilitySearch';
+import { PricingPositioningSearch } from './PricingPositioningSearch';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -78,6 +80,10 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [cnpjData, setCnpjData] = useState<Record<string, any> | null>(null);
   const [cnpjValue, setCnpjValue] = useState<string | null>(null);
   const [competitorsCount, setCompetitorsCount] = useState<number | null>(null);
+  const [sustainabilityData, setSustainabilityData] = useState<Record<string, any> | null>(null);
+  const [sustainabilityAutoFilled, setSustainabilityAutoFilled] = useState(false);
+  const [pricingData, setPricingData] = useState<Record<string, any> | null>(null);
+  const [pricingAutoFilled, setPricingAutoFilled] = useState(false);
 
   const handleReviewAutoFill = (values: Record<string, number>) => {
     setReviewAutoFilled(true);
@@ -122,6 +128,18 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   };
   const handleComplaintsCapture = (a: Record<string, any>) => setComplaintsAnalysisData(a);
 
+  const handleSustainabilityAutoFill = (values: Record<string, number>) => {
+    setSustainabilityAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
+  const handleSustainabilityCapture = (a: Record<string, any>) => setSustainabilityData(a);
+
+  const handlePricingAutoFill = (values: Record<string, number>) => {
+    setPricingAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
+  const handlePricingCapture = (a: Record<string, any>) => setPricingData(a);
+
   const handleCnpjValidated = ({ cnpj, record, yearsInOperation }: { cnpj: string; record: any; yearsInOperation: number | null }) => {
     setCnpjValue(cnpj);
     setCnpjData(record);
@@ -163,6 +181,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.context_analysis) setContextAnalysisData(ep.context_analysis);
       if (ep.complaints_analysis) setComplaintsAnalysisData(ep.complaints_analysis);
       if (ep.digital_presence_analysis) setDigitalAnalysisData(ep.digital_presence_analysis);
+      if (ep.sustainability_analysis) setSustainabilityData(ep.sustainability_analysis);
+      if (ep.pricing_analysis) setPricingData(ep.pricing_analysis);
     }
   }, [existingProfile]);
 
@@ -180,6 +200,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         complaints_analysis: complaintsAnalysisData,
         cnpj: cnpjValue,
         cnpj_data: cnpjData,
+        sustainability_analysis: sustainabilityData,
+        pricing_analysis: pricingData,
       };
       
       const { data, error } = await supabase
@@ -430,6 +452,68 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       </Card>
 
       {/* 2) Perfil do Empreendimento (ABAIXO do pré-preenchimento) */}
+      {/* 1.10) Sustentabilidade & ESG */}
+      <Card className="border-green-500/30 bg-gradient-to-br from-green-50/50 to-emerald-50/30 dark:from-green-950/20 dark:to-emerald-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-green-500/10">
+              <Sparkles className="h-5 w-5 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Sustentabilidade & Acessibilidade
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Certificações ESG, práticas sustentáveis e acessibilidade detectadas no site e em fontes públicas</CardDescription>
+            </div>
+            {sustainabilityAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <SustainabilitySearch
+            businessName={destinationName}
+            location={destinationName}
+            onAutoFill={handleSustainabilityAutoFill}
+            onAnalysisCapture={handleSustainabilityCapture}
+          />
+        </CardContent>
+      </Card>
+
+      {/* 1.11) Posicionamento de Preço */}
+      <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-50/50 to-amber-50/30 dark:from-yellow-950/20 dark:to-amber-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-yellow-500/10">
+              <Sparkles className="h-5 w-5 text-yellow-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Posicionamento de Preço (ADR)
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Diária média estimada vs mercado a partir de OTAs públicas (Booking, Google, Hoteis.com)</CardDescription>
+            </div>
+            {pricingAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <PricingPositioningSearch
+            businessName={destinationName}
+            location={destinationName}
+            onAutoFill={handlePricingAutoFill}
+            onAnalysisCapture={handlePricingCapture}
+          />
+        </CardContent>
+      </Card>
+
       <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardHeader>
           <div className="flex items-center gap-3">
