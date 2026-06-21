@@ -1819,6 +1819,54 @@ export type Database = {
         }
         Relationships: []
       }
+      datasus_health_cache: {
+        Row: {
+          beds_per_1k_inhabitants: number | null
+          created_at: string
+          emergency_units: number | null
+          has_24h_emergency: boolean | null
+          ibge_code: string
+          id: string
+          notes: string | null
+          reference_year: number | null
+          source: string | null
+          total_beds: number | null
+          total_establishments: number | null
+          total_hospitals: number | null
+          updated_at: string
+        }
+        Insert: {
+          beds_per_1k_inhabitants?: number | null
+          created_at?: string
+          emergency_units?: number | null
+          has_24h_emergency?: boolean | null
+          ibge_code: string
+          id?: string
+          notes?: string | null
+          reference_year?: number | null
+          source?: string | null
+          total_beds?: number | null
+          total_establishments?: number | null
+          total_hospitals?: number | null
+          updated_at?: string
+        }
+        Update: {
+          beds_per_1k_inhabitants?: number | null
+          created_at?: string
+          emergency_units?: number | null
+          has_24h_emergency?: boolean | null
+          ibge_code?: string
+          id?: string
+          notes?: string | null
+          reference_year?: number | null
+          source?: string | null
+          total_beds?: number | null
+          total_establishments?: number | null
+          total_hospitals?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       destination_certification_levels: {
         Row: {
           active: boolean
@@ -4358,6 +4406,7 @@ export type Database = {
           digital_presence_analysis: Json | null
           employee_count: number | null
           events_analysis: Json | null
+          health_infrastructure_analysis: Json | null
           id: string
           notes: string | null
           org_id: string
@@ -4376,9 +4425,11 @@ export type Database = {
           sustainability_initiatives: string[] | null
           target_market: string[] | null
           tariff_seasonality_analysis: Json | null
+          telecom_coverage_analysis: Json | null
           total_capacity: number | null
           transport_analysis: Json | null
           updated_at: string
+          urban_accessibility_analysis: Json | null
           years_in_operation: number | null
         }
         Insert: {
@@ -4401,6 +4452,7 @@ export type Database = {
           digital_presence_analysis?: Json | null
           employee_count?: number | null
           events_analysis?: Json | null
+          health_infrastructure_analysis?: Json | null
           id?: string
           notes?: string | null
           org_id: string
@@ -4419,9 +4471,11 @@ export type Database = {
           sustainability_initiatives?: string[] | null
           target_market?: string[] | null
           tariff_seasonality_analysis?: Json | null
+          telecom_coverage_analysis?: Json | null
           total_capacity?: number | null
           transport_analysis?: Json | null
           updated_at?: string
+          urban_accessibility_analysis?: Json | null
           years_in_operation?: number | null
         }
         Update: {
@@ -4444,6 +4498,7 @@ export type Database = {
           digital_presence_analysis?: Json | null
           employee_count?: number | null
           events_analysis?: Json | null
+          health_infrastructure_analysis?: Json | null
           id?: string
           notes?: string | null
           org_id?: string
@@ -4462,9 +4517,11 @@ export type Database = {
           sustainability_initiatives?: string[] | null
           target_market?: string[] | null
           tariff_seasonality_analysis?: Json | null
+          telecom_coverage_analysis?: Json | null
           total_capacity?: number | null
           transport_analysis?: Json | null
           updated_at?: string
+          urban_accessibility_analysis?: Json | null
           years_in_operation?: number | null
         }
         Relationships: [
