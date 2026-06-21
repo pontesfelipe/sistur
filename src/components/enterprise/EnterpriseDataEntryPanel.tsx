@@ -336,12 +336,20 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
     const indicatorById = new Map((indicators || []).map(i => [i.id, i]));
     const values = Object.entries(localValues)
       .filter(([_, value]) => value !== '')
-      .map(([indicatorId, value]) => ({
-        assessment_id: assessmentId,
-        indicator_id: indicatorId,
-        value_raw: parseLocalValue(value, indicatorById.get(indicatorId)),
-        source: autoFilledIds.has(indicatorId) ? 'Reviews Online (Auto)' : 'Manual (Enterprise)',
-      }));
+      .map(([indicatorId, value]) => {
+        const ind = indicatorById.get(indicatorId) as any;
+        const code = ind?.code as string | undefined;
+        const isAuto = autoFilledIds.has(indicatorId);
+        const source = isAuto
+          ? (code && ENT_AUTOFILL_SOURCE_MAP[code]) || 'Pré-preenchimento Automático (Auto)'
+          : 'Manual (Enterprise)';
+        return {
+          assessment_id: assessmentId,
+          indicator_id: indicatorId,
+          value_raw: parseLocalValue(value, indicatorById.get(indicatorId)),
+          source,
+        };
+      });
     
     await bulkUpsertValues.mutateAsync(values);
     
