@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 86,
+  minor: 87,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.87.0",
+    date: "2026-06-21",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — sincronização do catálogo unificado e linhagem de dados (pós-Fase 3). (1) Auditoria identificou 30 indicadores `ENT_*` (criados pela Fase 3 em `enterprise_indicators`) que NÃO estavam registrados no catálogo unificado `indicators` — o motor de cálculo `calculate-assessment` prioriza a tabela unificada via filtro `indicator_scope IN ('enterprise','both')`, portanto valores coletados pelos blocos automáticos para esses códigos eram silenciosamente descartados (não entravam em score por pilar nem na trilha de auditoria). (2) Migration de sincronização: insere os 30 códigos faltantes em `public.indicators` copiando pilar, benchmarks, peso, tier e unidade do catálogo legado, com `data_source='CALCULATED'`, `collection_type='AUTOMATICA'`, `indicator_scope='enterprise'`, `theme=` nome da categoria Enterprise (Satisfação do Hóspede, Marketing & Vendas, Ocupação & Receita, Infraestrutura, Sustentabilidade). Códigos sincronizados: ENT_AVAL_GOOGLE, ENT_REPUTACAO_CONSOLIDADA, ENT_REPUTACAO_PUBLICA, ENT_TAXA_SOLUCAO, ENT_TAXA_SOLUCAO_RECLAMACOES, ENT_FORCA_MARCA, ENT_PRESENCA_DIGITAL, ENT_PRESENCA_WEB, ENT_DEMANDA_INTERESSE, ENT_DEMANDA_EVENTOS, ENT_EVENTOS_DENSIDADE, ENT_COMMISSION_AVG, ENT_DIRECT_SALES_PCT, ENT_DIARIA_MEDIA, ENT_POSICAO_PRECO, ENT_INDICE_PRECO, ENT_COMP_GAP, ENT_SAZONALIDADE_TARIFARIA, ENT_SEASONALITY_INDEX, ENT_CONTEXTO_DESTINO, ENT_CONFORTO_CLIMATICO, ENT_TRANSPORTE_COBERTURA, ENT_CONECTIVIDADE_AEREA, ENT_SEGURANCA_DESTINO, ENT_SEGURANCA_SCORE, ENT_CONECTIVIDADE_TELECOM, ENT_ACESSIBILIDADE_SCORE, ENT_SAUDE_ENTORNO, ENT_SUSTENTABILIDADE, ENT_SUSTENTABILIDADE_SCORE. (3) Após a sincronização, `indicators` passa de 43 para 73 códigos `ENT_*` e o painel manual `EnterpriseDataEntryPanel` (que consome `useIndicators({scope:'enterprise'})`) já os renderiza com a badge de proveniência correta via `ENT_AUTOFILL_SOURCE_MAP`. (4) Linhagem de dados (`indicator_calculation_trail`) agora cobre todos os indicadores automáticos: cada valor `ENT_*` gravado pelos blocos referencia o `indicator_id` correto e participa do score por pilar. (5) Indicadores 100% derivados (calculados pelo próprio `calculate-assessment` a partir de outras tabelas — `ENT_COMMISSION_AVG`, `ENT_DIRECT_SALES_PCT`, `ENT_SEASONALITY_INDEX`, `ENT_COMP_GAP`, `ENT_COMPLIANCE_RATE`) continuam sendo INJETADOS no momento do cálculo (não exigem entrada manual). Para evitar duplicidade, esses códigos têm `data_source='CALCULATED'` no catálogo unificado e a UI usa essa flag como sinal de campo informativo (não bloqueante). (6) Nenhuma alteração de schema — apenas população idempotente do catálogo (`NOT EXISTS` para evitar duplicatas)."
+    ]
+  },
   {
     version: "1.86.0",
     date: "2026-06-21",
