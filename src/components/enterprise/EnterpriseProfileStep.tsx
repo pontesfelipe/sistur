@@ -44,6 +44,9 @@ import { ConsolidatedReputationSearch } from './ConsolidatedReputationSearch';
 import { SocialMediaSearch } from './SocialMediaSearch';
 import { AirConnectivitySearch } from './AirConnectivitySearch';
 import { TariffSeasonalitySearch } from './TariffSeasonalitySearch';
+import { TelecomCoverageSearch } from './TelecomCoverageSearch';
+import { UrbanAccessibilitySearch } from './UrbanAccessibilitySearch';
+import { HealthInfrastructureSearch } from './HealthInfrastructureSearch';
 import {
   runAllAutoFills,
   runOneAutoFill,
@@ -124,6 +127,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [airConnAutoFilled, setAirConnAutoFilled] = useState(false);
   const [tariffSeasonalityData, setTariffSeasonalityData] = useState<Record<string, any> | null>(null);
   const [tariffSeasonalityAutoFilled, setTariffSeasonalityAutoFilled] = useState(false);
+  const [telecomData, setTelecomData] = useState<Record<string, any> | null>(null);
+  const [telecomAutoFilled, setTelecomAutoFilled] = useState(false);
+  const [accessibilityData, setAccessibilityData] = useState<Record<string, any> | null>(null);
+  const [accessibilityAutoFilled, setAccessibilityAutoFilled] = useState(false);
+  const [healthData, setHealthData] = useState<Record<string, any> | null>(null);
+  const [healthAutoFilled, setHealthAutoFilled] = useState(false);
 
   // "Rodar todos": orquestra os blocos auto registrados via useAutoFillRunner
   const [runAllLoading, setRunAllLoading] = useState(false);
@@ -150,6 +159,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     social: { label: 'Redes Sociais', source: 'Instagram + Facebook + TikTok' },
     air: { label: 'Conectividade Aérea', source: 'ANAC (anac_air_connectivity)' },
     tariff: { label: 'Sazonalidade Tarifária', source: 'Derivado: demanda + eventos + ADR' },
+    telecom: { label: 'Conectividade Telecom', source: 'Anatel (anatel_coverage_cache)' },
+    accessibility: { label: 'Acessibilidade Urbana', source: 'Firecrawl web search (5 dimensões)' },
+    health: { label: 'Infra. de Saúde do Entorno', source: 'DATASUS/CNES (datasus_health_cache)' },
   };
   useEffect(() => {
     Object.entries(BLOCK_META).forEach(([id, m]) => setAutoFillMeta(id, m));
@@ -261,6 +273,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     { key: 'social', label: 'Redes Sociais', done: socialAutoFilled },
     { key: 'air', label: 'Conectividade Aérea', done: airConnAutoFilled },
     { key: 'tariff', label: 'Sazonalidade Tarifária', done: tariffSeasonalityAutoFilled },
+    { key: 'telecom', label: 'Telecom', done: telecomAutoFilled },
+    { key: 'accessibility', label: 'Acessibilidade', done: accessibilityAutoFilled },
+    { key: 'health', label: 'Saúde do Entorno', done: healthAutoFilled },
   ];
   const autoFillDone = autoFillFlags.filter((b) => b.done).length;
   const autoFillTotal = autoFillFlags.length;
@@ -360,6 +375,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const handleTariffSeasonalityAutoFill = (v: Record<string, number>) => { setTariffSeasonalityAutoFilled(true); onReviewAutoFill?.(v); };
   const handleTariffSeasonalityCapture = (a: Record<string, any>) => setTariffSeasonalityData(a);
 
+  const handleTelecomAutoFill = (v: Record<string, number>) => { setTelecomAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleTelecomCapture = (a: Record<string, any>) => setTelecomData(a);
+
+  const handleAccessibilityAutoFill = (v: Record<string, number>) => { setAccessibilityAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleAccessibilityCapture = (a: Record<string, any>) => setAccessibilityData(a);
+
+  const handleHealthAutoFill = (v: Record<string, number>) => { setHealthAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleHealthCapture = (a: Record<string, any>) => setHealthData(a);
+
   const handleCnpjValidated = ({ cnpj, record, yearsInOperation }: { cnpj: string; record: any; yearsInOperation: number | null }) => {
     setCnpjValue(cnpj);
     setCnpjData(record);
@@ -413,6 +437,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.social_media_analysis) setSocialData(ep.social_media_analysis);
       if (ep.air_connectivity_analysis) setAirConnData(ep.air_connectivity_analysis);
       if (ep.tariff_seasonality_analysis) setTariffSeasonalityData(ep.tariff_seasonality_analysis);
+      if (ep.telecom_coverage_analysis) setTelecomData(ep.telecom_coverage_analysis);
+      if (ep.urban_accessibility_analysis) setAccessibilityData(ep.urban_accessibility_analysis);
+      if (ep.health_infrastructure_analysis) setHealthData(ep.health_infrastructure_analysis);
       if (ep.autofill_run_state) hydrateAutoFillState(ep.autofill_run_state as AutoFillEntry[]);
     }
   }, [existingProfile]);
@@ -443,6 +470,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         social_media_analysis: socialData,
         air_connectivity_analysis: airConnData,
         tariff_seasonality_analysis: tariffSeasonalityData,
+        telecom_coverage_analysis: telecomData,
+        urban_accessibility_analysis: accessibilityData,
+        health_infrastructure_analysis: healthData,
         autofill_run_state: getAutoFillSnapshot() as any,
       };
       
@@ -1100,6 +1130,72 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             onAutoFill={handleTariffSeasonalityAutoFill}
             onAnalysisCapture={handleTariffSeasonalityCapture}
           />
+        </CardContent>
+      </Card>
+
+      {/* 1.22) Conectividade Telecom (Anatel) */}
+      <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-blue-50/30 dark:from-cyan-950/20 dark:to-blue-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-cyan-500/10"><Sparkles className="h-5 w-5 text-cyan-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Conectividade Telecom
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Anatel — cobertura 4G, 5G e Wi-Fi público do município (afeta PMS cloud, OTA mobile e check-in digital)</CardDescription>
+            </div>
+            {telecomAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <TelecomCoverageSearch destinationId={destinationId} onAutoFill={handleTelecomAutoFill} onAnalysisCapture={handleTelecomCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.23) Acessibilidade Urbana */}
+      <Card className="border-indigo-500/30 bg-gradient-to-br from-indigo-50/50 to-violet-50/30 dark:from-indigo-950/20 dark:to-violet-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-indigo-500/10"><Sparkles className="h-5 w-5 text-indigo-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Acessibilidade Urbana
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Pesquisa web por evidências de calçadas, rampas, sinalização tátil, transporte acessível e atrativos PCD no município</CardDescription>
+            </div>
+            {accessibilityAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <UrbanAccessibilitySearch destinationId={destinationId} onAutoFill={handleAccessibilityAutoFill} onAnalysisCapture={handleAccessibilityCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.24) Infraestrutura de Saúde do Entorno (DATASUS) */}
+      <Card className="border-rose-500/30 bg-gradient-to-br from-rose-50/50 to-pink-50/30 dark:from-rose-950/20 dark:to-pink-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-rose-500/10"><Sparkles className="h-5 w-5 text-rose-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Infraestrutura de Saúde do Entorno
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>DATASUS/CNES — hospitais, leitos, pronto-socorro 24h e densidade por 1k habitantes do município</CardDescription>
+            </div>
+            {healthAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <HealthInfrastructureSearch destinationId={destinationId} onAutoFill={handleHealthAutoFill} onAnalysisCapture={handleHealthCapture} />
         </CardContent>
       </Card>
 

@@ -1,6 +1,6 @@
 ---
 name: Enterprise Auto-Fill Catalog
-description: Catálogo dos 16 blocos automáticos de pré-preenchimento do Step 4 do diagnóstico Enterprise — fontes, edge functions, colunas JSONB e indicadores ENT_* alimentados
+description: Catálogo dos 21 blocos automáticos de pré-preenchimento do Step 4 do diagnóstico Enterprise — fontes, edge functions, colunas JSONB e indicadores ENT_* alimentados
 type: feature
 ---
 # Catálogo de Blocos Automáticos — Enterprise Step 4
@@ -37,3 +37,13 @@ Cada bloco roda independentemente e persiste em uma coluna JSONB de `enterprise_
 |---|-------|---------------|--------------|-------------|-------|
 | 17 | Conectividade Aérea | search-air-connectivity | air_connectivity_analysis | ENT_CONECTIVIDADE_AEREA | ANAC (tabela anac_air_connectivity) |
 | 18 | Sazonalidade Tarifária | (derivada client-side) | tariff_seasonality_analysis | ENT_SAZONALIDADE_TARIFARIA | Cruzamento demand + events + pricing |
+
+## Blocos 19-21 (v1.84.0 — Fase 2)
+
+| # | Bloco | Edge function | Coluna JSONB | Indicadores | Fonte |
+|---|-------|---------------|--------------|-------------|-------|
+| 19 | Conectividade Telecom | search-telecom-coverage | telecom_coverage_analysis | ENT_CONECTIVIDADE_TELECOM | Anatel (tabela anatel_coverage_cache) — composto 50% 4G + 30% 5G + 20% Wi-Fi público |
+| 20 | Acessibilidade Urbana | search-urban-accessibility | urban_accessibility_analysis | ENT_ACESSIBILIDADE_SCORE | Firecrawl /v2/search em 5 dimensões (calçada, piso tátil, atrativos PCD, transporte, banheiro adaptado) |
+| 21 | Infra. de Saúde do Entorno | search-health-infrastructure | health_infrastructure_analysis | ENT_SAUDE_ENTORNO | DATASUS/CNES (tabela datasus_health_cache) — composto 50% leitos/1k (ref. OMS 3/1k) + 30% PS 24h + 20% nº hospitais |
+
+Todos os 3 retornam `{ no_data: true, reason }` quando a fonte está vazia; o componente lança `NoDataError(reason)` e o orquestrador mostra badge âmbar "sem informações disponíveis — {causa}" (reuso da v1.83.2).

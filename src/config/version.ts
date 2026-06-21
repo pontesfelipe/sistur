@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 83,
-  patch: 2,
+  minor: 84,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.84.0",
+    date: "2026-06-21",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Enterprise — Fase 2 do plano de finalização: +3 blocos contextuais (total 21 + CNPJ). (1) Bloco 19 · Conectividade Telecom: nova edge function `search-telecom-coverage` lê `anatel_coverage_cache` por IBGE e deriva `ENT_CONECTIVIDADE_TELECOM` via composto 50% 4G + 30% 5G + 20% Wi-Fi público (tiers excelente/boa/média/baixa/crítica). (2) Bloco 22 · Acessibilidade Urbana: nova edge function `search-urban-accessibility` pesquisa 5 dimensões (calçada/rampa, piso tátil, atrativos PCD, transporte acessível, banheiro adaptado) via Firecrawl /v2/search, pondera por nº de hits e popula `ENT_ACESSIBILIDADE_SCORE`. (3) Bloco 23 · Infraestrutura de Saúde: nova edge function `search-health-infrastructure` lê novo cache `datasus_health_cache` (hospitais, leitos, leitos/1k, PS 24h) e popula `ENT_SAUDE_ENTORNO` via composto 50% leitos/1k (ref. OMS 3/1k) + 30% PS 24h + 20% nº hospitais. (4) Migration: 3 novos indicadores em `enterprise_indicators` (categoria OE_INFRAESTRUTURA), 3 colunas JSONB em `enterprise_profiles` (telecom_coverage_analysis, urban_accessibility_analysis, health_infrastructure_analysis), nova tabela `datasus_health_cache` com RLS pública de leitura e escrita restrita a service_role. (5) Cada bloco se auto-registra via `useAutoFillRunner` ('telecom', 'accessibility', 'health'), participa do 'Rodar todos' e da auto-cascata pós-reviews, com fonte exibida em badge e estado sem dados em âmbar (reuso da Fase 1.83.2). (6) Quando a fonte está vazia, a edge function retorna `{ no_data: true, reason }` e o componente lança `NoDataError(reason)` — orquestrador exibe 'sem informações disponíveis' com a causa exata (ex.: 'Município X/UF ainda não está no cache Anatel')."
+    ]
+  },
   {
     version: "1.83.2",
     date: "2026-06-21",
