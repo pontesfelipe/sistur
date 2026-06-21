@@ -169,6 +169,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     { key: 'demand', label: 'Demanda/Trends', done: demandAutoFilled },
     { key: 'reputation', label: 'Reputação OTAs', done: reputationAutoFilled },
     { key: 'social', label: 'Redes Sociais', done: socialAutoFilled },
+    { key: 'air', label: 'Conectividade Aérea', done: airConnAutoFilled },
+    { key: 'tariff', label: 'Sazonalidade Tarifária', done: tariffSeasonalityAutoFilled },
   ];
   const autoFillDone = autoFillFlags.filter((b) => b.done).length;
   const autoFillTotal = autoFillFlags.length;
