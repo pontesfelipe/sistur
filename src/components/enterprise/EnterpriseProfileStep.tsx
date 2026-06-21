@@ -624,6 +624,72 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardContent>
       </Card>
 
+      {/* 1.14) Conforto Climático */}
+      <Card className="border-sky-500/30 bg-gradient-to-br from-sky-50/50 to-blue-50/30 dark:from-sky-950/20 dark:to-blue-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-sky-500/10"><Sparkles className="h-5 w-5 text-sky-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Conforto Climático
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Open-Meteo (5 anos): temperatura, chuva e melhores meses do destino</CardDescription>
+            </div>
+            {climateAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ClimateComfortSearch destinationId={destinationId} onAutoFill={handleClimateAutoFill} onAnalysisCapture={handleClimateCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.15) Transporte Intra-Destino */}
+      <Card className="border-orange-500/30 bg-gradient-to-br from-orange-50/50 to-amber-50/30 dark:from-orange-950/20 dark:to-amber-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-orange-500/10"><Sparkles className="h-5 w-5 text-orange-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Transporte Intra-Destino
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Apps, transporte público, transfer e alternativos disponíveis no destino</CardDescription>
+            </div>
+            {transportAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <LocalTransportSearch destinationName={destinationName} onAutoFill={handleTransportAutoFill} onAnalysisCapture={handleTransportCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.16) Força da Marca */}
+      <Card className="border-pink-500/30 bg-gradient-to-br from-pink-50/50 to-fuchsia-50/30 dark:from-pink-950/20 dark:to-fuchsia-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-pink-500/10"><Sparkles className="h-5 w-5 text-pink-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Força da Marca
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Visibilidade orgânica: resultados de busca, autoridade de domínios, mídia e OTAs</CardDescription>
+            </div>
+            {brandAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <BrandStrengthSearch businessName={destinationName} location={destinationName} onAutoFill={handleBrandAutoFill} onAnalysisCapture={handleBrandCapture} />
+        </CardContent>
+      </Card>
+
       <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardHeader>
           <div className="flex items-center gap-3">
