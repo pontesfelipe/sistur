@@ -28,6 +28,8 @@ Cada um se auto-registra via `useAutoFillRunner` e participa do "Rodar todos" e 
 
 Liga os dados coletados ao pipeline existente.
 
+> **Pós-Fase 3 (v1.87.0) — Sincronização do catálogo unificado**: auditoria detectou que 30 dos novos códigos `ENT_*` viviam só em `enterprise_indicators` (catálogo legado). O motor `calculate-assessment` prioriza a tabela unificada `indicators` (`indicator_scope='enterprise'`), então os valores coletados pelos blocos automáticos eram descartados em silêncio. Migration de sincronização populou os 30 códigos no catálogo unificado preservando pilar, benchmarks, peso, tier e unidade. A linhagem de dados (`indicator_calculation_trail`) agora cobre 73 indicadores Enterprise (de 43 anteriores). Indicadores 100% derivados (`ENT_COMMISSION_AVG`, `ENT_DIRECT_SALES_PCT`, `ENT_SEASONALITY_INDEX`, `ENT_COMP_GAP`, `ENT_COMPLIANCE_RATE`) ficam marcados como `data_source='CALCULATED'` — calculados pelo próprio `calculate-assessment` para evitar duplicidade com entrada manual.
+
 - **Normalização min-max** dos 21 blocos: validar/ajustar `enterprise_indicators` (direção, min/max, benchmark) para todos os `ENT_*` que os blocos preenchem.
 - **Trigger de cálculo a 50%**: confirmar que `assessment_calc_jobs` enfileira corretamente no modo Enterprise quando ≥50% dos indicadores têm valor (regra já existente para Territorial).
 - **Status visual**: garantir que o painel de Status (Adequado ≥67% / Atenção 34–66% / Crítico ≤33%) renderiza para Enterprise nos mesmos componentes do Territorial.
