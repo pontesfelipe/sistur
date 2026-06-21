@@ -539,6 +539,67 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardContent>
       </Card>
 
+      {/* 1.12) Eventos & Sazonalidade Local */}
+      <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-sky-50/30 dark:from-cyan-950/20 dark:to-sky-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-cyan-500/10">
+              <Calendar className="h-5 w-5 text-cyan-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Eventos & Sazonalidade Local
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Calendário de eventos públicos e observatório — detecta meses de pico e padrão sazonal</CardDescription>
+            </div>
+            {eventsAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <LocalEventsSearch
+            destinationId={destinationId}
+            onAutoFill={handleEventsAutoFill}
+            onAnalysisCapture={handleEventsCapture}
+            onSeasonalitySuggestion={handleSeasonalitySuggestion}
+          />
+        </CardContent>
+      </Card>
+
+      {/* 1.13) Segurança Turística */}
+      <Card className="border-red-500/30 bg-gradient-to-br from-red-50/50 to-rose-50/30 dark:from-red-950/20 dark:to-rose-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-red-500/10">
+              <Search className="h-5 w-5 text-red-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Segurança Turística
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Sinais públicos de segurança: notícias, presença de polícia turística e alertas ativos</CardDescription>
+            </div>
+            {safetyAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <TourismSafetySearch
+            destinationName={destinationName}
+            onAutoFill={handleSafetyAutoFill}
+            onAnalysisCapture={handleSafetyCapture}
+          />
+        </CardContent>
+      </Card>
+
       <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardHeader>
           <div className="flex items-center gap-3">
