@@ -109,6 +109,29 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [socialData, setSocialData] = useState<Record<string, any> | null>(null);
   const [socialAutoFilled, setSocialAutoFilled] = useState(false);
 
+  // Resumo de progresso dos blocos automáticos (Step 4)
+  const autoFillFlags = [
+    { key: 'reviews', label: 'Reviews', done: reviewAutoFilled },
+    { key: 'digital', label: 'Presença Digital', done: digitalAutoFilled },
+    { key: 'context', label: 'Contexto Municipal', done: contextAutoFilled },
+    { key: 'cnpj', label: 'CNPJ', done: !!cnpjData },
+    { key: 'complaints', label: 'Reclamações', done: complaintsAutoFilled },
+    { key: 'competitors', label: 'Concorrentes', done: (competitorsCount ?? 0) > 0 },
+    { key: 'sustainability', label: 'Sustentabilidade', done: sustainabilityAutoFilled },
+    { key: 'pricing', label: 'Preço/Posicionamento', done: pricingAutoFilled },
+    { key: 'events', label: 'Eventos Locais', done: eventsAutoFilled },
+    { key: 'safety', label: 'Segurança', done: safetyAutoFilled },
+    { key: 'climate', label: 'Clima/Conforto', done: climateAutoFilled },
+    { key: 'transport', label: 'Transporte', done: transportAutoFilled },
+    { key: 'brand', label: 'Força da Marca', done: brandAutoFilled },
+    { key: 'demand', label: 'Demanda/Trends', done: demandAutoFilled },
+    { key: 'reputation', label: 'Reputação OTAs', done: reputationAutoFilled },
+    { key: 'social', label: 'Redes Sociais', done: socialAutoFilled },
+  ];
+  const autoFillDone = autoFillFlags.filter((b) => b.done).length;
+  const autoFillTotal = autoFillFlags.length;
+  const autoFillPct = Math.round((autoFillDone / autoFillTotal) * 100);
+
   const handleReviewAutoFill = (values: Record<string, number>) => {
     setReviewAutoFilled(true);
     onReviewAutoFill?.(values);
