@@ -452,6 +452,68 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       </Card>
 
       {/* 2) Perfil do Empreendimento (ABAIXO do pré-preenchimento) */}
+      {/* 1.10) Sustentabilidade & ESG */}
+      <Card className="border-green-500/30 bg-gradient-to-br from-green-50/50 to-emerald-50/30 dark:from-green-950/20 dark:to-emerald-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-green-500/10">
+              <Sparkles className="h-5 w-5 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Sustentabilidade & Acessibilidade
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Certificações ESG, práticas sustentáveis e acessibilidade detectadas no site e em fontes públicas</CardDescription>
+            </div>
+            {sustainabilityAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <SustainabilitySearch
+            businessName={destinationName}
+            location={destinationName}
+            onAutoFill={handleSustainabilityAutoFill}
+            onAnalysisCapture={handleSustainabilityCapture}
+          />
+        </CardContent>
+      </Card>
+
+      {/* 1.11) Posicionamento de Preço */}
+      <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-50/50 to-amber-50/30 dark:from-yellow-950/20 dark:to-amber-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-yellow-500/10">
+              <Sparkles className="h-5 w-5 text-yellow-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Posicionamento de Preço (ADR)
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Diária média estimada vs mercado a partir de OTAs públicas (Booking, Google, Hoteis.com)</CardDescription>
+            </div>
+            {pricingAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <PricingPositioningSearch
+            businessName={destinationName}
+            location={destinationName}
+            onAutoFill={handlePricingAutoFill}
+            onAnalysisCapture={handlePricingCapture}
+          />
+        </CardContent>
+      </Card>
+
       <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardHeader>
           <div className="flex items-center gap-3">
