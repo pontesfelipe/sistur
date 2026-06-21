@@ -135,6 +135,16 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     }
   };
 
+  // Auto-cascade: assim que a busca de Reviews concluir (usuário digitou o nome do hotel ali),
+  // dispara automaticamente todos os demais blocos uma única vez.
+  const [autoCascadeTriggered, setAutoCascadeTriggered] = useState(false);
+  useEffect(() => {
+    if (reviewAutoFilled && !autoCascadeTriggered && !runAllLoading) {
+      setAutoCascadeTriggered(true);
+      handleRunAll();
+    }
+  }, [reviewAutoFilled, autoCascadeTriggered, runAllLoading]);
+
   // Resumo de progresso dos blocos automáticos (Step 4)
   const autoFillFlags = [
     { key: 'reviews', label: 'Reviews', done: reviewAutoFilled },
