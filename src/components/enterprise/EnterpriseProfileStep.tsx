@@ -273,6 +273,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     { key: 'social', label: 'Redes Sociais', done: socialAutoFilled },
     { key: 'air', label: 'Conectividade Aérea', done: airConnAutoFilled },
     { key: 'tariff', label: 'Sazonalidade Tarifária', done: tariffSeasonalityAutoFilled },
+    { key: 'telecom', label: 'Telecom', done: telecomAutoFilled },
+    { key: 'accessibility', label: 'Acessibilidade', done: accessibilityAutoFilled },
+    { key: 'health', label: 'Saúde do Entorno', done: healthAutoFilled },
   ];
   const autoFillDone = autoFillFlags.filter((b) => b.done).length;
   const autoFillTotal = autoFillFlags.length;
