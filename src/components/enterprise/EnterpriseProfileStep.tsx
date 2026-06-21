@@ -36,6 +36,9 @@ import { SustainabilitySearch } from './SustainabilitySearch';
 import { PricingPositioningSearch } from './PricingPositioningSearch';
 import { LocalEventsSearch } from './LocalEventsSearch';
 import { TourismSafetySearch } from './TourismSafetySearch';
+import { ClimateComfortSearch } from './ClimateComfortSearch';
+import { LocalTransportSearch } from './LocalTransportSearch';
+import { BrandStrengthSearch } from './BrandStrengthSearch';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -90,6 +93,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [eventsAutoFilled, setEventsAutoFilled] = useState(false);
   const [safetyData, setSafetyData] = useState<Record<string, any> | null>(null);
   const [safetyAutoFilled, setSafetyAutoFilled] = useState(false);
+  const [climateData, setClimateData] = useState<Record<string, any> | null>(null);
+  const [climateAutoFilled, setClimateAutoFilled] = useState(false);
+  const [transportData, setTransportData] = useState<Record<string, any> | null>(null);
+  const [transportAutoFilled, setTransportAutoFilled] = useState(false);
+  const [brandData, setBrandData] = useState<Record<string, any> | null>(null);
+  const [brandAutoFilled, setBrandAutoFilled] = useState(false);
 
   const handleReviewAutoFill = (values: Record<string, number>) => {
     setReviewAutoFilled(true);
@@ -161,6 +170,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   };
   const handleSafetyCapture = (a: Record<string, any>) => setSafetyData(a);
 
+  const handleClimateAutoFill = (v: Record<string, number>) => { setClimateAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleClimateCapture = (a: Record<string, any>) => setClimateData(a);
+
+  const handleTransportAutoFill = (v: Record<string, number>) => { setTransportAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleTransportCapture = (a: Record<string, any>) => setTransportData(a);
+
+  const handleBrandAutoFill = (v: Record<string, number>) => { setBrandAutoFilled(true); onReviewAutoFill?.(v); };
+  const handleBrandCapture = (a: Record<string, any>) => setBrandData(a);
+
   const handleCnpjValidated = ({ cnpj, record, yearsInOperation }: { cnpj: string; record: any; yearsInOperation: number | null }) => {
     setCnpjValue(cnpj);
     setCnpjData(record);
@@ -206,6 +224,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.pricing_analysis) setPricingData(ep.pricing_analysis);
       if (ep.events_analysis) setEventsData(ep.events_analysis);
       if (ep.safety_analysis) setSafetyData(ep.safety_analysis);
+      if (ep.climate_analysis) setClimateData(ep.climate_analysis);
+      if (ep.transport_analysis) setTransportData(ep.transport_analysis);
+      if (ep.brand_strength_analysis) setBrandData(ep.brand_strength_analysis);
     }
   }, [existingProfile]);
 
@@ -227,6 +248,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         pricing_analysis: pricingData,
         events_analysis: eventsData,
         safety_analysis: safetyData,
+        climate_analysis: climateData,
+        transport_analysis: transportData,
+        brand_strength_analysis: brandData,
       };
       
       const { data, error } = await supabase
