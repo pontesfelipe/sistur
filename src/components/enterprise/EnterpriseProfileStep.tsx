@@ -321,6 +321,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.demand_trends_analysis) setDemandData(ep.demand_trends_analysis);
       if (ep.consolidated_reputation_analysis) setReputationData(ep.consolidated_reputation_analysis);
       if (ep.social_media_analysis) setSocialData(ep.social_media_analysis);
+      if (ep.air_connectivity_analysis) setAirConnData(ep.air_connectivity_analysis);
+      if (ep.tariff_seasonality_analysis) setTariffSeasonalityData(ep.tariff_seasonality_analysis);
     }
   }, [existingProfile]);
 
