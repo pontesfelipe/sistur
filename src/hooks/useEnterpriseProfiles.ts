@@ -42,6 +42,9 @@ export interface EnterpriseProfile {
   pricing_analysis: Record<string, any> | null;
   events_analysis: Record<string, any> | null;
   safety_analysis: Record<string, any> | null;
+  climate_analysis: Record<string, any> | null;
+  transport_analysis: Record<string, any> | null;
+  brand_strength_analysis: Record<string, any> | null;
   created_at: string;
   updated_at: string;
 }
