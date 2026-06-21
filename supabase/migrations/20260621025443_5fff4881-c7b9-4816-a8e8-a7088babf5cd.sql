@@ -1,0 +1,1 @@
+ALTER TABLE public.enterprise_profiles ADD COLUMN IF NOT EXISTS autofill_run_state jsonb;

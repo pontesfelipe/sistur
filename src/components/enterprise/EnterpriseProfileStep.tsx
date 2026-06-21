@@ -44,8 +44,16 @@ import { ConsolidatedReputationSearch } from './ConsolidatedReputationSearch';
 import { SocialMediaSearch } from './SocialMediaSearch';
 import { AirConnectivitySearch } from './AirConnectivitySearch';
 import { TariffSeasonalitySearch } from './TariffSeasonalitySearch';
-import { runAllAutoFills } from '@/lib/autoFillRunner';
-import { Play } from 'lucide-react';
+import {
+  runAllAutoFills,
+  runOneAutoFill,
+  setAutoFillMeta,
+  useAutoFillStatuses,
+  hydrateAutoFillState,
+  getAutoFillSnapshot,
+  type AutoFillEntry,
+} from '@/lib/autoFillRunner';
+import { Play, RefreshCw, AlertCircle } from 'lucide-react';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -121,23 +129,99 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [runAllLoading, setRunAllLoading] = useState(false);
   const [runAllProgress, setRunAllProgress] = useState<{ id: string; index: number; total: number } | null>(null);
 
+  // Friendly labels + data source per block id. Registered once on mount so the
+  // global registry can render meaningful badges/toasts without coupling each
+  // search component to the orchestrator.
+  const BLOCK_META: Record<string, { label: string; source: string }> = {
+    reviews: { label: 'Reviews', source: 'Booking + TripAdvisor + Google' },
+    digital: { label: 'Presença Digital', source: 'Google + OTAs + redes sociais' },
+    context: { label: 'Contexto Municipal', source: 'IBGE + ANAC + ANATEL + Mapa do Turismo' },
+    complaints: { label: 'Reclamações Públicas', source: 'Reclame Aqui + Procon' },
+    competitors: { label: 'Concorrentes', source: 'Booking + TripAdvisor + Google' },
+    sustainability: { label: 'Sustentabilidade & ESG', source: 'Site oficial + certificadoras' },
+    pricing: { label: 'Preço & Posicionamento', source: 'OTAs + metabuscadores' },
+    events: { label: 'Eventos Locais', source: 'Sympla + Eventbrite + agendas municipais' },
+    safety: { label: 'Segurança Turística', source: 'SSP + notícias regionais' },
+    climate: { label: 'Clima & Conforto', source: 'INMET + dados históricos' },
+    transport: { label: 'Transporte Urbano', source: 'GTFS + ANTT + prefeituras' },
+    brand: { label: 'Força da Marca', source: 'Pesquisa web + menções' },
+    demand: { label: 'Demanda & Trends', source: 'Google Trends + buscas sazonais' },
+    reputation: { label: 'Reputação Consolidada OTAs', source: 'Booking + Expedia + TripAdvisor' },
+    social: { label: 'Redes Sociais', source: 'Instagram + Facebook + TikTok' },
+    air: { label: 'Conectividade Aérea', source: 'ANAC (anac_air_connectivity)' },
+    tariff: { label: 'Sazonalidade Tarifária', source: 'Derivado: demanda + eventos + ADR' },
+  };
+  useEffect(() => {
+    Object.entries(BLOCK_META).forEach(([id, m]) => setAutoFillMeta(id, m));
+    // BLOCK_META is a stable object literal, fine to ignore deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Subscribe to per-block status (running / success / error)
+  const statuses = useAutoFillStatuses();
+  const statusById = new Map(statuses.map((s) => [s.id, s]));
+
+  const blockToast = ({ label, status, error }: { label: string; status: 'success' | 'error'; error?: string }) => {
+    if (status === 'success') {
+      toast.success(`✓ ${label}`);
+    } else {
+      toast.error(`✗ ${label}${error ? `: ${error}` : ''}`);
+    }
+  };
+
   const handleRunAll = async () => {
     if (runAllLoading) return;
     setRunAllLoading(true);
     setRunAllProgress(null);
-    toast.info('Iniciando preenchimento automático de todos os blocos...');
+    toast.info('Iniciando preenchimento automático...');
+    let okCount = 0;
+    let failCount = 0;
     try {
       await runAllAutoFills({
         delayMs: 800,
         onProgress: (info) => setRunAllProgress(info),
+        onBlockComplete: (info) => {
+          blockToast(info);
+          if (info.status === 'success') okCount++;
+          else failCount++;
+        },
       });
-      toast.success('Todos os blocos automáticos foram executados');
+      if (failCount === 0) {
+        toast.success(`Todos os ${okCount} blocos foram executados com sucesso`);
+      } else {
+        toast.warning(`${okCount} blocos OK • ${failCount} falharam — use "Tentar novamente" em cada um`);
+      }
+      persistRunState();
     } catch (e: any) {
       console.error(e);
       toast.error('Falha ao executar blocos: ' + (e?.message || 'erro desconhecido'));
     } finally {
       setRunAllLoading(false);
       setRunAllProgress(null);
+    }
+  };
+
+  const handleRetryOne = async (id: string) => {
+    const label = BLOCK_META[id]?.label ?? id;
+    toast.info(`Reexecutando ${label}...`);
+    const result = await runOneAutoFill(id, { onComplete: blockToast });
+    if ('status' in result && result.status === 'missing') {
+      toast.error(`Bloco "${label}" não está registrado (verifique se a etapa foi montada)`);
+    }
+    persistRunState();
+  };
+
+  // Persist run state to enterprise_profiles.autofill_run_state (best-effort)
+  const persistRunState = async () => {
+    try {
+      if (!effectiveOrgId) return;
+      const snapshot = getAutoFillSnapshot();
+      await supabase
+        .from('enterprise_profiles')
+        .update({ autofill_run_state: snapshot as any } as any)
+        .eq('destination_id', destinationId);
+    } catch (e) {
+      console.warn('[autoFillRunner] failed to persist run state', e);
     }
   };
 
@@ -323,6 +407,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.social_media_analysis) setSocialData(ep.social_media_analysis);
       if (ep.air_connectivity_analysis) setAirConnData(ep.air_connectivity_analysis);
       if (ep.tariff_seasonality_analysis) setTariffSeasonalityData(ep.tariff_seasonality_analysis);
+      if (ep.autofill_run_state) hydrateAutoFillState(ep.autofill_run_state as AutoFillEntry[]);
     }
   }, [existingProfile]);
 
@@ -352,6 +437,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         social_media_analysis: socialData,
         air_connectivity_analysis: airConnData,
         tariff_seasonality_analysis: tariffSeasonalityData,
+        autofill_run_state: getAutoFillSnapshot() as any,
       };
       
       const { data, error } = await supabase
@@ -455,25 +541,46 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               {' '}({runAllProgress.index + 1}/{runAllProgress.total})
             </div>
           )}
-          {autoFillDone > 0 && (
-            <div className="flex flex-wrap gap-1 mt-3">
-              {autoFillFlags.map((b) => (
-                <Badge
-                  key={b.key}
-                  variant="outline"
-                  className={cn(
-                    'text-[10px]',
-                    b.done
-                      ? 'border-green-500/40 text-green-700 dark:text-green-400'
-                      : 'text-muted-foreground opacity-60'
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {autoFillFlags.map((b) => {
+              const st = statusById.get(b.key);
+              const status = st?.status ?? (b.done ? 'success' : 'idle');
+              const isError = status === 'error';
+              const isRunning = status === 'running';
+              const isSuccess = status === 'success' || b.done;
+              return (
+                <div key={b.key} className="inline-flex items-center gap-1">
+                  <Badge
+                    variant="outline"
+                    title={st?.source ? `Fonte: ${st.source}${st.error ? ` · Erro: ${st.error}` : ''}` : undefined}
+                    className={cn(
+                      'text-[10px] gap-1',
+                      isError && 'border-red-500/50 text-red-700 dark:text-red-400 bg-red-500/5',
+                      isRunning && 'border-blue-500/40 text-blue-700 dark:text-blue-400 bg-blue-500/5',
+                      !isError && !isRunning && isSuccess && 'border-green-500/40 text-green-700 dark:text-green-400',
+                      !isError && !isRunning && !isSuccess && 'text-muted-foreground opacity-60',
+                    )}
+                  >
+                    {isRunning && <Loader2 className="h-2.5 w-2.5 animate-spin" />}
+                    {isError && <AlertCircle className="h-2.5 w-2.5" />}
+                    {!isRunning && !isError && isSuccess && <CheckCircle2 className="h-2.5 w-2.5" />}
+                    {b.label}
+                  </Badge>
+                  {isError && (
+                    <button
+                      type="button"
+                      onClick={() => handleRetryOne(b.key)}
+                      disabled={runAllLoading}
+                      title={`Tentar novamente: ${b.label}`}
+                      className="inline-flex items-center justify-center h-4 w-4 rounded text-red-700 dark:text-red-400 hover:bg-red-500/10 disabled:opacity-40"
+                    >
+                      <RefreshCw className="h-3 w-3" />
+                    </button>
                   )}
-                >
-                  {b.done && <CheckCircle2 className="h-2.5 w-2.5 mr-1" />}
-                  {b.label}
-                </Badge>
-              ))}
-            </div>
-          )}
+                </div>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 
