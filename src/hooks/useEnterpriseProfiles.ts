@@ -38,6 +38,8 @@ export interface EnterpriseProfile {
   complaints_analysis: Record<string, any> | null;
   cnpj: string | null;
   cnpj_data: Record<string, any> | null;
+  sustainability_analysis: Record<string, any> | null;
+  pricing_analysis: Record<string, any> | null;
   created_at: string;
   updated_at: string;
 }
