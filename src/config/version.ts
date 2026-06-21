@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 82,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.82.1",
+    date: "2026-06-21",
+    type: "patch" as const,
+    changes: [
+      "Retomar Diagnóstico Enterprise — fix: ao abrir um diagnóstico Enterprise via `?resume=`, a wizard sincroniza agora o `diagnosticType` com o valor salvo em `assessments.diagnostic_type`. Antes, o estado local permanecia no default 'territorial', fazendo com que a edição renderizasse o fluxo Territorial mesmo quando a listagem exibia o diagnóstico como Enterprise. Correção feita em `src/pages/NovaRodada.tsx` no efeito de carregamento do resume."
+    ]
+  },
   {
     version: "1.82.0",
     date: "2026-06-21",
