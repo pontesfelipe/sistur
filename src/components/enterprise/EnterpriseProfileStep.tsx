@@ -111,6 +111,30 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [socialData, setSocialData] = useState<Record<string, any> | null>(null);
   const [socialAutoFilled, setSocialAutoFilled] = useState(false);
 
+  // "Rodar todos": orquestra os blocos auto registrados via useAutoFillRunner
+  const [runAllLoading, setRunAllLoading] = useState(false);
+  const [runAllProgress, setRunAllProgress] = useState<{ id: string; index: number; total: number } | null>(null);
+
+  const handleRunAll = async () => {
+    if (runAllLoading) return;
+    setRunAllLoading(true);
+    setRunAllProgress(null);
+    toast.info('Iniciando preenchimento automático de todos os blocos...');
+    try {
+      await runAllAutoFills({
+        delayMs: 800,
+        onProgress: (info) => setRunAllProgress(info),
+      });
+      toast.success('Todos os blocos automáticos foram executados');
+    } catch (e: any) {
+      console.error(e);
+      toast.error('Falha ao executar blocos: ' + (e?.message || 'erro desconhecido'));
+    } finally {
+      setRunAllLoading(false);
+      setRunAllProgress(null);
+    }
+  };
+
   // Resumo de progresso dos blocos automáticos (Step 4)
   const autoFillFlags = [
     { key: 'reviews', label: 'Reviews', done: reviewAutoFilled },
