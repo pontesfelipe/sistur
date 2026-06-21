@@ -197,6 +197,12 @@ export default function NovaRodada() {
       const savedIndicatorCount = resumeIndicatorCount ?? 0;
       const status = resumeAssessment.status as string | null;
       const resumeDiagnosticType = ((resumeAssessment as any).diagnostic_type as DiagnosticType) || diagnosticType;
+      // Sync the wizard's diagnostic type with what was saved on the assessment.
+      // Without this, resuming an Enterprise diagnostic would render the Territorial
+      // flow because `diagnosticType` state stayed on its initial value.
+      if (resumeDiagnosticType !== diagnosticType) {
+        setDiagnosticType(resumeDiagnosticType);
+      }
       let resumeStep = 4;
       if (status === 'CALCULATED') {
         resumeStep = 7;
