@@ -28,6 +28,10 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { BusinessReviewSearch } from './BusinessReviewSearch';
 import { DigitalPresenceSearch } from './DigitalPresenceSearch';
+import { DestinationContextSearch } from './DestinationContextSearch';
+import { CnpjValidationSearch } from './CnpjValidationSearch';
+import { PublicComplaintsSearch } from './PublicComplaintsSearch';
+import { CompetitorsAutoSearch } from './CompetitorsAutoSearch';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -67,6 +71,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [reviewAnalysisData, setReviewAnalysisData] = useState<Record<string, any> | null>(null);
   const [digitalAnalysisData, setDigitalAnalysisData] = useState<Record<string, any> | null>(null);
   const [digitalAutoFilled, setDigitalAutoFilled] = useState(false);
+  const [contextAnalysisData, setContextAnalysisData] = useState<Record<string, any> | null>(null);
+  const [contextAutoFilled, setContextAutoFilled] = useState(false);
+  const [complaintsAnalysisData, setComplaintsAnalysisData] = useState<Record<string, any> | null>(null);
+  const [complaintsAutoFilled, setComplaintsAutoFilled] = useState(false);
+  const [cnpjData, setCnpjData] = useState<Record<string, any> | null>(null);
+  const [cnpjValue, setCnpjValue] = useState<string | null>(null);
+  const [competitorsCount, setCompetitorsCount] = useState<number | null>(null);
 
   const handleReviewAutoFill = (values: Record<string, number>) => {
     setReviewAutoFilled(true);
@@ -98,6 +109,28 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const handleDigitalAnalysisCapture = (fullAnalysis: Record<string, any>) => {
     setDigitalAnalysisData(fullAnalysis);
   };
+
+  const handleContextAutoFill = (values: Record<string, number>) => {
+    setContextAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
+  const handleContextCapture = (a: Record<string, any>) => setContextAnalysisData(a);
+
+  const handleComplaintsAutoFill = (values: Record<string, number>) => {
+    setComplaintsAutoFilled(true);
+    onReviewAutoFill?.(values);
+  };
+  const handleComplaintsCapture = (a: Record<string, any>) => setComplaintsAnalysisData(a);
+
+  const handleCnpjValidated = ({ cnpj, record, yearsInOperation }: { cnpj: string; record: any; yearsInOperation: number | null }) => {
+    setCnpjValue(cnpj);
+    setCnpjData(record);
+    setFormData((prev) => ({
+      ...prev,
+      ...(yearsInOperation != null ? { years_in_operation: yearsInOperation } : {}),
+    }));
+    toast.success('Dados cadastrais aplicados ao perfil');
+  };
   const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
   const queryClient = useQueryClient();
@@ -124,6 +157,11 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         target_market: existingProfile.target_market || [],
         average_occupancy_rate: existingProfile.average_occupancy_rate,
       });
+      const ep = existingProfile as any;
+      if (ep.cnpj) setCnpjValue(ep.cnpj);
+      if (ep.cnpj_data) setCnpjData(ep.cnpj_data);
+      if (ep.context_analysis) setContextAnalysisData(ep.context_analysis);
+      if (ep.complaints_analysis) setComplaintsAnalysisData(ep.complaints_analysis);
     }
   }, [existingProfile]);
 
@@ -137,6 +175,10 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         org_id: effectiveOrgId,
         review_analysis: reviewAnalysisData,
         digital_presence_analysis: digitalAnalysisData,
+        context_analysis: contextAnalysisData,
+        complaints_analysis: complaintsAnalysisData,
+        cnpj: cnpjValue,
+        cnpj_data: cnpjData,
       };
       
       const { data, error } = await supabase
@@ -263,6 +305,125 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             location={destinationName}
             onAutoFill={handleDigitalAutoFill}
             onAnalysisCapture={handleDigitalAnalysisCapture}
+          />
+        </CardContent>
+      </Card>
+
+      {/* 1.6) Contexto & Conectividade do Destino */}
+      <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-50/50 to-teal-50/30 dark:from-emerald-950/20 dark:to-teal-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-emerald-500/10">
+              <Search className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Contexto & Conectividade do Destino
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>ANAC, ANATEL, eventos, Mapa do Turismo e contexto socioeconômico do município</CardDescription>
+            </div>
+            {contextAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <DestinationContextSearch
+            destinationId={destinationId}
+            onAutoFill={handleContextAutoFill}
+            onAnalysisCapture={handleContextCapture}
+          />
+        </CardContent>
+      </Card>
+
+      {/* 1.7) Validação CNPJ */}
+      <Card className="border-purple-500/30 bg-gradient-to-br from-purple-50/50 to-fuchsia-50/30 dark:from-purple-950/20 dark:to-fuchsia-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-500/10">
+              <Building2 className="h-5 w-5 text-purple-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Validação CNPJ & Dados Cadastrais
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Receita Federal: razão social, CNAE, situação cadastral e anos de operação</CardDescription>
+            </div>
+            {cnpjData && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Validado
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <CnpjValidationSearch initialCnpj={cnpjValue} onValidated={handleCnpjValidated} />
+        </CardContent>
+      </Card>
+
+      {/* 1.8) Reclamações Públicas */}
+      <Card className="border-rose-500/30 bg-gradient-to-br from-rose-50/50 to-orange-50/30 dark:from-rose-950/20 dark:to-orange-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-rose-500/10">
+              <Search className="h-5 w-5 text-rose-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Reclamações Públicas
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Reclame Aqui e Procon — reputação pública e taxa de solução</CardDescription>
+            </div>
+            {complaintsAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <PublicComplaintsSearch
+            businessName={destinationName}
+            location={destinationName}
+            onAutoFill={handleComplaintsAutoFill}
+            onAnalysisCapture={handleComplaintsCapture}
+          />
+        </CardContent>
+      </Card>
+
+      {/* 1.9) Concorrentes Automáticos */}
+      <Card className="border-indigo-500/30 bg-gradient-to-br from-indigo-50/50 to-blue-50/30 dark:from-indigo-950/20 dark:to-blue-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-indigo-500/10">
+              <Search className="h-5 w-5 text-indigo-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Concorrentes Automáticos
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Benchmark competitivo via Booking, TripAdvisor e Google</CardDescription>
+            </div>
+            {competitorsCount != null && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />{competitorsCount} encontrados
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <CompetitorsAutoSearch
+            destinationId={destinationId}
+            businessName={destinationName}
+            location={destinationName}
+            propertyType={formData.property_type}
+            onCaptured={setCompetitorsCount}
           />
         </CardContent>
       </Card>

@@ -4343,6 +4343,10 @@ export type Database = {
           average_daily_rate: number | null
           average_occupancy_rate: number | null
           certifications: string[] | null
+          cnpj: string | null
+          cnpj_data: Json | null
+          complaints_analysis: Json | null
+          context_analysis: Json | null
           created_at: string
           destination_id: string
           digital_presence_analysis: Json | null
@@ -4369,6 +4373,10 @@ export type Database = {
           average_daily_rate?: number | null
           average_occupancy_rate?: number | null
           certifications?: string[] | null
+          cnpj?: string | null
+          cnpj_data?: Json | null
+          complaints_analysis?: Json | null
+          context_analysis?: Json | null
           created_at?: string
           destination_id: string
           digital_presence_analysis?: Json | null
@@ -4395,6 +4403,10 @@ export type Database = {
           average_daily_rate?: number | null
           average_occupancy_rate?: number | null
           certifications?: string[] | null
+          cnpj?: string | null
+          cnpj_data?: Json | null
+          complaints_analysis?: Json | null
+          context_analysis?: Json | null
           created_at?: string
           destination_id?: string
           digital_presence_analysis?: Json | null
