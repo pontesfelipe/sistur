@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Instagram, Loader2, Search, ExternalLink, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 interface PlatformData { handle: string | null; url: string; followers: number | null; sample: string }
 interface Analysis {
@@ -51,6 +52,8 @@ export function SocialMediaSearch({ businessName, location, onAutoFill, onAnalys
       console.error(e); toast.error(e?.message || 'Falha ao analisar redes');
     } finally { setLoading(false); }
   };
+
+  useAutoFillRunner('social', run);
 
   return (
     <div className="space-y-4">

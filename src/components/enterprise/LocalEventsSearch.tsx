@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { CalendarDays, Loader2, Search, TrendingUp, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 const MONTH_LABELS = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
@@ -60,6 +61,8 @@ export function LocalEventsSearch({ destinationId, onAutoFill, onAnalysisCapture
   };
 
   const maxHits = analysis ? Math.max(1, ...Object.values(analysis.month_distribution).map(Number)) : 1;
+
+  useAutoFillRunner('events', run);
 
   return (
     <div className="space-y-4">

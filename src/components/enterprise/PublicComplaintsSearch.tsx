@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Loader2, Search, AlertTriangle, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 interface Props {
   businessName: string;
@@ -48,6 +49,8 @@ export function PublicComplaintsSearch({ businessName, location, onAutoFill, onA
       setLoading(false);
     }
   };
+
+  useAutoFillRunner('complaints', run);
 
   return (
     <div className="space-y-4">

@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { TrendingUp, Loader2, Search, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 interface Analysis {
   demand_score: number;
@@ -55,6 +56,8 @@ export function DemandTrendsSearch({ businessName, location, onAutoFill, onAnaly
   };
 
   const maxHit = analysis ? Math.max(1, ...Object.values(analysis.seasonal_distribution)) : 1;
+
+  useAutoFillRunner('demand', run);
 
   return (
     <div className="space-y-4">

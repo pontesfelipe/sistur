@@ -42,6 +42,8 @@ import { BrandStrengthSearch } from './BrandStrengthSearch';
 import { DemandTrendsSearch } from './DemandTrendsSearch';
 import { ConsolidatedReputationSearch } from './ConsolidatedReputationSearch';
 import { SocialMediaSearch } from './SocialMediaSearch';
+import { runAllAutoFills } from '@/lib/autoFillRunner';
+import { Play } from 'lucide-react';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -108,6 +110,30 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [reputationAutoFilled, setReputationAutoFilled] = useState(false);
   const [socialData, setSocialData] = useState<Record<string, any> | null>(null);
   const [socialAutoFilled, setSocialAutoFilled] = useState(false);
+
+  // "Rodar todos": orquestra os blocos auto registrados via useAutoFillRunner
+  const [runAllLoading, setRunAllLoading] = useState(false);
+  const [runAllProgress, setRunAllProgress] = useState<{ id: string; index: number; total: number } | null>(null);
+
+  const handleRunAll = async () => {
+    if (runAllLoading) return;
+    setRunAllLoading(true);
+    setRunAllProgress(null);
+    toast.info('Iniciando preenchimento automático de todos os blocos...');
+    try {
+      await runAllAutoFills({
+        delayMs: 800,
+        onProgress: (info) => setRunAllProgress(info),
+      });
+      toast.success('Todos os blocos automáticos foram executados');
+    } catch (e: any) {
+      console.error(e);
+      toast.error('Falha ao executar blocos: ' + (e?.message || 'erro desconhecido'));
+    } finally {
+      setRunAllLoading(false);
+      setRunAllProgress(null);
+    }
+  };
 
   // Resumo de progresso dos blocos automáticos (Step 4)
   const autoFillFlags = [
@@ -380,8 +406,27 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               <Badge variant={autoFillDone === autoFillTotal ? 'default' : 'secondary'} className="text-[10px]">
                 {autoFillPct}%
               </Badge>
+              <Button
+                size="sm"
+                onClick={handleRunAll}
+                disabled={runAllLoading}
+                className="ml-2"
+              >
+                {runAllLoading ? (
+                  <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                ) : (
+                  <Play className="h-3.5 w-3.5 mr-1" />
+                )}
+                {runAllLoading ? 'Executando...' : 'Rodar todos'}
+              </Button>
             </div>
           </div>
+          {runAllLoading && runAllProgress && (
+            <div className="mt-3 text-xs text-muted-foreground">
+              Executando bloco <span className="font-medium text-foreground">{runAllProgress.id}</span>
+              {' '}({runAllProgress.index + 1}/{runAllProgress.total})
+            </div>
+          )}
           {autoFillDone > 0 && (
             <div className="flex flex-wrap gap-1 mt-3">
               {autoFillFlags.map((b) => (

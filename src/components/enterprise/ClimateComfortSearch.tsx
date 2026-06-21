@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { CloudRain, Loader2, Search, Sun, Thermometer } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 const MONTH_LABELS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
@@ -46,6 +47,8 @@ export function ClimateComfortSearch({ destinationId, onAutoFill, onAnalysisCapt
       console.error(e); toast.error(e?.message || 'Falha ao analisar clima');
     } finally { setLoading(false); }
   };
+
+  useAutoFillRunner('climate', run);
 
   return (
     <div className="space-y-4">

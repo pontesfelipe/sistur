@@ -22,6 +22,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
 interface DigitalPresenceAnalysis {
   own_website: { found: boolean; url: string | null; has_ssl: boolean | null };
@@ -85,6 +86,8 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
       setLoading(false);
     }
   };
+
+  useAutoFillRunner('digital-presence', runSearch);
 
   const renderOk = (ok: boolean) =>
     ok ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-muted-foreground/40" />;
