@@ -714,6 +714,72 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardContent>
       </Card>
 
+      {/* 1.17) Demanda & Tendências */}
+      <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-sky-50/30 dark:from-cyan-950/20 dark:to-sky-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-cyan-500/10"><Sparkles className="h-5 w-5 text-cyan-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Demanda & Tendências
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Volume orgânico, sinais transacionais em OTAs, distribuição mensal e picos de interesse</CardDescription>
+            </div>
+            {demandAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <DemandTrendsSearch businessName={destinationName} location={destinationName} onAutoFill={handleDemandAutoFill} onAnalysisCapture={handleDemandCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.18) Reputação Consolidada Multi-OTA */}
+      <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-50/50 to-amber-50/30 dark:from-yellow-950/20 dark:to-amber-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-yellow-500/10"><Sparkles className="h-5 w-5 text-yellow-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Reputação Consolidada
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Nota agregada de Booking, Google, TripAdvisor, Airbnb e demais OTAs em escala 0-10</CardDescription>
+            </div>
+            {reputationAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ConsolidatedReputationSearch businessName={destinationName} location={destinationName} onAutoFill={handleReputationAutoFill} onAnalysisCapture={handleReputationCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.19) Presença em Redes Sociais */}
+      <Card className="border-fuchsia-500/30 bg-gradient-to-br from-fuchsia-50/50 to-pink-50/30 dark:from-fuchsia-950/20 dark:to-pink-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-fuchsia-500/10"><Sparkles className="h-5 w-5 text-fuchsia-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Presença em Redes Sociais
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Instagram, Facebook, TikTok, YouTube e LinkedIn: perfis ativos e base estimada de seguidores</CardDescription>
+            </div>
+            {socialAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <SocialMediaSearch businessName={destinationName} location={destinationName} onAutoFill={handleSocialAutoFill} onAnalysisCapture={handleSocialCapture} />
+        </CardContent>
+      </Card>
+
       <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardHeader>
           <div className="flex items-center gap-3">
