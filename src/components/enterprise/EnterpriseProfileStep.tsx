@@ -541,25 +541,46 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               {' '}({runAllProgress.index + 1}/{runAllProgress.total})
             </div>
           )}
-          {autoFillDone > 0 && (
-            <div className="flex flex-wrap gap-1 mt-3">
-              {autoFillFlags.map((b) => (
-                <Badge
-                  key={b.key}
-                  variant="outline"
-                  className={cn(
-                    'text-[10px]',
-                    b.done
-                      ? 'border-green-500/40 text-green-700 dark:text-green-400'
-                      : 'text-muted-foreground opacity-60'
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {autoFillFlags.map((b) => {
+              const st = statusById.get(b.key);
+              const status = st?.status ?? (b.done ? 'success' : 'idle');
+              const isError = status === 'error';
+              const isRunning = status === 'running';
+              const isSuccess = status === 'success' || b.done;
+              return (
+                <div key={b.key} className="inline-flex items-center gap-1">
+                  <Badge
+                    variant="outline"
+                    title={st?.source ? `Fonte: ${st.source}${st.error ? ` · Erro: ${st.error}` : ''}` : undefined}
+                    className={cn(
+                      'text-[10px] gap-1',
+                      isError && 'border-red-500/50 text-red-700 dark:text-red-400 bg-red-500/5',
+                      isRunning && 'border-blue-500/40 text-blue-700 dark:text-blue-400 bg-blue-500/5',
+                      !isError && !isRunning && isSuccess && 'border-green-500/40 text-green-700 dark:text-green-400',
+                      !isError && !isRunning && !isSuccess && 'text-muted-foreground opacity-60',
+                    )}
+                  >
+                    {isRunning && <Loader2 className="h-2.5 w-2.5 animate-spin" />}
+                    {isError && <AlertCircle className="h-2.5 w-2.5" />}
+                    {!isRunning && !isError && isSuccess && <CheckCircle2 className="h-2.5 w-2.5" />}
+                    {b.label}
+                  </Badge>
+                  {isError && (
+                    <button
+                      type="button"
+                      onClick={() => handleRetryOne(b.key)}
+                      disabled={runAllLoading}
+                      title={`Tentar novamente: ${b.label}`}
+                      className="inline-flex items-center justify-center h-4 w-4 rounded text-red-700 dark:text-red-400 hover:bg-red-500/10 disabled:opacity-40"
+                    >
+                      <RefreshCw className="h-3 w-3" />
+                    </button>
                   )}
-                >
-                  {b.done && <CheckCircle2 className="h-2.5 w-2.5 mr-1" />}
-                  {b.label}
-                </Badge>
-              ))}
-            </div>
-          )}
+                </div>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 
