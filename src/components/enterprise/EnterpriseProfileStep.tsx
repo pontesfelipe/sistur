@@ -1133,6 +1133,72 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardContent>
       </Card>
 
+      {/* 1.22) Conectividade Telecom (Anatel) */}
+      <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-blue-50/30 dark:from-cyan-950/20 dark:to-blue-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-cyan-500/10"><Sparkles className="h-5 w-5 text-cyan-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Conectividade Telecom
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Anatel — cobertura 4G, 5G e Wi-Fi público do município (afeta PMS cloud, OTA mobile e check-in digital)</CardDescription>
+            </div>
+            {telecomAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <TelecomCoverageSearch destinationId={destinationId} onAutoFill={handleTelecomAutoFill} onAnalysisCapture={handleTelecomCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.23) Acessibilidade Urbana */}
+      <Card className="border-indigo-500/30 bg-gradient-to-br from-indigo-50/50 to-violet-50/30 dark:from-indigo-950/20 dark:to-violet-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-indigo-500/10"><Sparkles className="h-5 w-5 text-indigo-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Acessibilidade Urbana
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Pesquisa web por evidências de calçadas, rampas, sinalização tátil, transporte acessível e atrativos PCD no município</CardDescription>
+            </div>
+            {accessibilityAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <UrbanAccessibilitySearch destinationId={destinationId} onAutoFill={handleAccessibilityAutoFill} onAnalysisCapture={handleAccessibilityCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.24) Infraestrutura de Saúde do Entorno (DATASUS) */}
+      <Card className="border-rose-500/30 bg-gradient-to-br from-rose-50/50 to-pink-50/30 dark:from-rose-950/20 dark:to-pink-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-rose-500/10"><Sparkles className="h-5 w-5 text-rose-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Infraestrutura de Saúde do Entorno
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>DATASUS/CNES — hospitais, leitos, pronto-socorro 24h e densidade por 1k habitantes do município</CardDescription>
+            </div>
+            {healthAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <HealthInfrastructureSearch destinationId={destinationId} onAutoFill={handleHealthAutoFill} onAnalysisCapture={handleHealthCapture} />
+        </CardContent>
+      </Card>
+
       <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardHeader>
           <div className="flex items-center gap-3">
