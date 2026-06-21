@@ -4340,6 +4340,7 @@ export type Database = {
       enterprise_profiles: {
         Row: {
           accessibility_features: string[] | null
+          air_connectivity_analysis: Json | null
           average_daily_rate: number | null
           average_occupancy_rate: number | null
           brand_strength_analysis: Json | null
@@ -4373,6 +4374,7 @@ export type Database = {
           sustainability_analysis: Json | null
           sustainability_initiatives: string[] | null
           target_market: string[] | null
+          tariff_seasonality_analysis: Json | null
           total_capacity: number | null
           transport_analysis: Json | null
           updated_at: string
@@ -4380,6 +4382,7 @@ export type Database = {
         }
         Insert: {
           accessibility_features?: string[] | null
+          air_connectivity_analysis?: Json | null
           average_daily_rate?: number | null
           average_occupancy_rate?: number | null
           brand_strength_analysis?: Json | null
@@ -4413,6 +4416,7 @@ export type Database = {
           sustainability_analysis?: Json | null
           sustainability_initiatives?: string[] | null
           target_market?: string[] | null
+          tariff_seasonality_analysis?: Json | null
           total_capacity?: number | null
           transport_analysis?: Json | null
           updated_at?: string
@@ -4420,6 +4424,7 @@ export type Database = {
         }
         Update: {
           accessibility_features?: string[] | null
+          air_connectivity_analysis?: Json | null
           average_daily_rate?: number | null
           average_occupancy_rate?: number | null
           brand_strength_analysis?: Json | null
@@ -4453,6 +4458,7 @@ export type Database = {
           sustainability_analysis?: Json | null
           sustainability_initiatives?: string[] | null
           target_market?: string[] | null
+          tariff_seasonality_analysis?: Json | null
           total_capacity?: number | null
           transport_analysis?: Json | null
           updated_at?: string
