@@ -353,6 +353,57 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
   return (
     <div className="space-y-6">
+      {/* 0) Resumo de progresso dos blocos automáticos */}
+      <Card className="border-primary/20">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Sparkles className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-sm font-medium">
+                  Pré-preenchimento automático: {autoFillDone}/{autoFillTotal} blocos
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Cada bloco abaixo busca dados públicos para preencher indicadores do diagnóstico
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-32 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all"
+                  style={{ width: `${autoFillPct}%` }}
+                />
+              </div>
+              <Badge variant={autoFillDone === autoFillTotal ? 'default' : 'secondary'} className="text-[10px]">
+                {autoFillPct}%
+              </Badge>
+            </div>
+          </div>
+          {autoFillDone > 0 && (
+            <div className="flex flex-wrap gap-1 mt-3">
+              {autoFillFlags.map((b) => (
+                <Badge
+                  key={b.key}
+                  variant="outline"
+                  className={cn(
+                    'text-[10px]',
+                    b.done
+                      ? 'border-green-500/40 text-green-700 dark:text-green-400'
+                      : 'text-muted-foreground opacity-60'
+                  )}
+                >
+                  {b.done && <CheckCircle2 className="h-2.5 w-2.5 mr-1" />}
+                  {b.label}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* 1) Pré-preenchimento Automático via IA (ACIMA do perfil) */}
       <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
         <CardHeader>
