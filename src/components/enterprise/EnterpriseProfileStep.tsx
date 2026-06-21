@@ -44,6 +44,9 @@ import { ConsolidatedReputationSearch } from './ConsolidatedReputationSearch';
 import { SocialMediaSearch } from './SocialMediaSearch';
 import { AirConnectivitySearch } from './AirConnectivitySearch';
 import { TariffSeasonalitySearch } from './TariffSeasonalitySearch';
+import { TelecomCoverageSearch } from './TelecomCoverageSearch';
+import { UrbanAccessibilitySearch } from './UrbanAccessibilitySearch';
+import { HealthInfrastructureSearch } from './HealthInfrastructureSearch';
 import {
   runAllAutoFills,
   runOneAutoFill,
@@ -124,6 +127,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [airConnAutoFilled, setAirConnAutoFilled] = useState(false);
   const [tariffSeasonalityData, setTariffSeasonalityData] = useState<Record<string, any> | null>(null);
   const [tariffSeasonalityAutoFilled, setTariffSeasonalityAutoFilled] = useState(false);
+  const [telecomData, setTelecomData] = useState<Record<string, any> | null>(null);
+  const [telecomAutoFilled, setTelecomAutoFilled] = useState(false);
+  const [accessibilityData, setAccessibilityData] = useState<Record<string, any> | null>(null);
+  const [accessibilityAutoFilled, setAccessibilityAutoFilled] = useState(false);
+  const [healthData, setHealthData] = useState<Record<string, any> | null>(null);
+  const [healthAutoFilled, setHealthAutoFilled] = useState(false);
 
   // "Rodar todos": orquestra os blocos auto registrados via useAutoFillRunner
   const [runAllLoading, setRunAllLoading] = useState(false);
@@ -150,6 +159,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     social: { label: 'Redes Sociais', source: 'Instagram + Facebook + TikTok' },
     air: { label: 'Conectividade Aérea', source: 'ANAC (anac_air_connectivity)' },
     tariff: { label: 'Sazonalidade Tarifária', source: 'Derivado: demanda + eventos + ADR' },
+    telecom: { label: 'Conectividade Telecom', source: 'Anatel (anatel_coverage_cache)' },
+    accessibility: { label: 'Acessibilidade Urbana', source: 'Firecrawl web search (5 dimensões)' },
+    health: { label: 'Infra. de Saúde do Entorno', source: 'DATASUS/CNES (datasus_health_cache)' },
   };
   useEffect(() => {
     Object.entries(BLOCK_META).forEach(([id, m]) => setAutoFillMeta(id, m));
