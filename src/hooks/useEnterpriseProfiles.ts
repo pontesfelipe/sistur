@@ -33,6 +33,11 @@ export interface EnterpriseProfile {
   
   notes: string | null;
   review_analysis: Record<string, any> | null;
+  digital_presence_analysis: Record<string, any> | null;
+  context_analysis: Record<string, any> | null;
+  complaints_analysis: Record<string, any> | null;
+  cnpj: string | null;
+  cnpj_data: Record<string, any> | null;
   created_at: string;
   updated_at: string;
 }
