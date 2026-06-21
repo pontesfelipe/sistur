@@ -927,6 +927,56 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardContent>
       </Card>
 
+      {/* 1.20) Conectividade Aérea (ANAC) */}
+      <Card className="border-sky-500/30 bg-gradient-to-br from-sky-50/50 to-indigo-50/30 dark:from-sky-950/20 dark:to-indigo-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-sky-500/10"><Sparkles className="h-5 w-5 text-sky-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Conectividade Aérea
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>ANAC — voos/semana, passageiros 12m e participação internacional do aeroporto do município</CardDescription>
+            </div>
+            {airConnAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <AirConnectivitySearch destinationId={destinationId} onAutoFill={handleAirConnAutoFill} onAnalysisCapture={handleAirConnCapture} />
+        </CardContent>
+      </Card>
+
+      {/* 1.21) Sazonalidade Tarifária (derivada) */}
+      <Card className="border-violet-500/30 bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:from-violet-950/20 dark:to-purple-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-violet-500/10"><Sparkles className="h-5 w-5 text-violet-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Sazonalidade Tarifária
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Derivada</Badge>
+              </CardTitle>
+              <CardDescription>Cruza demanda orgânica, eventos locais e ADR mensal para mapear picos e baixas tarifárias</CardDescription>
+            </div>
+            {tariffSeasonalityAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <TariffSeasonalitySearch
+            pricingData={pricingData}
+            demandData={demandData}
+            eventsData={eventsData}
+            onAutoFill={handleTariffSeasonalityAutoFill}
+            onAnalysisCapture={handleTariffSeasonalityCapture}
+          />
+        </CardContent>
+      </Card>
+
       <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardHeader>
           <div className="flex items-center gap-3">
