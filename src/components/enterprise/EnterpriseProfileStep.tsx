@@ -434,6 +434,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.social_media_analysis) setSocialData(ep.social_media_analysis);
       if (ep.air_connectivity_analysis) setAirConnData(ep.air_connectivity_analysis);
       if (ep.tariff_seasonality_analysis) setTariffSeasonalityData(ep.tariff_seasonality_analysis);
+      if (ep.telecom_coverage_analysis) setTelecomData(ep.telecom_coverage_analysis);
+      if (ep.urban_accessibility_analysis) setAccessibilityData(ep.urban_accessibility_analysis);
+      if (ep.health_infrastructure_analysis) setHealthData(ep.health_infrastructure_analysis);
       if (ep.autofill_run_state) hydrateAutoFillState(ep.autofill_run_state as AutoFillEntry[]);
     }
   }, [existingProfile]);
