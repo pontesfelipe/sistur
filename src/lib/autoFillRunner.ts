@@ -14,7 +14,45 @@ import { useEffect, useRef, useSyncExternalStore } from 'react';
 
 type RunFn = () => Promise<unknown> | unknown;
 
-export type AutoFillStatus = 'idle' | 'running' | 'success' | 'error';
+export type AutoFillStatus = 'idle' | 'running' | 'success' | 'error' | 'no_data';
+
+/**
+ * Sinaliza que o bloco rodou com sucesso, mas a fonte de dados não retornou
+ * informações suficientes para preencher os indicadores. O orquestrador trata
+ * isso como um estado neutro (não-erro) e exibe a causa para o usuário.
+ *
+ * Componentes de busca podem usar `throw new NoDataError('motivo')` para
+ * sinalizar isso explicitamente. Para evitar editar 18 componentes, o
+ * `runEntry` também detecta mensagens de erro comuns ("Sem dados retornados",
+ * "não encontrado", "nenhum resultado", etc.) e converte para no_data.
+ */
+export class NoDataError extends Error {
+  constructor(reason: string) {
+    super(reason);
+    this.name = 'NoDataError';
+  }
+}
+
+const NO_DATA_PATTERNS = [
+  /sem dados/i,
+  /nenhum (?:resultado|dado|registro|item)/i,
+  /n[ãa]o (?:foi )?encontrad/i,
+  /not found/i,
+  /no data/i,
+  /no results/i,
+  /vazio/i,
+  /empty/i,
+];
+
+function classifyError(err: unknown): { kind: 'no_data' | 'error'; message: string } {
+  const message = err instanceof Error ? err.message : String(err);
+  if (err instanceof NoDataError) return { kind: 'no_data', message };
+  if ((err as any)?.name === 'NoDataError') return { kind: 'no_data', message };
+  if (NO_DATA_PATTERNS.some((re) => re.test(message))) {
+    return { kind: 'no_data', message };
+  }
+  return { kind: 'error', message };
+}
 
 export interface AutoFillEntry {
   id: string;
@@ -95,7 +133,7 @@ export function hydrateAutoFillState(entries: AutoFillEntry[] | null | undefined
       label: meta.get(e.id)?.label ?? e.label ?? e.id,
       source: meta.get(e.id)?.source ?? e.source,
       status,
-      error: status === 'error' ? e.error : undefined,
+      error: status === 'error' || status === 'no_data' ? e.error : undefined,
       lastRunAt: e.lastRunAt,
       lastDurationMs: e.lastDurationMs,
     });
@@ -120,11 +158,11 @@ export function useAutoFillStatuses(): AutoFillEntry[] {
 export interface RunAllOptions {
   delayMs?: number;
   onProgress?: (info: { id: string; index: number; total: number }) => void;
-  onBlockComplete?: (info: { id: string; label: string; status: 'success' | 'error'; error?: string }) => void;
+  onBlockComplete?: (info: { id: string; label: string; status: 'success' | 'error' | 'no_data'; error?: string }) => void;
   skipIds?: string[];
 }
 
-async function runEntry(id: string, fn: RunFn): Promise<{ status: 'success' | 'error'; error?: string }> {
+async function runEntry(id: string, fn: RunFn): Promise<{ status: 'success' | 'error' | 'no_data'; error?: string }> {
   const started = Date.now();
   setStatus(id, { status: 'running', error: undefined });
   try {
@@ -132,10 +170,14 @@ async function runEntry(id: string, fn: RunFn): Promise<{ status: 'success' | 'e
     setStatus(id, { status: 'success', error: undefined, lastRunAt: new Date().toISOString(), lastDurationMs: Date.now() - started });
     return { status: 'success' };
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error(`[autoFillRunner] "${id}" failed`, err);
-    setStatus(id, { status: 'error', error: msg, lastRunAt: new Date().toISOString(), lastDurationMs: Date.now() - started });
-    return { status: 'error', error: msg };
+    const { kind, message } = classifyError(err);
+    if (kind === 'no_data') {
+      console.info(`[autoFillRunner] "${id}" sem dados: ${message}`);
+    } else {
+      console.error(`[autoFillRunner] "${id}" failed`, err);
+    }
+    setStatus(id, { status: kind, error: message, lastRunAt: new Date().toISOString(), lastDurationMs: Date.now() - started });
+    return { status: kind, error: message };
   }
 }
 
@@ -156,8 +198,8 @@ export async function runAllAutoFills(opts: RunAllOptions = {}): Promise<void> {
 /** Re-execute a single block (used by the per-block "Tentar novamente" button). */
 export async function runOneAutoFill(
   id: string,
-  opts: { onComplete?: (info: { id: string; label: string; status: 'success' | 'error'; error?: string }) => void } = {},
-): Promise<{ status: 'success' | 'error'; error?: string } | { status: 'missing' }> {
+  opts: { onComplete?: (info: { id: string; label: string; status: 'success' | 'error' | 'no_data'; error?: string }) => void } = {},
+): Promise<{ status: 'success' | 'error' | 'no_data'; error?: string } | { status: 'missing' }> {
   const fn = registry.get(id);
   if (!fn) return { status: 'missing' };
   const result = await runEntry(id, fn);

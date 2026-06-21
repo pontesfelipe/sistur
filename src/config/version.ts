@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 83,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.83.2",
+    date: "2026-06-21",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Enterprise — pré-preenchimento automático: novo estado 'sem informações disponíveis'. Quando uma função de busca não encontra dados (ex.: município sem cobertura na fonte, fonte sem retorno, filtro vazio), o bloco não é mais tratado como erro vermelho. (1) `autoFillRunner` ganhou status `no_data` e classe `NoDataError`; o `runEntry` também detecta automaticamente mensagens comuns ('Sem dados retornados', 'não encontrado', 'no data', 'nenhum resultado', 'vazio') e converte para no_data sem precisar editar os 18 componentes de busca. (2) Toast por bloco: status `no_data` emite `toast.warning('ⓘ {bloco}: sem informações disponíveis — {causa}')`. (3) Resumo do 'Rodar todos' agora discrimina: 'X OK • Y sem dados • Z falharam'. (4) Badge âmbar com ícone Info para blocos sem dados, tooltip mostrando a causa e a fonte consultada; botão de retry também aparece (cor âmbar) para revalidar quando a fonte voltar a publicar."
+    ]
+  },
   {
     version: "1.83.1",
     date: "2026-06-21",
