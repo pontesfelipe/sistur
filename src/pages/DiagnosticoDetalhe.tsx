@@ -18,6 +18,8 @@ import { DataLineageView } from '@/components/diagnostics/DataLineageView';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
+import { EnterpriseRegressionAlerts } from '@/components/diagnostics/EnterpriseRegressionAlerts';
+import { EnterpriseOrgBenchmark } from '@/components/diagnostics/EnterpriseOrgBenchmark';
 import { PrescriptionModeView } from '@/components/diagnostics/PrescriptionModeView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
