@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 95,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.95.1",
+    date: "2026-06-22",
+    type: "patch" as const,
+    changes: [
+      "Fase 12.3 — Onboarding guiado Enterprise. Novo `EnterpriseOnboardingTour` em `src/components/enterprise/` com dialog de 5 passos (Bem-vindo, Identificação/CNPJ, Rodar 21 blocos, Importar CSV PMS, Calcular e gerar relatório), cada passo com 3 bullets de capacidades. Auto-abre na primeira visita ao Step Enterprise (controle via `localStorage` chave `sistur:enterprise:tour-seen-v1`); reabrível a qualquer momento pelo botão 'Tour' adicionado ao header do painel de progresso (ao lado de 'Rodar todos'). Indicador de progresso (dots) e botões Voltar/Pular/Próximo/Começar. Reduz fricção para novos operadores Enterprise. Bump 1.95.0 → 1.95.1."
+    ]
+  },
   {
     version: "1.95.0",
     date: "2026-06-22",

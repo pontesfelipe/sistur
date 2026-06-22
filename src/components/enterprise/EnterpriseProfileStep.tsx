@@ -57,6 +57,8 @@ import {
   type AutoFillEntry,
 } from '@/lib/autoFillRunner';
 import { Play, RefreshCw, AlertCircle, Info } from 'lucide-react';
+import { EnterpriseOnboardingTour } from './EnterpriseOnboardingTour';
+import { BookOpen } from 'lucide-react';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -92,6 +94,15 @@ const TARGET_MARKETS = [
 ];
 
 export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill }: EnterpriseProfileStepProps) {
+  const [tourOpen, setTourOpen] = useState(false);
+  // Fase 12.3 — auto-abre o tour na primeira visita ao Step Enterprise
+  useEffect(() => {
+    if (typeof window === 'undefined' || !destinationId) return;
+    if (!localStorage.getItem('sistur:enterprise:tour-seen-v1')) {
+      const t = setTimeout(() => setTourOpen(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, [destinationId]);
   const [reviewAutoFilled, setReviewAutoFilled] = useState(false);
   const [reviewAnalysisData, setReviewAnalysisData] = useState<Record<string, any> | null>(null);
   const [digitalAnalysisData, setDigitalAnalysisData] = useState<Record<string, any> | null>(null);
@@ -529,6 +540,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
   return (
     <div className="space-y-6">
+      {/* Fase 12.3 — Tour de onboarding (auto-abre na 1ª visita, reabrível via botão) */}
+      <EnterpriseOnboardingTour
+        destinationId={destinationId}
+        open={tourOpen}
+        onOpenChange={setTourOpen}
+      />
       {/* 0) Resumo de progresso dos blocos automáticos */}
       <Card className="border-primary/20">
         <CardContent className="py-4">
@@ -568,6 +585,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                   <Play className="h-3.5 w-3.5 mr-1" />
                 )}
                 {runAllLoading ? 'Executando...' : 'Rodar todos'}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setTourOpen(true)}
+                title="Abrir tour do módulo Enterprise"
+              >
+                <BookOpen className="h-3.5 w-3.5 mr-1" />
+                Tour
               </Button>
             </div>
           </div>
