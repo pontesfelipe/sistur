@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 89,
+  minor: 90,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.90.0",
+    date: "2026-06-22",
+    type: "minor" as const,
+    changes: [
+      "Relatório Enterprise — Fase 7 do plano de aprimoramento: template estrutural dedicado ao modo Empresarial em `report_structure_templates` (versão 2, ativa; a versão 1 fica desativada como histórico). A nova estrutura passa de 12 para 17 seções e separa explicitamente o que antes vivia diluído: (1) Diagnóstico Operacional dedicado a KPIs de origem PMS/CSV (Ocupação/ADR/RevPAR/GOP%/TrevPAR) com siglas expandidas na 1ª ocorrência; (2) Reputação & Satisfação separada, com NPS na escala -100 a +100, taxa de resposta a reviews e sentimento positivo; (3) Posicionamento Competitivo usando exclusivamente concorrentes anonimizados (Concorrente A/B/C — sem nome/CNPJ/URL), gap de preço contra mediana/p25/p75 e mix de canais de distribuição (direto vs. OTA, comissões), com proibição explícita de ranking público; (4) Pessoas & Cultura (turnover, FTE/UH, horas de treinamento) conectada ao I-OE; (5) ESG & Sustentabilidade (energia/água/resíduos, certificações) conectada ao I-RA; (6) Plano de Ação 90 dias organizado POR ÁREA RESPONSÁVEL (Comercial & Receita, Operações & Hospedagem, Pessoas & Cultura, ESG & Sustentabilidade, Marketing & Distribuição) com marcos em 30/60/90 dias e KPI alvo por ação. As três seções de Diagnóstico por Eixo (I-RA/I-OE/I-AO) continuam canônicas e devem citar a Trilha de Cálculo Enterprise injetada pela Fase 6. A estrutura respeita as 11 regras semânticas e os 4 auditores determinísticos da Fase 5 (escala NPS, expansão de glossário, privacidade de concorrentes, anti-ranking). `loadReportStructure` em `generate-report` já seleciona automaticamente a versão ativa por `updated_at desc`, então o pipeline passa a usar a nova estrutura sem ajustes de código. Encerra o plano de aprimoramento do Relatório Enterprise (Fases 5–7) sem impacto no modo Territorial."
+    ]
+  },
   {
     version: "1.89.0",
     date: "2026-06-22",
