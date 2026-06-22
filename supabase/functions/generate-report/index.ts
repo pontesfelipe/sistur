@@ -810,6 +810,113 @@ function formatEnterpriseProfile(profile: any): string {
   return lines.length > 1 ? lines.join('\n') + '\n' : '';
 }
 
+// v1.89.0 — Fase 6 Enterprise: contexto adicional para enriquecer o relatório.
+// Concorrentes são SEMPRE anonimizados (Concorrente A/B/C) — nunca expor nomes
+// ou CNPJs (regra anti-ranking + privacidade da camada semântica Enterprise).
+function formatEnterpriseCompetitorsAnon(competitors: any[]): string {
+  if (!competitors || competitors.length === 0) return '';
+  const sorted = [...competitors].sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0));
+  const letters = 'ABCDEFGHIJ';
+  const rows = sorted.slice(0, 8).map((c, i) => {
+    const rating = c.rating !== null && c.rating !== undefined ? `${Number(c.rating).toFixed(1)}/5` : '—';
+    const vol = c.review_volume ?? '—';
+    const dist = c.distance_km !== null && c.distance_km !== undefined
+      ? `${Number(c.distance_km).toFixed(1)} km`
+      : '—';
+    const type = c.property_type || '—';
+    return `- Concorrente ${letters[i] || (i + 1)}: tipo=${type} | nota=${rating} | volume de avaliações=${vol} | distância=${dist}`;
+  }).join('\n');
+  return `\n=== POSICIONAMENTO COMPETITIVO (CONCORRENTES ANONIMIZADOS) ===
+REGRA: NUNCA cite nomes, CNPJs ou URLs dos concorrentes; use apenas as letras (A, B, C…).
+NÃO produza ranking ("1º lugar", "líder", "melhor da cidade"). Use comparação como contexto.
+${rows}
+`;
+}
+
+function formatEnterpriseDistributionChannels(channels: any[]): string {
+  if (!channels || channels.length === 0) return '';
+  const totalShare = channels.reduce((s, c) => s + (Number(c.share_pct) || 0), 0);
+  const directShare = channels
+    .filter((c) => String(c.channel_type || '').toLowerCase() === 'direct')
+    .reduce((s, c) => s + (Number(c.share_pct) || 0), 0);
+  const rows = channels.map((c) => {
+    const share = c.share_pct !== null && c.share_pct !== undefined ? `${Number(c.share_pct).toFixed(1)}%` : '—';
+    const comm = c.commission_pct !== null && c.commission_pct !== undefined ? `${Number(c.commission_pct).toFixed(1)}%` : '—';
+    return `- ${c.channel_name || '—'} (${c.channel_type || '—'}): share=${share}, comissão=${comm}`;
+  }).join('\n');
+  return `\n=== CANAIS DE DISTRIBUIÇÃO ===
+Cobertura informada: ${totalShare.toFixed(1)}% | Vendas diretas: ${directShare.toFixed(1)}%
+${rows}
+`;
+}
+
+function formatEnterpriseReviewSnapshots(snaps: any[]): string {
+  if (!snaps || snaps.length === 0) return '';
+  const rows = snaps.slice(0, 6).map((s) => {
+    const date = s.snapshot_date ? new Date(s.snapshot_date).toLocaleDateString('pt-BR') : '—';
+    const rating = s.rating !== null && s.rating !== undefined ? `${Number(s.rating).toFixed(2)}/5` : '—';
+    const vol = s.review_volume ?? '—';
+    const resp = s.response_rate !== null && s.response_rate !== undefined ? `${Number(s.response_rate).toFixed(1)}%` : '—';
+    const sent = s.sentiment_positive_pct !== null && s.sentiment_positive_pct !== undefined ? `${Number(s.sentiment_positive_pct).toFixed(1)}%` : '—';
+    return `- ${date} | fonte=${s.source || '—'} | nota=${rating} | volume=${vol} | resposta=${resp} | sentimento+=${sent}`;
+  }).join('\n');
+  return `\n=== HISTÓRICO DE REPUTAÇÃO ONLINE (SNAPSHOTS) ===
+${rows}
+`;
+}
+
+function formatEnterpriseSeasonality(months: any[]): string {
+  if (!months || months.length === 0) return '';
+  const sorted = [...months].sort((a, b) => (b.year - a.year) || (b.month - a.month)).slice(0, 12);
+  const rows = sorted.map((m) => {
+    const occ = m.occupancy_rate !== null && m.occupancy_rate !== undefined ? `${Number(m.occupancy_rate).toFixed(1)}%` : '—';
+    const adr = m.adr !== null && m.adr !== undefined ? `R$ ${Number(m.adr).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—';
+    const rev = m.revpar !== null && m.revpar !== undefined ? `R$ ${Number(m.revpar).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—';
+    return `- ${m.year}-${String(m.month).padStart(2, '0')} | ocupação=${occ} | ADR=${adr} | RevPAR=${rev}`;
+  }).join('\n');
+  return `\n=== SAZONALIDADE OPERACIONAL (ÚLTIMOS MESES) ===
+${rows}
+`;
+}
+
+function formatEnterprisePmsImports(imports: any[]): string {
+  if (!imports || imports.length === 0) return '';
+  const rows = imports.slice(0, 5).map((imp) => {
+    const period = imp.period_start && imp.period_end
+      ? `${new Date(imp.period_start).toLocaleDateString('pt-BR')} → ${new Date(imp.period_end).toLocaleDateString('pt-BR')}`
+      : '—';
+    const when = imp.imported_at ? new Date(imp.imported_at).toLocaleDateString('pt-BR') : '—';
+    let metricsHint = '';
+    if (imp.parsed_metrics && typeof imp.parsed_metrics === 'object') {
+      const keys = Object.keys(imp.parsed_metrics).slice(0, 5);
+      metricsHint = ` | métricas: ${keys.join(', ')}`;
+    }
+    return `- Fonte PMS: ${imp.source || '—'} | período=${period} | importado em ${when} | linhas=${imp.rows_count ?? '—'} | status=${imp.status || '—'}${metricsHint}`;
+  }).join('\n');
+  return `\n=== IMPORTAÇÕES PMS RECENTES ===
+Esses lotes de CSV alimentam ENT_OCCUPANCY_RATE, ENT_ADR, ENT_REVPAR e derivados.
+Cite-os como "fonte: CSV do PMS (importado em DD/MM/AAAA)" ao referenciar essas métricas.
+${rows}
+`;
+}
+
+function formatEnterpriseCalculationTrail(trail: any[], indicatorsById: Map<string, any>): string {
+  if (!trail || trail.length === 0) return '';
+  const rows = trail.slice(0, 30).map((t) => {
+    const ind = indicatorsById.get(t.indicator_id);
+    const code = ind?.code || t.indicator_id;
+    const name = ind?.name || code;
+    const sources = Array.isArray(t.data_sources) ? t.data_sources.join(', ') : (t.data_sources || '—');
+    const formula = t.formula_text || '—';
+    const score = t.step_score !== null && t.step_score !== undefined ? `${formatPctBR(Number(t.step_score))}%` : '—';
+    return `- ${code} (${name}): score=${score} | fórmula=${formula} | fontes=${sources}`;
+  }).join('\n');
+  return `\n=== TRILHA DE CÁLCULO ENTERPRISE (ENT_*) ===
+Use estas fórmulas e fontes para justificar cada conclusão operacional/competitiva.
+${rows}
+`;
+}
+
 // External indicator values (IBGE, DATASUS, STN, CADASTUR …) serve as benchmark
 // references. Today they're only used at the data-import stage — surfacing them
 // in the prompt lets the LLM cite oficial baselines next to observed values.
