@@ -123,3 +123,9 @@ Cobertura dos 4 vetores selecionados pelo usuário ("todos os acima"):
 - **11.2 Benchmark intra-org Enterprise** (`EnterpriseOrgBenchmark`): média/mediana por pilar dos demais empreendimentos Enterprise da mesma org, totalmente anonimizado (N + estatística). Exibido apenas em Enterprise; respeita `no-public-rankings`.
 - **11.3 PDF Enterprise-aware**: `downloadPDF` e `buildPrintHTML` recebem `scope`; PDF Enterprise ganha faixa identificadora ('Relatório Enterprise … concorrentes anonimizados A/B/C') antes do corpo ABNT. Botões PDF (aba Gerar e Histórico) propagam o escopo via `diagnostic_type`.
 - **11.4 Recomendações EDU Enterprise**: `EduRecommendationsPanel` já é renderizado em Enterprise via `displayedIndicatorScores`. A sincronização Pós-Fase 3 (v1.87.0) dos códigos `ENT_*` na tabela unificada `indicators` habilita recomendações automaticamente assim que `edu_indicator_training_map` receber mapeamentos `ENT_*` → curso. Sem alteração de código necessária — gap puramente de dados.
+
+### Pós-Fase 11 — Cobertura EDU Enterprise (v1.94.1) ✅
+
+- Migração popula 30 mapeamentos `ENT_*` → curso na tabela `edu_indicator_training_map`, complementando os 26 já existentes. Cobertura total agora abrange RA (energia, água, resíduos, certificação, acessibilidade física), OE (financeiro, compliance, manutenção, tecnologia, parcerias, sazonalidade) e AO (reputação, NPS, revenue management, service recovery, presença digital).
+- Indicadores contextuais externos (saúde do entorno, conectividade aérea/telecom, segurança do destino, clima, eventos, transporte, demanda) ficam intencionalmente fora — não são acionáveis pelo empreendimento e não comportam prescrição.
+- Encerra o último gap pendente da Fase 11.
