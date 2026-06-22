@@ -3078,6 +3078,11 @@ serve(async (req) => {
       externalValuesRes,
       enterpriseValuesRes,
       enterpriseProfileRes,
+      enterpriseCompetitorsRes,
+      enterpriseChannelsRes,
+      enterpriseReviewSnapshotsRes,
+      enterpriseSeasonalityRes,
+      enterprisePmsImportsRes,
     ] = await Promise.all([
       supabase.from('indicator_scores').select('*, value_raw, value_normalized, score_pct, polarity, normalization_method, confidence_level, indicators(code, name, pillar, theme, description, direction, indicator_scope, benchmark_min, benchmark_max, benchmark_target, unit, value_format, normalization, data_source, source, collection_type)').eq('assessment_id', assessmentId).order('score', { ascending: true }),
       supabase.from('alerts').select('*').eq('assessment_id', assessmentId).eq('is_dismissed', false),
@@ -3105,6 +3110,22 @@ serve(async (req) => {
       isEnterprise && destinationId
         ? supabase.from('enterprise_profiles').select('*').eq('destination_id', destinationId).maybeSingle()
         : emptyMaybe,
+      // Fase 6 — Enterprise context enrichment
+      isEnterprise && destinationId
+        ? supabase.from('enterprise_competitors').select('property_type, rating, review_volume, distance_km').eq('destination_id', destinationId)
+        : emptyArray,
+      isEnterprise && destinationId
+        ? supabase.from('enterprise_distribution_channels').select('channel_name, channel_type, share_pct, commission_pct').eq('destination_id', destinationId)
+        : emptyArray,
+      isEnterprise && destinationId
+        ? supabase.from('enterprise_review_snapshots').select('snapshot_date, source, rating, review_volume, response_rate, sentiment_positive_pct').eq('destination_id', destinationId).order('snapshot_date', { ascending: false }).limit(6)
+        : emptyArray,
+      isEnterprise && destinationId
+        ? supabase.from('enterprise_seasonality_months').select('year, month, occupancy_rate, adr, revpar').eq('destination_id', destinationId).order('year', { ascending: false }).order('month', { ascending: false }).limit(12)
+        : emptyArray,
+      isEnterprise
+        ? supabase.from('enterprise_pms_imports').select('source, period_start, period_end, parsed_metrics, status, rows_count, imported_at').eq('assessment_id', assessmentId).order('imported_at', { ascending: false }).limit(5)
+        : emptyArray,
     ]);
 
     const indicatorScores = indicatorScoresRes.data || [];
@@ -3117,6 +3138,33 @@ serve(async (req) => {
     const externalValues = externalValuesRes.data || [];
     const enterpriseValues = enterpriseValuesRes.data || [];
     const enterpriseProfile = enterpriseProfileRes.data || null;
+    const enterpriseCompetitors = enterpriseCompetitorsRes.data || [];
+    const enterpriseChannels = enterpriseChannelsRes.data || [];
+    const enterpriseReviewSnapshots = enterpriseReviewSnapshotsRes.data || [];
+    const enterpriseSeasonality = enterpriseSeasonalityRes.data || [];
+    const enterprisePmsImports = enterprisePmsImportsRes.data || [];
+
+    // v1.89.0 — Trilha de cálculo dos indicadores Enterprise (ENT_*) — usada
+    // para justificar fórmulas/fontes das métricas operacionais no prompt.
+    let enterpriseCalcTrail: any[] = [];
+    const indicatorsByIdMap = new Map<string, any>();
+    if (isEnterprise) {
+      const entScoreIds = indicatorScores
+        .filter((s: any) => String(s.indicators?.code || '').startsWith('ENT_'))
+        .map((s: any) => s.indicator_id)
+        .filter(Boolean);
+      indicatorScores.forEach((s: any) => {
+        if (s.indicator_id && s.indicators) indicatorsByIdMap.set(s.indicator_id, s.indicators);
+      });
+      if (entScoreIds.length > 0) {
+        const { data: trailRows } = await supabase
+          .from('indicator_calculation_trail')
+          .select('indicator_id, formula_text, data_sources, step_score')
+          .eq('assessment_id', assessmentId)
+          .in('indicator_id', entScoreIds);
+        enterpriseCalcTrail = trailRows || [];
+      }
+    }
 
     // Fase 5 — Etapa 4: Audit trail (procedência por indicador) para justificar o relatório.
     // Tabela `assessment_indicator_audit` é populada pelo engine `calculate-assessment`.
