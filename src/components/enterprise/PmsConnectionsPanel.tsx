@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plug, RefreshCw, Trash2, ExternalLink, Loader2, Sparkles } from 'lucide-react';
+import { Plug, RefreshCw, Trash2, ExternalLink, Loader2, Sparkles, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useProfileContext } from '@/contexts/ProfileContext';
