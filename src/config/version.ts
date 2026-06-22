@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 94,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.94.1",
+    date: "2026-06-22",
+    type: "patch" as const,
+    changes: [
+      "Fase 11.4 — Cobertura completa de prescrições EDU Enterprise: migração popula 30 novos mapeamentos `ENT_*` → curso da trilha Enterprise em `edu_indicator_training_map`, complementando os 26 já existentes. Indicadores agora cobertos por triggers Atenção/Crítico: RA (ENT_CARBON, ENT_ENERGY, ENT_WASTE, ENT_ACCESSIBLE_ROOMS, ENT_SUSTENTABILIDADE, ENT_SUSTENTABILIDADE_SCORE), OE (ENT_GOPPAR, ENT_TREVPAR, ENT_DIGITAL_CHECKIN, ENT_STAFF_RATIO, ENT_LEGAL_DOCS, ENT_COMPLIANCE_RATE, ENT_SEASONALITY, ENT_SEGURANCA_SCORE) e AO (ENT_AVAL_GOOGLE, ENT_REVIEW_VOL, ENT_RESPONSE_RATE, ENT_REPUTACAO_CONSOLIDADA, ENT_REPUTACAO_PUBLICA, ENT_TAXA_SOLUCAO, ENT_TAXA_SOLUCAO_RECLAMACOES, ENT_REPEAT_GUEST, ENT_GUEST_SATISFACTION, ENT_DIARIA_MEDIA, ENT_INDICE_PRECO, ENT_POSICAO_PRECO, ENT_SAZONALIDADE_TARIFARIA, ENT_FORCA_MARCA, ENT_PRESENCA_DIGITAL, ENT_PRESENCA_WEB). Cada mapeamento usa `status_trigger=['CRITICO','MODERADO']` e `reason_template` específico do indicador, respeitando o constraint `learning-triggered-by-status` + `prescription-justification-format`. Indicadores contextuais externos (ENT_CONTEXTO_DESTINO, ENT_SAUDE_ENTORNO, ENT_ACESSIBILIDADE_SCORE, ENT_CONFORTO_CLIMATICO, ENT_SEGURANCA_DESTINO, ENT_TRANSPORTE_COBERTURA, ENT_CONECTIVIDADE_AEREA, ENT_CONECTIVIDADE_TELECOM, ENT_DEMANDA_EVENTOS, ENT_DEMANDA_INTERESSE, ENT_EVENTOS_DENSIDADE) ficam intencionalmente sem prescrição — são sinais do entorno municipal, não acionáveis pelo empreendimento. Encerra o último gap pendente da Fase 11. Bump 1.94.0 → 1.94.1."
+    ]
+  },
   {
     version: "1.94.0",
     date: "2026-06-22",
