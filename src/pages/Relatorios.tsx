@@ -1439,7 +1439,7 @@ export default function Relatorios() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => downloadPDF(historyReportRef)}
+                        onClick={() => downloadPDF(historyReportRef, selectedHistoryReport.diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial')}
                         className="gap-2"
                       >
                         <FileText className="h-4 w-4" />
