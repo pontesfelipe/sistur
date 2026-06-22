@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 90,
+  minor: 91,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.91.0",
+    date: "2026-06-22",
+    type: "minor" as const,
+    changes: [
+      "Relatório Enterprise — Fase 8 do plano de aprimoramento: validação ponta-a-ponta dos auditores e produtização do fluxo de auditoria. (1) Corrigidos dois falso-positivos detectados ao rodar os 10 auditores determinísticos (6 globais + 4 Enterprise) contra um relatório real: (a) `structural.no_truncation_markers` deixava `TODO|TBD` sem `\\b`, então qualquer palavra contendo a substring 'todo' (ex.: 'metodologia', 'metodológica', 'estudo') disparava `fail`; agora exige limites de palavra; (b) `glossary.IGMA_expansion` considerava a 1ª ocorrência da sigla mesmo quando ela era parte de um código de flag de sistema (`IGMA_EXTERNALITY_WARNING`, `IGMA_RA_LIMITATION`, `IGMA_GOVERNANCE_BLOCK`), que não pede expansão por extenso; a regex passou a ignorar IGMA seguida de underline e procura a primeira menção 'humana' da sigla. (2) `AdminSemanticLayer` ganhou um novo seletor 'Carregar relatório salvo' no painel de Auditoria: lista os últimos 50 `generated_reports` (com filtro Territorial / Enterprise / Todos), faz join com `assessments.diagnostic_type` para classificar e, ao clicar em uma linha, injeta o conteúdo na caixa de auditoria, ajusta automaticamente o escopo das regras (`auditScope`) para o tipo do diagnóstico e nomeia o arquivo com `<destino> — <data>`. Elimina o passo manual de copiar/colar do banco para validar conformidade. (3) Validação executada contra o relatório Enterprise existente de Foz do Iguaçu (anterior às Fases 5–7) confirmou o esperado: PASS em escala NPS, privacidade de concorrentes, anti-ranking, classificação, BRL e duplicatas; WARN em expansão de glossário Enterprise (RevPAR sem extenso) — pendência que as Fases 5–7 endereçam para novos relatórios via regras semânticas + template estrutural v2. Encerra Fase 8 com auditores confiáveis e auditoria operacional via UI."
+    ]
+  },
   {
     version: "1.90.0",
     date: "2026-06-22",

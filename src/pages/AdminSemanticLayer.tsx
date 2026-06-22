@@ -164,6 +164,55 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
   const [auditFilter, setAuditFilter] = useState<"all" | "fail" | "warn" | "pass">("all");
   const auditFileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // v1.91.0 — Fase 8: carregar relatórios já gerados (Enterprise ou Territorial)
+  // direto do banco para auditoria, sem precisar copiar/colar.
+  type SavedReport = {
+    id: string;
+    assessment_id: string;
+    destination_name: string | null;
+    created_at: string;
+    diagnostic_type: "territorial" | "enterprise" | null;
+    report_content: string;
+  };
+  const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
+  const [savedLoading, setSavedLoading] = useState(false);
+  const [savedScope, setSavedScope] = useState<"all" | "territorial" | "enterprise">("all");
+
+  const loadSavedReports = async () => {
+    setSavedLoading(true);
+    try {
+      // Join via assessment_id → assessments.diagnostic_type
+      const { data, error } = await supabase
+        .from("generated_reports")
+        .select("id, assessment_id, destination_name, created_at, report_content, assessments!inner(diagnostic_type)")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      const rows: SavedReport[] = (data || []).map((r: any) => ({
+        id: r.id,
+        assessment_id: r.assessment_id,
+        destination_name: r.destination_name,
+        created_at: r.created_at,
+        diagnostic_type: r.assessments?.diagnostic_type ?? null,
+        report_content: r.report_content,
+      }));
+      setSavedReports(rows);
+    } catch (e: any) {
+      toast.error("Erro ao carregar relatórios salvos: " + (e?.message ?? String(e)));
+    } finally {
+      setSavedLoading(false);
+    }
+  };
+
+  const loadSavedReportIntoAudit = (r: SavedReport) => {
+    setAuditText(r.report_content || "");
+    setAuditFileName(`${r.destination_name ?? "Relatório"} — ${new Date(r.created_at).toLocaleDateString("pt-BR")}`);
+    if (r.diagnostic_type === "enterprise" || r.diagnostic_type === "territorial") setAuditScope(r.diagnostic_type);
+    setAuditResult(null);
+    setAuditMeta(null);
+    toast.success(`Relatório carregado (${(r.report_content || "").length.toLocaleString("pt-BR")} chars).`);
+  };
+
   const handleAuditFile = async (file: File) => {
     const name = file.name.toLowerCase();
     const isTextual = /\.(txt|md|markdown|json|html|htm|csv|log)$/.test(name) || file.type.startsWith("text/");
@@ -846,6 +895,9 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     <Button variant="outline" size="sm" onClick={() => auditFileInputRef.current?.click()}>
                       <Upload className="h-4 w-4 mr-2" /> Selecionar arquivo
                     </Button>
+                    <Button variant="outline" size="sm" onClick={() => { if (savedReports.length === 0) loadSavedReports(); else loadSavedReports(); }}>
+                      <FileText className="h-4 w-4 mr-2" /> Carregar relatório salvo
+                    </Button>
                     <input
                       ref={auditFileInputRef}
                       type="file"
@@ -875,6 +927,51 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                   </Select>
                 </div>
               </div>
+
+              {(savedLoading || savedReports.length > 0) && (
+                <div className="rounded-md border p-3 space-y-2 bg-muted/30">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <Label className="text-xs font-medium">Relatórios salvos (últimos 50)</Label>
+                    <div className="flex items-center gap-2">
+                      <Select value={savedScope} onValueChange={(v: any) => setSavedScope(v)}>
+                        <SelectTrigger className="h-7 text-xs w-[180px]"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos</SelectItem>
+                          <SelectItem value="territorial">Territorial</SelectItem>
+                          <SelectItem value="enterprise">Enterprise</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" variant="ghost" onClick={() => setSavedReports([])}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  {savedLoading ? (
+                    <p className="text-xs text-muted-foreground">Carregando…</p>
+                  ) : (
+                    <div className="max-h-56 overflow-y-auto space-y-1">
+                      {savedReports.filter(r => savedScope === "all" || r.diagnostic_type === savedScope).map((r) => (
+                        <button
+                          key={r.id}
+                          onClick={() => loadSavedReportIntoAudit(r)}
+                          className="w-full text-left text-xs rounded border bg-background hover:bg-accent px-2 py-1.5 flex items-center justify-between gap-2"
+                        >
+                          <span className="truncate">
+                            <Badge variant="outline" className="text-[10px] mr-2 uppercase">{r.diagnostic_type ?? "?"}</Badge>
+                            {r.destination_name ?? r.assessment_id.slice(0, 8)}
+                          </span>
+                          <span className="text-muted-foreground shrink-0">
+                            {new Date(r.created_at).toLocaleDateString("pt-BR")} · {(r.report_content?.length ?? 0).toLocaleString("pt-BR")} chars
+                          </span>
+                        </button>
+                      ))}
+                      {savedReports.filter(r => savedScope === "all" || r.diagnostic_type === savedScope).length === 0 && (
+                        <p className="text-xs text-muted-foreground">Nenhum relatório nesta categoria.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div>
                 <Label className="text-xs">Conteúdo do relatório</Label>

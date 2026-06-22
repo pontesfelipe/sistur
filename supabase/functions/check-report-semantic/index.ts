@@ -35,7 +35,9 @@ function deterministicChecks(reportText: string): Finding[] {
   const sample = (s: string) => s.slice(0, 240);
 
   // 1) Marcas de truncagem residuais
-  const truncMarkers = /(stop_reason\s*[:=]\s*"?max_tokens|finish_reason\s*[:=]\s*"?length|\[TRUNCADO|\.\.\.\s*\[continua\]|TODO|TBD|\bLOREM IPSUM\b)/i;
+  // v1.91.0 — Adicionar word boundaries em TODO/TBD para evitar falso-positivo
+  // em palavras que contêm "todo" como substring (ex.: "metodologia", "estudo").
+  const truncMarkers = /(stop_reason\s*[:=]\s*"?max_tokens|finish_reason\s*[:=]\s*"?length|\[TRUNCADO|\.\.\.\s*\[continua\]|\bTODO\b|\bTBD\b|\bLOREM IPSUM\b)/i;
   const tm = reportText.match(truncMarkers);
   findings.push({
     rule_key: "structural.no_truncation_markers",
@@ -94,7 +96,12 @@ function deterministicChecks(reportText: string): Finding[] {
   });
 
   // 5) IGMA expandida na primeira ocorrência
-  const igmaIdx = reportText.indexOf("IGMA");
+  // v1.91.0 — Ignorar ocorrências em códigos de flag do tipo IGMA_EXTERNALITY_WARNING,
+  // IGMA_RA_LIMITATION etc. (são identificadores de sistema, não menções à sigla
+  // a serem expandidas). Procuramos a 1ª ocorrência "humana" (não seguida de `_`).
+  const igmaRe = /\bIGMA\b(?!_)/;
+  const igmaMatch = reportText.match(igmaRe);
+  const igmaIdx = igmaMatch ? igmaMatch.index! : -1;
   let igmaStatus: Status = "pass";
   let igmaEvidence: string | null = null;
   if (igmaIdx >= 0) {
