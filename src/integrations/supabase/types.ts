@@ -4385,6 +4385,60 @@ export type Database = {
           },
         ]
       }
+      enterprise_pms_connections: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          credentials: Json
+          destination_id: string
+          id: string
+          last_import_id: string | null
+          last_sync_at: string | null
+          last_sync_error: string | null
+          last_sync_status: string | null
+          org_id: string
+          property_id: string | null
+          property_name: string | null
+          provider: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          credentials?: Json
+          destination_id: string
+          id?: string
+          last_import_id?: string | null
+          last_sync_at?: string | null
+          last_sync_error?: string | null
+          last_sync_status?: string | null
+          org_id: string
+          property_id?: string | null
+          property_name?: string | null
+          provider: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          credentials?: Json
+          destination_id?: string
+          id?: string
+          last_import_id?: string | null
+          last_sync_at?: string | null
+          last_sync_error?: string | null
+          last_sync_status?: string | null
+          org_id?: string
+          property_id?: string | null
+          property_name?: string | null
+          provider?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       enterprise_pms_imports: {
         Row: {
           applied_at: string | null
