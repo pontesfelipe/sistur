@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 91,
+  minor: 92,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.92.0",
+    date: "2026-06-22",
+    type: "minor" as const,
+    changes: [
+      "Relatório Enterprise — Fase 9 do plano de aprimoramento: export DOCX (Word) Enterprise-aware. (1) `exportReportAsDocx` (`src/lib/exportReportDocx.ts`) ganhou parâmetro opcional `scope: 'territorial' | 'enterprise'` (default territorial, preserva compatibilidade). (2) `buildCoverPage` agora ajusta capa ABNT pelo escopo: no modo Enterprise o título principal vira 'RELATÓRIO ENTERPRISE — DIAGNÓSTICO OPERACIONAL & ESTRATÉGICO' (em vez de 'RELATÓRIO DE DIAGNÓSTICO SISTUR') e o texto de natureza do documento descreve indicadores operacionais (PMS, reputação, posicionamento, ESG) com aviso explícito de anonimização de concorrentes (Concorrente A/B/C), alinhado às regras semânticas Enterprise (Fases 5–7). (3) Nome do arquivo segue o escopo: `relatorio-enterprise-<destino>.docx` para Enterprise e `relatorio-<destino>.docx` para Territorial. (4) `Relatorios.tsx` propaga o escopo nos dois botões 'Word' (aba Gerar com `selectedAssessmentMeta.diagnostic_type` e aba Histórico com `selectedHistoryReport.diagnostic_type`), de modo que cada export usa a capa correta para o tipo do diagnóstico. (5) O corpo do documento (17 seções Enterprise do template v2) já era renderizado corretamente pelo parser markdown→DOCX existente (H1/H2/H3, tabela canônica 5 colunas, status colorido), então a única lacuna era a capa e o filename. Nenhum impacto no modo Territorial, nos relatórios já salvos ou no PDF/HTML preview."
+    ]
+  },
   {
     version: "1.91.0",
     date: "2026-06-22",
