@@ -85,6 +85,11 @@ Confirme se posso começar pela **Fase 1** (validação e UX) ou se prefere outr
 - Blocos respeitam as 11 regras semânticas e os 4 auditores da Fase 5 — concorrentes nunca carregam nome/CNPJ/URL.
 - Logger `data_collected` ganha 6 contadores novos para observabilidade.
 
-### Fase 7 — Template estrutural Enterprise (v1.90.0)
+### Fase 7 — Template estrutural Enterprise (v1.90.0) ✅
 
-- Linha dedicada em `report_structure_templates` para `mode='enterprise'`: Diagnóstico Operacional, Reputação & Satisfação, Posicionamento Competitivo, Pessoas & Cultura, ESG/Sustentabilidade, Plano de Ação 90 dias por área.
+- Nova linha em `report_structure_templates` (`scope='enterprise'`, `template='completo'`, `version=2`, `active=true`) com 17 seções; a v1 fica desativada como histórico.
+- Seções dedicadas: Diagnóstico Operacional (PMS/CSV), Reputação & Satisfação (NPS -100 a +100), Posicionamento Competitivo (concorrentes anonimizados + mix de canais), Pessoas & Cultura, ESG & Sustentabilidade.
+- Plano de Ação 90 dias organizado por área responsável (Comercial, Operações, Pessoas, ESG, Marketing) com marcos em 30/60/90 dias e KPI alvo por ação.
+- `loadReportStructure` seleciona automaticamente a versão ativa via `updated_at desc` — nenhum ajuste de código foi necessário no pipeline.
+
+Encerra o plano de aprimoramento do Relatório Enterprise (Fases 5–7).
