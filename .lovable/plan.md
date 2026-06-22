@@ -129,3 +129,9 @@ Cobertura dos 4 vetores selecionados pelo usuário ("todos os acima"):
 - Migração popula 30 mapeamentos `ENT_*` → curso na tabela `edu_indicator_training_map`, complementando os 26 já existentes. Cobertura total agora abrange RA (energia, água, resíduos, certificação, acessibilidade física), OE (financeiro, compliance, manutenção, tecnologia, parcerias, sazonalidade) e AO (reputação, NPS, revenue management, service recovery, presença digital).
 - Indicadores contextuais externos (saúde do entorno, conectividade aérea/telecom, segurança do destino, clima, eventos, transporte, demanda) ficam intencionalmente fora — não são acionáveis pelo empreendimento e não comportam prescrição.
 - Encerra o último gap pendente da Fase 11.
+
+### Fase 12 — Alertas por e-mail + Benchmark setorial (v1.95.0) ✅
+
+- **12.1 Alertas de regressão por e-mail** (fecha o gap visual da Fase 11.1): novo template `enterprise-regression-alert` registrado em `_shared/transactional-email-templates/registry.ts`. O painel `EnterpriseRegressionAlerts` agora exibe botão 'Notificar por e-mail' que dispara via `send-transactional-email` para o usuário logado, com dedupe por `localStorage` (`regression-email-<assessmentId>`) e idempotencyKey próprio. Vale para Territorial e Enterprise.
+- **12.2 Benchmark setorial anônimo** (extensão da Fase 11.2): novo `EnterpriseSectorBenchmark` compara o empreendimento contra a base SISTUR filtrada pelo mesmo `property_type` + faixa `star_rating` ±1, com média/mediana/Q1–Q3. Mínimo N=3 pares para exibir (privacidade), sem nomes nem ordenação. Renderizado apenas em Enterprise abaixo do benchmark intra-org.
+- **12.3 Onboarding guiado Enterprise** (frente D): adiada para fase seguinte — exige design dedicado de tour/wizard, fora do escopo desta entrega lean.

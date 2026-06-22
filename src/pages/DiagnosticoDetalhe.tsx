@@ -20,6 +20,7 @@ import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonVie
 import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
 import { EnterpriseRegressionAlerts } from '@/components/diagnostics/EnterpriseRegressionAlerts';
 import { EnterpriseOrgBenchmark } from '@/components/diagnostics/EnterpriseOrgBenchmark';
+import { EnterpriseSectorBenchmark } from '@/components/diagnostics/EnterpriseSectorBenchmark';
 import { PrescriptionModeView } from '@/components/diagnostics/PrescriptionModeView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
@@ -1001,6 +1002,8 @@ const DiagnosticoDetalhe = () => {
               <EnterpriseRegressionAlerts
                 destinationId={assessment.destination_id}
                 diagnosticType={isEnterprise ? 'enterprise' : 'territorial'}
+                destinationName={assessment.title}
+                currentAssessmentId={id!}
               />
             )}
 
@@ -1011,6 +1014,11 @@ const DiagnosticoDetalhe = () => {
                 currentDestinationId={assessment.destination_id}
                 currentAssessmentId={id!}
               />
+            )}
+
+            {/* Fase 12.2 — Benchmark setorial anônimo (Enterprise apenas) */}
+            {isEnterprise && assessment.destination_id && (
+              <EnterpriseSectorBenchmark currentDestinationId={assessment.destination_id} />
             )}
           </TabsContent>
 

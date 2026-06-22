@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 94,
-  patch: 1,
+  minor: 95,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.95.0",
+    date: "2026-06-22",
+    type: "minor" as const,
+    changes: [
+      "Fase 12 — Frentes B+F entregues. (12.1 Alertas por e-mail) Novo template `enterprise-regression-alert` em `supabase/functions/_shared/transactional-email-templates/` (registrado em `registry.ts`), com layout consistente com `observatory-critical-alert` (ABNT brand, footer institucional, link direto para `/diagnosticos/<id>`). O componente `EnterpriseRegressionAlerts` ganhou botão 'Notificar por e-mail' que invoca `send-transactional-email` com `idempotencyKey=regression-<assessmentId>-<ts>` e usa `localStorage` (`regression-email-<assessmentId>`) para evitar disparos duplicados na mesma rodada. Funciona em Territorial e Enterprise. (12.2 Benchmark setorial anônimo) Novo `EnterpriseSectorBenchmark` em `src/components/diagnostics/` — compara o empreendimento contra média/mediana/quartis (Q1–Q3) de TODA a base SISTUR filtrada pelo mesmo `property_type` + `star_rating` ±1, exibido apenas no modo Enterprise abaixo do benchmark intra-org. Privacidade: mínimo N=3 pares para exibir números (LGPD + `no-public-rankings`); abaixo disso mostra mensagem de cobertura insuficiente, sem expor segmento ainda formado. Sem nomes, sem ordenação, sem CNPJ. Bump 1.94.1 → 1.95.0."
+    ]
+  },
   {
     version: "1.94.1",
     date: "2026-06-22",
