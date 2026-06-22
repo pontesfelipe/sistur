@@ -1087,7 +1087,7 @@ export default function Relatorios() {
                           <Download className="h-4 w-4" />
                           Word
                         </Button>
-                        <Button variant="outline" onClick={() => downloadPDF()} className="gap-2">
+                        <Button variant="outline" onClick={() => downloadPDF(reportRef, selectedAssessmentMeta?.diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial')} className="gap-2">
                           <FileText className="h-4 w-4" />
                           PDF
                         </Button>
