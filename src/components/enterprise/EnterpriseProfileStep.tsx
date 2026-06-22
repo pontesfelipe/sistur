@@ -94,6 +94,7 @@ const TARGET_MARKETS = [
 ];
 
 export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill }: EnterpriseProfileStepProps) {
+  const [tourOpen, setTourOpen] = useState(false);
   const [reviewAutoFilled, setReviewAutoFilled] = useState(false);
   const [reviewAnalysisData, setReviewAnalysisData] = useState<Record<string, any> | null>(null);
   const [digitalAnalysisData, setDigitalAnalysisData] = useState<Record<string, any> | null>(null);
