@@ -635,6 +635,7 @@ export async function exportReportAsDocx(
   });
 
   const buffer = await Packer.toBlob(doc);
-  const filename = `relatorio-${destinationName.toLowerCase().replace(/\s+/g, '-')}.docx`;
+  const prefix = scope === 'enterprise' ? 'relatorio-enterprise' : 'relatorio';
+  const filename = `${prefix}-${destinationName.toLowerCase().replace(/\s+/g, '-')}.docx`;
   saveAs(buffer, filename);
 }
