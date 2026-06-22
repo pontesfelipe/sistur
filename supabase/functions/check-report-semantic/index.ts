@@ -399,6 +399,9 @@ serve(async (req) => {
 
     // (1) Determinísticas
     const detFindings = deterministicChecks(reportText);
+    if (appliesTo === "enterprise") {
+      detFindings.push(...enterpriseDeterministicChecks(reportText));
+    }
 
     // (2) Agrupar regras por categoria e fatiar em lotes
     const byCategory = new Map<string, any[]>();
