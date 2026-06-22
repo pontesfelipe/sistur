@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 87,
+  minor: 88,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.88.0",
+    date: "2026-06-22",
+    type: "minor" as const,
+    changes: [
+      "Relatório Enterprise — Fase 5 do plano de aprimoramento: camada semântica + auditor calibrados para modo Enterprise. (1) Seed de 10 regras `applies_to='enterprise'` em `report_semantic_entries`, cobrindo: glossário operacional (ADR/RevPAR/GOP/NPS/Ocupação/TrevPAR — expansão obrigatória na 1ª ocorrência), bandas de status calibradas por KPI (Ocupação, NPS na escala -100 a +100, GOP%), privacidade de concorrentes (sem nomes/CNPJs, comparações apenas agregadas), proibição de ranking público entre empreendimentos (gap contra mediana/p25/p75 em vez de '1º lugar'), atribuição correta de fonte PMS/CSV vs. reviews públicos, seções obrigatórias (Diagnóstico Operacional separado de Reputação, Posicionamento Competitivo, Plano de Ação 90 dias por área), e formatação de percentuais sem decimais. (2) Auditor `check-report-semantic` ganha 4 checagens determinísticas Enterprise (sem custo de IA, ativadas quando `appliesTo='enterprise'`): `enterprise.nps_scale` (rejeita 'NPS X/100'), `enterprise.glossary_expansion` (verifica expansão de ADR/RevPAR/GOP/NPS perto da 1ª ocorrência), `enterprise.competitor_privacy` (detecta CNPJ formatado e nomes próprios de concorrentes), `enterprise.no_competitor_ranking` (rejeita 'melhor da cidade', 'top N hotéis'). (3) Próximos passos planejados: Fase 6 — enriquecer contexto injetado em `process-report-job` (perfil, competitors, channels, PMS recentes, audit trail filtrada ENT_*); Fase 7 — template estrutural dedicado em `report_structure_templates`."
+    ]
+  },
   {
     version: "1.87.0",
     date: "2026-06-21",
