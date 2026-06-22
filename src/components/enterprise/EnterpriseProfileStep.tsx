@@ -532,6 +532,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
   return (
     <div className="space-y-6">
+      {/* Fase 12.3 — Tour de onboarding (auto-abre na 1ª visita, reabrível via botão) */}
+      <EnterpriseOnboardingTour
+        destinationId={destinationId}
+        open={tourOpen}
+        onOpenChange={setTourOpen}
+      />
       {/* 0) Resumo de progresso dos blocos automáticos */}
       <Card className="border-primary/20">
         <CardContent className="py-4">
