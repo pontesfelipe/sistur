@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 88,
+  minor: 89,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.89.0",
+    date: "2026-06-22",
+    type: "minor" as const,
+    changes: [
+      "Relatório Enterprise — Fase 6 do plano de aprimoramento: enriquecimento de contexto no pipeline de geração de relatórios para modo Enterprise. (1) `generate-report` agora consulta em paralelo 5 fontes Enterprise antes adormecidas no prompt: `enterprise_competitors` (anonimizados como Concorrente A/B/C — nunca expõe nome/CNPJ/URL), `enterprise_distribution_channels` (com share total, share direto e comissão por canal), `enterprise_review_snapshots` (últimos 6 snapshots por destino, com sentimento e taxa de resposta), `enterprise_seasonality_months` (últimos 12 meses de ocupação/ADR/RevPAR) e `enterprise_pms_imports` (últimas 5 importações, com período e métricas parseadas). (2) Após o cálculo, filtra `indicator_calculation_trail` pelos `indicator_id`s correspondentes a códigos `ENT_*` e injeta a 'Trilha de Cálculo Enterprise' no prompt (fórmula, fontes, score por indicador operacional). (3) Cada bloco é injetado logo após o `PERFIL DO EMPREENDIMENTO` e antes de `=== DADOS DO DIAGNÓSTICO ===`, mantendo a ordem: PMS → Sazonalidade → Reputação → Canais → Concorrentes → Trilha ENT. (4) Blocos respeitam as 11 regras semânticas e os 4 auditores determinísticos seedados na Fase 5 — concorrentes vêm anonimizados na origem (a tabela `enterprise_competitors` no prompt nunca traz `name` ou `source_url`), reforçando privacidade e anti-ranking. (5) Logger `data_collected` ganha 6 contadores novos (`enterpriseCompetitors`, `enterpriseChannels`, `enterpriseReviewSnapshots`, `enterpriseSeasonality`, `enterprisePmsImports`, `enterpriseCalcTrail`) para observabilidade do enriquecimento. (6) Nenhum impacto no modo Territorial — todas as buscas são condicionais a `isEnterprise && destinationId`. Próximo passo: Fase 7 — template estrutural Enterprise dedicado em `report_structure_templates` (seções Operacional/Reputação/Competitivo/Pessoas/ESG/Plano 90d)."
+    ]
+  },
   {
     version: "1.88.0",
     date: "2026-06-22",
