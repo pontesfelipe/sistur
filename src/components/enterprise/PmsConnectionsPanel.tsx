@@ -67,7 +67,7 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
           property_id: propertyId || null,
           property_name: propertyName || null,
           status: 'pending',
-          created_by: profile.id,
+          created_by: profile.user_id,
         })
         .select('id')
         .single();
