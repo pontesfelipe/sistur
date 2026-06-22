@@ -3346,6 +3346,12 @@ INSTRUÇÕES SOBRE COMPARATIVO TEMPORAL:
 ${coverBlock}
 ${formatDestinationMetadata(assessment.destinations)}
 ${isEnterprise ? formatEnterpriseProfile(enterpriseProfile) : ''}
+${isEnterprise ? formatEnterprisePmsImports(enterprisePmsImports) : ''}
+${isEnterprise ? formatEnterpriseSeasonality(enterpriseSeasonality) : ''}
+${isEnterprise ? formatEnterpriseReviewSnapshots(enterpriseReviewSnapshots) : ''}
+${isEnterprise ? formatEnterpriseDistributionChannels(enterpriseChannels) : ''}
+${isEnterprise ? formatEnterpriseCompetitorsAnon(enterpriseCompetitors) : ''}
+${isEnterprise ? formatEnterpriseCalculationTrail(enterpriseCalcTrail, indicatorsByIdMap) : ''}
 === DADOS DO DIAGNÓSTICO ===
 
 SCORES DOS EIXOS:
