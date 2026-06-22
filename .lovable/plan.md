@@ -93,3 +93,11 @@ Confirme se posso começar pela **Fase 1** (validação e UX) ou se prefere outr
 - `loadReportStructure` seleciona automaticamente a versão ativa via `updated_at desc` — nenhum ajuste de código foi necessário no pipeline.
 
 Encerra o plano de aprimoramento do Relatório Enterprise (Fases 5–7).
+
+### Fase 8 — Validação ponta-a-ponta e produtização da auditoria (v1.91.0) ✅
+
+- Corrigidos 2 falso-positivos nos auditores determinísticos do `check-report-semantic`:
+  - `structural.no_truncation_markers`: adicionado `\b` em `TODO|TBD` (antes capturava substrings em palavras como "metodologia").
+  - `glossary.IGMA_expansion`: passa a ignorar ocorrências de IGMA em códigos de flag (`IGMA_EXTERNALITY_WARNING`, `IGMA_RA_LIMITATION`, etc.) e procura a primeira menção "humana" da sigla.
+- `AdminSemanticLayer` (aba Auditoria): novo botão "Carregar relatório salvo" lista os últimos 50 `generated_reports` com filtro Territorial/Enterprise/Todos, faz join com `assessments.diagnostic_type` e, ao selecionar, popula a caixa de auditoria + ajusta `auditScope` automaticamente. Elimina copiar/colar manual.
+- Validação executada contra o relatório Enterprise de Foz do Iguaçu (anterior às Fases 5–7): PASS em escala NPS, privacidade, anti-ranking, classificação, BRL e duplicatas; WARN em expansão de glossário (RevPAR sem extenso) — endereçado pelas Fases 5–7 para relatórios novos.
