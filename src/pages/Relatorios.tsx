@@ -610,10 +610,14 @@ export default function Relatorios() {
 </head><body>${logoHtml}${orgHtml}${headerHtml}${bodyContent}${notesHtml}${footerHtml}</body></html>`;
   };
 
-  const downloadDocx = async (content: string, destName: string) => {
+  const downloadDocx = async (
+    content: string,
+    destName: string,
+    scope: 'territorial' | 'enterprise' = 'territorial',
+  ) => {
     if (!content) return;
     try {
-      await exportReportAsDocx(content, destName, reportCustomization);
+      await exportReportAsDocx(content, destName, reportCustomization, scope);
       toast.success('Relatório Word baixado!');
     } catch (err) {
       console.error('Error exporting DOCX:', err);
@@ -1065,7 +1069,15 @@ export default function Relatorios() {
 
                     {report && (
                       <>
-                        <Button variant="outline" onClick={() => downloadDocx(report, selectedDestination?.name || 'destino')} className="gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => downloadDocx(
+                            report,
+                            selectedDestination?.name || 'destino',
+                            (selectedAssessmentMeta?.diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial'),
+                          )}
+                          className="gap-2"
+                        >
                           <Download className="h-4 w-4" />
                           Word
                         </Button>
@@ -1408,7 +1420,11 @@ export default function Relatorios() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => downloadDocx(selectedHistoryReport.report_content, selectedHistoryReport.destination_name)}
+                        onClick={() => downloadDocx(
+                          selectedHistoryReport.report_content,
+                          selectedHistoryReport.destination_name,
+                          (selectedHistoryReport.diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial'),
+                        )}
                         className="gap-2"
                       >
                         <Download className="h-4 w-4" />
