@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 95,
-  patch: 1,
+  minor: 96,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.0",
+    date: "2026-06-23",
+    type: "minor" as const,
+    changes: [
+      "Fase 13 — Conectores PMS nativos (Cloudbeds em produção; demais 'em breve'). Nova tabela `enterprise_pms_connections` com RLS, coluna `credentials` oculta do `authenticated` (só acessível por service_role), status (pending/active/error/disconnected) e index `status + last_sync_at` para varreduras de cron. Edge function `sync-pms-connector`: suporta batch diário (cron) e sync on-demand por `connectionId`; para Cloudbeds, faz refresh automático de token via `refresh_token`, chama `getDashboard` (30 dias), normaliza occupancy/ADR/RevPAR/roomNights e grava em `enterprise_pms_imports` com `source='cloudbeds'`. Edge function `pms-oauth-callback`: recebe `?code=&state=<connection_id>`, troca por access/refresh token, persiste em `credentials`, atualiza status e redireciona para `/diagnosticos?pms=connected` (ou `?pms=error` em falha). Cron diário 03:00 UTC via `pg_cron` + `pg_net` dispara sync batch. UI `PmsConnectionsPanel`: renderizado no Step 4 do wizard Enterprise (`NovaRodadaDialogs.tsx`), lista conexões com status/último sync, permite sync manual e exclusão; dialog 'Conectar PMS' oferece Cloudbeds (OAuth ativo) + Stays/Opera/HITS como pendentes ('em breve'). Sem `CLOUDBEDS_CLIENT_ID` configurado, o fluxo exibe toast informativo ao invés de redirecionar. Bump 1.95.1 → 1.96.0."
+    ]
+  },
   {
     version: "1.95.1",
     date: "2026-06-22",

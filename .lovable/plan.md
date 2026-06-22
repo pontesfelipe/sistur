@@ -130,6 +130,15 @@ Cobertura dos 4 vetores selecionados pelo usuário ("todos os acima"):
 - Indicadores contextuais externos (saúde do entorno, conectividade aérea/telecom, segurança do destino, clima, eventos, transporte, demanda) ficam intencionalmente fora — não são acionáveis pelo empreendimento e não comportam prescrição.
 - Encerra o último gap pendente da Fase 11.
 
+### Fase 13 — Conectores PMS nativos (v1.96.0) ✅
+
+- **Tabela `enterprise_pms_connections`**: migration com RLS multi-tenant, `credentials` jsonb oculto do `authenticated` (só service_role acessa), index `status + last_sync_at` para varredura de cron, trigger `updated_at`.
+- **Edge function `sync-pms-connector`**: batch (cron, sem body) e on-demand (`{connectionId}`). Cloudbeds: refresh automático de token, chamada `getDashboard` (30 dias), normalização de occupancy/ADR/RevPAR/roomNights, gravação em `enterprise_pms_imports`. Stays/Opera/HITS: stub retornando 'ainda não implementado'.
+- **Edge function `pms-oauth-callback`**: troca `code` por access/refresh token, persiste em `credentials`, atualiza status e redireciona para `/diagnosticos?pms=connected|error`.
+- **Cron diário 03:00 UTC**: `pg_cron` + `pg_net` invoca `sync-pms-connector` sem argumentos (batch).
+- **UI `PmsConnectionsPanel`**: renderizado no Step 4 do wizard Enterprise, lista conexões com status/último sync, sync manual, exclusão. Dialog 'Conectar PMS': Cloudbeds (OAuth ativo) + Stays/Opera/HITS pendentes ('em breve'). Sem `CLOUDBEDS_CLIENT_ID`, explica ao usuário que precisa configurar as credenciais OAuth no Cloudbeds Partner Portal primeiro.
+- **Dependência externa**: `CLOUDBEDS_CLIENT_ID` e `CLOUDBEDS_CLIENT_SECRET` devem ser adicionados via Secrets antes de ativar o fluxo OAuth de produção. O app já é resiliente: sem secrets, exibe instruções em vez de quebrar.
+
 ### Fase 12 — Alertas por e-mail + Benchmark setorial (v1.95.0) ✅
 
 - **12.1 Alertas de regressão por e-mail** (fecha o gap visual da Fase 11.1): novo template `enterprise-regression-alert` registrado em `_shared/transactional-email-templates/registry.ts`. O painel `EnterpriseRegressionAlerts` agora exibe botão 'Notificar por e-mail' que dispara via `send-transactional-email` para o usuário logado, com dedupe por `localStorage` (`regression-email-<assessmentId>`) e idempotencyKey próprio. Vale para Territorial e Enterprise.
