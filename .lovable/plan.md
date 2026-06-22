@@ -68,3 +68,20 @@ Liga os dados coletados ao pipeline existente.
 - **Fase 4**: importar CSV de exemplo popula os 13 indicadores operacionais e o status recalcula automaticamente.
 
 Confirme se posso começar pela **Fase 1** (validação e UX) ou se prefere outra ordem.
+
+---
+
+## Plano de aprimoramento do Relatório Enterprise (Fases 5–7)
+
+### Fase 5 — Camada semântica + auditor Enterprise (v1.88.0) ✅
+
+- 10 regras `applies_to='enterprise'` em `report_semantic_entries`: glossário operacional (ADR/RevPAR/GOP/NPS/TrevPAR), bandas de status calibradas, privacidade de concorrentes (sem nomes/CNPJs), anti-ranking, atribuição PMS vs. reviews, seções obrigatórias (Diagnóstico Operacional, Reputação, Posicionamento Competitivo, Plano 90d) e formatação sem decimais.
+- 4 checagens determinísticas no `check-report-semantic` ativadas para Enterprise: escala NPS, expansão de siglas, privacidade de concorrentes, ranking competitivo.
+
+### Fase 6 — Contexto injetado em `process-report-job` (v1.89.0)
+
+- Injetar no prompt Enterprise: perfil completo (`enterprise_profiles` — porte, segmento, certificações, sazonalidade), `enterprise_review_snapshots` recentes, `enterprise_competitors` + `enterprise_distribution_channels`, lotes `enterprise_pms_imports` recentes, e `indicator_calculation_trail` filtrado por `ENT_*` da rodada.
+
+### Fase 7 — Template estrutural Enterprise (v1.90.0)
+
+- Linha dedicada em `report_structure_templates` para `mode='enterprise'`: Diagnóstico Operacional, Reputação & Satisfação, Posicionamento Competitivo, Pessoas & Cultura, ESG/Sustentabilidade, Plano de Ação 90 dias por área.
