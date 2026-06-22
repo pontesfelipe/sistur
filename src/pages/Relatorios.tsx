@@ -499,7 +499,10 @@ export default function Relatorios() {
 
   // MD download removed
 
-  const downloadPDF = (targetRef: RefObject<HTMLDivElement> = reportRef) => {
+  const downloadPDF = (
+    targetRef: RefObject<HTMLDivElement> = reportRef,
+    scope: 'territorial' | 'enterprise' = 'territorial',
+  ) => {
     if (!targetRef.current) return;
     
     const content = targetRef.current.innerHTML;
@@ -523,7 +526,7 @@ export default function Relatorios() {
       }
 
       iframeDoc.open();
-      iframeDoc.write(buildPrintHTML(content));
+      iframeDoc.write(buildPrintHTML(content, scope));
       iframeDoc.close();
 
       iframe.onload = () => {
@@ -537,7 +540,7 @@ export default function Relatorios() {
       return;
     }
 
-    printWindow.document.write(buildPrintHTML(content));
+    printWindow.document.write(buildPrintHTML(content, scope));
     printWindow.document.close();
     printWindow.focus();
 
