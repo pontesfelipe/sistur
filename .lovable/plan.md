@@ -101,3 +101,10 @@ Encerra o plano de aprimoramento do Relatório Enterprise (Fases 5–7).
   - `glossary.IGMA_expansion`: passa a ignorar ocorrências de IGMA em códigos de flag (`IGMA_EXTERNALITY_WARNING`, `IGMA_RA_LIMITATION`, etc.) e procura a primeira menção "humana" da sigla.
 - `AdminSemanticLayer` (aba Auditoria): novo botão "Carregar relatório salvo" lista os últimos 50 `generated_reports` com filtro Territorial/Enterprise/Todos, faz join com `assessments.diagnostic_type` e, ao selecionar, popula a caixa de auditoria + ajusta `auditScope` automaticamente. Elimina copiar/colar manual.
 - Validação executada contra o relatório Enterprise de Foz do Iguaçu (anterior às Fases 5–7): PASS em escala NPS, privacidade, anti-ranking, classificação, BRL e duplicatas; WARN em expansão de glossário (RevPAR sem extenso) — endereçado pelas Fases 5–7 para relatórios novos.
+
+### Fase 9 — Export DOCX Enterprise-aware (v1.92.0) ✅
+
+- `exportReportAsDocx` recebe `scope: 'territorial' | 'enterprise'` (default territorial).
+- Capa ABNT do modo Enterprise usa título "RELATÓRIO ENTERPRISE — DIAGNÓSTICO OPERACIONAL & ESTRATÉGICO" e texto de natureza dedicado (PMS/reputação/posicionamento/ESG + aviso de anonimização Concorrente A/B/C).
+- Filename: `relatorio-enterprise-<destino>.docx` no modo Enterprise; `relatorio-<destino>.docx` no Territorial.
+- `Relatorios.tsx` passa o escopo a partir de `diagnostic_type` nos dois botões Word (aba Gerar e aba Histórico). O corpo das 17 seções (template v2) já era renderizado corretamente pelo parser markdown→DOCX existente; só a capa e o nome do arquivo precisavam de ajuste.
