@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.1",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Fase 13.1 — Todos os adaptadores PMS prontos como integrações opcionais. `sync-pms-connector` agora implementa adapters reais para Stays (Basic auth via client_id+api_key), Oracle Opera Cloud (OAuth client_credentials com base_url/client_id/client_secret/app_key) e HITS Mobile (X-API-Key), além do Cloudbeds OAuth já existente. Credenciais por conexão são lidas de `enterprise_pms_connections.credentials` (JSONB protegido — só service_role) com fallback para env Deno (`STAYS_*`, `OPERA_*`, `HITS_*`). `PmsConnectionsPanel` ganhou registry `PROVIDER_AUTH` + `PROVIDER_FIELDS`: para provedores API-key, o dialog renderiza inputs dinâmicos por campo (com `type=password` em segredos) e marca a conexão como `active` imediatamente; OAuth segue redirecionando. Mensagem do dialog atualizada para 'Integração opcional — conecte apenas se possui credenciais ativas'. Mesmo padrão (registry + fallback env + credentials JSONB) deve ser reusado para futuras integrações (ERPs, CRMs, OTAs). Bump 1.96.0 → 1.96.1."
+    ]
+  },
   {
     version: "1.96.0",
     date: "2026-06-23",

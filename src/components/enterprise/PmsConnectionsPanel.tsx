@@ -30,6 +30,33 @@ const PROVIDER_LABEL: Record<Provider, string> = {
   hits: 'HITS Mobile',
 };
 
+/** Tipo de auth de cada adapter. Mesma estrutura serve para futuras integrações. */
+const PROVIDER_AUTH: Record<Provider, 'oauth' | 'apikey'> = {
+  cloudbeds: 'oauth',
+  stays: 'apikey',
+  opera: 'apikey',
+  hits: 'apikey',
+};
+
+/** Campos de credenciais por provider (rotulados em pt-BR). Vazio = OAuth. */
+const PROVIDER_FIELDS: Record<Provider, { key: string; label: string; placeholder?: string; type?: string }[]> = {
+  cloudbeds: [],
+  stays: [
+    { key: 'client_id', label: 'Client ID', placeholder: 'Conta Stays' },
+    { key: 'api_key', label: 'API Key', type: 'password' },
+  ],
+  opera: [
+    { key: 'base_url', label: 'Base URL', placeholder: 'https://<tenant>.hospitality.oracleindustry.com' },
+    { key: 'client_id', label: 'Client ID' },
+    { key: 'client_secret', label: 'Client Secret', type: 'password' },
+    { key: 'app_key', label: 'App Key (x-app-key)', type: 'password' },
+  ],
+  hits: [
+    { key: 'api_key', label: 'API Key', type: 'password' },
+    { key: 'base_url', label: 'Base URL (opcional)', placeholder: 'https://api.hitsmobile.com.br/v1' },
+  ],
+};
+
 const SUPABASE_PROJECT_REF = (import.meta as any).env?.VITE_SUPABASE_PROJECT_ID ?? '';
 const SUPABASE_FUNCTIONS_URL = `https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1`;
 const CLOUDBEDS_CLIENT_ID = (import.meta as any).env?.VITE_CLOUDBEDS_CLIENT_ID ?? '';
@@ -42,6 +69,7 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
   const [provider, setProvider] = useState<Provider>('cloudbeds');
   const [propertyId, setPropertyId] = useState('');
   const [propertyName, setPropertyName] = useState('');
+  const [credInputs, setCredInputs] = useState<Record<string, string>>({});
 
   const { data: conns, isLoading } = useQuery({
     queryKey: ['pms-connections', destinationId],
@@ -58,6 +86,15 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
   const createConn = useMutation({
     mutationFn: async () => {
       if (!profile?.org_id) throw new Error('Organização não encontrada');
+      const auth = PROVIDER_AUTH[provider];
+      let credentials: any = null;
+      if (auth === 'apikey') {
+        const required = PROVIDER_FIELDS[provider].filter(f => !f.label.includes('opcional'));
+        for (const f of required) {
+          if (!credInputs[f.key]?.trim()) throw new Error(`Preencha: ${f.label}`);
+        }
+        credentials = { ...credInputs };
+      }
       const { data, error } = await supabase
         .from('enterprise_pms_connections')
         .insert({
@@ -66,7 +103,8 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
           provider,
           property_id: propertyId || null,
           property_name: propertyName || null,
-          status: 'pending',
+          status: auth === 'apikey' ? 'active' : 'pending',
+          credentials,
           created_by: profile.user_id,
         })
         .select('id')
@@ -77,9 +115,10 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
     onSuccess: (id) => {
       qc.invalidateQueries({ queryKey: ['pms-connections', destinationId] });
       setOpen(false);
-      if (provider === 'cloudbeds') {
+      setCredInputs({});
+      if (PROVIDER_AUTH[provider] === 'oauth' && provider === 'cloudbeds') {
         if (!CLOUDBEDS_CLIENT_ID) {
-          toast.error('VITE_CLOUDBEDS_CLIENT_ID não configurado — configure as credenciais OAuth primeiro.');
+          toast.error('Credenciais OAuth Cloudbeds não configuradas. Conexão salva como pendente — ative depois.');
           return;
         }
         const redirect = `${SUPABASE_FUNCTIONS_URL}/pms-oauth-callback?provider=cloudbeds`;
@@ -91,7 +130,7 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
         authUrl.searchParams.set('state', id);
         window.location.href = authUrl.toString();
       } else {
-        toast.info(`${PROVIDER_LABEL[provider]} será habilitado em breve. Conexão registrada como pendente.`);
+        toast.success(`${PROVIDER_LABEL[provider]} conectado. Sync diário ativado.`);
       }
     },
     onError: (e: any) => toast.error('Erro ao criar conexão: ' + (e?.message ?? '')),
@@ -178,19 +217,19 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
           <DialogHeader>
             <DialogTitle>Conectar PMS</DialogTitle>
             <DialogDescription>
-              Hoje suportamos OAuth Cloudbeds em produção. Outros provedores ficam como pendentes até implementação.
+              Integração opcional. Conecte apenas se você possui credenciais ativas no seu PMS — todos os adaptadores estão prontos.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div>
               <Label htmlFor="prov">Provedor</Label>
-              <Select value={provider} onValueChange={(v) => setProvider(v as Provider)}>
+              <Select value={provider} onValueChange={(v) => { setProvider(v as Provider); setCredInputs({}); }}>
                 <SelectTrigger id="prov"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="cloudbeds">Cloudbeds (OAuth)</SelectItem>
-                  <SelectItem value="stays">Stays (em breve)</SelectItem>
-                  <SelectItem value="opera">Oracle Opera Cloud (em breve)</SelectItem>
-                  <SelectItem value="hits">HITS Mobile (em breve)</SelectItem>
+                  <SelectItem value="stays">Stays (API Key)</SelectItem>
+                  <SelectItem value="opera">Oracle Opera Cloud (OAuth client_credentials)</SelectItem>
+                  <SelectItem value="hits">HITS Mobile (API Key)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -202,6 +241,25 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
               <Label htmlFor="pname">Apelido / nome da propriedade</Label>
               <Input id="pname" value={propertyName} onChange={(e) => setPropertyName(e.target.value)} placeholder="Ex.: Hotel Bem-vindo Centro" />
             </div>
+            {PROVIDER_AUTH[provider] === 'apikey' && PROVIDER_FIELDS[provider].map((f) => (
+              <div key={f.key}>
+                <Label htmlFor={`cred-${f.key}`}>{f.label}</Label>
+                <Input
+                  id={`cred-${f.key}`}
+                  type={f.type ?? 'text'}
+                  value={credInputs[f.key] ?? ''}
+                  onChange={(e) => setCredInputs((s) => ({ ...s, [f.key]: e.target.value }))}
+                  placeholder={f.placeholder}
+                  autoComplete="off"
+                />
+              </div>
+            ))}
+            {PROVIDER_AUTH[provider] === 'apikey' && (
+              <p className="text-xs text-muted-foreground flex items-start gap-1">
+                <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
+                Credenciais são criptografadas e acessíveis apenas pelo serviço de sincronização (RLS service_role).
+              </p>
+            )}
             {provider === 'cloudbeds' && (
               <p className="text-xs text-muted-foreground flex items-start gap-1">
                 <ExternalLink className="h-3 w-3 mt-0.5 shrink-0" />

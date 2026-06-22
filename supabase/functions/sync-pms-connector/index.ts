@@ -1,6 +1,12 @@
 /// <reference lib="deno.ns" />
 /* Fase 13 — Sincronização PMS (provider registry).
- * Hoje implementa: cloudbeds. stays/opera/hits ficam como stub "em breve".
+ * Adaptadores prontos (todos opcionais — ativam quando o usuário tem credenciais):
+ *  - cloudbeds  : OAuth 2.0 (refresh_token automático)
+ *  - stays      : API Key (header `Authorization: Basic <token>`)
+ *  - opera      : OAuth client_credentials (Oracle Hospitality Integration Platform)
+ *  - hits       : API Key estática (HITS Mobile)
+ * Mesmo padrão aplica-se a qualquer integração futura: registrar adapter aqui,
+ * armazenar segredos em `credentials` (JSONB protegido por RLS) e/ou env Deno.
  * Chamado por: cron diário (modo batch, sem corpo) OU UI ("sync agora" com {connectionId}).
  */
 import { createClient } from 'jsr:@supabase/supabase-js@2';
@@ -75,11 +81,113 @@ async function syncCloudbeds(conn: Conn, admin: ReturnType<typeof createClient>)
   return { parsed, raw };
 }
 
+/* ---------- Stays (API Key) ---------- */
+async function syncStays(conn: Conn): Promise<{ parsed: any; raw: any }> {
+  const apiKey = conn.credentials?.api_key ?? Deno.env.get('STAYS_API_KEY');
+  const clientId = conn.credentials?.client_id ?? Deno.env.get('STAYS_CLIENT_ID');
+  if (!apiKey || !clientId) throw new Error('Stays: defina client_id e api_key nas credenciais.');
+  const end = new Date(); end.setUTCDate(end.getUTCDate() - 1);
+  const start = new Date(end); start.setUTCDate(start.getUTCDate() - 29);
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+  const url = new URL('https://stays.com.br/external/v1/booking/reservations');
+  url.searchParams.set('from', fmt(start));
+  url.searchParams.set('to', fmt(end));
+  const auth = btoa(`${clientId}:${apiKey}`);
+  const r = await fetch(url.toString(), { headers: { Authorization: `Basic ${auth}` } });
+  if (!r.ok) throw new Error(`Stays API ${r.status}: ${await r.text().catch(() => '')}`);
+  const raw = await r.json();
+  const reservations: any[] = Array.isArray(raw) ? raw : (raw?.reservations ?? []);
+  const roomNights = reservations.reduce((s, x) => s + Number(x?.nights ?? 0), 0);
+  const revenue = reservations.reduce((s, x) => s + Number(x?.price?.total ?? x?.total ?? 0), 0);
+  const adr = roomNights > 0 ? revenue / roomNights : 0;
+  return {
+    parsed: {
+      period_start: fmt(start), period_end: fmt(end),
+      occupancy_pct: 0, adr_brl: adr, revpar_brl: 0, room_nights_sold: roomNights,
+    },
+    raw,
+  };
+}
+
+/* ---------- Opera Cloud (OAuth client_credentials) ---------- */
+async function syncOpera(conn: Conn, admin: ReturnType<typeof createClient>): Promise<{ parsed: any; raw: any }> {
+  let creds = conn.credentials ?? {};
+  const base = creds.base_url ?? Deno.env.get('OPERA_BASE_URL');
+  const clientId = creds.client_id ?? Deno.env.get('OPERA_CLIENT_ID');
+  const clientSecret = creds.client_secret ?? Deno.env.get('OPERA_CLIENT_SECRET');
+  const appKey = creds.app_key ?? Deno.env.get('OPERA_APP_KEY');
+  if (!base || !clientId || !clientSecret || !appKey) {
+    throw new Error('Opera: defina base_url, client_id, client_secret e app_key.');
+  }
+  if (!creds.access_token || (creds.expires_at && Date.now() > creds.expires_at - 60_000)) {
+    const tr = await fetch(`${base}/oauth/v1/tokens`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic ' + btoa(`${clientId}:${clientSecret}`),
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'x-app-key': appKey,
+      },
+      body: 'grant_type=client_credentials',
+    });
+    if (!tr.ok) throw new Error(`Opera token ${tr.status}`);
+    const tj = await tr.json();
+    creds = { ...creds, access_token: tj.access_token, expires_at: Date.now() + Number(tj.expires_in ?? 3600) * 1000 };
+    await admin.from('enterprise_pms_connections').update({ credentials: creds }).eq('id', conn.id);
+  }
+  const end = new Date(); end.setUTCDate(end.getUTCDate() - 1);
+  const start = new Date(end); start.setUTCDate(start.getUTCDate() - 29);
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+  const r = await fetch(`${base}/rsv/v1/hotels/${conn.property_id ?? ''}/reservationStatistics?startDate=${fmt(start)}&endDate=${fmt(end)}`, {
+    headers: { Authorization: `Bearer ${creds.access_token}`, 'x-app-key': appKey },
+  });
+  if (!r.ok) throw new Error(`Opera API ${r.status}: ${await r.text().catch(() => '')}`);
+  const raw = await r.json();
+  const s = raw?.statistics ?? raw ?? {};
+  return {
+    parsed: {
+      period_start: fmt(start), period_end: fmt(end),
+      occupancy_pct: Number(s.occupancy ?? s.occupancyPercent ?? 0),
+      adr_brl: Number(s.adr ?? 0),
+      revpar_brl: Number(s.revpar ?? 0),
+      room_nights_sold: Number(s.roomNights ?? 0),
+    },
+    raw,
+  };
+}
+
+/* ---------- HITS Mobile (API Key estática) ---------- */
+async function syncHits(conn: Conn): Promise<{ parsed: any; raw: any }> {
+  const apiKey = conn.credentials?.api_key ?? Deno.env.get('HITS_API_KEY');
+  const base = conn.credentials?.base_url ?? Deno.env.get('HITS_BASE_URL') ?? 'https://api.hitsmobile.com.br/v1';
+  if (!apiKey) throw new Error('HITS: defina api_key nas credenciais.');
+  const end = new Date(); end.setUTCDate(end.getUTCDate() - 1);
+  const start = new Date(end); start.setUTCDate(start.getUTCDate() - 29);
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+  const url = `${base}/dashboard?propertyId=${conn.property_id ?? ''}&from=${fmt(start)}&to=${fmt(end)}`;
+  const r = await fetch(url, { headers: { 'X-API-Key': apiKey } });
+  if (!r.ok) throw new Error(`HITS API ${r.status}: ${await r.text().catch(() => '')}`);
+  const raw = await r.json();
+  const d = raw?.data ?? raw ?? {};
+  return {
+    parsed: {
+      period_start: fmt(start), period_end: fmt(end),
+      occupancy_pct: Number(d.occupancy ?? 0),
+      adr_brl: Number(d.adr ?? 0),
+      revpar_brl: Number(d.revpar ?? 0),
+      room_nights_sold: Number(d.roomNights ?? 0),
+    },
+    raw,
+  };
+}
+
 async function processOne(conn: Conn, admin: ReturnType<typeof createClient>) {
   try {
     let result: { parsed: any; raw: any };
     if (conn.provider === 'cloudbeds') result = await syncCloudbeds(conn, admin);
-    else throw new Error(`Provider '${conn.provider}' ainda não implementado`);
+    else if (conn.provider === 'stays') result = await syncStays(conn);
+    else if (conn.provider === 'opera') result = await syncOpera(conn, admin);
+    else if (conn.provider === 'hits') result = await syncHits(conn);
+    else throw new Error(`Provider '${conn.provider}' desconhecido`);
 
     const { data: imp, error: impErr } = await admin
       .from('enterprise_pms_imports')
