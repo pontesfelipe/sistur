@@ -95,6 +95,14 @@ const TARGET_MARKETS = [
 
 export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill }: EnterpriseProfileStepProps) {
   const [tourOpen, setTourOpen] = useState(false);
+  // Fase 12.3 — auto-abre o tour na primeira visita ao Step Enterprise
+  useEffect(() => {
+    if (typeof window === 'undefined' || !destinationId) return;
+    if (!localStorage.getItem('sistur:enterprise:tour-seen-v1')) {
+      const t = setTimeout(() => setTourOpen(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, [destinationId]);
   const [reviewAutoFilled, setReviewAutoFilled] = useState(false);
   const [reviewAnalysisData, setReviewAnalysisData] = useState<Record<string, any> | null>(null);
   const [digitalAnalysisData, setDigitalAnalysisData] = useState<Record<string, any> | null>(null);
