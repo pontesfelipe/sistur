@@ -16,6 +16,7 @@ import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseData
 import { DataImportPanel } from '@/components/diagnostics/DataImportPanel';
 import { EnterpriseProfileStep } from '@/components/enterprise/EnterpriseProfileStep';
 import { PmsCsvImportPanel } from '@/components/enterprise/PmsCsvImportPanel';
+import { PmsConnectionsPanel } from '@/components/enterprise/PmsConnectionsPanel';
 
 type DiagnosticType = 'territorial' | 'enterprise';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
@@ -117,6 +118,10 @@ export function NovaRodadaDialogs({
             </Button>
             {/* Fase 4 (v1.86.0) — bloco opcional de importação CSV/PMS */}
             <PmsCsvImportPanel assessmentId={createdAssessmentId} />
+            {/* Fase 13 (v1.96.0) — Conectores PMS nativos (Cloudbeds em produção) */}
+            {selectedDestinationData?.id && (
+              <PmsConnectionsPanel destinationId={selectedDestinationData.id} />
+            )}
             <EnterpriseDataEntryPanel
               assessmentId={createdAssessmentId}
               tier={selectedTier}
