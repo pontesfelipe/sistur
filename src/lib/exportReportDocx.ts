@@ -227,11 +227,22 @@ function parseMarkdownTable(lines: string[], primaryColor: string): (Paragraph |
 }
 
 /** Build ABNT-compliant cover page */
-function buildCoverPage(destinationName: string, customization?: ReportCustomization): Paragraph[] {
+function buildCoverPage(
+  destinationName: string,
+  customization?: ReportCustomization,
+  scope: 'territorial' | 'enterprise' = 'territorial',
+): Paragraph[] {
   const orgName = customization?.organizationName || 'SISTUR — Sistema Integrado de Suporte para Turismo em Regiões';
   const now = new Date();
   const year = now.getFullYear();
   const city = 'Brasil';
+  const isEnterprise = scope === 'enterprise';
+  const title = isEnterprise
+    ? 'RELATÓRIO ENTERPRISE — DIAGNÓSTICO OPERACIONAL & ESTRATÉGICO'
+    : 'RELATÓRIO DE DIAGNÓSTICO SISTUR';
+  const natureText = isEnterprise
+    ? 'Relatório técnico-estratégico de diagnóstico de empreendimento turístico gerado pelo Sistema SISTUR, com base nos pilares I-RA, I-OE e I-AO da metodologia de Mario Carlos Beni e em indicadores operacionais (PMS, reputação online, posicionamento competitivo e ESG). Concorrentes são tratados de forma anonimizada (Concorrente A/B/C), conforme regras semânticas Enterprise.'
+    : 'Relatório técnico de diagnóstico territorial gerado pelo Sistema SISTUR conforme metodologia de Mario Carlos Beni, seguindo padrões MEC/ABNT.';
 
   return [
     // Institution name (centered, uppercase, bold)
@@ -246,7 +257,7 @@ function buildCoverPage(destinationName: string, customization?: ReportCustomiza
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { after: 400, line: LINE_SPACING },
-      children: [new TextRun({ text: `RELATÓRIO DE DIAGNÓSTICO SISTUR`, font: FONT, size: 32, bold: true })],
+      children: [new TextRun({ text: title, font: FONT, size: 32, bold: true })],
     }),
     // Subtitle with destination name
     new Paragraph({
@@ -263,7 +274,7 @@ function buildCoverPage(destinationName: string, customization?: ReportCustomiza
       spacing: { after: 200, line: LINE_SPACING },
       children: [
         new TextRun({
-          text: 'Relatório técnico de diagnóstico territorial gerado pelo Sistema SISTUR conforme metodologia de Mario Carlos Beni, seguindo padrões MEC/ABNT.',
+          text: natureText,
           font: FONT, size: SMALL_SIZE, italics: true,
         }),
       ],
@@ -290,6 +301,7 @@ export async function exportReportAsDocx(
   markdownContent: string,
   destinationName: string,
   customization?: ReportCustomization,
+  scope: 'territorial' | 'enterprise' = 'territorial',
 ) {
   const primaryColor = customization?.primaryColor || '#1E40AF';
   const PRIMARY_HEX = hex(primaryColor);
@@ -297,7 +309,7 @@ export async function exportReportAsDocx(
   const children: (Paragraph | Table)[] = [];
 
   // --- Cover page (MEC/ABNT pre-textual element) ---
-  children.push(...buildCoverPage(destinationName, customization));
+  children.push(...buildCoverPage(destinationName, customization, scope));
 
   let i = 0;
   // ABNT: dentro da seção "Referências" usamos alinhamento à esquerda,
