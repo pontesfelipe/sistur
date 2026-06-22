@@ -57,6 +57,8 @@ import {
   type AutoFillEntry,
 } from '@/lib/autoFillRunner';
 import { Play, RefreshCw, AlertCircle, Info } from 'lucide-react';
+import { EnterpriseOnboardingTour } from './EnterpriseOnboardingTour';
+import { BookOpen } from 'lucide-react';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
