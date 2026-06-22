@@ -108,3 +108,9 @@ Encerra o plano de aprimoramento do Relatório Enterprise (Fases 5–7).
 - Capa ABNT do modo Enterprise usa título "RELATÓRIO ENTERPRISE — DIAGNÓSTICO OPERACIONAL & ESTRATÉGICO" e texto de natureza dedicado (PMS/reputação/posicionamento/ESG + aviso de anonimização Concorrente A/B/C).
 - Filename: `relatorio-enterprise-<destino>.docx` no modo Enterprise; `relatorio-<destino>.docx` no Territorial.
 - `Relatorios.tsx` passa o escopo a partir de `diagnostic_type` nos dois botões Word (aba Gerar e aba Histórico). O corpo das 17 seções (template v2) já era renderizado corretamente pelo parser markdown→DOCX existente; só a capa e o nome do arquivo precisavam de ajuste.
+
+### Fase 10 — Painel comparativo temporal Enterprise (v1.93.0) ✅
+
+- Novo `PillarTrendPanel` plota I-RA / I-OE / I-AO de até 24 rodadas calculadas para o mesmo destino/empreendimento, filtrando estritamente por `diagnostic_type` (territorial vs. enterprise não se misturam).
+- Renderizado em `DiagnosticoDetalhe` na aba Visão Geral, abaixo do `RoundComparisonView`, em ambos os modos (Territorial/Enterprise). Empty state quando há <2 rodadas.
+- Comparação 100% intra-destino — sem ranking entre municípios ou empreendimentos, alinhado às restrições `no-public-rankings` e `i-sistur-internal-only`.

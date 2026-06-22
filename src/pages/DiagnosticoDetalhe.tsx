@@ -17,6 +17,7 @@ import { AssessmentAuditTrail } from '@/components/diagnostics/AssessmentAuditTr
 import { DataLineageView } from '@/components/diagnostics/DataLineageView';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
+import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
 import { PrescriptionModeView } from '@/components/diagnostics/PrescriptionModeView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
@@ -981,6 +982,15 @@ const DiagnosticoDetalhe = () => {
                 assessmentId={id!}
                 destinationId={assessment.destination_id}
                 currentPillarScores={pillarScores}
+              />
+            )}
+
+            {/* Temporal Trend (Fase 10) */}
+            {assessment.destination_id && (
+              <PillarTrendPanel
+                destinationId={assessment.destination_id}
+                diagnosticType={isEnterprise ? 'enterprise' : 'territorial'}
+                currentAssessmentId={id!}
               />
             )}
           </TabsContent>
