@@ -2,12 +2,18 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, TrendingDown } from 'lucide-react';
+import { AlertTriangle, TrendingDown, Mail, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Props {
   destinationId: string;
   diagnosticType: 'territorial' | 'enterprise';
+  destinationName?: string;
+  currentAssessmentId?: string;
 }
 
 const PILLAR_LABELS: Record<string, string> = { RA: 'I-RA', OE: 'I-OE', AO: 'I-AO' };
@@ -18,7 +24,12 @@ const PILLAR_LABELS: Record<string, string> = { RA: 'I-RA', OE: 'I-OE', AO: 'I-A
  * `regression-detection-alerts`). Estritamente intra-empreendimento/intra-destino —
  * nenhum ranking entre destinos. Visual apenas; sem disparo de e-mail.
  */
-export function EnterpriseRegressionAlerts({ destinationId, diagnosticType }: Props) {
+export function EnterpriseRegressionAlerts({ destinationId, diagnosticType, destinationName, currentAssessmentId }: Props) {
+  const { user } = useAuth();
+  const [sending, setSending] = useState(false);
+  const dedupeKey = `regression-email-${currentAssessmentId ?? destinationId}`;
+  const alreadySent = typeof window !== 'undefined' && !!localStorage.getItem(dedupeKey);
+
   const { data, isLoading } = useQuery({
     queryKey: ['enterprise-regression', destinationId, diagnosticType],
     queryFn: async () => {
@@ -73,6 +84,38 @@ export function EnterpriseRegressionAlerts({ destinationId, diagnosticType }: Pr
   const alerts = data ?? [];
   if (alerts.length === 0) return null;
 
+  const dispatchEmail = async () => {
+    if (!user?.email) {
+      toast.error('E-mail do usuário indisponível.');
+      return;
+    }
+    setSending(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'enterprise-regression-alert',
+          recipientEmail: user.email,
+          idempotencyKey: `regression-${currentAssessmentId ?? destinationId}-${Date.now()}`,
+          templateData: {
+            destinationName: destinationName ?? 'seu diagnóstico',
+            diagnosticType,
+            assessmentId: currentAssessmentId ?? '',
+            drops: alerts.map((a) => ({
+              pillar: a.pillar, from: a.from, to: a.to, drop1: a.drop1, drop2: a.drop2,
+            })),
+          },
+        },
+      });
+      if (error) throw error;
+      localStorage.setItem(dedupeKey, new Date().toISOString());
+      toast.success('Alerta enviado para ' + user.email);
+    } catch (e: any) {
+      toast.error('Falha ao enviar alerta: ' + (e?.message ?? 'erro desconhecido'));
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <Card className="border-amber-300 dark:border-amber-700 bg-amber-50/40 dark:bg-amber-950/20">
       <CardHeader>
@@ -102,6 +145,18 @@ export function EnterpriseRegressionAlerts({ destinationId, diagnosticType }: Pr
             </div>
           </div>
         ))}
+        <div className="flex justify-end pt-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={dispatchEmail}
+            disabled={sending || alreadySent}
+            className="gap-2"
+          >
+            {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
+            {alreadySent ? 'Alerta já enviado' : 'Notificar por e-mail'}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
