@@ -895,6 +895,9 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     <Button variant="outline" size="sm" onClick={() => auditFileInputRef.current?.click()}>
                       <Upload className="h-4 w-4 mr-2" /> Selecionar arquivo
                     </Button>
+                    <Button variant="outline" size="sm" onClick={() => { if (savedReports.length === 0) loadSavedReports(); else loadSavedReports(); }}>
+                      <FileText className="h-4 w-4 mr-2" /> Carregar relatório salvo
+                    </Button>
                     <input
                       ref={auditFileInputRef}
                       type="file"
@@ -924,6 +927,51 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                   </Select>
                 </div>
               </div>
+
+              {(savedLoading || savedReports.length > 0) && (
+                <div className="rounded-md border p-3 space-y-2 bg-muted/30">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <Label className="text-xs font-medium">Relatórios salvos (últimos 50)</Label>
+                    <div className="flex items-center gap-2">
+                      <Select value={savedScope} onValueChange={(v: any) => setSavedScope(v)}>
+                        <SelectTrigger className="h-7 text-xs w-[180px]"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos</SelectItem>
+                          <SelectItem value="territorial">Territorial</SelectItem>
+                          <SelectItem value="enterprise">Enterprise</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" variant="ghost" onClick={() => setSavedReports([])}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  {savedLoading ? (
+                    <p className="text-xs text-muted-foreground">Carregando…</p>
+                  ) : (
+                    <div className="max-h-56 overflow-y-auto space-y-1">
+                      {savedReports.filter(r => savedScope === "all" || r.diagnostic_type === savedScope).map((r) => (
+                        <button
+                          key={r.id}
+                          onClick={() => loadSavedReportIntoAudit(r)}
+                          className="w-full text-left text-xs rounded border bg-background hover:bg-accent px-2 py-1.5 flex items-center justify-between gap-2"
+                        >
+                          <span className="truncate">
+                            <Badge variant="outline" className="text-[10px] mr-2 uppercase">{r.diagnostic_type ?? "?"}</Badge>
+                            {r.destination_name ?? r.assessment_id.slice(0, 8)}
+                          </span>
+                          <span className="text-muted-foreground shrink-0">
+                            {new Date(r.created_at).toLocaleDateString("pt-BR")} · {(r.report_content?.length ?? 0).toLocaleString("pt-BR")} chars
+                          </span>
+                        </button>
+                      ))}
+                      {savedReports.filter(r => savedScope === "all" || r.diagnostic_type === savedScope).length === 0 && (
+                        <p className="text-xs text-muted-foreground">Nenhum relatório nesta categoria.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div>
                 <Label className="text-xs">Conteúdo do relatório</Label>
