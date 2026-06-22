@@ -984,6 +984,15 @@ const DiagnosticoDetalhe = () => {
                 currentPillarScores={pillarScores}
               />
             )}
+
+            {/* Temporal Trend (Fase 10) */}
+            {assessment.destination_id && (
+              <PillarTrendPanel
+                destinationId={assessment.destination_id}
+                diagnosticType={isEnterprise ? 'enterprise' : 'territorial'}
+                currentAssessmentId={id!}
+              />
+            )}
           </TabsContent>
 
           {/* Categorias Enterprise Tab - Only for enterprise diagnostics */}
