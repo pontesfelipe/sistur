@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 93,
+  minor: 94,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.94.0",
+    date: "2026-06-22",
+    type: "minor" as const,
+    changes: [
+      "Fase 11 do plano Enterprise — 4 frentes complementares entregues. (1) Alertas de regressão Enterprise (`src/components/diagnostics/EnterpriseRegressionAlerts.tsx`): novo painel na aba Visão Geral que detecta quedas >2pp em I-RA/I-OE/I-AO em 2 rodadas consecutivas (regra `regression-detection-alerts`) e exibe badge âmbar com pilar, valores e títulos das rodadas; sem disparo de e-mail nesta fase (reuso visual do padrão `RegressionAlertsPanel` do Observatório). Renderizado tanto em Territorial quanto Enterprise. (2) Benchmark intra-organização Enterprise (`src/components/diagnostics/EnterpriseOrgBenchmark.tsx`): compara o empreendimento atual contra média/mediana dos demais empreendimentos Enterprise da mesma organização (uma rodada calculada mais recente por destino), totalmente anonimizado (N e estatística — sem nome de empreendimento), exibido apenas em Enterprise. Alinhado a `no-public-rankings` e `i-sistur-internal-only`. (3) Exportação PDF Enterprise-aware (`src/pages/Relatorios.tsx`): `downloadPDF` e `buildPrintHTML` ganharam parâmetro `scope`; no modo Enterprise o PDF imprime uma faixa identificadora 'Relatório Enterprise — Diagnóstico Operacional & Estratégico (concorrentes anonimizados: Concorrente A/B/C)' antes do corpo, mantendo a folha ABNT inalterada. Os botões PDF da aba Gerar e da aba Histórico passam o escopo via `diagnostic_type`. (4) Recomendações EDU Enterprise: confirmado que `EduRecommendationsPanel` já é renderizado tanto em Territorial quanto Enterprise via `displayedIndicatorScores` em `DiagnosticoDetalhe.tsx` (linha 1071); como `useEduRecommendationsForAssessment` consulta a tabela `indicators` unificada por `id` e cruza com `edu_indicator_training_map` por `code`, a sincronização dos códigos `ENT_*` na tabela unificada (Pós-Fase 3, v1.87.0) habilita recomendações Enterprise automaticamente quando os mapeamentos `ENT_*` → curso forem populados em `edu_indicator_training_map`. Sem alteração de código necessária. Bump 1.93.0 → 1.94.0."
+    ]
+  },
   {
     version: "1.93.0",
     date: "2026-06-22",

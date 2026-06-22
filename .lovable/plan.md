@@ -114,3 +114,12 @@ Encerra o plano de aprimoramento do Relatório Enterprise (Fases 5–7).
 - Novo `PillarTrendPanel` plota I-RA / I-OE / I-AO de até 24 rodadas calculadas para o mesmo destino/empreendimento, filtrando estritamente por `diagnostic_type` (territorial vs. enterprise não se misturam).
 - Renderizado em `DiagnosticoDetalhe` na aba Visão Geral, abaixo do `RoundComparisonView`, em ambos os modos (Territorial/Enterprise). Empty state quando há <2 rodadas.
 - Comparação 100% intra-destino — sem ranking entre municípios ou empreendimentos, alinhado às restrições `no-public-rankings` e `i-sistur-internal-only`.
+
+### Fase 11 — Frentes complementares Enterprise (v1.94.0) ✅
+
+Cobertura dos 4 vetores selecionados pelo usuário ("todos os acima"):
+
+- **11.1 Alertas de regressão Enterprise** (`EnterpriseRegressionAlerts`): detecta quedas >2pp em I-RA/I-OE/I-AO por 2 rodadas consecutivas (regra `regression-detection-alerts`). Painel âmbar renderizado em `DiagnosticoDetalhe` (Territorial e Enterprise). Sem disparo de e-mail nesta fase — apenas visual.
+- **11.2 Benchmark intra-org Enterprise** (`EnterpriseOrgBenchmark`): média/mediana por pilar dos demais empreendimentos Enterprise da mesma org, totalmente anonimizado (N + estatística). Exibido apenas em Enterprise; respeita `no-public-rankings`.
+- **11.3 PDF Enterprise-aware**: `downloadPDF` e `buildPrintHTML` recebem `scope`; PDF Enterprise ganha faixa identificadora ('Relatório Enterprise … concorrentes anonimizados A/B/C') antes do corpo ABNT. Botões PDF (aba Gerar e Histórico) propagam o escopo via `diagnostic_type`.
+- **11.4 Recomendações EDU Enterprise**: `EduRecommendationsPanel` já é renderizado em Enterprise via `displayedIndicatorScores`. A sincronização Pós-Fase 3 (v1.87.0) dos códigos `ENT_*` na tabela unificada `indicators` habilita recomendações automaticamente assim que `edu_indicator_training_map` receber mapeamentos `ENT_*` → curso. Sem alteração de código necessária — gap puramente de dados.

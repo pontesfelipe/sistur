@@ -499,7 +499,10 @@ export default function Relatorios() {
 
   // MD download removed
 
-  const downloadPDF = (targetRef: RefObject<HTMLDivElement> = reportRef) => {
+  const downloadPDF = (
+    targetRef: RefObject<HTMLDivElement> = reportRef,
+    scope: 'territorial' | 'enterprise' = 'territorial',
+  ) => {
     if (!targetRef.current) return;
     
     const content = targetRef.current.innerHTML;
@@ -523,7 +526,7 @@ export default function Relatorios() {
       }
 
       iframeDoc.open();
-      iframeDoc.write(buildPrintHTML(content));
+      iframeDoc.write(buildPrintHTML(content, scope));
       iframeDoc.close();
 
       iframe.onload = () => {
@@ -537,7 +540,7 @@ export default function Relatorios() {
       return;
     }
 
-    printWindow.document.write(buildPrintHTML(content));
+    printWindow.document.write(buildPrintHTML(content, scope));
     printWindow.document.close();
     printWindow.focus();
 
@@ -555,13 +558,16 @@ export default function Relatorios() {
   // are rendered in a separate window/iframe and don't support CSS custom
   // properties or dark mode. The generated HTML must be self-contained with
   // fixed colors for consistent print output regardless of the user's theme.
-  const buildPrintHTML = (bodyContent: string) => {
+  const buildPrintHTML = (bodyContent: string, scope: 'territorial' | 'enterprise' = 'territorial') => {
     const c = reportCustomization;
     const fontSizeMap = { small: '13px', medium: '15px', large: '17px' };
     const bodyFontSize = fontSizeMap[c.fontSize] || '15px';
     const color = c.primaryColor || '#1E40AF';
     const logoHtml = c.logoUrl ? `<div style="text-align:center;margin-bottom:16px;"><img src="${c.logoUrl}" style="max-height:60px;max-width:200px;" /></div>` : '';
     const orgHtml = c.organizationName ? `<div style="text-align:center;font-size:14px;color:#64748B;margin-bottom:4px;">${c.organizationName}</div>` : '';
+    const scopeBadge = scope === 'enterprise'
+      ? `<div style="text-align:center;font-size:11px;color:#7C2D12;background:#FFEDD5;border:1px solid #FED7AA;padding:4pt 8pt;margin-bottom:8pt;letter-spacing:0.05em;text-transform:uppercase;">Relatório Enterprise — Diagnóstico Operacional & Estratégico (concorrentes anonimizados: Concorrente A/B/C)</div>`
+      : '';
     const headerHtml = c.headerText ? `<div style="text-align:center;font-size:12px;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:24px;">${c.headerText}</div>` : '';
     const footerHtml = c.footerText ? `<div style="text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px;margin-top:24px;">${c.footerText}</div>` : '';
     const notesHtml = c.additionalNotes ? `<div style="margin-top:32px;padding:12px;background:#f8fafc;border-left:3px solid ${color};font-size:12px;color:#64748B;">${c.additionalNotes}</div>` : '';
@@ -607,7 +613,7 @@ export default function Relatorios() {
   /* Modo tela (preview) recebe o mesmo layout, mas com fundo do navegador */
   @media screen { body { max-width: 17cm; margin: 0 auto; padding: 2cm; } }
 </style>
-</head><body>${logoHtml}${orgHtml}${headerHtml}${bodyContent}${notesHtml}${footerHtml}</body></html>`;
+</head><body>${logoHtml}${orgHtml}${scopeBadge}${headerHtml}${bodyContent}${notesHtml}${footerHtml}</body></html>`;
   };
 
   const downloadDocx = async (
@@ -1081,7 +1087,7 @@ export default function Relatorios() {
                           <Download className="h-4 w-4" />
                           Word
                         </Button>
-                        <Button variant="outline" onClick={() => downloadPDF()} className="gap-2">
+                        <Button variant="outline" onClick={() => downloadPDF(reportRef, selectedAssessmentMeta?.diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial')} className="gap-2">
                           <FileText className="h-4 w-4" />
                           PDF
                         </Button>
@@ -1433,7 +1439,7 @@ export default function Relatorios() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => downloadPDF(historyReportRef)}
+                        onClick={() => downloadPDF(historyReportRef, selectedHistoryReport.diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial')}
                         className="gap-2"
                       >
                         <FileText className="h-4 w-4" />

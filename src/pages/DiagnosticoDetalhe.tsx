@@ -18,6 +18,8 @@ import { DataLineageView } from '@/components/diagnostics/DataLineageView';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
+import { EnterpriseRegressionAlerts } from '@/components/diagnostics/EnterpriseRegressionAlerts';
+import { EnterpriseOrgBenchmark } from '@/components/diagnostics/EnterpriseOrgBenchmark';
 import { PrescriptionModeView } from '@/components/diagnostics/PrescriptionModeView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
@@ -990,6 +992,23 @@ const DiagnosticoDetalhe = () => {
               <PillarTrendPanel
                 destinationId={assessment.destination_id}
                 diagnosticType={isEnterprise ? 'enterprise' : 'territorial'}
+                currentAssessmentId={id!}
+              />
+            )}
+
+            {/* Fase 11.1 — Alertas de regressão Enterprise (também útil em Territorial) */}
+            {assessment.destination_id && (
+              <EnterpriseRegressionAlerts
+                destinationId={assessment.destination_id}
+                diagnosticType={isEnterprise ? 'enterprise' : 'territorial'}
+              />
+            )}
+
+            {/* Fase 11.2 — Benchmark intra-organização (Enterprise apenas) */}
+            {isEnterprise && assessment.destination_id && (
+              <EnterpriseOrgBenchmark
+                orgId={orgId}
+                currentDestinationId={assessment.destination_id}
                 currentAssessmentId={id!}
               />
             )}
