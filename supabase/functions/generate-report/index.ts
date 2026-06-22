@@ -3285,6 +3285,12 @@ INSTRUÇÕES SOBRE COMPARATIVO TEMPORAL:
       enterpriseValues: enterpriseValues.length,
       hasEnterpriseProfile: !!enterpriseProfile,
       hasReviewAnalysis: !!enterpriseProfile?.review_analysis,
+      enterpriseCompetitors: enterpriseCompetitors.length,
+      enterpriseChannels: enterpriseChannels.length,
+      enterpriseReviewSnapshots: enterpriseReviewSnapshots.length,
+      enterpriseSeasonality: enterpriseSeasonality.length,
+      enterprisePmsImports: enterprisePmsImports.length,
+      enterpriseCalcTrail: enterpriseCalcTrail.length,
     });
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
