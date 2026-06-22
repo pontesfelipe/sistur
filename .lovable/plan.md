@@ -78,9 +78,12 @@ Confirme se posso começar pela **Fase 1** (validação e UX) ou se prefere outr
 - 10 regras `applies_to='enterprise'` em `report_semantic_entries`: glossário operacional (ADR/RevPAR/GOP/NPS/TrevPAR), bandas de status calibradas, privacidade de concorrentes (sem nomes/CNPJs), anti-ranking, atribuição PMS vs. reviews, seções obrigatórias (Diagnóstico Operacional, Reputação, Posicionamento Competitivo, Plano 90d) e formatação sem decimais.
 - 4 checagens determinísticas no `check-report-semantic` ativadas para Enterprise: escala NPS, expansão de siglas, privacidade de concorrentes, ranking competitivo.
 
-### Fase 6 — Contexto injetado em `process-report-job` (v1.89.0)
+### Fase 6 — Contexto injetado em `generate-report` (v1.89.0) ✅
 
-- Injetar no prompt Enterprise: perfil completo (`enterprise_profiles` — porte, segmento, certificações, sazonalidade), `enterprise_review_snapshots` recentes, `enterprise_competitors` + `enterprise_distribution_channels`, lotes `enterprise_pms_imports` recentes, e `indicator_calculation_trail` filtrado por `ENT_*` da rodada.
+- 5 fontes Enterprise injetadas em paralelo: `enterprise_competitors` (anonimizados como Concorrente A/B/C), `enterprise_distribution_channels` (share + comissão), `enterprise_review_snapshots` (até 6 snapshots), `enterprise_seasonality_months` (12 últimos meses) e `enterprise_pms_imports` (5 últimas importações).
+- Após o cálculo, filtra `indicator_calculation_trail` pelos `indicator_id`s dos códigos `ENT_*` e injeta "Trilha de Cálculo Enterprise" com fórmula/fontes/score.
+- Blocos respeitam as 11 regras semânticas e os 4 auditores da Fase 5 — concorrentes nunca carregam nome/CNPJ/URL.
+- Logger `data_collected` ganha 6 contadores novos para observabilidade.
 
 ### Fase 7 — Template estrutural Enterprise (v1.90.0)
 
