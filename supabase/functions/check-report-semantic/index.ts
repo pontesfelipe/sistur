@@ -134,6 +134,86 @@ function deterministicChecks(reportText: string): Finding[] {
 }
 
 // ---------------------------------------------------------------------------
+// Checagens determinísticas específicas do modo Enterprise.
+// ---------------------------------------------------------------------------
+function enterpriseDeterministicChecks(reportText: string): Finding[] {
+  const findings: Finding[] = [];
+  const sample = (s: string) => s.slice(0, 240);
+
+  // E1) NPS fora da escala oficial (-100 a +100). Captura "NPS de 85/100" ou "NPS 0-100".
+  const npsOutOfScale = reportText.match(/NPS[^.\n]{0,40}(?:de\s+)?\d{1,3}\s*\/\s*100\b/i)
+    || reportText.match(/NPS[^.\n]{0,30}escala\s+0\s*[-–]\s*100/i);
+  findings.push({
+    rule_key: "enterprise.nps_scale",
+    rule_title: "NPS na escala oficial (-100 a +100)",
+    status: npsOutOfScale ? "fail" : "pass",
+    evidence: npsOutOfScale ? sample(npsOutOfScale[0]) : null,
+    explanation: npsOutOfScale
+      ? "NPS apresentado em escala 0-100. A escala oficial é -100 a +100."
+      : "Sem indícios de NPS fora da escala oficial.",
+    suggested_fix: npsOutOfScale ? "Reapresentar o NPS como inteiro entre -100 e +100." : null,
+  });
+
+  // E2) Glossário operacional: siglas usadas sem expansão na primeira ocorrência.
+  const acros = [
+    { sigla: "ADR", extenso: /(Average Daily Rate|Diária Média)/i },
+    { sigla: "RevPAR", extenso: /(Revenue per Available Room|Receita por UH)/i },
+    { sigla: "GOP", extenso: /(Gross Operating Profit|Lucro Operacional Bruto)/i },
+    { sigla: "NPS", extenso: /(Net Promoter Score|Índice de Recomendação)/i },
+  ];
+  const missing: string[] = [];
+  for (const a of acros) {
+    const re = new RegExp(`\\b${a.sigla}\\b`);
+    const idx = reportText.search(re);
+    if (idx < 0) continue;
+    const window = reportText.slice(Math.max(0, idx - 200), idx + 200);
+    if (!a.extenso.test(window)) missing.push(a.sigla);
+  }
+  findings.push({
+    rule_key: "enterprise.glossary_expansion",
+    rule_title: "Glossário Enterprise — siglas expandidas na 1ª ocorrência",
+    status: missing.length === 0 ? "pass" : "warn",
+    evidence: missing.length ? `Sem expansão: ${missing.join(", ")}` : null,
+    explanation: missing.length
+      ? "Siglas operacionais aparecem sem expansão por extenso ao redor da primeira ocorrência."
+      : "Todas as siglas operacionais detectadas estão expandidas (ou não aparecem).",
+    suggested_fix: missing.length ? `Expandir na primeira menção: ${missing.map((s) => `${s} (…)`).join(", ")}.` : null,
+  });
+
+  // E3) Privacidade — nomes/CNPJ de concorrentes individualizados.
+  const cnpjPattern = /\b\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}\b/;
+  const competitorNamed = reportText.match(/concorrente\s+(?:[A-ZÁÉÍÓÚÂÊÔ][\wÁÉÍÓÚÂÊÔÃÕÇáéíóúâêôãõç&.\- ]{2,40})/);
+  const cnpj = reportText.match(cnpjPattern);
+  const hasIssue = !!cnpj || (competitorNamed && !/concorrente\s+[A-C]\b/.test(competitorNamed[0]));
+  findings.push({
+    rule_key: "enterprise.competitor_privacy",
+    rule_title: "Privacidade — concorrentes não individualizados",
+    status: hasIssue ? "fail" : "pass",
+    evidence: hasIssue ? sample((cnpj?.[0] ?? "") + " " + (competitorNamed?.[0] ?? "")) : null,
+    explanation: hasIssue
+      ? "Detectado nome próprio de concorrente e/ou CNPJ no corpo do relatório. Comparações devem ser agregadas."
+      : "Sem nomes próprios ou CNPJs de concorrentes individualizados.",
+    suggested_fix: hasIssue ? "Substituir por 'concorrente A/B/C' ou 'mediana do conjunto comparativo'." : null,
+  });
+
+  // E4) Ranking entre empreendimentos.
+  const entRanking = reportText.match(/(1º|primeiro|melhor|líder)\s+(?:lugar\s+)?(?:da|do)\s+(cidade|região|destino|segmento)/i)
+    || reportText.match(/top\s?\d+\s+(?:hotéis|pousadas|empreendimentos)/i);
+  findings.push({
+    rule_key: "enterprise.no_competitor_ranking",
+    rule_title: "Sem ranking público entre empreendimentos",
+    status: entRanking ? "fail" : "pass",
+    evidence: entRanking ? sample(entRanking[0]) : null,
+    explanation: entRanking
+      ? "Texto ordena o empreendimento contra concorrentes (ranking vedado em modo Enterprise)."
+      : "Sem ranking competitivo detectado.",
+    suggested_fix: entRanking ? "Substituir por gap percentual contra mediana/p25/p75 do conjunto comparativo." : null,
+  });
+
+  return findings;
+}
+
+// ---------------------------------------------------------------------------
 // Lote LLM: avalia um pequeno grupo de regras contra o relatório.
 // ---------------------------------------------------------------------------
 async function runLlmBatch(
