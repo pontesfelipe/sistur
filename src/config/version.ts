@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 92,
+  minor: 93,
   patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.93.0",
+    date: "2026-06-22",
+    type: "minor" as const,
+    changes: [
+      "Relatório Enterprise — Fase 10 do plano de aprimoramento: painel comparativo temporal multi-rodada. (1) Novo componente `PillarTrendPanel` (`src/components/diagnostics/PillarTrendPanel.tsx`) consulta `assessments` filtrando por `destination_id`, `status='CALCULATED'` e `diagnostic_type` (territorial OU enterprise) — escopos jamais se misturam — ordenado por `calculated_at` (até 24 rodadas), faz join in-memory com `pillar_scores` e renderiza um `Recharts LineChart` com 3 séries (I-RA / I-OE / I-AO, eixo Y 0–100%, tooltip mostra título da rodada). (2) Renderizado em `DiagnosticoDetalhe` na aba Visão Geral, abaixo do `RoundComparisonView` existente, tanto para diagnóstico Territorial quanto Enterprise — o `diagnosticType` é derivado de `isEnterprise` para garantir o isolamento de escopos. (3) Quando o destino tem menos de 2 rodadas calculadas, o painel exibe estado vazio dedicado (sem ruído visual). (4) Respeita restrição arquitetural: comparação é estritamente intra-destino / intra-empreendimento — nenhum ranking entre municípios ou empreendimentos é exibido, alinhado às memórias `no-public-rankings` e `i-sistur-internal-only`. Cores dos pilares usam tokens semânticos (`--pillar-ra/oe/ao`) já definidos no design system."
+    ]
+  },
   {
     version: "1.92.0",
     date: "2026-06-22",
