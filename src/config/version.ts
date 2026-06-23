@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 9,
+  patch: 10,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.10",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Destinos — a listagem agora filtra explicitamente pelo `effectiveOrgId` do usuário, evitando que administradores visualizem ao mesmo tempo destinos homônimos legítimos de organizações diferentes (ex.: Demo SISTUR × SISTUR). O mesmo escopo foi aplicado à validação de duplicidade ao editar destino, preservando o isolamento multi-tenant e mantendo duplicatas cross-org como cadastros separados e válidos."
+    ]
+  },
   {
     version: "1.96.9",
     date: "2026-06-23",
