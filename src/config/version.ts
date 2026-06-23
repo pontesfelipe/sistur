@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.3",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial Multi-Unidade (Fase 15.4 — Fase 3 completa) — Step 5 (Preenchimento manual) agora também exibe **Tabs por unidade** quando o diagnóstico é multi-unidade, com `EnterpriseDataEntryPanel` isolado por `unit_id`. Cada aba carrega e persiste valores em `indicator_values.unit_id` da respectiva unidade, permitindo que o mesmo KPI tenha valores diferentes por hotel da rede. Migração: índice único legado `(assessment_id, indicator_id)` em `indicator_values` e `enterprise_indicator_values` virou índice parcial `WHERE unit_id IS NULL`, mantendo compatibilidade com diagnósticos single-unit e liberando inserções multi-unidade pelo índice parcial `(assessment_id, indicator_id, unit_id) WHERE unit_id IS NOT NULL`. Hook `useIndicatorValues(assessmentId, unitId?)` ganhou parâmetro de unidade — filtra leitura por `unit_id` (ou `IS NULL`), e `upsertValue`/`bulkUpsertValues` escolhem o `onConflict` correto. Persistência defensiva do auto-fill no `NovaRodadaDialogs` também passou a respeitar a unidade ativa. Próximo passo: Fase 4 — refator do `calculate-assessment` para iterar `assessment_units` e gerar scores por unidade + consolidação ponderada por `room_count` na marca, e relatórios com seção comparativa de rede."
+    ]
+  },
   {
     version: "1.97.2",
     date: "2026-06-23",
