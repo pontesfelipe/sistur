@@ -1279,7 +1279,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <CardContent className="pt-0">
           <HealthInfrastructureSearch destinationId={destinationId} onAutoFill={handleHealthAutoFill} onAnalysisCapture={handleHealthCapture} />
         </CardContent>
-      </Card>      {/* === SECTION: 🔄 Indicadores Derivados === */}
+      </Card>
+
+      {/* === SECTION: 🔄 Indicadores Derivados === */}
       <div className="pt-4 pb-1">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           🔄 Indicadores Derivados
