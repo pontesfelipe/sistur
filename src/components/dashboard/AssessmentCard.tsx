@@ -178,6 +178,15 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
         </div>
       )}
 
+      <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+        <Clock className="h-4 w-4" />
+        <span>
+          {assessment.status === 'CALCULATED'
+            ? `Rodado em ${formatShortDate(assessment.calculated_at)}`
+            : `Criado em ${formatShortDate(assessment.created_at)}`}
+        </span>
+      </div>
+
       {(assessment.period_start || assessment.period_end) && (
         <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
