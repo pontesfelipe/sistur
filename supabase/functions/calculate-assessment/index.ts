@@ -1415,17 +1415,17 @@ async function runCalculationCore(
     }
 
     // 4. Delete existing scores/issues/recommendations/prescriptions/action_plans for this assessment
-    await supabase.from("action_plans").delete().eq("assessment_id", assessment_id);
-    await supabase.from("prescriptions").delete().eq("assessment_id", assessment_id);
-    await supabase.from("recommendations").delete().eq("assessment_id", assessment_id);
-    await supabase.from("issues").delete().eq("assessment_id", assessment_id);
-    await supabase.from("pillar_scores").delete().eq("assessment_id", assessment_id);
-    
-     // Delete indicator scores for this assessment.
-     // IMPORTANT: Indicators are now unified in the `indicators` catalog, so Enterprise scores must be stored
-     // in `indicator_scores` (FK -> indicators). The legacy `enterprise_indicator_scores` references
-     // `enterprise_indicators` and will fail with FK violations.
-     await supabase.from("indicator_scores").delete().eq("assessment_id", assessment_id);
+    {
+      const delScope = <T extends { eq: (...a: any[]) => any; is: (...a: any[]) => any }>(q: T): T =>
+        (isUnitScope ? q.eq("unit_id", unitId) : q.is("unit_id", null)) as T;
+      await delScope(supabase.from("action_plans").delete().eq("assessment_id", assessment_id) as any);
+      await delScope(supabase.from("prescriptions").delete().eq("assessment_id", assessment_id) as any);
+      await delScope(supabase.from("recommendations").delete().eq("assessment_id", assessment_id) as any);
+      await delScope(supabase.from("issues").delete().eq("assessment_id", assessment_id) as any);
+      await delScope(supabase.from("pillar_scores").delete().eq("assessment_id", assessment_id) as any);
+      // Delete indicator scores for this assessment (unified table for territorial + enterprise).
+      await delScope(supabase.from("indicator_scores").delete().eq("assessment_id", assessment_id) as any);
+    }
 
     // 5. Insert indicator scores (deduplicate by indicator_id to avoid unique constraint violations)
     if (indicatorScores.length > 0) {
