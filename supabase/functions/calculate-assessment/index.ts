@@ -1944,7 +1944,7 @@ async function runCalculationCore(
     }
 
     // Insert prescriptions
-    if (prescriptions.length > 0) {
+    if (prescriptions.length > 0 && !isUnitScope) {
       const { error: insertPrescError } = await supabase
         .from("prescriptions")
         .insert(prescriptions);
