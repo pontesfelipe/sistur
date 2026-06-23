@@ -205,6 +205,10 @@ export default function Configuracoes() {
               <Wrench className="h-4 w-4" />
               <span className="hidden sm:inline">Ferramentas</span>
             </TabsTrigger>
+            <TabsTrigger value="marcas" className="flex items-center gap-2 shrink-0">
+              <Hotel className="h-4 w-4" />
+              <span className="hidden sm:inline">Marcas</span>
+            </TabsTrigger>
             {isAdmin && (
               <TabsTrigger value="semantica" className="flex items-center gap-2 shrink-0">
                 <ScrollText className="h-4 w-4" />
