@@ -356,19 +356,11 @@ export function NovaRodadaForm({
             {destinationMode === 'select' ? (
               <div className="space-y-2">
                 <Label>Destino turístico</Label>
-                <Select value={selectedDestination} onValueChange={onSelectedDestinationChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um destino" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {destinations.map((dest) => (
-                      <SelectItem key={dest.id} value={dest.id}>
-                        {dest.name} {dest.uf ? `- ${dest.uf}` : ''} 
-                        {dest.ibge_code ? ` (IBGE: ${dest.ibge_code})` : ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <DestinationCombobox
+                  destinations={destinations}
+                  value={selectedDestination}
+                  onChange={onSelectedDestinationChange}
+                />
                 {selectedDestinationData && !selectedDestinationData.ibge_code && (
                   <p className="text-xs text-amber-600 dark:text-amber-400">
                     ⚠️ Este destino não possui código IBGE. O pré-preenchimento automático não estará disponível.
