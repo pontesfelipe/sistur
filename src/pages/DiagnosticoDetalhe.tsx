@@ -911,6 +911,13 @@ const DiagnosticoDetalhe = () => {
 
       {isCalculated && pillarScores.length > 0 ? (
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+          {brandRollup?.isMultiUnit && (
+            <BrandRollupPanel
+              brandName={brandRollup.brandName ?? null}
+              units={brandRollup.units}
+              rollups={brandRollup.rollups}
+            />
+          )}
           {prescriptionMode && (
             <Alert className="border-primary/40 bg-primary/5">
               <Target className="h-4 w-4 text-primary" />
