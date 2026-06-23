@@ -171,7 +171,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     air: { label: 'Conectividade Aérea', source: 'ANAC (anac_air_connectivity)' },
     tariff: { label: 'Sazonalidade Tarifária', source: 'Derivado: demanda + eventos + ADR' },
     telecom: { label: 'Conectividade Telecom', source: 'Anatel (anatel_coverage_cache)' },
-    accessibility: { label: 'Acessibilidade Urbana', source: 'Firecrawl web search (5 dimensões)' },
+    accessibility: { label: 'Acessibilidade Urbana', source: 'Busca pública na web (5 dimensões)' },
     health: { label: 'Infra. de Saúde do Entorno', source: 'DATASUS/CNES (datasus_health_cache)' },
   };
   useEffect(() => {
