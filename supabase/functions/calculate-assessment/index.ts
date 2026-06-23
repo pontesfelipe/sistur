@@ -565,7 +565,7 @@ async function runCalculationCore(
 
       // First, try to get values from the unified indicator_values table (new approach)
       // The EnterpriseDataEntryPanel saves to indicator_values with enterprise-scope indicators
-      const { data: unifiedValues, error: unifiedError } = await supabase
+      let unifiedValuesQ = supabase
         .from("indicator_values")
         .select(`
           id,
@@ -592,6 +592,9 @@ async function runCalculationCore(
         `)
         .eq("assessment_id", assessment_id)
         .eq("is_ignored", false);
+      if (isUnitScope) unifiedValuesQ = unifiedValuesQ.eq("unit_id", unitId);
+      else unifiedValuesQ = unifiedValuesQ.is("unit_id", null);
+      const { data: unifiedValues, error: unifiedError } = await unifiedValuesQ;
 
       if (unifiedError) {
         console.error("Error fetching unified indicator values:", unifiedError);
