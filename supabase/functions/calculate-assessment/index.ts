@@ -2433,6 +2433,191 @@ async function runCalculationCore(
 }
 
 // ============================================================
+// Multi-unit dispatcher (brand network)
+// Detects assessments with brand_id + multiple assessment_units, runs the
+// core calculation once per unit (per-unit scope) and persists the brand
+// rollup (weighted/simple averages, dispersion, critical unit) per pillar.
+// Single-unit / legacy assessments fall through to runCalculationCore as-is.
+// ============================================================
+async function runCalculation(
+  supabase: ReturnType<typeof createClient>,
+  authUserId: string,
+  assessment_id: string,
+): Promise<Record<string, unknown>> {
+  const { data: assessmentMeta } = await supabase
+    .from("assessments")
+    .select("brand_id, org_id, diagnostic_type")
+    .eq("id", assessment_id)
+    .maybeSingle();
+
+  const { data: units } = await supabase
+    .from("assessment_units")
+    .select("id, destination_id, enterprise_profile_id, is_primary, unit_name")
+    .eq("assessment_id", assessment_id);
+
+  const hasMultiUnit =
+    !!assessmentMeta?.brand_id &&
+    Array.isArray(units) &&
+    units.length > 1;
+
+  if (!hasMultiUnit) {
+    return await runCalculationCore(supabase, authUserId, assessment_id, null);
+  }
+
+  // Per-unit calculation
+  const unitResults: any[] = [];
+  for (const u of units!) {
+    try {
+      const r = await runCalculationCore(supabase, authUserId, assessment_id, {
+        unit_id: u.id,
+        destination_id: u.destination_id,
+        enterprise_profile_id: u.enterprise_profile_id,
+        unit_name: u.unit_name,
+      });
+      unitResults.push({ unit: u, result: r });
+    } catch (e) {
+      console.error(`[multi-unit] unit ${u.id} (${u.unit_name}) failed:`, e);
+      throw e;
+    }
+  }
+
+  // Load room_count per enterprise_profile to weight units
+  const profileIds = unitResults
+    .map((x) => x.unit.enterprise_profile_id)
+    .filter((x): x is string => !!x);
+  const weightByUnit = new Map<string, number>();
+  if (profileIds.length > 0) {
+    const { data: profs } = await supabase
+      .from("enterprise_profiles")
+      .select("id, room_count")
+      .in("id", profileIds);
+    const profMap = new Map<string, number>(
+      (profs || []).map((p: any) => [p.id, Number(p.room_count) || 0]),
+    );
+    for (const x of unitResults) {
+      const pid = x.unit.enterprise_profile_id;
+      const w = pid ? profMap.get(pid) || 0 : 0;
+      weightByUnit.set(x.unit.id, w > 0 ? w : 1);
+    }
+  } else {
+    for (const x of unitResults) weightByUnit.set(x.unit.id, 1);
+  }
+
+  // Aggregate per pillar
+  const PILLARS: Array<"RA" | "OE" | "AO"> = ["RA", "OE", "AO"];
+  const rollupRows: any[] = [];
+  const pillarSummary: Record<string, { weighted: number; simple: number; stddev: number; critical_unit_id: string | null }> = {};
+
+  for (const pillar of PILLARS) {
+    const entries = unitResults
+      .map((x) => {
+        const ps = (x.result?.pillar_scores as any[] | undefined) || [];
+        const row = ps.find((p) => p.pillar === pillar);
+        return row ? { unit_id: x.unit.id, score: Number(row.score), w: weightByUnit.get(x.unit.id) || 1 } : null;
+      })
+      .filter((e): e is { unit_id: string; score: number; w: number } => !!e);
+
+    if (entries.length === 0) continue;
+
+    const totalW = entries.reduce((s, e) => s + e.w, 0) || entries.length;
+    const weighted = entries.reduce((s, e) => s + e.score * e.w, 0) / totalW;
+    const simple = entries.reduce((s, e) => s + e.score, 0) / entries.length;
+    const variance = entries.reduce((s, e) => s + Math.pow(e.score - simple, 2), 0) / entries.length;
+    const stddev = Math.sqrt(variance);
+    const critical = [...entries].sort((a, b) => a.score - b.score)[0];
+
+    pillarSummary[pillar] = {
+      weighted,
+      simple,
+      stddev,
+      critical_unit_id: critical?.unit_id ?? null,
+    };
+
+    rollupRows.push({
+      assessment_id,
+      brand_id: assessmentMeta!.brand_id,
+      pillar,
+      score_weighted: Number(weighted.toFixed(4)),
+      score_simple: Number(simple.toFixed(4)),
+      stddev: Number(stddev.toFixed(4)),
+      unit_count: entries.length,
+      critical_unit_id: critical?.unit_id ?? null,
+    });
+  }
+
+  // GLOBAL rollup — average of pillar weighted scores (default org weights)
+  if (rollupRows.length > 0) {
+    const ra = pillarSummary["RA"]?.weighted ?? 0;
+    const oe = pillarSummary["OE"]?.weighted ?? 0;
+    const ao = pillarSummary["AO"]?.weighted ?? 0;
+    const wRA = 0.35, wOE = 0.30, wAO = 0.35;
+    const globalWeighted = ra * wRA + oe * wOE + ao * wAO;
+    const globalSimple = (ra + oe + ao) / 3;
+    rollupRows.push({
+      assessment_id,
+      brand_id: assessmentMeta!.brand_id,
+      pillar: "GLOBAL",
+      score_weighted: Number(globalWeighted.toFixed(4)),
+      score_simple: Number(globalSimple.toFixed(4)),
+      stddev: 0,
+      unit_count: unitResults.length,
+      critical_unit_id: null,
+    });
+  }
+
+  // Replace rollups for this assessment
+  await supabase.from("assessment_brand_rollups").delete().eq("assessment_id", assessment_id);
+  if (rollupRows.length > 0) {
+    const { error: rollErr } = await supabase
+      .from("assessment_brand_rollups")
+      .insert(rollupRows);
+    if (rollErr) console.error("Brand rollup insert error:", rollErr);
+  }
+
+  // Mark the assessment as CALCULATED (no IGMA at brand level for now)
+  await supabase
+    .from("assessments")
+    .update({
+      status: "CALCULATED",
+      calculated_at: new Date().toISOString(),
+      needs_recalculation: false,
+    })
+    .eq("id", assessment_id);
+
+  await supabase.from("audit_events").insert({
+    org_id: assessmentMeta!.org_id,
+    event_type: "ASSESSMENT_CALCULATED",
+    entity_type: "assessment",
+    entity_id: assessment_id,
+    metadata: {
+      mode: "multi-unit",
+      brand_id: assessmentMeta!.brand_id,
+      unit_count: unitResults.length,
+      brand_pillars: pillarSummary,
+    },
+  });
+
+  return {
+    success: true,
+    mode: "multi-unit",
+    assessment_id,
+    unit_count: unitResults.length,
+    units: unitResults.map((x) => ({
+      unit_id: x.unit.id,
+      unit_name: x.unit.unit_name,
+      pillar_scores: x.result?.pillar_scores ?? [],
+      critical_pillar: x.result?.critical_pillar ?? null,
+      critical_score: x.result?.critical_score ?? null,
+      issues_created: x.result?.issues_created ?? 0,
+      recommendations_created: x.result?.recommendations_created ?? 0,
+    })),
+    brand: pillarSummary,
+    issues_created: unitResults.reduce((s, x) => s + (x.result?.issues_created ?? 0), 0),
+    recommendations_created: unitResults.reduce((s, x) => s + (x.result?.recommendations_created ?? 0), 0),
+  };
+}
+
+// ============================================================
 // HTTP handler — async job pattern
 // Modo padrão: cria job em assessment_calc_jobs e responde 202 imediatamente,
 // rodando runCalculationCore em background via EdgeRuntime.waitUntil.
