@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 7,
+  patch: 8,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.8",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Terminologia — todas as referências de interface, relatórios e textos de ajuda que diziam 'Enterprise' agora exibem 'Empresarial' (ex.: 'SISTUR Empresarial', 'Diagnóstico Empresarial', 'Categorias Empresarial', selects e abas em Relatórios/Admin/Configurações). Identificadores internos (tipos TS, valores de enum 'enterprise', hooks `useEnterprise*`, colunas `has_enterprise_access`, rota `?type=enterprise`) foram preservados para não quebrar fluxos existentes."
+    ]
+  },
   {
     version: "1.96.7",
     date: "2026-06-23",
