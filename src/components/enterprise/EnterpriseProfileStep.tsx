@@ -527,7 +527,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         telecom_coverage_analysis: telecomData,
         urban_accessibility_analysis: accessibilityData,
         health_infrastructure_analysis: healthData,
-        autofill_run_state: getAutoFillSnapshot() as any,
+        autofill_run_state: (assessmentId
+          ? { byAssessment: { [assessmentId]: getAutoFillSnapshot() } }
+          : getAutoFillSnapshot()) as any,
       };
       
       const { data, error } = await supabase
