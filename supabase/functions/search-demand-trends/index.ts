@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({ query, limit: 25, lang: 'pt', country: 'br' }),
     });
     const json = await res.json();
-    if (!res.ok) throw new Error(json?.error || `Firecrawl ${res.status}`);
+    if (!res.ok) throw new Error(json?.error || `Falha ao consultar fonte externa (HTTP ${res.status})`);
 
     const items: any[] = json?.data?.web || json?.data || [];
     const total = items.length;

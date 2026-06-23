@@ -221,7 +221,7 @@ async function searchFirecrawl(apiKey: string, query: string, limit: number, scr
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`Firecrawl search failed [${response.status}]: ${errText}`);
+    throw new Error(`Falha ao consultar fonte externa de avaliações (HTTP ${response.status}): ${errText}`);
   }
 
   return response.json();
