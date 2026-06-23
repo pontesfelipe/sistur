@@ -60,6 +60,8 @@ import {
 import { Play, RefreshCw, AlertCircle, Info } from 'lucide-react';
 import { EnterpriseOnboardingTour } from './EnterpriseOnboardingTour';
 import { BookOpen } from 'lucide-react';
+import { BrandSelector } from './BrandSelector';
+import { useBrandUnits } from '@/hooks/useEnterpriseBrands';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -160,6 +162,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [enterpriseName, setEnterpriseName] = useState<string>('');
   const businessQuery = (enterpriseName || '').trim();
   const hasBusinessName = businessQuery.length > 0;
+
+  // Marca / rede do empreendimento (Fase 15.3). Cada `enterprise_profile` é
+  // uma "unidade" de uma marca; a mesma marca pode aparecer em várias
+  // unidades, uma por município.
+  const [brandId, setBrandId] = useState<string | null>(null);
+  const [brandName, setBrandName] = useState<string | null>(null);
+  const [unitName, setUnitName] = useState<string>('');
+  const [isFlagship, setIsFlagship] = useState<boolean>(false);
+  const { data: brandUnits } = useBrandUnits(brandId ?? null);
 
   // "Rodar todos": orquestra os blocos auto registrados via useAutoFillRunner
   const [runAllLoading, setRunAllLoading] = useState(false);
@@ -484,6 +495,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.telecom_coverage_analysis) setTelecomData(ep.telecom_coverage_analysis);
       if (ep.urban_accessibility_analysis) setAccessibilityData(ep.urban_accessibility_analysis);
       if (ep.health_infrastructure_analysis) setHealthData(ep.health_infrastructure_analysis);
+      if (ep.brand_id) setBrandId(ep.brand_id);
+      if (ep.unit_name) setUnitName(ep.unit_name);
+      if (typeof ep.is_flagship === 'boolean') setIsFlagship(ep.is_flagship);
       // Hydrate apenas o snapshot da rodada atual. Se o estado salvo for o
       // formato antigo (array puro), ele pertence a uma rodada anterior do
       // mesmo destino — descartamos para não pintar blocos como "verde" em
@@ -532,6 +546,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         ...formData,
         destination_id: destinationId,
         org_id: effectiveOrgId,
+        brand_id: brandId,
+        unit_name: unitName?.trim() || enterpriseName?.trim() || null,
+        is_flagship: isFlagship,
         review_analysis: reviewAnalysisData,
         digital_presence_analysis: digitalAnalysisData,
         context_analysis: contextAnalysisData,
