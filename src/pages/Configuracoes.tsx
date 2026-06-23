@@ -586,6 +586,11 @@ export default function Configuracoes() {
             <ModuleLibrary />
           </TabsContent>
 
+          {/* MARCAS TAB — gestão de redes de hotéis (Fase 15.3) */}
+          <TabsContent value="marcas" className="space-y-6">
+            <BrandManagementPanel />
+          </TabsContent>
+
           {/* FERRAMENTAS TAB */}
           <TabsContent value="ferramentas" className="space-y-6">
             <Card>
