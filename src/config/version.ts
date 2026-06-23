@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.2",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Fase 13.2 — Linhagem PMS conectada ao motor. `sync-pms-connector` agora, após inserir em `enterprise_pms_imports`, busca a rodada Enterprise ativa mais recente do destino (`assessments.diagnostic_type='enterprise'`, status draft/in_progress/completed) e faz upsert em `enterprise_indicator_values` para os códigos canônicos cobertos pelo payload PMS: `ENT_OCUPACAO` (occupancy_pct), `ENT_ADR` (adr_brl), `ENT_REVPAR` (revpar_brl), `ENT_GOPPAR`, `ENT_TREVPAR`, `ENT_NPS` e `ENT_REPEAT_GUEST` quando o provider expõe. `source` fica como `PMS:<provider>` e `notes` referencia o `enterprise_pms_imports.id` — assim a aba de indicadores e o `indicator_calculation_trail` passam a refletir a origem PMS automaticamente, sem cópia manual. Conflito resolvido via UNIQUE `(indicator_id, assessment_id)`. Falha de propagação é tolerante (warn) e não invalida o import bruto. Bump 1.96.1 → 1.96.2."
+    ]
+  },
   {
     version: "1.96.1",
     date: "2026-06-23",

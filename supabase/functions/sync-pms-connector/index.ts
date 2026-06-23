@@ -205,6 +205,66 @@ async function processOne(conn: Conn, admin: ReturnType<typeof createClient>) {
       .single();
     if (impErr) throw impErr;
 
+    // Propaga métricas para enterprise_indicator_values (alimenta a linhagem
+    // e o motor de cálculo). Busca a rodada Enterprise ativa mais recente
+    // do destino; se não houver, registra apenas o import (UI permite vincular depois).
+    try {
+      const { data: asmt } = await admin
+        .from('assessments')
+        .select('id')
+        .eq('org_id', conn.org_id)
+        .eq('destination_id', conn.destination_id)
+        .eq('diagnostic_type', 'enterprise')
+        .in('status', ['draft', 'in_progress', 'completed'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (asmt?.id) {
+        const codeMap: Record<string, number | undefined> = {
+          ENT_OCUPACAO: result.parsed.occupancy_pct,
+          ENT_ADR: result.parsed.adr_brl,
+          ENT_REVPAR: result.parsed.revpar_brl,
+          ENT_GOPPAR: result.parsed.goppar_brl,
+          ENT_TREVPAR: result.parsed.trevpar_brl,
+          ENT_NPS: result.parsed.nps,
+          ENT_REPEAT_GUEST: result.parsed.repeat_guest_pct,
+        };
+        const wanted = Object.entries(codeMap)
+          .filter(([, v]) => typeof v === 'number' && Number.isFinite(v) && v !== 0);
+        if (wanted.length > 0) {
+          const { data: inds } = await admin
+            .from('indicators')
+            .select('id, code')
+            .eq('indicator_scope', 'enterprise')
+            .in('code', wanted.map(([c]) => c));
+          const byCode = new Map((inds ?? []).map((r: any) => [r.code, r.id]));
+          const rows = wanted
+            .map(([code, value]) => {
+              const indicator_id = byCode.get(code);
+              if (!indicator_id) return null;
+              return {
+                indicator_id,
+                assessment_id: asmt.id,
+                org_id: conn.org_id,
+                value: Number(value),
+                reference_date: result.parsed.period_end,
+                source: `PMS:${conn.provider}`,
+                notes: `Import ${imp.id}`,
+              };
+            })
+            .filter(Boolean) as any[];
+          if (rows.length > 0) {
+            await admin
+              .from('enterprise_indicator_values')
+              .upsert(rows, { onConflict: 'indicator_id,assessment_id' });
+          }
+        }
+      }
+    } catch (propErr) {
+      console.warn('[sync-pms] propagação indicator_values falhou:', propErr);
+    }
+
     await admin.from('enterprise_pms_connections').update({
       status: 'active',
       last_sync_at: new Date().toISOString(),
