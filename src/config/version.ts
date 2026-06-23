@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 2,
+  patch: 3,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.3",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Nova Rodada — Seleção de destino com busca: o dropdown simples virou combobox pesquisável (Popover + Command) com filtro por nome, UF ou IBGE; selecionar via teclado funciona. Dedupe reforçado em `useDestinations.createDestination`: checa primeiro `ibge_code` (fonte canônica) e depois `name+UF` por organização, com mensagens claras orientando a selecionar o existente. Migration adiciona índices únicos parciais por org (`destinations_org_ibge_unique` e `destinations_org_name_uf_unique`) garantindo a regra no banco. Isolamento multi-tenant preservado: destinos com mesmo IBGE em organizações diferentes continuam permitidos (cada org tem seu próprio cadastro). Auditoria confirmou ZERO duplicatas dentro da mesma organização — os 3 pares cross-org existentes (Barretos/SP, Nova Trento/SC, Piracaia/SP) são legítimos pelo modelo RLS e foram mantidos."
+    ]
+  },
   {
     version: "1.96.2",
     date: "2026-06-23",
