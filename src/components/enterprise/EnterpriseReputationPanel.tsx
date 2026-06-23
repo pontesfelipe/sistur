@@ -186,7 +186,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
                 {searchCompetitors.isPending
                   ? <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   : <Search className="h-4 w-4 mr-2" />}
-                Buscar concorrentes (Firecrawl)
+                Buscar concorrentes (busca pública)
               </Button>
               <span className="text-xs text-muted-foreground">
                 Captura automática de até 5 concorrentes em {destinationName}. Substitui buscas anteriores; preserva os adicionados manualmente.
