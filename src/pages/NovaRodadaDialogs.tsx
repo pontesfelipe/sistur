@@ -122,15 +122,20 @@ export function NovaRodadaDialogs({
             org_id: effOrg,
             value_raw: Number(value),
             source: `Pré-preenchimento Automático (${code})`,
+            unit_id: isMultiUnit ? activeUnit?.id ?? null : null,
           };
         })
         .filter(Boolean) as any[];
       if (rows.length === 0) return;
       await supabase
         .from('indicator_values')
-        .upsert(rows, { onConflict: 'assessment_id,indicator_id' });
+        .upsert(rows, {
+          onConflict: isMultiUnit
+            ? 'assessment_id,indicator_id,unit_id'
+            : 'assessment_id,indicator_id',
+        });
     })();
-  }, [reviewPreFillValues, createdAssessmentId, indicators, orgId]);
+  }, [reviewPreFillValues, createdAssessmentId, indicators, orgId, isMultiUnit, activeUnit?.id]);
 
   const renderUnitTabs = (children: React.ReactNode) => {
     if (!isMultiUnit) return children;
