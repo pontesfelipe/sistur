@@ -111,6 +111,7 @@ export function NovaRodadaDialogs({
             <EnterpriseProfileStep
               destinationId={selectedDestinationData.id}
               destinationName={selectedDestinationData.name}
+              assessmentId={createdAssessmentId ?? resumeAssessmentId ?? null}
               onComplete={() => onSetCurrentStep(5)}
               onBack={onPreviousStep}
               onReviewAutoFill={(values) => setReviewPreFillValues(prev => ({ ...prev, ...values }))}
