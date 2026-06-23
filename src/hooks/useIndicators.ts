@@ -150,7 +150,7 @@ export function useIndicators(options: UseIndicatorsOptions = {}) {
   };
 }
 
-export function useIndicatorValues(assessmentId?: string) {
+export function useIndicatorValues(assessmentId?: string, unitId?: string | null) {
   const queryClient = useQueryClient();
 
   const getAssessmentOrgId = async (targetAssessmentId: string, fallbackOrgId: string) => {
@@ -163,17 +163,20 @@ export function useIndicatorValues(assessmentId?: string) {
   };
 
   const { data: values = [], isLoading, error } = useQuery({
-    queryKey: ['indicator-values', assessmentId],
+    queryKey: ['indicator-values', assessmentId, unitId ?? null],
     queryFn: async () => {
       if (!assessmentId) return [];
 
-      const { data, error } = await supabase
+      let q = supabase
         .from('indicator_values')
         .select(`
           *,
           indicator:indicators(*)
         `)
         .eq('assessment_id', assessmentId);
+      if (unitId) q = q.eq('unit_id', unitId);
+      else q = q.is('unit_id', null);
+      const { data, error } = await q;
 
       if (error) throw error;
       return data;
@@ -191,6 +194,7 @@ export function useIndicatorValues(assessmentId?: string) {
       reference_date?: string | null;
       is_ignored?: boolean;
       ignore_reason?: string | null;
+      unit_id?: string | null;
     }) => {
       // Get user's org_id
       const { data: { user } } = await supabase.auth.getUser();
@@ -210,13 +214,16 @@ export function useIndicatorValues(assessmentId?: string) {
       const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
       const valueOrgId = await getAssessmentOrgId(value.assessment_id, effectiveOrgId);
 
-      // Check if value exists
-      const { data: existing } = await supabase
+      // Check if value exists for this (assessment, indicator, unit) tuple
+      const effUnitId = value.unit_id ?? unitId ?? null;
+      let existingQ = supabase
         .from('indicator_values')
         .select('id')
         .eq('assessment_id', value.assessment_id)
-        .eq('indicator_id', value.indicator_id)
-        .single();
+        .eq('indicator_id', value.indicator_id);
+      if (effUnitId) existingQ = existingQ.eq('unit_id', effUnitId);
+      else existingQ = existingQ.is('unit_id', null);
+      const { data: existing } = await existingQ.maybeSingle();
 
       if (existing) {
         const updateData: Record<string, any> = {
@@ -243,6 +250,7 @@ export function useIndicatorValues(assessmentId?: string) {
         const insertData: Record<string, any> = {
           ...value,
           org_id: valueOrgId,
+          unit_id: effUnitId,
         };
 
         const { data, error } = await supabase
@@ -270,6 +278,7 @@ export function useIndicatorValues(assessmentId?: string) {
       indicator_id: string;
       value_raw?: number | null;
       source?: string | null;
+      unit_id?: string | null;
     }>) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
@@ -288,23 +297,25 @@ export function useIndicatorValues(assessmentId?: string) {
 
       if (!values || values.length === 0) return [];
 
-      // IMPORTANT: do NOT delete pre-existing values for this assessment.
-      // Previously we wiped all rows and re-inserted only the edited ones,
-      // which silently destroyed indicators the user had already saved
-      // unitarily (or that came from official pre-fill). We now upsert on
-      // the (assessment_id, indicator_id) unique key so existing values are
-      // updated in place and unrelated rows are preserved.
+      // Multi-unit aware: when any row carries unit_id, use the partial
+      // unique index on (assessment_id, indicator_id, unit_id WHERE NOT NULL).
+      // Otherwise (single-unit / territorial) fall back to the partial
+      // index on (assessment_id, indicator_id WHERE unit_id IS NULL).
+      const effUnitId = unitId ?? null;
+      const rows = values.map(v => ({
+        ...v,
+        unit_id: v.unit_id ?? effUnitId,
+        org_id: valueOrgId,
+      }));
+      const hasUnit = rows.some(r => r.unit_id);
       const { data, error } = await supabase
         .from('indicator_values')
-        .upsert(
-          values.map(v => ({
-            ...v,
-            org_id: valueOrgId,
-          })),
-          { onConflict: 'assessment_id,indicator_id' }
-        )
+        .upsert(rows, {
+          onConflict: hasUnit
+            ? 'assessment_id,indicator_id,unit_id'
+            : 'assessment_id,indicator_id',
+        })
         .select();
-
       if (error) throw error;
       return data;
     },

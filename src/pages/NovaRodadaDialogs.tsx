@@ -122,15 +122,20 @@ export function NovaRodadaDialogs({
             org_id: effOrg,
             value_raw: Number(value),
             source: `Pré-preenchimento Automático (${code})`,
+            unit_id: isMultiUnit ? activeUnit?.id ?? null : null,
           };
         })
         .filter(Boolean) as any[];
       if (rows.length === 0) return;
       await supabase
         .from('indicator_values')
-        .upsert(rows, { onConflict: 'assessment_id,indicator_id' });
+        .upsert(rows, {
+          onConflict: isMultiUnit
+            ? 'assessment_id,indicator_id,unit_id'
+            : 'assessment_id,indicator_id',
+        });
     })();
-  }, [reviewPreFillValues, createdAssessmentId, indicators, orgId]);
+  }, [reviewPreFillValues, createdAssessmentId, indicators, orgId, isMultiUnit, activeUnit?.id]);
 
   const renderUnitTabs = (children: React.ReactNode) => {
     if (!isMultiUnit) return children;
@@ -230,26 +235,29 @@ export function NovaRodadaDialogs({
               <Alert>
                 <Info className="h-4 w-4" />
                 <AlertDescription>
-                  Diagnóstico de rede com {orderedUnits.length} unidades. Nesta etapa, os indicadores
-                  manuais são preenchidos para a unidade principal
-                  {activeUnit?.unit_name ? ` (${activeUnit.unit_name})` : ''}. A coleta isolada por
-                  unidade no preenchimento manual entra na próxima fase; o pré-preenchimento da etapa
-                  anterior já roda por unidade individualmente.
+                  Diagnóstico de rede com {orderedUnits.length} unidades. Cada aba abaixo coleta os
+                  indicadores manuais de uma unidade isoladamente; os scores serão consolidados na
+                  marca após o cálculo.
                 </AlertDescription>
               </Alert>
             )}
             {/* Fase 4 (v1.86.0) — bloco opcional de importação CSV/PMS */}
             <PmsCsvImportPanel assessmentId={createdAssessmentId} />
             {/* Fase 13 (v1.96.0) — Conectores PMS nativos (Cloudbeds em produção) */}
-            {selectedDestinationData?.id && (
-              <PmsConnectionsPanel destinationId={selectedDestinationData.id} />
+            {effectiveDestinationData?.id && (
+              <PmsConnectionsPanel destinationId={effectiveDestinationData.id} />
             )}
-            <EnterpriseDataEntryPanel
-              assessmentId={createdAssessmentId}
-              tier={selectedTier}
-              onComplete={() => onSetCurrentStep(6)}
-              initialAutoFillValues={reviewPreFillValues}
-            />
+            {renderUnitTabs(
+              <EnterpriseDataEntryPanel
+                key={activeUnit?.id ?? 'single'}
+                assessmentId={createdAssessmentId}
+                tier={selectedTier}
+                onComplete={() => onSetCurrentStep(6)}
+                initialAutoFillValues={reviewPreFillValues}
+                unitId={activeUnit?.id ?? null}
+                unitLabel={activeUnit?.unit_name ?? activeUnit?.destinations?.name ?? null}
+              />
+            )}
           </div>
         ) : (
           <Card>

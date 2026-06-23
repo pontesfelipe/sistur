@@ -17,4 +17,4 @@ UI:
 - `BrandManagementPanel` em Configurações → aba "Marcas"
 - Card "Identidade do empreendimento e da marca" no topo do Step 4 de NovaRodada Empresarial
 
-Próximas fases planejadas: Tabs por unidade nos Steps 4/5 do wizard (pré-preenchimento e entrada manual com `unit_id`), refator do `calculate-enterprise-assessment` para iterar unidades e produzir agregação ponderada de marca, e seções comparativas em `generate-report`.
+**Status (v1.97.3):** Tabs por unidade implementadas nos Steps 4 e 5 do wizard. Step 4 isola pré-preenchimento por unidade; Step 5 carrega/salva `indicator_values` filtrados por `unit_id` usando `useIndicatorValues(assessmentId, unitId)`. Índice único legado `(assessment_id, indicator_id)` virou parcial `WHERE unit_id IS NULL` para liberar coexistência com multi-unit. **Pendente:** Fase 4 — refator do `calculate-assessment` para iterar `assessment_units`, gerar scores por unidade e consolidação ponderada (ex.: por `room_count`) na marca; relatórios com seção comparativa de rede.
