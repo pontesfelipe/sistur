@@ -3933,6 +3933,53 @@ export type Database = {
         }
         Relationships: []
       }
+      enterprise_brands: {
+        Row: {
+          brand_type: string
+          created_at: string
+          created_by: string | null
+          headquarters_uf: string | null
+          id: string
+          name: string
+          notes: string | null
+          org_id: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          brand_type?: string
+          created_at?: string
+          created_by?: string | null
+          headquarters_uf?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          org_id: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          brand_type?: string
+          created_at?: string
+          created_by?: string | null
+          headquarters_uf?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          org_id?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_brands_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       enterprise_competitors: {
         Row: {
           captured_at: string
@@ -4525,6 +4572,7 @@ export type Database = {
           autofill_run_state: Json | null
           average_daily_rate: number | null
           average_occupancy_rate: number | null
+          brand_id: string | null
           brand_strength_analysis: Json | null
           certifications: string[] | null
           climate_analysis: Json | null
@@ -4541,6 +4589,7 @@ export type Database = {
           events_analysis: Json | null
           health_infrastructure_analysis: Json | null
           id: string
+          is_flagship: boolean
           notes: string | null
           org_id: string
           peak_months: string[] | null
@@ -4561,6 +4610,7 @@ export type Database = {
           telecom_coverage_analysis: Json | null
           total_capacity: number | null
           transport_analysis: Json | null
+          unit_name: string | null
           updated_at: string
           urban_accessibility_analysis: Json | null
           years_in_operation: number | null
@@ -4571,6 +4621,7 @@ export type Database = {
           autofill_run_state?: Json | null
           average_daily_rate?: number | null
           average_occupancy_rate?: number | null
+          brand_id?: string | null
           brand_strength_analysis?: Json | null
           certifications?: string[] | null
           climate_analysis?: Json | null
@@ -4587,6 +4638,7 @@ export type Database = {
           events_analysis?: Json | null
           health_infrastructure_analysis?: Json | null
           id?: string
+          is_flagship?: boolean
           notes?: string | null
           org_id: string
           peak_months?: string[] | null
@@ -4607,6 +4659,7 @@ export type Database = {
           telecom_coverage_analysis?: Json | null
           total_capacity?: number | null
           transport_analysis?: Json | null
+          unit_name?: string | null
           updated_at?: string
           urban_accessibility_analysis?: Json | null
           years_in_operation?: number | null
@@ -4617,6 +4670,7 @@ export type Database = {
           autofill_run_state?: Json | null
           average_daily_rate?: number | null
           average_occupancy_rate?: number | null
+          brand_id?: string | null
           brand_strength_analysis?: Json | null
           certifications?: string[] | null
           climate_analysis?: Json | null
@@ -4633,6 +4687,7 @@ export type Database = {
           events_analysis?: Json | null
           health_infrastructure_analysis?: Json | null
           id?: string
+          is_flagship?: boolean
           notes?: string | null
           org_id?: string
           peak_months?: string[] | null
@@ -4653,11 +4708,19 @@ export type Database = {
           telecom_coverage_analysis?: Json | null
           total_capacity?: number | null
           transport_analysis?: Json | null
+          unit_name?: string | null
           updated_at?: string
           urban_accessibility_analysis?: Json | null
           years_in_operation?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "enterprise_profiles_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_brands"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "enterprise_profiles_destination_id_fkey"
             columns: ["destination_id"]
