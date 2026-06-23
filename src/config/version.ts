@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.6",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial Multi-Unidade (Fase 15.4 — Fase 4 / passo 3, encerrando a fase) — duas entregas finais: (1) **filtro por unidade nas abas internas do `DiagnosticoDetalhe`**: quando o diagnóstico é multi-unit (`brand_id` + 2+ `assessment_units`), um seletor aparece logo abaixo do `BrandRollupPanel` permitindo escolher 'Todas as unidades (marca)' ou uma unidade específica; o filtro escopa as abas Indicadores, Gargalos e Tratamento (Tratamento herda via `displayedIndicatorScores`) filtrando `indicator_scores`/`issues`/`recommendations` por `unit_id`. O estado é persistido na URL via `?unit=<id>` para deep-link/back-forward; (2) **seção comparativa de rede no relatório** (`generate-report`): quando o assessment tem `brand_id` + 2+ unidades, um novo bloco `=== DIAGNÓSTICO DE REDE (MARCA MULTI-UNIDADE) ===` é injetado no userPrompt da LLM contendo identidade da marca (`enterprise_brands`), tabela de rollups consolidados por pilar (`assessment_brand_rollups` — score ponderado por UH, score simples, dispersão σ, unidade crítica) e tabela de scores por unidade (RA/OE/AO + UH + nº de gargalos críticos) lida de `pillar_scores`/`issues` filtrados por `unit_id`. O bloco inclui instruções obrigatórias para a LLM gerar três capítulos: (a) 'Diagnóstico da Marca' com abrangência, score consolidado, dispersão e pilar crítico, (b) sub-capítulos por unidade com contexto territorial + scores + gargalos + recomendações locais, e (c) 'Comparativo da Rede' com ranking interno, fatores territoriais explicativos e separação entre recomendações transversais (marca) e locais (unidade). `process-report-job` não precisou de mudança — apenas reencaminha para `generate-report`. Fase 15.4 (Fase 4) concluída.",
+    ],
+  },
   {
     version: "1.97.5",
     date: "2026-06-23",
