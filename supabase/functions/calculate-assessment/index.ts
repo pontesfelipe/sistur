@@ -1859,6 +1859,7 @@ async function runCalculationCore(
         recommendations.push({
           org_id: orgId,
           assessment_id,
+          unit_id: unitId,
           issue_id: parentIssue.id,
           training_id: bestTraining.training_id,
           reason: justification,
@@ -1932,6 +1933,7 @@ async function runCalculationCore(
           recommendations.push({
             org_id: orgId,
             assessment_id,
+            unit_id: unitId,
             issue_id: issue.id,
             course_id: course.id,
             reason: justification,
