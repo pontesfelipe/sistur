@@ -6,6 +6,11 @@ export interface EnterpriseProfile {
   id: string;
   destination_id: string;
   org_id: string;
+
+  // Marca / rede de hotéis (Fase 15.3)
+  brand_id: string | null;
+  unit_name: string | null;
+  is_flagship: boolean;
   
   // Tipo e Porte
   property_type: string;

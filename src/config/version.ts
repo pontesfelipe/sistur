@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 96,
-  patch: 12,
+  minor: 97,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.0",
+    date: "2026-06-23",
+    type: "minor" as const,
+    changes: [
+      "Rede de Hotéis (Fase 15.3) — novo conceito de **Marca/Rede** para empreendimentos. Cada perfil empresarial passa a ser uma **unidade** de uma marca, permitindo agrupar várias unidades do mesmo empreendimento em diferentes municípios mantendo um diagnóstico independente por unidade. Nova tabela `enterprise_brands` (RLS por org, GRANTs e índices) e colunas `brand_id`, `unit_name`, `is_flagship` em `enterprise_profiles` com backfill automático: cada perfil existente recebeu uma marca 'solo' com o próprio nome para preservar 100% dos diagnósticos calculados. Index único `(brand_id, destination_id)` impede duplicar a mesma marca no mesmo município. Novos artefatos de front: hook `useEnterpriseBrands` (CRUD + listagem de unidades), componente `BrandSelector` (combobox + criação inline), `BrandManagementPanel` na nova aba **Configurações → Marcas** e card 'Identidade do empreendimento e da marca' no topo do Step 4 da Nova Rodada Empresarial. Quando a marca já existe, o seletor mostra as unidades atuais (helper text com a lista de municípios), facilitando a leitura da rede em contexto territorial."
+    ]
+  },
   {
     version: "1.96.12",
     date: "2026-06-23",

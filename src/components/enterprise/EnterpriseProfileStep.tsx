@@ -60,6 +60,8 @@ import {
 import { Play, RefreshCw, AlertCircle, Info } from 'lucide-react';
 import { EnterpriseOnboardingTour } from './EnterpriseOnboardingTour';
 import { BookOpen } from 'lucide-react';
+import { BrandSelector } from './BrandSelector';
+import { useBrandUnits } from '@/hooks/useEnterpriseBrands';
 
 interface EnterpriseProfileStepProps {
   destinationId: string;
@@ -160,6 +162,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [enterpriseName, setEnterpriseName] = useState<string>('');
   const businessQuery = (enterpriseName || '').trim();
   const hasBusinessName = businessQuery.length > 0;
+
+  // Marca / rede do empreendimento (Fase 15.3). Cada `enterprise_profile` é
+  // uma "unidade" de uma marca; a mesma marca pode aparecer em várias
+  // unidades, uma por município.
+  const [brandId, setBrandId] = useState<string | null>(null);
+  const [brandName, setBrandName] = useState<string | null>(null);
+  const [unitName, setUnitName] = useState<string>('');
+  const [isFlagship, setIsFlagship] = useState<boolean>(false);
+  const { data: brandUnits } = useBrandUnits(brandId ?? null);
 
   // "Rodar todos": orquestra os blocos auto registrados via useAutoFillRunner
   const [runAllLoading, setRunAllLoading] = useState(false);
@@ -484,6 +495,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.telecom_coverage_analysis) setTelecomData(ep.telecom_coverage_analysis);
       if (ep.urban_accessibility_analysis) setAccessibilityData(ep.urban_accessibility_analysis);
       if (ep.health_infrastructure_analysis) setHealthData(ep.health_infrastructure_analysis);
+      if (ep.brand_id) setBrandId(ep.brand_id);
+      if (ep.unit_name) setUnitName(ep.unit_name);
+      if (typeof ep.is_flagship === 'boolean') setIsFlagship(ep.is_flagship);
       // Hydrate apenas o snapshot da rodada atual. Se o estado salvo for o
       // formato antigo (array puro), ele pertence a uma rodada anterior do
       // mesmo destino — descartamos para não pintar blocos como "verde" em
@@ -532,6 +546,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         ...formData,
         destination_id: destinationId,
         org_id: effectiveOrgId,
+        brand_id: brandId,
+        unit_name: unitName?.trim() || enterpriseName?.trim() || null,
+        is_flagship: isFlagship,
         review_analysis: reviewAnalysisData,
         digital_presence_analysis: digitalAnalysisData,
         context_analysis: contextAnalysisData,
@@ -615,6 +632,73 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         open={tourOpen}
         onOpenChange={setTourOpen}
       />
+      {/* Marca / rede — Fase 15.3.
+          Permite agrupar várias unidades do mesmo empreendimento em diferentes
+          municípios. Cada unidade segue tendo seu próprio diagnóstico; a marca
+          serve como camada de análise consolidada da rede. */}
+      <Card className="border-primary/20">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Building2 className="h-4 w-4 text-primary" />
+            Identidade do empreendimento e da marca
+          </CardTitle>
+          <CardDescription>
+            Se este hotel faz parte de uma rede com unidades em outros municípios,
+            selecione (ou crie) a marca. A análise comparativa da rede usará esta
+            associação para confrontar desempenho da marca em diferentes destinos.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <BrandSelector
+            value={brandId}
+            onChange={(id, name) => {
+              setBrandId(id);
+              setBrandName(name);
+              // Sugestão de nome da unidade quando vazio
+              if (!unitName && name && destinationName) {
+                setUnitName(`${name} ${destinationName}`);
+              }
+            }}
+            helperText={
+              brandUnits && brandUnits.length > 0
+                ? `Esta marca já possui ${brandUnits.length} unidade(s): ${brandUnits
+                    .map((u) => u.destinations?.name)
+                    .filter(Boolean)
+                    .join(', ')}.`
+                : 'Empreendimento independente? Crie uma marca com o próprio nome — futuras unidades poderão ser anexadas.'
+            }
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="unit-name">Nome desta unidade</Label>
+              <Input
+                id="unit-name"
+                value={unitName}
+                onChange={(e) => setUnitName(e.target.value)}
+                placeholder={
+                  brandName
+                    ? `${brandName} ${destinationName}`
+                    : `Ex.: Hotel Central ${destinationName}`
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Identifica esta unidade dentro da marca (município: <strong>{destinationName}</strong>).
+              </p>
+            </div>
+            <div className="flex items-end gap-2">
+              <label className="flex items-center gap-2 cursor-pointer text-sm">
+                <input
+                  type="checkbox"
+                  checked={isFlagship}
+                  onChange={(e) => setIsFlagship(e.target.checked)}
+                  className="h-4 w-4"
+                />
+                Unidade principal (flagship) da marca
+              </label>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       {/* 0) Resumo de progresso dos blocos automáticos */}
       <Card className="border-primary/20">
         <CardContent className="py-4">
