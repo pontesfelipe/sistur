@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 5,
+  patch: 6,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.6",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Enterprise — limpeza final de menções ao provedor de scraping nas labels de fonte mostradas ao usuário. (1) `ENT_AUTOFILL_SOURCE_MAP` (EnterpriseDataEntryPanel) reescrito: cada código agora cita a fonte real (Google/TripAdvisor/Booking, Reclame Aqui/Procon, Instagram/Facebook/TikTok, OTAs, BrasilAPI etc.) sem mencionar 'Firecrawl', mantendo o sufixo (Auto) para indicar pré-preenchimento. (2) `EnterpriseProfileStep` (BLOCK_META.accessibility), `EnterpriseOnboardingTour` (passo 2), `EnterpriseReputationPanel` (botão de concorrentes) e `TariffSeasonalitySearch` (rótulo de fonte de demanda) também passaram a citar fontes públicas em vez do provedor. Indicadores e Linhagem do diagnóstico passam a exibir a fonte semântica correta para os blocos automáticos. Observação operacional: para popular novos indicadores em diagnósticos já calculados é necessário reabrir a rodada e clicar 'Rodar todos' — o motor agora persiste todos os 21 blocos em `indicator_values`, e a aba Indicadores recalcula automaticamente."
+    ]
+  },
   {
     version: "1.96.5",
     date: "2026-06-23",
