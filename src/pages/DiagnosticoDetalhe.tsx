@@ -1097,6 +1097,17 @@ const DiagnosticoDetalhe = () => {
             </TabsContent>
           )}
 
+          {/* Visão Integrada (Empresarial × Município) */}
+          {isEnterprise && assessment.destination_id && (
+            <TabsContent value="integrada" className="space-y-6">
+              <IntegratedTerritorialView
+                enterpriseDestinationId={assessment.destination_id}
+                enterprisePillarScores={pillarScores as any}
+                destinationName={assessmentDestination?.name || 'Empreendimento'}
+              />
+            </TabsContent>
+          )}
+
           {/* Normalização Tab - SISTUR Add-on Required */}
           <TabsContent value="normalizacao">
             <NormalizationView 
