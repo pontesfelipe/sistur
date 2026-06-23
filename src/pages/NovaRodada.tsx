@@ -563,6 +563,11 @@ export default function NovaRodada() {
           onSelectedDestinationChange={setSelectedDestination}
           destinations={destinations}
           selectedDestinationData={selectedDestinationData}
+          brandId={brandId}
+          brandName={brandName}
+          onBrandChange={(id, name) => { setBrandId(id); setBrandName(name); }}
+          units={units}
+          onUnitsChange={setUnits}
           assessmentTitle={assessmentTitle}
           onAssessmentTitleChange={setAssessmentTitle}
           periodStart={periodStart}
