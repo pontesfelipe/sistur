@@ -802,7 +802,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
               {isEnterpriseAssessment ? (
                 <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
                   <Hotel className="h-3 w-3 mr-1" />
-                  Enterprise
+                  Empresarial
                 </Badge>
               ) : (
                 <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
@@ -823,7 +823,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         </CardContent>
       </Card>
 
-      {/* Render Enterprise Panel for Enterprise diagnostics */}
+      {/* Render Empresarial Panel for Empresarial diagnostics */}
       {selectedAssessment && isEnterpriseAssessment && (
         <EnterpriseDataEntryPanel 
           assessmentId={selectedAssessment} 
@@ -834,7 +834,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         />
       )}
 
-      {/* Render Territorial Panel for non-Enterprise diagnostics */}
+      {/* Render Territorial Panel for non-Empresarial diagnostics */}
       {selectedAssessment && !isEnterpriseAssessment && (
         <>
           {/* Progress */}

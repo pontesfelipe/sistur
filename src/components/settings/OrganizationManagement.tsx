@@ -297,7 +297,7 @@ export function OrganizationManagement() {
                     />
                   </div>
 
-                  {/* Toggle Enterprise */}
+                  {/* Toggle Empresarial */}
                   <div className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
@@ -305,7 +305,7 @@ export function OrganizationManagement() {
                       </div>
                       <div>
                         <Label htmlFor="enterprise-access" className="font-medium">
-                          Acesso Enterprise
+                          Acesso Empresarial
                         </Label>
                         <p className="text-xs text-muted-foreground">
                           Diagnósticos hoteleiros com indicadores de performance (RevPAR, NPS, etc).
@@ -412,7 +412,7 @@ export function OrganizationManagement() {
                       {org.has_enterprise_access && (
                         <Badge variant="outline" className="text-xs gap-1 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30">
                           <Hotel className="h-3 w-3" />
-                          Enterprise
+                          Empresarial
                         </Badge>
                       )}
                       {!org.has_territorial_access && !org.has_enterprise_access && (

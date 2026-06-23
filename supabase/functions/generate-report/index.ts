@@ -810,9 +810,9 @@ function formatEnterpriseProfile(profile: any): string {
   return lines.length > 1 ? lines.join('\n') + '\n' : '';
 }
 
-// v1.89.0 — Fase 6 Enterprise: contexto adicional para enriquecer o relatório.
+// v1.89.0 — Fase 6 Empresarial: contexto adicional para enriquecer o relatório.
 // Concorrentes são SEMPRE anonimizados (Concorrente A/B/C) — nunca expor nomes
-// ou CNPJs (regra anti-ranking + privacidade da camada semântica Enterprise).
+// ou CNPJs (regra anti-ranking + privacidade da camada semântica Empresarial).
 function formatEnterpriseCompetitorsAnon(competitors: any[]): string {
   if (!competitors || competitors.length === 0) return '';
   const sorted = [...competitors].sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0));
@@ -1558,14 +1558,14 @@ ESTRUTURA:
 TIPO: RELATÓRIO ENTERPRISE COMPLETO — Mínimo 2500 palavras.
 
 ESTRUTURA (MEC/ABNT):
-# Relatório SISTUR Enterprise — [Nome]
+# Relatório SISTUR Empresarial — [Nome]
 [Ficha Técnica]
 ## 1. Sumário Executivo para Gestão
 ## 2. Perfil do Empreendimento
 - Se houver seção "PERFIL DO EMPREENDIMENTO" no input, renderize-a integralmente em tabela markdown (Atributo | Valor).
 - Destaque tipo de propriedade, capacidade, sazonalidade, público-alvo, certificações, iniciativas de sustentabilidade e recursos de acessibilidade.
 - Se não houver dados de perfil, indique que a ficha cadastral deve ser completada.
-## 3. Metodologia SISTUR Enterprise
+## 3. Metodologia SISTUR Empresarial
 ## 4. Diagnóstico por Categoria Funcional
 - Para cada categoria, use a TABELA CANÔNICA: | Indicador | Valor | Unidade | Status | Fonte |
 - Logo abaixo de cada tabela, em parágrafo, mencione benchmark, validado em (data) e evidência (value_text/Observações) — NÃO crie colunas extras.
@@ -1666,7 +1666,7 @@ REGRA FINAL: NÃO inclua nada além desta única subseção. Não escreva preâm
 
 function getEnvelopeSystemPrompt(template: string, isEnterprise: boolean): string {
   if (isEnterprise) {
-    return `Você é um consultor estratégico em gestão de empreendimentos turísticos. Está escrevendo o ENVELOPE de um relatório SISTUR Enterprise — todas as seções EXCETO o Diagnóstico por Categoria Funcional, que já foi escrito por outras chamadas e será inserido pelo orquestrador.
+    return `Você é um consultor estratégico em gestão de empreendimentos turísticos. Está escrevendo o ENVELOPE de um relatório SISTUR Empresarial — todas as seções EXCETO o Diagnóstico por Categoria Funcional, que já foi escrito por outras chamadas e será inserido pelo orquestrador.
 
 ESCOPO DESTA CHAMADA: você escreve título, ficha técnica, sumário executivo, perfil do empreendimento, metodologia, análise de gargalos consolidados, planos de ação, recomendações estratégicas, prescrições, roadmap, fontes/referências e considerações finais. NÃO REESCREVA as subseções do diagnóstico por categoria — você as recebe como contexto de leitura.
 
@@ -1675,11 +1675,11 @@ POLÍTICA "ZERO ALUCINAÇÃO": use apenas dados presentes no contexto. Quando fa
 CONSISTÊNCIA COM OS DIAGNÓSTICOS POR CATEGORIA: você recebe os textos das categorias na seção "DIAGNÓSTICO POR CATEGORIA (JÁ ESCRITO)". Os gargalos, recomendações e roadmap que você escrever DEVEM ser COERENTES com aqueles textos — cite os mesmos indicadores, mantenha as mesmas conclusões, não contradiga.
 
 ESTRUTURA OBRIGATÓRIA DA SUA SAÍDA — escreva nesta ordem EXATA:
-# Relatório SISTUR Enterprise — [Nome]
+# Relatório SISTUR Empresarial — [Nome]
 [Tabela de Ficha Técnica fornecida]
 ## 1. Sumário Executivo para Gestão
 ## 2. Perfil do Empreendimento
-## 3. Metodologia SISTUR Enterprise
+## 3. Metodologia SISTUR Empresarial
 ## 4. Diagnóstico por Categoria Funcional
 
 <!-- DIAGNOSTICO_PILARES_PLACEHOLDER -->
@@ -3101,16 +3101,16 @@ serve(async (req) => {
       ibgeCode
         ? supabase.from('external_indicator_values').select('*').eq('municipality_ibge_code', ibgeCode).eq('org_id', assessmentOrgId)
         : emptyArray,
-      // Enterprise-only: indicator values persisted in the legacy enterprise table.
+      // Empresarial-only: indicator values persisted in the legacy enterprise table.
       isEnterprise
         ? supabase.from('enterprise_indicator_values').select('*, enterprise_indicators(*, enterprise_indicator_categories(*))').eq('assessment_id', assessmentId)
         : emptyArray,
-      // Enterprise profile: 26 descriptive fields (property_type, certifications,
+      // Empresarial profile: 26 descriptive fields (property_type, certifications,
       // sustainability, accessibility…) that used to be dead data.
       isEnterprise && destinationId
         ? supabase.from('enterprise_profiles').select('*').eq('destination_id', destinationId).maybeSingle()
         : emptyMaybe,
-      // Fase 6 — Enterprise context enrichment
+      // Fase 6 — Empresarial context enrichment
       isEnterprise && destinationId
         ? supabase.from('enterprise_competitors').select('property_type, rating, review_volume, distance_km').eq('destination_id', destinationId)
         : emptyArray,
@@ -3144,7 +3144,7 @@ serve(async (req) => {
     const enterpriseSeasonality = enterpriseSeasonalityRes.data || [];
     const enterprisePmsImports = enterprisePmsImportsRes.data || [];
 
-    // v1.89.0 — Trilha de cálculo dos indicadores Enterprise (ENT_*) — usada
+    // v1.89.0 — Trilha de cálculo dos indicadores Empresarial (ENT_*) — usada
     // para justificar fórmulas/fontes das métricas operacionais no prompt.
     let enterpriseCalcTrail: any[] = [];
     const indicatorsByIdMap = new Map<string, any>();

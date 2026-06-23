@@ -110,7 +110,7 @@ const Index = () => {
   const { data: recentAssessments, isLoading: recentLoading } = useRecentAssessments();
   const { data: recommendations, isLoading: recsLoading } = useTopRecommendations();
 
-  // Enterprise hooks
+  // Empresarial hooks
   const { data: enterpriseKPIs, isLoading: enterpriseKPIsLoading } = useEnterpriseKPIs(selectedDestination);
   const { data: enterpriseStats, isLoading: enterpriseStatsLoading } = useEnterpriseDashboardStats();
   const { data: enterprisePillarData, isLoading: enterprisePillarLoading } = useAggregatedEnterprisePillarScores(selectedDestination);
@@ -296,7 +296,7 @@ const Index = () => {
                 className="gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
               >
                 <Hotel className="h-4 w-4" />
-                <span className="hidden sm:inline">Enterprise</span>
+                <span className="hidden sm:inline">Empresarial</span>
               </ToggleGroupItem>
             </ToggleGroup>
           ) : null}
@@ -427,7 +427,7 @@ const Index = () => {
                         <div className="flex items-center gap-2">
                           <TrendingUp className="h-4 w-4 text-primary" />
                           <span className="font-medium text-sm">
-                            {isEnterprise ? 'Índice Geral Enterprise' : 'Índice Geral SISTUR'} (média)
+                            {isEnterprise ? 'Índice Geral Empresarial' : 'Índice Geral SISTUR'} (média)
                           </span>
                         </div>
                         <span className="font-mono font-semibold">{Math.round(averageScore * 100)}%</span>

@@ -566,7 +566,7 @@ export default function Relatorios() {
     const logoHtml = c.logoUrl ? `<div style="text-align:center;margin-bottom:16px;"><img src="${c.logoUrl}" style="max-height:60px;max-width:200px;" /></div>` : '';
     const orgHtml = c.organizationName ? `<div style="text-align:center;font-size:14px;color:#64748B;margin-bottom:4px;">${c.organizationName}</div>` : '';
     const scopeBadge = scope === 'enterprise'
-      ? `<div style="text-align:center;font-size:11px;color:#7C2D12;background:#FFEDD5;border:1px solid #FED7AA;padding:4pt 8pt;margin-bottom:8pt;letter-spacing:0.05em;text-transform:uppercase;">Relatório Enterprise — Diagnóstico Operacional & Estratégico (concorrentes anonimizados: Concorrente A/B/C)</div>`
+      ? `<div style="text-align:center;font-size:11px;color:#7C2D12;background:#FFEDD5;border:1px solid #FED7AA;padding:4pt 8pt;margin-bottom:8pt;letter-spacing:0.05em;text-transform:uppercase;">Relatório Empresarial — Diagnóstico Operacional & Estratégico (concorrentes anonimizados: Concorrente A/B/C)</div>`
       : '';
     const headerHtml = c.headerText ? `<div style="text-align:center;font-size:12px;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:24px;">${c.headerText}</div>` : '';
     const footerHtml = c.footerText ? `<div style="text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px;margin-top:24px;">${c.footerText}</div>` : '';
@@ -852,7 +852,7 @@ export default function Relatorios() {
                         <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" />Territorial</span>
                       </SelectItem>
                       <SelectItem value="enterprise">
-                        <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />Enterprise</span>
+                        <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />Empresarial</span>
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -1274,7 +1274,7 @@ export default function Relatorios() {
                           <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" />Territorial</span>
                         </SelectItem>
                         <SelectItem value="enterprise">
-                          <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />Enterprise</span>
+                          <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />Empresarial</span>
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -1350,7 +1350,7 @@ export default function Relatorios() {
                                   <p className="font-medium truncate">{r.destination_name}</p>
                                   <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0">
                                     {r.diagnostic_type === 'enterprise' ? <Building2 className="h-2.5 w-2.5" /> : <Globe className="h-2.5 w-2.5" />}
-                                    {r.diagnostic_type === 'enterprise' ? 'Enterprise' : 'Territorial'}
+                                    {r.diagnostic_type === 'enterprise' ? 'Empresarial' : 'Territorial'}
                                   </Badge>
                                   {tierLabel && (
                                     <Badge variant="secondary" className="text-[10px] shrink-0">

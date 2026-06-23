@@ -286,7 +286,7 @@ const rules = [
   }
 ];
 
-// Enterprise indicator categories
+// Empresarial indicator categories
 const enterpriseCategories = [
   {
     id: 'financial',
@@ -763,14 +763,14 @@ export default function Metodologia() {
           </CardContent>
         </Card>
 
-        {/* Enterprise Module */}
+        {/* Empresarial Module */}
         <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <div className="p-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white">
                 <Hotel className="h-5 w-5" />
               </div>
-              <span>SISTUR Enterprise</span>
+              <span>SISTUR Empresarial</span>
               <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white ml-2">
                 <Sparkles className="h-3 w-3 mr-1" />
                 Módulo Hoteleiro
@@ -783,7 +783,7 @@ export default function Metodologia() {
           <CardContent className="space-y-6">
             <div className="prose prose-sm max-w-none dark:prose-invert">
               <p>
-                O <strong>SISTUR Enterprise</strong> estende a teoria sistêmica de Mario Beni para 
+                O <strong>SISTUR Empresarial</strong> estende a teoria sistêmica de Mario Beni para 
                 organizações do setor privado, especialmente hotéis, resorts e redes hoteleiras. 
                 O módulo utiliza <strong>22 indicadores especializados</strong> de hospitalidade, sendo que 
                 <strong>6 indicadores são compartilhados</strong> entre os diagnósticos territoriais e empresariais 
@@ -792,7 +792,7 @@ export default function Metodologia() {
               </p>
             </div>
 
-            {/* Enterprise Categories Grid */}
+            {/* Empresarial Categories Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {enterpriseCategories.map((category) => (
                 <div 
@@ -827,7 +827,7 @@ export default function Metodologia() {
               ))}
             </div>
 
-            {/* Enterprise vs Public Comparison */}
+            {/* Empresarial vs Public Comparison */}
             <div className="grid md:grid-cols-2 gap-4">
               <div className="rounded-xl border bg-card p-5 space-y-3">
                 <div className="flex items-center gap-2">
@@ -857,7 +857,7 @@ export default function Metodologia() {
               <div className="rounded-xl border-2 border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10 p-5 space-y-3">
                 <div className="flex items-center gap-2">
                   <Hotel className="h-5 w-5 text-amber-500" />
-                  <h4 className="font-semibold">Organizações Privadas (Enterprise)</h4>
+                  <h4 className="font-semibold">Organizações Privadas (Empresarial)</h4>
                 </div>
                 <ul className="text-sm space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
@@ -1315,9 +1315,9 @@ export default function Metodologia() {
                   nem detalhamento metodológico extenso.</li>
               </ul>
 
-              <h4>Variante Enterprise</h4>
+              <h4>Variante Empresarial</h4>
               <p>
-                Cada um dos três templates possui versão <strong>Enterprise</strong> — acionada quando
+                Cada um dos três templates possui versão <strong>Empresarial</strong> — acionada quando
                 o diagnóstico é de empreendimento (não destino). Substitui os eixos territoriais
                 (RA/OE/AO) por categorias funcionais (governança, ESG, satisfação do hóspede,
                 ocupação) e troca o foco territorial por KPIs de negócio e ROI.

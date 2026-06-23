@@ -294,8 +294,8 @@ export async function exportMetodologiaDocx() {
         heading('Regra 6: Interdependência Setorial', HeadingLevel.HEADING_3),
         para('Identifica indicadores que dependem de múltiplos setores (saúde, educação, saneamento).'),
 
-        // Enterprise
-        heading('5. SISTUR Enterprise — Módulo Hoteleiro', HeadingLevel.HEADING_1),
+        // Empresarial
+        heading('5. SISTUR Empresarial — Módulo Hoteleiro', HeadingLevel.HEADING_1),
         para('Adaptação da metodologia para o setor privado de hospitalidade com 22 indicadores especializados, sendo 6 compartilhados com diagnósticos territoriais (NPS, Reviews Online, Horas de Treinamento, % Funcionários Locais, % Compras Locais e Certificações Ambientais).'),
         para('Categorias: Performance Financeira, Experiência do Hóspede, Operações, Sustentabilidade, Recursos Humanos, Marketing & Distribuição, Compliance & Segurança.'),
 
@@ -351,7 +351,7 @@ export async function exportFAQDocx(items: FAQEntry[]) {
     general: 'Sobre o SISTUR',
     edu: 'SISTUR EDU',
     erp: 'SISTUR ERP',
-    enterprise: 'SISTUR Enterprise',
+    enterprise: 'SISTUR Empresarial',
   };
 
   const grouped = items.reduce((acc, item) => {
@@ -439,7 +439,7 @@ export async function exportManualUsuarioDocx() {
       heading('1.1 Login e Recuperação de Senha', HeadingLevel.HEADING_2),
       para('Acesse pela tela inicial usando e-mail e senha cadastrados. Caso tenha esquecido a senha, utilize a opção "Esqueceu a senha?" para receber um link de redefinição. Contas novas passam por aprovação de um administrador antes do primeiro acesso.'),
       heading('1.2 Estrutura da Interface', HeadingLevel.HEADING_2),
-      bullet('Barra lateral: navegação entre os módulos disponíveis (ERP, EDU, Enterprise, Observatório, Fórum, Configurações).', 'bullets'),
+      bullet('Barra lateral: navegação entre os módulos disponíveis (ERP, EDU, Empresarial, Observatório, Fórum, Configurações).', 'bullets'),
       bullet('Cabeçalho: título da página, notificações, perfil e troca rápida entre organizações (para usuários multi-org).', 'bullets'),
       bullet('Conteúdo principal: cards, tabelas e formulários específicos de cada módulo.', 'bullets'),
 
@@ -448,7 +448,7 @@ export async function exportManualUsuarioDocx() {
       para('Plataforma de diagnóstico territorial baseada nos três pilares (RA, OE e AO) da Análise Estrutural de Mario Beni. Permite criar rodadas, preencher indicadores, calcular o I-SISTUR e gerar relatórios.'),
       heading('2.2 SISTUR EDU', HeadingLevel.HEADING_2),
       para('Ambiente de capacitação com trilhas, cursos, exames e certificações. As prescrições de aprendizado são geradas automaticamente a partir dos resultados do diagnóstico (gatilho em Atenção/Crítico).'),
-      heading('2.3 SISTUR Enterprise', HeadingLevel.HEADING_2),
+      heading('2.3 SISTUR Empresarial', HeadingLevel.HEADING_2),
       para('Diagnóstico para empreendimentos privados (hotéis, agências, restaurantes). Usa 22 indicadores especializados e segue a mesma régua de status (Adequado/Atenção/Crítico).'),
       heading('2.4 Observatório Turístico', HeadingLevel.HEADING_2),
       para('Monitoramento permanente de fluxo, ocupação, eventos, receita e empregos. Permite ingestão automática a partir de fontes oficiais e exportação em CSV/PDF.'),
@@ -601,7 +601,7 @@ export async function exportManualDiagnosticosDocx() {
     subtitle: 'Como criar, calcular e interpretar diagnósticos no SISTUR',
     body: [
       heading('1. O que é um Diagnóstico SISTUR', HeadingLevel.HEADING_1),
-      para('Um diagnóstico é a fotografia estruturada de um destino turístico em um determinado momento, baseado nos pilares RA, OE e AO. Pode ser Territorial (município, região turística, consórcio) ou Enterprise (empreendimento privado).'),
+      para('Um diagnóstico é a fotografia estruturada de um destino turístico em um determinado momento, baseado nos pilares RA, OE e AO. Pode ser Territorial (município, região turística, consórcio) ou Empresarial (empreendimento privado).'),
 
       heading('2. Níveis Disponíveis', HeadingLevel.HEADING_1),
       bullet('Essencial — 9 indicadores, 30–45 minutos. Ideal para primeira avaliação.', 'bullets'),

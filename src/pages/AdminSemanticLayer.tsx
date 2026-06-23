@@ -164,7 +164,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
   const [auditFilter, setAuditFilter] = useState<"all" | "fail" | "warn" | "pass">("all");
   const auditFileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // v1.91.0 — Fase 8: carregar relatórios já gerados (Enterprise ou Territorial)
+  // v1.91.0 — Fase 8: carregar relatórios já gerados (Empresarial ou Territorial)
   // direto do banco para auditoria, sem precisar copiar/colar.
   type SavedReport = {
     id: string;
@@ -780,7 +780,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                         <SelectContent>
                           <SelectItem value="both">Ambos</SelectItem>
                           <SelectItem value="territorial">Territorial</SelectItem>
-                          <SelectItem value="enterprise">Enterprise</SelectItem>
+                          <SelectItem value="enterprise">Empresarial</SelectItem>
                         </SelectContent>
                       </Select>
                       <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.applies_to}</p>
@@ -938,7 +938,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                         <SelectContent>
                           <SelectItem value="all">Todos</SelectItem>
                           <SelectItem value="territorial">Territorial</SelectItem>
-                          <SelectItem value="enterprise">Enterprise</SelectItem>
+                          <SelectItem value="enterprise">Empresarial</SelectItem>
                         </SelectContent>
                       </Select>
                       <Button size="sm" variant="ghost" onClick={() => setSavedReports([])}>

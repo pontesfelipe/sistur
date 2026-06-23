@@ -440,7 +440,7 @@ export default function Configuracoes() {
 
                   <DocumentDownloadItem
                     title="FAQ — Perguntas Frequentes"
-                    description="Perguntas e respostas sobre o SISTUR, ERP, EDU e Enterprise"
+                    description="Perguntas e respostas sobre o SISTUR, ERP, EDU e Empresarial"
                     version={`v${APP_VERSION.full}`}
                     onDownload={async () => {
                       const { faqItems } = await import('@/pages/FAQ');

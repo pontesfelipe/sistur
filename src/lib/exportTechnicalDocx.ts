@@ -387,7 +387,7 @@ export async function exportTechnicalDocx() {
         bullet('Certificados digitais com QR code e verificação pública via URL única', 'bullets'),
         bullet('Perfil de estudante com wizard e recomendações personalizadas por IA', 'bullets'),
 
-        heading('4.3 Enterprise — Módulo Hoteleiro', HeadingLevel.HEADING_2),
+        heading('4.3 Empresarial — Módulo Hoteleiro', HeadingLevel.HEADING_2),
         para('Adaptação da metodologia para o setor privado de hospitalidade.'),
         bullet('22 indicadores especializados em 7 categorias', 'bullets'),
         bullet('6 indicadores compartilhados com diagnósticos territoriais (NPS, Reviews, Treinamento, etc.)', 'bullets'),
@@ -490,7 +490,7 @@ export async function exportTechnicalDocx() {
             tableRow([{ text: 'edu_progress', width: 2600 }, { text: 'Progresso do aluno com watch_seconds', width: 6426 }]),
             tableRow([{ text: 'certificates', width: 2600 }, { text: 'Certificados com QR code e verificação pública', width: 6426 }]),
             tableRow([{ text: 'exams / exam_attempts', width: 2600 }, { text: 'Provas com anti-cheat e histórico', width: 6426 }]),
-            tableRow([{ text: 'licenses', width: 2600 }, { text: 'Licenciamento: Trial (7d), Basic, Pro, Enterprise', width: 6426 }]),
+            tableRow([{ text: 'licenses', width: 2600 }, { text: 'Licenciamento: Trial (7d), Basic, Pro, Empresarial', width: 6426 }]),
             tableRow([{ text: 'audit_events', width: 2600 }, { text: 'Log de auditoria de operações críticas', width: 6426 }]),
             tableRow([{ text: 'forum_posts / comments', width: 2600 }, { text: 'Comunidade com moderação', width: 6426 }]),
             tableRow([{ text: 'game_sessions', width: 2600 }, { text: 'Persistência de sessões dos 4 jogos', width: 6426 }]),
@@ -533,7 +533,7 @@ export async function exportTechnicalDocx() {
           ['Trial Automático', '7 dias com ERP + EDU + Games habilitados'],
           ['Feature Gating', 'LicenseContext verifica plano em cada rota'],
           ['Expiração', 'Cron: expire_trial_licenses() atualiza status'],
-          ['Upgrade', 'Basic (5 destinos) → Pro (20) → Enterprise (∞)'],
+          ['Upgrade', 'Basic (5 destinos) → Pro (20) → Empresarial (∞)'],
         ]),
 
         heading('7.4 Fluxo de Autenticação e Acesso', HeadingLevel.HEADING_2),
@@ -635,7 +635,7 @@ export async function exportTechnicalDocx() {
         bullet('Flag de ajuste manual (was_manually_adjusted)', 'bullets'),
         para('Alterações em benchmarks ou pesos NÃO são retroativas. É necessário recalcular manualmente para aplicar novas regras.', { bold: true }),
 
-        heading('8.6 Indicadores — 71 Territoriais + 22 Enterprise', HeadingLevel.HEADING_2),
+        heading('8.6 Indicadores — 71 Territoriais + 22 Empresarial', HeadingLevel.HEADING_2),
         para('Os indicadores estão organizados por dimensão IGMA, cada um mapeado para um pilar:'),
         new Table({
           width: { size: 9026, type: WidthType.DXA },
