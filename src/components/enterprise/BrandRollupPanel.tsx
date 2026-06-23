@@ -51,7 +51,7 @@ export function BrandRollupPanel({ brandName, units, rollups }: Props) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {(['RA', 'OE', 'AO', 'GLOBAL'] as const).map((p) => {
             const row = byPillar(p);
-            const label = p === 'GLOBAL' ? 'Marca (Final)' : PILLAR_INFO[p as 'RA' | 'OE' | 'AO']?.shortName || p;
+            const label = p === 'GLOBAL' ? 'Marca (Final)' : PILLAR_INFO[p as 'RA' | 'OE' | 'AO']?.name || p;
             return (
               <div
                 key={p}
