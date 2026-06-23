@@ -26,6 +26,7 @@ import { HealthCheckPanel } from '@/components/tools/HealthCheckPanel';
 import MapaTurismoPanel from '@/components/official-data/MapaTurismoPanel';
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
 import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSearch';
+import { BrandManagementPanel } from '@/components/enterprise/BrandManagementPanel';
 import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
