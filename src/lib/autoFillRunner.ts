@@ -42,6 +42,9 @@ const NO_DATA_PATTERNS = [
   /no results/i,
   /vazio/i,
   /empty/i,
+  /indispon[íi]vel/i,
+  /sem dados/i,
+  /preencha manualmente/i,
 ];
 
 function classifyError(err: unknown): { kind: 'no_data' | 'error'; message: string } {
