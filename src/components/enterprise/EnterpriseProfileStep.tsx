@@ -501,7 +501,25 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const saveProfile = useMutation({
     mutationFn: async () => {
       if (!effectiveOrgId) throw new Error('Organização não encontrada');
-      
+
+      // Merge autofill_run_state por assessmentId para não sobrescrever o
+      // snapshot de rodadas anteriores no mesmo destino.
+      let mergedRunState: any = getAutoFillSnapshot();
+      if (assessmentId) {
+        const { data: current } = await supabase
+          .from('enterprise_profiles')
+          .select('autofill_run_state')
+          .eq('destination_id', destinationId)
+          .maybeSingle();
+        const existing = (current?.autofill_run_state ?? null) as any;
+        const byAssessment =
+          existing && !Array.isArray(existing) && typeof existing === 'object' && existing.byAssessment
+            ? { ...existing.byAssessment }
+            : {};
+        byAssessment[assessmentId] = getAutoFillSnapshot();
+        mergedRunState = { byAssessment };
+      }
+
       const payload = {
         ...formData,
         destination_id: destinationId,
@@ -527,9 +545,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         telecom_coverage_analysis: telecomData,
         urban_accessibility_analysis: accessibilityData,
         health_infrastructure_analysis: healthData,
-        autofill_run_state: (assessmentId
-          ? { byAssessment: { [assessmentId]: getAutoFillSnapshot() } }
-          : getAutoFillSnapshot()) as any,
+        autofill_run_state: mergedRunState as any,
       };
       
       const { data, error } = await supabase
