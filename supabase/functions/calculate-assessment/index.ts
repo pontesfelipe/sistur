@@ -1229,6 +1229,7 @@ async function runCalculationCore(
       indicatorScores.push({
         org_id: orgId,
         assessment_id,
+        unit_id: unitId,
         indicator_id: iv.indicator_id,
         score: isContextual ? null as any : score,
         // 3-layer enrichment (raw → normalized → score%)
