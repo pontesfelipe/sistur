@@ -7,13 +7,14 @@ export interface IntegratedTerritorialData {
   destination?: {
     id: string;
     name: string;
-    state: string | null;
+    uf: string | null;
     ibge_code: string | null;
   };
   assessment?: {
     id: string;
     title: string | null;
-    period_year: number | null;
+    period_start: string | null;
+    period_end: string | null;
     calculated_at: string | null;
     status: string;
   };
@@ -40,7 +41,7 @@ export function useIntegratedTerritorialView(
       // 1) Look up ibge_code on the empresarial destination
       const { data: entDest, error: e0 } = await supabase
         .from('destinations')
-        .select('id, name, state, ibge_code')
+        .select('id, name, uf, ibge_code')
         .eq('id', enterpriseDestinationId!)
         .maybeSingle();
       if (e0) throw e0;
@@ -51,7 +52,7 @@ export function useIntegratedTerritorialView(
       // 2) Find territorial destinations sharing the same IBGE (any org)
       const { data: terrDests, error: e1 } = await supabase
         .from('destinations')
-        .select('id, name, state, ibge_code')
+        .select('id, name, uf, ibge_code')
         .eq('ibge_code', entDest.ibge_code);
       if (e1) throw e1;
       const terrDestIds = (terrDests || []).map((d: any) => d.id);
@@ -62,18 +63,18 @@ export function useIntegratedTerritorialView(
       // 3) Pick the most recent CALCULATED territorial assessment
       const { data: assessments, error: e2 } = await supabase
         .from('assessments')
-        .select('id, title, period_year, calculated_at, status, destination_id, diagnostic_type, igma_interpretation')
+        .select('id, title, period_start, period_end, calculated_at, status, destination_id, diagnostic_type, igma_interpretation')
         .in('destination_id', terrDestIds)
         .eq('diagnostic_type', 'territorial')
         .eq('status', 'CALCULATED')
         .order('calculated_at', { ascending: false, nullsFirst: false })
         .limit(1);
       if (e2) throw e2;
-      const assessment = (assessments || [])[0];
+      const assessment = (assessments || [])[0] as any;
       if (!assessment) {
         return { matched: false, reason: 'not_calculated' };
       }
-      const matchedDest = (terrDests || []).find((d: any) => d.id === assessment.destination_id) || terrDests![0];
+      const matchedDest = (terrDests || []).find((d: any) => d.id === assessment.destination_id) || (terrDests as any)![0];
 
       // 4) Pillar scores + issues
       const [{ data: pillars }, { data: issues }] = await Promise.all([
@@ -94,13 +95,14 @@ export function useIntegratedTerritorialView(
         assessment: {
           id: assessment.id,
           title: assessment.title,
-          period_year: assessment.period_year,
+          period_start: assessment.period_start,
+          period_end: assessment.period_end,
           calculated_at: assessment.calculated_at,
           status: assessment.status,
         },
         pillarScores: (pillars || []) as any,
         issues: (issues || []) as any,
-        igmaInterpretation: (assessment as any).igma_interpretation,
+        igmaInterpretation: assessment.igma_interpretation,
       };
     },
   });
