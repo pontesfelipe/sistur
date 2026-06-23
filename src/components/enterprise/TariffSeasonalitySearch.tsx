@@ -42,7 +42,7 @@ function derive(pricing: any, demand: any, events: any): Analysis {
 
   // Sinal 1: demanda orgânica (DemandTrendsSearch)
   if (demand?.seasonal_distribution) {
-    sources.push('Demanda orgânica (Firecrawl SERP)');
+    sources.push('Demanda orgânica (busca pública)');
     const sd = demand.seasonal_distribution as Record<string, number>;
     const max = Math.max(1, ...Object.values(sd));
     MONTHS.forEach((m) => { monthScores[m] += ((sd[m] ?? 0) / max) * 50; });
