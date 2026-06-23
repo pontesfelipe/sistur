@@ -126,6 +126,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
       if (error) throw error;
       setResult(data);
       toast.success('Busca concluída!');
+      if (data?.businessName) onBusinessNameChange?.(data.businessName);
 
       // Capture full analysis for persistence
       if (data?.analysis && onAnalysisCapture) {
