@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 10,
+  patch: 11,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.11",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Pré-preenchimento Empresarial — o estado verde dos 21 blocos automáticos agora é isolado por rodada (`assessmentId`), não mais por destino. Antes, ao iniciar um novo diagnóstico para um destino já avaliado (ex.: novo hotel em Barretos), o `enterprise_profiles.autofill_run_state` da rodada anterior era carregado e pintava os blocos como 'Preenchido' sem o usuário ter sequer digitado o nome do empreendimento. Agora `EnterpriseProfileStep` recebe `assessmentId`, persiste o snapshot em `{ byAssessment: { [assessmentId]: entries } }` (merge preservando snapshots de rodadas anteriores) e hidrata apenas o snapshot da rodada atual; snapshots legados em formato array são descartados via novo `resetAutoFillState()` do `autoFillRunner` para garantir UI limpa em rascunhos novos."
+    ]
+  },
   {
     version: "1.96.10",
     date: "2026-06-23",
