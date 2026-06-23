@@ -54,6 +54,7 @@ import {
   useAutoFillStatuses,
   hydrateAutoFillState,
   getAutoFillSnapshot,
+  resetAutoFillState,
   type AutoFillEntry,
 } from '@/lib/autoFillRunner';
 import { Play, RefreshCw, AlertCircle, Info } from 'lucide-react';
@@ -66,6 +67,13 @@ interface EnterpriseProfileStepProps {
   onComplete: () => void;
   onBack?: () => void;
   onReviewAutoFill?: (values: Record<string, number>) => void;
+  /**
+   * ID da rodada/assessment atual. Usado para isolar o `autofill_run_state`
+   * por diagnóstico: o `enterprise_profiles` é único por destino, então sem
+   * esse escopo o estado verde dos blocos vazaria de uma rodada anterior para
+   * uma nova rodada do mesmo destino.
+   */
+  assessmentId?: string | null;
 }
 
 const PROPERTY_TYPES = [
@@ -93,7 +101,7 @@ const TARGET_MARKETS = [
   { value: 'eco', label: 'Ecoturismo' },
 ];
 
-export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill }: EnterpriseProfileStepProps) {
+export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill, assessmentId }: EnterpriseProfileStepProps) {
   const [tourOpen, setTourOpen] = useState(false);
   // Fase 12.3 — auto-abre o tour na primeira visita ao Step Enterprise
   useEffect(() => {
