@@ -48,7 +48,11 @@ const SOURCE_META: Record<SourceKind, { label: string; icon: any; tone: string; 
   },
 };
 
-const OFFICIAL_TOKENS = ['IBGE', 'CADASTUR', 'STN', 'DATASUS', 'MAPA_TURISMO', 'MAPA DO TURISMO', 'INEP', 'ANATEL', 'TSE', 'ANA', 'ANAC', 'CADUNICO', 'RAIS', 'CAGED'];
+const OFFICIAL_TOKENS = [
+  'IBGE', 'CADASTUR', 'STN', 'DATASUS', 'MAPA_TURISMO', 'MAPA DO TURISMO',
+  'INEP', 'ANATEL', 'TSE', 'ANA', 'ANAC', 'CADUNICO', 'RAIS', 'CAGED',
+  'BRASILAPI', 'RECEITA FEDERAL', 'OPEN-METEO', 'OPEN METEO',
+];
 
 /**
  * Commercial / full names shown to the user instead of acronyms.
@@ -68,7 +72,49 @@ const SOURCE_DISPLAY_NAMES: Record<string, string> = {
   CADUNICO: 'CadÚnico — Ministério do Desenvolvimento Social',
   RAIS: 'RAIS — Relação Anual de Informações Sociais (MTE)',
   CAGED: 'CAGED — Cadastro Geral de Empregados e Desempregados (MTE)',
+  BRASILAPI: 'BrasilAPI / Receita Federal',
+  'RECEITA FEDERAL': 'BrasilAPI / Receita Federal',
+  'OPEN-METEO': 'Open-Meteo ERA5 (clima)',
+  'OPEN METEO': 'Open-Meteo ERA5 (clima)',
 };
+
+/**
+ * Heurística específica para auto-fill Enterprise: mapeia o `source_detail`
+ * (ex.: "Open-Meteo ERA5 — 5 anos (Auto)") para um nome amigável SEM
+ * mencionar o provedor de scraping. Cada bloco vira uma fonte distinta no
+ * Sankey de linhagem.
+ */
+function classifyAutoFillSource(detail: string): { kind: SourceKind; sourceName: string } | null {
+  const d = detail.toUpperCase();
+  // Cálculos derivados
+  if (/DERIVAD|DERIVED|C[ÁA]LCULO|CALCULATED/.test(d)) {
+    return { kind: 'DERIVED', sourceName: 'Cálculo Interno' };
+  }
+  // Fontes oficiais já conhecidas
+  if (d.includes('OPEN-METEO') || d.includes('OPEN METEO')) return { kind: 'OFFICIAL', sourceName: 'Open-Meteo ERA5 (clima)' };
+  if (d.includes('BRASILAPI') || d.includes('RECEITA FEDERAL')) return { kind: 'OFFICIAL', sourceName: 'BrasilAPI / Receita Federal' };
+  if (d.includes('ANATEL')) return { kind: 'OFFICIAL', sourceName: displaySourceName('ANATEL') };
+  if (d.includes('ANAC')) return { kind: 'OFFICIAL', sourceName: displaySourceName('ANAC') };
+  if (d.includes('DATASUS') || d.includes('SAÚDE') || d.includes('SAUDE')) return { kind: 'OFFICIAL', sourceName: displaySourceName('DATASUS') };
+  if (d.includes('IBGE')) return { kind: 'OFFICIAL', sourceName: displaySourceName('IBGE') };
+  if (d.includes('MAPA TURISMO') || d.includes('MTUR')) return { kind: 'OFFICIAL', sourceName: displaySourceName('MAPA_TURISMO') };
+  // Buckets temáticos de busca web (sem citar o provedor de scraping)
+  if (d.includes('RECLAME') || d.includes('PROCON')) return { kind: 'OFFICIAL', sourceName: 'Reclamações públicas (Reclame Aqui / Procon)' };
+  if (d.includes('INSTAGRAM') || d.includes('FACEBOOK') || d.includes('TIKTOK')) return { kind: 'OFFICIAL', sourceName: 'Redes Sociais (Instagram / Facebook / TikTok)' };
+  if (d.includes('OTA') || d.includes('BOOKING/TRIPADVISOR') || d.includes('PREÇO') || d.includes('PRECO')) return { kind: 'OFFICIAL', sourceName: 'OTAs e Tarifas Públicas (Booking / Decolar / Expedia)' };
+  if (d.includes('SUSTENTAB')) return { kind: 'OFFICIAL', sourceName: 'Sinais Públicos de Sustentabilidade' };
+  if (d.includes('SEGURAN')) return { kind: 'OFFICIAL', sourceName: 'Segurança ao Turista (notícias e oficial)' };
+  if (d.includes('TRANSPORTE') || d.includes('UBER') || d.includes('MOBILIDADE')) return { kind: 'OFFICIAL', sourceName: 'Mobilidade Urbana (transporte público e apps)' };
+  if (d.includes('AGENDA') || d.includes('EVENTOS')) return { kind: 'OFFICIAL', sourceName: 'Eventos Municipais Oficiais' };
+  if (d.includes('SERP') || d.includes('MÍDIA') || d.includes('MIDIA') || d.includes('FORÇA') || d.includes('FORCA')) return { kind: 'OFFICIAL', sourceName: 'Menções Públicas da Marca (mídia e SERP)' };
+  if (d.includes('PRESENÇA DIGITAL') || d.includes('PRESENCA DIGITAL')) return { kind: 'OFFICIAL', sourceName: 'Presença Digital Pública (site e redes)' };
+  if (d.includes('DEMANDA') || d.includes('TRENDS')) return { kind: 'OFFICIAL', sourceName: 'Sinais de Demanda e Interesse (Trends)' };
+  if (d.includes('ACESSIBIL')) return { kind: 'OFFICIAL', sourceName: 'Acessibilidade Urbana (fontes públicas)' };
+  if (d.includes('REVIEW') || d.includes('GOOGLE') || d.includes('TRIPADVISOR') || d.includes('BOOKING') || d.includes('AIRBNB')) {
+    return { kind: 'OFFICIAL', sourceName: 'Avaliações Online (Google / TripAdvisor / Booking)' };
+  }
+  return null;
+}
 
 function displaySourceName(token: string): string {
   return SOURCE_DISPLAY_NAMES[token.toUpperCase()] || token;
@@ -100,9 +146,12 @@ function classifyRow(row: any): { kind: SourceKind; sourceName: string } {
   if (type.startsWith('DERIVED') || isDerivedIndicator(code)) {
     return { kind: 'DERIVED', sourceName: 'Cálculo Interno' };
   }
-  // Enterprise auto-fill from online reviews → tratar como fonte oficial automática
-  if (/REVIEW|GOOGLE|TRIPADVISOR|BOOKING|\(AUTO\)|AUTOMÁTIC|AUTOMATIC/.test(detail)) {
-    return { kind: 'OFFICIAL', sourceName: 'Reviews Online (Google / TripAdvisor / Booking)' };
+  // Enterprise auto-fill: extrai a fonte real (Open-Meteo, ANAC, Reclame Aqui,
+  // OTAs, etc.) em vez de bucketar tudo como "Reviews Online".
+  if (/\(AUTO\)|AUTOMÁTIC|AUTOMATIC|AUTO\b/.test(detail)) {
+    const mapped = classifyAutoFillSource(detail);
+    if (mapped) return mapped;
+    return { kind: 'OFFICIAL', sourceName: 'Pré-preenchimento Automático' };
   }
   if (type.startsWith('OFFICIAL_API') || type === 'AUTOMATICA') {
     const token = OFFICIAL_TOKENS.find((t) => detail.includes(t));
