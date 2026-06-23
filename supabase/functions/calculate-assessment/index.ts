@@ -1038,11 +1038,14 @@ async function runCalculationCore(
             const existingIndicatorIds = new Set(filteredIndicatorValues.map((iv: any) => iv.indicator_id));
             
             // Also build a set of IGNORED indicator IDs so external data doesn't re-introduce them
-            const { data: ignoredValues } = await supabase
+            let ignoredQ = supabase
               .from("indicator_values")
               .select("indicator_id")
               .eq("assessment_id", assessment_id)
               .eq("is_ignored", true);
+            if (isUnitScope) ignoredQ = ignoredQ.eq("unit_id", unitId);
+            else ignoredQ = ignoredQ.is("unit_id", null);
+            const { data: ignoredValues } = await ignoredQ;
             const ignoredIndicatorIds = new Set((ignoredValues || []).map((iv: any) => iv.indicator_id));
             
             // Add external values that are not already in indicator_values AND not ignored
