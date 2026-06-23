@@ -26,6 +26,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { NovaRodadaForm } from './NovaRodadaForm';
 import { NovaRodadaDialogs } from './NovaRodadaDialogs';
+import type { DraftUnit } from '@/components/enterprise/AssessmentUnitsManager';
 
 type VisibilityType = 'organization' | 'personal' | 'demo';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
@@ -69,6 +70,10 @@ export default function NovaRodada() {
   const [visibility, setVisibility] = useState<VisibilityType>('organization');
   const [destinationMode, setDestinationMode] = useState<'select' | 'create'>('select');
   const [selectedDestination, setSelectedDestination] = useState<string>('');
+  // Multi-unit enterprise (Fase 15.4)
+  const [brandId, setBrandId] = useState<string | null>(null);
+  const [brandName, setBrandName] = useState<string | null>(null);
+  const [units, setUnits] = useState<DraftUnit[]>([]);
   const [isDestinationFormOpen, setIsDestinationFormOpen] = useState(false);
   const [assessmentTitle, setAssessmentTitle] = useState('');
   const [periodStart, setPeriodStart] = useState('');
@@ -241,6 +246,17 @@ export default function NovaRodada() {
     }
   }, [selectedDestination, destinations, resumeAssessmentId, assessmentTitle]);
 
+  // Sincroniza o destino principal do assessment com a unidade primária do
+  // multi-unit. Mantém compatibilidade com todo o fluxo que ainda lê
+  // `destination_id` direto do `assessments`.
+  useEffect(() => {
+    if (diagnosticType !== 'enterprise') return;
+    const primary = units.find((u) => u.is_primary) ?? units[0];
+    if (primary && primary.destination_id !== selectedDestination) {
+      setSelectedDestination(primary.destination_id);
+    }
+  }, [units, diagnosticType, selectedDestination]);
+
   const handleValidationComplete = async (validatedValues: ExternalIndicatorValue[]) => {
     setValidatedDataCount(validatedValues.length);
     const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
@@ -308,6 +324,14 @@ export default function NovaRodada() {
           title: assessmentTitle.trim(), destination_id: selectedDestination, period_start: periodStart || null,
           period_end: periodEnd || null, visibility, tier: selectedTier, diagnostic_type: diagnosticType,
           expand_with_mandala: expandWithMandala,
+          brand_id: diagnosticType === 'enterprise' ? brandId : null,
+          units: diagnosticType === 'enterprise' && units.length > 0
+            ? units.map((u) => ({
+                destination_id: u.destination_id,
+                unit_name: u.unit_name || null,
+                is_primary: u.is_primary,
+              }))
+            : undefined,
         });
         setCreatedAssessmentId(result.id);
         // Write the assessment id to the URL so a refresh at any later step
@@ -339,7 +363,10 @@ export default function NovaRodada() {
 
   const canProceed = () => {
     if (currentStep === 1) return true;
-    if (currentStep === 2) return !!selectedDestination;
+    if (currentStep === 2) {
+      if (diagnosticType === 'enterprise') return !!brandId && units.length > 0;
+      return !!selectedDestination;
+    }
     if (currentStep === 3) return !!assessmentTitle && !!selectedDestination;
     return true;
   };
