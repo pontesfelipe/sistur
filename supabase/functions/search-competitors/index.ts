@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
 
     const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
     if (!firecrawlKey) {
-      return new Response(JSON.stringify({ error: 'Firecrawl not configured. Connect the Firecrawl connector.' }), {
+      return new Response(JSON.stringify({ error: 'Fonte de dados externa indisponível: Concorrentes (busca pública na web). A coleta automática não está ativa — preencha manualmente.' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }

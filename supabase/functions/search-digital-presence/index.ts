@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
 
     const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
     if (!firecrawlKey) {
-      return new Response(JSON.stringify({ error: 'Firecrawl not configured' }), {
+      return new Response(JSON.stringify({ error: 'Fonte de dados externa indisponível: Presença digital pública (site oficial e redes sociais). A coleta automática deste indicador não está ativa — preencha manualmente.' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }

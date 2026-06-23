@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
     if (!destinationName) return new Response(JSON.stringify({ error: 'destinationName required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     const apiKey = Deno.env.get('FIRECRAWL_API_KEY');
-    if (!apiKey) return new Response(JSON.stringify({ error: 'Firecrawl não configurado' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    if (!apiKey) return new Response(JSON.stringify({ error: 'Fonte de dados externa indisponível: Mobilidade urbana (Uber, 99, transporte público). Preencha manualmente.' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     const loc = `${destinationName} ${state || ''}`.trim();
     const [appsR, transitR, rentalR] = await Promise.all([
