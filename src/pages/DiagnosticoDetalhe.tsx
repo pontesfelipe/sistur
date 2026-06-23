@@ -21,6 +21,7 @@ import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
 import { EnterpriseRegressionAlerts } from '@/components/diagnostics/EnterpriseRegressionAlerts';
 import { EnterpriseOrgBenchmark } from '@/components/diagnostics/EnterpriseOrgBenchmark';
 import { EnterpriseSectorBenchmark } from '@/components/diagnostics/EnterpriseSectorBenchmark';
+import { IntegratedTerritorialView } from '@/components/diagnostics/IntegratedTerritorialView';
 import { PrescriptionModeView } from '@/components/diagnostics/PrescriptionModeView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
@@ -920,7 +921,7 @@ const DiagnosticoDetalhe = () => {
           )}
           <TabsList className={cn(
             "grid w-full",
-            isEnterprise ? "max-w-6xl grid-cols-10" : "max-w-5xl grid-cols-9"
+            isEnterprise ? "max-w-7xl grid-cols-11" : "max-w-5xl grid-cols-9"
           )}>
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -930,6 +931,12 @@ const DiagnosticoDetalhe = () => {
               <TabsTrigger value="categorias" className="gap-2">
                 <Layers className="h-4 w-4" />
                 <span className="hidden sm:inline">Categorias</span>
+              </TabsTrigger>
+            )}
+            {isEnterprise && (
+              <TabsTrigger value="integrada" className="gap-2">
+                <GitBranch className="h-4 w-4" />
+                <span className="hidden sm:inline">Integrada</span>
               </TabsTrigger>
             )}
             <TabsTrigger value="normalizacao" className="gap-2">
@@ -1087,6 +1094,17 @@ const DiagnosticoDetalhe = () => {
                 </div>
               </div>
               <EnterpriseCategoriesView indicatorScores={indicatorScores as any} />
+            </TabsContent>
+          )}
+
+          {/* Visão Integrada (Empresarial × Município) */}
+          {isEnterprise && assessment.destination_id && (
+            <TabsContent value="integrada" className="space-y-6">
+              <IntegratedTerritorialView
+                enterpriseDestinationId={assessment.destination_id}
+                enterprisePillarScores={pillarScores as any}
+                destinationName={assessmentDestination?.name || 'Empreendimento'}
+              />
             </TabsContent>
           )}
 
