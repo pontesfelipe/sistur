@@ -73,7 +73,7 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
   const diagnosticType = (assessment as any).diagnostic_type || 'territorial';
   const diagnosticTypeConfig = {
     territorial: { label: 'Territorial', icon: Landmark, className: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800' },
-    enterprise: { label: 'Enterprise', icon: Hotel, className: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800' },
+    enterprise: { label: 'Empresarial', icon: Hotel, className: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800' },
   };
   const dtInfo = diagnosticTypeConfig[diagnosticType as keyof typeof diagnosticTypeConfig] || diagnosticTypeConfig.territorial;
   const DtIcon = dtInfo.icon;
@@ -127,7 +127,7 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              {diagnosticType === 'territorial' ? 'Diagnóstico territorial (público)' : 'Diagnóstico enterprise (privado)'}
+              {diagnosticType === 'territorial' ? 'Diagnóstico territorial (público)' : 'Diagnóstico empresarial (privado)'}
             </TooltipContent>
           </Tooltip>
           {(assessment as any).expand_with_mandala && (
