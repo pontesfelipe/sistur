@@ -3566,7 +3566,6 @@ INSTRUÇÕES SOBRE BASE DE CONHECIMENTO:
 - Na seção de Fontes e Referências, liste todos os documentos da KB consultados
 ` : ''}
 === INSTRUÇÕES FINAIS ===
-${brandNetworkBlock}
 1. COMECE com o título e IMEDIATAMENTE a tabela de Ficha Técnica fornecida acima — NÃO pule essa tabela
 2. Siga EXATAMENTE a estrutura definida no system prompt para o template "${reportTemplate}"
 3. Use TABELAS MARKDOWN para todos os conjuntos de dados
