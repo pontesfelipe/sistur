@@ -51,6 +51,10 @@ interface EnterpriseDataEntryPanelProps {
   onComplete?: () => void;
   /** Pre-filled values from review search in step 4 (code -> value) */
   initialAutoFillValues?: Record<string, number>;
+  /** Unidade ativa em diagnósticos de rede multi-município. */
+  unitId?: string | null;
+  /** Nome da unidade ativa (exibido no cabeçalho quando multi-unidade). */
+  unitLabel?: string | null;
 }
 
 const PILLAR_CONFIG = {
@@ -112,12 +116,12 @@ const ENT_AUTOFILL_SOURCE_MAP: Record<string, string> = {
   ENT_SAZONALIDADE_TARIFARIA: 'Derivado: Demanda + Eventos + ADR (Auto)',
 };
 
-export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initialAutoFillValues }: EnterpriseDataEntryPanelProps) {
+export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initialAutoFillValues, unitId = null, unitLabel = null }: EnterpriseDataEntryPanelProps) {
   const { profile } = useProfile();
   
   // Use unified indicators table with enterprise scope filter
   const { indicators, isLoading: indicatorsLoading } = useIndicators({ scope: 'enterprise', tier });
-  const { values: existingValues, isLoading: valuesLoading, bulkUpsertValues, upsertValue } = useIndicatorValues(assessmentId);
+  const { values: existingValues, isLoading: valuesLoading, bulkUpsertValues, upsertValue } = useIndicatorValues(assessmentId, unitId);
   
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
