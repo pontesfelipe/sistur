@@ -355,6 +355,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
           indicator_id: indicatorId,
           value_raw: parseLocalValue(value, indicatorById.get(indicatorId)),
           source,
+          unit_id: unitId ?? null,
         };
       });
     
@@ -369,6 +370,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
         source: 'Manual (Enterprise)',
         is_ignored: true,
         ignore_reason: 'Marcado como não aplicável pelo usuário',
+        unit_id: unitId ?? null,
       });
     }
     
