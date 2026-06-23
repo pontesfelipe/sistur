@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 11,
+  patch: 12,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.12",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Pré-preenchimento Empresarial — reorganização do Step 4 em 4 seções claras: 🏨 Sobre o Empreendimento (10 blocos que dependem do nome do hotel), 📄 Cadastro Legal (CNPJ), 🌎 Sobre o Município/Destino (9 blocos territoriais que independem do nome do empreendimento) e 🔄 Indicadores Derivados (Sazonalidade Tarifária). Antes, blocos do empreendimento (Presença Digital, Reclamações, Sustentabilidade, Preço, Marca, Demanda, Reputação OTAs, Redes Sociais e Concorrentes) recebiam o nome do município no lugar do nome do hotel — vinha 'sem dados' ou trazia informação do destino. Agora o nome digitado no bloco Reviews é elevado para o estado do step (via novo prop `onBusinessNameChange` em `BusinessReviewSearch`) e propagado a todos os blocos da seção Empreendimento; um aviso âmbar avisa o usuário quando o nome ainda não foi informado."
+    ]
+  },
   {
     version: "1.96.11",
     date: "2026-06-23",

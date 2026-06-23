@@ -78,6 +78,8 @@ interface BusinessReviewSearchProps {
   onProfileAutoFill?: (metadata: PropertyMetadata) => void;
   /** Captures the full analysis result for persistence */
   onAnalysisCapture?: (fullAnalysis: Record<string, any>) => void;
+  /** Notifica o pai sempre que o nome do estabelecimento mudar (digitação ou normalização pós-busca). Usado para propagar o nome para os demais blocos automáticos. */
+  onBusinessNameChange?: (name: string) => void;
   /** Pre-fill business name */
   defaultBusinessName?: string;
   /** Pre-fill location */
@@ -96,8 +98,12 @@ const PROPERTY_TYPES = [
   { value: 'operadora', label: 'Operadora/Agência' },
 ];
 
-export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysisCapture, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
-  const [businessName, setBusinessName] = useState(defaultBusinessName);
+export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysisCapture, onBusinessNameChange, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
+  const [businessName, setBusinessNameState] = useState(defaultBusinessName);
+  const setBusinessName = (v: string) => {
+    setBusinessNameState(v);
+    onBusinessNameChange?.(v);
+  };
   const [location, setLocation] = useState(defaultLocation);
   const [propertyType, setPropertyType] = useState('hotel');
   const [isSearching, setIsSearching] = useState(false);
@@ -120,6 +126,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
       if (error) throw error;
       setResult(data);
       toast.success('Busca concluída!');
+      if (data?.businessName) onBusinessNameChange?.(data.businessName);
 
       // Capture full analysis for persistence
       if (data?.analysis && onAnalysisCapture) {
