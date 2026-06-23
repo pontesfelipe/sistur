@@ -21,6 +21,7 @@ import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
 import { EnterpriseRegressionAlerts } from '@/components/diagnostics/EnterpriseRegressionAlerts';
 import { EnterpriseOrgBenchmark } from '@/components/diagnostics/EnterpriseOrgBenchmark';
 import { EnterpriseSectorBenchmark } from '@/components/diagnostics/EnterpriseSectorBenchmark';
+import { IntegratedTerritorialView } from '@/components/diagnostics/IntegratedTerritorialView';
 import { PrescriptionModeView } from '@/components/diagnostics/PrescriptionModeView';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { Button } from '@/components/ui/button';
