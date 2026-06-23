@@ -473,8 +473,6 @@ export function NovaRodadaForm({
                 Criar novo
               </Button>
             </div>
-            </>
-            )}
 
             {destinationMode === 'select' ? (
               <div className="space-y-2">
@@ -519,6 +517,8 @@ export function NovaRodadaForm({
                   </div>
                 )}
               </div>
+            )}
+            </>
             )}
           </>
         )}
