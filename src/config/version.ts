@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 8,
+  patch: 9,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.9",
+    date: "2026-06-23",
+    type: "minor" as const,
+    changes: [
+      "Fase 14.6 — Visão Integrada Empresarial × Município. Nova aba 'Integrada' no diagnóstico Empresarial (`DiagnosticoDetalhe.tsx`) que cruza o empreendimento com o diagnóstico Territorial vigente do mesmo município. Novo hook `useIntegratedTerritorialView` localiza, via `ibge_code` do destino, o assessment Territorial `CALCULATED` mais recente em qualquer organização e devolve pillar_scores + issues + igma_interpretation. Componente `IntegratedTerritorialView` exibe: (1) cabeçalho com município de referência + link para abrir o diagnóstico territorial; (2) comparação por pilar (RA/OE/AO) entre empreendimento e município com badge de Δ em pontos percentuais (verde > +5pp, vermelho < -5pp); (3) lista dos gargalos críticos do município com aviso de que podem ter causa externa (infra pública, segurança, conectividade) e merecer ação conjunta com secretaria/consórcio/trade. Estados gracioso quando o destino não tem IBGE, quando não existe assessment territorial ou quando o territorial ainda não foi calculado. Não altera o cálculo do Empresarial — é informativo e respeita 'no-public-rankings' (sem ranking entre municípios)."
+    ]
+  },
   {
     version: "1.96.8",
     date: "2026-06-23",
