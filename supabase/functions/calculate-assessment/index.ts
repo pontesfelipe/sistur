@@ -2574,6 +2574,50 @@ async function runCalculation(
     if (rollErr) console.error("Brand rollup insert error:", rollErr);
   }
 
+  // Also persist brand-level pillar_scores rows (unit_id = NULL) so the
+  // existing single-unit UI (PillarGauge, summary cards) keeps working
+  // without any branch — multi-unit detection is additive.
+  await supabase
+    .from("pillar_scores")
+    .delete()
+    .eq("assessment_id", assessment_id)
+    .is("unit_id", null);
+
+  const brandPillarRows = (["RA", "OE", "AO"] as const)
+    .filter((p) => pillarSummary[p])
+    .map((p) => ({
+      org_id: assessmentMeta!.org_id,
+      assessment_id,
+      unit_id: null as any,
+      pillar: p,
+      score: Number(pillarSummary[p]!.weighted),
+      severity:
+        pillarSummary[p]!.weighted < 0.34
+          ? "CRITICO"
+          : pillarSummary[p]!.weighted < 0.67
+          ? "MODERADO"
+          : pillarSummary[p]!.weighted < 0.80
+          ? "BOM"
+          : pillarSummary[p]!.weighted < 0.90
+          ? "FORTE"
+          : "EXCELENTE",
+    }));
+  if (brandPillarRows.length > 0) {
+    const { error: bpErr } = await supabase.from("pillar_scores").insert(brandPillarRows);
+    if (bpErr) console.error("Brand pillar_scores insert error:", bpErr);
+  }
+
+  const ra = pillarSummary["RA"]?.weighted ?? 0;
+  const oe = pillarSummary["OE"]?.weighted ?? 0;
+  const ao = pillarSummary["AO"]?.weighted ?? 0;
+  const finalScore = Number((ra * 0.35 + oe * 0.30 + ao * 0.35).toFixed(4));
+  const finalClassification =
+    finalScore < 0.34 ? "CRITICO"
+    : finalScore < 0.67 ? "MODERADO"
+    : finalScore < 0.80 ? "BOM"
+    : finalScore < 0.90 ? "FORTE"
+    : "EXCELENTE";
+
   // Mark the assessment as CALCULATED (no IGMA at brand level for now)
   await supabase
     .from("assessments")
@@ -2581,6 +2625,8 @@ async function runCalculation(
       status: "CALCULATED",
       calculated_at: new Date().toISOString(),
       needs_recalculation: false,
+      final_score: finalScore,
+      final_classification: finalClassification,
     })
     .eq("id", assessment_id);
 

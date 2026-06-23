@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.5",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial Multi-Unidade (Fase 15.4 — Fase 4 / passo 2) — UI de resultado multi-unit no `DiagnosticoDetalhe`. Novo `BrandRollupPanel` aparece no topo da página quando o diagnóstico tem `brand_id` + 2+ `assessment_units`: exibe scores consolidados da marca por pilar (RA/OE/AO/Marca Final) com média ponderada por número de quartos, média simples e dispersão (desvio padrão), badge da unidade mais frágil por pilar, e ranking interno das unidades com badges de score RA/OE/AO. Novo hook `useBrandRollup(assessmentId)` lê `assessment_brand_rollups` + `pillar_scores` por unidade + `assessment_units` em uma única query reativa. Dispatcher multi-unit do `calculate-assessment` agora também persiste `pillar_scores` no nível da marca (`unit_id = NULL`) com o score ponderado, e grava `final_score` / `final_classification` em `assessments` — assim o `PillarGauge`, os cards de resumo e o IGMA panel da página continuam funcionando sem branch. Próximo passo (não bloqueia uso): relatório com seção comparativa de rede em `generate-report`/`process-report-job`."
+    ]
+  },
   {
     version: "1.97.4",
     date: "2026-06-23",

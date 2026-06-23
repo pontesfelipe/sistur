@@ -98,6 +98,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useBrandRollup } from '@/hooks/useBrandRollup';
+import { BrandRollupPanel } from '@/components/enterprise/BrandRollupPanel';
 
 const normalizeDisplayScore = (
   value: number | null | undefined,
@@ -240,6 +242,7 @@ const DiagnosticoDetalhe = () => {
   const isEnterprise = diagnosticType === 'enterprise';
   
   const { data: pillarScores = [], refetch: refetchPillarScores } = usePillarScores(id);
+  const { data: brandRollup } = useBrandRollup(id);
   const { data: rawIndicatorScores = [], refetch: refetchIndicatorScores } = useIndicatorScores(id, diagnosticType);
   const { data: rawIssues = [], refetch: refetchIssues } = useIssues(id);
   const { data: rawRecommendations = [], refetch: refetchRecommendations } = useRecommendations(id);
@@ -908,6 +911,13 @@ const DiagnosticoDetalhe = () => {
 
       {isCalculated && pillarScores.length > 0 ? (
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+          {brandRollup?.isMultiUnit && (
+            <BrandRollupPanel
+              brandName={brandRollup.brandName ?? null}
+              units={brandRollup.units}
+              rollups={brandRollup.rollups}
+            />
+          )}
           {prescriptionMode && (
             <Alert className="border-primary/40 bg-primary/5">
               <Target className="h-4 w-4 text-primary" />
