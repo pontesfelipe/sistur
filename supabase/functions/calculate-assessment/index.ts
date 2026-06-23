@@ -1418,8 +1418,12 @@ async function runCalculationCore(
     {
       const delScope = <T extends { eq: (...a: any[]) => any; is: (...a: any[]) => any }>(q: T): T =>
         (isUnitScope ? q.eq("unit_id", unitId) : q.is("unit_id", null)) as T;
-      await delScope(supabase.from("action_plans").delete().eq("assessment_id", assessment_id) as any);
-      await delScope(supabase.from("prescriptions").delete().eq("assessment_id", assessment_id) as any);
+      // action_plans + prescriptions are brand-level (no unit_id column).
+      // Only clear them on the single-unit / brand pass.
+      if (!isUnitScope) {
+        await supabase.from("action_plans").delete().eq("assessment_id", assessment_id);
+        await supabase.from("prescriptions").delete().eq("assessment_id", assessment_id);
+      }
       await delScope(supabase.from("recommendations").delete().eq("assessment_id", assessment_id) as any);
       await delScope(supabase.from("issues").delete().eq("assessment_id", assessment_id) as any);
       await delScope(supabase.from("pillar_scores").delete().eq("assessment_id", assessment_id) as any);
