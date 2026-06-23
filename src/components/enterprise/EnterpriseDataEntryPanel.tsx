@@ -86,25 +86,25 @@ const PILLAR_CONFIG = {
  */
 const ENT_AUTOFILL_SOURCE_MAP: Record<string, string> = {
   // Reviews / reputação
-  ENT_NPS: 'Reviews Online — Firecrawl + LLM (Auto)',
-  ENT_AVAL_GOOGLE: 'Reviews Online — Firecrawl + LLM (Auto)',
-  ENT_TAXA_SOLUCAO: 'Reclame Aqui / Procon — Firecrawl (Auto)',
-  ENT_COMP_GAP: 'Booking/TripAdvisor/Google — Firecrawl (Auto)',
-  ENT_REPUTACAO_CONSOLIDADA: 'Booking + Google + TripAdvisor + Airbnb — Firecrawl (Auto)',
+  ENT_NPS: 'Reviews Online — Google/TripAdvisor/Booking (Auto)',
+  ENT_AVAL_GOOGLE: 'Reviews Online — Google/TripAdvisor/Booking (Auto)',
+  ENT_TAXA_SOLUCAO: 'Reclame Aqui / Procon (Auto)',
+  ENT_COMP_GAP: 'Booking / TripAdvisor / Google Maps (Auto)',
+  ENT_REPUTACAO_CONSOLIDADA: 'Booking + Google + TripAdvisor + Airbnb (Auto)',
   // Presença e marca
-  ENT_PRESENCA_WEB: 'Presença Digital — Firecrawl (Auto)',
-  ENT_PRESENCA_DIGITAL: 'Instagram/Facebook/TikTok — Firecrawl (Auto)',
-  ENT_FORCA_MARCA: 'SERP / Mídia — Firecrawl (Auto)',
+  ENT_PRESENCA_WEB: 'Presença Digital — site oficial e diretórios (Auto)',
+  ENT_PRESENCA_DIGITAL: 'Instagram / Facebook / TikTok (Auto)',
+  ENT_FORCA_MARCA: 'Busca pública e mídia (Auto)',
   // Contexto territorial
   ENT_CONTEXTO_DESTINO: 'IBGE/ANAC/ANATEL/Mapa Turismo (Auto)',
-  ENT_DEMANDA_EVENTOS: 'Agenda Cultural Local — Firecrawl (Auto)',
-  ENT_SEGURANCA_DESTINO: 'Segurança Turística — Firecrawl (Auto)',
+  ENT_DEMANDA_EVENTOS: 'Agenda Cultural Local (Auto)',
+  ENT_SEGURANCA_DESTINO: 'Segurança Turística — fontes públicas (Auto)',
   ENT_CONFORTO_CLIMATICO: 'Open-Meteo ERA5 — 5 anos (Auto)',
-  ENT_TRANSPORTE_COBERTURA: 'Transporte Local — Firecrawl (Auto)',
+  ENT_TRANSPORTE_COBERTURA: 'Transporte Local — busca pública (Auto)',
   // Mercado
-  ENT_POSICAO_PRECO: 'OTAs / Preço — Firecrawl (Auto)',
-  ENT_DEMANDA_INTERESSE: 'Demanda & Trends — Firecrawl (Auto)',
-  ENT_SUSTENTABILIDADE: 'Sinais de Sustentabilidade — Firecrawl (Auto)',
+  ENT_POSICAO_PRECO: 'OTAs — preço comparado (Auto)',
+  ENT_DEMANDA_INTERESSE: 'Tendências de demanda — busca pública (Auto)',
+  ENT_SUSTENTABILIDADE: 'Sinais de Sustentabilidade — fontes públicas (Auto)',
   // Conformidade
   ENT_COMPLIANCE_RATE: 'BrasilAPI / Receita Federal (Auto)',
   // Conectividade e sazonalidade
