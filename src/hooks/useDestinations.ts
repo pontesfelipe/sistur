@@ -1,21 +1,27 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useProfileContext } from '@/contexts/ProfileContext';
 import { toast } from 'sonner';
 
 export function useDestinations() {
   const queryClient = useQueryClient();
+  const { effectiveOrgId, loading: profileLoading } = useProfileContext();
 
   const { data: destinations, isLoading, error } = useQuery({
-    queryKey: ['destinations'],
+    queryKey: ['destinations', effectiveOrgId],
     queryFn: async () => {
+      if (!effectiveOrgId) return [];
+
       const { data, error } = await supabase
         .from('destinations')
         .select('*')
+        .eq('org_id', effectiveOrgId)
         .order('name');
       
       if (error) throw error;
       return data;
     },
+    enabled: !profileLoading && !!effectiveOrgId,
   });
 
   const createDestination = useMutation({
@@ -117,6 +123,7 @@ export function useDestinations() {
       const { data: existing } = await supabase
         .from('destinations')
         .select('id')
+        .eq('org_id', effectiveOrgId)
         .ilike('name', destination.name.trim())
         .eq('uf', destination.uf)
         .neq('id', id)
@@ -173,7 +180,7 @@ export function useDestinations() {
 
   return {
     destinations,
-    isLoading,
+    isLoading: profileLoading || isLoading,
     error,
     createDestination,
     updateDestination,
