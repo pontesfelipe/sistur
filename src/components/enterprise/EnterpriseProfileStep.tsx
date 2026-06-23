@@ -253,9 +253,26 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     try {
       if (!effectiveOrgId) return;
       const snapshot = getAutoFillSnapshot();
+      // Escopa o snapshot por assessmentId quando disponível, mantendo
+      // compatibilidade com o formato antigo (array puro) caso não haja id.
+      let payload: any = snapshot;
+      if (assessmentId) {
+        const { data: current } = await supabase
+          .from('enterprise_profiles')
+          .select('autofill_run_state')
+          .eq('destination_id', destinationId)
+          .maybeSingle();
+        const existing = (current?.autofill_run_state ?? null) as any;
+        const byAssessment =
+          existing && !Array.isArray(existing) && typeof existing === 'object' && existing.byAssessment
+            ? { ...existing.byAssessment }
+            : {};
+        byAssessment[assessmentId] = snapshot;
+        payload = { byAssessment };
+      }
       await supabase
         .from('enterprise_profiles')
-        .update({ autofill_run_state: snapshot as any } as any)
+        .update({ autofill_run_state: payload as any } as any)
         .eq('destination_id', destinationId);
     } catch (e) {
       console.warn('[autoFillRunner] failed to persist run state', e);
