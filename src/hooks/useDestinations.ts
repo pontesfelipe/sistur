@@ -119,6 +119,8 @@ export function useDestinations() {
       latitude?: number | null;
       longitude?: number | null;
     }) => {
+      if (!effectiveOrgId) throw new Error('Organização ativa não encontrada');
+
       // Check for duplicate destination (same name + UF, excluding current)
       const { data: existing } = await supabase
         .from('destinations')
