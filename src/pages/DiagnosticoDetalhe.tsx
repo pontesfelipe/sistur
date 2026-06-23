@@ -98,6 +98,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useBrandRollup } from '@/hooks/useBrandRollup';
+import { BrandRollupPanel } from '@/components/enterprise/BrandRollupPanel';
 
 const normalizeDisplayScore = (
   value: number | null | undefined,
