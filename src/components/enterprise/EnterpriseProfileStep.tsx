@@ -476,7 +476,25 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.telecom_coverage_analysis) setTelecomData(ep.telecom_coverage_analysis);
       if (ep.urban_accessibility_analysis) setAccessibilityData(ep.urban_accessibility_analysis);
       if (ep.health_infrastructure_analysis) setHealthData(ep.health_infrastructure_analysis);
-      if (ep.autofill_run_state) hydrateAutoFillState(ep.autofill_run_state as AutoFillEntry[]);
+      // Hydrate apenas o snapshot da rodada atual. Se o estado salvo for o
+      // formato antigo (array puro), ele pertence a uma rodada anterior do
+      // mesmo destino — descartamos para não pintar blocos como "verde" em
+      // um novo diagnóstico.
+      if (ep.autofill_run_state) {
+        const raw = ep.autofill_run_state as any;
+        if (assessmentId && raw && !Array.isArray(raw) && raw.byAssessment) {
+          const entries = raw.byAssessment[assessmentId];
+          if (Array.isArray(entries)) {
+            hydrateAutoFillState(entries as AutoFillEntry[]);
+          } else {
+            resetAutoFillState();
+          }
+        } else {
+          resetAutoFillState();
+        }
+      } else {
+        resetAutoFillState();
+      }
     }
   }, [existingProfile]);
 
