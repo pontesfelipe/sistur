@@ -230,26 +230,29 @@ export function NovaRodadaDialogs({
               <Alert>
                 <Info className="h-4 w-4" />
                 <AlertDescription>
-                  Diagnóstico de rede com {orderedUnits.length} unidades. Nesta etapa, os indicadores
-                  manuais são preenchidos para a unidade principal
-                  {activeUnit?.unit_name ? ` (${activeUnit.unit_name})` : ''}. A coleta isolada por
-                  unidade no preenchimento manual entra na próxima fase; o pré-preenchimento da etapa
-                  anterior já roda por unidade individualmente.
+                  Diagnóstico de rede com {orderedUnits.length} unidades. Cada aba abaixo coleta os
+                  indicadores manuais de uma unidade isoladamente; os scores serão consolidados na
+                  marca após o cálculo.
                 </AlertDescription>
               </Alert>
             )}
             {/* Fase 4 (v1.86.0) — bloco opcional de importação CSV/PMS */}
             <PmsCsvImportPanel assessmentId={createdAssessmentId} />
             {/* Fase 13 (v1.96.0) — Conectores PMS nativos (Cloudbeds em produção) */}
-            {selectedDestinationData?.id && (
-              <PmsConnectionsPanel destinationId={selectedDestinationData.id} />
+            {effectiveDestinationData?.id && (
+              <PmsConnectionsPanel destinationId={effectiveDestinationData.id} />
             )}
-            <EnterpriseDataEntryPanel
-              assessmentId={createdAssessmentId}
-              tier={selectedTier}
-              onComplete={() => onSetCurrentStep(6)}
-              initialAutoFillValues={reviewPreFillValues}
-            />
+            {renderUnitTabs(
+              <EnterpriseDataEntryPanel
+                key={activeUnit?.id ?? 'single'}
+                assessmentId={createdAssessmentId}
+                tier={selectedTier}
+                onComplete={() => onSetCurrentStep(6)}
+                initialAutoFillValues={reviewPreFillValues}
+                unitId={activeUnit?.id ?? null}
+                unitLabel={activeUnit?.unit_name ?? activeUnit?.destinations?.name ?? null}
+              />
+            )}
           </div>
         ) : (
           <Card>
