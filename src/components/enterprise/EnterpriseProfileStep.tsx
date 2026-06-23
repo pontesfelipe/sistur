@@ -796,7 +796,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardHeader>
         <CardContent className="pt-0">
           <DigitalPresenceSearch
-            businessName={destinationName}
+            businessName={businessQuery}
             location={destinationName}
             onAutoFill={handleDigitalAutoFill}
             onAnalysisCapture={handleDigitalAnalysisCapture}
@@ -883,7 +883,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardHeader>
         <CardContent className="pt-0">
           <PublicComplaintsSearch
-            businessName={destinationName}
+            businessName={businessQuery}
             location={destinationName}
             onAutoFill={handleComplaintsAutoFill}
             onAnalysisCapture={handleComplaintsCapture}
@@ -915,7 +915,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <CardContent className="pt-0">
           <CompetitorsAutoSearch
             destinationId={destinationId}
-            businessName={destinationName}
+            businessName={businessQuery}
             location={destinationName}
             propertyType={formData.property_type}
             onCaptured={setCompetitorsCount}
@@ -947,7 +947,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardHeader>
         <CardContent className="pt-0">
           <SustainabilitySearch
-            businessName={destinationName}
+            businessName={businessQuery}
             location={destinationName}
             onAutoFill={handleSustainabilityAutoFill}
             onAnalysisCapture={handleSustainabilityCapture}
@@ -978,7 +978,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardHeader>
         <CardContent className="pt-0">
           <PricingPositioningSearch
-            businessName={destinationName}
+            businessName={businessQuery}
             location={destinationName}
             onAutoFill={handlePricingAutoFill}
             onAnalysisCapture={handlePricingCapture}
@@ -1109,7 +1109,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <BrandStrengthSearch businessName={destinationName} location={destinationName} onAutoFill={handleBrandAutoFill} onAnalysisCapture={handleBrandCapture} />
+          <BrandStrengthSearch businessName={businessQuery} location={destinationName} onAutoFill={handleBrandAutoFill} onAnalysisCapture={handleBrandCapture} />
         </CardContent>
       </Card>
 
@@ -1131,7 +1131,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <DemandTrendsSearch businessName={destinationName} location={destinationName} onAutoFill={handleDemandAutoFill} onAnalysisCapture={handleDemandCapture} />
+          <DemandTrendsSearch businessName={businessQuery} location={destinationName} onAutoFill={handleDemandAutoFill} onAnalysisCapture={handleDemandCapture} />
         </CardContent>
       </Card>
 
@@ -1153,7 +1153,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <ConsolidatedReputationSearch businessName={destinationName} location={destinationName} onAutoFill={handleReputationAutoFill} onAnalysisCapture={handleReputationCapture} />
+          <ConsolidatedReputationSearch businessName={businessQuery} location={destinationName} onAutoFill={handleReputationAutoFill} onAnalysisCapture={handleReputationCapture} />
         </CardContent>
       </Card>
 
@@ -1175,7 +1175,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <SocialMediaSearch businessName={destinationName} location={destinationName} onAutoFill={handleSocialAutoFill} onAnalysisCapture={handleSocialCapture} />
+          <SocialMediaSearch businessName={businessQuery} location={destinationName} onAutoFill={handleSocialAutoFill} onAnalysisCapture={handleSocialCapture} />
         </CardContent>
       </Card>
 
