@@ -1969,6 +1969,24 @@ async function runCalculationCore(
 
     console.log(`Created ${recommendations.length} recommendations`);
 
+    // Multi-unit mode: skip brand-level steps (assessment update, IGMA history,
+    // prescription cycles, regression alerts, snapshots, audit) — those happen
+    // once at the brand-level dispatcher after all units are computed.
+    if (isUnitScope) {
+      const unitCritical = [...pillarScores].sort((a, b) => a.score - b.score)[0];
+      return {
+        success: true,
+        assessment_id,
+        unit_id: unitId,
+        unit_name: unitContext?.unit_name ?? null,
+        pillar_scores: pillarScores,
+        critical_pillar: unitCritical?.pillar,
+        critical_score: unitCritical?.score,
+        issues_created: insertedIssues.length,
+        recommendations_created: recommendations.length,
+      };
+    }
+
     // 12. Update assessment with IGMA results + Score Final SISTUR (Etapa 4)
     // Fórmula canônica: Final = (RA × wRA) + (OE × wOE) + (AO × wAO)
     // Default: RA=0.35, OE=0.30, AO=0.35. Phase 4: pesos customizáveis por organização.
