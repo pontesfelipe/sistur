@@ -30,6 +30,13 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -175,6 +182,18 @@ const DiagnosticoDetalhe = () => {
   // indicadores em Atenção/Crítico (gatilhos de prescrição EDU).
   const prescriptionModeFromUrl = searchParams.get('prescription') === '1';
   const [prescriptionMode, setPrescriptionMode] = useState(prescriptionModeFromUrl);
+  // Multi-unit filter: when assessment é multi-unit (marca), permite isolar
+  // indicadores/gargalos/tratamento de uma unidade específica. null = todas.
+  const unitFromUrl = searchParams.get('unit');
+  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(unitFromUrl);
+  const handleUnitChange = (value: string) => {
+    const next = value === '__all__' ? null : value;
+    setSelectedUnitId(next);
+    const params = new URLSearchParams(searchParams);
+    if (next) params.set('unit', next);
+    else params.delete('unit');
+    setSearchParams(params, { replace: true });
+  };
   // Abas afetadas pelo Modo Prescrição
   const PRESCRIPTION_AFFECTED_TABS = ['indicadores', 'gargalos', 'tratamento'];
   const togglePrescriptionMode = (enabled: boolean) => {
@@ -288,9 +307,13 @@ const DiagnosticoDetalhe = () => {
 
   // Filter out ignored indicators from results
   const indicatorScores = useMemo(() => {
-    if (ignoredIndicatorIds.size === 0) return rawIndicatorScores;
-    return rawIndicatorScores.filter((s: any) => !ignoredIndicatorIds.has(s.indicator_id));
-  }, [rawIndicatorScores, ignoredIndicatorIds]);
+    let list = rawIndicatorScores as any[];
+    if (selectedUnitId) list = list.filter((s: any) => s.unit_id === selectedUnitId);
+    if (ignoredIndicatorIds.size > 0) {
+      list = list.filter((s: any) => !ignoredIndicatorIds.has(s.indicator_id));
+    }
+    return list;
+  }, [rawIndicatorScores, ignoredIndicatorIds, selectedUnitId]);
 
   // Prescription mode filter: only Atenção/Crítico indicators (score ≤ 0.66)
   const displayedIndicatorScores = useMemo(() => {
@@ -305,8 +328,10 @@ const DiagnosticoDetalhe = () => {
 
   // Filter issues: remove issues whose evidence indicators are ALL ignored
   const issues = useMemo(() => {
-    if (ignoredIndicatorCodes.size === 0) return rawIssues;
-    return rawIssues.filter((issue: any) => {
+    let list = rawIssues as any[];
+    if (selectedUnitId) list = list.filter((i: any) => i.unit_id === selectedUnitId);
+    if (ignoredIndicatorCodes.size === 0) return list;
+    return list.filter((issue: any) => {
       const evidence = issue.evidence;
       if (!evidence?.indicators || !Array.isArray(evidence.indicators)) return true;
       // Keep the issue if at least one indicator in its evidence is NOT ignored
@@ -315,7 +340,7 @@ const DiagnosticoDetalhe = () => {
       );
       return hasActiveIndicator;
     });
-  }, [rawIssues, ignoredIndicatorCodes]);
+  }, [rawIssues, ignoredIndicatorCodes, selectedUnitId]);
 
   // Issues displayed honor prescription mode (only Atenção/Crítico already by definition,
   // but we still filter out non-critical/atencao here for safety).
@@ -329,13 +354,15 @@ const DiagnosticoDetalhe = () => {
   // Filter recommendations: remove those linked to filtered-out issues
   const filteredIssueIds = useMemo(() => new Set(issues.map((i: any) => i.id)), [issues]);
   const recommendations = useMemo(() => {
-    if (ignoredIndicatorCodes.size === 0) return rawRecommendations;
-    return rawRecommendations.filter((rec: any) => {
+    let list = rawRecommendations as any[];
+    if (selectedUnitId) list = list.filter((r: any) => r.unit_id === selectedUnitId);
+    if (ignoredIndicatorCodes.size === 0) return list;
+    return list.filter((rec: any) => {
       // Keep if no linked issue, or if linked issue is still in the filtered set
       if (!rec.issue?.id) return true;
       return filteredIssueIds.has(rec.issue.id);
     });
-  }, [rawRecommendations, ignoredIndicatorCodes, filteredIssueIds]);
+  }, [rawRecommendations, ignoredIndicatorCodes, filteredIssueIds, selectedUnitId]);
 
   // Official data hooks - destination info
   const assessmentDestination = assessment?.destination as { name?: string; uf?: string; ibge_code?: string } | null;
@@ -917,6 +944,37 @@ const DiagnosticoDetalhe = () => {
               units={brandRollup.units}
               rollups={brandRollup.rollups}
             />
+          )}
+          {brandRollup?.isMultiUnit && (
+            <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-3">
+              <div className="text-sm">
+                <strong className="text-foreground">Escopo das abas internas:</strong>{' '}
+                <span className="text-muted-foreground">
+                  filtre Indicadores, Gargalos e Tratamento por unidade da marca.
+                </span>
+              </div>
+              <Select value={selectedUnitId ?? '__all__'} onValueChange={handleUnitChange}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder="Todas as unidades (marca)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">Todas as unidades (marca)</SelectItem>
+                  {brandRollup.units.map((u) => (
+                    <SelectItem key={u.id} value={u.id}>
+                      {u.unit_name}
+                      {u.destination_name ? ` — ${u.destination_name}` : ''}
+                      {u.destination_state ? `/${u.destination_state}` : ''}
+                      {u.is_primary ? ' ★' : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedUnitId && (
+                <Button variant="ghost" size="sm" onClick={() => handleUnitChange('__all__')}>
+                  Limpar filtro
+                </Button>
+              )}
+            </div>
           )}
           {prescriptionMode && (
             <Alert className="border-primary/40 bg-primary/5">

@@ -3174,6 +3174,113 @@ serve(async (req) => {
       .eq('assessment_id', assessmentId);
     const auditTrail = buildCanonicalAuditTrail(auditRows || [], indicatorValues, indicatorScores);
 
+    // ============================================================
+    // BRAND NETWORK BLOCK (Fase 15.4 — Fase 4 / passo 3)
+    // Quando o assessment é multi-unidade (assessments.brand_id + 2+
+    // assessment_units), injeta no prompt: perfil da marca, rollups
+    // consolidados por pilar e métricas/issues por unidade. Permite ao LLM
+    // produzir capítulo de Marca + por unidade + comparativo da rede.
+    // ============================================================
+    let brandNetworkBlock = '';
+    try {
+      const brandId = (assessment as any).brand_id as string | null;
+      if (brandId) {
+        const [{ data: brandRow }, { data: unitRows }, { data: rollupRows }] = await Promise.all([
+          supabase.from('enterprise_brands').select('id, name, brand_type, total_units, hq_destination_id').eq('id', brandId).maybeSingle(),
+          supabase
+            .from('assessment_units')
+            .select('id, unit_name, is_primary, destination_id, enterprise_profile_id, destinations:destinations(name, state, uf, ibge_code), profile:enterprise_profiles(room_count)')
+            .eq('assessment_id', assessmentId)
+            .order('is_primary', { ascending: false }),
+          supabase.from('assessment_brand_rollups').select('*').eq('assessment_id', assessmentId),
+        ]);
+        const units = (unitRows || []) as any[];
+        if (units.length > 1) {
+          const unitIds = units.map((u) => u.id);
+          const [{ data: unitPillarRows }, { data: unitIssueRows }] = await Promise.all([
+            supabase.from('pillar_scores').select('unit_id, pillar, score, severity').eq('assessment_id', assessmentId).in('unit_id', unitIds),
+            supabase.from('issues').select('unit_id, pillar, severity, title').eq('assessment_id', assessmentId).in('unit_id', unitIds),
+          ]);
+          const pillarsByUnit = new Map<string, any[]>();
+          (unitPillarRows || []).forEach((r: any) => {
+            const arr = pillarsByUnit.get(r.unit_id) || [];
+            arr.push(r);
+            pillarsByUnit.set(r.unit_id, arr);
+          });
+          const issuesByUnit = new Map<string, any[]>();
+          (unitIssueRows || []).forEach((r: any) => {
+            const arr = issuesByUnit.get(r.unit_id) || [];
+            arr.push(r);
+            issuesByUnit.set(r.unit_id, arr);
+          });
+          const fmtPct = (n: number | null | undefined) =>
+            n === null || n === undefined ? '—' : `${Math.round(Number(n) * 100)}%`;
+
+          const rollupTable = (() => {
+            const lines = [
+              '| Pilar | Score Ponderado (UH) | Score Simples | Dispersão σ | Unidades | Unidade Crítica |',
+              '|---|---|---|---|---|---|',
+            ];
+            for (const p of ['RA', 'OE', 'AO', 'GLOBAL']) {
+              const r: any = (rollupRows || []).find((x: any) => x.pillar === p);
+              if (!r) continue;
+              const crit = units.find((u) => u.id === r.critical_unit_id);
+              lines.push(
+                `| ${p} | ${fmtPct(r.score_weighted)} | ${fmtPct(r.score_simple)} | ${fmtPct(r.stddev)} | ${r.unit_count} | ${crit ? `${crit.unit_name} (${crit.destinations?.name || ''}/${crit.destinations?.state || crit.destinations?.uf || ''})` : '—'} |`,
+              );
+            }
+            return lines.join('\n');
+          })();
+
+          const unitsTable = (() => {
+            const lines = [
+              '| Unidade | Município/UF | UH (quartos) | I-RA | I-OE | I-AO | Gargalos críticos |',
+              '|---|---|---|---|---|---|---|',
+            ];
+            for (const u of units) {
+              const ps = pillarsByUnit.get(u.id) || [];
+              const ra = ps.find((x) => x.pillar === 'RA');
+              const oe = ps.find((x) => x.pillar === 'OE');
+              const ao = ps.find((x) => x.pillar === 'AO');
+              const iss = (issuesByUnit.get(u.id) || []).filter((i: any) => i.severity === 'CRITICO');
+              lines.push(
+                `| ${u.unit_name}${u.is_primary ? ' ★' : ''} | ${u.destinations?.name || '—'}/${u.destinations?.state || u.destinations?.uf || '—'} | ${u.profile?.room_count ?? '—'} | ${fmtPct(ra?.score)} | ${fmtPct(oe?.score)} | ${fmtPct(ao?.score)} | ${iss.length} |`,
+              );
+            }
+            return lines.join('\n');
+          })();
+
+          brandNetworkBlock = `\n=== DIAGNÓSTICO DE REDE (MARCA MULTI-UNIDADE) ===
+Este diagnóstico cobre uma MARCA com ${units.length} unidades em diferentes municípios.
+
+IDENTIDADE DA MARCA:
+- Nome: ${brandRow?.name || '—'}
+- Tipo: ${brandRow?.brand_type || '—'}
+- Total declarado de unidades: ${brandRow?.total_units ?? units.length}
+- Unidades diagnosticadas: ${units.length}
+
+CONSOLIDAÇÃO DA MARCA (rollups por pilar):
+${rollupTable}
+
+UNIDADES DA REDE (scores por unidade):
+${unitsTable}
+
+INSTRUÇÕES OBRIGATÓRIAS PARA O RELATÓRIO DE REDE:
+1. O relatório DEVE conter um capítulo "Diagnóstico da Marca" com: perfil da rede, abrangência geográfica (lista de municípios), score consolidado por pilar (use a tabela rollup acima — ponderado por UH), dispersão e pilar crítico da marca.
+2. Para CADA unidade da tabela acima, gere um sub-capítulo "Unidade: <unit_name> (<município/UF>)" contendo: contexto territorial sintético, scores RA/OE/AO da unidade, gargalos críticos próprios e recomendações locais.
+3. Inclua um capítulo final "Comparativo da Rede" com:
+   - Ranking interno por pilar (melhor → pior) usando os scores acima.
+   - Identificação dos fatores territoriais que explicam gaps (cite IBGE/CADASTUR/Mapa do Turismo da unidade pior).
+   - Recomendações TRANSVERSAIS (aplicáveis à marca toda) separadas das LOCAIS (específicas de uma unidade), apontando qual é qual.
+4. NUNCA reporte um score consolidado que não esteja na tabela rollup acima. NUNCA invente unidades fora da lista acima.
+5. Quando citar "a marca", refira-se ao agregado; quando citar uma unidade, use sempre nome + município.
+`;
+        }
+      }
+    } catch (e) {
+      console.warn('brand network block skipped:', (e as any)?.message || e);
+    }
+
     // Catalog indicators by code so we can decorate external benchmarks with
     // names/units from the indicators table.
     const indicatorsByCode = new Map<string, any>();
@@ -3458,6 +3565,7 @@ INSTRUÇÕES SOBRE BASE DE CONHECIMENTO:
 - Esses documentos representam dados locais e diretrizes específicas do destino
 - Na seção de Fontes e Referências, liste todos os documentos da KB consultados
 ` : ''}
+${brandNetworkBlock}
 === INSTRUÇÕES FINAIS ===
 1. COMECE com o título e IMEDIATAMENTE a tabela de Ficha Técnica fornecida acima — NÃO pule essa tabela
 2. Siga EXATAMENTE a estrutura definida no system prompt para o template "${reportTemplate}"
