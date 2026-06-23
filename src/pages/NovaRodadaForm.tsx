@@ -424,6 +424,35 @@ export function NovaRodadaForm({
         {/* Step 2: Destination */}
         {currentStep === 2 && (
           <>
+            {diagnosticType === 'enterprise' && (
+              <div className="space-y-4 mb-4">
+                <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <p className="text-sm text-amber-900 dark:text-amber-200">
+                    <strong>Diagnóstico empresarial:</strong> uma marca pode ter
+                    várias unidades em municípios diferentes. Selecione a marca
+                    e adicione abaixo os municípios onde o empreendimento opera —
+                    o diagnóstico será único, mas a coleta de dados será por unidade.
+                  </p>
+                </div>
+                <BrandSelector
+                  value={brandId}
+                  onChange={(id, name) => onBrandChange(id, name)}
+                />
+                <AssessmentUnitsManager
+                  destinations={destinations}
+                  value={units}
+                  onChange={onUnitsChange}
+                  unitNamePrefix={brandName}
+                />
+                {units.length === 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Adicione pelo menos uma unidade para prosseguir.
+                  </p>
+                )}
+              </div>
+            )}
+            {diagnosticType !== 'enterprise' && (
+            <>
             <div className="flex gap-4 mb-4">
               <Button
                 variant={destinationMode === 'select' ? 'default' : 'outline'}
@@ -444,6 +473,8 @@ export function NovaRodadaForm({
                 Criar novo
               </Button>
             </div>
+            </>
+            )}
 
             {destinationMode === 'select' ? (
               <div className="space-y-2">
