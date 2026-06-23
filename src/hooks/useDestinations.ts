@@ -49,17 +49,31 @@ export function useDestinations() {
       // For demo visibility, store as 'organization' in the DB (will be accessible when viewing demo)
       const dbVisibility = destination.visibility === 'demo' ? 'organization' : (destination.visibility || 'organization');
 
-      // Check for duplicate destination (same name + UF)
-      const { data: existing } = await supabase
+      // Dedupe: primeiro por IBGE (fonte canônica), depois por nome+UF.
+      if (destination.ibge_code) {
+        const { data: byIbge } = await supabase
+          .from('destinations')
+          .select('id, name')
+          .eq('org_id', targetOrgId)
+          .eq('ibge_code', destination.ibge_code)
+          .maybeSingle();
+        if (byIbge) {
+          throw new Error(
+            `Destino "${byIbge.name}" já cadastrado (IBGE ${destination.ibge_code}). Selecione-o na lista.`,
+          );
+        }
+      }
+      const { data: byName } = await supabase
         .from('destinations')
         .select('id')
         .eq('org_id', targetOrgId)
         .ilike('name', destination.name.trim())
         .eq('uf', destination.uf)
         .maybeSingle();
-
-      if (existing) {
-        throw new Error(`Já existe um destino "${destination.name}" no estado ${destination.uf}`);
+      if (byName) {
+        throw new Error(
+          `Já existe um destino "${destination.name}" em ${destination.uf}. Selecione-o na lista.`,
+        );
       }
 
       const { data, error } = await supabase
