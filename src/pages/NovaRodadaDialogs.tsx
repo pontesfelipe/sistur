@@ -63,7 +63,7 @@ export function NovaRodadaDialogs({
   // que a linhagem registre todas as fontes mesmo se o usuário não chegar até
   // o botão Salvar do Step 5. Cobre o gap em que valores de blocos como
   // Open-Meteo, ANAC, Reclame Aqui, OTAs etc. ficavam só em memória do wizard.
-  const { indicators } = useIndicators('enterprise');
+  const { indicators } = useIndicators({ scope: 'enterprise' });
   useEffect(() => {
     if (!createdAssessmentId || !indicators || indicators.length === 0) return;
     const entries = Object.entries(reviewPreFillValues);
