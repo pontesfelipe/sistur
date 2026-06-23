@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
 
     const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
     if (!firecrawlKey) {
-      return new Response(JSON.stringify({ error: 'Firecrawl not configured' }), {
+      return new Response(JSON.stringify({ error: 'Fonte de dados externa indisponível: Avaliações públicas (Google Maps, TripAdvisor, Booking). A coleta automática deste indicador não está ativa — preencha manualmente.' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
@@ -221,7 +221,7 @@ async function searchFirecrawl(apiKey: string, query: string, limit: number, scr
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`Firecrawl search failed [${response.status}]: ${errText}`);
+    throw new Error(`Falha ao consultar fonte externa de avaliações (HTTP ${response.status}): ${errText}`);
   }
 
   return response.json();

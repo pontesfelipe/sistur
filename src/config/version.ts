@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.4",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Preenchimento Automático — mensagens de erro reescritas para nomear a fonte real e ocultar detalhe técnico do provedor de scraping. As 10 edge functions de busca externa (search-business-reviews, search-digital-presence, search-competitors, search-tourism-safety, search-sustainability-signals, search-public-complaints, search-local-transport, search-pricing-positioning, search-brand-strength, discover-municipal-events) agora retornam 'Fonte de dados externa indisponível: <Nome da fonte>. Preencha manualmente.' (ex.: Avaliações públicas Google/TripAdvisor/Booking; Reclame Aqui/Procon; Tarifas em OTAs; Mobilidade urbana; etc.). Erros transitórios (HTTP 5xx do provedor) viram 'Falha ao consultar fonte externa (HTTP <status>)'. `autoFillRunner.classifyError` ganhou os padrões `indisponível`, `sem dados` e `preencha manualmente` para classificar essas respostas como `no_data` (badge âmbar 'sem informações disponíveis') em vez de erro vermelho, mantendo o fluxo coerente com o padrão da Fase 1."
+    ]
+  },
   {
     version: "1.96.3",
     date: "2026-06-23",

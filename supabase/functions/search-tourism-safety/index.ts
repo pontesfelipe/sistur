@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
 
     const apiKey = Deno.env.get('FIRECRAWL_API_KEY');
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'Firecrawl não configurado' }), {
+      return new Response(JSON.stringify({ error: 'Fonte de dados externa indisponível: Notícias e alertas de segurança ao turista. A coleta automática deste indicador não está ativa — preencha manualmente.' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }

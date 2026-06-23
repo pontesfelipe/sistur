@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     if (!businessName) return new Response(JSON.stringify({ error: 'businessName required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     const apiKey = Deno.env.get('FIRECRAWL_API_KEY');
-    if (!apiKey) return new Response(JSON.stringify({ error: 'Firecrawl não configurado' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    if (!apiKey) return new Response(JSON.stringify({ error: 'Fonte de dados externa indisponível: Menções públicas da marca em mídia e OTAs. Preencha manualmente.' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     const q = `"${businessName}" ${location || ''}`.trim();
     const [generalR, newsR, otaR] = await Promise.all([

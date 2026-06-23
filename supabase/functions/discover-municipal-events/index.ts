@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
   });
   const searchData = await searchRes.json();
   if (!searchRes.ok) {
-    return new Response(JSON.stringify({ error: "Firecrawl search falhou", detail: searchData }), {
+    return new Response(JSON.stringify({ error: "Não foi possível consultar a fonte de eventos municipais oficiais agora. Tente novamente em instantes ou preencha manualmente.", detail: searchData }), {
       status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
