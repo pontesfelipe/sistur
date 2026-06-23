@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,8 @@ import { DataImportPanel } from '@/components/diagnostics/DataImportPanel';
 import { EnterpriseProfileStep } from '@/components/enterprise/EnterpriseProfileStep';
 import { PmsCsvImportPanel } from '@/components/enterprise/PmsCsvImportPanel';
 import { PmsConnectionsPanel } from '@/components/enterprise/PmsConnectionsPanel';
+import { useIndicators } from '@/hooks/useIndicators';
+import { supabase } from '@/integrations/supabase/client';
 
 type DiagnosticType = 'territorial' | 'enterprise';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
@@ -55,6 +57,47 @@ export function NovaRodadaDialogs({
   resumeAssessment,
 }: NovaRodadaDialogsProps) {
   const [reviewPreFillValues, setReviewPreFillValues] = useState<Record<string, number>>({});
+
+  // Persistência defensiva: assim que um bloco automático devolve valores e já
+  // existe `createdAssessmentId`, faz upsert direto em `indicator_values` para
+  // que a linhagem registre todas as fontes mesmo se o usuário não chegar até
+  // o botão Salvar do Step 5. Cobre o gap em que valores de blocos como
+  // Open-Meteo, ANAC, Reclame Aqui, OTAs etc. ficavam só em memória do wizard.
+  const { indicators } = useIndicators('enterprise');
+  useEffect(() => {
+    if (!createdAssessmentId || !indicators || indicators.length === 0) return;
+    const entries = Object.entries(reviewPreFillValues);
+    if (entries.length === 0) return;
+    const codeToId = new Map(indicators.map((i: any) => [i.code, i.id]));
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: prof } = await supabase
+        .from('profiles')
+        .select('org_id, viewing_demo_org_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      const effOrg = prof?.viewing_demo_org_id || prof?.org_id || orgId;
+      if (!effOrg) return;
+      const rows = entries
+        .map(([code, value]) => {
+          const indicator_id = codeToId.get(code);
+          if (!indicator_id || value === null || value === undefined || !Number.isFinite(Number(value))) return null;
+          return {
+            assessment_id: createdAssessmentId,
+            indicator_id,
+            org_id: effOrg,
+            value_raw: Number(value),
+            source: `Pré-preenchimento Automático (${code})`,
+          };
+        })
+        .filter(Boolean) as any[];
+      if (rows.length === 0) return;
+      await supabase
+        .from('indicator_values')
+        .upsert(rows, { onConflict: 'assessment_id,indicator_id' });
+    })();
+  }, [reviewPreFillValues, createdAssessmentId, indicators, orgId]);
 
   return (
     <div className="space-y-6">
