@@ -491,6 +491,43 @@ const DiagnosticoDetalhe = () => {
     }
   };
 
+  const [recovering, setRecovering] = useState(false);
+  const handleRecoverAutoFill = async () => {
+    if (!id) return;
+    setRecovering(true);
+    const t = toast.loading('Recuperando valores automáticos e recalculando...');
+    try {
+      const { data, error } = await supabase.functions.invoke('recover-enterprise-autofill', {
+        body: { assessment_id: id },
+      });
+      if (error) throw error;
+      if (!data?.ok) {
+        toast.error(data?.error || 'Não foi possível recuperar valores automáticos', { id: t });
+        return;
+      }
+      const inserted = data.inserted_codes?.length || 0;
+      const updated = data.updated_codes?.length || 0;
+      const skipped = data.skipped?.length || 0;
+      toast.success(
+        `Recuperação concluída: ${inserted} novos, ${updated} atualizados${skipped ? `, ${skipped} preservados` : ''}. Recalculando…`,
+        { id: t },
+      );
+      // Refetch all data after recalculation
+      await Promise.all([
+        refetchAssessment(),
+        refetchPillarScores(),
+        refetchIndicatorScores(),
+        refetchIssues(),
+        refetchRecommendations(),
+      ]);
+    } catch (e: any) {
+      console.error('[recover-enterprise-autofill]', e);
+      toast.error(e?.message || 'Erro ao recuperar valores automáticos', { id: t });
+    } finally {
+      setRecovering(false);
+    }
+  };
+
   if (loadingAssessment) {
     return (
       <AppLayout title="Carregando...">
@@ -678,6 +715,15 @@ const DiagnosticoDetalhe = () => {
                 <Download className="mr-2 h-4 w-4" />
                 Exportar CSV
               </Button>
+              {isEnterprise && (
+                <Button variant="outline" onClick={handleRecoverAutoFill} disabled={recovering}>
+                  {recovering ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Recalculando…</>
+                  ) : (
+                    <><RefreshCw className="mr-2 h-4 w-4" />Recuperar valores automáticos</>
+                  )}
+                </Button>
+              )}
             </>
           )}
         </div>

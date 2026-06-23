@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 6,
+  patch: 7,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.7",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Enterprise — botão 'Recuperar valores automáticos' direto na página do diagnóstico (visível quando o diagnóstico é Enterprise e está Calculado). Aciona a nova edge function `recover-enterprise-autofill` que: (1) lê o `enterprise_profile` do destino e extrai valores numéricos das 19 colunas `*_analysis` (review, digital_presence, context, complaints, sustainability, pricing, events, safety, climate, transport, brand_strength, demand_trends, consolidated_reputation, social_media, air_connectivity, tariff_seasonality, telecom_coverage, urban_accessibility, health_infrastructure) usando um mapa código→extrator para 21 indicadores ENT_*; (2) faz upsert em `indicator_values` com a fonte semântica correta (sem citar Firecrawl), preservando entradas manuais e indicadores ignorados; (3) reseta o diagnóstico para DRAFT e dispara `calculate-assessment` no mesmo turno; (4) responde com listas de códigos inseridos/atualizados/preservados para feedback no toast. Resolve casos em que a Linhagem e a aba Indicadores mostravam só os 9 valores manuais/Reviews porque os 12+ blocos automáticos ficaram apenas em `enterprise_profiles.*_analysis` antes da correção da v1.96.5."
+    ]
+  },
   {
     version: "1.96.6",
     date: "2026-06-23",
