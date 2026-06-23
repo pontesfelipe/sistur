@@ -139,6 +139,12 @@ Cobertura dos 4 vetores selecionados pelo usuário ("todos os acima"):
 - **UI `PmsConnectionsPanel`**: renderizado no Step 4 do wizard Enterprise, lista conexões com status/último sync, sync manual, exclusão. Dialog 'Conectar PMS': Cloudbeds (OAuth ativo) + Stays/Opera/HITS pendentes ('em breve'). Sem `CLOUDBEDS_CLIENT_ID`, explica ao usuário que precisa configurar as credenciais OAuth no Cloudbeds Partner Portal primeiro.
 - **Dependência externa**: `CLOUDBEDS_CLIENT_ID` e `CLOUDBEDS_CLIENT_SECRET` devem ser adicionados via Secrets antes de ativar o fluxo OAuth de produção. O app já é resiliente: sem secrets, exibe instruções em vez de quebrar.
 
+### Fase 13.2 — Linhagem PMS no motor (v1.96.2) ✅
+
+- Gap detectado pós-13.1: o `sync-pms-connector` gravava só em `enterprise_pms_imports.parsed_metrics`, então `indicator_calculation_trail` e a aba de indicadores não refletiam a origem PMS.
+- Correção: após o insert do import, o sync busca a rodada Enterprise ativa mais recente (`destination_id` + `diagnostic_type='enterprise'`) e faz upsert em `enterprise_indicator_values` para `ENT_OCUPACAO`, `ENT_ADR`, `ENT_REVPAR`, `ENT_GOPPAR`, `ENT_TREVPAR`, `ENT_NPS`, `ENT_REPEAT_GUEST` (quando o provider expõe), com `source='PMS:<provider>'` e referência ao `import_id`. Conflito tratado por UNIQUE `(indicator_id, assessment_id)`.
+- Resultado: linhagem completa — valor PMS aparece na aba de indicadores, no `indicator_calculation_trail` e no relatório AI sem cópia manual.
+
 ### Fase 12 — Alertas por e-mail + Benchmark setorial (v1.95.0) ✅
 
 - **12.1 Alertas de regressão por e-mail** (fecha o gap visual da Fase 11.1): novo template `enterprise-regression-alert` registrado em `_shared/transactional-email-templates/registry.ts`. O painel `EnterpriseRegressionAlerts` agora exibe botão 'Notificar por e-mail' que dispara via `send-transactional-email` para o usuário logado, com dedupe por `localStorage` (`regression-email-<assessmentId>`) e idempotencyKey próprio. Vale para Territorial e Enterprise.
