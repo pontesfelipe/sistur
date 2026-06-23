@@ -54,6 +54,7 @@ import {
   useAutoFillStatuses,
   hydrateAutoFillState,
   getAutoFillSnapshot,
+  resetAutoFillState,
   type AutoFillEntry,
 } from '@/lib/autoFillRunner';
 import { Play, RefreshCw, AlertCircle, Info } from 'lucide-react';
@@ -66,6 +67,13 @@ interface EnterpriseProfileStepProps {
   onComplete: () => void;
   onBack?: () => void;
   onReviewAutoFill?: (values: Record<string, number>) => void;
+  /**
+   * ID da rodada/assessment atual. Usado para isolar o `autofill_run_state`
+   * por diagnóstico: o `enterprise_profiles` é único por destino, então sem
+   * esse escopo o estado verde dos blocos vazaria de uma rodada anterior para
+   * uma nova rodada do mesmo destino.
+   */
+  assessmentId?: string | null;
 }
 
 const PROPERTY_TYPES = [
@@ -93,7 +101,7 @@ const TARGET_MARKETS = [
   { value: 'eco', label: 'Ecoturismo' },
 ];
 
-export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill }: EnterpriseProfileStepProps) {
+export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill, assessmentId }: EnterpriseProfileStepProps) {
   const [tourOpen, setTourOpen] = useState(false);
   // Fase 12.3 — auto-abre o tour na primeira visita ao Step Enterprise
   useEffect(() => {
@@ -245,9 +253,26 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     try {
       if (!effectiveOrgId) return;
       const snapshot = getAutoFillSnapshot();
+      // Escopa o snapshot por assessmentId quando disponível, mantendo
+      // compatibilidade com o formato antigo (array puro) caso não haja id.
+      let payload: any = snapshot;
+      if (assessmentId) {
+        const { data: current } = await supabase
+          .from('enterprise_profiles')
+          .select('autofill_run_state')
+          .eq('destination_id', destinationId)
+          .maybeSingle();
+        const existing = (current?.autofill_run_state ?? null) as any;
+        const byAssessment =
+          existing && !Array.isArray(existing) && typeof existing === 'object' && existing.byAssessment
+            ? { ...existing.byAssessment }
+            : {};
+        byAssessment[assessmentId] = snapshot;
+        payload = { byAssessment };
+      }
       await supabase
         .from('enterprise_profiles')
-        .update({ autofill_run_state: snapshot as any } as any)
+        .update({ autofill_run_state: payload as any } as any)
         .eq('destination_id', destinationId);
     } catch (e) {
       console.warn('[autoFillRunner] failed to persist run state', e);
@@ -451,14 +476,50 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (ep.telecom_coverage_analysis) setTelecomData(ep.telecom_coverage_analysis);
       if (ep.urban_accessibility_analysis) setAccessibilityData(ep.urban_accessibility_analysis);
       if (ep.health_infrastructure_analysis) setHealthData(ep.health_infrastructure_analysis);
-      if (ep.autofill_run_state) hydrateAutoFillState(ep.autofill_run_state as AutoFillEntry[]);
+      // Hydrate apenas o snapshot da rodada atual. Se o estado salvo for o
+      // formato antigo (array puro), ele pertence a uma rodada anterior do
+      // mesmo destino — descartamos para não pintar blocos como "verde" em
+      // um novo diagnóstico.
+      if (ep.autofill_run_state) {
+        const raw = ep.autofill_run_state as any;
+        if (assessmentId && raw && !Array.isArray(raw) && raw.byAssessment) {
+          const entries = raw.byAssessment[assessmentId];
+          if (Array.isArray(entries)) {
+            hydrateAutoFillState(entries as AutoFillEntry[]);
+          } else {
+            resetAutoFillState();
+          }
+        } else {
+          resetAutoFillState();
+        }
+      } else {
+        resetAutoFillState();
+      }
     }
   }, [existingProfile]);
 
   const saveProfile = useMutation({
     mutationFn: async () => {
       if (!effectiveOrgId) throw new Error('Organização não encontrada');
-      
+
+      // Merge autofill_run_state por assessmentId para não sobrescrever o
+      // snapshot de rodadas anteriores no mesmo destino.
+      let mergedRunState: any = getAutoFillSnapshot();
+      if (assessmentId) {
+        const { data: current } = await supabase
+          .from('enterprise_profiles')
+          .select('autofill_run_state')
+          .eq('destination_id', destinationId)
+          .maybeSingle();
+        const existing = (current?.autofill_run_state ?? null) as any;
+        const byAssessment =
+          existing && !Array.isArray(existing) && typeof existing === 'object' && existing.byAssessment
+            ? { ...existing.byAssessment }
+            : {};
+        byAssessment[assessmentId] = getAutoFillSnapshot();
+        mergedRunState = { byAssessment };
+      }
+
       const payload = {
         ...formData,
         destination_id: destinationId,
@@ -484,7 +545,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         telecom_coverage_analysis: telecomData,
         urban_accessibility_analysis: accessibilityData,
         health_infrastructure_analysis: healthData,
-        autofill_run_state: getAutoFillSnapshot() as any,
+        autofill_run_state: mergedRunState as any,
       };
       
       const { data, error } = await supabase

@@ -144,6 +144,26 @@ export function hydrateAutoFillState(entries: AutoFillEntry[] | null | undefined
   notify();
 }
 
+/**
+ * Reset all per-block state to idle. Used when starting a fresh draft so that
+ * stale "success" badges from a previous rodada don't visually leak into a new
+ * diagnostic for the same destination.
+ */
+export function resetAutoFillState(): void {
+  for (const id of Array.from(state.keys())) {
+    state.set(id, {
+      id,
+      label: meta.get(id)?.label ?? id,
+      source: meta.get(id)?.source,
+      status: 'idle',
+      error: undefined,
+      lastRunAt: undefined,
+      lastDurationMs: undefined,
+    });
+  }
+  notify();
+}
+
 export function getAutoFillSnapshot(): AutoFillEntry[] {
   return cachedSnapshot;
 }
