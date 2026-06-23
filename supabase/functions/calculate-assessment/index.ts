@@ -1487,6 +1487,7 @@ async function runCalculationCore(
       pillarScores.push({
         org_id: orgId,
         assessment_id,
+        unit_id: unitId,
         pillar,
         score: pillarScore,
         severity: getSeverity(pillarScore),
