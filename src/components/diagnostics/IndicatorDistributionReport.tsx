@@ -32,7 +32,7 @@ type Pillar = 'RA' | 'OE' | 'AO';
 
 const scopeConfig: Record<IndicatorScope, { label: string; color: string; icon: typeof Landmark }> = {
   territorial: { label: 'Territorial', color: 'hsl(217, 91%, 60%)', icon: Landmark },
-  enterprise: { label: 'Enterprise', color: 'hsl(38, 92%, 50%)', icon: Hotel },
+  enterprise: { label: 'Empresarial', color: 'hsl(38, 92%, 50%)', icon: Hotel },
   both: { label: 'Ambos', color: 'hsl(270, 50%, 60%)', icon: Globe },
 };
 
@@ -258,7 +258,7 @@ export function IndicatorDistributionReport() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Distribuição por Escopo</CardTitle>
-            <CardDescription>Territorial vs Enterprise vs Ambos</CardDescription>
+            <CardDescription>Territorial vs Empresarial vs Ambos</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>

@@ -38,7 +38,7 @@ export const faqItems: FAQItem[] = [
   },
   {
     question: 'Qual a diferença entre Organizações Públicas e Privadas?',
-    answer: 'O SISTUR classifica organizações em dois tipos: PÚBLICAS (secretarias de turismo, órgãos governamentais) com foco em diagnósticos territoriais de municípios, e PRIVADAS (hotéis, resorts, empresas hoteleiras) com acesso opcional ao módulo Enterprise para indicadores específicos de hospitalidade.',
+    answer: 'O SISTUR classifica organizações em dois tipos: PÚBLICAS (secretarias de turismo, órgãos governamentais) com foco em diagnósticos territoriais de municípios, e PRIVADAS (hotéis, resorts, empresas hoteleiras) com acesso opcional ao módulo Empresarial para indicadores específicos de hospitalidade.',
     category: 'general',
   },
 
@@ -181,25 +181,25 @@ export const faqItems: FAQItem[] = [
     category: 'erp',
   },
 
-  // Enterprise-specific questions
+  // Empresarial-specific questions
   {
-    question: 'O que é o SISTUR Enterprise?',
-    answer: 'O SISTUR Enterprise é o módulo especializado para organizações do setor privado (hotéis, resorts, redes hoteleiras). Utiliza 22 indicadores de hospitalidade adaptados da metodologia Mario Beni, sendo 6 compartilhados com diagnósticos territoriais (NPS, Reviews Online, Horas de Treinamento, % Funcionários Locais, % Compras Locais e Certificações Ambientais).',
+    question: 'O que é o SISTUR Empresarial?',
+    answer: 'O SISTUR Empresarial é o módulo especializado para organizações do setor privado (hotéis, resorts, redes hoteleiras). Utiliza 22 indicadores de hospitalidade adaptados da metodologia Mario Beni, sendo 6 compartilhados com diagnósticos territoriais (NPS, Reviews Online, Horas de Treinamento, % Funcionários Locais, % Compras Locais e Certificações Ambientais).',
     category: 'enterprise',
   },
   {
-    question: 'Quais indicadores estão disponíveis no Enterprise?',
-    answer: 'O Enterprise inclui indicadores em 7 categorias: Performance Financeira (RevPAR, ADR, GOP Margin), Experiência do Hóspede (NPS, Reviews Online), Operações (Taxa de Ocupação), Sustentabilidade (Consumo de Água/Energia, Certificações), RH (Turnover, Horas de Treinamento), e Impacto Local (% Funcionários Locais, % Compras Locais). 6 destes indicadores também são usados em diagnósticos territoriais.',
+    question: 'Quais indicadores estão disponíveis no Empresarial?',
+    answer: 'O Empresarial inclui indicadores em 7 categorias: Performance Financeira (RevPAR, ADR, GOP Margin), Experiência do Hóspede (NPS, Reviews Online), Operações (Taxa de Ocupação), Sustentabilidade (Consumo de Água/Energia, Certificações), RH (Turnover, Horas de Treinamento), e Impacto Local (% Funcionários Locais, % Compras Locais). 6 destes indicadores também são usados em diagnósticos territoriais.',
     category: 'enterprise',
   },
   {
-    question: 'Como ativo o acesso Enterprise para minha organização?',
-    answer: 'O acesso Enterprise é habilitado por administradores nas Configurações > Organizações. Selecione a organização, marque o tipo como "Privada" e ative o toggle "Acesso Enterprise". Isso libera os indicadores e fluxos específicos para hospitalidade.',
+    question: 'Como ativo o acesso Empresarial para minha organização?',
+    answer: 'O acesso Empresarial é habilitado por administradores nas Configurações > Organizações. Selecione a organização, marque o tipo como "Privada" e ative o toggle "Acesso Empresarial". Isso libera os indicadores e fluxos específicos para hospitalidade.',
     category: 'enterprise',
   },
   {
-    question: 'Os indicadores Enterprise seguem a mesma metodologia Beni?',
-    answer: 'Sim! Os 22 indicadores Enterprise foram mapeados para os três pilares (RA, OE, AO) da teoria sistêmica de Mario Beni. Indicadores de sustentabilidade pertencem ao RA, infraestrutura ao OE, e operações ao AO. As mesmas 6 regras IGMA são aplicadas, e 6 indicadores (NPS, Reviews, Treinamento, Emprego Local, Compras Locais, Certificações) são compartilhados entre módulos.',
+    question: 'Os indicadores Empresarial seguem a mesma metodologia Beni?',
+    answer: 'Sim! Os 22 indicadores Empresarial foram mapeados para os três pilares (RA, OE, AO) da teoria sistêmica de Mario Beni. Indicadores de sustentabilidade pertencem ao RA, infraestrutura ao OE, e operações ao AO. As mesmas 6 regras IGMA são aplicadas, e 6 indicadores (NPS, Reviews, Treinamento, Emprego Local, Compras Locais, Certificações) são compartilhados entre módulos.',
     category: 'enterprise',
   },
   {
@@ -208,8 +208,8 @@ export const faqItems: FAQItem[] = [
     category: 'enterprise',
   },
   {
-    question: 'Posso usar SISTUR ERP e Enterprise na mesma organização?',
-    answer: 'Uma organização privada com Enterprise habilitado pode usar tanto os indicadores territoriais padrão (quando aplicável) quanto os indicadores específicos de hospitalidade. Os 6 indicadores compartilhados facilitam a integração entre diagnósticos territoriais e empresariais. Organizações públicas não têm acesso ao módulo Enterprise.',
+    question: 'Posso usar SISTUR ERP e Empresarial na mesma organização?',
+    answer: 'Uma organização privada com Empresarial habilitado pode usar tanto os indicadores territoriais padrão (quando aplicável) quanto os indicadores específicos de hospitalidade. Os 6 indicadores compartilhados facilitam a integração entre diagnósticos territoriais e empresariais. Organizações públicas não têm acesso ao módulo Empresarial.',
     category: 'enterprise',
   },
 
@@ -325,7 +325,7 @@ export default function FAQ() {
     <>
     <Helmet>
       <title>FAQ — Perguntas Frequentes | SISTUR</title>
-      <meta name="description" content="Tire dúvidas sobre o SISTUR: pilares RA/OE/AO, Motor IGMA, trilhas EDU, certificados, indicadores territoriais e Enterprise." />
+      <meta name="description" content="Tire dúvidas sobre o SISTUR: pilares RA/OE/AO, Motor IGMA, trilhas EDU, certificados, indicadores territoriais e Empresarial." />
       <link rel="canonical" href="https://sistur.lovable.app/faq" />
       <meta property="og:title" content="FAQ — Perguntas Frequentes | SISTUR" />
       <meta property="og:description" content="Respostas oficiais sobre diagnósticos territoriais, Motor IGMA e capacitação no SISTUR." />
@@ -386,7 +386,7 @@ export default function FAQ() {
                 {showEnterpriseTab && (
                   <TabsTrigger value="enterprise" className="flex items-center gap-2">
                     <Hotel className="h-4 w-4" />
-                    Enterprise
+                    Empresarial
                     <Badge variant="secondary" className="ml-1">{enterpriseItems.length}</Badge>
                   </TabsTrigger>
                 )}

@@ -57,7 +57,7 @@ const PLAN_CONFIG: Record<LicensePlan, { label: string; color: string; icon: str
   professor: { label: 'Professor', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30', icon: '📖' },
   basic: { label: 'Básico', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: '📦' },
   pro: { label: 'Pro', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', icon: '⭐' },
-  enterprise: { label: 'Enterprise', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', icon: '👑' },
+  enterprise: { label: 'Empresarial', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', icon: '👑' },
 };
 
 const STATUS_CONFIG: Record<LicenseStatus, { label: string; color: string }> = {

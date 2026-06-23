@@ -49,10 +49,10 @@ const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.R
     icon: <Building2 className="h-6 w-6 text-emerald-400" />,
     highlight: true,
     features: [
-      'Diagnóstico Enterprise (hotéis/resorts)',
+      'Diagnóstico Empresarial (hotéis/resorts)',
       'Indicadores de hospitalidade (ENT_*)',
       'Plataforma EDU',
-      'Relatórios Enterprise',
+      'Relatórios Empresarial',
       'Certificados personalizados',
       'Suporte prioritário',
       'Até 10 usuários',
@@ -64,7 +64,7 @@ const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.R
     price: 'Sob consulta',
     icon: <Zap className="h-6 w-6 text-purple-400" />,
     features: [
-      'Acesso completo Territorial + Enterprise',
+      'Acesso completo Territorial + Empresarial',
       'Diagnósticos RA/OE/AO',
       'Integrações (IBGE, APIs)',
       'Usuários ilimitados',
@@ -442,7 +442,7 @@ export default function Subscription() {
                       Plano atual
                     </Button>
                   ) : p.plan === 'enterprise' ? (
-                    <Button variant="outline" className="w-full gap-2" onClick={() => window.location.href = 'mailto:contato@sistur.com.br?subject=Plano Enterprise'}>
+                    <Button variant="outline" className="w-full gap-2" onClick={() => window.location.href = 'mailto:contato@sistur.com.br?subject=Plano Empresarial'}>
                       <Mail className="h-4 w-4" /> Falar com vendas
                     </Button>
                   ) : (

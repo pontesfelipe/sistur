@@ -87,7 +87,7 @@ export function ReportContextPanel() {
       .insert({
         org_id: orgId,
         scope,
-        name: `Contexto ${scope === "territorial" ? "Territorial" : "Enterprise"} — ${orgs.find(o => o.id === orgId)?.name ?? "Global"}`,
+        name: `Contexto ${scope === "territorial" ? "Territorial" : "Empresarial"} — ${orgs.find(o => o.id === orgId)?.name ?? "Global"}`,
         description: "Contexto editorial específico desta organização.",
         context: base?.context ?? "Persona: ...\nAudiência: ...\nTom: ...\nFoco: ...\nRestrições: ...",
         active: true,
@@ -180,7 +180,7 @@ export function ReportContextPanel() {
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="territorial">Territorial</SelectItem>
-                      <SelectItem value="enterprise">Enterprise</SelectItem>
+                      <SelectItem value="enterprise">Empresarial</SelectItem>
                       <SelectItem value="both">Ambos</SelectItem>
                     </SelectContent>
                   </Select>
@@ -270,7 +270,7 @@ function CreateContextRow({
           <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="territorial">Territorial</SelectItem>
-            <SelectItem value="enterprise">Enterprise</SelectItem>
+            <SelectItem value="enterprise">Empresarial</SelectItem>
           </SelectContent>
         </Select>
       </div>

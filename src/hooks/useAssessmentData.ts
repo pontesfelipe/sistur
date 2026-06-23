@@ -48,7 +48,7 @@ export function useIndicatorScores(assessmentId: string | undefined, diagnosticT
     queryFn: async () => {
       if (!assessmentId) return [];
 
-      // Unified indicator catalog: both Territorial and Enterprise scores are persisted in `indicator_scores`
+      // Unified indicator catalog: both Territorial and Empresarial scores are persisted in `indicator_scores`
       // with indicator metadata coming from `indicators`.
       const { data, error } = await supabase
         .from('indicator_scores')
@@ -65,7 +65,7 @@ export function useIndicatorScores(assessmentId: string | undefined, diagnosticT
   });
 }
 
-// Enterprise-specific indicator values hook
+// Empresarial-specific indicator values hook
 export function useEnterpriseIndicatorValuesForAssessment(assessmentId: string | undefined) {
   return useQuery({
     queryKey: ['enterprise-indicator-values-assessment', assessmentId],
@@ -99,7 +99,7 @@ export function useEnterpriseIndicatorValuesForAssessment(assessmentId: string |
         value_raw: v.value, // Map to common interface
         indicator: indicatorMap.get(v.indicator_id) ? {
           ...indicatorMap.get(v.indicator_id),
-          theme: (indicatorMap.get(v.indicator_id) as any)?.category?.name || 'Enterprise',
+          theme: (indicatorMap.get(v.indicator_id) as any)?.category?.name || 'Empresarial',
           direction: 'HIGH_IS_BETTER' as const,
           normalization: 'MIN_MAX' as const,
           min_ref: indicatorMap.get(v.indicator_id)?.benchmark_min,

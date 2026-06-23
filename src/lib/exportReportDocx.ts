@@ -241,7 +241,7 @@ function buildCoverPage(
     ? 'RELATÓRIO ENTERPRISE — DIAGNÓSTICO OPERACIONAL & ESTRATÉGICO'
     : 'RELATÓRIO DE DIAGNÓSTICO SISTUR';
   const natureText = isEnterprise
-    ? 'Relatório técnico-estratégico de diagnóstico de empreendimento turístico gerado pelo Sistema SISTUR, com base nos pilares I-RA, I-OE e I-AO da metodologia de Mario Carlos Beni e em indicadores operacionais (PMS, reputação online, posicionamento competitivo e ESG). Concorrentes são tratados de forma anonimizada (Concorrente A/B/C), conforme regras semânticas Enterprise.'
+    ? 'Relatório técnico-estratégico de diagnóstico de empreendimento turístico gerado pelo Sistema SISTUR, com base nos pilares I-RA, I-OE e I-AO da metodologia de Mario Carlos Beni e em indicadores operacionais (PMS, reputação online, posicionamento competitivo e ESG). Concorrentes são tratados de forma anonimizada (Concorrente A/B/C), conforme regras semânticas Empresarial.'
     : 'Relatório técnico de diagnóstico territorial gerado pelo Sistema SISTUR conforme metodologia de Mario Carlos Beni, seguindo padrões MEC/ABNT.';
 
   return [

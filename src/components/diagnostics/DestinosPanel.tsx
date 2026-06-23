@@ -169,7 +169,7 @@ export function DestinosPanel() {
                   {hasEnterpriseProfile(destination.id) && (
                     <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
                       <Hotel className="h-3 w-3 mr-1" />
-                      Enterprise
+                      Empresarial
                     </Badge>
                   )}
                   <DropdownMenu>
@@ -196,7 +196,7 @@ export function DestinosPanel() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => setEnterpriseProfileDestination(destination)}>
                             <Hotel className="mr-2 h-4 w-4 text-amber-600" />
-                            Perfil Enterprise
+                            Perfil Empresarial
                           </DropdownMenuItem>
                         </>
                       )}
@@ -289,7 +289,7 @@ export function DestinosPanel() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Enterprise Profile Dialog */}
+      {/* Empresarial Profile Dialog */}
       <Dialog 
         open={!!enterpriseProfileDestination} 
         onOpenChange={(open) => !open && setEnterpriseProfileDestination(null)}

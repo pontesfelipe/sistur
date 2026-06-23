@@ -306,7 +306,7 @@ export function NovaRodadaForm({
                       <Hotel className="h-6 w-6 text-amber-600" />
                     </div>
                     <div className="flex items-center gap-2 justify-center">
-                      <p className="font-medium">Enterprise</p>
+                      <p className="font-medium">Empresarial</p>
                       <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs">
                         <Sparkles className="h-2.5 w-2.5 mr-0.5" />
                         PRO
@@ -317,7 +317,7 @@ export function NovaRodadaForm({
                     </p>
                     {!hasEnterpriseAccess && (
                       <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                        Requer acesso Enterprise habilitado
+                        Requer acesso Empresarial habilitado
                       </p>
                     )}
                   </Label>

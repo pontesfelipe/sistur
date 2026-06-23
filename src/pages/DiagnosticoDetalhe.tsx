@@ -261,7 +261,7 @@ const DiagnosticoDetalhe = () => {
   
   // Use appropriate indicator values based on diagnostic type
   const { values: territorialIndicatorValues = [] } = useIndicatorValues(id);
-  // Enterprise values are stored in the unified `indicator_values` table as well.
+  // Empresarial values are stored in the unified `indicator_values` table as well.
   const indicatorValues = territorialIndicatorValues;
 
   // --- Ignored indicators filtering ---
@@ -1043,7 +1043,7 @@ const DiagnosticoDetalhe = () => {
               />
             )}
 
-            {/* Fase 11.1 — Alertas de regressão Enterprise (também útil em Territorial) */}
+            {/* Fase 11.1 — Alertas de regressão Empresarial (também útil em Territorial) */}
             {assessment.destination_id && (
               <EnterpriseRegressionAlerts
                 destinationId={assessment.destination_id}
@@ -1053,7 +1053,7 @@ const DiagnosticoDetalhe = () => {
               />
             )}
 
-            {/* Fase 11.2 — Benchmark intra-organização (Enterprise apenas) */}
+            {/* Fase 11.2 — Benchmark intra-organização (Empresarial apenas) */}
             {isEnterprise && assessment.destination_id && (
               <EnterpriseOrgBenchmark
                 orgId={orgId}
@@ -1062,13 +1062,13 @@ const DiagnosticoDetalhe = () => {
               />
             )}
 
-            {/* Fase 12.2 — Benchmark setorial anônimo (Enterprise apenas) */}
+            {/* Fase 12.2 — Benchmark setorial anônimo (Empresarial apenas) */}
             {isEnterprise && assessment.destination_id && (
               <EnterpriseSectorBenchmark currentDestinationId={assessment.destination_id} />
             )}
           </TabsContent>
 
-          {/* Categorias Enterprise Tab - Only for enterprise diagnostics */}
+          {/* Categorias Empresarial Tab - Only for enterprise diagnostics */}
           {isEnterprise && (
             <TabsContent value="categorias" className="space-y-6">
               <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-xl border border-amber-500/20 p-6 mb-4">
@@ -1078,7 +1078,7 @@ const DiagnosticoDetalhe = () => {
                   </div>
                   <div>
                     <h3 className="font-display font-semibold text-foreground">
-                      Categorias Enterprise
+                      Categorias Empresarial
                     </h3>
                     <p className="text-sm text-muted-foreground">
                       Visão consolidada por categorias: Performance, Sustentabilidade, Governança e mais
