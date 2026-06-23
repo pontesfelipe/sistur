@@ -2650,7 +2650,7 @@ serve(async (req) => {
   // Modo síncrono (somente para testes internos)
   if (body.sync === true) {
     try {
-      const result = await runCalculationCore(supabase as any, userId, assessment_id);
+      const result = await runCalculation(supabase as any, userId, assessment_id);
       return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -2708,7 +2708,7 @@ serve(async (req) => {
       .eq("id", jobId);
 
     try {
-      const result = await runCalculationCore(supabase as any, userId, assessment_id);
+      const result = await runCalculation(supabase as any, userId, assessment_id);
       await supabase
         .from("assessment_calc_jobs")
         .update({
