@@ -153,6 +153,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const [healthData, setHealthData] = useState<Record<string, any> | null>(null);
   const [healthAutoFilled, setHealthAutoFilled] = useState(false);
 
+  // Nome do empreendimento — fonte única alimentada pelo bloco Reviews e
+  // propagada para todos os demais blocos que dependem da identidade do
+  // estabelecimento (presença digital, reclamações, sustentabilidade, preço,
+  // marca, demanda, reputação OTAs, redes sociais e concorrentes).
+  const [enterpriseName, setEnterpriseName] = useState<string>('');
+  const businessQuery = (enterpriseName || '').trim();
+  const hasBusinessName = businessQuery.length > 0;
+
   // "Rodar todos": orquestra os blocos auto registrados via useAutoFillRunner
   const [runAllLoading, setRunAllLoading] = useState(false);
   const [runAllProgress, setRunAllProgress] = useState<{ id: string; index: number; total: number } | null>(null);
