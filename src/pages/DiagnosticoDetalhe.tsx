@@ -242,6 +242,7 @@ const DiagnosticoDetalhe = () => {
   const isEnterprise = diagnosticType === 'enterprise';
   
   const { data: pillarScores = [], refetch: refetchPillarScores } = usePillarScores(id);
+  const { data: brandRollup } = useBrandRollup(id);
   const { data: rawIndicatorScores = [], refetch: refetchIndicatorScores } = useIndicatorScores(id, diagnosticType);
   const { data: rawIssues = [], refetch: refetchIssues } = useIssues(id);
   const { data: rawRecommendations = [], refetch: refetchRecommendations } = useRecommendations(id);
