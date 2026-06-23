@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target, User, Eye, Building2, Monitor, Landmark, Hotel, Flower2 } from 'lucide-react';
+import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target, User, Eye, Building2, Monitor, Landmark, Hotel, Flower2, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Assessment } from '@/types/sistur';
 import { Badge } from '@/components/ui/badge';
@@ -55,6 +55,15 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
       month: 'short',
       year: 'numeric',
     });
+  };
+
+  const formatShortDate = (dateString?: string) => {
+    if (!dateString) return '';
+    const d = new Date(dateString);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = String(d.getFullYear()).slice(-2);
+    return `${day}/${month}/${year}`;
   };
 
   const tier = (assessment as any).tier || 'COMPLETE';
@@ -168,6 +177,15 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
           </span>
         </div>
       )}
+
+      <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+        <Clock className="h-4 w-4" />
+        <span>
+          {assessment.status === 'CALCULATED'
+            ? `Rodado em ${formatShortDate(assessment.calculated_at)}`
+            : `Criado em ${formatShortDate(assessment.created_at)}`}
+        </span>
+      </div>
 
       {(assessment.period_start || assessment.period_end) && (
         <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
