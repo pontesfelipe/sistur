@@ -728,6 +728,25 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardContent>
       </Card>
 
+      {!hasBusinessName && (
+        <div className="rounded-lg border border-amber-500/40 bg-amber-50/60 dark:bg-amber-950/20 px-4 py-3 text-sm text-amber-900 dark:text-amber-200">
+          <div className="font-medium flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" />
+            Informe o nome do empreendimento abaixo (bloco Reviews) antes de rodar os blocos automáticos.
+          </div>
+          <p className="text-xs mt-1 opacity-90">
+            Os blocos da seção <strong>Sobre o Empreendimento</strong> dependem do nome digitado nesse campo. Sem ele, as buscas voltarão como "sem dados" ou trarão informações do município no lugar do hotel.
+          </p>
+        </div>
+      )}
+
+      {/* === SECTION: 🏨 Sobre o Empreendimento === */}
+      <div className="pt-4 pb-1">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          🏨 Sobre o Empreendimento
+        </h3>
+        <p className="text-xs text-muted-foreground">Buscas focadas no estabelecimento — usam o nome do hotel/pousada digitado no bloco Reviews.</p>
+      </div>
       {/* 1) Pré-preenchimento Automático via IA (ACIMA do perfil) */}
       <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
         <CardHeader>
@@ -766,7 +785,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           />
         </CardContent>
       </Card>
-
       {/* 1.5) Presença Digital Automática */}
       <Card className="border-blue-500/30 bg-gradient-to-br from-blue-50/50 to-cyan-50/30 dark:from-blue-950/20 dark:to-cyan-950/10">
         <CardHeader>
@@ -803,63 +821,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           />
         </CardContent>
       </Card>
-
-      {/* 1.6) Contexto & Conectividade do Destino */}
-      <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-50/50 to-teal-50/30 dark:from-emerald-950/20 dark:to-teal-950/10">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-emerald-500/10">
-              <Search className="h-5 w-5 text-emerald-600" />
-            </div>
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Contexto & Conectividade do Destino
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
-              </CardTitle>
-              <CardDescription>ANAC, ANATEL, eventos, Mapa do Turismo e contexto socioeconômico do município</CardDescription>
-            </div>
-            {contextAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
-              </Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <DestinationContextSearch
-            destinationId={destinationId}
-            onAutoFill={handleContextAutoFill}
-            onAnalysisCapture={handleContextCapture}
-          />
-        </CardContent>
-      </Card>
-
-      {/* 1.7) Validação CNPJ */}
-      <Card className="border-purple-500/30 bg-gradient-to-br from-purple-50/50 to-fuchsia-50/30 dark:from-purple-950/20 dark:to-fuchsia-950/10">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-purple-500/10">
-              <Building2 className="h-5 w-5 text-purple-600" />
-            </div>
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Validação CNPJ & Dados Cadastrais
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
-              </CardTitle>
-              <CardDescription>Receita Federal: razão social, CNAE, situação cadastral e anos de operação</CardDescription>
-            </div>
-            {cnpjData && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />Validado
-              </Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <CnpjValidationSearch initialCnpj={cnpjValue} onValidated={handleCnpjValidated} />
-        </CardContent>
-      </Card>
-
       {/* 1.8) Reclamações Públicas */}
       <Card className="border-rose-500/30 bg-gradient-to-br from-rose-50/50 to-orange-50/30 dark:from-rose-950/20 dark:to-orange-950/10">
         <CardHeader>
@@ -890,7 +851,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           />
         </CardContent>
       </Card>
-
       {/* 1.9) Concorrentes Automáticos */}
       <Card className="border-indigo-500/30 bg-gradient-to-br from-indigo-50/50 to-blue-50/30 dark:from-indigo-950/20 dark:to-blue-950/10">
         <CardHeader>
@@ -923,8 +883,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         </CardContent>
       </Card>
 
-      {/* 2) Perfil do Empreendimento (ABAIXO do pré-preenchimento) */}
-      {/* 1.10) Sustentabilidade & ESG */}
+      {/* 2) Perfil do Empreendimento (ABAIXO do pré-preenchimento) */}      {/* 1.10) Sustentabilidade & ESG */}
       <Card className="border-green-500/30 bg-gradient-to-br from-green-50/50 to-emerald-50/30 dark:from-green-950/20 dark:to-emerald-950/10">
         <CardHeader>
           <div className="flex items-center gap-3">
@@ -954,7 +913,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           />
         </CardContent>
       </Card>
-
       {/* 1.11) Posicionamento de Preço */}
       <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-50/50 to-amber-50/30 dark:from-yellow-950/20 dark:to-amber-950/10">
         <CardHeader>
@@ -985,7 +943,158 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           />
         </CardContent>
       </Card>
-
+      {/* 1.16) Força da Marca */}
+      <Card className="border-pink-500/30 bg-gradient-to-br from-pink-50/50 to-fuchsia-50/30 dark:from-pink-950/20 dark:to-fuchsia-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-pink-500/10"><Sparkles className="h-5 w-5 text-pink-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Força da Marca
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Visibilidade orgânica: resultados de busca, autoridade de domínios, mídia e OTAs</CardDescription>
+            </div>
+            {brandAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <BrandStrengthSearch businessName={businessQuery} location={destinationName} onAutoFill={handleBrandAutoFill} onAnalysisCapture={handleBrandCapture} />
+        </CardContent>
+      </Card>
+      {/* 1.17) Demanda & Tendências */}
+      <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-sky-50/30 dark:from-cyan-950/20 dark:to-sky-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-cyan-500/10"><Sparkles className="h-5 w-5 text-cyan-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Demanda & Tendências
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Volume orgânico, sinais transacionais em OTAs, distribuição mensal e picos de interesse</CardDescription>
+            </div>
+            {demandAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <DemandTrendsSearch businessName={businessQuery} location={destinationName} onAutoFill={handleDemandAutoFill} onAnalysisCapture={handleDemandCapture} />
+        </CardContent>
+      </Card>
+      {/* 1.18) Reputação Consolidada Multi-OTA */}
+      <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-50/50 to-amber-50/30 dark:from-yellow-950/20 dark:to-amber-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-yellow-500/10"><Sparkles className="h-5 w-5 text-yellow-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Reputação Consolidada
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Nota agregada de Booking, Google, TripAdvisor, Airbnb e demais OTAs em escala 0-10</CardDescription>
+            </div>
+            {reputationAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ConsolidatedReputationSearch businessName={businessQuery} location={destinationName} onAutoFill={handleReputationAutoFill} onAnalysisCapture={handleReputationCapture} />
+        </CardContent>
+      </Card>
+      {/* 1.19) Presença em Redes Sociais */}
+      <Card className="border-fuchsia-500/30 bg-gradient-to-br from-fuchsia-50/50 to-pink-50/30 dark:from-fuchsia-950/20 dark:to-pink-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-fuchsia-500/10"><Sparkles className="h-5 w-5 text-fuchsia-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Presença em Redes Sociais
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Instagram, Facebook, TikTok, YouTube e LinkedIn: perfis ativos e base estimada de seguidores</CardDescription>
+            </div>
+            {socialAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <SocialMediaSearch businessName={businessQuery} location={destinationName} onAutoFill={handleSocialAutoFill} onAnalysisCapture={handleSocialCapture} />
+        </CardContent>
+      </Card>
+      {/* === SECTION: 📄 Cadastro Legal === */}
+      <div className="pt-4 pb-1">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          📄 Cadastro Legal
+        </h3>
+        <p className="text-xs text-muted-foreground">Dados oficiais da pessoa jurídica do empreendimento.</p>
+      </div>
+      {/* 1.7) Validação CNPJ */}
+      <Card className="border-purple-500/30 bg-gradient-to-br from-purple-50/50 to-fuchsia-50/30 dark:from-purple-950/20 dark:to-fuchsia-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-500/10">
+              <Building2 className="h-5 w-5 text-purple-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Validação CNPJ & Dados Cadastrais
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Receita Federal: razão social, CNAE, situação cadastral e anos de operação</CardDescription>
+            </div>
+            {cnpjData && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Validado
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <CnpjValidationSearch initialCnpj={cnpjValue} onValidated={handleCnpjValidated} />
+        </CardContent>
+      </Card>
+      {/* === SECTION: 🌎 Sobre o Município / Destino === */}
+      <div className="pt-4 pb-1">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          🌎 Sobre o Município / Destino
+        </h3>
+        <p className="text-xs text-muted-foreground">Indicadores do contexto territorial onde o empreendimento opera (independe do nome do hotel).</p>
+      </div>
+      {/* 1.6) Contexto & Conectividade do Destino */}
+      <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-50/50 to-teal-50/30 dark:from-emerald-950/20 dark:to-teal-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-emerald-500/10">
+              <Search className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Contexto & Conectividade do Destino
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>ANAC, ANATEL, eventos, Mapa do Turismo e contexto socioeconômico do município</CardDescription>
+            </div>
+            {contextAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <DestinationContextSearch
+            destinationId={destinationId}
+            onAutoFill={handleContextAutoFill}
+            onAnalysisCapture={handleContextCapture}
+          />
+        </CardContent>
+      </Card>
       {/* 1.12) Eventos & Sazonalidade Local */}
       <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-sky-50/30 dark:from-cyan-950/20 dark:to-sky-950/10">
         <CardHeader>
@@ -1016,7 +1125,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           />
         </CardContent>
       </Card>
-
       {/* 1.13) Segurança Turística */}
       <Card className="border-red-500/30 bg-gradient-to-br from-red-50/50 to-rose-50/30 dark:from-red-950/20 dark:to-rose-950/10">
         <CardHeader>
@@ -1046,7 +1154,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           />
         </CardContent>
       </Card>
-
       {/* 1.14) Conforto Climático */}
       <Card className="border-sky-500/30 bg-gradient-to-br from-sky-50/50 to-blue-50/30 dark:from-sky-950/20 dark:to-blue-950/10">
         <CardHeader>
@@ -1068,7 +1175,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           <ClimateComfortSearch destinationId={destinationId} onAutoFill={handleClimateAutoFill} onAnalysisCapture={handleClimateCapture} />
         </CardContent>
       </Card>
-
       {/* 1.15) Transporte Intra-Destino */}
       <Card className="border-orange-500/30 bg-gradient-to-br from-orange-50/50 to-amber-50/30 dark:from-orange-950/20 dark:to-amber-950/10">
         <CardHeader>
@@ -1090,95 +1196,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           <LocalTransportSearch destinationName={destinationName} onAutoFill={handleTransportAutoFill} onAnalysisCapture={handleTransportCapture} />
         </CardContent>
       </Card>
-
-      {/* 1.16) Força da Marca */}
-      <Card className="border-pink-500/30 bg-gradient-to-br from-pink-50/50 to-fuchsia-50/30 dark:from-pink-950/20 dark:to-fuchsia-950/10">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-pink-500/10"><Sparkles className="h-5 w-5 text-pink-600" /></div>
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Força da Marca
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
-              </CardTitle>
-              <CardDescription>Visibilidade orgânica: resultados de busca, autoridade de domínios, mídia e OTAs</CardDescription>
-            </div>
-            {brandAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <BrandStrengthSearch businessName={businessQuery} location={destinationName} onAutoFill={handleBrandAutoFill} onAnalysisCapture={handleBrandCapture} />
-        </CardContent>
-      </Card>
-
-      {/* 1.17) Demanda & Tendências */}
-      <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-sky-50/30 dark:from-cyan-950/20 dark:to-sky-950/10">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-cyan-500/10"><Sparkles className="h-5 w-5 text-cyan-600" /></div>
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Demanda & Tendências
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
-              </CardTitle>
-              <CardDescription>Volume orgânico, sinais transacionais em OTAs, distribuição mensal e picos de interesse</CardDescription>
-            </div>
-            {demandAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <DemandTrendsSearch businessName={businessQuery} location={destinationName} onAutoFill={handleDemandAutoFill} onAnalysisCapture={handleDemandCapture} />
-        </CardContent>
-      </Card>
-
-      {/* 1.18) Reputação Consolidada Multi-OTA */}
-      <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-50/50 to-amber-50/30 dark:from-yellow-950/20 dark:to-amber-950/10">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-yellow-500/10"><Sparkles className="h-5 w-5 text-yellow-600" /></div>
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Reputação Consolidada
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
-              </CardTitle>
-              <CardDescription>Nota agregada de Booking, Google, TripAdvisor, Airbnb e demais OTAs em escala 0-10</CardDescription>
-            </div>
-            {reputationAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <ConsolidatedReputationSearch businessName={businessQuery} location={destinationName} onAutoFill={handleReputationAutoFill} onAnalysisCapture={handleReputationCapture} />
-        </CardContent>
-      </Card>
-
-      {/* 1.19) Presença em Redes Sociais */}
-      <Card className="border-fuchsia-500/30 bg-gradient-to-br from-fuchsia-50/50 to-pink-50/30 dark:from-fuchsia-950/20 dark:to-pink-950/10">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-fuchsia-500/10"><Sparkles className="h-5 w-5 text-fuchsia-600" /></div>
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Presença em Redes Sociais
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
-              </CardTitle>
-              <CardDescription>Instagram, Facebook, TikTok, YouTube e LinkedIn: perfis ativos e base estimada de seguidores</CardDescription>
-            </div>
-            {socialAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <SocialMediaSearch businessName={businessQuery} location={destinationName} onAutoFill={handleSocialAutoFill} onAnalysisCapture={handleSocialCapture} />
-        </CardContent>
-      </Card>
-
       {/* 1.20) Conectividade Aérea (ANAC) */}
       <Card className="border-sky-500/30 bg-gradient-to-br from-sky-50/50 to-indigo-50/30 dark:from-sky-950/20 dark:to-indigo-950/10">
         <CardHeader>
@@ -1200,7 +1217,75 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           <AirConnectivitySearch destinationId={destinationId} onAutoFill={handleAirConnAutoFill} onAnalysisCapture={handleAirConnCapture} />
         </CardContent>
       </Card>
-
+      {/* 1.22) Conectividade Telecom (Anatel) */}
+      <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-blue-50/30 dark:from-cyan-950/20 dark:to-blue-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-cyan-500/10"><Sparkles className="h-5 w-5 text-cyan-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Conectividade Telecom
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Anatel — cobertura 4G, 5G e Wi-Fi público do município (afeta PMS cloud, OTA mobile e check-in digital)</CardDescription>
+            </div>
+            {telecomAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <TelecomCoverageSearch destinationId={destinationId} onAutoFill={handleTelecomAutoFill} onAnalysisCapture={handleTelecomCapture} />
+        </CardContent>
+      </Card>
+      {/* 1.23) Acessibilidade Urbana */}
+      <Card className="border-indigo-500/30 bg-gradient-to-br from-indigo-50/50 to-violet-50/30 dark:from-indigo-950/20 dark:to-violet-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-indigo-500/10"><Sparkles className="h-5 w-5 text-indigo-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Acessibilidade Urbana
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>Pesquisa web por evidências de calçadas, rampas, sinalização tátil, transporte acessível e atrativos PCD no município</CardDescription>
+            </div>
+            {accessibilityAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <UrbanAccessibilitySearch destinationId={destinationId} onAutoFill={handleAccessibilityAutoFill} onAnalysisCapture={handleAccessibilityCapture} />
+        </CardContent>
+      </Card>
+      {/* 1.24) Infraestrutura de Saúde do Entorno (DATASUS) */}
+      <Card className="border-rose-500/30 bg-gradient-to-br from-rose-50/50 to-pink-50/30 dark:from-rose-950/20 dark:to-pink-950/10">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-rose-500/10"><Sparkles className="h-5 w-5 text-rose-600" /></div>
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Infraestrutura de Saúde do Entorno
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+              </CardTitle>
+              <CardDescription>DATASUS/CNES — hospitais, leitos, pronto-socorro 24h e densidade por 1k habitantes do município</CardDescription>
+            </div>
+            {healthAutoFilled && (
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <HealthInfrastructureSearch destinationId={destinationId} onAutoFill={handleHealthAutoFill} onAnalysisCapture={handleHealthCapture} />
+        </CardContent>
+      </Card>      {/* === SECTION: 🔄 Indicadores Derivados === */}
+      <div className="pt-4 pb-1">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          🔄 Indicadores Derivados
+        </h3>
+        <p className="text-xs text-muted-foreground">Calculados automaticamente a partir dos blocos acima.</p>
+      </div>
       {/* 1.21) Sazonalidade Tarifária (derivada) */}
       <Card className="border-violet-500/30 bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:from-violet-950/20 dark:to-purple-950/10">
         <CardHeader>
@@ -1226,72 +1311,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             onAutoFill={handleTariffSeasonalityAutoFill}
             onAnalysisCapture={handleTariffSeasonalityCapture}
           />
-        </CardContent>
-      </Card>
-
-      {/* 1.22) Conectividade Telecom (Anatel) */}
-      <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-50/50 to-blue-50/30 dark:from-cyan-950/20 dark:to-blue-950/10">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-cyan-500/10"><Sparkles className="h-5 w-5 text-cyan-600" /></div>
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Conectividade Telecom
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
-              </CardTitle>
-              <CardDescription>Anatel — cobertura 4G, 5G e Wi-Fi público do município (afeta PMS cloud, OTA mobile e check-in digital)</CardDescription>
-            </div>
-            {telecomAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <TelecomCoverageSearch destinationId={destinationId} onAutoFill={handleTelecomAutoFill} onAnalysisCapture={handleTelecomCapture} />
-        </CardContent>
-      </Card>
-
-      {/* 1.23) Acessibilidade Urbana */}
-      <Card className="border-indigo-500/30 bg-gradient-to-br from-indigo-50/50 to-violet-50/30 dark:from-indigo-950/20 dark:to-violet-950/10">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-indigo-500/10"><Sparkles className="h-5 w-5 text-indigo-600" /></div>
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Acessibilidade Urbana
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
-              </CardTitle>
-              <CardDescription>Pesquisa web por evidências de calçadas, rampas, sinalização tátil, transporte acessível e atrativos PCD no município</CardDescription>
-            </div>
-            {accessibilityAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <UrbanAccessibilitySearch destinationId={destinationId} onAutoFill={handleAccessibilityAutoFill} onAnalysisCapture={handleAccessibilityCapture} />
-        </CardContent>
-      </Card>
-
-      {/* 1.24) Infraestrutura de Saúde do Entorno (DATASUS) */}
-      <Card className="border-rose-500/30 bg-gradient-to-br from-rose-50/50 to-pink-50/30 dark:from-rose-950/20 dark:to-pink-950/10">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-rose-500/10"><Sparkles className="h-5 w-5 text-rose-600" /></div>
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Infraestrutura de Saúde do Entorno
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
-              </CardTitle>
-              <CardDescription>DATASUS/CNES — hospitais, leitos, pronto-socorro 24h e densidade por 1k habitantes do município</CardDescription>
-            </div>
-            {healthAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <HealthInfrastructureSearch destinationId={destinationId} onAutoFill={handleHealthAutoFill} onAnalysisCapture={handleHealthCapture} />
         </CardContent>
       </Card>
 
