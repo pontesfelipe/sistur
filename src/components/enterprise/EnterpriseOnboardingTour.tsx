@@ -39,7 +39,7 @@ const STEPS: Step[] = [
   {
     icon: Play,
     title: 'Passo 2 — Rodar os 21 blocos automáticos',
-    description: 'Clique em "Rodar todos" e o SISTUR coleta dados de Google, Booking, ANAC, Anatel, DATASUS, IBGE e Firecrawl em paralelo.',
+    description: 'Clique em "Rodar todos" e o SISTUR coleta dados de Google, Booking, TripAdvisor, ANAC, Anatel, DATASUS, IBGE e demais fontes públicas em paralelo.',
     bullet: [
       'Toast por bloco com origem (Google, Booking, ANAC…)',
       'Retry individual em caso de falha',
