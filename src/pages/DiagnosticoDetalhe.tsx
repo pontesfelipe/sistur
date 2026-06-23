@@ -715,6 +715,15 @@ const DiagnosticoDetalhe = () => {
                 <Download className="mr-2 h-4 w-4" />
                 Exportar CSV
               </Button>
+              {isEnterprise && (
+                <Button variant="outline" onClick={handleRecoverAutoFill} disabled={recovering}>
+                  {recovering ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Recalculando…</>
+                  ) : (
+                    <><RefreshCw className="mr-2 h-4 w-4" />Recuperar valores automáticos</>
+                  )}
+                </Button>
+              )}
             </>
           )}
         </div>
