@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.1",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial Multi-Unidade (Fase 15.4 — base + wizard) — agora **um único diagnóstico empresarial** pode cobrir várias unidades da mesma marca em municípios diferentes. Modelo: nova tabela `assessment_units` (1 linha por unidade, `is_primary` com índice único parcial), `assessments.brand_id` referenciando `enterprise_brands`, e coluna opcional `unit_id` em `indicator_values` e `enterprise_indicator_values` (com índice único parcial `(assessment_id, indicator_id, unit_id)`) para coletar o mesmo indicador várias vezes no mesmo diagnóstico — uma por unidade — sem quebrar a chave legada `(assessment_id, indicator_id)` que continua válida para `unit_id IS NULL`. Compatibilidade total: assessments antigos seguem como single-unit. Front: novo hook `useAssessmentUnits`, componente `AssessmentUnitsManager` em modo rascunho (combobox de município + nome da unidade + estrela de unidade principal) e Step 2 do wizard agora exibe `BrandSelector` + `AssessmentUnitsManager` quando o tipo é Empresarial; `useAssessments.createAssessment` recebe `brand_id` e `units[]` e materializa as `assessment_units` automaticamente (auto-inclui o destino principal mesmo no fluxo single-unit, para uniformizar o cálculo). Próximos passos: Tabs por unidade no Step 4/5 (pré-preenchimento e entrada manual) e refator do `calculate-enterprise-assessment` para iterar unidades e produzir agregação de marca."
+    ]
+  },
   {
     version: "1.97.0",
     date: "2026-06-23",

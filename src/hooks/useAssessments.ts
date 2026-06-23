@@ -41,6 +41,18 @@ export function useAssessments() {
       tier?: 'COMPLETE' | 'MEDIUM' | 'SMALL';
       diagnostic_type?: 'territorial' | 'enterprise';
       expand_with_mandala?: boolean;
+      brand_id?: string | null;
+      /**
+       * Unidades adicionais para diagnóstico empresarial multi-unidade
+       * (1 marca × N municípios). Cada item gera uma linha em
+       * `assessment_units`. A unidade marcada como `is_primary` deve
+       * coincidir com `destination_id` no `assessments`.
+       */
+      units?: Array<{
+        destination_id: string;
+        unit_name?: string | null;
+        is_primary?: boolean;
+      }>;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
@@ -75,11 +87,40 @@ export function useAssessments() {
           tier: assessment.tier || 'COMPLETE',
           diagnostic_type: assessment.diagnostic_type || 'territorial',
           expand_with_mandala: assessment.expand_with_mandala ?? false,
+          brand_id: assessment.brand_id ?? null,
         })
         .select('*, destinations(name)')
         .single();
 
       if (error) throw error;
+
+      // Cria as unidades do diagnóstico (multi-unit). Sempre inclui a
+      // unidade do destino principal para que o cálculo possa iterar
+      // uniformemente sobre `assessment_units`.
+      const unitRows = (assessment.units && assessment.units.length > 0
+        ? assessment.units
+        : [{ destination_id: assessment.destination_id, is_primary: true }]
+      ).map((u) => ({
+        assessment_id: data.id,
+        destination_id: u.destination_id,
+        unit_name: u.unit_name ?? null,
+        is_primary: !!u.is_primary,
+      }));
+      // Garante exatamente uma unidade primária
+      if (!unitRows.some((u) => u.is_primary)) {
+        const idx = unitRows.findIndex((u) => u.destination_id === assessment.destination_id);
+        if (idx >= 0) unitRows[idx].is_primary = true;
+        else unitRows[0].is_primary = true;
+      }
+      const { error: unitsErr } = await supabase
+        .from('assessment_units')
+        .insert(unitRows);
+      if (unitsErr) {
+        console.error('Error creating assessment_units:', unitsErr);
+        // Não bloqueia a criação do assessment — o fluxo single-unit
+        // continua válido para retrocompatibilidade.
+      }
+
       return data;
     },
     onSuccess: () => {

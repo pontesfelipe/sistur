@@ -437,9 +437,82 @@ export type Database = {
           },
         ]
       }
+      assessment_units: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          destination_id: string
+          enterprise_profile_id: string | null
+          id: string
+          is_primary: boolean
+          status: string
+          unit_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          destination_id: string
+          enterprise_profile_id?: string | null
+          id?: string
+          is_primary?: boolean
+          status?: string
+          unit_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          destination_id?: string
+          enterprise_profile_id?: string | null
+          id?: string
+          is_primary?: boolean
+          status?: string
+          unit_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_units_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_units_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
+            foreignKeyName: "assessment_units_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_units_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
+          {
+            foreignKeyName: "assessment_units_enterprise_profile_id_fkey"
+            columns: ["enterprise_profile_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assessments: {
         Row: {
           algo_version: string
+          brand_id: string | null
           calculated_at: string | null
           created_at: string
           creator_user_id: string | null
@@ -469,6 +542,7 @@ export type Database = {
         }
         Insert: {
           algo_version?: string
+          brand_id?: string | null
           calculated_at?: string | null
           created_at?: string
           creator_user_id?: string | null
@@ -498,6 +572,7 @@ export type Database = {
         }
         Update: {
           algo_version?: string
+          brand_id?: string | null
           calculated_at?: string | null
           created_at?: string
           creator_user_id?: string | null
@@ -526,6 +601,13 @@ export type Database = {
           visibility?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "assessments_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_brands"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "assessments_destination_id_fkey"
             columns: ["destination_id"]
@@ -4297,6 +4379,7 @@ export type Database = {
           org_id: string
           reference_date: string | null
           source: string | null
+          unit_id: string | null
           updated_at: string
           validated: boolean | null
           validated_at: string | null
@@ -4313,6 +4396,7 @@ export type Database = {
           org_id: string
           reference_date?: string | null
           source?: string | null
+          unit_id?: string | null
           updated_at?: string
           validated?: boolean | null
           validated_at?: string | null
@@ -4329,6 +4413,7 @@ export type Database = {
           org_id?: string
           reference_date?: string | null
           source?: string | null
+          unit_id?: string | null
           updated_at?: string
           validated?: boolean | null
           validated_at?: string | null
@@ -4363,6 +4448,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enterprise_indicator_values_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_units"
             referencedColumns: ["id"]
           },
         ]
@@ -6197,6 +6289,7 @@ export type Database = {
           org_id: string
           reference_date: string | null
           source: string | null
+          unit_id: string | null
           value_raw: number | null
           value_text: string | null
         }
@@ -6211,6 +6304,7 @@ export type Database = {
           org_id: string
           reference_date?: string | null
           source?: string | null
+          unit_id?: string | null
           value_raw?: number | null
           value_text?: string | null
         }
@@ -6225,6 +6319,7 @@ export type Database = {
           org_id?: string
           reference_date?: string | null
           source?: string | null
+          unit_id?: string | null
           value_raw?: number | null
           value_text?: string | null
         }
@@ -6255,6 +6350,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_values_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_units"
             referencedColumns: ["id"]
           },
         ]
