@@ -34,6 +34,8 @@ import {
   ChevronsUpDown,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { BrandSelector } from '@/components/enterprise/BrandSelector';
+import { AssessmentUnitsManager, type DraftUnit } from '@/components/enterprise/AssessmentUnitsManager';
 
 function DestinationCombobox({
   destinations,
@@ -167,6 +169,11 @@ interface NovaRodadaFormProps {
   onSelectedDestinationChange: (id: string) => void;
   destinations: any[];
   selectedDestinationData: any;
+  brandId: string | null;
+  brandName: string | null;
+  onBrandChange: (id: string | null, name: string | null) => void;
+  units: DraftUnit[];
+  onUnitsChange: (units: DraftUnit[]) => void;
   assessmentTitle: string;
   onAssessmentTitleChange: (title: string) => void;
   periodStart: string;
