@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.2",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial Multi-Unidade (Fase 15.4 — Fase 3 parcial) — Step 4 (Pré-preenchimento + Perfil) do wizard agora exibe **Tabs por unidade** quando o diagnóstico empresarial cobre múltiplas unidades da mesma marca em municípios diferentes. Cada aba renderiza `EnterpriseProfileStep` isolado por `destination_id`+`assessment_id`, então os 21 blocos automáticos (Reviews, Presença Digital, Reclamações, Sustentabilidade, Preço, Marca, Demanda, Reputação OTAs, Redes Sociais, Concorrentes, IBGE, ANAC, ANATEL, Clima, Segurança, Transporte, Saúde, Acessibilidade etc.) rodam independentemente por unidade — cada hotel da rede usa seu próprio nome e contexto municipal. A unidade principal aparece com estrela; a UF é mostrada como sufixo. Step 5 (Preenchimento manual) ainda agrega para a unidade principal e exibe banner informativo de que a coleta isolada por unidade nesse passo entra na próxima fase, junto com o refator do `calculate-enterprise-assessment` para iterar unidades e produzir agregação de marca."
+    ]
+  },
   {
     version: "1.97.1",
     date: "2026-06-23",

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import {
   ArrowRight,
@@ -10,6 +12,9 @@ import {
   Shield,
   CheckCircle2,
   RefreshCw,
+  Building2,
+  Star,
+  Info,
 } from 'lucide-react';
 import { DataValidationPanel } from '@/components/official-data/DataValidationPanel';
 import { EnterpriseDataEntryPanel } from '@/components/enterprise/EnterpriseDataEntryPanel';
@@ -18,6 +23,7 @@ import { EnterpriseProfileStep } from '@/components/enterprise/EnterpriseProfile
 import { PmsCsvImportPanel } from '@/components/enterprise/PmsCsvImportPanel';
 import { PmsConnectionsPanel } from '@/components/enterprise/PmsConnectionsPanel';
 import { useIndicators } from '@/hooks/useIndicators';
+import { useAssessmentUnits } from '@/hooks/useAssessmentUnits';
 import { supabase } from '@/integrations/supabase/client';
 
 type DiagnosticType = 'territorial' | 'enterprise';
@@ -57,6 +63,33 @@ export function NovaRodadaDialogs({
   resumeAssessment,
 }: NovaRodadaDialogsProps) {
   const [reviewPreFillValues, setReviewPreFillValues] = useState<Record<string, number>>({});
+
+  // Fase 15.4 — Tabs por unidade no Step 4/5 quando o assessment é multi-unidade.
+  const activeAssessmentId = createdAssessmentId ?? resumeAssessmentId ?? null;
+  const { units } = useAssessmentUnits(activeAssessmentId);
+  const isMultiUnit = diagnosticType === 'enterprise' && units.length > 1;
+  const orderedUnits = units; // já vem com primary primeiro
+  const [activeUnitId, setActiveUnitId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isMultiUnit) { setActiveUnitId(null); return; }
+    if (!activeUnitId || !orderedUnits.find((u) => u.id === activeUnitId)) {
+      setActiveUnitId(orderedUnits[0]?.id ?? null);
+    }
+  }, [isMultiUnit, orderedUnits, activeUnitId]);
+  const activeUnit = orderedUnits.find((u) => u.id === activeUnitId) ?? null;
+  const activeUnitDestination = activeUnit
+    ? {
+        id: activeUnit.destination_id,
+        name:
+          (activeUnit.unit_name && activeUnit.unit_name.trim()) ||
+          activeUnit.destinations?.name ||
+          'Unidade',
+        ibge_code: activeUnit.destinations?.ibge_code ?? null,
+      }
+    : null;
+  const effectiveDestinationData = isMultiUnit && activeUnitDestination
+    ? activeUnitDestination
+    : selectedDestinationData;
 
   // Persistência defensiva: assim que um bloco automático devolve valores e já
   // existe `createdAssessmentId`, faz upsert direto em `indicator_values` para
@@ -99,6 +132,36 @@ export function NovaRodadaDialogs({
     })();
   }, [reviewPreFillValues, createdAssessmentId, indicators, orgId]);
 
+  const renderUnitTabs = (children: React.ReactNode) => {
+    if (!isMultiUnit) return children;
+    return (
+      <Tabs value={activeUnitId ?? undefined} onValueChange={(v) => setActiveUnitId(v)} className="w-full">
+        <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+          <Building2 className="h-4 w-4" />
+          <span>
+            Diagnóstico de rede — {orderedUnits.length} unidades. Cada aba abaixo coleta dados de uma unidade.
+          </span>
+        </div>
+        <TabsList className="flex flex-wrap h-auto gap-1">
+          {orderedUnits.map((u) => (
+            <TabsTrigger key={u.id} value={u.id} className="gap-1">
+              {u.is_primary && <Star className="h-3 w-3 fill-current" />}
+              {(u.unit_name && u.unit_name.trim()) || u.destinations?.name || 'Unidade'}
+              <span className="text-xs text-muted-foreground">
+                {u.destinations?.uf ? `· ${u.destinations.uf}` : ''}
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {orderedUnits.map((u) => (
+          <TabsContent key={u.id} value={u.id} className="mt-4">
+            {activeUnitId === u.id ? children : null}
+          </TabsContent>
+        ))}
+      </Tabs>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Resume Banner */}
@@ -107,15 +170,18 @@ export function NovaRodadaDialogs({
       {/* Step 4: Pre-filling / Enterprise Profile */}
       {currentStep === 4 && (
         diagnosticType === 'enterprise' ? (
-          selectedDestinationData ? (
-            <EnterpriseProfileStep
-              destinationId={selectedDestinationData.id}
-              destinationName={selectedDestinationData.name}
-              assessmentId={createdAssessmentId ?? resumeAssessmentId ?? null}
-              onComplete={() => onSetCurrentStep(5)}
-              onBack={onPreviousStep}
-              onReviewAutoFill={(values) => setReviewPreFillValues(prev => ({ ...prev, ...values }))}
-            />
+          effectiveDestinationData ? (
+            renderUnitTabs(
+              <EnterpriseProfileStep
+                key={activeUnit?.id ?? effectiveDestinationData.id}
+                destinationId={effectiveDestinationData.id}
+                destinationName={effectiveDestinationData.name}
+                assessmentId={activeAssessmentId}
+                onComplete={() => onSetCurrentStep(5)}
+                onBack={onPreviousStep}
+                onReviewAutoFill={(values) => setReviewPreFillValues(prev => ({ ...prev, ...values }))}
+              />
+            )
           ) : (
             <Card>
               <CardContent className="py-12 text-center">
@@ -160,6 +226,18 @@ export function NovaRodadaDialogs({
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar ao Perfil
             </Button>
+            {isMultiUnit && (
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Diagnóstico de rede com {orderedUnits.length} unidades. Nesta etapa, os indicadores
+                  manuais são preenchidos para a unidade principal
+                  {activeUnit?.unit_name ? ` (${activeUnit.unit_name})` : ''}. A coleta isolada por
+                  unidade no preenchimento manual entra na próxima fase; o pré-preenchimento da etapa
+                  anterior já roda por unidade individualmente.
+                </AlertDescription>
+              </Alert>
+            )}
             {/* Fase 4 (v1.86.0) — bloco opcional de importação CSV/PMS */}
             <PmsCsvImportPanel assessmentId={createdAssessmentId} />
             {/* Fase 13 (v1.96.0) — Conectores PMS nativos (Cloudbeds em produção) */}
