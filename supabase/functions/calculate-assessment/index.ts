@@ -945,7 +945,7 @@ async function runCalculationCore(
       }
     } else {
       // TERRITORIAL: Use standard indicator_values
-      const { data: indicatorValues, error: valuesError } = await supabase
+      let indicatorValuesQ = supabase
         .from("indicator_values")
         .select(`
           id,
@@ -971,6 +971,9 @@ async function runCalculationCore(
         `)
         .eq("assessment_id", assessment_id)
         .eq("is_ignored", false);
+      if (isUnitScope) indicatorValuesQ = indicatorValuesQ.eq("unit_id", unitId);
+      else indicatorValuesQ = indicatorValuesQ.is("unit_id", null);
+      const { data: indicatorValues, error: valuesError } = await indicatorValuesQ;
 
       if (valuesError) {
         console.error("Error fetching indicator values:", valuesError);
