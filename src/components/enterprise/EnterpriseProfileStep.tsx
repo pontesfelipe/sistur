@@ -632,6 +632,73 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         open={tourOpen}
         onOpenChange={setTourOpen}
       />
+      {/* Marca / rede — Fase 15.3.
+          Permite agrupar várias unidades do mesmo empreendimento em diferentes
+          municípios. Cada unidade segue tendo seu próprio diagnóstico; a marca
+          serve como camada de análise consolidada da rede. */}
+      <Card className="border-primary/20">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Building2 className="h-4 w-4 text-primary" />
+            Identidade do empreendimento e da marca
+          </CardTitle>
+          <CardDescription>
+            Se este hotel faz parte de uma rede com unidades em outros municípios,
+            selecione (ou crie) a marca. A análise comparativa da rede usará esta
+            associação para confrontar desempenho da marca em diferentes destinos.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <BrandSelector
+            value={brandId}
+            onChange={(id, name) => {
+              setBrandId(id);
+              setBrandName(name);
+              // Sugestão de nome da unidade quando vazio
+              if (!unitName && name && destinationName) {
+                setUnitName(`${name} ${destinationName}`);
+              }
+            }}
+            helperText={
+              brandUnits && brandUnits.length > 0
+                ? `Esta marca já possui ${brandUnits.length} unidade(s): ${brandUnits
+                    .map((u) => u.destinations?.name)
+                    .filter(Boolean)
+                    .join(', ')}.`
+                : 'Empreendimento independente? Crie uma marca com o próprio nome — futuras unidades poderão ser anexadas.'
+            }
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="unit-name">Nome desta unidade</Label>
+              <Input
+                id="unit-name"
+                value={unitName}
+                onChange={(e) => setUnitName(e.target.value)}
+                placeholder={
+                  brandName
+                    ? `${brandName} ${destinationName}`
+                    : `Ex.: Hotel Central ${destinationName}`
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Identifica esta unidade dentro da marca (município: <strong>{destinationName}</strong>).
+              </p>
+            </div>
+            <div className="flex items-end gap-2">
+              <label className="flex items-center gap-2 cursor-pointer text-sm">
+                <input
+                  type="checkbox"
+                  checked={isFlagship}
+                  onChange={(e) => setIsFlagship(e.target.checked)}
+                  className="h-4 w-4"
+                />
+                Unidade principal (flagship) da marca
+              </label>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       {/* 0) Resumo de progresso dos blocos automáticos */}
       <Card className="border-primary/20">
         <CardContent className="py-4">
