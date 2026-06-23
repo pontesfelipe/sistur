@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 96,
-  patch: 4,
+  patch: 5,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.96.5",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Linhagem de Dados (Enterprise) — fix de classificação que colapsava todos os blocos automáticos sob 'Reviews Online'. (1) `DataLineageView.classifyRow` agora extrai a fonte real do `source_detail` e gera nó próprio para cada origem: Open-Meteo ERA5, ANATEL, ANAC, DATASUS, IBGE, BrasilAPI/Receita Federal, Reclame Aqui/Procon, OTAs (Booking/Decolar/Expedia), Redes Sociais, Mobilidade Urbana, Eventos Municipais, Segurança ao Turista, Presença Digital, Demanda & Trends, Acessibilidade Urbana, Mídia/SERP — sem citar o provedor de scraping. Avaliações online seguem em bucket próprio quando explícito. (2) `NovaRodadaDialogs` ganhou persistência defensiva: assim que `createdAssessmentId` existe e qualquer bloco devolve valores via `onAutoFill`, faz upsert imediato em `indicator_values` (com `source='Pré-preenchimento Automático (<CODE>)'`) para que o cálculo e a linhagem registrem todas as fontes mesmo se o usuário não chegar até o botão Salvar do Step 5. Cobre o gap em que análises ficavam só em `enterprise_profiles.*_analysis` e eram ignoradas pelo motor."
+    ]
+  },
   {
     version: "1.96.4",
     date: "2026-06-23",
