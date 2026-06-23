@@ -33,6 +33,86 @@ import {
   Check,
   ChevronsUpDown,
 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
+function DestinationCombobox({
+  destinations,
+  value,
+  onChange,
+}: {
+  destinations: any[];
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = useMemo(
+    () => destinations.find((d) => d.id === value),
+    [destinations, value],
+  );
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between font-normal"
+        >
+          <span className="truncate text-left">
+            {selected
+              ? `${selected.name}${selected.uf ? ` - ${selected.uf}` : ''}${
+                  selected.ibge_code ? ` (IBGE: ${selected.ibge_code})` : ''
+                }`
+              : 'Selecione ou pesquise um destino'}
+          </span>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-[--radix-popover-trigger-width] p-0"
+        align="start"
+      >
+        <Command
+          filter={(itemValue, search) =>
+            itemValue.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
+          }
+        >
+          <CommandInput placeholder="Pesquisar por nome, UF ou IBGE..." />
+          <CommandList>
+            <CommandEmpty>Nenhum destino encontrado.</CommandEmpty>
+            <CommandGroup>
+              {destinations.map((dest) => {
+                const label = `${dest.name} ${dest.uf ?? ''} ${dest.ibge_code ?? ''}`.trim();
+                return (
+                  <CommandItem
+                    key={dest.id}
+                    value={`${label} ${dest.id}`}
+                    onSelect={() => {
+                      onChange(dest.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        value === dest.id ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                    <span className="truncate">
+                      {dest.name}
+                      {dest.uf ? ` - ${dest.uf}` : ''}
+                      {dest.ibge_code ? ` (IBGE: ${dest.ibge_code})` : ''}
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 type VisibilityType = 'organization' | 'personal' | 'demo';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
