@@ -326,6 +326,74 @@ export type Database = {
         }
         Relationships: []
       }
+      assessment_brand_rollups: {
+        Row: {
+          assessment_id: string
+          brand_id: string | null
+          created_at: string
+          critical_unit_id: string | null
+          pillar: string
+          score_simple: number
+          score_weighted: number
+          stddev: number
+          unit_count: number
+          updated_at: string
+        }
+        Insert: {
+          assessment_id: string
+          brand_id?: string | null
+          created_at?: string
+          critical_unit_id?: string | null
+          pillar: string
+          score_simple: number
+          score_weighted: number
+          stddev?: number
+          unit_count?: number
+          updated_at?: string
+        }
+        Update: {
+          assessment_id?: string
+          brand_id?: string | null
+          created_at?: string
+          critical_unit_id?: string | null
+          pillar?: string
+          score_simple?: number
+          score_weighted?: number
+          stddev?: number
+          unit_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_brand_rollups_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_brand_rollups_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+          {
+            foreignKeyName: "assessment_brand_rollups_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_brand_rollups_critical_unit_id_fkey"
+            columns: ["critical_unit_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assessment_calc_jobs: {
         Row: {
           assessment_id: string
@@ -6208,6 +6276,7 @@ export type Database = {
           polarity: string | null
           score: number | null
           score_pct: number | null
+          unit_id: string | null
           value_normalized: number | null
           value_raw: number | null
           weight_used: number | null
@@ -6225,6 +6294,7 @@ export type Database = {
           polarity?: string | null
           score?: number | null
           score_pct?: number | null
+          unit_id?: string | null
           value_normalized?: number | null
           value_raw?: number | null
           weight_used?: number | null
@@ -6242,6 +6312,7 @@ export type Database = {
           polarity?: string | null
           score?: number | null
           score_pct?: number | null
+          unit_id?: string | null
           value_normalized?: number | null
           value_raw?: number | null
           weight_used?: number | null
@@ -6273,6 +6344,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_scores_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_units"
             referencedColumns: ["id"]
           },
         ]
@@ -6857,6 +6935,7 @@ export type Database = {
           severity: Database["public"]["Enums"]["severity_type"]
           theme: string
           title: string
+          unit_id: string | null
         }
         Insert: {
           assessment_id: string
@@ -6871,6 +6950,7 @@ export type Database = {
           severity: Database["public"]["Enums"]["severity_type"]
           theme: string
           title: string
+          unit_id?: string | null
         }
         Update: {
           assessment_id?: string
@@ -6885,6 +6965,7 @@ export type Database = {
           severity?: Database["public"]["Enums"]["severity_type"]
           theme?: string
           title?: string
+          unit_id?: string | null
         }
         Relationships: [
           {
@@ -6906,6 +6987,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issues_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_units"
             referencedColumns: ["id"]
           },
         ]
@@ -8543,6 +8631,7 @@ export type Database = {
           pillar: Database["public"]["Enums"]["pillar_type"]
           score: number
           severity: Database["public"]["Enums"]["severity_type"]
+          unit_id: string | null
         }
         Insert: {
           assessment_id: string
@@ -8552,6 +8641,7 @@ export type Database = {
           pillar: Database["public"]["Enums"]["pillar_type"]
           score: number
           severity: Database["public"]["Enums"]["severity_type"]
+          unit_id?: string | null
         }
         Update: {
           assessment_id?: string
@@ -8561,6 +8651,7 @@ export type Database = {
           pillar?: Database["public"]["Enums"]["pillar_type"]
           score?: number
           severity?: Database["public"]["Enums"]["severity_type"]
+          unit_id?: string | null
         }
         Relationships: [
           {
@@ -8582,6 +8673,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pillar_scores_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_units"
             referencedColumns: ["id"]
           },
         ]
@@ -9990,6 +10088,7 @@ export type Database = {
           priority: number
           reason: string
           training_id: string | null
+          unit_id: string | null
         }
         Insert: {
           assessment_id: string
@@ -10001,6 +10100,7 @@ export type Database = {
           priority?: number
           reason: string
           training_id?: string | null
+          unit_id?: string | null
         }
         Update: {
           assessment_id?: string
@@ -10012,6 +10112,7 @@ export type Database = {
           priority?: number
           reason?: string
           training_id?: string | null
+          unit_id?: string | null
         }
         Relationships: [
           {
@@ -10055,6 +10156,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "edu_trainings"
             referencedColumns: ["training_id"]
+          },
+          {
+            foreignKeyName: "recommendations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_units"
+            referencedColumns: ["id"]
           },
         ]
       }

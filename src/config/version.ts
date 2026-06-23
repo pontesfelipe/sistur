@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 3,
+  patch: 4,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.4",
+    date: "2026-06-23",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial Multi-Unidade (Fase 15.4 — Fase 4 / passo 1) — `calculate-assessment` agora detecta diagnósticos de marca multi-unidade (`assessments.brand_id` + 2+ `assessment_units`) e roda o cálculo **uma vez por unidade**, lendo `indicator_values` filtrados por `unit_id`, sobrepondo o contexto territorial (município, IBGE, perfil empresarial) para cada unidade, e gravando `indicator_scores`, `pillar_scores`, `issues` e `recommendations` etiquetados com `unit_id`. Diagnósticos single-unit / legados (`brand_id IS NULL` ou ≤1 unidade) continuam usando o fluxo atual intocado — `unit_id IS NULL` nas escritas. Nova tabela `assessment_brand_rollups` guarda o **agregado da marca** por pilar (RA, OE, AO, GLOBAL): média ponderada por `room_count`, média simples, dispersão (desvio padrão entre unidades) e unidade crítica. Migração adiciona coluna opcional `unit_id` em `indicator_scores`/`pillar_scores`/`issues`/`recommendations` e converte os índices únicos legados em **índices parciais** (`WHERE unit_id IS NULL` para single-unit + `WHERE unit_id IS NOT NULL` por unidade), preservando totalmente o comportamento anterior. Próximo passo: UI de resultado multi-unidade (tabs por unidade + card de marca) em `DiagnosticoDetalhe` e seção comparativa de rede no relatório."
+    ]
+  },
   {
     version: "1.97.3",
     date: "2026-06-23",
