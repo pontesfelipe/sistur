@@ -453,9 +453,20 @@ async function runCalculationCore(
   supabase: ReturnType<typeof createClient>,
   authUserId: string,
   assessment_id: string,
+  unitContext?: {
+    unit_id: string;
+    destination_id: string;
+    enterprise_profile_id?: string | null;
+    unit_name?: string | null;
+  } | null,
 ): Promise<Record<string, unknown>> {
   {
     console.log(`Starting calculation for assessment: ${assessment_id}`);
+    const unitId: string | null = unitContext?.unit_id ?? null;
+    const isUnitScope = !!unitId;
+    if (isUnitScope) {
+      console.log(`[multi-unit] Calculating unit ${unitId} (${unitContext?.unit_name || ''})`);
+    }
 
     // 1. Get assessment details
     const { data: assessment, error: assessmentError } = await supabase
@@ -467,6 +478,19 @@ async function runCalculationCore(
     if (assessmentError || !assessment) {
       console.error("Assessment not found:", assessmentError);
       throw new CalcError("Assessment not found", 404);
+    }
+
+    // Multi-unit: override destination context to the unit's municipality so that
+    // enterprise derived blocks (revenue, compliance, reviews, competitors) and
+    // territorial joins (IBGE-based external data) target the right unit.
+    if (isUnitScope && unitContext?.destination_id) {
+      const { data: unitDest } = await supabase
+        .from("destinations")
+        .select("*")
+        .eq("id", unitContext.destination_id)
+        .maybeSingle();
+      (assessment as any).destination_id = unitContext.destination_id;
+      if (unitDest) (assessment as any).destination = unitDest;
     }
 
     const orgId = assessment.org_id;
