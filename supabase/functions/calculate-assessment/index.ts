@@ -1591,6 +1591,7 @@ async function runCalculationCore(
           issues.push({
             org_id: orgId,
             assessment_id,
+            unit_id: unitId,
             pillar,
             theme,
             severity,
