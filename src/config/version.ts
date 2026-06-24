@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 17,
+  patch: 18,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.18",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Territorial — corrigido erro ao importar/salvar valores no preenchimento manual: o salvamento em lote deixou de usar `upsert` incompatível com índices parciais de `indicator_values` e agora atualiza ou insere cada indicador pela chave correta da rodada/unidade. Também restaurado o GRANT de acesso autenticado da tabela para o Data API, mantendo as regras RLS existentes.",
+    ],
+  },
   {
     version: "1.97.17",
     date: "2026-06-24",

@@ -277,9 +277,13 @@ export function useIndicatorValues(assessmentId?: string, unitId?: string | null
       assessment_id: string;
       indicator_id: string;
       value_raw?: number | null;
+      value_text?: string | null;
       source?: string | null;
+      reference_date?: string | null;
       unit_id?: string | null;
     }>) => {
+      if (!values || values.length === 0) return [];
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
@@ -295,29 +299,59 @@ export function useIndicatorValues(assessmentId?: string, unitId?: string | null
       const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
       const valueOrgId = await getAssessmentOrgId(values[0]?.assessment_id, effectiveOrgId);
 
-      if (!values || values.length === 0) return [];
+      // Do not use PostgREST upsert here: indicator_values uses partial unique
+      // indexes to support both single-unit rows (unit_id IS NULL) and
+      // multi-unit rows (unit_id IS NOT NULL). Postgres requires a matching
+      // ON CONFLICT predicate for partial indexes, which the client upsert API
+      // cannot express, causing "no unique constraint matching" on manual fill.
+      const savedRows = [];
 
-      // Multi-unit aware: when any row carries unit_id, use the partial
-      // unique index on (assessment_id, indicator_id, unit_id WHERE NOT NULL).
-      // Otherwise (single-unit / territorial) fall back to the partial
-      // index on (assessment_id, indicator_id WHERE unit_id IS NULL).
-      const effUnitId = unitId ?? null;
-      const rows = values.map(v => ({
-        ...v,
-        unit_id: v.unit_id ?? effUnitId,
-        org_id: valueOrgId,
-      }));
-      const hasUnit = rows.some(r => r.unit_id);
-      const { data, error } = await supabase
-        .from('indicator_values')
-        .upsert(rows, {
-          onConflict: hasUnit
-            ? 'assessment_id,indicator_id,unit_id'
-            : 'assessment_id,indicator_id',
-        })
-        .select();
-      if (error) throw error;
-      return data;
+      for (const value of values) {
+        const effUnitId = value.unit_id ?? unitId ?? null;
+        let existingQ = supabase
+          .from('indicator_values')
+          .select('id')
+          .eq('assessment_id', value.assessment_id)
+          .eq('indicator_id', value.indicator_id);
+        if (effUnitId) existingQ = existingQ.eq('unit_id', effUnitId);
+        else existingQ = existingQ.is('unit_id', null);
+
+        const { data: existing, error: existingError } = await existingQ.maybeSingle();
+        if (existingError) throw existingError;
+
+        const persistedValue: Record<string, any> = {
+          value_raw: value.value_raw,
+          value_text: value.value_text,
+          source: value.source,
+          reference_date: value.reference_date,
+        };
+
+        if (existing) {
+          const { data, error } = await supabase
+            .from('indicator_values')
+            .update(persistedValue)
+            .eq('id', existing.id)
+            .select()
+            .single();
+          if (error) throw error;
+          savedRows.push(data);
+          continue;
+        }
+
+        const { data, error } = await supabase
+          .from('indicator_values')
+          .insert({
+            ...value,
+            org_id: valueOrgId,
+            unit_id: effUnitId,
+          } as any)
+          .select()
+          .single();
+        if (error) throw error;
+        savedRows.push(data);
+      }
+
+      return savedRows;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['indicator-values'] });
