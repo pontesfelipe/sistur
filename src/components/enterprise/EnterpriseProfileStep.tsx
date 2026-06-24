@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -208,6 +208,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Reset imediato do estado global do runner sempre que a rodada (assessmentId)
+  // ou o destino mudar. O `autoFillRunner` mantém state em escopo de módulo, que
+  // sobrevive a navegações entre rodadas; sem este reset, abrir uma rodada nova
+  // do mesmo empreendimento mostra os chips já verdes (vazamento da rodada
+  // anterior na mesma sessão do browser).
+  useLayoutEffect(() => {
+    resetAutoFillState();
+  }, [assessmentId, destinationId]);
+
   // Subscribe to per-block status (running / success / error)
   const statuses = useAutoFillStatuses();
   const statusById = new Map(statuses.map((s) => [s.id, s]));
@@ -347,7 +356,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
   // Resumo de progresso dos blocos automáticos (Step 4)
   const autoFillFlags = [
-    { key: 'reviews', label: 'Reviews', done: reviewAutoFilled },
+    { key: 'reviews', label: 'Reviews + Perfil', done: reviewAutoFilled },
     { key: 'digital', label: 'Presença Digital', done: digitalAutoFilled },
     { key: 'context', label: 'Contexto Municipal', done: contextAutoFilled },
     { key: 'cnpj', label: 'CNPJ', done: !!cnpjData },

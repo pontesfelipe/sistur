@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 15,
+  patch: 16,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.16",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial — corrigido vazamento de estado entre rodadas no Pré-preenchimento automático: o registry global do `autoFillRunner` agora é resetado de forma síncrona (useLayoutEffect) sempre que o `assessmentId` ou `destinationId` muda, evitando que os chips dos 21 blocos apareçam verdes ('Preenchido') ao abrir uma rodada nova do mesmo empreendimento sem recarregar a página. Renomeado o chip 'Reviews' para 'Reviews + Perfil' deixando explícito que o Perfil do Empreendimento (tipo, categoria, nº de quartos, funcionários) é preenchido por esse mesmo bloco — não é um bloco separado faltando.",
+    ],
+  },
   {
     version: "1.97.15",
     date: "2026-06-24",
