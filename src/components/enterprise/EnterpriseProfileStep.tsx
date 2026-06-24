@@ -520,6 +520,40 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     }
   }, [existingProfile]);
 
+  // Pré-preenche identidade (marca, nome da unidade, nome para buscas) a
+  // partir do próprio assessment quando o usuário já informou esses dados na
+  // criação da rodada (Step 2). Evita re-digitar "nome do hotel" no bloco
+  // Reviews e no Perfil ao retomar (`?resume=...`).
+  useEffect(() => {
+    if (!assessmentId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: asmt } = await supabase
+          .from('assessments')
+          .select('brand_id, enterprise_brands:brand_id(id, name)')
+          .eq('id', assessmentId)
+          .maybeSingle();
+        const { data: units } = await supabase
+          .from('assessment_units')
+          .select('unit_name, destination_id, is_primary')
+          .eq('assessment_id', assessmentId);
+        if (cancelled) return;
+        const unitForDest = (units || []).find((u: any) => u.destination_id === destinationId)
+          || (units || []).find((u: any) => u.is_primary)
+          || (units || [])[0];
+        const brand = (asmt as any)?.enterprise_brands || null;
+        setBrandId((prev) => prev ?? (asmt?.brand_id ?? null));
+        setBrandName((prev) => prev ?? (brand?.name ?? null));
+        setUnitName((prev) => prev || (unitForDest?.unit_name ?? ''));
+        setEnterpriseName((prev) => prev || (unitForDest?.unit_name || brand?.name || ''));
+      } catch (e) {
+        console.warn('[EnterpriseProfileStep] failed to prefill identity from assessment', e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [assessmentId, destinationId]);
+
   const saveProfile = useMutation({
     mutationFn: async () => {
       if (!effectiveOrgId) throw new Error('Organização não encontrada');
