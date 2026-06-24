@@ -200,6 +200,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     telecom: { label: 'Conectividade Telecom', source: 'Anatel (anatel_coverage_cache)' },
     accessibility: { label: 'Acessibilidade Urbana', source: 'Busca pública na web (5 dimensões)' },
     health: { label: 'Infra. de Saúde do Entorno', source: 'DATASUS/CNES (datasus_health_cache)' },
+    cnpj: { label: 'CNPJ', source: 'Busca pública + Receita Federal (BrasilAPI)' },
   };
   useEffect(() => {
     Object.entries(BLOCK_META).forEach(([id, m]) => setAutoFillMeta(id, m));
