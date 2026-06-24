@@ -253,6 +253,49 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   // anterior na mesma sessão do browser).
   useLayoutEffect(() => {
     resetAutoFillState();
+    setReviewAutoFilled(false);
+    setProfileAutoFilled(false);
+    setReviewAnalysisData(null);
+    setDigitalAnalysisData(null);
+    setDigitalAutoFilled(false);
+    setContextAnalysisData(null);
+    setContextAutoFilled(false);
+    setComplaintsAnalysisData(null);
+    setComplaintsAutoFilled(false);
+    setCnpjData(null);
+    setCnpjValue(null);
+    setCompetitorsCount(null);
+    setSustainabilityData(null);
+    setSustainabilityAutoFilled(false);
+    setPricingData(null);
+    setPricingAutoFilled(false);
+    setEventsData(null);
+    setEventsAutoFilled(false);
+    setSafetyData(null);
+    setSafetyAutoFilled(false);
+    setClimateData(null);
+    setClimateAutoFilled(false);
+    setTransportData(null);
+    setTransportAutoFilled(false);
+    setBrandData(null);
+    setBrandAutoFilled(false);
+    setDemandData(null);
+    setDemandAutoFilled(false);
+    setReputationData(null);
+    setReputationAutoFilled(false);
+    setSocialData(null);
+    setSocialAutoFilled(false);
+    setAirConnData(null);
+    setAirConnAutoFilled(false);
+    setTariffSeasonalityData(null);
+    setTariffSeasonalityAutoFilled(false);
+    setTelecomData(null);
+    setTelecomAutoFilled(false);
+    setAccessibilityData(null);
+    setAccessibilityAutoFilled(false);
+    setHealthData(null);
+    setHealthAutoFilled(false);
+    setFormData({ ...DEFAULT_PROFILE_FORM_DATA });
   }, [assessmentId, destinationId]);
 
   // Subscribe to per-block status (running / success / error)
@@ -619,7 +662,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         resetAutoFillState();
       }
     }
-  }, [existingProfile]);
+  }, [existingProfile, assessmentId, destinationId]);
 
   // Pré-preenche identidade (marca, nome da unidade, nome para buscas) a
   // partir do próprio assessment quando o usuário já informou esses dados na
