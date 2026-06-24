@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 13,
+  patch: 14,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.14",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial — política de frescura de dados por rodada. Cada novo `assessmentId` agora SEMPRE re-puxa todas as análises externas do zero (Reviews, Digital, Contexto, Reclamações, Concorrentes, ESG, Preço, Eventos, Segurança, Clima, Transporte, Marca, Demanda, Reputação OTAs, Social, Aérea, Tarifária, Telecom, Acessibilidade, Saúde) — `enterprise_profiles.*_analysis` deixa de ser hidratado quando o `autofill_run_state.byAssessment[assessmentId]` não pertence à rodada atual. Os blobs JSONB ficam armazenados no perfil só como histórico/lastrun e não voltam mais para a UI de uma rodada nova, evitando que valores antigos pintem blocos como 'Preenchido'. A 'frescura' continua respeitando os TTLs server-side das edge functions e caches dedicados (anatel_coverage_cache, datasus_health_cache, anac_air_connectivity, cadunico_municipio_cache, tse_turnout_cache, cnpj_validation_cache) — quando o cache da fonte está válido para o município/CNPJ, a edge function devolve o valor cacheado em vez de chamar a internet de novo.",
+    ],
+  },
   {
     version: "1.97.13",
     date: "2026-06-24",
