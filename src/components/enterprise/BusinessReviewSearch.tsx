@@ -207,49 +207,6 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
     }
   };
 
-  const handleAutoFill = () => {
-    if (!result?.analysis) return;
-
-    // Auto-fill indicators
-    if (onAutoFill) {
-      const values: Record<string, number> = {};
-      if (result.analysis.review_score !== null) {
-        values['ENT_REVIEW_SCORE'] = result.analysis.review_score;
-      }
-      if (result.analysis.review_count !== null && result.analysis.review_count !== undefined) {
-        values['ENT_REVIEW_VOL'] = result.analysis.review_count;
-      }
-      if (result.analysis.digital_maturity !== null) {
-        values['ENT_TECH_SCORE'] = result.analysis.digital_maturity;
-      }
-      if (result.analysis.sentiment_score !== null) {
-        values['ENT_GUEST_SATISFACTION'] = Number((result.analysis.sentiment_score * 2).toFixed(2));
-        const nps = Math.max(-100, Math.min(100, Math.round((result.analysis.sentiment_score - 3) * 50)));
-        values['ENT_NPS'] = nps;
-      }
-
-      if (Object.keys(values).length > 0) {
-        onAutoFill(values);
-      }
-    }
-
-    // Auto-fill profile metadata
-    if (onProfileAutoFill) {
-      const meta = (result.analysis.property_metadata || {}) as Partial<PropertyMetadata>;
-      const enrichedMeta = {
-        star_rating: meta.star_rating ?? null,
-        property_type: meta.property_type || propertyType || null,
-        room_count: meta.room_count ?? null,
-        employee_count: meta.employee_count ?? null,
-      };
-      if (enrichedMeta.star_rating != null || enrichedMeta.property_type || enrichedMeta.room_count != null || enrichedMeta.employee_count != null) {
-        onProfileAutoFill(enrichedMeta);
-      }
-    }
-
-    toast.success('Dados preenchidos automaticamente a partir dos reviews');
-  };
-
   const DIMENSION_LABELS: Record<string, string> = {
     atendimento: 'Atendimento',
     limpeza: 'Limpeza',
@@ -563,20 +520,6 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                   </Card>
                 )}
 
-                {/* Auto-fill Button */}
-                {onAutoFill && (result.analysis.review_score !== null || result.analysis.digital_maturity !== null || result.analysis.sentiment_score !== null) && (
-                  <Button
-                    onClick={handleAutoFill}
-                    className="w-full gap-2"
-                    variant="default"
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                    Preencher Indicadores Automaticamente
-                    <Badge variant="secondary" className="ml-1">
-                      {[result.analysis.review_score !== null, result.analysis.digital_maturity !== null, result.analysis.sentiment_score !== null].filter(Boolean).length} indicador(es)
-                    </Badge>
-                  </Button>
-                )}
               </>
             ) : (
               <div className="p-4 text-center text-muted-foreground">
