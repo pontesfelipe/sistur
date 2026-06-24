@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -105,6 +105,20 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
     onBusinessNameChange?.(v);
   };
   const [location, setLocation] = useState(defaultLocation);
+  // Sincroniza com prefill assíncrono (ex.: nome do hotel vindo do
+  // assessment ao retomar uma rodada). Só preenche se o usuário ainda não
+  // digitou nada para não sobrescrever a edição manual.
+  useEffect(() => {
+    if (defaultBusinessName && !businessName) {
+      setBusinessNameState(defaultBusinessName);
+      onBusinessNameChange?.(defaultBusinessName);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultBusinessName]);
+  useEffect(() => {
+    if (defaultLocation && !location) setLocation(defaultLocation);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultLocation]);
   const [propertyType, setPropertyType] = useState('hotel');
   const [isSearching, setIsSearching] = useState(false);
   const [result, setResult] = useState<SearchResult | null>(null);
