@@ -514,24 +514,45 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       const ep = existingProfile as any;
       if (ep.cnpj) setCnpjValue(ep.cnpj);
       if (ep.cnpj_data) setCnpjData(ep.cnpj_data);
-      if (ep.context_analysis) setContextAnalysisData(ep.context_analysis);
-      if (ep.complaints_analysis) setComplaintsAnalysisData(ep.complaints_analysis);
-      if (ep.digital_presence_analysis) setDigitalAnalysisData(ep.digital_presence_analysis);
-      if (ep.sustainability_analysis) setSustainabilityData(ep.sustainability_analysis);
-      if (ep.pricing_analysis) setPricingData(ep.pricing_analysis);
-      if (ep.events_analysis) setEventsData(ep.events_analysis);
-      if (ep.safety_analysis) setSafetyData(ep.safety_analysis);
-      if (ep.climate_analysis) setClimateData(ep.climate_analysis);
-      if (ep.transport_analysis) setTransportData(ep.transport_analysis);
-      if (ep.brand_strength_analysis) setBrandData(ep.brand_strength_analysis);
-      if (ep.demand_trends_analysis) setDemandData(ep.demand_trends_analysis);
-      if (ep.consolidated_reputation_analysis) setReputationData(ep.consolidated_reputation_analysis);
-      if (ep.social_media_analysis) setSocialData(ep.social_media_analysis);
-      if (ep.air_connectivity_analysis) setAirConnData(ep.air_connectivity_analysis);
-      if (ep.tariff_seasonality_analysis) setTariffSeasonalityData(ep.tariff_seasonality_analysis);
-      if (ep.telecom_coverage_analysis) setTelecomData(ep.telecom_coverage_analysis);
-      if (ep.urban_accessibility_analysis) setAccessibilityData(ep.urban_accessibility_analysis);
-      if (ep.health_infrastructure_analysis) setHealthData(ep.health_infrastructure_analysis);
+      // POLÍTICA: cada novo diagnóstico (assessmentId) sempre re-puxa todos os
+      // dados externos do zero — nunca reaproveita análises de rodadas
+      // anteriores armazenadas em enterprise_profiles.*_analysis (esses blobs
+      // são por-destino, não por-rodada). A "frescura" controlada por TTL
+      // (Anatel/DATASUS/CADUNICO/CNPJ/ANAC/TSE) fica na camada das edge
+      // functions, que consultam seus próprios caches server-side.
+      //
+      // Só hidratamos os blobs quando o snapshot do `autofill_run_state`
+      // pertence à rodada atual — sinal de que aquelas análises foram geradas
+      // *nesta* rodada e o usuário está retomando (?resume=...).
+      const runStateRaw = ep.autofill_run_state as any;
+      const belongsToCurrentRun =
+        assessmentId &&
+        runStateRaw &&
+        !Array.isArray(runStateRaw) &&
+        runStateRaw.byAssessment &&
+        Array.isArray(runStateRaw.byAssessment[assessmentId]) &&
+        runStateRaw.byAssessment[assessmentId].length > 0;
+
+      if (belongsToCurrentRun) {
+        if (ep.context_analysis) setContextAnalysisData(ep.context_analysis);
+        if (ep.complaints_analysis) setComplaintsAnalysisData(ep.complaints_analysis);
+        if (ep.digital_presence_analysis) setDigitalAnalysisData(ep.digital_presence_analysis);
+        if (ep.sustainability_analysis) setSustainabilityData(ep.sustainability_analysis);
+        if (ep.pricing_analysis) setPricingData(ep.pricing_analysis);
+        if (ep.events_analysis) setEventsData(ep.events_analysis);
+        if (ep.safety_analysis) setSafetyData(ep.safety_analysis);
+        if (ep.climate_analysis) setClimateData(ep.climate_analysis);
+        if (ep.transport_analysis) setTransportData(ep.transport_analysis);
+        if (ep.brand_strength_analysis) setBrandData(ep.brand_strength_analysis);
+        if (ep.demand_trends_analysis) setDemandData(ep.demand_trends_analysis);
+        if (ep.consolidated_reputation_analysis) setReputationData(ep.consolidated_reputation_analysis);
+        if (ep.social_media_analysis) setSocialData(ep.social_media_analysis);
+        if (ep.air_connectivity_analysis) setAirConnData(ep.air_connectivity_analysis);
+        if (ep.tariff_seasonality_analysis) setTariffSeasonalityData(ep.tariff_seasonality_analysis);
+        if (ep.telecom_coverage_analysis) setTelecomData(ep.telecom_coverage_analysis);
+        if (ep.urban_accessibility_analysis) setAccessibilityData(ep.urban_accessibility_analysis);
+        if (ep.health_infrastructure_analysis) setHealthData(ep.health_infrastructure_analysis);
+      }
       if (ep.brand_id) setBrandId(ep.brand_id);
       if (ep.unit_name) setUnitName(ep.unit_name);
       if (typeof ep.is_flagship === 'boolean') setIsFlagship(ep.is_flagship);
@@ -539,18 +560,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       // formato antigo (array puro), ele pertence a uma rodada anterior do
       // mesmo destino — descartamos para não pintar blocos como "verde" em
       // um novo diagnóstico.
-      if (ep.autofill_run_state) {
-        const raw = ep.autofill_run_state as any;
-        if (assessmentId && raw && !Array.isArray(raw) && raw.byAssessment) {
-          const entries = raw.byAssessment[assessmentId];
-          if (Array.isArray(entries)) {
-            hydrateAutoFillState(entries as AutoFillEntry[]);
-          } else {
-            resetAutoFillState();
-          }
-        } else {
-          resetAutoFillState();
-        }
+      if (belongsToCurrentRun) {
+        hydrateAutoFillState(runStateRaw.byAssessment[assessmentId] as AutoFillEntry[]);
       } else {
         resetAutoFillState();
       }
