@@ -103,6 +103,43 @@ const TARGET_MARKETS = [
   { value: 'eco', label: 'Ecoturismo' },
 ];
 
+const DEFAULT_PROFILE_FORM_DATA: Partial<EnterpriseProfileInput> = {
+  property_type: 'hotel',
+  star_rating: null,
+  room_count: null,
+  employee_count: null,
+  seasonality: null,
+  target_market: [],
+  average_occupancy_rate: null,
+};
+
+type ProfileAutoFillMetadata = {
+  star_rating: number | null;
+  property_type: string | null;
+  room_count: number | null;
+  employee_count: number | null;
+};
+
+const normalizeProfilePropertyType = (value: string | null | undefined) => {
+  const raw = (value || '').trim().toLowerCase();
+  if (!raw) return null;
+  if (raw.includes('resort')) return 'resort';
+  if (raw.includes('pousada')) return 'pousada';
+  if (raw.includes('hostel')) return 'hostel';
+  if (raw.includes('apart') || raw.includes('appart')) return 'apart_hotel';
+  if (raw.includes('flat')) return 'flat';
+  if (raw.includes('camp') || raw.includes('glamp')) return 'camping';
+  if (raw.includes('hotel')) return 'hotel';
+  return PROPERTY_TYPES.some((type) => type.value === raw) ? raw : null;
+};
+
+const normalizeProfileMetadata = (metadata: ProfileAutoFillMetadata): ProfileAutoFillMetadata => ({
+  star_rating: metadata.star_rating != null ? Math.max(1, Math.min(5, Math.round(Number(metadata.star_rating)))) : null,
+  property_type: normalizeProfilePropertyType(metadata.property_type),
+  room_count: metadata.room_count != null ? Math.max(1, Math.round(Number(metadata.room_count))) : null,
+  employee_count: metadata.employee_count != null ? Math.max(0, Math.round(Number(metadata.employee_count))) : null,
+});
+
 export function EnterpriseProfileStep({ destinationId, destinationName, onComplete, onBack, onReviewAutoFill, assessmentId }: EnterpriseProfileStepProps) {
   const [tourOpen, setTourOpen] = useState(false);
   // Fase 12.3 — auto-abre o tour na primeira visita ao Step Enterprise
@@ -114,6 +151,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     }
   }, [destinationId]);
   const [reviewAutoFilled, setReviewAutoFilled] = useState(false);
+  const [profileAutoFilled, setProfileAutoFilled] = useState(false);
   const [reviewAnalysisData, setReviewAnalysisData] = useState<Record<string, any> | null>(null);
   const [digitalAnalysisData, setDigitalAnalysisData] = useState<Record<string, any> | null>(null);
   const [digitalAutoFilled, setDigitalAutoFilled] = useState(false);
@@ -180,7 +218,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   // global registry can render meaningful badges/toasts without coupling each
   // search component to the orchestrator.
   const BLOCK_META: Record<string, { label: string; source: string }> = {
-    reviews: { label: 'Reviews + Perfil do Empreendimento', source: 'Booking + TripAdvisor + Google (nota, volume, sentimento, NPS, tipo/categoria/quartos/funcionários)' },
+    reviews: { label: 'Reviews Online', source: 'Booking + TripAdvisor + Google (nota, volume, sentimento, NPS)' },
     digital: { label: 'Presença Digital', source: 'Google + OTAs + redes sociais' },
     context: { label: 'Contexto Municipal', source: 'IBGE + ANAC + ANATEL + Mapa do Turismo' },
     complaints: { label: 'Reclamações Públicas', source: 'Reclame Aqui + Procon' },
@@ -215,6 +253,49 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   // anterior na mesma sessão do browser).
   useLayoutEffect(() => {
     resetAutoFillState();
+    setReviewAutoFilled(false);
+    setProfileAutoFilled(false);
+    setReviewAnalysisData(null);
+    setDigitalAnalysisData(null);
+    setDigitalAutoFilled(false);
+    setContextAnalysisData(null);
+    setContextAutoFilled(false);
+    setComplaintsAnalysisData(null);
+    setComplaintsAutoFilled(false);
+    setCnpjData(null);
+    setCnpjValue(null);
+    setCompetitorsCount(null);
+    setSustainabilityData(null);
+    setSustainabilityAutoFilled(false);
+    setPricingData(null);
+    setPricingAutoFilled(false);
+    setEventsData(null);
+    setEventsAutoFilled(false);
+    setSafetyData(null);
+    setSafetyAutoFilled(false);
+    setClimateData(null);
+    setClimateAutoFilled(false);
+    setTransportData(null);
+    setTransportAutoFilled(false);
+    setBrandData(null);
+    setBrandAutoFilled(false);
+    setDemandData(null);
+    setDemandAutoFilled(false);
+    setReputationData(null);
+    setReputationAutoFilled(false);
+    setSocialData(null);
+    setSocialAutoFilled(false);
+    setAirConnData(null);
+    setAirConnAutoFilled(false);
+    setTariffSeasonalityData(null);
+    setTariffSeasonalityAutoFilled(false);
+    setTelecomData(null);
+    setTelecomAutoFilled(false);
+    setAccessibilityData(null);
+    setAccessibilityAutoFilled(false);
+    setHealthData(null);
+    setHealthAutoFilled(false);
+    setFormData({ ...DEFAULT_PROFILE_FORM_DATA });
   }, [assessmentId, destinationId]);
 
   // Subscribe to per-block status (running / success / error)
@@ -356,7 +437,8 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
   // Resumo de progresso dos blocos automáticos (Step 4)
   const autoFillFlags = [
-    { key: 'reviews', label: 'Reviews + Perfil', done: reviewAutoFilled },
+    { key: 'reviews', label: 'Reviews Online', done: reviewAutoFilled },
+    { key: 'profile', label: 'Perfil do Empreendimento', done: profileAutoFilled },
     { key: 'digital', label: 'Presença Digital', done: digitalAutoFilled },
     { key: 'context', label: 'Contexto Municipal', done: contextAutoFilled },
     { key: 'cnpj', label: 'CNPJ', done: !!cnpjData },
@@ -387,17 +469,25 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     onReviewAutoFill?.(values);
   };
 
-  const handleProfileAutoFill = (metadata: { star_rating: number | null; property_type: string | null; room_count: number | null; employee_count: number | null }) => {
+  const handleProfileAutoFill = (metadata: ProfileAutoFillMetadata) => {
+    const normalized = normalizeProfileMetadata(metadata);
+    const hasDetectedProfileFields =
+      normalized.star_rating != null ||
+      normalized.room_count != null ||
+      normalized.employee_count != null;
+
     setFormData(prev => {
       const updates: Partial<EnterpriseProfileInput> = {};
-      if (metadata.star_rating != null) updates.star_rating = metadata.star_rating;
-      if (metadata.property_type) updates.property_type = metadata.property_type;
-      if (metadata.room_count != null) updates.room_count = metadata.room_count;
-      if (metadata.employee_count != null) updates.employee_count = metadata.employee_count;
+      if (normalized.star_rating != null) updates.star_rating = normalized.star_rating;
+      if (normalized.property_type) updates.property_type = normalized.property_type;
+      if (normalized.room_count != null) updates.room_count = normalized.room_count;
+      if (normalized.employee_count != null) updates.employee_count = normalized.employee_count;
       return { ...prev, ...updates };
     });
-    setReviewAutoFilled(true);
-    toast.success('Perfil do empreendimento preenchido com dados dos reviews');
+    if (hasDetectedProfileFields) {
+      setProfileAutoFilled(true);
+      toast.success('Perfil do empreendimento preenchido automaticamente');
+    }
   };
 
   const handleReviewAnalysisCapture = (fullAnalysis: Record<string, any>) => {
@@ -498,31 +588,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
   const queryClient = useQueryClient();
   
-  const [formData, setFormData] = useState<Partial<EnterpriseProfileInput>>({
-    property_type: 'hotel',
-    star_rating: null,
-    room_count: null,
-    employee_count: null,
-    seasonality: null,
-    target_market: [],
-    average_occupancy_rate: null,
-  });
+  const [formData, setFormData] = useState<Partial<EnterpriseProfileInput>>({ ...DEFAULT_PROFILE_FORM_DATA });
 
   // Load existing profile data
   useEffect(() => {
     if (existingProfile) {
-      setFormData({
-        property_type: existingProfile.property_type,
-        star_rating: existingProfile.star_rating,
-        room_count: existingProfile.room_count,
-        employee_count: existingProfile.employee_count,
-        seasonality: existingProfile.seasonality,
-        target_market: existingProfile.target_market || [],
-        average_occupancy_rate: existingProfile.average_occupancy_rate,
-      });
       const ep = existingProfile as any;
-      if (ep.cnpj) setCnpjValue(ep.cnpj);
-      if (ep.cnpj_data) setCnpjData(ep.cnpj_data);
       // POLÍTICA: cada novo diagnóstico (assessmentId) sempre re-puxa todos os
       // dados externos do zero — nunca reaproveita análises de rodadas
       // anteriores armazenadas em enterprise_profiles.*_analysis (esses blobs
@@ -543,6 +614,18 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         runStateRaw.byAssessment[assessmentId].length > 0;
 
       if (belongsToCurrentRun) {
+        setFormData({
+          property_type: existingProfile.property_type,
+          star_rating: existingProfile.star_rating,
+          room_count: existingProfile.room_count,
+          employee_count: existingProfile.employee_count,
+          seasonality: existingProfile.seasonality,
+          target_market: existingProfile.target_market || [],
+          average_occupancy_rate: existingProfile.average_occupancy_rate,
+        });
+        setProfileAutoFilled(Boolean(existingProfile.star_rating || existingProfile.room_count || existingProfile.employee_count));
+        if (ep.cnpj) setCnpjValue(ep.cnpj);
+        if (ep.cnpj_data) setCnpjData(ep.cnpj_data);
         if (ep.context_analysis) setContextAnalysisData(ep.context_analysis);
         if (ep.complaints_analysis) setComplaintsAnalysisData(ep.complaints_analysis);
         if (ep.digital_presence_analysis) setDigitalAnalysisData(ep.digital_presence_analysis);
@@ -562,9 +645,11 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         if (ep.urban_accessibility_analysis) setAccessibilityData(ep.urban_accessibility_analysis);
         if (ep.health_infrastructure_analysis) setHealthData(ep.health_infrastructure_analysis);
       }
-      if (ep.brand_id) setBrandId(ep.brand_id);
-      if (ep.unit_name) setUnitName(ep.unit_name);
-      if (typeof ep.is_flagship === 'boolean') setIsFlagship(ep.is_flagship);
+      if (belongsToCurrentRun) {
+        if (ep.brand_id) setBrandId(ep.brand_id);
+        if (ep.unit_name) setUnitName(ep.unit_name);
+        if (typeof ep.is_flagship === 'boolean') setIsFlagship(ep.is_flagship);
+      }
       // Hydrate apenas o snapshot da rodada atual. Se o estado salvo for o
       // formato antigo (array puro), ele pertence a uma rodada anterior do
       // mesmo destino — descartamos para não pintar blocos como "verde" em
@@ -572,10 +657,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       if (belongsToCurrentRun) {
         hydrateAutoFillState(runStateRaw.byAssessment[assessmentId] as AutoFillEntry[]);
       } else {
+        setFormData({ ...DEFAULT_PROFILE_FORM_DATA });
+        setProfileAutoFilled(false);
         resetAutoFillState();
       }
     }
-  }, [existingProfile]);
+  }, [existingProfile, assessmentId, destinationId]);
 
   // Pré-preenche identidade (marca, nome da unidade, nome para buscas) a
   // partir do próprio assessment quando o usuário já informou esses dados na
@@ -800,10 +887,10 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               </div>
               <div>
                 <div className="text-sm font-medium">
-                  Pré-preenchimento automático: {autoFillDone}/{autoFillTotal} blocos
+                  Pré-preenchimento automático: {autoFillDone}/{autoFillTotal} itens
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Cada bloco abaixo busca dados públicos para preencher indicadores do diagnóstico
+                  Cada item abaixo busca ou aplica dados públicos para preencher o diagnóstico
                 </div>
               </div>
             </div>

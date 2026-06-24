@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 16,
+  patch: 17,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.17",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial — Perfil do Empreendimento voltou a ser tratado como bloco explícito do pré-preenchimento: aparece separadamente no progresso, é resetado em rodada nova junto com todos os demais estados, e só fica verde quando a busca de Reviews retorna metadados reais (categoria, nº de UHs ou funcionários). Corrigido também o reaproveitamento indevido do `enterprise_profiles` por destino: em novo `assessmentId`, tipo/categoria/UHs/funcionários/CNPJ não são mais hidratados do perfil antigo; só voltam ao retomar a mesma rodada (`autofill_run_state.byAssessment[assessmentId]`).",
+    ],
+  },
   {
     version: "1.97.16",
     date: "2026-06-24",
