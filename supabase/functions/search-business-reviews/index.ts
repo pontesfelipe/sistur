@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
 
     // Extract review scores and insights using AI
     const lovableKey = Deno.env.get('LOVABLE_API_KEY');
-    let analysis = null;
+    let analysis: any = null;
 
     if (lovableKey) {
       // Include full scraped markdown content (comments/reviews text) when available, truncated to avoid token limits
