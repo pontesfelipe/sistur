@@ -887,10 +887,10 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               </div>
               <div>
                 <div className="text-sm font-medium">
-                  Pré-preenchimento automático: {autoFillDone}/{autoFillTotal} blocos
+                  Pré-preenchimento automático: {autoFillDone}/{autoFillTotal} itens
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Cada bloco abaixo busca dados públicos para preencher indicadores do diagnóstico
+                  Cada item abaixo busca ou aplica dados públicos para preencher o diagnóstico
                 </div>
               </div>
             </div>
