@@ -495,7 +495,21 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                     <CardContent className="p-4 space-y-2">
                       <span className="text-xs font-medium">Fontes Encontradas</span>
                       <div className="space-y-1.5">
-                        {result.analysis.sources.map((src, i) => (
+                        {(() => {
+                          // Dedup: mesma plataforma + mesma URL (normalizada) = uma única linha.
+                          // Se vier sem URL, dedup pela combinação plataforma + rating.
+                          const seen = new Set<string>();
+                          const unique = result.analysis!.sources.filter((src) => {
+                            const url = (src.url || '').trim().toLowerCase().replace(/\/+$/, '');
+                            const key = url
+                              ? `${(src.platform || '').toLowerCase()}|${url}`
+                              : `${(src.platform || '').toLowerCase()}|${src.rating ?? 'na'}`;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                          });
+                          return unique;
+                        })().map((src, i) => (
                           <div key={i} className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
                               <Badge variant="secondary" className="text-[10px] px-1.5">
