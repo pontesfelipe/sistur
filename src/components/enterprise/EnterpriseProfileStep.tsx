@@ -1145,7 +1145,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           📄 Cadastro Legal
         </h3>
-        <p className="text-xs text-muted-foreground">Dados oficiais da pessoa jurídica do empreendimento.</p>
       </div>
       {/* 1.7) Validação CNPJ */}
       <Card className="border-purple-500/30 bg-gradient-to-br from-purple-50/50 to-fuchsia-50/30 dark:from-purple-950/20 dark:to-fuchsia-950/10">
@@ -1177,7 +1176,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           🌎 Sobre o Município / Destino
         </h3>
-        <p className="text-xs text-muted-foreground">Indicadores do contexto territorial onde o empreendimento opera (independe do nome do hotel).</p>
       </div>
       {/* 1.6) Contexto & Conectividade do Destino */}
       <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-50/50 to-teal-50/30 dark:from-emerald-950/20 dark:to-teal-950/10">
