@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 6,
+  patch: 7,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.7",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial — pré-preenche o nome do empreendimento no Step 4 (Pré-preenchimento Automático / Busca de Reviews Online e Perfil do Empreendimento) a partir da identidade já informada na criação da rodada. `EnterpriseProfileStep` agora carrega, ao montar com `assessmentId`, `assessments.brand_id` + `enterprise_brands.name` + `assessment_units.unit_name` da unidade correspondente ao destino e popula `brandId`, `brandName`, `unitName` e o `enterpriseName` que alimenta o bloco Reviews. `BusinessReviewSearch` passou a sincronizar `defaultBusinessName`/`defaultLocation` reativamente (sem sobrescrever digitação do usuário), eliminando a necessidade de redigitar o nome do hotel ao retomar (`?resume=...`)."
+    ]
+  },
   {
     version: "1.97.6",
     date: "2026-06-23",
