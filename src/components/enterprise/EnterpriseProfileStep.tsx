@@ -1204,7 +1204,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <CnpjValidationSearch initialCnpj={cnpjValue} onValidated={handleCnpjValidated} />
+          <CnpjValidationSearch
+            initialCnpj={cnpjValue}
+            onValidated={handleCnpjValidated}
+            businessName={businessQuery}
+            location={destinationName}
+          />
         </CardContent>
       </Card>
       {/* === SECTION: 🌎 Sobre o Município / Destino === */}
