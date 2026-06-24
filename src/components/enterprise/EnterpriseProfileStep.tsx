@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -213,7 +213,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   // sobrevive a navegações entre rodadas; sem este reset, abrir uma rodada nova
   // do mesmo empreendimento mostra os chips já verdes (vazamento da rodada
   // anterior na mesma sessão do browser).
-  useEffect(() => {
+  useLayoutEffect(() => {
     resetAutoFillState();
   }, [assessmentId, destinationId]);
 
