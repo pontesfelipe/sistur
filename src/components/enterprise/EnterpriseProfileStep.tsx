@@ -868,14 +868,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Pré-preenchimento Automático
+                Reviews Online
                 <Badge variant="secondary" className="text-[10px]">
                   <Sparkles className="h-3 w-3 mr-1" />
                   IA
                 </Badge>
               </CardTitle>
               <CardDescription>
-                Busque reviews online do seu estabelecimento para preencher automaticamente o perfil e os indicadores de reputação
+                Google, TripAdvisor e Booking — alimenta reputação, satisfação e maturidade digital
               </CardDescription>
             </div>
             {reviewAutoFilled && (
