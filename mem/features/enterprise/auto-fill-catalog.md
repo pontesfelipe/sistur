@@ -1,15 +1,16 @@
 ---
 name: Enterprise Auto-Fill Catalog
-description: Catálogo dos 21 blocos automáticos de pré-preenchimento do Step 4 do diagnóstico Enterprise — fontes, edge functions, colunas JSONB e indicadores ENT_* alimentados
+description: Catálogo dos blocos automáticos de pré-preenchimento do Step 4 do diagnóstico Enterprise — fontes, edge functions, Perfil do Empreendimento e indicadores ENT_* alimentados
 type: feature
 ---
 # Catálogo de Blocos Automáticos — Enterprise Step 4
 
-Cada bloco roda independentemente e persiste em uma coluna JSONB de `enterprise_profiles`, alimentando 1+ indicadores `ENT_*` no diagnóstico.
+Cada bloco roda independentemente e persiste em uma coluna JSONB de `enterprise_profiles`, alimentando 1+ indicadores `ENT_*` no diagnóstico. O **Perfil do Empreendimento** é um item explícito do checklist de pré-preenchimento, mas não é uma edge function própria: ele é aplicado a partir dos metadados retornados por Reviews/CNPJ/Eventos e deve aparecer separado de "Reviews Online" na UI.
 
 | # | Bloco | Edge function | Coluna JSONB | Indicadores alimentados | Fonte |
 |---|-------|---------------|--------------|--------------------------|-------|
 | 1 | Reviews do estabelecimento | search-business-reviews | review_analysis | ENT_NPS, ENT_AVAL_GOOGLE | Firecrawl + LLM |
+| 1.1 | Perfil do Empreendimento | (aplicado pelo front a partir de Reviews/CNPJ/Eventos) | property_type, star_rating, room_count, employee_count, seasonality, cnpj_data | (perfil contextual obrigatório: tipo, categoria, UHs, funcionários, sazonalidade, CNPJ) | Metadados do site oficial/reviews + BrasilAPI + eventos |
 | 2 | Presença digital | search-digital-presence | digital_presence_analysis | ENT_PRESENCA_WEB | Firecrawl |
 | 3 | Contexto municipal | search-destination-context | context_analysis | ENT_CONTEXTO_DESTINO | IBGE/ANAC/ANATEL/Mapa Turismo |
 | 4 | CNPJ / Receita Federal | validate-cnpj | cnpj_data | (perfil: razão social, CNAE, anos op.) | BrasilAPI |
@@ -26,7 +27,7 @@ Cada bloco roda independentemente e persiste em uma coluna JSONB de `enterprise_
 | 15 | Reputação OTAs consolidada | search-consolidated-reputation | consolidated_reputation_analysis | ENT_REPUTACAO_CONSOLIDADA | Booking+Google+TripAdvisor+Airbnb |
 | 16 | Redes sociais | search-social-media | social_media_analysis | ENT_PRESENCA_DIGITAL | Instagram/FB/TikTok |
 
-**UI:** painel-resumo no topo do Step 4 mostra `X/16` blocos preenchidos com barra de progresso e badges por bloco. Implementado em `src/components/enterprise/EnterpriseProfileStep.tsx` a partir da v1.80.0.
+**UI:** painel-resumo no topo do Step 4 mostra os blocos/itens preenchidos com barra de progresso e badges por item. `Perfil do Empreendimento` deve aparecer como item separado de `Reviews Online`; só fica verde quando campos reais do perfil forem preenchidos automaticamente, nunca apenas porque Reviews rodou. Implementado em `src/components/enterprise/EnterpriseProfileStep.tsx` a partir da v1.80.0 e separado explicitamente na v1.97.17.
 
 **Secrets necessários:** `FIRECRAWL_API_KEY`, `LOVABLE_API_KEY` (para `beni-chat` em análises com LLM).
 
