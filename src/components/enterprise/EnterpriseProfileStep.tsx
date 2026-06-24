@@ -898,6 +898,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             onProfileAutoFill={handleProfileAutoFill}
             onAnalysisCapture={handleReviewAnalysisCapture}
             onBusinessNameChange={setEnterpriseName}
+            defaultBusinessName={enterpriseName}
             defaultLocation={destinationName}
             compact
           />
