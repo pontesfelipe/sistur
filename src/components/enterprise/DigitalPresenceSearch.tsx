@@ -94,6 +94,23 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
 
   return (
     <div className="space-y-4">
+      {(businessName?.trim() || location?.trim()) && (
+        <div className="flex flex-wrap items-center gap-1.5 text-xs">
+          <span className="text-muted-foreground">Buscando:</span>
+          {businessName?.trim() && (
+            <Badge variant="secondary" className="text-[10px] gap-1">
+              <Search className="h-3 w-3" />
+              {businessName.trim()}
+            </Badge>
+          )}
+          {location?.trim() && (
+            <Badge variant="outline" className="text-[10px] gap-1">
+              <MapPin className="h-3 w-3" />
+              {location.trim()}
+            </Badge>
+          )}
+        </div>
+      )}
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
           Detecta automaticamente site oficial, Google Business, OTAs (Booking, Expedia, Airbnb…) e redes sociais — preenche maturidade digital e canal direto.

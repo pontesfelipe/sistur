@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 7,
+  patch: 8,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.8",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial — bloco 'Presença Digital Automática' agora exibe um chip 'Buscando: <nome do empreendimento> · <município>' herdado do prefill da rodada (mesma fonte usada pelo bloco Reviews). A busca já era automática via prop `businessName`, mas faltava feedback visual confirmando que o nome do hotel vindo do `assessment` (marca + unidade) foi reaproveitado — agora o usuário não precisa redigitar nem voltar ao bloco Reviews para conferir."
+    ]
+  },
   {
     version: "1.97.7",
     date: "2026-06-24",
