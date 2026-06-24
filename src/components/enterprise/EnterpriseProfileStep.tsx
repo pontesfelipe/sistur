@@ -218,7 +218,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   // global registry can render meaningful badges/toasts without coupling each
   // search component to the orchestrator.
   const BLOCK_META: Record<string, { label: string; source: string }> = {
-    reviews: { label: 'Reviews + Perfil do Empreendimento', source: 'Booking + TripAdvisor + Google (nota, volume, sentimento, NPS, tipo/categoria/quartos/funcionários)' },
+    reviews: { label: 'Reviews Online', source: 'Booking + TripAdvisor + Google (nota, volume, sentimento, NPS)' },
     digital: { label: 'Presença Digital', source: 'Google + OTAs + redes sociais' },
     context: { label: 'Contexto Municipal', source: 'IBGE + ANAC + ANATEL + Mapa do Turismo' },
     complaints: { label: 'Reclamações Públicas', source: 'Reclame Aqui + Procon' },
