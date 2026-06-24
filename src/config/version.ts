@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 11,
+  patch: 12,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.12",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial — removido o botão 'Preencher Indicadores Automaticamente' do bloco Reviews Online. O preenchimento dos indicadores (ENT_REVIEW_SCORE, ENT_REVIEW_VOL, ENT_TECH_SCORE, ENT_GUEST_SATISFACTION, ENT_NPS) e da metadata do perfil já acontecia automaticamente ao final da busca; a confirmação manual era redundante. Removida também a função `handleAutoFill` agora não utilizada."
+    ]
+  },
   {
     version: "1.97.11",
     date: "2026-06-24",
