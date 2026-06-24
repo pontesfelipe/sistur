@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 9,
+  patch: 10,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.10",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial — bloco 'Reviews Online' agora também é executado pelo botão 'Rodar todos': `BusinessReviewSearch` registra-se no orquestrador `useAutoFillRunner('reviews', ...)` e ganha tratamento de NoDataError quando faltam nome/localização. Para evitar re-execução em loop, o cascade automático (disparado após a busca manual de Reviews) agora pula o id 'reviews' via `skipIds`, e `handleRunAll` marca `autoCascadeTriggered` antes de iniciar."
+    ]
+  },
   {
     version: "1.97.9",
     date: "2026-06-24",

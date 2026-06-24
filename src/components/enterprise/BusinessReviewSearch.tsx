@@ -28,6 +28,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useAutoFillRunner, NoDataError } from '@/lib/autoFillRunner';
 
 interface GuestExperienceDimensions {
   atendimento: number | null;
@@ -122,6 +123,16 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
   const [propertyType, setPropertyType] = useState('hotel');
   const [isSearching, setIsSearching] = useState(false);
   const [result, setResult] = useState<SearchResult | null>(null);
+
+  // Registra este bloco no orquestrador "Rodar todos" do Step 4. Lança
+  // NoDataError quando faltam os campos obrigatórios para que o runner
+  // marque o bloco como "sem informações" em vez de erro.
+  useAutoFillRunner('reviews', async () => {
+    if (!businessName.trim() || !location.trim()) {
+      throw new NoDataError('Informe o nome do estabelecimento e a localização');
+    }
+    await handleSearch();
+  });
 
   const handleSearch = async () => {
     if (!businessName.trim() || !location.trim()) {
