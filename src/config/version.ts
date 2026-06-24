@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 10,
+  patch: 11,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.11",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial — descoberta automática de CNPJ a partir do nome do empreendimento. (1) Nova edge function `discover-cnpj` faz buscas paralelas via Firecrawl (CNPJ + nome + município, sites como cnpj.biz/consultacnpj, Receita Federal) extrai sequências de 14 dígitos do texto/markdown dos resultados, valida via algoritmo de checksum oficial e devolve o(s) candidato(s) rankeados por frequência. (2) `CnpjValidationSearch` ganhou props `businessName`/`location` (herdadas do bloco Reviews), botão 'Buscar online' e chamada automática `discover-cnpj` → `validate-cnpj` em sequência; lista as fontes consultadas (hostnames) abaixo do campo. (3) Registrado no orquestrador `useAutoFillRunner('cnpj', ...)` — agora 'Rodar todos' também tenta descobrir e validar o CNPJ automaticamente quando o campo está vazio; usa NoDataError quando faltam dados. (4) Meta-label do bloco CNPJ adicionada ao BLOCK_META do `EnterpriseProfileStep` para refletir a fonte real (Busca pública + Receita Federal/BrasilAPI)."
+    ]
+  },
   {
     version: "1.97.10",
     date: "2026-06-24",

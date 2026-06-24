@@ -1,16 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, ShieldCheck, Building2, MapPin, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, ShieldCheck, Building2, MapPin, CheckCircle2, XCircle, Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAutoFillRunner, NoDataError } from '@/lib/autoFillRunner';
 
 interface Props {
   initialCnpj?: string | null;
   onValidated?: (data: { cnpj: string; record: any; yearsInOperation: number | null }) => void;
+  /** Nome do empreendimento (vindo do bloco Reviews) — usado para buscar o CNPJ online. */
+  businessName?: string;
+  /** Localização (município/UF) — refina a busca online. */
+  location?: string;
 }
 
 function formatCnpj(v: string) {
@@ -22,16 +27,24 @@ function formatCnpj(v: string) {
     .replace(/(\d{4})(\d)/, '$1-$2');
 }
 
-export function CnpjValidationSearch({ initialCnpj, onValidated }: Props) {
+export function CnpjValidationSearch({ initialCnpj, onValidated, businessName, location }: Props) {
   const [cnpj, setCnpj] = useState(initialCnpj ? formatCnpj(initialCnpj) : '');
   const [loading, setLoading] = useState(false);
+  const [discovering, setDiscovering] = useState(false);
   const [data, setData] = useState<any>(null);
+  const [discoveredFrom, setDiscoveredFrom] = useState<string[] | null>(null);
 
-  const run = async () => {
-    const digits = cnpj.replace(/\D/g, '');
+  // Sincroniza com prefill assíncrono (ex.: CNPJ vindo do perfil salvo)
+  useEffect(() => {
+    if (initialCnpj && !cnpj) setCnpj(formatCnpj(initialCnpj));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialCnpj]);
+
+  const run = async (override?: string) => {
+    const digits = (override ?? cnpj).replace(/\D/g, '');
     if (digits.length !== 14) {
       toast.error('Informe um CNPJ válido (14 dígitos).');
-      return;
+      return null;
     }
     setLoading(true);
     setData(null);
@@ -52,12 +65,52 @@ export function CnpjValidationSearch({ initialCnpj, onValidated }: Props) {
 
       onValidated?.({ cnpj: digits, record, yearsInOperation: years });
       toast.success('CNPJ validado');
+      return record;
     } catch (e: any) {
       toast.error('Erro: ' + (e.message || ''));
+      throw e;
     } finally {
       setLoading(false);
     }
   };
+
+  /** Tenta descobrir o CNPJ a partir do nome do empreendimento + localização e já valida. */
+  const discoverAndValidate = async (silent = false) => {
+    const name = (businessName || '').trim();
+    if (!name) {
+      if (!silent) toast.error('Informe o nome do empreendimento no bloco Reviews para buscar o CNPJ.');
+      throw new NoDataError('Sem nome do empreendimento para buscar CNPJ');
+    }
+    setDiscovering(true);
+    try {
+      const { data: resp, error } = await supabase.functions.invoke('discover-cnpj', {
+        body: { businessName: name, location: location || '' },
+      });
+      if (error) throw error;
+      if (!resp?.success || !resp?.best?.cnpj) {
+        if (!silent) toast.info('Nenhum CNPJ encontrado em fontes públicas. Informe manualmente.');
+        throw new NoDataError(resp?.error || 'CNPJ não encontrado online');
+      }
+      const found: string = resp.best.cnpj;
+      setCnpj(formatCnpj(found));
+      setDiscoveredFrom(resp.best.sources || []);
+      if (!silent) toast.success(`CNPJ encontrado: ${formatCnpj(found)} — validando...`);
+      await run(found);
+    } finally {
+      setDiscovering(false);
+    }
+  };
+
+  // Registra no orquestrador "Rodar todos"
+  useAutoFillRunner('cnpj', async () => {
+    // Se já houver CNPJ digitado e ainda não validado, valida; senão tenta descobrir.
+    if (cnpj.replace(/\D/g, '').length === 14 && !data) {
+      await run();
+      return;
+    }
+    if (data) return; // já validado, não refaz
+    await discoverAndValidate(true);
+  });
 
   return (
     <div className="space-y-4">
@@ -66,11 +119,35 @@ export function CnpjValidationSearch({ initialCnpj, onValidated }: Props) {
           <label className="text-xs font-medium">CNPJ</label>
           <Input value={cnpj} onChange={(e) => setCnpj(formatCnpj(e.target.value))} placeholder="00.000.000/0000-00" />
         </div>
-        <Button onClick={run} disabled={loading} size="sm">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => discoverAndValidate(false).catch(() => {})}
+          disabled={discovering || loading || !businessName?.trim()}
+          size="sm"
+          title={businessName?.trim() ? 'Buscar CNPJ a partir do nome do empreendimento' : 'Informe o nome do empreendimento no bloco Reviews'}
+        >
+          {discovering ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
+          Buscar online
+        </Button>
+        <Button onClick={() => run().catch(() => {})} disabled={loading} size="sm">
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ShieldCheck className="h-4 w-4 mr-2" />}
           Validar
         </Button>
       </div>
+      {businessName?.trim() && !data && (
+        <p className="text-[11px] text-muted-foreground">
+          Dica: clique em <span className="font-medium">Buscar online</span> para localizar o CNPJ de
+          <span className="font-medium"> "{businessName}"</span>{location ? ` em ${location}` : ''} em fontes públicas.
+        </p>
+      )}
+      {discoveredFrom && discoveredFrom.length > 0 && (
+        <p className="text-[11px] text-muted-foreground">
+          Fontes consultadas: {discoveredFrom.slice(0, 2).map((u) => {
+            try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; }
+          }).join(', ')}{discoveredFrom.length > 2 ? ` +${discoveredFrom.length - 2}` : ''}
+        </p>
+      )}
 
       {data && (
         <>
