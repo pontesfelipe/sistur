@@ -847,14 +847,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       </Card>
 
       {!hasBusinessName && (
-        <div className="rounded-lg border border-amber-500/40 bg-amber-50/60 dark:bg-amber-950/20 px-4 py-3 text-sm text-amber-900 dark:text-amber-200">
-          <div className="font-medium flex items-center gap-2">
-            <AlertCircle className="h-4 w-4" />
-            Informe o nome do empreendimento abaixo (bloco Reviews) antes de rodar os blocos automáticos.
-          </div>
-          <p className="text-xs mt-1 opacity-90">
-            Os blocos da seção <strong>Sobre o Empreendimento</strong> dependem do nome digitado nesse campo. Sem ele, as buscas voltarão como "sem dados" ou trarão informações do município no lugar do hotel.
-          </p>
+        <div className="rounded-lg border border-amber-500/40 bg-amber-50/60 dark:bg-amber-950/20 px-4 py-3 text-sm text-amber-900 dark:text-amber-200 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          Informe o nome do empreendimento no campo abaixo antes de rodar as buscas.
         </div>
       )}
 
@@ -863,7 +858,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           🏨 Sobre o Empreendimento
         </h3>
-        <p className="text-xs text-muted-foreground">Buscas focadas no estabelecimento — usam o nome do hotel/pousada digitado no bloco Reviews.</p>
       </div>
       {/* 1) Pré-preenchimento Automático via IA (ACIMA do perfil) */}
       <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
