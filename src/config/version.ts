@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 12,
+  patch: 13,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.13",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial — bloco 'Reviews Online': dedupe da lista 'Fontes Encontradas' (mesma plataforma + mesma URL agora aparece uma única vez, evitando linhas repetidas como 'Google Hotels' várias vezes seguidas). Label do bloco no painel de pré-preenchimento renomeado para 'Reviews + Perfil do Empreendimento' para deixar explícito que a mesma busca alimenta tanto os indicadores (ENT_REVIEW_SCORE, ENT_REVIEW_VOL, ENT_TECH_SCORE, ENT_GUEST_SATISFACTION, ENT_NPS) quanto a metadata do perfil (categoria, tipo, nº de quartos, nº de funcionários). Obs.: o botão antigo 'Preencher Indicadores Automaticamente' já havia sido removido no código (v1.97.12) — se ainda aparece em produção, é cache da build publicada anterior; basta republicar.",
+    ],
+  },
   {
     version: "1.97.12",
     date: "2026-06-24",
