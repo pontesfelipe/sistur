@@ -23,12 +23,73 @@ import {
   Sparkles,
   Hotel,
   MapPin,
-  ArrowRight,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAutoFillRunner, NoDataError } from '@/lib/autoFillRunner';
+
+const normalizeSourcePlatform = (platform: string | null | undefined) => {
+  const raw = (platform || 'Fonte').trim();
+  const key = raw
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+  if (key.includes('tripadvisor') || key.includes('trip advisor')) return 'TripAdvisor';
+  if (key.includes('google') || key.includes('maps')) return 'Google';
+  if (key.includes('booking')) return 'Booking.com';
+  if (key.includes('expedia')) return 'Expedia';
+  if (key.includes('decolar')) return 'Decolar';
+  if (key.includes('hotel') && key.includes('oficial')) return 'Site Oficial';
+  if (key.includes('siteoficial') || key.includes('site oficial')) return 'Site Oficial';
+
+  return raw;
+};
+
+const normalizeSourceUrl = (url: string | null | undefined) =>
+  (url || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\/(www\.)?/, '')
+    .replace(/[?#].*$/, '')
+    .replace(/\/+$/, '');
+
+const dedupeReviewSources = (sources: BusinessReviewAnalysis['sources'] = []) => {
+  const byPlatform = new Map<string, { platform: string; url: string; rating: number | null }>();
+
+  sources.forEach((src) => {
+    const platform = normalizeSourcePlatform(src.platform);
+    const platformKey = platform.toLowerCase();
+    const current = byPlatform.get(platformKey);
+    const candidate = {
+      platform,
+      url: src.url || '',
+      rating: src.rating ?? null,
+    };
+
+    if (!current) {
+      byPlatform.set(platformKey, candidate);
+      return;
+    }
+
+    const currentScore = (current.url ? 2 : 0) + (current.rating != null ? 1 : 0);
+    const candidateScore = (candidate.url ? 2 : 0) + (candidate.rating != null ? 1 : 0);
+    if (candidateScore > currentScore) byPlatform.set(platformKey, candidate);
+  });
+
+  const byUrl = new Map<string, { platform: string; url: string; rating: number | null }>();
+  Array.from(byPlatform.values()).forEach((src) => {
+    const urlKey = normalizeSourceUrl(src.url);
+    if (!urlKey) {
+      byUrl.set(`${src.platform.toLowerCase()}|sem-url`, src);
+      return;
+    }
+    if (!byUrl.has(urlKey)) byUrl.set(urlKey, src);
+  });
+
+  return Array.from(byUrl.values());
+};
 
 interface GuestExperienceDimensions {
   atendimento: number | null;
@@ -149,24 +210,34 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
       });
 
       if (error) throw error;
-      setResult(data);
+      const normalizedData = data?.analysis
+        ? {
+            ...data,
+            analysis: {
+              ...data.analysis,
+              sources: dedupeReviewSources(data.analysis.sources || []),
+              platforms_found: Array.from(new Set((data.analysis.platforms_found || []).map(normalizeSourcePlatform))),
+            },
+          }
+        : data;
+      setResult(normalizedData);
       toast.success('Busca concluída!');
-      if (data?.businessName) onBusinessNameChange?.(data.businessName);
+      if (normalizedData?.businessName) onBusinessNameChange?.(normalizedData.businessName);
 
       // Capture full analysis for persistence
-      if (data?.analysis && onAnalysisCapture) {
+      if (normalizedData?.analysis && onAnalysisCapture) {
         onAnalysisCapture({
-          ...data.analysis,
-          businessName: data.businessName,
-          location: data.location,
-          searchResults: data.searchResults,
+          ...normalizedData.analysis,
+          businessName: normalizedData.businessName,
+          location: normalizedData.location,
+          searchResults: normalizedData.searchResults,
           searchedAt: new Date().toISOString(),
         });
       }
 
       // Auto-fill profile metadata immediately when results arrive
       if (onProfileAutoFill) {
-        const meta = data?.analysis?.property_metadata || {};
+        const meta = normalizedData?.analysis?.property_metadata || {};
         // Build metadata merging AI results with search form fallback
         const enrichedMeta = {
           star_rating: meta.star_rating ?? null,
@@ -180,18 +251,18 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
       }
 
       // Auto-fill indicators immediately when results arrive
-      if (data?.analysis && onAutoFill) {
+      if (normalizedData?.analysis && onAutoFill) {
         const values: Record<string, number> = {};
-        if (data.analysis.review_score !== null) values['ENT_REVIEW_SCORE'] = data.analysis.review_score;
-        if (data.analysis.review_count !== null && data.analysis.review_count !== undefined) {
-          values['ENT_REVIEW_VOL'] = data.analysis.review_count;
+        if (normalizedData.analysis.review_score !== null) values['ENT_REVIEW_SCORE'] = normalizedData.analysis.review_score;
+        if (normalizedData.analysis.review_count !== null && normalizedData.analysis.review_count !== undefined) {
+          values['ENT_REVIEW_VOL'] = normalizedData.analysis.review_count;
         }
-        if (data.analysis.digital_maturity !== null) values['ENT_TECH_SCORE'] = data.analysis.digital_maturity;
-        if (data.analysis.sentiment_score !== null && data.analysis.sentiment_score !== undefined) {
+        if (normalizedData.analysis.digital_maturity !== null) values['ENT_TECH_SCORE'] = normalizedData.analysis.digital_maturity;
+        if (normalizedData.analysis.sentiment_score !== null && normalizedData.analysis.sentiment_score !== undefined) {
           // sentiment_score is 0-5 → ENT_GUEST_SATISFACTION é 0-10
-          values['ENT_GUEST_SATISFACTION'] = Number((data.analysis.sentiment_score * 2).toFixed(2));
+          values['ENT_GUEST_SATISFACTION'] = Number((normalizedData.analysis.sentiment_score * 2).toFixed(2));
           // NPS derivado: (sentiment - 3) * 50 ∈ [-100, 100]
-          const nps = Math.max(-100, Math.min(100, Math.round((data.analysis.sentiment_score - 3) * 50)));
+          const nps = Math.max(-100, Math.min(100, Math.round((normalizedData.analysis.sentiment_score - 3) * 50)));
           values['ENT_NPS'] = nps;
         }
         if (Object.keys(values).length > 0) {
@@ -495,21 +566,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                     <CardContent className="p-4 space-y-2">
                       <span className="text-xs font-medium">Fontes Encontradas</span>
                       <div className="space-y-1.5">
-                        {(() => {
-                          // Dedup: mesma plataforma + mesma URL (normalizada) = uma única linha.
-                          // Se vier sem URL, dedup pela combinação plataforma + rating.
-                          const seen = new Set<string>();
-                          const unique = result.analysis!.sources.filter((src) => {
-                            const url = (src.url || '').trim().toLowerCase().replace(/\/+$/, '');
-                            const key = url
-                              ? `${(src.platform || '').toLowerCase()}|${url}`
-                              : `${(src.platform || '').toLowerCase()}|${src.rating ?? 'na'}`;
-                            if (seen.has(key)) return false;
-                            seen.add(key);
-                            return true;
-                          });
-                          return unique;
-                        })().map((src, i) => (
+                        {dedupeReviewSources(result.analysis.sources).map((src, i) => (
                           <div key={i} className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
                               <Badge variant="secondary" className="text-[10px] px-1.5">
