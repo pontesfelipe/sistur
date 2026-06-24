@@ -847,14 +847,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       </Card>
 
       {!hasBusinessName && (
-        <div className="rounded-lg border border-amber-500/40 bg-amber-50/60 dark:bg-amber-950/20 px-4 py-3 text-sm text-amber-900 dark:text-amber-200">
-          <div className="font-medium flex items-center gap-2">
-            <AlertCircle className="h-4 w-4" />
-            Informe o nome do empreendimento abaixo (bloco Reviews) antes de rodar os blocos automáticos.
-          </div>
-          <p className="text-xs mt-1 opacity-90">
-            Os blocos da seção <strong>Sobre o Empreendimento</strong> dependem do nome digitado nesse campo. Sem ele, as buscas voltarão como "sem dados" ou trarão informações do município no lugar do hotel.
-          </p>
+        <div className="rounded-lg border border-amber-500/40 bg-amber-50/60 dark:bg-amber-950/20 px-4 py-3 text-sm text-amber-900 dark:text-amber-200 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          Informe o nome do empreendimento no campo abaixo antes de rodar as buscas.
         </div>
       )}
 
@@ -863,7 +858,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           🏨 Sobre o Empreendimento
         </h3>
-        <p className="text-xs text-muted-foreground">Buscas focadas no estabelecimento — usam o nome do hotel/pousada digitado no bloco Reviews.</p>
       </div>
       {/* 1) Pré-preenchimento Automático via IA (ACIMA do perfil) */}
       <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
@@ -874,14 +868,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Pré-preenchimento Automático
+                Reviews Online
                 <Badge variant="secondary" className="text-[10px]">
                   <Sparkles className="h-3 w-3 mr-1" />
                   IA
                 </Badge>
               </CardTitle>
               <CardDescription>
-                Busque reviews online do seu estabelecimento para preencher automaticamente o perfil e os indicadores de reputação
+                Google, TripAdvisor e Booking — alimenta reputação, satisfação e maturidade digital
               </CardDescription>
             </div>
             {reviewAutoFilled && (
@@ -1151,7 +1145,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           📄 Cadastro Legal
         </h3>
-        <p className="text-xs text-muted-foreground">Dados oficiais da pessoa jurídica do empreendimento.</p>
       </div>
       {/* 1.7) Validação CNPJ */}
       <Card className="border-purple-500/30 bg-gradient-to-br from-purple-50/50 to-fuchsia-50/30 dark:from-purple-950/20 dark:to-fuchsia-950/10">
@@ -1183,7 +1176,6 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           🌎 Sobre o Município / Destino
         </h3>
-        <p className="text-xs text-muted-foreground">Indicadores do contexto territorial onde o empreendimento opera (independe do nome do hotel).</p>
       </div>
       {/* 1.6) Contexto & Conectividade do Destino */}
       <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-50/50 to-teal-50/30 dark:from-emerald-950/20 dark:to-teal-950/10">

@@ -269,23 +269,23 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
   };
 
   return (
-    <Card className={cn(!compact && 'max-w-2xl mx-auto')}>
-      <CardHeader className={compact ? 'pb-3' : undefined}>
-        <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Search className="h-5 w-5 text-primary" />
+    <Card className={cn(!compact && 'max-w-2xl mx-auto', compact && 'border-0 shadow-none bg-transparent')}>
+      {!compact && (
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Search className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Busca de Reviews Online</CardTitle>
+              <CardDescription>
+                Pesquise avaliações em Google, TripAdvisor e outros
+              </CardDescription>
+            </div>
           </div>
-          <div>
-            <CardTitle className={compact ? 'text-base' : 'text-lg'}>
-              Busca de Reviews Online
-            </CardTitle>
-            <CardDescription>
-              Pesquise avaliações em Google, TripAdvisor e outros
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </CardHeader>
+      )}
+      <CardContent className={cn('space-y-4', compact && 'p-0')}>
         {/* Search Form */}
         <div className={cn('grid gap-3', compact ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2')}>
           <div className="space-y-1.5">

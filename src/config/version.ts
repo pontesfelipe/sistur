@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 8,
+  patch: 9,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.9",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Step 4 do Diagnóstico Empresarial — limpeza de linguagem duplicada: (1) removido o card interno 'Busca de Reviews Online' do `BusinessReviewSearch` quando em modo `compact` (estava dentro de outro card com header equivalente — agora o formulário herda o chrome do card pai); (2) card pai renomeado de 'Pré-preenchimento Automático' para 'Reviews Online' com descrição mais direta, evitando repetir o título do painel de progresso acima; (3) aviso âmbar reduzido a uma linha (sem repetir a explicação da seção); (4) removidos os helpers redundantes das seções '🏨 Sobre o Empreendimento', '📄 Cadastro Legal' e '🌎 Sobre o Município/Destino' — as descrições dos cards já explicam o escopo de cada bloco."
+    ]
+  },
   {
     version: "1.97.8",
     date: "2026-06-24",
