@@ -225,6 +225,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     if (runAllLoading) return;
     setRunAllLoading(true);
     setRunAllProgress(null);
+    // Marca o cascade como já disparado para evitar que a conclusão do bloco
+    // "reviews" (agora parte do Rodar todos) re-dispare handleRunAll em loop.
+    setAutoCascadeTriggered(true);
     toast.info('Iniciando preenchimento automático...');
     let okCount = 0;
     let failCount = 0;
@@ -304,7 +307,40 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   useEffect(() => {
     if (reviewAutoFilled && !autoCascadeTriggered && !runAllLoading) {
       setAutoCascadeTriggered(true);
-      handleRunAll();
+      // Reviews já rodou manualmente — dispara os demais blocos pulando "reviews"
+      // para evitar re-executar a mesma busca.
+      (async () => {
+        setRunAllLoading(true);
+        setRunAllProgress(null);
+        let okCount = 0, failCount = 0, noDataCount = 0;
+        try {
+          await runAllAutoFills({
+            delayMs: 800,
+            skipIds: ['reviews'],
+            onProgress: (info) => setRunAllProgress(info),
+            onBlockComplete: (info) => {
+              blockToast(info);
+              if (info.status === 'success') okCount++;
+              else if (info.status === 'no_data') noDataCount++;
+              else failCount++;
+            },
+          });
+          if (failCount === 0 && noDataCount === 0) {
+            toast.success(`Todos os ${okCount} blocos foram executados com sucesso`);
+          } else if (failCount === 0) {
+            toast.info(`${okCount} OK • ${noDataCount} sem informações disponíveis`);
+          } else {
+            toast.warning(`${okCount} OK • ${noDataCount} sem dados • ${failCount} falharam — use "Tentar novamente"`);
+          }
+          persistRunState();
+        } catch (e: any) {
+          console.error(e);
+          toast.error('Falha ao executar blocos: ' + (e?.message || 'erro desconhecido'));
+        } finally {
+          setRunAllLoading(false);
+          setRunAllProgress(null);
+        }
+      })();
     }
   }, [reviewAutoFilled, autoCascadeTriggered, runAllLoading]);
 
