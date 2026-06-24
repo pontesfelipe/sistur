@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 14,
+  patch: 15,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.15",
+    date: "2026-06-24",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Empresarial — correção definitiva do bloco Reviews Online: as fontes agora são normalizadas e deduplicadas por plataforma canônica (Google, TripAdvisor, Booking.com, Expedia, Site Oficial etc.) antes de salvar e antes de renderizar, evitando repetições como 'Google Hotels'/'Google Hotel Search'/'Google' e múltiplas linhas de TripAdvisor. O retorno da edge function `search-business-reviews` também passa pelo mesmo saneamento, então dados novos já chegam limpos ao front. O botão legado 'Preencher Indicadores Automaticamente' não existe mais no código-fonte atual; esta versão força uma nova build para substituir qualquer bundle publicado antigo que ainda estivesse aparecendo no domínio customizado.",
+    ],
+  },
   {
     version: "1.97.14",
     date: "2026-06-24",

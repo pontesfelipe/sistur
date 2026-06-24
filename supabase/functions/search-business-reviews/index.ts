@@ -180,6 +180,8 @@ Retorne APENAS um JSON válido com esta estrutura:
       }
     }
 
+    analysis = normalizeReviewAnalysis(analysis);
+
     const response = {
       success: true,
       businessName,
@@ -225,4 +227,74 @@ async function searchFirecrawl(apiKey: string, query: string, limit: number, scr
   }
 
   return response.json();
+}
+
+function normalizeSourcePlatform(platform: string | null | undefined) {
+  const raw = (platform || 'Fonte').trim();
+  const key = raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+  if (key.includes('tripadvisor') || key.includes('trip advisor')) return 'TripAdvisor';
+  if (key.includes('google') || key.includes('maps')) return 'Google';
+  if (key.includes('booking')) return 'Booking.com';
+  if (key.includes('expedia')) return 'Expedia';
+  if (key.includes('decolar')) return 'Decolar';
+  if (key.includes('hotel') && key.includes('oficial')) return 'Site Oficial';
+  if (key.includes('siteoficial') || key.includes('site oficial')) return 'Site Oficial';
+
+  return raw;
+}
+
+function normalizeSourceUrl(url: string | null | undefined) {
+  return (url || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\/(www\.)?/, '')
+    .replace(/[?#].*$/, '')
+    .replace(/\/+$/, '');
+}
+
+function dedupeSources(sources: any[] = []) {
+  const byPlatform = new Map<string, { platform: string; url: string; rating: number | null }>();
+
+  for (const src of sources) {
+    const platform = normalizeSourcePlatform(src?.platform);
+    const platformKey = platform.toLowerCase();
+    const candidate = {
+      platform,
+      url: src?.url || '',
+      rating: src?.rating ?? null,
+    };
+    const current = byPlatform.get(platformKey);
+
+    if (!current) {
+      byPlatform.set(platformKey, candidate);
+      continue;
+    }
+
+    const currentScore = (current.url ? 2 : 0) + (current.rating != null ? 1 : 0);
+    const candidateScore = (candidate.url ? 2 : 0) + (candidate.rating != null ? 1 : 0);
+    if (candidateScore > currentScore) byPlatform.set(platformKey, candidate);
+  }
+
+  const byUrl = new Map<string, { platform: string; url: string; rating: number | null }>();
+  for (const src of byPlatform.values()) {
+    const urlKey = normalizeSourceUrl(src.url);
+    if (!urlKey) {
+      byUrl.set(`${src.platform.toLowerCase()}|sem-url`, src);
+      continue;
+    }
+    if (!byUrl.has(urlKey)) byUrl.set(urlKey, src);
+  }
+
+  return Array.from(byUrl.values());
+}
+
+function normalizeReviewAnalysis(analysis: any) {
+  if (!analysis) return analysis;
+
+  return {
+    ...analysis,
+    sources: dedupeSources(Array.isArray(analysis.sources) ? analysis.sources : []),
+    platforms_found: Array.from(new Set((Array.isArray(analysis.platforms_found) ? analysis.platforms_found : []).map(normalizeSourcePlatform))),
+  };
 }
