@@ -33,7 +33,6 @@ export function useDestinations() {
       longitude?: number | null;
       visibility?: 'organization' | 'personal' | 'demo';
     }) => {
-      // Get the user's org_id and demo org info
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
       if (!user) throw new Error('Usuário não autenticado');
@@ -47,12 +46,16 @@ export function useDestinations() {
       if (profileError) throw profileError;
       if (!profile) throw new Error('Perfil não encontrado');
 
-      // Determine which org_id to use based on visibility
+      // Always target the org the user is effectively viewing — keeps the
+      // create flow aligned with the list (which uses effectiveOrgId).
+      // Otherwise dedup is checked against an org the user can't even see,
+      // surfacing "ghost" duplicate errors (ex.: usuário em modo demo recebia
+      // erro de duplicidade contra um destino existente apenas na org real).
+      const effectiveOrgId = profile.viewing_demo_org_id || profile.org_id;
       const targetOrgId = destination.visibility === 'demo' && profile.viewing_demo_org_id
         ? profile.viewing_demo_org_id
-        : profile.org_id;
-      
-      // For demo visibility, store as 'organization' in the DB (will be accessible when viewing demo)
+        : effectiveOrgId;
+
       const dbVisibility = destination.visibility === 'demo' ? 'organization' : (destination.visibility || 'organization');
 
       // Dedupe: primeiro por IBGE (fonte canônica), depois por nome+UF.
