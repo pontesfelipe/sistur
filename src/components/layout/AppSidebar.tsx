@@ -74,7 +74,7 @@ const navGroups: NavGroup[] = [
       { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
       { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true, module: 'diagnostico' },
       { name: 'Consórcios', href: '/consorcios', icon: Network, requiresERP: true, module: 'consorcios' },
-      { name: 'Observatório', href: '/observatorio', icon: Activity, requiresERP: true, module: 'observatorio' },
+      { name: 'Observatório (Em construção)', href: '/observatorio', icon: Activity, requiresERP: true, module: 'observatorio' },
       { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports', module: 'relatorios' },
       { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
     ],

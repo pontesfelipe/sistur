@@ -72,7 +72,7 @@ const navigationSections: NavSection[] = [
       { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
       { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
       { name: 'Consórcios', href: '/consorcios', icon: Network, requiresERP: true },
-      { name: 'Observatório', href: '/observatorio', icon: Activity, requiresERP: true },
+      { name: 'Observatório (Em construção)', href: '/observatorio', icon: Activity, requiresERP: true },
       { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
       { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
     ],
