@@ -98,7 +98,7 @@ export function BeniContextPanel() {
     setSaving(key);
     const { error } = await supabase
       .from('beni_settings')
-      .update({ [key]: value })
+      .update({ [key]: value } as any)
       .eq('id', true);
     setSaving(null);
     if (error) {

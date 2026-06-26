@@ -38,7 +38,7 @@ export function useEquipReward() {
       const field = input.type === 'avatar' ? 'equipped_avatar' : 'equipped_theme';
       const { error } = await supabase
         .from('edu_user_xp')
-        .upsert({ user_id: u.user.id, [field]: input.code }, { onConflict: 'user_id' });
+        .upsert({ user_id: u.user.id, [field]: input.code } as any, { onConflict: 'user_id' });
       if (error) throw error;
     },
     onSuccess: (_d, vars) => {

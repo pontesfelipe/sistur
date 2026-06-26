@@ -79,7 +79,7 @@ export function useAssessmentUnits(assessmentId: string | null | undefined) {
       }
       const { data, error } = await supabase
         .from('assessment_units')
-        .update(patch)
+        .update(patch as any)
         .eq('id', id)
         .select()
         .single();

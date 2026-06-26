@@ -24,9 +24,10 @@ interface Props {
   orgId: string | undefined;
   year: number;
   disabled?: boolean;
+  destinationId?: string;
 }
 
-export function DiscoverEventsDialog({ orgId, year, disabled }: Props) {
+export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -43,7 +44,7 @@ export function DiscoverEventsDialog({ orgId, year, disabled }: Props) {
     setSources([]);
     try {
       const { data, error } = await supabase.functions.invoke("discover-municipal-events", {
-        body: { org_id: orgId, year },
+        body: { org_id: orgId, year, destination_id: destinationId },
       });
       if (error) throw error;
       setCandidates(data?.candidates ?? []);

@@ -159,7 +159,7 @@ export function useAdminTrainingMutations() {
       
       const { data: training, error } = await supabase
         .from('edu_trainings')
-        .update(updateData)
+        .update(updateData as any)
         .eq('training_id', trainingId)
         .select()
         .single();
