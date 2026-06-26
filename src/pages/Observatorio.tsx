@@ -244,7 +244,7 @@ export default function Observatorio() {
             Painel contínuo deste destino — séries de fluxo, ocupação, eventos, receita e empregos.
             Distinto do diagnóstico cíclico: aqui acompanha-se o que está acontecendo agora.
           </p>
-          {isAdmin && orgDestinations.length > 1 && (
+          {orgDestinations.length > 1 && (
             <div className="mt-3 flex items-center gap-2">
               <Label className="text-xs text-muted-foreground">Visualizar destino:</Label>
               <Select
