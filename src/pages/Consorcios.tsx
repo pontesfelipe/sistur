@@ -89,7 +89,7 @@ export default function Consorcios() {
           <div>
             <h1 className="text-2xl font-display font-bold flex items-center gap-2">
               <Network className="h-6 w-6 text-primary" />
-              ERP Regional / Consórcios
+              Análise Regional / Consórcios
             </h1>
             <p className="text-muted-foreground mt-1 max-w-2xl">
               Agrupe municípios em um consórcio ou região turística para comparar diagnósticos e coordenar ações regionais. A comparação é privada entre os membros aceitos.
