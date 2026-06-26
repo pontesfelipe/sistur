@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  let body: { org_id?: string; year?: number } = {};
+  let body: { org_id?: string; year?: number; destination_id?: string } = {};
   try { body = await req.json(); } catch { /* noop */ }
 
   const year = body.year ?? new Date().getFullYear();
@@ -57,12 +57,22 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Resolve destino
-  const { data: dest } = await admin
+  // Resolve destino — org pode ter múltiplos destinos; aceita destination_id opcional.
+  let destQuery = admin
     .from("destinations")
     .select("name, uf")
     .eq("org_id", body.org_id)
-    .maybeSingle();
+    .order("created_at", { ascending: true })
+    .limit(1);
+  if (body.destination_id) {
+    destQuery = admin
+      .from("destinations")
+      .select("name, uf")
+      .eq("id", body.destination_id)
+      .limit(1);
+  }
+  const { data: destRows } = await destQuery;
+  const dest = destRows?.[0];
   if (!dest?.name) {
     return new Response(JSON.stringify({ error: "Destino não encontrado" }), {
       status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
