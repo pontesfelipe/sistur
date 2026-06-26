@@ -68,17 +68,23 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   {
-    label: 'ERP',
+    label: 'Analítico',
     icon: Briefcase,
     items: [
       { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
       { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true, module: 'diagnostico' },
-      { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true, module: 'projetos' },
-      { name: 'Minhas tarefas', href: '/minhas-tarefas', icon: FolderKanban, requiresERP: true },
       { name: 'Consórcios', href: '/consorcios', icon: Network, requiresERP: true, module: 'consorcios' },
       { name: 'Observatório', href: '/observatorio', icon: Activity, requiresERP: true, module: 'observatorio' },
       { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports', module: 'relatorios' },
       { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
+    ],
+  },
+  {
+    label: 'Gerenciamento de Projeto',
+    icon: FolderKanban,
+    items: [
+      { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true, module: 'projetos' },
+      { name: 'Minhas tarefas', href: '/minhas-tarefas', icon: FolderKanban, requiresERP: true },
     ],
   },
   {
