@@ -239,7 +239,7 @@ export function useIndicatorValues(assessmentId?: string, unitId?: string | null
 
         const { data, error } = await supabase
           .from('indicator_values')
-          .update(updateData)
+          .update(updateData as any)
           .eq('id', existing.id)
           .select()
           .single();
@@ -329,7 +329,7 @@ export function useIndicatorValues(assessmentId?: string, unitId?: string | null
         if (existing) {
           const { data, error } = await supabase
             .from('indicator_values')
-            .update(persistedValue)
+            .update(persistedValue as any)
             .eq('id', existing.id)
             .select()
             .single();
