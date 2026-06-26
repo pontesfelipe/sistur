@@ -170,17 +170,25 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
     onOpenChange(false);
   };
 
-  const filteredNavigation = useMemo(() => {
-    if (!initialized) return staticNavItems;
-    
-    return navigation.filter((item) => {
-      if (item.requiresAdmin && !isAdmin) return false;
-      if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
-      if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
-      if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
-      return true;
-    });
-  }, [initialized, isAdmin, isProfessor, hasERPAccess, hasEDUAccess]);
+  const filterItem = useCallback((item: NavItem) => {
+    if (item.requiresAdmin && !isAdmin) return false;
+    if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
+    if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
+    if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
+    return true;
+  }, [isAdmin, isProfessor, hasERPAccess, hasEDUAccess]);
+
+  const filteredSections = useMemo(() => {
+    if (!initialized) {
+      return [{ label: '', items: staticNavItems }];
+    }
+    return navigationSections
+      .map(section => ({
+        ...section,
+        items: section.items.filter(filterItem),
+      }))
+      .filter(section => section.items.length > 0);
+  }, [initialized, filterItem]);
 
   const filteredBottomNavigation = useMemo(() => {
     if (!initialized) return staticBottomNavItems;
@@ -194,7 +202,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
     });
   }, [initialized, isAdmin, isProfessor, hasERPAccess, hasEDUAccess]);
 
-  const NavItem = ({ item }: { item: typeof navigation[0] }) => {
+  const NavItem = ({ item }: { item: NavItem }) => {
     const isActive = location.pathname === item.href || 
       (item.href !== '/' && location.pathname.startsWith(item.href));
     
@@ -253,8 +261,19 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
 
         {/* Navigation - with touch-friendly spacing */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-200px)] overscroll-contain">
-          {filteredNavigation.map((item) => (
-            <NavItem key={item.name} item={item} />
+          {filteredSections.map((section) => (
+            <div key={section.label} className="mb-3">
+              {section.label && (
+                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {section.label}
+                </div>
+              )}
+              <div className="space-y-0.5">
+                {section.items.map((item) => (
+                  <NavItem key={item.name} item={item} />
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
 
