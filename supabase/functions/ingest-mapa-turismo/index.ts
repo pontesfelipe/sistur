@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { requireAdminOrServiceRole } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -274,15 +275,6 @@ Deno.serve(async (req) => {
     const useFirecrawl = body.use_firecrawl === true; // default false now
     const singleMunicipality = body.municipality; // optional: { nuUf, nuLocalidade }
 
-    // Get user ID from JWT
-    const authHeader = req.headers.get('Authorization');
-    let userId: string | null = null;
-    if (authHeader) {
-      const token = authHeader.replace('Bearer ', '');
-      const { data: { user } } = await supabase.auth.getUser(token);
-      userId = user?.id || null;
-    }
-
     // ─── Single municipality lookup mode ─────────────────────────────
     if (singleMunicipality) {
       const data = await fetchSingleMunicipio(singleMunicipality.nuUf, singleMunicipality.nuLocalidade);
@@ -319,6 +311,10 @@ Deno.serve(async (req) => {
     }
 
     // ─── Bulk import mode ────────────────────────────────────────────
+    // Bulk import mutates shared reference data — restrict to ADMIN or service-role.
+    const authCheck = await requireAdminOrServiceRole(req);
+    if (authCheck instanceof Response) return authCheck;
+    const userId = authCheck.mode === 'user' ? authCheck.user.id : null;
 
     // Create sync log
     const { data: syncLog } = await supabase
