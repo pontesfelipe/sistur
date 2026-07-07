@@ -113,7 +113,13 @@ serve(async (req) => {
     let systemPrompt = BENI_SYSTEM_PROMPT;
     let selectedModel = "google/gemini-3-flash-preview";
     try {
-      const { data: settings } = await userClient
+      // Use service-role client: beni_settings SELECT is admin-only via RLS,
+      // but every authenticated caller of this function needs the resolved prompt.
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      const { data: settings } = await adminClient
         .from("beni_settings")
         .select("persona, output_format, base_theory, dynamic_context, scope_guardrails, model")
         .eq("id", true)
