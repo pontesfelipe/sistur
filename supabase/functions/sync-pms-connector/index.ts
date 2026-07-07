@@ -10,6 +10,7 @@
  * Chamado por: cron diário (modo batch, sem corpo) OU UI ("sync agora" com {connectionId}).
  */
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { requireUser, requireServiceRole, forbidden } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -292,9 +293,28 @@ Deno.serve(async (req) => {
 
   let conns: Conn[] = [];
   if (body.connectionId) {
+    // Per-connection sync: requires an authenticated user that belongs to the
+    // connection's org (or an ADMIN).
+    const authRes = await requireUser(req);
+    if (authRes instanceof Response) return authRes;
+    const userId = authRes.user.id;
+
     const { data } = await admin.from('enterprise_pms_connections').select('*').eq('id', body.connectionId).single();
-    if (data) conns = [data as Conn];
+    if (!data) {
+      return new Response(JSON.stringify({ error: 'Connection not found' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const conn = data as Conn;
+    const { data: isAdmin } = await admin.rpc('has_role', { _user_id: userId, _role: 'ADMIN' });
+    const { data: belongs } = await admin.rpc('user_belongs_to_org', { _user_id: userId, _org_id: conn.org_id });
+    if (!isAdmin && !belongs) return forbidden('Not a member of this connection\'s organization');
+    conns = [conn];
   } else {
+    // Batch mode is reserved for pg_cron / service-role callers.
+    const svc = requireServiceRole(req);
+    if (svc) return svc;
     const { data } = await admin.from('enterprise_pms_connections').select('*').eq('status', 'active').limit(200);
     conns = (data ?? []) as Conn[];
   }
