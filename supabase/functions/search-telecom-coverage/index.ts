@@ -1,5 +1,6 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { requireUser } from '../_shared/auth.ts';
 
 /**
  * Bloco 19 — Conectividade Telecom (Anatel)
@@ -23,6 +24,8 @@ function tierFromScore(s: number): string {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   try {
+    const authRes = await requireUser(req);
+    if (authRes instanceof Response) return authRes;
     const { destinationId } = await req.json();
     if (!destinationId) throw new Error('destinationId obrigatório');
 

@@ -1,4 +1,5 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { requireUser } from '../_shared/auth.ts';
 
 const FIRECRAWL_V2 = 'https://api.firecrawl.dev/v2';
 
@@ -12,6 +13,8 @@ function classifyDemand(score: number) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   try {
+    const authRes = await requireUser(req);
+    if (authRes instanceof Response) return authRes;
     const apiKey = Deno.env.get('FIRECRAWL_API_KEY');
     if (!apiKey) throw new Error('FIRECRAWL_API_KEY ausente');
     const { businessName, location } = await req.json();
