@@ -1,5 +1,6 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { requireUser } from '../_shared/auth.ts';
 
 function classifyConnectivity(flights_per_week: number) {
   if (flights_per_week >= 200) return { tier: 'hub', score: 100 };
@@ -13,6 +14,9 @@ function classifyConnectivity(flights_per_week: number) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   try {
+    const authResult = await requireUser(req);
+    if (authResult instanceof Response) return authResult;
+
     const { destinationId } = await req.json();
     if (!destinationId) throw new Error('destinationId obrigatório');
 
