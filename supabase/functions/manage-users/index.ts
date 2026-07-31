@@ -809,8 +809,21 @@ Deno.serve(async (req) => {
         })
       }
 
+      // ORG_ADMIN may only resolve emails for users inside their own organization.
+      let allowedIds: string[] = user_ids
+      if (!isAdmin) {
+        const { data: scopedProfiles } = await supabaseAdmin
+          .from('profiles')
+          .select('user_id')
+          .in('user_id', user_ids)
+          .eq('org_id', requesterOrgId)
+        allowedIds = (scopedProfiles ?? []).map((p: any) => p.user_id)
+      }
+      const allowedSet = new Set(allowedIds)
+
       const usersWithEmail = await Promise.all(
         user_ids.map(async (userId: string) => {
+          if (!allowedSet.has(userId)) return { user_id: userId, email: null }
           const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(userId)
           return { user_id: userId, email: user?.email || null }
         })
