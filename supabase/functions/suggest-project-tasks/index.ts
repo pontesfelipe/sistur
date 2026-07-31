@@ -48,11 +48,23 @@ Deno.serve(async (req) => {
     // Load context
     const { data: project } = await admin
       .from("projects")
-      .select("id, name, description, methodology, status, destination:destinations(name, uf), assessment_id")
+      .select("id, name, description, methodology, status, org_id, destination:destinations(name, uf), assessment_id")
       .eq("id", project_id).single();
     if (!project) {
       return new Response(JSON.stringify({ error: "Project not found" }), {
         status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Authorization: caller must be a platform ADMIN or belong to the project's org.
+    const [{ data: isAdminData }, { data: prof }] = await Promise.all([
+      admin.rpc("has_role", { _user_id: userData.user.id, _role: "ADMIN" }),
+      admin.from("profiles").select("org_id").eq("user_id", userData.user.id).maybeSingle(),
+    ]);
+    const isAdmin = isAdminData === true;
+    if (!isAdmin && (!prof?.org_id || prof.org_id !== (project as any).org_id)) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
