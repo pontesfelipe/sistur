@@ -252,13 +252,14 @@ async function processOne(conn: Conn, admin: ReturnType<typeof createClient>) {
                 reference_date: result.parsed.period_end,
                 source: `PMS:${conn.provider}`,
                 notes: `Import ${imp.id}`,
+                unit_id: null,
               };
             })
             .filter(Boolean) as any[];
           if (rows.length > 0) {
             await admin
               .from('enterprise_indicator_values')
-              .upsert(rows, { onConflict: 'indicator_id,assessment_id' });
+              .upsert(rows, { onConflict: 'assessment_id,indicator_id,unit_id' });
           }
         }
       }

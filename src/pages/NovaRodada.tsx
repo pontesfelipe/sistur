@@ -288,11 +288,12 @@ export default function NovaRodada() {
             source: `Pré-preenchido (${v.source_code})`,
             org_id: valueOrgId,
             reference_date: v.reference_year ? `${v.reference_year}-01-01` : null,
+            unit_id: null,
           }));
         if (valuesToInsert.length > 0) {
           const { error } = await supabase
             .from('indicator_values')
-            .upsert(valuesToInsert, { onConflict: 'assessment_id,indicator_id' });
+            .upsert(valuesToInsert, { onConflict: 'assessment_id,indicator_id,unit_id' });
           if (error) throw error;
         }
       }

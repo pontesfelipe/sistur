@@ -130,9 +130,7 @@ export function NovaRodadaDialogs({
       await supabase
         .from('indicator_values')
         .upsert(rows, {
-          onConflict: isMultiUnit
-            ? 'assessment_id,indicator_id,unit_id'
-            : 'assessment_id,indicator_id',
+          onConflict: 'assessment_id,indicator_id,unit_id',
         });
     })();
   }, [reviewPreFillValues, createdAssessmentId, indicators, orgId, isMultiUnit, activeUnit?.id]);

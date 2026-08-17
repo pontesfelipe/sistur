@@ -127,6 +127,7 @@ export function ReportValidationBanner({
           value_raw: numeric,
           value_text: c.to,
           source: 'Autofix — Conferência de dados',
+          unit_id: null,
         });
       }
 
@@ -137,7 +138,7 @@ export function ReportValidationBanner({
 
       const { error } = await supabase
         .from('indicator_values')
-        .upsert(rows, { onConflict: 'assessment_id,indicator_id' });
+        .upsert(rows, { onConflict: 'assessment_id,indicator_id,unit_id' });
       if (error) {
         toast.error(error.message || 'Falha ao aplicar autofix.');
         return;
@@ -770,10 +771,11 @@ function IndicatorFixDialog({
       value_raw: numeric,
       value_text: valueText || null,
       source,
+      unit_id: null,
     };
     const { error } = await supabase
       .from('indicator_values')
-      .upsert(payload as any, { onConflict: 'assessment_id,indicator_id' });
+      .upsert(payload as any, { onConflict: 'assessment_id,indicator_id,unit_id' });
     setSaving(false);
     if (error) {
       toast.error(error.message || 'Não foi possível salvar o valor.');
