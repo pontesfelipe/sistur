@@ -257,12 +257,13 @@ export function DataValidationPanel({
         source: `Pré-preenchido (${v.source_code})`,
         org_id: orgId,
         reference_date: v.reference_year ? `${v.reference_year}-01-01` : null,
+        unit_id: null,
       }));
 
     if (valuesToPersist.length === 0) return;
     const { error } = await supabase
       .from('indicator_values')
-      .upsert(valuesToPersist, { onConflict: 'assessment_id,indicator_id' });
+      .upsert(valuesToPersist, { onConflict: 'assessment_id,indicator_id,unit_id' });
     if (error) throw error;
     await queryClient.invalidateQueries({ queryKey: ['indicator-values', assessmentId] });
   };
