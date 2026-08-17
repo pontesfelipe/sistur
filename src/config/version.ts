@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 18,
+  patch: 19,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.97.19",
+    date: "2026-08-17",
+    type: "patch" as const,
+    changes: [
+      "Correção crítica de salvamento de indicadores (erro reportado por usuários em /nova-rodada: \"there is no unique or exclusion constraint matching the ON CONFLICT specification\"). Os índices únicos de `indicator_values` e `enterprise_indicator_values` eram parciais (`WHERE unit_id IS NULL` / `IS NOT NULL`), e o PostgREST não consegue inferir índice parcial em `upsert` — toda gravação por `onConflict: 'assessment_id,indicator_id'` falhava (pré-preenchimento automático, validação de dados oficiais, autofix do relatório, recuperação de auto-fill empresarial e sync PMS). Os dois índices parciais foram substituídos por um índice único total `(assessment_id, indicator_id, unit_id) NULLS NOT DISTINCT`, que cobre tanto rodadas single-unit quanto multi-unidade, e todos os call sites passaram a usar `onConflict: 'assessment_id,indicator_id,unit_id'` com `unit_id` explícito no payload.",
+    ],
+  },
   {
     version: "1.97.18",
     date: "2026-06-24",
