@@ -237,6 +237,7 @@ Deno.serve(async (req) => {
         value_raw: collected[code].value,
         source: collected[code].source,
         collected_at: new Date().toISOString(),
+        unit_id: null,
       });
       if (ex) updated.push(code); else inserted.push(code);
     }
@@ -244,7 +245,7 @@ Deno.serve(async (req) => {
     if (upserts.length > 0) {
       const { error: upErr } = await admin
         .from('indicator_values')
-        .upsert(upserts, { onConflict: 'assessment_id,indicator_id' });
+        .upsert(upserts, { onConflict: 'assessment_id,indicator_id,unit_id' });
       if (upErr) {
         return new Response(JSON.stringify({ error: 'Erro ao gravar valores', detail: upErr.message }), {
           status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
