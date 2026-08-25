@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 97,
-  patch: 19,
+  patch: 20,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,6 +23,19 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.97.20",
+    date: "2026-08-25",
+    type: "patch" as const,
+    changes: [
+      "Varredura completa do sistema (segurança, tipos, lint, testes, build e erros de runtime reportados por usuários).",
+      "Correção crítica de isolamento multi-tenant em `assessment_units`: a política de leitura não restringia por organização, permitindo que qualquer usuário autenticado listasse unidades de diagnósticos de outras organizações. Agora exige pertencer à organização do diagnóstico (incluindo modo demo) ou ter papel ADMIN.",
+      "Políticas de `certificates` (que contêm PII) reescritas para o papel `authenticated` em vez do papel `public`, mantendo: cada usuário vê apenas os próprios certificados e ADMIN gerencia todos.",
+      "Função interna `touch_report_structure_templates_updated_at` passou a fixar `search_path`, eliminando o último alerta de \"Function Search Path Mutable\" do linter do banco.",
+      "Verificações sem pendências: TypeScript sem erros, 28 testes passando, build de produção OK, scanner de dependências sem vulnerabilidades altas/críticas.",
+    ],
+  },
+  {
+
     version: "1.97.19",
     date: "2026-08-17",
     type: "patch" as const,
