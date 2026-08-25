@@ -1,87 +1,47 @@
-# Fase 4 — Cálculo + relatório agregado de marca
+# Plano de implementação — 3 melhorias de alto impacto
 
-Objetivo: gerar **scores por unidade** + **consolidação ponderada da marca** num único `assessment_id` multi-unidade, e expor isso no relatório.
+## 1. Sumário Executivo de 1 página (Diagnóstico)
 
-## 1. Schema (migration)
+Nova aba/ação no diagnóstico que gera um resumo de uma página, pronto para impressão e exportação.
 
-Adicionar `unit_id uuid NULL REFERENCES assessment_units(id) ON DELETE CASCADE` em:
+Conteúdo:
+- Cabeçalho: destino/empreendimento, ciclo, data do cálculo, tier.
+- Índices dos 3 pilares (RA/OE/AO) com status em percentual (Adequado/Atenção/Crítico).
+- Top 5 gargalos (indicadores críticos) e Top 5 pontos fortes.
+- Interpretação territorial (Estrutural/Gestão/Entrega) e avisos IGMA em uma linha cada.
+- Próximos passos: recomendações e prescrições EDU vinculadas aos gargalos.
+- Rodapé com procedência dos dados (fontes oficiais usadas) e versão do sistema.
 
-- `indicator_scores`
-- `pillar_scores`
-- `issues`
-- `recommendations`
+Ações: imprimir/PDF (via print CSS) e exportar DOCX reaproveitando o utilitário de exportação existente.
 
-Para cada tabela: criar índice em `(assessment_id, unit_id)` e substituir os índices únicos existentes por **parciais** (`WHERE unit_id IS NULL` para legado + `WHERE unit_id IS NOT NULL` para multi-unidade), espelhando o padrão já usado em `indicator_values`.
+## 2. Comparativo entre ciclos lado a lado
 
-Nova tabela `assessment_brand_rollups` (por assessment, agregado de marca):
+Evolui o comparativo atual, que hoje só mostra a rodada anterior automaticamente.
 
-```text
-assessment_brand_rollups
-├── assessment_id (PK fk)
-├── brand_id
-├── pillar ('RA'|'OE'|'AO'|'GLOBAL')
-├── score_weighted     -- média ponderada por room_count
-├── score_simple       -- média simples
-├── stddev             -- dispersão entre unidades
-├── unit_count
-└── critical_unit_id   -- unidade pior naquele pilar
-PK (assessment_id, pillar)
-```
+- Seletor de duas rodadas calculadas do mesmo destino (A vs B).
+- Tabela indicador a indicador: valor A, valor B, variação em pontos percentuais, mudança de status.
+- Filtros por pilar e por tipo de mudança (melhorou / piorou / estável / mudou de status).
+- Destaque automático das 5 maiores melhorias e 5 maiores regressões, com o motivo derivado dos dados (valor bruto, fonte e mudança de faixa de normalização).
+- Exportação CSV do comparativo.
 
-GRANT + RLS por `org_id` via `assessment_id`.
+## 3. Simulador what-if ligado ao diagnóstico real
 
-## 2. Edge function `calculate-assessment` (refactor)
+- Carrega os indicadores reais da rodada selecionada.
+- Sliders por indicador (com limites e formato do catálogo) recalculando, no cliente, score normalizado, índice do pilar e status — usando exatamente as mesmas regras do motor atual (faixas 67%/34%, direção do indicador, pesos da organização).
+- Painel de resumo: status atual vs simulado por pilar, e quais indicadores dão maior ganho por esforço.
+- Nada é gravado no diagnóstico: a simulação é apenas exploratória.
+- Ação "criar projeto a partir deste cenário", reaproveitando o fluxo de geração de projeto já existente, levando os indicadores escolhidos como metas.
 
-```text
-runCalculationCore(assessment_id)
-├── carrega assessment + units = SELECT * FROM assessment_units WHERE assessment_id=?
-├── se units.length <= 1 → fluxo atual intocado (compat single-unit)
-└── senão (multi-unit enterprise):
-      for each unit in units:
-          runUnitCalculation(assessment_id, unit)
-              ├── busca indicator_values WHERE assessment_id=? AND unit_id=unit.id
-              ├── injeta derivados (receita, compliance) usando unit.destination_id e unit.enterprise_profile_id
-              ├── normaliza + scoreia → grava indicator_scores/pillar_scores/issues/recommendations COM unit_id
-              └── retorna {pillar_scores, critical}
-      aggregateBrand(units_results)
-          ├── pondera por enterprise_profiles.room_count (fallback 1)
-          ├── grava assessment_brand_rollups (RA, OE, AO, GLOBAL)
-          └── define pillar/score crítico da marca
-```
+## Notas técnicas
 
-Bloco de derivados enterprise (receita/compliance/reviews/competitors) passa a iterar por unidade usando `unit.destination_id` / `unit.enterprise_profile_id` em vez do `assessment.destination_id` global.
+- Novos componentes em `src/components/diagnostics/` (`ExecutiveSummary.tsx`, `CycleComparisonPanel.tsx`, `WhatIfSimulatorPanel.tsx`) e hooks correspondentes em `src/hooks/`.
+- Integração como novas abas em `DiagnosticoDetalhe.tsx`, disponíveis para modo territorial e empresarial (empresarial respeita filtro de unidade/marca).
+- Nenhuma mudança de schema: tudo é leitura de `assessments`, `pillar_scores`, `indicator_scores`, `indicator_values` (e equivalentes empresariais), respeitando `effectiveOrgId` e RLS.
+- Cálculo da simulação isolado em função pura reutilizando as regras de status já definidas, sem duplicar limites.
+- Bump de versão MINOR + entrada no `VERSION_HISTORY`.
 
-Resultado retornado: `{ success, mode: 'multi-unit', units: [{unit_id, pillar_scores, critical}], brand: {pillar_scores, critical, stddev} }`. Single-unit mantém o shape atual.
+## Ordem de entrega
 
-## 3. Hooks/UI
-
-- `useAssessmentResults(assessmentId)` (novo) — devolve `units[]` + `brand` quando multi-unidade; senão devolve o resultado single como hoje.
-- `DiagnosticoDetalhe.tsx` — quando multi-unidade: header com card da marca (score consolidado + dispersão), tabs por unidade reusando o painel atual; senão render legado.
-- `IntegratedTerritorialView.tsx` — sem mudanças funcionais; recebe `unitId` opcional quando aberto a partir de uma aba.
-
-## 4. Relatório (`process-report-job` / `generate-report` modo empresarial)
-
-Quando `assessment.brand_id` + `assessment_units.count > 1`:
-
-- Capítulo 1: **Marca** — perfil, abrangência (lista de municípios), score consolidado, dispersão por pilar, pilar crítico.
-- Capítulo 2..N: **Unidade `unit_name` (`municipio`)** — diagnóstico territorial + diagnóstico da unidade lado a lado.
-- Capítulo final: **Comparativo da rede** — ranking interno por pilar, fatores territoriais que explicam gaps, recomendações transversais (marca) × locais (unidade).
-
-LLM recebe payload com `brand_rollup` + array `units[]` (cada uma com pillar_scores, issues top-N, recommendations). Sem mudança no shape single-unit.
-
-## 5. Versão / memória
-
-- Bump `1.97.4` + entrada em `VERSION_HISTORY`.
-- Atualizar `mem/features/enterprise/brand-network-model.md` marcando Fase 4 como entregue.
-
-## Compatibilidade
-
-- Assessments antigos (sem unidades, ou com 1 unidade auto-criada): **continuam batendo o caminho atual** — nada de `unit_id` é gravado, índices parciais `WHERE unit_id IS NULL` preservam unicidade legada.
-- Toda nova coluna `unit_id` é nullable + sem default.
-
-## Entrega sugerida em 2 passos
-
-1. **Migration + refactor da edge function** (passos 1 e 2 + bump de versão).
-2. **UI de resultado multi-unidade + relatório** (passos 3 e 4).
-
-Confirma e eu já entrego o passo 1?
+1. Sumário executivo (maior valor imediato, menor risco).
+2. Comparativo entre ciclos.
+3. Simulador what-if + criação de projeto a partir do cenário.
