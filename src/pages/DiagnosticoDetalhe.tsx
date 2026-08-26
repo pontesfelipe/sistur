@@ -86,6 +86,9 @@ import {
   Target,
   MessageSquare,
   GitBranch,
+  ClipboardList,
+  GitCompare,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
