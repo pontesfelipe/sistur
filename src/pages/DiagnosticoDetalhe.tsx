@@ -15,6 +15,9 @@ import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculation
 import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePanel';
 import { AssessmentAuditTrail } from '@/components/diagnostics/AssessmentAuditTrail';
 import { DataLineageView } from '@/components/diagnostics/DataLineageView';
+import { ExecutiveSummary } from '@/components/diagnostics/ExecutiveSummary';
+import { CycleComparisonPanel } from '@/components/diagnostics/CycleComparisonPanel';
+import { WhatIfSimulatorPanel } from '@/components/diagnostics/WhatIfSimulatorPanel';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
@@ -83,6 +86,9 @@ import {
   Target,
   MessageSquare,
   GitBranch,
+  ClipboardList,
+  GitCompare,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { useCalculateAssessment } from '@/hooks/useCalculateAssessment';
 import { useAssessments } from '@/hooks/useAssessments';
@@ -143,7 +149,7 @@ const normalizeDisplayScore = (
   return score;
 };
 
-const VALID_TABS = ['radiografia', 'categorias', 'normalizacao', 'indicadores', 'gargalos', 'tratamento', 'prescricao', 'projeto', 'comentarios', 'linhagem'] as const;
+const VALID_TABS = ['radiografia', 'categorias', 'integrada', 'normalizacao', 'indicadores', 'gargalos', 'tratamento', 'prescricao', 'projeto', 'comentarios', 'linhagem', 'sumario', 'comparativo', 'simulador'] as const;
 type DetalheTab = typeof VALID_TABS[number];
 
 const DiagnosticoDetalhe = () => {
@@ -988,9 +994,14 @@ const DiagnosticoDetalhe = () => {
             </Alert>
           )}
           <TabsList className={cn(
-            "grid w-full",
-            isEnterprise ? "max-w-7xl grid-cols-11" : "max-w-5xl grid-cols-9"
+            "grid w-full h-auto flex-wrap",
+            isEnterprise ? "max-w-7xl grid-cols-7 lg:grid-cols-14" : "max-w-6xl grid-cols-6 lg:grid-cols-12"
           )}>
+            <TabsTrigger value="sumario" className="gap-2">
+              <ClipboardList className="h-4 w-4" />
+              <span className="hidden sm:inline">Sumário</span>
+            </TabsTrigger>
+
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Radiografia</span>
@@ -1039,7 +1050,16 @@ const DiagnosticoDetalhe = () => {
               <GitBranch className="h-4 w-4" />
               <span className="hidden sm:inline">Linhagem</span>
             </TabsTrigger>
+            <TabsTrigger value="comparativo" className="gap-2">
+              <GitCompare className="h-4 w-4" />
+              <span className="hidden sm:inline">Comparativo</span>
+            </TabsTrigger>
+            <TabsTrigger value="simulador" className="gap-2">
+              <SlidersHorizontal className="h-4 w-4" />
+              <span className="hidden sm:inline">Simulador</span>
+            </TabsTrigger>
           </TabsList>
+
 
           {/* Radiografia Tab */}
           <TabsContent value="radiografia" className="space-y-6">
@@ -1269,7 +1289,39 @@ const DiagnosticoDetalhe = () => {
               }
             />
           </TabsContent>
+
+          {/* Sumário Executivo Tab */}
+          <TabsContent value="sumario" className="space-y-4">
+            <ExecutiveSummary
+              assessment={assessment}
+              destinationName={assessmentDestination?.name}
+              isEnterprise={isEnterprise}
+              pillarScores={pillarScores as any}
+              indicatorScores={indicatorScores as any}
+              issues={issues as any}
+              recommendations={recommendations as any}
+              auditRows={auditRows as any}
+            />
+          </TabsContent>
+
+          {/* Comparativo entre ciclos Tab */}
+          <TabsContent value="comparativo" className="space-y-4">
+            <CycleComparisonPanel
+              assessmentId={id as string}
+              destinationId={(assessment as any)?.destination_id}
+              destinationName={assessmentDestination?.name}
+            />
+          </TabsContent>
+
+          {/* Simulador what-if Tab */}
+          <TabsContent value="simulador" className="space-y-4">
+            <WhatIfSimulatorPanel
+              indicatorScores={indicatorScores as any}
+              pillarScores={pillarScores as any}
+            />
+          </TabsContent>
         </Tabs>
+
       ) : (
         /* Pre-calculation state */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

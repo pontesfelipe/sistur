@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 97,
-  patch: 20,
+  minor: 98,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,6 +23,18 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "1.98.0",
+    date: "2026-08-25",
+    type: "minor" as const,
+    changes: [
+      "Nova aba **Sumário** no detalhe do diagnóstico: sumário executivo de 1 página com índices dos pilares, interpretação territorial, avisos IGMA, principais gargalos, pontos fortes, próximos passos e procedência dos dados — pronto para imprimir/salvar em PDF.",
+      "Nova aba **Comparativo**: comparação lado a lado de duas rodadas calculadas do mesmo destino (A vs B), com delta em pontos percentuais por pilar e por indicador, contagem de melhorias/regressões/estáveis e exportação CSV.",
+      "Nova aba **Simulador**: simulação 'e se?' local — ajusta hipoteticamente o score de cada indicador e projeta o impacto no índice e na classificação de cada pilar (régua canônica SISTUR). Nada é gravado; o diagnóstico oficial permanece inalterado.",
+      "Abas do detalhe do diagnóstico passaram a quebrar em múltiplas linhas em telas menores, acomodando as três novas visões.",
+    ],
+  },
+  {
+
     version: "1.97.20",
     date: "2026-08-25",
     type: "patch" as const,
