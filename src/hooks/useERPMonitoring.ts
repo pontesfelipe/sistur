@@ -317,8 +317,8 @@ export function useProjectStats() {
         const completedTasks = tasksForProject.filter((t) => t.status === 'done');
         const overdueTasks = tasksForProject.filter((t) => {
           if (t.status === 'done') return false;
-          if (!t.due_date) return false;
-          return new Date(t.due_date) < now;
+          if (!t.planned_end_date) return false;
+          return new Date(t.planned_end_date) < now;
         });
 
         return {
