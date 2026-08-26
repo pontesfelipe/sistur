@@ -107,15 +107,17 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
 
   const indicatorRows = useMemo(() => {
     if (!comparison) return [];
-    const map = new Map<string, { code: string; name: string; pillar: string; a?: number; b?: number }>();
+    type Row = { code: string; name: string; pillar: string; a?: number; b?: number };
+    const map = new Map<string, Row>();
     comparison.scores.forEach((s: any) => {
       const code = s.indicator?.code;
       if (!code) return;
-      const entry = map.get(code) || {
+      const entry: Row = map.get(code) || {
         code,
         name: s.indicator?.name || '',
         pillar: s.indicator?.pillar || '',
       };
+
       if (s.assessment_id === effectiveA) entry.a = s.score;
       if (s.assessment_id === effectiveB) entry.b = s.score;
       map.set(code, entry);
