@@ -15,6 +15,9 @@ import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculation
 import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePanel';
 import { AssessmentAuditTrail } from '@/components/diagnostics/AssessmentAuditTrail';
 import { DataLineageView } from '@/components/diagnostics/DataLineageView';
+import { ExecutiveSummary } from '@/components/diagnostics/ExecutiveSummary';
+import { CycleComparisonPanel } from '@/components/diagnostics/CycleComparisonPanel';
+import { WhatIfSimulatorPanel } from '@/components/diagnostics/WhatIfSimulatorPanel';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
