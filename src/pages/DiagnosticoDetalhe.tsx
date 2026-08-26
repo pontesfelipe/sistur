@@ -1269,7 +1269,39 @@ const DiagnosticoDetalhe = () => {
               }
             />
           </TabsContent>
+
+          {/* Sumário Executivo Tab */}
+          <TabsContent value="sumario" className="space-y-4">
+            <ExecutiveSummary
+              assessment={assessment}
+              destinationName={assessmentDestination?.name}
+              isEnterprise={isEnterprise}
+              pillarScores={pillarScores as any}
+              indicatorScores={indicatorScores as any}
+              issues={issues as any}
+              recommendations={recommendations as any}
+              auditRows={auditRows as any}
+            />
+          </TabsContent>
+
+          {/* Comparativo entre ciclos Tab */}
+          <TabsContent value="comparativo" className="space-y-4">
+            <CycleComparisonPanel
+              assessmentId={id as string}
+              destinationId={(assessment as any)?.destination_id}
+              destinationName={assessmentDestination?.name}
+            />
+          </TabsContent>
+
+          {/* Simulador what-if Tab */}
+          <TabsContent value="simulador" className="space-y-4">
+            <WhatIfSimulatorPanel
+              indicatorScores={indicatorScores as any}
+              pillarScores={pillarScores as any}
+            />
+          </TabsContent>
         </Tabs>
+
       ) : (
         /* Pre-calculation state */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
