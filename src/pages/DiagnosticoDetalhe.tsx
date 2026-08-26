@@ -994,9 +994,14 @@ const DiagnosticoDetalhe = () => {
             </Alert>
           )}
           <TabsList className={cn(
-            "grid w-full",
-            isEnterprise ? "max-w-7xl grid-cols-11" : "max-w-5xl grid-cols-9"
+            "grid w-full h-auto flex-wrap",
+            isEnterprise ? "max-w-7xl grid-cols-7 lg:grid-cols-14" : "max-w-6xl grid-cols-6 lg:grid-cols-12"
           )}>
+            <TabsTrigger value="sumario" className="gap-2">
+              <ClipboardList className="h-4 w-4" />
+              <span className="hidden sm:inline">Sumário</span>
+            </TabsTrigger>
+
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Radiografia</span>
