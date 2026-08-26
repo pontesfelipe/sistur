@@ -282,7 +282,7 @@ export function useProjectStats() {
         await Promise.all([
           supabase
             .from('project_tasks')
-            .select('id, project_id, status, due_date')
+            .select('id, project_id, status, planned_end_date')
             .in('project_id', projectIds),
           destinationIds.length > 0
             ? supabase
