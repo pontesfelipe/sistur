@@ -1050,7 +1050,16 @@ const DiagnosticoDetalhe = () => {
               <GitBranch className="h-4 w-4" />
               <span className="hidden sm:inline">Linhagem</span>
             </TabsTrigger>
+            <TabsTrigger value="comparativo" className="gap-2">
+              <GitCompare className="h-4 w-4" />
+              <span className="hidden sm:inline">Comparativo</span>
+            </TabsTrigger>
+            <TabsTrigger value="simulador" className="gap-2">
+              <SlidersHorizontal className="h-4 w-4" />
+              <span className="hidden sm:inline">Simulador</span>
+            </TabsTrigger>
           </TabsList>
+
 
           {/* Radiografia Tab */}
           <TabsContent value="radiografia" className="space-y-6">
