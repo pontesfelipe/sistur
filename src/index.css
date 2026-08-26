@@ -487,3 +487,18 @@
   animation: boardRipple 0.6s ease-out forwards;
   background: linear-gradient(90deg, transparent, rgba(234, 179, 8, 0.15), transparent);
 }
+
+/* v1.98.0 — Impressão do Sumário Executivo (1 página) */
+@media print {
+  .no-print { display: none !important; }
+
+  body:has(#executive-summary) * { visibility: hidden; }
+  body:has(#executive-summary) #executive-summary,
+  body:has(#executive-summary) #executive-summary * { visibility: visible; }
+  body:has(#executive-summary) #executive-summary {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    padding: 0;
+  }
+}
