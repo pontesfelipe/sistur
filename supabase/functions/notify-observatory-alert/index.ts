@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.45.0";
+import { sendTemplateEmailWithLog } from "../_shared/email-send-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -141,17 +142,39 @@ Deno.serve(async (req) => {
     let sent = 0;
     for (const email of recipients.values()) {
       try {
-        const { error } = await supabase.functions.invoke("send-transactional-email", {
-          body: {
-            templateName: "observatory-critical-alert",
-            recipientEmail: email,
-            idempotencyKey: `obs-alert-${alert.id}-${email}`,
+        const result = await sendTemplateEmailWithLog(
+          "observatory-critical-alert",
+          email,
+          {
             templateData,
+            idempotencyKey: `observatory-critical-alert-${alert.id}-${email}`,
           },
-        });
-        if (!error) sent++;
-      } catch (e) {
-        console.error("Falha ao enviar para", email, e);
+        );
+        if (result.sent) sent++;
+      } catch (e: any) {
+        // Rate limited: wait the API-provided cooldown before the next send.
+        if (e?.status === 429) {
+          const waitSeconds = typeof e?.retryAfterSeconds === "number" ? e.retryAfterSeconds : 60;
+          await new Promise((r) => setTimeout(r, waitSeconds * 1000));
+          try {
+            const retry = await sendTemplateEmailWithLog(
+              "observatory-critical-alert",
+              email,
+              {
+                templateData,
+                idempotencyKey: `observatory-critical-alert-${alert.id}-${email}`,
+              },
+            );
+            if (retry.sent) sent++;
+            continue;
+          } catch (retryError: any) {
+            console.error("Falha ao reenviar alerta do observatório", {
+              message: retryError?.message,
+            });
+            continue;
+          }
+        }
+        console.error("Falha ao enviar alerta do observatório", { message: e?.message });
       }
     }
 
