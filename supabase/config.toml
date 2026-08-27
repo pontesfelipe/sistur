@@ -15,22 +15,14 @@ project_id = "enexnpmkhvgufcervjsv"
     verify_jwt = false
   [functions.ingest-cadastur]
     verify_jwt = false
-  [functions.handle-email-suppression]
-    verify_jwt = false
-  [functions.handle-email-unsubscribe]
-    verify_jwt = false
   [functions.ingest-youtube]
     verify_jwt = false
   [functions.manage-users]
     verify_jwt = false
   [functions.preview-transactional-email]
     verify_jwt = false
-  [functions.process-email-queue]
-    verify_jwt = true
   [functions.search-ibge]
     verify_jwt = false
-  [functions.send-transactional-email]
-    verify_jwt = true
   [functions.run-health-check]
     verify_jwt = false
   [functions.sync-test-registry]
@@ -45,3 +37,13 @@ project_id = "enexnpmkhvgufcervjsv"
     verify_jwt = false
   [functions.check-report-semantic]
     verify_jwt = false
+  [functions.notify-edu-achievement]
+    verify_jwt = true
+  [functions.notify-access-requested]
+    verify_jwt = true
+  [functions.notify-access-approved]
+    verify_jwt = true
+  [functions.notify-enterprise-regression]
+    verify_jwt = true
+  [functions.send-admin-dispatch-email]
+    verify_jwt = true
