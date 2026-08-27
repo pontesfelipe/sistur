@@ -54,17 +54,23 @@ Deno.serve(async (req) => {
     // Recipient is resolved server-side from the profile record.
     const { data: profile, error: profileError } = await admin
       .from('profiles')
-      .select('email, full_name')
+      .select('full_name')
       .eq('user_id', userId)
       .maybeSingle()
     if (profileError) {
       console.error('Failed to read recipient profile', { code: profileError.code })
       return json({ error: 'Failed to load recipient' }, 500)
     }
-    if (!profile?.email) return json({ error: 'Recipient not found' }, 404)
+
+    const { data: authUser, error: authUserError } = await admin.auth.admin.getUserById(userId)
+    if (authUserError || !authUser?.user?.email) {
+      console.error('Failed to resolve recipient email', { hasError: !!authUserError })
+      return json({ error: 'Recipient not found' }, 404)
+    }
+    const recipientEmail = authUser.user.email
 
     const templateData: Record<string, unknown> = {}
-    if (profile.full_name) templateData.userName = profile.full_name
+    if (profile?.full_name) templateData.userName = profile.full_name
 
     if (templateName === 'custom-message') {
       const subject = String(body?.subject ?? '').trim()
@@ -75,7 +81,7 @@ Deno.serve(async (req) => {
       templateData.messageBody = messageBody
     }
 
-    const result = await sendTemplateEmailWithLog(templateName, profile.email, {
+    const result = await sendTemplateEmailWithLog(templateName, recipientEmail, {
       templateData,
       idempotencyKey: `admin-dispatch-${templateName}-${userId}-${Date.now()}`,
     })

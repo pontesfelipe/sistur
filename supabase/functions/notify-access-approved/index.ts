@@ -49,14 +49,23 @@ Deno.serve(async (req) => {
     // Recipient is derived from trusted data, never from the browser.
     const { data: profile, error: profileError } = await admin
       .from('profiles')
-      .select('email, full_name, org_id')
+      .select('user_id, full_name, org_id')
       .eq('id', profileId)
       .maybeSingle()
     if (profileError) {
       console.error('Failed to read profile', { code: profileError.code })
       return json({ error: 'Failed to load recipient' }, 500)
     }
-    if (!profile?.email) return json({ error: 'Recipient not found' }, 404)
+    if (!profile?.user_id) return json({ error: 'Recipient not found' }, 404)
+
+    const { data: authUser, error: authUserError } = await admin.auth.admin.getUserById(
+      profile.user_id,
+    )
+    if (authUserError || !authUser?.user?.email) {
+      console.error('Failed to resolve recipient email', { hasError: !!authUserError })
+      return json({ error: 'Recipient not found' }, 404)
+    }
+    const recipientEmail = authUser.user.email
 
     const isGlobalAdmin = (callerRoles ?? []).some((r: any) => r.role === 'ADMIN')
     const isOrgAdmin = (callerRoles ?? []).some(
@@ -67,7 +76,7 @@ Deno.serve(async (req) => {
     const role = ROLES.includes(body?.role) ? body.role : undefined
     const systemAccess = SYSTEMS.includes(body?.systemAccess) ? body.systemAccess : undefined
 
-    const result = await sendTemplateEmailWithLog('access-approved', profile.email, {
+    const result = await sendTemplateEmailWithLog('access-approved', recipientEmail, {
       templateData: { userName: profile.full_name || undefined, role, systemAccess },
       idempotencyKey: `access-approved-${profileId}`,
     })
