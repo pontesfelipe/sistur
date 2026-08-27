@@ -99,11 +99,9 @@ Deno.serve(async (req) => {
       "cleanup-exam-tracking",
       "elevenlabs-tts",
       "generate-project-structure",
-      "handle-email-suppression",
-      "handle-email-unsubscribe",
+      "handle-email-events",
       "preview-transactional-email",
-      "process-email-queue",
-      "send-transactional-email",
+      "send-admin-dispatch-email",
       "run-health-check",
       "sync-test-registry",
     ];

@@ -165,16 +165,11 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
       // Send access-requested confirmation email
       if (user.email) {
-        supabase.functions.invoke('send-transactional-email', {
+        supabase.functions.invoke('notify-access-requested', {
           body: {
-            templateName: 'access-requested',
-            recipientEmail: user.email,
-            idempotencyKey: `access-requested-${user.id}`,
-            templateData: {
-              userName: profile?.full_name || undefined,
-              role,
-              systemAccess,
-            },
+            userName: profile?.full_name || undefined,
+            role,
+            systemAccess,
           },
         }).catch(err => console.error('Failed to send access-requested email:', err));
       }

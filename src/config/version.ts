@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 98,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.98.1",
+    date: "2026-08-27",
+    type: "patch" as const,
+    changes: [
+      "Envio de e-mails migrado para a infraestrutura gerenciada da Lovable: entrega, retentativas, limites de envio, supressão (bounces/reclamações) e descadastro passam a ser tratados pela plataforma. Removidas a fila interna de e-mails, o processador agendado, os webhooks próprios de supressão/descadastro e a página `/unsubscribe` (agora hospedada pela plataforma).",
+      "E-mails do app agora saem de funções dedicadas por recurso: `notify-access-requested`, `notify-access-approved`, `notify-edu-achievement`, `notify-enterprise-regression`, `send-admin-dispatch-email` e `notify-observatory-alert`, todas usando o helper compartilhado com registro de auditoria em `email_send_log`.",
+      "Novo receptor de eventos de e-mail (`handle-email-events`) que registra bounces, reclamações e descadastros nas tabelas de auditoria existentes.",
+    ],
+  },
   {
     version: "1.98.0",
     date: "2026-08-25",

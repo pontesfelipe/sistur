@@ -93,16 +93,11 @@ export function PendingApprovalsPanel() {
 
       // Send approval notification email
       try {
-        await supabase.functions.invoke('send-transactional-email', {
+        await supabase.functions.invoke('notify-access-approved', {
           body: {
-            templateName: 'access-approved',
-            recipientEmail: pendingUsers.find(u => u.id === profileId)?.email,
-            idempotencyKey: `access-approved-${profileId}`,
-            templateData: {
-              userName: pendingUsers.find(u => u.id === profileId)?.full_name || undefined,
-              role: role,
-              systemAccess: systemAccess || undefined,
-            },
+            profileId,
+            role,
+            systemAccess: systemAccess || undefined,
           },
         });
       } catch (emailError) {
