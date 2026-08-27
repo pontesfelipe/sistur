@@ -70,13 +70,8 @@ export async function awardXP(input: {
     // Email de level up (somente se subiu de nível e não é a fonte 'badge_earned' que já dispara seu próprio email)
     if (newLevel > prevLevel) {
       try {
-        await supabase.functions.invoke('send-transactional-email', {
-          body: {
-            templateName: 'edu-level-up',
-            recipientEmail: u.user.email,
-            idempotencyKey: `levelup-${uid}-${newLevel}`,
-            templateData: { level: newLevel, totalXp: newTotal },
-          },
+        await supabase.functions.invoke('notify-edu-achievement', {
+          body: { kind: 'level-up', level: newLevel, totalXp: newTotal },
         });
       } catch {}
     }

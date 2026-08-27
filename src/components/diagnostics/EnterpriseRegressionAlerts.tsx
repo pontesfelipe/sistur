@@ -91,19 +91,14 @@ export function EnterpriseRegressionAlerts({ destinationId, diagnosticType, dest
     }
     setSending(true);
     try {
-      const { error } = await supabase.functions.invoke('send-transactional-email', {
+      const { error } = await supabase.functions.invoke('notify-enterprise-regression', {
         body: {
-          templateName: 'enterprise-regression-alert',
-          recipientEmail: user.email,
-          idempotencyKey: `regression-${currentAssessmentId ?? destinationId}-${Date.now()}`,
-          templateData: {
-            destinationName: destinationName ?? 'seu diagnóstico',
-            diagnosticType,
-            assessmentId: currentAssessmentId ?? '',
-            drops: alerts.map((a) => ({
-              pillar: a.pillar, from: a.from, to: a.to, drop1: a.drop1, drop2: a.drop2,
-            })),
-          },
+          destinationName: destinationName ?? 'seu diagnóstico',
+          diagnosticType,
+          assessmentId: currentAssessmentId ?? '',
+          drops: alerts.map((a) => ({
+            pillar: a.pillar, from: a.from, to: a.to, drop1: a.drop1, drop2: a.drop2,
+          })),
         },
       });
       if (error) throw error;

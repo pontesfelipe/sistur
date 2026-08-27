@@ -141,12 +141,12 @@ export function EmailDispatchPanel() {
     const template = getEffectiveTemplate();
     const templateData = getTemplateData(user.full_name);
 
-    const { error } = await supabase.functions.invoke('send-transactional-email', {
+    const { error } = await supabase.functions.invoke('send-admin-dispatch-email', {
       body: {
         templateName: template,
-        recipientEmail: user.email,
-        idempotencyKey: `admin-dispatch-${template}-${user.user_id}-${Date.now()}`,
-        templateData,
+        userId: user.user_id,
+        subject: templateData.subject,
+        messageBody: templateData.messageBody,
       },
     });
 

@@ -43,12 +43,12 @@ export async function autoClaimBadge(code: string) {
 
     // Email de badge conquistada (best-effort)
     try {
-      await supabase.functions.invoke('send-transactional-email', {
+      await supabase.functions.invoke('notify-edu-achievement', {
         body: {
-          templateName: 'edu-badge-earned',
-          recipientEmail: u.user.email,
-          idempotencyKey: `badge-${uid}-${badge.id}`,
-          templateData: { badgeTitle: badge.title, xpReward: badge.xp_reward },
+          kind: 'badge-earned',
+          badgeId: badge.id,
+          badgeTitle: badge.title,
+          xpReward: badge.xp_reward,
         },
       });
     } catch {}
