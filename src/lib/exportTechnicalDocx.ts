@@ -463,7 +463,7 @@ export async function exportTechnicalDocx() {
         bullet('ingest-mapa-turismo: Ingestão de dados do Mapa do Turismo Brasileiro', 'bullets'),
         bullet('ingest-youtube: Metadados de vídeos para biblioteca EDU', 'bullets'),
         bullet('moderate-image: Moderação de conteúdo via IA', 'bullets'),
-        bullet('send-transactional-email: E-mails transacionais com templates React', 'bullets'),
+        bullet('E-mails do app: envio direto pela infraestrutura gerenciada de e-mail da Lovable, com templates React', 'bullets'),
         bullet('auth-email-hook: Templates customizados de e-mail de autenticação', 'bullets'),
 
         new Paragraph({ children: [new PageBreak()] }),
@@ -866,16 +866,14 @@ export async function exportTechnicalDocx() {
           '$$;',
         ]),
 
-        heading('11.7 Fila de E-mails — enqueue_email()', HeadingLevel.HEADING_2),
+        heading('11.7 Envio de E-mails — infraestrutura gerenciada', HeadingLevel.HEADING_2),
         codeBlock([
-          'CREATE FUNCTION public.enqueue_email(queue_name text, payload jsonb)',
-          '  RETURNS bigint LANGUAGE plpgsql SECURITY DEFINER AS $$',
-          'BEGIN',
-          '  RETURN pgmq.send(queue_name, payload);',
-          'EXCEPTION WHEN undefined_table THEN',
-          '  PERFORM pgmq.create(queue_name);',
-          '  RETURN pgmq.send(queue_name, payload);',
-          'END; $$;',
+          '// Envio sincrono via API gerenciada de e-mail da Lovable',
+          "await sendTemplateEmail('access-approved', recipientEmail, {",
+          '  templateData: { userName, role, systemAccess },',
+          '  idempotencyKey: `access-approved-${profileId}`,',
+          '});',
+          '// Entrega, retentativas, supressao e descadastro sao gerenciados pela plataforma.',
         ]),
 
         heading('11.8 Auditoria — create_lms_audit_log()', HeadingLevel.HEADING_2),
