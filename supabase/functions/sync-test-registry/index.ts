@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
       "handle-email-unsubscribe",
       "preview-transactional-email",
       "process-email-queue",
-      "send-transactional-email",
+      "send-admin-dispatch-email",
       "run-health-check",
       "sync-test-registry",
     ];

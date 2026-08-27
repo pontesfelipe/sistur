@@ -109,7 +109,6 @@ const AdminLicenses = lazyWithReload(() => import("./pages/AdminLicenses"));
 const AdminIngestionHealth = lazyWithReload(() => import("./pages/AdminIngestionHealth"));
 const TermsAcceptance = lazyWithReload(() => import("./pages/TermsAcceptance"));
 const NotFound = lazyWithReload(() => import("./pages/NotFound"));
-const Unsubscribe = lazyWithReload(() => import("./pages/Unsubscribe"));
 const ProfessorDashboard = lazyWithReload(() => import("./pages/ProfessorDashboard"));
 const Tutorial = lazyWithReload(() => import("./pages/Tutorial"));
 const TutorialDetail = lazyWithReload(() => import("./pages/TutorialDetail"));
@@ -675,7 +674,6 @@ const App = () => {
                   }
                 />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               </ErrorBoundary>

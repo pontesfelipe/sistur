@@ -545,7 +545,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
         ],
         supabaseTables: ['profiles', 'terms_acceptance'],
         routes: ['/auth', '/onboarding', '/termos', '/pending-approval'],
-        edgeFunctions: ['auth-email-hook', 'send-transactional-email', 'process-email-queue', 'handle-email-suppression', 'handle-email-unsubscribe', 'preview-transactional-email'],
+        edgeFunctions: ['auth-email-hook', 'notify-access-requested', 'notify-access-approved', 'notify-edu-achievement', 'notify-enterprise-regression', 'send-admin-dispatch-email', 'handle-email-events', 'preview-transactional-email'],
         migrationKeywords: ['profiles', 'terms_acceptance', 'complete_user_onboarding'],
       },
       {
