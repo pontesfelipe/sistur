@@ -397,40 +397,15 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
       <ScreenFlash show={showMatchFlash} color="rgba(52,211,153,0.25)" />
       <LottieOverlay type="match" show={showMatchLottie} onComplete={() => setShowMatchLottie(false)} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" size={100} />
 
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between gap-2 px-2 sm:px-3 py-2 bg-black/50 backdrop-blur-xl border-b border-white/5 flex-shrink-0">
-        <button
-          onClick={onBack}
-          aria-label="Voltar"
-          className="flex items-center justify-center min-h-[40px] min-w-[40px] rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </button>
-        <div className="flex items-center gap-1.5 min-w-0">
-          <Brain className={cn('h-5 w-5 flex-shrink-0 drop-shadow-[0_0_6px_currentColor]', visuals.accentColor)} />
-          <h1 className="text-sm font-bold text-amber-300 drop-shadow truncate">
-            <span className="sm:hidden">Memória</span>
-            <span className="hidden sm:inline">Memória Ecológica</span>
-          </h1>
-        </div>
-        <div className="flex items-center gap-0.5">
-          <button
-            onClick={handleRestart}
-            aria-label="Reiniciar"
-            title="Reiniciar"
-            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-slate-400 hover:text-amber-300 hover:bg-white/5 transition-colors"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setShowTutorial(true)}
-            aria-label="Tutorial"
-            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-slate-400 hover:text-amber-300 hover:bg-white/5 transition-colors"
-          >
-            <HelpCircle className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
+      <GameTopBar
+        title="Memória Ecológica"
+        shortTitle="Memória"
+        icon={<Brain className={cn('h-5 w-5 flex-shrink-0 drop-shadow-[0_0_6px_currentColor]', visuals.accentColor)} aria-hidden="true" />}
+        onBack={onBack}
+        onRestart={handleRestart}
+        onHelp={() => setShowTutorial(true)}
+        className="flex-shrink-0"
+      />
 
       {/* HUD */}
       <div className="relative z-10 flex flex-col gap-1.5 px-3 py-2 bg-black/40 backdrop-blur-md border-b border-white/5 text-xs">
