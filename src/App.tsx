@@ -109,6 +109,7 @@ const AdminLicenses = lazyWithReload(() => import("./pages/AdminLicenses"));
 const AdminIngestionHealth = lazyWithReload(() => import("./pages/AdminIngestionHealth"));
 const TermsAcceptance = lazyWithReload(() => import("./pages/TermsAcceptance"));
 const NotFound = lazyWithReload(() => import("./pages/NotFound"));
+const AccessBlocked = lazyWithReload(() => import("./pages/AccessBlocked"));
 const ProfessorDashboard = lazyWithReload(() => import("./pages/ProfessorDashboard"));
 const Tutorial = lazyWithReload(() => import("./pages/Tutorial"));
 const TutorialDetail = lazyWithReload(() => import("./pages/TutorialDetail"));
@@ -181,6 +182,7 @@ const App = () => {
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/pending-approval" element={<PendingApproval />} />
+                <Route path="/acesso-bloqueado" element={<AccessBlocked />} />
                 <Route path="/termos" element={<TermsAcceptance />} />
                 <Route path="/verificar-certificado" element={<VerificarCertificado />} />
                 <Route path="/verificar-certificado/:code" element={<VerificarCertificado />} />
