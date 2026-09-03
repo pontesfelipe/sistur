@@ -99,7 +99,7 @@ export function useERPRealtimeUpdates() {
   useEffect(() => {
     // Subscribe to action_plans changes
     const actionPlansChannel = supabase
-      .channel('erp-action-plans-changes')
+      .channel(`erp-action-plans-changes-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {
@@ -116,7 +116,7 @@ export function useERPRealtimeUpdates() {
 
     // Subscribe to projects changes
     const projectsChannel = supabase
-      .channel('erp-projects-changes')
+      .channel(`erp-projects-changes-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {
@@ -133,7 +133,7 @@ export function useERPRealtimeUpdates() {
 
     // Subscribe to project_tasks changes
     const tasksChannel = supabase
-      .channel('erp-project-tasks-changes')
+      .channel(`erp-project-tasks-changes-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {
