@@ -46,50 +46,18 @@ export function PendingApprovalsPanel() {
   };
 
   const approveUser = async (userId: string, profileId: string, systemAccess: 'ERP' | 'EDU' | null) => {
-    const defaultRole = systemAccess === 'EDU' ? 'ESTUDANTE' : 'VIEWER';
-    const role = selectedRoles[profileId] || defaultRole;
-    
+    const role = selectedRoles[profileId] || defaultRoleForSystem(systemAccess);
+
     try {
       setProcessingId(profileId);
 
-      // Get user's org_id first
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('org_id')
-        .eq('id', profileId)
-        .single();
+      const { error } = await supabase.rpc('admin_approve_access_request', {
+        _user_id: userId,
+        _role: role,
+        _org_id: null,
+      });
 
-      if (!profile?.org_id) {
-        throw new Error('Organização não encontrada');
-      }
-
-      // Update profile to approve
-      const { data: approvedProfiles, error: profileError } = await supabase
-        .from('profiles')
-        .update({ pending_approval: false })
-        .eq('id', profileId)
-        .select('id');
-
-      if (profileError) throw profileError;
-      if (!approvedProfiles || approvedProfiles.length === 0) {
-        throw new Error('Não foi possível aprovar: permissão negada ou usuário não encontrado');
-      }
-
-      // Add/update user role (avoid unique constraint errors)
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .upsert(
-          [
-            {
-              user_id: userId,
-              org_id: profile.org_id,
-              role: role as 'ADMIN' | 'ANALYST' | 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR',
-            },
-          ],
-          { onConflict: 'user_id,org_id' }
-        );
-
-      if (roleError) throw roleError;
+      if (error) throw error;
 
       // Send approval notification email
       try {
@@ -118,18 +86,12 @@ export function PendingApprovalsPanel() {
     try {
       setProcessingId(profileId);
 
-      // Delete profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', profileId);
-
-      if (profileError) throw profileError;
-
-      // Delete auth user via edge function
-      await supabase.functions.invoke('manage-users', {
-        body: { action: 'delete', user_id: userId }
+      const { data, error } = await supabase.functions.invoke('manage-users', {
+        body: { action: 'delete_user', user_id: userId },
       });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       toast.success('Solicitação rejeitada');
       await fetchPendingUsers();
@@ -140,6 +102,7 @@ export function PendingApprovalsPanel() {
       setProcessingId(null);
     }
   };
+
 
   useEffect(() => {
     fetchPendingUsers();
