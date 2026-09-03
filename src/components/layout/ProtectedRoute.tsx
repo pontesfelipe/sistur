@@ -24,7 +24,8 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true, skipLic
     isProfessor,
     isOrgAdmin,
     hasERPAccess,
-    isAdmin 
+    isAdmin,
+    isBlocked
   } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const { isLicenseValid, initialized: licenseInit, loading: licenseLoading } = useLicense();
