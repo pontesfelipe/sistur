@@ -53,7 +53,8 @@ import {
   Edit,
   Trash2,
   Award,
-  Calendar
+  Calendar,
+  Lock as LockIcon
 } from 'lucide-react';
 import { 
   useEduTracks, 
@@ -67,6 +68,7 @@ import {
 } from '@/hooks/useEdu';
 import { useEduTrainings, EduTraining } from '@/hooks/useEduTrainings';
 import { useAuth } from '@/hooks/useAuth';
+import { useFoundationCourse } from '@/hooks/useFoundationCourse';
 import { TARGET_AGENT_INFO, type TargetAgent } from '@/types/sistur';
 import { TrackCertificate } from '@/components/edu/TrackCertificate';
 import { TrackExamsPanel } from '@/components/edu/TrackExamsPanel';
@@ -372,7 +374,7 @@ const EduTrilhas = () => {
         <Card className="mb-6 border-amber-500/40 bg-amber-500/5">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Lock className="h-5 w-5 text-amber-600" />
+              <LockIcon className="h-5 w-5 text-amber-600" />
               <CardTitle className="text-lg">Curso base obrigatório</CardTitle>
             </div>
             <CardDescription>
