@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 98,
-  patch: 1,
+  minor: 99,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.99.0",
+    date: "2026-09-03",
+    type: "minor" as const,
+    changes: [
+      "Curso base obrigatório 'Fundamentos do SISTUR e da Análise Estrutural do Turismo' cadastrado no catálogo EDU (curadoria acadêmica, item 7.6), com ementa, competências e estrutura modular em 6 módulos.",
+      "Trilhas formativas passam a exigir a conclusão do curso base: cartões bloqueados, aviso na listagem e bloqueio no acesso direto à trilha (administradores e professores isentos).",
+    ],
+  },
   {
     version: "1.98.1",
     date: "2026-08-27",
