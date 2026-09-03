@@ -226,7 +226,7 @@ const App = () => {
                 <Route
                   path="/admin/edu"
                   element={
-                    <AdminRoute>
+                    <AdminRoute platformOnly>
                       <AdminEdu />
                     </AdminRoute>
                   }
@@ -234,7 +234,7 @@ const App = () => {
                 <Route
                   path="/admin/certificacoes"
                   element={
-                    <AdminRoute>
+                    <AdminRoute platformOnly>
                       <AdminCertificacoes />
                     </AdminRoute>
                   }
@@ -242,7 +242,7 @@ const App = () => {
                 <Route
                   path="/admin/empacotamento"
                   element={
-                    <AdminRoute>
+                    <AdminRoute platformOnly>
                       <AdminEmpacotamento />
                     </AdminRoute>
                   }
@@ -507,7 +507,7 @@ const App = () => {
                 <Route
                   path="/admin/audit"
                   element={
-                    <AdminRoute>
+                    <AdminRoute platformOnly>
                       <AuditLogs />
                     </AdminRoute>
                   }
@@ -515,7 +515,7 @@ const App = () => {
                 <Route
                   path="/admin/report-logs"
                   element={
-                    <AdminRoute>
+                    <AdminRoute platformOnly>
                       <AdminReportLogs />
                     </AdminRoute>
                   }
@@ -523,7 +523,7 @@ const App = () => {
                 <Route
                   path="/admin/semantica"
                   element={
-                    <AdminRoute>
+                    <AdminRoute platformOnly>
                       <AdminSemanticLayer />
                     </AdminRoute>
                   }
@@ -639,7 +639,7 @@ const App = () => {
                 <Route
                   path="/admin/licencas"
                   element={
-                    <AdminRoute>
+                    <AdminRoute platformOnly>
                       <AdminLicenses />
                     </AdminRoute>
                   }
@@ -647,7 +647,7 @@ const App = () => {
                 <Route
                   path="/admin/ingestoes"
                   element={
-                    <AdminRoute>
+                    <AdminRoute platformOnly>
                       <AdminIngestionHealth />
                     </AdminRoute>
                   }
