@@ -480,11 +480,21 @@ Deno.serve(async (req) => {
         ban_duration: blocked ? '876000h' : 'none',
       })
 
-      await supabaseAdmin.from('audit_events').insert({
-        actor_id: requestingUser.id,
-        event_type: blocked ? 'user_blocked' : 'user_unblocked',
-        payload: { user_id, reason: reason ?? null },
-      })
+      const { data: targetProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('org_id')
+        .eq('user_id', user_id)
+        .maybeSingle()
+
+      if (targetProfile?.org_id) {
+        await supabaseAdmin.from('audit_events').insert({
+          org_id: targetProfile.org_id,
+          user_id: requestingUser.id,
+          event_type: blocked ? 'user_blocked' : 'user_unblocked',
+          entity_type: 'profile',
+          metadata: { target_user_id: user_id, reason: reason ?? null },
+        })
+      }
 
       if (blocked) {
         await supabaseAdmin
