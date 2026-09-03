@@ -94,6 +94,8 @@ const Certificates = lazyWithReload(() => import("./pages/Certificates"));
 const VerifyCertificate = lazyWithReload(() => import("./pages/VerifyCertificate"));
 const OnDemandRequests = lazyWithReload(() => import("./pages/OnDemandRequests"));
 const AuditLogs = lazyWithReload(() => import("./pages/AuditLogs"));
+const AdminComercial = lazyWithReload(() => import("./pages/AdminComercial"));
+
 const AdminReportLogs = lazyWithReload(() => import("./pages/AdminReportLogs"));
 const AdminSemanticLayer = lazyWithReload(() => import("./pages/AdminSemanticLayer"));
 const Projetos = lazyWithReload(() => import("./pages/Projetos"));
