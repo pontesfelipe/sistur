@@ -33,6 +33,9 @@ import { TrainingNotesPanel } from '@/components/edu/TrainingNotesPanel';
 import { SyllabusPanel } from '@/components/edu/SyllabusPanel';
 import { CourseDiscussionsPanel } from '@/components/edu/CourseDiscussionsPanel';
 import { useAuth } from '@/hooks/useAuth';
+import { useFoundationCourse, useCompleteStandaloneTraining } from '@/hooks/useFoundationCourse';
+import { toast } from 'sonner';
+
 
 interface TrainingMaterial {
   id: string;
