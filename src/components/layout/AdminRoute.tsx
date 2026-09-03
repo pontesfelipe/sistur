@@ -6,9 +6,11 @@ import { Loader2 } from 'lucide-react';
 
 interface AdminRouteProps {
   children: React.ReactNode;
+  /** Quando true, apenas ADMIN de plataforma acessa (ORG_ADMIN é redirecionado). */
+  platformOnly?: boolean;
 }
 
-export function AdminRoute({ children }: AdminRouteProps) {
+export function AdminRoute({ children, platformOnly = false }: AdminRouteProps) {
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, isOrgAdmin, isBlocked, loading: profileLoading, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
@@ -38,7 +40,7 @@ export function AdminRoute({ children }: AdminRouteProps) {
   if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
   if (awaitingApproval) return <Navigate to="/pending-approval" replace />;
-  if (!isAdmin && !isOrgAdmin) return <Navigate to="/" replace />;
+  if (platformOnly ? !isAdmin : (!isAdmin && !isOrgAdmin)) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 }
