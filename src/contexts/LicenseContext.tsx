@@ -68,6 +68,8 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
   // license row is missing. ProfileProvider wraps LicenseProvider in
   // App.tsx, so this hook resolves before useLicense is called.
   const { isAdmin, isOrgAdmin } = useProfileContext();
+  const { entitlements } = useEntitlements();
+
   const [license, setLicense] = useState<License | null>(null);
   const [serverFlags, setServerFlags] = useState<ServerLicenseFlags>({
     isValid: false,
