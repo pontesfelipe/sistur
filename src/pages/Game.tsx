@@ -16,7 +16,8 @@ import { BattleBoard } from '@/game/components/BattleBoard';
 import { TCGHand } from '@/game/components/TCGHand';
 import type { AvatarConfig, BiomeType } from '@/game/types';
 import { BIOME_INFO, PROFILE_INFO, VICTORY_CONDITIONS, UNLOCKABLE_SKINS } from '@/game/types';
-import { ArrowLeft, HelpCircle, Save, ScrollText, GraduationCap, Swords } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Save, ScrollText, GraduationCap, Swords, Volume2, VolumeX } from 'lucide-react';
+import { useGameFeedback } from '@/game/audio/useGameFeedback';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -28,6 +29,7 @@ type GamePhase = 'picker' | 'setup' | 'playing';
 export default function Game() {
   const navigate = useNavigate();
   const game = useCardGame();
+  const { play, muted, toggleMute } = useGameFeedback();
   const sessions = useGameSessions();
   const isMobile = useIsMobile();
 
@@ -174,14 +176,16 @@ export default function Game() {
     setPlayEffect(category);
     setTimeout(() => setScreenFlash(false), 400);
     setTimeout(() => setPlayEffect(null), 600);
+    play('flip');
     toast.success('Carta jogada! 🃏');
-  }, [game]);
+  }, [game, play]);
 
   const handleDiscardCard = useCallback((index: number) => {
     game.discardCard(index);
     setSelectedCardIndex(null);
+    play('coin');
     toast.info('Carta descartada (+1💰)');
-  }, [game]);
+  }, [game, play]);
 
   const handleResolveEvent = useCallback((index: number) => {
     const event = game.state.currentEvent;
@@ -195,8 +199,9 @@ export default function Game() {
       setTimeout(() => setScreenFlash(false), 400);
       setTimeout(() => setPlayEffect(null), 600);
       setTimeout(() => setLastFeedback(null), 3000);
+      play('reveal');
     }
-  }, [game]);
+  }, [game, play]);
 
   const handleResolveCouncil = useCallback((index: number) => {
     const decision = game.state.currentCouncil;
@@ -209,14 +214,16 @@ export default function Game() {
       setTimeout(() => setScreenFlash(false), 400);
       setTimeout(() => setPlayEffect(null), 600);
       setTimeout(() => setLastFeedback(null), 3000);
+      play('reveal');
     }
-  }, [game]);
+  }, [game, play]);
 
   const handleEndTurn = useCallback(() => {
     game.endTurn();
     setSelectedCardIndex(null);
+    play('step');
     toast('⚔️ Novo turno — ameaças surgem!', { icon: '🎴' });
-  }, [game]);
+  }, [game, play]);
 
   // Phase: Session picker
   if (phase === 'picker') {
@@ -296,6 +303,14 @@ export default function Game() {
             title="Salvar"
           >
             <Save className="h-4 w-4" />
+          </button>
+          <button
+            onClick={toggleMute}
+            aria-label={muted ? 'Ativar som' : 'Desativar som'}
+            aria-pressed={muted}
+            className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-amber-300 rounded-lg hover:bg-slate-800/60 transition-colors"
+          >
+            {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </button>
           <button
             onClick={() => setShowTutorial(true)}

@@ -12,6 +12,8 @@ import { ScreenFlash, ImpactPulse } from '@/game/vfx/ScreenFlash';
 import { getEmojiSprite } from '@/game/spriteMap';
 import { useGamePersistence } from '@/hooks/useGamePersistence';
 import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
+import { GameTopBar } from '@/components/games/GameTopBar';
+import { useGameFeedback } from '@/game/audio/useGameFeedback';
 
 // AI-generated biome images
 import florestaImg from '@/assets/biomes/floresta.jpg';
@@ -230,6 +232,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
   const [selectedTheme, setSelectedTheme] = useState<MapTheme | null>(null);
   const [state, setState] = useState<TreasureGameState | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
+  const { play, reducedMotion } = useGameFeedback();
   const [tutorialSeen, setTutorialSeen] = useState(false);
   const [collectAnim, setCollectAnim] = useState<string | null>(null);
   const [showTrapFlash, setShowTrapFlash] = useState(false);
@@ -330,7 +333,8 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         // VFX: treasure collect
         setShowCollectPulse(true);
         setTimeout(() => setShowCollectPulse(false), 600);
-        fireEcoBurst(0.5, 0.5);
+        if (!reducedMotion) fireEcoBurst(0.5, 0.5);
+        play('coin');
         setTimeout(() => showMessage(`${cell.item!.name} coletado! +${cell.item!.points}pts`, cell.item!.emoji), 50);
       } else if (cell.type === 'trap' && cell.trap) {
         newState.health = Math.max(0, newState.health - cell.trap.damage);
@@ -339,10 +343,12 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         newState.map = floodReveal(newMap, row, col);
         // VFX: trap hit
         setShowTrapFlash(true);
+        play('error');
         setTimeout(() => setShowTrapFlash(false), 400);
         setTimeout(() => showMessage(`${cell.trap!.name}! -${cell.trap!.damage} saúde`, cell.trap!.emoji), 50);
         if (newState.health <= 0) newState.isGameOver = true;
       } else if (cell.type === 'riddle' && cell.riddle) {
+        play('reveal');
         newState.currentRiddle = cell.riddle;
         newState.riddlePosition = { row, col };
       } else if (cell.type === 'exit') {
@@ -350,12 +356,32 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         const timeBonus = Math.floor(newState.timeRemaining / 3);
         newState.score += newState.health + timeBonus;
       } else if (cell.type === 'empty') {
+        play('step');
         newState.map = floodReveal(newMap, row, col);
       }
 
       return newState;
     });
-  }, [showMessage]);
+  }, [showMessage, play, reducedMotion]);
+
+  // Acessibilidade: mover com as setas do teclado / WASD
+  useEffect(() => {
+    if (!state || state.isGameOver || state.isVictory || state.currentRiddle) return;
+    const deltas: Record<string, [number, number]> = {
+      ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1],
+      w: [-1, 0], s: [1, 0], a: [0, -1], d: [0, 1],
+    };
+    const onKey = (e: KeyboardEvent) => {
+      const delta = deltas[e.key];
+      if (!delta) return;
+      const target = e.target as HTMLElement | null;
+      if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) return;
+      e.preventDefault();
+      handleMove(state.player.row + delta[0], state.player.col + delta[1]);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [state, handleMove]);
 
   const handleRiddleAnswer = useCallback((correct: boolean, reward: number) => {
     setState(prev => {
@@ -378,12 +404,14 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
   // VFX: victory/defeat triggers + clear save
   useEffect(() => {
     if (state?.isVictory && !prevVictory.current) {
-      fireVictoryConfetti();
+      if (!reducedMotion) fireVictoryConfetti();
+      play('victory');
       clear();
       prevVictory.current = true;
     }
     if (state?.isGameOver && !prevGameOver.current) {
-      fireDefeatEffect();
+      if (!reducedMotion) fireDefeatEffect();
+      play('defeat');
       clear();
       prevGameOver.current = true;
     }
@@ -455,23 +483,20 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
       <ScreenFlash show={showTrapFlash} color="rgba(239,68,68,0.3)" />
       <ImpactPulse show={showCollectPulse} color="rgba(250,204,21,0.4)" />
 
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-3 py-2 bg-black/40 backdrop-blur-xl border-b border-white/5 flex-shrink-0">
-        <button onClick={onBack} className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200 min-h-[44px] px-1">
-          <ArrowLeft className="h-4 w-4" />
-        </button>
-        <div className="flex items-center gap-2">
-          <motion.span className="text-xl" animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-            {getEmojiSprite(state.theme.emoji) ? (
-              <img src={getEmojiSprite(state.theme.emoji)!} alt="" className="w-6 h-6 object-contain" draggable={false} />
-            ) : state.theme.emoji}
-          </motion.span>
-          <h1 className="text-sm font-bold text-amber-300 drop-shadow">{state.theme.name}</h1>
-        </div>
-        <button onClick={() => setShowTutorial(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-200">
-          <HelpCircle className="h-4 w-4" />
-        </button>
-      </div>
+      <GameTopBar
+        title={state.theme.name}
+        icon={
+          getEmojiSprite(state.theme.emoji) ? (
+            <img src={getEmojiSprite(state.theme.emoji)!} alt="" className="w-6 h-6 object-contain" draggable={false} />
+          ) : (
+            <span className="text-xl" aria-hidden="true">{state.theme.emoji}</span>
+          )
+        }
+        onBack={onBack}
+        onRestart={handleRestart}
+        onHelp={() => setShowTutorial(true)}
+        className="flex-shrink-0"
+      />
 
       {/* HUD */}
       <div className="relative z-10 flex flex-col gap-1.5 px-3 py-2 bg-black/40 backdrop-blur-md border-b border-white/5 text-xs">
@@ -629,6 +654,8 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                   whileTap={isAdjacent ? { scale: 0.85 } : undefined}
                   whileHover={isAdjacent ? { scale: 1.08, y: -2 } : undefined}
                   onClick={() => isClickable && handleMove(r, c)}
+                  aria-label={cell.revealed ? `Linha ${r + 1}, coluna ${c + 1}: ${cell.type}` : `Linha ${r + 1}, coluna ${c + 1}: inexplorado`}
+                  aria-disabled={!isClickable}
                   className={cn(
                     'rounded-xl flex items-center justify-center transition-all border relative overflow-hidden',
                     cellClass,
@@ -641,7 +668,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                   )}
                   style={{ width: cellSize, height: cellSize }}
                 >
-                  {isClickable && (
+                  {isClickable && !reducedMotion && (
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent"
                       animate={{ x: ['-100%', '200%'] }}

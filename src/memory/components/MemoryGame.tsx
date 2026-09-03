@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, HelpCircle, Trophy, XCircle, Clock, Sparkles, Brain, Eye, Flame, Star, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Trophy, XCircle, Clock, Sparkles, Brain, Eye, Flame, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { generateMemoryCards, getGridColumns } from '../cardGenerator';
@@ -12,6 +12,8 @@ import { ScreenFlash } from '@/game/vfx/ScreenFlash';
 import { getEmojiSprite } from '@/game/spriteMap';
 import { useGamePersistence } from '@/hooks/useGamePersistence';
 import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
+import { GameTopBar } from '@/components/games/GameTopBar';
+import { useGameFeedback } from '@/game/audio/useGameFeedback';
 
 // AI-generated biome images
 import florestaImg from '@/assets/biomes/floresta.jpg';
@@ -145,6 +147,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
   const [selectedTheme, setSelectedTheme] = useState<MemoryTheme | null>(null);
   const [state, setState] = useState<MemoryGameState | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
+  const { play, reducedMotion } = useGameFeedback();
   const [tutorialSeen, setTutorialSeen] = useState(false);
   const [showMatchFlash, setShowMatchFlash] = useState(false);
   const [showMatchLottie, setShowMatchLottie] = useState(false);
@@ -250,6 +253,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
       if (prev.flippedIndices.length >= 2) return prev;
 
       const newCards = prev.cards.map((c, i) => i === index ? { ...c, flipped: true } : c);
+      play('flip');
       const newFlipped = [...prev.flippedIndices, index];
 
       if (newFlipped.length === 2) {
@@ -270,7 +274,8 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
           setShowMatchLottie(true);
           setTimeout(() => setShowMatchFlash(false), 400);
           const burstColors = newCombo >= 3 ? ['#fbbf24', '#f59e0b', '#eab308'] : ['#22c55e', '#34d399', '#6ee7b7'];
-          fireMatchBurst(0.5, 0.5, burstColors);
+          if (!reducedMotion) fireMatchBurst(0.5, 0.5, burstColors);
+          play('match');
 
           setCombo(newCombo);
           setMaxCombo(prev2 => Math.max(prev2, newCombo));
@@ -284,13 +289,14 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
           };
         } else {
           setCombo(0);
+          play('error');
           return { ...prev, cards: newCards, flippedIndices: newFlipped, moves: prev.moves + 1, isChecking: true };
         }
       }
 
       return { ...prev, cards: newCards, flippedIndices: newFlipped };
     });
-  }, []);
+  }, [combo, play, reducedMotion]);
 
   // Wrong match flip-back
   useEffect(() => {
@@ -317,12 +323,14 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
   // VFX: victory/defeat confetti triggers + clear save on completion
   useEffect(() => {
     if (state?.isVictory && !prevVictory.current) {
-      fireVictoryConfetti();
+      if (!reducedMotion) fireVictoryConfetti();
+      play('victory');
       clear();
       prevVictory.current = true;
     }
     if (state?.isGameOver && !prevGameOver.current) {
-      fireDefeatEffect();
+      if (!reducedMotion) fireDefeatEffect();
+      play('defeat');
       clear();
       prevGameOver.current = true;
     }
@@ -385,44 +393,19 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
 
   return (
     <div className={`min-h-screen bg-gradient-to-b ${visuals.bgGradient} flex flex-col text-white relative`}>
-      <FloatingParticles emojis={visuals.particleEmojis} color={visuals.ambientColor} />
+      {!reducedMotion && <FloatingParticles emojis={visuals.particleEmojis} color={visuals.ambientColor} />}
       <ScreenFlash show={showMatchFlash} color="rgba(52,211,153,0.25)" />
       <LottieOverlay type="match" show={showMatchLottie} onComplete={() => setShowMatchLottie(false)} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" size={100} />
 
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between gap-2 px-2 sm:px-3 py-2 bg-black/50 backdrop-blur-xl border-b border-white/5 flex-shrink-0">
-        <button
-          onClick={onBack}
-          aria-label="Voltar"
-          className="flex items-center justify-center min-h-[40px] min-w-[40px] rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </button>
-        <div className="flex items-center gap-1.5 min-w-0">
-          <Brain className={cn('h-5 w-5 flex-shrink-0 drop-shadow-[0_0_6px_currentColor]', visuals.accentColor)} />
-          <h1 className="text-sm font-bold text-amber-300 drop-shadow truncate">
-            <span className="sm:hidden">Memória</span>
-            <span className="hidden sm:inline">Memória Ecológica</span>
-          </h1>
-        </div>
-        <div className="flex items-center gap-0.5">
-          <button
-            onClick={handleRestart}
-            aria-label="Reiniciar"
-            title="Reiniciar"
-            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-slate-400 hover:text-amber-300 hover:bg-white/5 transition-colors"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setShowTutorial(true)}
-            aria-label="Tutorial"
-            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-slate-400 hover:text-amber-300 hover:bg-white/5 transition-colors"
-          >
-            <HelpCircle className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
+      <GameTopBar
+        title="Memória Ecológica"
+        shortTitle="Memória"
+        icon={<Brain className={cn('h-5 w-5 flex-shrink-0 drop-shadow-[0_0_6px_currentColor]', visuals.accentColor)} aria-hidden="true" />}
+        onBack={onBack}
+        onRestart={handleRestart}
+        onHelp={() => setShowTutorial(true)}
+        className="flex-shrink-0"
+      />
 
       {/* HUD */}
       <div className="relative z-10 flex flex-col gap-1.5 px-3 py-2 bg-black/40 backdrop-blur-md border-b border-white/5 text-xs">

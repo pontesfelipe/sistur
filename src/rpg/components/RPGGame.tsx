@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, RotateCcw, BookOpen, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, RotateCcw, BookOpen, HelpCircle, ChevronDown, ChevronUp, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BiomeSelector } from './BiomeSelector';
 import { StoryScene } from './StoryScene';
@@ -11,6 +11,7 @@ import { BIOME_INFO, INITIAL_STATS, type BiomeId, type RPGState, type StoryChoic
 import { getEmojiSprite } from '@/game/spriteMap';
 import { useGamePersistence } from '@/hooks/useGamePersistence';
 import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
+import { useGameFeedback } from '@/game/audio/useGameFeedback';
 
 const initialState: RPGState = {
   biome: null,
@@ -27,6 +28,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(false);
   const [diaryOpen, setDiaryOpen] = useState(false);
+  const { play, muted, toggleMute } = useGameFeedback();
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [resumeSavedAt, setResumeSavedAt] = useState<Date | null>(null);
 
@@ -65,6 +67,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
   }, [tutorialSeen, clear]);
 
   const handleChoice = useCallback((choice: StoryChoice) => {
+    play('click');
     setState(prev => {
       const newStats: BiomeStats = {
         biodiversidade: Math.max(0, Math.min(100, prev.stats.biodiversidade + (choice.effects.biodiversidade || 0))),
@@ -91,7 +94,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
         finished,
       };
     });
-  }, []);
+  }, [play]);
 
   const handleRestart = () => {
     clear();
@@ -192,6 +195,16 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Reiniciar</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleMute}
+                className="h-9 w-9"
+                aria-label={muted ? 'Ativar som' : 'Desativar som'}
+                aria-pressed={muted}
+              >
+                {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </Button>
               <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} className="h-9 w-9" aria-label="Tutorial">
                 <HelpCircle className="h-4 w-4" />
