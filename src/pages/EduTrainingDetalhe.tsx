@@ -33,6 +33,9 @@ import { TrainingNotesPanel } from '@/components/edu/TrainingNotesPanel';
 import { SyllabusPanel } from '@/components/edu/SyllabusPanel';
 import { CourseDiscussionsPanel } from '@/components/edu/CourseDiscussionsPanel';
 import { useAuth } from '@/hooks/useAuth';
+import { useFoundationCourse, useCompleteStandaloneTraining } from '@/hooks/useFoundationCourse';
+import { toast } from 'sonner';
+
 
 interface TrainingMaterial {
   id: string;
@@ -70,6 +73,9 @@ const EduTrainingDetalhe = () => {
   const { id } = useParams<{ id: string }>();
   const { data: training, isLoading, error } = useEduTraining(id);
   const { user } = useAuth();
+  const foundation = useFoundationCourse();
+  const completeTraining = useCompleteStandaloneTraining();
+
 
   // AVA Compliance: session tracking
   useEduSessionTracker({
@@ -399,7 +405,47 @@ const EduTrainingDetalhe = () => {
               </CardContent>
             </Card>
           )}
+          {/* Conclusão do curso */}
+          {user && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Conclusão
+                </CardTitle>
+                {foundation.course?.training_id === training.training_id && (
+                  <CardDescription>
+                    Curso base obrigatório: concluí-lo libera todas as trilhas formativas.
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                {foundation.course?.training_id === training.training_id && foundation.completed ? (
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    Curso concluído. Trilhas liberadas.
+                  </p>
+                ) : (
+                  <Button
+                    className="w-full"
+                    disabled={completeTraining.isPending}
+                    onClick={() =>
+                      completeTraining.mutate(training.training_id, {
+                        onSuccess: () => toast.success('Curso marcado como concluído'),
+                        onError: (e: any) =>
+                          toast.error(e?.message || 'Não foi possível registrar a conclusão'),
+                      })
+                    }
+                  >
+                    {completeTraining.isPending ? 'Registrando...' : 'Marcar como concluído'}
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Rating Widget */}
+
           <TrainingRatingWidget trainingId={training.training_id} trainingTitle={training.title} />
 
           {/* Notes Panel */}

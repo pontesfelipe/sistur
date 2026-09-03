@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+
 
 export interface FoundationCourse {
   training_id: string;
@@ -68,3 +69,50 @@ export function useFoundationCourse() {
     locked: !!courseQuery.data && !completed,
   };
 }
+
+/**
+ * Marca a conclusão de um treinamento avulso (sem trilha) em edu_progress.
+ * Necessário para que o aluno possa concluir o curso base e liberar as trilhas.
+ */
+export function useCompleteStandaloneTraining() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (trainingId: string) => {
+      if (!user?.id) throw new Error('Não autenticado');
+
+      const { data: existing } = await supabase
+        .from('edu_progress')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('training_id', trainingId)
+        .is('trail_id', null)
+        .maybeSingle();
+
+      const now = new Date().toISOString();
+
+      if (existing?.id) {
+        const { error } = await supabase
+          .from('edu_progress')
+          .update({ progress_percent: 100, completed_at: now, last_activity_at: now })
+          .eq('id', existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('edu_progress').insert({
+          user_id: user.id,
+          training_id: trainingId,
+          progress_percent: 100,
+          completed_at: now,
+          last_activity_at: now,
+        });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['foundation-course-completion'] });
+      queryClient.invalidateQueries({ queryKey: ['edu-progress'] });
+    },
+  });
+}
+
