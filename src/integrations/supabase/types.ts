@@ -11467,6 +11467,14 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_recent_logins: {
+        Args: { _from: string; _limit?: number; _to: string }
+        Returns: {
+          full_name: string
+          last_sign_in_at: string
+          user_id: string
+        }[]
+      }
       can_comment_on_org: {
         Args: { p_org_id: string; p_user_id?: string }
         Returns: boolean
