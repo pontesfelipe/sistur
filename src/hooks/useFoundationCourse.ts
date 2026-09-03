@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useProfile } from '@/contexts/ProfileContext';
+import { useProfileContext } from '@/contexts/ProfileContext';
 
 export interface FoundationCourse {
   training_id: string;
@@ -16,7 +16,7 @@ export interface FoundationCourse {
  */
 export function useFoundationCourse() {
   const { user } = useAuth();
-  const { isAdmin, isProfessor } = useProfile();
+  const { isAdmin, isProfessor } = useProfileContext();
 
   const courseQuery = useQuery({
     queryKey: ['foundation-course'],
