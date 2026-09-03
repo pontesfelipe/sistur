@@ -206,7 +206,9 @@ const Auth = () => {
       ua: typeof navigator !== 'undefined' ? navigator.userAgent : null,
     });
 
-    if (msg.includes('Invalid login credentials')) {
+    if (lower.includes('banned') || lower.includes('user is banned')) {
+      toast.error('Sua conta está bloqueada. Entre em contato com o administrador da sua organização.');
+    } else if (msg.includes('Invalid login credentials')) {
       toast.error('Email ou senha incorretos');
     } else if (msg.includes('Email not confirmed')) {
       toast.error('Confirme seu email antes de entrar. Verifique sua caixa de entrada.');

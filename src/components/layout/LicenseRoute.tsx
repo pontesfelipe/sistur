@@ -14,7 +14,7 @@ interface LicenseRouteProps {
 
 export function LicenseRoute({ children, requiredFeature, allowExpired = false, requirePaid = false }: LicenseRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, initialized: profileInit } = useProfileContext();
+  const { isAdmin, isBlocked, initialized: profileInit } = useProfileContext();
   const { loading: licenseLoading, initialized: licenseInit, isLicenseValid, hasFeature, isPaidPlan } = useLicense();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const location = useLocation();
@@ -36,6 +36,7 @@ export function LicenseRoute({ children, requiredFeature, allowExpired = false, 
     const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
     return <Navigate to={`/auth?redirect=${redirect}`} replace />;
   }
+  if (isBlocked) return <Navigate to="/acesso-bloqueado" replace />;
   if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
   if (isAdmin) return <>{children}</>;
   if (!isLicenseValid && !allowExpired) return <Navigate to="/assinatura" replace />;

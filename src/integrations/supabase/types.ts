@@ -8602,6 +8602,7 @@ export type Database = {
           has_territorial_access: boolean | null
           id: string
           is_demo: boolean
+          is_platform: boolean
           name: string
           org_type: Database["public"]["Enums"]["org_type"] | null
         }
@@ -8611,6 +8612,7 @@ export type Database = {
           has_territorial_access?: boolean | null
           id?: string
           is_demo?: boolean
+          is_platform?: boolean
           name: string
           org_type?: Database["public"]["Enums"]["org_type"] | null
         }
@@ -8620,6 +8622,7 @@ export type Database = {
           has_territorial_access?: boolean | null
           id?: string
           is_demo?: boolean
+          is_platform?: boolean
           name?: string
           org_type?: Database["public"]["Enums"]["org_type"] | null
         }
@@ -8877,6 +8880,8 @@ export type Database = {
         Row: {
           approval_requested_at: string | null
           avatar_url: string | null
+          blocked_at: string | null
+          blocked_reason: string | null
           created_at: string
           forum_show_identity: boolean | null
           full_name: string | null
@@ -8893,6 +8898,8 @@ export type Database = {
         Insert: {
           approval_requested_at?: string | null
           avatar_url?: string | null
+          blocked_at?: string | null
+          blocked_reason?: string | null
           created_at?: string
           forum_show_identity?: boolean | null
           full_name?: string | null
@@ -8909,6 +8916,8 @@ export type Database = {
         Update: {
           approval_requested_at?: string | null
           avatar_url?: string | null
+          blocked_at?: string | null
+          blocked_reason?: string | null
           created_at?: string
           forum_show_identity?: boolean | null
           full_name?: string | null
@@ -11450,6 +11459,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_approve_access_request: {
+        Args: { _org_id?: string; _role?: string; _user_id: string }
+        Returns: boolean
+      }
       admin_approve_user: { Args: { _user_id: string }; Returns: boolean }
       admin_cancel_license: {
         Args: { p_license_id: string; p_reason: string }
@@ -11916,6 +11929,7 @@ export type Database = {
         Returns: boolean
       }
       is_sistur_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_trusted_caller: { Args: never; Returns: boolean }
       link_student_referral: {
         Args: { p_referral_code: string }
         Returns: boolean

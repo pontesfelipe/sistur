@@ -12,7 +12,7 @@ interface EduRouteProps {
 
 export function EduRoute({ children, requireProfessor = false }: EduRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasEDUAccess, isProfessor, isAdmin, isOrgAdmin, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
+  const { hasEDUAccess, isProfessor, isAdmin, isOrgAdmin, isBlocked, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const { isLicenseValid, initialized: licenseInit } = useLicense();
   const location = useLocation();
@@ -37,6 +37,7 @@ export function EduRoute({ children, requireProfessor = false }: EduRouteProps) 
     const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
     return <Navigate to={`/auth?redirect=${redirect}`} replace />;
   }
+  if (isBlocked) return <Navigate to="/acesso-bloqueado" replace />;
   if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
   if (awaitingApproval) return <Navigate to="/pending-approval" replace />;
