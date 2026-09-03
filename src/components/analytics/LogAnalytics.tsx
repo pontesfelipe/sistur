@@ -462,10 +462,10 @@ export function LogAnalytics() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-primary" />
-              Usuários Recentes
+              Últimos Acessos
             </CardTitle>
             <CardDescription>
-              Atividade de usuários no período
+              Data do último login efetivo de cada usuário no período
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -473,7 +473,8 @@ export function LogAnalytics() {
               {recentLogins.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                   <Users className="h-8 w-8 mb-2" />
-                  <p>Nenhuma atividade no período</p>
+                  <p>Nenhum acesso no período</p>
+
                 </div>
               ) : (
                 <div className="space-y-3">
