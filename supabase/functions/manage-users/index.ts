@@ -301,6 +301,22 @@ Deno.serve(async (req) => {
     if (action === 'update_role') {
       const { user_id, role } = data
 
+      const VALID_ROLES = ['ADMIN', 'ORG_ADMIN', 'ANALYST', 'VIEWER', 'ESTUDANTE', 'PROFESSOR']
+      if (!VALID_ROLES.includes(role)) {
+        return new Response(JSON.stringify({ error: 'Invalid role' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Ninguém pode rebaixar a si mesmo (evita perda acidental de acesso administrativo)
+      if (user_id === requestingUser.id) {
+        return new Response(JSON.stringify({ error: 'Cannot change your own role' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
       // ORG_ADMIN cannot assign ADMIN or ORG_ADMIN roles
       if (!isAdmin && !ORG_ADMIN_ASSIGNABLE_ROLES.includes(role)) {
         return new Response(JSON.stringify({ error: 'Cannot assign this role' }), {
@@ -412,7 +428,14 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'block_user') {
-      const { user_id, blocked } = data
+      const { user_id, blocked, reason } = data
+
+      if (user_id === requestingUser.id) {
+        return new Response(JSON.stringify({ error: 'Cannot block yourself' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
 
       if (!(await verifyOrgAdminScope(user_id))) {
         return new Response(JSON.stringify({ error: 'User not in your organization' }), {
@@ -439,7 +462,10 @@ Deno.serve(async (req) => {
 
       const { error: updateError } = await supabaseAdmin
         .from('profiles')
-        .update({ pending_approval: blocked })
+        .update({
+          blocked_at: blocked ? new Date().toISOString() : null,
+          blocked_reason: blocked ? (reason ?? null) : null,
+        })
         .eq('user_id', user_id)
 
       if (updateError) {
@@ -448,6 +474,17 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
+
+      // Bloqueia também no Auth para invalidar novos logins
+      await supabaseAdmin.auth.admin.updateUserById(user_id, {
+        ban_duration: blocked ? '876000h' : 'none',
+      })
+
+      await supabaseAdmin.from('audit_events').insert({
+        actor_id: requestingUser.id,
+        event_type: blocked ? 'user_blocked' : 'user_unblocked',
+        payload: { user_id, reason: reason ?? null },
+      })
 
       if (blocked) {
         await supabaseAdmin
