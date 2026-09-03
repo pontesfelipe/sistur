@@ -3738,6 +3738,7 @@ export type Database = {
           ingestion_confidence: number | null
           ingestion_metadata: Json | null
           ingestion_source: string | null
+          is_foundation: boolean
           language: string | null
           level: string | null
           materials: Json | null
@@ -3784,6 +3785,7 @@ export type Database = {
           ingestion_confidence?: number | null
           ingestion_metadata?: Json | null
           ingestion_source?: string | null
+          is_foundation?: boolean
           language?: string | null
           level?: string | null
           materials?: Json | null
@@ -3830,6 +3832,7 @@ export type Database = {
           ingestion_confidence?: number | null
           ingestion_metadata?: Json | null
           ingestion_source?: string | null
+          is_foundation?: boolean
           language?: string | null
           level?: string | null
           materials?: Json | null
