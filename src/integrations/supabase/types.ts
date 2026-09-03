@@ -11528,16 +11528,7 @@ export type Database = {
         }
         Returns: string
       }
-      delete_email: {
-        Args: { message_id: number; queue_name: string }
-        Returns: boolean
-      }
-      email_queue_dispatch: { Args: never; Returns: undefined }
       end_stale_edu_sessions: { Args: never; Returns: undefined }
-      enqueue_email: {
-        Args: { payload: Json; queue_name: string }
-        Returns: number
-      }
       evaluate_destination_certification_eligibility: {
         Args: { _org_id: string }
         Returns: {
@@ -11936,15 +11927,6 @@ export type Database = {
           user_id: string
         }[]
       }
-      move_to_dlq: {
-        Args: {
-          dlq_name: string
-          message_id: number
-          payload: Json
-          source_queue: string
-        }
-        Returns: number
-      }
       org_has_module: {
         Args: { _module: string; _org_id: string }
         Returns: boolean
@@ -11956,14 +11938,6 @@ export type Database = {
       professor_qualifies_free_license: {
         Args: { p_professor_id: string }
         Returns: boolean
-      }
-      read_email_batch: {
-        Args: { batch_size: number; queue_name: string; vt: number }
-        Returns: {
-          message: Json
-          msg_id: number
-          read_ct: number
-        }[]
       }
       requeue_report_job: { Args: { p_job_id: string }; Returns: undefined }
       reset_org_pillar_weights: {
