@@ -437,7 +437,7 @@ const EduTrilhas = () => {
       ) : tracks && tracks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tracks.map((track, index) => (
-            <TrackCard key={track.id} track={track} index={index} />
+            <TrackCard key={track.id} track={track} index={index} locked={foundation.locked} />
           ))}
         </div>
       ) : (
@@ -460,7 +460,7 @@ const EduTrilhas = () => {
 };
 
 // Separate component to fetch progress for each track
-const TrackCard = ({ track, index }: { track: EduTrack; index: number }) => {
+const TrackCard = ({ track, index, locked }: { track: EduTrack; index: number; locked?: boolean }) => {
   const { data: trackWithTrainings } = useEduTrackWithTrainings(track.id);
   const totalTrainings = trackWithTrainings?.trainings?.length || 0;
 
@@ -519,12 +519,19 @@ const TrackCard = ({ track, index }: { track: EduTrack; index: number }) => {
           <TrackProgress trackId={track.id} totalTrainings={totalTrainings} />
         )}
         
-        <Button className="w-full mt-4" asChild>
-          <Link to={`/edu/trilha/${track.id}`}>
-            Ver Trilha
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
+        {locked ? (
+          <Button className="w-full mt-4" variant="outline" disabled>
+            <LockIcon className="mr-2 h-4 w-4" />
+            Conclua o curso base
+          </Button>
+        ) : (
+          <Button className="w-full mt-4" asChild>
+            <Link to={`/edu/trilha/${track.id}`}>
+              Ver Trilha
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
