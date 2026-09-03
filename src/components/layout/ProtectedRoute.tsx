@@ -67,10 +67,15 @@ export function ProtectedRoute({ children, redirectStudentsToEdu = true, skipLic
     return <Navigate to={`/auth?redirect=${redirect}`} replace />;
   }
 
+  if (isBlocked) {
+    return <Navigate to="/acesso-bloqueado" replace />;
+  }
+
   // Check terms acceptance before anything else
   if (!hasAcceptedTerms) {
     return <Navigate to="/termos" replace />;
   }
+
 
   if (needsOnboarding) {
     return <Navigate to="/onboarding" replace />;
