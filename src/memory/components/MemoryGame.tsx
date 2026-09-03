@@ -393,7 +393,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
 
   return (
     <div className={`min-h-screen bg-gradient-to-b ${visuals.bgGradient} flex flex-col text-white relative`}>
-      <FloatingParticles emojis={visuals.particleEmojis} color={visuals.ambientColor} />
+      {!reducedMotion && <FloatingParticles emojis={visuals.particleEmojis} color={visuals.ambientColor} />}
       <ScreenFlash show={showMatchFlash} color="rgba(52,211,153,0.25)" />
       <LottieOverlay type="match" show={showMatchLottie} onComplete={() => setShowMatchLottie(false)} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" size={100} />
 
