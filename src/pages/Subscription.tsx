@@ -456,6 +456,10 @@ export default function Subscription() {
           </div>
         </div>
 
+        <PlanCatalog />
+
+
+
         {/* License details */}
         {license && (
           <div className="bg-card border border-border rounded-xl p-5">
