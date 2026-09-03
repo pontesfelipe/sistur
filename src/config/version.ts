@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 1,
-  minor: 99,
-  patch: 2,
+  minor: 100,
+  patch: 0,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.100.0",
+    date: "2026-09-04",
+    type: "minor" as const,
+    changes: [
+      "Fase 0 de acessos: bloqueio real de contas (blocked_at/blocked_reason) com nova página '/acesso-bloqueado' e verificação em todos os guardas de rota.",
+      "Aprovação de solicitações agora usa a função segura do banco `admin_approve_access_request`, sem escrita direta em perfis e papéis pelo cliente.",
+      "Papéis canônicos centralizados em `src/lib/rbac.ts`; opção de conceder ADMIN removida da tela de aprovação.",
+      "Rotas administrativas de plataforma passam a exigir ADMIN global (`AdminRoute platformOnly`).",
+      "Gestão de usuários endurecida: validação de papel, proibição de auto-rebaixamento e auto-bloqueio, banimento no Auth e registro em auditoria.",
+    ],
+  },
   {
     version: "1.99.2",
     date: "2026-09-03",
