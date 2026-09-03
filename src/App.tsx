@@ -641,6 +641,14 @@ const App = () => {
                   }
                 />
                 <Route
+                  path="/admin/comercial"
+                  element={
+                    <AdminRoute platformOnly>
+                      <AdminComercial />
+                    </AdminRoute>
+                  }
+                />
+                <Route
                   path="/admin/licencas"
                   element={
                     <AdminRoute platformOnly>
@@ -648,6 +656,7 @@ const App = () => {
                     </AdminRoute>
                   }
                 />
+
                 <Route
                   path="/admin/ingestoes"
                   element={
