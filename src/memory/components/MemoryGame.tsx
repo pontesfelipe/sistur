@@ -12,6 +12,8 @@ import { ScreenFlash } from '@/game/vfx/ScreenFlash';
 import { getEmojiSprite } from '@/game/spriteMap';
 import { useGamePersistence } from '@/hooks/useGamePersistence';
 import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
+import { GameTopBar } from '@/components/games/GameTopBar';
+import { useGameFeedback } from '@/game/audio/useGameFeedback';
 
 // AI-generated biome images
 import florestaImg from '@/assets/biomes/floresta.jpg';
@@ -145,6 +147,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
   const [selectedTheme, setSelectedTheme] = useState<MemoryTheme | null>(null);
   const [state, setState] = useState<MemoryGameState | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
+  const { play, reducedMotion } = useGameFeedback();
   const [tutorialSeen, setTutorialSeen] = useState(false);
   const [showMatchFlash, setShowMatchFlash] = useState(false);
   const [showMatchLottie, setShowMatchLottie] = useState(false);
@@ -250,6 +253,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
       if (prev.flippedIndices.length >= 2) return prev;
 
       const newCards = prev.cards.map((c, i) => i === index ? { ...c, flipped: true } : c);
+      play('flip');
       const newFlipped = [...prev.flippedIndices, index];
 
       if (newFlipped.length === 2) {
@@ -270,7 +274,8 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
           setShowMatchLottie(true);
           setTimeout(() => setShowMatchFlash(false), 400);
           const burstColors = newCombo >= 3 ? ['#fbbf24', '#f59e0b', '#eab308'] : ['#22c55e', '#34d399', '#6ee7b7'];
-          fireMatchBurst(0.5, 0.5, burstColors);
+          if (!reducedMotion) fireMatchBurst(0.5, 0.5, burstColors);
+          play('match');
 
           setCombo(newCombo);
           setMaxCombo(prev2 => Math.max(prev2, newCombo));
@@ -284,13 +289,14 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
           };
         } else {
           setCombo(0);
+          play('error');
           return { ...prev, cards: newCards, flippedIndices: newFlipped, moves: prev.moves + 1, isChecking: true };
         }
       }
 
       return { ...prev, cards: newCards, flippedIndices: newFlipped };
     });
-  }, []);
+  }, [combo, play, reducedMotion]);
 
   // Wrong match flip-back
   useEffect(() => {
@@ -317,12 +323,14 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
   // VFX: victory/defeat confetti triggers + clear save on completion
   useEffect(() => {
     if (state?.isVictory && !prevVictory.current) {
-      fireVictoryConfetti();
+      if (!reducedMotion) fireVictoryConfetti();
+      play('victory');
       clear();
       prevVictory.current = true;
     }
     if (state?.isGameOver && !prevGameOver.current) {
-      fireDefeatEffect();
+      if (!reducedMotion) fireDefeatEffect();
+      play('defeat');
       clear();
       prevGameOver.current = true;
     }
