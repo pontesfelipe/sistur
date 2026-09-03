@@ -87,7 +87,7 @@ export function LogAnalytics() {
         { count: assessmentCount },
         { count: destinationCount },
         { count: calculatedCount },
-        { data: profiles }
+        { data: logins }
       ] = await Promise.all([
         supabase.from('assessments').select('*', { count: 'exact', head: true })
           .gte('created_at', fromDate).lte('created_at', toDate),
@@ -96,23 +96,22 @@ export function LogAnalytics() {
         supabase.from('assessments').select('*', { count: 'exact', head: true })
           .eq('status', 'CALCULATED')
           .gte('created_at', fromDate).lte('created_at', toDate),
-        supabase.from('profiles').select('user_id, full_name, updated_at')
-          .gte('updated_at', fromDate).lte('updated_at', toDate)
-          .order('updated_at', { ascending: false }).limit(10)
+        supabase.rpc('admin_recent_logins', { _from: fromDate, _to: toDate, _limit: 20 })
       ]);
 
       setAuditEvents(events || []);
-      setRecentLogins(profiles?.map(p => ({
-        user_id: p.user_id,
-        full_name: p.full_name,
-        last_login: p.updated_at
-      })) || []);
+      setRecentLogins((logins || []).map((l: { user_id: string; full_name: string | null; last_sign_in_at: string }) => ({
+        user_id: l.user_id,
+        full_name: l.full_name,
+        last_login: l.last_sign_in_at
+      })));
       setStats({
         totalAssessments: assessmentCount || 0,
         totalDestinations: destinationCount || 0,
         calculatedAssessments: calculatedCount || 0,
-        activeUsers: profiles?.length || 0
+        activeUsers: logins?.length || 0
       });
+
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
