@@ -239,7 +239,7 @@ export default function Subscription() {
                   <li>Plataforma EDU com trilhas e cursos</li>
                   <li>Jogos educacionais (TCG, RPG, Memória, Caça ao Tesouro)</li>
                   <li>Professor Beni (IA) e Social Turismo</li>
-                  <li>ERP de diagnósticos turísticos</li>
+                  <li>Analítico de diagnósticos turísticos</li>
                 </ul>
                 <p className="text-xs text-muted-foreground mb-4">
                   Sem compromisso — ao final dos 7 dias, escolha um plano para continuar.
@@ -290,7 +290,7 @@ export default function Subscription() {
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
               {[
-                { key: 'erp', label: 'ERP', icon: '📊' },
+                { key: 'erp', label: 'Analítico', icon: '📊' },
                 { key: 'edu', label: 'EDU', icon: '📚' },
                 { key: 'games', label: 'Jogos', icon: '🎮' },
                 { key: 'reports', label: 'Relatórios', icon: '📈' },

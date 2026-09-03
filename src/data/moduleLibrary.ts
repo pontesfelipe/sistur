@@ -62,7 +62,7 @@ export interface ModuleSection {
 export const MODULE_LIBRARY: ModuleSection[] = [
   {
     category: 'ERP',
-    title: 'ERP — Gestão Territorial',
+    title: 'Analítico — Gestão Territorial',
     subtitle: 'Diagnóstico, planejamento e monitoramento de destinos',
     modules: [
       {

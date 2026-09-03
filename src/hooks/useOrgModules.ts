@@ -10,7 +10,7 @@ export const ERP_MODULES: { key: string; label: string; description: string }[] 
   { key: "certificacao",       label: "Certificação Institucional", description: "Selo SISTUR para destinos." },
   { key: "projetos",           label: "Painel de Projetos",   description: "Gestão de projetos do destino." },
   { key: "relatorios",         label: "Relatórios",            description: "Geração de relatórios IA." },
-  { key: "consorcios",         label: "Consórcios Regionais", description: "ERP regional para grupos de municípios." },
+  { key: "consorcios",         label: "Consórcios Regionais", description: "Módulo regional para grupos de municípios." },
   { key: "observatorio",       label: "Observatório Turístico", description: "Fluxo, ocupação, eventos, receita, empregos." },
   { key: "edu",                label: "EDU",                   description: "Capacitação, trilhas e certificação educacional." },
 ];

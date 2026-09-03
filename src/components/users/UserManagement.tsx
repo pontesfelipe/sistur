@@ -30,7 +30,7 @@ const ROLE_INFO: Record<string, { label: string; color: string; icon: typeof Shi
 };
 
 const SYSTEM_ACCESS_INFO: Record<string, { label: string; color: string }> = {
-  ERP: { label: 'ERP', color: 'bg-primary/20 text-primary' },
+  ERP: { label: 'Analítico', color: 'bg-primary/20 text-primary' },
   EDU: { label: 'EDU', color: 'bg-emerald-500/20 text-emerald-700' },
 };
 
@@ -121,8 +121,8 @@ export function UserManagement() {
       const targetUser = users.find(u => u.user_id === userId);
       if (targetUser && targetUser.system_access !== 'ERP') {
         await updateSystemAccess(userId, 'ERP');
-        toast.info('Acesso alterado automaticamente para ERP', {
-          description: `O papel ${ROLE_INFO[newRole]?.label || newRole} requer acesso ERP.`
+        toast.info('Acesso alterado automaticamente para Analítico', {
+          description: `O papel ${ROLE_INFO[newRole]?.label || newRole} requer acesso Analítico.`
         });
       }
     }
@@ -148,7 +148,7 @@ export function UserManagement() {
       } else if (newAccess === 'ERP' && eduRoles.includes(targetUser.role)) {
         await updateUserRole(userId, 'VIEWER');
         toast.info('Papel alterado automaticamente para Visualizador', {
-          description: 'Acesso ERP requer papel Admin, Analista ou Visualizador.'
+          description: 'Acesso Analítico requer papel Admin, Analista ou Visualizador.'
         });
       }
     }
@@ -288,7 +288,7 @@ export function UserManagement() {
                         <SelectItem value="ERP">
                           <div className="flex items-center gap-2">
                             <Building2 className="h-4 w-4" />
-                            ERP - Sistema Territorial
+                            Analítico - Sistema Territorial
                           </div>
                         </SelectItem>
                         <SelectItem value="EDU">
@@ -441,7 +441,7 @@ export function UserManagement() {
                           <SelectItem value="ERP">
                             <div className="flex items-center gap-2">
                               <Building2 className="h-4 w-4" />
-                              ERP
+                              Analítico
                             </div>
                           </SelectItem>
                           <SelectItem value="EDU">

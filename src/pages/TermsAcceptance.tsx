@@ -167,7 +167,7 @@ function TermsContent() {
       <p className="text-xs text-muted-foreground mb-4">Versão 1.0 — Última atualização: 25 de março de 2026</p>
 
       <h2 className="text-base font-bold mt-6 mb-2">1. DEFINIÇÕES</h2>
-      <p><strong>"Plataforma"</strong> refere-se ao SISTUR — Sistema Integrado de Suporte para Turismo em Regiões, incluindo todos os módulos (ERP, EDU, Jogos, Fórum, Professor Beni) e quaisquer aplicações relacionadas.</p>
+      <p><strong>"Plataforma"</strong> refere-se ao SISTUR — Sistema Integrado de Suporte para Turismo em Regiões, incluindo todos os módulos (Analítico, EDU, Jogos, Fórum, Professor Beni) e quaisquer aplicações relacionadas.</p>
       <p><strong>"Titular"</strong> refere-se ao detentor dos direitos de propriedade intelectual sobre a Plataforma, incluindo seus sócios, desenvolvedores e parceiros autorizados.</p>
       <p><strong>"Usuário"</strong> refere-se a qualquer pessoa física ou jurídica que acesse ou utilize a Plataforma mediante registro.</p>
       <p><strong>"Conteúdo Gerado pelo Usuário"</strong> refere-se a dados, textos, diagnósticos, avaliações, materiais educacionais e quaisquer informações inseridas pelo Usuário na Plataforma.</p>

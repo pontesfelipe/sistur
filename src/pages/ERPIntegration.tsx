@@ -91,7 +91,7 @@ const ERPIntegration = () => {
 
   return (
     <AppLayout 
-      title="Integração ERP" 
+      title="Integração com Sistemas Externos" 
       subtitle="Monitoramento e sincronização com sistemas externos"
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -235,9 +235,9 @@ const ERPIntegration = () => {
         <TabsContent value="diagnostics" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Diagnósticos ERP</CardTitle>
+              <CardTitle>Diagnósticos Externos</CardTitle>
               <CardDescription>
-                Histórico de diagnósticos sincronizados do sistema ERP
+                Histórico de diagnósticos sincronizados de sistemas externos
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -309,7 +309,7 @@ const ERPIntegration = () => {
             <CardHeader>
               <CardTitle>Log de Eventos</CardTitle>
               <CardDescription>
-                Histórico de eventos do sistema ERP
+                Histórico de eventos de integração
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -311,7 +311,7 @@ export function OrgAdminUsersPanel() {
                         <SelectItem value="ERP">
                           <div className="flex items-center gap-2">
                             <Building2 className="h-4 w-4" />
-                            ERP - Sistema Territorial
+                            Analítico - Sistema Territorial
                           </div>
                         </SelectItem>
                         <SelectItem value="EDU">
@@ -468,7 +468,7 @@ export function OrgAdminUsersPanel() {
                             <DropdownMenuItem
                               onClick={() => handleSystemAccessChange(user.user_id, user.system_access === 'ERP' ? 'EDU' : 'ERP')}
                             >
-                              Mudar para {user.system_access === 'ERP' ? 'EDU' : 'ERP'}
+                              Mudar para {user.system_access === 'ERP' ? 'EDU' : 'Analítico'}
                             </DropdownMenuItem>
 
                             <DropdownMenuSeparator />
