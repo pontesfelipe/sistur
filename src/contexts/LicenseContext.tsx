@@ -2,6 +2,8 @@ import { useState, useEffect, createContext, useContext, ReactNode, useCallback,
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { useEntitlements } from '@/hooks/useEntitlements';
+
 
 export type LicensePlan = 'trial' | 'estudante' | 'professor' | 'basic' | 'pro' | 'enterprise';
 export type LicenseStatus = 'active' | 'expired' | 'cancelled' | 'suspended';
