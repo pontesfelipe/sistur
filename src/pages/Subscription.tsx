@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CancelSubscriptionDialog } from '@/components/subscription/CancelSubscriptionDialog';
+import { PlanCatalog } from '@/components/subscription/PlanCatalog';
+
 
 const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
   {
