@@ -64,7 +64,11 @@ All pages are lazy-loaded via `React.lazy()` with `Suspense`. Route guards:
 
 ### Roles
 
-`ADMIN`, `ANALYST`, `VIEWER`, `ESTUDANTE`, `PROFESSOR`
+`ADMIN` (platform-wide), `ORG_ADMIN` (tenant admin), `ANALYST`, `VIEWER` (Analítico/ERP), `ESTUDANTE`, `PROFESSOR` (EDU).
+
+- Role constants and assignability rules for the UI live in `src/lib/rbac.ts`.
+- Access model, security review and the commercial/plans roadmap with Lovable prompts: `docs/lovable/plano-acessos-planos-prompts.md`.
+- Only `ADMIN` can grant `ADMIN`/`ORG_ADMIN` (DB trigger `enforce_privileged_role_grants`); `profiles.org_id`, `pending_approval`, `system_access` and `blocked_at` are server-controlled columns.
 
 ### Core Modules
 
