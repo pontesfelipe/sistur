@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { UserPlus, Check, X, Clock, Loader2 } from 'lucide-react';
+import { approvalRoles, defaultRoleForSystem, ROLE_LABELS } from '@/lib/rbac';
 
 interface PendingUser {
   id: string;
@@ -167,7 +168,7 @@ export function PendingApprovalsPanel() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Select
-                    value={selectedRoles[user.id] || (user.system_access === 'EDU' ? 'ESTUDANTE' : 'VIEWER')}
+                    value={selectedRoles[user.id] || defaultRoleForSystem(user.system_access)}
                     onValueChange={(value) => 
                       setSelectedRoles(prev => ({ ...prev, [user.id]: value }))
                     }
@@ -176,18 +177,9 @@ export function PendingApprovalsPanel() {
                       <SelectValue placeholder="Papel" />
                     </SelectTrigger>
                     <SelectContent>
-                      {user.system_access === 'EDU' ? (
-                        <>
-                          <SelectItem value="ESTUDANTE">Estudante</SelectItem>
-                          <SelectItem value="PROFESSOR">Professor</SelectItem>
-                        </>
-                      ) : (
-                        <>
-                          <SelectItem value="VIEWER">Visualizador</SelectItem>
-                          <SelectItem value="ANALYST">Analista</SelectItem>
-                          <SelectItem value="ADMIN">Administrador</SelectItem>
-                        </>
-                      )}
+                      {approvalRoles(user.system_access).map(role => (
+                        <SelectItem key={role} value={role}>{ROLE_LABELS[role]}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <Button
