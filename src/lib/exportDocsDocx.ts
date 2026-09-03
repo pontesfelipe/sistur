@@ -350,7 +350,7 @@ export async function exportFAQDocx(items: FAQEntry[]) {
   const categoryLabels: Record<string, string> = {
     general: 'Sobre o SISTUR',
     edu: 'SISTUR EDU',
-    erp: 'SISTUR ERP',
+    erp: 'SISTUR Analítico',
     enterprise: 'SISTUR Empresarial',
   };
 
@@ -439,12 +439,12 @@ export async function exportManualUsuarioDocx() {
       heading('1.1 Login e Recuperação de Senha', HeadingLevel.HEADING_2),
       para('Acesse pela tela inicial usando e-mail e senha cadastrados. Caso tenha esquecido a senha, utilize a opção "Esqueceu a senha?" para receber um link de redefinição. Contas novas passam por aprovação de um administrador antes do primeiro acesso.'),
       heading('1.2 Estrutura da Interface', HeadingLevel.HEADING_2),
-      bullet('Barra lateral: navegação entre os módulos disponíveis (ERP, EDU, Empresarial, Observatório, Fórum, Configurações).', 'bullets'),
+      bullet('Barra lateral: navegação entre os módulos disponíveis (Analítico, EDU, Empresarial, Observatório, Fórum, Configurações).', 'bullets'),
       bullet('Cabeçalho: título da página, notificações, perfil e troca rápida entre organizações (para usuários multi-org).', 'bullets'),
       bullet('Conteúdo principal: cards, tabelas e formulários específicos de cada módulo.', 'bullets'),
 
       heading('2. Módulos Principais', HeadingLevel.HEADING_1),
-      heading('2.1 SISTUR ERP', HeadingLevel.HEADING_2),
+      heading('2.1 SISTUR Analítico', HeadingLevel.HEADING_2),
       para('Plataforma de diagnóstico territorial baseada nos três pilares (RA, OE e AO) da Análise Estrutural de Mario Beni. Permite criar rodadas, preencher indicadores, calcular o I-SISTUR e gerar relatórios.'),
       heading('2.2 SISTUR EDU', HeadingLevel.HEADING_2),
       para('Ambiente de capacitação com trilhas, cursos, exames e certificações. As prescrições de aprendizado são geradas automaticamente a partir dos resultados do diagnóstico (gatilho em Atenção/Crítico).'),

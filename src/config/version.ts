@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 99,
-  patch: 1,
+  patch: 2,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.99.2",
+    date: "2026-09-03",
+    type: "patch" as const,
+    changes: [
+      "Nomenclatura: todas as referências visíveis a 'ERP' passam a ser 'Analítico' (SISTUR Analítico) — onboarding, gestão de usuários, planos, FAQ, tutoriais, ajuda, biblioteca de módulos, termos e exportações de documentação.",
+      "Página de integração renomeada para 'Integração com Sistemas Externos', evitando confusão com o módulo Analítico do SISTUR.",
+      "Chaves internas (`system_access = 'ERP'`, rotas e hooks) mantidas inalteradas para não quebrar dados e permissões existentes.",
+    ],
+  },
   {
     version: "1.99.1",
     date: "2026-09-03",

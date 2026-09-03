@@ -46,7 +46,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
         title: 'Completar o Onboarding',
         description: 'Na primeira vez que entrar, o sistema mostra o assistente de onboarding onde você escolhe seu tipo de acesso.',
         details: [
-          'Selecione entre ERP (gestão de destinos) ou EDU (educação e capacitação).',
+          'Selecione entre Analítico (gestão de destinos) ou EDU (educação e capacitação).',
           'Escolha seu papel: Analista, Estudante, Professor, etc.',
           'Informe o nome da sua organização ou crie uma nova.',
           'Esses dados podem ser alterados depois nas Configurações.',
@@ -99,7 +99,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
   {
     topicId: 'gs-trial',
     title: 'Período de Teste',
-    introduction: 'Todo novo usuário recebe 7 dias gratuitos com acesso completo ao ERP, EDU e Jogos. Aproveite para explorar todas as funcionalidades!',
+    introduction: 'Todo novo usuário recebe 7 dias gratuitos com acesso completo ao Analítico, EDU e Jogos. Aproveite para explorar todas as funcionalidades!',
     estimatedMinutes: 3,
     subSteps: [
       {
@@ -107,7 +107,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
         title: 'O que está incluído no trial',
         description: 'Durante os 7 dias, você tem acesso a todos os módulos sem restrições.',
         details: [
-          'ERP: Crie destinos, faça diagnósticos e gere relatórios.',
+          'Analítico: Crie destinos, faça diagnósticos e gere relatórios.',
           'EDU: Acesse trilhas, capacitações e certificados.',
           'Jogos: Jogue todos os 4 jogos educacionais.',
           'Fórum: Participe da comunidade.',
@@ -130,7 +130,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
         description: 'Antes do trial expirar, acesse a página de Planos para continuar usando o SISTUR.',
         details: [
           'Plano Básico: Acesso ao EDU e Fórum.',
-          'Plano Pro: EDU + ERP básico + Relatórios.',
+          'Plano Pro: EDU + Analítico básico + Relatórios.',
           'Plano Enterprise: Acesso completo + suporte prioritário.',
           'Professores com 5+ alunos referenciados são isentos automaticamente!',
         ],
@@ -178,7 +178,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
   {
     topicId: 'erp-dashboard',
     title: 'Dashboard Principal',
-    introduction: 'O Dashboard é o centro de comando do SISTUR ERP. Aqui você vê uma visão consolidada de todos os seus destinos, diagnósticos e alertas em tempo real.',
+    introduction: 'O Dashboard é o centro de comando do SISTUR Analítico. Aqui você vê uma visão consolidada de todos os seus destinos, diagnósticos e alertas em tempo real.',
     estimatedMinutes: 5,
     subSteps: [
       {
@@ -232,7 +232,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
   {
     topicId: 'erp-diagnosticos',
     title: 'Criar Diagnósticos',
-    introduction: 'Os diagnósticos são o coração do SISTUR ERP. Através deles, você avalia sistematicamente um destino turístico usando indicadores baseados na metodologia de Mario Beni.',
+    introduction: 'Os diagnósticos são o coração do SISTUR Analítico. Através deles, você avalia sistematicamente um destino turístico usando indicadores baseados na metodologia de Mario Beni.',
     estimatedMinutes: 8,
     subSteps: [
       {
@@ -339,15 +339,15 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
         details: [
           'A barra de progresso é calculada automaticamente com base nas tarefas concluídas.',
           'Tarefas atrasadas são destacadas em vermelho.',
-          'Use o Dashboard ERP para uma visão consolidada de todos os projetos.',
+          'Use o Dashboard Analítico para uma visão consolidada de todos os projetos.',
         ],
       },
     ],
   },
   {
     topicId: 'erp-monitoring',
-    title: 'Monitoramento ERP',
-    introduction: 'O painel de Monitoramento ERP oferece uma visão executiva da evolução dos seus destinos turísticos ao longo do tempo.',
+    title: 'Monitoramento Analítico',
+    introduction: 'O painel de Monitoramento Analítico oferece uma visão executiva da evolução dos seus destinos turísticos ao longo do tempo.',
     estimatedMinutes: 4,
     subSteps: [
       {

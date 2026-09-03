@@ -35,7 +35,7 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'gs-profile',
         title: 'Seu Perfil',
-        description: 'Após o cadastro, você passa pelo onboarding onde escolhe seu tipo de acesso (ERP ou EDU) e seu papel. Seu perfil é aprovado pela equipe administrativa antes de ter acesso completo.',
+        description: 'Após o cadastro, você passa pelo onboarding onde escolhe seu tipo de acesso (Analítico ou EDU) e seu papel. Seu perfil é aprovado pela equipe administrativa antes de ter acesso completo.',
         icon: Users,
         roles: ['ERP', 'ESTUDANTE', 'PROFESSOR', 'ADMIN'],
         category: 'getting-started',
@@ -51,7 +51,7 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'gs-trial',
         title: 'Período de Teste',
-        description: 'Novos usuários recebem 7 dias de trial gratuito com acesso a ERP, EDU e Jogos. O acesso é gerenciado pelo administrador da organização.',
+        description: 'Novos usuários recebem 7 dias de trial gratuito com acesso a Analítico, EDU e Jogos. O acesso é gerenciado pelo administrador da organização.',
         icon: CreditCard,
         roles: ['ERP', 'ESTUDANTE', 'PROFESSOR', 'ADMIN'],
         category: 'getting-started',
@@ -102,8 +102,8 @@ export const tutorialCategories: TutorialCategory[] = [
       },
       {
         id: 'erp-monitoring',
-        title: 'Monitoramento ERP',
-        description: 'O painel de Monitoramento ERP acompanha evolução dos ciclos, progresso por pilar e projetos atrasados. Ideal para gestores acompanharem KPIs em tempo real.',
+        title: 'Monitoramento Analítico',
+        description: 'O painel de Monitoramento Analítico acompanha evolução dos ciclos, progresso por pilar e projetos atrasados. Ideal para gestores acompanharem KPIs em tempo real.',
         icon: Activity,
         route: '/erp',
         roles: ['ERP', 'ADMIN'],

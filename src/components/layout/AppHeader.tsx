@@ -76,7 +76,7 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
   };
 
   const getSystemAccessLabel = () => {
-    if (profile?.system_access === 'ERP') return 'ERP (Completo)';
+    if (profile?.system_access === 'ERP') return 'Analítico (Completo)';
     if (profile?.system_access === 'EDU') return 'EDU (Educacional)';
     return 'Não definido';
   };

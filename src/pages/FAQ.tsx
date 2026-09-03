@@ -208,7 +208,7 @@ export const faqItems: FAQItem[] = [
     category: 'enterprise',
   },
   {
-    question: 'Posso usar SISTUR ERP e Empresarial na mesma organização?',
+    question: 'Posso usar SISTUR Analítico e Empresarial na mesma organização?',
     answer: 'Uma organização privada com Empresarial habilitado pode usar tanto os indicadores territoriais padrão (quando aplicável) quanto os indicadores específicos de hospitalidade. Os 6 indicadores compartilhados facilitam a integração entre diagnósticos territoriais e empresariais. Organizações públicas não têm acesso ao módulo Empresarial.',
     category: 'enterprise',
   },
@@ -379,7 +379,7 @@ export default function FAQ() {
                 {showERPTab && (
                   <TabsTrigger value="erp" className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4" />
-                    <span className="hidden sm:inline">SISTUR</span> ERP
+                    <span className="hidden sm:inline">SISTUR</span> Analítico
                     <Badge variant="secondary" className="ml-1">{erpItems.length}</Badge>
                   </TabsTrigger>
                 )}

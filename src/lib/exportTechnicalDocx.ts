@@ -367,7 +367,7 @@ export async function exportTechnicalDocx() {
         // ══════════ 4. MÓDULOS FUNCIONAIS ══════════
         heading('4. Módulos Funcionais', HeadingLevel.HEADING_1),
 
-        heading('4.1 ERP — Diagnóstico Territorial', HeadingLevel.HEADING_2),
+        heading('4.1 Analítico — Diagnóstico Territorial', HeadingLevel.HEADING_2),
         para('Módulo central de avaliação de destinos turísticos.'),
         bullet('3 níveis de diagnóstico: Essencial (9 indicadores), Estratégico (19), Integral (96)', 'bullets'),
         bullet('Criação de rodadas (rounds) com período de coleta definido', 'bullets'),
@@ -529,8 +529,8 @@ export async function exportTechnicalDocx() {
         heading('7.3 Fluxo de Licenciamento', HeadingLevel.HEADING_2),
         flowDiagram([
           ['Registro', 'Cadastro com e-mail + verificação obrigatória'],
-          ['Onboarding', 'Seleção: ERP ou EDU + Role + Organização'],
-          ['Trial Automático', '7 dias com ERP + EDU + Games habilitados'],
+          ['Onboarding', 'Seleção: Analítico ou EDU + Role + Organização'],
+          ['Trial Automático', '7 dias com Analítico + EDU + Games habilitados'],
           ['Feature Gating', 'LicenseContext verifica plano em cada rota'],
           ['Expiração', 'Cron: expire_trial_licenses() atualiza status'],
           ['Upgrade', 'Basic (5 destinos) → Pro (20) → Empresarial (∞)'],

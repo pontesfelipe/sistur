@@ -37,15 +37,15 @@ export default function AdminEmpacotamento() {
   };
 
   return (
-    <AppLayout title="Empacotamento ERP Modular">
+    <AppLayout title="Empacotamento Modular">
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Package className="h-7 w-7 text-primary" />
-            Empacotamento ERP Modular
+            Empacotamento Modular
           </h1>
           <p className="text-muted-foreground mt-1">
-            Habilite ou desabilite módulos do ERP individualmente por organização.
+            Habilite ou desabilite módulos do Analítico individualmente por organização.
           </p>
         </div>
 

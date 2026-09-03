@@ -21,6 +21,15 @@ import {
 } from '@/data/moduleLibrary';
 import { buildModuleBundle, downloadBundle, scanModuleIntegrity, type IntegrityReport } from '@/lib/moduleBundle';
 
+const CATEGORY_LABEL: Record<ModuleCategory, string> = {
+  ERP: 'Analítico',
+  EDU: 'EDU',
+  Games: 'Games',
+  Enterprise: 'Empresarial',
+  Comunidade: 'Comunidade',
+  Plataforma: 'Plataforma',
+};
+
 const CATEGORY_BADGE: Record<ModuleCategory, string> = {
   ERP: 'bg-pillar-oe/10 text-pillar-oe border-pillar-oe/20',
   EDU: 'bg-pillar-ra/10 text-pillar-ra border-pillar-ra/20',
@@ -117,7 +126,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
             <div className="flex flex-wrap items-center gap-2">
               <CardTitle className="text-base font-bold">{m.module}</CardTitle>
               <Badge variant="outline" className={CATEGORY_BADGE[m.category]}>
-                {m.category}
+                {CATEGORY_LABEL[m.category]}
               </Badge>
               <Badge variant="outline" className="font-mono text-[10px]">
                 v{version}

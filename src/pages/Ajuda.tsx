@@ -19,7 +19,7 @@ const ROLE_LABELS: Record<TutorialRole, string> = {
   ADMIN: 'Administrador',
   PROFESSOR: 'Professor',
   ESTUDANTE: 'Estudante',
-  ERP: 'Gestor ERP',
+  ERP: 'Gestor Analítico',
 };
 
 export default function Ajuda() {

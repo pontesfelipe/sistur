@@ -157,12 +157,12 @@ export default function Onboarding() {
                         <BarChart3 className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <p className="font-semibold text-lg">SISTUR ERP</p>
+                        <p className="font-semibold text-lg">SISTUR Analítico</p>
                         <p className="text-sm text-muted-foreground">Gestão de destinos turísticos</p>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground pl-15">
-                      Diagnósticos por pilares, indicadores, monitoramento ERP, relatórios e capacitação prescrita.
+                      Diagnósticos por pilares, indicadores, monitoramento analítico, relatórios e capacitação prescrita.
                     </p>
                   </Label>
                 </div>
