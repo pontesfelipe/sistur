@@ -361,12 +361,37 @@ const EduTrilhas = () => {
   const { data: trainings } = useEduTrainings();
   const { createTrackWithTrainings } = useEduTrackMutations();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const foundation = useFoundationCourse();
 
   return (
     <AppLayout subNav={eduAprenderNav} 
       title="Trilhas Formativas" 
       subtitle="Percursos estruturados de capacitação com certificação"
     >
+      {foundation.locked && foundation.course && (
+        <Card className="mb-6 border-amber-500/40 bg-amber-500/5">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-amber-600" />
+              <CardTitle className="text-lg">Curso base obrigatório</CardTitle>
+            </div>
+            <CardDescription>
+              Para iniciar qualquer trilha formativa é necessário concluir o curso{' '}
+              <strong>{foundation.course.title}</strong>. Ele apresenta o turismo como sistema aberto
+              e os conjuntos RA, OE e AO — a linguagem comum de todas as demais formações.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link to={`/edu/training/${foundation.course.training_id}`}>
+                Começar curso base
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <Button variant="outline" asChild>
           <Link to="/edu">
