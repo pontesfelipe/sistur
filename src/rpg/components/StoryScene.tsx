@@ -6,6 +6,7 @@ import type { BiomeId } from '../types';
 import { fireVictoryConfetti, fireDefeatEffect } from '@/game/vfx/confetti';
 import { ScreenFlash } from '@/game/vfx/ScreenFlash';
 import { getEmojiSprite } from '@/game/spriteMap';
+import { useGameFeedback } from '@/game/audio/useGameFeedback';
 
 interface StorySceneProps {
   scene: StorySceneType;
@@ -58,6 +59,7 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [showEndingFlash, setShowEndingFlash] = useState(false);
   const endingTriggered = useRef(false);
+  const { play, reducedMotion } = useGameFeedback();
 
   // VFX: ending confetti
   useEffect(() => {
@@ -66,13 +68,15 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
       setShowEndingFlash(true);
       setTimeout(() => setShowEndingFlash(false), 500);
       if (scene.endingType === 'restaurado') {
-        fireVictoryConfetti();
+        if (!reducedMotion) fireVictoryConfetti();
+        play('victory');
       } else if (scene.endingType === 'degradado') {
-        fireDefeatEffect();
+        if (!reducedMotion) fireDefeatEffect();
+        play('defeat');
       }
     }
     if (!scene.isEnding) endingTriggered.current = false;
-  }, [scene.isEnding, scene.endingType]);
+  }, [scene.isEnding, scene.endingType, play, reducedMotion]);
 
   const handleChoice = (choice: StoryChoice, idx: number) => {
     setSelectedIdx(idx);
