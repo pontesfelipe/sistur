@@ -10,7 +10,7 @@ interface AdminRouteProps {
 
 export function AdminRoute({ children }: AdminRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, isOrgAdmin, loading: profileLoading, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
+  const { isAdmin, isOrgAdmin, isBlocked, loading: profileLoading, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const location = useLocation();
 
@@ -34,6 +34,7 @@ export function AdminRoute({ children }: AdminRouteProps) {
     const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
     return <Navigate to={`/auth?redirect=${redirect}`} replace />;
   }
+  if (isBlocked) return <Navigate to="/acesso-bloqueado" replace />;
   if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
   if (awaitingApproval) return <Navigate to="/pending-approval" replace />;

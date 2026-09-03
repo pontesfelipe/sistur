@@ -11,7 +11,7 @@ interface ERPRouteProps {
 
 export function ERPRoute({ children }: ERPRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasERPAccess, isAdmin, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
+  const { hasERPAccess, isAdmin, isBlocked, initialized, needsOnboarding, awaitingApproval, profile } = useProfileContext();
   const { hasAccepted: hasAcceptedTerms, isLoading: termsLoading } = useTermsAcceptance();
   const { isLicenseValid, initialized: licenseInit } = useLicense();
   const location = useLocation();
@@ -36,6 +36,7 @@ export function ERPRoute({ children }: ERPRouteProps) {
     const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
     return <Navigate to={`/auth?redirect=${redirect}`} replace />;
   }
+  if (isBlocked) return <Navigate to="/acesso-bloqueado" replace />;
   if (!hasAcceptedTerms) return <Navigate to="/termos" replace />;
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
   if (awaitingApproval) return <Navigate to="/pending-approval" replace />;

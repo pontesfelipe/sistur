@@ -11,6 +11,8 @@ export interface UserProfile {
   pending_approval: boolean;
   viewing_demo_org_id: string | null;
   forum_show_identity: boolean;
+  blocked_at: string | null;
+  blocked_reason: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -36,6 +38,7 @@ interface ProfileContextType {
   needsOnboarding: boolean;
   awaitingApproval: boolean;
   isViewingDemoData: boolean;
+  isBlocked: boolean;
   effectiveOrgId: string | undefined;
   completeOnboarding: (systemAccess: 'ERP' | 'EDU', role: 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR') => Promise<{ success: boolean; error?: string }>;
   toggleDemoMode: (enable: boolean) => Promise<{ success: boolean; error?: string }>;
@@ -97,6 +100,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
           pending_approval: profileResult.data.pending_approval ?? false,
           viewing_demo_org_id: profileResult.data.viewing_demo_org_id ?? null,
           forum_show_identity: profileResult.data.forum_show_identity ?? true,
+          blocked_at: (profileResult.data as any).blocked_at ?? null,
+          blocked_reason: (profileResult.data as any).blocked_reason ?? null,
           created_at: profileResult.data.created_at,
           updated_at: profileResult.data.updated_at,
         });
@@ -144,8 +149,9 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     const needsOnboarding = profile?.pending_approval === true && profile?.system_access === null;
     const awaitingApproval = profile?.pending_approval === true && profile?.system_access !== null;
     const isViewingDemoData = profile?.viewing_demo_org_id !== null;
+    const isBlocked = !!profile?.blocked_at;
     const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
-    return { hasRoleFn, isAdmin, isOrgAdmin, isAnalyst, isProfessor, isEstudante, hasERPAccess, hasEDUAccess, needsOnboarding, awaitingApproval, isViewingDemoData, effectiveOrgId };
+    return { hasRoleFn, isAdmin, isOrgAdmin, isAnalyst, isProfessor, isEstudante, hasERPAccess, hasEDUAccess, needsOnboarding, awaitingApproval, isViewingDemoData, isBlocked, effectiveOrgId };
   }, [roles, profile]);
 
   const completeOnboarding = async (
@@ -250,6 +256,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       needsOnboarding: derived.needsOnboarding,
       awaitingApproval: derived.awaitingApproval,
       isViewingDemoData: derived.isViewingDemoData,
+      isBlocked: derived.isBlocked,
       effectiveOrgId: derived.effectiveOrgId,
       completeOnboarding,
       toggleDemoMode,
