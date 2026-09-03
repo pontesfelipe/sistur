@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 1,
   minor: 99,
-  patch: 0,
+  patch: 1,
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -22,6 +22,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "1.99.1",
+    date: "2026-09-03",
+    type: "patch" as const,
+    changes: [
+      "Jogos educacionais: nova camada de áudio sintetizado (Web Audio API) com botão de som persistente no TCG, RPG, Memória e Caça ao Tesouro.",
+      "Haptics e suporte a 'movimento reduzido' aplicados aos efeitos visuais (confetes, partículas, brilhos) dos jogos.",
+      "Barra superior padronizada (voltar, reiniciar, som, ajuda) com alvos de toque de 44px e rótulos ARIA.",
+      "Caça ao Tesouro: navegação por teclado (setas/WASD) e rótulos acessíveis nas células do mapa.",
+    ],
+  },
   {
     version: "1.99.0",
     date: "2026-09-03",

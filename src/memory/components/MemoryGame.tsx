@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, HelpCircle, Trophy, XCircle, Clock, Sparkles, Brain, Eye, Flame, Star, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Trophy, XCircle, Clock, Sparkles, Brain, Eye, Flame, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { generateMemoryCards, getGridColumns } from '../cardGenerator';
