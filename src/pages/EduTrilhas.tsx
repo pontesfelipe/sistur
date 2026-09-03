@@ -53,7 +53,8 @@ import {
   Edit,
   Trash2,
   Award,
-  Calendar
+  Calendar,
+  Lock as LockIcon
 } from 'lucide-react';
 import { 
   useEduTracks, 
@@ -67,6 +68,7 @@ import {
 } from '@/hooks/useEdu';
 import { useEduTrainings, EduTraining } from '@/hooks/useEduTrainings';
 import { useAuth } from '@/hooks/useAuth';
+import { useFoundationCourse } from '@/hooks/useFoundationCourse';
 import { TARGET_AGENT_INFO, type TargetAgent } from '@/types/sistur';
 import { TrackCertificate } from '@/components/edu/TrackCertificate';
 import { TrackExamsPanel } from '@/components/edu/TrackExamsPanel';
@@ -361,12 +363,37 @@ const EduTrilhas = () => {
   const { data: trainings } = useEduTrainings();
   const { createTrackWithTrainings } = useEduTrackMutations();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const foundation = useFoundationCourse();
 
   return (
     <AppLayout subNav={eduAprenderNav} 
       title="Trilhas Formativas" 
       subtitle="Percursos estruturados de capacitação com certificação"
     >
+      {foundation.locked && foundation.course && (
+        <Card className="mb-6 border-amber-500/40 bg-amber-500/5">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <LockIcon className="h-5 w-5 text-amber-600" />
+              <CardTitle className="text-lg">Curso base obrigatório</CardTitle>
+            </div>
+            <CardDescription>
+              Para iniciar qualquer trilha formativa é necessário concluir o curso{' '}
+              <strong>{foundation.course.title}</strong>. Ele apresenta o turismo como sistema aberto
+              e os conjuntos RA, OE e AO — a linguagem comum de todas as demais formações.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link to={`/edu/training/${foundation.course.training_id}`}>
+                Começar curso base
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <Button variant="outline" asChild>
           <Link to="/edu">
@@ -410,7 +437,7 @@ const EduTrilhas = () => {
       ) : tracks && tracks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tracks.map((track, index) => (
-            <TrackCard key={track.id} track={track} index={index} />
+            <TrackCard key={track.id} track={track} index={index} locked={foundation.locked} />
           ))}
         </div>
       ) : (
@@ -433,7 +460,7 @@ const EduTrilhas = () => {
 };
 
 // Separate component to fetch progress for each track
-const TrackCard = ({ track, index }: { track: EduTrack; index: number }) => {
+const TrackCard = ({ track, index, locked }: { track: EduTrack; index: number; locked?: boolean }) => {
   const { data: trackWithTrainings } = useEduTrackWithTrainings(track.id);
   const totalTrainings = trackWithTrainings?.trainings?.length || 0;
 
@@ -492,12 +519,19 @@ const TrackCard = ({ track, index }: { track: EduTrack; index: number }) => {
           <TrackProgress trackId={track.id} totalTrainings={totalTrainings} />
         )}
         
-        <Button className="w-full mt-4" asChild>
-          <Link to={`/edu/trilha/${track.id}`}>
-            Ver Trilha
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
+        {locked ? (
+          <Button className="w-full mt-4" variant="outline" disabled>
+            <LockIcon className="mr-2 h-4 w-4" />
+            Conclua o curso base
+          </Button>
+        ) : (
+          <Button className="w-full mt-4" asChild>
+            <Link to={`/edu/trilha/${track.id}`}>
+              Ver Trilha
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
@@ -513,6 +547,7 @@ export const EduTrilhaDetalhe = () => {
   const { markComplete, markIncomplete } = useTrainingProgressMutations();
   const { updateTrackWithTrainings, deleteTrack } = useEduTrackMutations();
   const { user } = useAuth();
+  const foundation = useFoundationCourse();
   
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [certificateOpen, setCertificateOpen] = useState(false);
@@ -584,6 +619,36 @@ export const EduTrilhaDetalhe = () => {
     return (
       <AppLayout subNav={eduAprenderNav} title="Carregando..." subtitle="">
         <Skeleton className="h-64" />
+      </AppLayout>
+    );
+  }
+
+  if (foundation.locked && foundation.course) {
+    return (
+      <AppLayout subNav={eduAprenderNav} title="Curso base obrigatório" subtitle="">
+        <Card className="max-w-2xl mx-auto border-amber-500/40 bg-amber-500/5">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <LockIcon className="h-5 w-5 text-amber-600" />
+              <CardTitle className="text-lg">Trilha bloqueada</CardTitle>
+            </div>
+            <CardDescription>
+              Conclua primeiro o curso <strong>{foundation.course.title}</strong> para liberar as
+              trilhas formativas.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-2">
+            <Button asChild>
+              <Link to={`/edu/training/${foundation.course.training_id}`}>
+                Começar curso base
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/edu/trilhas">Voltar às Trilhas</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </AppLayout>
     );
   }
