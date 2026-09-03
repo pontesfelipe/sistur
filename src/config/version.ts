@@ -10,9 +10,10 @@
  */
 
 export const APP_VERSION = {
-  major: 1,
-  minor: 100,
+  major: 2,
+  minor: 0,
   patch: 0,
+
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
