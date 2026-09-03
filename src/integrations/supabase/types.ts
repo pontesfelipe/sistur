@@ -5030,6 +5030,50 @@ export type Database = {
           },
         ]
       }
+      entitlement_overrides: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          expires_at: string | null
+          feature: string
+          granted_by: string | null
+          id: string
+          org_id: string | null
+          reason: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          expires_at?: string | null
+          feature: string
+          granted_by?: string | null
+          id?: string
+          org_id?: string | null
+          reason?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          expires_at?: string | null
+          feature?: string
+          granted_by?: string | null
+          id?: string
+          org_id?: string | null
+          reason?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entitlement_overrides_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       entrepreneur_profiles: {
         Row: {
           business_description: string | null
@@ -8604,6 +8648,7 @@ export type Database = {
           is_demo: boolean
           is_platform: boolean
           name: string
+          org_kind: Database["public"]["Enums"]["org_kind_type"] | null
           org_type: Database["public"]["Enums"]["org_type"] | null
         }
         Insert: {
@@ -8614,6 +8659,7 @@ export type Database = {
           is_demo?: boolean
           is_platform?: boolean
           name: string
+          org_kind?: Database["public"]["Enums"]["org_kind_type"] | null
           org_type?: Database["public"]["Enums"]["org_type"] | null
         }
         Update: {
@@ -8624,6 +8670,7 @@ export type Database = {
           is_demo?: boolean
           is_platform?: boolean
           name?: string
+          org_kind?: Database["public"]["Enums"]["org_kind_type"] | null
           org_type?: Database["public"]["Enums"]["org_type"] | null
         }
         Relationships: []
@@ -8689,6 +8736,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      plans: {
+        Row: {
+          audience: string
+          billing_period: string
+          code: string
+          created_at: string
+          currency: string
+          description: string | null
+          features: Json
+          id: string
+          is_active: boolean
+          min_seats: number
+          name: string
+          price_cents: number | null
+          quote_only: boolean
+          seat_based: boolean
+          sort_order: number
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          audience: string
+          billing_period?: string
+          code: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          min_seats?: number
+          name: string
+          price_cents?: number | null
+          quote_only?: boolean
+          seat_based?: boolean
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          audience?: string
+          billing_period?: string
+          code?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          min_seats?: number
+          name?: string
+          price_cents?: number | null
+          quote_only?: boolean
+          seat_based?: boolean
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
       }
       prescription_cycles: {
         Row: {
@@ -10637,6 +10744,75 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          cancel_at: string | null
+          created_at: string
+          created_by: string | null
+          current_period_end: string | null
+          id: string
+          notes: string | null
+          org_id: string | null
+          plan_id: string
+          provider_ref: string | null
+          seats: number
+          source: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          cancel_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_period_end?: string | null
+          id?: string
+          notes?: string | null
+          org_id?: string | null
+          plan_id: string
+          provider_ref?: string | null
+          seats?: number
+          source?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          cancel_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_period_end?: string | null
+          id?: string
+          notes?: string | null
+          org_id?: string | null
+          plan_id?: string
+          provider_ref?: string | null
+          seats?: number
+          source?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -11771,6 +11947,7 @@ export type Database = {
           title: string
         }[]
       }
+      get_my_entitlements: { Args: never; Returns: Json }
       get_observatory_summary: {
         Args: { _org_id: string; _year: number }
         Returns: {
@@ -12141,6 +12318,13 @@ export type Database = {
         | "generated"
         | "rejected"
         | "failed"
+      org_kind_type:
+        | "PLATFORM"
+        | "PUBLIC"
+        | "ENTERPRISE"
+        | "INDEPENDENT"
+        | "PENDING"
+        | "DEMO"
       org_type: "PUBLIC" | "PRIVATE"
       pillar_scope_type: "RA" | "OE" | "AO" | "INTEGRATED"
       pillar_type: "RA" | "OE" | "AO"
@@ -12402,6 +12586,14 @@ export const Constants = {
         "generated",
         "rejected",
         "failed",
+      ],
+      org_kind_type: [
+        "PLATFORM",
+        "PUBLIC",
+        "ENTERPRISE",
+        "INDEPENDENT",
+        "PENDING",
+        "DEMO",
       ],
       org_type: ["PUBLIC", "PRIVATE"],
       pillar_scope_type: ["RA", "OE", "AO", "INTEGRATED"],

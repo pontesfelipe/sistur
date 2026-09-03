@@ -2,6 +2,8 @@ import { useState, useEffect, createContext, useContext, ReactNode, useCallback,
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
+import { useEntitlements } from '@/hooks/useEntitlements';
+
 
 export type LicensePlan = 'trial' | 'estudante' | 'professor' | 'basic' | 'pro' | 'enterprise';
 export type LicenseStatus = 'active' | 'expired' | 'cancelled' | 'suspended';
@@ -68,6 +70,8 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
   // license row is missing. ProfileProvider wraps LicenseProvider in
   // App.tsx, so this hook resolves before useLicense is called.
   const { isAdmin, isOrgAdmin } = useProfileContext();
+  const { entitlements } = useEntitlements();
+
   const [license, setLicense] = useState<License | null>(null);
   const [serverFlags, setServerFlags] = useState<ServerLicenseFlags>({
     isValid: false,
@@ -183,11 +187,14 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
   const hasFeature = useCallback((feature: string) => {
     // Admins bypass feature gating regardless of license state.
     if (isAdmin || isOrgAdmin) return true;
+    // Entitlements (planos/assinaturas/overrides) têm precedência positiva.
+    if (entitlements.features?.[feature] === true) return true;
     if (!license) return false;
     if (!computed.isLicenseValid) return false;
     if (license.plan === 'enterprise') return true;
     return license.features[feature] === true;
-  }, [license, computed.isLicenseValid, isAdmin, isOrgAdmin]);
+  }, [license, computed.isLicenseValid, isAdmin, isOrgAdmin, entitlements]);
+
 
   const forceRefetch = async () => {
     lastUserId.current = null;

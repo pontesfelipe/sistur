@@ -10,9 +10,10 @@
  */
 
 export const APP_VERSION = {
-  major: 1,
-  minor: 100,
+  major: 2,
+  minor: 0,
   patch: 0,
+
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
   },
@@ -23,6 +24,20 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "2.0.0",
+    date: "2026-09-04",
+    type: "major" as const,
+    changes: [
+      "Novo modelo comercial: tabelas `plans`, `subscriptions` e `entitlement_overrides`, com classificação de organizações por `org_kind`.",
+      "Função `get_my_entitlements()` e hook `useEntitlements` consolidam plano, assinatura vigente e concessões administrativas.",
+      "`LicenseContext.hasFeature` passa a considerar os entitlements canônicos, mantendo compatibilidade com o modelo de licenças legado.",
+      "Página de Planos exibe o catálogo oficial vindo do banco (Territorial sob consulta, Empresarial por assento, Estudante, Professor e Independente).",
+      "Nova área administrativa `/admin/comercial`: assinaturas manuais por contrato/empenho, suspensão/reativação, catálogo de planos e concessões de recursos.",
+      "Consolidação da Fase 0 de acessos (bloqueio de contas, aprovação via função segura, papéis canônicos e rotas de plataforma restritas).",
+    ],
+  },
+  {
+
     version: "1.100.0",
     date: "2026-09-04",
     type: "minor" as const,
