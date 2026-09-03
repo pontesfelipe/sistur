@@ -183,11 +183,14 @@ export function LicenseProvider({ children }: { children: ReactNode }) {
   const hasFeature = useCallback((feature: string) => {
     // Admins bypass feature gating regardless of license state.
     if (isAdmin || isOrgAdmin) return true;
+    // Entitlements (planos/assinaturas/overrides) têm precedência positiva.
+    if (entitlements.features?.[feature] === true) return true;
     if (!license) return false;
     if (!computed.isLicenseValid) return false;
     if (license.plan === 'enterprise') return true;
     return license.features[feature] === true;
-  }, [license, computed.isLicenseValid, isAdmin, isOrgAdmin]);
+  }, [license, computed.isLicenseValid, isAdmin, isOrgAdmin, entitlements]);
+
 
   const forceRefetch = async () => {
     lastUserId.current = null;
