@@ -364,6 +364,25 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
     });
   }, [showMessage, play, reducedMotion]);
 
+  // Acessibilidade: mover com as setas do teclado / WASD
+  useEffect(() => {
+    if (!state || state.isGameOver || state.isVictory || state.currentRiddle) return;
+    const deltas: Record<string, [number, number]> = {
+      ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1],
+      w: [-1, 0], s: [1, 0], a: [0, -1], d: [0, 1],
+    };
+    const onKey = (e: KeyboardEvent) => {
+      const delta = deltas[e.key];
+      if (!delta) return;
+      const target = e.target as HTMLElement | null;
+      if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) return;
+      e.preventDefault();
+      handleMove(state.player.row + delta[0], state.player.col + delta[1]);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [state, handleMove]);
+
   const handleRiddleAnswer = useCallback((correct: boolean, reward: number) => {
     setState(prev => {
       if (!prev || !prev.riddlePosition) return prev;
@@ -635,6 +654,8 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                   whileTap={isAdjacent ? { scale: 0.85 } : undefined}
                   whileHover={isAdjacent ? { scale: 1.08, y: -2 } : undefined}
                   onClick={() => isClickable && handleMove(r, c)}
+                  aria-label={cell.revealed ? `Linha ${r + 1}, coluna ${c + 1}: ${cell.type}` : `Linha ${r + 1}, coluna ${c + 1}: inexplorado`}
+                  aria-disabled={!isClickable}
                   className={cn(
                     'rounded-xl flex items-center justify-center transition-all border relative overflow-hidden',
                     cellClass,
@@ -647,7 +668,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                   )}
                   style={{ width: cellSize, height: cellSize }}
                 >
-                  {isClickable && (
+                  {isClickable && !reducedMotion && (
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent"
                       animate={{ x: ['-100%', '200%'] }}
