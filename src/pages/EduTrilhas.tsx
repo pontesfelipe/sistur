@@ -547,6 +547,7 @@ export const EduTrilhaDetalhe = () => {
   const { markComplete, markIncomplete } = useTrainingProgressMutations();
   const { updateTrackWithTrainings, deleteTrack } = useEduTrackMutations();
   const { user } = useAuth();
+  const foundation = useFoundationCourse();
   
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [certificateOpen, setCertificateOpen] = useState(false);
@@ -618,6 +619,36 @@ export const EduTrilhaDetalhe = () => {
     return (
       <AppLayout subNav={eduAprenderNav} title="Carregando..." subtitle="">
         <Skeleton className="h-64" />
+      </AppLayout>
+    );
+  }
+
+  if (foundation.locked && foundation.course) {
+    return (
+      <AppLayout subNav={eduAprenderNav} title="Curso base obrigatório" subtitle="">
+        <Card className="max-w-2xl mx-auto border-amber-500/40 bg-amber-500/5">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <LockIcon className="h-5 w-5 text-amber-600" />
+              <CardTitle className="text-lg">Trilha bloqueada</CardTitle>
+            </div>
+            <CardDescription>
+              Conclua primeiro o curso <strong>{foundation.course.title}</strong> para liberar as
+              trilhas formativas.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-2">
+            <Button asChild>
+              <Link to={`/edu/training/${foundation.course.training_id}`}>
+                Começar curso base
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/edu/trilhas">Voltar às Trilhas</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </AppLayout>
     );
   }
