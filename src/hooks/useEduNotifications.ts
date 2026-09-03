@@ -45,7 +45,7 @@ export function useEduNotifications() {
     if (!user?.id) return;
 
     const channel = supabase
-      .channel('edu-notifications-realtime')
+      .channel(`edu-notifications-realtime-${user.id}-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {
