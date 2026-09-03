@@ -73,6 +73,9 @@ const EduTrainingDetalhe = () => {
   const { id } = useParams<{ id: string }>();
   const { data: training, isLoading, error } = useEduTraining(id);
   const { user } = useAuth();
+  const foundation = useFoundationCourse();
+  const completeTraining = useCompleteStandaloneTraining();
+
 
   // AVA Compliance: session tracking
   useEduSessionTracker({
