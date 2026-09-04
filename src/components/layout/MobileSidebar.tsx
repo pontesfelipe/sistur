@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { useLicense } from '@/contexts/LicenseContext';
 import { useForumNotifications, useMarkForumAsSeen } from '@/hooks/useForumNotifications';
+import { useOrgModulesContext, ModuleKey } from '@/contexts/OrgModulesContext';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -58,6 +59,7 @@ interface NavItem {
   requiresProfessor?: boolean;
   requiresAdmin?: boolean;
   requiredFeature?: string;
+  module?: ModuleKey;
 }
 
 interface NavSection {
@@ -70,27 +72,27 @@ const navigationSections: NavSection[] = [
     label: 'Analítico',
     items: [
       { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
-      { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true },
-      { name: 'Consórcios', href: '/consorcios', icon: Network, requiresERP: true },
-      { name: 'Observatório (Em construção)', href: '/observatorio', icon: Activity, requiresERP: true },
-      { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports' },
+      { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true, module: 'diagnostico' },
+      { name: 'Consórcios', href: '/consorcios', icon: Network, requiresERP: true, module: 'consorcios' },
+      { name: 'Observatório (Em construção)', href: '/observatorio', icon: Activity, requiresERP: true, module: 'observatorio' },
+      { name: 'Relatórios', href: '/relatorios', icon: FileText, requiresERP: true, requiredFeature: 'reports', module: 'relatorios' },
       { name: 'Base de Conhecimento', href: '/base-conhecimento', icon: Library, requiresERP: true },
     ],
   },
   {
     label: 'Gerenciamento de Projeto',
     items: [
-      { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true },
+      { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true, module: 'projetos' },
       { name: 'Minhas tarefas', href: '/minhas-tarefas', icon: FolderKanban, requiresERP: true },
     ],
   },
   {
     label: 'Educação',
     items: [
-      { name: 'Minha Jornada', href: '/edu', icon: GraduationCap, requiresEDU: true },
-      { name: 'Aprender', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true },
-      { name: 'Avaliações', href: '/edu/minhas-provas', icon: ScrollText, requiresEDU: true },
-      { name: 'Turmas & Mensagens', href: '/edu/turmas', icon: Users, requiresEDU: true },
+      { name: 'Minha Jornada', href: '/edu', icon: GraduationCap, requiresEDU: true, module: 'edu' },
+      { name: 'Aprender', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true, module: 'edu' },
+      { name: 'Avaliações', href: '/edu/minhas-provas', icon: ScrollText, requiresEDU: true, module: 'edu' },
+      { name: 'Turmas & Mensagens', href: '/edu/turmas', icon: Users, requiresEDU: true, module: 'edu' },
       { name: 'Painel do Professor', href: '/professor', icon: BookOpen, requiresProfessor: true },
       { name: 'Admin EDU', href: '/admin/edu', icon: Shield, requiresAdmin: true },
     ],
@@ -131,6 +133,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const { signOut } = useAuth();
   const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess, initialized } = useProfileContext();
   const { hasFeature } = useLicense();
+  const { isModuleEnabled } = useOrgModulesContext();
   const { data: forumNotifications } = useForumNotifications();
   const markForumAsSeen = useMarkForumAsSeen();
   const { lightTap, selection } = useHaptic();
@@ -175,8 +178,9 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
     if (item.requiresProfessor && !isProfessor && !isAdmin) return false;
     if (item.requiresERP && !hasERPAccess && !isAdmin) return false;
     if (item.requiresEDU && !hasEDUAccess && !isAdmin) return false;
+    if (item.module && !isModuleEnabled(item.module)) return false;
     return true;
-  }, [isAdmin, isProfessor, hasERPAccess, hasEDUAccess]);
+  }, [isAdmin, isProfessor, hasERPAccess, hasEDUAccess, isModuleEnabled]);
 
   const filteredSections = useMemo(() => {
     if (!initialized) {
