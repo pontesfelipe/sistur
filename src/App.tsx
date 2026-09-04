@@ -124,7 +124,7 @@ const Consorcios = lazyWithReload(() => import("./pages/Consorcios"));
 const ConsorcioDetalhe = lazyWithReload(() => import("./pages/ConsorcioDetalhe"));
 const AdminCertificacoes = lazyWithReload(() => import("./pages/AdminCertificacoes"));
 const VerificarCertificado = lazyWithReload(() => import("./pages/VerificarCertificado"));
-const AdminEmpacotamento = lazyWithReload(() => import("./pages/AdminEmpacotamento"));
+
 const Observatorio = lazyWithReload(() => import("./pages/Observatorio"));
 
 // Preload frequently visited pages after initial render
@@ -249,14 +249,7 @@ const App = () => {
                     </AdminRoute>
                   }
                 />
-                <Route
-                  path="/admin/empacotamento"
-                  element={
-                    <AdminRoute platformOnly>
-                      <AdminEmpacotamento />
-                    </AdminRoute>
-                  }
-                />
+                <Route path="/admin/empacotamento" element={<Navigate to="/configuracoes?tab=empacotamento" replace />} />
                 <Route
                   path="/edu"
                   element={
