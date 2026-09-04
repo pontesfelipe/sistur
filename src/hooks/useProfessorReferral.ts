@@ -114,3 +114,46 @@ export function useLinkStudentReferral() {
     onError: () => toast.error('Erro ao vincular código'),
   });
 }
+
+/** Vínculo do usuário atual com um professor (lado do estudante). */
+export function useMyProfessorLink() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['student-referral', user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('student_referrals')
+        .select('id, professor_id, status, created_at')
+        .eq('student_id', user!.id)
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+      const nameMap = await fetchProfileNamesByIds([data.professor_id]).catch(() => new Map());
+      return { ...data, professor_name: nameMap.get(data.professor_id) || null };
+    },
+  });
+}
+
+/** Envio de convites por e-mail (professor). */
+export function useInviteStudents() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ emails, message }: { emails: string[]; message?: string }) => {
+      const { data, error } = await supabase.functions.invoke('invite-student', {
+        body: { emails, message },
+      });
+      if (error) throw error;
+      return data as { sent: number; failed: string[]; code: string };
+    },
+    onSuccess: (res) => {
+      if (res.sent > 0) toast.success(`${res.sent} convite(s) enviado(s).`);
+      if (res.failed?.length) toast.warning(`Falha ao enviar para: ${res.failed.join(', ')}`);
+      queryClient.invalidateQueries({ queryKey: ['professor-referral-code'] });
+    },
+    onError: () => toast.error('Erro ao enviar convites'),
+  });
+}
