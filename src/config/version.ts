@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 5,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.5.1",
+    date: "2026-09-04",
+    type: "patch" as const,
+    changes: [
+      "Empacotamento Modular (/admin/empacotamento) revalidado e ligado de verdade: catálogo reduzido apenas aos módulos que são efetivamente aplicados (Diagnóstico, Cadastro/Destinos, Projetos, Relatórios, Consórcios, Observatório e EDU).",
+      "Gating aplicado também em /destinos (módulo 'cadastro') e em todas as rotas EDU via EduRoute (módulo 'edu'); ADMIN continua com bypass global e o padrão permanece habilitado quando não há override.",
+      "Menu mobile passou a respeitar o empacotamento, igual ao menu desktop — itens de módulos desabilitados deixam de aparecer.",
+    ],
+  },
   {
     version: "2.4.3",
     date: "2026-09-04",
