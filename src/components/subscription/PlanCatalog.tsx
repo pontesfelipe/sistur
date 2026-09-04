@@ -83,23 +83,31 @@ export function PlanCatalog({ onSelectPlan, onCheckout }: PlanCatalogProps = {})
                     </li>
                   ))}
                 </ul>
-                {!isCurrent && (
-                  <Button
-                    variant={p.quote_only ? 'outline' : 'default'}
-                    className="w-full"
-                    onClick={() => {
-                      if (onSelectPlan) {
-                        onSelectPlan({ code: p.code, name: p.name });
-                        return;
-                      }
-                      window.location.href = `mailto:contato@sistur.com.br?subject=${encodeURIComponent(
-                        `Interesse no plano ${p.name}`,
-                      )}`;
-                    }}
-                  >
-                    {p.quote_only ? 'Falar com o time' : 'Quero contratar'}
-                  </Button>
-                )}
+                {!isCurrent && (() => {
+                  const onlinePriceId = !p.quote_only && p.price_cents ? p.stripe_price_id : null;
+                  const canCheckout = !!onlinePriceId && !!onCheckout;
+                  return (
+                    <Button
+                      variant={p.quote_only ? 'outline' : 'default'}
+                      className="w-full"
+                      onClick={() => {
+                        if (canCheckout) {
+                          onCheckout!({ code: p.code, name: p.name, priceId: onlinePriceId! });
+                          return;
+                        }
+                        if (onSelectPlan) {
+                          onSelectPlan({ code: p.code, name: p.name });
+                          return;
+                        }
+                        window.location.href = `mailto:contato@sistur.com.br?subject=${encodeURIComponent(
+                          `Interesse no plano ${p.name}`,
+                        )}`;
+                      }}
+                    >
+                      {p.quote_only ? 'Falar com o time' : canCheckout ? 'Assinar agora' : 'Quero contratar'}
+                    </Button>
+                  );
+                })()}
               </CardContent>
             </Card>
           );
