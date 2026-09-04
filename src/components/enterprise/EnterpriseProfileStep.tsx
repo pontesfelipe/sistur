@@ -208,6 +208,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   // unidades, uma por município.
   const [brandId, setBrandId] = useState<string | null>(null);
   const [brandName, setBrandName] = useState<string | null>(null);
+  const [manageBrandsOpen, setManageBrandsOpen] = useState(false);
   const [unitName, setUnitName] = useState<string>('');
   const [isFlagship, setIsFlagship] = useState<boolean>(false);
   const { data: brandUnits } = useBrandUnits(brandId ?? null);
