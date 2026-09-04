@@ -7,6 +7,58 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
 );
 
+const PLAN_PRICE_IDS = ['estudante_mensal', 'independente_mensal', 'empresarial_mensal'];
+
+/**
+ * Configuração do portal do cliente: método de pagamento, cancelamento ao
+ * fim do ciclo e troca de plano (upgrade/downgrade com pro-rata) self-service.
+ * Reutiliza a configuração ativa existente (metadata.app = 'sistur').
+ */
+async function resolvePortalConfiguration(
+  stripe: ReturnType<typeof createStripeClient>,
+): Promise<string> {
+  const existing = await stripe.billingPortal.configurations.list({ active: true, limit: 20 });
+  const found = existing.data.find((c: any) => c.metadata?.app === 'sistur');
+  if (found) return found.id;
+
+  const prices = await stripe.prices.list({ lookup_keys: PLAN_PRICE_IDS, limit: 10 });
+  const productIds = [...new Set(prices.data.map((p: any) =>
+    typeof p.product === 'string' ? p.product : p.product?.id,
+  ).filter(Boolean))] as string[];
+
+  const products = prices.data
+    .filter((p: any) => p.type === 'recurring')
+    .map((p: any) => ({
+      product: typeof p.product === 'string' ? p.product : p.product.id,
+      prices: [p.id],
+    }));
+
+  const created = await stripe.billingPortal.configurations.create({
+    business_profile: { headline: 'SISTUR — Gerencie sua assinatura' },
+    metadata: { app: 'sistur', productIds: productIds.join(',') },
+    features: {
+      payment_method_update: { enabled: true },
+      invoice_history: { enabled: true },
+      customer_update: { enabled: true, allowed_updates: ['email', 'name', 'tax_id'] },
+      subscription_cancel: {
+        enabled: true,
+        mode: 'at_period_end',
+        cancellation_reason: {
+          enabled: true,
+          options: ['too_expensive', 'missing_features', 'switched_service', 'unused', 'other'],
+        },
+      },
+      subscription_update: {
+        enabled: true,
+        default_allowed_updates: ['price'],
+        proration_behavior: 'create_prorations',
+        products,
+      },
+    },
+  });
+  return created.id;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') {
@@ -48,8 +100,10 @@ Deno.serve(async (req) => {
     }
 
     const stripe = createStripeClient(environment);
+    const configuration = await resolvePortalConfiguration(stripe);
     const portal = await stripe.billingPortal.sessions.create({
       customer: sub.stripe_customer_id as string,
+      configuration,
       ...(returnUrl && { return_url: returnUrl }),
     });
 
