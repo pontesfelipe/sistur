@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Clock, CheckCircle2, XCircle, Crown, Zap, Building2, AlertTriangle, Mail, GraduationCap, BookOpen, Sparkles, Ban } from 'lucide-react';
+import {
+  CheckCircle2, XCircle, Crown, Building2, AlertTriangle, Sparkles, Ban,
+  Coins, GraduationCap, HelpCircle,
+} from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
-import { useLicense, type LicensePlan } from '@/contexts/LicenseContext';
+import { Badge } from '@/components/ui/badge';
+import { useLicense } from '@/contexts/LicenseContext';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -14,82 +18,49 @@ import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useStripeCheckout } from '@/hooks/useStripeCheckout';
 import { getStripeEnvironment, isPaymentsConfigured } from '@/lib/stripe';
+import { useEntitlements } from '@/hooks/useEntitlements';
+import { useTrialState } from '@/hooks/useTrialState';
+import { useBeniQuota } from '@/hooks/useBeniQuota';
 
+const FEATURE_GRID: { key: string; label: string; icon: string }[] = [
+  { key: 'erp', label: 'Analítico territorial', icon: '📊' },
+  { key: 'enterprise', label: 'Diagnóstico empresarial', icon: '🏨' },
+  { key: 'edu', label: 'EDU', icon: '📚' },
+  { key: 'projects', label: 'Projetos', icon: '🗂️' },
+  { key: 'reports', label: 'Relatórios', icon: '📈' },
+  { key: 'observatory', label: 'Observatório', icon: '🛰️' },
+  { key: 'consortia', label: 'Consórcios', icon: '🤝' },
+  { key: 'beni', label: 'Professor Beni', icon: '🤖' },
+];
 
-const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
+const FAQ: { q: string; a: string }[] = [
   {
-    plan: 'estudante',
-    name: 'Estudante',
-    price: 'R$ 19/mês',
-    icon: <GraduationCap className="h-6 w-6 text-sky-400" />,
-    features: [
-      'Acesso à plataforma EDU',
-      'Trilhas de aprendizagem',
-      'Jogos educacionais',
-      'Certificados de conclusão',
-      'Professor Beni (IA)',
-      'Social Turismo',
-    ],
+    q: 'O plano Empresarial tem limite de usuários?',
+    a: 'Não. Ele começa com 5 usuários e cresce conforme a necessidade: cada usuário adicional é cobrado pelo mesmo valor por usuário/mês. Você ajusta a quantidade a qualquer momento no checkout ou no gerenciamento da assinatura.',
   },
   {
-    plan: 'professor',
-    name: 'Professor',
-    price: 'R$ 39/mês',
-    icon: <BookOpen className="h-6 w-6 text-amber-400" />,
-    highlight: true,
-    features: [
-      'Tudo do Estudante',
-      'Criar e gerenciar trilhas',
-      'Banco de questões e exames',
-      'Painel de desempenho dos alunos',
-      'Emissão de certificados',
-      'Suporte prioritário',
-    ],
+    q: 'Como funciona o período de avaliação?',
+    a: 'A avaliação é por uso, sem prazo: cada nova conta tem o curso base do SISTUR EDU e 10 perguntas ao Professor Beni; cada nova organização tem 1 diagnóstico com resultado em prévia. Depois disso, basta escolher um plano para liberar tudo.',
+  },
+  {
+    q: 'Posso trocar de plano depois?',
+    a: 'Sim. A troca é imediata e o valor é ajustado proporcionalmente na próxima fatura.',
+  },
+  {
+    q: 'Quais formas de pagamento são aceitas?',
+    a: 'Cartão de crédito e Pix, em reais (BRL). Notas e faturas ficam disponíveis no gerenciamento da assinatura.',
   },
 ];
 
-const ERP_PLANS: { plan: LicensePlan; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
-  {
-    plan: 'enterprise',
-    name: 'Empresarial',
-    price: 'R$ 149/mês',
-    icon: <Building2 className="h-6 w-6 text-emerald-400" />,
-    highlight: true,
-    features: [
-      'Diagnóstico Empresarial (hotéis/resorts)',
-      'Indicadores de hospitalidade (ENT_*)',
-      'Plataforma EDU',
-      'Relatórios Empresarial',
-      'Certificados personalizados',
-      'Suporte prioritário',
-      'Até 10 usuários',
-    ],
-  },
-  {
-    plan: 'pro',
-    name: 'Gestor Público',
-    price: 'Sob consulta',
-    icon: <Zap className="h-6 w-6 text-purple-400" />,
-    features: [
-      'Acesso completo Territorial + Empresarial',
-      'Diagnósticos RA/OE/AO',
-      'Integrações (IBGE, APIs)',
-      'Usuários ilimitados',
-      'API dedicada',
-      'Customização de marca',
-      'Gerente de conta dedicado',
-      'SLA garantido',
-    ],
-  },
-];
 export default function Subscription() {
-  const { license, isTrialActive, isTrialExpired, isPaidPlan, isLicenseValid, trialDaysRemaining, trialProgress, plan, planLabel } = useLicense();
-  const { refetchLicense } = useLicense();
-  const [activatingTrial, setActivatingTrial] = useState(false);
+  const { license, isPaidPlan, isLicenseValid, planLabel, refetchLicense } = useLicense();
+  const { entitlements } = useEntitlements();
+  const { userTrialing, orgTrialing, trainingConsumed, assessmentUsed, hasSubscription } = useTrialState();
+  const { unlimited: beniUnlimited, remaining: beniRemaining, allowance: beniAllowance, totalCredits: beniCredits } = useBeniQuota();
+
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const isCancelled = license?.status === 'cancelled';
-
-  const noLicense = !license;
+  const inTrial = !hasSubscription && (userTrialing || orgTrialing);
 
   const paymentsReady = isPaymentsConfigured();
   const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
@@ -98,11 +69,11 @@ export default function Subscription() {
   const [changingPlan, setChangingPlan] = useState(false);
 
   /**
-   * Assinatura de plano: se o usuário já tem assinatura Stripe ativa neste
-   * ambiente, troca o preço com pro-rata imediato (change-plan); caso
-   * contrário abre o checkout embutido para uma nova assinatura.
+   * Assinatura de plano: se o usuário já tem assinatura ativa neste ambiente,
+   * troca o preço com pro-rata imediato (change-plan); caso contrário abre o
+   * checkout embutido para uma nova assinatura.
    */
-  const handleSubscribePlan = async (name: string, priceId: string) => {
+  const handleSubscribePlan = async (name: string, priceId: string, quantity: number) => {
     try {
       setChangingPlan(true);
       const environment = getStripeEnvironment();
@@ -129,12 +100,12 @@ export default function Subscription() {
         return;
       }
       if (activeSub?.price_id === priceId) {
-        toast.info('Você já está neste plano.');
+        toast.info('Você já está neste plano. Para ajustar a quantidade de usuários, use o gerenciamento da assinatura.');
         return;
       }
 
-      setCheckoutTitle(name);
-      openCheckout({ priceId });
+      setCheckoutTitle(quantity > 1 ? `${name} — ${quantity} usuários` : name);
+      openCheckout({ priceId, quantity });
     } catch (err: any) {
       toast.error(err?.message || 'Não foi possível processar a assinatura');
     } finally {
@@ -157,384 +128,138 @@ export default function Subscription() {
     }
   };
 
-
-  const handleActivateTrial = async () => {
-    try {
-      setActivatingTrial(true);
-      const { error } = await supabase.rpc('activate_my_trial');
-
-      if (error) throw error;
-
-      toast.success('Trial de 7 dias ativado com sucesso!');
-      await refetchLicense();
-    } catch (err: any) {
-      console.error('Error activating trial:', err);
-      const errorMessage = String(err?.message || '');
-
-      if (errorMessage.includes('trial_already_used')) {
-        toast.error('Seu período de trial já foi utilizado.');
-      } else if (errorMessage.includes('paid_license_exists')) {
-        toast.error('Sua conta já possui um plano ativo.');
-      } else if (errorMessage.includes('profile_not_found') || errorMessage.includes('not_authenticated')) {
-        toast.error('Erro ao identificar usuário.');
-      } else {
-        toast.error('Erro ao ativar trial: ' + (err.message || 'Tente novamente'));
-      }
-    } finally {
-      setActivatingTrial(false);
-    }
-  };
+  const statusLabel = isCancelled ? 'Cancelado' : hasSubscription || isPaidPlan ? 'Ativo' : inTrial ? 'Avaliação' : 'Sem plano';
+  const headline = hasSubscription || isPaidPlan
+    ? planLabel
+    : inTrial ? 'Avaliação por uso' : 'Nenhum plano ativo';
 
   return (
-    <AppLayout title="Planos" subtitle="Gerencie seu plano e licença">
-      <div className="max-w-5xl mx-auto space-y-8">
-        {/* Current plan status */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+    <AppLayout title="Planos e assinatura" subtitle="Escolha o plano certo e gerencie sua contratação">
+      <div className="max-w-5xl mx-auto space-y-10">
+        {/* Situação atual */}
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           className={cn(
             'rounded-2xl border-2 p-6 relative overflow-hidden',
-                    isTrialActive ? 'border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-orange-950/20' :
-                    isPaidPlan ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/30 to-teal-950/20' :
-                    noLicense ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-blue-950/20' :
-                    isCancelled ? 'border-muted bg-gradient-to-br from-muted/30 to-muted/10' :
-                    isTrialExpired ? 'border-red-500/50 bg-gradient-to-br from-red-950/30 to-rose-950/20' :
-            'border-border bg-card',
+            isCancelled ? 'border-muted bg-muted/20'
+              : hasSubscription || isPaidPlan ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/30 to-teal-950/20'
+              : inTrial ? 'border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-orange-950/20'
+              : 'border-primary/50 bg-gradient-to-br from-primary/10 to-blue-950/20',
           )}
         >
-          {/* Background pattern */}
-          <div className="absolute inset-0 opacity-5" style={{
-            backgroundImage: 'radial-gradient(circle at 20% 50%, currentColor 1px, transparent 1px)',
-            backgroundSize: '30px 30px',
-          }} />
-
-          <div className="relative z-10">
-            <div className="flex items-start justify-between flex-wrap gap-4">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  {isTrialActive ? (
-                    <Clock className="h-6 w-6 text-amber-400" />
-                  ) : isPaidPlan ? (
-                    <Crown className="h-6 w-6 text-emerald-400" />
-                  ) : noLicense ? (
-                    <Sparkles className="h-6 w-6 text-primary" />
-                  ) : isCancelled ? (
-                    <Ban className="h-6 w-6 text-muted-foreground" />
-                  ) : (
-                    <AlertTriangle className="h-6 w-6 text-red-400" />
-                  )}
-                   <h2 className="text-xl font-bold">{noLicense ? 'Bem-vindo ao SISTUR!' : planLabel}</h2>
-                   {!noLicense && (
-                   <span className={cn(
-                     'text-xs font-bold px-2.5 py-1 rounded-full',
-                     isCancelled ? 'bg-muted text-muted-foreground' :
-                     isLicenseValid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400',
-                   )}>
-                     {isCancelled ? 'Cancelado' : isLicenseValid ? 'Ativo' : 'Inativo'}
-                   </span>
-                   )}
-                 </div>
-                 <p className="text-sm text-muted-foreground max-w-md">
-                   {noLicense
-                     ? 'Sua conta foi aprovada! Ative seu trial gratuito de 7 dias para explorar todas as funcionalidades ou escolha um plano abaixo.'
-                     : isCancelled
-                     ? `Seu plano ${planLabel} foi cancelado.${license?.expires_at ? ` Acesso mantido até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''} Escolha um novo plano abaixo.`
-                     : isTrialActive
-                     ? `Sua avaliação gratuita de 7 dias está ativa. Restam ${trialDaysRemaining} dia${trialDaysRemaining !== 1 ? 's' : ''} para explorar todas as funcionalidades.`
-                     : isPaidPlan
-                     ? `Você tem acesso completo ao plano ${planLabel}. ${license?.expires_at ? `Válido até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''}`
-                     : isTrialExpired
-                     ? 'Sua avaliação gratuita expirou. Escolha um plano para continuar usando o SISTUR.'
-                     : 'Nenhuma licença ativa encontrada. Ative um trial ou escolha um plano.'
-                  }
-                </p>
+          <div className="flex items-start justify-between flex-wrap gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                {isCancelled ? <Ban className="h-6 w-6 text-muted-foreground" />
+                  : hasSubscription || isPaidPlan ? <Crown className="h-6 w-6 text-emerald-400" />
+                  : inTrial ? <Sparkles className="h-6 w-6 text-amber-400" />
+                  : <AlertTriangle className="h-6 w-6 text-primary" />}
+                <h2 className="text-xl font-bold">{headline}</h2>
+                <span className={cn(
+                  'text-xs font-bold px-2.5 py-1 rounded-full',
+                  isCancelled ? 'bg-muted text-muted-foreground'
+                    : hasSubscription || isPaidPlan ? 'bg-emerald-500/20 text-emerald-400'
+                    : inTrial ? 'bg-amber-500/20 text-amber-300'
+                    : 'bg-primary/20 text-primary',
+                )}>
+                  {statusLabel}
+                </span>
               </div>
-
-              {isTrialActive && (
-                <div className="flex-shrink-0 text-right">
-                  <p className="text-3xl font-black text-amber-400 tabular-nums">{trialDaysRemaining}</p>
-                  <p className="text-xs text-muted-foreground">dias restantes</p>
-                </div>
-              )}
+              <p className="text-sm text-muted-foreground max-w-xl">
+                {isCancelled
+                  ? `Seu plano ${planLabel} foi cancelado.${license?.expires_at ? ` O acesso segue até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''} Escolha um novo plano abaixo.`
+                  : hasSubscription || isPaidPlan
+                  ? 'Sua assinatura está ativa. Use o gerenciamento para ajustar usuários, forma de pagamento e faturas.'
+                  : inTrial
+                  ? 'Você está na avaliação por uso: sem prazo, liberada até você consumir os itens de cortesia abaixo.'
+                  : 'Escolha um dos planos abaixo para liberar os módulos do SISTUR.'}
+              </p>
             </div>
 
-            {/* Trial progress bar */}
-            {isTrialActive && (
-              <div className="mt-4">
-                <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
-                  <span>Início do trial</span>
-                  <span>Fim do trial (7 dias)</span>
-                </div>
-                <div className="h-3 bg-black/30 rounded-full overflow-hidden border border-white/10">
-                  <motion.div
-                    className={cn(
-                      'h-full rounded-full',
-                      trialDaysRemaining <= 2 ? 'bg-gradient-to-r from-red-500 to-orange-500' :
-                      trialDaysRemaining <= 4 ? 'bg-gradient-to-r from-amber-500 to-yellow-500' :
-                      'bg-gradient-to-r from-emerald-500 to-teal-500',
-                    )}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${trialProgress}%` }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Trial expired warning */}
-            {isTrialExpired && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4 bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3"
+            {(hasSubscription || isPaidPlan) && !isCancelled && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowCancelDialog(true)}
+                className="text-muted-foreground hover:text-destructive gap-1.5"
               >
-                <AlertTriangle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-bold text-red-400">Período de avaliação encerrado</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Para continuar acessando o SISTUR, escolha um plano abaixo ou entre em contato com nossa equipe comercial.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Trial activation CTA for new users */}
-            {noLicense && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6 bg-primary/5 border border-primary/20 rounded-xl p-6"
-              >
-                <h3 className="text-base font-bold mb-2">🎉 Experimente o SISTUR gratuitamente</h3>
-                <p className="text-sm text-muted-foreground mb-1">
-                  Ative seu trial gratuito de <strong>7 dias</strong> e tenha acesso completo a todas as funcionalidades:
-                </p>
-                <ul className="text-sm text-muted-foreground space-y-1 mb-4 list-disc list-inside">
-                  <li>Plataforma EDU com trilhas e cursos</li>
-                  <li>Jogos educacionais (TCG, RPG, Memória, Caça ao Tesouro)</li>
-                  <li>Professor Beni (IA) e Social Turismo</li>
-                  <li>Analítico de diagnósticos turísticos</li>
-                </ul>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Sem compromisso — ao final dos 7 dias, escolha um plano para continuar.
-                </p>
-                <Button
-                  size="lg"
-                  onClick={handleActivateTrial}
-                  disabled={activatingTrial}
-                  className="gap-2 text-base px-8"
-                >
-                  <Sparkles className="h-5 w-5" />
-                  {activatingTrial ? 'Ativando...' : 'Ativar Trial Gratuito de 7 Dias'}
-                </Button>
-              </motion.div>
-            )}
-
-            {/* Cancel button for active licenses */}
-            {(isTrialActive || isPaidPlan) && !isCancelled && (
-              <div className="mt-4 pt-4 border-t border-border/50">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowCancelDialog(true)}
-                  className="text-muted-foreground hover:text-destructive gap-1.5"
-                >
-                  <Ban className="h-3.5 w-3.5" />
-                  Cancelar plano
-                </Button>
-              </div>
+                <Ban className="h-3.5 w-3.5" /> Cancelar plano
+              </Button>
             )}
           </div>
-        </motion.div>
+
+          {inTrial && (
+            <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <TrialItem
+                icon={<GraduationCap className="h-4 w-4" />}
+                label="Curso base do EDU"
+                done={trainingConsumed}
+                doneText="Concluído — trilhas completas exigem plano"
+                openText="Disponível na sua avaliação"
+              />
+              <TrialItem
+                icon={<Building2 className="h-4 w-4" />}
+                label="1 diagnóstico"
+                done={assessmentUsed}
+                doneText="Utilizado — resultados em prévia"
+                openText="Ainda disponível"
+              />
+              <TrialItem
+                icon={<Coins className="h-4 w-4" />}
+                label="Professor Beni"
+                done={beniRemaining + beniCredits <= 0 && !beniUnlimited}
+                doneText="Perguntas de cortesia esgotadas"
+                openText={`${beniRemaining + beniCredits} pergunta(s) restante(s)`}
+              />
+            </div>
+          )}
+        </motion.section>
 
         <CancelSubscriptionDialog
           open={showCancelDialog}
           onOpenChange={setShowCancelDialog}
           planLabel={planLabel}
           expiresAt={license?.expires_at || null}
-          isTrial={license?.plan === 'trial'}
+          isTrial={false}
           onCancelled={() => refetchLicense()}
         />
 
-        {/* Feature access */}
-        {license && (
-          <div>
-            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">
-              Funcionalidades do seu plano
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-              {[
-                { key: 'erp', label: 'Analítico', icon: '📊' },
-                { key: 'edu', label: 'EDU', icon: '📚' },
-                { key: 'games', label: 'Jogos', icon: '🎮' },
-                { key: 'reports', label: 'Relatórios', icon: '📈' },
-                { key: 'integrations', label: 'Integrações', icon: '🔗' },
-              ].map(f => {
-                const enabled = isLicenseValid && (license.plan === 'enterprise' || license.features[f.key] === true);
-                return (
-                  <div key={f.key} className={cn(
-                    'rounded-xl border p-3 flex items-center gap-2 transition-all',
-                    enabled ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/50 bg-muted/20 opacity-50',
-                  )}>
-                    <span className="text-lg">{f.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">{f.label}</p>
-                    </div>
-                    {enabled ? (
-                      <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* EDU Plans */}
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <GraduationCap className="h-5 w-5 text-sky-400" />
-            <h3 className="text-lg font-bold">Planos EDU</h3>
-          </div>
-          <p className="text-sm text-muted-foreground mb-6">
-            Ideal para estudantes e professores da área de turismo.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
-            {EDU_PLANS.map((p, i) => {
-              const isCurrentPlan = plan === p.plan && isPaidPlan;
+        {/* Módulos liberados */}
+        <section>
+          <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">
+            Módulos liberados na sua conta
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {FEATURE_GRID.map(f => {
+              const enabled = entitlements.features?.[f.key] === true;
               return (
-                <motion.div
-                  key={p.plan}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className={cn(
-                    'relative rounded-2xl border-2 p-6 flex flex-col transition-shadow',
-                    p.highlight ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-border',
-                    isCurrentPlan && 'ring-2 ring-emerald-500/50',
-                  )}
-                >
-                  {p.highlight && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                      Recomendado
-                    </span>
-                  )}
-                  {isCurrentPlan && (
-                    <span className="absolute -top-3 right-4 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                      Seu plano
-                    </span>
-                  )}
-
-                  <div className="mb-4">
-                    {p.icon}
-                    <h4 className="text-lg font-bold mt-2">{p.name}</h4>
-                    <p className="text-2xl font-black mt-1">{p.price}</p>
-                  </div>
-
-                  <ul className="space-y-2.5 flex-1 mb-6">
-                    {p.features.map(f => (
-                      <li key={f} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                        <span className="text-muted-foreground">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {isCurrentPlan ? (
-                    <Button disabled className="w-full" variant="outline">
-                      Plano atual
-                    </Button>
-                  ) : (
-                    <Button className={cn('w-full', p.highlight && 'bg-amber-600 hover:bg-amber-700')}>
-                      {isTrialActive ? 'Atualizar agora' : 'Começar'}
-                    </Button>
-                  )}
-                </motion.div>
+                <div key={f.key} className={cn(
+                  'rounded-xl border p-3 flex items-center gap-2 transition-all',
+                  enabled ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/50 bg-muted/20 opacity-60',
+                )}>
+                  <span className="text-lg">{f.icon}</span>
+                  <p className="text-xs font-medium flex-1 min-w-0 truncate">{f.label}</p>
+                  {enabled
+                    ? <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                    : <XCircle className="h-4 w-4 text-muted-foreground shrink-0" />}
+                </div>
               );
             })}
           </div>
-        </div>
-
-        {/* ERP/Organization Plans */}
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Building2 className="h-5 w-5 text-purple-400" />
-            <h3 className="text-lg font-bold">Planos Organizacionais</h3>
-          </div>
-          <p className="text-sm text-muted-foreground mb-6">
-            {isTrialActive
-              ? 'Atualize antes do fim do trial para não perder o acesso.'
-              : 'Para gestores, analistas e organizações de turismo.'}
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
-            {ERP_PLANS.map((p, i) => {
-              const isCurrentPlan = plan === p.plan && isPaidPlan;
-              return (
-                <motion.div
-                  key={p.plan}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className={cn(
-                    'relative rounded-2xl border-2 p-6 flex flex-col transition-shadow',
-                    p.highlight ? 'border-purple-500/50 shadow-lg shadow-purple-500/10' : 'border-border',
-                    isCurrentPlan && 'ring-2 ring-emerald-500/50',
-                  )}
-                >
-                  {p.highlight && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                      Popular
-                    </span>
-                  )}
-                  {isCurrentPlan && (
-                    <span className="absolute -top-3 right-4 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                      Seu plano
-                    </span>
-                  )}
-
-                  <div className="mb-4">
-                    {p.icon}
-                    <h4 className="text-lg font-bold mt-2">{p.name}</h4>
-                    <p className="text-2xl font-black mt-1">{p.price}</p>
-                  </div>
-
-                  <ul className="space-y-2.5 flex-1 mb-6">
-                    {p.features.map(f => (
-                      <li key={f} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                        <span className="text-muted-foreground">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {isCurrentPlan ? (
-                    <Button disabled className="w-full" variant="outline">
-                      Plano atual
-                    </Button>
-                  ) : p.plan === 'enterprise' ? (
-                    <Button variant="outline" className="w-full gap-2" onClick={() => window.location.href = 'mailto:contato@sistur.com.br?subject=Plano Empresarial'}>
-                      <Mail className="h-4 w-4" /> Falar com vendas
-                    </Button>
-                  ) : (
-                    <Button className={cn('w-full', p.highlight && 'bg-purple-600 hover:bg-purple-700')}>
-                      {isTrialActive ? 'Atualizar agora' : 'Começar'}
-                    </Button>
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
+          {!isLicenseValid && !hasSubscription && (
+            <p className="text-xs text-muted-foreground mt-3">
+              Módulos bloqueados são liberados imediatamente após a contratação.
+            </p>
+          )}
+        </section>
 
         {paymentsReady && <PaymentTestModeBanner />}
 
+        {/* Catálogo oficial (única fonte de preços) */}
         <PlanCatalog
           onCheckout={paymentsReady && !changingPlan
-            ? ({ name, priceId }) => { void handleSubscribePlan(name, priceId); }
+            ? ({ name, priceId, quantity }) => { void handleSubscribePlan(name, priceId, quantity); }
             : undefined}
         />
 
@@ -548,12 +273,40 @@ export default function Subscription() {
         )}
 
         {paymentsReady && (
-          <div className="flex justify-end">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-4">
+            <div>
+              <p className="text-sm font-medium">Gerenciar assinatura</p>
+              <p className="text-xs text-muted-foreground">
+                Ajuste a quantidade de usuários, atualize o pagamento e baixe faturas.
+              </p>
+            </div>
             <Button variant="outline" onClick={handleOpenPortal} disabled={openingPortal}>
-              {openingPortal ? 'Abrindo...' : 'Gerenciar assinatura, pagamento e faturas'}
+              {openingPortal ? 'Abrindo...' : 'Abrir gerenciamento'}
             </Button>
           </div>
         )}
+
+        {/* Perguntas frequentes */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <HelpCircle className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-bold">Perguntas frequentes</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {FAQ.map(item => (
+              <div key={item.q} className="rounded-xl border border-border bg-card p-4">
+                <p className="text-sm font-semibold mb-1.5">{item.q}</p>
+                <p className="text-sm text-muted-foreground">{item.a}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground mt-4">
+            Precisa de uma proposta institucional, nota de empenho ou volume acima de 100 usuários?{' '}
+            <a className="underline" href="mailto:contato@sistur.com.br?subject=Proposta%20SISTUR">
+              Fale com o time comercial
+            </a>.
+          </p>
+        </section>
 
         <Dialog open={isOpen} onOpenChange={(open) => { if (!open) closeCheckout(); }}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -563,36 +316,24 @@ export default function Subscription() {
             {checkoutElement}
           </DialogContent>
         </Dialog>
-
-
-
-
-
-        {/* License details */}
-        {license && (
-          <div className="bg-card border border-border rounded-xl p-5">
-            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Detalhes da licença</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground text-xs">ID da licença</p>
-                <p className="font-mono text-xs mt-0.5">{license.id.slice(0, 8)}...</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground text-xs">Ativada em</p>
-                <p className="font-medium mt-0.5">{new Date(license.activated_at).toLocaleDateString('pt-BR')}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground text-xs">Máx. usuários</p>
-                <p className="font-medium mt-0.5">{license.max_users}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground text-xs">Última atualização</p>
-                <p className="font-medium mt-0.5">{new Date(license.updated_at).toLocaleDateString('pt-BR')}</p>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </AppLayout>
+  );
+}
+
+function TrialItem({ icon, label, done, doneText, openText }: {
+  icon: React.ReactNode; label: string; done: boolean; doneText: string; openText: string;
+}) {
+  return (
+    <div className="rounded-xl border border-border/60 bg-background/40 p-3">
+      <div className="flex items-center gap-2 mb-1">
+        {icon}
+        <p className="text-xs font-semibold">{label}</p>
+        <Badge variant={done ? 'secondary' : 'outline'} className="ml-auto text-[10px]">
+          {done ? 'Consumido' : 'Disponível'}
+        </Badge>
+      </div>
+      <p className="text-xs text-muted-foreground">{done ? doneText : openText}</p>
+    </div>
   );
 }
