@@ -19,6 +19,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useBeniQuota } from '@/hooks/useBeniQuota';
+import { Link } from 'react-router-dom';
 import { ChatMessageList } from './ChatMessageList';
 import { ChatInput } from './ChatInput';
 import { BeniContextSelector, type BeniContext } from './BeniContextSelector';
@@ -44,6 +46,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/beni-chat`;
 
 export function BeniChatBot({ initialContext }: BeniChatBotProps) {
   const { user } = useAuth();
+  const beniQuota = useBeniQuota();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
