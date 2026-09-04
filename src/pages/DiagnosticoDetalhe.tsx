@@ -1328,7 +1328,7 @@ const DiagnosticoDetalhe = () => {
           </TabsContent>
         </Tabs>
         ))
-      ) : (
+        : (
         /* Pre-calculation state */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-card rounded-xl border p-8 text-center">
