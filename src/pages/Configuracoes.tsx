@@ -231,6 +231,10 @@ export default function Configuracoes() {
               <Bot className="h-4 w-4" />
               <span className="hidden sm:inline">Beni</span>
             </TabsTrigger>
+            <TabsTrigger value="regras-negocio" className="flex items-center gap-2 shrink-0">
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden sm:inline">Regras & Planos</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* GERAL TAB */}
