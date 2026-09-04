@@ -108,6 +108,7 @@ const TreasureGame = lazyWithReload(() => import("./pages/TreasureGame"));
 const MemoryGame = lazyWithReload(() => import("./pages/MemoryGame"));
 const Subscription = lazyWithReload(() => import("./pages/Subscription"));
 const Precos = lazyWithReload(() => import("./pages/Precos"));
+const CheckoutReturn = lazyWithReload(() => import("./pages/CheckoutReturn"));
 const AdminLicenses = lazyWithReload(() => import("./pages/AdminLicenses"));
 const AdminIngestionHealth = lazyWithReload(() => import("./pages/AdminIngestionHealth"));
 const TermsAcceptance = lazyWithReload(() => import("./pages/TermsAcceptance"));
@@ -190,6 +191,7 @@ const App = () => {
                  <Route path="/verificar-certificado" element={<VerificarCertificado />} />
                  <Route path="/verificar-certificado/:code" element={<VerificarCertificado />} />
                  <Route path="/planos" element={<Precos />} />
+                 <Route path="/checkout/retorno" element={<CheckoutReturn />} />
                 <Route
                   path="/"
                   element={
