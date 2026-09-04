@@ -652,6 +652,36 @@ export const EduTrilhaDetalhe = () => {
     );
   }
 
+  if (trialLocked) {
+    return (
+      <AppLayout subNav={eduAprenderNav} title="Período de teste concluído" subtitle="">
+        <Card className="max-w-2xl mx-auto border-primary/40 bg-primary/5">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <LockIcon className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Trilha disponível nos planos</CardTitle>
+            </div>
+            <CardDescription>
+              Você concluiu o curso base do teste gratuito. Para acessar esta e todas as demais
+              trilhas formativas, conheça os planos do SISTUR EDU.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-2">
+            <Button asChild>
+              <Link to="/assinatura">
+                Ver planos
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/edu/trilhas">Voltar às Trilhas</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </AppLayout>
+    );
+  }
+
   if (foundation.locked && foundation.course) {
     return (
       <AppLayout subNav={eduAprenderNav} title="Curso base obrigatório" subtitle="">
