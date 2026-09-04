@@ -194,28 +194,6 @@ export default function Configuracoes() {
               <Wrench className="h-4 w-4" />
               <span className="hidden sm:inline">Ferramentas</span>
             </TabsTrigger>
-            {isAdmin && (
-              <TabsTrigger value="semantica" className="flex items-center gap-2 shrink-0">
-                <ScrollText className="h-4 w-4" />
-                <span className="hidden sm:inline">Semântica</span>
-              </TabsTrigger>
-            )}
-            {isAdmin && (
-              <TabsTrigger value="estrutura" className="flex items-center gap-2 shrink-0">
-                <ListOrdered className="h-4 w-4" />
-                <span className="hidden sm:inline">Estrutura</span>
-              </TabsTrigger>
-            )}
-            {(isAdmin || isOrgAdmin) && (
-              <TabsTrigger value="contexto" className="flex items-center gap-2 shrink-0">
-                <Sparkles className="h-4 w-4" />
-                <span className="hidden sm:inline">Contexto</span>
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="beni" className="flex items-center gap-2 shrink-0">
-              <Bot className="h-4 w-4" />
-              <span className="hidden sm:inline">Beni</span>
-            </TabsTrigger>
             <TabsTrigger value="regras-negocio" className="flex items-center gap-2 shrink-0">
               <Sparkles className="h-4 w-4" />
               <span className="hidden sm:inline">Regras & Planos</span>
