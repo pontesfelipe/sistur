@@ -761,10 +761,10 @@ export default function ProfessorDashboard() {
   const groupLabel = isEduOnly ? 'Salas de Aula' : 'Grupos / Salas';
 
   return (
-    <AppLayout title="Gestão de Treinamentos">
+    <AppLayout title="Painel do Professor">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-display font-bold">Gestão de Treinamentos</h1>
+          <h1 className="text-3xl font-display font-bold">Painel do Professor</h1>
           <p className="text-muted-foreground">
             Gerencie {isEduOnly ? 'salas de aula, alunos e atividades' : 'grupos de capacitação, salas e atividades'}
           </p>
