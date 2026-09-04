@@ -124,7 +124,7 @@ export function BusinessRulesPanel() {
                         {p.name}
                       </CardTitle>
                       <CardDescription className="text-sm">
-                        {p.quote_only ? 'Sob consulta' : formatPlanPrice(p.price_cents)}
+                        {formatPlanPrice(p)}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2 text-sm">
