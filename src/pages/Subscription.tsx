@@ -550,7 +550,7 @@ export default function Subscription() {
         {paymentsReady && (
           <div className="flex justify-end">
             <Button variant="outline" onClick={handleOpenPortal} disabled={openingPortal}>
-              {openingPortal ? 'Abrindo...' : 'Gerenciar pagamento e faturas'}
+              {openingPortal ? 'Abrindo...' : 'Gerenciar assinatura, pagamento e faturas'}
             </Button>
           </div>
         )}
