@@ -9,6 +9,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CancelSubscriptionDialog } from '@/components/subscription/CancelSubscriptionDialog';
 import { PlanCatalog } from '@/components/subscription/PlanCatalog';
+import { BeniCreditPacks } from '@/components/subscription/BeniCreditPacks';
+import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useStripeCheckout } from '@/hooks/useStripeCheckout';
+import { getStripeEnvironment, isPaymentsConfigured } from '@/lib/stripe';
 
 
 const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
