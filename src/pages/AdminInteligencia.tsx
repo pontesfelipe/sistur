@@ -5,7 +5,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Bot, ScrollText, ListOrdered, Sparkles } from 'lucide-react';
 import { BeniContextPanel } from '@/components/settings/BeniContextPanel';
 
-...
+const AdminSemanticLayer = lazy(() => import('@/pages/AdminSemanticLayer'));
+const ReportStructurePanel = lazy(() =>
+  import('@/components/admin/ReportStructurePanel').then(m => ({ default: m.ReportStructurePanel }))
+);
+const ReportContextPanel = lazy(() =>
+  import('@/components/admin/ReportContextPanel').then(m => ({ default: m.ReportContextPanel }))
+);
+
+const VALID_TABS = ['beni', 'contexto', 'semantica', 'estrutura'];
+
 export default function AdminInteligencia() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
@@ -58,6 +67,6 @@ export default function AdminInteligencia() {
           </Suspense>
         </TabsContent>
       </Tabs>
-    </div>
+    </AppLayout>
   );
 }
