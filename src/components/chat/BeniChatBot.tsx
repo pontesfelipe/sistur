@@ -418,9 +418,31 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
               </div>
             </div>
             <div>
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-lg flex items-center gap-2 flex-wrap">
                 Professor Mario Beni
                 <Badge variant="outline" className="text-xs font-normal">IA</Badge>
+                {!beniQuota.isLoading && !beniQuota.unlimited && beniQuota.balance?.authenticated && (
+                  <Badge
+                    variant={beniQuota.exhausted ? 'destructive' : 'secondary'}
+                    className="text-xs font-normal"
+                    title={
+                      beniQuota.isTrial
+                        ? 'Perguntas gratuitas do período de teste'
+                        : 'Perguntas restantes neste mês' +
+                          (beniQuota.totalCredits > 0 ? ` + ${beniQuota.totalCredits} créditos extras` : '')
+                    }
+                  >
+                    {beniQuota.isTrial
+                      ? `Teste: ${beniQuota.remaining}/10 perguntas`
+                      : `Beni: ${beniQuota.remaining}/${beniQuota.allowance} este mês`}
+                    {beniQuota.totalCredits > 0 && ` (+${beniQuota.totalCredits})`}
+                  </Badge>
+                )}
+                {beniQuota.exhausted && (
+                  <Link to="/assinatura" className="text-xs text-primary underline underline-offset-2">
+                    Ver planos
+                  </Link>
+                )}
               </CardTitle>
               <p className="text-sm text-muted-foreground">Especialista em Turismo Sustentável</p>
             </div>
