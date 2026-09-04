@@ -107,6 +107,7 @@ const RPGGame = lazyWithReload(() => import("./pages/RPGGame"));
 const TreasureGame = lazyWithReload(() => import("./pages/TreasureGame"));
 const MemoryGame = lazyWithReload(() => import("./pages/MemoryGame"));
 const Subscription = lazyWithReload(() => import("./pages/Subscription"));
+const Precos = lazyWithReload(() => import("./pages/Precos"));
 const AdminLicenses = lazyWithReload(() => import("./pages/AdminLicenses"));
 const AdminIngestionHealth = lazyWithReload(() => import("./pages/AdminIngestionHealth"));
 const TermsAcceptance = lazyWithReload(() => import("./pages/TermsAcceptance"));
