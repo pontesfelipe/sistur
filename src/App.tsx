@@ -78,6 +78,7 @@ const EduCalendario = lazyWithReload(() => import("./pages/EduCalendario"));
 const EduRecompensas = lazyWithReload(() => import("./pages/EduRecompensas"));
 
 const Configuracoes = lazyWithReload(() => import("./pages/Configuracoes"));
+const AdminInteligencia = lazyWithReload(() => import("./pages/AdminInteligencia"));
 const Relatorios = lazyWithReload(() => import("./pages/Relatorios"));
 const NovaRodada = lazyWithReload(() => import("./pages/NovaRodada"));
 const FAQ = lazyWithReload(() => import("./pages/FAQ"));
@@ -387,6 +388,14 @@ const App = () => {
                   element={
                     <AdminRoute>
                       <Configuracoes />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/inteligencia"
+                  element={
+                    <AdminRoute>
+                      <AdminInteligencia />
                     </AdminRoute>
                   }
                 />

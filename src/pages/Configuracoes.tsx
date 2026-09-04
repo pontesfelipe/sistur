@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -29,7 +29,7 @@ import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSear
 import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
-import { BeniContextPanel } from '@/components/settings/BeniContextPanel';
+
 import { BusinessRulesPanel } from '@/components/settings/BusinessRulesPanel';
 import { ModuleLibrary } from '@/components/settings/ModuleLibrary';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
@@ -60,22 +60,12 @@ import {
   Clock,
   Search,
   Map,
-  ScrollText,
-  ListOrdered,
   Sparkles,
-  Bot,
   Library,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-const AdminSemanticLayer = lazy(() => import('@/pages/AdminSemanticLayer'));
-const ReportStructurePanel = lazy(() =>
-  import('@/components/admin/ReportStructurePanel').then(m => ({ default: m.ReportStructurePanel }))
-);
-const ReportContextPanel = lazy(() =>
-  import('@/components/admin/ReportContextPanel').then(m => ({ default: m.ReportContextPanel }))
-);
 
 // Helper component for downloadable documents
 function DocumentDownloadItem({ 
@@ -204,28 +194,6 @@ export default function Configuracoes() {
               <Wrench className="h-4 w-4" />
               <span className="hidden sm:inline">Ferramentas</span>
             </TabsTrigger>
-            {isAdmin && (
-              <TabsTrigger value="semantica" className="flex items-center gap-2 shrink-0">
-                <ScrollText className="h-4 w-4" />
-                <span className="hidden sm:inline">Semântica</span>
-              </TabsTrigger>
-            )}
-            {isAdmin && (
-              <TabsTrigger value="estrutura" className="flex items-center gap-2 shrink-0">
-                <ListOrdered className="h-4 w-4" />
-                <span className="hidden sm:inline">Estrutura</span>
-              </TabsTrigger>
-            )}
-            {(isAdmin || isOrgAdmin) && (
-              <TabsTrigger value="contexto" className="flex items-center gap-2 shrink-0">
-                <Sparkles className="h-4 w-4" />
-                <span className="hidden sm:inline">Contexto</span>
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="beni" className="flex items-center gap-2 shrink-0">
-              <Bot className="h-4 w-4" />
-              <span className="hidden sm:inline">Beni</span>
-            </TabsTrigger>
             <TabsTrigger value="regras-negocio" className="flex items-center gap-2 shrink-0">
               <Sparkles className="h-4 w-4" />
               <span className="hidden sm:inline">Regras & Planos</span>
@@ -349,35 +317,6 @@ export default function Configuracoes() {
             <LogAnalytics />
           </TabsContent>
 
-          {/* SEMANTICA TAB */}
-          {isAdmin && (
-            <TabsContent value="semantica" className="space-y-6">
-              <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando camada semântica…</div>}>
-                <AdminSemanticLayer embedded />
-              </Suspense>
-            </TabsContent>
-          )}
-
-          {isAdmin && (
-            <TabsContent value="estrutura" className="space-y-6">
-              <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando estrutura do relatório…</div>}>
-                <ReportStructurePanel />
-              </Suspense>
-            </TabsContent>
-          )}
-
-          {(isAdmin || isOrgAdmin) && (
-            <TabsContent value="contexto" className="space-y-6">
-              <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando contexto do relatório…</div>}>
-                <ReportContextPanel />
-              </Suspense>
-            </TabsContent>
-          )}
-
-          {/* BENI TAB — regras de conversa e contexto do Professor Beni Chat */}
-          <TabsContent value="beni" className="space-y-6">
-            <BeniContextPanel />
-          </TabsContent>
 
           <TabsContent value="documentacao" className="space-y-6">
             {/* Principles */}
