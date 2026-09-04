@@ -31,6 +31,7 @@ import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
 import { BeniContextPanel } from '@/components/settings/BeniContextPanel';
+import { BusinessRulesPanel } from '@/components/settings/BusinessRulesPanel';
 import { ModuleLibrary } from '@/components/settings/ModuleLibrary';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
 import {
@@ -230,6 +231,10 @@ export default function Configuracoes() {
             <TabsTrigger value="beni" className="flex items-center gap-2 shrink-0">
               <Bot className="h-4 w-4" />
               <span className="hidden sm:inline">Beni</span>
+            </TabsTrigger>
+            <TabsTrigger value="regras-negocio" className="flex items-center gap-2 shrink-0">
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden sm:inline">Regras & Planos</span>
             </TabsTrigger>
           </TabsList>
 
@@ -715,6 +720,11 @@ export default function Configuracoes() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          {/* REGRAS & PLANOS TAB — modelo de negócio, planos, trial e cotas */}
+          <TabsContent value="regras-negocio" className="space-y-6">
+            <BusinessRulesPanel />
           </TabsContent>
         </Tabs>
       </div>
