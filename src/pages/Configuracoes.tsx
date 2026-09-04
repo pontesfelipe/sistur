@@ -29,6 +29,9 @@ import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSear
 import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
+import { EmpacotamentoPanel } from '@/components/settings/EmpacotamentoPanel';
+import { useSearchParams } from 'react-router-dom';
+import { Package } from 'lucide-react';
 
 import { BusinessRulesPanel } from '@/components/settings/BusinessRulesPanel';
 import { ModuleLibrary } from '@/components/settings/ModuleLibrary';
@@ -146,6 +149,18 @@ function ExternalReferenceItem({
 
 export default function Configuracoes() {
   const { isAdmin, isOrgAdmin } = useProfile();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const allowedTabs = ['geral', 'usuarios', 'feedback', 'logs', 'documentacao', 'biblioteca', 'ferramentas', 'regras-negocio', 'empacotamento'];
+  const activeTab = tabParam && allowedTabs.includes(tabParam) ? tabParam : 'geral';
+  const handleTabChange = (value: string) => {
+    if (value === 'geral') {
+      searchParams.delete('tab');
+      setSearchParams(searchParams, { replace: true });
+    } else {
+      setSearchParams({ tab: value }, { replace: true });
+    }
+  };
 
   return (
     <AppLayout title="Configurações" subtitle="Documentação, metodologia de cálculo e ferramentas do SISTUR">
@@ -157,7 +172,7 @@ export default function Configuracoes() {
           empty/forbidden panel. "Usuários" stays visible for ORG_ADMIN so
           they can manage their org members via OrgAdminUsersPanel.
         */}
-        <Tabs defaultValue="geral" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className="flex overflow-x-auto gap-3 w-full h-auto p-1 pb-2 scrollbar-hide">
 
             <TabsTrigger value="geral" className="flex items-center gap-2 shrink-0">
@@ -198,6 +213,12 @@ export default function Configuracoes() {
               <Sparkles className="h-4 w-4" />
               <span className="hidden sm:inline">Regras & Planos</span>
             </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="empacotamento" className="flex items-center gap-2 shrink-0">
+                <Package className="h-4 w-4" />
+                <span className="hidden sm:inline">Empacotamento</span>
+              </TabsTrigger>
+            )}
           </TabsList>
 
           {/* GERAL TAB */}
