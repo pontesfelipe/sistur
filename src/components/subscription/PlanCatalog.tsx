@@ -83,7 +83,7 @@ function PlanCard({
           </p>
         )}
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 flex flex-col flex-1">
         {p.description && <p className="text-sm text-muted-foreground">{p.description}</p>}
         <ul className="space-y-1.5">
           {features.map(([key]) => (
@@ -123,7 +123,7 @@ function PlanCard({
         {!isCurrent && (
           <Button
             variant={p.quote_only ? 'outline' : 'default'}
-            className="w-full"
+            className="w-full mt-auto"
             onClick={() => {
               if (canCheckout) {
                 onCheckout!({ code: p.code, name: p.name, priceId: onlinePriceId!, quantity });
