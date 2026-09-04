@@ -464,7 +464,7 @@ const EduTrilhas = () => {
       ) : tracks && tracks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tracks.map((track, index) => (
-            <TrackCard key={track.id} track={track} index={index} locked={foundation.locked} />
+            <TrackCard key={track.id} track={track} index={index} locked={foundation.locked || trialLocked} />
           ))}
         </div>
       ) : (
@@ -575,6 +575,8 @@ export const EduTrilhaDetalhe = () => {
   const { updateTrackWithTrainings, deleteTrack } = useEduTrackMutations();
   const { user } = useAuth();
   const foundation = useFoundationCourse();
+  const trial = useTrialState();
+  const trialLocked = trial.userTrialing && trial.trainingConsumed;
   
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [certificateOpen, setCertificateOpen] = useState(false);
