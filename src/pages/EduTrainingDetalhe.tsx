@@ -34,6 +34,7 @@ import { SyllabusPanel } from '@/components/edu/SyllabusPanel';
 import { CourseDiscussionsPanel } from '@/components/edu/CourseDiscussionsPanel';
 import { useAuth } from '@/hooks/useAuth';
 import { useFoundationCourse, useCompleteStandaloneTraining } from '@/hooks/useFoundationCourse';
+import { useTrialState } from '@/hooks/useTrialState';
 import { toast } from 'sonner';
 
 
@@ -74,6 +75,7 @@ const EduTrainingDetalhe = () => {
   const { data: training, isLoading, error } = useEduTraining(id);
   const { user } = useAuth();
   const foundation = useFoundationCourse();
+  const trial = useTrialState();
   const completeTraining = useCompleteStandaloneTraining();
 
 
@@ -113,6 +115,36 @@ const EduTrainingDetalhe = () => {
             </Link>
           </Button>
         </div>
+      </AppLayout>
+    );
+  }
+
+  // Trial por consumo: após concluir o curso base, demais treinamentos exigem plano.
+  // O próprio curso base (is_foundation) permanece acessível; ADMIN/PROFESSOR são isentos.
+  const isFoundationTraining = foundation.course?.training_id === training.training_id;
+  if (trial.userTrialing && trial.trainingConsumed && !isFoundationTraining && !foundation.exempt) {
+    return (
+      <AppLayout title="Período de teste concluído" subtitle="">
+        <Card className="max-w-2xl mx-auto border-primary/40 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="text-lg">Conteúdo disponível nos planos</CardTitle>
+            <CardDescription>
+              Você concluiu o curso base do teste gratuito. Para acessar este e todos os demais
+              treinamentos, com certificados e o Professor Beni sem limites, conheça os planos.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-2">
+            <Button asChild>
+              <Link to="/assinatura">Ver planos</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/edu">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Voltar ao catálogo
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
       </AppLayout>
     );
   }

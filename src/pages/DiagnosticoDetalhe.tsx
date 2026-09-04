@@ -16,6 +16,8 @@ import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePane
 import { AssessmentAuditTrail } from '@/components/diagnostics/AssessmentAuditTrail';
 import { DataLineageView } from '@/components/diagnostics/DataLineageView';
 import { ExecutiveSummary } from '@/components/diagnostics/ExecutiveSummary';
+import { TrialResultsTeaser } from '@/components/diagnostics/TrialResultsTeaser';
+import { useTrialState } from '@/hooks/useTrialState';
 import { CycleComparisonPanel } from '@/components/diagnostics/CycleComparisonPanel';
 import { WhatIfSimulatorPanel } from '@/components/diagnostics/WhatIfSimulatorPanel';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
@@ -267,6 +269,7 @@ const DiagnosticoDetalhe = () => {
   const isEnterprise = diagnosticType === 'enterprise';
   
   const { data: pillarScores = [], refetch: refetchPillarScores } = usePillarScores(id);
+  const trial = useTrialState();
   const { data: brandRollup } = useBrandRollup(id);
   const { data: rawIndicatorScores = [], refetch: refetchIndicatorScores } = useIndicatorScores(id, diagnosticType);
   const { data: rawIssues = [], refetch: refetchIssues } = useIssues(id);
@@ -943,6 +946,9 @@ const DiagnosticoDetalhe = () => {
       )}
 
       {isCalculated && pillarScores.length > 0 ? (
+        trial.orgTrialing ? (
+          <TrialResultsTeaser />
+        ) : (
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           {brandRollup?.isMultiUnit && (
             <BrandRollupPanel
@@ -1321,8 +1327,8 @@ const DiagnosticoDetalhe = () => {
             />
           </TabsContent>
         </Tabs>
-
-      ) : (
+        ))
+        : (
         /* Pre-calculation state */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-card rounded-xl border p-8 text-center">

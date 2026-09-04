@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 0,
+  minor: 2,
   patch: 0,
 
   get full() {
@@ -23,6 +23,30 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.2.0",
+    date: "2026-09-04",
+    type: "minor" as const,
+    changes: [
+      "Fase 5 — Área comercial: página pública de preços em /planos com o catálogo oficial e formulário de interesse; leads gravados em `comercial_leads` (captura pública, leitura restrita a ADMIN).",
+      "Painel comercial ganha a aba 'Leads' com funil (Novo → Contatado → Convertido/Descartado).",
+      "Catálogo de planos agora é público para leitura (RLS endurecida: escrita somente ADMIN).",
+      "Fase 6 — Limpeza: removido o mapeamento legado papel→plano; `licenses` permanece apenas como fachada de compatibilidade via `LicenseContext`.",
+      "Pendente: Fase 2 (Stripe) — checkout, portal do cliente e webhook, a ser ativada por último.",
+    ],
+  },
+  {
+    version: "2.1.0",
+    date: "2026-09-04",
+    type: "minor" as const,
+    changes: [
+      "Fase 3 — Cotas do Professor Beni: tabelas `beni_quotas`, `beni_credits` e `beni_usage_log`; consumo por pergunta com estorno automático em falha; contador de saldo no chat e CTA para planos; aba 'Beni' no painel comercial para concessão de créditos.",
+      "Fase 4 — Trial por consumo: substitui o teste por tempo. Usuário novo tem o curso base (is_foundation) + 10 perguntas ao Beni; organização nova roda 1 diagnóstico com resultados em teaser (desbloqueio ao contratar); projetos bloqueados no trial.",
+      "Base existente convertida automaticamente (grandfathering) — nenhum usuário atual perde acesso.",
+      "Diagnóstico calculado registra a rodada de teste da organização via `record_trial_assessment`.",
+      "Novos hooks `useTrialState` e `useBeniQuota`; componente `TrialResultsTeaser` na tela de resultados.",
+    ],
+  },
   {
     version: "2.0.0",
     date: "2026-09-04",

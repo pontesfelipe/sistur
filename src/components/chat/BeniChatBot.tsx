@@ -19,6 +19,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useBeniQuota } from '@/hooks/useBeniQuota';
+import { Link } from 'react-router-dom';
 import { ChatMessageList } from './ChatMessageList';
 import { ChatInput } from './ChatInput';
 import { BeniContextSelector, type BeniContext } from './BeniContextSelector';
@@ -44,6 +46,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/beni-chat`;
 
 export function BeniChatBot({ initialContext }: BeniChatBotProps) {
   const { user } = useAuth();
+  const beniQuota = useBeniQuota();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -207,6 +210,16 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
       clearTimeout(timeoutId);
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        if (response.status === 402 && errorData.code === 'beni_quota_exceeded') {
+          beniQuota.refresh();
+          toast.error(errorData.error || 'Limite de perguntas ao Professor Beni atingido.', {
+            action: { label: 'Ver planos', onClick: () => { window.location.href = '/assinatura'; } },
+            duration: 8000,
+          });
+          setMessages(prev => prev.filter(m => m.content !== ''));
+          setIsLoading(false);
+          return;
+        }
         throw new Error(errorData.error || `Erro ${response.status}`);
       }
       if (!response.body) throw new Error('No response body');
@@ -294,6 +307,7 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
       }
 
       if (assistantContent) {
+        beniQuota.refresh();
         const assistantMsgId = await saveMessage('assistant', assistantContent);
         if (assistantMsgId) {
           setMessages(prev => prev.map((m, idx) => idx === prev.length - 1 ? { ...m, id: assistantMsgId } : m));
@@ -404,9 +418,31 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
               </div>
             </div>
             <div>
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-lg flex items-center gap-2 flex-wrap">
                 Professor Mario Beni
                 <Badge variant="outline" className="text-xs font-normal">IA</Badge>
+                {!beniQuota.isLoading && !beniQuota.unlimited && beniQuota.balance?.authenticated && (
+                  <Badge
+                    variant={beniQuota.exhausted ? 'destructive' : 'secondary'}
+                    className="text-xs font-normal"
+                    title={
+                      beniQuota.isTrial
+                        ? 'Perguntas gratuitas do período de teste'
+                        : 'Perguntas restantes neste mês' +
+                          (beniQuota.totalCredits > 0 ? ` + ${beniQuota.totalCredits} créditos extras` : '')
+                    }
+                  >
+                    {beniQuota.isTrial
+                      ? `Teste: ${beniQuota.remaining}/10 perguntas`
+                      : `Beni: ${beniQuota.remaining}/${beniQuota.allowance} este mês`}
+                    {beniQuota.totalCredits > 0 && ` (+${beniQuota.totalCredits})`}
+                  </Badge>
+                )}
+                {beniQuota.exhausted && (
+                  <Link to="/assinatura" className="text-xs text-primary underline underline-offset-2">
+                    Ver planos
+                  </Link>
+                )}
               </CardTitle>
               <p className="text-sm text-muted-foreground">Especialista em Turismo Sustentável</p>
             </div>

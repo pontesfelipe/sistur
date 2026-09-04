@@ -258,6 +258,15 @@ export function useCreateProject() {
       priority?: TaskPriority;
       generated_structure?: unknown;
     }) => {
+      // Trial por consumo: o módulo de projetos exige plano contratado
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: trial } = await (supabase.rpc as any)('get_my_trial_state');
+      if (trial?.org_trialing) {
+        throw new Error(
+          'O módulo de Projetos faz parte dos planos contratados. Acesse Assinatura para liberar projetos, resultados completos e relatórios.'
+        );
+      }
+
       const { data, error } = await supabase
         .from("projects")
         .insert({

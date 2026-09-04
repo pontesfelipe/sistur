@@ -26,6 +26,29 @@ interface OverrideRow {
   id: string; org_id: string | null; user_id: string | null; feature: string;
   enabled: boolean; expires_at: string | null; reason: string | null;
 }
+interface BeniUsageRow {
+  id: string; user_id: string; org_id: string | null; source: string;
+  question_chars: number | null; created_at: string;
+}
+interface BeniQuotaRow {
+  id: string; user_id: string; period: string; allowance: number; used: number;
+}
+interface BeniCreditRow {
+  id: string; user_id: string | null; org_id: string | null; balance: number;
+  source: string; expires_at: string; reason: string | null; created_at: string;
+}
+interface LeadRow {
+  id: string; name: string; email: string; phone: string | null;
+  organization: string | null; interested_plan: string | null; message: string | null;
+  status: 'new' | 'contacted' | 'converted' | 'discarded'; created_at: string;
+}
+
+const LEAD_STATUS_LABELS: Record<LeadRow['status'], string> = {
+  new: 'Novo',
+  contacted: 'Contatado',
+  converted: 'Convertido',
+  discarded: 'Descartado',
+};
 
 export default function AdminComercial() {
   const qc = useQueryClient();
@@ -56,6 +79,100 @@ export default function AdminComercial() {
       if (error) throw error;
       return (data as unknown as OverrideRow[]) ?? [];
     },
+  });
+
+  const { data: beniUsage } = useQuery({
+    queryKey: ['admin-beni-usage'],
+    queryFn: async (): Promise<BeniUsageRow[]> => {
+      const { data, error } = await supabase
+        .from('beni_usage_log' as never)
+        .select('id, user_id, org_id, source, question_chars, created_at' as never)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data as unknown as BeniUsageRow[]) ?? [];
+    },
+  });
+
+  const { data: beniQuotas } = useQuery({
+    queryKey: ['admin-beni-quotas'],
+    queryFn: async (): Promise<BeniQuotaRow[]> => {
+      const { data, error } = await supabase
+        .from('beni_quotas' as never)
+        .select('id, user_id, period, allowance, used' as never)
+        .order('used', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data as unknown as BeniQuotaRow[]) ?? [];
+    },
+  });
+
+  const { data: beniCredits } = useQuery({
+    queryKey: ['admin-beni-credits'],
+    queryFn: async (): Promise<BeniCreditRow[]> => {
+      const { data, error } = await supabase
+        .from('beni_credits' as never)
+        .select('id, user_id, org_id, balance, source, expires_at, reason, created_at' as never)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data as unknown as BeniCreditRow[]) ?? [];
+    },
+  });
+
+  const { data: leads, isLoading: leadsLoading } = useQuery({
+    queryKey: ['admin-comercial-leads'],
+    queryFn: async (): Promise<LeadRow[]> => {
+      const { data, error } = await supabase
+        .from('comercial_leads' as never)
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      return (data as unknown as LeadRow[]) ?? [];
+    },
+  });
+
+  const updateLeadStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: LeadRow['status'] }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from('comercial_leads' as never) as any)
+        .update({ status })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-comercial-leads'] });
+      toast.success('Status do lead atualizado.');
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const [creditTarget, setCreditTarget] = useState<'org' | 'user'>('org');
+  const [creditOrg, setCreditOrg] = useState('');
+  const [creditUser, setCreditUser] = useState('');
+  const [creditAmount, setCreditAmount] = useState('50');
+  const [creditSource, setCreditSource] = useState('manual');
+  const [creditReason, setCreditReason] = useState('');
+
+  const grantCredits = useMutation({
+    mutationFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.rpc as any)('admin_grant_beni_credits', {
+        _target_user: creditTarget === 'user' ? creditUser : null,
+        _target_org: creditTarget === 'org' ? creditOrg : null,
+        _amount: Number(creditAmount) || 0,
+        _source: creditSource,
+        _reason: creditReason || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Créditos concedidos');
+      setCreditReason('');
+      qc.invalidateQueries({ queryKey: ['admin-beni-credits'] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const [orgId, setOrgId] = useState('');
@@ -124,6 +241,8 @@ export default function AdminComercial() {
           <TabsTrigger value="assinaturas">Assinaturas</TabsTrigger>
           <TabsTrigger value="planos">Planos</TabsTrigger>
           <TabsTrigger value="concessoes">Concessões</TabsTrigger>
+          <TabsTrigger value="beni">Beni</TabsTrigger>
+          <TabsTrigger value="leads">Leads</TabsTrigger>
         </TabsList>
 
         <TabsContent value="assinaturas" className="space-y-6">
@@ -306,6 +425,240 @@ export default function AdminComercial() {
                   )}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="beni" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Conceder créditos do Professor Beni</CardTitle>
+              <CardDescription>
+                Créditos valem 12 meses e são consumidos após a cota mensal. Pacotes: 50 (R$ 14,90), 150 (R$ 34,90), org 500 (R$ 99).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+              <div className="space-y-1.5">
+                <Label>Destino</Label>
+                <Select value={creditTarget} onValueChange={(v) => setCreditTarget(v as 'org' | 'user')}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="org">Organização</SelectItem>
+                    <SelectItem value="user">Usuário</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {creditTarget === 'org' ? (
+                <div className="space-y-1.5">
+                  <Label>Organização</Label>
+                  <Select value={creditOrg} onValueChange={setCreditOrg}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      {orgs?.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <Label>ID do usuário</Label>
+                  <Input value={creditUser} onChange={e => setCreditUser(e.target.value)} placeholder="uuid" />
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <Label>Quantidade</Label>
+                <Input type="number" min={1} value={creditAmount} onChange={e => setCreditAmount(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Origem</Label>
+                <Select value={creditSource} onValueChange={setCreditSource}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="manual">Manual</SelectItem>
+                    <SelectItem value="pack_50">Pacote 50</SelectItem>
+                    <SelectItem value="pack_150">Pacote 150</SelectItem>
+                    <SelectItem value="pack_org_500">Pacote org 500</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                disabled={grantCredits.isPending || (creditTarget === 'org' ? !creditOrg : !creditUser) || !(Number(creditAmount) > 0)}
+                onClick={() => grantCredits.mutate()}
+              >
+                Conceder
+              </Button>
+              <div className="md:col-span-5 space-y-1.5">
+                <Label>Motivo</Label>
+                <Input value={creditReason} onChange={e => setCreditReason(e.target.value)} placeholder="Ex.: Compra pacote 50 — pedido #123" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">Créditos ativos</CardTitle></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Destino</TableHead>
+                    <TableHead>Saldo</TableHead>
+                    <TableHead>Origem</TableHead>
+                    <TableHead>Expira</TableHead>
+                    <TableHead>Motivo</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(beniCredits ?? []).map(c => (
+                    <TableRow key={c.id}>
+                      <TableCell>{c.org_id ? orgName(c.org_id) : `Usuário ${c.user_id?.slice(0, 8)}`}</TableCell>
+                      <TableCell>{c.balance}</TableCell>
+                      <TableCell>{c.source}</TableCell>
+                      <TableCell>{new Date(c.expires_at).toLocaleDateString('pt-BR')}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{c.reason ?? '—'}</TableCell>
+                    </TableRow>
+                  ))}
+                  {!beniCredits?.length && (
+                    <TableRow><TableCell colSpan={5} className="text-muted-foreground">Nenhum crédito concedido.</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">Cotas do período (top consumidores)</CardTitle></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Usuário</TableHead>
+                    <TableHead>Período</TableHead>
+                    <TableHead>Usado</TableHead>
+                    <TableHead>Cota</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(beniQuotas ?? []).map(q => (
+                    <TableRow key={q.id}>
+                      <TableCell>{q.user_id.slice(0, 8)}</TableCell>
+                      <TableCell>{q.period === 'trial' ? 'Teste' : q.period}</TableCell>
+                      <TableCell>{q.used}</TableCell>
+                      <TableCell>{q.allowance}</TableCell>
+                    </TableRow>
+                  ))}
+                  {!beniQuotas?.length && (
+                    <TableRow><TableCell colSpan={4} className="text-muted-foreground">Nenhum consumo registrado.</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">Uso recente</CardTitle></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Usuário</TableHead>
+                    <TableHead>Organização</TableHead>
+                    <TableHead>Fonte</TableHead>
+                    <TableHead>Caracteres</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(beniUsage ?? []).map(u => (
+                    <TableRow key={u.id}>
+                      <TableCell>{new Date(u.created_at).toLocaleString('pt-BR')}</TableCell>
+                      <TableCell>{u.user_id.slice(0, 8)}</TableCell>
+                      <TableCell>{u.org_id ? orgName(u.org_id) : '—'}</TableCell>
+                      <TableCell>{u.source}</TableCell>
+                      <TableCell>{u.question_chars ?? '—'}</TableCell>
+                    </TableRow>
+                  ))}
+                  {!beniUsage?.length && (
+                    <TableRow><TableCell colSpan={5} className="text-muted-foreground">Nenhum uso registrado.</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="leads" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Leads comerciais</CardTitle>
+              <CardDescription>
+                Interessados capturados na página pública de preços (/planos).
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {leadsLoading ? (
+                <div className="space-y-2">
+                  {[0, 1, 2].map((i) => <Skeleton key={i} className="h-10 w-full" />)}
+                </div>
+              ) : !leads?.length ? (
+                <p className="text-sm text-muted-foreground py-6 text-center">
+                  Nenhum lead recebido até o momento.
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Contato</TableHead>
+                      <TableHead>Organização</TableHead>
+                      <TableHead>Plano</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="w-[160px]">Ação</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {leads.map((lead) => (
+                      <TableRow key={lead.id}>
+                        <TableCell className="whitespace-nowrap text-sm">
+                          {new Date(lead.created_at).toLocaleDateString('pt-BR')}
+                        </TableCell>
+                        <TableCell className="font-medium">{lead.name}</TableCell>
+                        <TableCell className="text-sm">
+                          <div>{lead.email}</div>
+                          {lead.phone && (
+                            <div className="text-muted-foreground">{lead.phone}</div>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm">{lead.organization ?? '—'}</TableCell>
+                        <TableCell className="text-sm">{lead.interested_plan ?? '—'}</TableCell>
+                        <TableCell>
+                          <Badge variant={lead.status === 'new' ? 'default' : 'secondary'}>
+                            {LEAD_STATUS_LABELS[lead.status]}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={lead.status}
+                            onValueChange={(v) =>
+                              updateLeadStatus.mutate({ id: lead.id, status: v as LeadRow['status'] })
+                            }
+                          >
+                            <SelectTrigger className="h-8 w-[140px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.entries(LEAD_STATUS_LABELS).map(([value, label]) => (
+                                <SelectItem key={value} value={value}>
+                                  {label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

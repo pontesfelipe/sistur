@@ -25,7 +25,12 @@ const AUDIENCE_LABELS: Record<string, string> = {
   INDEPENDENT: 'Profissionais autônomos',
 };
 
-export function PlanCatalog() {
+interface PlanCatalogProps {
+  /** Quando informado, o CTA do plano chama este callback (ex.: abrir formulário de interesse) */
+  onSelectPlan?: (plan: { code: string; name: string }) => void;
+}
+
+export function PlanCatalog({ onSelectPlan }: PlanCatalogProps = {}) {
   const { data: plans, isLoading } = usePlans();
   const { plan: currentPlanCode } = useEntitlements();
 
@@ -80,11 +85,15 @@ export function PlanCatalog() {
                   <Button
                     variant={p.quote_only ? 'outline' : 'default'}
                     className="w-full"
-                    onClick={() =>
-                      (window.location.href = `mailto:contato@sistur.com.br?subject=${encodeURIComponent(
+                    onClick={() => {
+                      if (onSelectPlan) {
+                        onSelectPlan({ code: p.code, name: p.name });
+                        return;
+                      }
+                      window.location.href = `mailto:contato@sistur.com.br?subject=${encodeURIComponent(
                         `Interesse no plano ${p.name}`,
-                      )}`)
-                    }
+                      )}`;
+                    }}
                   >
                     {p.quote_only ? 'Falar com o time' : 'Quero contratar'}
                   </Button>

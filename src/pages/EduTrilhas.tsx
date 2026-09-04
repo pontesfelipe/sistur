@@ -69,6 +69,7 @@ import {
 import { useEduTrainings, EduTraining } from '@/hooks/useEduTrainings';
 import { useAuth } from '@/hooks/useAuth';
 import { useFoundationCourse } from '@/hooks/useFoundationCourse';
+import { useTrialState } from '@/hooks/useTrialState';
 import { TARGET_AGENT_INFO, type TargetAgent } from '@/types/sistur';
 import { TrackCertificate } from '@/components/edu/TrackCertificate';
 import { TrackExamsPanel } from '@/components/edu/TrackExamsPanel';
@@ -364,6 +365,9 @@ const EduTrilhas = () => {
   const { createTrackWithTrainings } = useEduTrackMutations();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const foundation = useFoundationCourse();
+  const trial = useTrialState();
+  // Trial por consumo: após concluir o curso base, as demais trilhas exigem plano
+  const trialLocked = trial.userTrialing && trial.trainingConsumed;
 
   return (
     <AppLayout subNav={eduAprenderNav} 
@@ -387,6 +391,29 @@ const EduTrilhas = () => {
             <Button asChild>
               <Link to={`/edu/training/${foundation.course.training_id}`}>
                 Começar curso base
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {trialLocked && (
+        <Card className="mb-6 border-primary/40 bg-primary/5">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <LockIcon className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Período de teste concluído</CardTitle>
+            </div>
+            <CardDescription>
+              Você concluiu o curso base incluído no teste gratuito. Para seguir nas trilhas
+              formativas, com certificados e o Professor Beni sem limites, conheça os planos.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link to="/assinatura">
+                Ver planos
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -437,7 +464,7 @@ const EduTrilhas = () => {
       ) : tracks && tracks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tracks.map((track, index) => (
-            <TrackCard key={track.id} track={track} index={index} locked={foundation.locked} />
+            <TrackCard key={track.id} track={track} index={index} locked={foundation.locked || trialLocked} />
           ))}
         </div>
       ) : (
@@ -548,6 +575,8 @@ export const EduTrilhaDetalhe = () => {
   const { updateTrackWithTrainings, deleteTrack } = useEduTrackMutations();
   const { user } = useAuth();
   const foundation = useFoundationCourse();
+  const trial = useTrialState();
+  const trialLocked = trial.userTrialing && trial.trainingConsumed;
   
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [certificateOpen, setCertificateOpen] = useState(false);
@@ -619,6 +648,36 @@ export const EduTrilhaDetalhe = () => {
     return (
       <AppLayout subNav={eduAprenderNav} title="Carregando..." subtitle="">
         <Skeleton className="h-64" />
+      </AppLayout>
+    );
+  }
+
+  if (trialLocked) {
+    return (
+      <AppLayout subNav={eduAprenderNav} title="Período de teste concluído" subtitle="">
+        <Card className="max-w-2xl mx-auto border-primary/40 bg-primary/5">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <LockIcon className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Trilha disponível nos planos</CardTitle>
+            </div>
+            <CardDescription>
+              Você concluiu o curso base do teste gratuito. Para acessar esta e todas as demais
+              trilhas formativas, conheça os planos do SISTUR EDU.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-2">
+            <Button asChild>
+              <Link to="/assinatura">
+                Ver planos
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/edu/trilhas">Voltar às Trilhas</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </AppLayout>
     );
   }

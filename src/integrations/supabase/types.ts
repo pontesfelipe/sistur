@@ -764,6 +764,77 @@ export type Database = {
         }
         Relationships: []
       }
+      beni_credits: {
+        Row: {
+          balance: number
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          org_id: string | null
+          reason: string | null
+          source: string
+          user_id: string | null
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          org_id?: string | null
+          reason?: string | null
+          source?: string
+          user_id?: string | null
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          org_id?: string | null
+          reason?: string | null
+          source?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beni_credits_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beni_quotas: {
+        Row: {
+          allowance: number
+          id: string
+          period: string
+          updated_at: string
+          used: number
+          user_id: string
+        }
+        Insert: {
+          allowance?: number
+          id?: string
+          period: string
+          updated_at?: string
+          used?: number
+          user_id: string
+        }
+        Update: {
+          allowance?: number
+          id?: string
+          period?: string
+          updated_at?: string
+          used?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       beni_settings: {
         Row: {
           base_theory: string | null
@@ -797,6 +868,36 @@ export type Database = {
           persona?: string | null
           scope_guardrails?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      beni_usage_log: {
+        Row: {
+          created_at: string
+          id: string
+          model: string | null
+          org_id: string | null
+          question_chars: number | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          model?: string | null
+          org_id?: string | null
+          question_chars?: number | null
+          source: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          model?: string | null
+          org_id?: string | null
+          question_chars?: number | null
+          source?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1359,6 +1460,51 @@ export type Database = {
           raw_response?: Json | null
           razao_social?: string | null
           situacao_cadastral?: string | null
+        }
+        Relationships: []
+      }
+      comercial_leads: {
+        Row: {
+          audience: string | null
+          created_at: string
+          email: string
+          id: string
+          interested_plan: string | null
+          message: string | null
+          name: string
+          notes: string | null
+          organization: string | null
+          phone: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          interested_plan?: string | null
+          message?: string | null
+          name: string
+          notes?: string | null
+          organization?: string | null
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          interested_plan?: string | null
+          message?: string | null
+          name?: string
+          notes?: string | null
+          organization?: string | null
+          phone?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -11232,6 +11378,39 @@ export type Database = {
           },
         ]
       }
+      trial_state: {
+        Row: {
+          assessment_run_at: string | null
+          converted_at: string | null
+          created_at: string
+          notes: string | null
+          subject_id: string
+          subject_kind: string
+          training_consumed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          assessment_run_at?: string | null
+          converted_at?: string | null
+          created_at?: string
+          notes?: string | null
+          subject_id: string
+          subject_kind: string
+          training_consumed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assessment_run_at?: string | null
+          converted_at?: string | null
+          created_at?: string
+          notes?: string | null
+          subject_id?: string
+          subject_kind?: string
+          training_consumed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tse_turnout_cache: {
         Row: {
           created_at: string
@@ -11607,6 +11786,14 @@ export type Database = {
       }
     }
     Functions: {
+      _beni_resolve_allowance: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: {
+          allowance: number
+          is_trial: boolean
+          period: string
+        }[]
+      }
       activate_my_trial: {
         Args: never
         Returns: {
@@ -11644,6 +11831,10 @@ export type Database = {
         Args: { p_license_id: string; p_reason: string }
         Returns: undefined
       }
+      admin_convert_trial: {
+        Args: { _notes?: string; _subject_id: string; _subject_kind: string }
+        Returns: Json
+      }
       admin_get_all_users: {
         Args: never
         Returns: {
@@ -11655,6 +11846,16 @@ export type Database = {
           system_access: Database["public"]["Enums"]["system_access_type"]
           user_id: string
         }[]
+      }
+      admin_grant_beni_credits: {
+        Args: {
+          _amount?: number
+          _reason?: string
+          _source?: string
+          _target_org?: string
+          _target_user?: string
+        }
+        Returns: Json
       }
       admin_recent_logins: {
         Args: { _from: string; _limit?: number; _to: string }
@@ -11717,6 +11918,7 @@ export type Database = {
         Args: { p_ibge_code: string }
         Returns: number
       }
+      consume_beni_token: { Args: { _question_chars?: number }; Returns: Json }
       create_lms_audit_log: {
         Args: {
           p_action: string
@@ -11784,6 +11986,7 @@ export type Database = {
         Args: { p_assignment_id: string }
         Returns: Json
       }
+      get_beni_balance: { Args: never; Returns: Json }
       get_classroom_diary: {
         Args: { p_classroom_id: string }
         Returns: {
@@ -11948,6 +12151,7 @@ export type Database = {
         }[]
       }
       get_my_entitlements: { Args: never; Returns: Json }
+      get_my_trial_state: { Args: never; Returns: Json }
       get_observatory_summary: {
         Args: { _org_id: string; _year: number }
         Returns: {
@@ -12141,6 +12345,8 @@ export type Database = {
         Args: { p_professor_id: string }
         Returns: boolean
       }
+      record_trial_assessment: { Args: { _org_id: string }; Returns: Json }
+      refund_beni_token: { Args: never; Returns: Json }
       requeue_report_job: { Args: { p_job_id: string }; Returns: undefined }
       reset_org_pillar_weights: {
         Args: { p_org_id: string }
