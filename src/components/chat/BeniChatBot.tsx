@@ -210,6 +210,16 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
       clearTimeout(timeoutId);
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        if (response.status === 402 && errorData.code === 'beni_quota_exceeded') {
+          beniQuota.refresh();
+          toast.error(errorData.error || 'Limite de perguntas ao Professor Beni atingido.', {
+            action: { label: 'Ver planos', onClick: () => { window.location.href = '/assinatura'; } },
+            duration: 8000,
+          });
+          setMessages(prev => prev.filter(m => m.content !== ''));
+          setIsLoading(false);
+          return;
+        }
         throw new Error(errorData.error || `Erro ${response.status}`);
       }
       if (!response.body) throw new Error('No response body');
@@ -297,6 +307,7 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
       }
 
       if (assistantContent) {
+        beniQuota.refresh();
         const assistantMsgId = await saveMessage('assistant', assistantContent);
         if (assistantMsgId) {
           setMessages(prev => prev.map((m, idx) => idx === prev.length - 1 ? { ...m, id: assistantMsgId } : m));
