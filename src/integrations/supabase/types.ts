@@ -8821,6 +8821,39 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_events: {
+        Row: {
+          created_at: string
+          environment: string
+          event_id: string | null
+          event_type: string
+          id: string
+          payload: Json | null
+          price_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          environment?: string
+          event_id?: string | null
+          event_type: string
+          id?: string
+          payload?: Json | null
+          price_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          environment?: string
+          event_id?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          price_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       pillar_scores: {
         Row: {
           assessment_id: string
@@ -8900,6 +8933,7 @@ export type Database = {
           quote_only: boolean
           seat_based: boolean
           sort_order: number
+          stripe_price_id: string | null
           updated_at: string
           version: number
         }
@@ -8919,6 +8953,7 @@ export type Database = {
           quote_only?: boolean
           seat_based?: boolean
           sort_order?: number
+          stripe_price_id?: string | null
           updated_at?: string
           version?: number
         }
@@ -8938,6 +8973,7 @@ export type Database = {
           quote_only?: boolean
           seat_based?: boolean
           sort_order?: number
+          stripe_price_id?: string | null
           updated_at?: string
           version?: number
         }
@@ -10893,52 +10929,67 @@ export type Database = {
       subscriptions: {
         Row: {
           cancel_at: string | null
+          cancel_at_period_end: boolean
           created_at: string
           created_by: string | null
           current_period_end: string | null
+          environment: string
           id: string
           notes: string | null
           org_id: string | null
           plan_id: string
+          price_id: string | null
           provider_ref: string | null
           seats: number
           source: string
           started_at: string
           status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
           cancel_at?: string | null
+          cancel_at_period_end?: boolean
           created_at?: string
           created_by?: string | null
           current_period_end?: string | null
+          environment?: string
           id?: string
           notes?: string | null
           org_id?: string | null
           plan_id: string
+          price_id?: string | null
           provider_ref?: string | null
           seats?: number
           source?: string
           started_at?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           cancel_at?: string | null
+          cancel_at_period_end?: boolean
           created_at?: string
           created_by?: string | null
           current_period_end?: string | null
+          environment?: string
           id?: string
           notes?: string | null
           org_id?: string | null
           plan_id?: string
+          price_id?: string | null
           provider_ref?: string | null
           seats?: number
           source?: string
           started_at?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
