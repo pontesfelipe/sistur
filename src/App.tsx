@@ -186,8 +186,9 @@ const App = () => {
                 <Route path="/pending-approval" element={<PendingApproval />} />
                 <Route path="/acesso-bloqueado" element={<AccessBlocked />} />
                 <Route path="/termos" element={<TermsAcceptance />} />
-                <Route path="/verificar-certificado" element={<VerificarCertificado />} />
-                <Route path="/verificar-certificado/:code" element={<VerificarCertificado />} />
+                 <Route path="/verificar-certificado" element={<VerificarCertificado />} />
+                 <Route path="/verificar-certificado/:code" element={<VerificarCertificado />} />
+                 <Route path="/planos" element={<Precos />} />
                 <Route
                   path="/"
                   element={
