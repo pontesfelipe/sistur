@@ -37,6 +37,18 @@ interface BeniCreditRow {
   id: string; user_id: string | null; org_id: string | null; balance: number;
   source: string; expires_at: string; reason: string | null; created_at: string;
 }
+interface LeadRow {
+  id: string; name: string; email: string; phone: string | null;
+  organization: string | null; interested_plan: string | null; message: string | null;
+  status: 'new' | 'contacted' | 'converted' | 'discarded'; created_at: string;
+}
+
+const LEAD_STATUS_LABELS: Record<LeadRow['status'], string> = {
+  new: 'Novo',
+  contacted: 'Contatado',
+  converted: 'Convertido',
+  discarded: 'Descartado',
+};
 
 export default function AdminComercial() {
   const qc = useQueryClient();
@@ -106,6 +118,34 @@ export default function AdminComercial() {
       if (error) throw error;
       return (data as unknown as BeniCreditRow[]) ?? [];
     },
+  });
+
+  const { data: leads, isLoading: leadsLoading } = useQuery({
+    queryKey: ['admin-comercial-leads'],
+    queryFn: async (): Promise<LeadRow[]> => {
+      const { data, error } = await supabase
+        .from('comercial_leads' as never)
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      return (data as unknown as LeadRow[]) ?? [];
+    },
+  });
+
+  const updateLeadStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: LeadRow['status'] }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from('comercial_leads' as never) as any)
+        .update({ status })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-comercial-leads'] });
+      toast.success('Status do lead atualizado.');
+    },
+    onError: (err: Error) => toast.error(err.message),
   });
 
   const [creditTarget, setCreditTarget] = useState<'org' | 'user'>('org');
@@ -202,6 +242,7 @@ export default function AdminComercial() {
           <TabsTrigger value="planos">Planos</TabsTrigger>
           <TabsTrigger value="concessoes">Concessões</TabsTrigger>
           <TabsTrigger value="beni">Beni</TabsTrigger>
+          <TabsTrigger value="leads">Leads</TabsTrigger>
         </TabsList>
 
         <TabsContent value="assinaturas" className="space-y-6">
