@@ -201,6 +201,7 @@ export default function AdminComercial() {
           <TabsTrigger value="assinaturas">Assinaturas</TabsTrigger>
           <TabsTrigger value="planos">Planos</TabsTrigger>
           <TabsTrigger value="concessoes">Concessões</TabsTrigger>
+          <TabsTrigger value="beni">Beni</TabsTrigger>
         </TabsList>
 
         <TabsContent value="assinaturas" className="space-y-6">
@@ -380,6 +381,162 @@ export default function AdminComercial() {
                   ))}
                   {!overrides?.length && (
                     <TableRow><TableCell colSpan={4} className="text-muted-foreground">Nenhuma concessão registrada.</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="beni" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Conceder créditos do Professor Beni</CardTitle>
+              <CardDescription>
+                Créditos valem 12 meses e são consumidos após a cota mensal. Pacotes: 50 (R$ 14,90), 150 (R$ 34,90), org 500 (R$ 99).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+              <div className="space-y-1.5">
+                <Label>Destino</Label>
+                <Select value={creditTarget} onValueChange={(v) => setCreditTarget(v as 'org' | 'user')}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="org">Organização</SelectItem>
+                    <SelectItem value="user">Usuário</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {creditTarget === 'org' ? (
+                <div className="space-y-1.5">
+                  <Label>Organização</Label>
+                  <Select value={creditOrg} onValueChange={setCreditOrg}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      {orgs?.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <Label>ID do usuário</Label>
+                  <Input value={creditUser} onChange={e => setCreditUser(e.target.value)} placeholder="uuid" />
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <Label>Quantidade</Label>
+                <Input type="number" min={1} value={creditAmount} onChange={e => setCreditAmount(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Origem</Label>
+                <Select value={creditSource} onValueChange={setCreditSource}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="manual">Manual</SelectItem>
+                    <SelectItem value="pack_50">Pacote 50</SelectItem>
+                    <SelectItem value="pack_150">Pacote 150</SelectItem>
+                    <SelectItem value="pack_org_500">Pacote org 500</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                disabled={grantCredits.isPending || (creditTarget === 'org' ? !creditOrg : !creditUser) || !(Number(creditAmount) > 0)}
+                onClick={() => grantCredits.mutate()}
+              >
+                Conceder
+              </Button>
+              <div className="md:col-span-5 space-y-1.5">
+                <Label>Motivo</Label>
+                <Input value={creditReason} onChange={e => setCreditReason(e.target.value)} placeholder="Ex.: Compra pacote 50 — pedido #123" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">Créditos ativos</CardTitle></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Destino</TableHead>
+                    <TableHead>Saldo</TableHead>
+                    <TableHead>Origem</TableHead>
+                    <TableHead>Expira</TableHead>
+                    <TableHead>Motivo</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(beniCredits ?? []).map(c => (
+                    <TableRow key={c.id}>
+                      <TableCell>{c.org_id ? orgName(c.org_id) : `Usuário ${c.user_id?.slice(0, 8)}`}</TableCell>
+                      <TableCell>{c.balance}</TableCell>
+                      <TableCell>{c.source}</TableCell>
+                      <TableCell>{new Date(c.expires_at).toLocaleDateString('pt-BR')}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{c.reason ?? '—'}</TableCell>
+                    </TableRow>
+                  ))}
+                  {!beniCredits?.length && (
+                    <TableRow><TableCell colSpan={5} className="text-muted-foreground">Nenhum crédito concedido.</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">Cotas do período (top consumidores)</CardTitle></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Usuário</TableHead>
+                    <TableHead>Período</TableHead>
+                    <TableHead>Usado</TableHead>
+                    <TableHead>Cota</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(beniQuotas ?? []).map(q => (
+                    <TableRow key={q.id}>
+                      <TableCell>{q.user_id.slice(0, 8)}</TableCell>
+                      <TableCell>{q.period === 'trial' ? 'Teste' : q.period}</TableCell>
+                      <TableCell>{q.used}</TableCell>
+                      <TableCell>{q.allowance}</TableCell>
+                    </TableRow>
+                  ))}
+                  {!beniQuotas?.length && (
+                    <TableRow><TableCell colSpan={4} className="text-muted-foreground">Nenhum consumo registrado.</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">Uso recente</CardTitle></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Usuário</TableHead>
+                    <TableHead>Organização</TableHead>
+                    <TableHead>Fonte</TableHead>
+                    <TableHead>Caracteres</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(beniUsage ?? []).map(u => (
+                    <TableRow key={u.id}>
+                      <TableCell>{new Date(u.created_at).toLocaleString('pt-BR')}</TableCell>
+                      <TableCell>{u.user_id.slice(0, 8)}</TableCell>
+                      <TableCell>{u.org_id ? orgName(u.org_id) : '—'}</TableCell>
+                      <TableCell>{u.source}</TableCell>
+                      <TableCell>{u.question_chars ?? '—'}</TableCell>
+                    </TableRow>
+                  ))}
+                  {!beniUsage?.length && (
+                    <TableRow><TableCell colSpan={5} className="text-muted-foreground">Nenhum uso registrado.</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
