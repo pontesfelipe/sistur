@@ -4,6 +4,7 @@ import { useProfileContext } from '@/contexts/ProfileContext';
 import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { useLicense } from '@/contexts/LicenseContext';
 import { Loader2 } from 'lucide-react';
+import { ModuleRoute } from '@/components/layout/ModuleRoute';
 
 interface EduRouteProps {
   children: React.ReactNode;
@@ -42,9 +43,10 @@ export function EduRoute({ children, requireProfessor = false }: EduRouteProps) 
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
   if (awaitingApproval) return <Navigate to="/pending-approval" replace />;
   if (isAdmin || isOrgAdmin) return <>{children}</>;
+  // Empacotamento modular: bloqueia o EDU quando o módulo não está no pacote da org
   if (!isLicenseValid) return <Navigate to="/assinatura" replace />;
   if (requireProfessor && !isProfessor && !isOrgAdmin) return <Navigate to="/edu" replace />;
   if (!hasEDUAccess) return <Navigate to="/onboarding" replace />;
 
-  return <>{children}</>;
+  return <ModuleRoute module="edu">{children}</ModuleRoute>;
 }

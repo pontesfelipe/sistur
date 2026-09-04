@@ -133,6 +133,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const { signOut } = useAuth();
   const { isAdmin, isProfessor, hasERPAccess, hasEDUAccess, initialized } = useProfileContext();
   const { hasFeature } = useLicense();
+  const { isModuleEnabled } = useOrgModulesContext();
   const { data: forumNotifications } = useForumNotifications();
   const markForumAsSeen = useMarkForumAsSeen();
   const { lightTap, selection } = useHaptic();

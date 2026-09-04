@@ -204,7 +204,9 @@ const App = () => {
                   path="/destinos"
                   element={
                     <ERPRoute>
-                      <Destinos />
+                      <ModuleRoute module="cadastro">
+                        <Destinos />
+                      </ModuleRoute>
                     </ERPRoute>
                   }
                 />
