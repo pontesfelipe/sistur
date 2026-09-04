@@ -104,9 +104,43 @@ serve(async (req) => {
   try {
     const { messages, context } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
+
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    // ----------------------------------------------------------------
+    // Cota de tokens do Professor Beni (Fase 3 do modelo comercial).
+    // Debita ANTES de chamar o gateway; em falha do modelo, estorna.
+    // Ordem de consumo: cota mensal -> creditos do usuario -> org.
+    // ----------------------------------------------------------------
+    let tokenConsumed = false;
+    try {
+      const lastUserMsg = [...(messages ?? [])].reverse().find((m: any) => m?.role === "user");
+      const questionChars = typeof lastUserMsg?.content === "string" ? lastUserMsg.content.length : null;
+      const { data: consumeResult, error: consumeErr } = await userClient.rpc("consume_beni_token", {
+        _question_chars: questionChars,
+      });
+      if (consumeErr) {
+        console.error("beni-chat: consume_beni_token error", consumeErr);
+      } else if (consumeResult && consumeResult.allowed === false) {
+        const isTrial = consumeResult.is_trial === true;
+        return new Response(
+          JSON.stringify({
+            error: isTrial
+              ? "Você usou suas 10 perguntas gratuitas do Professor Beni. Assine um plano para continuar a conversa."
+              : "Você atingiu seu limite de perguntas ao Professor Beni neste mês. Adquira um pacote de perguntas ou aguarde a renovação da cota.",
+            code: "beni_quota_exceeded",
+            is_trial: isTrial,
+          }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } else {
+        tokenConsumed = true;
+      }
+    } catch (quotaErr) {
+      // Falha na verificacao de cota nao deve derrubar o chat
+      console.error("beni-chat: quota check failed", quotaErr);
     }
 
     // Build context-aware system prompt. Allow admin overrides via beni_settings.
