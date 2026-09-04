@@ -946,6 +946,9 @@ const DiagnosticoDetalhe = () => {
       )}
 
       {isCalculated && pillarScores.length > 0 ? (
+        trial.orgTrialing ? (
+          <TrialResultsTeaser />
+        ) : (
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           {brandRollup?.isMultiUnit && (
             <BrandRollupPanel
@@ -1324,7 +1327,7 @@ const DiagnosticoDetalhe = () => {
             />
           </TabsContent>
         </Tabs>
-
+        )}
       ) : (
         /* Pre-calculation state */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
