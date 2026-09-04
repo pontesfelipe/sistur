@@ -11333,6 +11333,39 @@ export type Database = {
           },
         ]
       }
+      trial_state: {
+        Row: {
+          assessment_run_at: string | null
+          converted_at: string | null
+          created_at: string
+          notes: string | null
+          subject_id: string
+          subject_kind: string
+          training_consumed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          assessment_run_at?: string | null
+          converted_at?: string | null
+          created_at?: string
+          notes?: string | null
+          subject_id: string
+          subject_kind: string
+          training_consumed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assessment_run_at?: string | null
+          converted_at?: string | null
+          created_at?: string
+          notes?: string | null
+          subject_id?: string
+          subject_kind?: string
+          training_consumed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tse_turnout_cache: {
         Row: {
           created_at: string
@@ -11753,6 +11786,10 @@ export type Database = {
         Args: { p_license_id: string; p_reason: string }
         Returns: undefined
       }
+      admin_convert_trial: {
+        Args: { _notes?: string; _subject_id: string; _subject_kind: string }
+        Returns: Json
+      }
       admin_get_all_users: {
         Args: never
         Returns: {
@@ -12069,6 +12106,7 @@ export type Database = {
         }[]
       }
       get_my_entitlements: { Args: never; Returns: Json }
+      get_my_trial_state: { Args: never; Returns: Json }
       get_observatory_summary: {
         Args: { _org_id: string; _year: number }
         Returns: {
@@ -12262,6 +12300,7 @@ export type Database = {
         Args: { p_professor_id: string }
         Returns: boolean
       }
+      record_trial_assessment: { Args: { _org_id: string }; Returns: Json }
       refund_beni_token: { Args: never; Returns: Json }
       requeue_report_job: { Args: { p_job_id: string }; Returns: undefined }
       reset_org_pillar_weights: {
