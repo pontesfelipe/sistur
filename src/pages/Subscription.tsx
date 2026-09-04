@@ -119,14 +119,38 @@ export default function Subscription() {
       const { data, error } = await supabase.functions.invoke('create-portal-session', {
         body: { environment: getStripeEnvironment(), returnUrl: window.location.href },
       });
-      if (error || !data?.url) throw new Error(error?.message || 'Nenhuma assinatura online encontrada');
+
+      // functions.invoke devolve apenas "non-2xx status code"; o motivo real
+      // vem no corpo da resposta, então lemos antes de mostrar ao usuário.
+      if (error) {
+        let message = '';
+        let status = 0;
+        const ctx = (error as any)?.context;
+        if (ctx instanceof Response) {
+          status = ctx.status;
+          const body = await ctx.clone().json().catch(() => null);
+          message = body?.error || '';
+        }
+        if (status === 404 || /assinatura online/i.test(message)) {
+          toast.info('Você ainda não tem uma assinatura online ativa. Escolha um plano para começar.');
+          return;
+        }
+        if (status === 401) {
+          toast.error('Sua sessão expirou. Entre novamente para gerenciar a conta.');
+          return;
+        }
+        throw new Error(message || 'Não foi possível abrir o gerenciamento da conta');
+      }
+
+      if (!data?.url) throw new Error('Não foi possível abrir o gerenciamento da conta');
       window.open(data.url as string, '_blank', 'noopener,noreferrer');
     } catch (err: any) {
-      toast.error(err?.message || 'Não foi possível abrir o gerenciamento de pagamento');
+      toast.error(err?.message || 'Não foi possível abrir o gerenciamento da conta');
     } finally {
       setOpeningPortal(false);
     }
   };
+
 
   const statusLabel = isCancelled ? 'Cancelado' : hasSubscription || isPaidPlan ? 'Ativo' : inTrial ? 'Avaliação' : 'Sem plano';
   const headline = hasSubscription || isPaidPlan
