@@ -26,7 +26,6 @@ import { HealthCheckPanel } from '@/components/tools/HealthCheckPanel';
 import MapaTurismoPanel from '@/components/official-data/MapaTurismoPanel';
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
 import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSearch';
-import { BrandManagementPanel } from '@/components/enterprise/BrandManagementPanel';
 import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
@@ -205,10 +204,6 @@ export default function Configuracoes() {
             <TabsTrigger value="ferramentas" className="flex items-center gap-2 shrink-0">
               <Wrench className="h-4 w-4" />
               <span className="hidden sm:inline">Ferramentas</span>
-            </TabsTrigger>
-            <TabsTrigger value="marcas" className="flex items-center gap-2 shrink-0">
-              <Hotel className="h-4 w-4" />
-              <span className="hidden sm:inline">Marcas</span>
             </TabsTrigger>
             {isAdmin && (
               <TabsTrigger value="semantica" className="flex items-center gap-2 shrink-0">
