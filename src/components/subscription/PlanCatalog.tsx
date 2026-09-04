@@ -57,14 +57,20 @@ function PlanCard({
   const monthlyTotal = p.seat_based && p.price_cents ? p.price_cents * quantity : null;
 
   return (
-    <Card className={isCurrent ? 'border-primary shadow-lg' : undefined}>
+    <Card
+      className={
+        isCurrent
+          ? 'border-primary ring-1 ring-primary/30 shadow-lg flex flex-col'
+          : 'flex flex-col transition-all hover:border-primary/40 hover:shadow-md'
+      }
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-base">{p.name}</CardTitle>
           {isCurrent && <Badge>Plano atual</Badge>}
         </div>
         <CardDescription>{AUDIENCE_LABELS[p.audience] ?? p.audience}</CardDescription>
-        <p className="text-xl font-bold mt-2">{formatPlanPrice(p)}</p>
+        <p className="text-2xl font-bold mt-3 tracking-tight">{formatPlanPrice(p)}</p>
         {p.code === 'professor' && (
           <p className="text-xs text-muted-foreground">
             Gratuito quando você tem 5 ou mais estudantes ativos que entraram pelo seu link de indicação.
