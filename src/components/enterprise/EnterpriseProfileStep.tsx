@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { BrandManagementPanel } from './BrandManagementPanel';
 import { 
   Hotel, 
   Users, 
@@ -206,6 +208,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   // unidades, uma por município.
   const [brandId, setBrandId] = useState<string | null>(null);
   const [brandName, setBrandName] = useState<string | null>(null);
+  const [manageBrandsOpen, setManageBrandsOpen] = useState(false);
   const [unitName, setUnitName] = useState<string>('');
   const [isFlagship, setIsFlagship] = useState<boolean>(false);
   const { data: brandUnits } = useBrandUnits(brandId ?? null);
@@ -846,6 +849,30 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 : 'Empreendimento independente? Crie uma marca com o próprio nome — futuras unidades poderão ser anexadas.'
             }
           />
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-xs"
+              onClick={() => setManageBrandsOpen(true)}
+            >
+              <Building2 className="h-3.5 w-3.5 mr-1.5" />
+              Gerenciar marcas da organização
+            </Button>
+          </div>
+          <Dialog open={manageBrandsOpen} onOpenChange={setManageBrandsOpen}>
+            <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Marcas da organização</DialogTitle>
+                <DialogDescription>
+                  Crie, edite ou remova marcas/redes. As unidades de cada diagnóstico
+                  empresarial são associadas à marca nesta etapa.
+                </DialogDescription>
+              </DialogHeader>
+              <BrandManagementPanel />
+            </DialogContent>
+          </Dialog>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="unit-name">Nome desta unidade</Label>

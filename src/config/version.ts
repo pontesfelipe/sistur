@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 4,
-  patch: 2,
+  patch: 3,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.4.3",
+    date: "2026-09-04",
+    type: "patch" as const,
+    changes: [
+      "Marcas/redes de hotéis: gestão movida de Configurações para dentro do fluxo do diagnóstico empresarial — a marca é selecionada ou criada na etapa de identidade do empreendimento, com botão 'Gerenciar marcas da organização' no mesmo local.",
+    ],
+  },
   {
     version: "2.4.2",
     date: "2026-09-04",
