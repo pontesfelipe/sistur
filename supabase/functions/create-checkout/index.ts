@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const priceId: string = body?.priceId;
     const environment: StripeEnv = body?.environment === 'live' ? 'live' : 'sandbox';
-    const quantity: number = Math.min(Math.max(Number(body?.quantity) || 1, 1), 10);
+    const quantity: number = Math.min(Math.max(Number(body?.quantity) || 1, 1), 100);
     const returnUrl: string = body?.returnUrl;
 
     if (!priceId || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {

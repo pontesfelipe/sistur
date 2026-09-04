@@ -7,7 +7,7 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
 );
 
-const PLAN_PRICE_IDS = ['estudante_mensal', 'independente_mensal', 'empresarial_mensal'];
+const PLAN_PRICE_IDS = ['estudante_mensal', 'empresarial_mensal'];
 
 /**
  * Configuração do portal do cliente: método de pagamento, cancelamento ao
