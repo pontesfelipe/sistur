@@ -27,7 +27,6 @@ const PLAN_ICONS: Record<string, typeof Landmark> = {
   empresarial: Building2,
   estudante: GraduationCap,
   professor: GraduationCap,
-  independente: User,
 };
 
 function FlowStep({ icon: Icon, title, desc, tone = 'default' }: {
