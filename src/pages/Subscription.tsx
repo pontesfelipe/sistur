@@ -141,13 +141,23 @@ export default function Subscription() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           className={cn(
-            'rounded-2xl border-2 p-6 relative overflow-hidden',
-            isCancelled ? 'border-muted bg-muted/20'
-              : hasSubscription || isPaidPlan ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/30 to-teal-950/20'
-              : inTrial ? 'border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-orange-950/20'
-              : 'border-primary/50 bg-gradient-to-br from-primary/10 to-blue-950/20',
+            'rounded-2xl border p-6 relative overflow-hidden shadow-sm',
+            isCancelled ? 'border-border bg-muted/30'
+              : hasSubscription || isPaidPlan ? 'border-emerald-500/40 bg-emerald-500/5'
+              : inTrial ? 'border-amber-500/40 bg-amber-500/5'
+              : 'border-primary/40 bg-primary/5',
           )}
         >
+          <div
+            aria-hidden
+            className={cn(
+              'pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full blur-3xl opacity-40',
+              isCancelled ? 'bg-muted-foreground/10'
+                : hasSubscription || isPaidPlan ? 'bg-emerald-500/20'
+                : inTrial ? 'bg-amber-500/20'
+                : 'bg-primary/20',
+            )}
+          />
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
