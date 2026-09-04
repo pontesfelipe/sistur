@@ -141,7 +141,7 @@ export function BusinessRulesPanel() {
                       {p.code === 'empresarial' && (
                         <p className="text-xs text-muted-foreground border-l-2 border-primary/40 pl-2">
                           Mínimo de 5 usuários, <strong>sem teto</strong>: o cliente expande
-                          pagando o valor por usuário adicional (cobrança por assento).
+                          pagando o valor por usuário adicional (cobrança por usuário).
                         </p>
                       )}
                     </CardContent>
