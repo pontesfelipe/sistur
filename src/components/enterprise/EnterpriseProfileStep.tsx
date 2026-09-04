@@ -849,6 +849,30 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 : 'Empreendimento independente? Crie uma marca com o próprio nome — futuras unidades poderão ser anexadas.'
             }
           />
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-xs"
+              onClick={() => setManageBrandsOpen(true)}
+            >
+              <Building2 className="h-3.5 w-3.5 mr-1.5" />
+              Gerenciar marcas da organização
+            </Button>
+          </div>
+          <Dialog open={manageBrandsOpen} onOpenChange={setManageBrandsOpen}>
+            <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Marcas da organização</DialogTitle>
+                <DialogDescription>
+                  Crie, edite ou remova marcas/redes. As unidades de cada diagnóstico
+                  empresarial são associadas à marca nesta etapa.
+                </DialogDescription>
+              </DialogHeader>
+              <BrandManagementPanel />
+            </DialogContent>
+          </Dialog>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="unit-name">Nome desta unidade</Label>
