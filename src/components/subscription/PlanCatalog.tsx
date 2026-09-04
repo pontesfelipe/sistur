@@ -9,6 +9,7 @@ import { Check, Sparkles, Users } from 'lucide-react';
 import { usePlans, useEntitlements, formatPlanPrice, type Plan } from '@/hooks/useEntitlements';
 
 const FEATURE_LABELS: Record<string, string> = {
+  consulting: 'Especialista em turismo dedicado',
   erp: 'SISTUR Analítico (territorial)',
   enterprise: 'Diagnóstico empresarial',
   edu: 'SISTUR EDU',
@@ -22,6 +23,7 @@ const FEATURE_LABELS: Record<string, string> = {
 
 const AUDIENCE_LABELS: Record<string, string> = {
   PUBLIC: 'Gestão pública',
+  CONSULTING: 'Destinos e empresas',
   ENTERPRISE: 'Empresas e redes',
   STUDENT: 'Estudantes',
   TEACHER: 'Professores',
