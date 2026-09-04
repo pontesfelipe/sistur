@@ -28,9 +28,11 @@ const AUDIENCE_LABELS: Record<string, string> = {
 interface PlanCatalogProps {
   /** Quando informado, o CTA do plano chama este callback (ex.: abrir formulário de interesse) */
   onSelectPlan?: (plan: { code: string; name: string }) => void;
+  /** Quando informado, planos com preço online abrem o checkout em vez do formulário */
+  onCheckout?: (plan: { code: string; name: string; priceId: string }) => void;
 }
 
-export function PlanCatalog({ onSelectPlan }: PlanCatalogProps = {}) {
+export function PlanCatalog({ onSelectPlan, onCheckout }: PlanCatalogProps = {}) {
   const { data: plans, isLoading } = usePlans();
   const { plan: currentPlanCode } = useEntitlements();
 
