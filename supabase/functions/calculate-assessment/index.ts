@@ -507,6 +507,14 @@ async function runCalculationCore(
       });
       if (!isAdmin) throw new CalcError("Caller does not belong to this assessment's org", 403);
     }
+
+    // Trial por consumo: registra a rodada de diagnostico da organizacao
+    try {
+      await supabase.rpc("record_trial_assessment", { _org_id: orgId });
+    } catch (trialErr) {
+      console.warn("record_trial_assessment failed", trialErr);
+    }
+
     const assessmentTier = assessment.tier || 'COMPLETE';
     const diagnosticType = assessment.diagnostic_type || 'territorial';
     const isEnterprise = diagnosticType === 'enterprise';
