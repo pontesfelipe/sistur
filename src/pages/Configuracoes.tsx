@@ -29,7 +29,7 @@ import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSear
 import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
-import { BeniContextPanel } from '@/components/settings/BeniContextPanel';
+
 import { BusinessRulesPanel } from '@/components/settings/BusinessRulesPanel';
 import { ModuleLibrary } from '@/components/settings/ModuleLibrary';
 import { APP_VERSION, VERSION_HISTORY } from '@/config/version';
@@ -60,22 +60,12 @@ import {
   Clock,
   Search,
   Map,
-  ScrollText,
-  ListOrdered,
   Sparkles,
-  Bot,
   Library,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-const AdminSemanticLayer = lazy(() => import('@/pages/AdminSemanticLayer'));
-const ReportStructurePanel = lazy(() =>
-  import('@/components/admin/ReportStructurePanel').then(m => ({ default: m.ReportStructurePanel }))
-);
-const ReportContextPanel = lazy(() =>
-  import('@/components/admin/ReportContextPanel').then(m => ({ default: m.ReportContextPanel }))
-);
 
 // Helper component for downloadable documents
 function DocumentDownloadItem({ 
@@ -349,35 +339,6 @@ export default function Configuracoes() {
             <LogAnalytics />
           </TabsContent>
 
-          {/* SEMANTICA TAB */}
-          {isAdmin && (
-            <TabsContent value="semantica" className="space-y-6">
-              <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando camada semântica…</div>}>
-                <AdminSemanticLayer embedded />
-              </Suspense>
-            </TabsContent>
-          )}
-
-          {isAdmin && (
-            <TabsContent value="estrutura" className="space-y-6">
-              <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando estrutura do relatório…</div>}>
-                <ReportStructurePanel />
-              </Suspense>
-            </TabsContent>
-          )}
-
-          {(isAdmin || isOrgAdmin) && (
-            <TabsContent value="contexto" className="space-y-6">
-              <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando contexto do relatório…</div>}>
-                <ReportContextPanel />
-              </Suspense>
-            </TabsContent>
-          )}
-
-          {/* BENI TAB — regras de conversa e contexto do Professor Beni Chat */}
-          <TabsContent value="beni" className="space-y-6">
-            <BeniContextPanel />
-          </TabsContent>
 
           <TabsContent value="documentacao" className="space-y-6">
             {/* Principles */}
