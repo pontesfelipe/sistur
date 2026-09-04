@@ -249,14 +249,7 @@ const App = () => {
                     </AdminRoute>
                   }
                 />
-                <Route
-                  path="/admin/empacotamento"
-                  element={
-                    <AdminRoute platformOnly>
-                      <AdminEmpacotamento />
-                    </AdminRoute>
-                  }
-                />
+                <Route path="/admin/empacotamento" element={<Navigate to="/configuracoes?tab=empacotamento" replace />} />
                 <Route
                   path="/edu"
                   element={
