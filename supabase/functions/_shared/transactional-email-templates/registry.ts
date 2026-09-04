@@ -16,6 +16,7 @@ import { template as eduLevelUp } from './edu-level-up.tsx'
 import { template as eduBadgeEarned } from './edu-badge-earned.tsx'
 import { template as observatoryCriticalAlert } from './observatory-critical-alert.tsx'
 import { template as enterpriseRegressionAlert } from './enterprise-regression-alert.tsx'
+import { template as purchaseConfirmation } from './purchase-confirmation.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'access-approved': accessApproved,
@@ -25,4 +26,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'edu-badge-earned': eduBadgeEarned,
   'observatory-critical-alert': observatoryCriticalAlert,
   'enterprise-regression-alert': enterpriseRegressionAlert,
+  'purchase-confirmation': purchaseConfirmation,
 }

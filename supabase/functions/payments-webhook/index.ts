@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { type StripeEnv, verifyWebhook } from '../_shared/stripe.ts';
+import { sendTemplateEmailWithLog } from '../_shared/email-send-log.ts';
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function db() {
@@ -102,6 +103,58 @@ async function grantBeniPack(session: any, env: StripeEnv) {
   console.log('créditos Beni concedidos', { userId, orgId, priceId, env });
 }
 
+/** E-mail de confirmação + marcação do lead comercial como convertido. */
+async function onPurchaseCompleted(session: any, env: StripeEnv) {
+  const userId: string | null = session.metadata?.userId ?? null;
+  const priceId: string | null = session.metadata?.priceId ?? null;
+  const pack = priceId ? BENI_PACKS[priceId] : null;
+
+  let email: string | null = session.customer_details?.email ?? null;
+  let userName: string | undefined;
+  if (userId) {
+    const { data } = await db().auth.admin.getUserById(userId);
+    email = email ?? data?.user?.email ?? null;
+    userName = (data?.user?.user_metadata?.full_name as string) || undefined;
+  }
+  if (!email) return;
+
+  // Nome do item: plano (via stripe_price_id) ou pacote Beni
+  let itemName = priceId ?? 'Compra';
+  if (pack) {
+    itemName = `Professor Beni — ${pack.amount} perguntas`;
+  } else if (priceId) {
+    const { data: plan } = await db()
+      .from('plans')
+      .select('name, price_cents')
+      .eq('stripe_price_id', priceId)
+      .maybeSingle();
+    if ((plan as any)?.name) itemName = (plan as any).name;
+  }
+
+  const amountLabel = session.amount_total != null
+    ? `R$ ${(session.amount_total / 100).toFixed(2).replace('.', ',')}${session.mode === 'subscription' ? '/mês' : ''}`
+    : undefined;
+
+  await sendTemplateEmailWithLog('purchase-confirmation', email, {
+    templateData: {
+      userName,
+      itemName,
+      amountLabel,
+      kind: pack ? 'credits' : 'subscription',
+      credits: pack?.amount,
+    },
+    idempotencyKey: `purchase-confirmation-${session.id}`,
+  }).catch((e) => console.error('falha ao enviar e-mail de confirmação', e));
+
+  // Lead comercial convertido (mesmo e-mail)
+  const { error } = await db()
+    .from('comercial_leads')
+    .update({ status: 'converted' })
+    .eq('email', email)
+    .in('status', ['new', 'contacted']);
+  if (error) console.error('falha ao converter lead', error);
+}
+
 async function handleEvent(event: any, env: StripeEnv) {
   await db().from('payment_events').insert({
     event_id: event.id ?? null,
@@ -122,13 +175,15 @@ async function handleEvent(event: any, env: StripeEnv) {
       break;
     case 'checkout.session.completed': {
       const session = event.data.object;
-      if (session.payment_status !== 'unpaid' && session.mode === 'payment') {
-        await grantBeniPack(session, env);
+      if (session.payment_status !== 'unpaid') {
+        if (session.mode === 'payment') await grantBeniPack(session, env);
+        await onPurchaseCompleted(session, env);
       }
       break;
     }
     case 'checkout.session.async_payment_succeeded':
       await grantBeniPack(event.data.object, env);
+      await onPurchaseCompleted(event.data.object, env);
       break;
     default:
       console.log('Evento não tratado:', event.type);
