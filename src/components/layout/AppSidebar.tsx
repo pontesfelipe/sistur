@@ -111,10 +111,11 @@ const navGroups: NavGroup[] = [
 ];
 
 const bottomNavigation: NavItem[] = [
-  { name: 'Configurações', href: '/configuracoes', icon: Settings },
+  { name: 'Inteligência', href: '/admin/inteligencia', icon: Bot, requiresAdmin: true },
+  { name: 'Configurações', href: '/configuracoes', icon: Settings, requiresAdmin: true },
   { name: 'Planos', href: '/assinatura', icon: CreditCard },
   { name: 'Ajuda', href: '/ajuda', icon: HelpCircle },
-    { name: 'Comercial', href: '/admin/comercial', icon: Shield, requiresAdmin: true },
+  { name: 'Comercial', href: '/admin/comercial', icon: Shield, requiresAdmin: true },
 
   { name: 'Certificações', href: '/admin/certificacoes', icon: Award, requiresAdmin: true },
   { name: 'Empacotamento', href: '/admin/empacotamento', icon: Briefcase, requiresAdmin: true },
