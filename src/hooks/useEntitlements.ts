@@ -56,6 +56,8 @@ export interface Plan {
   features: Record<string, boolean>;
   is_active: boolean;
   sort_order: number;
+  /** Preço correspondente no provedor de pagamento (checkout online) */
+  stripe_price_id?: string | null;
 }
 
 /** Catálogo público de planos ativos. */
