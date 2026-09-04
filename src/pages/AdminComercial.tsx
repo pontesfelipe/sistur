@@ -584,6 +584,84 @@ export default function AdminComercial() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="leads" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Leads comerciais</CardTitle>
+              <CardDescription>
+                Interessados capturados na página pública de preços (/planos).
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {leadsLoading ? (
+                <div className="space-y-2">
+                  {[0, 1, 2].map((i) => <Skeleton key={i} className="h-10 w-full" />)}
+                </div>
+              ) : !leads?.length ? (
+                <p className="text-sm text-muted-foreground py-6 text-center">
+                  Nenhum lead recebido até o momento.
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Contato</TableHead>
+                      <TableHead>Organização</TableHead>
+                      <TableHead>Plano</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="w-[160px]">Ação</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {leads.map((lead) => (
+                      <TableRow key={lead.id}>
+                        <TableCell className="whitespace-nowrap text-sm">
+                          {new Date(lead.created_at).toLocaleDateString('pt-BR')}
+                        </TableCell>
+                        <TableCell className="font-medium">{lead.name}</TableCell>
+                        <TableCell className="text-sm">
+                          <div>{lead.email}</div>
+                          {lead.phone && (
+                            <div className="text-muted-foreground">{lead.phone}</div>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm">{lead.organization ?? '—'}</TableCell>
+                        <TableCell className="text-sm">{lead.interested_plan ?? '—'}</TableCell>
+                        <TableCell>
+                          <Badge variant={lead.status === 'new' ? 'default' : 'secondary'}>
+                            {LEAD_STATUS_LABELS[lead.status]}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={lead.status}
+                            onValueChange={(v) =>
+                              updateLeadStatus.mutate({ id: lead.id, status: v as LeadRow['status'] })
+                            }
+                          >
+                            <SelectTrigger className="h-8 w-[140px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.entries(LEAD_STATUS_LABELS).map(([value, label]) => (
+                                <SelectItem key={value} value={value}>
+                                  {label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </AppLayout>
   );
