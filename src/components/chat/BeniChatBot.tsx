@@ -483,6 +483,23 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
           onDeleteMessage={deleteMessage}
           isLoading={isLoading}
         />
+        {!beniQuota.isLoading && !beniQuota.unlimited && beniQuota.balance?.authenticated && (
+          <div className="px-3 pt-2 flex items-center justify-between gap-2 text-xs text-muted-foreground border-t">
+            <span>
+              {beniQuota.exhausted
+                ? 'Você usou todas as perguntas disponíveis.'
+                : beniQuota.isTrial
+                  ? `Restam ${beniQuota.remaining} de 10 perguntas gratuitas do teste.`
+                  : `Restam ${beniQuota.remaining} de ${beniQuota.allowance} perguntas este mês` +
+                    (beniQuota.totalCredits > 0 ? `, além de ${beniQuota.totalCredits} créditos extras.` : '.')}
+            </span>
+            {(beniQuota.exhausted || beniQuota.remaining <= 5) && (
+              <Link to="/assinatura" className="text-primary underline underline-offset-2 shrink-0">
+                {beniQuota.isTrial ? 'Ver planos' : 'Comprar créditos'}
+              </Link>
+            )}
+          </div>
+        )}
         <ChatInput
           input={input}
           onInputChange={setInput}
