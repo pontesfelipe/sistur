@@ -53,3 +53,5 @@ project_id = "enexnpmkhvgufcervjsv"
     verify_jwt = true
   [functions.send-admin-dispatch-email]
     verify_jwt = true
+  [functions.change-plan]
+  verify_jwt = false
