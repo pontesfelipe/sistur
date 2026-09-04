@@ -91,6 +91,27 @@ export default function Subscription() {
 
   const noLicense = !license;
 
+  const paymentsReady = isPaymentsConfigured();
+  const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
+  const [checkoutTitle, setCheckoutTitle] = useState('');
+  const [openingPortal, setOpeningPortal] = useState(false);
+
+  const handleOpenPortal = async () => {
+    try {
+      setOpeningPortal(true);
+      const { data, error } = await supabase.functions.invoke('create-portal-session', {
+        body: { environment: getStripeEnvironment(), returnUrl: window.location.href },
+      });
+      if (error || !data?.url) throw new Error(error?.message || 'Nenhuma assinatura online encontrada');
+      window.open(data.url as string, '_blank', 'noopener,noreferrer');
+    } catch (err: any) {
+      toast.error(err?.message || 'Não foi possível abrir o gerenciamento de pagamento');
+    } finally {
+      setOpeningPortal(false);
+    }
+  };
+
+
   const handleActivateTrial = async () => {
     try {
       setActivatingTrial(true);
