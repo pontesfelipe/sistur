@@ -95,7 +95,7 @@ const navGroups: NavGroup[] = [
       { name: 'Aprender', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true },
       { name: 'Avaliações', href: '/edu/minhas-provas', icon: ScrollText, requiresEDU: true },
       { name: 'Turmas & Mensagens', href: '/edu/turmas', icon: Users, requiresEDU: true },
-      { name: 'Gestão de Treinamentos', href: '/professor', icon: BookOpen, requiresProfessor: true },
+      { name: 'Painel do Professor', href: '/professor', icon: BookOpen, requiresProfessor: true },
       { name: 'Admin EDU', href: '/admin/edu', icon: Shield, requiresAdmin: true },
     ],
   },
