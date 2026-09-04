@@ -570,7 +570,7 @@ export const MODULE_LIBRARY: ModuleSection[] = [
           'src/components/layout/LicenseRoute.tsx',
         ],
         supabaseTables: ['licenses', 'license_features'],
-        routes: ['/assinatura', '/admin/licencas'],
+        routes: ['/assinatura', '/admin/comercial'],
         migrationKeywords: ['licenses', 'license_features', 'expire_trial_licenses', 'upgrade_license'],
       },
       {

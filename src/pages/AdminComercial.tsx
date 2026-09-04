@@ -15,6 +15,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { usePlans, formatPlanPrice } from '@/hooks/useEntitlements';
 import { toast } from 'sonner';
+import { TrialConsumptionPanel } from '@/components/admin/TrialConsumptionPanel';
 
 interface OrgRow { id: string; name: string; org_kind: string | null }
 interface SubscriptionRow {
@@ -242,6 +243,7 @@ export default function AdminComercial() {
           <TabsTrigger value="planos">Planos</TabsTrigger>
           <TabsTrigger value="concessoes">Concessões</TabsTrigger>
           <TabsTrigger value="beni">Beni</TabsTrigger>
+          <TabsTrigger value="trials">Trials</TabsTrigger>
           <TabsTrigger value="leads">Leads</TabsTrigger>
         </TabsList>
 
@@ -583,6 +585,10 @@ export default function AdminComercial() {
               </Table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="trials">
+          <TrialConsumptionPanel />
         </TabsContent>
 
         <TabsContent value="leads" className="space-y-4">
