@@ -36,7 +36,7 @@ const FEATURE_GRID: { key: string; label: string; icon: string }[] = [
 const FAQ: { q: string; a: string }[] = [
   {
     q: 'O plano Empresarial tem limite de usuários?',
-    a: 'Não. Ele começa com 5 usuários e cresce conforme a necessidade: cada usuário adicional é cobrado pelo mesmo valor por usuário/mês. Você ajusta a quantidade a qualquer momento no checkout ou no gerenciamento da assinatura.',
+    a: 'Não. Ele começa com 5 usuários e cresce conforme a necessidade: cada usuário adicional é cobrado pelo mesmo valor por usuário/mês. Você ajusta a quantidade a qualquer momento no checkout ou em Gerenciar conta.',
   },
   {
     q: 'Como funciona o período de avaliação?',
@@ -48,7 +48,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Quais formas de pagamento são aceitas?',
-    a: 'Cartão de crédito e Pix, em reais (BRL). Notas e faturas ficam disponíveis no gerenciamento da assinatura.',
+    a: 'Cartão de crédito e Pix, em reais (BRL). Notas e faturas ficam disponíveis em Gerenciar conta.',
   },
 ];
 
@@ -100,7 +100,7 @@ export default function Subscription() {
         return;
       }
       if (activeSub?.price_id === priceId) {
-        toast.info('Você já está neste plano. Para ajustar a quantidade de usuários, use o gerenciamento da assinatura.');
+        toast.info('Você já está neste plano. Para ajustar a quantidade de usuários, use o gerenciamento da conta.');
         return;
       }
 
@@ -204,7 +204,7 @@ export default function Subscription() {
                 {isCancelled
                   ? `Seu plano ${planLabel} foi cancelado.${license?.expires_at ? ` O acesso segue até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''} Escolha um novo plano abaixo.`
                   : hasSubscription || isPaidPlan
-                  ? 'Sua assinatura está ativa. Use o gerenciamento para ajustar usuários, forma de pagamento e faturas.'
+                  ? 'Sua assinatura está ativa. Use Gerenciar conta para ajustar usuários, forma de pagamento e faturas.'
                   : inTrial
                   ? 'Você está na avaliação por uso: sem prazo, liberada até você consumir os itens de cortesia abaixo.'
                   : 'Escolha um dos planos abaixo para liberar os módulos do SISTUR.'}
@@ -311,13 +311,13 @@ export default function Subscription() {
         {paymentsReady && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-4">
             <div>
-              <p className="text-sm font-medium">Gerenciar assinatura</p>
+              <p className="text-sm font-medium">Gerenciar conta</p>
               <p className="text-xs text-muted-foreground">
                 Ajuste a quantidade de usuários, atualize o pagamento e baixe faturas.
               </p>
             </div>
             <Button variant="outline" onClick={handleOpenPortal} disabled={openingPortal}>
-              {openingPortal ? 'Abrindo...' : 'Abrir gerenciamento'}
+              {openingPortal ? 'Abrindo...' : 'Gerenciar conta'}
             </Button>
           </div>
         )}
