@@ -9,6 +9,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CancelSubscriptionDialog } from '@/components/subscription/CancelSubscriptionDialog';
 import { PlanCatalog } from '@/components/subscription/PlanCatalog';
+import { BeniCreditPacks } from '@/components/subscription/BeniCreditPacks';
+import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useStripeCheckout } from '@/hooks/useStripeCheckout';
+import { getStripeEnvironment, isPaymentsConfigured } from '@/lib/stripe';
 
 
 const EDU_PLANS: { plan: LicensePlan | string; name: string; price: string; icon: React.ReactNode; features: string[]; highlight?: boolean }[] = [
@@ -85,6 +90,27 @@ export default function Subscription() {
   const isCancelled = license?.status === 'cancelled';
 
   const noLicense = !license;
+
+  const paymentsReady = isPaymentsConfigured();
+  const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
+  const [checkoutTitle, setCheckoutTitle] = useState('');
+  const [openingPortal, setOpeningPortal] = useState(false);
+
+  const handleOpenPortal = async () => {
+    try {
+      setOpeningPortal(true);
+      const { data, error } = await supabase.functions.invoke('create-portal-session', {
+        body: { environment: getStripeEnvironment(), returnUrl: window.location.href },
+      });
+      if (error || !data?.url) throw new Error(error?.message || 'Nenhuma assinatura online encontrada');
+      window.open(data.url as string, '_blank', 'noopener,noreferrer');
+    } catch (err: any) {
+      toast.error(err?.message || 'Não foi possível abrir o gerenciamento de pagamento');
+    } finally {
+      setOpeningPortal(false);
+    }
+  };
+
 
   const handleActivateTrial = async () => {
     try {
@@ -458,7 +484,42 @@ export default function Subscription() {
           </div>
         </div>
 
-        <PlanCatalog />
+        {paymentsReady && <PaymentTestModeBanner />}
+
+        <PlanCatalog
+          onCheckout={paymentsReady ? ({ name, priceId }) => {
+            setCheckoutTitle(name);
+            openCheckout({ priceId });
+          } : undefined}
+        />
+
+        {paymentsReady && (
+          <BeniCreditPacks
+            onBuy={(pack) => {
+              setCheckoutTitle(`Pacote Beni — ${pack.name}`);
+              openCheckout({ priceId: pack.priceId });
+            }}
+          />
+        )}
+
+        {paymentsReady && (
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={handleOpenPortal} disabled={openingPortal}>
+              {openingPortal ? 'Abrindo...' : 'Gerenciar pagamento e faturas'}
+            </Button>
+          </div>
+        )}
+
+        <Dialog open={isOpen} onOpenChange={(open) => { if (!open) closeCheckout(); }}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{checkoutTitle || 'Finalizar contratação'}</DialogTitle>
+            </DialogHeader>
+            {checkoutElement}
+          </DialogContent>
+        </Dialog>
+
+
 
 
 

@@ -28,9 +28,11 @@ const AUDIENCE_LABELS: Record<string, string> = {
 interface PlanCatalogProps {
   /** Quando informado, o CTA do plano chama este callback (ex.: abrir formulário de interesse) */
   onSelectPlan?: (plan: { code: string; name: string }) => void;
+  /** Quando informado, planos com preço online abrem o checkout em vez do formulário */
+  onCheckout?: (plan: { code: string; name: string; priceId: string }) => void;
 }
 
-export function PlanCatalog({ onSelectPlan }: PlanCatalogProps = {}) {
+export function PlanCatalog({ onSelectPlan, onCheckout }: PlanCatalogProps = {}) {
   const { data: plans, isLoading } = usePlans();
   const { plan: currentPlanCode } = useEntitlements();
 
@@ -81,23 +83,31 @@ export function PlanCatalog({ onSelectPlan }: PlanCatalogProps = {}) {
                     </li>
                   ))}
                 </ul>
-                {!isCurrent && (
-                  <Button
-                    variant={p.quote_only ? 'outline' : 'default'}
-                    className="w-full"
-                    onClick={() => {
-                      if (onSelectPlan) {
-                        onSelectPlan({ code: p.code, name: p.name });
-                        return;
-                      }
-                      window.location.href = `mailto:contato@sistur.com.br?subject=${encodeURIComponent(
-                        `Interesse no plano ${p.name}`,
-                      )}`;
-                    }}
-                  >
-                    {p.quote_only ? 'Falar com o time' : 'Quero contratar'}
-                  </Button>
-                )}
+                {!isCurrent && (() => {
+                  const onlinePriceId = !p.quote_only && p.price_cents ? p.stripe_price_id : null;
+                  const canCheckout = !!onlinePriceId && !!onCheckout;
+                  return (
+                    <Button
+                      variant={p.quote_only ? 'outline' : 'default'}
+                      className="w-full"
+                      onClick={() => {
+                        if (canCheckout) {
+                          onCheckout!({ code: p.code, name: p.name, priceId: onlinePriceId! });
+                          return;
+                        }
+                        if (onSelectPlan) {
+                          onSelectPlan({ code: p.code, name: p.name });
+                          return;
+                        }
+                        window.location.href = `mailto:contato@sistur.com.br?subject=${encodeURIComponent(
+                          `Interesse no plano ${p.name}`,
+                        )}`;
+                      }}
+                    >
+                      {p.quote_only ? 'Falar com o time' : canCheckout ? 'Assinar agora' : 'Quero contratar'}
+                    </Button>
+                  );
+                })()}
               </CardContent>
             </Card>
           );

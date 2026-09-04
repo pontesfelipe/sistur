@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 2,
+  minor: 3,
   patch: 0,
 
   get full() {
@@ -23,6 +23,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.3.0",
+    date: "2026-09-04",
+    type: "minor" as const,
+    changes: [
+      "Fase 2 — Pagamentos online: contratação dos planos Estudante (R$ 29/mês), Independente (R$ 99/mês) e Empresarial (R$ 149/mês) direto na plataforma, em BRL.",
+      "Pacotes avulsos de créditos do Professor Beni: 50 (R$ 29), 150 (R$ 69) e 500 para a organização (R$ 199), creditados automaticamente após o pagamento.",
+      "Checkout incorporado na página /assinatura, página de retorno em /checkout/retorno e botão para gerenciar pagamento e faturas.",
+      "Sincronização automática de assinaturas: status, período vigente e conversão do trial por consumo no primeiro pagamento confirmado.",
+      "Planos Territorial (contrato/empenho) e Professor (gratuito) seguem fora do checkout online.",
+    ],
+  },
   {
     version: "2.2.0",
     date: "2026-09-04",
