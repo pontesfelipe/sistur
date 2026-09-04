@@ -24,7 +24,7 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "2.3.0",
+    version: "2.3.1",
     date: "2026-09-04",
     type: "minor" as const,
     changes: [
@@ -36,7 +36,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "2.2.0",
+    version: "2.3.1",
     date: "2026-09-04",
     type: "minor" as const,
     changes: [
@@ -48,7 +48,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "2.1.0",
+    version: "2.3.1",
     date: "2026-09-04",
     type: "minor" as const,
     changes: [
@@ -60,7 +60,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "2.0.0",
+    version: "2.3.1",
     date: "2026-09-04",
     type: "major" as const,
     changes: [
@@ -74,7 +74,7 @@ export const VERSION_HISTORY = [
   },
   {
 
-    version: "1.100.0",
+    version: "2.3.1",
     date: "2026-09-04",
     type: "minor" as const,
     changes: [
@@ -86,7 +86,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.99.2",
+    version: "2.3.1",
     date: "2026-09-03",
     type: "patch" as const,
     changes: [
@@ -96,7 +96,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.99.1",
+    version: "2.3.1",
     date: "2026-09-03",
     type: "patch" as const,
     changes: [
@@ -107,7 +107,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.99.0",
+    version: "2.3.1",
     date: "2026-09-03",
     type: "minor" as const,
     changes: [
@@ -116,7 +116,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.98.1",
+    version: "2.3.1",
     date: "2026-08-27",
     type: "patch" as const,
     changes: [
@@ -126,7 +126,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.98.0",
+    version: "2.3.1",
     date: "2026-08-25",
     type: "minor" as const,
     changes: [
@@ -138,7 +138,7 @@ export const VERSION_HISTORY = [
   },
   {
 
-    version: "1.97.20",
+    version: "2.3.1",
     date: "2026-08-25",
     type: "patch" as const,
     changes: [
@@ -151,7 +151,7 @@ export const VERSION_HISTORY = [
   },
   {
 
-    version: "1.97.19",
+    version: "2.3.1",
     date: "2026-08-17",
     type: "patch" as const,
     changes: [
@@ -159,7 +159,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.97.18",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -167,7 +167,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.97.17",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -175,7 +175,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.97.16",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -183,7 +183,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.97.15",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -191,7 +191,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.97.14",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -199,7 +199,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.97.13",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -207,7 +207,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.97.12",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -215,7 +215,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.11",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -223,7 +223,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.10",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -231,7 +231,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.9",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -239,7 +239,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.8",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -247,7 +247,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.7",
+    version: "2.3.1",
     date: "2026-06-24",
     type: "patch" as const,
     changes: [
@@ -255,7 +255,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.6",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -263,7 +263,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.97.5",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -271,7 +271,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.4",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -279,7 +279,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.3",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -287,7 +287,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.2",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -295,7 +295,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.1",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -303,7 +303,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.97.0",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "minor" as const,
     changes: [
@@ -311,7 +311,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.12",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -319,7 +319,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.11",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -327,7 +327,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.10",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -335,7 +335,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.9",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "minor" as const,
     changes: [
@@ -343,7 +343,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.8",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -351,7 +351,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.7",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -359,7 +359,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.6",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -367,7 +367,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.5",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -375,7 +375,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.4",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -383,7 +383,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.3",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -391,7 +391,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.2",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -399,7 +399,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.1",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "patch" as const,
     changes: [
@@ -407,7 +407,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.96.0",
+    version: "2.3.1",
     date: "2026-06-23",
     type: "minor" as const,
     changes: [
@@ -415,7 +415,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.95.1",
+    version: "2.3.1",
     date: "2026-06-22",
     type: "patch" as const,
     changes: [
@@ -423,7 +423,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.95.0",
+    version: "2.3.1",
     date: "2026-06-22",
     type: "minor" as const,
     changes: [
@@ -431,7 +431,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.94.1",
+    version: "2.3.1",
     date: "2026-06-22",
     type: "patch" as const,
     changes: [
@@ -439,7 +439,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.94.0",
+    version: "2.3.1",
     date: "2026-06-22",
     type: "minor" as const,
     changes: [
@@ -447,7 +447,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.93.0",
+    version: "2.3.1",
     date: "2026-06-22",
     type: "minor" as const,
     changes: [
@@ -455,7 +455,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.92.0",
+    version: "2.3.1",
     date: "2026-06-22",
     type: "minor" as const,
     changes: [
@@ -463,7 +463,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.91.0",
+    version: "2.3.1",
     date: "2026-06-22",
     type: "minor" as const,
     changes: [
@@ -471,7 +471,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.90.0",
+    version: "2.3.1",
     date: "2026-06-22",
     type: "minor" as const,
     changes: [
@@ -479,7 +479,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.89.0",
+    version: "2.3.1",
     date: "2026-06-22",
     type: "minor" as const,
     changes: [
@@ -487,7 +487,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.88.0",
+    version: "2.3.1",
     date: "2026-06-22",
     type: "minor" as const,
     changes: [
@@ -495,7 +495,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.87.0",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "minor" as const,
     changes: [
@@ -503,7 +503,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.86.0",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "minor" as const,
     changes: [
@@ -511,7 +511,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.85.0",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "minor" as const,
     changes: [
@@ -519,7 +519,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.84.0",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "minor" as const,
     changes: [
@@ -527,7 +527,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.83.2",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "patch" as const,
     changes: [
@@ -535,7 +535,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.83.1",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "patch" as const,
     changes: [
@@ -543,7 +543,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.83.0",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "minor" as const,
     changes: [
@@ -551,7 +551,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.82.1",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "patch" as const,
     changes: [
@@ -559,7 +559,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.82.0",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "minor" as const,
     changes: [
@@ -567,7 +567,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.81.1",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "patch" as const,
     changes: [
@@ -575,7 +575,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.81.0",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "minor" as const,
     changes: [
@@ -583,7 +583,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.80.1",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "patch" as const,
     changes: [
@@ -591,7 +591,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.80.0",
+    version: "2.3.1",
     date: "2026-06-21",
     type: "minor" as const,
     changes: [
@@ -600,7 +600,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.79.0",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -610,7 +610,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.78.0",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -619,7 +619,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.77.0",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -628,7 +628,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.76.0",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -640,7 +640,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.75.0",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -651,7 +651,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.74.0",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -661,7 +661,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.73.0",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -672,7 +672,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.72.0",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -681,7 +681,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.20",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -689,7 +689,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.19",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -697,7 +697,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.18",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -705,7 +705,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.17",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -713,7 +713,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.16",
+    version: "2.3.1",
     date: "2026-06-20",
     type: "minor" as const,
     changes: [
@@ -721,7 +721,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.15",
+    version: "2.3.1",
     date: "2026-06-18",
     type: "patch" as const,
     changes: [
@@ -729,7 +729,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.14",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -737,7 +737,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.13",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -745,7 +745,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.12",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -753,7 +753,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.11",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -761,7 +761,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.10",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -769,7 +769,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.9",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "minor" as const,
     changes: [
@@ -780,7 +780,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.8",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -789,7 +789,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.7",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -798,7 +798,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.6",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -806,7 +806,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.5",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -814,7 +814,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.4",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "minor" as const,
     changes: [
@@ -822,7 +822,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.3",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -830,7 +830,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.2",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "minor" as const,
     changes: [
@@ -838,7 +838,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.1",
+    version: "2.3.1",
     date: "2026-06-17",
     type: "patch" as const,
     changes: [
@@ -846,7 +846,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.66.0",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "minor" as const,
     changes: [
@@ -854,7 +854,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.65.5",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -862,7 +862,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.65.4",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -870,7 +870,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.65.3",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -878,7 +878,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.65.2",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -886,7 +886,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.65.1",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -894,7 +894,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.65.0",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "minor" as const,
     changes: [
@@ -902,7 +902,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.13",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -910,7 +910,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.12",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -918,7 +918,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.11",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -926,7 +926,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.10",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -934,7 +934,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.9",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -942,7 +942,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.8",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -950,7 +950,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.7",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -958,7 +958,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.6",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -966,7 +966,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.5",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -974,7 +974,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.4",
+    version: "2.3.1",
     date: "2026-06-16",
     type: "patch" as const,
     changes: [
@@ -982,7 +982,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.3",
+    version: "2.3.1",
     date: "2026-06-15",
     type: "patch" as const,
     changes: [
@@ -990,7 +990,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.2",
+    version: "2.3.1",
     date: "2026-06-15",
     type: "patch" as const,
     changes: [
@@ -999,7 +999,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.1",
+    version: "2.3.1",
     date: "2026-06-05",
     type: "patch" as const,
     changes: [
@@ -1007,7 +1007,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.64.0",
+    version: "2.3.1",
     date: "2026-06-05",
     type: "minor" as const,
     changes: [
@@ -1016,7 +1016,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.63.0",
+    version: "2.3.1",
     date: "2026-06-05",
     type: "minor" as const,
     changes: [
@@ -1024,7 +1024,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.16",
+    version: "2.3.1",
     date: "2026-06-05",
     type: "patch" as const,
     changes: [
@@ -1032,7 +1032,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.15",
+    version: "2.3.1",
     date: "2026-06-05",
     type: "minor" as const,
     changes: [
@@ -1041,7 +1041,7 @@ export const VERSION_HISTORY = [
   },
 
   {
-    version: "1.62.14",
+    version: "2.3.1",
     date: "2026-06-05",
     type: "patch" as const,
     changes: [
@@ -1049,7 +1049,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.13",
+    version: "2.3.1",
     date: "2026-06-05",
     type: "minor" as const,
     changes: [
@@ -1057,7 +1057,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.12",
+    version: "2.3.1",
     date: "2026-06-05",
     type: "patch" as const,
     changes: [
@@ -1065,7 +1065,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.11",
+    version: "2.3.1",
     date: "2026-06-04",
     type: "patch" as const,
     changes: [
@@ -1073,7 +1073,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.10",
+    version: "2.3.1",
     date: "2026-06-04",
     type: "patch" as const,
     changes: [
@@ -1081,7 +1081,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.9",
+    version: "2.3.1",
     date: "2026-06-04",
     type: "patch" as const,
     changes: [
@@ -1089,7 +1089,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.8",
+    version: "2.3.1",
     date: "2026-06-04",
     type: "patch" as const,
     changes: [
@@ -1097,7 +1097,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.7",
+    version: "2.3.1",
     date: "2026-06-04",
     type: "minor" as const,
     changes: [
@@ -1107,7 +1107,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.6",
+    version: "2.3.1",
     date: "2026-06-03",
     type: "minor" as const,
     changes: [
@@ -1117,7 +1117,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.5",
+    version: "2.3.1",
     date: "2026-06-02",
     type: "minor" as const,
     changes: [
@@ -1125,7 +1125,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.4",
+    version: "2.3.1",
     date: "2026-06-02",
     type: "patch" as const,
     changes: [
@@ -1133,7 +1133,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.3",
+    version: "2.3.1",
     date: "2026-06-02",
     type: "patch" as const,
     changes: [
@@ -1141,7 +1141,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.2",
+    version: "2.3.1",
     date: "2026-06-02",
     type: "patch" as const,
     changes: [
@@ -1149,7 +1149,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.1",
+    version: "2.3.1",
     date: "2026-06-02",
     type: "patch" as const,
     changes: [
@@ -1157,7 +1157,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.62.0",
+    version: "2.3.1",
     date: "2026-06-02",
     type: "minor" as const,
     changes: [
@@ -1165,7 +1165,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.61.5",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1173,7 +1173,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.61.4",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1181,7 +1181,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.61.3",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1189,7 +1189,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.61.2",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1198,7 +1198,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.61.1",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1207,7 +1207,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.61.0",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "minor" as const,
     changes: [
@@ -1218,7 +1218,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.60.6",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1226,7 +1226,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.60.5",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1234,7 +1234,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.60.4",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1242,7 +1242,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.60.3",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1250,7 +1250,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.60.2",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1258,7 +1258,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.60.1",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "patch" as const,
     changes: [
@@ -1266,7 +1266,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.60.0",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "minor" as const,
     changes: [
@@ -1274,7 +1274,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.59.0",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "minor" as const,
     changes: [
@@ -1284,7 +1284,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.58.0",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "minor" as const,
     changes: [
@@ -1292,7 +1292,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.57.0",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "minor" as const,
     changes: [
@@ -1300,7 +1300,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.56.0",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "minor" as const,
     changes: [
@@ -1308,7 +1308,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.55.0",
+    version: "2.3.1",
     date: "2026-06-01",
     type: "minor" as const,
     changes: [
@@ -1316,7 +1316,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.54.1",
+    version: "2.3.1",
     date: "2026-05-28",
     type: "patch" as const,
     changes: [
@@ -1325,7 +1325,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.54.0",
+    version: "2.3.1",
     date: "2026-05-18",
     type: "minor" as const,
     changes: [
@@ -1333,7 +1333,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.53.5",
+    version: "2.3.1",
     date: "2026-05-16",
     type: "patch" as const,
     changes: [
@@ -1341,7 +1341,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.53.4",
+    version: "2.3.1",
     date: "2026-05-05",
     type: "patch" as const,
     changes: [
@@ -1349,7 +1349,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.53.3",
+    version: "2.3.1",
     date: "2026-05-05",
     type: "patch" as const,
     changes: [
@@ -1357,7 +1357,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.53.2",
+    version: "2.3.1",
     date: "2026-05-05",
     type: "patch" as const,
     changes: [
@@ -1365,7 +1365,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.53.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1375,7 +1375,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.52.4",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "patch" as const,
     changes: [
@@ -1383,7 +1383,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.52.3",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "patch" as const,
     changes: [
@@ -1391,7 +1391,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.52.2",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "patch" as const,
     changes: [
@@ -1399,7 +1399,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.52.1",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "patch" as const,
     changes: [
@@ -1407,7 +1407,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.52.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1416,7 +1416,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.51.1",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "patch" as const,
     changes: [
@@ -1424,7 +1424,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.51.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1434,7 +1434,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.50.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1443,7 +1443,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.49.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1452,7 +1452,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.48.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1463,7 +1463,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.47.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1472,7 +1472,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.46.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1481,7 +1481,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.45.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1490,7 +1490,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.44.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1499,7 +1499,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.43.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1509,7 +1509,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.42.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1518,7 +1518,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.41.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1527,7 +1527,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.40.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1535,7 +1535,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.39.1",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "patch" as const,
     changes: [
@@ -1543,7 +1543,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.39.0",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1557,7 +1557,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.77",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "patch" as const,
     changes: [
@@ -1565,7 +1565,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.76",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1573,7 +1573,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.75",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1581,7 +1581,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.74",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1589,7 +1589,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.73",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "minor" as const,
     changes: [
@@ -1599,7 +1599,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.72",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "patch" as const,
     changes: [
@@ -1607,7 +1607,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.71",
+    version: "2.3.1",
     date: "2026-05-03",
     type: "patch" as const,
     changes: [
@@ -1615,7 +1615,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.70",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "patch" as const,
     changes: [
@@ -1623,7 +1623,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.69",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "patch" as const,
     changes: [
@@ -1631,7 +1631,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.68",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "patch" as const,
     changes: [
@@ -1639,7 +1639,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.67",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "patch" as const,
     changes: [
@@ -1647,7 +1647,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.66",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "patch" as const,
     changes: [
@@ -1655,7 +1655,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.65",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "patch" as const,
     changes: [
@@ -1663,7 +1663,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.64",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "patch" as const,
     changes: [
@@ -1671,7 +1671,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.63",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "patch" as const,
     changes: [
@@ -1679,7 +1679,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.62",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "minor" as const,
     changes: [
@@ -1688,7 +1688,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.61",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "patch" as const,
     changes: [
@@ -1696,7 +1696,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.60",
+    version: "2.3.1",
     date: "2026-05-02",
     type: "patch" as const,
     changes: [
@@ -1704,7 +1704,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.59",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1712,7 +1712,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.58",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1720,7 +1720,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.57",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1728,7 +1728,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.56",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1736,7 +1736,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.55",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1744,7 +1744,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.54",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1752,7 +1752,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.53",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1761,7 +1761,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.52",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1769,7 +1769,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.51",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1777,7 +1777,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.50",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1785,7 +1785,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.49",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1793,7 +1793,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.48",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1801,7 +1801,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.47",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1809,7 +1809,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.46",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1817,7 +1817,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.45",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1825,7 +1825,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.44",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1833,7 +1833,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.43",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1841,7 +1841,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.42",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1850,7 +1850,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.41",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1859,7 +1859,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.40",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1867,7 +1867,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.39",
+    version: "2.3.1",
     date: "2026-05-01",
     type: "patch" as const,
     changes: [
@@ -1877,7 +1877,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.38",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1887,7 +1887,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.38.37",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1895,7 +1895,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.36",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1903,7 +1903,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.35",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1911,7 +1911,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.34",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1919,7 +1919,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.33",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1927,7 +1927,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.32",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1935,7 +1935,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.31",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "minor" as const,
     changes: [
@@ -1943,7 +1943,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.30",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1951,7 +1951,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.29",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1959,7 +1959,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.28",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1967,7 +1967,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.27",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1975,7 +1975,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.26",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1983,7 +1983,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.25",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1991,7 +1991,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.24",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -1999,7 +1999,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.23",
+    version: "2.3.1",
     date: "2026-04-30",
     type: "patch" as const,
     changes: [
@@ -2007,7 +2007,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.22",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2015,7 +2015,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.21",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2023,7 +2023,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.20",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2031,7 +2031,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.19",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2039,7 +2039,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.18",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2047,7 +2047,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.17",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2055,7 +2055,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.16",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2063,7 +2063,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.15",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2071,7 +2071,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.14",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2079,7 +2079,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.13",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2087,7 +2087,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.12",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2095,7 +2095,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.11",
+    version: "2.3.1",
     date: "2026-04-29",
     type: "patch" as const,
     changes: [
@@ -2103,7 +2103,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.10",
+    version: "2.3.1",
     date: "2026-04-28",
     type: "patch" as const,
     changes: [
@@ -2111,7 +2111,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.9",
+    version: "2.3.1",
     date: "2026-04-28",
     type: "patch" as const,
     changes: [
@@ -2119,7 +2119,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.8",
+    version: "2.3.1",
     date: "2026-04-28",
     type: "patch" as const,
     changes: [
@@ -2127,7 +2127,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.7",
+    version: "2.3.1",
     date: "2026-04-28",
     type: "patch" as const,
     changes: [
@@ -2135,7 +2135,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.6",
+    version: "2.3.1",
     date: "2026-04-28",
     type: "patch" as const,
     changes: [
@@ -2143,7 +2143,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.5",
+    version: "2.3.1",
     date: "2026-04-28",
     type: "patch" as const,
     changes: [
@@ -2151,7 +2151,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.4",
+    version: "2.3.1",
     date: "2026-04-28",
     type: "patch" as const,
     changes: [
@@ -2159,7 +2159,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.3",
+    version: "2.3.1",
     date: "2026-04-28",
     type: "patch" as const,
     changes: [
@@ -2167,7 +2167,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.2",
+    version: "2.3.1",
     date: "2026-04-28",
     type: "patch" as const,
     changes: [
@@ -2175,7 +2175,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.1",
+    version: "2.3.1",
     date: "2026-04-28",
     type: "patch" as const,
     changes: [
@@ -2183,7 +2183,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.38.0",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "minor" as const,
     changes: [
@@ -2191,7 +2191,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.37.0",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "minor" as const,
     changes: [
@@ -2199,7 +2199,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.36.0",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "minor" as const,
     changes: [
@@ -2207,7 +2207,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.35.0",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "minor" as const,
     changes: [
@@ -2215,7 +2215,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.34.0",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "minor" as const,
     changes: [
@@ -2223,7 +2223,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.33.0",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "minor" as const,
     changes: [
@@ -2231,7 +2231,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.32.1",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "patch" as const,
     changes: [
@@ -2239,7 +2239,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.32.0",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "minor" as const,
     changes: [
@@ -2247,7 +2247,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.31.0",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "minor" as const,
     changes: [
@@ -2255,7 +2255,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.30.17",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "patch" as const,
     changes: [
@@ -2263,7 +2263,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.30.16",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "patch" as const,
     changes: [
@@ -2271,7 +2271,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.30.15",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "patch" as const,
     changes: [
@@ -2279,7 +2279,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.30.14",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "patch" as const,
     changes: [
@@ -2287,7 +2287,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.30.13",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "patch" as const,
     changes: [
@@ -2295,7 +2295,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.30.12",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "patch" as const,
     changes: [
@@ -2303,7 +2303,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.11",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "patch" as const,
     changes: [
@@ -2311,7 +2311,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.10",
+    version: "2.3.1",
     date: "2026-04-27",
     type: "patch" as const,
     changes: [
@@ -2319,7 +2319,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.9",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2327,7 +2327,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.8",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2335,7 +2335,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.7",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2344,7 +2344,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.6",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2352,7 +2352,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.5",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2360,7 +2360,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.4",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2368,7 +2368,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.3",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2380,7 +2380,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.2",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2389,7 +2389,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.1",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2398,7 +2398,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.30.0",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "minor" as const,
     changes: [
@@ -2410,7 +2410,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.29.1",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2420,7 +2420,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.29.0",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "minor" as const,
     changes: [
@@ -2433,7 +2433,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.28.0",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "minor" as const,
     changes: [
@@ -2445,7 +2445,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.27.3",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2453,7 +2453,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.27.2",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2465,7 +2465,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.27.1",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "patch" as const,
     changes: [
@@ -2475,7 +2475,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.27.0",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "minor" as const,
     changes: [
@@ -2488,7 +2488,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.26.0",
+    version: "2.3.1",
     date: "2026-04-17",
     type: "minor" as const,
     changes: [
@@ -2501,7 +2501,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.25.0",
+    version: "2.3.1",
     date: "2026-04-16",
     type: "minor" as const,
     changes: [
@@ -2513,7 +2513,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.24.3",
+    version: "2.3.1",
     date: "2026-04-16",
     type: "patch" as const,
     changes: [
@@ -2523,7 +2523,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.24.2",
+    version: "2.3.1",
     date: "2026-04-16",
     type: "patch" as const,
     changes: [
@@ -2531,7 +2531,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.24.1",
+    version: "2.3.1",
     date: "2026-04-16",
     type: "patch" as const,
     changes: [
@@ -2541,7 +2541,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.24.0",
+    version: "2.3.1",
     date: "2026-04-16",
     type: "minor" as const,
     changes: [
@@ -2553,7 +2553,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.23.0",
+    version: "2.3.1",
     date: "2026-04-16",
     type: "minor" as const,
     changes: [
@@ -2567,7 +2567,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.22.0",
+    version: "2.3.1",
     date: "2026-04-16",
     type: "minor" as const,
     changes: [
@@ -2580,7 +2580,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.21.15",
+    version: "2.3.1",
     date: "2026-04-16",
     type: "patch" as const,
     changes: [
@@ -2592,7 +2592,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.21.14",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2602,7 +2602,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.21.13",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2613,7 +2613,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.21.12",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2623,7 +2623,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.21.11",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2633,7 +2633,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.21.10",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2642,7 +2642,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.21.9",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2655,7 +2655,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.21.8",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2666,7 +2666,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.21.7",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2677,7 +2677,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.21.6",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2688,7 +2688,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.21.5",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "minor" as const,
     changes: [
@@ -2704,7 +2704,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.21.3",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2716,7 +2716,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.21.2",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2726,7 +2726,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.21.1",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2737,7 +2737,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.21.0",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "minor" as const,
     changes: [
@@ -2754,7 +2754,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.20.1",
+    version: "2.3.1",
     date: "2026-04-15",
     type: "patch" as const,
     changes: [
@@ -2764,7 +2764,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.20.0",
+    version: "2.3.1",
     date: "2026-04-14",
     type: "minor" as const,
     changes: [
@@ -2780,7 +2780,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.19.9",
+    version: "2.3.1",
     date: "2026-04-14",
     type: "patch" as const,
     changes: [
@@ -2790,7 +2790,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.19.8",
+    version: "2.3.1",
     date: "2026-04-14",
     type: "patch" as const,
     changes: [
@@ -2802,7 +2802,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.19.7",
+    version: "2.3.1",
     date: "2026-04-14",
     type: "patch" as const,
     changes: [
@@ -2816,7 +2816,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.19.6",
+    version: "2.3.1",
     date: "2026-04-14",
     type: "patch" as const,
     changes: [
@@ -2827,7 +2827,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.19.5",
+    version: "2.3.1",
     date: "2026-04-14",
     type: "patch" as const,
     changes: [
@@ -2838,7 +2838,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.19.4",
+    version: "2.3.1",
     date: "2026-04-14",
     type: "patch" as const,
     changes: [
@@ -2851,7 +2851,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.19.3",
+    version: "2.3.1",
     date: "2026-04-14",
     type: "patch" as const,
     changes: [
@@ -2862,7 +2862,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.19.2",
+    version: "2.3.1",
     date: "2026-04-14",
     type: "patch" as const,
     changes: [
@@ -2873,7 +2873,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.19.1",
+    version: "2.3.1",
     date: "2026-04-14",
     type: "patch" as const,
     changes: [
@@ -2883,7 +2883,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.19.0",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "minor" as const,
     changes: [
@@ -2900,7 +2900,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.18.6",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "patch" as const,
     changes: [
@@ -2910,7 +2910,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.18.5",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "patch" as const,
     changes: [
@@ -2920,7 +2920,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.18.4",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "patch" as const,
     changes: [
@@ -2931,7 +2931,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.18.3",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "patch" as const,
     changes: [
@@ -2944,7 +2944,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.18.2",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "patch" as const,
     changes: [
@@ -2957,7 +2957,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.18.1",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "patch" as const,
     changes: [
@@ -2970,7 +2970,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.18.0",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "minor" as const,
     changes: [
@@ -2986,7 +2986,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.17.1",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "patch" as const,
     changes: [
@@ -2998,7 +2998,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.17.0",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "minor" as const,
     changes: [
@@ -3012,7 +3012,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.16.0",
+    version: "2.3.1",
     date: "2026-04-13",
     type: "minor" as const,
     changes: [
@@ -3025,7 +3025,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.15.2",
+    version: "2.3.1",
     date: "2026-04-04",
     type: "patch" as const,
     changes: [
@@ -3035,7 +3035,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.15.1",
+    version: "2.3.1",
     date: "2026-04-04",
     type: "patch" as const,
     changes: [
@@ -3046,7 +3046,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.15.0",
+    version: "2.3.1",
     date: "2026-04-04",
     type: "minor" as const,
     changes: [
@@ -3058,7 +3058,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.14.4",
+    version: "2.3.1",
     date: "2026-04-02",
     type: "patch" as const,
     changes: [
@@ -3069,7 +3069,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.14.3",
+    version: "2.3.1",
     date: "2026-04-02",
     type: "patch" as const,
     changes: [
@@ -3083,7 +3083,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.14.2",
+    version: "2.3.1",
     date: "2026-04-02",
     type: "patch" as const,
     changes: [
@@ -3093,7 +3093,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.14.1",
+    version: "2.3.1",
     date: "2026-04-02",
     type: "patch" as const,
     changes: [
@@ -3106,7 +3106,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.14.0",
+    version: "2.3.1",
     date: "2026-04-02",
     type: "minor" as const,
     changes: [
@@ -3119,7 +3119,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.13.5",
+    version: "2.3.1",
     date: "2026-04-01",
     type: "patch" as const,
     changes: [
@@ -3129,7 +3129,7 @@ export const VERSION_HISTORY = [
     ],
   },
   {
-    version: "1.13.4",
+    version: "2.3.1",
     date: "2026-04-01",
     type: "patch" as const,
     changes: [
@@ -3142,7 +3142,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.13.3",
+    version: "2.3.1",
     date: "2026-04-01",
     type: "patch" as const,
     changes: [
@@ -3158,7 +3158,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.13.2",
+    version: "2.3.1",
     date: "2026-04-01",
     type: "patch" as const,
     changes: [
@@ -3171,7 +3171,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.13.1",
+    version: "2.3.1",
     date: "2026-04-01",
     type: "patch" as const,
     changes: [
@@ -3182,7 +3182,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.13.0",
+    version: "2.3.1",
     date: "2026-04-01",
     type: "minor" as const,
     changes: [
@@ -3196,7 +3196,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.12.2",
+    version: "2.3.1",
     date: "2026-04-01",
     type: "patch" as const,
     changes: [
@@ -3212,7 +3212,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.12.1",
+    version: "2.3.1",
     date: "2026-04-01",
     type: "patch" as const,
     changes: [
@@ -3229,7 +3229,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.12.0",
+    version: "2.3.1",
     date: "2026-04-01",
     type: "minor" as const,
     changes: [
@@ -3243,7 +3243,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.11.3",
+    version: "2.3.1",
     date: "2026-04-01",
     type: "patch" as const,
     changes: [
@@ -3254,7 +3254,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.11.2",
+    version: "2.3.1",
     date: "2026-03-31",
     type: "patch" as const,
     changes: [
@@ -3278,7 +3278,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.11.0",
+    version: "2.3.1",
     date: "2026-03-27",
     type: "minor" as const,
     changes: [
@@ -3293,7 +3293,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.10.0",
+    version: "2.3.1",
     date: "2026-03-26",
     type: "minor" as const,
     changes: [
@@ -3306,7 +3306,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.9.0",
+    version: "2.3.1",
     date: "2026-03-26",
     type: "minor" as const,
     changes: [
@@ -3323,7 +3323,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.8.5",
+    version: "2.3.1",
     date: "2026-03-26",
     type: "patch" as const,
     changes: [
@@ -3338,7 +3338,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.8.4",
+    version: "2.3.1",
     date: "2026-03-25",
     type: "patch" as const,
     changes: [
@@ -3351,7 +3351,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.8.3",
+    version: "2.3.1",
     date: "2026-03-25",
     type: "patch" as const,
     changes: [
@@ -3362,7 +3362,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.8.2",
+    version: "2.3.1",
     date: "2026-03-25",
     type: "patch" as const,
     changes: [
@@ -3374,7 +3374,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.8.1",
+    version: "2.3.1",
     date: "2026-03-25",
     type: "patch" as const,
     changes: [
@@ -3385,7 +3385,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.8.0",
+    version: "2.3.1",
     date: "2026-03-25",
     type: "minor" as const,
     changes: [
@@ -3399,7 +3399,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.16",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3410,7 +3410,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.15",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3420,7 +3420,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.14",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3432,7 +3432,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.13",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3444,7 +3444,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.12",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3453,7 +3453,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.11",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3465,7 +3465,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.10",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3476,7 +3476,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.7",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3488,7 +3488,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.6",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3500,7 +3500,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.5",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3512,7 +3512,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.4",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3523,7 +3523,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.1",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "patch" as const,
     changes: [
@@ -3534,7 +3534,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.7.0",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "minor" as const,
     changes: [
@@ -3547,7 +3547,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.6.0",
+    version: "2.3.1",
     date: "2026-01-23",
     type: "minor" as const,
     changes: [
@@ -3559,7 +3559,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.5.5",
+    version: "2.3.1",
     date: "2026-01-16",
     type: "patch" as const,
     changes: [
@@ -3569,7 +3569,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.5.4",
+    version: "2.3.1",
     date: "2026-01-16",
     type: "patch" as const,
     changes: [
@@ -3578,7 +3578,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.5.3",
+    version: "2.3.1",
     date: "2026-01-16",
     type: "patch" as const,
     changes: [
@@ -3589,7 +3589,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.5.2",
+    version: "2.3.1",
     date: "2026-01-16",
     type: "patch" as const,
     changes: [
@@ -3600,7 +3600,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.5.1",
+    version: "2.3.1",
     date: "2026-01-16",
     type: "patch" as const,
     changes: [
@@ -3612,7 +3612,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.5.0",
+    version: "2.3.1",
     date: "2026-01-16",
     type: "minor" as const,
     changes: [
@@ -3624,7 +3624,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.4.0",
+    version: "2.3.1",
     date: "2026-01-16",
     type: "minor" as const,
     changes: [
@@ -3635,7 +3635,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.3.0",
+    version: "2.3.1",
     date: "2026-01-16",
     type: "minor" as const,
     changes: [
@@ -3646,7 +3646,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.1.0",
+    version: "2.3.1",
     date: "2025-01-16",
     type: "minor" as const,
     changes: [
@@ -3656,7 +3656,7 @@ export const VERSION_HISTORY = [
     ]
   },
   {
-    version: "1.0.0",
+    version: "2.3.1",
     date: "2025-01-15",
     type: "major" as const,
     changes: [
@@ -3673,7 +3673,7 @@ export const VERSION_HISTORY = [
 export type VersionChangeType = "major" | "minor" | "patch";
 
 export interface VersionEntry {
-  version: string;
+  version: "2.3.1",
   date: string;
   type: VersionChangeType;
   changes: string[];
