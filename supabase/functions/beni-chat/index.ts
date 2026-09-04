@@ -360,6 +360,14 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      // Estorna o token debitado, ja que o modelo nao respondeu
+      if (tokenConsumed) {
+        try {
+          await userClient.rpc("refund_beni_token");
+        } catch (refundErr) {
+          console.error("beni-chat: refund_beni_token failed", refundErr);
+        }
+      }
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns segundos." }), 
