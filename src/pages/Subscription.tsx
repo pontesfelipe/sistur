@@ -458,7 +458,42 @@ export default function Subscription() {
           </div>
         </div>
 
-        <PlanCatalog />
+        {paymentsReady && <PaymentTestModeBanner />}
+
+        <PlanCatalog
+          onCheckout={paymentsReady ? ({ name, priceId }) => {
+            setCheckoutTitle(name);
+            openCheckout({ priceId });
+          } : undefined}
+        />
+
+        {paymentsReady && (
+          <BeniCreditPacks
+            onBuy={(pack) => {
+              setCheckoutTitle(`Pacote Beni — ${pack.name}`);
+              openCheckout({ priceId: pack.priceId });
+            }}
+          />
+        )}
+
+        {paymentsReady && (
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={handleOpenPortal} disabled={openingPortal}>
+              {openingPortal ? 'Abrindo...' : 'Gerenciar pagamento e faturas'}
+            </Button>
+          </div>
+        )}
+
+        <Dialog open={isOpen} onOpenChange={(open) => { if (!open) closeCheckout(); }}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{checkoutTitle || 'Finalizar contratação'}</DialogTitle>
+            </DialogHeader>
+            {checkoutElement}
+          </DialogContent>
+        </Dialog>
+
+
 
 
 
