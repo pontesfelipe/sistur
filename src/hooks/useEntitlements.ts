@@ -85,5 +85,5 @@ export function formatPlanPrice(plan: Plan): string {
     currency: plan.currency || 'BRL',
   });
   const period = plan.billing_period === 'annual' ? '/ano' : '/mês';
-  return plan.seat_based ? `${value} por assento ${period}` : `${value} ${period}`;
+  return plan.seat_based ? `${value} por usuário ${period}` : `${value} ${period}`;
 }

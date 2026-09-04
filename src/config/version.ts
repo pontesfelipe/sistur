@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 5,
-  patch: 2,
+  patch: 3,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.5.3",
+    date: "2026-09-04",
+    type: "patch" as const,
+    changes: [
+      "Página de Planos e assinatura com visual refinado: cartão de situação sem fundo acinzentado no tema claro, cartões de módulos e de planos mais legíveis e botões alinhados.",
+      "Terminologia de cobrança trocada de 'por assento' para 'por usuário'.",
+    ],
+  },
   {
     version: "2.5.2",
     date: "2026-09-04",

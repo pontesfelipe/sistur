@@ -141,13 +141,23 @@ export default function Subscription() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           className={cn(
-            'rounded-2xl border-2 p-6 relative overflow-hidden',
-            isCancelled ? 'border-muted bg-muted/20'
-              : hasSubscription || isPaidPlan ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/30 to-teal-950/20'
-              : inTrial ? 'border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-orange-950/20'
-              : 'border-primary/50 bg-gradient-to-br from-primary/10 to-blue-950/20',
+            'rounded-2xl border p-6 relative overflow-hidden shadow-sm',
+            isCancelled ? 'border-border bg-muted/30'
+              : hasSubscription || isPaidPlan ? 'border-emerald-500/40 bg-emerald-500/5'
+              : inTrial ? 'border-amber-500/40 bg-amber-500/5'
+              : 'border-primary/40 bg-primary/5',
           )}
         >
+          <div
+            aria-hidden
+            className={cn(
+              'pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full blur-3xl opacity-40',
+              isCancelled ? 'bg-muted-foreground/10'
+                : hasSubscription || isPaidPlan ? 'bg-emerald-500/20'
+                : inTrial ? 'bg-amber-500/20'
+                : 'bg-primary/20',
+            )}
+          />
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -235,14 +245,16 @@ export default function Subscription() {
               const enabled = entitlements.features?.[f.key] === true;
               return (
                 <div key={f.key} className={cn(
-                  'rounded-xl border p-3 flex items-center gap-2 transition-all',
-                  enabled ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/50 bg-muted/20 opacity-60',
+                  'rounded-xl border p-3 flex items-center gap-2.5 transition-all',
+                  enabled
+                    ? 'border-emerald-500/30 bg-emerald-500/5 shadow-sm'
+                    : 'border-dashed border-border bg-muted/20 text-muted-foreground',
                 )}>
-                  <span className="text-lg">{f.icon}</span>
+                  <span className={cn('text-lg', !enabled && 'grayscale opacity-60')}>{f.icon}</span>
                   <p className="text-xs font-medium flex-1 min-w-0 truncate">{f.label}</p>
                   {enabled
-                    ? <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                    : <XCircle className="h-4 w-4 text-muted-foreground shrink-0" />}
+                    ? <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                    : <XCircle className="h-4 w-4 text-muted-foreground/60 shrink-0" />}
                 </div>
               );
             })}
