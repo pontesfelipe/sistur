@@ -245,7 +245,7 @@ export const tutorialCategories: TutorialCategory[] = [
         title: 'Gestão de Licenças',
         description: 'Visualize todas as licenças ativas, trials, conversões. Cancele ou estenda licenças. Gerencie cotas por organização e monitore métricas de conversão.',
         icon: Shield,
-        route: '/admin/licencas',
+        route: '/admin/comercial',
         roles: ['ADMIN'],
         category: 'admin',
       },
