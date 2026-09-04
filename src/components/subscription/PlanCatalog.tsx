@@ -23,6 +23,7 @@ const FEATURE_LABELS: Record<string, string> = {
 
 const AUDIENCE_LABELS: Record<string, string> = {
   PUBLIC: 'Gestão pública',
+  CONSULTING: 'Destinos e empresas',
   ENTERPRISE: 'Empresas e redes',
   STUDENT: 'Estudantes',
   TEACHER: 'Professores',
