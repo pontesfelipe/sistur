@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useProfessorReferralCode, useProfessorStudents, useReferralCount } from '@/hooks/useProfessorReferral';
+import { useProfessorReferralCode, useProfessorStudents, useReferralCount, useInviteStudents } from '@/hooks/useProfessorReferral';
 import { useClassrooms, useClassroomStudents, useClassroomStudentActions, useClassroomAssignments, useClassroomAssignmentActions } from '@/hooks/useClassrooms';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileContext } from '@/contexts/ProfileContext';
@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 import {
   Users, Copy, Gift, Plus, School, BookOpen, ClipboardList,
   Trash2, Calendar, Loader2, Check, X, UserPlus, FileText,
-  Building2, GraduationCap, Target, BarChart3, Settings,
+  Building2, GraduationCap, Target, BarChart3, Settings, Mail,
   MoreVertical, Pencil, Shield, Eye, LayoutDashboard
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -37,6 +37,71 @@ import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+// ─── Convite por e-mail ───
+function InviteStudentsDialog() {
+  const [open, setOpen] = useState(false);
+  const [emails, setEmails] = useState('');
+  const [message, setMessage] = useState('');
+  const invite = useInviteStudents();
+
+  const parsed = emails
+    .split(/[\s,;]+/)
+    .map(e => e.trim().toLowerCase())
+    .filter(e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+
+  const handleSend = () => {
+    invite.mutate(
+      { emails: parsed, message: message.trim() || undefined },
+      { onSuccess: () => { setOpen(false); setEmails(''); setMessage(''); } },
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="w-full">
+          <Mail className="h-4 w-4 mr-2" />
+          Convidar por e-mail
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Convidar estudantes</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <Label>E-mails (separados por vírgula, ponto e vírgula ou linha)</Label>
+            <Textarea
+              rows={4}
+              value={emails}
+              onChange={e => setEmails(e.target.value)}
+              placeholder="aluno1@email.com, aluno2@email.com"
+            />
+            <p className="text-xs text-muted-foreground">
+              {parsed.length} e-mail(s) válido(s). Máximo de 30 por envio.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label>Mensagem (opcional)</Label>
+            <Textarea
+              rows={3}
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              placeholder="Ex.: Turma de Planejamento Turístico — 2º semestre."
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Quem já tem conta é vinculado ao entrar pelo link; quem ainda não tem cria a conta com o código.
+            Depois disso você adiciona a pessoa à turma em Grupos.
+          </p>
+          <Button className="w-full" onClick={handleSend} disabled={!parsed.length || invite.isPending}>
+            {invite.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Mail className="h-4 w-4 mr-2" />}
+            Enviar convites
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 // ─── Referral Panel (EDU) ───
 function ReferralPanel() {
@@ -89,6 +154,7 @@ function ReferralPanel() {
                 <Copy className="h-4 w-4 mr-2" />
                 Copiar link de convite
               </Button>
+              <InviteStudentsDialog />
             </>
           ) : (
             <Button onClick={() => generateCode.mutate()} disabled={generateCode.isPending}>

@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 4,
-  patch: 3,
+  minor: 5,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;

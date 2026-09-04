@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { ClassroomAnnouncementsPanel } from '@/components/edu/ClassroomAnnouncementsPanel';
 import { ClassroomLeaderboardPanel } from '@/components/edu/ClassroomLeaderboardPanel';
+import { JoinProfessorCard } from '@/components/edu/JoinProfessorCard';
 
 interface StudentClassroom {
   classroom_id: string;
@@ -77,6 +78,8 @@ const EduMinhasTurmas = () => {
             Turmas em que você está matriculado e anúncios dos professores.
           </p>
         </div>
+
+        <JoinProfessorCard />
 
         {isLoading && <Skeleton className="h-32 w-full" />}
         {!isLoading && classrooms.length === 0 && (
