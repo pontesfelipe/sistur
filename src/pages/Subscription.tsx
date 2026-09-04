@@ -95,6 +95,52 @@ export default function Subscription() {
   const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
   const [checkoutTitle, setCheckoutTitle] = useState('');
   const [openingPortal, setOpeningPortal] = useState(false);
+  const [changingPlan, setChangingPlan] = useState(false);
+
+  /**
+   * Assinatura de plano: se o usuário já tem assinatura Stripe ativa neste
+   * ambiente, troca o preço com pro-rata imediato (change-plan); caso
+   * contrário abre o checkout embutido para uma nova assinatura.
+   */
+  const handleSubscribePlan = async (name: string, priceId: string) => {
+    try {
+      setChangingPlan(true);
+      const environment = getStripeEnvironment();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Faça login para assinar');
+
+      const { data: activeSub } = await supabase
+        .from('subscriptions')
+        .select('price_id, stripe_subscription_id')
+        .eq('user_id', user.id)
+        .eq('environment', environment)
+        .in('status', ['active', 'trialing', 'past_due'])
+        .not('stripe_subscription_id', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (activeSub?.stripe_subscription_id && activeSub.price_id !== priceId) {
+        const { error } = await supabase.functions.invoke('change-plan', {
+          body: { priceId, environment },
+        });
+        if (error) throw error;
+        toast.success(`Plano alterado para ${name}. O valor é ajustado proporcionalmente na próxima fatura.`);
+        return;
+      }
+      if (activeSub?.price_id === priceId) {
+        toast.info('Você já está neste plano.');
+        return;
+      }
+
+      setCheckoutTitle(name);
+      openCheckout({ priceId });
+    } catch (err: any) {
+      toast.error(err?.message || 'Não foi possível processar a assinatura');
+    } finally {
+      setChangingPlan(false);
+    }
+  };
 
   const handleOpenPortal = async () => {
     try {
@@ -487,10 +533,9 @@ export default function Subscription() {
         {paymentsReady && <PaymentTestModeBanner />}
 
         <PlanCatalog
-          onCheckout={paymentsReady ? ({ name, priceId }) => {
-            setCheckoutTitle(name);
-            openCheckout({ priceId });
-          } : undefined}
+          onCheckout={paymentsReady && !changingPlan
+            ? ({ name, priceId }) => { void handleSubscribePlan(name, priceId); }
+            : undefined}
         />
 
         {paymentsReady && (
