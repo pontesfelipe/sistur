@@ -65,6 +65,11 @@ function PlanCard({
         </div>
         <CardDescription>{AUDIENCE_LABELS[p.audience] ?? p.audience}</CardDescription>
         <p className="text-xl font-bold mt-2">{formatPlanPrice(p)}</p>
+        {p.code === 'professor' && (
+          <p className="text-xs text-muted-foreground">
+            Gratuito quando você tem 5 ou mais estudantes ativos que entraram pelo seu link de indicação.
+          </p>
+        )}
         {p.seat_based && (
           <p className="text-xs text-muted-foreground">
             A partir de {p.min_seats} usuários. Sem limite máximo — acrescente usuários quando precisar,
