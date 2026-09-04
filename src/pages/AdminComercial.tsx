@@ -26,6 +26,17 @@ interface OverrideRow {
   id: string; org_id: string | null; user_id: string | null; feature: string;
   enabled: boolean; expires_at: string | null; reason: string | null;
 }
+interface BeniUsageRow {
+  id: string; user_id: string; org_id: string | null; source: string;
+  question_chars: number | null; created_at: string;
+}
+interface BeniQuotaRow {
+  id: string; user_id: string; period: string; allowance: number; used: number;
+}
+interface BeniCreditRow {
+  id: string; user_id: string | null; org_id: string | null; balance: number;
+  source: string; expires_at: string; reason: string | null; created_at: string;
+}
 
 export default function AdminComercial() {
   const qc = useQueryClient();
@@ -56,6 +67,72 @@ export default function AdminComercial() {
       if (error) throw error;
       return (data as unknown as OverrideRow[]) ?? [];
     },
+  });
+
+  const { data: beniUsage } = useQuery({
+    queryKey: ['admin-beni-usage'],
+    queryFn: async (): Promise<BeniUsageRow[]> => {
+      const { data, error } = await supabase
+        .from('beni_usage_log' as never)
+        .select('id, user_id, org_id, source, question_chars, created_at' as never)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data as unknown as BeniUsageRow[]) ?? [];
+    },
+  });
+
+  const { data: beniQuotas } = useQuery({
+    queryKey: ['admin-beni-quotas'],
+    queryFn: async (): Promise<BeniQuotaRow[]> => {
+      const { data, error } = await supabase
+        .from('beni_quotas' as never)
+        .select('id, user_id, period, allowance, used' as never)
+        .order('used', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data as unknown as BeniQuotaRow[]) ?? [];
+    },
+  });
+
+  const { data: beniCredits } = useQuery({
+    queryKey: ['admin-beni-credits'],
+    queryFn: async (): Promise<BeniCreditRow[]> => {
+      const { data, error } = await supabase
+        .from('beni_credits' as never)
+        .select('id, user_id, org_id, balance, source, expires_at, reason, created_at' as never)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data as unknown as BeniCreditRow[]) ?? [];
+    },
+  });
+
+  const [creditTarget, setCreditTarget] = useState<'org' | 'user'>('org');
+  const [creditOrg, setCreditOrg] = useState('');
+  const [creditUser, setCreditUser] = useState('');
+  const [creditAmount, setCreditAmount] = useState('50');
+  const [creditSource, setCreditSource] = useState('manual');
+  const [creditReason, setCreditReason] = useState('');
+
+  const grantCredits = useMutation({
+    mutationFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.rpc as any)('admin_grant_beni_credits', {
+        _target_user: creditTarget === 'user' ? creditUser : null,
+        _target_org: creditTarget === 'org' ? creditOrg : null,
+        _amount: Number(creditAmount) || 0,
+        _source: creditSource,
+        _reason: creditReason || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Créditos concedidos');
+      setCreditReason('');
+      qc.invalidateQueries({ queryKey: ['admin-beni-credits'] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const [orgId, setOrgId] = useState('');
