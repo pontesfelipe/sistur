@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Bot, ScrollText, ListOrdered, Sparkles } from 'lucide-react';
 import { BeniContextPanel } from '@/components/settings/BeniContextPanel';
@@ -20,14 +21,10 @@ export default function AdminInteligencia() {
   const defaultTab = VALID_TABS.includes(tabParam || '') ? tabParam! : 'beni';
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Inteligência</h1>
-        <p className="text-muted-foreground mt-1">
-          Professor Beni, contexto dos relatórios, camada semântica e estrutura de análise.
-        </p>
-      </div>
-
+    <AppLayout
+      title="Inteligência"
+      subtitle="Professor Beni, contexto dos relatórios, camada semântica e estrutura de análise."
+    >
       <Tabs defaultValue={defaultTab} className="w-full">
         <TabsList className="flex w-full gap-1 overflow-x-auto whitespace-nowrap justify-start">
           <TabsTrigger value="beni" className="flex items-center gap-2 shrink-0">
@@ -70,6 +67,6 @@ export default function AdminInteligencia() {
           </Suspense>
         </TabsContent>
       </Tabs>
-    </div>
+    </AppLayout>
   );
 }
