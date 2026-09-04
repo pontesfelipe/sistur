@@ -3,16 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const ERP_MODULES: { key: string; label: string; description: string }[] = [
-  { key: "diagnostico",        label: "Diagnóstico",          description: "Diagnósticos sistêmicos (RA/OE/AO)." },
-  { key: "indicadores",        label: "Indicadores",          description: "Catálogo, coleta e validação de indicadores." },
-  { key: "cadastro",           label: "Cadastro / Inventário", description: "Inventário turístico, CADASTUR, mapa de turismo." },
-  { key: "mapa_oportunidades", label: "Mapa de Oportunidades", description: "Identificação de gaps e oportunidades." },
-  { key: "certificacao",       label: "Certificação Institucional", description: "Selo SISTUR para destinos." },
-  { key: "projetos",           label: "Painel de Projetos",   description: "Gestão de projetos do destino." },
-  { key: "relatorios",         label: "Relatórios",            description: "Geração de relatórios IA." },
-  { key: "consorcios",         label: "Consórcios Regionais", description: "Módulo regional para grupos de municípios." },
-  { key: "observatorio",       label: "Observatório Turístico", description: "Fluxo, ocupação, eventos, receita, empregos." },
-  { key: "edu",                label: "EDU",                   description: "Capacitação, trilhas e certificação educacional." },
+  { key: "diagnostico",  label: "Diagnóstico",           description: "Diagnósticos sistêmicos (RA/OE/AO) e indicadores." },
+  { key: "cadastro",     label: "Cadastro / Destinos",   description: "Cadastro de destinos, inventário e CADASTUR." },
+  { key: "projetos",     label: "Painel de Projetos",    description: "Gestão de projetos do destino." },
+  { key: "relatorios",   label: "Relatórios",            description: "Geração de relatórios IA." },
+  { key: "consorcios",   label: "Consórcios Regionais",  description: "Módulo regional para grupos de municípios." },
+  { key: "observatorio", label: "Observatório Turístico", description: "Fluxo, ocupação, eventos, receita, empregos." },
+  { key: "edu",          label: "EDU",                   description: "Capacitação, trilhas e certificação educacional." },
 ];
 
 export interface OrgModuleOverride {

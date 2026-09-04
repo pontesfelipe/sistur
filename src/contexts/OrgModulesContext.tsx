@@ -9,10 +9,7 @@ import { useProfileContext } from "@/contexts/ProfileContext";
  */
 export type ModuleKey =
   | "diagnostico"
-  | "indicadores"
   | "cadastro"
-  | "mapa_oportunidades"
-  | "certificacao"
   | "projetos"
   | "relatorios"
   | "consorcios"
