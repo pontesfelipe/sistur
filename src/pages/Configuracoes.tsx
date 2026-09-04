@@ -675,6 +675,11 @@ export default function Configuracoes() {
           <TabsContent value="regras-negocio" className="space-y-6">
             <BusinessRulesPanel />
           </TabsContent>
+
+          {/* EMPACOTAMENTO TAB (admin) */}
+          <TabsContent value="empacotamento" className="space-y-6">
+            {isAdmin && <EmpacotamentoPanel />}
+          </TabsContent>
         </Tabs>
       </div>
     </AppLayout>

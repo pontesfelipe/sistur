@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 5,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.5.2",
+    date: "2026-09-04",
+    type: "patch" as const,
+    changes: [
+      "Empacotamento Modular movido para dentro de Configurações como aba própria (visível apenas para ADMIN).",
+      "A rota /admin/empacotamento agora redireciona para /configuracoes?tab=empacotamento e o item foi removido do menu lateral.",
+    ],
+  },
   {
     version: "2.5.1",
     date: "2026-09-04",
