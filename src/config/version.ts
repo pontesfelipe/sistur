@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 4,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.4.2",
+    date: "2026-09-04",
+    type: "patch" as const,
+    changes: [
+      "Configurações: nova aba 'Regras & Planos' com o modelo de negócio completo — planos oficiais, avaliação gratuita por consumo, cotas e créditos do Professor Beni, fluxos visuais da jornada de acesso e regras fixas da metodologia.",
+    ],
+  },
   {
     version: "2.3.2",
     date: "2026-09-04",
