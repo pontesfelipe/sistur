@@ -245,14 +245,16 @@ export default function Subscription() {
               const enabled = entitlements.features?.[f.key] === true;
               return (
                 <div key={f.key} className={cn(
-                  'rounded-xl border p-3 flex items-center gap-2 transition-all',
-                  enabled ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/50 bg-muted/20 opacity-60',
+                  'rounded-xl border p-3 flex items-center gap-2.5 transition-all',
+                  enabled
+                    ? 'border-emerald-500/30 bg-emerald-500/5 shadow-sm'
+                    : 'border-dashed border-border bg-muted/20 text-muted-foreground',
                 )}>
-                  <span className="text-lg">{f.icon}</span>
+                  <span className={cn('text-lg', !enabled && 'grayscale opacity-60')}>{f.icon}</span>
                   <p className="text-xs font-medium flex-1 min-w-0 truncate">{f.label}</p>
                   {enabled
-                    ? <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                    : <XCircle className="h-4 w-4 text-muted-foreground shrink-0" />}
+                    ? <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                    : <XCircle className="h-4 w-4 text-muted-foreground/60 shrink-0" />}
                 </div>
               );
             })}
