@@ -1463,6 +1463,51 @@ export type Database = {
         }
         Relationships: []
       }
+      comercial_leads: {
+        Row: {
+          audience: string | null
+          created_at: string
+          email: string
+          id: string
+          interested_plan: string | null
+          message: string | null
+          name: string
+          notes: string | null
+          organization: string | null
+          phone: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          interested_plan?: string | null
+          message?: string | null
+          name: string
+          notes?: string | null
+          organization?: string | null
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          interested_plan?: string | null
+          message?: string | null
+          name?: string
+          notes?: string | null
+          organization?: string | null
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       community_feedback: {
         Row: {
           age_group: string | null
