@@ -10,7 +10,33 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Coins, Infinity as InfinityIcon, Gift, Search, Ban } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Coins, Infinity as InfinityIcon, Gift, Search, Ban, Plus, ArrowUpDown } from 'lucide-react';
+
+type SortField = 'name' | 'org' | 'used' | 'user_credits' | 'org_credits' | 'status';
+interface SortState { field: SortField; dir: 'asc' | 'desc' }
+
+function SortHead({
+  field,
+  label,
+  sort,
+  onSort,
+}: { field: SortField; label: string; sort: SortState; onSort: (f: SortField) => void }) {
+  const active = sort.field === field;
+  return (
+    <TableHead>
+      <button
+        type="button"
+        onClick={() => onSort(field)}
+        className={`inline-flex items-center gap-1 ${active ? 'text-foreground font-medium' : ''}`}
+      >
+        {label}
+        <ArrowUpDown className="h-3 w-3 opacity-60" />
+        {active && <span className="text-xs">{sort.dir === 'asc' ? '↑' : '↓'}</span>}
+      </button>
+    </TableHead>
+  );
+}
 
 interface OverviewRow {
   user_id: string;
