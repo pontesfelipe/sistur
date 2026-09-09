@@ -2051,6 +2051,7 @@ async function runTwoPhasePipeline(args: {
           })
         : null;
       if (budget) onStage('claude_budget_pillar', { pillar: p, ...budget });
+      const firstBudget = budget ? budget.maxTokens : 8000;
       return callProviderNonStreaming({
         provider,
         systemPrompt: sp,
@@ -2058,8 +2059,26 @@ async function runTwoPhasePipeline(args: {
         lovableApiKey,
         anthropicApiKey,
         signal: controller.signal,
-        maxTokens: budget ? budget.maxTokens : 8000,
-      }).then((res) => {
+        maxTokens: firstBudget,
+      }).then(async (res) => {
+        // v2.6.1 — uma única retentativa com orçamento maior quando o texto
+        // foi cortado por limite de tokens. Antes, a truncagem derrubava o
+        // pipeline inteiro e o job estourava o timeout.
+        if (!res.ok && /truncated/i.test(res.reason) && !controller.signal.aborted) {
+          const retryBudget = Math.min(CLAUDE_HARD_OUTPUT_CAP, Math.round(firstBudget * 1.8));
+          if (retryBudget > firstBudget) {
+            onStage('pillar_retry_bigger_budget', { pillar: p, from: firstBudget, to: retryBudget });
+            res = await callProviderNonStreaming({
+              provider,
+              systemPrompt: sp,
+              userPrompt: up,
+              lovableApiKey,
+              anthropicApiKey,
+              signal: controller.signal,
+              maxTokens: retryBudget,
+            });
+          }
+        }
         if (res.ok && onPillarReady) {
           try { onPillarReady(p, res.content); } catch { /* ignore */ }
         }
