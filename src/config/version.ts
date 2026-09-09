@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 6,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.6.1",
+    date: "2026-09-09",
+    type: "patch" as const,
+    changes: [
+      "Organizações antigas criadas automaticamente no cadastro (Rafael, Christiana, Felipe e Usuário Demo) foram removidas e seu conteúdo movido para a organização SISTUR.",
+      "Tabela de Créditos Beni: ordenação por qualquer coluna, filtro por organização e adição de créditos direto na linha.",
+      "Seleção múltipla na tabela de Créditos Beni para adicionar a mesma quantidade de créditos a vários usuários de uma vez.",
+    ],
+  },
   {
     version: "2.6.0",
     date: "2026-09-09",
