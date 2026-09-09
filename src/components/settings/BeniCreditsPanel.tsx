@@ -10,7 +10,33 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Coins, Infinity as InfinityIcon, Gift, Search, Ban } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Coins, Infinity as InfinityIcon, Gift, Search, Ban, Plus, ArrowUpDown } from 'lucide-react';
+
+type SortField = 'name' | 'org' | 'used' | 'user_credits' | 'org_credits' | 'status';
+interface SortState { field: SortField; dir: 'asc' | 'desc' }
+
+function SortHead({
+  field,
+  label,
+  sort,
+  onSort,
+}: { field: SortField; label: string; sort: SortState; onSort: (f: SortField) => void }) {
+  const active = sort.field === field;
+  return (
+    <TableHead>
+      <button
+        type="button"
+        onClick={() => onSort(field)}
+        className={`inline-flex items-center gap-1 ${active ? 'text-foreground font-medium' : ''}`}
+      >
+        {label}
+        <ArrowUpDown className="h-3 w-3 opacity-60" />
+        {active && <span className="text-xs">{sort.dir === 'asc' ? '↑' : '↓'}</span>}
+      </button>
+    </TableHead>
+  );
+}
 
 interface OverviewRow {
   user_id: string;
@@ -166,6 +192,99 @@ export function BeniCreditsPanel() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // tabela: filtro por organização, ordenação e concessão por linha/lote
+  const [orgFilter, setOrgFilter] = useState('all');
+  const [sort, setSort] = useState<SortState>({ field: 'name', dir: 'asc' });
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [rowAmounts, setRowAmounts] = useState<Record<string, string>>({});
+  const [bulkAmount, setBulkAmount] = useState('50');
+
+  const toggleSort = (field: SortField) =>
+    setSort((p) => (p.field === field ? { field, dir: p.dir === 'asc' ? 'desc' : 'asc' } : { field, dir: 'asc' }));
+
+  const toggleSelected = (id: string) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+
+  const orgOptions = useMemo(() => {
+    const m = new Map<string, string>();
+    overview?.forEach((r) => { if (r.org_id) m.set(r.org_id, r.org_name || 'Organização'); });
+    return Array.from(m, ([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [overview]);
+
+  const rows = useMemo(() => {
+    let list = overview ?? [];
+    if (orgFilter === 'none') list = list.filter((r) => !r.org_id);
+    else if (orgFilter !== 'all') list = list.filter((r) => r.org_id === orgFilter);
+    const dir = sort.dir === 'asc' ? 1 : -1;
+    const key = (r: OverviewRow) => {
+      switch (sort.field) {
+        case 'org': return (r.org_name || '').toLowerCase();
+        case 'used': return r.used;
+        case 'user_credits': return r.user_credits;
+        case 'org_credits': return r.org_credits;
+        case 'status': return r.unlimited ? 1 : 0;
+        default: return (r.full_name || r.email || '').toLowerCase();
+      }
+    };
+    return [...list].sort((a, b) => {
+      const ka = key(a); const kb = key(b);
+      if (ka === kb) return 0;
+      return ka > kb ? dir : -dir;
+    });
+  }, [overview, orgFilter, sort]);
+
+  const allSelected = rows.length > 0 && rows.every((r) => selectedIds.has(r.user_id));
+
+  const grantCredits = async (userId: string, value: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.rpc as any)('admin_grant_beni_credits', {
+      _target_user: userId,
+      _target_org: null,
+      _amount: value,
+      _source: 'manual',
+      _reason: 'ajuste rápido no painel',
+      _expires_at: null,
+      _campaign: null,
+    });
+    if (error) throw error;
+  };
+
+  const refreshOverview = () => qc.invalidateQueries({ queryKey: ['beni-overview'] });
+
+  const rowGrant = useMutation({
+    mutationFn: async ({ userId, amount: value }: { userId: string; amount: number }) => {
+      if (!value || value <= 0) throw new Error('Informe uma quantidade maior que zero');
+      await grantCredits(userId, value);
+      return userId;
+    },
+    onSuccess: (userId) => {
+      toast.success('Créditos adicionados');
+      setRowAmounts((p) => ({ ...p, [userId]: '' }));
+      refreshOverview();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const bulkGrant = useMutation({
+    mutationFn: async () => {
+      const value = Number(bulkAmount);
+      if (!value || value <= 0) throw new Error('Informe uma quantidade maior que zero');
+      for (const id of selectedIds) await grantCredits(id, value);
+      return selectedIds.size;
+    },
+    onSuccess: (count) => {
+      toast.success(`Créditos adicionados para ${count} usuário(s)`);
+      setSelectedIds(new Set());
+      refreshOverview();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   const canSubmit =
     (target === 'user' ? !!targetUser.trim() : !!targetOrg) &&
     (grantKind === 'unlimited' || Number(amount) > 0) &&
@@ -307,19 +426,57 @@ export function BeniCreditsPanel() {
         <CardHeader className="space-y-3">
           <div>
             <CardTitle className="text-base">Créditos por usuário</CardTitle>
-            <CardDescription>Consumo do mês atual, créditos disponíveis e liberações ilimitadas.</CardDescription>
+            <CardDescription>
+              Consumo do mês atual, créditos disponíveis e liberações ilimitadas. Clique nos títulos das colunas para
+              ordenar, filtre por organização e adicione créditos direto na linha ou para vários de uma vez.
+            </CardDescription>
           </div>
-          <div className="flex gap-2">
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && setAppliedSearch(search)}
-              placeholder="Buscar por nome, e-mail ou organização"
-            />
-            <Button variant="outline" onClick={() => setAppliedSearch(search)}>
-              <Search className="h-4 w-4" />
-            </Button>
+          <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex gap-2 flex-1">
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && setAppliedSearch(search)}
+                placeholder="Buscar por nome, e-mail ou organização"
+              />
+              <Button variant="outline" onClick={() => setAppliedSearch(search)}>
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+            <Select value={orgFilter} onValueChange={setOrgFilter}>
+              <SelectTrigger className="md:w-72"><SelectValue placeholder="Todas as organizações" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as organizações</SelectItem>
+                <SelectItem value="none">Sem organização</SelectItem>
+                {orgOptions.map((o) => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
+          {selectedIds.size > 0 && (
+            <div className="flex flex-wrap items-end gap-2 rounded-md border bg-muted/40 p-3">
+              <div className="text-sm text-muted-foreground">
+                {selectedIds.size} selecionado(s)
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Adicionar créditos</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  className="w-32"
+                  value={bulkAmount}
+                  onChange={(e) => setBulkAmount(e.target.value)}
+                />
+              </div>
+              <Button
+                size="sm"
+                disabled={bulkGrant.isPending || Number(bulkAmount) <= 0}
+                onClick={() => bulkGrant.mutate()}
+              >
+                <Plus className="h-4 w-4 mr-1" /> Aplicar a todos
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())}>Limpar seleção</Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -329,17 +486,34 @@ export function BeniCreditsPanel() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Pessoa</TableHead>
-                    <TableHead>Organização</TableHead>
-                    <TableHead>Uso no mês</TableHead>
-                    <TableHead>Créditos próprios</TableHead>
-                    <TableHead>Créditos da organização</TableHead>
-                    <TableHead>Situação</TableHead>
+                    <TableHead className="w-10">
+                      <Checkbox
+                        checked={allSelected}
+                        onCheckedChange={(v) =>
+                          setSelectedIds(v ? new Set(rows.map((r) => r.user_id)) : new Set())
+                        }
+                        aria-label="Selecionar todos"
+                      />
+                    </TableHead>
+                    <SortHead field="name" label="Pessoa" sort={sort} onSort={toggleSort} />
+                    <SortHead field="org" label="Organização" sort={sort} onSort={toggleSort} />
+                    <SortHead field="used" label="Uso no mês" sort={sort} onSort={toggleSort} />
+                    <SortHead field="user_credits" label="Créditos próprios" sort={sort} onSort={toggleSort} />
+                    <SortHead field="org_credits" label="Créditos da organização" sort={sort} onSort={toggleSort} />
+                    <SortHead field="status" label="Situação" sort={sort} onSort={toggleSort} />
+                    <TableHead className="text-right">Adicionar créditos</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {overview?.map((r) => (
+                  {rows.map((r) => (
                     <TableRow key={r.user_id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.has(r.user_id)}
+                          onCheckedChange={() => toggleSelected(r.user_id)}
+                          aria-label="Selecionar usuário"
+                        />
+                      </TableCell>
                       <TableCell>
                         <div className="font-medium">{r.full_name || '—'}</div>
                         <div className="text-xs text-muted-foreground">{r.email}</div>
@@ -360,11 +534,36 @@ export function BeniCreditsPanel() {
                           <Badge variant="outline">Cota do plano</Badge>
                         )}
                       </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1">
+                          <Input
+                            type="number"
+                            min={1}
+                            className="h-8 w-20"
+                            value={rowAmounts[r.user_id] ?? ''}
+                            placeholder="50"
+                            onChange={(e) => setRowAmounts((p) => ({ ...p, [r.user_id]: e.target.value }))}
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={rowGrant.isPending}
+                            onClick={() =>
+                              rowGrant.mutate({
+                                userId: r.user_id,
+                                amount: Number(rowAmounts[r.user_id] || 50),
+                              })
+                            }
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
-                  {!overview?.length && (
+                  {!rows.length && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-muted-foreground">Nenhum usuário encontrado.</TableCell>
+                      <TableCell colSpan={8} className="text-muted-foreground">Nenhum usuário encontrado.</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -373,6 +572,7 @@ export function BeniCreditsPanel() {
           )}
         </CardContent>
       </Card>
+
 
       <Card>
         <CardHeader>
