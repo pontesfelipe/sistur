@@ -30,8 +30,9 @@ import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
 import { EmpacotamentoPanel } from '@/components/settings/EmpacotamentoPanel';
+import { BeniCreditsPanel } from '@/components/settings/BeniCreditsPanel';
 import { useSearchParams } from 'react-router-dom';
-import { Package } from 'lucide-react';
+import { Package, Coins } from 'lucide-react';
 
 import { BusinessRulesPanel } from '@/components/settings/BusinessRulesPanel';
 import { ModuleLibrary } from '@/components/settings/ModuleLibrary';
@@ -151,7 +152,7 @@ export default function Configuracoes() {
   const { isAdmin, isOrgAdmin } = useProfile();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
-  const allowedTabs = ['geral', 'usuarios', 'feedback', 'logs', 'documentacao', 'biblioteca', 'ferramentas', 'regras-negocio', 'empacotamento'];
+  const allowedTabs = ['geral', 'usuarios', 'feedback', 'logs', 'documentacao', 'biblioteca', 'ferramentas', 'regras-negocio', 'empacotamento', 'creditos-beni'];
   const activeTab = tabParam && allowedTabs.includes(tabParam) ? tabParam : 'geral';
   const handleTabChange = (value: string) => {
     if (value === 'geral') {
@@ -217,6 +218,12 @@ export default function Configuracoes() {
               <TabsTrigger value="empacotamento" className="flex items-center gap-2 shrink-0">
                 <Package className="h-4 w-4" />
                 <span className="hidden sm:inline">Empacotamento</span>
+              </TabsTrigger>
+            )}
+            {isAdmin && (
+              <TabsTrigger value="creditos-beni" className="flex items-center gap-2 shrink-0">
+                <Coins className="h-4 w-4" />
+                <span className="hidden sm:inline">Créditos Beni</span>
               </TabsTrigger>
             )}
           </TabsList>
@@ -679,6 +686,11 @@ export default function Configuracoes() {
           {/* EMPACOTAMENTO TAB (admin) */}
           <TabsContent value="empacotamento" className="space-y-6">
             {isAdmin && <EmpacotamentoPanel />}
+          </TabsContent>
+
+          {/* CREDITOS BENI TAB (admin) */}
+          <TabsContent value="creditos-beni" className="space-y-6">
+            {isAdmin && <BeniCreditsPanel />}
           </TabsContent>
         </Tabs>
       </div>

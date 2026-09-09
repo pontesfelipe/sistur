@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 5,
-  patch: 3,
+  minor: 6,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.6.0",
+    date: "2026-09-09",
+    type: "minor" as const,
+    changes: [
+      "Nova aba 'Créditos Beni' em Configurações (ADMIN): visão por usuário do consumo mensal, créditos próprios e da organização.",
+      "Concessão de créditos promocionais por usuário ou para a organização inteira, com validade personalizada e rótulo de campanha.",
+      "Liberação de acesso ilimitado ao Professor Beni por período determinado ou por tempo indeterminado, com revogação.",
+    ],
+  },
   {
     version: "2.5.3",
     date: "2026-09-04",
