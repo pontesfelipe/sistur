@@ -1979,7 +1979,10 @@ async function callProviderNonStreaming(args: {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
-        max_tokens: maxTokens,
+        // v2.6.1 — GPT-5 é modelo de raciocínio: os tokens de reasoning saem
+        // do mesmo orçamento e, com limite justo, a resposta volta vazia
+        // (sintoma "gpt5 empty content (0)"). Damos folga extra ao fallback.
+        max_completion_tokens: provider === 'gpt5' ? Math.min(32_000, maxTokens + 8_000) : maxTokens,
       }),
       signal,
     });
