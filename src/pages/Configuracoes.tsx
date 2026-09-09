@@ -30,6 +30,7 @@ import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
 import { EmpacotamentoPanel } from '@/components/settings/EmpacotamentoPanel';
+import { BeniCreditsPanel } from '@/components/settings/BeniCreditsPanel';
 import { useSearchParams } from 'react-router-dom';
 import { Package } from 'lucide-react';
 
