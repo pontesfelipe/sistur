@@ -1777,6 +1777,7 @@ const CLAUDE_MAX_CONTEXT_TOKENS = 200_000;
 // "concluído" porque a truncagem por max_tokens passava silenciosamente).
 const CLAUDE_HARD_OUTPUT_CAP = 32_000;
 const CLAUDE_MIN_OUTPUT = 2_500;
+const CLAUDE_MIN_PILLAR_OUTPUT = 8_000;
 const CLAUDE_INPUT_SAFETY_TOKENS = 8_000; // margem para tool-use / metadata
 
 /** Estimativa conservadora (1 token ≈ 3.6 chars em PT-BR + markdown).
@@ -1831,7 +1832,10 @@ function pickClaudeBudget(args: {
   let base: number;
   if (phase === 'pillar') {
     // 1 dos 3 pilares — escopo restrito a ~1/3 dos indicadores.
-    base = 3_500;
+    // v2.6.1: base elevada de 3.5k → 7k. Com tier/template multipliers o
+    // orçamento caía para ~4.3k e o capítulo do pilar RA era cortado no meio
+    // (stop_reason=max_tokens, 12.596 chars), derrubando o job inteiro.
+    base = 7_000;
   } else if (phase === 'envelope') {
     // Envelope cobre intro + ficha + metodologia + benchmarks + prognóstico
     // + plano de ação + referências; é a chamada mais longa. v1.66.13: base
@@ -1862,6 +1866,11 @@ function pickClaudeBudget(args: {
   // do proxy de edge function em janelas longas.
   if (maxTokens > CLAUDE_HARD_OUTPUT_CAP) maxTokens = CLAUDE_HARD_OUTPUT_CAP;
   if (maxTokens < CLAUDE_MIN_OUTPUT) maxTokens = CLAUDE_MIN_OUTPUT;
+  // v2.6.1 — piso específico do capítulo de pilar: abaixo disso o texto sai
+  // cortado no meio e o pipeline inteiro falha (não há fallback parcial).
+  if (phase === 'pillar' && maxTokens < CLAUDE_MIN_PILLAR_OUTPUT && available > CLAUDE_MIN_PILLAR_OUTPUT) {
+    maxTokens = CLAUDE_MIN_PILLAR_OUTPUT;
+  }
 
   return {
     maxTokens,
@@ -1970,7 +1979,10 @@ async function callProviderNonStreaming(args: {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
-        max_tokens: maxTokens,
+        // v2.6.1 — GPT-5 é modelo de raciocínio: os tokens de reasoning saem
+        // do mesmo orçamento e, com limite justo, a resposta volta vazia
+        // (sintoma "gpt5 empty content (0)"). Damos folga extra ao fallback.
+        max_completion_tokens: provider === 'gpt5' ? Math.min(32_000, maxTokens + 8_000) : maxTokens,
       }),
       signal,
     });
@@ -2042,6 +2054,7 @@ async function runTwoPhasePipeline(args: {
           })
         : null;
       if (budget) onStage('claude_budget_pillar', { pillar: p, ...budget });
+      const firstBudget = budget ? budget.maxTokens : 8000;
       return callProviderNonStreaming({
         provider,
         systemPrompt: sp,
@@ -2049,8 +2062,26 @@ async function runTwoPhasePipeline(args: {
         lovableApiKey,
         anthropicApiKey,
         signal: controller.signal,
-        maxTokens: budget ? budget.maxTokens : 8000,
-      }).then((res) => {
+        maxTokens: firstBudget,
+      }).then(async (res) => {
+        // v2.6.1 — uma única retentativa com orçamento maior quando o texto
+        // foi cortado por limite de tokens. Antes, a truncagem derrubava o
+        // pipeline inteiro e o job estourava o timeout.
+        if (!res.ok && /truncated/i.test(res.reason) && !controller.signal.aborted) {
+          const retryBudget = Math.min(CLAUDE_HARD_OUTPUT_CAP, Math.round(firstBudget * 1.8));
+          if (retryBudget > firstBudget) {
+            onStage('pillar_retry_bigger_budget', { pillar: p, from: firstBudget, to: retryBudget });
+            res = await callProviderNonStreaming({
+              provider,
+              systemPrompt: sp,
+              userPrompt: up,
+              lovableApiKey,
+              anthropicApiKey,
+              signal: controller.signal,
+              maxTokens: retryBudget,
+            });
+          }
+        }
         if (res.ok && onPillarReady) {
           try { onPillarReady(p, res.content); } catch { /* ignore */ }
         }

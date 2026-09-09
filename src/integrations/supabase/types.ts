@@ -11972,29 +11972,18 @@ export type Database = {
           user_id: string
         }[]
       }
-      admin_grant_beni_credits:
-        | {
-            Args: {
-              _amount?: number
-              _reason?: string
-              _source?: string
-              _target_org?: string
-              _target_user?: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              _amount?: number
-              _campaign?: string
-              _expires_at?: string
-              _reason?: string
-              _source?: string
-              _target_org?: string
-              _target_user?: string
-            }
-            Returns: Json
-          }
+      admin_grant_beni_credits: {
+        Args: {
+          _amount?: number
+          _campaign?: string
+          _expires_at?: string
+          _reason?: string
+          _source?: string
+          _target_org?: string
+          _target_user?: string
+        }
+        Returns: Json
+      }
       admin_grant_beni_unlimited: {
         Args: {
           _campaign?: string
