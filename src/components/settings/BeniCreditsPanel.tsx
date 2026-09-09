@@ -307,19 +307,57 @@ export function BeniCreditsPanel() {
         <CardHeader className="space-y-3">
           <div>
             <CardTitle className="text-base">Créditos por usuário</CardTitle>
-            <CardDescription>Consumo do mês atual, créditos disponíveis e liberações ilimitadas.</CardDescription>
+            <CardDescription>
+              Consumo do mês atual, créditos disponíveis e liberações ilimitadas. Clique nos títulos das colunas para
+              ordenar, filtre por organização e adicione créditos direto na linha ou para vários de uma vez.
+            </CardDescription>
           </div>
-          <div className="flex gap-2">
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && setAppliedSearch(search)}
-              placeholder="Buscar por nome, e-mail ou organização"
-            />
-            <Button variant="outline" onClick={() => setAppliedSearch(search)}>
-              <Search className="h-4 w-4" />
-            </Button>
+          <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex gap-2 flex-1">
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && setAppliedSearch(search)}
+                placeholder="Buscar por nome, e-mail ou organização"
+              />
+              <Button variant="outline" onClick={() => setAppliedSearch(search)}>
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+            <Select value={orgFilter} onValueChange={setOrgFilter}>
+              <SelectTrigger className="md:w-72"><SelectValue placeholder="Todas as organizações" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as organizações</SelectItem>
+                <SelectItem value="none">Sem organização</SelectItem>
+                {orgOptions.map((o) => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
+          {selectedIds.size > 0 && (
+            <div className="flex flex-wrap items-end gap-2 rounded-md border bg-muted/40 p-3">
+              <div className="text-sm text-muted-foreground">
+                {selectedIds.size} selecionado(s)
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Adicionar créditos</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  className="w-32"
+                  value={bulkAmount}
+                  onChange={(e) => setBulkAmount(e.target.value)}
+                />
+              </div>
+              <Button
+                size="sm"
+                disabled={bulkGrant.isPending || Number(bulkAmount) <= 0}
+                onClick={() => bulkGrant.mutate()}
+              >
+                <Plus className="h-4 w-4 mr-1" /> Aplicar a todos
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())}>Limpar seleção</Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -329,17 +367,34 @@ export function BeniCreditsPanel() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Pessoa</TableHead>
-                    <TableHead>Organização</TableHead>
-                    <TableHead>Uso no mês</TableHead>
-                    <TableHead>Créditos próprios</TableHead>
-                    <TableHead>Créditos da organização</TableHead>
-                    <TableHead>Situação</TableHead>
+                    <TableHead className="w-10">
+                      <Checkbox
+                        checked={allSelected}
+                        onCheckedChange={(v) =>
+                          setSelectedIds(v ? new Set(rows.map((r) => r.user_id)) : new Set())
+                        }
+                        aria-label="Selecionar todos"
+                      />
+                    </TableHead>
+                    <SortHead field="name" label="Pessoa" sort={sort} onSort={toggleSort} />
+                    <SortHead field="org" label="Organização" sort={sort} onSort={toggleSort} />
+                    <SortHead field="used" label="Uso no mês" sort={sort} onSort={toggleSort} />
+                    <SortHead field="user_credits" label="Créditos próprios" sort={sort} onSort={toggleSort} />
+                    <SortHead field="org_credits" label="Créditos da organização" sort={sort} onSort={toggleSort} />
+                    <SortHead field="status" label="Situação" sort={sort} onSort={toggleSort} />
+                    <TableHead className="text-right">Adicionar créditos</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {overview?.map((r) => (
+                  {rows.map((r) => (
                     <TableRow key={r.user_id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.has(r.user_id)}
+                          onCheckedChange={() => toggleSelected(r.user_id)}
+                          aria-label="Selecionar usuário"
+                        />
+                      </TableCell>
                       <TableCell>
                         <div className="font-medium">{r.full_name || '—'}</div>
                         <div className="text-xs text-muted-foreground">{r.email}</div>
@@ -360,11 +415,36 @@ export function BeniCreditsPanel() {
                           <Badge variant="outline">Cota do plano</Badge>
                         )}
                       </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1">
+                          <Input
+                            type="number"
+                            min={1}
+                            className="h-8 w-20"
+                            value={rowAmounts[r.user_id] ?? ''}
+                            placeholder="50"
+                            onChange={(e) => setRowAmounts((p) => ({ ...p, [r.user_id]: e.target.value }))}
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={rowGrant.isPending}
+                            onClick={() =>
+                              rowGrant.mutate({
+                                userId: r.user_id,
+                                amount: Number(rowAmounts[r.user_id] || 50),
+                              })
+                            }
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
-                  {!overview?.length && (
+                  {!rows.length && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-muted-foreground">Nenhum usuário encontrado.</TableCell>
+                      <TableCell colSpan={8} className="text-muted-foreground">Nenhum usuário encontrado.</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -373,6 +453,7 @@ export function BeniCreditsPanel() {
           )}
         </CardContent>
       </Card>
+
 
       <Card>
         <CardHeader>
