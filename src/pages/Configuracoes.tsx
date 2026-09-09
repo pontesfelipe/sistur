@@ -32,7 +32,7 @@ import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/setting
 import { EmpacotamentoPanel } from '@/components/settings/EmpacotamentoPanel';
 import { BeniCreditsPanel } from '@/components/settings/BeniCreditsPanel';
 import { useSearchParams } from 'react-router-dom';
-import { Package } from 'lucide-react';
+import { Package, Coins } from 'lucide-react';
 
 import { BusinessRulesPanel } from '@/components/settings/BusinessRulesPanel';
 import { ModuleLibrary } from '@/components/settings/ModuleLibrary';
