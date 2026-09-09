@@ -687,6 +687,11 @@ export default function Configuracoes() {
           <TabsContent value="empacotamento" className="space-y-6">
             {isAdmin && <EmpacotamentoPanel />}
           </TabsContent>
+
+          {/* CREDITOS BENI TAB (admin) */}
+          <TabsContent value="creditos-beni" className="space-y-6">
+            {isAdmin && <BeniCreditsPanel />}
+          </TabsContent>
         </Tabs>
       </div>
     </AppLayout>
