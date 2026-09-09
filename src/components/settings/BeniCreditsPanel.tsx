@@ -192,6 +192,99 @@ export function BeniCreditsPanel() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // tabela: filtro por organização, ordenação e concessão por linha/lote
+  const [orgFilter, setOrgFilter] = useState('all');
+  const [sort, setSort] = useState<SortState>({ field: 'name', dir: 'asc' });
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [rowAmounts, setRowAmounts] = useState<Record<string, string>>({});
+  const [bulkAmount, setBulkAmount] = useState('50');
+
+  const toggleSort = (field: SortField) =>
+    setSort((p) => (p.field === field ? { field, dir: p.dir === 'asc' ? 'desc' : 'asc' } : { field, dir: 'asc' }));
+
+  const toggleSelected = (id: string) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+
+  const orgOptions = useMemo(() => {
+    const m = new Map<string, string>();
+    overview?.forEach((r) => { if (r.org_id) m.set(r.org_id, r.org_name || 'Organização'); });
+    return Array.from(m, ([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [overview]);
+
+  const rows = useMemo(() => {
+    let list = overview ?? [];
+    if (orgFilter === 'none') list = list.filter((r) => !r.org_id);
+    else if (orgFilter !== 'all') list = list.filter((r) => r.org_id === orgFilter);
+    const dir = sort.dir === 'asc' ? 1 : -1;
+    const key = (r: OverviewRow) => {
+      switch (sort.field) {
+        case 'org': return (r.org_name || '').toLowerCase();
+        case 'used': return r.used;
+        case 'user_credits': return r.user_credits;
+        case 'org_credits': return r.org_credits;
+        case 'status': return r.unlimited ? 1 : 0;
+        default: return (r.full_name || r.email || '').toLowerCase();
+      }
+    };
+    return [...list].sort((a, b) => {
+      const ka = key(a); const kb = key(b);
+      if (ka === kb) return 0;
+      return ka > kb ? dir : -dir;
+    });
+  }, [overview, orgFilter, sort]);
+
+  const allSelected = rows.length > 0 && rows.every((r) => selectedIds.has(r.user_id));
+
+  const grantCredits = async (userId: string, value: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.rpc as any)('admin_grant_beni_credits', {
+      _target_user: userId,
+      _target_org: null,
+      _amount: value,
+      _source: 'manual',
+      _reason: 'ajuste rápido no painel',
+      _expires_at: null,
+      _campaign: null,
+    });
+    if (error) throw error;
+  };
+
+  const refreshOverview = () => qc.invalidateQueries({ queryKey: ['beni-overview'] });
+
+  const rowGrant = useMutation({
+    mutationFn: async ({ userId, amount: value }: { userId: string; amount: number }) => {
+      if (!value || value <= 0) throw new Error('Informe uma quantidade maior que zero');
+      await grantCredits(userId, value);
+      return userId;
+    },
+    onSuccess: (userId) => {
+      toast.success('Créditos adicionados');
+      setRowAmounts((p) => ({ ...p, [userId]: '' }));
+      refreshOverview();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const bulkGrant = useMutation({
+    mutationFn: async () => {
+      const value = Number(bulkAmount);
+      if (!value || value <= 0) throw new Error('Informe uma quantidade maior que zero');
+      for (const id of selectedIds) await grantCredits(id, value);
+      return selectedIds.size;
+    },
+    onSuccess: (count) => {
+      toast.success(`Créditos adicionados para ${count} usuário(s)`);
+      setSelectedIds(new Set());
+      refreshOverview();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   const canSubmit =
     (target === 'user' ? !!targetUser.trim() : !!targetOrg) &&
     (grantKind === 'unlimited' || Number(amount) > 0) &&
