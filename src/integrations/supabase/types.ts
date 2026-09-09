@@ -767,6 +767,7 @@ export type Database = {
       beni_credits: {
         Row: {
           balance: number
+          campaign: string | null
           created_at: string
           created_by: string | null
           expires_at: string
@@ -778,6 +779,7 @@ export type Database = {
         }
         Insert: {
           balance?: number
+          campaign?: string | null
           created_at?: string
           created_by?: string | null
           expires_at?: string
@@ -789,6 +791,7 @@ export type Database = {
         }
         Update: {
           balance?: number
+          campaign?: string | null
           created_at?: string
           created_by?: string | null
           expires_at?: string
@@ -870,6 +873,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      beni_unlimited_grants: {
+        Row: {
+          campaign: string | null
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          org_id: string | null
+          reason: string | null
+          revoked_at: string | null
+          starts_at: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          campaign?: string | null
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          org_id?: string | null
+          reason?: string | null
+          revoked_at?: string | null
+          starts_at?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          campaign?: string | null
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          org_id?: string | null
+          reason?: string | null
+          revoked_at?: string | null
+          starts_at?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beni_unlimited_grants_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       beni_usage_log: {
         Row: {
@@ -11837,6 +11890,10 @@ export type Database = {
       }
     }
     Functions: {
+      _beni_has_unlimited: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       _beni_resolve_allowance: {
         Args: { _org_id: string; _user_id: string }
         Returns: {
@@ -11878,6 +11935,23 @@ export type Database = {
         Returns: boolean
       }
       admin_approve_user: { Args: { _user_id: string }; Returns: boolean }
+      admin_beni_overview: {
+        Args: { _limit?: number; _search?: string }
+        Returns: {
+          allowance: number
+          email: string
+          full_name: string
+          org_credits: number
+          org_id: string
+          org_name: string
+          period: string
+          unlimited: boolean
+          unlimited_expires_at: string
+          used: number
+          user_credits: number
+          user_id: string
+        }[]
+      }
       admin_cancel_license: {
         Args: { p_license_id: string; p_reason: string }
         Returns: undefined
@@ -11898,11 +11972,34 @@ export type Database = {
           user_id: string
         }[]
       }
-      admin_grant_beni_credits: {
+      admin_grant_beni_credits:
+        | {
+            Args: {
+              _amount?: number
+              _reason?: string
+              _source?: string
+              _target_org?: string
+              _target_user?: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _amount?: number
+              _campaign?: string
+              _expires_at?: string
+              _reason?: string
+              _source?: string
+              _target_org?: string
+              _target_user?: string
+            }
+            Returns: Json
+          }
+      admin_grant_beni_unlimited: {
         Args: {
-          _amount?: number
+          _campaign?: string
+          _expires_at?: string
           _reason?: string
-          _source?: string
           _target_org?: string
           _target_user?: string
         }
@@ -11915,6 +12012,10 @@ export type Database = {
           last_sign_in_at: string
           user_id: string
         }[]
+      }
+      admin_revoke_beni_unlimited: {
+        Args: { _grant_id: string }
+        Returns: Json
       }
       can_comment_on_org: {
         Args: { p_org_id: string; p_user_id?: string }
