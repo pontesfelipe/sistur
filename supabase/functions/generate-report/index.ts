@@ -1865,6 +1865,11 @@ function pickClaudeBudget(args: {
   // do proxy de edge function em janelas longas.
   if (maxTokens > CLAUDE_HARD_OUTPUT_CAP) maxTokens = CLAUDE_HARD_OUTPUT_CAP;
   if (maxTokens < CLAUDE_MIN_OUTPUT) maxTokens = CLAUDE_MIN_OUTPUT;
+  // v2.6.1 — piso específico do capítulo de pilar: abaixo disso o texto sai
+  // cortado no meio e o pipeline inteiro falha (não há fallback parcial).
+  if (phase === 'pillar' && maxTokens < CLAUDE_MIN_PILLAR_OUTPUT && available > CLAUDE_MIN_PILLAR_OUTPUT) {
+    maxTokens = CLAUDE_MIN_PILLAR_OUTPUT;
+  }
 
   return {
     maxTokens,
