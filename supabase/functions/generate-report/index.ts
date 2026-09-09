@@ -1831,7 +1831,10 @@ function pickClaudeBudget(args: {
   let base: number;
   if (phase === 'pillar') {
     // 1 dos 3 pilares — escopo restrito a ~1/3 dos indicadores.
-    base = 3_500;
+    // v2.6.1: base elevada de 3.5k → 7k. Com tier/template multipliers o
+    // orçamento caía para ~4.3k e o capítulo do pilar RA era cortado no meio
+    // (stop_reason=max_tokens, 12.596 chars), derrubando o job inteiro.
+    base = 7_000;
   } else if (phase === 'envelope') {
     // Envelope cobre intro + ficha + metodologia + benchmarks + prognóstico
     // + plano de ação + referências; é a chamada mais longa. v1.66.13: base
