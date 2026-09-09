@@ -220,6 +220,12 @@ export default function Configuracoes() {
                 <span className="hidden sm:inline">Empacotamento</span>
               </TabsTrigger>
             )}
+            {isAdmin && (
+              <TabsTrigger value="creditos-beni" className="flex items-center gap-2 shrink-0">
+                <Coins className="h-4 w-4" />
+                <span className="hidden sm:inline">Créditos Beni</span>
+              </TabsTrigger>
+            )}
           </TabsList>
 
           {/* GERAL TAB */}
