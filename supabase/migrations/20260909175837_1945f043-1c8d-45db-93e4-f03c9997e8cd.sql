@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.admin_grant_beni_credits(uuid, uuid, integer, text, text);
