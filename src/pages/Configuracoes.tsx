@@ -152,7 +152,7 @@ export default function Configuracoes() {
   const { isAdmin, isOrgAdmin } = useProfile();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
-  const allowedTabs = ['geral', 'usuarios', 'feedback', 'logs', 'documentacao', 'biblioteca', 'ferramentas', 'regras-negocio', 'empacotamento'];
+  const allowedTabs = ['geral', 'usuarios', 'feedback', 'logs', 'documentacao', 'biblioteca', 'ferramentas', 'regras-negocio', 'empacotamento', 'creditos-beni'];
   const activeTab = tabParam && allowedTabs.includes(tabParam) ? tabParam : 'geral';
   const handleTabChange = (value: string) => {
     if (value === 'geral') {
