@@ -1777,6 +1777,7 @@ const CLAUDE_MAX_CONTEXT_TOKENS = 200_000;
 // "concluído" porque a truncagem por max_tokens passava silenciosamente).
 const CLAUDE_HARD_OUTPUT_CAP = 32_000;
 const CLAUDE_MIN_OUTPUT = 2_500;
+const CLAUDE_MIN_PILLAR_OUTPUT = 8_000;
 const CLAUDE_INPUT_SAFETY_TOKENS = 8_000; // margem para tool-use / metadata
 
 /** Estimativa conservadora (1 token ≈ 3.6 chars em PT-BR + markdown).
