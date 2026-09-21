@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type RefObject } from 'react';
+import { useState, useRef, useEffect, useMemo, type RefObject } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { exportReportAsDocx } from '@/lib/exportReportDocx';
 import { getStatusStyle, mapIndicatorTableColumns, normalizeStatusCellText, realignIndicatorRow } from '@/lib/reportStatusStyle';
@@ -50,6 +50,7 @@ import {
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 import { ReportValidationBanner } from '@/components/reports/ReportValidationBanner';
 import { useReportJobWatcher, ensureNotificationPermission } from '@/hooks/useReportJobWatcher';
+import { fetchComplianceSheet, buildComplianceSheetMarkdown } from '@/lib/complianceSheet';
 
 const REPORT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`;
 
