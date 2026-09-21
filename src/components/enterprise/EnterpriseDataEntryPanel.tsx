@@ -128,6 +128,10 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
   const [autoFilledIds, setAutoFilledIds] = useState<Set<string>>(new Set());
   const [activePillar, setActivePillar] = useState<'RA' | 'OE' | 'AO'>('RA');
+  /** Divergências entre valor digitado manualmente e valor encontrado online. */
+  const [divergences, setDivergences] = useState<
+    Array<{ id: string; label: string; manual: string; online: string; onlineRaw: number }>
+  >([]);
 
   const formatNumberBR = useCallback((value: number | null | undefined, indicator?: Indicator) => {
     return formatIndicatorFieldDisplayValue(value, indicator as any);
