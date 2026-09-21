@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 7,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.7.1",
+    date: "2026-09-21",
+    type: "minor" as const,
+    changes: [
+      "Nova aba 'Integração IA (MCP)' no menu Inteligência: guia completo do servidor MCP do SISTUR — o que é, como conectar (ChatGPT, Claude, Cursor), ferramentas disponíveis e exemplos de uso, com URL copiável.",
+    ],
+  },
   {
     version: "2.7.0",
     date: "2026-09-21",
