@@ -1095,7 +1095,7 @@ export default function Relatorios() {
                         <Button
                           variant="outline"
                           onClick={() => downloadDocx(
-                            report,
+                            reportWithCompliance,
                             selectedDestination?.name || 'destino',
                             (selectedAssessmentMeta?.diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial'),
                           )}
