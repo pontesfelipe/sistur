@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 7,
-  patch: 1,
+  minor: 8,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.8.0",
+    date: "2026-09-21",
+    type: "minor" as const,
+    changes: [
+      "Resiliência das fontes oficiais: quando IBGE, DATASUS, STN ou CADASTUR não respondem, o último dado oficial validado do mesmo município é reaproveitado automaticamente e sinalizado no preenchimento.",
+      "Quórum mínimo em índices compostos: índices que dependem de vários componentes (ex.: I-SEMT) só são calculados com pelo menos 2 de 3 componentes; sem quórum ficam como 'Aguardando componentes' e fora da média do pilar.",
+      "Proteção do dado digitado no diagnóstico Empresarial: o preenchimento automático não sobrescreve mais valores informados manualmente; divergências entre o valor digitado e o encontrado online aparecem com as opções 'Manter o meu' e 'Adotar online'.",
+      "Nova Ficha de Conformidade Metodológica nos relatórios (pré-visualização, PDF e Word): fonte, ano-base e método de coleta por indicador, com o percentual de dados auditados.",
+    ],
+  },
   {
     version: "2.7.1",
     date: "2026-09-21",
