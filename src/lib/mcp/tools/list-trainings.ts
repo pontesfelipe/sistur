@@ -19,10 +19,11 @@ export default defineTool({
     const supabase = supabaseForUser(ctx);
     let query = supabase
       .from("edu_trainings")
-      .select("id, title, description, pillar, level, duration_minutes, is_foundation, status")
+      .select("id, title, description, pillar, level, duration_minutes, is_foundation, status, active")
+      .eq("active", true)
       .order("title", { ascending: true })
       .limit(limit);
-    if (pillar) query = query.eq("pillar", pillar as never);
+    if (pillar) query = query.eq("pillar", pillar);
     if (search) query = query.ilike("title", `%${search}%`);
     const { data, error } = await query;
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };

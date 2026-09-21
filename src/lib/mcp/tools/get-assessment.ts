@@ -25,8 +25,8 @@ export default defineTool({
     if (!data) throw new ToolError("Diagnóstico não encontrado ou sem acesso.");
 
     const { data: pillars, error: pillarError } = await supabase
-      .from("assessment_pillar_scores")
-      .select("pillar, score, classification")
+      .from("pillar_scores")
+      .select("pillar, score, severity")
       .eq("assessment_id", assessment_id);
     if (pillarError) {
       return { content: [{ type: "text", text: pillarError.message }], isError: true };
@@ -54,7 +54,7 @@ export default defineTool({
       pillars: (pillars ?? []).map((p) => ({
         pillar: p.pillar,
         scorePercent: p.score,
-        classification: p.classification,
+        severity: p.severity,
       })),
     };
     return {
