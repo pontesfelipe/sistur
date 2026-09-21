@@ -121,7 +121,7 @@ export default function NovaRodada() {
     queryKey: ['profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data, error } = await supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle();
+      const { data, error } = await supabase.from('profiles').select('user_id, org_id, full_name, system_access, viewing_demo_org_id').eq('user_id', user.id).maybeSingle();
       if (error) throw error;
       return data;
     },

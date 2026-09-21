@@ -12095,6 +12095,13 @@ export type Database = {
         Returns: Json
       }
       flag_suspicious_edu_sessions: { Args: never; Returns: undefined }
+      forum_author_display: {
+        Args: { p_user_id: string }
+        Returns: {
+          author_avatar: string
+          author_name: string
+        }[]
+      }
       generate_certificate_id: { Args: never; Returns: string }
       generate_track_exam_rulesets: {
         Args: {
