@@ -2,7 +2,7 @@ import { Suspense, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bot, ScrollText, ListOrdered, Sparkles } from 'lucide-react';
+import { Bot, ScrollText, ListOrdered, Sparkles, Plug } from 'lucide-react';
 import { BeniContextPanel } from '@/components/settings/BeniContextPanel';
 
 const AdminSemanticLayer = lazy(() => import('@/pages/AdminSemanticLayer'));
@@ -12,8 +12,11 @@ const ReportStructurePanel = lazy(() =>
 const ReportContextPanel = lazy(() =>
   import('@/components/admin/ReportContextPanel').then(m => ({ default: m.ReportContextPanel }))
 );
+const McpGuidePanel = lazy(() =>
+  import('@/components/admin/McpGuidePanel').then(m => ({ default: m.McpGuidePanel }))
+);
 
-const VALID_TABS = ['beni', 'contexto', 'semantica', 'estrutura'];
+const VALID_TABS = ['beni', 'contexto', 'semantica', 'estrutura', 'mcp'];
 
 export default function AdminInteligencia() {
   const [searchParams] = useSearchParams();
@@ -23,7 +26,7 @@ export default function AdminInteligencia() {
   return (
     <AppLayout
       title="Inteligência"
-      subtitle="Professor Beni, contexto dos relatórios, camada semântica e estrutura de análise."
+      subtitle="Professor Beni, contexto dos relatórios, camada semântica, estrutura de análise e integração MCP."
     >
       <Tabs defaultValue={defaultTab} className="w-full">
         <TabsList className="flex w-full gap-1 overflow-x-auto whitespace-nowrap justify-start">
@@ -42,6 +45,10 @@ export default function AdminInteligencia() {
           <TabsTrigger value="estrutura" className="flex items-center gap-2 shrink-0">
             <ListOrdered className="h-4 w-4" />
             Estrutura
+          </TabsTrigger>
+          <TabsTrigger value="mcp" className="flex items-center gap-2 shrink-0">
+            <Plug className="h-4 w-4" />
+            Integração IA (MCP)
           </TabsTrigger>
         </TabsList>
 
@@ -64,6 +71,12 @@ export default function AdminInteligencia() {
         <TabsContent value="estrutura" className="space-y-6">
           <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando estrutura do relatório…</div>}>
             <ReportStructurePanel />
+          </Suspense>
+        </TabsContent>
+
+        <TabsContent value="mcp" className="space-y-6">
+          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando guia de integração…</div>}>
+            <McpGuidePanel />
           </Suspense>
         </TabsContent>
       </Tabs>
