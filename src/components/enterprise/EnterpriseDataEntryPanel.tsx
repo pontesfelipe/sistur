@@ -469,6 +469,42 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
   
   return (
     <div className="space-y-6">
+      {/* Divergências entre o valor digitado e o valor encontrado online */}
+      {divergences.length > 0 && (
+        <Card className="border-amber-500/50 bg-amber-50/60 dark:bg-amber-950/20">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+              Divergência encontrada ({divergences.length})
+            </CardTitle>
+            <CardDescription>
+              Seu valor foi preservado. Compare com o que foi encontrado online e escolha qual manter.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {divergences.map((d) => (
+              <div key={d.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-background p-3">
+                <div className="text-sm">
+                  <div className="font-medium">{d.label}</div>
+                  <div className="text-muted-foreground">
+                    Seu valor: <span className="font-medium text-foreground">{d.manual}</span>
+                    {' · '}Online: <span className="font-medium text-foreground">{d.online}</span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => keepManualValue(d.id)}>
+                    Manter o meu
+                  </Button>
+                  <Button size="sm" variant="secondary" onClick={() => acceptOnlineValue(d.id, d.onlineRaw, d.label)}>
+                    Adotar online
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Header with Progress */}
       <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardHeader>
