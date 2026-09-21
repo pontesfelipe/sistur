@@ -666,6 +666,16 @@ export function DataValidationPanel({
                             ) : (
                               <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Manual</Badge>
                             )}
+                            {/* Selo de reaproveitamento do cache municipal (fonte oficial indisponível) */}
+                            {/Reaproveitado do cache municipal/i.test((value as any).notes || '') && (
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0 border-amber-500/60 text-amber-700 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-300"
+                                title="A fonte oficial não respondeu no momento da coleta. Reaproveitamos o último dado oficial validado deste mesmo município."
+                              >
+                                Reaproveitado
+                              </Badge>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>

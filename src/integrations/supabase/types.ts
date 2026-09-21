@@ -12500,6 +12500,10 @@ export type Database = {
         Args: { p_org_id: string }
         Returns: undefined
       }
+      restore_municipal_official_cache: {
+        Args: { p_ibge_code: string; p_org_id: string }
+        Returns: number
+      }
       send_assignment_reminder: {
         Args: {
           p_assignment_id: string

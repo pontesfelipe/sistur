@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type RefObject } from 'react';
+import { useState, useRef, useEffect, useMemo, type RefObject } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { exportReportAsDocx } from '@/lib/exportReportDocx';
 import { getStatusStyle, mapIndicatorTableColumns, normalizeStatusCellText, realignIndicatorRow } from '@/lib/reportStatusStyle';
@@ -50,6 +50,7 @@ import {
 import { ReportCustomizationDialog, loadCustomization, type ReportCustomization } from '@/components/reports/ReportCustomizationDialog';
 import { ReportValidationBanner } from '@/components/reports/ReportValidationBanner';
 import { useReportJobWatcher, ensureNotificationPermission } from '@/hooks/useReportJobWatcher';
+import { fetchComplianceSheet, buildComplianceSheetMarkdown } from '@/lib/complianceSheet';
 
 const REPORT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`;
 
@@ -261,6 +262,22 @@ export default function Relatorios() {
   const pillarScores = assessmentDetails?.pillarScores;
   const issues = assessmentDetails?.issues;
   const prescriptions = assessmentDetails?.prescriptions;
+
+  // Ficha de Conformidade Metodológica — anexo de auditoria dos dados,
+  // acrescentado ao final do relatório (pré-visualização, PDF e Word).
+  const { data: complianceSheet } = useQuery({
+    queryKey: ['compliance-sheet', selectedAssessmentId],
+    queryFn: () => fetchComplianceSheet(selectedAssessmentId),
+    enabled: !!selectedAssessmentId,
+  });
+  const complianceMarkdown = useMemo(
+    () => (complianceSheet ? buildComplianceSheetMarkdown(complianceSheet) : ''),
+    [complianceSheet],
+  );
+  const reportWithCompliance = useMemo(
+    () => (report && complianceMarkdown ? `${report}\n${complianceMarkdown}` : report),
+    [report, complianceMarkdown],
+  );
 
   const calculatedAssessments = assessments?.filter(a => a.status === 'CALCULATED') || [];
   const visibleSavedReports = (savedReports ?? []).filter((r) => {
@@ -1078,7 +1095,7 @@ export default function Relatorios() {
                         <Button
                           variant="outline"
                           onClick={() => downloadDocx(
-                            report,
+                            reportWithCompliance,
                             selectedDestination?.name || 'destino',
                             (selectedAssessmentMeta?.diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial'),
                           )}
@@ -1216,7 +1233,7 @@ export default function Relatorios() {
                           completed: troca para o `report` final carregado de
                           generated_reports. */}
                       {!report && livePartial && renderMarkdown(livePartial)}
-                      {report && renderMarkdown(report)}
+                      {report && renderMarkdown(reportWithCompliance)}
                       {isGenerating && (report || livePartial) && (
                         <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1" />
                       )}

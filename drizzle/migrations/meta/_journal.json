@@ -8,6 +8,13 @@
       "when": 1790027109589,
       "tag": "0000_security_hardening_views_profiles_audit_storage",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790028088307,
+      "tag": "0001_restore_municipal_official_cache",
+      "breakpoints": true
     }
   ]
 }

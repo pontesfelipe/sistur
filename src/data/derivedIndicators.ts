@@ -83,7 +83,7 @@ export const DERIVED_INDICATORS: Record<string, DerivedIndicatorInfo> = {
       'I_SEMT = média ponderada de IPCR (40%) + IIET (35%) + IPTL invertido (25%)',
     requiredInputs: ['igma_ipcr', 'igma_iiet', 'igma_iptl'],
     resultUnit: 'índice (0–100)',
-    note: 'Índice composto. Calculado após os três componentes estarem disponíveis.',
+    note: 'Índice composto com quórum mínimo: exige pelo menos 2 dos 3 componentes. Com menos que isso, aparece como "Aguardando componentes" e não entra na média do pilar.',
   },
 };
 

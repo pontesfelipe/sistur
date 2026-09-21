@@ -283,6 +283,21 @@ export function useFetchOfficialData() {
         }
       }
 
+      // Resiliência de fontes oficiais: se alguma API oficial falhou/expirou,
+      // reaproveita o último valor oficial automático já coletado para o mesmo
+      // município (cache municipal), sem sobrescrever nada que a organização já
+      // tenha. Ver migração restore_municipal_official_cache.
+      let restoredFromCache = 0;
+      try {
+        const { data: restored, error: restoreErr } = await supabase.rpc(
+          'restore_municipal_official_cache',
+          { p_ibge_code: ibgeCode, p_org_id: orgId },
+        );
+        if (!restoreErr && typeof restored === 'number') restoredFromCache = restored;
+      } catch (e) {
+        console.warn('Cache municipal indisponível:', e);
+      }
+
       // Merge statuses into response
       const cadasturStatus = cadastur?.data?.results || {};
       const anaStatus = ana?.data?.results || {};
@@ -291,6 +306,7 @@ export function useFetchOfficialData() {
         cadastur_status: cadasturStatus,
         mapa_turismo_status: mapa || { status: 'unavailable', count: 0 },
         ana_status: anaStatus,
+        restored_from_cache: restoredFromCache,
         mst_status: includeMandala ? {
           tse: tse?.data || null,
           anatel: anatel?.data || null,
@@ -318,7 +334,11 @@ export function useFetchOfficialData() {
         ? `IQA: ${anaIqa.avg_iqa} (${anaIqa.stations_count} estações)`
         : '';
 
-      const extras = [cadasturMsg, mapaMsg, anaMsg].filter(Boolean).join(' | ');
+      const cacheMsg = (data as any).restored_from_cache > 0
+        ? `${(data as any).restored_from_cache} indicador(es) reaproveitado(s) do cache municipal`
+        : '';
+
+      const extras = [cadasturMsg, mapaMsg, anaMsg, cacheMsg].filter(Boolean).join(' | ');
 
       toast({
         title: 'Dados oficiais carregados',
