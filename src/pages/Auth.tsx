@@ -282,10 +282,19 @@ const Auth = () => {
     }
   };
 
+  // Preserve ?redirect=<path> across social sign-in round-trips.
+  const socialRedirectUri = () => {
+    const raw = searchParams.get('redirect');
+    if (raw && raw.startsWith('/') && !raw.startsWith('//')) {
+      return `${window.location.origin}/auth?redirect=${encodeURIComponent(raw)}`;
+    }
+    return window.location.origin;
+  };
+
   const handleGoogleSignIn = async () => {
     setLoading(true);
     const { error } = await lovable.auth.signInWithOAuth('google', {
-      redirect_uri: window.location.origin,
+      redirect_uri: socialRedirectUri(),
     });
     
     if (error) {
@@ -297,7 +306,7 @@ const Auth = () => {
   const handleAppleSignIn = async () => {
     setLoading(true);
     const { error } = await lovable.auth.signInWithOAuth('apple', {
-      redirect_uri: window.location.origin,
+      redirect_uri: socialRedirectUri(),
     });
     
     if (error) {

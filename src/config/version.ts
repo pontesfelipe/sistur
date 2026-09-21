@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 6,
-  patch: 1,
+  minor: 7,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.7.0",
+    date: "2026-09-21",
+    type: "minor" as const,
+    changes: [
+      "Integrações com agentes de IA (MCP): assistentes externos (ChatGPT, Claude, Cursor) podem consultar o SISTUR com login do próprio usuário",
+      "7 ferramentas disponibilizadas: destinos, diagnósticos (lista e detalhe com notas por pilar), projetos, tarefas, criação de tarefa e catálogo de capacitações",
+      "Nova página de autorização em /.lovable/oauth/consent com aprovação ou recusa explícita do usuário",
+      "Login social passa a preservar o destino original após a autenticação",
+    ],
+  },
   {
     version: "2.6.1",
     date: "2026-09-09",
