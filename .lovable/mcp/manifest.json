@@ -1,0 +1,278 @@
+{
+  "version": 1,
+  "sdk_version": "3.0.1",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://enexnpmkhvgufcervjsv.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "sistur",
+      "version": "1.0.0",
+      "title": "SISTUR"
+    },
+    "tools": [
+      {
+        "name": "list_destinations",
+        "title": "Listar destinos",
+        "description": "Lista os destinos turísticos acessíveis ao usuário autenticado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "search": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Filtra por nome do destino."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25,
+              "description": "Máximo de destinos retornados."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_assessments",
+        "title": "Listar diagnósticos",
+        "description": "Lista os diagnósticos (rodadas de avaliação) acessíveis ao usuário, com nota e classificação final.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "destination_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Filtra por destino."
+            },
+            "status": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Filtra pelo status do diagnóstico."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Máximo de diagnósticos retornados."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_assessment",
+        "title": "Detalhar diagnóstico",
+        "description": "Retorna um diagnóstico com notas por pilar (RA, OE, AO), bloqueios sistêmicos e interpretação IGMA.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "assessment_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Identificador do diagnóstico."
+            }
+          },
+          "required": [
+            "assessment_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_projects",
+        "title": "Listar projetos",
+        "description": "Lista os projetos de intervenção acessíveis ao usuário autenticado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Filtra pelo status do projeto."
+            },
+            "destination_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Filtra por destino."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25,
+              "description": "Máximo de projetos retornados."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_project_tasks",
+        "title": "Listar tarefas do projeto",
+        "description": "Lista as tarefas de um projeto, com responsável, prazo e status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "project_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Identificador do projeto."
+            },
+            "status": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Filtra pelo status da tarefa."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "description": "Máximo de tarefas retornadas."
+            }
+          },
+          "required": [
+            "project_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_project_task",
+        "title": "Criar tarefa de projeto",
+        "description": "Cria uma tarefa em um projeto existente, no nome do usuário autenticado.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "project_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Identificador do projeto."
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Título da tarefa."
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 2000,
+              "description": "Descrição da tarefa."
+            },
+            "priority": {
+              "type": "string",
+              "enum": [
+                "baixa",
+                "media",
+                "alta",
+                "critica"
+              ],
+              "description": "Prioridade da tarefa."
+            },
+            "planned_end_date": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Prazo planejado no formato AAAA-MM-DD."
+            }
+          },
+          "required": [
+            "project_id",
+            "title"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_trainings",
+        "title": "Listar capacitações",
+        "description": "Lista as capacitações e cursos do catálogo educacional disponíveis ao usuário.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "pillar": {
+              "type": "string",
+              "enum": [
+                "RA",
+                "OE",
+                "AO"
+              ],
+              "description": "Filtra pelo pilar SISTUR."
+            },
+            "search": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Filtra por título."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25,
+              "description": "Máximo de capacitações retornadas."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
