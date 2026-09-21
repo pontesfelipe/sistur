@@ -204,21 +204,44 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
     return map;
   }, [existingValues]);
 
-  // Apply initial auto-fill values from step 4 review search
+  // Apply initial auto-fill values from step 4 review search.
+  // O valor digitado manualmente é sempre preservado; quando o valor
+  // encontrado online divergir do manual, registramos a divergência para
+  // exibir o aviso com as duas opções ao usuário.
   useEffect(() => {
     if (!initialAutoFillValues || Object.keys(initialAutoFillValues).length === 0 || !indicators) return;
     const codeToId = new Map(indicators.map(i => [(i as any).code, i.id]));
     const codeToIndicator = new Map(indicators.map(i => [(i as any).code, i]));
+    const foundDivergences: Array<{ id: string; label: string; manual: string; online: string; onlineRaw: number }> = [];
     setLocalValues(prev => {
       const updated = { ...prev };
       let applied = false;
       const newlyFilled: string[] = [];
       Object.entries(initialAutoFillValues).forEach(([code, value]) => {
         const id = codeToId.get(code);
-        if (id && !updated[id]) {
-          updated[id] = formatNumberBR(value, codeToIndicator.get(code));
+        if (!id) return;
+        const indicator = codeToIndicator.get(code) as any;
+        const formatted = formatNumberBR(value, indicator);
+        if (!updated[id]) {
+          updated[id] = formatted;
           applied = true;
           newlyFilled.push(id);
+          return;
+        }
+        // Já existe valor: preserva. Se a origem não é automática e o valor
+        // difere, sinaliza divergência.
+        const existing = existingByIndicator.get(id);
+        const src: string = existing?.source ?? '';
+        const isAutomatic = /\(Auto\)|Pré-preenchimento Automático|Automático/i.test(src);
+        const current = parseNumberBR(updated[id]);
+        if (!isAutomatic && current !== null && Number(current) !== Number(value)) {
+          foundDivergences.push({
+            id,
+            label: indicator?.name ?? code,
+            manual: updated[id],
+            online: formatted,
+            onlineRaw: Number(value),
+          });
         }
       });
       if (newlyFilled.length > 0) {
@@ -230,7 +253,27 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
       }
       return applied ? updated : prev;
     });
-  }, [initialAutoFillValues, indicators, formatNumberBR]);
+    if (foundDivergences.length > 0) {
+      setDivergences(prev => {
+        const seen = new Set(prev.map(d => d.id));
+        const merged = [...prev];
+        foundDivergences.forEach(d => { if (!seen.has(d.id)) merged.push(d); });
+        return merged;
+      });
+    }
+  }, [initialAutoFillValues, indicators, formatNumberBR, parseNumberBR, existingByIndicator]);
+
+  const acceptOnlineValue = useCallback((id: string, onlineRaw: number, label: string) => {
+    const indicator = (indicators || []).find(i => i.id === id) as any;
+    setLocalValues(prev => ({ ...prev, [id]: formatNumberBR(onlineRaw, indicator) }));
+    setAutoFilledIds(prev => new Set(prev).add(id));
+    setDivergences(prev => prev.filter(d => d.id !== id));
+    toast.success(`Valor online adotado em "${label}"`);
+  }, [indicators, formatNumberBR]);
+
+  const keepManualValue = useCallback((id: string) => {
+    setDivergences(prev => prev.filter(d => d.id !== id));
+  }, []);
 
   const handleToggleIgnore = useCallback((indicatorId: string) => {
     setIgnoredIds(prev => {
