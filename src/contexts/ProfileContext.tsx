@@ -77,7 +77,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       const [profileResult, rolesResult] = await Promise.all([
         supabase
           .from('profiles')
-          .select('*')
+          .select('user_id, org_id, full_name, avatar_url, system_access, pending_approval, viewing_demo_org_id, forum_show_identity, blocked_at, created_at, updated_at')
           .eq('user_id', user.id)
           .single(),
         supabase
@@ -101,7 +101,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
           viewing_demo_org_id: profileResult.data.viewing_demo_org_id ?? null,
           forum_show_identity: profileResult.data.forum_show_identity ?? true,
           blocked_at: (profileResult.data as any).blocked_at ?? null,
-          blocked_reason: (profileResult.data as any).blocked_reason ?? null,
+          blocked_reason: null,
           created_at: profileResult.data.created_at,
           updated_at: profileResult.data.updated_at,
         });
