@@ -110,6 +110,7 @@ const MemoryGame = lazyWithReload(() => import("./pages/MemoryGame"));
 const Subscription = lazyWithReload(() => import("./pages/Subscription"));
 const Precos = lazyWithReload(() => import("./pages/Precos"));
 const CheckoutReturn = lazyWithReload(() => import("./pages/CheckoutReturn"));
+const OAuthConsent = lazyWithReload(() => import("./pages/OAuthConsent"));
 const AdminIngestionHealth = lazyWithReload(() => import("./pages/AdminIngestionHealth"));
 const TermsAcceptance = lazyWithReload(() => import("./pages/TermsAcceptance"));
 const NotFound = lazyWithReload(() => import("./pages/NotFound"));
@@ -192,6 +193,7 @@ const App = () => {
                  <Route path="/verificar-certificado/:code" element={<VerificarCertificado />} />
                  <Route path="/planos" element={<Precos />} />
                  <Route path="/checkout/retorno" element={<CheckoutReturn />} />
+                 <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
                 <Route
                   path="/"
                   element={
