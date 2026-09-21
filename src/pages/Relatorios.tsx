@@ -1233,7 +1233,7 @@ export default function Relatorios() {
                           completed: troca para o `report` final carregado de
                           generated_reports. */}
                       {!report && livePartial && renderMarkdown(livePartial)}
-                      {report && renderMarkdown(report)}
+                      {report && renderMarkdown(reportWithCompliance)}
                       {isGenerating && (report || livePartial) && (
                         <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1" />
                       )}
