@@ -334,7 +334,11 @@ export function useFetchOfficialData() {
         ? `IQA: ${anaIqa.avg_iqa} (${anaIqa.stations_count} estações)`
         : '';
 
-      const extras = [cadasturMsg, mapaMsg, anaMsg].filter(Boolean).join(' | ');
+      const cacheMsg = (data as any).restored_from_cache > 0
+        ? `${(data as any).restored_from_cache} indicador(es) reaproveitado(s) do cache municipal`
+        : '';
+
+      const extras = [cadasturMsg, mapaMsg, anaMsg, cacheMsg].filter(Boolean).join(' | ');
 
       toast({
         title: 'Dados oficiais carregados',

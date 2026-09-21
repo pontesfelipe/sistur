@@ -1359,6 +1359,32 @@ async function runCalculationCore(
           }
         }
 
+        // Quórum mínimo: índices compostos com 3+ componentes só são calculados
+        // quando pelo menos 2/3 dos componentes estiverem disponíveis. Com menos
+        // que isso, o índice fica "Aguardando componentes" (registrado na
+        // auditoria com score nulo) e NÃO entra na média do pilar, evitando nota
+        // parcial que mascare o resultado.
+        const minQuorum = rules.length >= 3 ? Math.ceil((rules.length * 2) / 3) : rules.length;
+        if (componentScores.length > 0 && componentScores.length < minQuorum) {
+          const { data: pendingIndicator } = await supabase
+            .from("indicators")
+            .select("id, pillar")
+            .eq("code", compositeCode)
+            .maybeSingle();
+          auditEntries.push({
+            assessment_id,
+            indicator_code: compositeCode,
+            pillar: pendingIndicator?.pillar ?? null,
+            value: null,
+            normalized_score: null,
+            source_type: 'DERIVED',
+            source_detail: `composite:${compositeCode} — aguardando componentes (${componentScores.length}/${rules.length}, mínimo ${minQuorum})`,
+            weight: 0,
+          });
+          console.log(`Composite ${compositeCode} sem quórum: ${componentScores.length}/${rules.length} (mín. ${minQuorum})`);
+          continue;
+        }
+
         // Calculate weighted average if we have components
         if (componentScores.length > 0) {
           const totalWeight = componentScores.reduce((sum, c) => sum + c.weight, 0);
