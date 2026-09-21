@@ -263,6 +263,22 @@ export default function Relatorios() {
   const issues = assessmentDetails?.issues;
   const prescriptions = assessmentDetails?.prescriptions;
 
+  // Ficha de Conformidade Metodológica — anexo de auditoria dos dados,
+  // acrescentado ao final do relatório (pré-visualização, PDF e Word).
+  const { data: complianceSheet } = useQuery({
+    queryKey: ['compliance-sheet', selectedAssessmentId],
+    queryFn: () => fetchComplianceSheet(selectedAssessmentId),
+    enabled: !!selectedAssessmentId,
+  });
+  const complianceMarkdown = useMemo(
+    () => (complianceSheet ? buildComplianceSheetMarkdown(complianceSheet) : ''),
+    [complianceSheet],
+  );
+  const reportWithCompliance = useMemo(
+    () => (report && complianceMarkdown ? `${report}\n${complianceMarkdown}` : report),
+    [report, complianceMarkdown],
+  );
+
   const calculatedAssessments = assessments?.filter(a => a.status === 'CALCULATED') || [];
   const visibleSavedReports = (savedReports ?? []).filter((r) => {
     if (r.visibility === 'personal' && r.created_by !== profile?.user_id) return false;
