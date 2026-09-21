@@ -112,10 +112,35 @@ export function NovaRodadaDialogs({
         .maybeSingle();
       const effOrg = prof?.viewing_demo_org_id || prof?.org_id || orgId;
       if (!effOrg) return;
+
+      // Proteção do dado primário: nunca sobrescrever um valor digitado
+      // manualmente pelo operador. Só gravamos automaticamente quando o
+      // indicador ainda está vazio ou quando a origem anterior também era
+      // automática.
+      const targetIds = entries
+        .map(([code]) => codeToId.get(code))
+        .filter(Boolean) as string[];
+      const manualIds = new Set<string>();
+      if (targetIds.length > 0) {
+        const { data: existing } = await supabase
+          .from('indicator_values')
+          .select('indicator_id, source, unit_id')
+          .eq('assessment_id', createdAssessmentId)
+          .in('indicator_id', targetIds);
+        const currentUnit = isMultiUnit ? activeUnit?.id ?? null : null;
+        (existing || []).forEach((row: any) => {
+          if ((row.unit_id ?? null) !== currentUnit) return;
+          const src: string = row.source ?? '';
+          const isAutomatic = /\(Auto\)|Pré-preenchimento Automático|Automático/i.test(src);
+          if (!isAutomatic) manualIds.add(row.indicator_id);
+        });
+      }
+
       const rows = entries
         .map(([code, value]) => {
           const indicator_id = codeToId.get(code);
-          if (!indicator_id || value === null || value === undefined || !Number.isFinite(Number(value))) return null;
+          if (!indicator_id || manualIds.has(indicator_id)) return null;
+          if (value === null || value === undefined || !Number.isFinite(Number(value))) return null;
           return {
             assessment_id: createdAssessmentId,
             indicator_id,
