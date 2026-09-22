@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
     const service = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || SUPABASE_ANON_KEY);
     const { data: dest } = await service
       .from('destinations')
-      .select('id, name, uf, ibge_code')
+      .select('id, name, uf, ibge_code, org_id')
       .eq('id', destinationId)
       .maybeSingle();
 
@@ -77,16 +77,16 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 1) Internal observatory events (if any). Build the OR filter defensively:
-    // PostgREST rejects `ibge_code.eq.` (empty value) with a 400, so only add
-    // that branch when we actually have an IBGE code.
-    const orParts = [`destination_id.eq.${destinationId}`];
-    if (dest.ibge_code) orParts.push(`ibge_code.eq.${dest.ibge_code}`);
-    const { data: internalEvents } = await service
-      .from('observatory_events')
-      .select('event_name, event_type, start_date, end_date, estimated_attendance')
-      .or(orParts.join(','))
-      .limit(30);
+    // 1) Internal observatory events (if any). `observatory_events` is scoped by
+    // organization (no destination_id / ibge_code columns), so filter by the
+    // destination's org.
+    const { data: internalEvents } = dest.org_id
+      ? await service
+          .from('observatory_events')
+          .select('name, category, start_date, end_date, estimated_attendance')
+          .eq('org_id', dest.org_id)
+          .limit(30)
+      : { data: [] as any[] };
 
     // 2) Firecrawl public search
     const apiKey = Deno.env.get('FIRECRAWL_API_KEY');

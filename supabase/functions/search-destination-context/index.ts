@@ -115,8 +115,8 @@ Deno.serve(async (req) => {
       air_connectivity: anac ? {
         score: air_score,
         airport: nearest_airport,
-        passengers_total: anac.passengers_total ?? anac.total_passengers ?? null,
-        ref_year: anac.ref_year ?? null,
+        passengers_total: anac.total_passengers_12m ?? null,
+        ref_year: anac.reference_period_end ? new Date(anac.reference_period_end).getUTCFullYear() : null,
       } : { score: 1, airport: null, passengers_total: null, ref_year: null },
       telecom_coverage: anatel ? {
         score: telecom_score,
