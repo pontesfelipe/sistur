@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     const svc = createClient(SUPABASE_URL, SERVICE);
     const { data: dest } = await svc
       .from('destinations')
-      .select('id, name, uf, ibge_code, tourism_region, has_pdt, municipality_type')
+      .select('id, name, uf, ibge_code, tourism_region, has_pdt, municipality_type, org_id')
       .eq('id', destination_id)
       .maybeSingle();
 
@@ -54,12 +54,14 @@ Deno.serve(async (req) => {
     const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString();
 
     const [anacR, anatelR, eventsR, mapaR, cadunicoR, ctxR] = await Promise.all([
-      ibge ? svc.from('anac_air_connectivity').select('*').eq('ibge_code', ibge).order('ref_year', { ascending: false }).limit(1).maybeSingle() : Promise.resolve({ data: null }),
+      ibge ? svc.from('anac_air_connectivity').select('*').eq('ibge_code', ibge).order('reference_period_end', { ascending: false }).limit(1).maybeSingle() : Promise.resolve({ data: null }),
       ibge ? svc.from('anatel_coverage_cache').select('*').eq('ibge_code', ibge).maybeSingle() : Promise.resolve({ data: null }),
-      svc.from('observatory_events').select('id, name, start_date, end_date, category').eq('destination_id', destination_id).gte('start_date', oneYearAgo).limit(20),
+      dest.org_id
+        ? svc.from('observatory_events').select('id, name, start_date, end_date, category').eq('org_id', dest.org_id).gte('start_date', oneYearAgo).limit(20)
+        : Promise.resolve({ data: [] }),
       ibge ? svc.from('mapa_turismo_municipios').select('*').eq('ibge_code', ibge).maybeSingle() : Promise.resolve({ data: null }),
-      ibge ? svc.from('cadunico_municipio_cache').select('*').eq('ibge_code', ibge).maybeSingle() : Promise.resolve({ data: null }),
-      svc.from('municipal_socioeconomic_context').select('*').eq('destination_id', destination_id).maybeSingle(),
+      ibge ? svc.from('cadunico_municipio_cache').select('*').eq('ibge_code_7', ibge).maybeSingle() : Promise.resolve({ data: null }),
+      ibge ? svc.from('municipal_socioeconomic_context').select('*').eq('ibge_code', ibge).maybeSingle() : Promise.resolve({ data: null }),
     ]);
 
     const anac = (anacR as any).data;
@@ -73,8 +75,10 @@ Deno.serve(async (req) => {
     let air_score = 1;
     let nearest_airport: string | null = null;
     if (anac) {
-      const pax = anac.passengers_total ?? anac.total_passengers ?? null;
-      nearest_airport = anac.airport_name ?? anac.iata_code ?? null;
+      const pax = anac.total_passengers_12m ?? null;
+      nearest_airport = Array.isArray(anac.airport_icao_codes) && anac.airport_icao_codes.length > 0
+        ? anac.airport_icao_codes.join(', ')
+        : null;
       if (pax != null) {
         if (pax > 5_000_000) air_score = 5;
         else if (pax > 1_000_000) air_score = 4;
