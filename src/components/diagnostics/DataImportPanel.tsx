@@ -263,12 +263,24 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         }
 
         if (toInsert.length > 0) {
-          for (const val of toInsert) {
-            await supabase.from('indicator_values').insert(val);
-          }
+          const { data: inserted, error: insertError } = await supabase
+            .from('indicator_values')
+            .insert(toInsert)
+            .select('id');
+
           // Refetch indicator values to update the form
           await queryClient.invalidateQueries({ queryKey: ['indicator-values', selectedAssessment] });
-          toast.success(`${toInsert.length} indicadores pré-preenchidos automaticamente`);
+
+          const savedCount = inserted?.length ?? 0;
+          if (insertError || savedCount === 0) {
+            console.error('Pré-preenchimento bloqueado:', insertError);
+            toast.error('Não foi possível pré-preencher os indicadores', {
+              description:
+                'Você não tem permissão para gravar dados neste diagnóstico. Peça a um administrador ou analista da organização para executar o pré-preenchimento.',
+            });
+          } else {
+            toast.success(`${savedCount} indicadores pré-preenchidos automaticamente`);
+          }
         }
 
         setHasAutoInjected(true);

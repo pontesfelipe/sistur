@@ -283,24 +283,45 @@ export function useFetchOfficialData() {
         }
       }
 
-      // Resiliência de fontes oficiais: se alguma API oficial falhou/expirou,
-      // reaproveita o último valor oficial automático já coletado para o mesmo
-      // município (cache municipal), sem sobrescrever nada que a organização já
-      // tenha. Ver migração restore_municipal_official_cache.
-      let restoredFromCache = 0;
-      try {
-        const { data: restored, error: restoreErr } = await supabase.rpc(
-          'restore_municipal_official_cache',
-          { p_ibge_code: ibgeCode, p_org_id: orgId },
-        );
-        if (!restoreErr && typeof restored === 'number') restoredFromCache = restored;
-      } catch (e) {
-        console.warn('Cache municipal indisponível:', e);
-      }
-
       // Merge statuses into response
       const cadasturStatus = cadastur?.data?.results || {};
       const anaStatus = ana?.data?.results || {};
+
+      // Resiliência de fontes oficiais: SOMENTE quando alguma fonte oficial
+      // falhou/expirou nesta coleta, reaproveita o último valor oficial
+      // automático já coletado para o mesmo município (cache municipal), sem
+      // sobrescrever nada que a organização já tenha.
+      // Ver migração restore_municipal_official_cache.
+      const statusFailed = (s: any) =>
+        !!s && typeof s === 'object' &&
+        Object.values(s).some((v: any) => v?.status && v.status !== 'success');
+
+      const anySourceFailed =
+        officialResult.status === 'rejected' ||
+        cadasturResult.status === 'rejected' ||
+        mapaResult.status === 'rejected' ||
+        anaResult.status === 'rejected' ||
+        tseResult?.status === 'rejected' ||
+        anatelResult?.status === 'rejected' ||
+        !!cadastur?.error || !!ana?.error || !!tse?.error || !!anatel?.error ||
+        statusFailed(cadasturStatus) ||
+        statusFailed(anaStatus) ||
+        (mapa?.status && mapa.status !== 'success') ||
+        (Array.isArray(official?.data?.errors) && official.data.errors.length > 0);
+
+      let restoredFromCache = 0;
+      if (anySourceFailed) {
+        try {
+          const { data: restored, error: restoreErr } = await supabase.rpc(
+            'restore_municipal_official_cache',
+            { p_ibge_code: ibgeCode, p_org_id: orgId },
+          );
+          if (!restoreErr && typeof restored === 'number') restoredFromCache = restored;
+        } catch (e) {
+          console.warn('Cache municipal indisponível:', e);
+        }
+      }
+
       return {
         ...official.data,
         cadastur_status: cadasturStatus,
