@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { extractAttachment, triageRelevance, attachmentContentParts, sseTextResponse, IRRELEVANT_REPLY } from "./attachment.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -409,7 +410,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: selectedModel,
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: systemPrompt + folderInstructions },
           ...messages,
         ],
         stream: true,
