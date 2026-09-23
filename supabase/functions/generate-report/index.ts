@@ -3812,7 +3812,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
             if (gemResp.ok && gemResp.body) {
               response = gemResp;
               usedProvider = 'gemini';
-              console.log(`Report generation using provider: gemini-2.5-pro`);
+              console.log(`Report generation using provider: gemini-3.1-pro-preview`);
               logger.setProvider('gemini', 'google/gemini-3.1-pro-preview');
               logger.stage('provider_selected', { provider: 'gemini', model: 'google/gemini-3.1-pro-preview' });
             } else {

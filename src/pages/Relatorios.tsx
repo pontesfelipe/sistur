@@ -121,7 +121,7 @@ const getProviderLabel = (provider?: string | null, model?: string | null) => {
   if (!provider && !model) return 'IA n/d';
   const p = (provider || '').toLowerCase();
   if (p === 'claude') return 'Claude';
-  if (p === 'gpt5' || p === 'gpt-5') return 'GPT-5';
+  if (p === 'gpt5' || p === 'gpt-5') return (model || '').includes('gpt-6') ? 'GPT-6 Astra' : 'GPT-5';
   if (p === 'gemini') return 'Gemini';
   if (model) return model.split('/').pop() || model;
   return provider || null;
@@ -194,7 +194,7 @@ export default function Relatorios() {
   const [runInDemo, setRunInDemo] = useState(false);
   // GAP-FIX (v1.38.18): Comparação temporal agora é OPT-IN.
   const [enableComparison, setEnableComparison] = useState(false);
-  // v1.38.35 — Seletor de provedor de IA (apenas ADMIN). 'auto' = cadeia padrão Claude→GPT-5→Gemini.
+  // v1.38.35 — Seletor de provedor de IA (apenas ADMIN). 'auto' = cadeia padrão Claude→GPT-6 Astra→Gemini.
   const [aiProvider, setAiProvider] = useState<'auto' | 'claude' | 'gpt5' | 'gemini'>('auto');
   const reportRef = useRef<HTMLDivElement>(null);
   const historyReportRef = useRef<HTMLDivElement>(null);
@@ -1026,10 +1026,10 @@ export default function Relatorios() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="auto">⚙️ Auto (Claude→GPT-5→Gemini)</SelectItem>
+                          <SelectItem value="auto">⚙️ Auto (Claude→GPT-6 Astra→Gemini)</SelectItem>
                           <SelectItem value="claude">🟣 Claude Sonnet 4.5</SelectItem>
-                          <SelectItem value="gpt5">🟢 GPT-5</SelectItem>
-                          <SelectItem value="gemini">🔵 Gemini 2.5 Pro</SelectItem>
+                          <SelectItem value="gpt5">🟢 GPT-6 Astra</SelectItem>
+                          <SelectItem value="gemini">🔵 Gemini 3.1 Pro</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
