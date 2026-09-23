@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 9,
+  minor: 10,
   patch: 0,
 
   get full() {
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.10.0",
+    date: "2026-09-23",
+    type: "minor" as const,
+    changes: [
+      "Professor Beni: campo de pergunta maior e com crescimento automático (Enter envia, Shift+Enter quebra linha)",
+      "Professor Beni: pastas/projetos com instruções próprias e várias conversas, cada uma com endereço próprio",
+      "Professor Beni: compartilhar conversa por link somente leitura, exportar para Word ou enviar por e-mail",
+      "Professor Beni: anexar arquivos (PDF, Word, Excel, CSV, TXT, imagens) com triagem de relevância antes da análise",
+    ],
+  },
   {
     version: "2.9.0",
     date: "2026-09-23",
