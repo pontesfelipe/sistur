@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 8,
+  minor: 9,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.9.0",
+    date: "2026-09-23",
+    type: "minor" as const,
+    changes: [
+      "Professor Beni passa a usar o GPT-6 Astra por padrão; o modelo continua selecionável em Inteligência → Beni, com a lista atualizada (GPT-6 Astra, GPT-5.6, Gemini 3.8 Flash, Gemini 3.1 Pro).",
+      "Relatórios migrados para modelos mais novos: GPT-5 → GPT-6 Astra e Gemini 2.5 Pro → Gemini 3.1 Pro, na geração e na validação.",
+    ],
+  },
   {
     version: "2.8.0",
     date: "2026-09-21",
