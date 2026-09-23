@@ -61,6 +61,8 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
         <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Saldo</p><p className={cn("text-xl font-bold", totals.variance < 0 ? "text-red-600" : "text-foreground")}>{BRL(totals.variance)}</p></CardContent></Card>
         <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Execução</p><p className="text-xl font-bold">{totals.executionPct.toFixed(1)}%</p></CardContent></Card>
       </div>
+      <ProjectRoiCard projectId={projectId} investment={totals.actual || totals.planned} />
+
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
