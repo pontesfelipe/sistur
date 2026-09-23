@@ -1966,7 +1966,7 @@ async function callProviderNonStreaming(args: {
       }
       return { ok: true, content: acc };
     }
-    const model = provider === 'gpt5' ? 'openai/gpt-5' : 'google/gemini-2.5-pro';
+    const model = provider === 'gpt5' ? 'openai/gpt-6-astra' : 'google/gemini-3.1-pro-preview';
     const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -1983,6 +1983,7 @@ async function callProviderNonStreaming(args: {
         // do mesmo orçamento e, com limite justo, a resposta volta vazia
         // (sintoma "gpt5 empty content (0)"). Damos folga extra ao fallback.
         max_completion_tokens: provider === 'gpt5' ? Math.min(32_000, maxTokens + 8_000) : maxTokens,
+        ...(provider === 'gpt5' ? { reasoning_effort: 'medium' } : {}),
       }),
       signal,
     });
@@ -2558,8 +2559,8 @@ ${reportText.slice(0, 18000)}`;
         }
       } else {
         const model = validatorProvider === 'gpt5'
-          ? 'openai/gpt-5'
-          : 'google/gemini-2.5-pro';
+          ? 'openai/gpt-6-astra'
+          : 'google/gemini-3.1-pro-preview';
         const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
           method: 'POST',
           headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
@@ -2570,6 +2571,7 @@ ${reportText.slice(0, 18000)}`;
               { role: 'user', content: usr },
             ],
             response_format: { type: 'json_object' },
+            ...(validatorProvider === 'gpt5' ? { reasoning_effort: 'low' } : {}),
           }),
           signal: validatorAbort.signal,
         });
@@ -3677,6 +3679,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               { role: "user", content: userPrompt },
             ],
             stream: true,
+            ...(model.startsWith('openai/') ? { reasoning_effort: 'medium' } : {}),
           }),
         });
 
@@ -3781,49 +3784,49 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
 
         const tryGpt5 = async (): Promise<void> => {
           try {
-            const gptResp = await callLovableGateway("openai/gpt-5");
+            const gptResp = await callLovableGateway("openai/gpt-6-astra");
             if (gptResp.ok && gptResp.body) {
               response = gptResp;
               usedProvider = 'gpt5';
-              console.log(`Report generation using provider: gpt-5`);
-              logger.setProvider('gpt5', 'openai/gpt-5');
-              logger.stage('provider_selected', { provider: 'gpt5', model: 'openai/gpt-5' });
+              console.log(`Report generation using provider: gpt-6-astra`);
+              logger.setProvider('gpt5', 'openai/gpt-6-astra');
+              logger.stage('provider_selected', { provider: 'gpt5', model: 'openai/gpt-6-astra' });
             } else {
               const errBody = await gptResp.text().catch(() => "");
               const reason = `status ${gptResp.status}: ${errBody.slice(0, 200)}`;
               fallbackTrail.push({ provider: 'gpt5', reason });
               console.warn(`GPT-5 unavailable. ${reason}`);
-              logger.error('provider_failed', new Error(reason), { provider: 'gpt5', model: 'openai/gpt-5' });
+              logger.error('provider_failed', new Error(reason), { provider: 'gpt5', model: 'openai/gpt-6-astra' });
             }
           } catch (e) {
             const reason = e instanceof Error ? e.message : String(e);
             fallbackTrail.push({ provider: 'gpt5', reason });
             console.warn(`GPT-5 request threw: ${reason}`);
-            logger.error('provider_failed', e, { provider: 'gpt5', model: 'openai/gpt-5' });
+            logger.error('provider_failed', e, { provider: 'gpt5', model: 'openai/gpt-6-astra' });
           }
         };
 
         const tryGemini = async (): Promise<void> => {
           try {
-            const gemResp = await callLovableGateway("google/gemini-2.5-pro");
+            const gemResp = await callLovableGateway("google/gemini-3.1-pro-preview");
             if (gemResp.ok && gemResp.body) {
               response = gemResp;
               usedProvider = 'gemini';
-              console.log(`Report generation using provider: gemini-2.5-pro`);
-              logger.setProvider('gemini', 'google/gemini-2.5-pro');
-              logger.stage('provider_selected', { provider: 'gemini', model: 'google/gemini-2.5-pro' });
+              console.log(`Report generation using provider: gemini-3.1-pro-preview`);
+              logger.setProvider('gemini', 'google/gemini-3.1-pro-preview');
+              logger.stage('provider_selected', { provider: 'gemini', model: 'google/gemini-3.1-pro-preview' });
             } else {
               const errBody = await gemResp.text().catch(() => "");
               const reason = `status ${gemResp.status}: ${errBody.slice(0, 200)}`;
               fallbackTrail.push({ provider: 'gemini', reason });
               console.warn(`Gemini unavailable. ${reason}`);
-              logger.error('provider_failed', new Error(reason), { provider: 'gemini', model: 'google/gemini-2.5-pro' });
+              logger.error('provider_failed', new Error(reason), { provider: 'gemini', model: 'google/gemini-3.1-pro-preview' });
             }
           } catch (e) {
             const reason = e instanceof Error ? e.message : String(e);
             fallbackTrail.push({ provider: 'gemini', reason });
             console.warn(`Gemini request threw: ${reason}`);
-            logger.error('provider_failed', e, { provider: 'gemini', model: 'google/gemini-2.5-pro' });
+            logger.error('provider_failed', e, { provider: 'gemini', model: 'google/gemini-3.1-pro-preview' });
           }
         };
 
@@ -4104,9 +4107,9 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         const modelLabelForPersist = usedProvider === 'claude'
           ? 'anthropic/claude-sonnet-4-5-20250929'
           : usedProvider === 'gpt5'
-          ? 'openai/gpt-5'
+          ? 'openai/gpt-6-astra'
           : usedProvider === 'gemini'
-          ? 'google/gemini-2.5-pro'
+          ? 'google/gemini-3.1-pro-preview'
           : null;
         if (existing && !forceRegenerate) {
           const { error } = await supabaseAdmin
@@ -4156,8 +4159,8 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           const modelLabel = usedProvider === 'claude'
             ? 'anthropic/claude-sonnet-4-5-20250929'
             : usedProvider === 'gpt5'
-            ? 'openai/gpt-5'
-            : 'google/gemini-2.5-pro';
+            ? 'openai/gpt-6-astra'
+            : 'google/gemini-3.1-pro-preview';
           await supabaseAdmin.from('audit_events').insert({
             org_id: assessment.org_id,
             user_id: userId,
