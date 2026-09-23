@@ -29,11 +29,20 @@ type Message = {
   id?: string;
   role: 'user' | 'assistant';
   content: string;
+  attachmentName?: string;
 };
 
 interface BeniChatBotProps {
   initialContext?: BeniContext;
+  conversationId?: string;
+  onConversationCreated?: (id: string) => void;
+  onNewConversation?: () => void;
+  onActivity?: () => void;
+  headerExtra?: React.ReactNode;
 }
+
+const MAX_FILE = 10 * 1024 * 1024;
+const ACCEPTED = '.pdf,.docx,.xlsx,.xls,.csv,.txt,.md,image/png,image/jpeg,image/webp';
 
 const SUGGESTED_QUESTIONS = [
   { icon: Leaf, text: "O que significa RA estar crítico?", color: "text-emerald-600" },
@@ -44,7 +53,9 @@ const SUGGESTED_QUESTIONS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/beni-chat`;
 
-export function BeniChatBot({ initialContext }: BeniChatBotProps) {
+export function BeniChatBot({ initialContext, conversationId, onConversationCreated, onNewConversation, onActivity, headerExtra }: BeniChatBotProps) {
+  const convIdRef = useRef<string | undefined>(conversationId);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const { user } = useAuth();
   const beniQuota = useBeniQuota();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -63,30 +74,40 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
 
   // Load messages from database on mount
   const loadMessages = useCallback(async () => {
-    if (!user) { setIsLoadingHistory(false); return; }
+    if (!user || !conversationId) { setMessages([]); setIsLoadingHistory(false); return; }
     try {
       const { data, error } = await supabase
         .from('beni_chat_messages')
-        .select('id, role, content, created_at')
-        .eq('user_id', user.id)
+        .select('id, role, content, created_at, beni_attachments(file_name)')
+        .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
       if (error) throw error;
-      setMessages(data?.map(m => ({ id: m.id, role: m.role as 'user' | 'assistant', content: m.content })) || []);
+      setMessages(data?.map((m: any) => ({ id: m.id, role: m.role as 'user' | 'assistant', content: m.content, attachmentName: m.beni_attachments?.file_name })) || []);
     } catch (error) {
       console.error('Error loading chat history:', error);
     } finally {
       setIsLoadingHistory(false);
     }
-  }, [user]);
+  }, [user, conversationId]);
 
   useEffect(() => { loadMessages(); }, [loadMessages]);
 
-  const saveMessage = async (role: 'user' | 'assistant', content: string): Promise<string | null> => {
-    if (!user) return null;
+  const ensureConversation = async (firstText: string): Promise<string | undefined> => {
+    if (convIdRef.current || !user) return convIdRef.current;
+    const title = firstText.replace(/\s+/g, ' ').trim().slice(0, 60) || 'Nova conversa';
+    const { data, error } = await supabase.from('beni_conversations').insert({ user_id: user.id, title }).select('id').single();
+    if (error) { console.error(error); toast.error('Não foi possível criar a conversa'); return undefined; }
+    convIdRef.current = data.id;
+    return data.id;
+  };
+
+  const saveMessage = async (role: 'user' | 'assistant', content: string, attachmentId?: string): Promise<string | null> => {
+    if (!user || !convIdRef.current) return null;
     try {
+      supabase.from('beni_conversations').update({ updated_at: new Date().toISOString() }).eq('id', convIdRef.current).then(() => {});
       const { data, error } = await supabase
         .from('beni_chat_messages')
-        .insert({ user_id: user.id, role, content })
+        .insert({ user_id: user.id, role, content, conversation_id: convIdRef.current, attachment_id: attachmentId ?? null })
         .select('id')
         .single();
       if (error) throw error;
@@ -177,19 +198,49 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
     if (!newState) stopSpeaking();
   }, [voiceEnabled, stopSpeaking]);
 
-  const streamChat = async (userMessage: string) => {
-    const userMsg: Message = { role: 'user', content: userMessage };
+  const uploadAttachment = async (file: File, convId: string): Promise<string | null> => {
+    if (!user) return null;
+    const safe = file.name.replace(/[^\w.\-]+/g, '_');
+    const path = `${user.id}/${crypto.randomUUID()}-${safe}`;
+    const { error: upErr } = await supabase.storage.from('beni-attachments').upload(path, file, { contentType: file.type || undefined });
+    if (upErr) { toast.error('Falha ao enviar o anexo'); return null; }
+    const { data, error } = await supabase.from('beni_attachments').insert({
+      user_id: user.id, conversation_id: convId, file_name: file.name, file_path: path, mime: file.type || null, size: file.size,
+    }).select('id').single();
+    if (error) { toast.error('Falha ao registrar o anexo'); return null; }
+    return data.id;
+  };
+
+  const handleFileSelected = (file: File | null) => {
+    if (file && file.size > MAX_FILE) { toast.error('Arquivo acima de 10 MB'); return; }
+    setPendingFile(file);
+  };
+
+  const streamChat = async (rawMessage: string) => {
+    const file = pendingFile;
+    const userMessage = rawMessage || (file ? 'Poderia avaliar este documento?' : '');
+    const userMsg: Message = { role: 'user', content: userMessage, attachmentName: file?.name };
+    const isNew = !convIdRef.current;
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
     setInput('');
+    setPendingFile(null);
 
-    const userMsgId = await saveMessage('user', userMessage);
+    const convId = await ensureConversation(userMessage);
+    if (!convId) { setIsLoading(false); setMessages(prev => prev.slice(0, -1)); return; }
+    let attachmentId: string | null = null;
+    if (file) {
+      attachmentId = await uploadAttachment(file, convId);
+      if (!attachmentId) { setIsLoading(false); setMessages(prev => prev.slice(0, -1)); return; }
+    }
+
+    const userMsgId = await saveMessage('user', userMessage, attachmentId ?? undefined);
     if (userMsgId) {
       setMessages(prev => prev.map((m, idx) => idx === prev.length - 1 ? { ...m, id: userMsgId } : m));
     }
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000);
+    const timeoutId = setTimeout(() => controller.abort(), file ? 150000 : 90000);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -203,7 +254,7 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMsg], context: beniContext }),
+        body: JSON.stringify({ messages: [...messages, userMsg].map(m => ({ role: m.role, content: m.content })), context: beniContext, conversationId: convId, attachmentId }),
         signal: controller.signal,
       });
 
@@ -313,6 +364,8 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
           setMessages(prev => prev.map((m, idx) => idx === prev.length - 1 ? { ...m, id: assistantMsgId } : m));
         }
         if (voiceEnabled) speakText(assistantContent);
+        onActivity?.();
+        if (isNew) onConversationCreated?.(convId);
       } else {
         toast.error('Professor Beni não respondeu. Tente novamente.');
         setMessages(prev => prev.filter(m => m.content !== ''));
@@ -332,13 +385,12 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && !pendingFile) || isLoading) return;
     streamChat(input.trim());
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) return;
-    if (e.key === 'Enter' && e.shiftKey) { e.preventDefault(); handleSubmit(); }
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); handleSubmit(); }
   };
 
   const handleSuggestion = (text: string) => {
@@ -346,17 +398,10 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
     streamChat(text);
   };
 
-  const handleClearChat = async () => {
-    if (!user) { setMessages([]); setInput(''); return; }
-    try {
-      const { error } = await supabase.from('beni_chat_messages').delete().eq('user_id', user.id);
-      if (error) throw error;
-      setMessages([]); setInput('');
-      toast.success('Histórico limpo');
-    } catch (error) {
-      console.error('Error clearing chat:', error);
-      toast.error('Erro ao limpar histórico');
-    }
+  const handleClearChat = () => {
+    if (onNewConversation) { onNewConversation(); return; }
+    convIdRef.current = undefined;
+    setMessages([]); setInput('');
   };
 
   // Voice input using Web Speech API
@@ -395,7 +440,7 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
 
   if (isLoadingHistory) {
     return (
-      <Card className="h-[calc(100vh-12rem)] min-h-[400px] max-h-[700px] flex items-center justify-center">
+      <Card className="h-[calc(100vh-10rem)] min-h-[480px] flex items-center justify-center">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
           Carregando histórico...
@@ -405,7 +450,7 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
   }
 
   return (
-    <Card className="h-[calc(100vh-12rem)] min-h-[400px] max-h-[700px] flex flex-col">
+    <Card className="h-[calc(100vh-10rem)] min-h-[480px] flex flex-col">
       <CardHeader className="pb-3 border-b shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -462,6 +507,7 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
                 <Square className="h-4 w-4" />
               </Button>
             )}
+            {headerExtra}
             {messages.length > 0 && (
               <Button variant="ghost" size="sm" onClick={handleClearChat} className="text-muted-foreground">
                 <RefreshCw className="h-4 w-4 mr-1" />
@@ -509,6 +555,9 @@ export function BeniChatBot({ initialContext }: BeniChatBotProps) {
           isLoading={isLoading}
           isListening={isListening}
           inputRef={inputRef}
+          pendingFile={pendingFile}
+          onFileSelected={handleFileSelected}
+          accept={ACCEPTED}
         />
       </CardContent>
     </Card>

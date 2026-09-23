@@ -7,12 +7,14 @@ import {
   GraduationCap,
   User,
   Trash2,
+  Paperclip,
 } from 'lucide-react';
 
 type Message = {
   id?: string;
   role: 'user' | 'assistant';
   content: string;
+  attachmentName?: string;
 };
 
 interface SuggestedQuestion {
@@ -105,6 +107,11 @@ export function ChatMessageList({
                       : 'bg-muted'
                   }`}
                 >
+                  {message.attachmentName && (
+                    <div className="mb-2 inline-flex items-center gap-1 rounded-md bg-background/20 px-2 py-1 text-xs">
+                      <Paperclip className="h-3 w-3" />{message.attachmentName}
+                    </div>
+                  )}
                   <p className="text-sm whitespace-pre-wrap leading-relaxed">
                     {message.content || (
                       <span className="flex items-center gap-2 text-muted-foreground">

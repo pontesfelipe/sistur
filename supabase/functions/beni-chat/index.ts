@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { extractAttachment, triageRelevance, attachmentContentParts, sseTextResponse, IRRELEVANT_REPLY } from "./attachment.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -101,11 +102,69 @@ serve(async (req) => {
   const { client: userClient } = authResult;
 
   try {
-    const { messages, context } = await req.json();
+    const body = await req.json();
+    const context = body.context;
+    const conversationId: string | null = typeof body.conversationId === "string" ? body.conversationId : null;
+    const attachmentId: string | null = typeof body.attachmentId === "string" ? body.attachmentId : null;
+    // Only plain role/content pairs from the client
+    let messages: any[] = (Array.isArray(body.messages) ? body.messages : [])
+      .filter((m: any) => (m?.role === "user" || m?.role === "assistant") && typeof m?.content === "string")
+      .map((m: any) => ({ role: m.role, content: m.content }));
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    // Instruções da pasta (projeto) da conversa
+    let folderInstructions = "";
+    if (conversationId) {
+      const { data: conv } = await userClient
+        .from("beni_conversations")
+        .select("id, beni_folders(name, instructions)")
+        .eq("id", conversationId)
+        .maybeSingle();
+      if (!conv) {
+        return new Response(JSON.stringify({ error: "Conversa não encontrada." }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const f: any = (conv as any).beni_folders;
+      if (f?.instructions) folderInstructions = `\n\nINSTRUÇÕES DO PROJETO "${f.name}":\n${f.instructions}`;
+    }
+
+    // Anexo: extrai conteúdo e faz triagem de relevância ANTES de debitar cota
+    if (attachmentId) {
+      const { data: att } = await userClient
+        .from("beni_attachments")
+        .select("id, file_name, file_path, mime")
+        .eq("id", attachmentId)
+        .maybeSingle();
+      if (!att) {
+        return new Response(JSON.stringify({ error: "Anexo não encontrado." }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: blob, error: dlErr } = await userClient.storage.from("beni-attachments").download(att.file_path);
+      if (dlErr || !blob) {
+        return new Response(JSON.stringify({ error: "Não foi possível ler o anexo." }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const payload = await extractAttachment(new Uint8Array(await blob.arrayBuffer()), att.file_name, att.mime || blob.type || "");
+      const lastIdx = messages.map((m) => m.role).lastIndexOf("user");
+      const question = lastIdx >= 0 ? messages[lastIdx].content : "";
+      const triage = await triageRelevance(LOVABLE_API_KEY, payload, question);
+      await userClient.from("beni_attachments")
+        .update({ relevant: triage.relevant, relevance_reason: triage.reason.slice(0, 500) })
+        .eq("id", att.id);
+      if (!triage.relevant) {
+        return sseTextResponse(IRRELEVANT_REPLY(att.file_name), corsHeaders);
+      }
+      if (lastIdx >= 0) {
+        messages = [...messages];
+        messages[lastIdx] = { role: "user", content: attachmentContentParts(payload, question) };
+      }
     }
 
     // ----------------------------------------------------------------
@@ -351,7 +410,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: selectedModel,
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: systemPrompt + folderInstructions },
           ...messages,
         ],
         stream: true,

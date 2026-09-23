@@ -124,6 +124,7 @@ const EduHistoricoEscolar = lazyWithReload(() => import("./pages/EduHistoricoEsc
 const Consorcios = lazyWithReload(() => import("./pages/Consorcios"));
 const ConsorcioDetalhe = lazyWithReload(() => import("./pages/ConsorcioDetalhe"));
 const AdminCertificacoes = lazyWithReload(() => import("./pages/AdminCertificacoes"));
+const BeniShared = lazyWithReload(() => import("./pages/BeniShared"));
 const VerificarCertificado = lazyWithReload(() => import("./pages/VerificarCertificado"));
 
 const Observatorio = lazyWithReload(() => import("./pages/Observatorio"));
@@ -189,7 +190,8 @@ const App = () => {
                 <Route path="/pending-approval" element={<PendingApproval />} />
                 <Route path="/acesso-bloqueado" element={<AccessBlocked />} />
                 <Route path="/termos" element={<TermsAcceptance />} />
-                 <Route path="/verificar-certificado" element={<VerificarCertificado />} />
+                 <Route path="/beni/compartilhado/:token" element={<BeniShared />} />
+                <Route path="/verificar-certificado" element={<VerificarCertificado />} />
                  <Route path="/verificar-certificado/:code" element={<VerificarCertificado />} />
                  <Route path="/planos" element={<Precos />} />
                  <Route path="/checkout/retorno" element={<CheckoutReturn />} />
@@ -450,6 +452,14 @@ const App = () => {
                 />
                 <Route
                   path="/professor-beni"
+                  element={
+                    <ProtectedRoute redirectStudentsToEdu={false}>
+                      <BeniChat />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/professor-beni/c/:conversationId"
                   element={
                     <ProtectedRoute redirectStudentsToEdu={false}>
                       <BeniChat />
