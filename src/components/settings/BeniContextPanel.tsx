@@ -43,15 +43,14 @@ const SECTION_META: Record<SectionKey, { title: string; description?: string; ic
 };
 
 const MODEL_OPTIONS: { value: string; label: string; hint: string }[] = [
-  { value: 'google/gemini-3-flash-preview', label: 'Gemini 3 Flash (Preview)', hint: 'Padrão — rápido e equilibrado' },
-  { value: 'google/gemini-3.5-flash', label: 'Gemini 3.5 Flash', hint: 'Mais raciocínio, ainda rápido' },
+  { value: 'openai/gpt-6-astra', label: 'GPT-6 Astra', hint: 'Padrão — o mais capaz (OpenAI)' },
+  { value: 'openai/gpt-5.6-sol', label: 'GPT-5.6 Sol', hint: 'Topo de linha GPT-5.6' },
+  { value: 'openai/gpt-5.6-terra', label: 'GPT-5.6 Terra', hint: 'Equilibrado, menor custo' },
+  { value: 'openai/gpt-5.6-luna', label: 'GPT-5.6 Luna', hint: 'Rápido e barato' },
+  { value: 'google/gemini-3.8-flash', label: 'Gemini 3.8 Flash', hint: 'Mais novo Gemini — rápido' },
+  { value: 'google/gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro (Preview)', hint: 'Raciocínio profundo' },
   { value: 'google/gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash Lite', hint: 'Custo-eficiente, alto volume' },
-  { value: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash', hint: 'Estável, multimodal' },
-  { value: 'google/gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', hint: 'Mais barato/rápido' },
-  { value: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro', hint: 'Raciocínio profundo' },
-  { value: 'openai/gpt-5', label: 'GPT-5', hint: 'Forte raciocínio (mais caro)' },
-  { value: 'openai/gpt-5-mini', label: 'GPT-5 Mini', hint: 'Equilíbrio de custo' },
-  { value: 'openai/gpt-5-nano', label: 'GPT-5 Nano', hint: 'Rápido e barato' },
+  { value: 'google/gemini-3-flash-preview', label: 'Gemini 3 Flash (Preview)', hint: 'Modelo anterior' },
 ];
 
 export function BeniContextPanel() {

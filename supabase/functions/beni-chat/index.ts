@@ -81,15 +81,14 @@ Se a pergunta NÃO for relacionada a nenhum desses temas, responda educadamente:
 NÃO responda perguntas sobre: programação, receitas culinárias, saúde médica, direito, matemática geral, entretenimento, esportes, política partidária, religião, ou qualquer outro tema fora do turismo e da metodologia SISTUR. Seja firme mas educado na recusa.`;
 
 const ALLOWED_MODELS = new Set([
-  "google/gemini-3-flash-preview",
+  "openai/gpt-6-astra",
+  "openai/gpt-5.6-sol",
+  "openai/gpt-5.6-terra",
+  "openai/gpt-5.6-luna",
+  "google/gemini-3.8-flash",
+  "google/gemini-3.1-pro-preview",
   "google/gemini-3.1-flash-lite",
-  "google/gemini-3.5-flash",
-  "google/gemini-2.5-flash",
-  "google/gemini-2.5-flash-lite",
-  "google/gemini-2.5-pro",
-  "openai/gpt-5",
-  "openai/gpt-5-mini",
-  "openai/gpt-5-nano",
+  "google/gemini-3-flash-preview",
 ]);
 
 serve(async (req) => {
@@ -145,7 +144,7 @@ serve(async (req) => {
 
     // Build context-aware system prompt. Allow admin overrides via beni_settings.
     let systemPrompt = BENI_SYSTEM_PROMPT;
-    let selectedModel = "google/gemini-3-flash-preview";
+    let selectedModel = "openai/gpt-6-astra";
     try {
       // Use service-role client: beni_settings SELECT is admin-only via RLS,
       // but every authenticated caller of this function needs the resolved prompt.
@@ -356,6 +355,12 @@ serve(async (req) => {
           ...messages,
         ],
         stream: true,
+        // Modelos OpenAI de raciocínio: esforço leve mantém o chat rápido.
+        ...(selectedModel === "openai/gpt-6-astra"
+          ? { reasoning_effort: "low" }
+          : selectedModel.startsWith("openai/gpt-5.6")
+            ? { reasoning_effort: "none" }
+            : {}),
       }),
     });
 
