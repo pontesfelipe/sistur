@@ -1,4 +1,13 @@
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { BeniConversationSidebar } from '@/components/chat/BeniConversationSidebar';
+import { ShareConversationMenu } from '@/components/chat/ShareConversationMenu';
+import { useBeniConversations } from '@/hooks/useBeniConversations';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
+import { PanelLeft, ChevronDown } from 'lucide-react';
 import { BeniChatBot } from '@/components/chat/BeniChatBot';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -45,19 +54,61 @@ const TOPICS = [
 ];
 
 export default function BeniChat() {
+  const { conversationId } = useParams<{ conversationId?: string }>();
+  const navigate = useNavigate();
+  const api = useBeniConversations();
+  const [drawer, setDrawer] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
+  const active = api.conversations.find((c) => c.id === conversationId);
+
+  const goNew = () => { setDrawer(false); navigate('/professor-beni'); };
+  const sidebar = (
+    <BeniConversationSidebar
+      api={api}
+      activeId={conversationId}
+      onNew={goNew}
+      onNavigate={() => setDrawer(false)}
+      onDeletedActive={() => navigate('/professor-beni', { replace: true })}
+    />
+  );
+
   return (
     <AppLayout
       title="Professor Beni"
       subtitle="Assistente virtual baseado na metodologia sistêmica do turismo"
     >
-      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
-        {/* Main Chat - takes full width on mobile */}
-        <div className="lg:col-span-2 min-h-0">
-          <BeniChatBot />
+      <div className="flex flex-col lg:grid lg:grid-cols-[260px_1fr_280px] gap-4">
+        <aside className="hidden lg:block h-[calc(100vh-10rem)] min-h-[480px]">{sidebar}</aside>
+
+        <div className="min-h-0 space-y-2">
+          <div className="lg:hidden">
+            <Sheet open={drawer} onOpenChange={setDrawer}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm"><PanelLeft className="h-4 w-4 mr-1" />Conversas e pastas</Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] pt-10">{sidebar}</SheetContent>
+            </Sheet>
+          </div>
+          <BeniChatBot
+            key={conversationId ?? 'new'}
+            conversationId={conversationId}
+            onConversationCreated={(id) => { api.refresh(); navigate(`/professor-beni/c/${id}`, { replace: true }); }}
+            onNewConversation={goNew}
+            onActivity={api.refresh}
+            headerExtra={active ? (
+              <ShareConversationMenu conversation={active} onUpdate={(patch) => api.updateConversation(active.id, patch as any)} />
+            ) : null}
+          />
         </div>
 
         {/* Sidebar - hidden on mobile, shown on desktop */}
-        <div className="hidden lg:block space-y-4">
+        <Collapsible open={infoOpen} onOpenChange={setInfoOpen} className="hidden lg:block space-y-4">
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-full justify-between">
+              Sobre o Professor e tópicos <ChevronDown className={`h-4 w-4 transition-transform ${infoOpen ? 'rotate-180' : ''}`} />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4">
           {/* About Card */}
           <Card>
             <CardHeader className="pb-3">
@@ -146,7 +197,8 @@ export default function BeniChat() {
               </div>
             </CardContent>
           </Card>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </AppLayout>
   );
