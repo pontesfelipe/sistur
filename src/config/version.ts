@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 10,
+  minor: 11,
   patch: 0,
 
   get full() {
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.11.0",
+    date: "2026-09-23",
+    type: "minor" as const,
+    changes: [
+      "Empresarial: aba Precificação com diária sugerida por mês (ocupação, eventos, mercado, piso/teto) e RevPAR projetado",
+      "Empresarial: aba LTV do hóspede com LTV, custo de aquisição e relação LTV/CAC",
+      "Projetos: cartão de ROI e payback no orçamento",
+      "Diagnóstico: Gêmeo Digital no Simulador com alavancas, cenários Pessimista/Base/Otimista e projeção de 1 a 5 anos",
+    ],
+  },
   {
     version: "2.10.0",
     date: "2026-09-23",

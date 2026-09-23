@@ -13,6 +13,7 @@ import {
   type EnterpriseChannelType,
 } from '@/hooks/useEnterpriseRevenue';
 import { useProfile } from '@/hooks/useProfile';
+import { DynamicPricingPanel, LtvPanel } from './DynamicPricingPanel';
 
 const CHANNEL_TYPES: { value: EnterpriseChannelType; label: string; defaultCommission: number }[] = [
   { value: 'DIRETO', label: 'Direto (site/telefone/walk-in)', defaultCommission: 0 },
@@ -102,7 +103,7 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="canais" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
             <TabsTrigger value="canais" className="gap-2">
               <TrendingUp className="h-4 w-4" />
               Canais de Distribuição
@@ -111,6 +112,8 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
               <Calendar className="h-4 w-4" />
               Sazonalidade Mensal
             </TabsTrigger>
+            <TabsTrigger value="precificacao">Precificação</TabsTrigger>
+            <TabsTrigger value="ltv">LTV do hóspede</TabsTrigger>
           </TabsList>
 
           {/* CANAIS */}
@@ -274,6 +277,8 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
               <strong> ENT_SEASONALITY_INDEX</strong> no próximo cálculo do diagnóstico.
             </p>
           </TabsContent>
+          <TabsContent value="precificacao"><DynamicPricingPanel months={months} /></TabsContent>
+          <TabsContent value="ltv"><LtvPanel commissionPct={weightedCommission} /></TabsContent>
         </Tabs>
       </CardContent>
     </Card>
