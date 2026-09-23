@@ -39,15 +39,17 @@ const corsHeaders = {
 // pela Chris (faz tabela → resumo → tabela → reinicia). Agora, em falha, o
 // job é marcado como failed e o usuário decide refazer.
 const MAX_ATTEMPTS = 1;
-const STREAM_IDLE_TIMEOUT_MS = 4 * 60 * 1000;
-const STREAM_HARD_TIMEOUT_MS = 12 * 60 * 1000;
+// v2.8.1 — limites abaixo do wall-clock do worker (~400s) para que os blocos
+// catch/finally sempre consigam marcar o job como failed/completed.
+const STREAM_IDLE_TIMEOUT_MS = 2 * 60 * 1000;
+const STREAM_HARD_TIMEOUT_MS = 6 * 60 * 1000;
 
 function fmtPrefix(traceId: string, started: number, jobId: string, reportId: string | null) {
   const elapsed = ((Date.now() - started) / 1000).toFixed(1);
   return `[trace=${traceId}][+${elapsed}s][job=${jobId}][report=${reportId ?? '-'}]`;
 }
 
-serve(async (req) => {
+async function handle(req: Request): Promise<Response> {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -411,4 +413,25 @@ serve(async (req) => {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+}
+
+// v2.8.1 — Responde 202 imediatamente e processa em segundo plano, para que o
+// proxy (~150s) nunca devolva 504 ao chamador (trigger pg_net) nem interrompa
+// o pipeline no meio.
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const authError = requireServiceRole(req);
+  if (authError) return authError;
+  const task = handle(req).catch((e) => {
+    console.error("[process-report-job] background error", e);
+    return new Response(null, { status: 500 });
+  });
+  const rt = (globalThis as any).EdgeRuntime;
+  if (rt?.waitUntil) {
+    rt.waitUntil(task);
+    return new Response(JSON.stringify({ ok: true, accepted: true }), {
+      status: 202, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  return await task;
 });

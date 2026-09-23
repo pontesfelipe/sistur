@@ -246,11 +246,23 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
           reference_date: string | null;
         }> = [];
 
-        for (const ext of extValues) {
+        // Um mesmo indicador pode vir de várias organizações: prioriza a própria
+        // organização e depois o ano mais recente, mantendo 1 linha por indicador.
+        const sortedExt = [...extValues].sort((a: any, b: any) => {
+          const ao = a.org_id === valueOrgId ? 0 : 1;
+          const bo = b.org_id === valueOrgId ? 0 : 1;
+          if (ao !== bo) return ao - bo;
+          return (b.reference_year ?? 0) - (a.reference_year ?? 0);
+        });
+        const seenIndicatorIds = new Set<string>();
+
+        for (const ext of sortedExt) {
           const indicator = codeToIndicator.get(ext.indicator_code);
           if (!indicator) continue;
           if (existingIndicatorIds.has(indicator.id)) continue;
+          if (seenIndicatorIds.has(indicator.id)) continue;
           if (ext.raw_value === null) continue;
+          seenIndicatorIds.add(indicator.id);
 
           toInsert.push({
             assessment_id: selectedAssessment,
@@ -272,12 +284,19 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
           await queryClient.invalidateQueries({ queryKey: ['indicator-values', selectedAssessment] });
 
           const savedCount = inserted?.length ?? 0;
-          if (insertError || savedCount === 0) {
-            console.error('Pré-preenchimento bloqueado:', insertError);
+          if (insertError) {
+            console.error('Pré-preenchimento falhou:', insertError);
+            const isRls = insertError.code === '42501' || /row-level security/i.test(insertError.message ?? '');
+            const isDup = insertError.code === '23505';
             toast.error('Não foi possível pré-preencher os indicadores', {
-              description:
-                'Você não tem permissão para gravar dados neste diagnóstico. Peça a um administrador ou analista da organização para executar o pré-preenchimento.',
+              description: isRls
+                ? 'Você não tem permissão para gravar dados neste diagnóstico. Peça a um administrador ou analista da organização para executar o pré-preenchimento.'
+                : isDup
+                  ? 'Alguns indicadores já possuem valor neste diagnóstico. Recarregue a página e tente novamente.'
+                  : (insertError.message || 'Tente novamente.'),
             });
+          } else if (savedCount === 0) {
+            toast.info('Nenhum indicador novo foi pré-preenchido.');
           } else {
             toast.success(`${savedCount} indicadores pré-preenchidos automaticamente`);
           }
