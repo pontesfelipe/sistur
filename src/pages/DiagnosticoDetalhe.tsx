@@ -21,6 +21,7 @@ import { useTrialState } from '@/hooks/useTrialState';
 import { CycleComparisonPanel } from '@/components/diagnostics/CycleComparisonPanel';
 import { WhatIfSimulatorPanel } from '@/components/diagnostics/WhatIfSimulatorPanel';
 import { DigitalTwinPanel } from '@/components/diagnostics/DigitalTwinPanel';
+import { GeomarketingPanel } from '@/components/diagnostics/GeomarketingPanel';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
@@ -1327,6 +1328,7 @@ const DiagnosticoDetalhe = () => {
               pillarScores={pillarScores as any}
             />
             <DigitalTwinPanel pillarScores={pillarScores as any} />
+            {assessment.destination_id && <GeomarketingPanel destinationId={assessment.destination_id} />}
           </TabsContent>
         </Tabs>
         ))

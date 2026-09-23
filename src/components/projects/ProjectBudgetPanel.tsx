@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, Wallet, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { computeRoi } from "@/lib/revenueIntelligence";
 
 const BRL = (n: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n || 0);
 
@@ -173,5 +174,33 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function ProjectRoiCard({ projectId, investment }: { projectId: string; investment: number }) {
+  const key = `sistur-roi-${projectId}`;
+  const [annual, setAnnual] = useState<number>(() => Number(localStorage.getItem(key) ?? 0));
+  const [years, setYears] = useState(3);
+  const { roi, paybackMonths } = computeRoi(investment, annual, years);
+  const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Retorno do investimento (ROI)</CardTitle>
+        <CardDescription>Investimento considerado: {brl(investment)}</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-4 md:grid-cols-4 items-end">
+        <div className="space-y-1">
+          <Label>Retorno anual esperado (R$)</Label>
+          <Input type="number" value={annual || ""} onChange={(e) => { const v = Number(e.target.value); setAnnual(v); localStorage.setItem(key, String(v)); }} />
+        </div>
+        <div className="space-y-1">
+          <Label>Horizonte (anos)</Label>
+          <Input type="number" min={1} max={10} value={years} onChange={(e) => setYears(Math.max(1, Number(e.target.value)))} />
+        </div>
+        <div><p className="text-xs text-muted-foreground">ROI</p><p className="text-2xl font-semibold">{roi == null ? "—" : `${Math.round(roi)}%`}</p></div>
+        <div><p className="text-xs text-muted-foreground">Payback</p><p className="text-2xl font-semibold">{paybackMonths == null ? "—" : `${Math.ceil(paybackMonths)} meses`}</p></div>
+      </CardContent>
+    </Card>
   );
 }
