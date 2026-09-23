@@ -740,29 +740,138 @@ export type Database = {
           },
         ]
       }
+      beni_attachments: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          file_name: string
+          file_path: string
+          id: string
+          mime: string | null
+          relevance_reason: string | null
+          relevant: boolean | null
+          size: number | null
+          user_id: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          file_name: string
+          file_path: string
+          id?: string
+          mime?: string | null
+          relevance_reason?: string | null
+          relevant?: boolean | null
+          size?: number | null
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          mime?: string | null
+          relevance_reason?: string | null
+          relevant?: boolean | null
+          size?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beni_attachments_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "beni_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beni_chat_messages: {
         Row: {
+          attachment_id: string | null
           content: string
+          conversation_id: string | null
           created_at: string
           id: string
           role: string
           user_id: string
         }
         Insert: {
+          attachment_id?: string | null
           content: string
+          conversation_id?: string | null
           created_at?: string
           id?: string
           role: string
           user_id: string
         }
         Update: {
+          attachment_id?: string | null
           content?: string
+          conversation_id?: string | null
           created_at?: string
           id?: string
           role?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "beni_chat_messages_attachment_id_fkey"
+            columns: ["attachment_id"]
+            isOneToOne: false
+            referencedRelation: "beni_attachments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beni_chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "beni_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beni_conversations: {
+        Row: {
+          created_at: string
+          folder_id: string | null
+          id: string
+          share_enabled: boolean
+          share_token: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          folder_id?: string | null
+          id?: string
+          share_enabled?: boolean
+          share_token?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          folder_id?: string | null
+          id?: string
+          share_enabled?: boolean
+          share_token?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beni_conversations_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "beni_folders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       beni_credits: {
         Row: {
@@ -810,6 +919,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      beni_folders: {
+        Row: {
+          created_at: string
+          id: string
+          instructions: string | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          instructions?: string | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          instructions?: string | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       beni_quotas: {
         Row: {
@@ -12384,6 +12520,7 @@ export type Database = {
         Args: { p_score: number }
         Returns: Database["public"]["Enums"]["severity_type"]
       }
+      get_shared_beni_conversation: { Args: { _token: string }; Returns: Json }
       get_stale_assessments: {
         Args: never
         Returns: {

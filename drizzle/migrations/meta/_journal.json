@@ -15,6 +15,13 @@
       "when": 1790028088307,
       "tag": "0001_restore_municipal_official_cache",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790203344840,
+      "tag": "0002_beni_folders_conversations_attachments",
+      "breakpoints": true
     }
   ]
 }
