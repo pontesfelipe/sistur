@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 11,
+  minor: 13,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.13.0",
+    date: "2026-09-23",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico: Geomarketing no Simulador com mapa, raio de influência, concorrentes, mapa de calor da oferta, demanda aérea (ANAC) e eventos do Observatório",
+      "Projetos: correção do cartão de ROI e payback",
+    ],
+  },
   {
     version: "2.11.0",
     date: "2026-09-23",
