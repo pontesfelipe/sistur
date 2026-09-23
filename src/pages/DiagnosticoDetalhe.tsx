@@ -20,6 +20,7 @@ import { TrialResultsTeaser } from '@/components/diagnostics/TrialResultsTeaser'
 import { useTrialState } from '@/hooks/useTrialState';
 import { CycleComparisonPanel } from '@/components/diagnostics/CycleComparisonPanel';
 import { WhatIfSimulatorPanel } from '@/components/diagnostics/WhatIfSimulatorPanel';
+import { DigitalTwinPanel } from '@/components/diagnostics/DigitalTwinPanel';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
@@ -1325,6 +1326,7 @@ const DiagnosticoDetalhe = () => {
               indicatorScores={indicatorScores as any}
               pillarScores={pillarScores as any}
             />
+            <DigitalTwinPanel pillarScores={pillarScores as any} />
           </TabsContent>
         </Tabs>
         ))
