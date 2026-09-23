@@ -81,8 +81,8 @@ export function DynamicPricingPanel({ months }: { months: SeasonalityMonth[] }) 
   );
 }
 
-export function LtvPanel({ cac }: { cac: number }) {
-  const [v, setV] = useState({ spendPerStay: 800, staysPerYear: 1, yearsRetained: 3, marginPct: 30, cac: Math.round(cac) });
+export function LtvPanel({ commissionPct }: { commissionPct: number }) {
+  const [v, setV] = useState({ spendPerStay: 800, staysPerYear: 1, yearsRetained: 3, marginPct: 30, cac: Math.round(800 * (commissionPct || 0) / 100) });
   const r = computeLtv(v);
   const f = (k: keyof typeof v, label: string) => (
     <div className="space-y-1">
