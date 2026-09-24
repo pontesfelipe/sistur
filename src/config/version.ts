@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 14,
+  minor: 15,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.15.0",
+    date: "2026-09-24",
+    type: "minor" as const,
+    changes: [
+      "Gêmeo Digital: salvar cenários com nome, reabrir e excluir",
+      "Gêmeo Digital: botão \"Transformar cenário em projeto\" com metas projetadas e alavancas na descrição",
+    ],
+  },
   {
     version: "2.14.0",
     date: "2026-09-24",
