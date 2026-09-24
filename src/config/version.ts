@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 13,
+  minor: 14,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.14.0",
+    date: "2026-09-24",
+    type: "minor" as const,
+    changes: [
+      "Geomarketing: camada com as unidades da mesma rede/marca em outros municípios",
+      "Geomarketing: camada de origem dos visitantes por estado, com linhas proporcionais ao percentual informado",
+    ],
+  },
   {
     version: "2.13.0",
     date: "2026-09-23",

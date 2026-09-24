@@ -12,6 +12,15 @@ import { MapPin } from 'lucide-react';
 
 interface Props { destinationId: string }
 
+// Capitais por UF (coordenadas aproximadas) para a camada de origem da demanda.
+const UF_CAPITALS: Record<string, [number, number]> = {
+  AC:[-9.97,-67.81],AL:[-9.66,-35.73],AP:[0.03,-51.07],AM:[-3.12,-60.02],BA:[-12.97,-38.5],CE:[-3.73,-38.52],
+  DF:[-15.79,-47.88],ES:[-20.32,-40.34],GO:[-16.68,-49.25],MA:[-2.53,-44.3],MT:[-15.6,-56.1],MS:[-20.44,-54.65],
+  MG:[-19.92,-43.94],PA:[-1.46,-48.5],PB:[-7.12,-34.86],PR:[-25.43,-49.27],PE:[-8.05,-34.9],PI:[-5.09,-42.8],
+  RJ:[-22.91,-43.17],RN:[-5.79,-35.21],RS:[-30.03,-51.23],RO:[-8.76,-63.9],RR:[2.82,-60.67],SC:[-27.6,-48.55],
+  SP:[-23.55,-46.63],SE:[-10.91,-37.07],TO:[-10.18,-48.33],
+};
+
 // Posição aproximada: concorrentes só têm distância; distribuímos em ângulos determinísticos.
 function offset(lat: number, lng: number, km: number, i: number) {
   const ang = (i * 137.5 * Math.PI) / 180;
@@ -27,6 +36,15 @@ export function GeomarketingPanel({ destinationId }: Props) {
   const [radius, setRadius] = useState(10);
   const [showComp, setShowComp] = useState(true);
   const [showHeat, setShowHeat] = useState(true);
+  const [showBrand, setShowBrand] = useState(true);
+  const [showOrigin, setShowOrigin] = useState(true);
+  const originKey = `sistur-geo-origin-${destinationId}`;
+  const [origins, setOrigins] = useState<Record<string, number>>(() => {
+    try { return JSON.parse(localStorage.getItem(originKey) || '{}'); } catch { return {}; }
+  });
+  const [newUf, setNewUf] = useState('SP');
+  const [newPct, setNewPct] = useState(20);
+  const saveOrigins = (o: Record<string, number>) => { setOrigins(o); localStorage.setItem(originKey, JSON.stringify(o)); };
 
   const { data } = useQuery({
     queryKey: ['geomarketing', destinationId],
@@ -44,7 +62,14 @@ export function GeomarketingPanel({ destinationId }: Props) {
         .select('total_passengers_12m,flights_per_week,airport_icao_codes,reference_period_end')
         .in('ibge_code', [code, code.slice(0, 6)]).order('reference_period_end', { ascending: false }).limit(1)
         : { data: [] as any[] };
-      return { dest, comps: comps ?? [], events: events ?? [], anac: anac?.[0] ?? null };
+      // Rede/marca: unidades da mesma marca do empreendimento deste destino.
+      const { data: own } = await supabase.from('enterprise_profiles')
+        .select('brand_id').eq('destination_id', destinationId).not('brand_id', 'is', null).limit(1);
+      const brandId = own?.[0]?.brand_id;
+      const { data: units } = brandId ? await supabase.from('enterprise_profiles')
+        .select('id,unit_name,is_flagship,destination_id,destinations(name,uf,latitude,longitude)')
+        .eq('brand_id', brandId) : { data: [] as any[] };
+      return { dest, comps: comps ?? [], events: events ?? [], anac: anac?.[0] ?? null, units: units ?? [] };
     },
   });
 
@@ -76,8 +101,23 @@ export function GeomarketingPanel({ destinationId }: Props) {
       if (showComp) L.circleMarker(pos, { radius: 6, color: 'hsl(var(--destructive))', fillOpacity: 0.8 })
         .bindPopup(`<b>${comp.name}</b><br/>${comp.property_type ?? ''} · ${comp.distance_km} km<br/>Nota ${comp.rating ?? '—'} (${comp.review_volume ?? 0} avaliações)`).addTo(g);
     });
-    mapRef.current?.fitBounds(L.latLng(c).toBounds(radius * 2200));
-  }, [data, dest, radius, showComp, showHeat]);
+    const bounds = L.latLngBounds([L.latLng(c).toBounds(radius * 2200).getNorthEast(), L.latLng(c).toBounds(radius * 2200).getSouthWest()]);
+    if (showBrand) (data?.units ?? []).forEach((u: any) => {
+      const d = u.destinations; if (!d?.latitude || u.destination_id === destinationId) return;
+      const pos: [number, number] = [d.latitude, d.longitude];
+      L.circleMarker(pos, { radius: 7, color: 'hsl(var(--pillar-oe))', fillOpacity: 0.9 })
+        .bindPopup(`<b>${u.unit_name ?? 'Unidade'}</b>${u.is_flagship ? ' (principal)' : ''}<br/>${d.name}/${d.uf}`).addTo(g);
+      bounds.extend(pos);
+    });
+    if (showOrigin) Object.entries(origins).forEach(([uf, pct]) => {
+      const pos = UF_CAPITALS[uf]; if (!pos) return;
+      L.polyline([pos, c], { color: 'hsl(var(--pillar-ao))', weight: 1 + pct / 8, opacity: 0.7 }).addTo(g);
+      L.circleMarker(pos, { radius: 4 + pct / 5, color: 'hsl(var(--pillar-ao))', fillOpacity: 0.6 })
+        .bindPopup(`<b>${uf}</b>: ${pct}% dos visitantes`).addTo(g);
+      bounds.extend(pos);
+    });
+    mapRef.current?.fitBounds(bounds);
+  }, [data, dest, radius, showComp, showHeat, showBrand, showOrigin, origins, destinationId]);
 
   return (
     <Card>
@@ -97,6 +137,22 @@ export function GeomarketingPanel({ destinationId }: Props) {
               </div>
               <div className="flex items-center gap-2"><Switch checked={showComp} onCheckedChange={setShowComp} /><Label>Concorrentes</Label></div>
               <div className="flex items-center gap-2"><Switch checked={showHeat} onCheckedChange={setShowHeat} /><Label>Mapa de calor da oferta</Label></div>
+              <div className="flex items-center gap-2"><Switch checked={showBrand} onCheckedChange={setShowBrand} /><Label>Unidades da rede ({Math.max(0, (data?.units?.length ?? 0) - 1)})</Label></div>
+              <div className="flex items-center gap-2"><Switch checked={showOrigin} onCheckedChange={setShowOrigin} /><Label>Origem dos visitantes</Label></div>
+            </div>
+            <div className="rounded-md border p-3 space-y-2 text-sm">
+              <p className="font-medium">Origem dos visitantes (por estado)</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <select className="h-9 rounded-md border bg-background px-2" value={newUf} onChange={e => setNewUf(e.target.value)} aria-label="Estado de origem">
+                  {Object.keys(UF_CAPITALS).map(uf => <option key={uf}>{uf}</option>)}
+                </select>
+                <input type="number" min={1} max={100} className="h-9 w-20 rounded-md border bg-background px-2" value={newPct} onChange={e => setNewPct(Number(e.target.value))} aria-label="Percentual" />
+                <span>%</span>
+                <button type="button" className="h-9 rounded-md bg-primary px-3 text-primary-foreground" onClick={() => saveOrigins({ ...origins, [newUf]: newPct })}>Adicionar</button>
+                {Object.entries(origins).map(([uf, pct]) => (
+                  <Badge key={uf} variant="secondary" className="cursor-pointer" onClick={() => { const o = { ...origins }; delete o[uf]; saveOrigins(o); }}>{uf} {pct}% ✕</Badge>
+                ))}
+              </div>
             </div>
             <div ref={mapEl} className="h-[420px] w-full rounded-md border z-0" />
             <div className="grid gap-3 md:grid-cols-3 text-sm">
