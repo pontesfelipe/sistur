@@ -11684,6 +11684,60 @@ export type Database = {
         }
         Relationships: []
       }
+      twin_scenarios: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          created_by: string
+          id: string
+          intensities: Json
+          name: string
+          org_id: string
+          preset: string
+          projection: Json
+          years: number
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          intensities?: Json
+          name: string
+          org_id: string
+          preset?: string
+          projection?: Json
+          years?: number
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          intensities?: Json
+          name?: string
+          org_id?: string
+          preset?: string
+          projection?: Json
+          years?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_scenarios_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "twin_scenarios_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["latest_assessment_id"]
+          },
+        ]
+      }
       user_feedback: {
         Row: {
           admin_notes: string | null
