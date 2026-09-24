@@ -43,7 +43,7 @@ export function useBrandRollup(assessmentId?: string) {
           destination_id,
           is_primary,
           enterprise_profile_id,
-          destination:destinations(name, state),
+          destination:destinations(name, uf),
           profile:enterprise_profiles(room_count)
         `)
         .eq('assessment_id', assessmentId)
@@ -84,7 +84,7 @@ export function useBrandRollup(assessmentId?: string) {
         unit_name: u.unit_name,
         destination_id: u.destination_id,
         destination_name: u.destination?.name ?? null,
-        destination_state: u.destination?.state ?? null,
+        destination_state: u.destination?.uf ?? null,
         is_primary: !!u.is_primary,
         enterprise_profile_id: u.enterprise_profile_id,
         room_count: u.profile?.room_count ?? null,

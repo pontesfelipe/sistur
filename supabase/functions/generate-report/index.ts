@@ -3222,7 +3222,7 @@ serve(async (req) => {
           supabase.from('enterprise_brands').select('id, name, brand_type, total_units, hq_destination_id').eq('id', brandId).maybeSingle(),
           supabase
             .from('assessment_units')
-            .select('id, unit_name, is_primary, destination_id, enterprise_profile_id, destinations:destinations(name, state, uf, ibge_code), profile:enterprise_profiles(room_count)')
+            .select('id, unit_name, is_primary, destination_id, enterprise_profile_id, destinations:destinations(name, uf, ibge_code), profile:enterprise_profiles(room_count)')
             .eq('assessment_id', assessmentId)
             .order('is_primary', { ascending: false }),
           supabase.from('assessment_brand_rollups').select('*').eq('assessment_id', assessmentId),
@@ -3259,7 +3259,7 @@ serve(async (req) => {
               if (!r) continue;
               const crit = units.find((u) => u.id === r.critical_unit_id);
               lines.push(
-                `| ${p} | ${fmtPct(r.score_weighted)} | ${fmtPct(r.score_simple)} | ${fmtPct(r.stddev)} | ${r.unit_count} | ${crit ? `${crit.unit_name} (${crit.destinations?.name || ''}/${crit.destinations?.state || crit.destinations?.uf || ''})` : '—'} |`,
+                `| ${p} | ${fmtPct(r.score_weighted)} | ${fmtPct(r.score_simple)} | ${fmtPct(r.stddev)} | ${r.unit_count} | ${crit ? `${crit.unit_name} (${crit.destinations?.name || ''}/${crit.destinations?.uf || ''})` : '—'} |`,
               );
             }
             return lines.join('\n');
@@ -3277,7 +3277,7 @@ serve(async (req) => {
               const ao = ps.find((x) => x.pillar === 'AO');
               const iss = (issuesByUnit.get(u.id) || []).filter((i: any) => i.severity === 'CRITICO');
               lines.push(
-                `| ${u.unit_name}${u.is_primary ? ' ★' : ''} | ${u.destinations?.name || '—'}/${u.destinations?.state || u.destinations?.uf || '—'} | ${u.profile?.room_count ?? '—'} | ${fmtPct(ra?.score)} | ${fmtPct(oe?.score)} | ${fmtPct(ao?.score)} | ${iss.length} |`,
+                `| ${u.unit_name}${u.is_primary ? ' ★' : ''} | ${u.destinations?.name || '—'}/${u.destinations?.uf || '—'} | ${u.profile?.room_count ?? '—'} | ${fmtPct(ra?.score)} | ${fmtPct(oe?.score)} | ${fmtPct(ao?.score)} | ${iss.length} |`,
               );
             }
             return lines.join('\n');
