@@ -1327,7 +1327,7 @@ const DiagnosticoDetalhe = () => {
               indicatorScores={indicatorScores as any}
               pillarScores={pillarScores as any}
             />
-            <DigitalTwinPanel pillarScores={pillarScores as any} />
+            <DigitalTwinPanel pillarScores={pillarScores as any} assessmentId={assessment.id} orgId={(assessment as any).org_id} destinationId={assessment.destination_id} />
             {assessment.destination_id && <GeomarketingPanel destinationId={assessment.destination_id} />}
           </TabsContent>
         </Tabs>

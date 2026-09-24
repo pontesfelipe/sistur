@@ -3,6 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useCreateProject } from '@/hooks/useProjects';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Trash2, Save, FolderPlus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { TWIN_LEVERS, projectScenario, type PillarKey } from '@/lib/revenueIntelligence';
 import { SEVERITY_INFO, getSeverityFromScore, type Severity } from '@/types/sistur';
@@ -13,7 +20,22 @@ const PRESETS: Record<string, { drift: number; intensity: number }> = {
   Otimista: { drift: 0.5, intensity: 80 },
 };
 
-export function DigitalTwinPanel({ pillarScores }: { pillarScores: any[] }) {
+interface Ctx { assessmentId?: string; orgId?: string; destinationId?: string }
+
+export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinationId }: { pillarScores: any[] } & Ctx) {
+  const qc = useQueryClient();
+  const navigate = useNavigate();
+  const createProject = useCreateProject();
+  const [scenarioName, setScenarioName] = useState('');
+  const { data: saved = [] } = useQuery({
+    queryKey: ['twin-scenarios', assessmentId],
+    enabled: !!assessmentId,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('twin_scenarios').select('*').eq('assessment_id', assessmentId!).order('created_at', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
   const base = useMemo(() => {
     const get = (p: PillarKey) => Number(pillarScores.find((x: any) => x.pillar === p)?.score ?? 0.5);
     return { RA: get('RA'), OE: get('OE'), AO: get('AO') };
@@ -43,6 +65,40 @@ export function DigitalTwinPanel({ pillarScores }: { pillarScores: any[] }) {
     [base, intensities, years, preset],
   );
   const current = scenarios.find((s) => s.name === preset)!.data;
+  const saveScenario = async () => {
+    if (!assessmentId || !orgId) return;
+    const name = scenarioName.trim() || `${preset} — ${years} ano(s)`;
+    const { error } = await supabase.from('twin_scenarios').insert({
+      org_id: orgId, assessment_id: assessmentId, name, preset, years, intensities, projection: current as any,
+    });
+    if (error) { toast.error(error.code === '42501' ? 'Sem permissão para salvar cenários nesta organização.' : error.message); return; }
+    setScenarioName(''); toast.success('Cenário salvo');
+    qc.invalidateQueries({ queryKey: ['twin-scenarios', assessmentId] });
+  };
+  const loadScenario = (s: any) => { setPreset(s.preset in PRESETS ? s.preset : 'Base'); setYears(s.years); setIntensities({ ...intensities, ...(s.intensities || {}) }); };
+  const deleteScenario = async (id: string) => {
+    const { error } = await supabase.from('twin_scenarios').delete().eq('id', id);
+    if (error) toast.error(error.message); else qc.invalidateQueries({ queryKey: ['twin-scenarios', assessmentId] });
+  };
+  const toProject = async () => {
+    if (!assessmentId || !orgId || !destinationId) return;
+    const active = TWIN_LEVERS.filter((l) => (intensities[l.id] || 0) > 0).sort((a, b) => intensities[b.id] - intensities[a.id]);
+    const last = current[current.length - 1];
+    const start = new Date(); const end = new Date(); end.setFullYear(end.getFullYear() + years);
+    const description = `Projeto gerado a partir do cenário "${scenarioName.trim() || preset}" do Gêmeo Digital (${years} ano(s)).\n` +
+      `Meta projetada: RA ${Math.round(last.RA * 100)}%, OE ${Math.round(last.OE * 100)}%, AO ${Math.round(last.AO * 100)}%.\n` +
+      `Alavancas: ${active.map((l) => `${l.label} (${intensities[l.id]}%)`).join('; ') || 'nenhuma'}.`;
+    try {
+      const p: any = await createProject.mutateAsync({
+        org_id: orgId, destination_id: destinationId, assessment_id: assessmentId,
+        name: `Cenário ${scenarioName.trim() || preset} — Gêmeo Digital`, description, methodology: 'waterfall',
+        planned_start_date: start.toISOString().slice(0, 10), planned_end_date: end.toISOString().slice(0, 10),
+        generated_structure: { source: 'digital_twin', preset, years, intensities, projection: current },
+      });
+      if (p?.id) navigate(`/projetos/${p.id}`);
+    } catch { /* toast já exibido */ }
+  };
+
   const chart = current.map((p) => ({ ano: `Ano ${p.year}`, RA: Math.round(p.RA * 100), OE: Math.round(p.OE * 100), AO: Math.round(p.AO * 100) }));
 
   return (
@@ -70,6 +126,28 @@ export function DigitalTwinPanel({ pillarScores }: { pillarScores: any[] }) {
               </div>
             ))}
           </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Input className="w-64" placeholder="Nome do cenário (opcional)" value={scenarioName} onChange={(e) => setScenarioName(e.target.value)} />
+            <Button size="sm" variant="outline" onClick={saveScenario} disabled={!assessmentId}><Save className="h-4 w-4 mr-1" />Salvar cenário</Button>
+            <Button size="sm" onClick={toProject} disabled={!destinationId || createProject.isPending}><FolderPlus className="h-4 w-4 mr-1" />Transformar cenário em projeto</Button>
+          </div>
+          {saved.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-sm font-medium">Cenários salvos</p>
+              {saved.map((s: any) => {
+                const l = (s.projection || [])[s.projection?.length - 1];
+                return (
+                  <div key={s.id} className="flex items-center justify-between rounded border p-2 text-sm">
+                    <button type="button" className="text-left hover:underline" onClick={() => loadScenario(s)}>
+                      <b>{s.name}</b> · {new Date(s.created_at).toLocaleDateString('pt-BR')}
+                      {l && <span className="text-muted-foreground"> — RA {Math.round(l.RA * 100)}% · OE {Math.round(l.OE * 100)}% · AO {Math.round(l.AO * 100)}%</span>}
+                    </button>
+                    <Button size="icon" variant="ghost" aria-label="Excluir cenário" onClick={() => deleteScenario(s.id)}><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <div className="h-64">
             <ResponsiveContainer>
               <LineChart data={chart}>
