@@ -22,6 +22,7 @@ import { CycleComparisonPanel } from '@/components/diagnostics/CycleComparisonPa
 import { WhatIfSimulatorPanel } from '@/components/diagnostics/WhatIfSimulatorPanel';
 import { DigitalTwinPanel } from '@/components/diagnostics/DigitalTwinPanel';
 import { GeomarketingPanel } from '@/components/diagnostics/GeomarketingPanel';
+import { RevenueIntelligenceGate } from '@/components/layout/RevenueIntelligenceGate';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
 import { PillarTrendPanel } from '@/components/diagnostics/PillarTrendPanel';
@@ -1327,8 +1328,10 @@ const DiagnosticoDetalhe = () => {
               indicatorScores={indicatorScores as any}
               pillarScores={pillarScores as any}
             />
-            <DigitalTwinPanel pillarScores={pillarScores as any} assessmentId={assessment.id} orgId={(assessment as any).org_id} destinationId={assessment.destination_id} />
-            {assessment.destination_id && <GeomarketingPanel destinationId={assessment.destination_id} />}
+            <RevenueIntelligenceGate title="O Gêmeo Digital">
+              <DigitalTwinPanel pillarScores={pillarScores as any} assessmentId={assessment.id} orgId={(assessment as any).org_id} destinationId={assessment.destination_id} />
+            </RevenueIntelligenceGate>
+            {assessment.destination_id && <RevenueIntelligenceGate title="O Geomarketing"><GeomarketingPanel destinationId={assessment.destination_id} /></RevenueIntelligenceGate>}
           </TabsContent>
         </Tabs>
         ))

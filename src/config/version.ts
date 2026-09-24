@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 15,
+  minor: 16,
   patch: 0,
 
   get full() {
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.16.0",
+    date: "2026-09-24",
+    type: "minor" as const,
+    changes: [
+      "Precificação: botão \"Explicar com IA\" com justificativa por mês",
+      "Precificação, LTV, Gêmeo Digital e Geomarketing liberados nos planos Pro/Enterprise e no teste",
+      "Metodologia: fórmulas de precificação, LTV, ROI, Gêmeo Digital e Geomarketing",
+    ],
+  },
   {
     version: "2.15.0",
     date: "2026-09-24",
