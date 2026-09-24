@@ -2,6 +2,10 @@ import { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Sparkles, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { suggestPrices, computeLtv } from '@/lib/revenueIntelligence';
 import type { SeasonalityMonth } from '@/hooks/useEnterpriseRevenue';
 
@@ -11,6 +15,8 @@ const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', curren
 export function DynamicPricingPanel({ months }: { months: SeasonalityMonth[] }) {
   const [rules, setRules] = useState({ floor: 0, ceiling: 0, maxChangePct: 20, targetOccupancy: 70, marketAdr: 0 });
   const [events, setEvents] = useState<Record<number, number>>({});
+  const [aiText, setAiText] = useState<Record<number, string>>({});
+  const [aiLoading, setAiLoading] = useState(false);
 
   const suggestions = useMemo(() => {
     const input = Array.from({ length: 12 }, (_, i) => {
@@ -26,6 +32,16 @@ export function DynamicPricingPanel({ months }: { months: SeasonalityMonth[] }) 
   }, [months, rules, events]);
 
   const hasData = months.some((m) => m.adr);
+
+  const explain = async () => {
+    setAiLoading(true);
+    const { data, error } = await supabase.functions.invoke('pricing-justification', {
+      body: { suggestions: suggestions.map((s) => ({ month: s.month, baseAdr: s.baseAdr, suggestedAdr: s.suggestedAdr, changePct: s.changePct, reasons: s.reasons })) },
+    });
+    setAiLoading(false);
+    if (error || !data?.items) { toast.error('Não foi possível gerar as justificativas agora. Tente de novo em instantes.'); return; }
+    setAiText(Object.fromEntries(data.items.map((i: any) => [i.month, i.text])));
+  };
   const cur = suggestions.reduce((s, x) => s + (x.currentRevpar || 0), 0);
   const proj = suggestions.reduce((s, x) => s + (x.projectedRevpar || 0), 0);
 
@@ -55,6 +71,10 @@ export function DynamicPricingPanel({ months }: { months: SeasonalityMonth[] }) 
           <div className="flex flex-wrap gap-3 text-sm">
             <Badge variant="outline">RevPAR somado atual: {brl(cur)}</Badge>
             <Badge variant="outline">RevPAR somado projetado: {brl(proj)}</Badge>
+            <Button size="sm" variant="outline" onClick={explain} disabled={aiLoading}>
+              {aiLoading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}
+              Explicar com IA
+            </Button>
           </div>
           <div className="space-y-2">
             {suggestions.map((s) => (
@@ -71,7 +91,7 @@ export function DynamicPricingPanel({ months }: { months: SeasonalityMonth[] }) 
                   <Input type="number" min="0" placeholder="Eventos" value={events[s.month] || ''}
                     onChange={(e) => setEvents({ ...events, [s.month]: Number(e.target.value) })} />
                 </div>
-                <span className="col-span-5 text-xs text-muted-foreground">{s.reasons.join(' · ')}</span>
+                <span className="col-span-5 text-xs text-muted-foreground">{aiText[s.month] || s.reasons.join(' · ')}</span>
               </div>
             ))}
           </div>
