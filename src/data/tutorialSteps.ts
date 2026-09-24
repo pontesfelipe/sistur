@@ -129,7 +129,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
         title: 'Escolher um plano',
         description: 'Antes do trial expirar, acesse a página de Planos para continuar usando o SISTUR.',
         details: [
-          'Plano Básico: Acesso ao EDU e Fórum.',
+          'Planos Territorial e Empresarial: Analítico, EDU, relatórios e Professor Beni.',
           'Plano Pro: EDU + Analítico básico + Relatórios.',
           'Plano Enterprise: Acesso completo + suporte prioritário.',
           'Professores com 5+ alunos referenciados são isentos automaticamente!',
