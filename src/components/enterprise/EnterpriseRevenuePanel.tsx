@@ -14,6 +14,7 @@ import {
 } from '@/hooks/useEnterpriseRevenue';
 import { useProfile } from '@/hooks/useProfile';
 import { DynamicPricingPanel, LtvPanel } from './DynamicPricingPanel';
+import { RevenueIntelligenceGate } from '@/components/layout/RevenueIntelligenceGate';
 
 const CHANNEL_TYPES: { value: EnterpriseChannelType; label: string; defaultCommission: number }[] = [
   { value: 'DIRETO', label: 'Direto (site/telefone/walk-in)', defaultCommission: 0 },
@@ -277,8 +278,8 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
               <strong> ENT_SEASONALITY_INDEX</strong> no próximo cálculo do diagnóstico.
             </p>
           </TabsContent>
-          <TabsContent value="precificacao"><DynamicPricingPanel months={months} /></TabsContent>
-          <TabsContent value="ltv"><LtvPanel commissionPct={weightedCommission} /></TabsContent>
+          <TabsContent value="precificacao"><RevenueIntelligenceGate title="A Precificação dinâmica"><DynamicPricingPanel months={months} /></RevenueIntelligenceGate></TabsContent>
+          <TabsContent value="ltv"><RevenueIntelligenceGate title="O LTV do hóspede"><LtvPanel commissionPct={weightedCommission} /></RevenueIntelligenceGate></TabsContent>
         </Tabs>
       </CardContent>
     </Card>

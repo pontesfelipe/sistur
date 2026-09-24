@@ -1420,6 +1420,20 @@ export default function Metodologia() {
         {/* References */}
         <Card>
           <CardHeader>
+            <CardTitle>Inteligência de Receita e Cenários</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <p><strong>Precificação dinâmica:</strong> a diária sugerida parte da diária média do mês e é ajustada pela distância entre a ocupação real e a meta, pelo número de eventos e pela diária de mercado informada. A variação respeita o limite mensal, o piso e o teto. Elasticidade simplificada: cada +1% no preço reduz 0,3% da ocupação. RevPAR = diária × ocupação. É apenas sugestão; nenhum sistema externo é alterado. A justificativa por IA é opcional e só explica o cálculo.</p>
+            <p><strong>LTV do hóspede:</strong> gasto por estadia × estadias por ano × anos de relacionamento × margem. CAC sugerido pela comissão média ponderada dos canais. LTV/CAC abaixo de 3 indica aquisição cara.</p>
+            <p><strong>ROI de projeto:</strong> ROI = (retorno anual − investimento) ÷ investimento; payback = investimento ÷ retorno anual. Investimento vem do orçamento do projeto.</p>
+            <p><strong>Gêmeo Digital:</strong> projeção de 1 a 5 anos dos pilares RA, OE e AO a partir de alavancas. Regras sistêmicas: com RA abaixo de 34%, ganhos em AO caem pela metade; com OE abaixo de 34%, todos os ganhos caem 30%. Resultados limitados entre 0% e 100%. Cenários são projeções, não previsões.</p>
+            <p><strong>Geomarketing:</strong> mapa do destino com raio de influência, concorrentes (intensidade pelo número de avaliações), unidades da rede, eventos, demanda aérea (ANAC) e origem dos visitantes informada. Não há ranking entre municípios.</p>
+            <p>Disponível nos planos Pro e Enterprise e durante o teste.</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Info className="h-5 w-5 text-primary" />
               Referências
