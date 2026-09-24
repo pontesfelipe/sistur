@@ -201,7 +201,7 @@ function TermsContent() {
       <p><strong>6.4.</strong> Certificados emitidos pela Plataforma são validados por código de verificação único e representam a conclusão real dos módulos correspondentes. Qualquer tentativa de fraude resultará na revogação imediata do certificado.</p>
 
       <h2 className="text-base font-bold mt-6 mb-2">7. LICENCIAMENTO E PAGAMENTO</h2>
-      <p><strong>7.1.</strong> O acesso à Plataforma é concedido mediante assinatura de plano (Trial, Estudante, Professor, Básico, Profissional ou Empresarial), conforme descrito na página de assinatura.</p>
+      <p><strong>7.1.</strong> O acesso à Plataforma é concedido mediante assinatura de plano (Avaliação Gratuita, Territorial, Empresarial, Estudante, Professor ou Consultoria Especializada), conforme descrito na página de assinatura.</p>
       <p><strong>7.2.</strong> O período de avaliação gratuita (Trial) tem duração de 7 dias. Ao término, o Usuário deverá contratar um plano para continuar utilizando a Plataforma.</p>
       <p><strong>7.3.</strong> O Titular reserva-se o direito de alterar preços e condições dos planos com aviso prévio de 30 dias.</p>
       <p><strong>7.4.</strong> Licenças organizacionais são vinculadas à organização contratante e podem ser redistribuídas entre membros conforme os limites de cota estabelecidos.</p>

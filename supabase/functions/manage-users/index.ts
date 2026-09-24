@@ -9,7 +9,7 @@ const corsHeaders = {
 const ROLE_TO_PLAN: Record<string, string> = {
   ADMIN: 'enterprise',
   ANALYST: 'pro',
-  VIEWER: 'basic',
+  VIEWER: 'pro',
   ESTUDANTE: 'estudante',
   PROFESSOR: 'professor',
 }
@@ -19,7 +19,6 @@ const DEFAULT_FEATURES: Record<string, Record<string, boolean>> = {
   trial: { erp: true, edu: true, games: true, reports: false, integrations: false },
   estudante: { erp: false, edu: true, games: true, reports: false, integrations: false },
   professor: { erp: false, edu: true, games: true, reports: true, integrations: false },
-  basic: { erp: true, edu: true, games: true, reports: true, integrations: false },
   pro: { erp: true, edu: true, games: true, reports: true, integrations: true },
   enterprise: { erp: true, edu: true, games: true, reports: true, integrations: true },
 }
@@ -36,8 +35,8 @@ async function syncLicense(
   orgId: string,
   role: string
 ) {
-  const plan = ROLE_TO_PLAN[role] || 'basic'
-  const features = DEFAULT_FEATURES[plan] || DEFAULT_FEATURES.basic
+  const plan = ROLE_TO_PLAN[role] || 'pro'
+  const features = DEFAULT_FEATURES[plan] || DEFAULT_FEATURES.pro
   const isAdmin = role === 'ADMIN'
 
   const { data: existing } = await supabaseAdmin

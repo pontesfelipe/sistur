@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 16,
+  minor: 17,
   patch: 0,
 
   get full() {
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.17.0",
+    date: "2026-09-24",
+    type: "minor" as const,
+    changes: [
+      "Plano legado Básico removido: 15 licenças migradas para Territorial (pro), com todos os recursos",
+      "Função VIEWER agora recebe licença Territorial; regras de validade, entitlements e cota do Beni sem 'basic'",
+      "Textos do tutorial e Termos de Uso atualizados para os planos atuais",
+    ],
+  },
   {
     version: "2.16.0",
     date: "2026-09-24",
