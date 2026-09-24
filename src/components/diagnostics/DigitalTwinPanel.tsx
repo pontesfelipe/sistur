@@ -95,7 +95,7 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
         planned_start_date: start.toISOString().slice(0, 10), planned_end_date: end.toISOString().slice(0, 10),
         generated_structure: { source: 'digital_twin', preset, years, intensities, projection: current },
       });
-      if (p?.id) navigate(`/projetos/${p.id}`);
+      if (p?.id) navigate(`/projetos?project=${p.id}`);
     } catch { /* toast já exibido */ }
   };
 
