@@ -34,17 +34,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
+    // Valida a sessão em cache no servidor; se o token for inválido/expirado
+    // sem renovação possível, encerra a sessão local para forçar novo login
+    // (evita chamadas autenticadas caindo como anônimas).
+    const validateSession = async () => {
+      const { data: { session: cached } } = await supabase.auth.getSession();
+      if (!cached) return;
+      const { error } = await supabase.auth.getUser();
+      const status = (error as { status?: number } | null)?.status;
+      if (error && (status === 401 || status === 403)) {
+        await supabase.auth.signOut({ scope: 'local' });
+      }
+    };
+
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session) validateSession();
     });
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') validateSession();
+    };
+    document.addEventListener('visibilitychange', onVisible);
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);
 
