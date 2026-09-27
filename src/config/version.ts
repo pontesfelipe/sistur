@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 18,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.18.2",
+    date: "2026-09-27",
+    type: "patch" as const,
+    changes: [
+      "Professor Beni pergunta como a pessoa prefere ser chamada quando o tratamento é questionado e mantém a escolha durante a conversa.",
+      "Nomes e apelidos ofensivos são recusados com educação, solicitando uma alternativa respeitosa sem repetir o termo.",
+    ],
+  },
   {
     version: "2.18.1",
     date: "2026-09-27",
