@@ -99,6 +99,14 @@ Deno.serve(async (req) => {
     const stripePrice = prices.data[0];
     const isRecurring = stripePrice.type === 'recurring';
 
+    // Regras de quantidade: pacotes avulsos = 1; plano por usuário respeita o mínimo do plano.
+    let finalQty = isRecurring ? quantity : 1;
+    if (isRecurring) {
+      const { data: plan } = await supabase
+        .from('plans').select('seat_based, min_seats').eq('stripe_price_id', priceId).maybeSingle();
+      finalQty = (plan as any)?.seat_based ? Math.max(finalQty, (plan as any).min_seats ?? 1) : 1;
+    }
+
     const customerId = await resolveOrCreateCustomer(stripe, {
       email: user.email ?? undefined,
       userId: user.id,
@@ -117,10 +125,13 @@ Deno.serve(async (req) => {
       userId: user.id,
       priceId,
       orgId: (profile as any)?.org_id ?? '',
+    quantity: String(finalQty),
     };
 
     const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: stripePrice.id, quantity }],
+      line_items: [{ price: stripePrice.id, quantity: finalQty }],
+      // Assinaturas: só cartão (Pix não permite cobrança recorrente automática)
+      ...(isRecurring && { payment_method_types: ['card'] }),
       mode: isRecurring ? 'subscription' : 'payment',
       ui_mode: 'embedded_page',
       return_url: returnUrl,
