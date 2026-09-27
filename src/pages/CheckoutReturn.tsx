@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,6 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 export default function CheckoutReturn() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
+  const queryClient = useQueryClient();
+
+  // Atualiza plano, créditos e acesso algumas vezes enquanto a confirmação do pagamento chega
+  useEffect(() => {
+    if (!sessionId) return;
+    const timers = [3000, 8000, 15000].map((ms) => setTimeout(() => queryClient.invalidateQueries(), ms));
+    return () => timers.forEach(clearTimeout);
+  }, [sessionId, queryClient]);
 
   return (
     <main className="min-h-screen flex items-center justify-center p-6">

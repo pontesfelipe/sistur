@@ -60,6 +60,7 @@ async function upsertSubscription(subscription: any, env: StripeEnv) {
     stripe_customer_id: typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id,
     current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
     cancel_at_period_end: subscription.cancel_at_period_end ?? false,
+    quantity: item?.quantity ?? 1,
     source: 'stripe',
     provider_ref: subscription.id,
     environment: env,
@@ -93,7 +94,9 @@ async function grantBeniPack(session: any, env: StripeEnv) {
   const orgId = session.metadata?.orgId || null;
   if (!userId) return;
 
-  const quantity = 1;
+  // Quantidade real comprada (itens da sessão)
+  let quantity = Number(session.metadata?.quantity) || 1;
+  if (quantity < 1) quantity = 1;
   await db().from('beni_credits').insert({
     user_id: pack.org ? null : userId,
     org_id: pack.org ? orgId : null,
@@ -156,7 +159,7 @@ async function onPurchaseCompleted(session: any, env: StripeEnv) {
 }
 
 async function handleEvent(event: any, env: StripeEnv) {
-  await db().from('payment_events').insert({
+  const { error: dupError } = await db().from('payment_events').insert({
     event_id: event.id ?? null,
     event_type: event.type,
     environment: env,
@@ -164,6 +167,11 @@ async function handleEvent(event: any, env: StripeEnv) {
     price_id: event.data?.object?.metadata?.priceId ?? null,
     payload: event.data?.object ?? null,
   });
+  // Idempotência: o mesmo evento reenviado não é processado duas vezes
+  if (dupError?.code === '23505') {
+    console.log('evento já processado', event.id);
+    return;
+  }
 
   switch (event.type) {
     case 'customer.subscription.created':
@@ -184,6 +192,10 @@ async function handleEvent(event: any, env: StripeEnv) {
     case 'checkout.session.async_payment_succeeded':
       await grantBeniPack(event.data.object, env);
       await onPurchaseCompleted(event.data.object, env);
+      break;
+    case 'invoice.payment_failed':
+    case 'checkout.session.async_payment_failed':
+      console.warn('pagamento falhou', event.type, event.data?.object?.id);
       break;
     default:
       console.log('Evento não tratado:', event.type);

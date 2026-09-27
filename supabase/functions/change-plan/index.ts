@@ -18,6 +18,7 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json();
     const priceId: string = body?.priceId;
+    const quantity: number | null = body?.quantity ? Math.min(Math.max(Math.floor(Number(body.quantity)) || 1, 1), 100) : null;
     const environment: StripeEnv = body?.environment === 'live' ? 'live' : 'sandbox';
 
     if (!priceId || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
@@ -45,7 +46,7 @@ Deno.serve(async (req) => {
     // Assinatura Stripe ativa do usuário neste ambiente
     const { data: sub } = await supabase
       .from('subscriptions')
-      .select('stripe_subscription_id, price_id')
+      .select('stripe_subscription_id, price_id, quantity, org_id')
       .eq('user_id', user.id)
       .eq('environment', environment)
       .in('status', ['active', 'trialing', 'past_due'])
@@ -60,7 +61,7 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    if (sub.price_id === priceId) {
+    if (sub.price_id === priceId && (!quantity || quantity === sub.quantity)) {
       return new Response(JSON.stringify({ error: 'Você já está neste plano' }), {
         status: 409,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -76,14 +77,29 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Plano por usuário: respeita mínimo e não permite reduzir abaixo dos usuários já na organização
+    const { data: plan } = await supabase.from('plans').select('seat_based, min_seats').eq('stripe_price_id', priceId).maybeSingle();
+    let newQty = 1;
+    if ((plan as any)?.seat_based) {
+      newQty = Math.max(quantity ?? sub.quantity ?? 1, (plan as any).min_seats ?? 1);
+      if (sub.org_id) {
+        const { count } = await supabase.from('profiles').select('user_id', { count: 'exact', head: true }).eq('org_id', sub.org_id);
+        if ((count ?? 0) > newQty) {
+          return new Response(JSON.stringify({ error: `A organização já tem ${count} usuários. Escolha pelo menos ${count}.` }), {
+            status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+      }
+    }
+
     const stripeSub = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
     const itemId = stripeSub.items?.data?.[0]?.id;
     if (!itemId) throw new Error('Item da assinatura não encontrado');
 
     await stripe.subscriptions.update(sub.stripe_subscription_id, {
-      items: [{ id: itemId, price: prices.data[0].id }],
+      items: [{ id: itemId, price: prices.data[0].id, quantity: newQty }],
       proration_behavior: 'create_prorations',
-      metadata: { userId: user.id, priceId },
+      metadata: { userId: user.id, priceId, orgId: sub.org_id ?? '' },
     });
 
     return new Response(JSON.stringify({ success: true }), {
