@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 17,
+  minor: 18,
   patch: 0,
 
   get full() {
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.18.0",
+    date: "2026-09-25",
+    type: "minor" as const,
+    changes: [
+      "Pagamentos — eventos do Stripe reenviados não são processados duas vezes (créditos Beni não duplicam).",
+      "Plano Empresarial — quantidade de usuários paga é salva e respeitada: novos usuários além do limite são bloqueados; a quantidade pode ser alterada na página de assinatura (proporcional).",
+      "Checkout — assinaturas só no cartão (Pix apenas em créditos avulsos); mínimo de usuários validado no servidor; pacotes Beni sempre quantidade 1.",
+      "Renovação recusada bloqueia o acesso até a regularização; página de retorno do pagamento atualiza o acesso automaticamente.",
+    ],
+  },
   {
     version: "2.17.0",
     date: "2026-09-24",
