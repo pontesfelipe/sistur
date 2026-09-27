@@ -233,6 +233,28 @@ serve(async (req) => {
     }
 
     // ----------------------------------------------------------------
+    // Personalização: identificar o usuário pelo nome para uma conversa pessoal.
+    // ----------------------------------------------------------------
+    try {
+      const { data: userData } = await userClient.auth.getUser();
+      const uid = userData?.user?.id;
+      if (uid) {
+        const { data: profile } = await userClient
+          .from("profiles")
+          .select("full_name")
+          .eq("user_id", uid)
+          .maybeSingle();
+        const fullName = (profile?.full_name ?? "").trim();
+        if (fullName) {
+          const firstName = fullName.split(/\s+/)[0];
+          systemPrompt += `\n\nUSUÁRIO ATUAL: ${fullName} (primeiro nome: ${firstName}). Trate a pessoa pelo primeiro nome de forma natural e cordial, especialmente na saudação inicial e em momentos de encorajamento, sem repetir o nome em toda resposta. Adapte exemplos e recomendações ao contexto dela.`;
+        }
+      }
+    } catch (profileErr) {
+      console.error("beni-chat: failed to load user profile", profileErr);
+    }
+
+    // ----------------------------------------------------------------
     // Fetch user-accessible diagnostics (assessments) and reports.
     // The userClient is scoped to the caller's JWT, so RLS automatically
     // limits results to what the user is allowed to see (their org's data
