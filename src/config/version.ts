@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 18,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.18.1",
+    date: "2026-09-27",
+    type: "patch" as const,
+    changes: [
+      "Professor Beni usa o primeiro nome de forma natural em saudações e momentos relevantes, sem repetição artificial.",
+      "Conversas sem nome confiável seguem de forma acolhedora e neutra, sem inventar tratamento ou expor a ausência do nome.",
+    ],
+  },
   {
     version: "2.18.0",
     date: "2026-09-25",
