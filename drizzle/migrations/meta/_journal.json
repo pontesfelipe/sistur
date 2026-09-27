@@ -36,6 +36,13 @@
       "when": 1790284068750,
       "tag": "0004_remove_legacy_basic_plan",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790545820853,
+      "tag": "0005_billing_seats_and_idempotency",
+      "breakpoints": true
     }
   ]
 }

@@ -11129,6 +11129,7 @@ export type Database = {
           plan_id: string
           price_id: string | null
           provider_ref: string | null
+          quantity: number
           seats: number
           source: string
           started_at: string
@@ -11151,6 +11152,7 @@ export type Database = {
           plan_id: string
           price_id?: string | null
           provider_ref?: string | null
+          quantity?: number
           seats?: number
           source?: string
           started_at?: string
@@ -11173,6 +11175,7 @@ export type Database = {
           plan_id?: string
           price_id?: string | null
           provider_ref?: string | null
+          quantity?: number
           seats?: number
           source?: string
           started_at?: string
@@ -12676,6 +12679,7 @@ export type Database = {
         Args: { _module: string; _org_id: string }
         Returns: boolean
       }
+      org_paid_seat_limit: { Args: { _org: string }; Returns: number }
       owns_classroom: {
         Args: { p_classroom_id: string; p_user_id: string }
         Returns: boolean
