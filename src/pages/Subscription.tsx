@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   CheckCircle2, XCircle, Crown, Building2, AlertTriangle, Sparkles, Ban,
@@ -43,12 +44,16 @@ const FAQ: { q: string; a: string }[] = [
     a: 'A avaliação é por uso, sem prazo: cada nova conta tem o curso base do SISTUR EDU e 10 perguntas ao Professor Beni; cada nova organização tem 1 diagnóstico com resultado em prévia. Depois disso, basta escolher um plano para liberar tudo.',
   },
   {
+    q: 'E se a renovação não for paga?',
+    a: 'Se a cobrança mensal do cartão for recusada, o acesso aos recursos do plano é suspenso até o pagamento ser regularizado em Gerenciar conta.',
+  },
+  {
     q: 'Posso trocar de plano depois?',
     a: 'Sim. A troca é imediata e o valor é ajustado proporcionalmente na próxima fatura.',
   },
   {
     q: 'Quais formas de pagamento são aceitas?',
-    a: 'Cartão de crédito e Pix, em reais (BRL). Notas e faturas ficam disponíveis em Gerenciar conta.',
+    a: 'Assinaturas mensais: cartão de crédito, com renovação automática. Créditos avulsos do Professor Beni: cartão ou Pix. Valores em reais (BRL); faturas ficam em Gerenciar conta.',
   },
 ];
 
@@ -58,6 +63,7 @@ export default function Subscription() {
   const { userTrialing, orgTrialing, trainingConsumed, assessmentUsed, hasSubscription } = useTrialState();
   const { unlimited: beniUnlimited, remaining: beniRemaining, allowance: beniAllowance, totalCredits: beniCredits } = useBeniQuota();
 
+  const queryClient = useQueryClient();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const isCancelled = license?.status === 'cancelled';
   const inTrial = !hasSubscription && (userTrialing || orgTrialing);
@@ -82,7 +88,7 @@ export default function Subscription() {
 
       const { data: activeSub } = await supabase
         .from('subscriptions')
-        .select('price_id, stripe_subscription_id')
+        .select('price_id, stripe_subscription_id, quantity')
         .eq('user_id', user.id)
         .eq('environment', environment)
         .in('status', ['active', 'trialing', 'past_due'])
@@ -91,16 +97,25 @@ export default function Subscription() {
         .limit(1)
         .maybeSingle();
 
-      if (activeSub?.stripe_subscription_id && activeSub.price_id !== priceId) {
+      const samePrice = activeSub?.price_id === priceId;
+      const qtyChanged = samePrice && quantity > 1 && quantity !== (activeSub as any)?.quantity;
+      if (activeSub?.stripe_subscription_id && (!samePrice || qtyChanged)) {
         const { error } = await supabase.functions.invoke('change-plan', {
-          body: { priceId, environment },
+          body: { priceId, environment, quantity },
         });
-        if (error) throw error;
-        toast.success(`Plano alterado para ${name}. O valor é ajustado proporcionalmente na próxima fatura.`);
+        if (error) {
+          const ctx = (error as any)?.context;
+          const body = ctx instanceof Response ? await ctx.clone().json().catch(() => null) : null;
+          throw new Error(body?.error || 'Não foi possível alterar o plano');
+        }
+        toast.success(qtyChanged
+          ? `Quantidade de usuários alterada para ${quantity}. O valor é ajustado proporcionalmente.`
+          : `Plano alterado para ${name}. O valor é ajustado proporcionalmente na próxima fatura.`);
+        setTimeout(() => { queryClient.invalidateQueries(); refetchLicense(); }, 4000);
         return;
       }
-      if (activeSub?.price_id === priceId) {
-        toast.info('Você já está neste plano. Para ajustar a quantidade de usuários, use o gerenciamento da conta.');
+      if (samePrice) {
+        toast.info('Você já está neste plano com essa quantidade de usuários.');
         return;
       }
 
