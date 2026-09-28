@@ -38,7 +38,6 @@ import {
   Filter,
   Landmark,
   Hotel,
-  Rocket,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
