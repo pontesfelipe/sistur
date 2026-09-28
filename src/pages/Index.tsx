@@ -1,3 +1,4 @@
+import { LaunchBanner } from '@/components/layout/LaunchBanner';
 import { useState, useCallback, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -303,6 +304,11 @@ const Index = () => {
         </div>
       }
     >
+      {/* Aviso de lançamento */}
+      <div className="mb-8">
+        <LaunchBanner />
+      </div>
+
       {/* Hero Stats - different for each mode */}
       {isEnterprise ? (
         <div className="mb-8">

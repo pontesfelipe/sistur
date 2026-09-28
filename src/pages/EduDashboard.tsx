@@ -1,3 +1,4 @@
+import { LaunchBanner } from '@/components/layout/LaunchBanner';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -76,6 +77,9 @@ const EduDashboard = () => {
       subtitle="Acompanhe seu progresso de aprendizado"
     >
       <div className="space-y-6">
+        {/* Aviso de lançamento */}
+        <LaunchBanner />
+
         {/* Top Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">

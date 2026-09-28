@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 18,
-  patch: 2,
+  patch: 3,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.18.3",
+    date: "2026-09-28",
+    type: "patch" as const,
+    changes: [
+      "Faixa de aviso 'Em breve: lançamento oficial da plataforma' no topo da página principal.",
+    ],
+  },
   {
     version: "2.18.2",
     date: "2026-09-27",
