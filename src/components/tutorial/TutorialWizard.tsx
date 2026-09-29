@@ -56,7 +56,7 @@ export function TutorialWizard({ open, onClose }: TutorialWizardProps) {
             <Badge variant="outline" className="text-xs">
               {currentIndex + 1} / {allSteps.length}
             </Badge>
-            <Badge variant="secondary" className="text-xs ml-auto">
+            <Badge variant="secondary" className="text-xs ml-auto mr-6 truncate max-w-[55%]">
               {(step as any).categoryTitle}
             </Badge>
           </div>
@@ -71,19 +71,28 @@ export function TutorialWizard({ open, onClose }: TutorialWizardProps) {
           </DialogDescription>
         </DialogHeader>
 
-        {/* Progress dots */}
-        <div className="flex justify-center gap-1.5 py-2">
-          {allSteps.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentIndex(i)}
-              className={cn(
-                'h-2 rounded-full transition-all',
-                i === currentIndex ? 'w-6 bg-primary' : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
-              )}
-            />
-          ))}
-        </div>
+        {/* Progress */}
+        {allSteps.length > 10 ? (
+          <div className="py-2">
+            <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+              <div className="h-full bg-primary transition-all" style={{ width: `${((currentIndex + 1) / allSteps.length) * 100}%` }} />
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap justify-center gap-1.5 py-2">
+            {allSteps.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentIndex(i)}
+                aria-label={`Ir para o passo ${i + 1}`}
+                className={cn(
+                  'h-2 rounded-full transition-all',
+                  i === currentIndex ? 'w-6 bg-primary' : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                )}
+              />
+            ))}
+          </div>
+        )}
 
         <DialogFooter className="flex-row justify-between sm:justify-between gap-2">
           <div className="flex gap-2">
