@@ -37,7 +37,7 @@ export function AppLayout({ children, title, subtitle, actions, subNav }: AppLay
       {/* Mobile Sidebar */}
       <MobileSidebar open={mobileOpen} onOpenChange={setMobileOpen} />
       
-      <div className="md:pl-64 transition-all duration-300">
+      <div className="md:pl-64 transition-all duration-300 overflow-x-clip">
         <TrialBanner />
         <AppHeader
           title={title}

@@ -85,7 +85,7 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
     <header className="h-14 md:h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30">
       <div className="h-full px-3 sm:px-4 md:px-6 flex items-center justify-between">
         {/* Left: Mobile menu + Title */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           {/* Mobile menu trigger */}
           {onMobileMenuClick && (
             <Button
@@ -116,7 +116,7 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0 pl-2">
           {/* Custom page actions */}
           {actions}
 

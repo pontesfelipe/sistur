@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 18,
-  patch: 3,
+  patch: 4,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.18.4",
+    date: "2026-09-29",
+    type: "patch" as const,
+    changes: [
+      "Mobile: cabeçalho não corta mais o avatar (título encolhe, botão 'Novo Post' vira ícone).",
+      "Mobile: abas das páginas EDU/Ajuda sem rolagem lateral da página inteira.",
+      "Mobile: janela do tutorial com margens e cantos arredondados.",
+    ],
+  },
   {
     version: "2.18.3",
     date: "2026-09-28",
