@@ -120,26 +120,38 @@ function PlanCard({
           </div>
         )}
 
-        {!isCurrent && (
+        {isCurrent && p.seat_based && canCheckout ? (
           <Button
-            variant={p.quote_only ? 'outline' : 'default'}
+            variant="outline"
             className="w-full mt-auto"
-            onClick={() => {
-              if (canCheckout) {
-                onCheckout!({ code: p.code, name: p.name, priceId: onlinePriceId!, quantity });
-                return;
-              }
-              if (onSelectPlan) {
-                onSelectPlan({ code: p.code, name: p.name });
-                return;
-              }
-              window.location.href = `mailto:contato@sistur.com.br?subject=${encodeURIComponent(
-                `Interesse no plano ${p.name}`,
-              )}`;
-            }}
+            onClick={() =>
+              onCheckout!({ code: p.code, name: p.name, priceId: onlinePriceId!, quantity })
+            }
           >
-            {p.quote_only ? 'Falar com o time' : canCheckout ? 'Assinar agora' : 'Quero contratar'}
+            Atualizar usuários
           </Button>
+        ) : (
+          !isCurrent && (
+            <Button
+              variant={p.quote_only ? 'outline' : 'default'}
+              className="w-full mt-auto"
+              onClick={() => {
+                if (canCheckout) {
+                  onCheckout!({ code: p.code, name: p.name, priceId: onlinePriceId!, quantity });
+                  return;
+                }
+                if (onSelectPlan) {
+                  onSelectPlan({ code: p.code, name: p.name });
+                  return;
+                }
+                window.location.href = `mailto:contato@sistur.com.br?subject=${encodeURIComponent(
+                  `Interesse no plano ${p.name}`,
+                )}`;
+              }}
+            >
+              {p.quote_only ? 'Falar com o time' : canCheckout ? 'Assinar agora' : 'Quero contratar'}
+            </Button>
+          )
         )}
       </CardContent>
     </Card>
