@@ -267,7 +267,7 @@ const Index = () => {
       title="Dashboard" 
       subtitle={isEnterprise ? "Visão consolidada do setor hoteleiro" : "Painel de controle do sistema de turismo"}
       actions={
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <WidgetCustomizer 
             isEnabled={isEnabled}
             toggleWidget={toggleWidget}
@@ -281,12 +281,12 @@ const Index = () => {
               type="single" 
               value={diagnosticMode} 
               onValueChange={(value) => value && setDiagnosticMode(value as DiagnosticMode)}
-              className="bg-muted rounded-lg p-1"
+              className="bg-muted rounded-lg p-0.5 sm:p-1"
             >
               <ToggleGroupItem 
                 value="territorial" 
                 aria-label="Ver diagnósticos territoriais"
-                className="gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
+                className="gap-1.5 h-8 px-2 sm:h-10 sm:px-3 data-[state=on]:bg-background data-[state=on]:shadow-sm"
               >
                 <Landmark className="h-4 w-4" />
                 <span className="hidden sm:inline">Territorial</span>
@@ -294,7 +294,7 @@ const Index = () => {
               <ToggleGroupItem 
                 value="enterprise" 
                 aria-label="Ver diagnósticos enterprise"
-                className="gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm"
+                className="gap-1.5 h-8 px-2 sm:h-10 sm:px-3 data-[state=on]:bg-background data-[state=on]:shadow-sm"
               >
                 <Hotel className="h-4 w-4" />
                 <span className="hidden sm:inline">Empresarial</span>

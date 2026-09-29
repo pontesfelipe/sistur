@@ -205,7 +205,7 @@ export default function Projetos() {
 
         {/* Projects Tabs */}
         <Tabs defaultValue="all" className="space-y-4">
-          <TabsList>
+          <TabsList className="w-full sm:w-auto justify-start overflow-x-auto scrollbar-thin">
             <TabsTrigger value="all">Todos ({projects?.length || 0})</TabsTrigger>
             <TabsTrigger value="active">Em Andamento ({activeProjects.length})</TabsTrigger>
             <TabsTrigger value="planning">Planejamento ({planningProjects.length})</TabsTrigger>

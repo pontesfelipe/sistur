@@ -30,7 +30,8 @@ export const VERSION_HISTORY = [
     changes: [
       "Mobile: cabeçalho não corta mais o avatar (título encolhe, botão 'Novo Post' vira ícone).",
       "Mobile: abas das páginas EDU/Ajuda sem rolagem lateral da página inteira.",
-      "Mobile: janela do tutorial com margens e cantos arredondados.",
+      "Mobile: janela do tutorial com margens e cantos arredondados; barra de progresso quando há muitos passos.",
+      "Mobile: título do Painel visível (seletor Territorial/Empresarial e selo Demo compactos) e abas de Projetos roláveis.",
     ],
   },
   {
