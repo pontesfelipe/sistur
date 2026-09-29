@@ -49,7 +49,7 @@ export function TutorialWizard({ open, onClose }: TutorialWizardProps) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleSkip(); }}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-lg rounded-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="h-5 w-5 text-primary" />

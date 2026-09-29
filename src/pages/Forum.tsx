@@ -111,9 +111,9 @@ export default function Forum() {
       subtitle="Compartilhe conhecimento, tire dúvidas e conecte-se com a comunidade"
       actions={
         !isDetailView ? (
-          <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
+          <Button onClick={() => setShowCreateDialog(true)} className="gap-2" aria-label="Novo post">
             <Plus className="h-4 w-4" />
-            Novo Post
+            <span className="hidden sm:inline">Novo Post</span>
           </Button>
         ) : undefined
       }
