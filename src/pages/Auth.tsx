@@ -31,6 +31,18 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string; fullName?: string }>({});
 
+  // True when the visitor landed here from a protected deep link.
+  const hasRedirect = (() => {
+    const raw = searchParams.get('redirect');
+    if (!raw) return false;
+    try {
+      const decoded = decodeURIComponent(raw);
+      return decoded.startsWith('/') && !decoded.startsWith('//') && decoded !== '/';
+    } catch {
+      return false;
+    }
+  })();
+
   // Check URL for reset mode (user clicked email link)
   useEffect(() => {
     const urlMode = searchParams.get('mode');
