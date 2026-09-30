@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 import { Loader2, BarChart3, GraduationCap, ArrowLeft, Database, Sparkles, Info, Tag, HelpCircle } from 'lucide-react';
 import { LaunchBanner } from '@/components/layout/LaunchBanner';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 
 // Validation schemas
 const emailSchema = z.string().email('Email inválido');
@@ -20,6 +22,7 @@ const nameSchema = z.string().min(2, 'Nome deve ter pelo menos 2 caracteres');
 type AuthMode = 'login' | 'signup' | 'forgot' | 'reset';
 
 const Auth = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, signIn, signUp, resetPassword, updatePassword, loading: authLoading } = useAuth();
@@ -110,7 +113,7 @@ const Auth = () => {
     }
     
     if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'As senhas não coincidem';
+      newErrors.confirmPassword = t('As senhas não coincidem');
     }
     
     setErrors(newErrors);
@@ -138,7 +141,7 @@ const Auth = () => {
     }
     
     if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'As senhas não coincidem';
+      newErrors.confirmPassword = t('As senhas não coincidem');
     }
     
     setErrors(newErrors);
@@ -234,28 +237,28 @@ const Auth = () => {
 
       const map: Record<string, { title: string; hint: string }> = {
         offline: {
-          title: 'Você está offline',
-          hint: 'Reconecte à internet (Wi-Fi ou 4G/5G) e tente novamente.',
+          title: t('Você está offline'),
+          hint: t('Reconecte à internet (Wi-Fi ou 4G/5G) e tente novamente.'),
         },
         timeout: {
-          title: 'Tempo esgotado ao contatar o servidor',
-          hint: 'Sua rede está lenta ou bloqueando. Tente outra rede (4G/5G) ou desative VPN.',
+          title: t('Tempo esgotado ao contatar o servidor'),
+          hint: t('Sua rede está lenta ou bloqueando. Tente outra rede (4G/5G) ou desative VPN.'),
         },
         blocked: {
-          title: 'Conexão bloqueada pelo navegador',
-          hint: 'Desative VPN, antivírus, firewall corporativo ou bloqueadores (uBlock/AdBlock). Tente em aba anônima.',
+          title: t('Conexão bloqueada pelo navegador'),
+          hint: t('Desative VPN, antivírus, firewall corporativo ou bloqueadores (uBlock/AdBlock). Tente em aba anônima.'),
         },
         server: {
-          title: 'Servidor de autenticação indisponível',
-          hint: 'Tente novamente em alguns minutos. Se persistir, contate o suporte.',
+          title: t('Servidor de autenticação indisponível'),
+          hint: t('Tente novamente em alguns minutos. Se persistir, contate o suporte.'),
         },
         misconfig: {
-          title: 'Configuração ausente',
-          hint: 'Recarregue a página (Ctrl+Shift+R). Se persistir, contate o suporte.',
+          title: t('Configuração ausente'),
+          hint: t('Recarregue a página (Ctrl+Shift+R). Se persistir, contate o suporte.'),
         },
         unknown: {
-          title: 'Falha intermitente de conexão',
-          hint: 'Recarregue a página (Ctrl+Shift+R) e tente novamente. Se persistir, troque de rede.',
+          title: t('Falha intermitente de conexão'),
+          hint: t('Recarregue a página (Ctrl+Shift+R) e tente novamente. Se persistir, troque de rede.'),
         },
       };
       const info = map[diag.kind] || map.unknown;
@@ -264,7 +267,7 @@ const Auth = () => {
         description: `Diagnóstico: ${diag.kind} (${diag.detail})`,
       });
     } else {
-      toast.error(msg || 'Erro ao fazer login');
+      toast.error(msg || t('Erro ao fazer login'));
     }
   };
 
@@ -312,7 +315,7 @@ const Auth = () => {
     
     if (error) {
       setLoading(false);
-      toast.error('Erro ao entrar com Google: ' + error.message);
+      toast.error(t('Erro ao entrar com Google: ') + error.message);
     }
   };
 
@@ -324,7 +327,7 @@ const Auth = () => {
     
     if (error) {
       setLoading(false);
-      toast.error('Erro ao entrar com Apple: ' + error.message);
+      toast.error(t('Erro ao entrar com Apple: ') + error.message);
     }
   };
 
@@ -386,7 +389,7 @@ const Auth = () => {
                 </div>
                 <span className="font-display font-bold text-xl">SISTUR</span>
               </div>
-              <CardTitle className="text-2xl font-display">Solicitar Acesso</CardTitle>
+              <CardTitle className="text-2xl font-display">{t('Solicitar Acesso')}</CardTitle>
               <CardDescription>
                 Crie sua conta para acessar o SISTUR
               </CardDescription>
@@ -394,11 +397,11 @@ const Auth = () => {
             <CardContent>
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Nome Completo</Label>
+                  <Label htmlFor="signup-name">{t('Nome Completo')}</Label>
                   <Input
                     id="signup-name"
                     type="text"
-                    placeholder="Seu nome completo"
+                    placeholder={t('Seu nome completo')}
                     value={fullName}
                     onChange={(e) => {
                       setFullName(e.target.value);
@@ -407,7 +410,7 @@ const Auth = () => {
                     className={errors.fullName ? 'border-destructive' : ''}
                   />
                   {errors.fullName && (
-                    <p className="text-sm text-destructive">{errors.fullName}</p>
+                    <p className="text-sm text-destructive">{t(errors.fullName)}</p>
                   )}
                 </div>
                 <div className="space-y-2">
@@ -424,11 +427,11 @@ const Auth = () => {
                     className={errors.email ? 'border-destructive' : ''}
                   />
                   {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email}</p>
+                    <p className="text-sm text-destructive">{t(errors.email)}</p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Senha</Label>
+                  <Label htmlFor="signup-password">{t('Senha')}</Label>
                   <Input
                     id="signup-password"
                     type="password"
@@ -441,11 +444,11 @@ const Auth = () => {
                     className={errors.password ? 'border-destructive' : ''}
                   />
                   {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password}</p>
+                    <p className="text-sm text-destructive">{t(errors.password)}</p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-confirm">Confirmar Senha</Label>
+                  <Label htmlFor="signup-confirm">{t('Confirmar Senha')}</Label>
                   <Input
                     id="signup-confirm"
                     type="password"
@@ -458,17 +461,17 @@ const Auth = () => {
                     className={errors.confirmPassword ? 'border-destructive' : ''}
                   />
                   {errors.confirmPassword && (
-                    <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                    <p className="text-sm text-destructive">{t(errors.confirmPassword)}</p>
                   )}
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Criando conta...
+                      {t('Criando conta...')}
                     </>
                   ) : (
-                    'Criar Conta'
+                    t('Criar Conta')
                   )}
                 </Button>
 
@@ -506,7 +509,7 @@ const Auth = () => {
                       fill="#EA4335"
                     />
                   </svg>
-                  Continuar com Google
+                  {t('Continuar com Google')}
                 </Button>
 
                 <Button
@@ -519,7 +522,7 @@ const Auth = () => {
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                   </svg>
-                  Continuar com Apple
+                  {t('Continuar com Apple')}
                 </Button>
 
                 <Button
@@ -532,7 +535,7 @@ const Auth = () => {
                   }}
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Já tenho uma conta
+                  {t('Já tenho uma conta')}
                 </Button>
               </form>
             </CardContent>
@@ -549,9 +552,9 @@ const Auth = () => {
                 </div>
                 <span className="font-display font-bold text-xl">SISTUR</span>
               </div>
-              <CardTitle className="text-2xl font-display">Recuperar Senha</CardTitle>
+              <CardTitle className="text-2xl font-display">{t('Recuperar Senha')}</CardTitle>
               <CardDescription>
-                Digite seu email para receber o link de recuperação
+                {t('Digite seu email para receber o link de recuperação')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -570,17 +573,17 @@ const Auth = () => {
                     className={errors.email ? 'border-destructive' : ''}
                   />
                   {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email}</p>
+                    <p className="text-sm text-destructive">{t(errors.email)}</p>
                   )}
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Enviando...
+                      {t('Enviando...')}
                     </>
                   ) : (
-                    'Enviar Link de Recuperação'
+                    t('Enviar Link de Recuperação')
                   )}
                 </Button>
                 <Button
@@ -593,7 +596,7 @@ const Auth = () => {
                   }}
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Voltar ao login
+                  {t('Voltar ao login')}
                 </Button>
               </form>
             </CardContent>
@@ -610,15 +613,15 @@ const Auth = () => {
                 </div>
                 <span className="font-display font-bold text-xl">SISTUR</span>
               </div>
-              <CardTitle className="text-2xl font-display">Nova Senha</CardTitle>
+              <CardTitle className="text-2xl font-display">{t('Nova Senha')}</CardTitle>
               <CardDescription>
-                Digite sua nova senha
+                {t('Digite sua nova senha')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="new-password">Nova Senha</Label>
+                  <Label htmlFor="new-password">{t('Nova Senha')}</Label>
                   <Input
                     id="new-password"
                     type="password"
@@ -631,11 +634,11 @@ const Auth = () => {
                     className={errors.password ? 'border-destructive' : ''}
                   />
                   {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password}</p>
+                    <p className="text-sm text-destructive">{t(errors.password)}</p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirmar Senha</Label>
+                  <Label htmlFor="confirm-password">{t('Confirmar Senha')}</Label>
                   <Input
                     id="confirm-password"
                     type="password"
@@ -648,17 +651,17 @@ const Auth = () => {
                     className={errors.confirmPassword ? 'border-destructive' : ''}
                   />
                   {errors.confirmPassword && (
-                    <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                    <p className="text-sm text-destructive">{t(errors.confirmPassword)}</p>
                   )}
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Atualizando...
+                      {t('Atualizando...')}
                     </>
                   ) : (
-                    'Atualizar Senha'
+                    t('Atualizar Senha')
                   )}
                 </Button>
               </form>
@@ -676,15 +679,15 @@ const Auth = () => {
                 </div>
                 <span className="font-display font-bold text-xl">SISTUR</span>
               </div>
-              <h1 className="text-2xl font-semibold leading-none tracking-tight font-display">Bem-vindo</h1>
+              <h1 className="text-2xl font-semibold leading-none tracking-tight font-display">{t('Bem-vindo')}</h1>
               <CardDescription>
-                Entre com suas credenciais para acessar o sistema
+                {t('Entre com suas credenciais para acessar o sistema')}
               </CardDescription>
               {hasRedirect && (
                 <div className="mt-4 flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 p-3 text-left">
                   <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <p className="text-sm text-muted-foreground">
-                    Entre ou crie sua conta para acessar o conteúdo solicitado.
+                    {t('Entre ou crie sua conta para acessar o conteúdo solicitado.')}
                   </p>
                 </div>
               )}
@@ -705,12 +708,12 @@ const Auth = () => {
                     className={errors.email ? 'border-destructive' : ''}
                   />
                   {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email}</p>
+                    <p className="text-sm text-destructive">{t(errors.email)}</p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="login-password">Senha</Label>
+                    <Label htmlFor="login-password">{t('Senha')}</Label>
                     <Button
                       type="button"
                       variant="link"
@@ -721,7 +724,7 @@ const Auth = () => {
                         setPassword('');
                       }}
                     >
-                      Esqueceu a senha?
+                      {t('Esqueceu a senha?')}
                     </Button>
                   </div>
                   <Input
@@ -736,17 +739,17 @@ const Auth = () => {
                     className={errors.password ? 'border-destructive' : ''}
                   />
                   {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password}</p>
+                    <p className="text-sm text-destructive">{t(errors.password)}</p>
                   )}
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Entrando...
+                      {t('Entrando...')}
                     </>
                   ) : (
-                    'Entrar'
+                    t('Entrar')
                   )}
                 </Button>
 
@@ -784,7 +787,7 @@ const Auth = () => {
                       fill="#EA4335"
                     />
                   </svg>
-                  Continuar com Google
+                  {t('Continuar com Google')}
                 </Button>
 
                 <Button
@@ -797,7 +800,7 @@ const Auth = () => {
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                   </svg>
-                  Continuar com Apple
+                  {t('Continuar com Apple')}
                 </Button>
 
                 <div className="text-center">
@@ -810,7 +813,7 @@ const Auth = () => {
                       setErrors({});
                     }}
                   >
-                    Não tem conta? Solicitar acesso
+                    {t('Não tem conta? Solicitar acesso')}
                   </Button>
                 </div>
 
@@ -824,14 +827,14 @@ const Auth = () => {
                     onClick={() => navigate('/planos')}
                   >
                     <Tag className="mr-1.5 h-3.5 w-3.5" />
-                    Conhecer planos e preços
+                    {t('Conhecer planos e preços')}
                   </Button>
                   <a
                     href="mailto:suporte@sistur.com.br?subject=Ajuda%20com%20o%20acesso%20ao%20SISTUR"
                     className="inline-flex items-center text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
                   >
                     <HelpCircle className="mr-1.5 h-3.5 w-3.5" />
-                    Preciso de ajuda
+                    {t('Preciso de ajuda')}
                   </a>
                 </div>
               </form>
@@ -862,19 +865,19 @@ const Auth = () => {
         <div className="space-y-10 relative z-10">
           <div>
             <h1 className="text-4xl xl:text-5xl font-display font-bold text-primary-foreground mb-5 leading-[1.1]">
-              Sistema Integrado de Gestão do Turismo
+              {t('Sistema Integrado de Gestão do Turismo')}
             </h1>
             <p className="text-primary-foreground/80 text-lg leading-relaxed max-w-md">
-              Diagnóstico inteligente e capacitação para destinos turísticos brasileiros.
+              {t('Diagnóstico inteligente e capacitação para destinos turísticos brasileiros.')}
             </p>
           </div>
 
           <div className="space-y-5">
             {[
-              { icon: BarChart3, title: 'Diagnóstico Sistêmico', desc: 'Análise dos pilares RA, OE e AO pela metodologia Mario Beni' },
-              { icon: Database, title: 'Ecossistema de Dados Oficiais', desc: 'IBGE, Cadastur, Mapa do Turismo e DataSUS integrados' },
-              { icon: Sparkles, title: 'Professor Beni (IA)', desc: 'Inteligência ancorada nos microdados do seu território' },
-              { icon: GraduationCap, title: 'SISTUR EDU', desc: 'Trilhas de capacitação adaptativas e certificados' },
+              { icon: BarChart3, title: t('Diagnóstico Sistêmico'), desc: t('Análise dos pilares RA, OE e AO pela metodologia Mario Beni') },
+              { icon: Database, title: t('Ecossistema de Dados Oficiais'), desc: t('IBGE, Cadastur, Mapa do Turismo e DataSUS integrados') },
+              { icon: Sparkles, title: t('Professor Beni (IA)'), desc: t('Inteligência ancorada nos microdados do seu território') },
+              { icon: GraduationCap, title: 'SISTUR EDU', desc: t('Trilhas de capacitação adaptativas e certificados') },
             ].map(({ icon: FIcon, title: fTitle, desc }) => (
               <div key={fTitle} className="flex items-center gap-4 text-primary-foreground/90 group">
                 <div className="h-11 w-11 rounded-2xl bg-primary-foreground/15 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
@@ -890,7 +893,7 @@ const Auth = () => {
         </div>
 
         <p className="text-primary-foreground/50 text-sm relative z-10">
-          © 2026 SISTUR — Instituto Mario Beni. Todos os direitos reservados.
+          {t('© 2026 SISTUR — Instituto Mario Beni. Todos os direitos reservados.')}
         </p>
       </div>
 
@@ -898,6 +901,9 @@ const Auth = () => {
       <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 bg-background relative">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-accent/[0.02]" />
         <div className="relative z-10 w-full max-w-md animate-fade-in">
+          <div className="flex justify-end mb-2">
+            <LanguageSwitcher />
+          </div>
           <div className="mb-6">
             <LaunchBanner />
           </div>
