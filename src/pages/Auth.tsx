@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, MapPin, BarChart3, GraduationCap, ArrowLeft } from 'lucide-react';
+import { Loader2, BarChart3, GraduationCap, ArrowLeft, Database, Sparkles, Info, Tag, HelpCircle } from 'lucide-react';
 import { z } from 'zod';
 
 // Validation schemas
