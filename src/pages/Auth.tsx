@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Loader2, BarChart3, GraduationCap, ArrowLeft, Database, Sparkles, Info, Tag, HelpCircle } from 'lucide-react';
+import { LaunchBanner } from '@/components/layout/LaunchBanner';
 import { z } from 'zod';
 
 // Validation schemas
