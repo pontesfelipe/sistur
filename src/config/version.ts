@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 19,
-  patch: 4,
+  minor: 20,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.20.0",
+    date: "2026-09-30",
+    type: "minor" as const,
+    changes: [
+      "Idiomas (fase 1): seletor Português / English / Español no topo da plataforma e na tela de login; escolha salva no navegador.",
+      "Traduzidos: tela de login, menus (lateral, celular e barra inferior), menu do usuário, títulos de todas as páginas e sugestões do Professor Beni.",
+      "Professor Beni responde no idioma escolhido.",
+      "Esquema de tradução: a frase em português é a chave; textos ainda não traduzidos aparecem em português.",
+    ],
+  },
   {
     version: "2.19.4",
     date: "2026-09-30",
