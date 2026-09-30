@@ -24,6 +24,17 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "2.19.1",
+    date: "2026-09-30",
+    type: "patch" as const,
+    changes: [
+      "Tela de acesso: destaques de dados oficiais (IBGE, Cadastur, Mapa do Turismo, DataSUS) e Professor Beni (IA).",
+      "Tela de acesso: aviso ao chegar por link protegido e atalhos para planos e preços e para suporte.",
+      "Professor Beni: sugestões iniciais mais práticas (gargalos do destino, plano de ação, capacitação da equipe).",
+      "Tela de acesso: rodapé atualizado para 2026.",
+    ],
+  },
+  {
     version: "2.19.0",
     date: "2026-09-30",
     type: "minor" as const,
