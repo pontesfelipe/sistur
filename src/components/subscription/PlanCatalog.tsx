@@ -48,13 +48,20 @@ function PlanCard({
   isCurrent,
   onSelectPlan,
   onCheckout,
-}: { plan: Plan; isCurrent: boolean } & PlanCatalogProps) {
+  annual,
+}: { plan: Plan; isCurrent: boolean; annual: boolean } & PlanCatalogProps) {
   const [seats, setSeats] = useState(p.min_seats || 1);
   const features = Object.entries(p.features || {}).filter(([, v]) => v === true);
-  const onlinePriceId = !p.quote_only && p.price_cents ? p.stripe_price_id : null;
+  const hasAnnual = !!p.stripe_price_id_annual && !!p.annual_price_cents;
+  const useAnnual = annual && hasAnnual;
+  const unitCents = useAnnual ? p.annual_price_cents! : p.price_cents;
+  const onlinePriceId = !p.quote_only && p.price_cents
+    ? (useAnnual ? p.stripe_price_id_annual : p.stripe_price_id)
+    : null;
   const canCheckout = !!onlinePriceId && !!onCheckout;
   const quantity = p.seat_based ? seats : 1;
-  const monthlyTotal = p.seat_based && p.price_cents ? p.price_cents * quantity : null;
+  const monthlyTotal = p.seat_based && unitCents ? unitCents * quantity : null;
+  const periodLabel = useAnnual ? 'ano' : 'mês';
 
   return (
     <Card
@@ -70,7 +77,24 @@ function PlanCard({
           {isCurrent && <Badge>Plano atual</Badge>}
         </div>
         <CardDescription>{AUDIENCE_LABELS[p.audience] ?? p.audience}</CardDescription>
-        <p className="text-2xl font-bold mt-3 tracking-tight">{formatPlanPrice(p)}</p>
+        {useAnnual ? (
+          <div className="mt-3 space-y-1">
+            <p className="text-sm text-muted-foreground line-through">
+              {formatBRL(p.price_cents! * 12)}/ano
+            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-2xl font-bold tracking-tight">
+                {formatBRL(p.annual_price_cents!)}/ano{p.seat_based ? ' por usuário' : ''}
+              </p>
+              <Badge variant="secondary">15% de desconto</Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Equivale a {formatBRL(Math.floor(p.annual_price_cents! / 1200) * 100)}/mês, pago uma vez por ano.
+            </p>
+          </div>
+        ) : (
+          <p className="text-2xl font-bold mt-3 tracking-tight">{formatPlanPrice(p)}</p>
+        )}
         {p.code === 'professor' && (
           <p className="text-xs text-muted-foreground">
             Gratuito quando você tem 5 ou mais estudantes ativos que entraram pelo seu link de indicação.
@@ -113,7 +137,7 @@ function PlanCard({
             />
             {monthlyTotal !== null && (
               <p className="text-xs text-muted-foreground">
-                Total estimado: <strong className="text-foreground">{formatBRL(monthlyTotal)}/mês</strong> para {quantity} usuários.
+                Total estimado: <strong className="text-foreground">{formatBRL(monthlyTotal)}/{periodLabel}</strong> para {quantity} usuários.
                 Acima de {MAX_SEATS} usuários, fale com o time comercial.
               </p>
             )}
@@ -161,6 +185,7 @@ function PlanCard({
 export function PlanCatalog({ onSelectPlan, onCheckout }: PlanCatalogProps = {}) {
   const { data: plans, isLoading } = usePlans();
   const { plan: currentPlanCode } = useEntitlements();
+  const [annual, setAnnual] = useState(false);
 
   if (isLoading) {
     return (
@@ -183,6 +208,17 @@ export function PlanCatalog({ onSelectPlan, onCheckout }: PlanCatalogProps = {})
         podem ser assinados online e alterados a qualquer momento.
       </p>
 
+      <div className="flex justify-center mb-6">
+        <div className="inline-flex rounded-full border border-border bg-muted/40 p-1" role="tablist" aria-label="Período de cobrança">
+          <Button size="sm" variant={annual ? 'ghost' : 'default'} className="rounded-full" onClick={() => setAnnual(false)} aria-pressed={!annual}>
+            Mensal
+          </Button>
+          <Button size="sm" variant={annual ? 'default' : 'ghost'} className="rounded-full gap-2" onClick={() => setAnnual(true)} aria-pressed={annual}>
+            Anual <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">-15%</Badge>
+          </Button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {plans.map((p) => (
           <PlanCard
@@ -191,6 +227,7 @@ export function PlanCatalog({ onSelectPlan, onCheckout }: PlanCatalogProps = {})
             isCurrent={currentPlanCode === p.code}
             onSelectPlan={onSelectPlan}
             onCheckout={onCheckout}
+            annual={annual}
           />
         ))}
       </div>

@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 18,
-  patch: 4,
+  minor: 19,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.19.0",
+    date: "2026-09-30",
+    type: "minor" as const,
+    changes: [
+      "Planos anuais com 15% de desconto (Estudante R$ 295/ano, Professor R$ 357/ano, Empresarial R$ 601/ano por usuário), valores arredondados para baixo.",
+      "Seletor Mensal/Anual na página de planos e assinatura, com preço cheio riscado e selo de 15% de desconto.",
+    ],
+  },
   {
     version: "2.18.4",
     date: "2026-09-29",

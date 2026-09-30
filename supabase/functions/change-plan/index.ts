@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
     }
 
     // Plano por usuário: respeita mínimo e não permite reduzir abaixo dos usuários já na organização
-    const { data: plan } = await supabase.from('plans').select('seat_based, min_seats').eq('stripe_price_id', priceId).maybeSingle();
+    const { data: plan } = await supabase.from('plans').select('seat_based, min_seats').or(`stripe_price_id.eq.${priceId},stripe_price_id_annual.eq.${priceId}`).maybeSingle();
     let newQty = 1;
     if ((plan as any)?.seat_based) {
       newQty = Math.max(quantity ?? sub.quantity ?? 1, (plan as any).min_seats ?? 1);
