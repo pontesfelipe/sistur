@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Loader2, BarChart3, GraduationCap, ArrowLeft, Database, Sparkles, Info, Tag, HelpCircle } from 'lucide-react';
+import { LaunchBanner } from '@/components/layout/LaunchBanner';
 import { z } from 'zod';
 
 // Validation schemas
@@ -894,9 +895,12 @@ const Auth = () => {
       </div>
 
       {/* Right side - Forms */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-background relative">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 bg-background relative">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-accent/[0.02]" />
         <div className="relative z-10 w-full max-w-md animate-fade-in">
+          <div className="mb-6">
+            <LaunchBanner />
+          </div>
           {renderForm()}
         </div>
       </div>

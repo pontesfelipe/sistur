@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 19,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.19.2",
+    date: "2026-09-30",
+    type: "patch" as const,
+    changes: [
+      "Tela de acesso: banner de lançamento (Em breve) também exibido acima do formulário.",
+    ],
+  },
   {
     version: "2.19.1",
     date: "2026-09-30",
