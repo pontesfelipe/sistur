@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -132,20 +133,20 @@ export function AssignmentFormDialog({
       return;
     }
 
-    if (form.type === 'track' && !form.track_id) return toast.error('Selecione uma trilha');
-    if (form.type === 'training' && !form.training_id) return toast.error('Selecione um treinamento');
-    if (form.type === 'exam' && !form.exam_ruleset_id) return toast.error('Selecione uma prova');
+    if (form.type === 'track' && !form.track_id) return toast.error(tx('Selecione uma trilha'));
+    if (form.type === 'training' && !form.training_id) return toast.error(tx('Selecione um treinamento'));
+    if (form.type === 'exam' && !form.exam_ruleset_id) return toast.error(tx('Selecione uma prova'));
 
     if (
       form.available_from &&
       form.due_date &&
       new Date(form.available_from) >= new Date(form.due_date)
     ) {
-      return toast.error('A data de entrega deve ser posterior à liberação');
+      return toast.error(tx('A data de entrega deve ser posterior à liberação'));
     }
 
     if (!allMembers && (!form.target_user_ids || form.target_user_ids.length === 0)) {
-      return toast.error('Selecione ao menos um aluno-alvo');
+      return toast.error(tx('Selecione ao menos um aluno-alvo'));
     }
 
     onSubmit({
@@ -179,7 +180,7 @@ export function AssignmentFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nova atividade</DialogTitle>
+          <DialogTitle>{tx('Nova atividade')}</DialogTitle>
           <DialogDescription>
             Configure quando a atividade abre, quem recebe e (para provas) regras específicas.
           </DialogDescription>
@@ -188,7 +189,7 @@ export function AssignmentFormDialog({
         <div className="space-y-4">
           {/* Type */}
           <div className="space-y-2">
-            <Label>Tipo</Label>
+            <Label>{tx('Tipo')}</Label>
             <Select
               value={form.type}
               onValueChange={(v: any) =>
@@ -206,16 +207,16 @@ export function AssignmentFormDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="exam">Prova / Exame</SelectItem>
-                <SelectItem value="track">Trilha de aprendizado</SelectItem>
-                <SelectItem value="training">Treinamento</SelectItem>
+                <SelectItem value="exam">{tx('Prova / Exame')}</SelectItem>
+                <SelectItem value="track">{tx('Trilha de aprendizado')}</SelectItem>
+                <SelectItem value="training">{tx('Treinamento')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {form.type === 'track' && (
             <div className="space-y-2">
-              <Label>Trilha *</Label>
+              <Label>{tx('Trilha *')}</Label>
               <Select
                 value={form.track_id}
                 onValueChange={v => {
@@ -224,7 +225,7 @@ export function AssignmentFormDialog({
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Escolha uma trilha" />
+                  <SelectValue placeholder={tx('Escolha uma trilha')} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableTracks.map(t => (
@@ -239,7 +240,7 @@ export function AssignmentFormDialog({
 
           {form.type === 'training' && (
             <div className="space-y-2">
-              <Label>Treinamento *</Label>
+              <Label>{tx('Treinamento *')}</Label>
               <Select
                 value={form.training_id}
                 onValueChange={v => {
@@ -248,12 +249,12 @@ export function AssignmentFormDialog({
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Escolha um treinamento" />
+                  <SelectValue placeholder={tx('Escolha um treinamento')} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableTrainings.map(t => (
                     <SelectItem key={t.training_id} value={t.training_id}>
-                      {t.title}
+                      {tx(t.title)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -263,7 +264,7 @@ export function AssignmentFormDialog({
 
           {form.type === 'exam' && (
             <div className="space-y-2">
-              <Label>Prova *</Label>
+              <Label>{tx('Prova *')}</Label>
               <Select
                 value={form.exam_ruleset_id}
                 onValueChange={v => {
@@ -272,12 +273,12 @@ export function AssignmentFormDialog({
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Escolha uma prova" />
+                  <SelectValue placeholder={tx('Escolha uma prova')} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableExams.map(e => (
                     <SelectItem key={e.ruleset_id} value={e.ruleset_id}>
-                      {e.label}
+                      {tx(e.label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -286,7 +287,7 @@ export function AssignmentFormDialog({
           )}
 
           <div className="space-y-2">
-            <Label>Título</Label>
+            <Label>{tx('Título')}</Label>
             <Input
               value={form.title}
               maxLength={200}
@@ -311,7 +312,7 @@ export function AssignmentFormDialog({
             <div className="space-y-2">
               <Label className="flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5" />
-                Liberada em
+                {tx('Liberada em')}
               </Label>
               <Input
                 type="datetime-local"
@@ -324,7 +325,7 @@ export function AssignmentFormDialog({
             <div className="space-y-2">
               <Label className="flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5" />
-                Entrega até
+                {tx('Entrega até')}
               </Label>
               <Input
                 type="datetime-local"
@@ -341,7 +342,7 @@ export function AssignmentFormDialog({
           <div className="space-y-2">
             <Label className="flex items-center gap-1.5">
               <Users className="h-3.5 w-3.5" />
-              Quem recebe
+              {tx('Quem recebe')}
             </Label>
             <div className="flex items-center gap-2">
               <Checkbox
@@ -357,7 +358,7 @@ export function AssignmentFormDialog({
             {!allMembers && (
               <div className="border rounded-md p-2 space-y-1 max-h-40 overflow-y-auto">
                 {members.length === 0 ? (
-                  <p className="text-xs text-muted-foreground p-2">Nenhum aluno na turma</p>
+                  <p className="text-xs text-muted-foreground p-2">{tx('Nenhum aluno na turma')}</p>
                 ) : (
                   members.map(m => (
                     <div key={m.student_id} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-muted">
@@ -391,7 +392,7 @@ export function AssignmentFormDialog({
                 className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Settings2 className="h-3.5 w-3.5" />
-                {showAdvanced ? 'Ocultar' : 'Mostrar'} regras específicas (opcional)
+                {showAdvanced ? tx('Ocultar') : tx('Mostrar')} regras específicas (opcional)
               </button>
 
               {showAdvanced && (
@@ -402,7 +403,7 @@ export function AssignmentFormDialog({
                       type="number"
                       min={5}
                       max={480}
-                      placeholder="padrão"
+                      placeholder={tx('padrão')}
                       value={form.override_time_limit_minutes}
                       onChange={e =>
                         setForm(p => ({ ...p, override_time_limit_minutes: e.target.value }))
@@ -410,12 +411,12 @@ export function AssignmentFormDialog({
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Tentativas</Label>
+                    <Label className="text-xs">{tx('Tentativas')}</Label>
                     <Input
                       type="number"
                       min={1}
                       max={10}
-                      placeholder="padrão"
+                      placeholder={tx('padrão')}
                       value={form.override_max_attempts}
                       onChange={e =>
                         setForm(p => ({ ...p, override_max_attempts: e.target.value }))
@@ -428,7 +429,7 @@ export function AssignmentFormDialog({
                       type="number"
                       min={0}
                       max={100}
-                      placeholder="padrão"
+                      placeholder={tx('padrão')}
                       value={form.override_min_score_pct}
                       onChange={e =>
                         setForm(p => ({ ...p, override_min_score_pct: e.target.value }))
@@ -445,7 +446,7 @@ export function AssignmentFormDialog({
 
           <Button className="w-full" onClick={handleSubmit} disabled={isPending}>
             {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Atribuir atividade
+            {tx('Atribuir atividade')}
           </Button>
         </div>
       </DialogContent>

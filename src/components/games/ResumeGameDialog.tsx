@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
@@ -15,7 +16,7 @@ export function ResumeGameDialog({ open, savedAt, onResume, onNewGame }: ResumeG
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-md" onPointerDownOutside={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>🎮 Jogo salvo encontrado</DialogTitle>
+          <DialogTitle>{tx('🎮 Jogo salvo encontrado')}</DialogTitle>
           <DialogDescription>
             {savedAt && (
               <>Salvo {formatDistanceToNow(savedAt, { addSuffix: true, locale: ptBR })}.</>
@@ -24,8 +25,8 @@ export function ResumeGameDialog({ open, savedAt, onResume, onNewGame }: ResumeG
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-row gap-2 sm:justify-end">
-          <Button variant="outline" onClick={onNewGame}>Novo Jogo</Button>
-          <Button onClick={onResume}>Continuar</Button>
+          <Button variant="outline" onClick={onNewGame}>{tx('Novo Jogo')}</Button>
+          <Button onClick={onResume}>{tx('Continuar')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +44,7 @@ export function DailyMissionsPanel() {
       </CardHeader>
       <CardContent className="space-y-4">
         {list.length === 0 && (
-          <p className="text-sm text-muted-foreground">Nenhuma missão para hoje. Volte amanhã!</p>
+          <p className="text-sm text-muted-foreground">{tx('Nenhuma missão para hoje. Volte amanhã!')}</p>
         )}
         {list.map((m) => {
           const pct = Math.min(100, Math.round((m.progress / Math.max(1, m.target)) * 100));
@@ -59,11 +60,11 @@ export function DailyMissionsPanel() {
                       <Target className="h-4 w-4 text-muted-foreground" />
                     )}
                     <p className={`font-medium text-sm ${done ? 'line-through text-muted-foreground' : ''}`}>
-                      {m.title}
+                      {tx(m.title)}
                     </p>
                   </div>
                   {m.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5 ml-6">{m.description}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 ml-6">{tx(m.description)}</p>
                   )}
                 </div>
                 <Badge variant={done ? 'default' : 'outline'}>+{m.xp_reward} XP</Badge>

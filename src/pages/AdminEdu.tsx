@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -166,16 +167,16 @@ const AdminEdu = () => {
           trainingId: editingTraining,
           data: formData,
         });
-        toast.success('Treinamento atualizado com sucesso!');
+        toast.success(tx('Treinamento atualizado com sucesso!'));
       } else {
         await createTraining.mutateAsync(formData);
-        toast.success('Treinamento criado com sucesso!');
+        toast.success(tx('Treinamento criado com sucesso!'));
       }
       setIsDialogOpen(false);
       setFormData(defaultFormData);
       setEditingTraining(null);
     } catch (error) {
-      toast.error('Erro ao salvar treinamento');
+      toast.error(tx('Erro ao salvar treinamento'));
       console.error(error);
     }
   };
@@ -196,9 +197,9 @@ const AdminEdu = () => {
         video_provider: 'supabase',
         video_asset: { path: result.path },
       }));
-      toast.success('Vídeo enviado com sucesso!');
+      toast.success(tx('Vídeo enviado com sucesso!'));
     } catch (error) {
-      toast.error('Erro ao enviar vídeo');
+      toast.error(tx('Erro ao enviar vídeo'));
       console.error(error);
     } finally {
       setUploadingVideo(false);
@@ -209,39 +210,39 @@ const AdminEdu = () => {
     if (!deleteConfirmId) return;
     try {
       await deleteTraining.mutateAsync(deleteConfirmId);
-      toast.success('Treinamento excluído');
+      toast.success(tx('Treinamento excluído'));
       setDeleteConfirmId(null);
     } catch (error) {
-      toast.error('Erro ao excluir treinamento');
+      toast.error(tx('Erro ao excluir treinamento'));
     }
   };
   
   const handlePublish = async (trainingId: string) => {
     try {
       await publishTraining.mutateAsync(trainingId);
-      toast.success('Treinamento publicado!');
+      toast.success(tx('Treinamento publicado!'));
     } catch (error) {
-      toast.error('Erro ao publicar treinamento');
+      toast.error(tx('Erro ao publicar treinamento'));
     }
   };
   
   const handleArchive = async (trainingId: string) => {
     try {
       await archiveTraining.mutateAsync(trainingId);
-      toast.success('Treinamento arquivado');
+      toast.success(tx('Treinamento arquivado'));
     } catch (error) {
-      toast.error('Erro ao arquivar treinamento');
+      toast.error(tx('Erro ao arquivar treinamento'));
     }
   };
   
   const getStatusBadge = (status?: string) => {
     switch (status) {
       case 'published':
-        return <Badge className="bg-green-500/20 text-green-700 border-green-500/30"><Eye className="w-3 h-3 mr-1" />Publicado</Badge>;
+        return <Badge className="bg-green-500/20 text-green-700 border-green-500/30"><Eye className="w-3 h-3 mr-1" />{tx('Publicado')}</Badge>;
       case 'archived':
-        return <Badge variant="secondary"><Archive className="w-3 h-3 mr-1" />Arquivado</Badge>;
+        return <Badge variant="secondary"><Archive className="w-3 h-3 mr-1" />{tx('Arquivado')}</Badge>;
       default:
-        return <Badge variant="outline"><EyeOff className="w-3 h-3 mr-1" />Rascunho</Badge>;
+        return <Badge variant="outline"><EyeOff className="w-3 h-3 mr-1" />{tx('Rascunho')}</Badge>;
     }
   };
   
@@ -254,46 +255,46 @@ const AdminEdu = () => {
 
   return (
     <AppLayout 
-      title="Administração EDU" 
-      subtitle="Gerenciamento de treinamentos, vídeos e analytics"
+      title={tx('Administração EDU')} 
+      subtitle={tx('Gerenciamento de treinamentos, vídeos e analytics')}
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full max-w-6xl grid-cols-8">
           <TabsTrigger value="trainings" className="gap-2">
             <GraduationCap className="h-4 w-4" />
-            Treinamentos
+            {tx('Treinamentos')}
           </TabsTrigger>
           <TabsTrigger value="paths" className="gap-2">
             <FileText className="h-4 w-4" />
-            Trilhas
+            {tx('Trilhas')}
           </TabsTrigger>
           <TabsTrigger value="quizzes" className="gap-2">
             <CheckCircle className="h-4 w-4" />
-            Quizzes
+            {tx('Quizzes')}
           </TabsTrigger>
           <TabsTrigger value="essays" className="gap-2">
             <FileText className="h-4 w-4" />
-            Dissertativas
+            {tx('Dissertativas')}
           </TabsTrigger>
           <TabsTrigger value="import" className="gap-2">
             <Youtube className="h-4 w-4" />
-            Importação
+            {tx('Importação')}
           </TabsTrigger>
           <TabsTrigger value="analytics" className="gap-2">
             <BarChart3 className="h-4 w-4" />
-            Analytics
+            {tx('Analytics')}
           </TabsTrigger>
           <TabsTrigger value="badges" className="gap-2">
             <Award className="h-4 w-4" />
-            Badges
+            {tx('Badges')}
           </TabsTrigger>
           <TabsTrigger value="gamification" className="gap-2">
             <TrendingUp className="h-4 w-4" />
-            Gamificação
+            {tx('Gamificação')}
           </TabsTrigger>
           <TabsTrigger value="ranking" className="gap-2">
             <Award className="h-4 w-4" />
-            Ranking de Turmas
+            {tx('Ranking de Turmas')}
           </TabsTrigger>
         </TabsList>
 
@@ -305,7 +306,7 @@ const AdminEdu = () => {
               <div className="relative max-w-sm flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar treinamentos..."
+                  placeholder={tx('Buscar treinamentos...')}
                   className="pl-9"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -313,23 +314,23 @@ const AdminEdu = () => {
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder={tx('Status')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="draft">Rascunho</SelectItem>
-                  <SelectItem value="published">Publicado</SelectItem>
-                  <SelectItem value="archived">Arquivado</SelectItem>
+                  <SelectItem value="all">{tx('Todos')}</SelectItem>
+                  <SelectItem value="draft">{tx('Rascunho')}</SelectItem>
+                  <SelectItem value="published">{tx('Publicado')}</SelectItem>
+                  <SelectItem value="archived">{tx('Arquivado')}</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={typeFilter} onValueChange={setTypeFilter}>
                 <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Tipo" />
+                  <SelectValue placeholder={tx('Tipo')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="course">Cursos</SelectItem>
-                  <SelectItem value="live">Lives</SelectItem>
+                  <SelectItem value="all">{tx('Todos')}</SelectItem>
+                  <SelectItem value="course">{tx('Cursos')}</SelectItem>
+                  <SelectItem value="live">{tx('Lives')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -337,16 +338,16 @@ const AdminEdu = () => {
               <DialogTrigger asChild>
                 <Button onClick={handleOpenCreate}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Novo Treinamento
+                  {tx('Novo Treinamento')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
-                    {editingTraining ? 'Editar Treinamento' : 'Novo Treinamento'}
+                    {editingTraining ? tx('Editar Treinamento') : tx('Novo Treinamento')}
                   </DialogTitle>
                   <DialogDescription>
-                    Preencha as informações do treinamento
+                    {tx('Preencha as informações do treinamento')}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -361,29 +362,29 @@ const AdminEdu = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="course_code">Código do Curso</Label>
+                      <Label htmlFor="course_code">{tx('Código do Curso')}</Label>
                       <Input 
                         id="course_code" 
                         value={formData.course_code || ''}
                         onChange={(e) => setFormData(prev => ({ ...prev, course_code: e.target.value }))}
-                        placeholder="Ex: EDU-001"
+                        placeholder={tx('Ex: EDU-001')}
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="title">Título</Label>
+                    <Label htmlFor="title">{tx('Título')}</Label>
                     <Input 
                       id="title" 
                       value={formData.title}
                       onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="Nome do treinamento"
+                      placeholder={tx('Nome do treinamento')}
                     />
                   </div>
                   
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <Label>Tipo</Label>
+                      <Label>{tx('Tipo')}</Label>
                       <Select 
                         value={formData.type} 
                         onValueChange={(v) => setFormData(prev => ({ ...prev, type: v as 'course' | 'live' }))}
@@ -392,13 +393,13 @@ const AdminEdu = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="course">Curso</SelectItem>
-                          <SelectItem value="live">Live</SelectItem>
+                          <SelectItem value="course">{tx('Curso')}</SelectItem>
+                          <SelectItem value="live">{tx('Live')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Pilar</Label>
+                      <Label>{tx('Pilar')}</Label>
                       <Select 
                         value={formData.pillar} 
                         onValueChange={(v) => setFormData(prev => ({ ...prev, pillar: v as 'RA' | 'OE' | 'AO' }))}
@@ -407,14 +408,14 @@ const AdminEdu = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="RA">RA - Recursos e Atrativos</SelectItem>
-                          <SelectItem value="OE">OE - Oferta e Estrutura</SelectItem>
-                          <SelectItem value="AO">AO - Ação Organizada</SelectItem>
+                          <SelectItem value="RA">{tx('RA - Recursos e Atrativos')}</SelectItem>
+                          <SelectItem value="OE">{tx('OE - Oferta e Estrutura')}</SelectItem>
+                          <SelectItem value="AO">{tx('AO - Ação Organizada')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Nível</Label>
+                      <Label>{tx('Nível')}</Label>
                       <Select 
                         value={formData.level || 'BASICO'} 
                         onValueChange={(v) => setFormData(prev => ({ ...prev, level: v }))}
@@ -423,33 +424,33 @@ const AdminEdu = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="BASICO">Básico</SelectItem>
-                          <SelectItem value="INTERMEDIARIO">Intermediário</SelectItem>
-                          <SelectItem value="AVANCADO">Avançado</SelectItem>
+                          <SelectItem value="BASICO">{tx('Básico')}</SelectItem>
+                          <SelectItem value="INTERMEDIARIO">{tx('Intermediário')}</SelectItem>
+                          <SelectItem value="AVANCADO">{tx('Avançado')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="description">Descrição / Objetivo</Label>
+                    <Label htmlFor="description">{tx('Descrição / Objetivo')}</Label>
                     <Textarea 
                       id="description" 
                       value={formData.description || formData.objectives || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value, objectives: e.target.value }))}
-                      placeholder="Descreva o objetivo do treinamento"
+                      placeholder={tx('Descreva o objetivo do treinamento')}
                       rows={3}
                     />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="target_audience">Público-alvo</Label>
+                      <Label htmlFor="target_audience">{tx('Público-alvo')}</Label>
                       <Input 
                         id="target_audience" 
                         value={formData.target_audience || ''}
                         onChange={(e) => setFormData(prev => ({ ...prev, target_audience: e.target.value }))}
-                        placeholder="Ex: Gestores, Técnicos"
+                        placeholder={tx('Ex: Gestores, Técnicos')}
                       />
                     </div>
                     <div className="space-y-2">
@@ -464,7 +465,7 @@ const AdminEdu = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label>Status</Label>
+                    <Label>{tx('Status')}</Label>
                     <Select 
                       value={formData.status} 
                       onValueChange={(v) => setFormData(prev => ({ ...prev, status: v as 'draft' | 'published' | 'archived' }))}
@@ -473,20 +474,20 @@ const AdminEdu = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="draft">Rascunho</SelectItem>
-                        <SelectItem value="published">Publicado</SelectItem>
-                        <SelectItem value="archived">Arquivado</SelectItem>
+                        <SelectItem value="draft">{tx('Rascunho')}</SelectItem>
+                        <SelectItem value="published">{tx('Publicado')}</SelectItem>
+                        <SelectItem value="archived">{tx('Arquivado')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   
                   {/* Video Upload Section */}
                   <div className="space-y-4 pt-4 border-t">
-                    <Label className="text-base font-semibold">Vídeo</Label>
+                    <Label className="text-base font-semibold">{tx('Vídeo')}</Label>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label>Provedor</Label>
+                        <Label>{tx('Provedor')}</Label>
                         <Select 
                           value={formData.video_provider || 'supabase'} 
                           onValueChange={(v) => setFormData(prev => ({ ...prev, video_provider: v as 'supabase' | 'mux' | 'vimeo' | 'youtube' }))}
@@ -495,19 +496,19 @@ const AdminEdu = () => {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="supabase">Upload direto</SelectItem>
-                            <SelectItem value="youtube">YouTube</SelectItem>
-                            <SelectItem value="vimeo">Vimeo</SelectItem>
+                            <SelectItem value="supabase">{tx('Upload direto')}</SelectItem>
+                            <SelectItem value="youtube">{tx('YouTube')}</SelectItem>
+                            <SelectItem value="vimeo">{tx('Vimeo')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="video_url">URL do Vídeo</Label>
+                        <Label htmlFor="video_url">{tx('URL do Vídeo')}</Label>
                         <Input 
                           id="video_url" 
                           value={formData.video_url || ''}
                           onChange={(e) => setFormData(prev => ({ ...prev, video_url: e.target.value }))}
-                          placeholder="URL ou será preenchido após upload"
+                          placeholder={tx('URL ou será preenchido após upload')}
                         />
                       </div>
                     </div>
@@ -530,19 +531,19 @@ const AdminEdu = () => {
                           {uploadingVideo ? (
                             <>
                               <Clock className="mr-2 h-4 w-4 animate-spin" />
-                              Enviando...
+                              {tx('Enviando...')}
                             </>
                           ) : (
                             <>
                               <Upload className="mr-2 h-4 w-4" />
-                              Fazer Upload
+                              {tx('Fazer Upload')}
                             </>
                           )}
                         </Button>
                         {formData.video_url && (
                           <Badge variant="secondary" className="gap-1">
                             <FileVideo className="h-3 w-3" />
-                            Vídeo enviado
+                            {tx('Vídeo enviado')}
                           </Badge>
                         )}
                       </div>
@@ -556,13 +557,13 @@ const AdminEdu = () => {
                 </div>
                 <div className="flex justify-end gap-3">
                   <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancelar
+                    {tx('Cancelar')}
                   </Button>
                   <Button 
                     onClick={handleSubmit}
                     disabled={!formData.title || !formData.training_id || createTraining.isPending || updateTraining.isPending}
                   >
-                    {(createTraining.isPending || updateTraining.isPending) ? 'Salvando...' : 'Salvar'}
+                    {(createTraining.isPending || updateTraining.isPending) ? tx('Salvando...') : tx('Salvar')}
                   </Button>
                 </div>
               </DialogContent>
@@ -581,19 +582,19 @@ const AdminEdu = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Treinamento</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Pilar</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Vídeo</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
+                    <TableHead>{tx('Treinamento')}</TableHead>
+                    <TableHead>{tx('Tipo')}</TableHead>
+                    <TableHead>{tx('Pilar')}</TableHead>
+                    <TableHead>{tx('Status')}</TableHead>
+                    <TableHead>{tx('Vídeo')}</TableHead>
+                    <TableHead className="text-right">{tx('Ações')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredTrainings.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        Nenhum treinamento encontrado
+                        {tx('Nenhum treinamento encontrado')}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -601,16 +602,16 @@ const AdminEdu = () => {
                       <TableRow key={training.training_id}>
                         <TableCell>
                           <div>
-                            <p className="font-medium">{training.title}</p>
+                            <p className="font-medium">{tx(training.title)}</p>
                             <p className="text-xs text-muted-foreground">{training.course_code || training.training_id}</p>
                           </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant={training.type === 'course' ? 'default' : 'secondary'}>
                             {training.type === 'course' ? (
-                              <><GraduationCap className="h-3 w-3 mr-1" />Curso</>
+                              <><GraduationCap className="h-3 w-3 mr-1" />{tx('Curso')}</>
                             ) : (
-                              <><Video className="h-3 w-3 mr-1" />Live</>
+                              <><Video className="h-3 w-3 mr-1" />{tx('Live')}</>
                             )}
                           </Badge>
                         </TableCell>
@@ -639,7 +640,7 @@ const AdminEdu = () => {
                                 variant="ghost" 
                                 size="icon"
                                 onClick={() => handlePublish(training.training_id)}
-                                title="Publicar"
+                                title={tx('Publicar')}
                               >
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               </Button>
@@ -649,7 +650,7 @@ const AdminEdu = () => {
                                 variant="ghost" 
                                 size="icon"
                                 onClick={() => handleArchive(training.training_id)}
-                                title="Arquivar"
+                                title={tx('Arquivar')}
                               >
                                 <Archive className="h-4 w-4" />
                               </Button>
@@ -718,7 +719,7 @@ const AdminEdu = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Matrículas</CardTitle>
+                <CardTitle className="text-sm font-medium">{tx('Total Matrículas')}</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -731,7 +732,7 @@ const AdminEdu = () => {
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Conclusões</CardTitle>
+                <CardTitle className="text-sm font-medium">{tx('Conclusões')}</CardTitle>
                 <CheckCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -744,7 +745,7 @@ const AdminEdu = () => {
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Tempo Total Assistido</CardTitle>
+                <CardTitle className="text-sm font-medium">{tx('Tempo Total Assistido')}</CardTitle>
                 <Play className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -765,7 +766,7 @@ const AdminEdu = () => {
               <CardContent>
                 <div className="text-2xl font-bold">{eventStats?.totalEvents || 0}</div>
                 <p className="text-xs text-muted-foreground">
-                  Interações registradas
+                  {tx('Interações registradas')}
                 </p>
               </CardContent>
             </Card>
@@ -775,8 +776,8 @@ const AdminEdu = () => {
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Tipos de Eventos</CardTitle>
-                <CardDescription>Distribuição de eventos nos últimos 30 dias</CardDescription>
+                <CardTitle>{tx('Tipos de Eventos')}</CardTitle>
+                <CardDescription>{tx('Distribuição de eventos nos últimos 30 dias')}</CardDescription>
               </CardHeader>
               <CardContent>
                 {eventStats?.byType && Object.keys(eventStats.byType).length > 0 ? (
@@ -790,7 +791,7 @@ const AdminEdu = () => {
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-8">
-                    Nenhum evento registrado ainda
+                    {tx('Nenhum evento registrado ainda')}
                   </p>
                 )}
               </CardContent>
@@ -798,29 +799,29 @@ const AdminEdu = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle>Status das Matrículas</CardTitle>
-                <CardDescription>Distribuição por status atual</CardDescription>
+                <CardTitle>{tx('Status das Matrículas')}</CardTitle>
+                <CardDescription>{tx('Distribuição por status atual')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-green-500" />
-                      Ativos
+                      {tx('Ativos')}
                     </span>
                     <Badge>{enrollmentStats?.activeEnrollments || 0}</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-blue-500" />
-                      Concluídos
+                      {tx('Concluídos')}
                     </span>
                     <Badge>{enrollmentStats?.completedEnrollments || 0}</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-gray-400" />
-                      Abandonados
+                      {tx('Abandonados')}
                     </span>
                     <Badge variant="secondary">{enrollmentStats?.droppedEnrollments || 0}</Badge>
                   </div>
@@ -832,26 +833,26 @@ const AdminEdu = () => {
           {/* Trainings Summary */}
           <Card>
             <CardHeader>
-              <CardTitle>Resumo dos Treinamentos</CardTitle>
-              <CardDescription>Visão geral do catálogo</CardDescription>
+              <CardTitle>{tx('Resumo dos Treinamentos')}</CardTitle>
+              <CardDescription>{tx('Visão geral do catálogo')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 rounded-lg bg-muted/50">
                   <p className="text-2xl font-bold">{trainings?.length || 0}</p>
-                  <p className="text-sm text-muted-foreground">Total</p>
+                  <p className="text-sm text-muted-foreground">{tx('Total')}</p>
                 </div>
                 <div className="text-center p-4 rounded-lg bg-green-500/10">
                   <p className="text-2xl font-bold">{trainings?.filter(t => t.status === 'published').length || 0}</p>
-                  <p className="text-sm text-muted-foreground">Publicados</p>
+                  <p className="text-sm text-muted-foreground">{tx('Publicados')}</p>
                 </div>
                 <div className="text-center p-4 rounded-lg bg-yellow-500/10">
                   <p className="text-2xl font-bold">{trainings?.filter(t => t.status === 'draft').length || 0}</p>
-                  <p className="text-sm text-muted-foreground">Rascunhos</p>
+                  <p className="text-sm text-muted-foreground">{tx('Rascunhos')}</p>
                 </div>
                 <div className="text-center p-4 rounded-lg bg-blue-500/10">
                   <p className="text-2xl font-bold">{trainings?.filter(t => t.video_url).length || 0}</p>
-                  <p className="text-sm text-muted-foreground">Com Vídeo</p>
+                  <p className="text-sm text-muted-foreground">{tx('Com Vídeo')}</p>
                 </div>
               </div>
             </CardContent>
@@ -863,15 +864,15 @@ const AdminEdu = () => {
       <AlertDialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogTitle>{tx('Confirmar exclusão')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este treinamento? Esta ação não pode ser desfeita.
+              {tx('Tem certeza que deseja excluir este treinamento? Esta ação não pode ser desfeita.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Excluir
+              {tx('Excluir')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

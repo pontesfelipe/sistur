@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -156,11 +157,11 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.type !== 'application/pdf') {
-      toast.error('Apenas arquivos PDF são aceitos.');
+      toast.error(tx('Apenas arquivos PDF são aceitos.'));
       return;
     }
     if (file.size > MAX_FILE_SIZE) {
-      toast.error('Arquivo muito grande. Máximo 10MB.');
+      toast.error(tx('Arquivo muito grande. Máximo 10MB.'));
       return;
     }
     setPdfFile(file);
@@ -291,7 +292,7 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
       setPdfUrl(null);
       onOpenChange(false);
     } catch (error: any) {
-      toast.error('Erro ao salvar post: ' + error.message);
+      toast.error(tx('Erro ao salvar post: ') + error.message);
     } finally {
       setIsUploading(false);
     }
@@ -304,7 +305,7 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Editar Post' : 'Criar Novo Post'}</DialogTitle>
+          <DialogTitle>{isEditing ? tx('Editar Post') : tx('Criar Novo Post')}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -314,9 +315,9 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Título</FormLabel>
+                  <FormLabel>{tx('Título')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Digite o título do seu post..." {...field} />
+                    <Input placeholder={tx('Digite o título do seu post...')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -328,10 +329,10 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
               name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Conteúdo</FormLabel>
+                  <FormLabel>{tx('Conteúdo')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Compartilhe seus pensamentos, perguntas ou conhecimento..."
+                      placeholder={tx('Compartilhe seus pensamentos, perguntas ou conhecimento...')}
                       className="min-h-[150px]"
                       {...field}
                     />
@@ -347,17 +348,17 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Categoria</FormLabel>
+                    <FormLabel>{tx('Categoria')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma categoria" />
+                          <SelectValue placeholder={tx('Selecione uma categoria')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {categories.map((cat) => (
                           <SelectItem key={cat.value} value={cat.value}>
-                            {cat.label}
+                            {tx(cat.label)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -372,7 +373,7 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
                 name="visibility"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Visibilidade</FormLabel>
+                    <FormLabel>{tx('Visibilidade')}</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -383,14 +384,14 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
                           <RadioGroupItem value="org" id="org" />
                           <Label htmlFor="org" className="flex items-center gap-1 cursor-pointer">
                             <Building2 className="h-4 w-4" />
-                            Organização
+                            {tx('Organização')}
                           </Label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="public" id="public" />
                           <Label htmlFor="public" className="flex items-center gap-1 cursor-pointer">
                             <Globe className="h-4 w-4" />
-                            Público
+                            {tx('Público')}
                           </Label>
                         </div>
                       </RadioGroup>
@@ -441,7 +442,7 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
                       className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-muted/50 transition-colors"
                     >
                       <Plus className="h-6 w-6 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Adicionar</span>
+                      <span className="text-xs text-muted-foreground">{tx('Adicionar')}</span>
                     </button>
                   )}
                 </div>
@@ -488,7 +489,7 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
                   className="gap-2"
                 >
                   <Upload className="h-4 w-4" />
-                  Anexar PDF
+                  {tx('Anexar PDF')}
                 </Button>
               ) : (
                 <div className="flex items-center gap-3 p-2 bg-muted rounded-lg">
@@ -505,11 +506,11 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
 
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancelar
+                {tx('Cancelar')}
               </Button>
               <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEditing ? 'Salvar' : 'Publicar'}
+                {isEditing ? tx('Salvar') : tx('Publicar')}
               </Button>
             </div>
           </form>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -18,26 +19,26 @@ export function OrgClassroomRankingPanel() {
           <Trophy className="h-5 w-5 text-amber-500" /> Ranking de Turmas
         </CardTitle>
         <CardDescription>
-          Comparativo entre todas as turmas ativas da organização, ordenadas por XP médio. Inclui taxa de conclusão e alunos em risco para apoiar decisões pedagógicas.
+          {tx('Comparativo entre todas as turmas ativas da organização, ordenadas por XP médio. Inclui taxa de conclusão e alunos em risco para apoiar decisões pedagógicas.')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {rows.length === 0 ? (
-          <p className="text-center py-8 text-muted-foreground text-sm">Nenhuma turma ativa para comparar.</p>
+          <p className="text-center py-8 text-muted-foreground text-sm">{tx('Nenhuma turma ativa para comparar.')}</p>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
-                  <TableHead>Turma</TableHead>
-                  <TableHead>Professor</TableHead>
-                  <TableHead className="text-right">Alunos</TableHead>
-                  <TableHead className="text-right">XP médio</TableHead>
-                  <TableHead className="text-right">Streaks</TableHead>
-                  <TableHead className="text-right">Em risco</TableHead>
-                  <TableHead className="text-right">Conclusão</TableHead>
-                  <TableHead className="text-right">Nota média</TableHead>
+                  <TableHead>{tx('Turma')}</TableHead>
+                  <TableHead>{tx('Professor')}</TableHead>
+                  <TableHead className="text-right">{tx('Alunos')}</TableHead>
+                  <TableHead className="text-right">{tx('XP médio')}</TableHead>
+                  <TableHead className="text-right">{tx('Streaks')}</TableHead>
+                  <TableHead className="text-right">{tx('Em risco')}</TableHead>
+                  <TableHead className="text-right">{tx('Conclusão')}</TableHead>
+                  <TableHead className="text-right">{tx('Nota média')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

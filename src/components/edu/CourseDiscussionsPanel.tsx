@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,7 +72,7 @@ function ReplyList({ discussion, isInstructor }: { discussion: CourseDiscussion;
       ))}
       <div className="flex gap-2">
         <Textarea
-          placeholder="Escrever resposta..."
+          placeholder={tx('Escrever resposta...')}
           value={body}
           onChange={(e) => setBody(e.target.value)}
           rows={2}
@@ -123,18 +124,18 @@ export function CourseDiscussionsPanel({ trainingId, isInstructor = false }: Pro
         {showForm && (
           <div className="space-y-2 p-3 border rounded-md bg-muted/30">
             <Input
-              placeholder="Título da pergunta"
+              placeholder={tx('Título da pergunta')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <Textarea
-              placeholder="Descreva sua dúvida..."
+              placeholder={tx('Descreva sua dúvida...')}
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={3}
             />
             <div className="flex justify-end gap-2">
-              <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>
+              <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>{tx('Cancelar')}</Button>
               <Button
                 size="sm"
                 disabled={!title.trim() || !body.trim() || createDiscussion.isPending}
@@ -149,7 +150,7 @@ export function CourseDiscussionsPanel({ trainingId, isInstructor = false }: Pro
                   );
                 }}
               >
-                Publicar
+                {tx('Publicar')}
               </Button>
             </div>
           </div>
@@ -158,7 +159,7 @@ export function CourseDiscussionsPanel({ trainingId, isInstructor = false }: Pro
         {isLoading && <Skeleton className="h-24 w-full" />}
         {!isLoading && discussions.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-6">
-            Ainda não há perguntas neste curso. Seja o primeiro a perguntar!
+            {tx('Ainda não há perguntas neste curso. Seja o primeiro a perguntar!')}
           </p>
         )}
         {discussions.map((d) => (
@@ -170,9 +171,9 @@ export function CourseDiscussionsPanel({ trainingId, isInstructor = false }: Pro
             >
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-sm">{d.title}</span>
+                  <span className="font-medium text-sm">{tx(d.title)}</span>
                   {d.status === 'resolved' && (
-                    <Badge variant="default" className="bg-success text-xs">Resolvida</Badge>
+                    <Badge variant="default" className="bg-success text-xs">{tx('Resolvida')}</Badge>
                   )}
                 </div>
                 <span className="text-xs text-muted-foreground">

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -136,9 +137,9 @@ const EduCatalogo = () => {
             </Badge>
             <Badge variant={training.type === 'course' ? 'default' : 'secondary'}>
               {training.type === 'course' ? (
-                <><GraduationCap className="h-3 w-3 mr-1" />Curso</>
+                <><GraduationCap className="h-3 w-3 mr-1" />{tx('Curso')}</>
               ) : (
-                <><Video className="h-3 w-3 mr-1" />Live</>
+                <><Video className="h-3 w-3 mr-1" />{tx('Live')}</>
               )}
             </Badge>
             {training.curriculum_level && (
@@ -151,18 +152,18 @@ const EduCatalogo = () => {
               return hasContent ? (
                 <Badge variant="ready">
                   <Video className="h-3 w-3 mr-1" />
-                  Com conteúdo
+                  {tx('Com conteúdo')}
                 </Badge>
               ) : (
                 <Badge variant="draft">
                   <Clock className="h-3 w-3 mr-1" />
-                  Em progresso
+                  {tx('Em progresso')}
                 </Badge>
               );
             })()}
           </div>
           <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-2">
-            {training.title}
+            {tx(training.title)}
           </CardTitle>
           {training.objective && (
             <CardDescription className="line-clamp-3">
@@ -192,7 +193,7 @@ const EduCatalogo = () => {
                   <TooltipTrigger asChild>
                     <Button variant="outline" className="flex-1 cursor-not-allowed" disabled>
                       <Lock className="mr-2 h-4 w-4" />
-                      Bloqueado
+                      {tx('Bloqueado')}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -204,7 +205,7 @@ const EduCatalogo = () => {
               <Button variant="outline" className="flex-1" asChild>
                 <Link to={`/edu/training/${training.training_id}`}>
                   <Target className="mr-2 h-4 w-4" />
-                  Ver Detalhes
+                  {tx('Ver Detalhes')}
                 </Link>
               </Button>
             )}
@@ -236,8 +237,8 @@ const EduCatalogo = () => {
 
   return (
     <AppLayout subNav={eduAprenderNav} 
-      title="SISTUR EDU" 
-      subtitle="Catálogo de cursos e lives baseado em diagnóstico IGMA"
+      title={tx('SISTUR EDU')} 
+      subtitle={tx('Catálogo de cursos e lives baseado em diagnóstico IGMA')}
     >
       
           {/* Curriculum Progression Indicator */}
@@ -245,7 +246,7 @@ const EduCatalogo = () => {
             <CardContent className="py-4">
               <div className="flex items-center gap-2 mb-2 text-sm font-medium text-muted-foreground">
                 <GraduationCap className="h-4 w-4" />
-                Progressão Curricular
+                {tx('Progressão Curricular')}
               </div>
               <div className="flex items-center gap-1 flex-wrap">
                 {[1, 2, 3, 4].map((lvl, i) => {
@@ -288,12 +289,12 @@ const EduCatalogo = () => {
                 {hasProfile ? (
                   <>
                     <UserCircle className="mr-2 h-4 w-4" />
-                    Meu Perfil
+                    {tx('Meu Perfil')}
                   </>
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Preencher Perfil
+                    {tx('Preencher Perfil')}
                   </>
                 )}
               </Link>
@@ -316,7 +317,7 @@ const EduCatalogo = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nome ou código..."
+                placeholder={tx('Buscar por nome ou código...')}
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -325,44 +326,44 @@ const EduCatalogo = () => {
             <div className="flex flex-wrap gap-3">
               <Select value={levelFilter} onValueChange={setLevelFilter}>
                 <SelectTrigger className="w-full sm:w-44">
-                  <SelectValue placeholder="Nível" />
+                  <SelectValue placeholder={tx('Nível')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos os níveis</SelectItem>
+                  <SelectItem value="all">{tx('Todos os níveis')}</SelectItem>
                   {[1, 2, 3, 4].map(lvl => (
                     <SelectItem key={lvl} value={String(lvl)}>
                       Nível {lvl} — {LEVEL_SHORT_NAMES[lvl]}
                     </SelectItem>
                   ))}
-                  <SelectItem value="none">Sem nível</SelectItem>
+                  <SelectItem value="none">{tx('Sem nível')}</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={typeFilter} onValueChange={setTypeFilter}>
                 <SelectTrigger className="w-full sm:w-40">
-                  <SelectValue placeholder="Tipo" />
+                  <SelectValue placeholder={tx('Tipo')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos tipos</SelectItem>
+                  <SelectItem value="all">{tx('Todos tipos')}</SelectItem>
                   <SelectItem value="course">
                     <span className="flex items-center gap-2">
                       <GraduationCap className="h-4 w-4" />
-                      Cursos
+                      {tx('Cursos')}
                     </span>
                   </SelectItem>
                   <SelectItem value="live">
                     <span className="flex items-center gap-2">
                       <Video className="h-4 w-4" />
-                      Lives
+                      {tx('Lives')}
                     </span>
                   </SelectItem>
                 </SelectContent>
               </Select>
               <Select value={contentFilter} onValueChange={setContentFilter}>
                 <SelectTrigger className="w-full sm:w-52">
-                  <SelectValue placeholder="Conteúdo" />
+                  <SelectValue placeholder={tx('Conteúdo')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="all">{tx('Todos')}</SelectItem>
                   <SelectItem value="content">
                     <span className="flex items-center gap-2">
                       <Video className="h-4 w-4 text-primary" />
@@ -442,7 +443,7 @@ const EduCatalogo = () => {
               <TabsList className="grid grid-cols-2 sm:flex sm:flex-wrap h-auto gap-1">
                 <TabsTrigger value="all" className="gap-2">
                   <BookOpen className="h-4 w-4" />
-                  <span className="hidden sm:inline">Todos</span> ({trainings?.length || 0})
+                  <span className="hidden sm:inline">{tx('Todos')}</span> ({trainings?.length || 0})
                 </TabsTrigger>
                 <TabsTrigger value="RA" className="gap-2">
                   RA ({(stats?.byPillar.RA?.courses || 0) + (stats?.byPillar.RA?.lives || 0)})
@@ -477,7 +478,7 @@ const EduCatalogo = () => {
                           <div className="flex items-center gap-3 mb-3">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
                               <BookOpen className="h-3.5 w-3.5" />
-                              Sem nível definido
+                              {tx('Sem nível definido')}
                             </span>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -495,7 +496,7 @@ const EduCatalogo = () => {
                 ) : (
                   <EmptyState
                     icon={GraduationCap}
-                    title={trainings?.length === 0 ? 'Nenhum treinamento cadastrado' : 'Nenhum treinamento encontrado'}
+                    title={trainings?.length === 0 ? tx('Nenhum treinamento cadastrado') : tx('Nenhum treinamento encontrado')}
                     description={trainings?.length === 0 
                       ? 'Os treinamentos serão importados em breve. Enquanto isso, configure seu perfil de aprendizado.'
                       : 'Tente ajustar os filtros de busca para encontrar o conteúdo desejado.'}

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -105,7 +106,7 @@ export function ImportReviewQueue() {
         toast.error(result.error || 'Erro na importação');
       }
     } catch (error) {
-      toast.error('Erro ao executar importação');
+      toast.error(tx('Erro ao executar importação'));
     }
   };
   
@@ -116,7 +117,7 @@ export function ImportReviewQueue() {
       toast.success(`${selectedIds.size} treinamentos publicados`);
       setSelectedIds(new Set());
     } catch (error) {
-      toast.error('Erro ao publicar');
+      toast.error(tx('Erro ao publicar'));
     }
   };
   
@@ -130,7 +131,7 @@ export function ImportReviewQueue() {
       toast.success(`Pilar atualizado para ${pillar}`);
       setSelectedIds(new Set());
     } catch (error) {
-      toast.error('Erro ao atualizar pilar');
+      toast.error(tx('Erro ao atualizar pilar'));
     }
   };
   
@@ -142,7 +143,7 @@ export function ImportReviewQueue() {
       setSelectedIds(new Set());
       setShowDeleteDialog(false);
     } catch (error) {
-      toast.error('Erro ao remover');
+      toast.error(tx('Erro ao remover'));
     }
   };
   
@@ -163,15 +164,15 @@ export function ImportReviewQueue() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Youtube className="h-5 w-5 text-red-500" />
-                Importação de Conteúdo
+                {tx('Importação de Conteúdo')}
               </CardTitle>
               <CardDescription>
-                Importe vídeos do YouTube automaticamente com classificação por pilar SISTUR
+                {tx('Importe vídeos do YouTube automaticamente com classificação por pilar SISTUR')}
               </CardDescription>
             </div>
             <Button onClick={() => setShowIngestionDialog(true)}>
               <Upload className="mr-2 h-4 w-4" />
-              Nova Importação
+              {tx('Nova Importação')}
             </Button>
           </div>
         </CardHeader>
@@ -184,13 +185,13 @@ export function ImportReviewQueue() {
               </Badge>
               {lastResult.source && (
                 <Badge variant={lastResult.source === 'youtube_data_api' ? 'default' : 'secondary'}>
-                  {lastResult.source === 'youtube_data_api' ? 'Data API' : 'RSS'}
+                  {lastResult.source === 'youtube_data_api' ? tx('Data API') : tx('RSS')}
                 </Badge>
               )}
               {lastResult.hasEnrichedMetadata && (
                 <Badge variant="outline" className="text-green-600 border-green-300">
                   <Eye className="mr-1 h-3 w-3" />
-                  Metadados enriquecidos
+                  {tx('Metadados enriquecidos')}
                 </Badge>
               )}
               {lastResult.channelId && (
@@ -208,7 +209,7 @@ export function ImportReviewQueue() {
         <CardHeader>
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
             <div>
-              <CardTitle>Fila de Revisão</CardTitle>
+              <CardTitle>{tx('Fila de Revisão')}</CardTitle>
               <CardDescription>
                 {filteredTrainings.length} treinamentos importados aguardando revisão
               </CardDescription>
@@ -221,7 +222,7 @@ export function ImportReviewQueue() {
                 </span>
                 <Select onValueChange={(v) => handleBatchUpdatePillar(v as 'RA' | 'AO' | 'OE')}>
                   <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Alterar pilar" />
+                    <SelectValue placeholder={tx('Alterar pilar')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="RA">RA</SelectItem>
@@ -235,7 +236,7 @@ export function ImportReviewQueue() {
                   disabled={batchPublish.isPending}
                 >
                   <CheckCircle className="mr-1 h-4 w-4" />
-                  Publicar
+                  {tx('Publicar')}
                 </Button>
                 <Button 
                   size="sm" 
@@ -243,7 +244,7 @@ export function ImportReviewQueue() {
                   onClick={() => setShowDeleteDialog(true)}
                 >
                   <Trash2 className="mr-1 h-4 w-4" />
-                  Excluir
+                  {tx('Excluir')}
                 </Button>
               </div>
             )}
@@ -254,7 +255,7 @@ export function ImportReviewQueue() {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por título..."
+                placeholder={tx('Buscar por título...')}
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -262,10 +263,10 @@ export function ImportReviewQueue() {
             </div>
             <Select value={pillarFilter} onValueChange={setPillarFilter}>
               <SelectTrigger className="w-32">
-                <SelectValue placeholder="Pilar" />
+                <SelectValue placeholder={tx('Pilar')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="all">{tx('Todos')}</SelectItem>
                 <SelectItem value="RA">RA</SelectItem>
                 <SelectItem value="AO">AO</SelectItem>
                 <SelectItem value="OE">OE</SelectItem>
@@ -287,13 +288,13 @@ export function ImportReviewQueue() {
           ) : filteredTrainings.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <Youtube className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Nenhum conteúdo importado aguardando revisão</p>
+              <p>{tx('Nenhum conteúdo importado aguardando revisão')}</p>
               <Button 
                 variant="outline" 
                 className="mt-4"
                 onClick={() => setShowIngestionDialog(true)}
               >
-                Iniciar Importação
+                {tx('Iniciar Importação')}
               </Button>
             </div>
           ) : (
@@ -306,14 +307,14 @@ export function ImportReviewQueue() {
                       onCheckedChange={handleSelectAll}
                     />
                   </TableHead>
-                  <TableHead>Título</TableHead>
-                  <TableHead>Duração</TableHead>
-                  <TableHead>Views</TableHead>
-                  <TableHead>Pilar</TableHead>
-                  <TableHead>Confiança</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Importado em</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                  <TableHead>{tx('Título')}</TableHead>
+                  <TableHead>{tx('Duração')}</TableHead>
+                  <TableHead>{tx('Views')}</TableHead>
+                  <TableHead>{tx('Pilar')}</TableHead>
+                  <TableHead>{tx('Confiança')}</TableHead>
+                  <TableHead>{tx('Tipo')}</TableHead>
+                  <TableHead>{tx('Importado em')}</TableHead>
+                  <TableHead className="text-right">{tx('Ações')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -344,7 +345,7 @@ export function ImportReviewQueue() {
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{training.title}</p>
+                          <p className="font-medium truncate">{tx(training.title)}</p>
                           <p className="text-xs text-muted-foreground">
                             {training.ingestion_metadata?.youtube_id}
                           </p>
@@ -399,7 +400,7 @@ export function ImportReviewQueue() {
                     </TableCell>
                     <TableCell>
                       <Badge variant={training.type === 'live' ? 'secondary' : 'outline'}>
-                        {training.type === 'live' ? 'Live' : 'Curso'}
+                        {training.type === 'live' ? tx('Live') : tx('Curso')}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
@@ -416,7 +417,7 @@ export function ImportReviewQueue() {
                             href={training.video_url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            title="Ver no YouTube"
+                            title={tx('Ver no YouTube')}
                           >
                             <ExternalLink className="h-4 w-4" />
                           </a>
@@ -428,7 +429,7 @@ export function ImportReviewQueue() {
                             handleSelectOne(training.training_id, true);
                             handleBatchPublish();
                           }}
-                          title="Publicar"
+                          title={tx('Publicar')}
                         >
                           <CheckCircle className="h-4 w-4 text-green-600" />
                         </Button>
@@ -448,7 +449,7 @@ export function ImportReviewQueue() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Youtube className="h-5 w-5 text-red-500" />
-              Importar Vídeos do YouTube
+              {tx('Importar Vídeos do YouTube')}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-4">
               <p>
@@ -458,7 +459,7 @@ export function ImportReviewQueue() {
               
               <div className="space-y-3 pt-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Canal do YouTube</label>
+                  <label className="text-sm font-medium text-foreground">{tx('Canal do YouTube')}</label>
                   <Input
                     value={channelHandle}
                     onChange={(e) => setChannelHandle(e.target.value)}
@@ -467,7 +468,7 @@ export function ImportReviewQueue() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Limite de vídeos</label>
+                  <label className="text-sm font-medium text-foreground">{tx('Limite de vídeos')}</label>
                   <Select 
                     value={ingestionLimit.toString()} 
                     onValueChange={(v) => setIngestionLimit(parseInt(v))}
@@ -476,10 +477,10 @@ export function ImportReviewQueue() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="10">10 vídeos</SelectItem>
-                      <SelectItem value="25">25 vídeos</SelectItem>
-                      <SelectItem value="50">50 vídeos</SelectItem>
-                      <SelectItem value="100">100 vídeos</SelectItem>
+                      <SelectItem value="10">{tx('10 vídeos')}</SelectItem>
+                      <SelectItem value="25">{tx('25 vídeos')}</SelectItem>
+                      <SelectItem value="50">{tx('50 vídeos')}</SelectItem>
+                      <SelectItem value="100">{tx('100 vídeos')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -487,7 +488,7 @@ export function ImportReviewQueue() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRunIngestion}
               disabled={isPending}
@@ -495,12 +496,12 @@ export function ImportReviewQueue() {
               {isPending ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Importando...
+                  {tx('Importando...')}
                 </>
               ) : (
                 <>
                   <Upload className="mr-2 h-4 w-4" />
-                  Iniciar Importação
+                  {tx('Iniciar Importação')}
                 </>
               )}
             </AlertDialogAction>
@@ -512,19 +513,19 @@ export function ImportReviewQueue() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogTitle>{tx('Confirmar exclusão')}</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja excluir {selectedIds.size} treinamento(s)? 
               Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleBatchDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              Excluir
+              {tx('Excluir')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

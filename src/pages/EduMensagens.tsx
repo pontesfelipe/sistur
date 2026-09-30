@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -68,14 +69,14 @@ const EduMensagens = () => {
   };
 
   return (
-    <AppLayout subNav={eduTurmasNav} title="Mensagens">
+    <AppLayout subNav={eduTurmasNav} title={tx('Mensagens')}>
       <div className="container max-w-6xl py-6 space-y-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <MessageCircle className="h-6 w-6" /> Mensagens
           </h1>
           <p className="text-sm text-muted-foreground">
-            Conversas diretas entre alunos e professores.
+            {tx('Conversas diretas entre alunos e professores.')}
           </p>
         </div>
 
@@ -84,13 +85,13 @@ const EduMensagens = () => {
           <Card className="md:col-span-1 flex flex-col overflow-hidden">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between gap-2">
-                <CardTitle className="text-base">Conversas</CardTitle>
+                <CardTitle className="text-base">{tx('Conversas')}</CardTitle>
                 <NewMessageDialog onPick={(peerId) => setActivePeer(peerId)} />
               </div>
               <div className="relative">
                 <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar..."
+                  placeholder={tx('Buscar...')}
                   className="pl-8 h-9"
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
@@ -102,7 +103,7 @@ const EduMensagens = () => {
                 {loadingConvs && <Skeleton className="h-16 m-3" />}
                 {!loadingConvs && filtered.length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-8 px-3">
-                    Nenhuma conversa ainda.
+                    {tx('Nenhuma conversa ainda.')}
                   </p>
                 )}
                 {filtered.map((c) => (
@@ -139,7 +140,7 @@ const EduMensagens = () => {
           <Card className="md:col-span-2 flex flex-col overflow-hidden">
             {!activePeer ? (
               <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
-                Selecione uma conversa
+                {tx('Selecione uma conversa')}
               </div>
             ) : (
               <>
@@ -177,7 +178,7 @@ const EduMensagens = () => {
                 </CardContent>
                 <div className="border-t p-3 flex gap-2">
                   <Textarea
-                    placeholder="Escrever mensagem..."
+                    placeholder={tx('Escrever mensagem...')}
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
                     rows={2}

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { eduJornadaNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,13 +39,13 @@ export default function EduRecompensas() {
                 {type === 'avatar' ? r.value : '🎨'}
               </div>
               <div className="font-medium text-sm">{r.name}</div>
-              <div className="text-xs text-muted-foreground">{r.description}</div>
+              <div className="text-xs text-muted-foreground">{tx(r.description)}</div>
               {unlocked ? (
                 equipped ? (
-                  <Badge className="gap-1"><CheckCircle2 className="w-3 h-3" /> Em uso</Badge>
+                  <Badge className="gap-1"><CheckCircle2 className="w-3 h-3" /> {tx('Em uso')}</Badge>
                 ) : (
                   <Button size="sm" variant="outline" onClick={() => equip.mutate({ type, code: r.code })} disabled={equip.isPending}>
-                    {type === 'avatar' ? 'Equipar' : 'Aplicar'}
+                    {type === 'avatar' ? tx('Equipar') : tx('Aplicar')}
                   </Button>
                 )
               ) : (
@@ -58,12 +59,12 @@ export default function EduRecompensas() {
   );
 
   return (
-    <AppLayout subNav={eduJornadaNav} title="Recompensas" subtitle="Avatares e temas desbloqueáveis pelo seu progresso">
+    <AppLayout subNav={eduJornadaNav} title={tx('Recompensas')} subtitle={tx('Avatares e temas desbloqueáveis pelo seu progresso')}>
       <div className="container mx-auto p-4 sm:p-6 space-y-6 max-w-5xl">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10"><Sparkles className="w-6 h-6 text-primary" /></div>
           <div>
-            <h1 className="text-2xl font-bold">Recompensas</h1>
+            <h1 className="text-2xl font-bold">{tx('Recompensas')}</h1>
             <p className="text-sm text-muted-foreground">
               {xpLoading ? 'Carregando...' : `Você está no nível ${level} — desbloqueie itens conforme evolui.`}
             </p>
@@ -72,8 +73,8 @@ export default function EduRecompensas() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Avatares</CardTitle>
-            <CardDescription>Personalize sua identidade no EDU</CardDescription>
+            <CardTitle className="text-base">{tx('Avatares')}</CardTitle>
+            <CardDescription>{tx('Personalize sua identidade no EDU')}</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? <Skeleton className="h-40 w-full" /> : renderGrid(avatars, 'avatar')}
@@ -82,8 +83,8 @@ export default function EduRecompensas() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Temas</CardTitle>
-            <CardDescription>Visual da sua jornada de aprendizado</CardDescription>
+            <CardTitle className="text-base">{tx('Temas')}</CardTitle>
+            <CardDescription>{tx('Visual da sua jornada de aprendizado')}</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? <Skeleton className="h-40 w-full" /> : renderGrid(themes, 'theme')}

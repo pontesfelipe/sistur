@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 /**
  * SISTUR EDU - Compliance & Anti-Fraud Report Panel
  * Shows session tracking, interaction logs, and fraud flags per student.
@@ -91,7 +92,7 @@ function ComplianceStatsCards({ userId }: { userId: string }) {
             <Activity className="h-3.5 w-3.5" /> Engajamento
           </div>
           <p className="text-2xl font-bold">{stats.activePercent}<span className="text-sm font-normal text-muted-foreground">%</span></p>
-          <p className="text-xs text-muted-foreground">tempo ativo vs total</p>
+          <p className="text-xs text-muted-foreground">{tx('tempo ativo vs total')}</p>
         </CardContent>
       </Card>
       <Card>
@@ -142,12 +143,12 @@ function SessionDetailDialog({ session, open, onClose }: { session: LearningSess
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-          <div><span className="text-muted-foreground">Início:</span> {format(new Date(session.started_at), 'dd/MM/yyyy HH:mm:ss')}</div>
-          <div><span className="text-muted-foreground">Fim:</span> {session.ended_at ? format(new Date(session.ended_at), 'dd/MM/yyyy HH:mm:ss') : 'Em andamento'}</div>
-          <div><span className="text-muted-foreground">Duração:</span> {Math.round(session.duration_seconds / 60)} min</div>
-          <div><span className="text-muted-foreground">Ativo:</span> {Math.round(session.active_seconds / 60)} min ({session.duration_seconds > 0 ? Math.round((session.active_seconds / session.duration_seconds) * 100) : 0}%)</div>
-          <div><span className="text-muted-foreground">Tipo:</span> {session.session_type}</div>
-          <div><span className="text-muted-foreground">Entidade:</span> {session.entity_type || '—'}</div>
+          <div><span className="text-muted-foreground">{tx('Início:')}</span> {format(new Date(session.started_at), 'dd/MM/yyyy HH:mm:ss')}</div>
+          <div><span className="text-muted-foreground">{tx('Fim:')}</span> {session.ended_at ? format(new Date(session.ended_at), 'dd/MM/yyyy HH:mm:ss') : 'Em andamento'}</div>
+          <div><span className="text-muted-foreground">{tx('Duração:')}</span> {Math.round(session.duration_seconds / 60)} min</div>
+          <div><span className="text-muted-foreground">{tx('Ativo:')}</span> {Math.round(session.active_seconds / 60)} min ({session.duration_seconds > 0 ? Math.round((session.active_seconds / session.duration_seconds) * 100) : 0}%)</div>
+          <div><span className="text-muted-foreground">{tx('Tipo:')}</span> {session.session_type}</div>
+          <div><span className="text-muted-foreground">{tx('Entidade:')}</span> {session.entity_type || '—'}</div>
         </div>
 
         <h4 className="font-medium text-sm mb-2">Log de Interações ({interactions?.length || 0})</h4>
@@ -159,10 +160,10 @@ function SessionDetailDialog({ session, open, onClose }: { session: LearningSess
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-36">Horário</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Elemento</TableHead>
-                  <TableHead>Página</TableHead>
+                  <TableHead className="w-36">{tx('Horário')}</TableHead>
+                  <TableHead>{tx('Tipo')}</TableHead>
+                  <TableHead>{tx('Elemento')}</TableHead>
+                  <TableHead>{tx('Página')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -175,7 +176,7 @@ function SessionDetailDialog({ session, open, onClose }: { session: LearningSess
                   </TableRow>
                 ))}
                 {(!interactions || interactions.length === 0) && (
-                  <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">Nenhuma interação registrada</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">{tx('Nenhuma interação registrada')}</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>
@@ -203,11 +204,11 @@ function FraudReviewDialog({ flag, open, onClose }: { flag: FraudFlag | null; op
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Revisar Alerta</DialogTitle>
+          <DialogTitle>{tx('Revisar Alerta')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="p-3 bg-muted rounded-lg text-sm">
-            <p className="font-medium">{flag.description}</p>
+            <p className="font-medium">{tx(flag.description)}</p>
             <p className="text-xs text-muted-foreground mt-1">{format(new Date(flag.created_at), 'dd/MM/yyyy HH:mm')}</p>
           </div>
           {flag.evidence && Object.keys(flag.evidence).length > 0 && (
@@ -216,7 +217,7 @@ function FraudReviewDialog({ flag, open, onClose }: { flag: FraudFlag | null; op
             </div>
           )}
           <Textarea
-            placeholder="Notas da revisão..."
+            placeholder={tx('Notas da revisão...')}
             value={notes}
             onChange={e => setNotes(e.target.value)}
           />
@@ -260,22 +261,22 @@ export function ComplianceReportPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-primary" />
-            Compliance & Anti-Fraude — Relatório de Sessões
+            {tx('Compliance & Anti-Fraude — Relatório de Sessões')}
           </CardTitle>
           <CardDescription>
-            Rastreamento de presença, interações e alertas automáticos para certificação AVA
+            {tx('Rastreamento de presença, interações e alertas automáticos para certificação AVA')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
             <div className="flex-1 w-full">
-              <label className="text-sm font-medium mb-1 block">Selecionar Aluno</label>
+              <label className="text-sm font-medium mb-1 block">{tx('Selecionar Aluno')}</label>
               <Select value={selectedUserId} onValueChange={setSelectedUserId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Escolha um aluno..." />
+                  <SelectValue placeholder={tx('Escolha um aluno...')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {studentsLoading && <SelectItem value="_loading" disabled>Carregando...</SelectItem>}
+                  {studentsLoading && <SelectItem value="_loading" disabled>{tx('Carregando...')}</SelectItem>}
                   {(students || []).map(s => (
                     <SelectItem key={s.user_id} value={s.user_id}>{s.full_name}</SelectItem>
                   ))}
@@ -312,12 +313,12 @@ export function ComplianceReportPanel() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Data</TableHead>
-                          <TableHead>Tipo</TableHead>
-                          <TableHead>Duração</TableHead>
-                          <TableHead>Ativo</TableHead>
-                          <TableHead>Inativo</TableHead>
-                          <TableHead>Status</TableHead>
+                          <TableHead>{tx('Data')}</TableHead>
+                          <TableHead>{tx('Tipo')}</TableHead>
+                          <TableHead>{tx('Duração')}</TableHead>
+                          <TableHead>{tx('Ativo')}</TableHead>
+                          <TableHead>{tx('Inativo')}</TableHead>
+                          <TableHead>{tx('Status')}</TableHead>
                           <TableHead></TableHead>
                         </TableRow>
                       </TableHeader>
@@ -334,9 +335,9 @@ export function ComplianceReportPanel() {
                               <TableCell className="text-red-500">{Math.round(s.idle_seconds / 60)} min</TableCell>
                               <TableCell>
                                 {s.is_active ? (
-                                  <Badge className="bg-green-500 text-[10px]"><Wifi className="h-3 w-3 mr-1" /> Online</Badge>
+                                  <Badge className="bg-green-500 text-[10px]"><Wifi className="h-3 w-3 mr-1" /> {tx('Online')}</Badge>
                                 ) : (
-                                  <Badge variant="secondary" className="text-[10px]">Encerrada</Badge>
+                                  <Badge variant="secondary" className="text-[10px]">{tx('Encerrada')}</Badge>
                                 )}
                               </TableCell>
                               <TableCell>
@@ -350,7 +351,7 @@ export function ComplianceReportPanel() {
                         {(!sessions || sessions.length === 0) && (
                           <TableRow>
                             <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                              Nenhuma sessão registrada para este aluno
+                              {tx('Nenhuma sessão registrada para este aluno')}
                             </TableCell>
                           </TableRow>
                         )}
@@ -371,10 +372,10 @@ export function ComplianceReportPanel() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pending">Pendentes</SelectItem>
-                      <SelectItem value="confirmed">Confirmados</SelectItem>
-                      <SelectItem value="dismissed">Descartados</SelectItem>
-                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="pending">{tx('Pendentes')}</SelectItem>
+                      <SelectItem value="confirmed">{tx('Confirmados')}</SelectItem>
+                      <SelectItem value="dismissed">{tx('Descartados')}</SelectItem>
+                      <SelectItem value="all">{tx('Todos')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -394,7 +395,7 @@ export function ComplianceReportPanel() {
                           <AlertTriangle className="h-4 w-4" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium">{f.description}</p>
+                          <p className="text-sm font-medium">{tx(f.description)}</p>
                           <div className="flex gap-2 mt-1">
                             <Badge variant="outline" className="text-[10px]">{f.flag_type}</Badge>
                             <span className="text-xs text-muted-foreground">

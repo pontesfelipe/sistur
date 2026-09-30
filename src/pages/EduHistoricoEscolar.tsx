@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { eduAvaliacoesNav } from '@/components/layout/eduSubNav';
@@ -11,10 +12,10 @@ import { useStudentTranscript, transcriptStats } from '@/hooks/useStudentTranscr
 
 function statusBadge(status: string) {
   if (status === 'concluido')
-    return <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20"><CheckCircle2 className="h-3 w-3 mr-1" />Concluído</Badge>;
+    return <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20"><CheckCircle2 className="h-3 w-3 mr-1" />{tx('Concluído')}</Badge>;
   if (status === 'em_andamento')
-    return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />Em andamento</Badge>;
-  return <Badge variant="outline">Não iniciado</Badge>;
+    return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />{tx('Em andamento')}</Badge>;
+  return <Badge variant="outline">{tx('Não iniciado')}</Badge>;
 }
 
 export default function EduHistoricoEscolar() {
@@ -24,8 +25,8 @@ export default function EduHistoricoEscolar() {
 
   return (
     <AppLayout subNav={eduAvaliacoesNav}
-      title="Histórico Escolar"
-      subtitle="Boletim consolidado dos seus cursos, exames e certificados"
+      title={tx('Histórico Escolar')}
+      subtitle={tx('Boletim consolidado dos seus cursos, exames e certificados')}
     >
       {isLoading ? (
         <div className="space-y-4">
@@ -38,31 +39,31 @@ export default function EduHistoricoEscolar() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground">Cursos</p>
+                <p className="text-xs text-muted-foreground">{tx('Cursos')}</p>
                 <p className="text-2xl font-bold">{stats.totalCursos}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground">Concluídos</p>
+                <p className="text-xs text-muted-foreground">{tx('Concluídos')}</p>
                 <p className="text-2xl font-bold text-emerald-600">{stats.concluidos}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground">Em andamento</p>
+                <p className="text-xs text-muted-foreground">{tx('Em andamento')}</p>
                 <p className="text-2xl font-bold">{stats.emAndamento}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground">Carga horária</p>
+                <p className="text-xs text-muted-foreground">{tx('Carga horária')}</p>
                 <p className="text-2xl font-bold">{stats.totalHoras}h</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground">Média ponderada</p>
+                <p className="text-xs text-muted-foreground">{tx('Média ponderada')}</p>
                 <p className="text-2xl font-bold">
                   {stats.mediaPonderada !== null ? `${stats.mediaPonderada.toFixed(1)}%` : '—'}
                 </p>
@@ -75,20 +76,20 @@ export default function EduHistoricoEscolar() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5" />
-                Boletim Detalhado
+                {tx('Boletim Detalhado')}
               </CardTitle>
               <CardDescription>
-                Lista de todos os cursos cursados, com nota, carga horária e certificados
+                {tx('Lista de todos os cursos cursados, com nota, carga horária e certificados')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {rows.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <BookOpen className="h-12 w-12 mx-auto opacity-30 mb-3" />
-                  <p className="font-medium">Nenhuma atividade registrada ainda</p>
-                  <p className="text-sm mt-1">Comece por explorar o catálogo de cursos.</p>
+                  <p className="font-medium">{tx('Nenhuma atividade registrada ainda')}</p>
+                  <p className="text-sm mt-1">{tx('Comece por explorar o catálogo de cursos.')}</p>
                   <Button asChild variant="outline" className="mt-4">
-                    <Link to="/edu/catalogo">Ir ao catálogo</Link>
+                    <Link to="/edu/catalogo">{tx('Ir ao catálogo')}</Link>
                   </Button>
                 </div>
               ) : (
@@ -96,13 +97,13 @@ export default function EduHistoricoEscolar() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Curso</TableHead>
-                        <TableHead>Pilar</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Progresso</TableHead>
-                        <TableHead className="text-right">Nota</TableHead>
-                        <TableHead className="text-right">Tentativas</TableHead>
-                        <TableHead>Certificado</TableHead>
+                        <TableHead>{tx('Curso')}</TableHead>
+                        <TableHead>{tx('Pilar')}</TableHead>
+                        <TableHead>{tx('Status')}</TableHead>
+                        <TableHead className="text-right">{tx('Progresso')}</TableHead>
+                        <TableHead className="text-right">{tx('Nota')}</TableHead>
+                        <TableHead className="text-right">{tx('Tentativas')}</TableHead>
+                        <TableHead>{tx('Certificado')}</TableHead>
                         <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>

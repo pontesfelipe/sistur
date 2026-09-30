@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { LaunchBanner } from '@/components/layout/LaunchBanner';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -73,8 +74,8 @@ const EduDashboard = () => {
 
   return (
     <AppLayout subNav={eduJornadaNav}
-      title="Minha Jornada"
-      subtitle="Acompanhe seu progresso de aprendizado"
+      title={tx('Minha Jornada')}
+      subtitle={tx('Acompanhe seu progresso de aprendizado')}
     >
       <div className="space-y-6">
         {/* Aviso de lançamento */}
@@ -89,7 +90,7 @@ const EduDashboard = () => {
                 <Badge variant="secondary" className="text-xs">Nível {level}</Badge>
               </div>
               <p className="text-2xl font-display font-bold">{totalXP}</p>
-              <p className="text-xs text-muted-foreground">XP Total</p>
+              <p className="text-xs text-muted-foreground">{tx('XP Total')}</p>
               <Progress value={xpProgress} className="h-1.5 mt-2" />
               <p className="text-[10px] text-muted-foreground mt-1">{nextLevelXP - totalXP} XP para nível {level + 1}</p>
             </CardContent>
@@ -102,7 +103,7 @@ const EduDashboard = () => {
                 {currentStreak >= 7 && <Badge variant="default" className="text-xs">🔥</Badge>}
               </div>
               <p className="text-2xl font-display font-bold">{currentStreak}</p>
-              <p className="text-xs text-muted-foreground">Dias consecutivos</p>
+              <p className="text-xs text-muted-foreground">{tx('Dias consecutivos')}</p>
             </CardContent>
           </Card>
 
@@ -112,7 +113,7 @@ const EduDashboard = () => {
                 <GraduationCap className="h-5 w-5 text-green-500" />
               </div>
               <p className="text-2xl font-display font-bold">{completedTrainings}</p>
-              <p className="text-xs text-muted-foreground">Concluídos</p>
+              <p className="text-xs text-muted-foreground">{tx('Concluídos')}</p>
             </CardContent>
           </Card>
 
@@ -122,7 +123,7 @@ const EduDashboard = () => {
                 <Award className="h-5 w-5 text-yellow-500" />
               </div>
               <p className="text-2xl font-display font-bold">{certificates?.length ?? 0}</p>
-              <p className="text-xs text-muted-foreground">Certificados</p>
+              <p className="text-xs text-muted-foreground">{tx('Certificados')}</p>
             </CardContent>
           </Card>
         </div>
@@ -135,11 +136,11 @@ const EduDashboard = () => {
                 <Sparkles className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1">
-                <p className="font-medium">Configure seu perfil de aprendizado</p>
-                <p className="text-sm text-muted-foreground">Receba recomendações personalizadas de treinamentos</p>
+                <p className="font-medium">{tx('Configure seu perfil de aprendizado')}</p>
+                <p className="text-sm text-muted-foreground">{tx('Receba recomendações personalizadas de treinamentos')}</p>
               </div>
               <Button asChild size="sm">
-                <Link to="/edu/perfil">Configurar</Link>
+                <Link to="/edu/perfil">{tx('Configurar')}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -151,7 +152,7 @@ const EduDashboard = () => {
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-display font-semibold flex items-center gap-2">
                 <Play className="h-5 w-5 text-primary" />
-                Continue de onde parou
+                {tx('Continue de onde parou')}
               </h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -174,7 +175,7 @@ const EduDashboard = () => {
                     <Button variant="ghost" size="sm" className="w-full mt-2" asChild>
                       <Link to={`/edu/training/${progress.training_id}`}>
                         <Play className="h-3 w-3 mr-1" />
-                        Continuar
+                        {tx('Continuar')}
                       </Link>
                     </Button>
                   </CardContent>
@@ -198,7 +199,7 @@ const EduDashboard = () => {
                 <div key={notif.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
                   <div className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium line-clamp-1">{notif.title}</p>
+                    <p className="text-sm font-medium line-clamp-1">{tx(notif.title)}</p>
                     {notif.message && (
                       <p className="text-xs text-muted-foreground line-clamp-1">{notif.message}</p>
                     )}
@@ -217,27 +218,27 @@ const EduDashboard = () => {
           <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
             <Link to="/edu/catalogo">
               <BookOpen className="h-5 w-5" />
-              <span className="text-xs">Catálogo</span>
+              <span className="text-xs">{tx('Catálogo')}</span>
               <span className="text-[10px] text-muted-foreground">{trainings?.length ?? 0} treinamentos</span>
             </Link>
           </Button>
           <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
             <Link to="/edu/trilhas">
               <Route className="h-5 w-5" />
-              <span className="text-xs">Trilhas</span>
+              <span className="text-xs">{tx('Trilhas')}</span>
               <span className="text-[10px] text-muted-foreground">{tracks?.length ?? 0} trilhas</span>
             </Link>
           </Button>
           <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
             <Link to="/edu/historico">
               <Target className="h-5 w-5" />
-              <span className="text-xs">Provas</span>
+              <span className="text-xs">{tx('Provas')}</span>
             </Link>
           </Button>
           <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
             <Link to="/certificados">
               <Award className="h-5 w-5" />
-              <span className="text-xs">Certificados</span>
+              <span className="text-xs">{tx('Certificados')}</span>
               <span className="text-[10px] text-muted-foreground">{certificates?.length ?? 0}</span>
             </Link>
           </Button>
@@ -277,9 +278,9 @@ const EduDashboard = () => {
           <Card className="border-dashed">
             <CardContent className="p-6 text-center">
               <Trophy className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-              <p className="font-medium">Comece sua jornada</p>
+              <p className="font-medium">{tx('Comece sua jornada')}</p>
               <p className="text-sm text-muted-foreground mb-4">
-                Explore o catálogo, complete treinamentos e ganhe conquistas
+                {tx('Explore o catálogo, complete treinamentos e ganhe conquistas')}
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 {Object.values(ACHIEVEMENTS).slice(0, 5).map((def) => (
@@ -300,7 +301,7 @@ const EduDashboard = () => {
         <div>
           <h2 className="text-lg font-display font-semibold flex items-center gap-2 mb-3">
             <TrendingUp className="h-5 w-5 text-primary" />
-            Conteúdo por Pilar
+            {tx('Conteúdo por Pilar')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {(['RA', 'OE', 'AO'] as Pillar[]).map((pillar) => (

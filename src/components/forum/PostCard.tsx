@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -134,7 +135,7 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
               {post.is_pinned && (
                 <Badge variant="default" className="gap-1 text-xs">
                   <Pin className="h-3 w-3" />
-                  Fixado
+                  {tx('Fixado')}
                 </Badge>
               )}
               <Badge variant="secondary" className={categoryColors[post.category]}>
@@ -144,12 +145,12 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
                 {post.visibility === 'public' ? (
                   <>
                     <Globe className="h-3 w-3" />
-                    Público
+                    {tx('Público')}
                   </>
                 ) : (
                   <>
                     <Building2 className="h-3 w-3" />
-                    Org
+                    {tx('Org')}
                   </>
                 )}
               </Badge>
@@ -171,7 +172,7 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    {post.is_pinned ? 'Desafixar post' : 'Fixar post'}
+                    {post.is_pinned ? tx('Desafixar post') : tx('Fixar post')}
                   </TooltipContent>
                 </Tooltip>
               )}
@@ -180,7 +181,7 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
               {(canEdit || canDelete) && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Mais ações do post">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={tx('Mais ações do post')}>
                       <MoreVertical className="h-4 w-4" aria-hidden="true" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -193,7 +194,7 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
                         }}
                       >
                         <Pencil className="mr-2 h-4 w-4" />
-                        Editar
+                        {tx('Editar')}
                       </DropdownMenuItem>
                     )}
                     {canDelete && (
@@ -207,11 +208,11 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
                           }}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Excluir
+                          {tx('Excluir')}
                           {isAdmin && !isOwner && (
                             <Badge variant="outline" className="ml-2 text-xs gap-1">
                               <Shield className="h-3 w-3" />
-                              Admin
+                              {tx('Admin')}
                             </Badge>
                           )}
                         </DropdownMenuItem>
@@ -225,7 +226,7 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
         </CardHeader>
 
         <CardContent className="pb-2">
-          <h3 className="font-semibold text-lg mb-2">{post.title}</h3>
+          <h3 className="font-semibold text-lg mb-2">{tx(post.title)}</h3>
           <p className="text-muted-foreground line-clamp-3">{post.content}</p>
 
           {/* Image carousel or single image */}
@@ -246,7 +247,7 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
               <FileText className="h-5 w-5 text-primary" />
               <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <Paperclip className="h-3 w-3" />
-                PDF anexado
+                {tx('PDF anexado')}
               </span>
             </div>
           )}
@@ -259,7 +260,7 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
               size="sm"
               className={cn('gap-1', post.user_liked && 'text-red-500')}
               onClick={handleLike}
-              aria-label={post.user_liked ? 'Remover curtida' : 'Curtir post'}
+              aria-label={post.user_liked ? tx('Remover curtida') : tx('Curtir post')}
               aria-pressed={post.user_liked}
             >
               <Heart className={cn('h-4 w-4', post.user_liked && 'fill-current')} aria-hidden="true" />
@@ -283,13 +284,13 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir post?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. O post e todas as respostas serão permanentemente excluídos.
+              {tx('Esta ação não pode ser desfeita. O post e todas as respostas serão permanentemente excluídos.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Excluir
+              {tx('Excluir')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

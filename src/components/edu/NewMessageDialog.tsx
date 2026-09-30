@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,21 +40,21 @@ export function NewMessageDialog({ onPick }: Props) {
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Iniciar conversa</DialogTitle>
+          <DialogTitle>{tx('Iniciar conversa')}</DialogTitle>
           <DialogDescription>
-            Escolha um professor ou aluno das suas turmas.
+            {tx('Escolha um professor ou aluno das suas turmas.')}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="relative">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-8" placeholder="Buscar nome ou turma..." value={filter} onChange={e => setFilter(e.target.value)} />
+            <Input className="pl-8" placeholder={tx('Buscar nome ou turma...')} value={filter} onChange={e => setFilter(e.target.value)} />
           </div>
           <ScrollArea className="h-[60vh] -mx-2 px-2">
             {isLoading && <Skeleton className="h-12" />}
             {!isLoading && grouped.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-8">
-                Nenhum contato disponível. Você precisa estar matriculado em uma turma.
+                {tx('Nenhum contato disponível. Você precisa estar matriculado em uma turma.')}
               </p>
             )}
             <div className="space-y-1">
@@ -73,7 +74,7 @@ export function NewMessageDialog({ onPick }: Props) {
                   </div>
                   <Badge variant={c.role === 'professor' ? 'default' : 'secondary'} className="text-[10px] gap-1">
                     {c.role === 'professor' ? <GraduationCap className="h-3 w-3" /> : <UsersIcon className="h-3 w-3" />}
-                    {c.role === 'professor' ? 'Professor' : 'Aluno'}
+                    {c.role === 'professor' ? tx('Professor') : tx('Aluno')}
                   </Badge>
                 </button>
               ))}

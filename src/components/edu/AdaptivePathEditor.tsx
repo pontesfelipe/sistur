@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,7 +47,7 @@ export function AdaptivePathEditor() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Trilha criada');
+      toast.success(tx('Trilha criada'));
       qc.invalidateQueries({ queryKey: ['admin-adaptive-paths'] });
     },
     onError: (e: any) => toast.error(e.message),
@@ -68,7 +69,7 @@ export function AdaptivePathEditor() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Trilha atualizada');
+      toast.success(tx('Trilha atualizada'));
       qc.invalidateQueries({ queryKey: ['admin-adaptive-paths'] });
       setEditing(null);
     },
@@ -81,7 +82,7 @@ export function AdaptivePathEditor() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Trilha removida');
+      toast.success(tx('Trilha removida'));
       qc.invalidateQueries({ queryKey: ['admin-adaptive-paths'] });
     },
     onError: (e: any) => toast.error(e.message),
@@ -92,8 +93,8 @@ export function AdaptivePathEditor() {
       <CardHeader>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <CardTitle className="text-lg">Trilhas Adaptativas</CardTitle>
-            <CardDescription>Crie percursos com etapas, pré-requisitos e gatilhos por status do diagnóstico.</CardDescription>
+            <CardTitle className="text-lg">{tx('Trilhas Adaptativas')}</CardTitle>
+            <CardDescription>{tx('Crie percursos com etapas, pré-requisitos e gatilhos por status do diagnóstico.')}</CardDescription>
           </div>
           <Button size="sm" onClick={() => createPath.mutate({})} disabled={createPath.isPending}>
             <Plus className="w-4 h-4 mr-1" /> Nova trilha
@@ -101,25 +102,25 @@ export function AdaptivePathEditor() {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {isLoading && <p className="text-sm text-muted-foreground">Carregando…</p>}
+        {isLoading && <p className="text-sm text-muted-foreground">{tx('Carregando…')}</p>}
         {!isLoading && !paths?.length && (
-          <p className="text-sm text-muted-foreground py-6 text-center">Nenhuma trilha criada ainda.</p>
+          <p className="text-sm text-muted-foreground py-6 text-center">{tx('Nenhuma trilha criada ainda.')}</p>
         )}
         {(paths ?? []).map((p) => (
           <div key={p.id} className="border rounded-lg p-3 space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium">{p.title}</span>
+                  <span className="font-medium">{tx(p.title)}</span>
                   {p.pillar && <Badge variant="outline">{p.pillar}</Badge>}
                   {p.level && <Badge variant="secondary" className="capitalize">{p.level}</Badge>}
                   {p.published ? (
-                    <Badge>Publicada</Badge>
+                    <Badge>{tx('Publicada')}</Badge>
                   ) : (
-                    <Badge variant="outline">Rascunho</Badge>
+                    <Badge variant="outline">{tx('Rascunho')}</Badge>
                   )}
                 </div>
-                {p.description && <p className="text-xs text-muted-foreground mt-1">{p.description}</p>}
+                {p.description && <p className="text-xs text-muted-foreground mt-1">{tx(p.description)}</p>}
               </div>
               <div className="flex gap-1">
                 <Button size="sm" variant="outline" onClick={() => setEditing(p)}>
@@ -143,16 +144,16 @@ export function AdaptivePathEditor() {
         <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Editar trilha</DialogTitle>
+              <DialogTitle>{tx('Editar trilha')}</DialogTitle>
             </DialogHeader>
             {editing && (
               <div className="space-y-3">
                 <div>
-                  <Label>Título</Label>
+                  <Label>{tx('Título')}</Label>
                   <Input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} />
                 </div>
                 <div>
-                  <Label>Descrição</Label>
+                  <Label>{tx('Descrição')}</Label>
                   <Textarea
                     value={editing.description ?? ''}
                     onChange={(e) => setEditing({ ...editing, description: e.target.value })}
@@ -160,7 +161,7 @@ export function AdaptivePathEditor() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label>Pilar</Label>
+                    <Label>{tx('Pilar')}</Label>
                     <Select
                       value={editing.pillar ?? ''}
                       onValueChange={(v) => setEditing({ ...editing, pillar: v as any })}
@@ -174,30 +175,30 @@ export function AdaptivePathEditor() {
                     </Select>
                   </div>
                   <div>
-                    <Label>Nível</Label>
+                    <Label>{tx('Nível')}</Label>
                     <Select
                       value={editing.level ?? 'introdutorio'}
                       onValueChange={(v) => setEditing({ ...editing, level: v })}
                     >
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="introdutorio">Introdutório</SelectItem>
-                        <SelectItem value="basico">Básico</SelectItem>
-                        <SelectItem value="intermediario">Intermediário</SelectItem>
-                        <SelectItem value="avancado">Avançado</SelectItem>
+                        <SelectItem value="introdutorio">{tx('Introdutório')}</SelectItem>
+                        <SelectItem value="basico">{tx('Básico')}</SelectItem>
+                        <SelectItem value="intermediario">{tx('Intermediário')}</SelectItem>
+                        <SelectItem value="avancado">{tx('Avançado')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm">Adaptativa</Label>
+                  <Label className="text-sm">{tx('Adaptativa')}</Label>
                   <Switch
                     checked={editing.is_adaptive}
                     onCheckedChange={(v) => setEditing({ ...editing, is_adaptive: v })}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm">Publicada</Label>
+                  <Label className="text-sm">{tx('Publicada')}</Label>
                   <Switch
                     checked={editing.published}
                     onCheckedChange={(v) => setEditing({ ...editing, published: v })}
@@ -206,9 +207,9 @@ export function AdaptivePathEditor() {
               </div>
             )}
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
+              <Button variant="outline" onClick={() => setEditing(null)}>{tx('Cancelar')}</Button>
               <Button onClick={() => editing && updatePath.mutate(editing)} disabled={updatePath.isPending}>
-                Salvar
+                {tx('Salvar')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -279,7 +280,7 @@ function PathStepsEditor({ pathId }: { pathId: string }) {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Etapa atualizada');
+      toast.success(tx('Etapa atualizada'));
       qc.invalidateQueries({ queryKey: ['admin-path-steps', pathId] });
     },
   });
@@ -301,7 +302,7 @@ function PathStepsEditor({ pathId }: { pathId: string }) {
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Etapas da trilha</DialogTitle>
+          <DialogTitle>{tx('Etapas da trilha')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           {(steps ?? []).map((s) => (
@@ -318,7 +319,7 @@ function PathStepsEditor({ pathId }: { pathId: string }) {
                 </Button>
               </div>
               <Textarea
-                placeholder="Descrição"
+                placeholder={tx('Descrição')}
                 value={s.description ?? ''}
                 onChange={(e) => updateStep.mutate({ ...s, description: e.target.value })}
                 rows={2}
@@ -328,10 +329,10 @@ function PathStepsEditor({ pathId }: { pathId: string }) {
                   value={s.training_id ?? ''}
                   onValueChange={(v) => updateStep.mutate({ ...s, training_id: v || null })}
                 >
-                  <SelectTrigger><SelectValue placeholder="Curso vinculado" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={tx('Curso vinculado')} /></SelectTrigger>
                   <SelectContent>
                     {(trainings ?? []).map((t: any) => (
-                      <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
+                      <SelectItem key={t.id} value={t.id}>{tx(t.title)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -341,15 +342,15 @@ function PathStepsEditor({ pathId }: { pathId: string }) {
                 >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="any">Sem gatilho</SelectItem>
-                    <SelectItem value="atencao">Trigger: Atenção</SelectItem>
-                    <SelectItem value="critico">Trigger: Crítico</SelectItem>
+                    <SelectItem value="any">{tx('Sem gatilho')}</SelectItem>
+                    <SelectItem value="atencao">{tx('Trigger: Atenção')}</SelectItem>
+                    <SelectItem value="critico">{tx('Trigger: Crítico')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid grid-cols-2 gap-2 items-center">
                 <div>
-                  <Label className="text-xs">Nota mínima</Label>
+                  <Label className="text-xs">{tx('Nota mínima')}</Label>
                   <Input
                     type="number"
                     value={s.min_score ?? 70}
@@ -357,7 +358,7 @@ function PathStepsEditor({ pathId }: { pathId: string }) {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs">Opcional</Label>
+                  <Label className="text-xs">{tx('Opcional')}</Label>
                   <Switch
                     checked={s.is_optional}
                     onCheckedChange={(v) => updateStep.mutate({ ...s, is_optional: v })}

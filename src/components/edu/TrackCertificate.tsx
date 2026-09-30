@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -208,18 +209,18 @@ export const TrackCertificate = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Award className="h-5 w-5 text-primary" />
-            Certificado de Conclusão
+            {tx('Certificado de Conclusão')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex justify-end gap-2 mb-4">
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
-            Imprimir
+            {tx('Imprimir')}
           </Button>
           <Button onClick={handlePrint}>
             <Download className="mr-2 h-4 w-4" />
-            Download PDF
+            {tx('Download PDF')}
           </Button>
         </div>
 
@@ -261,7 +262,7 @@ export const TrackCertificate = ({
               color: 'hsl(222, 47%, 20%)',
               marginBottom: '16px',
             }}>
-              SISTUR EDU
+              {tx('SISTUR EDU')}
             </div>
             
             <div style={{ 
@@ -271,7 +272,7 @@ export const TrackCertificate = ({
               color: 'hsl(222, 47%, 20%)',
               marginBottom: '8px',
             }}>
-              CERTIFICADO
+              {tx('CERTIFICADO')}
             </div>
             
             <div style={{ 
@@ -279,7 +280,7 @@ export const TrackCertificate = ({
               color: 'hsl(215, 16%, 47%)',
               marginBottom: '24px',
             }}>
-              Certificamos que
+              {tx('Certificamos que')}
             </div>
             
             <div style={{ 
@@ -297,7 +298,7 @@ export const TrackCertificate = ({
               color: 'hsl(215, 16%, 47%)',
               marginBottom: '8px',
             }}>
-              concluiu com êxito a trilha formativa
+              {tx('concluiu com êxito a trilha formativa')}
             </div>
             
             <div style={{ 

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -116,7 +117,7 @@ function ReplyCard({
               {reply.is_solution && (
                 <Badge variant="default" className="gap-1">
                   <CheckCircle2 className="h-3 w-3" />
-                  Solução
+                  {tx('Solução')}
                 </Badge>
               )}
             </div>
@@ -128,10 +129,10 @@ function ReplyCard({
                   size="sm"
                   onClick={() => onMarkAsSolution(reply.id)}
                   className="text-primary"
-                  title="Marcar como solução"
+                  title={tx('Marcar como solução')}
                 >
                   <CheckCircle2 className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Marcar como solução</span>
+                  <span className="hidden sm:inline">{tx('Marcar como solução')}</span>
                 </Button>
               )}
 
@@ -148,7 +149,7 @@ function ReplyCard({
                       onClick={() => onDelete(reply.id)}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
+                      {tx('Excluir')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -179,7 +180,7 @@ function ReplyCard({
               onClick={() => onReply(reply.id, reply.author?.full_name || 'Usuário')}
             >
               <Reply className="h-4 w-4" />
-              Responder
+              {tx('Responder')}
             </Button>
           )}
           <Button
@@ -189,7 +190,7 @@ function ReplyCard({
             onClick={() => onReport(reply.id)}
           >
             <Flag className="h-4 w-4" />
-            Denunciar
+            {tx('Denunciar')}
           </Button>
         </CardFooter>
       </Card>
@@ -304,7 +305,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-xl font-bold">Post</h1>
+        <h1 className="text-xl font-bold">{tx('Post')}</h1>
       </div>
 
       {/* Main Post */}
@@ -333,7 +334,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
               {post.is_pinned && (
                 <Badge variant="default" className="gap-1 text-xs">
                   <Pin className="h-3 w-3" />
-                  Fixado
+                  {tx('Fixado')}
                 </Badge>
               )}
               <Badge variant="secondary">
@@ -343,12 +344,12 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
                 {post.visibility === 'public' ? (
                   <>
                     <Globe className="h-3 w-3" />
-                    Público
+                    {tx('Público')}
                   </>
                 ) : (
                   <>
                     <Building2 className="h-3 w-3" />
-                    Org
+                    {tx('Org')}
                   </>
                 )}
               </Badge>
@@ -379,7 +380,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
                     {(isOwner || isAdmin) && (
                       <DropdownMenuItem onClick={onEdit}>
                         <Pencil className="mr-2 h-4 w-4" />
-                        Editar
+                        {tx('Editar')}
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
@@ -387,7 +388,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
                       onClick={() => setShowDeletePostDialog(true)}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
+                      {tx('Excluir')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -397,7 +398,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
         </CardHeader>
 
         <CardContent>
-          <h2 className="text-xl font-bold mb-3">{post.title}</h2>
+          <h2 className="text-xl font-bold mb-3">{tx(post.title)}</h2>
           <p className="whitespace-pre-wrap">{post.content}</p>
 
           {/* Image carousel or single image */}
@@ -426,8 +427,8 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
                   <FileText className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-sm">Documento PDF</p>
-                  <p className="text-xs text-muted-foreground">Clique para visualizar</p>
+                  <p className="font-medium text-sm">{tx('Documento PDF')}</p>
+                  <p className="text-xs text-muted-foreground">{tx('Clique para visualizar')}</p>
                 </div>
                 <Download className="h-5 w-5 text-muted-foreground" />
               </a>
@@ -461,14 +462,14 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
         {replyingTo && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted px-3 py-2 rounded-lg">
             <CornerDownRight className="h-4 w-4" />
-            <span>Respondendo a <strong>{replyingTo.authorName}</strong></span>
+            <span>{tx('Respondendo a')} <strong>{replyingTo.authorName}</strong></span>
             <Button
               variant="ghost"
               size="sm"
               className="h-6 px-2 ml-auto"
               onClick={() => setReplyingTo(null)}
             >
-              Cancelar
+              {tx('Cancelar')}
             </Button>
           </div>
         )}
@@ -501,7 +502,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
 
         {replies.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">
-            Nenhuma resposta ainda. Seja o primeiro a responder!
+            {tx('Nenhuma resposta ainda. Seja o primeiro a responder!')}
           </p>
         ) : (
           replies.map((reply) => (
@@ -537,13 +538,13 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir post?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. O post e todas as respostas serão permanentemente excluídos.
+              {tx('Esta ação não pode ser desfeita. O post e todas as respostas serão permanentemente excluídos.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeletePost} className="bg-destructive text-destructive-foreground">
-              Excluir
+              {tx('Excluir')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -555,13 +556,13 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir resposta?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita.
+              {tx('Esta ação não pode ser desfeita.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteReply} className="bg-destructive text-destructive-foreground">
-              Excluir
+              {tx('Excluir')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

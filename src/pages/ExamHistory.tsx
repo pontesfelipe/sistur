@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -88,20 +89,20 @@ const ExamHistory = () => {
       });
       setAppealDialog(null);
       setAppealReason('');
-      toast.success('Recurso enviado com sucesso!');
+      toast.success(tx('Recurso enviado com sucesso!'));
     } catch {
-      toast.error('Erro ao enviar recurso');
+      toast.error(tx('Erro ao enviar recurso'));
     }
   };
 
   const getResultBadge = (result: string | null) => {
     switch (result) {
       case 'passed':
-        return <Badge className="bg-green-500/10 text-green-700 border-green-200"><CheckCircle className="w-3 h-3 mr-1" />Aprovado</Badge>;
+        return <Badge className="bg-green-500/10 text-green-700 border-green-200"><CheckCircle className="w-3 h-3 mr-1" />{tx('Aprovado')}</Badge>;
       case 'failed':
-        return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Reprovado</Badge>;
+        return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />{tx('Reprovado')}</Badge>;
       case 'pending':
-        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Aguardando Correção</Badge>;
+        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />{tx('Aguardando Correção')}</Badge>;
       default:
         return <Badge variant="outline">—</Badge>;
     }
@@ -110,48 +111,48 @@ const ExamHistory = () => {
   const getAppealStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Pendente</Badge>;
+        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />{tx('Pendente')}</Badge>;
       case 'accepted':
-        return <Badge className="bg-green-500/10 text-green-700 border-green-200"><CheckCircle className="w-3 h-3 mr-1" />Aceito</Badge>;
+        return <Badge className="bg-green-500/10 text-green-700 border-green-200"><CheckCircle className="w-3 h-3 mr-1" />{tx('Aceito')}</Badge>;
       case 'rejected':
-        return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Rejeitado</Badge>;
+        return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />{tx('Rejeitado')}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
   };
 
   return (
-    <AppLayout subNav={eduAvaliacoesNav} title="Histórico de Provas" subtitle="Consulte seus resultados e gerencie recursos">
+    <AppLayout subNav={eduAvaliacoesNav} title={tx('Histórico de Provas')} subtitle={tx('Consulte seus resultados e gerencie recursos')}>
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         <Card>
           <CardContent className="pt-4 pb-3 text-center">
             <p className="text-2xl font-bold">{stats.total}</p>
-            <p className="text-xs text-muted-foreground">Total de Provas</p>
+            <p className="text-xs text-muted-foreground">{tx('Total de Provas')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-3 text-center">
             <p className="text-2xl font-bold text-green-600">{stats.passed}</p>
-            <p className="text-xs text-muted-foreground">Aprovações</p>
+            <p className="text-xs text-muted-foreground">{tx('Aprovações')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-3 text-center">
             <p className="text-2xl font-bold text-red-600">{stats.failed}</p>
-            <p className="text-xs text-muted-foreground">Reprovações</p>
+            <p className="text-xs text-muted-foreground">{tx('Reprovações')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-3 text-center">
             <p className="text-2xl font-bold text-amber-600">{stats.pending}</p>
-            <p className="text-xs text-muted-foreground">Pendentes</p>
+            <p className="text-xs text-muted-foreground">{tx('Pendentes')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-3 text-center">
             <p className="text-2xl font-bold">{stats.avgScore}%</p>
-            <p className="text-xs text-muted-foreground">Média Geral</p>
+            <p className="text-xs text-muted-foreground">{tx('Média Geral')}</p>
           </CardContent>
         </Card>
       </div>
@@ -160,7 +161,7 @@ const ExamHistory = () => {
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="history" className="gap-2">
             <History className="h-4 w-4" />
-            Histórico
+            {tx('Histórico')}
           </TabsTrigger>
           <TabsTrigger value="appeals" className="gap-2">
             <MessageSquare className="h-4 w-4" />
@@ -172,13 +173,13 @@ const ExamHistory = () => {
           <div className="flex justify-between items-center">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filtrar por resultado" />
+                <SelectValue placeholder={tx('Filtrar por resultado')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="passed">Aprovado</SelectItem>
-                <SelectItem value="failed">Reprovado</SelectItem>
-                <SelectItem value="pending">Pendente</SelectItem>
+                <SelectItem value="all">{tx('Todos')}</SelectItem>
+                <SelectItem value="passed">{tx('Aprovado')}</SelectItem>
+                <SelectItem value="failed">{tx('Reprovado')}</SelectItem>
+                <SelectItem value="pending">{tx('Pendente')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -192,21 +193,21 @@ const ExamHistory = () => {
               ) : filteredAttempts.length === 0 ? (
                 <div className="p-12 text-center text-muted-foreground">
                   <ClipboardList className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Nenhuma prova realizada</p>
+                  <p>{tx('Nenhuma prova realizada')}</p>
                   <Button variant="link" onClick={() => navigate('/edu')}>
-                    Ir ao Catálogo EDU
+                    {tx('Ir ao Catálogo EDU')}
                   </Button>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Curso / Prova</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Nota</TableHead>
-                      <TableHead>Resultado</TableHead>
-                      <TableHead>Modo</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
+                      <TableHead>{tx('Curso / Prova')}</TableHead>
+                      <TableHead>{tx('Data')}</TableHead>
+                      <TableHead>{tx('Nota')}</TableHead>
+                      <TableHead>{tx('Resultado')}</TableHead>
+                      <TableHead>{tx('Modo')}</TableHead>
+                      <TableHead className="text-right">{tx('Ações')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -235,7 +236,7 @@ const ExamHistory = () => {
                         <TableCell>{getResultBadge(attempt.result)}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className="text-xs">
-                            {attempt.grading_mode === 'automatic' ? 'Auto' : attempt.grading_mode === 'hybrid' ? 'Híbrido' : 'Manual'}
+                            {attempt.grading_mode === 'automatic' ? 'Auto' : attempt.grading_mode === 'hybrid' ? tx('Híbrido') : tx('Manual')}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
@@ -246,7 +247,7 @@ const ExamHistory = () => {
                               onClick={() => navigate(`/edu/exam-review/${attempt.attempt_id}`)}
                             >
                               <Eye className="h-4 w-4 mr-1" />
-                              Revisar
+                              {tx('Revisar')}
                             </Button>
                             {(() => {
                               // Allow filing an appeal for up to APPEAL_WINDOW_DAYS after submission.
@@ -270,7 +271,7 @@ const ExamHistory = () => {
                                   })}
                                 >
                                   <MessageSquare className="h-4 w-4 mr-1" />
-                                  Recurso
+                                  {tx('Recurso')}
                                 </Button>
                               );
                             })()}
@@ -295,16 +296,16 @@ const ExamHistory = () => {
               ) : !appeals?.length ? (
                 <div className="p-12 text-center text-muted-foreground">
                   <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Nenhum recurso enviado</p>
+                  <p>{tx('Nenhum recurso enviado')}</p>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Data do Recurso</TableHead>
-                      <TableHead>Motivo</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Resposta</TableHead>
+                      <TableHead>{tx('Data do Recurso')}</TableHead>
+                      <TableHead>{tx('Motivo')}</TableHead>
+                      <TableHead>{tx('Status')}</TableHead>
+                      <TableHead>{tx('Resposta')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -323,7 +324,7 @@ const ExamHistory = () => {
                           {appeal.admin_response ? (
                             <p className="text-sm text-muted-foreground line-clamp-2">{appeal.admin_response}</p>
                           ) : (
-                            <span className="text-sm text-muted-foreground italic">Aguardando</span>
+                            <span className="text-sm text-muted-foreground italic">{tx('Aguardando')}</span>
                           )}
                         </TableCell>
                       </TableRow>
@@ -340,33 +341,33 @@ const ExamHistory = () => {
       <AlertDialog open={!!appealDialog} onOpenChange={(open) => !open && setAppealDialog(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Enviar Recurso</AlertDialogTitle>
+            <AlertDialogTitle>{tx('Enviar Recurso')}</AlertDialogTitle>
             <AlertDialogDescription>
               Questione o resultado da prova "{appealDialog?.courseName}". 
               Descreva os motivos do recurso de forma clara e objetiva.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-3 py-4">
-            <Label htmlFor="appeal-reason">Motivo do recurso</Label>
+            <Label htmlFor="appeal-reason">{tx('Motivo do recurso')}</Label>
             <Textarea
               id="appeal-reason"
               value={appealReason}
               onChange={(e) => setAppealReason(e.target.value)}
-              placeholder="Descreva por que discorda do resultado..."
+              placeholder={tx('Descreva por que discorda do resultado...')}
               rows={5}
             />
             {appealReason.length > 0 && appealReason.length < 20 && (
-              <p className="text-xs text-severity-moderate">Mínimo de 20 caracteres</p>
+              <p className="text-xs text-severity-moderate">{tx('Mínimo de 20 caracteres')}</p>
             )}
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleSubmitAppeal}
               disabled={appealReason.length < 20 || createAppeal.isPending}
             >
               {createAppeal.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Enviar Recurso
+              {tx('Enviar Recurso')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

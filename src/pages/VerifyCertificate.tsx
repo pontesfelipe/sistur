@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -49,19 +50,19 @@ const VerifyCertificate = () => {
             <div className="mx-auto mb-4 p-4 rounded-full bg-red-500/10">
               <AlertTriangle className="h-12 w-12 text-red-500" />
             </div>
-            <CardTitle className="text-2xl">Certificado Não Encontrado</CardTitle>
+            <CardTitle className="text-2xl">{tx('Certificado Não Encontrado')}</CardTitle>
             <CardDescription>
               {result?.message || 'O código de verificação informado não corresponde a nenhum certificado válido.'}
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-sm text-muted-foreground mb-6">
-              Verifique se o código foi digitado corretamente ou entre em contato com o emissor.
+              {tx('Verifique se o código foi digitado corretamente ou entre em contato com o emissor.')}
             </p>
             <Button variant="outline" asChild>
               <Link to="/">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Voltar ao Início
+                {tx('Voltar ao Início')}
               </Link>
             </Button>
           </CardContent>
@@ -86,9 +87,9 @@ const VerifyCertificate = () => {
         <div className="text-center">
           <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
             <ArrowLeft className="mr-1 h-4 w-4" />
-            SISTUR EDU
+            {tx('SISTUR EDU')}
           </Link>
-          <h1 className="text-2xl font-bold">Verificação de Certificado</h1>
+          <h1 className="text-2xl font-bold">{tx('Verificação de Certificado')}</h1>
         </div>
 
         {/* Status Card */}
@@ -105,12 +106,12 @@ const VerifyCertificate = () => {
               {isValid ? (
                 <>
                   <Shield className="w-3 h-3 mr-1" />
-                  Certificado Válido
+                  {tx('Certificado Válido')}
                 </>
               ) : (
                 <>
                   <XCircle className="w-3 h-3 mr-1" />
-                  Certificado Inválido
+                  {tx('Certificado Inválido')}
                 </>
               )}
             </Badge>
@@ -125,7 +126,7 @@ const VerifyCertificate = () => {
               </p>
               {revokedReason && (
                 <div className="mt-4 rounded-md border border-red-500/30 bg-red-500/5 p-3 text-left">
-                  <p className="text-xs font-semibold text-red-700">Motivo da revogação</p>
+                  <p className="text-xs font-semibold text-red-700">{tx('Motivo da revogação')}</p>
                   <p className="text-sm mt-1">{revokedReason}</p>
                   {revokedAt && (
                     <p className="text-xs text-muted-foreground mt-2">
@@ -148,7 +149,7 @@ const VerifyCertificate = () => {
                 </div>
                 <div>
                   <CardTitle>{certificate.lms_courses?.title || 'Curso'}</CardTitle>
-                  <CardDescription>Certificado de Conclusão</CardDescription>
+                  <CardDescription>{tx('Certificado de Conclusão')}</CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -157,14 +158,14 @@ const VerifyCertificate = () => {
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                   <User className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Aluno</p>
+                    <p className="text-xs text-muted-foreground">{tx('Aluno')}</p>
                     <p className="font-medium">{certificate.student_name || 'Nome não disponível'}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                   <Calendar className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Data de Emissão</p>
+                    <p className="text-xs text-muted-foreground">{tx('Data de Emissão')}</p>
                     <p className="font-medium">
                       {format(new Date(certificate.issued_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                     </p>
@@ -173,14 +174,14 @@ const VerifyCertificate = () => {
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                   <BookOpen className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Código de Verificação</p>
+                    <p className="text-xs text-muted-foreground">{tx('Código de Verificação')}</p>
                     <p className="font-mono font-medium text-sm">{certificate.verification_code}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                   <Clock className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Carga Horária</p>
+                    <p className="text-xs text-muted-foreground">{tx('Carga Horária')}</p>
                     <p className="font-medium">{certificate.workload_minutes} minutos</p>
                   </div>
                 </div>
@@ -198,7 +199,7 @@ const VerifyCertificate = () => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <QrCode className="h-4 w-4" />
-                  <span>QR Code de verificação</span>
+                  <span>{tx('QR Code de verificação')}</span>
                 </div>
               </div>
 
@@ -208,7 +209,7 @@ const VerifyCertificate = () => {
                   Verificação realizada em {format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Este documento foi verificado automaticamente pelo sistema SISTUR EDU
+                  {tx('Este documento foi verificado automaticamente pelo sistema SISTUR EDU')}
                 </p>
               </div>
             </CardContent>

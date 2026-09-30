@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import {
   Dialog,
@@ -69,24 +70,24 @@ export function ReportDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Flag className="h-5 w-5 text-destructive" />
-            Denunciar {targetType === 'post' ? 'Post' : 'Resposta'}
+            Denunciar {targetType === 'post' ? tx('Post') : tx('Resposta')}
           </DialogTitle>
           <DialogDescription>
-            Informe o motivo da denúncia. Nossa equipe irá analisar e tomar as medidas necessárias.
+            {tx('Informe o motivo da denúncia. Nossa equipe irá analisar e tomar as medidas necessárias.')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="reason">Motivo da denúncia *</Label>
+            <Label htmlFor="reason">{tx('Motivo da denúncia *')}</Label>
             <Select value={reason} onValueChange={setReason}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione um motivo" />
+                <SelectValue placeholder={tx('Selecione um motivo')} />
               </SelectTrigger>
               <SelectContent>
                 {REPORT_REASONS.map((r) => (
                   <SelectItem key={r.value} value={r.value}>
-                    {r.label}
+                    {tx(r.label)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -97,7 +98,7 @@ export function ReportDialog({
             <Label htmlFor="comment">Comentário adicional (opcional)</Label>
             <Textarea
               id="comment"
-              placeholder="Forneça mais detalhes sobre a denúncia..."
+              placeholder={tx('Forneça mais detalhes sobre a denúncia...')}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={3}
@@ -107,7 +108,7 @@ export function ReportDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
+            {tx('Cancelar')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -119,7 +120,7 @@ export function ReportDialog({
             ) : (
               <Flag className="h-4 w-4 mr-2" />
             )}
-            Enviar Denúncia
+            {tx('Enviar Denúncia')}
           </Button>
         </DialogFooter>
       </DialogContent>

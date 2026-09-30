@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 /**
  * SISEDU - Painel de Anotações Pessoais
  * Permite que alunos criem notas vinculadas a treinamentos
@@ -59,7 +60,7 @@ export function TrainingNotesPanel({ trainingId, moduleIndex, currentVideoTime }
         <CardTitle className="text-sm flex items-center justify-between">
           <span className="flex items-center gap-2">
             <StickyNote className="h-4 w-4 text-yellow-500" />
-            Minhas Anotações
+            {tx('Minhas Anotações')}
             {notes && notes.length > 0 && (
               <Badge variant="secondary" className="text-xs">{notes.length}</Badge>
             )}
@@ -73,7 +74,7 @@ export function TrainingNotesPanel({ trainingId, moduleIndex, currentVideoTime }
         {showForm && (
           <div className="space-y-2 animate-fade-in">
             <Textarea
-              placeholder="Escreva sua anotação..."
+              placeholder={tx('Escreva sua anotação...')}
               value={newContent}
               onChange={(e) => setNewContent(e.target.value)}
               rows={3}
@@ -87,17 +88,17 @@ export function TrainingNotesPanel({ trainingId, moduleIndex, currentVideoTime }
             )}
             <div className="flex gap-2">
               <Button size="sm" onClick={handleCreate} disabled={!newContent.trim() || createNote.isPending}>
-                Salvar
+                {tx('Salvar')}
               </Button>
               <Button size="sm" variant="ghost" onClick={() => { setShowForm(false); setNewContent(''); }}>
-                Cancelar
+                {tx('Cancelar')}
               </Button>
             </div>
           </div>
         )}
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Carregando...</p>
+          <p className="text-sm text-muted-foreground">{tx('Carregando...')}</p>
         ) : notes && notes.length > 0 ? (
           <div className="space-y-2 max-h-80 overflow-y-auto">
             {notes.map((note) => (
@@ -119,7 +120,7 @@ export function TrainingNotesPanel({ trainingId, moduleIndex, currentVideoTime }
           </div>
         ) : !showForm ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            Nenhuma anotação ainda. Clique em + para começar.
+            {tx('Nenhuma anotação ainda. Clique em + para começar.')}
           </p>
         ) : null}
       </CardContent>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -88,11 +89,11 @@ function RecommendationCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <Badge variant="outline" className="text-xs">
-                {isTrack ? 'Trilha' : isLive ? 'Live' : 'Curso'}
+                {isTrack ? 'Trilha' : isLive ? tx('Live') : tx('Curso')}
               </Badge>
               {pillar && (
                 <Badge variant="outline" className={`text-xs ${PILLAR_COLORS[pillar]}`}>
-                  {PILLAR_LABELS[pillar]}
+                  {tx(PILLAR_LABELS[pillar])}
                 </Badge>
               )}
             </div>
@@ -136,7 +137,7 @@ function RecommendationCard({
         {/* Match Reasons (collapsed by default) */}
         {recommendation.match_reasons.length > 0 && (
           <div className="mt-3 pt-3 border-t">
-            <p className="text-xs text-muted-foreground mb-1">Por que recomendamos:</p>
+            <p className="text-xs text-muted-foreground mb-1">{tx('Por que recomendamos:')}</p>
             <div className="flex flex-wrap gap-1">
               {recommendation.match_reasons.slice(0, 2).map((reason, idx) => (
                 <Badge key={idx} variant="secondary" className="text-xs font-normal">
@@ -204,7 +205,7 @@ export function PersonalizedRecommendationsPanel({
       <Card className="border-dashed">
         <CardContent className="py-8 text-center">
           <UserCircle className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-          <h3 className="font-semibold mb-1">Complete seu Perfil de Aprendizado</h3>
+          <h3 className="font-semibold mb-1">{tx('Complete seu Perfil de Aprendizado')}</h3>
           <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
             Preencha seu perfil para receber recomendações de cursos e trilhas 
             personalizadas de acordo com seus interesses e objetivos.
@@ -212,7 +213,7 @@ export function PersonalizedRecommendationsPanel({
           <Link to="/edu/perfil">
             <Button>
               <Sparkles className="mr-2 h-4 w-4" />
-              Preencher Perfil
+              {tx('Preencher Perfil')}
             </Button>
           </Link>
         </CardContent>
@@ -226,7 +227,7 @@ export function PersonalizedRecommendationsPanel({
       <Card className="border-dashed">
         <CardContent className="py-8 text-center">
           <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-          <h3 className="font-semibold mb-1">Nenhuma Recomendação Ainda</h3>
+          <h3 className="font-semibold mb-1">{tx('Nenhuma Recomendação Ainda')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
             {isProfileComplete 
               ? 'Clique abaixo para gerar suas recomendações personalizadas.'
@@ -237,12 +238,12 @@ export function PersonalizedRecommendationsPanel({
               {generateMutation.isPending ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Gerando...
+                  {tx('Gerando...')}
                 </>
               ) : (
                 <>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Gerar Recomendações
+                  {tx('Gerar Recomendações')}
                 </>
               )}
             </Button>
@@ -250,7 +251,7 @@ export function PersonalizedRecommendationsPanel({
             <Link to="/edu/perfil">
               <Button>
                 <UserCircle className="mr-2 h-4 w-4" />
-                Completar Perfil
+                {tx('Completar Perfil')}
               </Button>
             </Link>
           )}
@@ -274,7 +275,7 @@ export function PersonalizedRecommendationsPanel({
           <div>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Recomendado para Você
+              {tx('Recomendado para Você')}
             </h3>
             <p className="text-sm text-muted-foreground">
               {courses.length} cursos • {lives.length} lives • {tracks.length} trilhas
@@ -288,12 +289,12 @@ export function PersonalizedRecommendationsPanel({
               disabled={generateMutation.isPending}
             >
               <RefreshCw className={`h-4 w-4 mr-1 ${generateMutation.isPending ? 'animate-spin' : ''}`} />
-              Atualizar
+              {tx('Atualizar')}
             </Button>
             <Link to="/edu/perfil">
               <Button variant="ghost" size="sm">
                 <UserCircle className="h-4 w-4 mr-1" />
-                Editar Perfil
+                {tx('Editar Perfil')}
               </Button>
             </Link>
           </div>
@@ -317,7 +318,7 @@ export function PersonalizedRecommendationsPanel({
           {(courses.length + lives.length) > 0 && (
             <Button onClick={() => setCreateTrackOpen(true)}>
               <GraduationCap className="mr-2 h-4 w-4" />
-              Criar Trilha com Sugestões
+              {tx('Criar Trilha com Sugestões')}
             </Button>
           )}
           
@@ -333,7 +334,7 @@ export function PersonalizedRecommendationsPanel({
       <Dialog open={allOpen} onOpenChange={setAllOpen}>
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Todas as recomendações</DialogTitle>
+            <DialogTitle>{tx('Todas as recomendações')}</DialogTitle>
             <DialogDescription>
               {courses.length} cursos • {lives.length} lives • {tracks.length} trilhas
             </DialogDescription>
@@ -345,7 +346,7 @@ export function PersonalizedRecommendationsPanel({
               disabled={courses.length + lives.length === 0}
             >
               <GraduationCap className="mr-2 h-4 w-4" />
-              Criar trilha com sugestões
+              {tx('Criar trilha com sugestões')}
             </Button>
             <Button
               variant="outline"
@@ -353,7 +354,7 @@ export function PersonalizedRecommendationsPanel({
               disabled={generateMutation.isPending}
             >
               <RefreshCw className={`mr-2 h-4 w-4 ${generateMutation.isPending ? 'animate-spin' : ''}`} />
-              Atualizar recomendações
+              {tx('Atualizar recomendações')}
             </Button>
           </div>
 
@@ -376,11 +377,11 @@ export function PersonalizedRecommendationsPanel({
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <Badge variant="outline" className="text-xs">
-                            {isTrack ? 'Trilha' : isLive ? 'Live' : 'Curso'}
+                            {isTrack ? 'Trilha' : isLive ? tx('Live') : tx('Curso')}
                           </Badge>
                           {pillar && (
                             <Badge variant="outline" className={`text-xs ${PILLAR_COLORS[pillar]}`}>
-                              {PILLAR_LABELS[pillar]}
+                              {tx(PILLAR_LABELS[pillar])}
                             </Badge>
                           )}
                           <span className="text-xs text-muted-foreground">

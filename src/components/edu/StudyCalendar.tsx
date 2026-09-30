@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 /**
  * SISEDU - Calendário de Estudos
  * Exibe aulas ao vivo, prazos de atribuições e datas de exames
@@ -69,9 +70,9 @@ export function StudyCalendar() {
 
   const getTypeBadge = (type: CalendarEvent['type']) => {
     switch (type) {
-      case 'live': return <Badge variant="destructive" className="text-[10px]">Live</Badge>;
-      case 'assignment_due': return <Badge variant="default" className="text-[10px]">Prazo</Badge>;
-      case 'exam': return <Badge variant="secondary" className="text-[10px]">Exame</Badge>;
+      case 'live': return <Badge variant="destructive" className="text-[10px]">{tx('Live')}</Badge>;
+      case 'assignment_due': return <Badge variant="default" className="text-[10px]">{tx('Prazo')}</Badge>;
+      case 'exam': return <Badge variant="secondary" className="text-[10px]">{tx('Exame')}</Badge>;
     }
   };
 
@@ -80,14 +81,14 @@ export function StudyCalendar() {
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
           <Calendar className="h-4 w-4 text-primary" />
-          Calendário de Estudos
+          {tx('Calendário de Estudos')}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {Object.keys(groupedByDay).length === 0 ? (
           <div className="text-center py-6 text-sm text-muted-foreground">
             <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p>Nenhum evento nos próximos 30 dias</p>
+            <p>{tx('Nenhum evento nos próximos 30 dias')}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -104,7 +105,7 @@ export function StudyCalendar() {
                     >
                       {getIcon(event.type)}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium line-clamp-1">{event.title}</p>
+                        <p className="text-sm font-medium line-clamp-1">{tx(event.title)}</p>
                         <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                           <Clock className="h-2.5 w-2.5" />
                           {format(event.date, 'HH:mm')}

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { eduJornadaNav } from '@/components/layout/eduSubNav';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -58,15 +59,15 @@ export default function EduConquistas() {
   }, [events]);
 
   return (
-    <AppLayout subNav={eduJornadaNav} title="Minhas Conquistas">
+    <AppLayout subNav={eduJornadaNav} title={tx('Minhas Conquistas')}>
       <div className="container mx-auto p-4 sm:p-6 space-y-6 max-w-5xl">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
             <Trophy className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Minhas Conquistas</h1>
-            <p className="text-sm text-muted-foreground">XP, nível e badges acumulados na plataforma.</p>
+            <h1 className="text-2xl font-bold">{tx('Minhas Conquistas')}</h1>
+            <p className="text-sm text-muted-foreground">{tx('XP, nível e badges acumulados na plataforma.')}</p>
           </div>
         </div>
 
@@ -74,7 +75,7 @@ export default function EduConquistas() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Progressão</CardTitle>
+            <CardTitle className="text-base">{tx('Progressão')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {xpLoading ? (
@@ -94,7 +95,7 @@ export default function EduConquistas() {
                 {xp?.current_streak ? (
                   <div className="flex items-center gap-2 text-sm">
                     <Flame className="w-4 h-4 text-orange-500" />
-                    <span>Streak atual: <strong>{xp.current_streak}</strong> dias</span>
+                    <span>{tx('Streak atual:')} <strong>{xp.current_streak}</strong> dias</span>
                     {xp.longest_streak ? (
                       <span className="text-muted-foreground">· recorde {xp.longest_streak}d</span>
                     ) : null}
@@ -121,7 +122,7 @@ export default function EduConquistas() {
         </Card>
 
         <div>
-          <h2 className="text-lg font-semibold mb-3">Badges</h2>
+          <h2 className="text-lg font-semibold mb-3">{tx('Badges')}</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {(catalog ?? []).map((b) => {
               const Icon = ICONS[b.icon ?? 'Award'] ?? Award;
@@ -134,12 +135,12 @@ export default function EduConquistas() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium">{b.title}</span>
-                        {earned && <UIBadge variant="default" className="text-xs">Conquistada</UIBadge>}
+                        <span className="font-medium">{tx(b.title)}</span>
+                        {earned && <UIBadge variant="default" className="text-xs">{tx('Conquistada')}</UIBadge>}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">{b.description}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{tx(b.description)}</p>
                       {b.criteria && (
-                        <p className="text-xs mt-1"><span className="text-muted-foreground">Critério:</span> {b.criteria}</p>
+                        <p className="text-xs mt-1"><span className="text-muted-foreground">{tx('Critério:')}</span> {b.criteria}</p>
                       )}
                       <div className="text-xs text-primary mt-1">+{b.xp_reward} XP</div>
                       {earned && (
@@ -162,8 +163,8 @@ export default function EduConquistas() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Histórico de XP</CardTitle>
-            <CardDescription>Últimos 50 eventos</CardDescription>
+            <CardTitle className="text-base">{tx('Histórico de XP')}</CardTitle>
+            <CardDescription>{tx('Últimos 50 eventos')}</CardDescription>
           </CardHeader>
           <CardContent className="pb-0">
             <div className="h-44">
@@ -188,7 +189,7 @@ export default function EduConquistas() {
           </CardContent>
           <CardContent>
             {!events?.length ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">Sem eventos ainda. Conclua cursos e etapas para começar.</p>
+              <p className="text-sm text-muted-foreground py-4 text-center">{tx('Sem eventos ainda. Conclua cursos e etapas para começar.')}</p>
             ) : (
               <div className="space-y-2">
                 {events.map((e) => (

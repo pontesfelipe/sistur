@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -54,8 +55,8 @@ export function ProfessorOverviewPanel() {
       <Card>
         <CardContent className="p-12 text-center text-muted-foreground">
           <BarChart3 className="h-12 w-12 mx-auto opacity-30 mb-3" />
-          <p className="font-medium">Nenhuma turma ativa ainda</p>
-          <p className="text-sm">Crie uma turma para visualizar métricas agregadas aqui.</p>
+          <p className="font-medium">{tx('Nenhuma turma ativa ainda')}</p>
+          <p className="text-sm">{tx('Crie uma turma para visualizar métricas agregadas aqui.')}</p>
         </CardContent>
       </Card>
     );
@@ -64,10 +65,10 @@ export function ProfessorOverviewPanel() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Stat icon={Users} label="Alunos no total" value={String(totals.students)} />
-        <Stat icon={Trophy} label="XP médio" value={String(avgXp)} accent="bg-amber-500/10 text-amber-600" />
-        <Stat icon={Flame} label="Streaks ativos" value={String(totals.streaks)} accent="bg-orange-500/10 text-orange-600" />
-        <Stat icon={AlertTriangle} label="Alunos em risco" value={String(totals.atRisk)} accent="bg-destructive/10 text-destructive" />
+        <Stat icon={Users} label={tx('Alunos no total')} value={String(totals.students)} />
+        <Stat icon={Trophy} label={tx('XP médio')} value={String(avgXp)} accent="bg-amber-500/10 text-amber-600" />
+        <Stat icon={Flame} label={tx('Streaks ativos')} value={String(totals.streaks)} accent="bg-orange-500/10 text-orange-600" />
+        <Stat icon={AlertTriangle} label={tx('Alunos em risco')} value={String(totals.atRisk)} accent="bg-destructive/10 text-destructive" />
       </div>
 
       <Card>
@@ -84,13 +85,13 @@ export function ProfessorOverviewPanel() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Turma</TableHead>
-                  <TableHead className="text-right">Alunos</TableHead>
-                  <TableHead className="text-right">XP médio</TableHead>
-                  <TableHead className="text-right">Streaks</TableHead>
-                  <TableHead className="text-right">Em risco</TableHead>
-                  <TableHead className="text-right">Conclusão</TableHead>
-                  <TableHead className="text-right">Nota média</TableHead>
+                  <TableHead>{tx('Turma')}</TableHead>
+                  <TableHead className="text-right">{tx('Alunos')}</TableHead>
+                  <TableHead className="text-right">{tx('XP médio')}</TableHead>
+                  <TableHead className="text-right">{tx('Streaks')}</TableHead>
+                  <TableHead className="text-right">{tx('Em risco')}</TableHead>
+                  <TableHead className="text-right">{tx('Conclusão')}</TableHead>
+                  <TableHead className="text-right">{tx('Nota média')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

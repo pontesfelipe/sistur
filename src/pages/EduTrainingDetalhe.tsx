@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useParams, Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useEduSessionTracker } from '@/hooks/useEduSessionTracker';
@@ -89,7 +90,7 @@ const EduTrainingDetalhe = () => {
 
   if (isLoading) {
     return (
-      <AppLayout title="Carregando..." subtitle="Buscando detalhes do treinamento">
+      <AppLayout title={tx('Carregando...')} subtitle={tx('Buscando detalhes do treinamento')}>
         <div className="space-y-6">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-32 w-full" />
@@ -101,17 +102,17 @@ const EduTrainingDetalhe = () => {
 
   if (error || !training) {
     return (
-      <AppLayout title="Treinamento não encontrado" subtitle="">
+      <AppLayout title={tx('Treinamento não encontrado')} subtitle="">
         <div className="text-center py-16">
           <AlertCircle className="mx-auto h-12 w-12 text-destructive/50" />
-          <h3 className="mt-4 text-lg font-semibold">Treinamento não encontrado</h3>
+          <h3 className="mt-4 text-lg font-semibold">{tx('Treinamento não encontrado')}</h3>
           <p className="mt-2 text-muted-foreground">
-            O treinamento solicitado não existe ou foi removido.
+            {tx('O treinamento solicitado não existe ou foi removido.')}
           </p>
           <Button variant="outline" asChild className="mt-4">
             <Link to="/edu">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Voltar ao catálogo
+              {tx('Voltar ao catálogo')}
             </Link>
           </Button>
         </div>
@@ -124,10 +125,10 @@ const EduTrainingDetalhe = () => {
   const isFoundationTraining = foundation.course?.training_id === training.training_id;
   if (trial.userTrialing && trial.trainingConsumed && !isFoundationTraining && !foundation.exempt) {
     return (
-      <AppLayout title="Período de teste concluído" subtitle="">
+      <AppLayout title={tx('Período de teste concluído')} subtitle="">
         <Card className="max-w-2xl mx-auto border-primary/40 bg-primary/5">
           <CardHeader>
-            <CardTitle className="text-lg">Conteúdo disponível nos planos</CardTitle>
+            <CardTitle className="text-lg">{tx('Conteúdo disponível nos planos')}</CardTitle>
             <CardDescription>
               Você concluiu o curso base do teste gratuito. Para acessar este e todos os demais
               treinamentos, com certificados e o Professor Beni sem limites, conheça os planos.
@@ -135,12 +136,12 @@ const EduTrainingDetalhe = () => {
           </CardHeader>
           <CardContent className="flex gap-2">
             <Button asChild>
-              <Link to="/assinatura">Ver planos</Link>
+              <Link to="/assinatura">{tx('Ver planos')}</Link>
             </Button>
             <Button variant="outline" asChild>
               <Link to="/edu">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Voltar ao catálogo
+                {tx('Voltar ao catálogo')}
               </Link>
             </Button>
           </CardContent>
@@ -165,13 +166,13 @@ const EduTrainingDetalhe = () => {
   return (
     <AppLayout 
       title={training.title}
-      subtitle={`${training.type === 'course' ? 'Curso' : 'Live'} • Pilar ${training.pillar}`}
+      subtitle={`${training.type === 'course' ? tx('Curso') : tx('Live')} • Pilar ${training.pillar}`}
     >
       {/* Back button */}
       <Button variant="ghost" asChild className="mb-6">
         <Link to="/edu">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Voltar ao catálogo
+          {tx('Voltar ao catálogo')}
         </Link>
       </Button>
 
@@ -200,7 +201,7 @@ const EduTrainingDetalhe = () => {
                 <div className="absolute inset-0 bg-foreground/60 flex items-center justify-center">
                   <div className="text-center text-background">
                     <Video className="h-12 w-12 mx-auto mb-2 opacity-70" />
-                    <p className="text-sm opacity-80">Vídeo em breve</p>
+                    <p className="text-sm opacity-80">{tx('Vídeo em breve')}</p>
                   </div>
                 </div>
               </div>
@@ -219,9 +220,9 @@ const EduTrainingDetalhe = () => {
                 </Badge>
                 <Badge variant={training.type === 'course' ? 'default' : 'secondary'}>
                   {training.type === 'course' ? (
-                    <><GraduationCap className="h-3 w-3 mr-1" />Curso</>
+                    <><GraduationCap className="h-3 w-3 mr-1" />{tx('Curso')}</>
                   ) : (
-                    <><Video className="h-3 w-3 mr-1" />Live</>
+                    <><Video className="h-3 w-3 mr-1" />{tx('Live')}</>
                   )}
                 </Badge>
                 {pillarInfo && (
@@ -242,7 +243,7 @@ const EduTrainingDetalhe = () => {
                   </Badge>
                 )}
               </div>
-              <CardTitle className="text-2xl">{training.title}</CardTitle>
+              <CardTitle className="text-2xl">{tx(training.title)}</CardTitle>
               {training.objective && (
                 <CardDescription className="text-base mt-2 whitespace-pre-line">
                   {training.objective}
@@ -257,7 +258,7 @@ const EduTrainingDetalhe = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpen className="h-5 w-5" />
-                  Módulos do Curso
+                  {tx('Módulos do Curso')}
                 </CardTitle>
                 <CardDescription>
                   {modules.length} módulos estruturados para o aprendizado
@@ -303,7 +304,7 @@ const EduTrainingDetalhe = () => {
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
                 <FileText className="mx-auto h-10 w-10 opacity-50 mb-3" />
-                <p>Estrutura modular em desenvolvimento.</p>
+                <p>{tx('Estrutura modular em desenvolvimento.')}</p>
               </CardContent>
             </Card>
           )}
@@ -320,7 +321,7 @@ const EduTrainingDetalhe = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  Público-alvo
+                  {tx('Público-alvo')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -336,26 +337,26 @@ const EduTrainingDetalhe = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Target className="h-4 w-4" />
-                Informações
+                {tx('Informações')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tipo</span>
+                <span className="text-muted-foreground">{tx('Tipo')}</span>
                 <span className="font-medium">
-                  {training.type === 'course' ? 'Curso' : 'Live'}
+                  {training.type === 'course' ? tx('Curso') : tx('Live')}
                 </span>
               </div>
               <Separator />
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Pilar</span>
+                <span className="text-muted-foreground">{tx('Pilar')}</span>
                 <span className="font-medium">{pillarInfo?.fullName || training.pillar}</span>
               </div>
               {training.course_code && (
                 <>
                   <Separator />
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Código</span>
+                    <span className="text-muted-foreground">{tx('Código')}</span>
                     <span className="font-medium">{training.course_code}</span>
                   </div>
                 </>
@@ -364,7 +365,7 @@ const EduTrainingDetalhe = () => {
                 <>
                   <Separator />
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Módulos</span>
+                    <span className="text-muted-foreground">{tx('Módulos')}</span>
                     <span className="font-medium">{modules.length}</span>
                   </div>
                 </>
@@ -373,7 +374,7 @@ const EduTrainingDetalhe = () => {
                 <>
                   <Separator />
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Duração</span>
+                    <span className="text-muted-foreground">{tx('Duração')}</span>
                     <span className="font-medium">{training.duration_minutes} min</span>
                   </div>
                 </>
@@ -382,7 +383,7 @@ const EduTrainingDetalhe = () => {
                 <>
                   <Separator />
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Fonte</span>
+                    <span className="text-muted-foreground">{tx('Fonte')}</span>
                     <span className="font-medium text-xs">{training.source}</span>
                   </div>
                 </>
@@ -391,7 +392,7 @@ const EduTrainingDetalhe = () => {
                 <>
                   <Separator />
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Origem</span>
+                    <span className="text-muted-foreground">{tx('Origem')}</span>
                     <Badge variant="outline" className="text-xs">
                       {training.ingestion_source === 'youtube_data_api' ? 'YouTube' : training.ingestion_source}
                     </Badge>
@@ -407,7 +408,7 @@ const EduTrainingDetalhe = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Paperclip className="h-4 w-4" />
-                  Materiais de Apoio
+                  {tx('Materiais de Apoio')}
                 </CardTitle>
                 <CardDescription>
                   {materials.length} {materials.length === 1 ? 'arquivo disponível' : 'arquivos disponíveis'}
@@ -443,11 +444,11 @@ const EduTrainingDetalhe = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4" />
-                  Conclusão
+                  {tx('Conclusão')}
                 </CardTitle>
                 {foundation.course?.training_id === training.training_id && (
                   <CardDescription>
-                    Curso base obrigatório: concluí-lo libera todas as trilhas formativas.
+                    {tx('Curso base obrigatório: concluí-lo libera todas as trilhas formativas.')}
                   </CardDescription>
                 )}
               </CardHeader>
@@ -455,7 +456,7 @@ const EduTrainingDetalhe = () => {
                 {foundation.course?.training_id === training.training_id && foundation.completed ? (
                   <p className="text-sm text-muted-foreground flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
-                    Curso concluído. Trilhas liberadas.
+                    {tx('Curso concluído. Trilhas liberadas.')}
                   </p>
                 ) : (
                   <Button
@@ -463,13 +464,13 @@ const EduTrainingDetalhe = () => {
                     disabled={completeTraining.isPending}
                     onClick={() =>
                       completeTraining.mutate(training.training_id, {
-                        onSuccess: () => toast.success('Curso marcado como concluído'),
+                        onSuccess: () => toast.success(tx('Curso marcado como concluído')),
                         onError: (e: any) =>
                           toast.error(e?.message || 'Não foi possível registrar a conclusão'),
                       })
                     }
                   >
-                    {completeTraining.isPending ? 'Registrando...' : 'Marcar como concluído'}
+                    {completeTraining.isPending ? tx('Registrando...') : tx('Marcar como concluído')}
                   </Button>
                 )}
               </CardContent>
@@ -487,7 +488,7 @@ const EduTrainingDetalhe = () => {
           {(training as any).created_by && user?.id !== (training as any).created_by && (
             <Button asChild variant="outline" className="w-full">
               <Link to={`/edu/mensagens?peer=${(training as any).created_by}`}>
-                Falar com instrutor
+                {tx('Falar com instrutor')}
               </Link>
             </Button>
           )}

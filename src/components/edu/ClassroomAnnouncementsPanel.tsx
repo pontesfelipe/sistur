@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -68,24 +69,24 @@ export function ClassroomAnnouncementsPanel({ classroomId, canManage }: Props) {
         {showForm && canManage && (
           <div className="space-y-2 p-3 border rounded-md bg-muted/30">
             <Input
-              placeholder="Título"
+              placeholder={tx('Título')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <Textarea
-              placeholder="Mensagem para a turma..."
+              placeholder={tx('Mensagem para a turma...')}
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={4}
             />
             <div className="flex items-center gap-2">
               <Switch id="pinned" checked={pinned} onCheckedChange={setPinned} />
-              <Label htmlFor="pinned" className="text-sm cursor-pointer">Fixar no topo</Label>
+              <Label htmlFor="pinned" className="text-sm cursor-pointer">{tx('Fixar no topo')}</Label>
             </div>
             <div className="flex justify-end gap-2">
-              <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>
+              <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>{tx('Cancelar')}</Button>
               <Button size="sm" disabled={!title.trim() || !body.trim() || create.isPending} onClick={handleSubmit}>
-                Publicar
+                {tx('Publicar')}
               </Button>
             </div>
           </div>
@@ -94,7 +95,7 @@ export function ClassroomAnnouncementsPanel({ classroomId, canManage }: Props) {
         {isLoading && <Skeleton className="h-24 w-full" />}
         {!isLoading && announcements.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-6">
-            Nenhum anúncio publicado ainda.
+            {tx('Nenhum anúncio publicado ainda.')}
           </p>
         )}
 
@@ -105,7 +106,7 @@ export function ClassroomAnnouncementsPanel({ classroomId, canManage }: Props) {
           >
             <div className="flex items-start justify-between gap-2 mb-1">
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <h4 className="font-medium text-sm truncate">{a.title}</h4>
+                <h4 className="font-medium text-sm truncate">{tx(a.title)}</h4>
                 {a.pinned && (
                   <Badge variant="secondary" className="text-xs">
                     <Pin className="h-3 w-3 mr-1" /> Fixado
@@ -119,7 +120,7 @@ export function ClassroomAnnouncementsPanel({ classroomId, canManage }: Props) {
                     variant="ghost"
                     className="h-7 w-7"
                     onClick={() => togglePin.mutate({ id: a.id, pinned: !a.pinned })}
-                    title={a.pinned ? 'Desafixar' : 'Fixar'}
+                    title={a.pinned ? tx('Desafixar') : tx('Fixar')}
                   >
                     {a.pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
                   </Button>
@@ -130,7 +131,7 @@ export function ClassroomAnnouncementsPanel({ classroomId, canManage }: Props) {
                     onClick={() => {
                       if (confirm('Remover este anúncio?')) remove.mutate(a.id);
                     }}
-                    title="Remover"
+                    title={tx('Remover')}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>

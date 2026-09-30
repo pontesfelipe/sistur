@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -104,7 +105,7 @@ export function BadgesAdminPanel() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Badge removida');
+      toast.success(tx('Badge removida'));
       qc.invalidateQueries({ queryKey: ['admin-badges'] });
       qc.invalidateQueries({ queryKey: ['edu-badges'] });
       setConfirmDelete(null);
@@ -138,7 +139,7 @@ export function BadgesAdminPanel() {
         <div>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Award className="h-5 w-5 text-primary" />
-            Catálogo de Badges
+            {tx('Catálogo de Badges')}
           </h3>
           <p className="text-sm text-muted-foreground">
             Crie e gerencie badges concedidas aos alunos. Use códigos estáveis (ex: <code>first_course</code>).
@@ -146,16 +147,16 @@ export function BadgesAdminPanel() {
         </div>
         <Button onClick={openCreate}>
           <Plus className="h-4 w-4 mr-2" />
-          Nova badge
+          {tx('Nova badge')}
         </Button>
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Carregando…</p>
+        <p className="text-sm text-muted-foreground">{tx('Carregando…')}</p>
       ) : !badges?.length ? (
         <Card>
           <CardContent className="py-8 text-center text-sm text-muted-foreground">
-            Nenhuma badge cadastrada ainda.
+            {tx('Nenhuma badge cadastrada ainda.')}
           </CardContent>
         </Card>
       ) : (
@@ -171,7 +172,7 @@ export function BadgesAdminPanel() {
                         <Icon className="h-4 w-4" />
                       </div>
                       <div>
-                        <CardTitle className="text-sm">{b.title}</CardTitle>
+                        <CardTitle className="text-sm">{tx(b.title)}</CardTitle>
                         <CardDescription className="text-[11px] font-mono">
                           {b.code}
                         </CardDescription>
@@ -193,10 +194,10 @@ export function BadgesAdminPanel() {
                   </div>
                 </CardHeader>
                 <CardContent className="text-xs space-y-1">
-                  {b.description && <p>{b.description}</p>}
+                  {b.description && <p>{tx(b.description)}</p>}
                   {b.criteria && (
                     <p className="text-muted-foreground">
-                      <strong>Critério:</strong> {b.criteria}
+                      <strong>{tx('Critério:')}</strong> {b.criteria}
                     </p>
                   )}
                   <div className="flex items-center gap-2 pt-1">
@@ -213,7 +214,7 @@ export function BadgesAdminPanel() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{editing ? 'Editar badge' : 'Nova badge'}</DialogTitle>
+            <DialogTitle>{editing ? tx('Editar badge') : tx('Nova badge')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div>
@@ -222,15 +223,15 @@ export function BadgesAdminPanel() {
                 value={draft.code}
                 disabled={!!editing}
                 onChange={(e) => setDraft({ ...draft, code: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
-                placeholder="ex: course_master"
+                placeholder={tx('ex: course_master')}
               />
             </div>
             <div>
-              <Label>Título</Label>
+              <Label>{tx('Título')}</Label>
               <Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
             </div>
             <div>
-              <Label>Descrição</Label>
+              <Label>{tx('Descrição')}</Label>
               <Textarea
                 rows={2}
                 value={draft.description ?? ''}
@@ -242,12 +243,12 @@ export function BadgesAdminPanel() {
               <Input
                 value={draft.criteria ?? ''}
                 onChange={(e) => setDraft({ ...draft, criteria: e.target.value })}
-                placeholder="ex: Concluir 5 cursos"
+                placeholder={tx('ex: Concluir 5 cursos')}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>XP de recompensa</Label>
+                <Label>{tx('XP de recompensa')}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -256,7 +257,7 @@ export function BadgesAdminPanel() {
                 />
               </div>
               <div>
-                <Label>Ícone</Label>
+                <Label>{tx('Ícone')}</Label>
                 <select
                   className="w-full h-10 rounded-md border bg-background px-3 text-sm"
                   value={draft.icon ?? 'Award'}
@@ -275,15 +276,15 @@ export function BadgesAdminPanel() {
                 checked={draft.active}
                 onCheckedChange={(v) => setDraft({ ...draft, active: v })}
               />
-              <Label>Ativa</Label>
+              <Label>{tx('Ativa')}</Label>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancelar
+              {tx('Cancelar')}
             </Button>
             <Button onClick={() => save.mutate()} disabled={save.isPending}>
-              {save.isPending ? 'Salvando…' : 'Salvar'}
+              {save.isPending ? tx('Salvando…') : tx('Salvar')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -299,12 +300,12 @@ export function BadgesAdminPanel() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => confirmDelete && remove.mutate(confirmDelete.id)}
               className="bg-destructive text-destructive-foreground"
             >
-              Remover
+              {tx('Remover')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

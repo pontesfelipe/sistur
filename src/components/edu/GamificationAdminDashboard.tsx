@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -78,7 +79,7 @@ export function GamificationAdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Alunos com XP</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx('Alunos com XP')}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -87,7 +88,7 @@ export function GamificationAdminDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">XP do Top 10</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx('XP do Top 10')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -96,7 +97,7 @@ export function GamificationAdminDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Badges concedidas</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx('Badges concedidas')}</CardTitle>
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -105,7 +106,7 @@ export function GamificationAdminDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Missões 7d</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx('Missões 7d')}</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -117,7 +118,7 @@ export function GamificationAdminDashboard() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2"><Target className="h-5 w-5" /> Missões diárias concluídas (últimos 7 dias)</CardTitle>
-          <CardDescription>Conclusões agregadas de todos os alunos.</CardDescription>
+          <CardDescription>{tx('Conclusões agregadas de todos os alunos.')}</CardDescription>
         </CardHeader>
         <CardContent style={{ height: 240 }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -135,17 +136,17 @@ export function GamificationAdminDashboard() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Trophy className="h-5 w-5" /> Top 10 alunos por XP</CardTitle>
+            <CardTitle className="flex items-center gap-2"><Trophy className="h-5 w-5" /> {tx('Top 10 alunos por XP')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
-                  <TableHead>Aluno</TableHead>
-                  <TableHead className="text-right">Nível</TableHead>
+                  <TableHead>{tx('Aluno')}</TableHead>
+                  <TableHead className="text-right">{tx('Nível')}</TableHead>
                   <TableHead className="text-right">XP</TableHead>
-                  <TableHead className="text-right">Streak</TableHead>
+                  <TableHead className="text-right">{tx('Streak')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -161,7 +162,7 @@ export function GamificationAdminDashboard() {
                   </TableRow>
                 ))}
                 {data.topXP.length === 0 && (
-                  <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">Sem dados ainda.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">{tx('Sem dados ainda.')}</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>
@@ -170,14 +171,14 @@ export function GamificationAdminDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Award className="h-5 w-5" /> Badges mais conquistadas</CardTitle>
+            <CardTitle className="flex items-center gap-2"><Award className="h-5 w-5" /> {tx('Badges mais conquistadas')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Badge</TableHead>
-                  <TableHead className="text-right">Conquistas</TableHead>
+                  <TableHead>{tx('Badge')}</TableHead>
+                  <TableHead className="text-right">{tx('Conquistas')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -185,13 +186,13 @@ export function GamificationAdminDashboard() {
                   <TableRow key={b.badge_id}>
                     <TableCell className="flex items-center gap-2">
                       {b.icon && <span className="text-lg">{b.icon}</span>}
-                      <span>{b.title}</span>
+                      <span>{tx(b.title)}</span>
                     </TableCell>
                     <TableCell className="text-right tabular-nums">{b.count}</TableCell>
                   </TableRow>
                 ))}
                 {data.badgeStats.length === 0 && (
-                  <TableRow><TableCell colSpan={2} className="text-center text-muted-foreground">Sem dados ainda.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={2} className="text-center text-muted-foreground">{tx('Sem dados ainda.')}</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>

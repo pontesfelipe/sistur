@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -183,7 +184,7 @@ const TrackFormDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'create' ? 'Nova Trilha Formativa' : 'Editar Trilha'}
+            {mode === 'create' ? tx('Nova Trilha Formativa') : tx('Editar Trilha')}
           </DialogTitle>
           <DialogDescription>
             {mode === 'create' 
@@ -194,20 +195,20 @@ const TrackFormDialog = ({
         
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nome da Trilha *</Label>
+            <Label htmlFor="name">{tx('Nome da Trilha *')}</Label>
             <Input
               id="name"
-              placeholder="Ex: Gestão de Destinos Turísticos"
+              placeholder={tx('Ex: Gestão de Destinos Turísticos')}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
+            <Label htmlFor="description">{tx('Descrição')}</Label>
             <Textarea
               id="description"
-              placeholder="Descreva o objetivo e conteúdo da trilha..."
+              placeholder={tx('Descreva o objetivo e conteúdo da trilha...')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
@@ -215,10 +216,10 @@ const TrackFormDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="objective">Objetivo</Label>
+            <Label htmlFor="objective">{tx('Objetivo')}</Label>
             <Input
               id="objective"
-              placeholder="Objetivo principal da trilha"
+              placeholder={tx('Objetivo principal da trilha')}
               value={objective}
               onChange={(e) => setObjective(e.target.value)}
             />
@@ -226,24 +227,24 @@ const TrackFormDialog = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Público-alvo</Label>
+              <Label>{tx('Público-alvo')}</Label>
               <Select value={audience} onValueChange={(v) => setAudience(v as TargetAgent)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
+                  <SelectValue placeholder={tx('Selecione')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="GESTORES">Gestores Públicos</SelectItem>
-                  <SelectItem value="TECNICOS">Técnicos</SelectItem>
-                  <SelectItem value="TRADE">Trade Turístico</SelectItem>
+                  <SelectItem value="GESTORES">{tx('Gestores Públicos')}</SelectItem>
+                  <SelectItem value="TECNICOS">{tx('Técnicos')}</SelectItem>
+                  <SelectItem value="TRADE">{tx('Trade Turístico')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="delivery">Certificação</Label>
+              <Label htmlFor="delivery">{tx('Certificação')}</Label>
               <Input
                 id="delivery"
-                placeholder="Ex: Certificado de 40h"
+                placeholder={tx('Ex: Certificado de 40h')}
                 value={delivery}
                 onChange={(e) => setDelivery(e.target.value)}
               />
@@ -255,7 +256,7 @@ const TrackFormDialog = ({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar treinamentos..."
+                placeholder={tx('Buscar treinamentos...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
@@ -283,19 +284,19 @@ const TrackFormDialog = ({
                         </Badge>
                         <Badge variant={training.type === 'course' ? 'default' : 'secondary'} className="text-xs">
                           {training.type === 'course' ? (
-                            <><GraduationCap className="h-3 w-3 mr-1" />Curso</>
+                            <><GraduationCap className="h-3 w-3 mr-1" />{tx('Curso')}</>
                           ) : (
-                            <><Video className="h-3 w-3 mr-1" />Live</>
+                            <><Video className="h-3 w-3 mr-1" />{tx('Live')}</>
                           )}
                         </Badge>
                       </div>
-                      <p className="font-medium text-sm truncate">{training.title}</p>
+                      <p className="font-medium text-sm truncate">{tx(training.title)}</p>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="p-4 text-center text-muted-foreground text-sm">
-                  Nenhum treinamento encontrado
+                  {tx('Nenhum treinamento encontrado')}
                 </div>
               )}
             </div>
@@ -309,7 +310,7 @@ const TrackFormDialog = ({
                 className="mt-0.5"
               />
               <div className="space-y-1">
-                <p className="text-sm font-medium">Gerar provas finais automaticamente</p>
+                <p className="text-sm font-medium">{tx('Gerar provas finais automaticamente')}</p>
                 <p className="text-xs text-muted-foreground">
                   Cria uma prova por pilar coberto pelos treinamentos (20 questões, 70% nota mínima, 60 min, até 2 tentativas).
                   Opcional — você pode gerar depois pelo botão "Gerar provas" no detalhe da trilha.
@@ -321,13 +322,13 @@ const TrackFormDialog = ({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
+            {tx('Cancelar')}
           </Button>
           <Button 
             onClick={handleSubmit} 
             disabled={!name.trim() || selectedTrainings.length === 0 || isSubmitting}
           >
-            {isSubmitting ? 'Salvando...' : mode === 'create' ? 'Criar Trilha' : 'Salvar Alterações'}
+            {isSubmitting ? 'Salvando...' : mode === 'create' ? tx('Criar Trilha') : tx('Salvar Alterações')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -351,7 +352,7 @@ const TrackProgress = ({ trackId, totalTrainings }: TrackProgressProps) => {
   return (
     <div className="mt-3">
       <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-        <span>Progresso</span>
+        <span>{tx('Progresso')}</span>
         <span>{completedCount}/{totalTrainings} ({percentage}%)</span>
       </div>
       <Progress value={percentage} className="h-2" />
@@ -371,26 +372,26 @@ const EduTrilhas = () => {
 
   return (
     <AppLayout subNav={eduAprenderNav} 
-      title="Trilhas Formativas" 
-      subtitle="Percursos estruturados de capacitação com certificação"
+      title={tx('Trilhas Formativas')} 
+      subtitle={tx('Percursos estruturados de capacitação com certificação')}
     >
       {foundation.locked && foundation.course && (
         <Card className="mb-6 border-amber-500/40 bg-amber-500/5">
           <CardHeader>
             <div className="flex items-center gap-2">
               <LockIcon className="h-5 w-5 text-amber-600" />
-              <CardTitle className="text-lg">Curso base obrigatório</CardTitle>
+              <CardTitle className="text-lg">{tx('Curso base obrigatório')}</CardTitle>
             </div>
             <CardDescription>
               Para iniciar qualquer trilha formativa é necessário concluir o curso{' '}
-              <strong>{foundation.course.title}</strong>. Ele apresenta o turismo como sistema aberto
+              <strong>{tx(foundation.course.title)}</strong>. Ele apresenta o turismo como sistema aberto
               e os conjuntos RA, OE e AO — a linguagem comum de todas as demais formações.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild>
               <Link to={`/edu/training/${foundation.course.training_id}`}>
-                Começar curso base
+                {tx('Começar curso base')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -403,7 +404,7 @@ const EduTrilhas = () => {
           <CardHeader>
             <div className="flex items-center gap-2">
               <LockIcon className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Período de teste concluído</CardTitle>
+              <CardTitle className="text-lg">{tx('Período de teste concluído')}</CardTitle>
             </div>
             <CardDescription>
               Você concluiu o curso base incluído no teste gratuito. Para seguir nas trilhas
@@ -413,7 +414,7 @@ const EduTrilhas = () => {
           <CardContent>
             <Button asChild>
               <Link to="/assinatura">
-                Ver planos
+                {tx('Ver planos')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -425,14 +426,14 @@ const EduTrilhas = () => {
         <Button variant="outline" asChild>
           <Link to="/edu">
             <ChevronLeft className="mr-2 h-4 w-4" />
-            Voltar ao Catálogo
+            {tx('Voltar ao Catálogo')}
           </Link>
         </Button>
         
         {trainings && trainings.length > 0 && (
           <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Criar Trilha
+            {tx('Criar Trilha')}
           </Button>
         )}
       </div>
@@ -470,14 +471,14 @@ const EduTrilhas = () => {
       ) : (
         <div className="text-center py-16">
           <Route className="mx-auto h-12 w-12 text-muted-foreground/50" />
-          <h3 className="mt-4 text-lg font-semibold">Nenhuma trilha cadastrada</h3>
+          <h3 className="mt-4 text-lg font-semibold">{tx('Nenhuma trilha cadastrada')}</h3>
           <p className="mt-2 text-muted-foreground mb-4">
-            Crie trilhas formativas agrupando treinamentos para seus públicos-alvo.
+            {tx('Crie trilhas formativas agrupando treinamentos para seus públicos-alvo.')}
           </p>
           {trainings && trainings.length > 0 && (
             <Button onClick={() => setCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Criar Trilha
+              {tx('Criar Trilha')}
             </Button>
           )}
         </div>
@@ -504,7 +505,7 @@ const TrackCard = ({ track, index, locked }: { track: EduTrack; index: number; l
           {track.audience && (
             <Badge variant="secondary" className="text-xs">
               <Users className="h-3 w-3 mr-1" />
-              {TARGET_AGENT_INFO[track.audience].label}
+              {tx(TARGET_AGENT_INFO[track.audience].label)}
             </Badge>
           )}
         </div>
@@ -513,14 +514,14 @@ const TrackCard = ({ track, index, locked }: { track: EduTrack; index: number; l
         </CardTitle>
         {track.description && (
           <CardDescription className="line-clamp-2">
-            {track.description}
+            {tx(track.description)}
           </CardDescription>
         )}
       </CardHeader>
       <CardContent>
         {track.objective && (
           <div className="mb-4">
-            <p className="text-sm font-medium text-foreground/80 mb-1">Objetivo</p>
+            <p className="text-sm font-medium text-foreground/80 mb-1">{tx('Objetivo')}</p>
             <p className="text-sm text-muted-foreground line-clamp-2">
               {track.objective}
             </p>
@@ -549,12 +550,12 @@ const TrackCard = ({ track, index, locked }: { track: EduTrack; index: number; l
         {locked ? (
           <Button className="w-full mt-4" variant="outline" disabled>
             <LockIcon className="mr-2 h-4 w-4" />
-            Conclua o curso base
+            {tx('Conclua o curso base')}
           </Button>
         ) : (
           <Button className="w-full mt-4" asChild>
             <Link to={`/edu/trilha/${track.id}`}>
-              Ver Trilha
+              {tx('Ver Trilha')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -646,7 +647,7 @@ export const EduTrilhaDetalhe = () => {
 
   if (isLoading) {
     return (
-      <AppLayout subNav={eduAprenderNav} title="Carregando..." subtitle="">
+      <AppLayout subNav={eduAprenderNav} title={tx('Carregando...')} subtitle="">
         <Skeleton className="h-64" />
       </AppLayout>
     );
@@ -654,12 +655,12 @@ export const EduTrilhaDetalhe = () => {
 
   if (trialLocked) {
     return (
-      <AppLayout subNav={eduAprenderNav} title="Período de teste concluído" subtitle="">
+      <AppLayout subNav={eduAprenderNav} title={tx('Período de teste concluído')} subtitle="">
         <Card className="max-w-2xl mx-auto border-primary/40 bg-primary/5">
           <CardHeader>
             <div className="flex items-center gap-2">
               <LockIcon className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Trilha disponível nos planos</CardTitle>
+              <CardTitle className="text-lg">{tx('Trilha disponível nos planos')}</CardTitle>
             </div>
             <CardDescription>
               Você concluiu o curso base do teste gratuito. Para acessar esta e todas as demais
@@ -669,12 +670,12 @@ export const EduTrilhaDetalhe = () => {
           <CardContent className="flex gap-2">
             <Button asChild>
               <Link to="/assinatura">
-                Ver planos
+                {tx('Ver planos')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link to="/edu/trilhas">Voltar às Trilhas</Link>
+              <Link to="/edu/trilhas">{tx('Voltar às Trilhas')}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -684,27 +685,27 @@ export const EduTrilhaDetalhe = () => {
 
   if (foundation.locked && foundation.course) {
     return (
-      <AppLayout subNav={eduAprenderNav} title="Curso base obrigatório" subtitle="">
+      <AppLayout subNav={eduAprenderNav} title={tx('Curso base obrigatório')} subtitle="">
         <Card className="max-w-2xl mx-auto border-amber-500/40 bg-amber-500/5">
           <CardHeader>
             <div className="flex items-center gap-2">
               <LockIcon className="h-5 w-5 text-amber-600" />
-              <CardTitle className="text-lg">Trilha bloqueada</CardTitle>
+              <CardTitle className="text-lg">{tx('Trilha bloqueada')}</CardTitle>
             </div>
             <CardDescription>
-              Conclua primeiro o curso <strong>{foundation.course.title}</strong> para liberar as
+              Conclua primeiro o curso <strong>{tx(foundation.course.title)}</strong> para liberar as
               trilhas formativas.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">
             <Button asChild>
               <Link to={`/edu/training/${foundation.course.training_id}`}>
-                Começar curso base
+                {tx('Começar curso base')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link to="/edu/trilhas">Voltar às Trilhas</Link>
+              <Link to="/edu/trilhas">{tx('Voltar às Trilhas')}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -714,12 +715,12 @@ export const EduTrilhaDetalhe = () => {
 
   if (!track) {
     return (
-      <AppLayout subNav={eduAprenderNav} title="Trilha não encontrada" subtitle="">
+      <AppLayout subNav={eduAprenderNav} title={tx('Trilha não encontrada')} subtitle="">
         <div className="text-center py-16">
           <Route className="mx-auto h-12 w-12 text-muted-foreground/50" />
-          <p className="mt-4 text-muted-foreground">Esta trilha não existe ou foi removida.</p>
+          <p className="mt-4 text-muted-foreground">{tx('Esta trilha não existe ou foi removida.')}</p>
           <Button className="mt-4" asChild>
-            <Link to="/edu/trilhas">Voltar às Trilhas</Link>
+            <Link to="/edu/trilhas">{tx('Voltar às Trilhas')}</Link>
           </Button>
         </div>
       </AppLayout>
@@ -735,7 +736,7 @@ export const EduTrilhaDetalhe = () => {
         <Button variant="outline" asChild>
           <Link to="/edu/trilhas">
             <ChevronLeft className="mr-2 h-4 w-4" />
-            Voltar às Trilhas
+            {tx('Voltar às Trilhas')}
           </Link>
         </Button>
         
@@ -743,7 +744,7 @@ export const EduTrilhaDetalhe = () => {
           {isTrackComplete && (
             <Button onClick={() => setCertificateOpen(true)}>
               <Award className="mr-2 h-4 w-4" />
-              Ver Certificado
+              {tx('Ver Certificado')}
             </Button>
           )}
           {/* Only show edit/delete buttons if user is the creator */}
@@ -751,7 +752,7 @@ export const EduTrilhaDetalhe = () => {
             <>
               <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
                 <Edit className="mr-2 h-4 w-4" />
-                Editar
+                {tx('Editar')}
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -767,7 +768,7 @@ export const EduTrilhaDetalhe = () => {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
                     <AlertDialogAction
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       onClick={() => {
@@ -775,7 +776,7 @@ export const EduTrilhaDetalhe = () => {
                         window.location.href = '/edu/trilhas';
                       }}
                     >
-                      Excluir
+                      {tx('Excluir')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -822,24 +823,24 @@ export const EduTrilhaDetalhe = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {track.audience && (
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Público-alvo</p>
+                <p className="text-sm text-muted-foreground mb-1">{tx('Público-alvo')}</p>
                 <Badge variant="secondary">
                   <Users className="h-3 w-3 mr-1" />
-                  {TARGET_AGENT_INFO[track.audience].label}
+                  {tx(TARGET_AGENT_INFO[track.audience].label)}
                 </Badge>
               </div>
             )}
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Treinamentos</p>
+              <p className="text-sm text-muted-foreground mb-1">{tx('Treinamentos')}</p>
               <p className="text-2xl font-bold">{totalTrainings}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Concluídos</p>
+              <p className="text-sm text-muted-foreground mb-1">{tx('Concluídos')}</p>
               <p className="text-2xl font-bold text-green-600">{completedCount}</p>
             </div>
             {track.delivery && (
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Certificação</p>
+                <p className="text-sm text-muted-foreground mb-1">{tx('Certificação')}</p>
                 <div className="flex items-center gap-2">
                   <GraduationCap className="h-4 w-4 text-primary" />
                   <span className="text-sm">{track.delivery}</span>
@@ -852,7 +853,7 @@ export const EduTrilhaDetalhe = () => {
           {totalTrainings > 0 && (
             <div className="mt-6">
               <div className="flex items-center justify-between text-sm mb-2">
-                <span className="font-medium">Seu progresso na trilha</span>
+                <span className="font-medium">{tx('Seu progresso na trilha')}</span>
                 <span className="text-muted-foreground">{progressPercentage}% concluído</span>
               </div>
               <Progress value={progressPercentage} className="h-3" />
@@ -860,11 +861,11 @@ export const EduTrilhaDetalhe = () => {
                 <div className="flex items-center justify-between mt-2">
                   <p className="text-sm text-green-600 flex items-center gap-1">
                     <CheckCircle2 className="h-4 w-4" />
-                    Parabéns! Você concluiu todos os treinamentos desta trilha!
+                    {tx('Parabéns! Você concluiu todos os treinamentos desta trilha!')}
                   </p>
                   <Button size="sm" variant="outline" onClick={() => setCertificateOpen(true)}>
                     <Award className="mr-2 h-4 w-4" />
-                    Ver Certificado
+                    {tx('Ver Certificado')}
                   </Button>
                 </div>
               )}
@@ -877,7 +878,7 @@ export const EduTrilhaDetalhe = () => {
       {id && <TrackExamsPanel trackId={id} canManage={!!isCreator} />}
 
       {/* Trainings in Track */}
-      <h3 className="text-xl font-semibold mb-4">Treinamentos da Trilha</h3>
+      <h3 className="text-xl font-semibold mb-4">{tx('Treinamentos da Trilha')}</h3>
       {trackTrainings && trackTrainings.length > 0 ? (
         <div className="space-y-4">
           {trackTrainings.map((training, index) => {
@@ -895,7 +896,7 @@ export const EduTrilhaDetalhe = () => {
                     <button
                       onClick={() => handleToggleComplete(training.training_id)}
                       className="flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full"
-                      title={isCompleted ? 'Marcar como não concluído' : 'Marcar como concluído'}
+                      title={isCompleted ? tx('Marcar como não concluído') : tx('Marcar como concluído')}
                     >
                       {isCompleted ? (
                         <CheckCircle2 className="h-8 w-8 text-green-600" />
@@ -920,19 +921,19 @@ export const EduTrilhaDetalhe = () => {
                         </Badge>
                         <Badge variant={training.type === 'course' ? 'default' : 'secondary'}>
                           {training.type === 'course' ? (
-                            <><GraduationCap className="h-3 w-3 mr-1" />Curso</>
+                            <><GraduationCap className="h-3 w-3 mr-1" />{tx('Curso')}</>
                           ) : (
-                            <><Video className="h-3 w-3 mr-1" />Live</>
+                            <><Video className="h-3 w-3 mr-1" />{tx('Live')}</>
                           )}
                         </Badge>
                         {isCompleted && (
                           <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
-                            Concluído
+                            {tx('Concluído')}
                           </Badge>
                         )}
                       </div>
                       <h4 className={`font-medium truncate ${isCompleted ? 'line-through text-muted-foreground' : ''}`}>
-                        {training.title}
+                        {tx(training.title)}
                       </h4>
                       <div className="flex items-center gap-4 mt-1">
                         {training.objective && (
@@ -951,7 +952,7 @@ export const EduTrilhaDetalhe = () => {
                     <Button variant="outline" size="sm" asChild>
                       <Link to={`/edu/training/${training.training_id}`}>
                         <Target className="mr-2 h-4 w-4" />
-                        Ver
+                        {tx('Ver')}
                       </Link>
                     </Button>
                   </div>
@@ -962,7 +963,7 @@ export const EduTrilhaDetalhe = () => {
         </div>
       ) : (
         <div className="text-center py-8 text-muted-foreground">
-          Nenhum treinamento associado a esta trilha.
+          {tx('Nenhum treinamento associado a esta trilha.')}
         </div>
       )}
     </AppLayout>
