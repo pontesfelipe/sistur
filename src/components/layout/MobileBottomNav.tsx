@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useProfileContext } from '@/contexts/ProfileContext';
@@ -33,6 +34,7 @@ interface MobileBottomNavProps {
 }
 
 export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
+  const { t } = useTranslation();
   const location = useLocation();
   const { isAdmin, hasERPAccess, hasEDUAccess, initialized } = useProfileContext();
   const { data: forumNotifications } = useForumNotifications();
@@ -84,7 +86,7 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
               key={item.href}
               to={item.href}
               onClick={handleNavClick}
-              aria-label={item.name}
+              aria-label={t(item.name)}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
                 'flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 touch-target no-tap-highlight mobile-active relative',
@@ -104,7 +106,7 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
                   </span>
                 )}
               </div>
-              <span className="text-[11px] font-medium">{item.name}</span>
+              <span className="text-[11px] font-medium">{t(item.name)}</span>
             </Link>
           );
         })}
@@ -116,7 +118,7 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
           className="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 touch-target no-tap-highlight mobile-active text-muted-foreground"
         >
           <Menu className="h-5 w-5" />
-          <span className="text-[11px] font-medium">Menu</span>
+          <span className="text-[11px] font-medium">{t('Menu')}</span>
         </button>
       </div>
     </nav>

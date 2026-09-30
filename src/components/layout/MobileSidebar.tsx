@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -128,6 +129,7 @@ interface MobileSidebarProps {
 }
 
 export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
@@ -163,7 +165,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const handleSignOut = async () => {
     lightTap();
     await signOut();
-    toast.success('Você saiu da sua conta');
+    toast.success(t('Você saiu da sua conta'));
     onOpenChange(false);
     navigate('/auth');
   };
@@ -230,7 +232,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
           )}
         >
           <item.icon className="h-5 w-5 flex-shrink-0" />
-          <span className="font-medium text-sm flex-1">{item.name}</span>
+          <span className="font-medium text-sm flex-1">{t(item.name)}</span>
           {isLocked && (
             <Lock className="h-3.5 w-3.5 text-muted-foreground/50 flex-shrink-0" />
           )}
@@ -295,7 +297,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
                 className="w-full justify-start gap-3 px-3 py-3 h-auto text-foreground hover:bg-muted"
               >
                 <MessageSquarePlus className="h-5 w-5" />
-                <span className="font-medium text-sm">Feedback</span>
+                <span className="font-medium text-sm">{t('Feedback')}</span>
               </Button>
             }
           />
@@ -307,7 +309,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
             className="w-full justify-start gap-3 px-3 py-3 h-auto text-destructive hover:text-destructive hover:bg-destructive/10"
           >
             <LogOut className="h-5 w-5" />
-            <span className="font-medium text-sm">Sair</span>
+            <span className="font-medium text-sm">{t('Sair')}</span>
           </Button>
         </div>
       </SheetContent>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -125,6 +126,7 @@ const staticBottomNavItems = bottomNavigation.filter(item =>
 );
 
 export function AppSidebar() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
@@ -148,7 +150,7 @@ export function AppSidebar() {
 
   const handleSignOut = async () => {
     await signOut();
-    toast.success('Você saiu da sua conta');
+    toast.success(t('Você saiu da sua conta'));
     navigate('/auth');
   };
 
@@ -231,7 +233,7 @@ export function AppSidebar() {
           )}
         </div>
         {!collapsed && (
-          <span className="font-medium text-sm truncate flex-1">{item.name}</span>
+          <span className="font-medium text-sm truncate flex-1">{t(item.name)}</span>
         )}
         {isLocked && !collapsed && (
           <Lock className="h-3.5 w-3.5 text-muted-foreground/50 flex-shrink-0" />
@@ -249,7 +251,7 @@ export function AppSidebar() {
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>{content}</TooltipTrigger>
           <TooltipContent side="right" className="font-medium flex items-center gap-2">
-            {item.name}
+            {t(item.name)}
             {showBadge && (
               <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
                 {(forumNotifications?.unreadCount ?? 0) > 99 ? '99+' : forumNotifications?.unreadCount}
@@ -281,7 +283,7 @@ export function AppSidebar() {
           'h-5 w-5 flex-shrink-0 transition-transform',
           !isActive && 'group-hover:scale-110'
         )} />
-        {!collapsed && <span className="font-medium text-sm truncate">{item.name}</span>}
+        {!collapsed && <span className="font-medium text-sm truncate">{t(item.name)}</span>}
       </Link>
     );
 
@@ -289,7 +291,7 @@ export function AppSidebar() {
       return (
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>{content}</TooltipTrigger>
-          <TooltipContent side="right" className="font-medium">{item.name}</TooltipContent>
+          <TooltipContent side="right" className="font-medium">{t(item.name)}</TooltipContent>
         </Tooltip>
       );
     }
@@ -353,7 +355,7 @@ export function AppSidebar() {
                 )}
               >
                 <GroupIcon className="h-4 w-4 flex-shrink-0" />
-                <span className="flex-1 text-left">{group.label}</span>
+                <span className="flex-1 text-left">{t(group.label)}</span>
                 <ChevronDown className={cn(
                   'h-3.5 w-3.5 transition-transform duration-200',
                   isOpen && 'rotate-180'
@@ -398,7 +400,7 @@ export function AppSidebar() {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent side="right" className="font-medium">Feedback</TooltipContent>
+            <TooltipContent side="right" className="font-medium">{t('Feedback')}</TooltipContent>
           </Tooltip>
         ) : (
           <FeedbackDialog
@@ -408,7 +410,7 @@ export function AppSidebar() {
                 className="w-full justify-start px-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               >
                 <MessageSquarePlus className="h-5 w-5 mr-3" />
-                <span className="text-sm">Feedback</span>
+                <span className="text-sm">{t('Feedback')}</span>
               </Button>
             }
           />
@@ -427,7 +429,7 @@ export function AppSidebar() {
                 <LogOut className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right" className="font-medium">Sair</TooltipContent>
+            <TooltipContent side="right" className="font-medium">{t('Sair')}</TooltipContent>
           </Tooltip>
         ) : (
           <Button
@@ -436,7 +438,7 @@ export function AppSidebar() {
             className="w-full justify-start px-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           >
             <LogOut className="h-5 w-5 mr-3" />
-            <span className="text-sm">Sair</span>
+            <span className="text-sm">{t('Sair')}</span>
           </Button>
         )}
         
@@ -455,7 +457,7 @@ export function AppSidebar() {
           ) : (
             <>
               <ChevronLeft className="h-4 w-4 mr-2" />
-              <span className="text-sm">Recolher</span>
+              <span className="text-sm">{t('Recolher')}</span>
             </>
           )}
         </Button>
