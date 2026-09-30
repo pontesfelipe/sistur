@@ -670,7 +670,7 @@ const DiagnosticoDetalhe = () => {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>{tx('Voltar para edição?')}</AlertDialogTitle>
+                  <AlertDialogTitle>Voltar para edição?</AlertDialogTitle>
                   <AlertDialogDescription>
                     Isso irá mudar o status do diagnóstico para "Rascunho" e você poderá editar os dados dos indicadores. 
                     Após as alterações, será necessário recalcular os índices.
@@ -800,7 +800,7 @@ const DiagnosticoDetalhe = () => {
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>{tx('Adicionar mais dados?')}</AlertDialogTitle>
+                      <AlertDialogTitle>Adicionar mais dados?</AlertDialogTitle>
                       <AlertDialogDescription>
                         Para adicionar mais dados, o diagnóstico voltará ao status de rascunho e você poderá preencher os indicadores faltantes.
                         Após as alterações, será necessário recalcular os índices.
@@ -971,10 +971,10 @@ const DiagnosticoDetalhe = () => {
               </div>
               <Select value={selectedUnitId ?? '__all__'} onValueChange={handleUnitChange}>
                 <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder={tx('Todas as unidades (marca)')} />
+                  <SelectValue placeholder=Todas as unidades (marca) />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__all__">{tx('Todas as unidades (marca)')}</SelectItem>
+                  <SelectItem value="__all__">Todas as unidades (marca)</SelectItem>
                   {brandRollup.units.map((u) => (
                     <SelectItem key={u.id} value={u.id}>
                       {u.unit_name}

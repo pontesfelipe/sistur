@@ -1005,9 +1005,9 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-xs text-muted-foreground flex items-center gap-1" aria-live="polite">
-                          {autosaveStatus === 'saving' && (<><Loader2 className="h-3 w-3 animate-spin" /> {tx('Salvando rascunho…')}</>)}
-                          {autosaveStatus === 'saved' && (<><CheckCircle2 className="h-3 w-3 text-severity-good" /> {tx('Rascunho salvo')}</>)}
-                          {autosaveStatus === 'error' && (<><AlertCircle className="h-3 w-3 text-destructive" /> {tx('Falha no autosave')}</>)}
+                          {autosaveStatus === 'saving' && (<><Loader2 className="h-3 w-3 animate-spin" /> Salvando rascunho…</>)}
+                          {autosaveStatus === 'saved' && (<><CheckCircle2 className="h-3 w-3 text-severity-good" /> Rascunho salvo</>)}
+                          {autosaveStatus === 'error' && (<><AlertCircle className="h-3 w-3 text-destructive" /> Falha no autosave</>)}
                           {autosaveStatus === 'idle' && Object.keys(editedValues).length > 0 && (<>{tx('Alterações pendentes…')}</>)}
                         </span>
                         <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending || errorCount > 0}>
@@ -1388,7 +1388,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                     <div className="p-3 bg-card border rounded-lg">
                       <p className="font-medium mb-1">codigo</p>
-                      <p className="text-muted-foreground">{tx('Código do indicador (ex: RA001)')}</p>
+                      <p className="text-muted-foreground">Código do indicador (ex: RA001)</p>
                     </div>
                     <div className="p-3 bg-card border rounded-lg">
                       <p className="font-medium mb-1">valor</p>
@@ -1396,7 +1396,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                     </div>
                     <div className="p-3 bg-card border rounded-lg">
                       <p className="font-medium mb-1">fonte</p>
-                      <p className="text-muted-foreground">{tx('Fonte dos dados (opcional)')}</p>
+                      <p className="text-muted-foreground">Fonte dos dados (opcional)</p>
                     </div>
                   </div>
 

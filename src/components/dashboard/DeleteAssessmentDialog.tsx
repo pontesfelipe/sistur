@@ -174,7 +174,7 @@ export function DeleteAssessmentDialog({
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            {tx('Excluir diagnóstico?')}
+            Excluir diagnóstico?
           </AlertDialogTitle>
           <AlertDialogDescription className="space-y-3">
             <p>

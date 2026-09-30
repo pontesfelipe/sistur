@@ -218,7 +218,7 @@ export function ProjectGovernance({ projectId }: Props) {
             </div>
             <div className="flex items-center gap-2">
               <Checkbox checked={cpForm.is_mandatory} onCheckedChange={v => setCpForm({ ...cpForm, is_mandatory: !!v })} />
-              <Label>{tx('Obrigatório (bloqueia conclusão do projeto)')}</Label>
+              <Label>Obrigatório (bloqueia conclusão do projeto)</Label>
             </div>
           </div>
           <DialogFooter>

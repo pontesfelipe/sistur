@@ -188,15 +188,15 @@ export default function Projetos() {
                   <p className="text-2xl font-bold">{portfolio.total}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-600" /> {tx('Melhoraram')}</p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-600" /> Melhoraram</p>
                   <p className="text-2xl font-bold text-emerald-600">{portfolio.improved}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1"><TrendingDown className="h-3 w-3 text-red-600" /> {tx('Regrediram')}</p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><TrendingDown className="h-3 w-3 text-red-600" /> Regrediram</p>
                   <p className="text-2xl font-bold text-red-600">{portfolio.regressed}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1"><TargetIcon className="h-3 w-3 text-primary" /> {tx('Atingiram meta')}</p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><TargetIcon className="h-3 w-3 text-primary" /> Atingiram meta</p>
                   <p className="text-2xl font-bold text-primary">{portfolio.reachedTarget}</p>
                 </div>
               </div>

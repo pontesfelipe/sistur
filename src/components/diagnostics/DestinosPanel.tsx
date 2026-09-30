@@ -276,7 +276,7 @@ export function DestinosPanel() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{tx('Excluir destino?')}</AlertDialogTitle>
+            <AlertDialogTitle>Excluir destino?</AlertDialogTitle>
             <AlertDialogDescription>
               {tx('Esta ação não pode ser desfeita. Todos os diagnósticos associados também serão excluídos.')}
             </AlertDialogDescription>

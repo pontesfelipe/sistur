@@ -46,7 +46,7 @@ interface IndicatorFormData {
 interface IndicatorFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: IndicatorFormData) => {tx('Promise')}<void>;
+  onSubmit: (data: IndicatorFormData) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -240,7 +240,7 @@ export function IndicatorFormDialog({
 
             {/* Weight */}
             <div className="space-y-2">
-              <Label htmlFor="weight">{tx('Peso (%)')}</Label>
+              <Label htmlFor="weight">Peso (%)</Label>
               <Input
                 id="weight"
                 type="number"

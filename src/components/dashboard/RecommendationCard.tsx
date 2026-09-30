@@ -108,7 +108,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
           <div className="mt-3 rounded-lg border bg-muted/30 p-3 space-y-2">
             <div className="flex items-center gap-2 text-xs font-medium text-foreground">
               <Target className="h-3.5 w-3.5 text-primary" />
-              <span>{tx('Por que este curso?')}</span>
+              <span>Por que este curso?</span>
             </div>
             
             <p className="text-xs text-muted-foreground">

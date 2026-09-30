@@ -75,7 +75,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
   });
 
   const dest = data?.dest;
-  const inRadius = useMemo(() => (data?.comps ?? []).filter((c: any) => {tx('(c.distance_km ?? 0)')} <= radius), [data, radius]);
+  const inRadius = useMemo(() => (data?.comps ?? []).filter((c: any) => (c.distance_km ?? 0) <= radius), [data, radius]);
   const supply = inRadius.reduce((s: number, c: any) => s + (c.review_volume ?? 1), 0);
   const demand = (data?.anac?.total_passengers_12m ?? 0) + (data?.events ?? []).reduce((s: number, e: any) => s + (e.estimated_attendance ?? 0), 0);
 
@@ -123,7 +123,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5" /> {tx('Geomarketing')}</CardTitle>
+        <CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5" /> Geomarketing</CardTitle>
         <CardDescription>Oferta e demanda no entorno de {dest?.name ?? 'destino'}. Posições de concorrentes são aproximadas pela distância informada. Sem comparação entre municípios.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -142,7 +142,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
               <div className="flex items-center gap-2"><Switch checked={showOrigin} onCheckedChange={setShowOrigin} /><Label>{tx('Origem dos visitantes')}</Label></div>
             </div>
             <div className="rounded-md border p-3 space-y-2 text-sm">
-              <p className="font-medium">{tx('Origem dos visitantes (por estado)')}</p>
+              <p className="font-medium">Origem dos visitantes (por estado)</p>
               <div className="flex flex-wrap items-center gap-2">
                 <select className="h-9 rounded-md border bg-background px-2" value={newUf} onChange={e => setNewUf(e.target.value)} aria-label={tx('Estado de origem')}>
                   {Object.keys(UF_CAPITALS).map(uf => <option key={uf}>{uf}</option>)}
@@ -163,12 +163,12 @@ export function GeomarketingPanel({ destinationId }: Props) {
                 <p className="text-xs text-muted-foreground">{supply.toLocaleString('pt-BR')} avaliações somadas</p>
               </div>
               <div className="rounded-md border p-3">
-                <p className="text-muted-foreground">{tx('Demanda aérea (ANAC, 12 meses)')}</p>
+                <p className="text-muted-foreground">Demanda aérea (ANAC, 12 meses)</p>
                 <p className="text-2xl font-semibold">{data?.anac ? Number(data.anac.total_passengers_12m ?? 0).toLocaleString('pt-BR') : '—'}</p>
                 <p className="text-xs text-muted-foreground">{data?.anac ? `${data.anac.flights_per_week ?? 0} voos/semana` : 'Sem aeroporto no município'}</p>
               </div>
               <div className="rounded-md border p-3">
-                <p className="text-muted-foreground">{tx('Próximos eventos (Observatório)')}</p>
+                <p className="text-muted-foreground">Próximos eventos (Observatório)</p>
                 {data?.events?.length ? data.events.slice(0, 4).map((e: any) => (
                   <p key={e.id} className="text-xs">{new Date(e.start_date).toLocaleDateString('pt-BR')} · {e.name}
                     {e.estimated_attendance ? <Badge variant="secondary" className="ml-1">{e.estimated_attendance.toLocaleString('pt-BR')}</Badge> : null}</p>
@@ -176,7 +176,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
               </div>
             </div>
             {demand > 0 && supply > 0 && (
-              <p className="text-sm text-muted-foreground">{tx('Relação demanda/oferta no raio:')} <b>{Math.round(demand / supply).toLocaleString('pt-BR')}</b> {tx('visitantes por avaliação de concorrente — quanto maior, mais espaço de mercado.')}</p>
+              <p className="text-sm text-muted-foreground">{tx('Relação demanda/oferta no raio:')} <b>{Math.round(demand / supply).toLocaleString('pt-BR')}</b> visitantes por avaliação de concorrente — quanto maior, mais espaço de mercado.</p>
             )}
           </>
         )}

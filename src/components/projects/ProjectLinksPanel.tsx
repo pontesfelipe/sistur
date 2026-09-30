@@ -80,12 +80,12 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-lg flex items-center gap-2"><Link2 className="h-5 w-5" /> {tx('Vínculos Externos')}</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2"><Link2 className="h-5 w-5" /> Vínculos Externos</CardTitle>
             <CardDescription>
               {tx('Conecte este projeto a oportunidades de investimento, consórcios regionais, alertas do observatório e issues do diagnóstico.')}
             </CardDescription>
           </div>
-          <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4 mr-1" /> {tx('Novo vínculo')}</Button>
+          <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4 mr-1" /> Novo vínculo</Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {isLoading ? (
@@ -152,8 +152,8 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
               </Select>
             </div>
             <div>
-              <Label>{tx('Notas (opcional)')}</Label>
-              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={tx('Por que este item se relaciona ao projeto?')} />
+              <Label>Notas (opcional)</Label>
+              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder=Por que este item se relaciona ao projeto? />
             </div>
           </div>
           <DialogFooter>

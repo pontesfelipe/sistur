@@ -128,7 +128,7 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
             ))}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Input className="w-64" placeholder={tx('Nome do cenário (opcional)')} value={scenarioName} onChange={(e) => setScenarioName(e.target.value)} />
+            <Input className="w-64" placeholder=Nome do cenário (opcional) value={scenarioName} onChange={(e) => setScenarioName(e.target.value)} />
             <Button size="sm" variant="outline" onClick={saveScenario} disabled={!assessmentId}><Save className="h-4 w-4 mr-1" />{tx('Salvar cenário')}</Button>
             <Button size="sm" onClick={toProject} disabled={!destinationId || createProject.isPending}><FolderPlus className="h-4 w-4 mr-1" />{tx('Transformar cenário em projeto')}</Button>
           </div>

@@ -107,7 +107,7 @@ export function ExternalDataQualityPanel() {
                     <div className="font-semibold tabular-nums">{row.total_records.toLocaleString('pt-BR')}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="h-3 w-3" /> {tx('Municípios')}</div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="h-3 w-3" /> Municípios</div>
                     <div className="font-semibold tabular-nums">{row.distinct_municipalities.toLocaleString('pt-BR')}</div>
                   </div>
                 </div>

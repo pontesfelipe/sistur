@@ -49,7 +49,7 @@ export function ProjectMembersPanel({ projectId }: { projectId: string }) {
         {canManage && (
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-              <Button size="sm"><UserPlus className="h-4 w-4 mr-1.5" /> {tx('Adicionar')}</Button>
+              <Button size="sm"><UserPlus className="h-4 w-4 mr-1.5" /> Adicionar</Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0" align="end">
               <div className="p-3 border-b space-y-2">

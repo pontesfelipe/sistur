@@ -281,7 +281,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
               if (!ok) toast.info(tx('Nenhum marco ou tarefa com data planejada para exportar.'));
             }}
             className="gap-1"
-            title={tx('Exportar calendário (.ics)')}
+            title=Exportar calendário (.ics)
           >
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">.ics</span>
@@ -874,7 +874,7 @@ function IndicatorImpactPanel({ projectId, assessmentId }: { projectId: string; 
   }
 
   const improved = data.filter((d) => (d.delta ?? 0) > 0.01).length;
-  const regressed = data.filter((d) => {tx('(d.delta ?? 0)')} < -0.01).length;
+  const regressed = data.filter((d) => (d.delta ?? 0) < -0.01).length;
   const reachedTarget = data.filter((d) => (d.current_score ?? 0) >= (d.target_score ?? 0.67)).length;
 
   return (
@@ -898,7 +898,7 @@ function IndicatorImpactPanel({ projectId, assessmentId }: { projectId: string; 
             const baselinePct = item.baseline_score !== null ? Math.round(Number(item.baseline_score) * 100) : null;
             const currentPct = item.current_score !== null ? Math.round(item.current_score * 100) : null;
             const deltaPct = item.delta !== null ? Math.round(item.delta * 100) : null;
-            const trend = (item.delta ?? 0) > {tx('0.01 ? \'up\' : (item.delta ?? 0)')} < -0.01 ? 'down' : 'flat';
+            const trend = (item.delta ?? 0) > 0.01 ? 'up' : (item.delta ?? 0) < -0.01 ? 'down' : 'flat';
             return (
               <div key={item.id} className="flex items-center justify-between gap-3 border rounded-lg p-3">
                 <div className="min-w-0 flex-1">

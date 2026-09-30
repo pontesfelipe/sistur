@@ -245,7 +245,7 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
 
             {/* Additional Notes */}
             <div className="space-y-2">
-              <Label htmlFor="additionalNotes">{tx('Notas adicionais (rodapé do relatório)')}</Label>
+              <Label htmlFor="additionalNotes">Notas adicionais (rodapé do relatório)</Label>
               <Textarea
                 id="additionalNotes"
                 placeholder={tx('Ex: Este relatório é parte do plano estratégico 2025-2028...')}

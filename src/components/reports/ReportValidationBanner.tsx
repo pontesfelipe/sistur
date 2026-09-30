@@ -498,7 +498,7 @@ export function ReportValidationBanner({
                     salvo. Nenhuma ação adicional é necessária — o documento já está consistente.
                   </p>
                   <p className="text-xs text-muted-foreground mb-2">
-                    <span className="font-medium text-foreground">{tx('O que é a "tabela oficial":')}</span>{' '}
+                    <span className="font-medium text-foreground">O que é a "tabela oficial":</span>{' '}
                     é a tabela de auditoria do diagnóstico (<code>indicator_values</code>) — onde
                     ficam os valores numéricos confirmados por você ou importados das fontes
                     oficiais (IBGE, CADASTUR, STN, DATASUS, INEP etc.). Quando a IA cita um número
@@ -811,7 +811,7 @@ function IndicatorFixDialog({
               <Input id="vraw" value={valueRaw} onChange={(e) => setValueRaw(e.target.value)} placeholder={tx('ex.: 42.5')} />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="vtext" className="text-xs">{tx('Valor textual (opcional)')}</Label>
+              <Label htmlFor="vtext" className="text-xs">Valor textual (opcional)</Label>
               <Input id="vtext" value={valueText} onChange={(e) => setValueText(e.target.value)} />
             </div>
             <div className="space-y-1">

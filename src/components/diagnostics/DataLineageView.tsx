@@ -135,7 +135,7 @@ function prettifyCode(code: string): string {
     .trim();
   return cleaned
     .split(' ')
-    .map((w) => {tx('(w.length')} <= 2 ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()))
+    .map((w) => (w.length <= 2 ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()))
     .join(' ');
 }
 

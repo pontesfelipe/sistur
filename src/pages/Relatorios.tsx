@@ -584,7 +584,7 @@ export default function Relatorios() {
     const logoHtml = c.logoUrl ? `<div style="text-align:center;margin-bottom:16px;"><img src="${c.logoUrl}" style="max-height:60px;max-width:200px;" /></div>` : '';
     const orgHtml = c.organizationName ? `<div style="text-align:center;font-size:14px;color:#64748B;margin-bottom:4px;">${c.organizationName}</div>` : '';
     const scopeBadge = scope === 'enterprise'
-      ? `<div style="text-align:center;font-size:11px;color:#7C2D12;background:#FFEDD5;border:1px solid #FED7AA;padding:4pt 8pt;margin-bottom:8pt;letter-spacing:0.05em;text-transform:uppercase;">{tx('Relatório Empresarial — Diagnóstico Operacional & Estratégico (concorrentes anonimizados: Concorrente A/B/C)')}</div>`
+      ? `<div style="text-align:center;font-size:11px;color:#7C2D12;background:#FFEDD5;border:1px solid #FED7AA;padding:4pt 8pt;margin-bottom:8pt;letter-spacing:0.05em;text-transform:uppercase;">Relatório Empresarial — Diagnóstico Operacional & Estratégico (concorrentes anonimizados: Concorrente A/B/C)</div>`
       : '';
     const headerHtml = c.headerText ? `<div style="text-align:center;font-size:12px;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:24px;">${c.headerText}</div>` : '';
     const footerHtml = c.footerText ? `<div style="text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px;margin-top:24px;">${c.footerText}</div>` : '';
@@ -1020,14 +1020,14 @@ export default function Relatorios() {
                   {isAdmin && (
                     <div className="w-52">
                       <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                        Modelo de IA <span className="text-[10px] uppercase tracking-wide text-amber-600">{tx('(admin)')}</span>
+                        Modelo de IA <span className="text-[10px] uppercase tracking-wide text-amber-600">(admin)</span>
                       </label>
                       <Select value={aiProvider} onValueChange={(v) => setAiProvider(v as typeof aiProvider)}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="auto">{tx('⚙️ Auto (Claude→GPT-6 Astra→Gemini)')}</SelectItem>
+                          <SelectItem value="auto">⚙️ Auto (Claude→GPT-6 Astra→Gemini)</SelectItem>
                           <SelectItem value="claude">{tx('🟣 Claude Sonnet 4.5')}</SelectItem>
                           <SelectItem value="gpt5">{tx('🟢 GPT-6 Astra')}</SelectItem>
                           <SelectItem value="gemini">{tx('🔵 Gemini 3.1 Pro')}</SelectItem>

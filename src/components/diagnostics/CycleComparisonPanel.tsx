@@ -191,7 +191,7 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">{tx('Rodada A (base)')}</p>
+              <p className="text-xs text-muted-foreground mb-1">Rodada A (base)</p>
               <Select value={effectiveA} onValueChange={setAId}>
                 <SelectTrigger>
                   <SelectValue placeholder={tx('Selecione')} />
@@ -206,7 +206,7 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
               </Select>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">{tx('Rodada B (comparação)')}</p>
+              <p className="text-xs text-muted-foreground mb-1">Rodada B (comparação)</p>
               <Select value={effectiveB} onValueChange={setBId}>
                 <SelectTrigger>
                   <SelectValue placeholder={tx('Selecione')} />

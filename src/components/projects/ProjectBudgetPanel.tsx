@@ -69,10 +69,10 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-lg flex items-center gap-2"><Wallet className="h-5 w-5" /> {tx('Linhas de Orçamento')}</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2"><Wallet className="h-5 w-5" /> Linhas de Orçamento</CardTitle>
             <CardDescription>{tx('Planejamento e execução financeira por categoria e fase')}</CardDescription>
           </div>
-          <Button onClick={openNew} size="sm"><Plus className="h-4 w-4 mr-1" /> {tx('Nova linha')}</Button>
+          <Button onClick={openNew} size="sm"><Plus className="h-4 w-4 mr-1" /> Nova linha</Button>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -138,17 +138,17 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label>{tx('Planejado (R$)')}</Label>
+                  <Label>Planejado (R$)</Label>
                   <Input type="number" step="0.01" value={editing.planned_amount ?? 0} onChange={(e) => setEditing({ ...editing, planned_amount: Number(e.target.value) })} />
                 </div>
                 <div>
-                  <Label>{tx('Realizado (R$)')}</Label>
+                  <Label>Realizado (R$)</Label>
                   <Input type="number" step="0.01" value={editing.actual_amount ?? 0} onChange={(e) => setEditing({ ...editing, actual_amount: Number(e.target.value) })} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label>{tx('Fase (opcional)')}</Label>
+                  <Label>Fase (opcional)</Label>
                   <Select value={editing.phase_id ?? "_none"} onValueChange={(v) => setEditing({ ...editing, phase_id: v === "_none" ? null : v })}>
                     <SelectTrigger><SelectValue placeholder={tx('Sem fase')} /></SelectTrigger>
                     <SelectContent>
@@ -187,16 +187,16 @@ function ProjectRoiCard({ projectId, investment }: { projectId: string; investme
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">{tx('Retorno do investimento (ROI)')}</CardTitle>
+        <CardTitle className="text-base">Retorno do investimento (ROI)</CardTitle>
         <CardDescription>Investimento considerado: {brl(investment)}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-4 items-end">
         <div className="space-y-1">
-          <Label>{tx('Retorno anual esperado (R$)')}</Label>
+          <Label>Retorno anual esperado (R$)</Label>
           <Input type="number" value={annual || ""} onChange={(e) => { const v = Number(e.target.value); setAnnual(v); localStorage.setItem(key, String(v)); }} />
         </div>
         <div className="space-y-1">
-          <Label>{tx('Horizonte (anos)')}</Label>
+          <Label>Horizonte (anos)</Label>
           <Input type="number" min={1} max={10} value={years} onChange={(e) => setYears(Math.max(1, Number(e.target.value)))} />
         </div>
         <div><p className="text-xs text-muted-foreground">ROI</p><p className="text-2xl font-semibold">{roi == null ? "—" : `${Math.round(roi)}%`}</p></div>
