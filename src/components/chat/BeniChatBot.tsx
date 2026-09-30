@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { getCurrentLanguage } from '@/i18n';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -58,6 +60,7 @@ const SUGGESTED_QUESTIONS = [
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/beni-chat`;
 
 export function BeniChatBot({ initialContext, conversationId, onConversationCreated, onNewConversation, onActivity, headerExtra }: BeniChatBotProps) {
+  const { t } = useTranslation();
   const convIdRef = useRef<string | undefined>(conversationId);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const { user } = useAuth();
@@ -258,7 +261,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMsg].map(m => ({ role: m.role, content: m.content })), context: beniContext, conversationId: convId, attachmentId }),
+        body: JSON.stringify({ messages: [...messages, userMsg].map(m => ({ role: m.role, content: m.content })), context: beniContext, conversationId: convId, attachmentId, language: getCurrentLanguage() }),
         signal: controller.signal,
       });
 
@@ -528,7 +531,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
       <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
         <ChatMessageList
           messages={messages}
-          suggestedQuestions={SUGGESTED_QUESTIONS}
+          suggestedQuestions={SUGGESTED_QUESTIONS.map((q) => ({ ...q, text: t(q.text) }))}
           onSuggestion={handleSuggestion}
           onDeleteMessage={deleteMessage}
           isLoading={isLoading}

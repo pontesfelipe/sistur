@@ -1,0 +1,1 @@
+- i18n: react-i18next with the pt-BR sentence as key (keySeparator off); only en/es JSON in src/i18n/locales. Why: incremental migration, untranslated text falls back to Portuguese.
