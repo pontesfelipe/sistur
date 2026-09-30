@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 20,
-  patch: 2,
+  minor: 21,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.21.0",
+    date: "2026-09-30",
+    type: "minor" as const,
+    changes: [
+      "Idiomas (fase 3): EDU (Minha Jornada, catálogo, trilhas, provas, certificados), Social Turismo e Jogos traduzidos para inglês e espanhol (cerca de 900 textos).",
+    ],
+  },
   {
     version: "2.20.2",
     date: "2026-09-30",
