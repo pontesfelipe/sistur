@@ -418,7 +418,7 @@ const Auth = () => {
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="seu@email.com"
+                    placeholder={t('seu@email.com')}
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
@@ -480,7 +480,7 @@ const Auth = () => {
                     <Separator className="w-full" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">ou</span>
+                    <span className="bg-background px-2 text-muted-foreground">{t('ou')}</span>
                   </div>
                 </div>
 
@@ -564,7 +564,7 @@ const Auth = () => {
                   <Input
                     id="forgot-email"
                     type="email"
-                    placeholder="seu@email.com"
+                    placeholder={t('seu@email.com')}
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
@@ -699,7 +699,7 @@ const Auth = () => {
                   <Input
                     id="login-email"
                     type="email"
-                    placeholder="seu@email.com"
+                    placeholder={t('seu@email.com')}
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
@@ -758,7 +758,7 @@ const Auth = () => {
                     <Separator className="w-full" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">ou</span>
+                    <span className="bg-background px-2 text-muted-foreground">{t('ou')}</span>
                   </div>
                 </div>
 
