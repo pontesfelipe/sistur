@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 // v1.98.0 — Comparativo entre ciclos (Rodada A vs Rodada B).
 //
 // Compara duas rodadas CALCULATED do mesmo destino/empreendimento lado a lado:
@@ -175,7 +176,7 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
     return (
       <Card>
         <CardContent className="py-10 text-center text-muted-foreground">
-          É necessário ter pelo menos duas rodadas calculadas deste destino para comparar ciclos.
+          {tx('É necessário ter pelo menos duas rodadas calculadas deste destino para comparar ciclos.')}
         </CardContent>
       </Card>
     );
@@ -185,15 +186,15 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
     <div className="space-y-4">
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Comparativo entre ciclos</CardTitle>
+          <CardTitle className="text-base">{tx('Comparativo entre ciclos')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Rodada A (base)</p>
+              <p className="text-xs text-muted-foreground mb-1">{tx('Rodada A (base)')}</p>
               <Select value={effectiveA} onValueChange={setAId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
+                  <SelectValue placeholder={tx('Selecione')} />
                 </SelectTrigger>
                 <SelectContent>
                   {candidates.map((c: any) => (
@@ -205,10 +206,10 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
               </Select>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Rodada B (comparação)</p>
+              <p className="text-xs text-muted-foreground mb-1">{tx('Rodada B (comparação)')}</p>
               <Select value={effectiveB} onValueChange={setBId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
+                  <SelectValue placeholder={tx('Selecione')} />
                 </SelectTrigger>
                 <SelectContent>
                   {candidates.map((c: any) => (
@@ -222,7 +223,7 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
           </div>
 
           {effectiveA === effectiveB ? (
-            <p className="text-sm text-muted-foreground">Selecione duas rodadas diferentes.</p>
+            <p className="text-sm text-muted-foreground">{tx('Selecione duas rodadas diferentes.')}</p>
           ) : isLoading ? (
             <Skeleton className="h-48 w-full" />
           ) : (
@@ -255,7 +256,7 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
                 <span className="text-muted-foreground">{counts.stable} estáveis</span>
                 <Button variant="outline" size="sm" className="ml-auto" onClick={handleExportCSV}>
                   <Download className="mr-2 h-4 w-4" />
-                  Exportar CSV
+                  {tx('Exportar CSV')}
                 </Button>
               </div>
 
@@ -263,8 +264,8 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b text-left text-xs text-muted-foreground">
-                      <th className="py-2 pr-2">Indicador</th>
-                      <th className="py-2 pr-2">Pilar</th>
+                      <th className="py-2 pr-2">{tx('Indicador')}</th>
+                      <th className="py-2 pr-2">{tx('Pilar')}</th>
                       <th className="py-2 pr-2 text-right">A</th>
                       <th className="py-2 pr-2 text-right">B</th>
                       <th className="py-2 text-right">Δ</th>
@@ -287,7 +288,7 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
                     {indicatorRows.length === 0 && (
                       <tr>
                         <td colSpan={5} className="py-6 text-center text-muted-foreground">
-                          Sem indicadores comparáveis entre as rodadas selecionadas.
+                          {tx('Sem indicadores comparáveis entre as rodadas selecionadas.')}
                         </td>
                       </tr>
                     )}

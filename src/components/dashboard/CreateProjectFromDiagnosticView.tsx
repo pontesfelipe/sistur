@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -92,7 +93,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
 
   const handleContinue = () => {
     if (selectedPlanIds.size === 0) {
-      toast.error("Selecione pelo menos um item para criar o projeto");
+      toast.error(tx('Selecione pelo menos um item para criar o projeto'));
       return;
     }
     // Auto-suggest project name
@@ -108,11 +109,11 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
 
   const handleCreateProject = async () => {
     if (!projectName.trim()) {
-      toast.error("Informe o nome do projeto");
+      toast.error(tx('Informe o nome do projeto'));
       return;
     }
     if (!profile?.org_id || !destinationId) {
-      toast.error("Dados da organização ou destino não encontrados");
+      toast.error(tx('Dados da organização ou destino não encontrados'));
       return;
     }
 
@@ -161,7 +162,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
         await createTasks.mutateAsync(tasks);
       }
 
-      toast.success("Projeto criado com sucesso!", {
+      toast.success(tx('Projeto criado com sucesso!'), {
         description: `${selectedItems.length} tarefas adicionadas ao projeto`,
       });
 
@@ -169,7 +170,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
       navigate(`/projetos`);
     } catch (err) {
       console.error('Error creating project:', err);
-      toast.error("Erro ao criar projeto");
+      toast.error(tx('Erro ao criar projeto'));
     } finally {
       setIsCreating(false);
     }
@@ -188,9 +189,9 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <FolderKanban className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium">Nenhuma ação identificada</h3>
+          <h3 className="text-lg font-medium">{tx('Nenhuma ação identificada')}</h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Execute o diagnóstico para identificar gargalos e gerar ações que podem ser convertidas em projeto.
+            {tx('Execute o diagnóstico para identificar gargalos e gerar ações que podem ser convertidas em projeto.')}
           </p>
         </CardContent>
       </Card>
@@ -209,7 +210,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
             </div>
             <div className="flex-1">
               <h3 className="font-display font-semibold text-foreground">
-                Criar Projeto a partir do Diagnóstico
+                {tx('Criar Projeto a partir do Diagnóstico')}
               </h3>
               <p className="text-sm text-muted-foreground mt-1">
                 Selecione as ações identificadas pelo diagnóstico que deseja incluir como tarefas no novo projeto. 
@@ -289,7 +290,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
             disabled={selectedPlanIds.size === 0}
             className="gap-2"
           >
-            Continuar
+            {tx('Continuar')}
             <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
@@ -308,7 +309,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
           </div>
           <div className="flex-1">
             <h3 className="font-display font-semibold text-foreground">
-              Configurar Projeto
+              {tx('Configurar Projeto')}
             </h3>
             <p className="text-sm text-muted-foreground mt-1">
               Preencha os detalhes do projeto. {selectedPlanIds.size} ação(ões) serão convertidas em tarefas.
@@ -322,32 +323,32 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <FolderKanban className="h-4 w-4" />
-            Detalhes do Projeto
+            {tx('Detalhes do Projeto')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Nome do Projeto *</label>
+            <label className="text-sm font-medium">{tx('Nome do Projeto *')}</label>
             <Input
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              placeholder="Ex: Plano de Melhoria Turística 2026"
+              placeholder={tx('Ex: Plano de Melhoria Turística 2026')}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Descrição</label>
+            <label className="text-sm font-medium">{tx('Descrição')}</label>
             <Textarea
               value={projectDescription}
               onChange={(e) => setProjectDescription(e.target.value)}
-              placeholder="Descreva os objetivos e escopo do projeto..."
+              placeholder={tx('Descreva os objetivos e escopo do projeto...')}
               rows={3}
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Metodologia</label>
+              <label className="text-sm font-medium">{tx('Metodologia')}</label>
               <Select value={methodology} onValueChange={(v) => setMethodology(v as ProjectMethodology)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -366,22 +367,22 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Prioridade</label>
+              <label className="text-sm font-medium">{tx('Prioridade')}</label>
               <Select value={priority} onValueChange={(v) => setPriority(v as TaskPriority)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Baixa</SelectItem>
-                  <SelectItem value="medium">Média</SelectItem>
-                  <SelectItem value="high">Alta</SelectItem>
-                  <SelectItem value="critical">Crítica</SelectItem>
+                  <SelectItem value="low">{tx('Baixa')}</SelectItem>
+                  <SelectItem value="medium">{tx('Média')}</SelectItem>
+                  <SelectItem value="high">{tx('Alta')}</SelectItem>
+                  <SelectItem value="critical">{tx('Crítica')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Data de Início</label>
+              <label className="text-sm font-medium">{tx('Data de Início')}</label>
               <Input
                 type="date"
                 value={plannedStartDate}
@@ -390,7 +391,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Data de Término</label>
+              <label className="text-sm font-medium">{tx('Data de Término')}</label>
               <Input
                 type="date"
                 value={plannedEndDate}
@@ -409,7 +410,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
             Tarefas que serão criadas ({selectedPlanIds.size})
           </CardTitle>
           <CardDescription>
-            Cada ação selecionada será convertida em uma tarefa do projeto
+            {tx('Cada ação selecionada será convertida em uma tarefa do projeto')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -435,7 +436,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
       {/* Actions */}
       <div className="flex items-center justify-between">
         <Button variant="outline" onClick={() => setStep('select')}>
-          Voltar
+          {tx('Voltar')}
         </Button>
         <Button 
           onClick={handleCreateProject}
@@ -445,12 +446,12 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
           {isCreating ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Criando projeto...
+              {tx('Criando projeto...')}
             </>
           ) : (
             <>
               <FolderKanban className="h-4 w-4" />
-              Criar Projeto
+              {tx('Criar Projeto')}
             </>
           )}
         </Button>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 /**
  * MandalaDestino — Visual representation of the SISTUR diagnostic
  * as a Mandala (Mario Beni, 2007) extended with the
@@ -101,7 +102,7 @@ export function MandalaDestino({
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="font-display text-xl font-semibold text-foreground">
-            Mandala do Destino
+            {tx('Mandala do Destino')}
           </h3>
           {destinationName && (
             <p className="text-sm text-muted-foreground mt-1">{destinationName}</p>
@@ -114,7 +115,7 @@ export function MandalaDestino({
         {expandWithMandala && (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-accent text-accent-foreground border border-border">
             <Sparkles className="h-3 w-3" />
-            🌀 MST
+            {tx('🌀 MST')}
           </span>
         )}
       </div>

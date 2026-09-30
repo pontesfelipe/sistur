@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -188,7 +189,7 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
       <div className="bg-gradient-to-r from-primary/5 to-accent/5 rounded-xl border p-6">
         <div className="flex items-center gap-3 mb-2">
           <FileText className="h-5 w-5 text-primary" />
-          <h3 className="font-display font-semibold">Transparência na Normalização</h3>
+          <h3 className="font-display font-semibold">{tx('Transparência na Normalização')}</h3>
         </div>
         <p className="text-sm text-muted-foreground">
           Esta visão mostra como cada indicador foi normalizado: valor bruto, fonte dos dados, 
@@ -200,13 +201,13 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
       <div className="flex flex-col sm:flex-row gap-3 p-4 bg-muted/30 rounded-lg border">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Filter className="h-4 w-4" />
-          <span>Filtros:</span>
+          <span>{tx('Filtros:')}</span>
         </div>
         <div className="flex flex-wrap gap-3 flex-1">
           <div className="relative flex-1 min-w-[180px] max-w-[280px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar indicador..."
+              placeholder={tx('Buscar indicador...')}
               className="pl-9 h-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -214,10 +215,10 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
           </div>
           <Select value={pillarFilter} onValueChange={setPillarFilter}>
             <SelectTrigger className="w-28 h-9">
-              <SelectValue placeholder="Pilar" />
+              <SelectValue placeholder={tx('Pilar')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="all">{tx('Todos')}</SelectItem>
               <SelectItem value="ra">IRA</SelectItem>
               <SelectItem value="oe">IOE</SelectItem>
               <SelectItem value="ao">IAO</SelectItem>
@@ -225,10 +226,10 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
           </Select>
           <Select value={themeFilter} onValueChange={setThemeFilter}>
             <SelectTrigger className="w-44 h-9">
-              <SelectValue placeholder="Tema" />
+              <SelectValue placeholder={tx('Tema')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os temas</SelectItem>
+              <SelectItem value="all">{tx('Todos os temas')}</SelectItem>
               {availableThemes.map(theme => (
                 <SelectItem key={theme} value={theme}>{theme}</SelectItem>
               ))}
@@ -236,13 +237,13 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-32 h-9">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={tx('Status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="critico">Crítico</SelectItem>
-              <SelectItem value="moderado">Moderado</SelectItem>
-              <SelectItem value="bom">Bom</SelectItem>
+              <SelectItem value="all">{tx('Todos')}</SelectItem>
+              <SelectItem value="critico">{tx('Crítico')}</SelectItem>
+              <SelectItem value="moderado">{tx('Moderado')}</SelectItem>
+              <SelectItem value="bom">{tx('Bom')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -270,13 +271,13 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-24">Código</TableHead>
-                <TableHead>Indicador</TableHead>
-                <TableHead className="w-24">Valor Bruto</TableHead>
-                <TableHead className="w-28">Fonte</TableHead>
-                <TableHead className="w-28">Confiança</TableHead>
-                <TableHead>Regra Aplicada</TableHead>
-                <TableHead className="w-32 text-right">Score Final</TableHead>
+                <TableHead className="w-24">{tx('Código')}</TableHead>
+                <TableHead>{tx('Indicador')}</TableHead>
+                <TableHead className="w-24">{tx('Valor Bruto')}</TableHead>
+                <TableHead className="w-28">{tx('Fonte')}</TableHead>
+                <TableHead className="w-28">{tx('Confiança')}</TableHead>
+                <TableHead>{tx('Regra Aplicada')}</TableHead>
+                <TableHead className="w-32 text-right">{tx('Score Final')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -393,7 +394,7 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
 
       {indicatorScores.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
-          Nenhum indicador calculado ainda.
+          {tx('Nenhum indicador calculado ainda.')}
         </div>
       )}
     </div>

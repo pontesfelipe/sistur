@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -129,30 +130,30 @@ export function PhaseFormDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="phase-name">Nome da Fase *</Label>
+            <Label htmlFor="phase-name">{tx('Nome da Fase *')}</Label>
             <Input
               id="phase-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Ex: Planejamento, Execução..."
+              placeholder={tx('Ex: Planejamento, Execução...')}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phase-description">Descrição</Label>
+            <Label htmlFor="phase-description">{tx('Descrição')}</Label>
             <Textarea
               id="phase-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descrição da fase"
+              placeholder={tx('Descrição da fase')}
               rows={2}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Status</Label>
+              <Label>{tx('Status')}</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as PhaseStatus)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -168,7 +169,7 @@ export function PhaseFormDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phase-order">Ordem</Label>
+              <Label htmlFor="phase-order">{tx('Ordem')}</Label>
               <Input
                 id="phase-order"
                 type="number"
@@ -181,7 +182,7 @@ export function PhaseFormDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="phase-start">Data de Início</Label>
+              <Label htmlFor="phase-start">{tx('Data de Início')}</Label>
               <Input
                 id="phase-start"
                 type="date"
@@ -190,7 +191,7 @@ export function PhaseFormDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phase-end">Data de Término</Label>
+              <Label htmlFor="phase-end">{tx('Data de Término')}</Label>
               <Input
                 id="phase-end"
                 type="date"
@@ -202,7 +203,7 @@ export function PhaseFormDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
+              {tx('Cancelar')}
             </Button>
             <Button type="submit" disabled={isPending || !name}>
               {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -122,7 +123,7 @@ export function DestinosPanel() {
         <div className="relative max-w-md flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar destinos..."
+            placeholder={tx('Buscar destinos...')}
             className="pl-9"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -130,7 +131,7 @@ export function DestinosPanel() {
         </div>
         <Button onClick={() => setIsFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Novo Destino
+          {tx('Novo Destino')}
         </Button>
       </div>
 
@@ -169,7 +170,7 @@ export function DestinosPanel() {
                   {hasEnterpriseProfile(destination.id) && (
                     <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
                       <Hotel className="h-3 w-3 mr-1" />
-                      Empresarial
+                      {tx('Empresarial')}
                     </Badge>
                   )}
                   <DropdownMenu>
@@ -182,13 +183,13 @@ export function DestinosPanel() {
                       <DropdownMenuItem asChild>
                         <Link to={`/diagnosticos?destino=${destination.id}`}>
                           <Eye className="mr-2 h-4 w-4" />
-                          Ver detalhes
+                          {tx('Ver detalhes')}
                         </Link>
                       </DropdownMenuItem>
                       {canMutate && (
                         <DropdownMenuItem onClick={() => handleEdit(destination)}>
                           <Edit className="mr-2 h-4 w-4" />
-                          Editar
+                          {tx('Editar')}
                         </DropdownMenuItem>
                       )}
                       {canMutate && hasEnterpriseAccess && (
@@ -196,7 +197,7 @@ export function DestinosPanel() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => setEnterpriseProfileDestination(destination)}>
                             <Hotel className="mr-2 h-4 w-4 text-amber-600" />
-                            Perfil Empresarial
+                            {tx('Perfil Empresarial')}
                           </DropdownMenuItem>
                         </>
                       )}
@@ -208,7 +209,7 @@ export function DestinosPanel() {
                             onClick={() => setDeleteId(destination.id)}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Excluir
+                            {tx('Excluir')}
                           </DropdownMenuItem>
                         </>
                       )}
@@ -219,11 +220,11 @@ export function DestinosPanel() {
 
               <div className="mt-4 pt-4 border-t border-border">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Código IBGE</span>
+                  <span className="text-muted-foreground">{tx('Código IBGE')}</span>
                   <span className="font-mono text-foreground">{destination.ibge_code || '—'}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm mt-2">
-                  <span className="text-muted-foreground">Coordenadas</span>
+                  <span className="text-muted-foreground">{tx('Coordenadas')}</span>
                   <span className="font-mono text-foreground text-xs">
                     {destination.latitude && destination.longitude 
                       ? `${destination.latitude.toFixed(4)}, ${destination.longitude.toFixed(4)}`
@@ -234,7 +235,7 @@ export function DestinosPanel() {
 
               <Button variant="outline" className="w-full mt-4" asChild>
                 <Link to={`/diagnosticos?destino=${destination.id}`}>
-                  Ver diagnósticos
+                  {tx('Ver diagnósticos')}
                 </Link>
               </Button>
             </div>
@@ -257,7 +258,7 @@ export function DestinosPanel() {
           {!searchQuery && (
             <Button className="mt-4" onClick={() => setIsFormOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Novo Destino
+              {tx('Novo Destino')}
             </Button>
           )}
         </div>
@@ -275,15 +276,15 @@ export function DestinosPanel() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir destino?</AlertDialogTitle>
+            <AlertDialogTitle>{tx('Excluir destino?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. Todos os diagnósticos associados também serão excluídos.
+              {tx('Esta ação não pode ser desfeita. Todos os diagnósticos associados também serão excluídos.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Excluir
+              {tx('Excluir')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

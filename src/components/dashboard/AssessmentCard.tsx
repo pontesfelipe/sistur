@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { cn } from '@/lib/utils';
 import { MapPin, Calendar, ChevronRight, Trash2, Zap, Gauge, Target, User, Eye, Building2, Monitor, Landmark, Hotel, Flower2, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -135,7 +136,7 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
               <TooltipTrigger asChild>
                 <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border border-primary/40 bg-primary/10 text-primary">
                   <Flower2 className="h-3 w-3" />
-                  🌀 MST
+                  {tx('🌀 MST')}
                 </div>
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -111,7 +112,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
           </div>
           <div className="flex-1">
             <h3 className="font-display font-semibold text-foreground mb-1">
-              Modo Prescrição
+              {tx('Modo Prescrição')}
             </h3>
             <p className="text-sm text-muted-foreground">
               Visão focada apenas em indicadores que disparam ações corretivas
@@ -126,25 +127,25 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Gatilhos identificados</CardDescription>
+            <CardDescription>{tx('Gatilhos identificados')}</CardDescription>
             <CardTitle className="text-3xl">{totalTriggers}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            Indicadores em Atenção ou Crítico
+            {tx('Indicadores em Atenção ou Crítico')}
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Com prescrição EDU</CardDescription>
+            <CardDescription>{tx('Com prescrição EDU')}</CardDescription>
             <CardTitle className="text-3xl">{triggersWithPrescription}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            Cursos vinculados automaticamente
+            {tx('Cursos vinculados automaticamente')}
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Cobertura</CardDescription>
+            <CardDescription>{tx('Cobertura')}</CardDescription>
             <CardTitle className="text-3xl">{Math.round(coverage)}%</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
@@ -158,7 +159,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
       {totalTriggers === 0 && (
         <Alert>
           <ListChecks className="h-4 w-4" />
-          <AlertTitle>Nenhum gatilho prescritivo</AlertTitle>
+          <AlertTitle>{tx('Nenhum gatilho prescritivo')}</AlertTitle>
           <AlertDescription>
             Todos os indicadores estão com status Adequado. Não há prescrições
             corretivas necessárias neste momento.
@@ -173,7 +174,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
             <div className="text-sm">
               <p className="font-medium flex items-center gap-2">
                 <FolderKanban className="h-4 w-4 text-primary" />
-                Transformar gatilhos em projeto
+                {tx('Transformar gatilhos em projeto')}
               </p>
               <p className="text-muted-foreground text-xs mt-1">
                 {selectedCodes.size > 0
@@ -182,9 +183,9 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button size="sm" variant="ghost" onClick={selectAll}>Selecionar todos</Button>
+              <Button size="sm" variant="ghost" onClick={selectAll}>{tx('Selecionar todos')}</Button>
               <Button size="sm" variant="ghost" onClick={clearAll} disabled={selectedCodes.size === 0}>
-                Limpar
+                {tx('Limpar')}
               </Button>
               <Button size="sm" onClick={goToCreateProject}>
                 <FolderKanban className="h-4 w-4 mr-1" /> Criar projeto
@@ -259,7 +260,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
                       {!hasCourse && (
                         <Badge variant="outline" className="text-xs gap-1">
                           <AlertTriangle className="h-3 w-3" />
-                          Sem curso
+                          {tx('Sem curso')}
                         </Badge>
                       )}
                     </div>

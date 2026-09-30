@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -43,7 +44,7 @@ export function DiagnosticProgressDashboard({ status, hasIndicatorValues, hasRep
   return (
     <Card className="mb-6">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium text-muted-foreground">Progresso do Diagnóstico</CardTitle>
+        <CardTitle className="text-sm font-medium text-muted-foreground">{tx('Progresso do Diagnóstico')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between">

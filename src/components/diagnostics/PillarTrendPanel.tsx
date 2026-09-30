@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -86,7 +87,7 @@ export function PillarTrendPanel({ destinationId, diagnosticType, currentAssessm
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <LineChart className="h-5 w-5 text-primary" />
-            Evolução temporal dos pilares
+            {tx('Evolução temporal dos pilares')}
           </CardTitle>
           <CardDescription>
             São necessárias pelo menos 2 rodadas calculadas {diagnosticType === 'enterprise' ? 'Enterprise' : 'Territoriais'} para exibir o histórico.

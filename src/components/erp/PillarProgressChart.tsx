@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -59,9 +60,9 @@ export function PillarProgressChart({ data, isLoading }: PillarProgressChartProp
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            Scores por Pilar
+            {tx('Scores por Pilar')}
           </CardTitle>
-          <CardDescription>Nenhum diagnóstico calculado encontrado</CardDescription>
+          <CardDescription>{tx('Nenhum diagnóstico calculado encontrado')}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -72,10 +73,10 @@ export function PillarProgressChart({ data, isLoading }: PillarProgressChartProp
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <BarChart3 className="h-5 w-5" />
-          Scores por Pilar
+          {tx('Scores por Pilar')}
         </CardTitle>
         <CardDescription>
-          Média dos scores dos diagnósticos calculados por pilar do SISTUR
+          {tx('Média dos scores dos diagnósticos calculados por pilar do SISTUR')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -142,7 +143,7 @@ export function PillarProgressChart({ data, isLoading }: PillarProgressChartProp
                   {hasMultipleDestinations && (
                     <div className="mt-3 pt-3 border-t space-y-2">
                       <p className="text-xs text-muted-foreground font-medium mb-2">
-                        Scores por Destino:
+                        {tx('Scores por Destino:')}
                       </p>
                       {pillar.destinations.map((dest) => {
                         const destScorePercent = Math.round(dest.score * 100);

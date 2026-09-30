@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { cn } from '@/lib/utils';
 import { GraduationCap, Clock, ExternalLink, AlertTriangle, Target, Building2, Users, Truck } from 'lucide-react';
 import type { Recommendation, TerritorialInterpretation } from '@/types/sistur';
@@ -107,7 +108,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
           <div className="mt-3 rounded-lg border bg-muted/30 p-3 space-y-2">
             <div className="flex items-center gap-2 text-xs font-medium text-foreground">
               <Target className="h-3.5 w-3.5 text-primary" />
-              <span>Por que este curso?</span>
+              <span>{tx('Por que este curso?')}</span>
             </div>
             
             <p className="text-xs text-muted-foreground">
@@ -119,7 +120,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               <div className="pt-2 border-t border-border/50">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5">
                   <AlertTriangle className="h-3 w-3" />
-                  <span>Gargalo diagnosticado:</span>
+                  <span>{tx('Gargalo diagnosticado:')}</span>
                 </div>
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <Badge 
@@ -203,7 +204,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               asChild
             >
               <a href={url} target="_blank" rel="noopener noreferrer">
-                Acessar curso
+                {tx('Acessar curso')}
                 <ExternalLink className="ml-2 h-3 w-3" />
               </a>
             </Button>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -86,7 +87,7 @@ export function EnterpriseRegressionAlerts({ destinationId, diagnosticType, dest
 
   const dispatchEmail = async () => {
     if (!user?.email) {
-      toast.error('E-mail do usuário indisponível.');
+      toast.error(tx('E-mail do usuário indisponível.'));
       return;
     }
     setSending(true);
@@ -103,9 +104,9 @@ export function EnterpriseRegressionAlerts({ destinationId, diagnosticType, dest
       });
       if (error) throw error;
       localStorage.setItem(dedupeKey, new Date().toISOString());
-      toast.success('Alerta enviado para ' + user.email);
+      toast.success(tx('Alerta enviado para ') + user.email);
     } catch (e: any) {
-      toast.error('Falha ao enviar alerta: ' + (e?.message ?? 'erro desconhecido'));
+      toast.error(tx('Falha ao enviar alerta: ') + (e?.message ?? 'erro desconhecido'));
     } finally {
       setSending(false);
     }

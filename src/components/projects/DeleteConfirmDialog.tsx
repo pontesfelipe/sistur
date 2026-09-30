@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,7 +36,7 @@ export function DeleteConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>{tx('Cancelar')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
@@ -45,7 +46,7 @@ export function DeleteConfirmDialog({
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Excluir
+            {tx('Excluir')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

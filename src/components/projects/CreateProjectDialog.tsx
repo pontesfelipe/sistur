@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -420,7 +421,7 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
     } catch (error) {
       console.error('Error creating project:', error);
       toast({
-        title: 'Erro ao criar projeto',
+        title: tx('Erro ao criar projeto'),
         description: error instanceof Error ? error.message : 'Erro desconhecido',
         variant: 'destructive',
       });
@@ -476,11 +477,11 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
                 <CardContent className="flex flex-col items-center justify-center py-8">
                   <AlertCircle className="h-10 w-10 text-muted-foreground/50 mb-4" />
                   <p className="text-muted-foreground text-center">
-                    Nenhum destino disponível. Para criar um projeto, você precisa ter:
+                    {tx('Nenhum destino disponível. Para criar um projeto, você precisa ter:')}
                   </p>
                   <ul className="text-sm text-muted-foreground mt-2 space-y-1">
-                    <li>• Um diagnóstico com status CALCULATED</li>
-                    <li>• Um relatório gerado para esse diagnóstico</li>
+                    <li>{tx('• Um diagnóstico com status CALCULATED')}</li>
+                    <li>{tx('• Um relatório gerado para esse diagnóstico')}</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -519,7 +520,7 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
                         </div>
                         <Badge variant="secondary" className="bg-green-100 text-green-700">
                           <CheckCircle2 className="h-3 w-3 mr-1" />
-                          Pronto
+                          {tx('Pronto')}
                         </Badge>
                       </div>
                     </CardHeader>
@@ -530,10 +531,10 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
 
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={handleClose}>
-                Cancelar
+                {tx('Cancelar')}
               </Button>
               <Button onClick={handleSelectContinue} disabled={!selectedAssessment}>
-                Continuar
+                {tx('Continuar')}
               </Button>
             </div>
           </div>
@@ -544,21 +545,21 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
             {/* Project Info */}
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nome do Projeto *</Label>
+                <Label htmlFor="name">{tx('Nome do Projeto *')}</Label>
                 <Input
                   id="name"
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
-                  placeholder="Nome do projeto"
+                  placeholder={tx('Nome do projeto')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Descrição</Label>
+                <Label htmlFor="description">{tx('Descrição')}</Label>
                 <Textarea
                   id="description"
                   value={projectDescription}
                   onChange={(e) => setProjectDescription(e.target.value)}
-                  placeholder="Descrição detalhada do projeto (opcional - será gerada pela IA)"
+                  placeholder={tx('Descrição detalhada do projeto (opcional - será gerada pela IA)')}
                   rows={3}
                 />
               </div>
@@ -566,7 +567,7 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
 
             {/* Methodology Selection */}
             <div className="space-y-3">
-              <Label>Metodologia de Gestão *</Label>
+              <Label>{tx('Metodologia de Gestão *')}</Label>
               <div className="grid md:grid-cols-2 gap-3">
                 {(Object.keys(METHODOLOGY_INFO) as ProjectMethodology[]).map((key) => {
                   const info = METHODOLOGY_INFO[key];
@@ -602,21 +603,21 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
             {/* Priority and Dates */}
             <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label>Prioridade</Label>
+                <Label>{tx('Prioridade')}</Label>
                 <Select value={priority} onValueChange={(v) => setPriority(v as TaskPriority)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Baixa</SelectItem>
-                    <SelectItem value="medium">Média</SelectItem>
-                    <SelectItem value="high">Alta</SelectItem>
-                    <SelectItem value="critical">Crítica</SelectItem>
+                    <SelectItem value="low">{tx('Baixa')}</SelectItem>
+                    <SelectItem value="medium">{tx('Média')}</SelectItem>
+                    <SelectItem value="high">{tx('Alta')}</SelectItem>
+                    <SelectItem value="critical">{tx('Crítica')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="startDate">Data de Início</Label>
+                <Label htmlFor="startDate">{tx('Data de Início')}</Label>
                 <Input
                   id="startDate"
                   type="date"
@@ -625,7 +626,7 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="endDate">Data de Término</Label>
+                <Label htmlFor="endDate">{tx('Data de Término')}</Label>
                 <Input
                   id="endDate"
                   type="date"
@@ -637,18 +638,18 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
 
             <div className="flex justify-between gap-2 pt-4">
               <Button variant="outline" onClick={() => setStep('select')}>
-                Voltar
+                {tx('Voltar')}
               </Button>
               <Button onClick={handleGenerate} disabled={!projectName || isGenerating}>
                 {isGenerating ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Gerando...
+                    {tx('Gerando...')}
                   </>
                 ) : (
                   <>
                     <Wand2 className="h-4 w-4 mr-2" />
-                    Gerar Projeto com IA
+                    {tx('Gerar Projeto com IA')}
                   </>
                 )}
               </Button>

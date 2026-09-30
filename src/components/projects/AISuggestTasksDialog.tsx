@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCreateTasks, useProjectPhases } from "@/hooks/useProjects";
@@ -45,7 +46,7 @@ export function AISuggestTasksDialog({
       const list = (data?.suggestions ?? []) as Suggestion[];
       setSuggestions(list);
       setSelected(new Set(list.map((_, i) => i)));
-      if (list.length === 0) toast.info("Nenhuma sugestão gerada — projeto já parece coberto.");
+      if (list.length === 0) toast.info(tx('Nenhuma sugestão gerada — projeto já parece coberto.'));
     } catch (e: any) {
       toast.error(e?.message ?? "Erro ao gerar sugestões");
     } finally {
@@ -80,7 +81,7 @@ export function AISuggestTasksDialog({
         tags: [...(s.tags ?? []), ...(s.indicator_code ? [s.indicator_code] : []), "Inteligência SISTUR"],
       }));
     if (toCreate.length === 0) {
-      toast.info("Selecione ao menos uma sugestão.");
+      toast.info(tx('Selecione ao menos uma sugestão.'));
       return;
     }
     await createTasks.mutateAsync(toCreate as any);
@@ -100,22 +101,22 @@ export function AISuggestTasksDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /> Sugerir tarefas com inteligência SISTUR</DialogTitle>
+          <DialogTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /> {tx('Sugerir tarefas com inteligência SISTUR')}</DialogTitle>
           <DialogDescription>
-            A inteligência SISTUR analisa indicadores vinculados, fases e tarefas existentes para sugerir novas tarefas acionáveis.
+            {tx('A inteligência SISTUR analisa indicadores vinculados, fases e tarefas existentes para sugerir novas tarefas acionáveis.')}
           </DialogDescription>
         </DialogHeader>
 
         {suggestions.length === 0 && !loading && (
           <div className="py-8 text-center">
-            <Button onClick={generate} size="lg"><Sparkles className="h-4 w-4 mr-2" /> Gerar sugestões</Button>
+            <Button onClick={generate} size="lg"><Sparkles className="h-4 w-4 mr-2" /> {tx('Gerar sugestões')}</Button>
           </div>
         )}
 
         {loading && (
           <div className="py-12 flex flex-col items-center gap-2 text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="text-sm">Analisando projeto...</span>
+            <span className="text-sm">{tx('Analisando projeto...')}</span>
           </div>
         )}
 
@@ -148,7 +149,7 @@ export function AISuggestTasksDialog({
               <RefreshCw className="h-4 w-4 mr-1" /> Regenerar
             </Button>
           )}
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>{tx('Cancelar')}</Button>
           {suggestions.length > 0 && (
             <Button onClick={importSelected} disabled={createTasks.isPending || selected.size === 0}>
               {createTasks.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}

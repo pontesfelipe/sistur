@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -51,7 +52,7 @@ export function TaskAssigneeCombobox({ value, displayName, onChange, placeholder
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command>
-          <CommandInput placeholder="Buscar pessoa..." />
+          <CommandInput placeholder={tx('Buscar pessoa...')} />
           <CommandList>
             <CommandEmpty>{isLoading ? 'Carregando...' : 'Nenhum usuário encontrado.'}</CommandEmpty>
             <CommandGroup>

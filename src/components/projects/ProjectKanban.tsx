@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -47,7 +48,7 @@ export function ProjectKanban({ tasks, onEdit }: { tasks: ProjectTask[]; onEdit?
       await updateTask.mutateAsync({ id: taskId, updates: { status } });
       toast({ title: 'Tarefa movida', description: `→ ${TASK_STATUS_INFO[status].label}` });
     } catch (err: any) {
-      toast({ title: 'Erro ao mover tarefa', description: err.message, variant: 'destructive' });
+      toast({ title: tx('Erro ao mover tarefa'), description: err.message, variant: 'destructive' });
     } finally {
       setDraggingId(null);
       setHoverCol(null);
@@ -86,7 +87,7 @@ export function ProjectKanban({ tasks, onEdit }: { tasks: ProjectTask[]; onEdit?
               <div className="p-2 space-y-2 min-h-[160px] max-h-[60vh] overflow-y-auto">
                 {items.length === 0 ? (
                   <p className="text-xs text-muted-foreground text-center py-6">
-                    Solte tarefas aqui
+                    {tx('Solte tarefas aqui')}
                   </p>
                 ) : (
                   items.map((task) => {

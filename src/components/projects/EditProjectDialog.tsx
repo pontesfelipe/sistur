@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -85,38 +86,38 @@ export function EditProjectDialog({ project, open, onOpenChange }: EditProjectDi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Editar Projeto</DialogTitle>
+          <DialogTitle>{tx('Editar Projeto')}</DialogTitle>
           <DialogDescription>
-            Atualize as informações do projeto
+            {tx('Atualize as informações do projeto')}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nome do Projeto *</Label>
+            <Label htmlFor="name">{tx('Nome do Projeto *')}</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Nome do projeto"
+              placeholder={tx('Nome do projeto')}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
+            <Label htmlFor="description">{tx('Descrição')}</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descrição do projeto"
+              placeholder={tx('Descrição do projeto')}
               rows={3}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Status</Label>
+              <Label>{tx('Status')}</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as ProjectStatus)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -132,7 +133,7 @@ export function EditProjectDialog({ project, open, onOpenChange }: EditProjectDi
             </div>
 
             <div className="space-y-2">
-              <Label>Metodologia</Label>
+              <Label>{tx('Metodologia')}</Label>
               <Select value={methodology} onValueChange={(v) => setMethodology(v as ProjectMethodology)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -149,7 +150,7 @@ export function EditProjectDialog({ project, open, onOpenChange }: EditProjectDi
           </div>
 
           <div className="space-y-2">
-            <Label>Prioridade</Label>
+            <Label>{tx('Prioridade')}</Label>
             <Select value={priority} onValueChange={(v) => setPriority(v as TaskPriority)}>
               <SelectTrigger>
                 <SelectValue />
@@ -166,7 +167,7 @@ export function EditProjectDialog({ project, open, onOpenChange }: EditProjectDi
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="start-date">Data de Início</Label>
+              <Label htmlFor="start-date">{tx('Data de Início')}</Label>
               <Input
                 id="start-date"
                 type="date"
@@ -175,7 +176,7 @@ export function EditProjectDialog({ project, open, onOpenChange }: EditProjectDi
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="end-date">Data de Término</Label>
+              <Label htmlFor="end-date">{tx('Data de Término')}</Label>
               <Input
                 id="end-date"
                 type="date"
@@ -187,11 +188,11 @@ export function EditProjectDialog({ project, open, onOpenChange }: EditProjectDi
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
+              {tx('Cancelar')}
             </Button>
             <Button type="submit" disabled={updateProject.isPending || !name}>
               {updateProject.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Salvar Alterações
+              {tx('Salvar Alterações')}
             </Button>
           </DialogFooter>
         </form>

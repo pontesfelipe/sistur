@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -93,8 +94,8 @@ const Diagnosticos = () => {
 
   return (
     <AppLayout 
-      title="Diagnósticos" 
-      subtitle="Rodadas de avaliação dos destinos"
+      title={tx('Diagnósticos')} 
+      subtitle={tx('Rodadas de avaliação dos destinos')}
     >
       <Tabs
         value={mainTab}
@@ -112,15 +113,15 @@ const Diagnosticos = () => {
         <TabsList className="w-full max-w-2xl">
           <TabsTrigger value="rodadas" className="gap-2 flex-1">
             <ClipboardList className="h-4 w-4" />
-            Rodadas
+            {tx('Rodadas')}
           </TabsTrigger>
           <TabsTrigger value="destinos" className="gap-2 flex-1">
             <MapPin className="h-4 w-4" />
-            Destinos
+            {tx('Destinos')}
           </TabsTrigger>
           <TabsTrigger value="indicadores" className="gap-2 flex-1">
             <Upload className="h-4 w-4" />
-            Indicadores
+            {tx('Indicadores')}
           </TabsTrigger>
         </TabsList>
 
@@ -131,7 +132,7 @@ const Diagnosticos = () => {
               <div className="relative max-w-md flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar diagnósticos..."
+                  placeholder={tx('Buscar diagnósticos...')}
                   className="pl-9"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -139,34 +140,34 @@ const Diagnosticos = () => {
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder={tx('Status')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="DRAFT">Rascunho</SelectItem>
-                  <SelectItem value="DATA_READY">Dados Prontos</SelectItem>
-                  <SelectItem value="CALCULATED">Calculado</SelectItem>
+                  <SelectItem value="all">{tx('Todos')}</SelectItem>
+                  <SelectItem value="DRAFT">{tx('Rascunho')}</SelectItem>
+                  <SelectItem value="DATA_READY">{tx('Dados Prontos')}</SelectItem>
+                  <SelectItem value="CALCULATED">{tx('Calculado')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <Button asChild>
               <Link to="/nova-rodada">
                 <Plus className="mr-2 h-4 w-4" />
-                Nova Rodada
+                {tx('Nova Rodada')}
               </Link>
             </Button>
           </div>
 
           {/* Tier Explanation */}
           <div className="p-4 rounded-lg border bg-gradient-to-br from-muted/50 to-transparent">
-            <h3 className="font-semibold mb-3">Níveis de Diagnóstico</h3>
+            <h3 className="font-semibold mb-3">{tx('Níveis de Diagnóstico')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
               <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
                 <div className="flex items-center gap-2 font-medium text-green-700 dark:text-green-400 mb-1">
                   <span className="text-lg">⚡</span> Essencial
                 </div>
                 <p className="text-xs text-green-600/80 dark:text-green-400/80">
-                  ~20 indicadores essenciais. Ideal para municípios menores ou primeira avaliação rápida.
+                  {tx('~20 indicadores essenciais. Ideal para municípios menores ou primeira avaliação rápida.')}
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
@@ -174,7 +175,7 @@ const Diagnosticos = () => {
                   <span className="text-lg">📊</span> Estratégico
                 </div>
                 <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
-                  ~50 indicadores. Análise tática para cidades médias ou acompanhamento contínuo.
+                  {tx('~50 indicadores. Análise tática para cidades médias ou acompanhamento contínuo.')}
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
@@ -182,7 +183,7 @@ const Diagnosticos = () => {
                   <span className="text-lg">🎯</span> Integral
                 </div>
                 <p className="text-xs text-primary/80">
-                  100+ indicadores. Análise 360° para capitais, polos turísticos ou planejamento estratégico.
+                  {tx('100+ indicadores. Análise 360° para capitais, polos turísticos ou planejamento estratégico.')}
                 </p>
               </div>
             </div>
@@ -192,30 +193,30 @@ const Diagnosticos = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-lg border bg-card">
               <div className="flex items-center gap-3">
-                <Badge variant="draft" className="h-6 px-3">Rascunho</Badge>
+                <Badge variant="draft" className="h-6 px-3">{tx('Rascunho')}</Badge>
                 <span className="text-2xl font-display font-bold">
                   {isLoading ? <Skeleton className="h-8 w-8" /> : statusCounts.DRAFT}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Aguardando preenchimento de dados</p>
+              <p className="text-xs text-muted-foreground mt-1">{tx('Aguardando preenchimento de dados')}</p>
             </div>
             <div className="p-4 rounded-lg border bg-card">
               <div className="flex items-center gap-3">
-                <Badge variant="ready" className="h-6 px-3">Dados Prontos</Badge>
+                <Badge variant="ready" className="h-6 px-3">{tx('Dados Prontos')}</Badge>
                 <span className="text-2xl font-display font-bold">
                   {isLoading ? <Skeleton className="h-8 w-8" /> : statusCounts.DATA_READY}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Pronto para calcular diagnóstico</p>
+              <p className="text-xs text-muted-foreground mt-1">{tx('Pronto para calcular diagnóstico')}</p>
             </div>
             <div className="p-4 rounded-lg border bg-card">
               <div className="flex items-center gap-3">
-                <Badge variant="calculated" className="h-6 px-3">Calculado</Badge>
+                <Badge variant="calculated" className="h-6 px-3">{tx('Calculado')}</Badge>
                 <span className="text-2xl font-display font-bold">
                   {isLoading ? <Skeleton className="h-8 w-8" /> : statusCounts.CALCULATED}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Diagnóstico completo</p>
+              <p className="text-xs text-muted-foreground mt-1">{tx('Diagnóstico completo')}</p>
             </div>
           </div>
 

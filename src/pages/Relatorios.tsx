@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useRef, useEffect, useMemo, type RefObject } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { exportReportAsDocx } from '@/lib/exportReportDocx';
@@ -315,14 +316,14 @@ export default function Relatorios() {
 
   const generateReport = async (forceRegenerate = false) => {
     if (!selectedAssessmentId || !selectedDestination) {
-      toast.error('Selecione um diagnóstico calculado');
+      toast.error(tx('Selecione um diagnóstico calculado'));
       return;
     }
 
     // Get current session for authentication
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
-      toast.error('Você precisa estar autenticado para gerar relatórios');
+      toast.error(tx('Você precisa estar autenticado para gerar relatórios'));
       return;
     }
 
@@ -423,7 +424,7 @@ export default function Relatorios() {
       while (Date.now() < pollDeadline) {
         await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
         if (cancelGenerationRef.current) {
-          toast.info('Acompanhamento cancelado. A geração continua no servidor — confira o histórico em alguns minutos.');
+          toast.info(tx('Acompanhamento cancelado. A geração continua no servidor — confira o histórico em alguns minutos.'));
           return;
         }
         const { data: job } = await supabase
@@ -479,7 +480,7 @@ export default function Relatorios() {
       setLivePartial('');
       setGenerationProgressPct(100);
 
-      toast.success('Relatório gerado e salvo com sucesso!');
+      toast.success(tx('Relatório gerado e salvo com sucesso!'));
       queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
       queryClient.invalidateQueries({ queryKey: ['destinations-with-report-data'] });
     } catch (error) {
@@ -503,11 +504,11 @@ export default function Relatorios() {
       .eq('id', reportId);
 
     if (error) {
-      toast.error('Erro ao excluir relatório');
+      toast.error(tx('Erro ao excluir relatório'));
       return;
     }
 
-    toast.success('Relatório excluído');
+    toast.success(tx('Relatório excluído'));
     queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
     if (selectedHistoryReport?.id === reportId) {
       setSelectedHistoryReport(null);
@@ -537,7 +538,7 @@ export default function Relatorios() {
 
       const iframeDoc = iframe.contentWindow?.document;
       if (!iframeDoc) {
-        toast.error('Não foi possível preparar o PDF. Desative o bloqueador de pop-ups.');
+        toast.error(tx('Não foi possível preparar o PDF. Desative o bloqueador de pop-ups.'));
         document.body.removeChild(iframe);
         return;
       }
@@ -553,7 +554,7 @@ export default function Relatorios() {
         }, 300);
       };
 
-      toast.success('Use "Salvar como PDF" na janela de impressão.');
+      toast.success(tx('Use "Salvar como PDF" na janela de impressão.'));
       return;
     }
 
@@ -568,7 +569,7 @@ export default function Relatorios() {
       }, 300);
     };
 
-    toast.success('Use "Salvar como PDF" na janela de impressão.');
+    toast.success(tx('Use "Salvar como PDF" na janela de impressão.'));
   };
 
   // PDF/print export: hardcoded hex colors are intentional here because PDFs
@@ -583,13 +584,13 @@ export default function Relatorios() {
     const logoHtml = c.logoUrl ? `<div style="text-align:center;margin-bottom:16px;"><img src="${c.logoUrl}" style="max-height:60px;max-width:200px;" /></div>` : '';
     const orgHtml = c.organizationName ? `<div style="text-align:center;font-size:14px;color:#64748B;margin-bottom:4px;">${c.organizationName}</div>` : '';
     const scopeBadge = scope === 'enterprise'
-      ? `<div style="text-align:center;font-size:11px;color:#7C2D12;background:#FFEDD5;border:1px solid #FED7AA;padding:4pt 8pt;margin-bottom:8pt;letter-spacing:0.05em;text-transform:uppercase;">Relatório Empresarial — Diagnóstico Operacional & Estratégico (concorrentes anonimizados: Concorrente A/B/C)</div>`
+      ? `<div style="text-align:center;font-size:11px;color:#7C2D12;background:#FFEDD5;border:1px solid #FED7AA;padding:4pt 8pt;margin-bottom:8pt;letter-spacing:0.05em;text-transform:uppercase;">{tx('Relatório Empresarial — Diagnóstico Operacional & Estratégico (concorrentes anonimizados: Concorrente A/B/C)')}</div>`
       : '';
     const headerHtml = c.headerText ? `<div style="text-align:center;font-size:12px;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:24px;">${c.headerText}</div>` : '';
     const footerHtml = c.footerText ? `<div style="text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px;margin-top:24px;">${c.footerText}</div>` : '';
     const notesHtml = c.additionalNotes ? `<div style="margin-top:32px;padding:12px;background:#f8fafc;border-left:3px solid ${color};font-size:12px;color:#64748B;">${c.additionalNotes}</div>` : '';
     return `<!DOCTYPE html>
-<html><head><title>Relatório SISTUR</title>
+<html><head><title>{tx('Relatório SISTUR')}</title>
 <style>
   /* ===== ABNT / MEC (NBR 14724, 6024, 6023, 10520) ===== */
   /* Papel A4, margens 3cm sup/esq e 2cm inf/dir, Arial 12pt, entrelinha 1,5,
@@ -641,10 +642,10 @@ export default function Relatorios() {
     if (!content) return;
     try {
       await exportReportAsDocx(content, destName, reportCustomization, scope);
-      toast.success('Relatório Word baixado!');
+      toast.success(tx('Relatório Word baixado!'));
     } catch (err) {
       console.error('Error exporting DOCX:', err);
-      toast.error('Erro ao gerar arquivo Word.');
+      toast.error(tx('Erro ao gerar arquivo Word.'));
     }
   };
 
@@ -823,17 +824,17 @@ export default function Relatorios() {
   };
 
   return (
-    <AppLayout title="Relatórios" subtitle="Geração de planos de desenvolvimento com IA">
+    <AppLayout title={tx('Relatórios')} subtitle={tx('Geração de planos de desenvolvimento com IA')}>
       <div className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="generate" className="gap-2">
               <Sparkles className="h-4 w-4" />
-              Gerar Novo
+              {tx('Gerar Novo')}
             </TabsTrigger>
             <TabsTrigger value="history" className="gap-2">
               <History className="h-4 w-4" />
-              Histórico
+              {tx('Histórico')}
               {savedReports && savedReports.length > 0 && (
                 <Badge variant="secondary" className="ml-1">{savedReports.length}</Badge>
               )}
@@ -846,10 +847,10 @@ export default function Relatorios() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary" />
-                  Gerador de Relatórios com Mente Sistur
+                  {tx('Gerador de Relatórios com Mente Sistur')}
                 </CardTitle>
                 <CardDescription>
-                  Selecione um diagnóstico calculado para gerar um plano de desenvolvimento turístico personalizado
+                  {tx('Selecione um diagnóstico calculado para gerar um plano de desenvolvimento turístico personalizado')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -857,39 +858,39 @@ export default function Relatorios() {
                 <div className="flex flex-wrap gap-3 items-end">
                   <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
                     <Filter className="h-4 w-4" />
-                    Filtros:
+                    {tx('Filtros:')}
                   </div>
                   <Select value={genTypeFilter} onValueChange={setGenTypeFilter}>
                     <SelectTrigger className="w-40 h-8 text-xs">
-                      <SelectValue placeholder="Tipo" />
+                      <SelectValue placeholder={tx('Tipo')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos os tipos</SelectItem>
+                      <SelectItem value="all">{tx('Todos os tipos')}</SelectItem>
                       <SelectItem value="territorial">
-                        <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" />Territorial</span>
+                        <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" />{tx('Territorial')}</span>
                       </SelectItem>
                       <SelectItem value="enterprise">
-                        <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />Empresarial</span>
+                        <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />{tx('Empresarial')}</span>
                       </SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={genTierFilter} onValueChange={setGenTierFilter}>
                     <SelectTrigger className="w-40 h-8 text-xs">
-                      <SelectValue placeholder="Nível" />
+                      <SelectValue placeholder={tx('Nível')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos os níveis</SelectItem>
-                      <SelectItem value="essencial">⚡ Essencial</SelectItem>
-                      <SelectItem value="estrategico">📊 Estratégico</SelectItem>
-                      <SelectItem value="integral">🎯 Integral</SelectItem>
+                      <SelectItem value="all">{tx('Todos os níveis')}</SelectItem>
+                      <SelectItem value="essencial">{tx('⚡ Essencial')}</SelectItem>
+                      <SelectItem value="estrategico">{tx('📊 Estratégico')}</SelectItem>
+                      <SelectItem value="integral">{tx('🎯 Integral')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={genDestFilter} onValueChange={setGenDestFilter}>
                     <SelectTrigger className="w-48 h-8 text-xs">
-                      <SelectValue placeholder="Destino" />
+                      <SelectValue placeholder={tx('Destino')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos os destinos</SelectItem>
+                      <SelectItem value="all">{tx('Todos os destinos')}</SelectItem>
                       {destinations?.map(d => (
                         <SelectItem key={d.id} value={d.id}>
                           <span className="flex items-center gap-1.5">
@@ -902,7 +903,7 @@ export default function Relatorios() {
                   </Select>
                   {(genTypeFilter !== 'all' || genTierFilter !== 'all' || genDestFilter !== 'all') && (
                     <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => { setGenTypeFilter('all'); setGenTierFilter('all'); setGenDestFilter('all'); }}>
-                      Limpar filtros
+                      {tx('Limpar filtros')}
                     </Button>
                   )}
                 </div>
@@ -910,7 +911,7 @@ export default function Relatorios() {
                 <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4">
                   <div className="flex-1 min-w-[260px]">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                      Diagnóstico
+                      {tx('Diagnóstico')}
                     </label>
                     <Select 
                       value={selectedAssessmentId} 
@@ -918,12 +919,12 @@ export default function Relatorios() {
                       disabled={assessmentsLoading}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione um diagnóstico calculado" className="truncate" />
+                        <SelectValue placeholder={tx('Selecione um diagnóstico calculado')} className="truncate" />
                       </SelectTrigger>
                       <SelectContent>
                         {filteredCalculatedAssessments.length === 0 ? (
                           <SelectItem value="none" disabled>
-                            Nenhum diagnóstico calculado disponível
+                            {tx('Nenhum diagnóstico calculado disponível')}
                           </SelectItem>
                         ) : (
                           filteredCalculatedAssessments.map((assessment) => {
@@ -952,23 +953,23 @@ export default function Relatorios() {
 
                   <div className="w-48">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                      Modelo
+                      {tx('Modelo')}
                     </label>
                     <Select value={reportTemplate} onValueChange={setReportTemplate}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="completo">📋 Completo</SelectItem>
-                        <SelectItem value="executivo">📊 Executivo</SelectItem>
-                        <SelectItem value="investidor">💰 Investidores</SelectItem>
+                        <SelectItem value="completo">{tx('📋 Completo')}</SelectItem>
+                        <SelectItem value="executivo">{tx('📊 Executivo')}</SelectItem>
+                        <SelectItem value="investidor">{tx('💰 Investidores')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="w-44">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                      Visibilidade
+                      {tx('Visibilidade')}
                     </label>
                     <Select value={reportVisibility} onValueChange={setReportVisibility}>
                       <SelectTrigger>
@@ -978,13 +979,13 @@ export default function Relatorios() {
                         <SelectItem value="personal">
                           <span className="flex items-center gap-1.5">
                             <Lock className="h-3 w-3" />
-                            Pessoal
+                            {tx('Pessoal')}
                           </span>
                         </SelectItem>
                         <SelectItem value="org">
                           <span className="flex items-center gap-1.5">
                             <Users className="h-3 w-3" />
-                            Organização
+                            {tx('Organização')}
                           </span>
                         </SelectItem>
                       </SelectContent>
@@ -994,7 +995,7 @@ export default function Relatorios() {
                   {isAdmin && (
                     <div className="w-36">
                       <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                        Ambiente
+                        {tx('Ambiente')}
                       </label>
                       <TooltipProvider>
                         <Tooltip>
@@ -1019,17 +1020,17 @@ export default function Relatorios() {
                   {isAdmin && (
                     <div className="w-52">
                       <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                        Modelo de IA <span className="text-[10px] uppercase tracking-wide text-amber-600">(admin)</span>
+                        Modelo de IA <span className="text-[10px] uppercase tracking-wide text-amber-600">{tx('(admin)')}</span>
                       </label>
                       <Select value={aiProvider} onValueChange={(v) => setAiProvider(v as typeof aiProvider)}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="auto">⚙️ Auto (Claude→GPT-6 Astra→Gemini)</SelectItem>
-                          <SelectItem value="claude">🟣 Claude Sonnet 4.5</SelectItem>
-                          <SelectItem value="gpt5">🟢 GPT-6 Astra</SelectItem>
-                          <SelectItem value="gemini">🔵 Gemini 3.1 Pro</SelectItem>
+                          <SelectItem value="auto">{tx('⚙️ Auto (Claude→GPT-6 Astra→Gemini)')}</SelectItem>
+                          <SelectItem value="claude">{tx('🟣 Claude Sonnet 4.5')}</SelectItem>
+                          <SelectItem value="gpt5">{tx('🟢 GPT-6 Astra')}</SelectItem>
+                          <SelectItem value="gemini">{tx('🔵 Gemini 3.1 Pro')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1037,7 +1038,7 @@ export default function Relatorios() {
 
                   <div className="w-44">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                      Comparativo
+                      {tx('Comparativo')}
                     </label>
                     <TooltipProvider>
                       <Tooltip>
@@ -1083,10 +1084,10 @@ export default function Relatorios() {
                         variant="outline"
                         onClick={cancelGeneration}
                         className="gap-2"
-                        title="Cancelar a geração em andamento"
+                        title={tx('Cancelar a geração em andamento')}
                       >
                         <X className="h-4 w-4" />
-                        Cancelar
+                        {tx('Cancelar')}
                       </Button>
                     )}
 
@@ -1102,7 +1103,7 @@ export default function Relatorios() {
                           className="gap-2"
                         >
                           <Download className="h-4 w-4" />
-                          Word
+                          {tx('Word')}
                         </Button>
                         <Button variant="outline" onClick={() => downloadPDF(reportRef, selectedAssessmentMeta?.diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial')} className="gap-2">
                           <FileText className="h-4 w-4" />
@@ -1110,7 +1111,7 @@ export default function Relatorios() {
                         </Button>
                         <Button variant="outline" onClick={() => setCustomizationOpen(true)} className="gap-2">
                           <Settings2 className="h-4 w-4" />
-                          Personalizar
+                          {tx('Personalizar')}
                         </Button>
                       </>
                     )}
@@ -1162,7 +1163,7 @@ export default function Relatorios() {
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <FileText className="h-5 w-5 text-primary" />
-                      Plano de Desenvolvimento
+                      {tx('Plano de Desenvolvimento')}
                       {selectedDestination && ` - ${selectedDestination.name}`}
                       {isGenerating && livePartial && (
                         <Badge variant="outline" className="gap-1 border-primary/40 bg-primary/10 text-primary">
@@ -1170,7 +1171,7 @@ export default function Relatorios() {
                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60"></span>
                             <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
                           </span>
-                          Pré-visualização ao vivo
+                          {tx('Pré-visualização ao vivo')}
                         </Badge>
                       )}
                     </CardTitle>
@@ -1183,7 +1184,7 @@ export default function Relatorios() {
                   {report && !isGenerating && (
                     <Button variant="ghost" size="sm" onClick={() => generateReport(true)} className="gap-2">
                       <RefreshCw className="h-4 w-4" />
-                      Regenerar
+                      {tx('Regenerar')}
                     </Button>
                   )}
                 </CardHeader>
@@ -1225,7 +1226,7 @@ export default function Relatorios() {
                       )}
                       {isGenerating && generationElapsed >= 60 && !report && !livePartial && (
                         <div className="mt-3 text-xs text-amber-600 dark:text-amber-400">
-                          A geração continua no servidor. Se ficar mais de 8 minutos sem avançar, o sistema marcará falha automaticamente para você tentar novamente sem duplicar jobs.
+                          {tx('A geração continua no servidor. Se ficar mais de 8 minutos sem avançar, o sistema marcará falha automaticamente para você tentar novamente sem duplicar jobs.')}
                         </div>
                       )}
                       {/* v1.38.65 — Quando isGenerating + livePartial: renderiza o
@@ -1251,7 +1252,7 @@ export default function Relatorios() {
                     <FileText className="h-8 w-8 text-primary" />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">
-                    Nenhum relatório gerado
+                    {tx('Nenhum relatório gerado')}
                   </h3>
                   <p className="text-muted-foreground max-w-md">
                     Selecione um diagnóstico calculado acima e clique em &quot;Gerar Relatório&quot; para criar um plano de desenvolvimento turístico personalizado com a Mente Sistur.
@@ -1268,7 +1269,7 @@ export default function Relatorios() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <History className="h-5 w-5" />
-                    Relatórios Salvos
+                    {tx('Relatórios Salvos')}
                   </CardTitle>
                   <CardDescription>
                     {reportsError
@@ -1283,37 +1284,37 @@ export default function Relatorios() {
                   <div className="flex flex-col gap-2">
                     <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
                       <SelectTrigger className="h-8 text-xs">
-                        <SelectValue placeholder="Tipo" />
+                        <SelectValue placeholder={tx('Tipo')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Todos os tipos</SelectItem>
+                        <SelectItem value="all">{tx('Todos os tipos')}</SelectItem>
                         <SelectItem value="territorial">
-                          <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" />Territorial</span>
+                          <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" />{tx('Territorial')}</span>
                         </SelectItem>
                         <SelectItem value="enterprise">
-                          <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />Empresarial</span>
+                          <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" />{tx('Empresarial')}</span>
                         </SelectItem>
                       </SelectContent>
                     </Select>
                     <Select value={historyTierFilter} onValueChange={setHistoryTierFilter}>
                       <SelectTrigger className="h-8 text-xs">
-                        <SelectValue placeholder="Nível" />
+                        <SelectValue placeholder={tx('Nível')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Todos os níveis</SelectItem>
-                        <SelectItem value="essencial">⚡ Essencial</SelectItem>
-                        <SelectItem value="estrategico">📊 Estratégico</SelectItem>
-                        <SelectItem value="integral">🎯 Integral</SelectItem>
+                        <SelectItem value="all">{tx('Todos os níveis')}</SelectItem>
+                        <SelectItem value="essencial">{tx('⚡ Essencial')}</SelectItem>
+                        <SelectItem value="estrategico">{tx('📊 Estratégico')}</SelectItem>
+                        <SelectItem value="integral">{tx('🎯 Integral')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <Select value={historyOwnerFilter} onValueChange={setHistoryOwnerFilter}>
                       <SelectTrigger className="h-8 text-xs">
-                        <SelectValue placeholder="Autor" />
+                        <SelectValue placeholder={tx('Autor')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Todos da organização</SelectItem>
+                        <SelectItem value="all">{tx('Todos da organização')}</SelectItem>
                         <SelectItem value="mine">
-                          <span className="flex items-center gap-1.5"><Lock className="h-3 w-3" />Somente meus</span>
+                          <span className="flex items-center gap-1.5"><Lock className="h-3 w-3" />{tx('Somente meus')}</span>
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -1324,7 +1325,7 @@ export default function Relatorios() {
                         className="h-8 justify-start px-2 text-xs"
                         onClick={() => { setHistoryTypeFilter('all'); setHistoryTierFilter('all'); setHistoryOwnerFilter('all'); }}
                       >
-                        Limpar filtros
+                        {tx('Limpar filtros')}
                       </Button>
                     )}
                   </div>
@@ -1332,9 +1333,9 @@ export default function Relatorios() {
                   {reportsError ? (
                     <div className="text-center py-8 text-muted-foreground space-y-3">
                       <AlertTriangle className="h-8 w-8 mx-auto text-destructive" />
-                      <p>Falha ao carregar relatórios salvos.</p>
+                      <p>{tx('Falha ao carregar relatórios salvos.')}</p>
                       <Button variant="outline" size="sm" onClick={() => refetchReports()}>
-                        Tentar novamente
+                        {tx('Tentar novamente')}
                       </Button>
                     </div>
                   ) : isHistoryLoading ? (
@@ -1347,7 +1348,7 @@ export default function Relatorios() {
                         {filteredSavedReports.length === 0 ? (
                           <div className="text-center py-8 text-muted-foreground">
                             <Filter className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                            <p>Nenhum relatório combina com os filtros</p>
+                            <p>{tx('Nenhum relatório combina com os filtros')}</p>
                           </div>
                         ) : filteredSavedReports.map((r) => {
                           const tierLabel = getReportTierLabel(r.tier);
@@ -1375,12 +1376,12 @@ export default function Relatorios() {
                                     </Badge>
                                   )}
                                   {r.visibility === 'org' ? (
-                                    <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0"><Users className="h-2.5 w-2.5" />Org</Badge>
+                                    <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0"><Users className="h-2.5 w-2.5" />{tx('Org')}</Badge>
                                   ) : (
-                                    <Badge variant="secondary" className="text-[10px] gap-0.5 shrink-0"><Lock className="h-2.5 w-2.5" />Pessoal</Badge>
+                                    <Badge variant="secondary" className="text-[10px] gap-0.5 shrink-0"><Lock className="h-2.5 w-2.5" />{tx('Pessoal')}</Badge>
                                   )}
                                   {r.environment === 'demo' && (
-                                    <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0 border-amber-500 text-amber-600"><FlaskConical className="h-2.5 w-2.5" />Demo</Badge>
+                                    <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0 border-amber-500 text-amber-600"><FlaskConical className="h-2.5 w-2.5" />{tx('Demo')}</Badge>
                                   )}
                                   {isAdmin && (
                                     <Badge
@@ -1418,7 +1419,7 @@ export default function Relatorios() {
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
                       <History className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p>Nenhum relatório salvo</p>
+                      <p>{tx('Nenhum relatório salvo')}</p>
                     </div>
                   )}
                 </CardContent>
@@ -1451,7 +1452,7 @@ export default function Relatorios() {
                         className="gap-2"
                       >
                         <Download className="h-4 w-4" />
-                        Word
+                        {tx('Word')}
                       </Button>
                       <Button
                         variant="outline"
@@ -1487,15 +1488,15 @@ export default function Relatorios() {
                           entityType="report"
                           entityId={selectedHistoryReport.id}
                           orgId={selectedHistoryReport.org_id}
-                          title="Comentários do relatório"
-                          description="Discuta este relatório com sua equipe. Use @ para mencionar colegas da organização."
+                          title={tx('Comentários do relatório')}
+                          description={tx('Discuta este relatório com sua equipe. Use @ para mencionar colegas da organização.')}
                         />
                       </div>
                     </>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
                       <FileText className="h-12 w-12 mb-4 opacity-50" />
-                      <p>Selecione um relatório da lista para visualizar</p>
+                      <p>{tx('Selecione um relatório da lista para visualizar')}</p>
                     </div>
                   )}
                 </CardContent>

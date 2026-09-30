@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -140,24 +141,24 @@ export function DestinationComparison({
         <div>
           <CardTitle className="text-lg font-display flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            Comparativo de Destinos
+            {tx('Comparativo de Destinos')}
           </CardTitle>
           <CardDescription>
-            Selecione até 5 destinos para comparar os índices dos pilares
+            {tx('Selecione até 5 destinos para comparar os índices dos pilares')}
           </CardDescription>
         </div>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm">
               <Plus className="h-4 w-4 mr-2" />
-              Adicionar destino
+              {tx('Adicionar destino')}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[250px] p-0" align="end">
             <Command>
-              <CommandInput placeholder="Buscar destino..." />
+              <CommandInput placeholder={tx('Buscar destino...')} />
               <CommandList>
-                <CommandEmpty>Nenhum destino encontrado.</CommandEmpty>
+                <CommandEmpty>{tx('Nenhum destino encontrado.')}</CommandEmpty>
                 <CommandGroup>
                   {destinations.map((dest) => (
                     <CommandItem

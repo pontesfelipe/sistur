@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { 
@@ -102,10 +103,10 @@ export function CycleEvolutionChart({
         <div>
           <CardTitle className="text-lg flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            Evolução dos Ciclos ERP
+            {tx('Evolução dos Ciclos ERP')}
           </CardTitle>
           <CardDescription>
-            Acompanhamento de planos de ação e scores por ciclo de diagnóstico
+            {tx('Acompanhamento de planos de ação e scores por ciclo de diagnóstico')}
           </CardDescription>
         </div>
         {destinations && destinations.length > 0 && onDestinationChange && (
@@ -114,10 +115,10 @@ export function CycleEvolutionChart({
             onValueChange={onDestinationChange}
           >
             <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Todos os destinos" />
+              <SelectValue placeholder={tx('Todos os destinos')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os destinos</SelectItem>
+              <SelectItem value="all">{tx('Todos os destinos')}</SelectItem>
               {destinations.map((dest) => (
                 <SelectItem key={dest.id} value={dest.id}>
                   {dest.name}
@@ -131,7 +132,7 @@ export function CycleEvolutionChart({
         {chartData.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <BarChart3 className="h-12 w-12 mb-4 opacity-30" />
-            <p className="text-sm">Nenhum ciclo de diagnóstico encontrado.</p>
+            <p className="text-sm">{tx('Nenhum ciclo de diagnóstico encontrado.')}</p>
           </div>
         ) : (
           <>
@@ -154,7 +155,7 @@ export function CycleEvolutionChart({
                     {cycle.hasProject && (
                       <Badge variant="outline" className="text-xs gap-1">
                         <FolderKanban className="h-3 w-3" />
-                        Projeto
+                        {tx('Projeto')}
                       </Badge>
                     )}
                   </div>

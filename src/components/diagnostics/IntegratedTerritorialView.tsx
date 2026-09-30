@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -61,7 +62,7 @@ export function IntegratedTerritorialView({
     return (
       <Alert>
         <Info className="h-4 w-4" />
-        <AlertTitle>Visão Integrada indisponível</AlertTitle>
+        <AlertTitle>{tx('Visão Integrada indisponível')}</AlertTitle>
         <AlertDescription className="space-y-2">
           <p>{reasonText}</p>
           <p className="text-sm text-muted-foreground">
@@ -92,7 +93,7 @@ export function IntegratedTerritorialView({
             <div>
               <CardTitle className="flex items-center gap-2">
                 <GitBranch className="h-5 w-5 text-primary" />
-                Visão Integrada — Empreendimento × Município
+                {tx('Visão Integrada — Empreendimento × Município')}
               </CardTitle>
               <CardDescription className="mt-1.5 space-y-0.5">
                 <span className="flex items-center gap-1.5">
@@ -112,7 +113,7 @@ export function IntegratedTerritorialView({
             </div>
             <Button asChild variant="outline" size="sm">
               <Link to={`/diagnosticos/${data.assessment!.id}`}>
-                Abrir diagnóstico territorial
+                {tx('Abrir diagnóstico territorial')}
                 <ArrowRight className="h-3.5 w-3.5 ml-1" />
               </Link>
             </Button>
@@ -123,7 +124,7 @@ export function IntegratedTerritorialView({
       {/* Pillar-by-pillar comparison */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Comparação por Pilar</CardTitle>
+          <CardTitle className="text-base">{tx('Comparação por Pilar')}</CardTitle>
           <CardDescription>
             Score do empreendimento vs. score do município no mesmo pilar sistêmico (RA/OE/AO).
             Δ positivo indica que o empreendimento está acima do entorno.
@@ -143,13 +144,13 @@ export function IntegratedTerritorialView({
               >
                 <div className="font-medium text-sm">{PILLAR_LABELS[p]}</div>
                 <div className="text-sm">
-                  <span className="text-muted-foreground">Empreend.: </span>
+                  <span className="text-muted-foreground">{tx('Empreend.:')} </span>
                   <span className={`font-semibold ${entSev?.color ?? ''}`}>
                     {pct(ent?.score)} {entSev ? `· ${entSev.label}` : ''}
                   </span>
                 </div>
                 <div className="text-sm">
-                  <span className="text-muted-foreground">Município: </span>
+                  <span className="text-muted-foreground">{tx('Município:')} </span>
                   <span className={`font-semibold ${terrSev?.color ?? ''}`}>
                     {pct(terr?.score)} {terrSev ? `· ${terrSev.label}` : ''}
                   </span>
@@ -185,7 +186,7 @@ export function IntegratedTerritorialView({
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-severity-critical" />
-              Gargalos críticos no município
+              {tx('Gargalos críticos no município')}
             </CardTitle>
             <CardDescription>
               Esses gargalos territoriais podem afetar o desempenho do empreendimento mesmo

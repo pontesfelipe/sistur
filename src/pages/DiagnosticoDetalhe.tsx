@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
@@ -489,7 +490,7 @@ const DiagnosticoDetalhe = () => {
 
   const handleExportCSV = () => {
     if (!assessment || pillarScores.length === 0) {
-      toast.error('Nenhum dado para exportar');
+      toast.error(tx('Nenhum dado para exportar'));
       return;
     }
 
@@ -520,17 +521,17 @@ const DiagnosticoDetalhe = () => {
     link.download = `diagnostico-${assessment.title.replace(/\s+/g, '-')}.csv`;
     link.click();
     URL.revokeObjectURL(url);
-    toast.success('CSV exportado com sucesso!');
+    toast.success(tx('CSV exportado com sucesso!'));
   };
 
   const handleResetToDraft = async () => {
     if (!id) return;
     try {
       await updateAssessment.mutateAsync({ id, status: 'DRAFT' });
-      toast.success('Diagnóstico voltou para rascunho. Você pode editar os dados.');
+      toast.success(tx('Diagnóstico voltou para rascunho. Você pode editar os dados.'));
       refetchAssessment();
     } catch (error) {
-      toast.error('Erro ao resetar diagnóstico');
+      toast.error(tx('Erro ao resetar diagnóstico'));
     }
   };
 
@@ -538,7 +539,7 @@ const DiagnosticoDetalhe = () => {
   const handleRecoverAutoFill = async () => {
     if (!id) return;
     setRecovering(true);
-    const t = toast.loading('Recuperando valores automáticos e recalculando...');
+    const t = toast.loading(tx('Recuperando valores automáticos e recalculando...'));
     try {
       const { data, error } = await supabase.functions.invoke('recover-enterprise-autofill', {
         body: { assessment_id: id },
@@ -573,7 +574,7 @@ const DiagnosticoDetalhe = () => {
 
   if (loadingAssessment) {
     return (
-      <AppLayout title="Carregando...">
+      <AppLayout title={tx('Carregando...')}>
         <div className="space-y-6">
           <Skeleton className="h-32 w-full" />
           <div className="grid grid-cols-3 gap-6">
@@ -588,13 +589,13 @@ const DiagnosticoDetalhe = () => {
 
   if (!assessment) {
     return (
-      <AppLayout title="Diagnóstico não encontrado">
+      <AppLayout title={tx('Diagnóstico não encontrado')}>
         <div className="text-center py-16">
           <p className="text-muted-foreground">
-            O diagnóstico solicitado não foi encontrado.
+            {tx('O diagnóstico solicitado não foi encontrado.')}
           </p>
           <Button className="mt-4" asChild>
-            <Link to="/diagnosticos">Voltar para diagnósticos</Link>
+            <Link to="/diagnosticos">{tx('Voltar para diagnósticos')}</Link>
           </Button>
         </div>
       </AppLayout>
@@ -641,7 +642,7 @@ const DiagnosticoDetalhe = () => {
         <Button variant="ghost" asChild>
           <Link to="/diagnosticos">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar
+            {tx('Voltar')}
           </Link>
         </Button>
         <div className="flex gap-2">
@@ -649,7 +650,7 @@ const DiagnosticoDetalhe = () => {
             <div className="flex items-center gap-2 mr-2 px-3 py-1.5 rounded-lg border bg-card">
               <Target className={cn("h-4 w-4", prescriptionMode ? "text-primary" : "text-muted-foreground")} />
               <Label htmlFor="prescription-mode" className="text-sm cursor-pointer">
-                Modo Prescrição
+                {tx('Modo Prescrição')}
               </Label>
               <Switch
                 id="prescription-mode"
@@ -664,21 +665,21 @@ const DiagnosticoDetalhe = () => {
               <AlertDialogTrigger asChild>
                 <Button variant="outline">
                   <RotateCcw className="mr-2 h-4 w-4" />
-                  Editar Dados
+                  {tx('Editar Dados')}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Voltar para edição?</AlertDialogTitle>
+                  <AlertDialogTitle>{tx('Voltar para edição?')}</AlertDialogTitle>
                   <AlertDialogDescription>
                     Isso irá mudar o status do diagnóstico para "Rascunho" e você poderá editar os dados dos indicadores. 
                     Após as alterações, será necessário recalcular os índices.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
                   <AlertDialogAction onClick={handleResetToDraft}>
-                    Sim, voltar para edição
+                    {tx('Sim, voltar para edição')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -692,14 +693,14 @@ const DiagnosticoDetalhe = () => {
                 <SheetTrigger asChild>
                   <Button variant="outline" disabled={!ibgeCode}>
                     <Database className="mr-2 h-4 w-4" />
-                    Pré-preencher
+                    {tx('Pré-preencher')}
                   </Button>
                 </SheetTrigger>
                 <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
                   <SheetHeader>
-                    <SheetTitle>Pré-preenchimento de Dados Oficiais</SheetTitle>
+                    <SheetTitle>{tx('Pré-preenchimento de Dados Oficiais')}</SheetTitle>
                     <SheetDescription>
-                      Busque e valide dados de fontes oficiais para preencher automaticamente os indicadores
+                      {tx('Busque e valide dados de fontes oficiais para preencher automaticamente os indicadores')}
                     </SheetDescription>
                   </SheetHeader>
                   <div className="mt-6">
@@ -710,7 +711,7 @@ const DiagnosticoDetalhe = () => {
                       assessmentId={id}
                       includeMandala={includeMandala}
                       onValidationComplete={() => {
-                        toast.success('Dados validados com sucesso!');
+                        toast.success(tx('Dados validados com sucesso!'));
                         setIsPreFillOpen(false);
                       }}
                     />
@@ -721,7 +722,7 @@ const DiagnosticoDetalhe = () => {
               <Button variant="outline" asChild>
                 <Link to={`/diagnosticos?tab=importacao&assessment=${id}`}>
                   <Edit className="mr-2 h-4 w-4" />
-                  Preencher Dados
+                  {tx('Preencher Dados')}
                 </Link>
               </Button>
               <div className="relative group">
@@ -729,18 +730,18 @@ const DiagnosticoDetalhe = () => {
                   {calculating ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Calculando...
+                      {tx('Calculando...')}
                     </>
                   ) : (
                     <>
                       <Calculator className="mr-2 h-4 w-4" />
-                      Calcular Índices
+                      {tx('Calcular Índices')}
                     </>
                   )}
                 </Button>
                 {filledIndicators === 0 && (
                   <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-popover text-popover-foreground border rounded px-2 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                    Preencha ao menos um indicador para habilitar o cálculo
+                    {tx('Preencha ao menos um indicador para habilitar o cálculo')}
                   </span>
                 )}
               </div>
@@ -751,19 +752,19 @@ const DiagnosticoDetalhe = () => {
               <Button variant="outline" asChild>
                 <Link to={`/relatorios?assessment=${id}`}>
                   <FileText className="mr-2 h-4 w-4" />
-                  Gerar Relatório
+                  {tx('Gerar Relatório')}
                 </Link>
               </Button>
               <Button variant="outline" onClick={handleExportCSV}>
                 <Download className="mr-2 h-4 w-4" />
-                Exportar CSV
+                {tx('Exportar CSV')}
               </Button>
               {isEnterprise && (
                 <Button variant="outline" onClick={handleRecoverAutoFill} disabled={recovering}>
                   {recovering ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Recalculando…</>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{tx('Recalculando…')}</>
                   ) : (
-                    <><RefreshCw className="mr-2 h-4 w-4" />Recuperar valores automáticos</>
+                    <><RefreshCw className="mr-2 h-4 w-4" />{tx('Recuperar valores automáticos')}</>
                   )}
                 </Button>
               )}
@@ -782,7 +783,7 @@ const DiagnosticoDetalhe = () => {
                   <PlusCircle className="h-5 w-5 text-accent" />
                 </div>
                 <div>
-                  <p className="font-medium text-sm">Dados podem ser enriquecidos</p>
+                  <p className="font-medium text-sm">{tx('Dados podem ser enriquecidos')}</p>
                   <p className="text-xs text-muted-foreground">
                     {filledIndicators} de {totalIndicators} indicadores preenchidos ({Math.round(completenessPercentage)}%). 
                     Adicionar mais dados pode melhorar a precisão do diagnóstico.
@@ -794,21 +795,21 @@ const DiagnosticoDetalhe = () => {
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="outline" size="sm">
-                      Adicionar dados
+                      {tx('Adicionar dados')}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Adicionar mais dados?</AlertDialogTitle>
+                      <AlertDialogTitle>{tx('Adicionar mais dados?')}</AlertDialogTitle>
                       <AlertDialogDescription>
                         Para adicionar mais dados, o diagnóstico voltará ao status de rascunho e você poderá preencher os indicadores faltantes.
                         Após as alterações, será necessário recalcular os índices.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
                       <AlertDialogAction onClick={handleResetToDraft}>
-                        Sim, adicionar dados
+                        {tx('Sim, adicionar dados')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -828,9 +829,9 @@ const DiagnosticoDetalhe = () => {
                 <BookOpen className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-sm">Documentos da Base de Conhecimento utilizados</p>
+                <p className="font-medium text-sm">{tx('Documentos da Base de Conhecimento utilizados')}</p>
                 <p className="text-xs text-muted-foreground mt-0.5 mb-2">
-                  Os seguintes arquivos foram considerados na geração do relatório deste diagnóstico:
+                  {tx('Os seguintes arquivos foram considerados na geração do relatório deste diagnóstico:')}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {kbFilesUsed.map((f: any) => (
@@ -841,7 +842,7 @@ const DiagnosticoDetalhe = () => {
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Para atualizar com novos documentos, gere o relatório novamente.
+                  {tx('Para atualizar com novos documentos, gere o relatório novamente.')}
                 </p>
               </div>
             </div>
@@ -864,7 +865,7 @@ const DiagnosticoDetalhe = () => {
             <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
             <div>
               <p className="font-medium text-amber-700 dark:text-amber-300">
-                Dados oficiais atualizados após o último cálculo
+                {tx('Dados oficiais atualizados após o último cálculo')}
               </p>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Novos valores de fontes oficiais (IBGE, CADASTUR, STN, MTur) chegaram para este município. Recalcule para incorporá-los.
@@ -873,7 +874,7 @@ const DiagnosticoDetalhe = () => {
           </div>
           <Button onClick={handleCalculate} disabled={calculating} className="shrink-0">
             {calculating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-            Recalcular agora
+            {tx('Recalcular agora')}
           </Button>
         </div>
       )}
@@ -912,7 +913,7 @@ const DiagnosticoDetalhe = () => {
 
           {isCalculated && (
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">Calculado em</p>
+              <p className="text-sm text-muted-foreground">{tx('Calculado em')}</p>
               <p className="font-medium">{formatDate(assessment.calculated_at)}</p>
             </div>
           )}
@@ -963,17 +964,17 @@ const DiagnosticoDetalhe = () => {
           {brandRollup?.isMultiUnit && (
             <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-3">
               <div className="text-sm">
-                <strong className="text-foreground">Escopo das abas internas:</strong>{' '}
+                <strong className="text-foreground">{tx('Escopo das abas internas:')}</strong>{' '}
                 <span className="text-muted-foreground">
-                  filtre Indicadores, Gargalos e Tratamento por unidade da marca.
+                  {tx('filtre Indicadores, Gargalos e Tratamento por unidade da marca.')}
                 </span>
               </div>
               <Select value={selectedUnitId ?? '__all__'} onValueChange={handleUnitChange}>
                 <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder="Todas as unidades (marca)" />
+                  <SelectValue placeholder={tx('Todas as unidades (marca)')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__all__">Todas as unidades (marca)</SelectItem>
+                  <SelectItem value="__all__">{tx('Todas as unidades (marca)')}</SelectItem>
                   {brandRollup.units.map((u) => (
                     <SelectItem key={u.id} value={u.id}>
                       {u.unit_name}
@@ -986,7 +987,7 @@ const DiagnosticoDetalhe = () => {
               </Select>
               {selectedUnitId && (
                 <Button variant="ghost" size="sm" onClick={() => handleUnitChange('__all__')}>
-                  Limpar filtro
+                  {tx('Limpar filtro')}
                 </Button>
               )}
             </div>
@@ -994,10 +995,10 @@ const DiagnosticoDetalhe = () => {
           {prescriptionMode && (
             <Alert className="border-primary/40 bg-primary/5">
               <Target className="h-4 w-4 text-primary" />
-              <AlertTitle>Modo Prescrição ativo</AlertTitle>
+              <AlertTitle>{tx('Modo Prescrição ativo')}</AlertTitle>
               <AlertDescription>
-                Exibindo apenas indicadores em <strong>Atenção</strong> ou <strong>Crítico</strong> (score ≤ 66%).
-                Afeta as abas <strong>Indicadores</strong>, <strong>Gargalos</strong> e <strong>Tratamento</strong>.
+                Exibindo apenas indicadores em <strong>{tx('Atenção')}</strong> ou <strong>{tx('Crítico')}</strong> (score ≤ 66%).
+                Afeta as abas <strong>{tx('Indicadores')}</strong>, <strong>{tx('Gargalos')}</strong> e <strong>{tx('Tratamento')}</strong>.
                 As demais abas (Radiografia, Normalização, Projeto, Comentários, Linhagem) não são filtradas.
               </AlertDescription>
             </Alert>
@@ -1008,64 +1009,64 @@ const DiagnosticoDetalhe = () => {
           )}>
             <TabsTrigger value="sumario" className="gap-2">
               <ClipboardList className="h-4 w-4" />
-              <span className="hidden sm:inline">Sumário</span>
+              <span className="hidden sm:inline">{tx('Sumário')}</span>
             </TabsTrigger>
 
             <TabsTrigger value="radiografia" className="gap-2">
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Radiografia</span>
+              <span className="hidden sm:inline">{tx('Radiografia')}</span>
             </TabsTrigger>
             {isEnterprise && (
               <TabsTrigger value="categorias" className="gap-2">
                 <Layers className="h-4 w-4" />
-                <span className="hidden sm:inline">Categorias</span>
+                <span className="hidden sm:inline">{tx('Categorias')}</span>
               </TabsTrigger>
             )}
             {isEnterprise && (
               <TabsTrigger value="integrada" className="gap-2">
                 <GitBranch className="h-4 w-4" />
-                <span className="hidden sm:inline">Integrada</span>
+                <span className="hidden sm:inline">{tx('Integrada')}</span>
               </TabsTrigger>
             )}
             <TabsTrigger value="normalizacao" className="gap-2">
               <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Normalização</span>
+              <span className="hidden sm:inline">{tx('Normalização')}</span>
             </TabsTrigger>
             <TabsTrigger value="indicadores" className="gap-2">
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Indicadores</span>
+              <span className="hidden sm:inline">{tx('Indicadores')}</span>
             </TabsTrigger>
             <TabsTrigger value="gargalos" className="gap-2">
               <AlertTriangle className="h-4 w-4" />
-              <span className="hidden sm:inline">Gargalos</span>
+              <span className="hidden sm:inline">{tx('Gargalos')}</span>
             </TabsTrigger>
             <TabsTrigger value="tratamento" className="gap-2">
               <GraduationCap className="h-4 w-4" />
-              <span className="hidden sm:inline">Tratamento</span>
+              <span className="hidden sm:inline">{tx('Tratamento')}</span>
             </TabsTrigger>
             <TabsTrigger value="prescricao" className="gap-2">
               <Target className="h-4 w-4" />
-              <span className="hidden sm:inline">Prescrição</span>
+              <span className="hidden sm:inline">{tx('Prescrição')}</span>
             </TabsTrigger>
             <TabsTrigger value="projeto" className="gap-2">
               <FolderKanban className="h-4 w-4" />
-              <span className="hidden sm:inline">Projeto</span>
+              <span className="hidden sm:inline">{tx('Projeto')}</span>
             </TabsTrigger>
             <TabsTrigger value="comentarios" className="gap-2">
               <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">Comentários</span>
+              <span className="hidden sm:inline">{tx('Comentários')}</span>
             </TabsTrigger>
             <TabsTrigger value="linhagem" className="gap-2">
               <GitBranch className="h-4 w-4" />
-              <span className="hidden sm:inline">Linhagem</span>
+              <span className="hidden sm:inline">{tx('Linhagem')}</span>
             </TabsTrigger>
             <TabsTrigger value="comparativo" className="gap-2">
               <GitCompare className="h-4 w-4" />
-              <span className="hidden sm:inline">Comparativo</span>
+              <span className="hidden sm:inline">{tx('Comparativo')}</span>
             </TabsTrigger>
             <TabsTrigger value="simulador" className="gap-2">
               <SlidersHorizontal className="h-4 w-4" />
-              <span className="hidden sm:inline">Simulador</span>
+              <span className="hidden sm:inline">{tx('Simulador')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -1099,12 +1100,12 @@ const DiagnosticoDetalhe = () => {
             {/* Summary */}
             <div className="bg-card rounded-xl border p-6">
               <h3 className="text-lg font-display font-semibold mb-4">
-                Resumo do Diagnóstico
+                {tx('Resumo do Diagnóstico')}
               </h3>
               <div className="prose prose-sm max-w-none text-muted-foreground">
                 <p>
                   O destino <strong>{assessmentDestination?.name}</strong>{' '}
-                  apresenta como <strong>ponto crítico</strong> o pilar{' '}
+                  apresenta como <strong>{tx('ponto crítico')}</strong> o pilar{' '}
                   <strong className="text-severity-critical">
                     {criticalPillar?.pillar === 'RA'
                       ? 'Relações Ambientais (IRA)'
@@ -1124,7 +1125,7 @@ const DiagnosticoDetalhe = () => {
                   </strong>
                   . O sistema recomenda{' '}
                   <strong>{recommendations.length} cursos de capacitação</strong>{' '}
-                  para endereçar os problemas identificados.
+                  {tx('para endereçar os problemas identificados.')}
                 </p>
               </div>
             </div>
@@ -1182,10 +1183,10 @@ const DiagnosticoDetalhe = () => {
                   </div>
                   <div>
                     <h3 className="font-display font-semibold text-foreground">
-                      Categorias Empresarial
+                      {tx('Categorias Empresarial')}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Visão consolidada por categorias: Performance, Sustentabilidade, Governança e mais
+                      {tx('Visão consolidada por categorias: Performance, Sustentabilidade, Governança e mais')}
                     </p>
                   </div>
                 </div>
@@ -1219,7 +1220,7 @@ const DiagnosticoDetalhe = () => {
             {prescriptionMode && (
               <Alert>
                 <Target className="h-4 w-4" />
-                <AlertTitle>Modo Prescrição ativo</AlertTitle>
+                <AlertTitle>{tx('Modo Prescrição ativo')}</AlertTitle>
                 <AlertDescription>
                   Exibindo apenas indicadores em Atenção ou Crítico
                   ({displayedIndicatorScores.length} de {indicatorScores.length}).
@@ -1246,10 +1247,10 @@ const DiagnosticoDetalhe = () => {
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-foreground">
-                    SISTUR EDU — Plano de Capacitação
+                    {tx('SISTUR EDU — Plano de Capacitação')}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Prescrições automáticas baseadas nos indicadores críticos e em atenção
+                    {tx('Prescrições automáticas baseadas nos indicadores críticos e em atenção')}
                   </p>
                 </div>
               </div>
@@ -1328,10 +1329,10 @@ const DiagnosticoDetalhe = () => {
               indicatorScores={indicatorScores as any}
               pillarScores={pillarScores as any}
             />
-            <RevenueIntelligenceGate title="O Gêmeo Digital">
+            <RevenueIntelligenceGate title={tx('O Gêmeo Digital')}>
               <DigitalTwinPanel pillarScores={pillarScores as any} assessmentId={assessment.id} orgId={(assessment as any).org_id} destinationId={assessment.destination_id} />
             </RevenueIntelligenceGate>
-            {assessment.destination_id && <RevenueIntelligenceGate title="O Geomarketing"><GeomarketingPanel destinationId={assessment.destination_id} /></RevenueIntelligenceGate>}
+            {assessment.destination_id && <RevenueIntelligenceGate title={tx('O Geomarketing')}><GeomarketingPanel destinationId={assessment.destination_id} /></RevenueIntelligenceGate>}
           </TabsContent>
         </Tabs>
         ))
@@ -1357,12 +1358,12 @@ const DiagnosticoDetalhe = () => {
               <>
                 <Button variant="default" asChild>
                   <Link to={`/nova-rodada?resume=${id}`}>
-                    Continuar Fluxo Guiado
+                    {tx('Continuar Fluxo Guiado')}
                   </Link>
                 </Button>
                 <Button variant="outline" asChild>
                   <Link to={`/diagnosticos?tab=importacao&assessment=${id}`}>
-                    Ir direto para Preenchimento
+                    {tx('Ir direto para Preenchimento')}
                   </Link>
                 </Button>
               </>
@@ -1371,12 +1372,12 @@ const DiagnosticoDetalhe = () => {
               {calculating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Calculando...
+                  {tx('Calculando...')}
                 </>
               ) : (
                 <>
                   <Calculator className="mr-2 h-4 w-4" />
-                  Calcular Índices
+                  {tx('Calcular Índices')}
                 </>
               )}
             </Button>

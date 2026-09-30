@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,7 +73,7 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
       org_id: orgId, assessment_id: assessmentId, name, preset, years, intensities, projection: current as any,
     });
     if (error) { toast.error(error.code === '42501' ? 'Sem permissão para salvar cenários nesta organização.' : error.message); return; }
-    setScenarioName(''); toast.success('Cenário salvo');
+    setScenarioName(''); toast.success(tx('Cenário salvo'));
     qc.invalidateQueries({ queryKey: ['twin-scenarios', assessmentId] });
   };
   const loadScenario = (s: any) => { setPreset(s.preset in PRESETS ? s.preset : 'Base'); setYears(s.years); setIntensities({ ...intensities, ...(s.intensities || {}) }); };
@@ -104,7 +105,7 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader className="pb-3"><CardTitle className="text-base">Gêmeo Digital — cenários de 1 a 5 anos</CardTitle></CardHeader>
+        <CardHeader className="pb-3"><CardTitle className="text-base">{tx('Gêmeo Digital — cenários de 1 a 5 anos')}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
             Escolha um cenário e ajuste as alavancas. Os efeitos seguem regras sistêmicas: meio ambiente fraco (RA abaixo de 34%) limita ganhos operacionais, e governança fraca (OE abaixo de 34%) reduz todos os ganhos. Nada é salvo no diagnóstico oficial.
@@ -114,7 +115,7 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
               <Button key={n} size="sm" variant={preset === n ? 'default' : 'outline'} onClick={() => applyPreset(n)}>{n}</Button>
             ))}
             <span className="ml-4 text-sm">Horizonte: {years} ano(s)</span>
-            <div className="w-40"><Slider value={[years]} min={1} max={5} step={1} onValueChange={([v]) => setYears(v)} aria-label="Horizonte" /></div>
+            <div className="w-40"><Slider value={[years]} min={1} max={5} step={1} onValueChange={([v]) => setYears(v)} aria-label={tx('Horizonte')} /></div>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             {TWIN_LEVERS.map((l) => (
@@ -127,13 +128,13 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
             ))}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Input className="w-64" placeholder="Nome do cenário (opcional)" value={scenarioName} onChange={(e) => setScenarioName(e.target.value)} />
-            <Button size="sm" variant="outline" onClick={saveScenario} disabled={!assessmentId}><Save className="h-4 w-4 mr-1" />Salvar cenário</Button>
-            <Button size="sm" onClick={toProject} disabled={!destinationId || createProject.isPending}><FolderPlus className="h-4 w-4 mr-1" />Transformar cenário em projeto</Button>
+            <Input className="w-64" placeholder={tx('Nome do cenário (opcional)')} value={scenarioName} onChange={(e) => setScenarioName(e.target.value)} />
+            <Button size="sm" variant="outline" onClick={saveScenario} disabled={!assessmentId}><Save className="h-4 w-4 mr-1" />{tx('Salvar cenário')}</Button>
+            <Button size="sm" onClick={toProject} disabled={!destinationId || createProject.isPending}><FolderPlus className="h-4 w-4 mr-1" />{tx('Transformar cenário em projeto')}</Button>
           </div>
           {saved.length > 0 && (
             <div className="space-y-1">
-              <p className="text-sm font-medium">Cenários salvos</p>
+              <p className="text-sm font-medium">{tx('Cenários salvos')}</p>
               {saved.map((s: any) => {
                 const l = (s.projection || [])[s.projection?.length - 1];
                 return (
@@ -142,7 +143,7 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
                       <b>{s.name}</b> · {new Date(s.created_at).toLocaleDateString('pt-BR')}
                       {l && <span className="text-muted-foreground"> — RA {Math.round(l.RA * 100)}% · OE {Math.round(l.OE * 100)}% · AO {Math.round(l.AO * 100)}%</span>}
                     </button>
-                    <Button size="icon" variant="ghost" aria-label="Excluir cenário" onClick={() => deleteScenario(s.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <Button size="icon" variant="ghost" aria-label={tx('Excluir cenário')} onClick={() => deleteScenario(s.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 );
               })}

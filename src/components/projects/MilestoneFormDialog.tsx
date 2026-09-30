@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -112,30 +113,30 @@ export function MilestoneFormDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="milestone-name">Nome do Marco *</Label>
+            <Label htmlFor="milestone-name">{tx('Nome do Marco *')}</Label>
             <Input
               id="milestone-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Ex: Entrega da primeira versão"
+              placeholder={tx('Ex: Entrega da primeira versão')}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="milestone-description">Descrição</Label>
+            <Label htmlFor="milestone-description">{tx('Descrição')}</Label>
             <Textarea
               id="milestone-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descrição do marco"
+              placeholder={tx('Descrição do marco')}
               rows={2}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="milestone-target">Data Prevista *</Label>
+              <Label htmlFor="milestone-target">{tx('Data Prevista *')}</Label>
               <Input
                 id="milestone-target"
                 type="date"
@@ -146,7 +147,7 @@ export function MilestoneFormDialog({
             </div>
 
             <div className="space-y-2">
-              <Label>Status</Label>
+              <Label>{tx('Status')}</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as MilestoneStatus)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -164,7 +165,7 @@ export function MilestoneFormDialog({
 
           {status === 'completed' && (
             <div className="space-y-2">
-              <Label htmlFor="milestone-completed">Data de Conclusão</Label>
+              <Label htmlFor="milestone-completed">{tx('Data de Conclusão')}</Label>
               <Input
                 id="milestone-completed"
                 type="date"
@@ -176,7 +177,7 @@ export function MilestoneFormDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
+              {tx('Cancelar')}
             </Button>
             <Button type="submit" disabled={isPending || !name || !targetDate}>
               {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}

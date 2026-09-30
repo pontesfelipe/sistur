@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -145,20 +146,20 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <GraduationCap className="h-5 w-5 text-accent" />
-            Prescrições SISTUR EDU
+            {tx('Prescrições SISTUR EDU')}
           </CardTitle>
           <CardDescription>
-            Cursos e lives recomendados com base nos indicadores
+            {tx('Cursos e lives recomendados com base nos indicadores')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
             <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
             <p className="text-muted-foreground text-sm">
-              Nenhuma prescrição encontrada para os indicadores atuais.
+              {tx('Nenhuma prescrição encontrada para os indicadores atuais.')}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              Isso pode ocorrer se não houver mapeamentos configurados ou se todos os indicadores estão adequados.
+              {tx('Isso pode ocorrer se não houver mapeamentos configurados ou se todos os indicadores estão adequados.')}
             </p>
           </div>
         </CardContent>
@@ -183,7 +184,7 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
       {/* Pillar Filter */}
       <div className="flex items-center gap-3">
         <Filter className="h-4 w-4 text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">Filtrar por pilar:</span>
+        <span className="text-sm text-muted-foreground">{tx('Filtrar por pilar:')}</span>
         <ToggleGroup 
           type="single" 
           value={pillarFilter} 
@@ -191,7 +192,7 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
           className="gap-1"
         >
           <ToggleGroupItem value="all" size="sm" className="text-xs px-3">
-            Todos
+            {tx('Todos')}
             <Badge variant="secondary" className="ml-1.5 text-xs px-1.5 py-0">
               {pillarCounts.all}
             </Badge>
@@ -240,11 +241,11 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" />
-              Cursos Prescritos
+              {tx('Cursos Prescritos')}
               <Badge variant="secondary" className="ml-2">{courses.length}</Badge>
             </CardTitle>
             <CardDescription>
-              Capacitações estruturadas baseadas nos gargalos identificados
+              {tx('Capacitações estruturadas baseadas nos gargalos identificados')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -273,11 +274,11 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Video className="h-5 w-5 text-accent" />
-              Lives Prescritas
+              {tx('Lives Prescritas')}
               <Badge variant="secondary" className="ml-2">{lives.length}</Badge>
             </CardTitle>
             <CardDescription>
-              Conteúdos audiovisuais para aprofundamento temático
+              {tx('Conteúdos audiovisuais para aprofundamento temático')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -366,7 +367,7 @@ function RecommendationItem({ rec, index }: { rec: DisplayRecommendation; index:
       </div>
       <Button variant="outline" size="sm" asChild>
         <Link to={`/edu/training/${rec.training.training_id}`}>
-          Ver
+          {tx('Ver')}
         </Link>
       </Button>
     </div>

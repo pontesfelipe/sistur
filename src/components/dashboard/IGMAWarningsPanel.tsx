@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -117,7 +118,7 @@ export function IGMAWarningsPanel({
           <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
             <Ban className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">
-              Ações bloqueadas: 
+              {tx('Ações bloqueadas:')}
             </span>
             <div className="flex gap-1 flex-wrap">
               {igmaInterpretation.blockedActions.map(action => {
@@ -143,13 +144,13 @@ export function IGMAWarningsPanel({
           <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
             <Calendar className="h-4 w-4 text-primary" />
             <div className="flex-1">
-              <p className="text-sm font-medium">Próxima Revisão Recomendada</p>
+              <p className="text-sm font-medium">{tx('Próxima Revisão Recomendada')}</p>
               <p className="text-sm text-muted-foreground">
                 {format(new Date(nextReviewRecommendedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
               </p>
             </div>
             <Badge variant="outline" className="text-xs">
-              Ciclo Contínuo
+              {tx('Ciclo Contínuo')}
             </Badge>
           </div>
         )}
@@ -158,12 +159,12 @@ export function IGMAWarningsPanel({
         <div className="pt-2 border-t flex items-center justify-between">
           <p className="text-xs text-muted-foreground flex items-center gap-1">
             <Info className="h-3 w-3" />
-            Baseado nos princípios sistêmicos do Prof. Mario Beni
+            {tx('Baseado nos princípios sistêmicos do Prof. Mario Beni')}
           </p>
           <Button variant="ghost" size="sm" asChild className="h-7 text-xs">
             <Link to="/metodologia" className="flex items-center gap-1">
               <BookMarked className="h-3 w-3" />
-              Ver metodologia
+              {tx('Ver metodologia')}
             </Link>
           </Button>
         </div>

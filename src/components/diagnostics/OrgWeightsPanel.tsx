@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -84,7 +85,7 @@ export function OrgWeightsPanel() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Pesos de pilar atualizados — diagnósticos marcados para recálculo');
+      toast.success(tx('Pesos de pilar atualizados — diagnósticos marcados para recálculo'));
       qc.invalidateQueries({ queryKey: ['org-pillar-weights', orgId] });
     },
     onError: (e: any) => toast.error(`Erro: ${e.message}`),
@@ -96,7 +97,7 @@ export function OrgWeightsPanel() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Pesos de pilar restaurados ao padrão');
+      toast.success(tx('Pesos de pilar restaurados ao padrão'));
       setDraft(null);
       qc.invalidateQueries({ queryKey: ['org-pillar-weights', orgId] });
     },
@@ -113,7 +114,7 @@ export function OrgWeightsPanel() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Peso do indicador atualizado');
+      toast.success(tx('Peso do indicador atualizado'));
       qc.invalidateQueries({ queryKey: ['org-indicator-weights', orgId] });
     },
     onError: (e: any) => toast.error(`Erro: ${e.message}`),
@@ -122,7 +123,7 @@ export function OrgWeightsPanel() {
   const overriddenCount = indicatorWeights?.filter(i => i.is_overridden).length ?? 0;
 
   if (!orgId) {
-    return <Card><CardContent className="py-8 text-center text-muted-foreground">Selecione uma organização.</CardContent></Card>;
+    return <Card><CardContent className="py-8 text-center text-muted-foreground">{tx('Selecione uma organização.')}</CardContent></Card>;
   }
 
   return (
@@ -130,7 +131,7 @@ export function OrgWeightsPanel() {
       <div>
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Sliders className="h-5 w-5" />
-          Pesos Customizáveis da Organização
+          {tx('Pesos Customizáveis da Organização')}
         </h3>
         <p className="text-sm text-muted-foreground">
           Ajuste a importância relativa de cada pilar e indicador no Score Final do diagnóstico.
@@ -140,9 +141,9 @@ export function OrgWeightsPanel() {
 
       <Tabs defaultValue="pillars">
         <TabsList>
-          <TabsTrigger value="pillars">Pesos por Pilar</TabsTrigger>
+          <TabsTrigger value="pillars">{tx('Pesos por Pilar')}</TabsTrigger>
           <TabsTrigger value="indicators">
-            Pesos por Indicador
+            {tx('Pesos por Indicador')}
             {overriddenCount > 0 && <Badge variant="outline" className="ml-2 h-5">{overriddenCount}</Badge>}
           </TabsTrigger>
         </TabsList>
@@ -150,10 +151,10 @@ export function OrgWeightsPanel() {
         <TabsContent value="pillars" className="space-y-4 mt-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Distribuição entre Pilares (RA / OE / AO)</CardTitle>
+              <CardTitle className="text-base">{tx('Distribuição entre Pilares (RA / OE / AO)')}</CardTitle>
               <CardDescription>
-                Padrão SISTUR: RA 35% / OE 30% / AO 35%. A soma dos três pesos deve ser exatamente 100%.
-                {isCustom && <Badge variant="outline" className="ml-2 bg-violet-500/15 text-violet-700 dark:text-violet-300">Personalizado</Badge>}
+                {tx('Padrão SISTUR: RA 35% / OE 30% / AO 35%. A soma dos três pesos deve ser exatamente 100%.')}
+                {isCustom && <Badge variant="outline" className="ml-2 bg-violet-500/15 text-violet-700 dark:text-violet-300">{tx('Personalizado')}</Badge>}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -182,7 +183,7 @@ export function OrgWeightsPanel() {
                   <div className={`flex items-center justify-between p-3 rounded-md border ${sumValid ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-destructive/10 border-destructive/30'}`}>
                     <span className="text-sm font-medium flex items-center gap-2">
                       {sumValid ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <AlertTriangle className="h-4 w-4 text-destructive" />}
-                      Soma total
+                      {tx('Soma total')}
                     </span>
                     <span className="font-bold tabular-nums">{(sum * 100).toFixed(1)}%</span>
                   </div>
@@ -194,14 +195,14 @@ export function OrgWeightsPanel() {
                       disabled={!isCustom || resetPillarsMutation.isPending}
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
-                      Restaurar padrão
+                      {tx('Restaurar padrão')}
                     </Button>
                     <Button
                       onClick={() => setPillarsMutation.mutate(draft)}
                       disabled={!sumValid || setPillarsMutation.isPending}
                     >
                       <Save className="h-4 w-4 mr-2" />
-                      Salvar pesos
+                      {tx('Salvar pesos')}
                     </Button>
                   </div>
                 </>
@@ -213,7 +214,7 @@ export function OrgWeightsPanel() {
         <TabsContent value="indicators" className="space-y-4 mt-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Sobreposições de Peso por Indicador</CardTitle>
+              <CardTitle className="text-base">{tx('Sobreposições de Peso por Indicador')}</CardTitle>
               <CardDescription>
                 Padrão = peso global do catálogo. Edite para sobrepor apenas neste contexto organizacional.
                 Limpe o campo (deixe vazio e Enter) para restaurar o padrão.
@@ -262,7 +263,7 @@ function IndicatorWeightTable({
     } else {
       const w = Number(raw.replace(',', '.'));
       if (isNaN(w) || w < 0 || w > 10) {
-        toast.error('Peso deve ser entre 0 e 10');
+        toast.error(tx('Peso deve ser entre 0 e 10'));
         return;
       }
       if (Math.abs(w - defaultW) < 0.001) {
@@ -293,12 +294,12 @@ function IndicatorWeightTable({
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
-              <TableHead>Indicador</TableHead>
-              <TableHead>Pilar</TableHead>
-              <TableHead className="text-right">Padrão</TableHead>
-              <TableHead className="text-right">Efetivo</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[160px]">Ajustar</TableHead>
+              <TableHead>{tx('Indicador')}</TableHead>
+              <TableHead>{tx('Pilar')}</TableHead>
+              <TableHead className="text-right">{tx('Padrão')}</TableHead>
+              <TableHead className="text-right">{tx('Efetivo')}</TableHead>
+              <TableHead>{tx('Status')}</TableHead>
+              <TableHead className="w-[160px]">{tx('Ajustar')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -313,9 +314,9 @@ function IndicatorWeightTable({
                 <TableCell className="text-right tabular-nums font-medium">{Number(r.effective_weight).toFixed(2)}</TableCell>
                 <TableCell>
                   {r.is_overridden ? (
-                    <Badge variant="outline" className="bg-violet-500/15 text-violet-700 dark:text-violet-300">Personalizado</Badge>
+                    <Badge variant="outline" className="bg-violet-500/15 text-violet-700 dark:text-violet-300">{tx('Personalizado')}</Badge>
                   ) : (
-                    <Badge variant="outline" className="text-muted-foreground">Padrão</Badge>
+                    <Badge variant="outline" className="text-muted-foreground">{tx('Padrão')}</Badge>
                   )}
                 </TableCell>
                 <TableCell>

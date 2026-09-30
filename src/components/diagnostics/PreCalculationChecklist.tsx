@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -79,7 +80,7 @@ export function PreCalculationChecklist({ indicators, indicatorValues, tier, isE
         <CardTitle className="text-base flex items-center justify-between">
           <span className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-primary" />
-            Validação Pré-Cálculo
+            {tx('Validação Pré-Cálculo')}
           </span>
           <Badge variant={analysis.qualityScore >= 70 ? 'default' : analysis.qualityScore >= 40 ? 'secondary' : 'destructive'}>
             Qualidade: {analysis.qualityScore}%
@@ -90,7 +91,7 @@ export function PreCalculationChecklist({ indicators, indicatorValues, tier, isE
         {/* Overall progress */}
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="text-muted-foreground">Preenchimento geral</span>
+            <span className="text-muted-foreground">{tx('Preenchimento geral')}</span>
             <span className="font-medium">{analysis.totalFilled}/{analysis.totalRequired} ({Math.round(overallPct)}%)</span>
           </div>
           <Progress value={overallPct} className="h-2" />
@@ -158,15 +159,15 @@ export function PreCalculationChecklist({ indicators, indicatorValues, tier, isE
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="p-2 rounded-lg bg-muted/50">
             <p className="text-lg font-bold">{Math.round(analysis.completeness * 100)}%</p>
-            <p className="text-[10px] text-muted-foreground">Completude</p>
+            <p className="text-[10px] text-muted-foreground">{tx('Completude')}</p>
           </div>
           <div className="p-2 rounded-lg bg-muted/50">
             <p className="text-lg font-bold">{analysis.autoCount}</p>
-            <p className="text-[10px] text-muted-foreground">Automáticos</p>
+            <p className="text-[10px] text-muted-foreground">{tx('Automáticos')}</p>
           </div>
           <div className="p-2 rounded-lg bg-muted/50">
             <p className="text-lg font-bold">{analysis.manualCount}</p>
-            <p className="text-[10px] text-muted-foreground">Manuais</p>
+            <p className="text-[10px] text-muted-foreground">{tx('Manuais')}</p>
           </div>
         </div>
       </CardContent>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -87,7 +88,7 @@ export function EnterpriseOrgBenchmark({ orgId, currentDestinationId, currentAss
           Benchmark interno ({data.total} empreendimentos)
         </CardTitle>
         <CardDescription>
-          Comparação anônima entre empreendimentos Enterprise da mesma organização. Sem ranking público — uso interno apenas.
+          {tx('Comparação anônima entre empreendimentos Enterprise da mesma organização. Sem ranking público — uso interno apenas.')}
         </CardDescription>
       </CardHeader>
       <CardContent>

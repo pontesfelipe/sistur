@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -83,9 +84,9 @@ export function StaleAssessmentsPanel() {
     return (
       <div className="text-center py-12 bg-card rounded-xl border">
         <CheckCircle2 className="mx-auto h-12 w-12 text-severity-good" />
-        <h3 className="mt-4 text-lg font-semibold">Tudo em dia</h3>
+        <h3 className="mt-4 text-lg font-semibold">{tx('Tudo em dia')}</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          Nenhum diagnóstico com dados oficiais desatualizados aguardando recálculo.
+          {tx('Nenhum diagnóstico com dados oficiais desatualizados aguardando recálculo.')}
         </p>
       </div>
     );
@@ -101,7 +102,7 @@ export function StaleAssessmentsPanel() {
               {rows.length} diagnóstico{rows.length > 1 ? 's' : ''} com dados oficiais atualizados após o último cálculo
             </p>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Recalcule para incorporar os novos valores de IBGE, CADASTUR, STN ou Mapa do Turismo.
+              {tx('Recalcule para incorporar os novos valores de IBGE, CADASTUR, STN ou Mapa do Turismo.')}
             </p>
           </div>
         </div>
@@ -156,7 +157,7 @@ export function StaleAssessmentsPanel() {
                 disabled={isThis || bulkRunning}
               >
                 {isThis ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                <span className="ml-2 hidden sm:inline">Recalcular</span>
+                <span className="ml-2 hidden sm:inline">{tx('Recalcular')}</span>
               </Button>
             </div>
           );

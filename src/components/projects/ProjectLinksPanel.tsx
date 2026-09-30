@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo, useState } from "react";
 import {
   useProjectExternalLinks,
@@ -79,18 +80,18 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-lg flex items-center gap-2"><Link2 className="h-5 w-5" /> Vínculos Externos</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2"><Link2 className="h-5 w-5" /> {tx('Vínculos Externos')}</CardTitle>
             <CardDescription>
-              Conecte este projeto a oportunidades de investimento, consórcios regionais, alertas do observatório e issues do diagnóstico.
+              {tx('Conecte este projeto a oportunidades de investimento, consórcios regionais, alertas do observatório e issues do diagnóstico.')}
             </CardDescription>
           </div>
-          <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4 mr-1" /> Novo vínculo</Button>
+          <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4 mr-1" /> {tx('Novo vínculo')}</Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {isLoading ? (
             <div className="py-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin" /></div>
           ) : links.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">Nenhum vínculo registrado.</p>
+            <p className="text-sm text-muted-foreground text-center py-6">{tx('Nenhum vínculo registrado.')}</p>
           ) : (
             (Object.keys(grouped) as ExternalLinkType[]).map((t) => {
               const items = grouped[t];
@@ -124,10 +125,10 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Novo vínculo externo</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tx('Novo vínculo externo')}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
-              <Label>Tipo</Label>
+              <Label>{tx('Tipo')}</Label>
               <Select value={type} onValueChange={(v) => { setType(v as ExternalLinkType); setExternalId(""); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -140,10 +141,10 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
             <div>
               <Label>Item ({options.length} disponíveis)</Label>
               <Select value={externalId} onValueChange={setExternalId}>
-                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tx('Selecione...')} /></SelectTrigger>
                 <SelectContent>
                   {options.length === 0 ? (
-                    <div className="p-2 text-xs text-muted-foreground">Nenhum item disponível</div>
+                    <div className="p-2 text-xs text-muted-foreground">{tx('Nenhum item disponível')}</div>
                   ) : options.map((o) => (
                     <SelectItem key={o.id} value={o.id}>{o.label}</SelectItem>
                   ))}
@@ -151,12 +152,12 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
               </Select>
             </div>
             <div>
-              <Label>Notas (opcional)</Label>
-              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Por que este item se relaciona ao projeto?" />
+              <Label>{tx('Notas (opcional)')}</Label>
+              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={tx('Por que este item se relaciona ao projeto?')} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>{tx('Cancelar')}</Button>
             <Button onClick={submit} disabled={!externalId || create.isPending}>
               {create.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />} Vincular
             </Button>

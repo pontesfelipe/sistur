@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -44,10 +45,10 @@ export function OverdueProjectsList({ projects, isLoading }: OverdueProjectsList
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2 text-severity-good">
             <CheckCircle2 className="h-5 w-5" />
-            Projetos Atrasados
+            {tx('Projetos Atrasados')}
           </CardTitle>
           <CardDescription className="text-severity-good">
-            Nenhum projeto atrasado! Excelente gestão de cronograma.
+            {tx('Nenhum projeto atrasado! Excelente gestão de cronograma.')}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -62,7 +63,7 @@ export function OverdueProjectsList({ projects, isLoading }: OverdueProjectsList
           Projetos Atrasados ({projects.length})
         </CardTitle>
         <CardDescription>
-          Projetos que ultrapassaram a data de término prevista
+          {tx('Projetos que ultrapassaram a data de término prevista')}
         </CardDescription>
       </CardHeader>
       <CardContent>

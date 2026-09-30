@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { cn } from '@/lib/utils';
 import { LucideIcon } from 'lucide-react';
 
@@ -50,7 +51,7 @@ export function StatCard({ title, value, icon: Icon, trend, variant = 'default',
               )}
             >
               {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
-              <span className="text-muted-foreground font-normal ml-1">vs. anterior</span>
+              <span className="text-muted-foreground font-normal ml-1">{tx('vs. anterior')}</span>
             </p>
           )}
         </div>

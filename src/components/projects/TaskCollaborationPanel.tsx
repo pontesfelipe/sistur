@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -81,9 +82,9 @@ function RaciSection({ taskId, projectId, canEdit }: { taskId: string; projectId
                     </PopoverTrigger>
                     <PopoverContent className="w-64 p-0" align="start">
                       <Command>
-                        <CommandInput placeholder="Buscar..." />
+                        <CommandInput placeholder={tx('Buscar...')} />
                         <CommandList>
-                          <CommandEmpty>Sem usuários.</CommandEmpty>
+                          <CommandEmpty>{tx('Sem usuários.')}</CommandEmpty>
                           <CommandGroup>
                             {users
                               .filter((u) => !entries.some((e) => e.user_id === u.user_id))
@@ -137,7 +138,7 @@ function CommentsSection({ taskId, projectId }: { taskId: string; projectId: str
       <CardContent className="space-y-3">
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {comments.length === 0 && (
-            <p className="text-xs text-muted-foreground text-center py-4">Nenhum comentário ainda.</p>
+            <p className="text-xs text-muted-foreground text-center py-4">{tx('Nenhum comentário ainda.')}</p>
           )}
           {comments.map((c) => (
             <div key={c.id} className="flex gap-2 group">
@@ -169,7 +170,7 @@ function CommentsSection({ taskId, projectId }: { taskId: string; projectId: str
         <div className="flex gap-2">
           <Textarea
             value={body} onChange={(e) => setBody(e.target.value)}
-            placeholder="Escrever comentário..." rows={2} className="text-sm"
+            placeholder={tx('Escrever comentário...')} rows={2} className="text-sm"
             onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit(); }}
           />
           <Button size="sm" onClick={submit} disabled={!body.trim() || addComment.isPending}>
@@ -193,7 +194,7 @@ function ActivitySection({ taskId }: { taskId: string }) {
       </CardHeader>
       <CardContent>
         {activity.length === 0 ? (
-          <p className="text-xs text-muted-foreground text-center py-3">Sem registros.</p>
+          <p className="text-xs text-muted-foreground text-center py-3">{tx('Sem registros.')}</p>
         ) : (
           <ul className="space-y-1.5 text-xs max-h-48 overflow-y-auto">
             {activity.map((a) => (
@@ -202,12 +203,12 @@ function ActivitySection({ taskId }: { taskId: string }) {
                   {format(new Date(a.created_at), "dd/MM HH:mm", { locale: ptBR })}
                 </span>
                 <span>
-                  {a.action === 'created' && <>Tarefa criada</>}
+                  {a.action === 'created' && <>{tx('Tarefa criada')}</>}
                   {a.action === 'status_changed' && (
-                    <>Status: <strong>{a.old_value}</strong> <ArrowRight className="inline h-3 w-3" /> <strong>{a.new_value}</strong></>
+                    <>{tx('Status:')} <strong>{a.old_value}</strong> <ArrowRight className="inline h-3 w-3" /> <strong>{a.new_value}</strong></>
                   )}
                   {a.action === 'assigned' && (
-                    <>Responsável alterado</>
+                    <>{tx('Responsável alterado')}</>
                   )}
                   {!['created','status_changed','assigned'].includes(a.action) && a.action}
                 </span>
