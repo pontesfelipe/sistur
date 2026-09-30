@@ -89,7 +89,7 @@ function PlanCard({
               <Badge variant="secondary">15% de desconto</Badge>
             </div>
             <p className="text-xs text-muted-foreground">
-              Equivale a {formatBRL(Math.floor(p.annual_price_cents! / 12))}/mês, pago uma vez por ano.
+              Equivale a {formatBRL(Math.floor(p.annual_price_cents! / 1200) * 100)}/mês, pago uma vez por ano.
             </p>
           </div>
         ) : (
