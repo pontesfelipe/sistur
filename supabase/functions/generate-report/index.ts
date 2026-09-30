@@ -2914,7 +2914,15 @@ serve(async (req) => {
       traceId: bodyTraceId,
       // v1.54.1 — Pilares já gerados em tentativa anterior (resume).
       partialPillars: incomingPartialPillars,
+      // v2.20.1 — idioma da interface do usuário (pt-BR | en | es).
+      language: rawLanguage,
     } = await req.json();
+    const reportLanguage: 'pt-BR' | 'en' | 'es' = rawLanguage === 'en' || rawLanguage === 'es' ? rawLanguage : 'pt-BR';
+    const LANG_BLOCK = reportLanguage === 'en'
+      ? '\n\nIDIOMA DE SAÍDA: escreva TODO o relatório em INGLÊS (títulos, textos e tabelas). Mantenha as siglas RA, OE, AO, IGMA e nomes de fontes oficiais; traduza nomes dos pilares e status (Adequado=Adequate, Atenção=Attention, Crítico=Critical). Valores monetários continuam em R$.'
+      : reportLanguage === 'es'
+      ? '\n\nIDIOMA DE SALIDA: escreva TODO o relatório em ESPANHOL (títulos, textos e tabelas). Mantenha as siglas RA, OE, AO, IGMA e nomes de fontes oficiais; traduza nomes dos pilares e status (Adequado=Adecuado, Atenção=Atención, Crítico=Crítico). Valores monetários continuam em R$.'
+      : '';
 
     const appVersion: string = (typeof rawAppVersion === 'string' && /^v?\d+\.\d+\.\d+/.test(rawAppVersion))
       ? (rawAppVersion.startsWith('v') ? rawAppVersion : `v${rawAppVersion}`)
@@ -2993,6 +3001,7 @@ serve(async (req) => {
             // v1.38.53 — Persistir payload + JWT para o worker independente
             // (process-report-job) executar sem depender do request original.
             payload: {
+              language: reportLanguage,
               assessmentId,
               destinationName,
               pillarScores,
@@ -3467,7 +3476,7 @@ INSTRUÇÕES SOBRE COMPARATIVO TEMPORAL:
     const systemPrompt =
       (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') +
       getSystemPrompt(reportTemplate, isEnterprise) +
-      (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
+      (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '') + LANG_BLOCK;
 
     const prescriptionsText = prescriptions?.length > 0 
       ? prescriptions.map((p: any) => `- [${p.status}] ${p.justification} (Pilar: ${p.pillar}, Agente: ${p.target_agent}, Prioridade: ${p.priority || 'N/A'})`).join('\n')
@@ -3907,14 +3916,14 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         if (useParallelPipeline) {
           logger.stage('parallel_pipeline_enabled', { template: reportTemplate, isEnterprise });
           const systemPromptByPillar = {
-            RA: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('RA', isEnterprise),
-            OE: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('OE', isEnterprise),
-            AO: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('AO', isEnterprise),
+            RA: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('RA', isEnterprise) + LANG_BLOCK,
+            OE: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('OE', isEnterprise) + LANG_BLOCK,
+            AO: (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') + getPillarSystemPrompt('AO', isEnterprise) + LANG_BLOCK,
           };
           const envelopeSystemPrompt =
             (REPORT_CONTEXT_BLOCK ? `${REPORT_CONTEXT_BLOCK}\n\n` : '') +
             getEnvelopeSystemPrompt(reportTemplate, isEnterprise) +
-            (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '');
+            (REPORT_STRUCTURE_BLOCK ? `\n\n${REPORT_STRUCTURE_BLOCK}` : '') + LANG_BLOCK;
 
           // O userPrompt já contém TODO o contexto. Para os pilares, mandamos
           // o mesmo userPrompt — o systemPrompt é que restringe o escopo.

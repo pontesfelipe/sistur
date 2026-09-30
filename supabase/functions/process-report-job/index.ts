@@ -224,6 +224,7 @@ async function handle(req: Request): Promise<Response> {
           backgroundRun: false,
           aiProvider: payload.aiProvider ?? "auto",
           appVersion: payload.appVersion,
+          language: payload.language,
           traceId,
           partialPillars,
         }),

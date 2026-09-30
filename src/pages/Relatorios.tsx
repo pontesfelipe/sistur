@@ -1,3 +1,4 @@
+import { getCurrentLanguage } from '@/i18n';
 import { tx } from '@/i18n/t';
 import { useState, useRef, useEffect, useMemo, type RefObject } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -379,6 +380,7 @@ export default function Relatorios() {
           environment: runInDemo ? 'demo' : 'production',
           enableComparison,
           mode: 'background',
+          language: getCurrentLanguage(),
           // v1.38.45 — sempre envia a versão atual do app para que o
           // validador (`report_validations.validator_version`) reflita
           // a versão vigente do sistema, evitando confusão com validações
