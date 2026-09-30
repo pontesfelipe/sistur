@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 21,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.21.1",
+    date: "2026-09-30",
+    type: "patch" as const,
+    changes: [
+      "Idiomas (fase 3, segunda passada): abas das telas, motivos das recomendações do EDU, selos do Social Turismo e os 4 jogos traduzidos.",
+      "Datas relativas (ex.: \"há 8 meses\") passam a aparecer no idioma escolhido.",
+    ],
+  },
   {
     version: "2.21.0",
     date: "2026-09-30",
