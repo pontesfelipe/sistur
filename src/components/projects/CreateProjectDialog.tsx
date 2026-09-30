@@ -559,7 +559,7 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
                   id="description"
                   value={projectDescription}
                   onChange={(e) => setProjectDescription(e.target.value)}
-                  placeholder=Descrição detalhada do projeto (opcional - será gerada pela IA)
+                  placeholder={tx('Descrição detalhada do projeto (opcional - será gerada pela IA)')}
                   rows={3}
                 />
               </div>

@@ -153,7 +153,7 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
             </div>
             <div>
               <Label>Notas (opcional)</Label>
-              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder=Por que este item se relaciona ao projeto? />
+              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={tx('Por que este item se relaciona ao projeto?')} />
             </div>
           </div>
           <DialogFooter>

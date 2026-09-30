@@ -971,7 +971,7 @@ const DiagnosticoDetalhe = () => {
               </div>
               <Select value={selectedUnitId ?? '__all__'} onValueChange={handleUnitChange}>
                 <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder=Todas as unidades (marca) />
+                  <SelectValue placeholder={tx('Todas as unidades (marca)')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__all__">Todas as unidades (marca)</SelectItem>

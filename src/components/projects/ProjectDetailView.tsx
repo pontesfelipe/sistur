@@ -281,7 +281,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
               if (!ok) toast.info(tx('Nenhum marco ou tarefa com data planejada para exportar.'));
             }}
             className="gap-1"
-            title=Exportar calendário (.ics)
+            title={tx('Exportar calendário (.ics)')}
           >
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">.ics</span>
