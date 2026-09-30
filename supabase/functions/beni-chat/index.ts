@@ -146,6 +146,12 @@ serve(async (req) => {
     const context = body.context;
     const conversationId: string | null = typeof body.conversationId === "string" ? body.conversationId : null;
     const attachmentId: string | null = typeof body.attachmentId === "string" ? body.attachmentId : null;
+    const uiLanguage: string = body.language === "en" || body.language === "es" ? body.language : "pt-BR";
+    const LANGUAGE_DIRECTIVE: Record<string, string> = {
+      en: "\n\nIDIOMA DA RESPOSTA: o usuário usa a plataforma em INGLÊS. Responda sempre em inglês natural, mantendo as mesmas regras de formato (texto corrido, sem markdown). Mantenha as siglas RA, OE, AO e IGMA; traduza os nomes dos pilares e dos status (Adequado=Adequate, Atenção=Attention, Crítico=Critical). Se o usuário escrever em outro idioma, responda no idioma dele.",
+      es: "\n\nIDIOMA DA RESPOSTA: o usuário usa a plataforma em ESPANHOL. Responda sempre em espanhol natural, mantendo as mesmas regras de formato (texto corrido, sem markdown). Mantenha as siglas RA, OE, AO e IGMA; traduza os nomes dos pilares e dos status (Adequado=Adecuado, Atenção=Atención, Crítico=Crítico). Se o usuário escrever em outro idioma, responda no idioma dele.",
+    };
+    const languageDirective = LANGUAGE_DIRECTIVE[uiLanguage] ?? "";
     // Only plain role/content pairs from the client
     let messages: any[] = (Array.isArray(body.messages) ? body.messages : [])
       .filter((m: any) => (m?.role === "user" || m?.role === "assistant") && typeof m?.content === "string")
@@ -478,7 +484,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: selectedModel,
         messages: [
-          { role: "system", content: systemPrompt + folderInstructions },
+          { role: "system", content: systemPrompt + folderInstructions + languageDirective },
           ...messages,
         ],
         stream: true,

@@ -1,3 +1,4 @@
+import { getCurrentLanguage } from '@/i18n';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -258,7 +259,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMsg].map(m => ({ role: m.role, content: m.content })), context: beniContext, conversationId: convId, attachmentId }),
+        body: JSON.stringify({ messages: [...messages, userMsg].map(m => ({ role: m.role, content: m.content })), context: beniContext, conversationId: convId, attachmentId, language: getCurrentLanguage() }),
         signal: controller.signal,
       });
 
