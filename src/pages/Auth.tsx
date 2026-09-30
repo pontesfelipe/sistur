@@ -841,9 +841,10 @@ const Auth = () => {
 
           <div className="space-y-5">
             {[
-              { icon: MapPin, title: 'Gestão de Destinos', desc: 'Cadastre e monitore seus destinos turísticos' },
-              { icon: BarChart3, title: 'Diagnóstico por Pilares', desc: 'Análise I-RA, I-OE e I-AO com identificação de gargalos' },
-              { icon: GraduationCap, title: 'SISTUR EDU', desc: 'Recomendações de capacitação personalizadas' },
+              { icon: BarChart3, title: 'Diagnóstico Sistêmico', desc: 'Análise dos pilares RA, OE e AO pela metodologia Mario Beni' },
+              { icon: Database, title: 'Ecossistema de Dados Oficiais', desc: 'IBGE, Cadastur, Mapa do Turismo e DataSUS integrados' },
+              { icon: Sparkles, title: 'Professor Beni (IA)', desc: 'Inteligência ancorada nos microdados do seu território' },
+              { icon: GraduationCap, title: 'SISTUR EDU', desc: 'Trilhas de capacitação adaptativas e certificados' },
             ].map(({ icon: FIcon, title: fTitle, desc }) => (
               <div key={fTitle} className="flex items-center gap-4 text-primary-foreground/90 group">
                 <div className="h-11 w-11 rounded-2xl bg-primary-foreground/15 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
