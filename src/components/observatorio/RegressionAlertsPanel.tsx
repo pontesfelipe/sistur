@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -118,7 +119,7 @@ export function RegressionAlertsPanel() {
                   </Badge>
                   <span className="text-xs text-muted-foreground">Período: {period}</span>
                   <span className="text-xs text-muted-foreground">
-                    · {format(new Date(a.created_at), "dd 'de' MMM", { locale: ptBR })}
+                    · {format(new Date(a.created_at), "dd 'de' MMM", { locale: getDateLocale() })}
                   </span>
                 </div>
                 <p className="text-sm">{a.message}</p>

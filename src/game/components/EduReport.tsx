@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import type { EduMetrics, ProfileScores, AvatarPreset } from '../types';
 import { PROFILE_INFO, UNLOCKABLE_SKINS } from '../types';
 import type { GameState } from '../types';
@@ -43,7 +44,7 @@ export function EduReport({ metrics, profileScores, dominantProfile, turn, unloc
           <span className="text-2xl">{tendency.emoji}</span>
           <div>
             <p className="text-sm font-bold text-blue-800 dark:text-blue-200">Tendência: {tendency.label}</p>
-            <p className="text-[10px] text-blue-600 dark:text-blue-300">{tendency.description}</p>
+            <p className="text-[10px] text-blue-600 dark:text-blue-300">{tx(tendency.description)}</p>
           </div>
         </div>
       </div>
@@ -60,7 +61,7 @@ export function EduReport({ metrics, profileScores, dominantProfile, turn, unloc
             const pct = totalDecisions > 0 ? (item.value / totalDecisions) * 100 : 0;
             return (
               <div key={item.label} className="flex items-center gap-2">
-                <span className="text-[10px] w-28 truncate">{item.label}</span>
+                <span className="text-[10px] w-28 truncate">{tx(item.label)}</span>
                 <div className="flex-1 h-2 rounded-full bg-black/10 overflow-hidden">
                   <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: item.color }} />
                 </div>
@@ -73,42 +74,42 @@ export function EduReport({ metrics, profileScores, dominantProfile, turn, unloc
 
       {/* Choice types */}
       <div className="bg-card/90 rounded-xl p-3 shadow-sm">
-        <p className="text-xs font-bold mb-2">🎲 Tipos de Escolha</p>
+        <p className="text-xs font-bold mb-2">{tx('🎲 Tipos de Escolha')}</p>
         <div className="grid grid-cols-3 gap-2 text-center">
           <div>
             <div className="text-lg font-bold text-green-600">🧠 {metrics.smartChoices}</div>
-            <div className="text-[10px] text-muted-foreground">Inteligentes</div>
+            <div className="text-[10px] text-muted-foreground">{tx('Inteligentes')}</div>
           </div>
           <div>
             <div className="text-lg font-bold text-yellow-600">⚡ {metrics.quickChoices}</div>
-            <div className="text-[10px] text-muted-foreground">Rápidas</div>
+            <div className="text-[10px] text-muted-foreground">{tx('Rápidas')}</div>
           </div>
           <div>
             <div className="text-lg font-bold text-red-600">🎰 {metrics.riskyChoices}</div>
-            <div className="text-[10px] text-muted-foreground">Arriscadas</div>
+            <div className="text-[10px] text-muted-foreground">{tx('Arriscadas')}</div>
           </div>
         </div>
       </div>
 
       {/* Sustainability stats */}
       <div className="bg-card/90 rounded-xl p-3 shadow-sm">
-        <p className="text-xs font-bold mb-2">🌍 Sustentabilidade</p>
+        <p className="text-xs font-bold mb-2">{tx('🌍 Sustentabilidade')}</p>
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="flex items-center gap-1.5">
             <span className="text-green-500">🟢</span>
-            <span>Turnos no verde: <strong>{metrics.turnsInGreen}</strong></span>
+            <span>{tx('Turnos no verde:')} <strong>{metrics.turnsInGreen}</strong></span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-red-500">🔴</span>
-            <span>Turnos no vermelho: <strong>{metrics.turnsInRed}</strong></span>
+            <span>{tx('Turnos no vermelho:')} <strong>{metrics.turnsInRed}</strong></span>
           </div>
           <div className="flex items-center gap-1.5">
             <span>🏗️</span>
-            <span>Construções excessivas: <strong>{metrics.excessiveBuilding}</strong></span>
+            <span>{tx('Construções excessivas:')} <strong>{metrics.excessiveBuilding}</strong></span>
           </div>
           <div className="flex items-center gap-1.5">
             <span>🏠</span>
-            <span>Total construções: <strong>{metrics.totalBuildings}</strong></span>
+            <span>{tx('Total construções:')} <strong>{metrics.totalBuildings}</strong></span>
           </div>
         </div>
       </div>

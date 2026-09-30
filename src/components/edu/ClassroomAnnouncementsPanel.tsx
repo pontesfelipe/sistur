@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -140,7 +141,7 @@ export function ClassroomAnnouncementsPanel({ classroomId, canManage }: Props) {
             </div>
             <p className="text-sm whitespace-pre-wrap text-muted-foreground">{a.body}</p>
             <p className="text-xs text-muted-foreground mt-2">
-              {a.author_name} · {formatDistanceToNow(new Date(a.created_at), { addSuffix: true, locale: ptBR })}
+              {a.author_name} · {formatDistanceToNow(new Date(a.created_at), { addSuffix: true, locale: getDateLocale() })}
             </p>
           </div>
         ))}

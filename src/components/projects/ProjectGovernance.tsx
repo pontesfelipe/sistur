@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -117,7 +118,7 @@ export function ProjectGovernance({ projectId }: Props) {
                         {cp.description && <p className="text-sm text-muted-foreground mt-1">{tx(cp.description)}</p>}
                         {cp.due_date && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Prazo: {format(new Date(cp.due_date), 'dd/MM/yyyy', { locale: ptBR })}
+                            Prazo: {format(new Date(cp.due_date), 'dd/MM/yyyy', { locale: getDateLocale() })}
                           </p>
                         )}
                         {cp.evidence_url && (

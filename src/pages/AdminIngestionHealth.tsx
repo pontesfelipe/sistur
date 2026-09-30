@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -64,7 +65,7 @@ const FN_DISPLAY: Record<string, string> = {
 
 function formatDate(iso: string | null) {
   if (!iso) return '—';
-  return format(new Date(iso), "dd/MM/yyyy HH:mm", { locale: ptBR });
+  return format(new Date(iso), "dd/MM/yyyy HH:mm", { locale: getDateLocale() });
 }
 
 function formatDuration(ms: number | null) {

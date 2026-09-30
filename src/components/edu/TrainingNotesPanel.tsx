@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 /**
  * SISEDU - Painel de Anotações Pessoais
@@ -178,7 +179,7 @@ function NoteItem({
                 </Badge>
               )}
               <span className="text-[10px] text-muted-foreground">
-                {formatDistanceToNow(new Date(note.created_at), { addSuffix: true, locale: ptBR })}
+                {formatDistanceToNow(new Date(note.created_at), { addSuffix: true, locale: getDateLocale() })}
               </span>
             </div>
             <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">

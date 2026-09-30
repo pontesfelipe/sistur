@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -229,7 +230,7 @@ export default function ConsorcioDetalhe() {
                             </td>
                             <td className="py-2 px-3 text-xs text-muted-foreground">
                               {r.last_calculated_at
-                                ? format(new Date(r.last_calculated_at), "dd/MM/yyyy", { locale: ptBR })
+                                ? format(new Date(r.last_calculated_at), "dd/MM/yyyy", { locale: getDateLocale() })
                                 : "—"}
                             </td>
                           </tr>
@@ -264,7 +265,7 @@ export default function ConsorcioDetalhe() {
                           <div>
                             <div className="font-medium text-sm">{m.org_name}</div>
                             <div className="text-xs text-muted-foreground">
-                              {m.member_role === "lead" ? "Município-líder" : "Membro"} · convidado em {format(new Date(m.invited_at), "dd/MM/yyyy", { locale: ptBR })}
+                              {m.member_role === "lead" ? "Município-líder" : "Membro"} · convidado em {format(new Date(m.invited_at), "dd/MM/yyyy", { locale: getDateLocale() })}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">

@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -113,7 +114,7 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
         
         return {
           name: `Ciclo ${index + 1}`,
-          fullDate: date ? format(new Date(date), "dd/MM/yyyy", { locale: ptBR }) : '',
+          fullDate: date ? format(new Date(date), "dd/MM/yyyy", { locale: getDateLocale() }) : '',
           title: assessment.title,
           RA: scores.RA ? Math.round(scores.RA * 100) : null,
           OE: scores.OE ? Math.round(scores.OE * 100) : null,

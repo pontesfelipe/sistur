@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { cn } from '@/lib/utils';
 import type { GameCard } from '../cardTypes';
 import { RARITY_COLORS, CATEGORY_COLORS, TYPE_LABELS } from '../cardTypes';
@@ -89,14 +90,14 @@ export function CardDisplay({ card, onClick, onDiscard, disabled, tooExpensive, 
         {/* Description */}
         {!small && (
           <p className="text-[9px] text-muted-foreground text-center mt-1 leading-tight line-clamp-2">
-            {card.description}
+            {tx(card.description)}
           </p>
         )}
 
         {/* Tags */}
         {card.exhaust && (
           <span className="text-[8px] bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300 px-1.5 rounded-full mt-0.5 font-bold">
-            USO ÚNICO
+            {tx('USO ÚNICO')}
           </span>
         )}
       </div>
@@ -114,7 +115,7 @@ export function CardDisplay({ card, onClick, onDiscard, disabled, tooExpensive, 
         <button
           onClick={(e) => { e.stopPropagation(); onDiscard(); }}
           className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500/80 text-white text-[10px] font-bold flex items-center justify-center hover:bg-red-600 transition-colors"
-          title="Descartar (+1💰)"
+          title={tx('Descartar (+1💰)')}
         >
           ✕
         </button>
@@ -123,7 +124,7 @@ export function CardDisplay({ card, onClick, onDiscard, disabled, tooExpensive, 
       {/* Too expensive overlay */}
       {tooExpensive && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl">
-          <span className="text-xs font-bold text-white bg-red-500/80 px-2 py-1 rounded">💰 Sem moedas</span>
+          <span className="text-xs font-bold text-white bg-red-500/80 px-2 py-1 rounded">{tx('💰 Sem moedas')}</span>
         </div>
       )}
     </div>

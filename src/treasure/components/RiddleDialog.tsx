@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Riddle } from '../types';
@@ -54,7 +55,7 @@ export function RiddleDialog({ riddle, onAnswer }: RiddleDialogProps) {
               <span className="text-5xl">🧩</span>
             )}
           </motion.div>
-          <h2 className="text-lg font-bold text-purple-200">Enigma Ambiental</h2>
+          <h2 className="text-lg font-bold text-purple-200">{tx('Enigma Ambiental')}</h2>
           <div className="mt-1 flex items-center justify-center gap-1.5">
             <span className="text-[10px] text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
               +{riddle.reward} pts

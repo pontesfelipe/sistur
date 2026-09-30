@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -127,7 +128,7 @@ const EduMensagens = () => {
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {formatDistanceToNow(new Date(c.last_at), {
                         addSuffix: true,
-                        locale: ptBR,
+                        locale: getDateLocale(),
                       })}
                     </p>
                   </button>
@@ -167,7 +168,7 @@ const EduMensagens = () => {
                             >
                               <p className="text-sm whitespace-pre-wrap">{m.body}</p>
                               <p className={`text-xs mt-1 ${mine ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                                {format(new Date(m.created_at), 'dd/MM HH:mm', { locale: ptBR })}
+                                {format(new Date(m.created_at), 'dd/MM HH:mm', { locale: getDateLocale() })}
                               </p>
                             </div>
                           </div>

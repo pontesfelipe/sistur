@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 /**
  * SISEDU - Relatório Individual do Aluno (para Professores)
@@ -259,7 +260,7 @@ export function StudentReportDialog({ studentId, studentName, open, onClose }: S
                       {stats.recentActivity.map((act, i) => (
                         <TableRow key={i}>
                           <TableCell className="text-xs">
-                            {format(new Date(act.date), 'dd/MM HH:mm', { locale: ptBR })}
+                            {format(new Date(act.date), 'dd/MM HH:mm', { locale: getDateLocale() })}
                           </TableCell>
                           <TableCell className="text-xs line-clamp-1 max-w-48">{act.training}</TableCell>
                           <TableCell>

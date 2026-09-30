@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -201,7 +202,7 @@ export const TrackCertificate = ({
     }, 250);
   };
 
-  const formattedDate = format(completedAt, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const formattedDate = format(completedAt, "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale() });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -179,7 +180,7 @@ export function ProjectsOverviewCard({ projects, isLoading }: ProjectsOverviewCa
                     {project.planned_end_date && (
                       <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3" />
-                        Prazo: {format(new Date(project.planned_end_date), "dd/MM/yy", { locale: ptBR })}
+                        Prazo: {format(new Date(project.planned_end_date), "dd/MM/yy", { locale: getDateLocale() })}
                       </div>
                     )}
 

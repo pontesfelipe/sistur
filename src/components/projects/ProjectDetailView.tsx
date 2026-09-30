@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import {
@@ -255,9 +256,9 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
             {project.planned_start_date && (
               <span className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                {format(new Date(project.planned_start_date), 'dd/MM/yyyy', { locale: ptBR })}
+                {format(new Date(project.planned_start_date), 'dd/MM/yyyy', { locale: getDateLocale() })}
                 {project.planned_end_date &&
-                  ` - ${format(new Date(project.planned_end_date), 'dd/MM/yyyy', { locale: ptBR })}`}
+                  ` - ${format(new Date(project.planned_end_date), 'dd/MM/yyyy', { locale: getDateLocale() })}`}
               </span>
             )}
           </div>
@@ -621,7 +622,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-sm font-medium">
-                        {format(new Date(milestone.target_date), 'dd/MM/yyyy', { locale: ptBR })}
+                        {format(new Date(milestone.target_date), 'dd/MM/yyyy', { locale: getDateLocale() })}
                       </p>
                       <Badge
                         variant="secondary"

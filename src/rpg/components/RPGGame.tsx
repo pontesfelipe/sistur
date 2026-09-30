@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, RotateCcw, BookOpen, HelpCircle, ChevronDown, ChevronUp, Volume2, VolumeX } from 'lucide-react';
@@ -132,7 +133,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
   if (!story || !currentScene) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Erro ao carregar a história.</p>
+        <p className="text-muted-foreground">{tx('Erro ao carregar a história.')}</p>
       </div>
     );
   }
@@ -156,7 +157,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
         <div className="max-w-3xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
           <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <Button variant="ghost" size="icon" onClick={onBack} className="h-9 w-9 flex-shrink-0" aria-label="Voltar">
+              <Button variant="ghost" size="icon" onClick={onBack} className="h-9 w-9 flex-shrink-0" aria-label={tx('Voltar')}>
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div className="min-w-0">
@@ -178,11 +179,11 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
                   size="icon"
                   onClick={handleNewBiome}
                   className="h-9 w-9 sm:w-auto sm:px-3 sm:gap-1.5 text-xs"
-                  aria-label="Outro Bioma"
-                  title="Outro Bioma"
+                  aria-label={tx('Outro Bioma')}
+                  title={tx('Outro Bioma')}
                 >
                   <BookOpen className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Outro Bioma</span>
+                  <span className="hidden sm:inline">{tx('Outro Bioma')}</span>
                 </Button>
               )}
               <Button
@@ -190,23 +191,23 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
                 size="icon"
                 onClick={handleRestart}
                 className="h-9 w-9 sm:w-auto sm:px-3 sm:gap-1.5 text-xs"
-                aria-label="Reiniciar"
-                title="Reiniciar"
+                aria-label={tx('Reiniciar')}
+                title={tx('Reiniciar')}
               >
                 <RotateCcw className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Reiniciar</span>
+                <span className="hidden sm:inline">{tx('Reiniciar')}</span>
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleMute}
                 className="h-9 w-9"
-                aria-label={muted ? 'Ativar som' : 'Desativar som'}
+                aria-label={muted ? tx('Ativar som') : tx('Desativar som')}
                 aria-pressed={muted}
               >
                 {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} className="h-9 w-9" aria-label="Tutorial">
+              <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} className="h-9 w-9" aria-label={tx('Tutorial')}>
                 <HelpCircle className="h-4 w-4" />
               </Button>
             </div>
@@ -245,7 +246,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
               className="w-full flex items-center justify-between text-sm font-bold text-muted-foreground hover:text-foreground transition-colors group"
             >
               <span className="flex items-center gap-2">
-                📜 Diário da Jornada
+                {tx('📜 Diário da Jornada')}
                 <span className="text-xs font-normal text-muted-foreground/60">({state.history.length} capítulos)</span>
               </span>
               {diaryOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}

@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
@@ -110,7 +111,7 @@ function ReplyCard({
                 <p className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(reply.created_at), {
                     addSuffix: true,
-                    locale: ptBR,
+                    locale: getDateLocale(),
                   })}
                 </p>
               </div>
@@ -324,7 +325,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
                 <p className="text-sm text-muted-foreground">
                   {formatDistanceToNow(new Date(post.created_at), {
                     addSuffix: true,
-                    locale: ptBR,
+                    locale: getDateLocale(),
                   })}
                 </p>
               </div>

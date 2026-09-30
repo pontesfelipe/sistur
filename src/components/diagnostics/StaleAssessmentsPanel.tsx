@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -145,7 +146,7 @@ export function StaleAssessmentsPanel() {
                   {r.data_updated_at && (
                     <span className="flex items-center gap-1 shrink-0">
                       <Clock className="h-3 w-3" />
-                      Marcado {formatDistanceToNow(new Date(r.data_updated_at), { addSuffix: true, locale: ptBR })}
+                      Marcado {formatDistanceToNow(new Date(r.data_updated_at), { addSuffix: true, locale: getDateLocale() })}
                     </span>
                   )}
                 </div>

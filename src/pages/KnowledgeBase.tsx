@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useState, useRef } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -181,7 +182,7 @@ function FileCard({ file, destinations }: { file: KBFile; destinations: any[] })
           </div>
           {file.description && <p className="text-xs text-muted-foreground truncate mt-0.5">{file.description}</p>}
           <p className="text-xs text-muted-foreground mt-0.5">
-            {formatSize(file.file_size_bytes)} • {format(new Date(file.created_at), "dd MMM yyyy", { locale: ptBR })}
+            {formatSize(file.file_size_bytes)} • {format(new Date(file.created_at), "dd MMM yyyy", { locale: getDateLocale() })}
           </p>
         </div>
         <div className="flex items-center gap-1 shrink-0">

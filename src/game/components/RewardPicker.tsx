@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { GameCard } from '../cardTypes';
@@ -37,7 +38,7 @@ export function RewardPicker({ cards, onPick, onSkip }: RewardPickerProps) {
               transition={{ delay: 0.3 }}
               className="text-lg font-bold text-white drop-shadow-lg"
             >
-              ✨ Carta adicionada ao deck!
+              {tx('✨ Carta adicionada ao deck!')}
             </motion.p>
             <CardDisplay card={chosenCard} />
           </motion.div>
@@ -50,8 +51,8 @@ export function RewardPicker({ cards, onPick, onSkip }: RewardPickerProps) {
             className="bg-background rounded-2xl shadow-2xl max-w-lg w-full p-5 text-center space-y-4"
           >
             <div className="text-4xl">🎁</div>
-            <h2 className="text-xl font-bold">Escolha uma Carta!</h2>
-            <p className="text-sm text-muted-foreground">Adicione uma nova carta ao seu deck como recompensa.</p>
+            <h2 className="text-xl font-bold">{tx('Escolha uma Carta!')}</h2>
+            <p className="text-sm text-muted-foreground">{tx('Adicione uma nova carta ao seu deck como recompensa.')}</p>
 
             <div className="flex flex-wrap justify-center gap-3">
               {cards.map((card, i) => (

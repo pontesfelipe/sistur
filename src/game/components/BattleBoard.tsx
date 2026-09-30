@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import type { GameCard } from '../cardTypes';
@@ -43,7 +44,7 @@ export function BattleBoard({ playerBoard, threats, scores, equilibrium, turn, s
         
         <div className="min-h-[120px] sm:min-h-[140px] rounded-xl bg-gradient-to-b from-red-950/40 to-red-900/20 border border-red-800/30 p-2 flex items-center justify-center">
           {threats.length === 0 ? (
-            <p className="text-xs text-red-400/50 italic">Nenhuma ameaça no campo...</p>
+            <p className="text-xs text-red-400/50 italic">{tx('Nenhuma ameaça no campo...')}</p>
           ) : (
             <div className="flex flex-wrap gap-2 justify-center">
               {threats.map((threat, i) => (
@@ -83,7 +84,7 @@ export function BattleBoard({ playerBoard, threats, scores, equilibrium, turn, s
           )}>
             ⚖️ {Math.round(equilibrium)}%
           </span>
-          <span className="text-[8px] text-muted-foreground">Equilíbrio</span>
+          <span className="text-[8px] text-muted-foreground">{tx('Equilíbrio')}</span>
         </div>
         <div className="ml-auto flex flex-col items-end">
           {/* Score progress toward target */}
@@ -104,7 +105,7 @@ export function BattleBoard({ playerBoard, threats, scores, equilibrium, turn, s
         <div className="flex items-center gap-2 mb-1">
           <div className="h-px flex-1 bg-emerald-500/30" />
           <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1">
-            🃏 Suas Cartas em Campo
+            {tx('🃏 Suas Cartas em Campo')}
           </span>
           <div className="h-px flex-1 bg-emerald-500/30" />
         </div>
@@ -123,7 +124,7 @@ export function BattleBoard({ playerBoard, threats, scores, equilibrium, turn, s
                 catInfo.gradient,
               )}>
                 <span className="text-sm">{catInfo.emoji}</span>
-                <span>{catInfo.label}</span>
+                <span>{tx(catInfo.label)}</span>
               </div>
 
               {/* Cards row */}

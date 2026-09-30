@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -332,7 +333,7 @@ export default function MapaTurismoPanel() {
                     {syncLogs.map(log => (
                       <TableRow key={log.id}>
                         <TableCell className="text-sm">
-                          {format(new Date(log.started_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                          {format(new Date(log.started_at), "dd/MM/yyyy HH:mm", { locale: getDateLocale() })}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">

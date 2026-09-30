@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,7 +57,7 @@ export function ProjectTimeline({ project, phases, milestones }: Props) {
       <CardHeader>
         <CardTitle className="text-lg">{tx('Linha do tempo')}</CardTitle>
         <CardDescription>
-          {format(new Date(data.min), 'dd MMM yyyy', { locale: ptBR })} → {format(new Date(data.max), 'dd MMM yyyy', { locale: ptBR })} · {totalDays} dias
+          {format(new Date(data.min), 'dd MMM yyyy', { locale: getDateLocale() })} → {format(new Date(data.max), 'dd MMM yyyy', { locale: getDateLocale() })} · {totalDays} dias
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

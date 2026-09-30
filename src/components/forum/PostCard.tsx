@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState, useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
@@ -125,7 +126,7 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
                 <p className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(post.created_at), {
                     addSuffix: true,
-                    locale: ptBR,
+                    locale: getDateLocale(),
                   })}
                 </p>
               </div>

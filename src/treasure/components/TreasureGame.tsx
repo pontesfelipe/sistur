@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, HelpCircle, Heart, MapPin, Trophy, Footprints, Sparkles, Shield, Clock, XCircle, Compass, AlertTriangle, Pause } from 'lucide-react';
@@ -205,7 +206,7 @@ function DangerWarning({ playerRow, playerCol, map }: { playerRow: number; playe
       <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity }}>
         <AlertTriangle className="h-3 w-3" />
       </motion.div>
-      {nearbyTraps >= 2 ? 'Perigo!' : 'Cuidado!'}
+      {nearbyTraps >= 2 ? tx('Perigo!') : tx('Cuidado!')}
     </motion.div>
   );
 }
@@ -428,7 +429,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
           <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-slate-200">
             <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
           </Button>
-          <h1 className="text-lg font-bold text-amber-300">🗺️ Caça ao Tesouro Ecológico</h1>
+          <h1 className="text-lg font-bold text-amber-300">{tx('🗺️ Caça ao Tesouro Ecológico')}</h1>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full">
           <motion.p
@@ -436,7 +437,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
             animate={{ opacity: 1, y: 0 }}
             className="text-slate-300 mb-6 text-center text-base font-medium"
           >
-            ✨ Escolha um bioma para explorar:
+            {tx('✨ Escolha um bioma para explorar:')}
           </motion.p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
             {MAP_THEMES.map((theme, i) => (
@@ -464,7 +465,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                     <span className="text-4xl block mb-2 drop-shadow-lg">{theme.emoji}</span>
                   )}
                   <h3 className="text-lg font-bold drop-shadow">{theme.name}</h3>
-                  <p className="text-xs text-white/80 mt-1 leading-relaxed">{theme.description}</p>
+                  <p className="text-xs text-white/80 mt-1 leading-relaxed">{tx(theme.description)}</p>
                 </div>
               </motion.button>
             ))}
@@ -751,7 +752,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
             className="bg-gradient-to-b from-slate-900 to-red-950/50 rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border border-red-800/40"
           >
             <motion.div className="text-6xl" animate={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 0.5, repeat: 2 }}>💀</motion.div>
-            <h2 className="text-xl font-bold text-red-400">Missão Falhou!</h2>
+            <h2 className="text-xl font-bold text-red-400">{tx('Missão Falhou!')}</h2>
             <p className="text-sm text-slate-400">
               {state.timeRemaining <= 0
                 ? '⏰ O tempo acabou! Você não encontrou a saída a tempo.'
@@ -760,15 +761,15 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                 : 'Sua saúde chegou a zero pelas armadilhas ambientais.'}
             </p>
             <div className="bg-black/30 rounded-2xl p-4 text-xs text-left text-slate-300 space-y-1.5 border border-white/5">
-              <p><strong className="text-slate-200">Pontuação:</strong> {state.score}</p>
-              <p><strong className="text-slate-200">Tesouros:</strong> {state.treasuresCollected}/{state.totalTreasures}</p>
-              <p><strong className="text-slate-200">Enigmas:</strong> {state.riddlesSolved}</p>
-              <p><strong className="text-slate-200">Erros:</strong> {state.riddleErrors}/{state.maxRiddleErrors}</p>
-              <p><strong className="text-slate-200">Movimentos:</strong> {state.moves}</p>
+              <p><strong className="text-slate-200">{tx('Pontuação:')}</strong> {state.score}</p>
+              <p><strong className="text-slate-200">{tx('Tesouros:')}</strong> {state.treasuresCollected}/{state.totalTreasures}</p>
+              <p><strong className="text-slate-200">{tx('Enigmas:')}</strong> {state.riddlesSolved}</p>
+              <p><strong className="text-slate-200">{tx('Erros:')}</strong> {state.riddleErrors}/{state.maxRiddleErrors}</p>
+              <p><strong className="text-slate-200">{tx('Movimentos:')}</strong> {state.moves}</p>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors">🗺️ Biomas</button>
-              <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-500/20">🔄 Tentar</button>
+              <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors">{tx('🗺️ Biomas')}</button>
+              <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-500/20">{tx('🔄 Tentar')}</button>
             </div>
           </motion.div>
         </div>
@@ -783,23 +784,23 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
             className="bg-gradient-to-b from-amber-950 to-yellow-950 rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border-2 border-amber-400/60"
           >
             <motion.div className="text-7xl" animate={{ y: [0, -15, 0], rotate: [0, 5, -5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>🏆</motion.div>
-            <h2 className="text-xl font-bold text-amber-300 drop-shadow">Exploração Completa!</h2>
+            <h2 className="text-xl font-bold text-amber-300 drop-shadow">{tx('Exploração Completa!')}</h2>
             <p className="text-sm text-amber-400/80">
               {state.treasuresCollected === state.totalTreasures
                 ? '🌟 Você coletou todos os tesouros! Incrível!'
                 : `Você chegou à saída com ${state.treasuresCollected} de ${state.totalTreasures} tesouros.`}
             </p>
             <div className="bg-black/20 rounded-2xl p-4 text-xs text-left text-amber-200 space-y-1.5 border border-amber-600/20">
-              <p><strong>Pontuação:</strong> {state.score}</p>
-              <p><strong>Tesouros:</strong> {state.treasuresCollected}/{state.totalTreasures}</p>
-              <p><strong>Enigmas:</strong> {state.riddlesSolved} (erros: {state.riddleErrors})</p>
-              <p><strong>Tempo restante:</strong> {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')} (+bônus)</p>
-              <p><strong>Saúde restante:</strong> {state.health} (+bônus)</p>
-              <p><strong>Movimentos:</strong> {state.moves}</p>
+              <p><strong>{tx('Pontuação:')}</strong> {state.score}</p>
+              <p><strong>{tx('Tesouros:')}</strong> {state.treasuresCollected}/{state.totalTreasures}</p>
+              <p><strong>{tx('Enigmas:')}</strong> {state.riddlesSolved} (erros: {state.riddleErrors})</p>
+              <p><strong>{tx('Tempo restante:')}</strong> {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')} (+bônus)</p>
+              <p><strong>{tx('Saúde restante:')}</strong> {state.health} (+bônus)</p>
+              <p><strong>{tx('Movimentos:')}</strong> {state.moves}</p>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-amber-600 text-sm font-bold text-amber-300 hover:bg-amber-900/50 transition-colors">🗺️ Biomas</button>
-              <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-400/20">🌟 Jogar</button>
+              <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-amber-600 text-sm font-bold text-amber-300 hover:bg-amber-900/50 transition-colors">{tx('🗺️ Biomas')}</button>
+              <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-400/20">{tx('🌟 Jogar')}</button>
             </div>
           </motion.div>
         </div>

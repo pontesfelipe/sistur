@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -222,7 +223,7 @@ const OnDemandRequests = () => {
                         <CardTitle className="text-lg">{request.topic_text}</CardTitle>
                         <CardDescription className="flex items-center gap-2">
                           <Clock className="h-3 w-3" />
-                          Solicitado em {format(new Date(request.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          Solicitado em {format(new Date(request.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: getDateLocale() })}
                         </CardDescription>
                       </div>
                       <div className="flex gap-2">

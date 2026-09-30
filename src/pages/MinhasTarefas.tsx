@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -80,7 +81,7 @@ function TaskGroup({ title, tasks, collapsed }: { title: string; tasks: any[]; c
                   {t.planned_end_date && (
                     <span className={cn('flex items-center gap-1', overdue && 'text-destructive font-medium')}>
                       <CalendarDays className="h-3 w-3" />
-                      {format(new Date(t.planned_end_date), 'dd/MM/yyyy', { locale: ptBR })}
+                      {format(new Date(t.planned_end_date), 'dd/MM/yyyy', { locale: getDateLocale() })}
                       {overdue && ' (atrasada)'}
                     </span>
                   )}

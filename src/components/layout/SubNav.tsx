@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
@@ -46,7 +47,7 @@ export function SubNav({ items, className }: SubNavProps) {
               )}
             >
               {Icon && <Icon className="h-4 w-4" />}
-              <span>{item.name}</span>
+              <span>{tx(item.name)}</span>
             </NavLink>
           );
         })}

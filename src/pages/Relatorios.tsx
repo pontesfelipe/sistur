@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { getCurrentLanguage } from '@/i18n';
 import { tx } from '@/i18n/t';
 import { useState, useRef, useEffect, useMemo, type RefObject } from 'react';
@@ -934,8 +935,8 @@ export default function Relatorios() {
                             const dest = destinations?.find(d => d.id === assessment.destination_id)
                               ?? { name: meta.destinations?.name || 'Destino' };
                             const calcDate = assessment.calculated_at 
-                              ? format(new Date(assessment.calculated_at), "dd/MM/yy", { locale: ptBR })
-                              : format(new Date(assessment.created_at), "dd/MM/yy", { locale: ptBR });
+                              ? format(new Date(assessment.calculated_at), "dd/MM/yy", { locale: getDateLocale() })
+                              : format(new Date(assessment.created_at), "dd/MM/yy", { locale: getDateLocale() });
                             const creatorName = meta.creator?.full_name;
                             return (
                               <SelectItem key={assessment.id} value={assessment.id}>
@@ -1398,7 +1399,7 @@ export default function Relatorios() {
                                 </div>
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                                   <Calendar className="h-3 w-3" />
-                                  {format(new Date(r.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                                  {format(new Date(r.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: getDateLocale() })}
                                 </div>
                               </div>
                               <Button
@@ -1437,7 +1438,7 @@ export default function Relatorios() {
                     </CardTitle>
                     {selectedHistoryReport && (
                       <CardDescription>
-                        Gerado em {format(new Date(selectedHistoryReport.created_at), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
+                        Gerado em {format(new Date(selectedHistoryReport.created_at), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: getDateLocale() })}
                       </CardDescription>
                     )}
                   </div>

@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -195,7 +196,7 @@ const Certificates = () => {
                   </CardTitle>
                   <CardDescription className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
-                    Emitido em {format(new Date(cert.issued_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                    Emitido em {format(new Date(cert.issued_at), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale() })}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

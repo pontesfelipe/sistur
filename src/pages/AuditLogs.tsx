@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -296,7 +297,7 @@ const AuditLogs = () => {
                         {log.ip_address || '-'}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {format(new Date(log.created_at), "dd/MM/yyyy HH:mm:ss", { locale: ptBR })}
+                        {format(new Date(log.created_at), "dd/MM/yyyy HH:mm:ss", { locale: getDateLocale() })}
                       </TableCell>
                       <TableCell>
                         <Button variant="ghost" size="icon">
@@ -365,7 +366,7 @@ const AuditLogs = () => {
                   </div>
                   <div>
                     <span className="text-sm text-muted-foreground">Data/Hora</span>
-                    <p>{format(new Date(selectedLog.created_at), "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })}</p>
+                    <p>{format(new Date(selectedLog.created_at), "dd/MM/yyyy 'às' HH:mm:ss", { locale: getDateLocale() })}</p>
                   </div>
                 </div>
                 

@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -483,7 +484,7 @@ export default function AdminReportLogs() {
                       return (
                         <TableRow key={r.id} className="cursor-pointer hover:bg-muted/40" onClick={() => setSelected(r)}>
                           <TableCell className="text-xs tabular-nums">
-                            {format(new Date(r.created_at), 'dd/MM HH:mm:ss', { locale: ptBR })}
+                            {format(new Date(r.created_at), 'dd/MM HH:mm:ss', { locale: getDateLocale() })}
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline" className={`gap-1 ${lvl.className}`}>
@@ -529,7 +530,7 @@ export default function AdminReportLogs() {
                 Detalhes do Evento
               </DialogTitle>
               <DialogDescription>
-                {selected && format(new Date(selected.created_at), "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })}
+                {selected && format(new Date(selected.created_at), "dd/MM/yyyy 'às' HH:mm:ss", { locale: getDateLocale() })}
               </DialogDescription>
             </DialogHeader>
             {selected && (

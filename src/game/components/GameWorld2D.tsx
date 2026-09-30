@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useRef, useEffect, useCallback, useState } from 'react';
 import type { PlacedBuilding, BiomeType } from '../types';
 import { BIOME_INFO } from '../types';
@@ -338,7 +339,7 @@ export function GameWorld2D({ grid, biome, selectedBuilding, onTileClick, raValu
       {selectedBuilding && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg border border-border animate-pulse">
           <p className="text-xs font-medium text-center">
-            👆 Toque no mapa para construir!
+            {tx('👆 Toque no mapa para construir!')}
           </p>
         </div>
       )}

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { getEmojiSprite } from '@/game/spriteMap';
@@ -77,7 +78,7 @@ export function TreasureTutorial({ onComplete }: { onComplete: () => void }) {
               <span className="text-5xl">{current.emoji}</span>
             )}
           </div>
-          <h2 className="text-xl font-bold text-foreground mb-2">{current.title}</h2>
+          <h2 className="text-xl font-bold text-foreground mb-2">{tx(current.title)}</h2>
           <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">{current.text}</p>
           {current.tip && (
             <div className="mt-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-2.5">
@@ -88,7 +89,7 @@ export function TreasureTutorial({ onComplete }: { onComplete: () => void }) {
         <div className="flex gap-2">
           {!isFirst && (
             <button onClick={() => setStep(s => s - 1)} className="px-4 py-3 bg-muted text-foreground font-bold rounded-xl hover:bg-muted/80 transition-colors text-sm min-h-[48px]">
-              ⬅️ Voltar
+              {tx('⬅️ Voltar')}
             </button>
           )}
           <button onClick={next} className={cn('flex-1 py-3 font-bold rounded-xl text-white text-sm shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform min-h-[48px]', isLast ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-gradient-to-r from-amber-500 to-yellow-600')}>
@@ -97,7 +98,7 @@ export function TreasureTutorial({ onComplete }: { onComplete: () => void }) {
         </div>
         {!isLast && (
           <button onClick={onComplete} className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors py-2">
-            Pular tutorial
+            {tx('Pular tutorial')}
           </button>
         )}
       </div>
