@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import type { GameCard } from '../cardTypes';
@@ -27,7 +28,7 @@ export function TCGHand({ hand, coins, onPlay, onDiscard, canPlay, selectedIndex
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          🃏 Sem cartas. Passe o turno para comprar!
+          {tx('🃏 Sem cartas. Passe o turno para comprar!')}
         </motion.p>
       </div>
     );
@@ -98,13 +99,13 @@ export function TCGHand({ hand, coins, onPlay, onDiscard, canPlay, selectedIndex
       {selectedIndex !== null && (
         <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
           <span className="text-xs text-yellow-500 font-bold animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]">
-            ⚡ Toque novamente para jogar!
+            {tx('⚡ Toque novamente para jogar!')}
           </span>
           <button
             onClick={() => onSelect(null)}
             className="text-xs px-3 py-1 rounded-lg bg-muted hover:bg-accent transition-colors"
           >
-            Cancelar
+            {tx('Cancelar')}
           </button>
         </div>
       )}

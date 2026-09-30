@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import type { GameCard } from '../cardTypes';
 import { CardDisplay } from './CardDisplay';
 
@@ -15,7 +16,7 @@ export function CardHand({ hand, coins, onPlay, onDiscard, canPlay, selectedInde
   if (hand.length === 0) {
     return (
       <div className="flex items-center justify-center py-8 text-muted-foreground">
-        <p className="text-sm">🃏 Sem cartas na mão. Passe o turno para comprar!</p>
+        <p className="text-sm">{tx('🃏 Sem cartas na mão. Passe o turno para comprar!')}</p>
       </div>
     );
   }
@@ -56,12 +57,12 @@ export function CardHand({ hand, coins, onPlay, onDiscard, canPlay, selectedInde
 
       {selectedIndex !== null && (
         <div className="flex items-center gap-2 animate-in fade-in duration-200">
-          <p className="text-xs text-muted-foreground">👆 Toque de novo para jogar</p>
+          <p className="text-xs text-muted-foreground">{tx('👆 Toque de novo para jogar')}</p>
           <button
             onClick={() => onSelect(null)}
             className="text-xs px-2 py-1 rounded-lg bg-muted hover:bg-accent transition-colors"
           >
-            Cancelar
+            {tx('Cancelar')}
           </button>
         </div>
       )}

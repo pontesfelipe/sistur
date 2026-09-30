@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ export function ResumeGameDialog({ open, savedAt, onResume, onNewGame }: ResumeG
           <DialogTitle>{tx('🎮 Jogo salvo encontrado')}</DialogTitle>
           <DialogDescription>
             {savedAt && (
-              <>Salvo {formatDistanceToNow(savedAt, { addSuffix: true, locale: ptBR })}.</>
+              <>Salvo {formatDistanceToNow(savedAt, { addSuffix: true, locale: getDateLocale() })}.</>
             )}
             {' '}Deseja continuar de onde parou?
           </DialogDescription>

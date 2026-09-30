@@ -1,3 +1,5 @@
+import { tx } from '@/i18n/t';
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -47,12 +49,12 @@ export function SessionPicker({ sessions, loading, onNewGame, onLoadSession, onD
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Voltar ao SISTUR
+          {tx('Voltar ao SISTUR')}
         </button>
 
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">⚔️ Guardião do Território</h1>
-          <p className="text-sm text-muted-foreground">Defenda seu destino turístico com cartas estratégicas!</p>
+          <h1 className="text-3xl font-bold">{tx('⚔️ Guardião do Território')}</h1>
+          <p className="text-sm text-muted-foreground">{tx('Defenda seu destino turístico com cartas estratégicas!')}</p>
         </div>
 
         {/* New Game Button */}
@@ -62,7 +64,7 @@ export function SessionPicker({ sessions, loading, onNewGame, onLoadSession, onD
           size="lg"
         >
           <Plus className="h-5 w-5 mr-2" />
-          Nova Aventura
+          {tx('Nova Aventura')}
         </Button>
 
         {/* Sessions List */}
@@ -105,7 +107,7 @@ export function SessionPicker({ sessions, loading, onNewGame, onLoadSession, onD
                       </div>
                       <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {formatDistanceToNow(new Date(session.updated_at), { addSuffix: true, locale: ptBR })}
+                        {formatDistanceToNow(new Date(session.updated_at), { addSuffix: true, locale: getDateLocale() })}
                       </p>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
@@ -129,13 +131,13 @@ export function SessionPicker({ sessions, loading, onNewGame, onLoadSession, onD
                         }}
                       >
                         <Play className="h-4 w-4 mr-1" />
-                        Jogar
+                        {tx('Jogar')}
                       </Button>
                     </div>
                   </div>
                   {deletingId === session.id && (
                     <p className="text-xs text-destructive mt-2 animate-pulse">
-                      Clique novamente no 🗑️ para confirmar a exclusão
+                      {tx('Clique novamente no 🗑️ para confirmar a exclusão')}
                     </p>
                   )}
                 </Card>
@@ -145,8 +147,8 @@ export function SessionPicker({ sessions, loading, onNewGame, onLoadSession, onD
         ) : (
           <div className="text-center py-8 text-muted-foreground">
             <p className="text-4xl mb-2">🗺️</p>
-            <p className="text-sm">Nenhuma sessão salva ainda.</p>
-            <p className="text-xs">Comece uma nova aventura!</p>
+            <p className="text-sm">{tx('Nenhuma sessão salva ainda.')}</p>
+            <p className="text-xs">{tx('Comece uma nova aventura!')}</p>
           </div>
         )}
       </div>

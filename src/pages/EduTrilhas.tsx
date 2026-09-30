@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -944,7 +945,7 @@ export const EduTrilhaDetalhe = () => {
                         {isCompleted && completionDate && (
                           <span className="text-xs text-green-600 flex items-center gap-1 flex-shrink-0">
                             <Calendar className="h-3 w-3" />
-                            {format(completionDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                            {format(completionDate, "dd/MM/yyyy 'às' HH:mm", { locale: getDateLocale() })}
                           </span>
                         )}
                       </div>

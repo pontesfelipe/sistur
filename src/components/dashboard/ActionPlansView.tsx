@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -184,7 +185,7 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
                 {plan.due_date && (
                   <div className="flex items-center gap-1 text-sm text-muted-foreground mt-2">
                     <Calendar className="h-4 w-4" />
-                    <span>Prazo: {format(new Date(plan.due_date), "dd/MM/yyyy", { locale: ptBR })}</span>
+                    <span>Prazo: {format(new Date(plan.due_date), "dd/MM/yyyy", { locale: getDateLocale() })}</span>
                   </div>
                 )}
               </CardHeader>
@@ -252,7 +253,7 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
                   {/* Completed at */}
                   {plan.completed_at && (
                     <div className="text-sm text-muted-foreground">
-                      Concluído em: {format(new Date(plan.completed_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                      Concluído em: {format(new Date(plan.completed_at), "dd/MM/yyyy 'às' HH:mm", { locale: getDateLocale() })}
                     </div>
                   )}
                 </CardContent>

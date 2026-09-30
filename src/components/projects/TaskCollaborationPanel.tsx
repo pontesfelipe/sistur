@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -151,7 +152,7 @@ function CommentsSection({ taskId, projectId }: { taskId: string; projectId: str
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-medium">{c.user_name || 'Usuário'}</span>
                   <span className="text-[10px] text-muted-foreground">
-                    {format(new Date(c.created_at), "dd/MM HH:mm", { locale: ptBR })}
+                    {format(new Date(c.created_at), "dd/MM HH:mm", { locale: getDateLocale() })}
                   </span>
                   {c.user_id === user?.id && (
                     <button
@@ -200,7 +201,7 @@ function ActivitySection({ taskId }: { taskId: string }) {
             {activity.map((a) => (
               <li key={a.id} className="flex items-start gap-2">
                 <span className="text-muted-foreground tabular-nums shrink-0">
-                  {format(new Date(a.created_at), "dd/MM HH:mm", { locale: ptBR })}
+                  {format(new Date(a.created_at), "dd/MM HH:mm", { locale: getDateLocale() })}
                 </span>
                 <span>
                   {a.action === 'created' && <>{tx('Tarefa criada')}</>}

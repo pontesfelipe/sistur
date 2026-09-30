@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -100,7 +101,7 @@ export function GameTutorial({ onComplete }: GameTutorialProps) {
         {/* Content */}
         <div className="text-center mb-5">
           <span className="text-5xl block mb-3">{current.emoji}</span>
-          <h2 className="text-xl font-bold text-foreground mb-2">{current.title}</h2>
+          <h2 className="text-xl font-bold text-foreground mb-2">{tx(current.title)}</h2>
           <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">{current.text}</p>
           {current.tip && (
             <div className="mt-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-2.5">
@@ -116,7 +117,7 @@ export function GameTutorial({ onComplete }: GameTutorialProps) {
               onClick={prev}
               className="px-4 py-3 bg-muted text-foreground font-bold rounded-xl hover:bg-muted/80 transition-colors text-sm min-h-[48px]"
             >
-              ⬅️ Voltar
+              {tx('⬅️ Voltar')}
             </button>
           )}
           <button
@@ -138,7 +139,7 @@ export function GameTutorial({ onComplete }: GameTutorialProps) {
             onClick={onComplete}
             className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
           >
-            Pular tutorial
+            {tx('Pular tutorial')}
           </button>
         )}
       </div>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import type { GameBars, GameLevel, BiomeType, AvatarPreset, ProfileScores } from '../types';
 import { LEVEL_NAMES, LEVEL_XP, BIOME_INFO, PROFILE_INFO } from '../types';
 import { cn } from '@/lib/utils';
@@ -68,7 +69,7 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
             <span className="text-2xl">{PROFILE_INFO[dominantProfile].emoji}</span>
             <div>
               <div className="text-sm font-bold">{PROFILE_INFO[dominantProfile].name}</div>
-              <div className="text-[10px] opacity-80">{PROFILE_INFO[dominantProfile].description}</div>
+              <div className="text-[10px] opacity-80">{tx(PROFILE_INFO[dominantProfile].description)}</div>
             </div>
           </div>
           {/* Profile breakdown bars */}
@@ -100,10 +101,10 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
       {(!profileScores || totalScore === 0) && (
         <div className="bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-xl p-3 shadow-lg border border-amber-200 dark:border-amber-700">
           <p className="text-xs font-medium text-amber-800 dark:text-amber-200 text-center">
-            🧭 Jogue para descobrir seu perfil!
+            {tx('🧭 Jogue para descobrir seu perfil!')}
           </p>
           <p className="text-[10px] text-amber-600 dark:text-amber-300 text-center mt-0.5">
-            Suas ações definem quem você é.
+            {tx('Suas ações definem quem você é.')}
           </p>
         </div>
       )}
@@ -128,11 +129,11 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
         <div className="grid grid-cols-3 gap-2 text-center mb-3">
           <div>
             <div className="text-lg font-bold">💰 {coins}</div>
-            <div className="text-[10px] text-muted-foreground">Moedas</div>
+            <div className="text-[10px] text-muted-foreground">{tx('Moedas')}</div>
           </div>
           <div>
             <div className="text-lg font-bold">👥 {visitors}</div>
-            <div className="text-[10px] text-muted-foreground">Visitantes</div>
+            <div className="text-[10px] text-muted-foreground">{tx('Visitantes')}</div>
           </div>
           <div>
             <div className="text-lg font-bold">{BIOME_INFO[biome].emoji}</div>
@@ -142,15 +143,15 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
 
         {/* Bars */}
         <div className="space-y-2">
-          <BarDisplay label="Natureza" emoji="🌳" value={bars.ra} color="#22c55e" />
-          <BarDisplay label="Conforto" emoji="🏗️" value={bars.oe} color="#3b82f6" />
-          <BarDisplay label="Organização" emoji="🤝" value={bars.ao} color="#a855f7" />
+          <BarDisplay label={tx('Natureza')} emoji="🌳" value={bars.ra} color="#22c55e" />
+          <BarDisplay label={tx('Conforto')} emoji="🏗️" value={bars.oe} color="#3b82f6" />
+          <BarDisplay label={tx('Organização')} emoji="🤝" value={bars.ao} color="#a855f7" />
         </div>
 
         {/* Equilibrium */}
         <div className="mt-3 pt-2 border-t border-border">
           <div className="flex items-center justify-between text-xs font-bold">
-            <span>⚖️ Equilíbrio</span>
+            <span>{tx('⚖️ Equilíbrio')}</span>
             <span className={cn(
               equilibrium >= 60 ? 'text-green-600' : equilibrium >= 40 ? 'text-yellow-600' : 'text-red-600'
             )}>
@@ -175,7 +176,7 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
 
       {/* Victory Objectives */}
       <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/50 dark:to-yellow-950/50 rounded-xl p-3 shadow-lg border border-amber-200 dark:border-amber-700">
-        <p className="text-xs font-bold mb-2 text-amber-800 dark:text-amber-200">🎯 Objetivo: Cidade do Futuro</p>
+        <p className="text-xs font-bold mb-2 text-amber-800 dark:text-amber-200">{tx('🎯 Objetivo: Cidade do Futuro')}</p>
         <div className="space-y-1.5">
           {[
             { done: level >= 5, label: 'Nível 5', emoji: '⭐' },

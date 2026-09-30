@@ -141,7 +141,7 @@ function RecommendationCard({
             <div className="flex flex-wrap gap-1">
               {recommendation.match_reasons.slice(0, 2).map((reason, idx) => (
                 <Badge key={idx} variant="secondary" className="text-xs font-normal">
-                  {reason.reason}
+                  {tx(reason.reason.replace(/^Pilar (RA|OE|AO) é do seu interesse$/, "Pilar {{p}} é do seu interesse"), { p: reason.reason.match(/^Pilar (\w+)/)?.[1] })}
                 </Badge>
               ))}
             </div>

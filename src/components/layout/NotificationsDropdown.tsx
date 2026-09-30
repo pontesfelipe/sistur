@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { Bell, ClipboardList, AlertTriangle, Calculator, Database, TrendingDown, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -59,7 +60,7 @@ export function NotificationsDropdown() {
     try {
       return formatDistanceToNow(new Date(timestamp), { 
         addSuffix: true, 
-        locale: ptBR 
+        locale: getDateLocale() 
       });
     } catch {
       return '';

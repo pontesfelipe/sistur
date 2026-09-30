@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,7 +55,7 @@ function ReplyList({ discussion, isInstructor }: { discussion: CourseDiscussion;
               )}
             </div>
             <span className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(r.created_at), { addSuffix: true, locale: ptBR })}
+              {formatDistanceToNow(new Date(r.created_at), { addSuffix: true, locale: getDateLocale() })}
             </span>
           </div>
           <p className="text-sm whitespace-pre-wrap">{r.body}</p>
@@ -182,7 +183,7 @@ export function CourseDiscussionsPanel({ trainingId, isInstructor = false }: Pro
               </div>
               <p className="text-xs text-muted-foreground line-clamp-2">{d.body}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {d.author_name} · {formatDistanceToNow(new Date(d.created_at), { addSuffix: true, locale: ptBR })}
+                {d.author_name} · {formatDistanceToNow(new Date(d.created_at), { addSuffix: true, locale: getDateLocale() })}
               </p>
             </button>
             {openId === d.id && (

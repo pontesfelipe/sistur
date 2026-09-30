@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -130,7 +131,7 @@ const VerifyCertificate = () => {
                   <p className="text-sm mt-1">{revokedReason}</p>
                   {revokedAt && (
                     <p className="text-xs text-muted-foreground mt-2">
-                      Revogado em {format(new Date(revokedAt), "dd/MM/yyyy", { locale: ptBR })}
+                      Revogado em {format(new Date(revokedAt), "dd/MM/yyyy", { locale: getDateLocale() })}
                     </p>
                   )}
                 </div>
@@ -167,7 +168,7 @@ const VerifyCertificate = () => {
                   <div>
                     <p className="text-xs text-muted-foreground">{tx('Data de Emissão')}</p>
                     <p className="font-medium">
-                      {format(new Date(certificate.issued_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                      {format(new Date(certificate.issued_at), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale() })}
                     </p>
                   </div>
                 </div>
@@ -206,7 +207,7 @@ const VerifyCertificate = () => {
               {/* Verification Footer */}
               <div className="pt-4 border-t text-center">
                 <p className="text-xs text-muted-foreground">
-                  Verificação realizada em {format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                  Verificação realizada em {format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: getDateLocale() })}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {tx('Este documento foi verificado automaticamente pelo sistema SISTUR EDU')}

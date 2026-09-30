@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useMemo, useState } from "react";
 import {
   useObservatoryMetrics,
@@ -481,7 +482,7 @@ export default function Observatorio() {
                       <div className="min-w-0">
                         <CardTitle className="text-base truncate">{ev.name}</CardTitle>
                         <CardDescription className="mt-1">
-                          {format(new Date(ev.start_date), "dd 'de' MMM", { locale: ptBR })} – {format(new Date(ev.end_date), "dd 'de' MMM yyyy", { locale: ptBR })}
+                          {format(new Date(ev.start_date), "dd 'de' MMM", { locale: getDateLocale() })} – {format(new Date(ev.end_date), "dd 'de' MMM yyyy", { locale: getDateLocale() })}
                         </CardDescription>
                       </div>
                       {ev.category && <Badge variant="secondary" className="capitalize">{ev.category}</Badge>}

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { StoryScene as StorySceneType, StoryChoice } from '../types';
@@ -207,7 +208,7 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
               transition={{ delay: 0.3 }}
               className="text-sm font-semibold text-muted-foreground uppercase tracking-wide"
             >
-              O que você faz?
+              {tx('O que você faz?')}
             </motion.p>
             {scene.choices.map((choice, idx) => {
               const cfg = choiceTypeConfig[choice.type];
@@ -267,7 +268,7 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
                         className="text-xs text-muted-foreground mt-1 inline-block"
                         animate={isSelected ? { scale: 1.05 } : {}}
                       >
-                        {cfg.label}
+                        {tx(cfg.label)}
                       </motion.span>
                     </div>
                     <motion.span
@@ -328,7 +329,7 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
             >
-              {scene.endingType === 'restaurado' ? 'Missão Cumprida!' : scene.endingType === 'degradado' ? 'Missão Fracassada' : 'Resultado Misto'}
+              {scene.endingType === 'restaurado' ? 'Missão Cumprida!' : scene.endingType === 'degradado' ? tx('Missão Fracassada') : tx('Resultado Misto')}
             </motion.h3>
             <motion.p
               className="text-sm text-muted-foreground"

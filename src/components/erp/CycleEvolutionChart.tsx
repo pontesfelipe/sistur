@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -93,7 +94,7 @@ export function CycleEvolutionChart({
     ...cycle,
     name: `Ciclo ${cycle.cycle}`,
     formattedDate: cycle.date 
-      ? format(new Date(cycle.date), "dd/MM/yy", { locale: ptBR })
+      ? format(new Date(cycle.date), "dd/MM/yy", { locale: getDateLocale() })
       : '',
   })) || [];
 

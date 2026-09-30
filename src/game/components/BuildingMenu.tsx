@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import type { GameLevel, PlacedBuilding } from '../types';
 import { BUILDINGS, checkBuildingRequirements } from '../constants';
 import { cn } from '@/lib/utils';
@@ -26,7 +27,7 @@ export function BuildingMenu({ selectedBuilding, onSelect, coins, level, grid }:
         const buildings = BUILDINGS.filter(b => b.category === cat.key);
         return (
           <div key={cat.key}>
-            <h3 className="text-xs font-bold mb-1.5 text-muted-foreground">{cat.label}</h3>
+            <h3 className="text-xs font-bold mb-1.5 text-muted-foreground">{tx(cat.label)}</h3>
             <div className="grid grid-cols-2 gap-1.5">
               {buildings.map(b => {
                 const locked = b.unlockLevel > level;
@@ -115,7 +116,7 @@ export function BuildingMenu({ selectedBuilding, onSelect, coins, level, grid }:
 
       {selectedBuilding && (
         <p className="text-xs text-center text-muted-foreground animate-pulse">
-          👆 Clique no mapa para construir!
+          {tx('👆 Clique no mapa para construir!')}
         </p>
       )}
     </div>

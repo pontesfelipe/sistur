@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -229,7 +230,7 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
                     <div>
                       <div className="font-medium text-sm">{access.org_name || 'Organização'}</div>
                       <div className="text-xs text-muted-foreground">
-                        Concedido em {format(new Date(access.granted_at), "dd/MM/yyyy", { locale: ptBR })}
+                        Concedido em {format(new Date(access.granted_at), "dd/MM/yyyy", { locale: getDateLocale() })}
                       </div>
                     </div>
                   </div>
@@ -311,7 +312,7 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
                         <div className="text-xs text-muted-foreground">{access.user_email}</div>
                       )}
                       <div className="text-xs text-muted-foreground">
-                        Concedido em {format(new Date(access.granted_at), "dd/MM/yyyy", { locale: ptBR })}
+                        Concedido em {format(new Date(access.granted_at), "dd/MM/yyyy", { locale: getDateLocale() })}
                       </div>
                     </div>
                   </div>

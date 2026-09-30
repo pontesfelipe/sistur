@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { motion } from 'framer-motion';
 import { BIOME_INFO, type BiomeId } from '../types';
 import { getEmojiSprite } from '@/game/spriteMap';
@@ -35,10 +36,10 @@ export function BiomeSelector({ onSelect }: BiomeSelectorProps) {
           {getEmojiSprite('🌍') ? (
             <img src={getEmojiSprite('🌍')!} alt="" className="w-9 h-9 object-contain" draggable={false} />
           ) : '🌍'}
-          Missão Bioma
+          {tx('Missão Bioma')}
         </h1>
         <p className="text-muted-foreground text-lg max-w-md mx-auto">
-          Escolha um bioma para iniciar sua missão de restauração
+          {tx('Escolha um bioma para iniciar sua missão de restauração')}
         </p>
       </motion.div>
 
@@ -68,7 +69,7 @@ export function BiomeSelector({ onSelect }: BiomeSelectorProps) {
                   )}
                 </div>
                 <h3 className="text-xl font-bold mb-1 drop-shadow-lg">{info.name}</h3>
-                <p className="text-sm text-white/90 leading-relaxed drop-shadow">{info.description}</p>
+                <p className="text-sm text-white/90 leading-relaxed drop-shadow">{tx(info.description)}</p>
               </div>
             </motion.button>
           );

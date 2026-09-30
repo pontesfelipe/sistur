@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useMemo, useRef, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -278,7 +279,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-sm">{c.author_name}</span>
                       <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(c.created_at), { addSuffix: true, locale: ptBR })}
+                        {formatDistanceToNow(new Date(c.created_at), { addSuffix: true, locale: getDateLocale() })}
                       </span>
                       {anchorBadge(c)}
                       {isResolved && (

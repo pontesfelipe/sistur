@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -338,9 +339,9 @@ function ProjectCard({ project, onClick }: ProjectCardProps) {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="h-4 w-4" />
             <span>
-              {format(new Date(project.planned_start_date), 'dd/MM/yyyy', { locale: ptBR })}
+              {format(new Date(project.planned_start_date), 'dd/MM/yyyy', { locale: getDateLocale() })}
               {project.planned_end_date &&
-                ` - ${format(new Date(project.planned_end_date), 'dd/MM/yyyy', { locale: ptBR })}`}
+                ` - ${format(new Date(project.planned_end_date), 'dd/MM/yyyy', { locale: getDateLocale() })}`}
             </span>
           </div>
         )}

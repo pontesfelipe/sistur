@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 /**
  * SISEDU - Calendário de Estudos
@@ -95,7 +96,7 @@ export function StudyCalendar() {
             {Object.entries(groupedByDay).map(([dayKey, events]) => (
               <div key={dayKey}>
                 <p className="text-xs font-medium text-muted-foreground uppercase mb-2">
-                  {format(new Date(dayKey), "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                  {format(new Date(dayKey), "EEEE, dd 'de' MMMM", { locale: getDateLocale() })}
                 </p>
                 <div className="space-y-1.5">
                   {events.map((event) => (

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { cn } from '@/lib/utils';
 import type { GameCard } from '../cardTypes';
 import type { ThreatCard } from '../threatCards';
@@ -132,7 +133,7 @@ export function TCGPlayerCard({
         {/* Description (only in hand, on hover) */}
         {inHand && isHovered && (
           <p className="text-[8px] text-muted-foreground text-center leading-tight line-clamp-2 animate-in fade-in duration-200">
-            {card.description}
+            {tx(card.description)}
           </p>
         )}
       </div>
@@ -157,7 +158,7 @@ export function TCGPlayerCard({
         <button
           onClick={(e) => { e.stopPropagation(); onDiscard(); }}
           className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-red-500/80 text-white text-[9px] font-bold flex items-center justify-center hover:bg-red-600 hover:scale-110 transition-all opacity-0 group-hover:opacity-100 z-[3]"
-          title="Descartar (+1💰)"
+          title={tx('Descartar (+1💰)')}
         >
           ✕
         </button>

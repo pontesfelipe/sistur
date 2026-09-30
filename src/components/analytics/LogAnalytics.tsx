@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -219,7 +220,7 @@ export function LogAnalytics() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="justify-start text-left font-normal min-w-[140px]">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {format(dateRange.from, "dd/MM/yyyy", { locale: ptBR })}
+                    {format(dateRange.from, "dd/MM/yyyy", { locale: getDateLocale() })}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -238,7 +239,7 @@ export function LogAnalytics() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="justify-start text-left font-normal min-w-[140px]">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {format(dateRange.to, "dd/MM/yyyy", { locale: ptBR })}
+                    {format(dateRange.to, "dd/MM/yyyy", { locale: getDateLocale() })}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -445,7 +446,7 @@ export function LogAnalytics() {
                           <Clock className="h-3 w-3" />
                           {formatDistanceToNow(new Date(event.created_at), { 
                             addSuffix: true, 
-                            locale: ptBR 
+                            locale: getDateLocale() 
                           })}
                         </p>
                       </div>
@@ -492,7 +493,7 @@ export function LogAnalytics() {
                         </p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {format(new Date(login.last_login), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          {format(new Date(login.last_login), "dd/MM/yyyy 'às' HH:mm", { locale: getDateLocale() })}
                         </p>
                       </div>
                     </div>

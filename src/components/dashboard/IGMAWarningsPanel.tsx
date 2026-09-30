@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -146,7 +147,7 @@ export function IGMAWarningsPanel({
             <div className="flex-1">
               <p className="text-sm font-medium">{tx('Próxima Revisão Recomendada')}</p>
               <p className="text-sm text-muted-foreground">
-                {format(new Date(nextReviewRecommendedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                {format(new Date(nextReviewRecommendedAt), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale() })}
               </p>
             </div>
             <Badge variant="outline" className="text-xs">

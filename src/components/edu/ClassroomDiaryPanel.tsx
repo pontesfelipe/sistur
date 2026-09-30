@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -129,7 +130,7 @@ export function ClassroomDiaryPanel({ classroomId, classroomName }: Props) {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {r.last_seen_at
-                        ? formatDistanceToNow(new Date(r.last_seen_at), { addSuffix: true, locale: ptBR })
+                        ? formatDistanceToNow(new Date(r.last_seen_at), { addSuffix: true, locale: getDateLocale() })
                         : '—'}
                     </TableCell>
                   </TableRow>

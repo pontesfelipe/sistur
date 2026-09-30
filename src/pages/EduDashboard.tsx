@@ -1,3 +1,4 @@
+import { getDateLocale } from '@/i18n/dateLocale';
 import { tx } from '@/i18n/t';
 import { LaunchBanner } from '@/components/layout/LaunchBanner';
 import { useState } from 'react';
@@ -169,7 +170,7 @@ const EduDashboard = () => {
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>{Math.round(progress.progress_pct)}% concluído</span>
                       <span>
-                        {formatDistanceToNow(new Date(progress.last_accessed_at), { addSuffix: true, locale: ptBR })}
+                        {formatDistanceToNow(new Date(progress.last_accessed_at), { addSuffix: true, locale: getDateLocale() })}
                       </span>
                     </div>
                     <Button variant="ghost" size="sm" className="w-full mt-2" asChild>
@@ -205,7 +206,7 @@ const EduDashboard = () => {
                     )}
                   </div>
                   <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                    {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: ptBR })}
+                    {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: getDateLocale() })}
                   </span>
                 </div>
               ))}

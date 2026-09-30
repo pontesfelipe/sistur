@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Trophy, XCircle, Clock, Sparkles, Brain, Eye, Flame, Star } from 'lucide-react';
@@ -347,11 +348,11 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
           <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-slate-200">
             <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
           </Button>
-          <h1 className="text-lg font-bold text-amber-300">🧠 Memória Ecológica</h1>
+          <h1 className="text-lg font-bold text-amber-300">{tx('🧠 Memória Ecológica')}</h1>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full">
           <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-slate-300 mb-6 text-center text-base font-medium">
-            ✨ Escolha um bioma para jogar:
+            {tx('✨ Escolha um bioma para jogar:')}
           </motion.p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
             {MEMORY_THEMES.map((theme, i) => (
@@ -378,7 +379,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
                     <span className="text-4xl block mb-2 drop-shadow-lg">{theme.emoji}</span>
                   )}
                   <h3 className="text-lg font-bold drop-shadow">{theme.name}</h3>
-                  <p className="text-xs text-white/80 mt-1 leading-relaxed">{theme.description}</p>
+                  <p className="text-xs text-white/80 mt-1 leading-relaxed">{tx(theme.description)}</p>
                 </div>
               </motion.button>
             ))}
@@ -398,7 +399,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
       <LottieOverlay type="match" show={showMatchLottie} onComplete={() => setShowMatchLottie(false)} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" size={100} />
 
       <GameTopBar
-        title="Memória Ecológica"
+        title={tx('Memória Ecológica')}
         shortTitle="Memória"
         icon={<Brain className={cn('h-5 w-5 flex-shrink-0 drop-shadow-[0_0_6px_currentColor]', visuals.accentColor)} aria-hidden="true" />}
         onBack={onBack}
@@ -569,7 +570,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
                     ) : (
                       <>
                         <p className="text-[9px] sm:text-[11px] text-center leading-snug text-white/80 font-medium px-0.5">
-                          {card.data.description}
+                          {tx(card.data.description)}
                         </p>
                         <span className={cn('text-[8px] px-1.5 py-0.5 rounded-full border mt-1', catColor)}>
                           {card.data.category}
@@ -601,19 +602,19 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
             className="bg-gradient-to-b from-slate-900 to-red-950/50 rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border border-red-800/40">
             <motion.div className="text-6xl" animate={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 0.5, repeat: 2 }}>😵</motion.div>
-            <h2 className="text-xl font-bold text-red-400">Jogo Encerrado!</h2>
+            <h2 className="text-xl font-bold text-red-400">{tx('Jogo Encerrado!')}</h2>
             <p className="text-sm text-slate-400">
               {state.timeRemaining <= 0 ? '⏰ O tempo acabou!' : `❌ Você atingiu o limite de ${state.maxErrors} erros.`}
             </p>
             <div className="bg-black/30 rounded-2xl p-4 text-xs text-left text-slate-300 space-y-1.5 border border-white/5">
-              <p><strong className="text-slate-200">Pontuação:</strong> {state.score}</p>
-              <p><strong className="text-slate-200">Pares:</strong> {state.matchedPairs}/{state.totalPairs}</p>
-              <p><strong className="text-slate-200">Erros:</strong> {state.errors}/{state.maxErrors}</p>
-              <p><strong className="text-slate-200">Jogadas:</strong> {state.moves}</p>
+              <p><strong className="text-slate-200">{tx('Pontuação:')}</strong> {state.score}</p>
+              <p><strong className="text-slate-200">{tx('Pares:')}</strong> {state.matchedPairs}/{state.totalPairs}</p>
+              <p><strong className="text-slate-200">{tx('Erros:')}</strong> {state.errors}/{state.maxErrors}</p>
+              <p><strong className="text-slate-200">{tx('Jogadas:')}</strong> {state.moves}</p>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors">🌍 Biomas</button>
-              <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-500/20">🔄 Tentar</button>
+              <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors">{tx('🌍 Biomas')}</button>
+              <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-500/20">{tx('🔄 Tentar')}</button>
             </div>
           </motion.div>
         </div>
@@ -645,23 +646,23 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
                 ))}
               </div>
               <h2 className="text-xl font-bold text-amber-300 drop-shadow">
-                {stars === 3 ? 'Memória Perfeita!' : stars === 2 ? 'Excelente!' : 'Bem feito!'}
+                {stars === 3 ? 'Memória Perfeita!' : stars === 2 ? tx('Excelente!') : tx('Bem feito!')}
               </h2>
               <p className="text-sm text-amber-400/80">
                 {state.errors === 0 ? '🌟 Sem nenhum erro! Incrível!' : `Você encontrou todos os pares com ${state.errors} erro${state.errors > 1 ? 's' : ''}!`}
               </p>
               <div className="bg-black/20 rounded-2xl p-4 text-xs text-left text-amber-200 space-y-1.5 border border-amber-600/20">
-                <p><strong>Pontuação:</strong> {state.score}</p>
-                <p><strong>Pares:</strong> {state.matchedPairs}/{state.totalPairs}</p>
-                <p><strong>Erros:</strong> {state.errors}</p>
-                {maxCombo >= 2 && <p><strong>Melhor combo:</strong> 🔥 x{maxCombo}</p>}
-                <p><strong>Dicas usadas:</strong> {hintsUsed}/{MAX_HINTS}</p>
-                <p><strong>Tempo restante:</strong> {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')} (+bônus)</p>
-                <p><strong>Jogadas:</strong> {state.moves}</p>
+                <p><strong>{tx('Pontuação:')}</strong> {state.score}</p>
+                <p><strong>{tx('Pares:')}</strong> {state.matchedPairs}/{state.totalPairs}</p>
+                <p><strong>{tx('Erros:')}</strong> {state.errors}</p>
+                {maxCombo >= 2 && <p><strong>{tx('Melhor combo:')}</strong> 🔥 x{maxCombo}</p>}
+                <p><strong>{tx('Dicas usadas:')}</strong> {hintsUsed}/{MAX_HINTS}</p>
+                <p><strong>{tx('Tempo restante:')}</strong> {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')} (+bônus)</p>
+                <p><strong>{tx('Jogadas:')}</strong> {state.moves}</p>
               </div>
               <div className="flex gap-3">
-                <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-amber-600 text-sm font-bold text-amber-300 hover:bg-amber-900/50 transition-colors">🌍 Biomas</button>
-                <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-400/20">🌟 Jogar</button>
+                <button onClick={() => { setSelectedTheme(null); setState(null); }} className="flex-1 py-3 rounded-xl border border-amber-600 text-sm font-bold text-amber-300 hover:bg-amber-900/50 transition-colors">{tx('🌍 Biomas')}</button>
+                <button onClick={handleRestart} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-400/20">{tx('🌟 Jogar')}</button>
               </div>
             </motion.div>
           </div>
