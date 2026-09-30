@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -87,16 +88,16 @@ export function ProjectsOverviewCard({ projects, isLoading }: ProjectsOverviewCa
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <FolderKanban className="h-5 w-5" />
-            Projetos
+            {tx('Projetos')}
           </CardTitle>
           <CardDescription>
-            Nenhum projeto cadastrado. Crie projetos a partir de diagnósticos calculados.
+            {tx('Nenhum projeto cadastrado. Crie projetos a partir de diagnósticos calculados.')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button variant="outline" asChild>
             <Link to="/projetos">
-              Ir para Projetos
+              {tx('Ir para Projetos')}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Link>
           </Button>
@@ -114,12 +115,12 @@ export function ProjectsOverviewCard({ projects, isLoading }: ProjectsOverviewCa
             Projetos em Andamento ({activeProjects.length})
           </CardTitle>
           <CardDescription>
-            Acompanhamento dos projetos derivados de diagnósticos
+            {tx('Acompanhamento dos projetos derivados de diagnósticos')}
           </CardDescription>
         </div>
         <Button variant="ghost" size="sm" asChild>
           <Link to="/projetos">
-            Ver todos
+            {tx('Ver todos')}
             <ExternalLink className="h-4 w-4 ml-1" />
           </Link>
         </Button>
@@ -153,7 +154,7 @@ export function ProjectsOverviewCard({ projects, isLoading }: ProjectsOverviewCa
 
                     <div className="mt-3 space-y-2">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground">Progresso</span>
+                        <span className="text-muted-foreground">{tx('Progresso')}</span>
                         <span className="font-medium">{project.completionRate}%</span>
                       </div>
                       <Progress value={project.completionRate} className="h-1.5" />
@@ -189,7 +190,7 @@ export function ProjectsOverviewCard({ projects, isLoading }: ProjectsOverviewCa
                       asChild
                     >
                       <Link to={`/projetos?view=${project.id}`}>
-                        Ver Detalhes
+                        {tx('Ver Detalhes')}
                         <ExternalLink className="h-3 w-3 ml-1" />
                       </Link>
                     </Button>

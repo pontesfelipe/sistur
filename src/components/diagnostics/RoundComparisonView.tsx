@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -65,7 +66,7 @@ export function RoundComparisonView({ assessmentId, destinationId, currentPillar
       <Card className="border-dashed">
         <CardContent className="py-8 text-center text-muted-foreground">
           <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
-          <p className="text-sm">Primeira rodada para este destino. Comparativos estarão disponíveis após a segunda rodada.</p>
+          <p className="text-sm">{tx('Primeira rodada para este destino. Comparativos estarão disponíveis após a segunda rodada.')}</p>
         </CardContent>
       </Card>
     );
@@ -83,7 +84,7 @@ export function RoundComparisonView({ assessmentId, destinationId, currentPillar
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <TrendingUp className="h-5 w-5 text-primary" />
-          Comparativo com Rodada Anterior
+          {tx('Comparativo com Rodada Anterior')}
         </CardTitle>
         <CardDescription>
           Comparando com: {previous.assessment.title} ({new Date(previous.assessment.calculated_at || previous.assessment.created_at).toLocaleDateString('pt-BR')})
@@ -103,7 +104,7 @@ export function RoundComparisonView({ assessmentId, destinationId, currentPillar
                 <div className="flex items-end gap-3">
                   <div>
                     <p className="text-2xl font-bold">{Math.round(ps.score * 100)}%</p>
-                    <p className="text-xs text-muted-foreground">Atual</p>
+                    <p className="text-xs text-muted-foreground">{tx('Atual')}</p>
                   </div>
                   <div className={`flex items-center gap-1 mb-1 ${trend.color}`}>
                     <TrendIcon className="h-4 w-4" />
@@ -113,7 +114,7 @@ export function RoundComparisonView({ assessmentId, destinationId, currentPillar
                   </div>
                   <div className="text-right ml-auto">
                     <p className="text-lg text-muted-foreground">{Math.round(prevScore * 100)}%</p>
-                    <p className="text-xs text-muted-foreground">Anterior</p>
+                    <p className="text-xs text-muted-foreground">{tx('Anterior')}</p>
                   </div>
                 </div>
                 <Badge variant={ps.severity === 'CRITICO' ? 'destructive' : ps.severity === 'MODERADO' ? 'secondary' : 'default'} className="mt-2">

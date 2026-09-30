@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -41,7 +42,7 @@ export function ProjectTimeline({ project, phases, milestones }: Props) {
     return (
       <Card className="border-dashed">
         <CardContent className="py-12 text-center text-muted-foreground">
-          Defina datas planejadas nas fases ou no projeto para visualizar a linha do tempo.
+          {tx('Defina datas planejadas nas fases ou no projeto para visualizar a linha do tempo.')}
         </CardContent>
       </Card>
     );
@@ -53,7 +54,7 @@ export function ProjectTimeline({ project, phases, milestones }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Linha do tempo</CardTitle>
+        <CardTitle className="text-lg">{tx('Linha do tempo')}</CardTitle>
         <CardDescription>
           {format(new Date(data.min), 'dd MMM yyyy', { locale: ptBR })} → {format(new Date(data.max), 'dd MMM yyyy', { locale: ptBR })} · {totalDays} dias
         </CardDescription>
@@ -62,7 +63,7 @@ export function ProjectTimeline({ project, phases, milestones }: Props) {
         {/* Phase bars */}
         <div className="space-y-2">
           {data.phasesWithDates.length === 0 && (
-            <p className="text-sm text-muted-foreground">Nenhuma fase com datas planejadas.</p>
+            <p className="text-sm text-muted-foreground">{tx('Nenhuma fase com datas planejadas.')}</p>
           )}
           {data.phasesWithDates.map((p) => {
             const start = parseISO(p.planned_start_date!).getTime();

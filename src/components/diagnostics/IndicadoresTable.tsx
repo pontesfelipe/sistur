@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -218,58 +219,58 @@ export function IndicadoresTable({
             <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
               <div className="flex items-center gap-2 mb-2">
                 <Database className="h-4 w-4 text-primary" />
-                <span className="font-medium text-primary">Fonte: IGMA</span>
+                <span className="font-medium text-primary">{tx('Fonte: IGMA')}</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <span className="text-muted-foreground">Dimensão IGMA:</span>
+                  <span className="text-muted-foreground">{tx('Dimensão IGMA:')}</span>
                   <p className="font-medium">{igmaDimension || 'N/A'}</p>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Pilar SISTUR:</span>
+                  <span className="text-muted-foreground">{tx('Pilar SISTUR:')}</span>
                   <p className="font-medium">{indicator.pillar}</p>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Interpretação padrão:</span>
+                  <span className="text-muted-foreground">{tx('Interpretação padrão:')}</span>
                   <p className="font-medium">{defaultInterpretation || 'N/A'}</p>
                 </div>
               </div>
               {isPending && (
                 <div className="mt-2 flex items-center gap-2 text-amber-600">
                   <AlertTriangle className="h-4 w-4" />
-                  <span className="text-sm">Pendente de confirmação</span>
+                  <span className="text-sm">{tx('Pendente de confirmação')}</span>
                 </div>
               )}
             </div>
           )}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-muted-foreground">Direção:</span>
+              <span className="text-muted-foreground">{tx('Direção:')}</span>
               <p className="font-medium">{directionLabels[indicator.direction]}</p>
             </div>
             <div>
-              <span className="text-muted-foreground">Normalização:</span>
+              <span className="text-muted-foreground">{tx('Normalização:')}</span>
               <p className="font-medium">{normLabels[indicator.normalization]}</p>
             </div>
             <div>
-              <span className="text-muted-foreground">Peso:</span>
+              <span className="text-muted-foreground">{tx('Peso:')}</span>
               <p className="font-medium">{(indicator.weight * 100).toFixed(0)}%</p>
             </div>
             <div>
-              <span className="text-muted-foreground">Tema:</span>
+              <span className="text-muted-foreground">{tx('Tema:')}</span>
               <p className="font-medium capitalize">{indicator.theme}</p>
             </div>
           </div>
           {indicator.description && (
             <div>
-              <span className="text-muted-foreground text-sm">Descrição:</span>
+              <span className="text-muted-foreground text-sm">{tx('Descrição:')}</span>
               <p className="text-sm mt-1">{indicator.description}</p>
             </div>
           )}
           {/* Guidance for enterprise indicators */}
           {INDICATOR_GUIDANCE[indicator.code] && (
             <div className="p-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
-              <p className="text-sm text-blue-700 dark:text-blue-300 font-medium mb-1">💡 Como obter este dado</p>
+              <p className="text-sm text-blue-700 dark:text-blue-300 font-medium mb-1">{tx('💡 Como obter este dado')}</p>
               <p className="text-sm text-blue-700/90 dark:text-blue-300/90">
                 {INDICATOR_GUIDANCE[indicator.code].howToFind}
               </p>
@@ -292,16 +293,16 @@ export function IndicadoresTable({
             if (!derived) return null;
             return (
               <div className="p-3 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300/60 dark:border-emerald-800/40">
-                <p className="text-sm text-emerald-800 dark:text-emerald-200 font-medium mb-1">🧮 Calculado automaticamente</p>
+                <p className="text-sm text-emerald-800 dark:text-emerald-200 font-medium mb-1">{tx('🧮 Calculado automaticamente')}</p>
                 <p className="text-sm text-emerald-700/90 dark:text-emerald-300/90">
-                  <strong>Fórmula:</strong> {derived.formula}
+                  <strong>{tx('Fórmula:')}</strong> {derived.formula}
                 </p>
                 <p className="text-sm text-emerald-700/90 dark:text-emerald-300/90 mt-1">
-                  <strong>Resultado em:</strong> {derived.resultUnit}
+                  <strong>{tx('Resultado em:')}</strong> {derived.resultUnit}
                 </p>
                 {derived.requiredInputs.length > 0 && (
                   <p className="text-xs text-emerald-700/80 dark:text-emerald-300/80 mt-1">
-                    <strong>Insumos:</strong> {derived.requiredInputs.join(' · ')}
+                    <strong>{tx('Insumos:')}</strong> {derived.requiredInputs.join(' · ')}
                   </p>
                 )}
                 {derived.note && (
@@ -312,7 +313,7 @@ export function IndicadoresTable({
           })()}
           {(indicator as any).notes && (
             <div>
-              <span className="text-muted-foreground text-sm">Notas:</span>
+              <span className="text-muted-foreground text-sm">{tx('Notas:')}</span>
               <p className="text-sm mt-1 text-muted-foreground">{(indicator as any).notes}</p>
             </div>
           )}
@@ -342,19 +343,19 @@ export function IndicadoresTable({
             <SelectItem value="territorial">
               <div className="flex items-center gap-2">
                 <Landmark className="h-3 w-3 text-blue-600" />
-                <span>Territorial</span>
+                <span>{tx('Territorial')}</span>
               </div>
             </SelectItem>
             <SelectItem value="enterprise">
               <div className="flex items-center gap-2">
                 <Hotel className="h-3 w-3 text-amber-600" />
-                <span>Enterprise</span>
+                <span>{tx('Enterprise')}</span>
               </div>
             </SelectItem>
             <SelectItem value="both">
               <div className="flex items-center gap-2">
                 <Globe className="h-3 w-3 text-purple-600" />
-                <span>Ambos</span>
+                <span>{tx('Ambos')}</span>
               </div>
             </SelectItem>
           </SelectContent>
@@ -411,19 +412,19 @@ export function IndicadoresTable({
             <SelectItem value="SMALL">
               <div className="flex items-center gap-2">
                 <Zap className="h-3 w-3 text-green-600" />
-                Essencial
+                {tx('Essencial')}
               </div>
             </SelectItem>
             <SelectItem value="MEDIUM">
               <div className="flex items-center gap-2">
                 <Gauge className="h-3 w-3 text-amber-600" />
-                Estratégico
+                {tx('Estratégico')}
               </div>
             </SelectItem>
             <SelectItem value="COMPLETE">
               <div className="flex items-center gap-2">
                 <Target className="h-3 w-3 text-primary" />
-                Integral
+                {tx('Integral')}
               </div>
             </SelectItem>
           </SelectContent>
@@ -539,7 +540,7 @@ export function IndicadoresTable({
                             <TooltipTrigger>
                               <AlertTriangle className="h-3 w-3 text-amber-500" />
                             </TooltipTrigger>
-                            <TooltipContent>Pendente de confirmação</TooltipContent>
+                            <TooltipContent>{tx('Pendente de confirmação')}</TooltipContent>
                           </Tooltip>
                         )}
                       </div>
@@ -553,18 +554,18 @@ export function IndicadoresTable({
                               <span className="font-medium text-sm">{indicator.name}</span>
                               {(indicator as any).is_mandala_extension && (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 border-primary/50 text-primary bg-primary/10">
-                                  🌀 MST
+                                  {tx('🌀 MST')}
                                 </Badge>
                               )}
                               {CADASTUR_SEMI_AUTO_CODES.has(indicator.code) ? (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 border-cyan-500/50 text-cyan-600 bg-cyan-500/10">
                                   <Database className="h-2.5 w-2.5 mr-0.5" />
-                                  CADASTUR
+                                  {tx('CADASTUR')}
                                 </Badge>
                               ) : collectionType === 'DERIVED' ? (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 border-emerald-500/50 text-emerald-700 dark:text-emerald-300 bg-emerald-500/10">
                                   <Calculator className="h-2.5 w-2.5 mr-0.5" />
-                                  Calculado
+                                  {tx('Calculado')}
                                 </Badge>
                               ) : collectionType === 'AUTOMATICA' && (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
@@ -590,14 +591,14 @@ export function IndicadoresTable({
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => onStartEditWeight(indicator)}>
                           <Edit className="mr-2 h-4 w-4" />
-                          Editar Peso
+                          {tx('Editar Peso')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => onDeleteIndicator(indicator.id)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Excluir
+                          {tx('Excluir')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -625,19 +626,19 @@ export function IndicadoresTable({
 
                   {/* Theme */}
                   <div className="text-sm">
-                    <span className="text-muted-foreground">Tema: </span>
+                    <span className="text-muted-foreground">{tx('Tema:')} </span>
                     <span className="capitalize">{isIGMA && igmaDimension ? igmaDimension : indicator.theme}</span>
                   </div>
 
                   {/* Tier Editor - Mobile */}
                   <div className="flex items-center justify-between pt-2 border-t">
-                    <span className="text-sm text-muted-foreground">Tier:</span>
+                    <span className="text-sm text-muted-foreground">{tx('Tier:')}</span>
                     {renderTierEditor(indicator)}
                   </div>
 
                   {/* Weight Editor */}
                   <div className="flex items-center justify-between pt-2 border-t">
-                    <span className="text-sm text-muted-foreground">Peso:</span>
+                    <span className="text-sm text-muted-foreground">{tx('Peso:')}</span>
                     {renderWeightEditor(indicator)}
                   </div>
                 </div>
@@ -648,36 +649,36 @@ export function IndicadoresTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Código</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Escopo</TableHead>
-                <TableHead>Fonte</TableHead>
-                <TableHead>Pilar</TableHead>
-                <TableHead>Dimensão/Tema</TableHead>
-                <TableHead>Interpretação</TableHead>
+                <TableHead>{tx('Código')}</TableHead>
+                <TableHead>{tx('Nome')}</TableHead>
+                <TableHead>{tx('Escopo')}</TableHead>
+                <TableHead>{tx('Fonte')}</TableHead>
+                <TableHead>{tx('Pilar')}</TableHead>
+                <TableHead>{tx('Dimensão/Tema')}</TableHead>
+                <TableHead>{tx('Interpretação')}</TableHead>
                 <TableHead>
                   <Tooltip>
-                    <TooltipTrigger className="cursor-help">Confiab.</TooltipTrigger>
+                    <TooltipTrigger className="cursor-help">{tx('Confiab.')}</TooltipTrigger>
                     <TooltipContent>
                       Confiabilidade da fonte (1-5):<br/>
                       5★ Automático (API oficial)<br/>
                       4★ Calculado (derivado oficial)<br/>
                       3★ Manual (entrada do usuário)<br/>
-                      2★ Estimado
+                      {tx('2★ Estimado')}
                     </TooltipContent>
                   </Tooltip>
                 </TableHead>
                 <TableHead>
                   <Tooltip>
-                    <TooltipTrigger className="cursor-help">Tier</TooltipTrigger>
-                    <TooltipContent>Clique para editar o nível mínimo</TooltipContent>
+                    <TooltipTrigger className="cursor-help">{tx('Tier')}</TooltipTrigger>
+                    <TooltipContent>{tx('Clique para editar o nível mínimo')}</TooltipContent>
                   </Tooltip>
                 </TableHead>
-                <TableHead>Normalização</TableHead>
+                <TableHead>{tx('Normalização')}</TableHead>
                 <TableHead className="text-right">
                   <Tooltip>
-                    <TooltipTrigger className="cursor-help">Peso</TooltipTrigger>
-                    <TooltipContent>Clique para editar</TooltipContent>
+                    <TooltipTrigger className="cursor-help">{tx('Peso')}</TooltipTrigger>
+                    <TooltipContent>{tx('Clique para editar')}</TooltipContent>
                   </Tooltip>
                 </TableHead>
                 <TableHead className="w-12"></TableHead>
@@ -701,7 +702,7 @@ export function IndicadoresTable({
                             <TooltipTrigger>
                               <AlertTriangle className="h-4 w-4 text-amber-500" />
                             </TooltipTrigger>
-                            <TooltipContent>Pendente de confirmação</TooltipContent>
+                            <TooltipContent>{tx('Pendente de confirmação')}</TooltipContent>
                           </Tooltip>
                         )}
                       </div>
@@ -720,18 +721,18 @@ export function IndicadoresTable({
                               )}
                               {(indicator as any).is_mandala_extension && (
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/50 text-primary bg-primary/10">
-                                  🌀 MST
+                                  {tx('🌀 MST')}
                                 </Badge>
                               )}
                               {CADASTUR_SEMI_AUTO_CODES.has(indicator.code) ? (
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-cyan-500/50 text-cyan-600 bg-cyan-500/10">
                                   <Database className="h-3 w-3 mr-0.5" />
-                                  CADASTUR
+                                  {tx('CADASTUR')}
                                 </Badge>
                               ) : collectionType === 'DERIVED' ? (
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-violet-500/50 text-violet-600 bg-violet-500/10">
                                   <Calculator className="h-3 w-3 mr-0.5" />
-                                  CALCULADO
+                                  {tx('CALCULADO')}
                                 </Badge>
                               ) : collectionType === 'AUTOMATICA' && (
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
@@ -825,14 +826,14 @@ export function IndicadoresTable({
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => onStartEditWeight(indicator)}>
                             <Edit className="mr-2 h-4 w-4" />
-                            Editar Peso
+                            {tx('Editar Peso')}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => onDeleteIndicator(indicator.id)}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Excluir
+                            {tx('Excluir')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -860,7 +861,7 @@ export function IndicadoresTable({
           {indicators.length === 0 && (
             <Button className="mt-4">
               <Plus className="mr-2 h-4 w-4" />
-              Novo Indicador
+              {tx('Novo Indicador')}
             </Button>
           )}
         </div>

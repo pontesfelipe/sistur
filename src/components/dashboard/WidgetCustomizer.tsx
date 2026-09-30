@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
@@ -33,15 +34,15 @@ export function WidgetCustomizer({ isEnabled, toggleWidget, resetToDefaults, has
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="gap-1.5">
           <Settings2 className="h-4 w-4" />
-          <span className="hidden sm:inline">Personalizar</span>
+          <span className="hidden sm:inline">{tx('Personalizar')}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-4" align="end">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-medium text-sm">Widgets do Dashboard</h4>
+          <h4 className="font-medium text-sm">{tx('Widgets do Dashboard')}</h4>
           <Button variant="ghost" size="sm" onClick={resetToDefaults} className="h-7 gap-1 text-xs text-muted-foreground">
             <RotateCcw className="h-3 w-3" />
-            Resetar
+            {tx('Resetar')}
           </Button>
         </div>
         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">

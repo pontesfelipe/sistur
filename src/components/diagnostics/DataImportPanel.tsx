@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -288,7 +289,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
             console.error('Pré-preenchimento falhou:', insertError);
             const isRls = insertError.code === '42501' || /row-level security/i.test(insertError.message ?? '');
             const isDup = insertError.code === '23505';
-            toast.error('Não foi possível pré-preencher os indicadores', {
+            toast.error(tx('Não foi possível pré-preencher os indicadores'), {
               description: isRls
                 ? 'Você não tem permissão para gravar dados neste diagnóstico. Peça a um administrador ou analista da organização para executar o pré-preenchimento.'
                 : isDup
@@ -296,7 +297,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                   : (insertError.message || 'Tente novamente.'),
             });
           } else if (savedCount === 0) {
-            toast.info('Nenhum indicador novo foi pré-preenchido.');
+            toast.info(tx('Nenhum indicador novo foi pré-preenchido.'));
           } else {
             toast.success(`${savedCount} indicadores pré-preenchidos automaticamente`);
           }
@@ -319,7 +320,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     // Cap file size (5 MB) to prevent locking the page on a bad drop.
     const MAX_BYTES = 5 * 1024 * 1024;
     if (file.size > MAX_BYTES) {
-      toast.error('Arquivo muito grande', { description: 'Tamanho máximo: 5 MB.' });
+      toast.error(tx('Arquivo muito grande'), { description: 'Tamanho máximo: 5 MB.' });
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
@@ -366,12 +367,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
     const reader = new FileReader();
     reader.onerror = () => {
-      toast.error('Não foi possível ler o arquivo.');
+      toast.error(tx('Não foi possível ler o arquivo.'));
     };
     reader.onload = (e) => {
       const buffer = e.target?.result as ArrayBuffer;
       if (!buffer) {
-        toast.error('Arquivo vazio.');
+        toast.error(tx('Arquivo vazio.'));
         return;
       }
 
@@ -387,7 +388,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       const lines = cleaned.split(/\r?\n/).filter(line => line.trim().length > 0);
 
       if (lines.length < 2) {
-        toast.error('CSV sem linhas de dados', {
+        toast.error(tx('CSV sem linhas de dados'), {
           description: 'Inclua o cabeçalho e ao menos uma linha de dados.',
         });
         return;
@@ -578,7 +579,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
     // Block save if validation error
     if (validationErrors[indicatorId]) {
-      toast.error('Corrija o valor antes de salvar');
+      toast.error(tx('Corrija o valor antes de salvar'));
       return;
     }
 
@@ -602,7 +603,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     // Check for validation errors
     const activeErrors = Object.entries(validationErrors).filter(([id, err]) => err && editedValues[id]);
     if (activeErrors.length > 0) {
-      toast.error('Corrija os erros de validação antes de salvar', {
+      toast.error(tx('Corrija os erros de validação antes de salvar'), {
         description: `${activeErrors.length} indicador(es) com valores inválidos`,
       });
       return;
@@ -617,7 +618,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
     await bulkUpsertValues.mutateAsync(dataToSave);
     setEditedValues({});
-    toast.success('Todos os valores foram salvos!');
+    toast.success(tx('Todos os valores foram salvos!'));
   };
 
   // ---------------------------------------------------------------------------
@@ -652,12 +653,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         return next;
       });
       setAutosaveStatus('saved');
-      if (!silent) toast.success('Rascunho salvo automaticamente');
+      if (!silent) toast.success(tx('Rascunho salvo automaticamente'));
       return true;
     } catch (err) {
       console.error('[autosave] failed', err);
       setAutosaveStatus('error');
-      if (!silent) toast.error('Falha ao salvar rascunho automaticamente');
+      if (!silent) toast.error(tx('Falha ao salvar rascunho automaticamente'));
       return false;
     }
   };
@@ -700,7 +701,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     if (Object.keys(editedValuesRef.current).length > 0) {
       const ok = await flushAutosave(false);
       if (!ok) {
-        toast.error('Não foi possível salvar antes de trocar — corrija os erros e tente novamente.');
+        toast.error(tx('Não foi possível salvar antes de trocar — corrija os erros e tente novamente.'));
         return;
       }
     }
@@ -799,15 +800,15 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                 <Database className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold">Selecione o Diagnóstico</h3>
+                <h3 className="font-semibold">{tx('Selecione o Diagnóstico')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Escolha o diagnóstico para preencher os dados
+                  {tx('Escolha o diagnóstico para preencher os dados')}
                 </p>
               </div>
             </div>
             <Select value={selectedAssessment} onValueChange={handleAssessmentSwitch}>
               <SelectTrigger className="w-72">
-                <SelectValue placeholder="Selecionar diagnóstico" />
+                <SelectValue placeholder={tx('Selecionar diagnóstico')} />
               </SelectTrigger>
               <SelectContent>
                 {assessments?.filter(a => a.status !== 'CALCULATED').map((a) => {
@@ -833,12 +834,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
               {isEnterpriseAssessment ? (
                 <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
                   <Hotel className="h-3 w-3 mr-1" />
-                  Empresarial
+                  {tx('Empresarial')}
                 </Badge>
               ) : (
                 <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                   <Landmark className="h-3 w-3 mr-1" />
-                  Territorial
+                  {tx('Territorial')}
                 </Badge>
               )}
               <Badge variant="outline">
@@ -872,7 +873,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
           <Card>
             <CardContent className="py-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">Progresso do Preenchimento</span>
+                <span className="text-sm font-medium">{tx('Progresso do Preenchimento')}</span>
                 <span className="text-sm text-muted-foreground">
                   {filledCount} de {activeIndicators.length} indicadores
                   {ignoredCount > 0 && (
@@ -933,12 +934,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                     {calculating ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Calculando...
+                        {tx('Calculando...')}
                       </>
                     ) : (
                       <>
                         <Calculator className="h-4 w-4" />
-                        Calcular Diagnóstico
+                        {tx('Calcular Diagnóstico')}
                       </>
                     )}
                   </Button>
@@ -952,11 +953,11 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
             <TabsList className="grid w-full max-w-md grid-cols-2">
               <TabsTrigger value="formulario" className="gap-2">
                 <PenLine className="h-4 w-4" />
-                Formulário
+                {tx('Formulário')}
               </TabsTrigger>
               <TabsTrigger value="csv" className="gap-2">
                 <FileSpreadsheet className="h-4 w-4" />
-                Importar CSV
+                {tx('Importar CSV')}
               </TabsTrigger>
             </TabsList>
 
@@ -974,7 +975,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                     variant={fillFilter === 'all' ? 'default' : 'outline'}
                     onClick={() => setFillFilter('all')}
                   >
-                    Todos
+                    {tx('Todos')}
                   </Button>
                   <Button
                     type="button"
@@ -982,7 +983,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                     variant={fillFilter === 'unfilled' ? 'default' : 'outline'}
                     onClick={() => setFillFilter('unfilled')}
                   >
-                    Não preenchidos
+                    {tx('Não preenchidos')}
                   </Button>
                 </div>
               </div>
@@ -1007,11 +1008,11 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                           {autosaveStatus === 'saving' && (<><Loader2 className="h-3 w-3 animate-spin" /> Salvando rascunho…</>)}
                           {autosaveStatus === 'saved' && (<><CheckCircle2 className="h-3 w-3 text-severity-good" /> Rascunho salvo</>)}
                           {autosaveStatus === 'error' && (<><AlertCircle className="h-3 w-3 text-destructive" /> Falha no autosave</>)}
-                          {autosaveStatus === 'idle' && Object.keys(editedValues).length > 0 && (<>Alterações pendentes…</>)}
+                          {autosaveStatus === 'idle' && Object.keys(editedValues).length > 0 && (<>{tx('Alterações pendentes…')}</>)}
                         </span>
                         <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending || errorCount > 0}>
                           <Save className="mr-2 h-4 w-4" />
-                          Salvar Todos
+                          {tx('Salvar Todos')}
                         </Button>
                       </div>
                     </div>
@@ -1072,12 +1073,12 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                         <TooltipTrigger asChild>
                                           <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-emerald-500/60 text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 shrink-0">
                                             <Calculator className="h-2.5 w-2.5 mr-0.5" />
-                                            Calculado
+                                            {tx('Calculado')}
                                           </Badge>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-xs">
-                                          <p className="text-xs"><strong>Fórmula:</strong> {derivedInfo!.formula}</p>
-                                          <p className="text-xs mt-1 italic">Não preencha manualmente — gerado no recálculo.</p>
+                                          <p className="text-xs"><strong>{tx('Fórmula:')}</strong> {derivedInfo!.formula}</p>
+                                          <p className="text-xs mt-1 italic">{tx('Não preencha manualmente — gerado no recálculo.')}</p>
                                         </TooltipContent>
                                       </Tooltip>
                                     )}
@@ -1119,7 +1120,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                     {isIgnored && (
                                       <Badge variant="outline" className="text-xs px-1.5 py-0 border-destructive/50 text-destructive">
                                         <EyeOff className="h-3 w-3 mr-1" />
-                                        Ignorado
+                                        {tx('Ignorado')}
                                       </Badge>
                                     )}
                                   </div>
@@ -1129,7 +1130,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                     return (
                                       <div className="mt-2 p-2 rounded bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
                                         <p className="text-xs text-blue-700 dark:text-blue-300">
-                                          <strong>💡 Como obter:</strong> {guidance.howToFind}
+                                          <strong>{tx('💡 Como obter:')}</strong> {guidance.howToFind}
                                         </p>
                                         {guidance.examples && (
                                           <p className="text-xs text-blue-600/80 dark:text-blue-400/80 mt-1">
@@ -1145,17 +1146,17 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                     return (
                                       <div className="mt-2 p-2 rounded bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300/60 dark:border-emerald-800/40">
                                         <p className="text-xs text-emerald-800 dark:text-emerald-200 font-medium flex items-center gap-1">
-                                          🧮 Calculado automaticamente
+                                          {tx('🧮 Calculado automaticamente')}
                                         </p>
                                         <p className="text-xs text-emerald-700/90 dark:text-emerald-300/90 mt-1">
-                                          <strong>Fórmula:</strong> {derived.formula}
+                                          <strong>{tx('Fórmula:')}</strong> {derived.formula}
                                         </p>
                                         <p className="text-xs text-emerald-700/90 dark:text-emerald-300/90 mt-1">
-                                          <strong>Resultado em:</strong> {derived.resultUnit}
+                                          <strong>{tx('Resultado em:')}</strong> {derived.resultUnit}
                                         </p>
                                         {derived.requiredInputs.length > 0 && (
                                           <p className="text-xs text-emerald-700/80 dark:text-emerald-300/80 mt-1">
-                                            <strong>Insumos necessários:</strong> {derived.requiredInputs.join(' · ')}
+                                            <strong>{tx('Insumos necessários:')}</strong> {derived.requiredInputs.join(' · ')}
                                           </p>
                                         )}
                                         {derived.note && (
@@ -1164,7 +1165,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           </p>
                                         )}
                                         <p className="text-xs text-muted-foreground mt-1">
-                                          Não preencha este campo manualmente — o valor é gerado ao recalcular o diagnóstico.
+                                          {tx('Não preencha este campo manualmente — o valor é gerado ao recalcular o diagnóstico.')}
                                         </p>
                                       </div>
                                     );
@@ -1221,7 +1222,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           <SelectValue placeholder={isIgnored ? 'Ignorado' : isDerived ? '🧮 Calculado automaticamente' : 'Selecionar'} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value={EMPTY_SELECT_VALUE}>Não informado</SelectItem>
+                                          <SelectItem value={EMPTY_SELECT_VALUE}>{tx('Não informado')}</SelectItem>
                                           {fieldConfig.options.map((option) => (
                                             <SelectItem key={option.value} value={option.value}>
                                               {option.label}
@@ -1278,7 +1279,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                         <TooltipTrigger asChild>
                                           <PenLine className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-primary/50 pointer-events-auto cursor-pointer" />
                                         </TooltipTrigger>
-                                        <TooltipContent>Clique no campo para editar o valor pré-preenchido</TooltipContent>
+                                        <TooltipContent>{tx('Clique no campo para editar o valor pré-preenchido')}</TooltipContent>
                                       </Tooltip>
                                     )}
                                   </div>
@@ -1290,7 +1291,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                   )}
                                   {indicator.code === 'ana_iqa' && !isPreFilled && !currentValue && !hasUnsavedChanges && (
                                     <p className="text-xs text-muted-foreground mt-1 italic">
-                                      Nota: Nem todos os municípios terão estações IQA num raio de 50 km — nesses casos o campo fica disponível para preenchimento manual.
+                                      {tx('Nota: Nem todos os municípios terão estações IQA num raio de 50 km — nesses casos o campo fica disponível para preenchimento manual.')}
                                     </p>
                                   )}
                                 </div>
@@ -1368,20 +1369,20 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
                     <Info className="h-5 w-5 text-primary" />
-                    Formato do Arquivo CSV
+                    {tx('Formato do Arquivo CSV')}
                   </CardTitle>
                   <CardDescription>
-                    O arquivo deve seguir exatamente este formato para importação correta
+                    {tx('O arquivo deve seguir exatamente este formato para importação correta')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm">
                     <p className="text-muted-foreground mb-2"># Linha de cabeçalho (obrigatória):</p>
-                    <p className="text-foreground">codigo,valor,fonte</p>
+                    <p className="text-foreground">{tx('codigo,valor,fonte')}</p>
                     <p className="text-muted-foreground mt-3 mb-2"># Linhas de dados:</p>
-                    <p className="text-foreground">RA001,75,IBGE</p>
-                    <p className="text-foreground">RA002,92,Pesquisa Local</p>
-                    <p className="text-foreground">OE001,8500,Manual</p>
+                    <p className="text-foreground">{tx('RA001,75,IBGE')}</p>
+                    <p className="text-foreground">{tx('RA002,92,Pesquisa Local')}</p>
+                    <p className="text-foreground">{tx('OE001,8500,Manual')}</p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -1391,7 +1392,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                     </div>
                     <div className="p-3 bg-card border rounded-lg">
                       <p className="font-medium mb-1">valor</p>
-                      <p className="text-muted-foreground">Valor numérico do indicador</p>
+                      <p className="text-muted-foreground">{tx('Valor numérico do indicador')}</p>
                     </div>
                     <div className="p-3 bg-card border rounded-lg">
                       <p className="font-medium mb-1">fonte</p>
@@ -1401,7 +1402,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
                   <Button variant="outline" onClick={downloadTemplate}>
                     <Download className="mr-2 h-4 w-4" />
-                    Baixar Template CSV
+                    {tx('Baixar Template CSV')}
                   </Button>
                 </CardContent>
               </Card>
@@ -1410,7 +1411,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
                     <Upload className="h-5 w-5 text-primary" />
-                    Carregar Arquivo
+                    {tx('Carregar Arquivo')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1424,7 +1425,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                     />
                     <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
                       <FileSpreadsheet className="mr-2 h-4 w-4" />
-                      Selecionar Arquivo CSV
+                      {tx('Selecionar Arquivo CSV')}
                     </Button>
                     {parsedData.length > 0 && (
                       <Button onClick={handleImport} disabled={bulkUpsertValues.isPending}>
@@ -1439,11 +1440,11 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-16">Status</TableHead>
-                            <TableHead>Código</TableHead>
-                            <TableHead>Valor</TableHead>
-                            <TableHead>Fonte</TableHead>
-                            <TableHead>Mensagem</TableHead>
+                            <TableHead className="w-16">{tx('Status')}</TableHead>
+                            <TableHead>{tx('Código')}</TableHead>
+                            <TableHead>{tx('Valor')}</TableHead>
+                            <TableHead>{tx('Fonte')}</TableHead>
+                            <TableHead>{tx('Mensagem')}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -1483,9 +1484,9 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
       {!selectedAssessment && (
         <Card className="p-16 text-center">
           <Database className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Selecione um Diagnóstico</h3>
+          <h3 className="text-lg font-semibold mb-2">{tx('Selecione um Diagnóstico')}</h3>
           <p className="text-muted-foreground">
-            Escolha um diagnóstico acima para começar a preencher os dados dos indicadores.
+            {tx('Escolha um diagnóstico acima para começar a preencher os dados dos indicadores.')}
           </p>
         </Card>
       )}

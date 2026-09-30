@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -129,7 +130,7 @@ export function IndicatorDistributionReport() {
   }
 
   if (!distributionData) {
-    return <div className="text-muted-foreground">Nenhum indicador encontrado.</div>;
+    return <div className="text-muted-foreground">{tx('Nenhum indicador encontrado.')}</div>;
   }
 
   const { matrix, scopeTotals, pillarTotals, tierTotals, pillarChartData, scopePieData } = distributionData;
@@ -140,9 +141,9 @@ export function IndicatorDistributionReport() {
       <div className="flex items-center gap-3">
         <BarChart3 className="h-6 w-6 text-primary" />
         <div>
-          <h2 className="text-xl font-semibold">Distribuição de Indicadores</h2>
+          <h2 className="text-xl font-semibold">{tx('Distribuição de Indicadores')}</h2>
           <p className="text-sm text-muted-foreground">
-            Relatório consolidado por Escopo, Pilar e Tier
+            {tx('Relatório consolidado por Escopo, Pilar e Tier')}
           </p>
         </div>
         <Badge variant="outline" className="ml-auto text-lg px-3 py-1">
@@ -157,7 +158,7 @@ export function IndicatorDistributionReport() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Globe className="h-4 w-4" />
-              Por Escopo
+              {tx('Por Escopo')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -181,7 +182,7 @@ export function IndicatorDistributionReport() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-              Por Pilar
+              {tx('Por Pilar')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -204,7 +205,7 @@ export function IndicatorDistributionReport() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Target className="h-4 w-4" />
-              Por Tier
+              {tx('Por Tier')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -229,8 +230,8 @@ export function IndicatorDistributionReport() {
         {/* Bar Chart - Pillars by Tier */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Indicadores por Pilar e Tier</CardTitle>
-            <CardDescription>Distribuição de indicadores nos 3 pilares do SISTUR</CardDescription>
+            <CardTitle className="text-base">{tx('Indicadores por Pilar e Tier')}</CardTitle>
+            <CardDescription>{tx('Distribuição de indicadores nos 3 pilares do SISTUR')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -257,8 +258,8 @@ export function IndicatorDistributionReport() {
         {/* Pie Chart - Scope Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Distribuição por Escopo</CardTitle>
-            <CardDescription>Territorial vs Empresarial vs Ambos</CardDescription>
+            <CardTitle className="text-base">{tx('Distribuição por Escopo')}</CardTitle>
+            <CardDescription>{tx('Territorial vs Empresarial vs Ambos')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -293,34 +294,34 @@ export function IndicatorDistributionReport() {
       {/* Detailed Matrix Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Matriz Detalhada: Escopo × Pilar × Tier</CardTitle>
-          <CardDescription>Contagem de indicadores em cada combinação</CardDescription>
+          <CardTitle className="text-base">{tx('Matriz Detalhada: Escopo × Pilar × Tier')}</CardTitle>
+          <CardDescription>{tx('Contagem de indicadores em cada combinação')}</CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-32">Escopo</TableHead>
-                <TableHead className="w-24">Pilar</TableHead>
+                <TableHead className="w-32">{tx('Escopo')}</TableHead>
+                <TableHead className="w-24">{tx('Pilar')}</TableHead>
                 <TableHead className="text-center">
                   <div className="flex items-center justify-center gap-1">
                     <Zap className="h-3 w-3 text-green-600" />
-                    Essencial
+                    {tx('Essencial')}
                   </div>
                 </TableHead>
                 <TableHead className="text-center">
                   <div className="flex items-center justify-center gap-1">
                     <Gauge className="h-3 w-3 text-amber-600" />
-                    Estratégico
+                    {tx('Estratégico')}
                   </div>
                 </TableHead>
                 <TableHead className="text-center">
                   <div className="flex items-center justify-center gap-1">
                     <Target className="h-3 w-3 text-primary" />
-                    Integral
+                    {tx('Integral')}
                   </div>
                 </TableHead>
-                <TableHead className="text-center font-semibold">Total</TableHead>
+                <TableHead className="text-center font-semibold">{tx('Total')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -374,7 +375,7 @@ export function IndicatorDistributionReport() {
               })}
               {/* Totals Row */}
               <TableRow className="bg-muted/30 font-semibold">
-                <TableCell colSpan={2} className="text-right">Total Geral</TableCell>
+                <TableCell colSpan={2} className="text-right">{tx('Total Geral')}</TableCell>
                 <TableCell className="text-center">{tierTotals.SMALL}</TableCell>
                 <TableCell className="text-center">{tierTotals.MEDIUM}</TableCell>
                 <TableCell className="text-center">{tierTotals.COMPLETE}</TableCell>

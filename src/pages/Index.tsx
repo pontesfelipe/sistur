@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { LaunchBanner } from '@/components/layout/LaunchBanner';
 import { useState, useCallback, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -264,7 +265,7 @@ const Index = () => {
 
   return (
     <AppLayout 
-      title="Dashboard" 
+      title={tx('Dashboard')} 
       subtitle={isEnterprise ? "Visão consolidada do setor hoteleiro" : "Painel de controle do sistema de turismo"}
       actions={
         <div className="flex items-center gap-1 sm:gap-2">
@@ -285,19 +286,19 @@ const Index = () => {
             >
               <ToggleGroupItem 
                 value="territorial" 
-                aria-label="Ver diagnósticos territoriais"
+                aria-label={tx('Ver diagnósticos territoriais')}
                 className="gap-1.5 h-8 px-2 sm:h-10 sm:px-3 data-[state=on]:bg-background data-[state=on]:shadow-sm"
               >
                 <Landmark className="h-4 w-4" />
-                <span className="hidden sm:inline">Territorial</span>
+                <span className="hidden sm:inline">{tx('Territorial')}</span>
               </ToggleGroupItem>
               <ToggleGroupItem 
                 value="enterprise" 
-                aria-label="Ver diagnósticos enterprise"
+                aria-label={tx('Ver diagnósticos enterprise')}
                 className="gap-1.5 h-8 px-2 sm:h-10 sm:px-3 data-[state=on]:bg-background data-[state=on]:shadow-sm"
               >
                 <Hotel className="h-4 w-4" />
-                <span className="hidden sm:inline">Empresarial</span>
+                <span className="hidden sm:inline">{tx('Empresarial')}</span>
               </ToggleGroupItem>
             </ToggleGroup>
           ) : null}
@@ -329,10 +330,10 @@ const Index = () => {
             </>
           ) : (
             <>
-              <StatCard title="Destinos Cadastrados" value={stats?.totalDestinations ?? 0} icon={MapPin} variant="primary" />
-              <StatCard title="Diagnósticos" value={stats?.activeAssessments ?? 0} icon={ClipboardList} />
-              <StatCard title="Gargalos Críticos" value={stats?.criticalIssues ?? 0} icon={AlertTriangle} variant="warning" />
-              <StatCard title="Capacitações" value={stats?.pendingRecommendations ?? 0} icon={GraduationCap} variant="success" />
+              <StatCard title={tx('Destinos Cadastrados')} value={stats?.totalDestinations ?? 0} icon={MapPin} variant="primary" />
+              <StatCard title={tx('Diagnósticos')} value={stats?.activeAssessments ?? 0} icon={ClipboardList} />
+              <StatCard title={tx('Gargalos Críticos')} value={stats?.criticalIssues ?? 0} icon={AlertTriangle} variant="warning" />
+              <StatCard title={tx('Capacitações')} value={stats?.pendingRecommendations ?? 0} icon={GraduationCap} variant="success" />
             </>
           )}
         </div>
@@ -394,13 +395,13 @@ const Index = () => {
                       <Button variant="outline" size="sm" className="flex-1 sm:flex-none" asChild>
                         <Link to="/relatorios">
                           <FileText className="mr-2 h-4 w-4" />
-                          <span className="hidden xs:inline">Relatório</span>
+                          <span className="hidden xs:inline">{tx('Relatório')}</span>
                         </Link>
                       </Button>
                       <Button variant="outline" size="sm" className="flex-1 sm:flex-none" asChild>
                         <Link to="/diagnosticos">
-                          <span className="hidden xs:inline">Ver diagnósticos</span>
-                          <span className="xs:hidden">Ver</span>
+                          <span className="hidden xs:inline">{tx('Ver diagnósticos')}</span>
+                          <span className="xs:hidden">{tx('Ver')}</span>
                           <ArrowRight className="ml-1 sm:ml-2 h-4 w-4" />
                         </Link>
                       </Button>
@@ -449,8 +450,8 @@ const Index = () => {
                       <div className="mt-6 space-y-3">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                           <div>
-                            <h4 className="font-display text-base font-semibold text-foreground">Mandala do Destino</h4>
-                            <p className="text-xs text-muted-foreground">Selecione um destino para visualizar sua mandala sistêmica.</p>
+                            <h4 className="font-display text-base font-semibold text-foreground">{tx('Mandala do Destino')}</h4>
+                            <p className="text-xs text-muted-foreground">{tx('Selecione um destino para visualizar sua mandala sistêmica.')}</p>
                           </div>
                           <Select
                             value={mandalaDestination ?? "inherit"}
@@ -458,7 +459,7 @@ const Index = () => {
                           >
                             <SelectTrigger className="w-full sm:w-[220px]">
                               <MapPin className="h-4 w-4 mr-2" />
-                              <SelectValue placeholder="Destino da Mandala" />
+                              <SelectValue placeholder={tx('Destino da Mandala')} />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="inherit">
@@ -486,7 +487,7 @@ const Index = () => {
                           />
                         ) : (
                           <p className="text-sm text-muted-foreground text-center py-8 border rounded-2xl">
-                            Nenhum diagnóstico calculado para o destino selecionado.
+                            {tx('Nenhum diagnóstico calculado para o destino selecionado.')}
                           </p>
                         )}
                       </div>
@@ -494,7 +495,7 @@ const Index = () => {
                   </>
                 ) : (
                   <p className="text-muted-foreground text-center py-8">
-                    Nenhum dado de diagnóstico disponível ainda.
+                    {tx('Nenhum dado de diagnóstico disponível ainda.')}
                   </p>
                 )}
               </CardContent>
@@ -511,7 +512,7 @@ const Index = () => {
                 </CardTitle>
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/diagnosticos">
-                    Ver todos
+                    {tx('Ver todos')}
                     <ArrowRight className="ml-1 h-4 w-4" />
                   </Link>
                 </Button>
@@ -611,7 +612,7 @@ const Index = () => {
                 >
                   <Link to={`/nova-rodada${isEnterprise ? '?type=enterprise' : ''}`}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Nova Rodada
+                    {tx('Nova Rodada')}
                   </Link>
                 </Button>
               </CardContent>
@@ -622,7 +623,7 @@ const Index = () => {
           {isEnabled('workflow-status') && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-display">Status do Fluxo</CardTitle>
+                <CardTitle className="text-lg font-display">{tx('Status do Fluxo')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {recentLoading ? (
@@ -659,7 +660,7 @@ const Index = () => {
                   })
                 ) : (
                   <p className="text-muted-foreground text-center py-4">
-                    Nenhum diagnóstico criado ainda.
+                    {tx('Nenhum diagnóstico criado ainda.')}
                   </p>
                 )}
               </CardContent>
@@ -670,7 +671,7 @@ const Index = () => {
           {isEnabled('recommendations') && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-display">Recomendações Prioritárias</CardTitle>
+                <CardTitle className="text-lg font-display">{tx('Recomendações Prioritárias')}</CardTitle>
               </CardHeader>
               <CardContent>
                 {recsLoading ? (
@@ -686,13 +687,13 @@ const Index = () => {
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-4">
-                    Nenhuma recomendação disponível.
+                    {tx('Nenhuma recomendação disponível.')}
                   </p>
                 )}
                 <Button variant="outline" className="w-full mt-4" asChild>
                   <Link to="/edu/catalogo">
                     <GraduationCap className="mr-2 h-4 w-4" />
-                    Ver catálogo SISTUR EDU
+                    {tx('Ver catálogo SISTUR EDU')}
                   </Link>
                 </Button>
               </CardContent>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -100,13 +101,13 @@ export function IssuesView({ issues }: IssuesViewProps) {
       <div className="flex flex-col sm:flex-row gap-3 p-4 bg-muted/30 rounded-lg border">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Filter className="h-4 w-4" />
-          <span>Filtros:</span>
+          <span>{tx('Filtros:')}</span>
         </div>
         <div className="flex flex-wrap gap-3 flex-1">
           <div className="relative flex-1 min-w-[180px] max-w-[280px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar gargalo..."
+              placeholder={tx('Buscar gargalo...')}
               className="pl-9 h-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -114,10 +115,10 @@ export function IssuesView({ issues }: IssuesViewProps) {
           </div>
           <Select value={pillarFilter} onValueChange={setPillarFilter}>
             <SelectTrigger className="w-28 h-9">
-              <SelectValue placeholder="Pilar" />
+              <SelectValue placeholder={tx('Pilar')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="all">{tx('Todos')}</SelectItem>
               <SelectItem value="ra">IRA</SelectItem>
               <SelectItem value="oe">IOE</SelectItem>
               <SelectItem value="ao">IAO</SelectItem>
@@ -125,20 +126,20 @@ export function IssuesView({ issues }: IssuesViewProps) {
           </Select>
           <Select value={severityFilter} onValueChange={setSeverityFilter}>
             <SelectTrigger className="w-32 h-9">
-              <SelectValue placeholder="Severidade" />
+              <SelectValue placeholder={tx('Severidade')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              <SelectItem value="CRITICO">Crítico</SelectItem>
-              <SelectItem value="MODERADO">Moderado</SelectItem>
+              <SelectItem value="all">{tx('Todas')}</SelectItem>
+              <SelectItem value="CRITICO">{tx('Crítico')}</SelectItem>
+              <SelectItem value="MODERADO">{tx('Moderado')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={themeFilter} onValueChange={setThemeFilter}>
             <SelectTrigger className="w-44 h-9">
-              <SelectValue placeholder="Tema" />
+              <SelectValue placeholder={tx('Tema')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os temas</SelectItem>
+              <SelectItem value="all">{tx('Todos os temas')}</SelectItem>
               {availableThemes.map(theme => (
                 <SelectItem key={theme} value={theme}>{theme}</SelectItem>
               ))}
@@ -146,13 +147,13 @@ export function IssuesView({ issues }: IssuesViewProps) {
           </Select>
           <Select value={interpretationFilter} onValueChange={setInterpretationFilter}>
             <SelectTrigger className="w-36 h-9">
-              <SelectValue placeholder="Interpretação" />
+              <SelectValue placeholder={tx('Interpretação')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              <SelectItem value="ESTRUTURAL">Estrutural</SelectItem>
-              <SelectItem value="GESTAO">Gestão</SelectItem>
-              <SelectItem value="ENTREGA">Entrega</SelectItem>
+              <SelectItem value="all">{tx('Todas')}</SelectItem>
+              <SelectItem value="ESTRUTURAL">{tx('Estrutural')}</SelectItem>
+              <SelectItem value="GESTAO">{tx('Gestão')}</SelectItem>
+              <SelectItem value="ENTREGA">{tx('Entrega')}</SelectItem>
             </SelectContent>
           </Select>
         </div>

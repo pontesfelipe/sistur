@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -47,19 +48,19 @@ export function ProjectEduPanel({ projectId }: Props) {
         <Card>
           <CardContent className="pt-6 flex items-center gap-3">
             <GraduationCap className="h-8 w-8 text-primary" />
-            <div><p className="text-sm text-muted-foreground">Concluídos</p><p className="text-2xl font-bold">{completed}/{enrollments.length}</p></div>
+            <div><p className="text-sm text-muted-foreground">{tx('Concluídos')}</p><p className="text-2xl font-bold">{completed}/{enrollments.length}</p></div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6 flex items-center gap-3">
             <BookOpen className="h-8 w-8 text-amber-500" />
-            <div><p className="text-sm text-muted-foreground">Obrigatórios pendentes</p><p className="text-2xl font-bold">{mandatoryPending}</p></div>
+            <div><p className="text-sm text-muted-foreground">{tx('Obrigatórios pendentes')}</p><p className="text-2xl font-bold">{mandatoryPending}</p></div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6 flex items-center gap-3">
             <Sparkles className="h-8 w-8 text-purple-500" />
-            <div><p className="text-sm text-muted-foreground">Cursos sugeridos</p><p className="text-2xl font-bold">{relevantRecs.length}</p></div>
+            <div><p className="text-sm text-muted-foreground">{tx('Cursos sugeridos')}</p><p className="text-2xl font-bold">{relevantRecs.length}</p></div>
           </CardContent>
         </Card>
       </div>
@@ -69,7 +70,7 @@ export function ProjectEduPanel({ projectId }: Props) {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2"><Sparkles className="h-4 w-4 text-purple-500" /> Cursos recomendados pelo diagnóstico</CardTitle>
-            <CardDescription>Prescrições EDU para os indicadores deste projeto</CardDescription>
+            <CardDescription>{tx('Prescrições EDU para os indicadores deste projeto')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -103,14 +104,14 @@ export function ProjectEduPanel({ projectId }: Props) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Capacitações vinculadas</CardTitle>
-            <CardDescription>Cursos que apoiam a execução deste projeto</CardDescription>
+            <CardTitle>{tx('Capacitações vinculadas')}</CardTitle>
+            <CardDescription>{tx('Cursos que apoiam a execução deste projeto')}</CardDescription>
           </div>
-          <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4 mr-2" />Novo</Button>
+          <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4 mr-2" />{tx('Novo')}</Button>
         </CardHeader>
         <CardContent>
           {enrollments.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">Nenhuma capacitação vinculada ainda.</p>
+            <p className="text-sm text-muted-foreground text-center py-8">{tx('Nenhuma capacitação vinculada ainda.')}</p>
           ) : (
             <div className="space-y-2">
               {enrollments.map(e => {
@@ -120,7 +121,7 @@ export function ProjectEduPanel({ projectId }: Props) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-medium text-sm">{e.course_title}</p>
-                        {e.is_mandatory && <Badge variant="destructive">Obrigatório</Badge>}
+                        {e.is_mandatory && <Badge variant="destructive">{tx('Obrigatório')}</Badge>}
                         <Badge className={cn('text-white', info.color)}>{info.label}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">
@@ -150,18 +151,18 @@ export function ProjectEduPanel({ projectId }: Props) {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Vincular capacitação</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tx('Vincular capacitação')}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Curso</Label><Input value={form.course_title} onChange={e => setForm({ ...form, course_title: e.target.value })} /></div>
+            <div><Label>{tx('Curso')}</Label><Input value={form.course_title} onChange={e => setForm({ ...form, course_title: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Público</Label>
+                <Label>{tx('Público')}</Label>
                 <Select value={form.target_audience} onValueChange={v => setForm({ ...form, target_audience: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Gestores">Gestores</SelectItem>
-                    <SelectItem value="Técnicos">Técnicos</SelectItem>
-                    <SelectItem value="Trade">Trade</SelectItem>
+                    <SelectItem value="Gestores">{tx('Gestores')}</SelectItem>
+                    <SelectItem value="Técnicos">{tx('Técnicos')}</SelectItem>
+                    <SelectItem value="Trade">{tx('Trade')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -170,11 +171,11 @@ export function ProjectEduPanel({ projectId }: Props) {
             <div><Label>Aluno (opcional)</Label><Input value={form.user_name} onChange={e => setForm({ ...form, user_name: e.target.value })} /></div>
             <div className="flex items-center gap-2">
               <Checkbox checked={form.is_mandatory} onCheckedChange={v => setForm({ ...form, is_mandatory: !!v })} />
-              <Label>Obrigatório</Label>
+              <Label>{tx('Obrigatório')}</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>{tx('Cancelar')}</Button>
             <Button onClick={async () => {
               if (!form.course_title) return;
               await create.mutateAsync({
@@ -188,7 +189,7 @@ export function ProjectEduPanel({ projectId }: Props) {
               });
               setOpen(false);
               setForm({ course_title: '', target_audience: 'Gestores', user_name: '', is_mandatory: false, indicator_code: '' });
-            }}>Vincular</Button>
+            }}>{tx('Vincular')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -167,7 +168,7 @@ export function EnterpriseCategoriesView({ indicatorScores }: EnterpriseCategori
     return (
       <div className="text-center py-12 text-muted-foreground">
         <Building2 className="mx-auto h-12 w-12 mb-4 opacity-50" />
-        <p>Nenhum score de indicador enterprise disponível</p>
+        <p>{tx('Nenhum score de indicador enterprise disponível')}</p>
       </div>
     );
   }

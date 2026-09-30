@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -84,15 +85,15 @@ const Destinos = () => {
 
   return (
     <AppLayout 
-      title="Destinos" 
-      subtitle="Gerencie os destinos turísticos"
+      title={tx('Destinos')} 
+      subtitle={tx('Gerencie os destinos turísticos')}
     >
       {/* Header Actions */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between mb-6">
         <div className="relative max-w-md flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar destinos..."
+            placeholder={tx('Buscar destinos...')}
             className="pl-9"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -101,7 +102,7 @@ const Destinos = () => {
         {canMutate && (
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Novo Destino
+            {tx('Novo Destino')}
           </Button>
         )}
       </div>
@@ -147,13 +148,13 @@ const Destinos = () => {
                     <DropdownMenuItem asChild>
                       <Link to={`/diagnosticos?destino=${destination.id}`}>
                         <Eye className="mr-2 h-4 w-4" />
-                        Ver detalhes
+                        {tx('Ver detalhes')}
                       </Link>
                     </DropdownMenuItem>
                     {canMutate && (
                       <DropdownMenuItem onClick={() => handleEdit(destination)}>
                         <Edit className="mr-2 h-4 w-4" />
-                        Editar
+                        {tx('Editar')}
                       </DropdownMenuItem>
                     )}
                     {canMutate && (
@@ -162,7 +163,7 @@ const Destinos = () => {
                         onClick={() => setDeleteId(destination.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Excluir
+                        {tx('Excluir')}
                       </DropdownMenuItem>
                     )}
                   </DropdownMenuContent>
@@ -171,11 +172,11 @@ const Destinos = () => {
 
               <div className="mt-4 pt-4 border-t border-border">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Código IBGE</span>
+                  <span className="text-muted-foreground">{tx('Código IBGE')}</span>
                   <span className="font-mono text-foreground">{destination.ibge_code || '—'}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm mt-2">
-                  <span className="text-muted-foreground">Coordenadas</span>
+                  <span className="text-muted-foreground">{tx('Coordenadas')}</span>
                   <span className="font-mono text-foreground text-xs">
                     {destination.latitude && destination.longitude 
                       ? `${destination.latitude.toFixed(4)}, ${destination.longitude.toFixed(4)}`
@@ -186,7 +187,7 @@ const Destinos = () => {
 
               <Button variant="outline" className="w-full mt-4" asChild>
                 <Link to={`/diagnosticos?destino=${destination.id}`}>
-                  Ver diagnósticos
+                  {tx('Ver diagnósticos')}
                 </Link>
               </Button>
             </div>
@@ -209,7 +210,7 @@ const Destinos = () => {
           {!searchQuery && canMutate && (
             <Button className="mt-4" onClick={() => setIsFormOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Novo Destino
+              {tx('Novo Destino')}
             </Button>
           )}
         </div>
@@ -229,13 +230,13 @@ const Destinos = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir destino?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. Todos os diagnósticos associados também serão excluídos.
+              {tx('Esta ação não pode ser desfeita. Todos os diagnósticos associados também serão excluídos.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Excluir
+              {tx('Excluir')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

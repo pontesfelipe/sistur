@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -63,11 +64,11 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      toast.error('Selecione um arquivo de imagem');
+      toast.error(tx('Selecione um arquivo de imagem'));
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      toast.error('Imagem deve ter no máximo 2MB');
+      toast.error(tx('Imagem deve ter no máximo 2MB'));
       return;
     }
     const reader = new FileReader();
@@ -81,13 +82,13 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
     saveCustomization(config);
     onApply(config);
     onOpenChange(false);
-    toast.success('Personalização salva!');
+    toast.success(tx('Personalização salva!'));
   };
 
   const handleReset = () => {
     setConfig({ ...DEFAULT_CUSTOMIZATION });
     localStorage.removeItem(STORAGE_KEY);
-    toast.info('Personalização restaurada ao padrão');
+    toast.info(tx('Personalização restaurada ao padrão'));
   };
 
   return (
@@ -96,10 +97,10 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings2 className="h-5 w-5 text-primary" />
-            Personalizar Relatório
+            {tx('Personalizar Relatório')}
           </DialogTitle>
           <DialogDescription>
-            Configure logo, cabeçalho, rodapé e aparência dos relatórios exportados
+            {tx('Configure logo, cabeçalho, rodapé e aparência dos relatórios exportados')}
           </DialogDescription>
         </DialogHeader>
 
@@ -107,11 +108,11 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
           <div className="space-y-6 py-2">
             {/* Logo */}
             <div className="space-y-2">
-              <Label className="text-sm font-semibold">Logo da Organização</Label>
+              <Label className="text-sm font-semibold">{tx('Logo da Organização')}</Label>
               <div className="flex items-center gap-3">
                 {config.logoUrl ? (
                   <div className="relative h-16 w-32 border rounded-md overflow-hidden bg-muted flex items-center justify-center">
-                    <img src={config.logoUrl} alt="Logo" className="max-h-full max-w-full object-contain" />
+                    <img src={config.logoUrl} alt={tx('Logo')} className="max-h-full max-w-full object-contain" />
                     <Button
                       variant="destructive"
                       size="icon"
@@ -128,7 +129,7 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
                   >
                     <div className="text-center">
                       <ImageIcon className="h-5 w-5 mx-auto text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Upload</span>
+                      <span className="text-xs text-muted-foreground">{tx('Upload')}</span>
                     </div>
                   </div>
                 )}
@@ -142,21 +143,21 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
                 {config.logoUrl && (
                   <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
                     <Upload className="h-3 w-3 mr-1" />
-                    Trocar
+                    {tx('Trocar')}
                   </Button>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">PNG ou JPG, máx. 2MB. Aparece no cabeçalho do Word e PDF.</p>
+              <p className="text-xs text-muted-foreground">{tx('PNG ou JPG, máx. 2MB. Aparece no cabeçalho do Word e PDF.')}</p>
             </div>
 
             <Separator />
 
             {/* Organization */}
             <div className="space-y-2">
-              <Label htmlFor="orgName">Nome da Organização</Label>
+              <Label htmlFor="orgName">{tx('Nome da Organização')}</Label>
               <Input
                 id="orgName"
-                placeholder="Ex: Secretaria Municipal de Turismo"
+                placeholder={tx('Ex: Secretaria Municipal de Turismo')}
                 value={config.organizationName}
                 onChange={(e) => setConfig(prev => ({ ...prev, organizationName: e.target.value }))}
               />
@@ -164,10 +165,10 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
 
             {/* Header */}
             <div className="space-y-2">
-              <Label htmlFor="headerText">Texto do Cabeçalho</Label>
+              <Label htmlFor="headerText">{tx('Texto do Cabeçalho')}</Label>
               <Input
                 id="headerText"
-                placeholder="Texto exibido no topo de cada página"
+                placeholder={tx('Texto exibido no topo de cada página')}
                 value={config.headerText}
                 onChange={(e) => setConfig(prev => ({ ...prev, headerText: e.target.value }))}
               />
@@ -175,10 +176,10 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
 
             {/* Footer */}
             <div className="space-y-2">
-              <Label htmlFor="footerText">Texto do Rodapé</Label>
+              <Label htmlFor="footerText">{tx('Texto do Rodapé')}</Label>
               <Input
                 id="footerText"
-                placeholder="Ex: Documento confidencial — Uso interno"
+                placeholder={tx('Ex: Documento confidencial — Uso interno')}
                 value={config.footerText}
                 onChange={(e) => setConfig(prev => ({ ...prev, footerText: e.target.value }))}
               />
@@ -188,10 +189,10 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
 
             {/* Appearance */}
             <div className="space-y-4">
-              <Label className="text-sm font-semibold">Aparência</Label>
+              <Label className="text-sm font-semibold">{tx('Aparência')}</Label>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="primaryColor" className="text-sm">Cor primária</Label>
+                <Label htmlFor="primaryColor" className="text-sm">{tx('Cor primária')}</Label>
                 <div className="flex items-center gap-2">
                   <input
                     id="primaryColor"
@@ -205,7 +206,7 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
               </div>
 
               <div className="flex items-center justify-between">
-                <Label className="text-sm">Tamanho da fonte</Label>
+                <Label className="text-sm">{tx('Tamanho da fonte')}</Label>
                 <Select
                   value={config.fontSize}
                   onValueChange={(v) => setConfig(prev => ({ ...prev, fontSize: v as any }))}
@@ -214,15 +215,15 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="small">Pequena</SelectItem>
-                    <SelectItem value="medium">Média</SelectItem>
-                    <SelectItem value="large">Grande</SelectItem>
+                    <SelectItem value="small">{tx('Pequena')}</SelectItem>
+                    <SelectItem value="medium">{tx('Média')}</SelectItem>
+                    <SelectItem value="large">{tx('Grande')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="showDate" className="text-sm">Exibir data de geração</Label>
+                <Label htmlFor="showDate" className="text-sm">{tx('Exibir data de geração')}</Label>
                 <Switch
                   id="showDate"
                   checked={config.showDate}
@@ -231,7 +232,7 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="showPageNumbers" className="text-sm">Exibir número de páginas</Label>
+                <Label htmlFor="showPageNumbers" className="text-sm">{tx('Exibir número de páginas')}</Label>
                 <Switch
                   id="showPageNumbers"
                   checked={config.showPageNumbers}
@@ -247,23 +248,23 @@ export function ReportCustomizationDialog({ open, onOpenChange, onApply }: Props
               <Label htmlFor="additionalNotes">Notas adicionais (rodapé do relatório)</Label>
               <Textarea
                 id="additionalNotes"
-                placeholder="Ex: Este relatório é parte do plano estratégico 2025-2028..."
+                placeholder={tx('Ex: Este relatório é parte do plano estratégico 2025-2028...')}
                 value={config.additionalNotes}
                 rows={3}
                 onChange={(e) => setConfig(prev => ({ ...prev, additionalNotes: e.target.value }))}
               />
-              <p className="text-xs text-muted-foreground">Adicionado como bloco final antes do rodapé.</p>
+              <p className="text-xs text-muted-foreground">{tx('Adicionado como bloco final antes do rodapé.')}</p>
             </div>
           </div>
         </ScrollArea>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
           <Button variant="ghost" size="sm" onClick={handleReset} className="text-muted-foreground">
-            Restaurar padrão
+            {tx('Restaurar padrão')}
           </Button>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-            <Button onClick={handleApply}>Salvar Personalização</Button>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>{tx('Cancelar')}</Button>
+            <Button onClick={handleApply}>{tx('Salvar Personalização')}</Button>
           </div>
         </DialogFooter>
       </DialogContent>

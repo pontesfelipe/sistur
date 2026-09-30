@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -63,7 +64,7 @@ export default function Projetos() {
 
   if (selectedProjectId) {
     return (
-      <AppLayout title="Projeto">
+      <AppLayout title={tx('Projeto')}>
         <ProjectDetailView
           projectId={selectedProjectId}
           onBack={() => setSelectedProjectId(null)}
@@ -73,17 +74,17 @@ export default function Projetos() {
   }
 
   return (
-    <AppLayout title="Gerenciamento de Projetos">
+    <AppLayout title={tx('Gerenciamento de Projetos')}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold flex items-center gap-2">
               <FolderKanban className="h-6 w-6 text-primary" />
-              Gerenciamento de Projetos
+              {tx('Gerenciamento de Projetos')}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Crie e gerencie projetos baseados em diagnósticos e relatórios
+              {tx('Crie e gerencie projetos baseados em diagnósticos e relatórios')}
             </p>
           </div>
           <div className="flex gap-2">
@@ -111,11 +112,11 @@ export default function Projetos() {
               }}
             >
               <Download className="h-4 w-4" />
-              Exportar CSV
+              {tx('Exportar CSV')}
             </Button>
             <Button onClick={() => setCreateDialogOpen(true)} className="gap-2">
               <Plus className="h-4 w-4" />
-              Novo Projeto
+              {tx('Novo Projeto')}
             </Button>
           </div>
         </div>
@@ -126,7 +127,7 @@ export default function Projetos() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total</p>
+                  <p className="text-sm text-muted-foreground">{tx('Total')}</p>
                   <p className="text-2xl font-bold">{projects?.length || 0}</p>
                 </div>
                 <FolderKanban className="h-8 w-8 text-primary/50" />
@@ -137,7 +138,7 @@ export default function Projetos() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Em Andamento</p>
+                  <p className="text-sm text-muted-foreground">{tx('Em Andamento')}</p>
                   <p className="text-2xl font-bold text-amber-600">{activeProjects.length}</p>
                 </div>
                 <Clock className="h-8 w-8 text-amber-500/50" />
@@ -148,7 +149,7 @@ export default function Projetos() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Planejamento</p>
+                  <p className="text-sm text-muted-foreground">{tx('Planejamento')}</p>
                   <p className="text-2xl font-bold text-blue-600">{planningProjects.length}</p>
                 </div>
                 <Target className="h-8 w-8 text-blue-500/50" />
@@ -159,7 +160,7 @@ export default function Projetos() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Concluídos</p>
+                  <p className="text-sm text-muted-foreground">{tx('Concluídos')}</p>
                   <p className="text-2xl font-bold text-green-600">{completedProjects.length}</p>
                 </div>
                 <BarChart3 className="h-8 w-8 text-green-500/50" />
@@ -174,7 +175,7 @@ export default function Projetos() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-primary" />
-                Impacto agregado do portfólio
+                {tx('Impacto agregado do portfólio')}
               </CardTitle>
               <CardDescription>
                 Indicadores monitorados em {portfolio.projectsWithLinks} projeto(s) com baseline registrado.
@@ -183,7 +184,7 @@ export default function Projetos() {
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">Indicadores vinculados</p>
+                  <p className="text-xs text-muted-foreground">{tx('Indicadores vinculados')}</p>
                   <p className="text-2xl font-bold">{portfolio.total}</p>
                 </div>
                 <div>
@@ -239,13 +240,13 @@ export default function Projetos() {
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <FolderKanban className="h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Nenhum projeto criado</h3>
+              <h3 className="text-lg font-semibold mb-2">{tx('Nenhum projeto criado')}</h3>
               <p className="text-muted-foreground text-center max-w-md mb-4">
-                Crie seu primeiro projeto baseado em um diagnóstico calculado e relatório gerado.
+                {tx('Crie seu primeiro projeto baseado em um diagnóstico calculado e relatório gerado.')}
               </p>
               <Button onClick={() => setCreateDialogOpen(true)} className="gap-2">
                 <Plus className="h-4 w-4" />
-                Criar Primeiro Projeto
+                {tx('Criar Primeiro Projeto')}
               </Button>
             </CardContent>
           </Card>
@@ -271,7 +272,7 @@ function ProjectGrid({ projects, onSelect }: ProjectGridProps) {
   if (!projects || projects.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        Nenhum projeto nesta categoria
+        {tx('Nenhum projeto nesta categoria')}
       </div>
     );
   }

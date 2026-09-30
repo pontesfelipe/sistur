@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -98,7 +99,7 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [], indicator
         <CardTitle className="text-base flex items-center justify-between">
           <span className="flex items-center gap-2">
             <Database className="h-5 w-5 text-primary" />
-            Procedência dos Dados
+            {tx('Procedência dos Dados')}
           </span>
           <Badge variant={analysis.coveragePct >= 60 ? 'default' : 'secondary'}>
             Cobertura automática: {analysis.coveragePct}%
@@ -117,26 +118,26 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [], indicator
           <div className="p-3 rounded-lg border bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900">
             <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
               <Globe2 className="h-4 w-4" />
-              <span className="text-xs font-medium">Oficiais</span>
+              <span className="text-xs font-medium">{tx('Oficiais')}</span>
             </div>
             <p className="text-2xl font-bold mt-1">{analysis.official.length}</p>
-            <p className="text-[10px] text-muted-foreground">IBGE, CADASTUR, STN…</p>
+            <p className="text-[10px] text-muted-foreground">{tx('IBGE, CADASTUR, STN…')}</p>
           </div>
           <div className="p-3 rounded-lg border bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900">
             <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
               <Calculator className="h-4 w-4" />
-              <span className="text-xs font-medium">Calculados</span>
+              <span className="text-xs font-medium">{tx('Calculados')}</span>
             </div>
             <p className="text-2xl font-bold mt-1">{analysis.derived.length}</p>
-            <p className="text-[10px] text-muted-foreground">Fórmulas sobre dados oficiais</p>
+            <p className="text-[10px] text-muted-foreground">{tx('Fórmulas sobre dados oficiais')}</p>
           </div>
           <div className="p-3 rounded-lg border bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900">
             <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
               <PenLine className="h-4 w-4" />
-              <span className="text-xs font-medium">Manuais</span>
+              <span className="text-xs font-medium">{tx('Manuais')}</span>
             </div>
             <p className="text-2xl font-bold mt-1">{analysis.manual.length}</p>
-            <p className="text-[10px] text-muted-foreground">Preenchidos pela equipe</p>
+            <p className="text-[10px] text-muted-foreground">{tx('Preenchidos pela equipe')}</p>
           </div>
         </div>
 
@@ -171,7 +172,7 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [], indicator
               Indicadores manuais ({analysis.manual.length})
             </p>
             <p className="text-[11px] text-muted-foreground">
-              Sem fonte automática disponível — atualize periodicamente para manter a confiabilidade.
+              {tx('Sem fonte automática disponível — atualize periodicamente para manter a confiabilidade.')}
             </p>
           </div>
         )}

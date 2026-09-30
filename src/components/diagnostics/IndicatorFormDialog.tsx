@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -87,9 +88,9 @@ export function IndicatorFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Novo Indicador</DialogTitle>
+          <DialogTitle>{tx('Novo Indicador')}</DialogTitle>
           <DialogDescription>
-            Cadastre um novo indicador para o sistema de diagnóstico.
+            {tx('Cadastre um novo indicador para o sistema de diagnóstico.')}
           </DialogDescription>
         </DialogHeader>
 
@@ -97,19 +98,19 @@ export function IndicatorFormDialog({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Code */}
             <div className="space-y-2">
-              <Label htmlFor="code">Código *</Label>
+              <Label htmlFor="code">{tx('Código *')}</Label>
               <Input
                 id="code"
                 value={formData.code}
                 onChange={(e) => handleChange('code', e.target.value)}
-                placeholder="Ex: RA001"
+                placeholder={tx('Ex: RA001')}
                 required
               />
             </div>
 
             {/* Pillar */}
             <div className="space-y-2">
-              <Label htmlFor="pillar">Pilar *</Label>
+              <Label htmlFor="pillar">{tx('Pilar *')}</Label>
               <Select
                 value={formData.pillar}
                 onValueChange={(value) => handleChange('pillar', value as Pillar)}
@@ -118,9 +119,9 @@ export function IndicatorFormDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="RA">I-RA - Relações Ambientais</SelectItem>
-                  <SelectItem value="OE">I-OE - Organização Estrutural</SelectItem>
-                  <SelectItem value="AO">I-AO - Ações Operacionais</SelectItem>
+                  <SelectItem value="RA">{tx('I-RA - Relações Ambientais')}</SelectItem>
+                  <SelectItem value="OE">{tx('I-OE - Organização Estrutural')}</SelectItem>
+                  <SelectItem value="AO">{tx('I-AO - Ações Operacionais')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -128,36 +129,36 @@ export function IndicatorFormDialog({
 
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Nome *</Label>
+            <Label htmlFor="name">{tx('Nome *')}</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              placeholder="Nome do indicador"
+              placeholder={tx('Nome do indicador')}
               required
             />
           </div>
 
           {/* Theme */}
           <div className="space-y-2">
-            <Label htmlFor="theme">Tema *</Label>
+            <Label htmlFor="theme">{tx('Tema *')}</Label>
             <Input
               id="theme"
               value={formData.theme}
               onChange={(e) => handleChange('theme', e.target.value)}
-              placeholder="Ex: Saneamento, Segurança, Infraestrutura"
+              placeholder={tx('Ex: Saneamento, Segurança, Infraestrutura')}
               required
             />
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
+            <Label htmlFor="description">{tx('Descrição')}</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleChange('description', e.target.value)}
-              placeholder="Descrição detalhada do indicador"
+              placeholder={tx('Descrição detalhada do indicador')}
               rows={2}
             />
           </div>
@@ -165,18 +166,18 @@ export function IndicatorFormDialog({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Unit */}
             <div className="space-y-2">
-              <Label htmlFor="unit">Unidade</Label>
+              <Label htmlFor="unit">{tx('Unidade')}</Label>
               <Input
                 id="unit"
                 value={formData.unit}
                 onChange={(e) => handleChange('unit', e.target.value)}
-                placeholder="Ex: %, R$, hab"
+                placeholder={tx('Ex: %, R$, hab')}
               />
             </div>
 
             {/* Direction */}
             <div className="space-y-2">
-              <Label htmlFor="direction">Direção</Label>
+              <Label htmlFor="direction">{tx('Direção')}</Label>
               <Select
                 value={formData.direction}
                 onValueChange={(value) => handleChange('direction', value as Direction)}
@@ -185,15 +186,15 @@ export function IndicatorFormDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="HIGH_IS_BETTER">↑ Maior é melhor</SelectItem>
-                  <SelectItem value="LOW_IS_BETTER">↓ Menor é melhor</SelectItem>
+                  <SelectItem value="HIGH_IS_BETTER">{tx('↑ Maior é melhor')}</SelectItem>
+                  <SelectItem value="LOW_IS_BETTER">{tx('↓ Menor é melhor')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* Normalization */}
             <div className="space-y-2">
-              <Label htmlFor="normalization">Normalização</Label>
+              <Label htmlFor="normalization">{tx('Normalização')}</Label>
               <Select
                 value={formData.normalization}
                 onValueChange={(value) => handleChange('normalization', value as Normalization)}
@@ -202,9 +203,9 @@ export function IndicatorFormDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="MIN_MAX">Min-Max</SelectItem>
-                  <SelectItem value="BANDS">Faixas</SelectItem>
-                  <SelectItem value="BINARY">Binário</SelectItem>
+                  <SelectItem value="MIN_MAX">{tx('Min-Max')}</SelectItem>
+                  <SelectItem value="BANDS">{tx('Faixas')}</SelectItem>
+                  <SelectItem value="BINARY">{tx('Binário')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -213,7 +214,7 @@ export function IndicatorFormDialog({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Min Ref */}
             <div className="space-y-2">
-              <Label htmlFor="min_ref">Valor Mínimo</Label>
+              <Label htmlFor="min_ref">{tx('Valor Mínimo')}</Label>
               <Input
                 id="min_ref"
                 type="number"
@@ -226,7 +227,7 @@ export function IndicatorFormDialog({
 
             {/* Max Ref */}
             <div className="space-y-2">
-              <Label htmlFor="max_ref">Valor Máximo</Label>
+              <Label htmlFor="max_ref">{tx('Valor Máximo')}</Label>
               <Input
                 id="max_ref"
                 type="number"
@@ -255,7 +256,7 @@ export function IndicatorFormDialog({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Tier */}
             <div className="space-y-2">
-              <Label htmlFor="tier">Tier de Diagnóstico</Label>
+              <Label htmlFor="tier">{tx('Tier de Diagnóstico')}</Label>
               <Select
                 value={formData.minimum_tier}
                 onValueChange={(value) => handleChange('minimum_tier', value as DiagnosisTier)}
@@ -264,16 +265,16 @@ export function IndicatorFormDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="SMALL">Essencial</SelectItem>
-                  <SelectItem value="MEDIUM">Estratégico</SelectItem>
-                  <SelectItem value="COMPLETE">Integral</SelectItem>
+                  <SelectItem value="SMALL">{tx('Essencial')}</SelectItem>
+                  <SelectItem value="MEDIUM">{tx('Estratégico')}</SelectItem>
+                  <SelectItem value="COMPLETE">{tx('Integral')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* Scope */}
             <div className="space-y-2">
-              <Label htmlFor="scope">Escopo</Label>
+              <Label htmlFor="scope">{tx('Escopo')}</Label>
               <Select
                 value={formData.indicator_scope}
                 onValueChange={(value) => handleChange('indicator_scope', value as IndicatorScope)}
@@ -282,9 +283,9 @@ export function IndicatorFormDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="territorial">Territorial</SelectItem>
-                  <SelectItem value="enterprise">Enterprise</SelectItem>
-                  <SelectItem value="both">Ambos</SelectItem>
+                  <SelectItem value="territorial">{tx('Territorial')}</SelectItem>
+                  <SelectItem value="enterprise">{tx('Enterprise')}</SelectItem>
+                  <SelectItem value="both">{tx('Ambos')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -297,11 +298,11 @@ export function IndicatorFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >
-              Cancelar
+              {tx('Cancelar')}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Criar Indicador
+              {tx('Criar Indicador')}
             </Button>
           </DialogFooter>
         </form>

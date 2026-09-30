@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -81,7 +82,7 @@ export function IndicadoresFilters({
         <div className="relative max-w-md flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar indicadores..."
+            placeholder={tx('Buscar indicadores...')}
             className="pl-9"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -89,10 +90,10 @@ export function IndicadoresFilters({
         </div>
         <Select value={pillarFilter} onValueChange={onPillarFilterChange}>
           <SelectTrigger className="w-full xs:w-32">
-            <SelectValue placeholder="Pilar" />
+            <SelectValue placeholder={tx('Pilar')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="all">{tx('Todos')}</SelectItem>
             <SelectItem value="ra">IRA</SelectItem>
             <SelectItem value="oe">IOE</SelectItem>
             <SelectItem value="ao">IAO</SelectItem>
@@ -100,20 +101,20 @@ export function IndicadoresFilters({
         </Select>
         <Select value={sourceFilter} onValueChange={onSourceFilterChange}>
           <SelectTrigger className="w-full xs:w-32">
-            <SelectValue placeholder="Fonte" />
+            <SelectValue placeholder={tx('Fonte')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todas</SelectItem>
+            <SelectItem value="all">{tx('Todas')}</SelectItem>
             <SelectItem value="igma">IGMA</SelectItem>
-            <SelectItem value="other">Outras</SelectItem>
+            <SelectItem value="other">{tx('Outras')}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={themeFilter} onValueChange={onThemeFilterChange}>
           <SelectTrigger className="w-full xs:w-44">
-            <SelectValue placeholder="Tema" />
+            <SelectValue placeholder={tx('Tema')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os temas</SelectItem>
+            <SelectItem value="all">{tx('Todos os temas')}</SelectItem>
             {availableThemes.map(theme => (
               <SelectItem key={theme} value={theme}>{theme}</SelectItem>
             ))}
@@ -121,10 +122,10 @@ export function IndicadoresFilters({
         </Select>
         <Select value={tierFilter} onValueChange={onTierFilterChange}>
           <SelectTrigger className="w-full xs:w-36">
-            <SelectValue placeholder="Tier" />
+            <SelectValue placeholder={tx('Tier')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os níveis</SelectItem>
+            <SelectItem value="all">{tx('Todos os níveis')}</SelectItem>
             <SelectItem value="SMALL">
               <div className="flex items-center gap-2">
                 <Zap className="h-3 w-3 text-green-600" />
@@ -147,7 +148,7 @@ export function IndicadoresFilters({
         </Select>
         <Select value={scopeFilter} onValueChange={onScopeFilterChange}>
           <SelectTrigger className="w-full xs:w-40">
-            <SelectValue placeholder="Escopo" />
+            <SelectValue placeholder={tx('Escopo')} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos escopos ({indicatorsTotal})</SelectItem>
@@ -173,10 +174,10 @@ export function IndicadoresFilters({
         </Select>
         <Select value={collectionFilter} onValueChange={onCollectionFilterChange}>
           <SelectTrigger className="w-full xs:w-40">
-            <SelectValue placeholder="Coleta" />
+            <SelectValue placeholder={tx('Coleta')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todas coletas</SelectItem>
+            <SelectItem value="all">{tx('Todas coletas')}</SelectItem>
             <SelectItem value="AUTOMATICA">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-3 w-3 text-severity-good" />
@@ -205,7 +206,7 @@ export function IndicadoresFilters({
         </Select>
         <Select value={mandalaFilter} onValueChange={onMandalaFilterChange}>
           <SelectTrigger className="w-full xs:w-44">
-            <SelectValue placeholder="Mandala" />
+            <SelectValue placeholder={tx('Mandala')} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos ({mandalaCounts.core + mandalaCounts.mandala})</SelectItem>
@@ -226,7 +227,7 @@ export function IndicadoresFilters({
       </div>
       <Button onClick={onNewIndicator}>
         <Plus className="mr-2 h-4 w-4" />
-        Novo Indicador
+        {tx('Novo Indicador')}
       </Button>
     </div>
   );

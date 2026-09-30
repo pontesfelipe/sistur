@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -176,10 +177,10 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
         <div>
           <CardTitle className="text-lg font-display flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            Evolução Temporal
+            {tx('Evolução Temporal')}
           </CardTitle>
           <CardDescription>
-            Acompanhe a evolução dos pilares ao longo dos ciclos de diagnóstico
+            {tx('Acompanhe a evolução dos pilares ao longo dos ciclos de diagnóstico')}
           </CardDescription>
         </div>
         <Select 
@@ -187,7 +188,7 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
           onValueChange={setSelectedDestination}
         >
           <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="Selecionar destino" />
+            <SelectValue placeholder={tx('Selecionar destino')} />
           </SelectTrigger>
           <SelectContent>
             {destinations.map((dest) => (
@@ -285,15 +286,15 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Activity className="h-12 w-12 mb-4 opacity-30" />
             <p className="text-sm text-center">
-              Este destino possui apenas 1 ciclo de diagnóstico.
+              {tx('Este destino possui apenas 1 ciclo de diagnóstico.')}
               <br />
-              Execute mais diagnósticos para visualizar a evolução temporal.
+              {tx('Execute mais diagnósticos para visualizar a evolução temporal.')}
             </p>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Activity className="h-12 w-12 mb-4 opacity-30" />
-            <p className="text-sm">Nenhum diagnóstico calculado para este destino.</p>
+            <p className="text-sm">{tx('Nenhum diagnóstico calculado para este destino.')}</p>
           </div>
         )}
       </CardContent>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { List, FileBarChart, RefreshCw, ShieldCheck, Sliders } from 'lucide-react';
@@ -132,10 +133,10 @@ export function IndicadoresPanel() {
         id: indicatorId,
         minimum_tier: newTier,
       } as any);
-      toast.success('Tier atualizado com sucesso');
+      toast.success(tx('Tier atualizado com sucesso'));
       setEditingTierId(null);
     } catch (error) {
-      toast.error('Erro ao atualizar tier');
+      toast.error(tx('Erro ao atualizar tier'));
     }
   };
 
@@ -152,16 +153,16 @@ export function IndicadoresPanel() {
   const handleSaveWeight = async (indicatorId: string) => {
     const newWeight = parseFloat(editingWeightValue) / 100;
     if (isNaN(newWeight) || newWeight < 0 || newWeight > 1) {
-      toast.error('Peso inválido. Use um valor entre 0 e 100.');
+      toast.error(tx('Peso inválido. Use um valor entre 0 e 100.'));
       return;
     }
     try {
       await updateIndicator.mutateAsync({ id: indicatorId, weight: newWeight });
-      toast.success('Peso atualizado com sucesso');
+      toast.success(tx('Peso atualizado com sucesso'));
       setEditingWeightId(null);
       setEditingWeightValue('');
     } catch (error) {
-      toast.error('Erro ao atualizar peso');
+      toast.error(tx('Erro ao atualizar peso'));
     }
   };
 
@@ -173,10 +174,10 @@ export function IndicadoresPanel() {
   const handleSaveScope = async (indicatorId: string, newScope: IndicatorScope) => {
     try {
       await updateIndicator.mutateAsync({ id: indicatorId, indicator_scope: newScope } as any);
-      toast.success('Escopo atualizado com sucesso');
+      toast.success(tx('Escopo atualizado com sucesso'));
       setEditingScopeId(null);
     } catch {
-      toast.error('Erro ao atualizar escopo');
+      toast.error(tx('Erro ao atualizar escopo'));
     }
   };
 
@@ -198,23 +199,23 @@ export function IndicadoresPanel() {
         <TabsList>
           <TabsTrigger value="list" className="gap-2">
             <List className="h-4 w-4" />
-            Lista
+            {tx('Lista')}
           </TabsTrigger>
           <TabsTrigger value="report" className="gap-2">
             <FileBarChart className="h-4 w-4" />
-            Relatório
+            {tx('Relatório')}
           </TabsTrigger>
           <TabsTrigger value="stale" className="gap-2">
             <RefreshCw className="h-4 w-4" />
-            Recálculo
+            {tx('Recálculo')}
           </TabsTrigger>
           <TabsTrigger value="quality" className="gap-2">
             <ShieldCheck className="h-4 w-4" />
-            Qualidade
+            {tx('Qualidade')}
           </TabsTrigger>
           <TabsTrigger value="weights" className="gap-2">
             <Sliders className="h-4 w-4" />
-            Pesos
+            {tx('Pesos')}
           </TabsTrigger>
         </TabsList>
       </div>

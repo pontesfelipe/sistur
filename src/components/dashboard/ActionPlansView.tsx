@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -76,9 +77,9 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <Target className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium">Nenhum plano de ação</h3>
+          <h3 className="text-lg font-medium">{tx('Nenhum plano de ação')}</h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Execute o diagnóstico para gerar planos de ação automaticamente
+            {tx('Execute o diagnóstico para gerar planos de ação automaticamente')}
           </p>
         </CardContent>
       </Card>
@@ -109,7 +110,7 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
               <ClipboardList className="h-5 w-5 text-muted-foreground" />
               <span className="text-2xl font-bold">{plans.length}</span>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Total de Planos</p>
+            <p className="text-sm text-muted-foreground mt-1">{tx('Total de Planos')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -118,7 +119,7 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
               <Clock className="h-5 w-5 text-muted-foreground" />
               <span className="text-2xl font-bold">{pendingCount}</span>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Pendentes</p>
+            <p className="text-sm text-muted-foreground mt-1">{tx('Pendentes')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -127,7 +128,7 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
               <Play className="h-5 w-5 text-primary" />
               <span className="text-2xl font-bold">{inProgressCount}</span>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Em Andamento</p>
+            <p className="text-sm text-muted-foreground mt-1">{tx('Em Andamento')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -136,7 +137,7 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
               <CheckCircle2 className="h-5 w-5 text-green-600" />
               <span className="text-2xl font-bold">{completedCount}</span>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Concluídos</p>
+            <p className="text-sm text-muted-foreground mt-1">{tx('Concluídos')}</p>
           </CardContent>
         </Card>
       </div>
@@ -194,7 +195,7 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Responsável pelo plano"
+                      placeholder={tx('Responsável pelo plano')}
                       value={plan.owner || ""}
                       onChange={(e) => {
                         updatePlan.mutate({
@@ -208,7 +209,7 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
 
                   {/* Status change */}
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium">Alterar status:</span>
+                    <span className="text-sm font-medium">{tx('Alterar status:')}</span>
                     <Select
                       value={plan.status}
                       onValueChange={(value) => handleStatusChange(plan, value as ActionPlan['status'])}
@@ -217,10 +218,10 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="PENDING">Pendente</SelectItem>
-                        <SelectItem value="IN_PROGRESS">Em Andamento</SelectItem>
-                        <SelectItem value="COMPLETED">Concluído</SelectItem>
-                        <SelectItem value="CANCELLED">Cancelado</SelectItem>
+                        <SelectItem value="PENDING">{tx('Pendente')}</SelectItem>
+                        <SelectItem value="IN_PROGRESS">{tx('Em Andamento')}</SelectItem>
+                        <SelectItem value="COMPLETED">{tx('Concluído')}</SelectItem>
+                        <SelectItem value="CANCELLED">{tx('Cancelado')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -228,9 +229,9 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
                   {/* Completion notes */}
                   {(plan.status === 'IN_PROGRESS' || plan.status === 'COMPLETED') && (
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Notas de conclusão:</label>
+                      <label className="text-sm font-medium">{tx('Notas de conclusão:')}</label>
                       <Textarea
-                        placeholder="Descreva as ações realizadas..."
+                        placeholder={tx('Descreva as ações realizadas...')}
                         value={completionNotes[plan.id] ?? plan.completion_notes ?? ""}
                         onChange={(e) => setCompletionNotes(prev => ({
                           ...prev,

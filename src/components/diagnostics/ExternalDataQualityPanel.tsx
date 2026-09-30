@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -55,7 +56,7 @@ export function ExternalDataQualityPanel() {
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground">
           <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
-          Não foi possível carregar a qualidade dos dados oficiais.
+          {tx('Não foi possível carregar a qualidade dos dados oficiais.')}
         </CardContent>
       </Card>
     );
@@ -66,7 +67,7 @@ export function ExternalDataQualityPanel() {
       <Card>
         <CardContent className="py-12 text-center text-muted-foreground">
           <Database className="h-10 w-10 mx-auto mb-3 opacity-40" />
-          Nenhum dado oficial coletado ainda.
+          {tx('Nenhum dado oficial coletado ainda.')}
         </CardContent>
       </Card>
     );
@@ -75,9 +76,9 @@ export function ExternalDataQualityPanel() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold">Qualidade dos Dados Oficiais</h3>
+        <h3 className="text-lg font-semibold">{tx('Qualidade dos Dados Oficiais')}</h3>
         <p className="text-sm text-muted-foreground">
-          Idade, cobertura municipal e volume de cada fonte oficial integrada ao SISTUR.
+          {tx('Idade, cobertura municipal e volume de cada fonte oficial integrada ao SISTUR.')}
         </p>
       </div>
 
@@ -102,7 +103,7 @@ export function ExternalDataQualityPanel() {
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <div className="text-xs text-muted-foreground">Registros</div>
+                    <div className="text-xs text-muted-foreground">{tx('Registros')}</div>
                     <div className="font-semibold tabular-nums">{row.total_records.toLocaleString('pt-BR')}</div>
                   </div>
                   <div>
@@ -112,7 +113,7 @@ export function ExternalDataQualityPanel() {
                 </div>
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-muted-foreground">Cobertura municipal</span>
+                    <span className="text-muted-foreground">{tx('Cobertura municipal')}</span>
                     <span className="font-medium">{row.coverage_pct?.toFixed(1) ?? '0'}%</span>
                   </div>
                   <Progress value={row.coverage_pct || 0} className="h-2" />

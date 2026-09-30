@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import {
   useProject,
@@ -123,9 +124,9 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
   if (!project) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Projeto não encontrado</p>
+        <p className="text-muted-foreground">{tx('Projeto não encontrado')}</p>
         <Button variant="outline" onClick={onBack} className="mt-4">
-          Voltar
+          {tx('Voltar')}
         </Button>
       </div>
     );
@@ -267,20 +268,20 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
             size="sm"
             onClick={() => setAiSuggestOpen(true)}
             className="gap-1"
-            title="Sugerir tarefas com inteligência SISTUR"
+            title={tx('Sugerir tarefas com inteligência SISTUR')}
           >
             <Sparkles className="h-4 w-4" />
-            <span className="hidden sm:inline">Inteligência SISTUR</span>
+            <span className="hidden sm:inline">{tx('Inteligência SISTUR')}</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={() => {
               const ok = exportProjectCalendar(project, milestones || [], tasks || []);
-              if (!ok) toast.info('Nenhum marco ou tarefa com data planejada para exportar.');
+              if (!ok) toast.info(tx('Nenhum marco ou tarefa com data planejada para exportar.'));
             }}
             className="gap-1"
-            title="Exportar calendário (.ics)"
+            title={tx('Exportar calendário (.ics)')}
           >
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">.ics</span>
@@ -312,7 +313,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Progresso</p>
+                <p className="text-sm text-muted-foreground">{tx('Progresso')}</p>
                 <p className="text-2xl font-bold">{progressPercent}%</p>
               </div>
               <Target className="h-8 w-8 text-primary/50" />
@@ -324,7 +325,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Tarefas</p>
+                <p className="text-sm text-muted-foreground">{tx('Tarefas')}</p>
                 <p className="text-2xl font-bold">
                   {completedTasks}/{totalTasks}
                 </p>
@@ -337,7 +338,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Fases</p>
+                <p className="text-sm text-muted-foreground">{tx('Fases')}</p>
                 <p className="text-2xl font-bold">{phases?.length || 0}</p>
               </div>
               <FolderKanban className="h-8 w-8 text-blue-500/50" />
@@ -348,7 +349,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Marcos</p>
+                <p className="text-sm text-muted-foreground">{tx('Marcos')}</p>
                 <p className="text-2xl font-bold">{milestones?.length || 0}</p>
               </div>
               <Milestone className="h-8 w-8 text-amber-500/50" />
@@ -360,25 +361,25 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="overview">{tx('Visão Geral')}</TabsTrigger>
           <TabsTrigger value="phases">Fases ({phases?.length || 0})</TabsTrigger>
           <TabsTrigger value="tasks">Tarefas ({tasks?.length || 0})</TabsTrigger>
-          <TabsTrigger value="kanban">Kanban</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          <TabsTrigger value="kanban">{tx('Kanban')}</TabsTrigger>
+          <TabsTrigger value="timeline">{tx('Timeline')}</TabsTrigger>
           <TabsTrigger value="milestones">Marcos ({milestones?.length || 0})</TabsTrigger>
-          <TabsTrigger value="indicators">Indicadores</TabsTrigger>
-          <TabsTrigger value="governance">Governança</TabsTrigger>
-          <TabsTrigger value="team">Equipe</TabsTrigger>
-          <TabsTrigger value="edu">Capacitação</TabsTrigger>
-          <TabsTrigger value="budget">Orçamento</TabsTrigger>
-          <TabsTrigger value="links">Vínculos</TabsTrigger>
+          <TabsTrigger value="indicators">{tx('Indicadores')}</TabsTrigger>
+          <TabsTrigger value="governance">{tx('Governança')}</TabsTrigger>
+          <TabsTrigger value="team">{tx('Equipe')}</TabsTrigger>
+          <TabsTrigger value="edu">{tx('Capacitação')}</TabsTrigger>
+          <TabsTrigger value="budget">{tx('Orçamento')}</TabsTrigger>
+          <TabsTrigger value="links">{tx('Vínculos')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           {/* Phases Overview */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Fases do Projeto</CardTitle>
+              <CardTitle className="text-lg">{tx('Fases do Projeto')}</CardTitle>
               <CardDescription>
                 Metodologia {methodologyInfo.name}
               </CardDescription>
@@ -425,7 +426,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           {/* Recent Tasks */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Tarefas Recentes</CardTitle>
+              <CardTitle className="text-lg">{tx('Tarefas Recentes')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -466,7 +467,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <div className="flex justify-end">
             <Button onClick={handleAddPhase}>
               <Plus className="h-4 w-4 mr-2" />
-              Nova Fase
+              {tx('Nova Fase')}
             </Button>
           </div>
           {phases?.map((phase) => (
@@ -490,10 +491,10 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="pending">Pendente</SelectItem>
-                        <SelectItem value="in_progress">Em Progresso</SelectItem>
-                        <SelectItem value="completed">Concluído</SelectItem>
-                        <SelectItem value="blocked">Bloqueado</SelectItem>
+                        <SelectItem value="pending">{tx('Pendente')}</SelectItem>
+                        <SelectItem value="in_progress">{tx('Em Progresso')}</SelectItem>
+                        <SelectItem value="completed">{tx('Concluído')}</SelectItem>
+                        <SelectItem value="blocked">{tx('Bloqueado')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <Button variant="ghost" size="icon" onClick={() => handleEditPhase(phase)}>
@@ -524,7 +525,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                       />
                     ))}
                   {tasks?.filter((t) => t.phase_id === phase.id).length === 0 && (
-                    <p className="text-sm text-muted-foreground">Nenhuma tarefa nesta fase</p>
+                    <p className="text-sm text-muted-foreground">{tx('Nenhuma tarefa nesta fase')}</p>
                   )}
                   <Button
                     variant="outline"
@@ -533,7 +534,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                     onClick={() => handleAddTask(phase.id)}
                   >
                     <Plus className="h-3 w-3 mr-1" />
-                    Adicionar Tarefa
+                    {tx('Adicionar Tarefa')}
                   </Button>
                 </div>
               </CardContent>
@@ -542,10 +543,10 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           {(!phases || phases.length === 0) && (
             <Card>
               <CardContent className="py-8 text-center">
-                <p className="text-muted-foreground">Nenhuma fase criada</p>
+                <p className="text-muted-foreground">{tx('Nenhuma fase criada')}</p>
                 <Button variant="outline" className="mt-4" onClick={handleAddPhase}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Criar primeira fase
+                  {tx('Criar primeira fase')}
                 </Button>
               </CardContent>
             </Card>
@@ -556,12 +557,12 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <div className="flex justify-end">
             <Button onClick={() => handleAddTask()}>
               <Plus className="h-4 w-4 mr-2" />
-              Nova Tarefa
+              {tx('Nova Tarefa')}
             </Button>
           </div>
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Todas as Tarefas</CardTitle>
+              <CardTitle className="text-lg">{tx('Todas as Tarefas')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -576,7 +577,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                 ))}
                 {(!tasks || tasks.length === 0) && (
                   <p className="text-muted-foreground text-center py-4">
-                    Nenhuma tarefa criada
+                    {tx('Nenhuma tarefa criada')}
                   </p>
                 )}
               </div>
@@ -588,12 +589,12 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           <div className="flex justify-end">
             <Button onClick={handleAddMilestone}>
               <Plus className="h-4 w-4 mr-2" />
-              Novo Marco
+              {tx('Novo Marco')}
             </Button>
           </div>
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Marcos do Projeto</CardTitle>
+              <CardTitle className="text-lg">{tx('Marcos do Projeto')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -653,7 +654,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                 ))}
                 {(!milestones || milestones.length === 0) && (
                   <p className="text-muted-foreground text-center py-4">
-                    Nenhum marco definido
+                    {tx('Nenhum marco definido')}
                   </p>
                 )}
               </div>
@@ -726,7 +727,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
       <DeleteConfirmDialog
         open={deletePhaseOpen}
         onOpenChange={setDeletePhaseOpen}
-        title="Excluir Fase"
+        title={tx('Excluir Fase')}
         description={`Tem certeza que deseja excluir a fase "${phaseToDelete?.name}"? As tarefas associadas também serão removidas.`}
         onConfirm={confirmDeletePhase}
         isPending={deletePhase.isPending}
@@ -744,7 +745,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
       <DeleteConfirmDialog
         open={deleteTaskOpen}
         onOpenChange={setDeleteTaskOpen}
-        title="Excluir Tarefa"
+        title={tx('Excluir Tarefa')}
         description={`Tem certeza que deseja excluir a tarefa "${taskToDelete?.title}"?`}
         onConfirm={confirmDeleteTask}
         isPending={deleteTask.isPending}
@@ -760,7 +761,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
       <DeleteConfirmDialog
         open={deleteMilestoneOpen}
         onOpenChange={setDeleteMilestoneOpen}
-        title="Excluir Marco"
+        title={tx('Excluir Marco')}
         description={`Tem certeza que deseja excluir o marco "${milestoneToDelete?.name}"?`}
         onConfirm={confirmDeleteMilestone}
         isPending={deleteMilestone.isPending}
@@ -861,7 +862,7 @@ function IndicatorImpactPanel({ projectId, assessmentId }: { projectId: string; 
       <Card className="border-dashed">
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <TrendingUp className="h-10 w-10 text-muted-foreground/50 mb-3" />
-          <p className="font-medium">Nenhum indicador vinculado</p>
+          <p className="font-medium">{tx('Nenhum indicador vinculado')}</p>
           <p className="text-sm text-muted-foreground max-w-md mt-1">
             Projetos criados pelo Modo Prescrição do diagnóstico já trazem os indicadores-alvo
             com baseline registrado. Para projetos antigos, recrie a partir do diagnóstico para
@@ -879,17 +880,17 @@ function IndicatorImpactPanel({ projectId, assessmentId }: { projectId: string; 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Vinculados</p><p className="text-2xl font-bold">{data.length}</p></CardContent></Card>
-        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Melhoraram</p><p className="text-2xl font-bold text-emerald-600">{improved}</p></CardContent></Card>
-        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Regrediram</p><p className="text-2xl font-bold text-red-600">{regressed}</p></CardContent></Card>
-        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Atingiram meta</p><p className="text-2xl font-bold text-primary">{reachedTarget}</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">{tx('Vinculados')}</p><p className="text-2xl font-bold">{data.length}</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">{tx('Melhoraram')}</p><p className="text-2xl font-bold text-emerald-600">{improved}</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">{tx('Regrediram')}</p><p className="text-2xl font-bold text-red-600">{regressed}</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">{tx('Atingiram meta')}</p><p className="text-2xl font-bold text-primary">{reachedTarget}</p></CardContent></Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Trilha de Impacto</CardTitle>
+          <CardTitle className="text-base">{tx('Trilha de Impacto')}</CardTitle>
           <CardDescription>
-            Baseline registrado na criação do projeto vs score atual do diagnóstico vinculado.
+            {tx('Baseline registrado na criação do projeto vs score atual do diagnóstico vinculado.')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -910,11 +911,11 @@ function IndicatorImpactPanel({ projectId, assessmentId }: { projectId: string; 
                 </div>
                 <div className="flex items-center gap-3 text-sm shrink-0">
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Baseline</p>
+                    <p className="text-xs text-muted-foreground">{tx('Baseline')}</p>
                     <p className="font-semibold">{baselinePct !== null ? `${baselinePct}%` : '—'}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Atual</p>
+                    <p className="text-xs text-muted-foreground">{tx('Atual')}</p>
                     <p className="font-semibold">{currentPct !== null ? `${currentPct}%` : '—'}</p>
                   </div>
                   <div className={cn(

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { cn } from '@/lib/utils';
 import { AlertTriangle, ChevronRight, Building2, Users, Truck } from 'lucide-react';
 import type { Issue, TerritorialInterpretation } from '@/types/sistur';
@@ -103,7 +104,7 @@ export function IssueCard({ issue, onViewRecommendations }: IssueCardProps) {
 
           {evidenceIndicators.length > 0 && (
             <div className="mt-2 text-sm text-muted-foreground">
-              <span className="font-medium">Evidências: </span>
+              <span className="font-medium">{tx('Evidências:')} </span>
               {evidenceIndicators.map((ind, i) => (
                 <span key={i}>
                   {ind.name} ({Math.round(ind.score * 100)}%)
@@ -120,7 +121,7 @@ export function IssueCard({ issue, onViewRecommendations }: IssueCardProps) {
               className="mt-2 -ml-2 text-primary hover:text-primary"
               onClick={onViewRecommendations}
             >
-              Ver recomendações
+              {tx('Ver recomendações')}
               <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           )}

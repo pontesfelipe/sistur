@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { cn } from '@/lib/utils';
 import type { Pillar, Severity } from '@/types/sistur';
 import { PILLAR_INFO, SEVERITY_INFO } from '@/types/sistur';
@@ -45,7 +46,7 @@ export function PillarGauge({ pillar, score, severity, isCritical }: PillarGauge
       {isCritical && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <span className="px-3 py-1 text-xs font-semibold rounded-full bg-severity-critical text-destructive-foreground">
-            Ponto Crítico
+            {tx('Ponto Crítico')}
           </span>
         </div>
       )}

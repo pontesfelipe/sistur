@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,9 +41,9 @@ export function ProjectMembersPanel({ projectId }: { projectId: string }) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle className="text-lg">Equipe do projeto</CardTitle>
+          <CardTitle className="text-lg">{tx('Equipe do projeto')}</CardTitle>
           <CardDescription>
-            Defina quem pode visualizar ou editar este projeto. Apenas Donos podem gerenciar a equipe.
+            {tx('Defina quem pode visualizar ou editar este projeto. Apenas Donos podem gerenciar a equipe.')}
           </CardDescription>
         </div>
         {canManage && (
@@ -52,20 +53,20 @@ export function ProjectMembersPanel({ projectId }: { projectId: string }) {
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0" align="end">
               <div className="p-3 border-b space-y-2">
-                <label className="text-xs font-medium">Papel</label>
+                <label className="text-xs font-medium">{tx('Papel')}</label>
                 <Select value={pendingRole} onValueChange={(v) => setPendingRole(v as ProjectMemberRole)}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="owner">Dono — gerencia equipe e exclui</SelectItem>
-                    <SelectItem value="editor">Editor — cria e edita tarefas</SelectItem>
-                    <SelectItem value="viewer">Visualizador — apenas leitura</SelectItem>
+                    <SelectItem value="owner">{tx('Dono — gerencia equipe e exclui')}</SelectItem>
+                    <SelectItem value="editor">{tx('Editor — cria e edita tarefas')}</SelectItem>
+                    <SelectItem value="viewer">{tx('Visualizador — apenas leitura')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <Command>
-                <CommandInput placeholder="Buscar usuário da organização..." />
+                <CommandInput placeholder={tx('Buscar usuário da organização...')} />
                 <CommandList>
-                  <CommandEmpty>Nenhum usuário disponível.</CommandEmpty>
+                  <CommandEmpty>{tx('Nenhum usuário disponível.')}</CommandEmpty>
                   <CommandGroup>
                     {available.map((u) => (
                       <CommandItem
@@ -94,9 +95,9 @@ export function ProjectMembersPanel({ projectId }: { projectId: string }) {
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Carregando...</p>
+          <p className="text-sm text-muted-foreground">{tx('Carregando...')}</p>
         ) : members.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhum membro cadastrado ainda.</p>
+          <p className="text-sm text-muted-foreground">{tx('Nenhum membro cadastrado ainda.')}</p>
         ) : (
           <ul className="divide-y">
             {members.map((m) => {
@@ -128,9 +129,9 @@ export function ProjectMembersPanel({ projectId }: { projectId: string }) {
                       >
                         <SelectTrigger className="h-8 w-32 text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="owner">Dono</SelectItem>
-                          <SelectItem value="editor">Editor</SelectItem>
-                          <SelectItem value="viewer">Visualizador</SelectItem>
+                          <SelectItem value="owner">{tx('Dono')}</SelectItem>
+                          <SelectItem value="editor">{tx('Editor')}</SelectItem>
+                          <SelectItem value="viewer">{tx('Visualizador')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <Button

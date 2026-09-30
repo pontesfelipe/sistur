@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 // v1.98.0 — Simulador "E se?" (what-if).
 //
 // Permite ajustar hipoteticamente o score normalizado de indicadores e ver o
@@ -67,7 +68,7 @@ export function WhatIfSimulatorPanel({ indicatorScores, pillarScores }: Props) {
     return (
       <Card>
         <CardContent className="py-10 text-center text-muted-foreground">
-          Calcule a rodada para habilitar o simulador.
+          {tx('Calcule a rodada para habilitar o simulador.')}
         </CardContent>
       </Card>
     );
@@ -85,10 +86,10 @@ export function WhatIfSimulatorPanel({ indicatorScores, pillarScores }: Props) {
 
       <Card>
         <CardHeader className="pb-3 flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-base">Impacto projetado nos pilares</CardTitle>
+          <CardTitle className="text-base">{tx('Impacto projetado nos pilares')}</CardTitle>
           <Button variant="ghost" size="sm" onClick={() => setOverrides({})} disabled={touched === 0}>
             <RotateCcw className="mr-2 h-4 w-4" />
-            Restaurar
+            {tx('Restaurar')}
           </Button>
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -134,7 +135,7 @@ export function WhatIfSimulatorPanel({ indicatorScores, pillarScores }: Props) {
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Ajustar indicadores</CardTitle>
+          <CardTitle className="text-base">{tx('Ajustar indicadores')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           {simulated.map((r) => {

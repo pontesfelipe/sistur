@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -261,7 +262,7 @@ export function DataLineageView({ auditRows, indicatorValues, pillarScores = [],
       <Card>
         <CardContent className="py-10 text-center text-sm text-muted-foreground">
           <GitBranch className="h-8 w-8 mx-auto mb-2 opacity-40" />
-          A linhagem dos dados ficará disponível assim que houver indicadores preenchidos neste diagnóstico.
+          {tx('A linhagem dos dados ficará disponível assim que houver indicadores preenchidos neste diagnóstico.')}
         </CardContent>
       </Card>
     );
@@ -525,7 +526,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
                           ? `ring-2 ${meta.ring} shadow-md`
                           : ''
                       }`}
-                      title="Clique para ver os indicadores"
+                      title={tx('Clique para ver os indicadores')}
                     >
                       <Icon className="h-3.5 w-3.5 shrink-0" />
                       <span className="text-xs font-medium flex-1 leading-snug">{s.name}</span>
@@ -539,7 +540,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
             {/* Col 2 — Indicadores agrupados por tipo */}
             <div className="space-y-2">
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium px-1">
-                Indicadores
+                {tx('Indicadores')}
               </p>
               <div className="space-y-2">
                 {(['OFFICIAL', 'DERIVED', 'MANUAL'] as SourceKind[]).map((k) => {
@@ -590,7 +591,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
             {/* Col 3 — Pilares */}
             <div className="space-y-2">
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium px-1">
-                Pilares
+                {tx('Pilares')}
               </p>
               <div className="space-y-2">
                 {pillarKeys.map((pk) => {
@@ -659,7 +660,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
             {/* Col 4 — Score final */}
             <div className="space-y-2">
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium px-1">
-                Resultado
+                {tx('Resultado')}
               </p>
               <div
                 ref={resultRef}
@@ -667,7 +668,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
               >
                 <Gauge className="h-6 w-6 text-primary mb-1.5" />
                 <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Score Final
+                  {tx('Score Final')}
                 </span>
                 <span className="text-3xl font-bold tabular-nums text-primary mt-1">
                   {finalScore !== null && finalScore !== undefined
@@ -675,7 +676,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
                     : '—'}
                 </span>
                 <span className="text-[10px] text-muted-foreground mt-2">
-                  Média ponderada dos pilares
+                  {tx('Média ponderada dos pilares')}
                 </span>
                 {pillarScores.length > 0 && (
                   <div className="mt-3 w-full space-y-1 border-t pt-2">
@@ -708,7 +709,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
 
           {/* Legenda */}
           <div className="mt-8 pt-4 border-t flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
-            <span className="font-medium">Legenda:</span>
+            <span className="font-medium">{tx('Legenda:')}</span>
             <span className="inline-flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500" /> Oficial (IBGE, CADASTUR, STN…)
             </span>
@@ -719,7 +720,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
               <span className="w-2.5 h-2.5 rounded-sm bg-amber-500" /> Manual (equipe local)
             </span>
             <span className="ml-auto italic">
-              A espessura das linhas é proporcional ao volume de indicadores.
+              {tx('A espessura das linhas é proporcional ao volume de indicadores.')}
             </span>
           </div>
         </CardContent>
@@ -795,7 +796,7 @@ function SelectionPanel({ selected, lineage, indicatorCatalogByCode, onClose }: 
       <div className="flex items-start justify-between gap-4 px-4 py-3 border-b bg-muted/30">
         <div className="min-w-0">
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
-            Indicadores neste nó
+            {tx('Indicadores neste nó')}
           </p>
           <h4 className="text-sm font-semibold truncate">{title}</h4>
           <p className="text-xs text-muted-foreground">{subtitle}</p>
@@ -803,14 +804,14 @@ function SelectionPanel({ selected, lineage, indicatorCatalogByCode, onClose }: 
         <button
           onClick={onClose}
           className="text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
-          aria-label="Fechar"
+          aria-label={tx('Fechar')}
         >
-          Fechar ✕
+          {tx('Fechar ✕')}
         </button>
       </div>
       {items.length === 0 ? (
         <p className="p-6 text-sm text-muted-foreground text-center">
-          Nenhum código de indicador disponível para este nó.
+          {tx('Nenhum código de indicador disponível para este nó.')}
         </p>
       ) : (
         <div className="max-h-[360px] overflow-auto">
@@ -839,7 +840,7 @@ function SelectionPanel({ selected, lineage, indicatorCatalogByCode, onClose }: 
       )}
       <div className="px-4 py-2 border-t bg-muted/20 text-[10px] text-muted-foreground flex items-center justify-between">
         <span>{items.length} indicador{items.length === 1 ? '' : 'es'} único{items.length === 1 ? '' : 's'}</span>
-        <span className="italic">Clique novamente no nó para fechar</span>
+        <span className="italic">{tx('Clique novamente no nó para fechar')}</span>
       </div>
     </div>
   );

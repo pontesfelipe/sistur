@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -165,8 +166,8 @@ export function TaskFormDialog({
         {isEditing && task ? (
           <Tabs defaultValue="details">
             <TabsList>
-              <TabsTrigger value="details">Detalhes</TabsTrigger>
-              <TabsTrigger value="collab">Equipe e Comentários</TabsTrigger>
+              <TabsTrigger value="details">{tx('Detalhes')}</TabsTrigger>
+              <TabsTrigger value="collab">{tx('Equipe e Comentários')}</TabsTrigger>
             </TabsList>
             <TabsContent value="details">
               {renderForm()}
@@ -190,36 +191,36 @@ export function TaskFormDialog({
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="task-title">Título *</Label>
+            <Label htmlFor="task-title">{tx('Título *')}</Label>
             <Input
               id="task-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Título da tarefa"
+              placeholder={tx('Título da tarefa')}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="task-description">Descrição</Label>
+            <Label htmlFor="task-description">{tx('Descrição')}</Label>
             <Textarea
               id="task-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descrição da tarefa"
+              placeholder={tx('Descrição da tarefa')}
               rows={2}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Fase</Label>
+              <Label>{tx('Fase')}</Label>
               <Select value={phaseId} onValueChange={setPhaseId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione..." />
+                  <SelectValue placeholder={tx('Selecione...')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Sem fase</SelectItem>
+                  <SelectItem value="">{tx('Sem fase')}</SelectItem>
                   {phases.map((phase) => (
                     <SelectItem key={phase.id} value={phase.id}>
                       {phase.name}
@@ -230,7 +231,7 @@ export function TaskFormDialog({
             </div>
 
             <div className="space-y-2">
-              <Label>Tipo</Label>
+              <Label>{tx('Tipo')}</Label>
               <Select value={taskType} onValueChange={(v) => setTaskType(v as TaskType)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -248,7 +249,7 @@ export function TaskFormDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Status</Label>
+              <Label>{tx('Status')}</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as TaskStatus)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -264,7 +265,7 @@ export function TaskFormDialog({
             </div>
 
             <div className="space-y-2">
-              <Label>Prioridade</Label>
+              <Label>{tx('Prioridade')}</Label>
               <Select value={priority} onValueChange={(v) => setPriority(v as TaskPriority)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -281,7 +282,7 @@ export function TaskFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="task-assignee">Responsável</Label>
+            <Label htmlFor="task-assignee">{tx('Responsável')}</Label>
             <TaskAssigneeCombobox
               value={assigneeId}
               displayName={assigneeName}
@@ -289,13 +290,13 @@ export function TaskFormDialog({
                 setAssigneeId(u?.user_id || null);
                 setAssigneeName(u?.full_name || '');
               }}
-              placeholder="Atribuir a um membro da organização..."
+              placeholder={tx('Atribuir a um membro da organização...')}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="task-hours">Horas Estimadas</Label>
+              <Label htmlFor="task-hours">{tx('Horas Estimadas')}</Label>
               <Input
                 id="task-hours"
                 type="number"
@@ -308,7 +309,7 @@ export function TaskFormDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="task-points">Story Points</Label>
+              <Label htmlFor="task-points">{tx('Story Points')}</Label>
               <Input
                 id="task-points"
                 type="number"
@@ -322,7 +323,7 @@ export function TaskFormDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="task-start">Data de Início</Label>
+              <Label htmlFor="task-start">{tx('Data de Início')}</Label>
               <Input
                 id="task-start"
                 type="date"
@@ -331,7 +332,7 @@ export function TaskFormDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="task-end">Data de Término</Label>
+              <Label htmlFor="task-end">{tx('Data de Término')}</Label>
               <Input
                 id="task-end"
                 type="date"
@@ -343,7 +344,7 @@ export function TaskFormDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
+              {tx('Cancelar')}
             </Button>
             <Button type="submit" disabled={isPending || !title}>
               {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}

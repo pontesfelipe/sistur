@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,22 +36,22 @@ export function DeleteProjectDialog({ project, open, onOpenChange, onDeleted }: 
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Excluir Projeto</AlertDialogTitle>
+          <AlertDialogTitle>{tx('Excluir Projeto')}</AlertDialogTitle>
           <AlertDialogDescription>
             Tem certeza que deseja excluir o projeto <strong>"{project.name}"</strong>?
             <br /><br />
-            Esta ação não pode ser desfeita. Todas as fases, tarefas e marcos associados serão removidos.
+            {tx('Esta ação não pode ser desfeita. Todas as fases, tarefas e marcos associados serão removidos.')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={deleteProject.isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             {deleteProject.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Excluir
+            {tx('Excluir')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

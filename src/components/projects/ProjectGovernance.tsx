@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -60,7 +61,7 @@ export function ProjectGovernance({ projectId }: Props) {
           <CardContent className="pt-6 flex items-center gap-3">
             <ShieldCheck className="h-8 w-8 text-primary" />
             <div>
-              <p className="text-sm text-muted-foreground">Checkpoints aprovados</p>
+              <p className="text-sm text-muted-foreground">{tx('Checkpoints aprovados')}</p>
               <p className="text-2xl font-bold">{approvedCount}/{checkpoints.length}</p>
             </div>
           </CardContent>
@@ -69,7 +70,7 @@ export function ProjectGovernance({ projectId }: Props) {
           <CardContent className="pt-6 flex items-center gap-3">
             <Clock className="h-8 w-8 text-amber-500" />
             <div>
-              <p className="text-sm text-muted-foreground">Obrigatórios pendentes</p>
+              <p className="text-sm text-muted-foreground">{tx('Obrigatórios pendentes')}</p>
               <p className="text-2xl font-bold">{mandatoryPending}</p>
             </div>
           </CardContent>
@@ -78,7 +79,7 @@ export function ProjectGovernance({ projectId }: Props) {
           <CardContent className="pt-6 flex items-center gap-3">
             <CheckCircle2 className="h-8 w-8 text-green-500" />
             <div>
-              <p className="text-sm text-muted-foreground">Atribuições RACI</p>
+              <p className="text-sm text-muted-foreground">{tx('Atribuições RACI')}</p>
               <p className="text-2xl font-bold">{raci.length}</p>
             </div>
           </CardContent>
@@ -89,8 +90,8 @@ export function ProjectGovernance({ projectId }: Props) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Checkpoints de governança</CardTitle>
-            <CardDescription>Marcos obrigatórios por pilar com evidência e aprovação</CardDescription>
+            <CardTitle>{tx('Checkpoints de governança')}</CardTitle>
+            <CardDescription>{tx('Marcos obrigatórios por pilar com evidência e aprovação')}</CardDescription>
           </div>
           <Button size="sm" onClick={() => setCpOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />Novo checkpoint
@@ -98,7 +99,7 @@ export function ProjectGovernance({ projectId }: Props) {
         </CardHeader>
         <CardContent>
           {checkpoints.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">Nenhum checkpoint criado ainda.</p>
+            <p className="text-sm text-muted-foreground text-center py-8">{tx('Nenhum checkpoint criado ainda.')}</p>
           ) : (
             <div className="space-y-3">
               {checkpoints.map(cp => {
@@ -110,7 +111,7 @@ export function ProjectGovernance({ projectId }: Props) {
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-medium">{cp.name}</p>
                           {cp.pillar && cp.pillar !== 'GERAL' && <Badge variant="outline">{cp.pillar}</Badge>}
-                          {cp.is_mandatory && <Badge variant="destructive">Obrigatório</Badge>}
+                          {cp.is_mandatory && <Badge variant="destructive">{tx('Obrigatório')}</Badge>}
                           <Badge className={cn('text-white', info.color)}>{info.label}</Badge>
                         </div>
                         {cp.description && <p className="text-sm text-muted-foreground mt-1">{cp.description}</p>}
@@ -121,7 +122,7 @@ export function ProjectGovernance({ projectId }: Props) {
                         )}
                         {cp.evidence_url && (
                           <a href={cp.evidence_url} target="_blank" rel="noreferrer" className="text-xs text-primary underline mt-1 inline-block">
-                            Ver evidência
+                            {tx('Ver evidência')}
                           </a>
                         )}
                         {cp.evidence_notes && <p className="text-xs italic mt-1">"{cp.evidence_notes}"</p>}
@@ -159,8 +160,8 @@ export function ProjectGovernance({ projectId }: Props) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Matriz RACI</CardTitle>
-            <CardDescription>Responsabilidades por tarefa</CardDescription>
+            <CardTitle>{tx('Matriz RACI')}</CardTitle>
+            <CardDescription>{tx('Responsabilidades por tarefa')}</CardDescription>
           </div>
           <Button size="sm" onClick={() => setRaciOpen(true)} disabled={tasks.length === 0}>
             <Plus className="h-4 w-4 mr-2" />Atribuir
@@ -168,7 +169,7 @@ export function ProjectGovernance({ projectId }: Props) {
         </CardHeader>
         <CardContent>
           {raci.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">Nenhuma atribuição RACI ainda.</p>
+            <p className="text-sm text-muted-foreground text-center py-8">{tx('Nenhuma atribuição RACI ainda.')}</p>
           ) : (
             <div className="space-y-2">
               {tasks.filter(t => raci.some(r => r.task_id === t.id)).map(task => (
@@ -196,24 +197,24 @@ export function ProjectGovernance({ projectId }: Props) {
       {/* New checkpoint dialog */}
       <Dialog open={cpOpen} onOpenChange={setCpOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Novo checkpoint</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tx('Novo checkpoint')}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Nome</Label><Input value={cpForm.name} onChange={e => setCpForm({ ...cpForm, name: e.target.value })} /></div>
-            <div><Label>Descrição</Label><Textarea value={cpForm.description} onChange={e => setCpForm({ ...cpForm, description: e.target.value })} /></div>
+            <div><Label>{tx('Nome')}</Label><Input value={cpForm.name} onChange={e => setCpForm({ ...cpForm, name: e.target.value })} /></div>
+            <div><Label>{tx('Descrição')}</Label><Textarea value={cpForm.description} onChange={e => setCpForm({ ...cpForm, description: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Pilar</Label>
+                <Label>{tx('Pilar')}</Label>
                 <Select value={cpForm.pillar} onValueChange={v => setCpForm({ ...cpForm, pillar: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="GERAL">Geral</SelectItem>
-                    <SelectItem value="RA">RA - Relações Ambientais</SelectItem>
-                    <SelectItem value="OE">OE - Organização Estrutural</SelectItem>
-                    <SelectItem value="AO">AO - Ações Operacionais</SelectItem>
+                    <SelectItem value="GERAL">{tx('Geral')}</SelectItem>
+                    <SelectItem value="RA">{tx('RA - Relações Ambientais')}</SelectItem>
+                    <SelectItem value="OE">{tx('OE - Organização Estrutural')}</SelectItem>
+                    <SelectItem value="AO">{tx('AO - Ações Operacionais')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div><Label>Prazo</Label><Input type="date" value={cpForm.due_date} onChange={e => setCpForm({ ...cpForm, due_date: e.target.value })} /></div>
+              <div><Label>{tx('Prazo')}</Label><Input type="date" value={cpForm.due_date} onChange={e => setCpForm({ ...cpForm, due_date: e.target.value })} /></div>
             </div>
             <div className="flex items-center gap-2">
               <Checkbox checked={cpForm.is_mandatory} onCheckedChange={v => setCpForm({ ...cpForm, is_mandatory: !!v })} />
@@ -221,7 +222,7 @@ export function ProjectGovernance({ projectId }: Props) {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCpOpen(false)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setCpOpen(false)}>{tx('Cancelar')}</Button>
             <Button onClick={async () => {
               if (!cpForm.name) return;
               await createCheckpoint.mutateAsync({
@@ -234,7 +235,7 @@ export function ProjectGovernance({ projectId }: Props) {
               });
               setCpOpen(false);
               setCpForm({ name: '', description: '', pillar: 'GERAL', is_mandatory: true, due_date: '' });
-            }}>Criar</Button>
+            }}>{tx('Criar')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -242,13 +243,13 @@ export function ProjectGovernance({ projectId }: Props) {
       {/* Evidence dialog */}
       <Dialog open={!!evidenceOpen} onOpenChange={(o) => !o && setEvidenceOpen(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Submeter evidência</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tx('Submeter evidência')}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>URL da evidência</Label><Input value={evidence.url} onChange={e => setEvidence({ ...evidence, url: e.target.value })} placeholder="https://..." /></div>
-            <div><Label>Notas</Label><Textarea value={evidence.notes} onChange={e => setEvidence({ ...evidence, notes: e.target.value })} /></div>
+            <div><Label>{tx('URL da evidência')}</Label><Input value={evidence.url} onChange={e => setEvidence({ ...evidence, url: e.target.value })} placeholder="https://..." /></div>
+            <div><Label>{tx('Notas')}</Label><Textarea value={evidence.notes} onChange={e => setEvidence({ ...evidence, notes: e.target.value })} /></div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEvidenceOpen(null)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setEvidenceOpen(null)}>{tx('Cancelar')}</Button>
             <Button onClick={async () => {
               if (!evidenceOpen) return;
               await updateCheckpoint.mutateAsync({
@@ -257,7 +258,7 @@ export function ProjectGovernance({ projectId }: Props) {
                 action: 'submit',
               });
               setEvidenceOpen(null);
-            }}>Submeter</Button>
+            }}>{tx('Submeter')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -265,19 +266,19 @@ export function ProjectGovernance({ projectId }: Props) {
       {/* RACI dialog */}
       <Dialog open={raciOpen} onOpenChange={setRaciOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Atribuir responsável</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tx('Atribuir responsável')}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
-              <Label>Tarefa</Label>
+              <Label>{tx('Tarefa')}</Label>
               <Select value={raciForm.task_id} onValueChange={v => setRaciForm({ ...raciForm, task_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tx('Selecione')} /></SelectTrigger>
                 <SelectContent>
                   {tasks.map(t => <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Papel</Label>
+              <Label>{tx('Papel')}</Label>
               <Select value={raciForm.role} onValueChange={v => setRaciForm({ ...raciForm, role: v as RaciRole })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -285,10 +286,10 @@ export function ProjectGovernance({ projectId }: Props) {
                 </SelectContent>
               </Select>
             </div>
-            <div><Label>Nome</Label><Input value={raciForm.user_name} onChange={e => setRaciForm({ ...raciForm, user_name: e.target.value })} placeholder="Ex.: Maria Silva" /></div>
+            <div><Label>{tx('Nome')}</Label><Input value={raciForm.user_name} onChange={e => setRaciForm({ ...raciForm, user_name: e.target.value })} placeholder={tx('Ex.: Maria Silva')} /></div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRaciOpen(false)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setRaciOpen(false)}>{tx('Cancelar')}</Button>
             <Button onClick={async () => {
               if (!raciForm.task_id || !raciForm.user_name) return;
               await addRaci.mutateAsync({
@@ -300,7 +301,7 @@ export function ProjectGovernance({ projectId }: Props) {
               });
               setRaciOpen(false);
               setRaciForm({ task_id: '', user_name: '', role: 'responsible' });
-            }}>Atribuir</Button>
+            }}>{tx('Atribuir')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

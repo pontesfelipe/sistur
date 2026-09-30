@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -70,7 +71,7 @@ export function AssessmentAuditTrail({
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground text-sm">
           <FileSearch className="h-8 w-8 mx-auto mb-2 opacity-40" />
-          Não foi possível carregar a trilha de auditoria.
+          {tx('Não foi possível carregar a trilha de auditoria.')}
         </CardContent>
       </Card>
     );
@@ -81,7 +82,7 @@ export function AssessmentAuditTrail({
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground text-sm">
           <FileSearch className="h-8 w-8 mx-auto mb-2 opacity-40" />
-          Nenhum registro de auditoria para este diagnóstico.
+          {tx('Nenhum registro de auditoria para este diagnóstico.')}
         </CardContent>
       </Card>
     );
@@ -100,7 +101,7 @@ export function AssessmentAuditTrail({
           <div>
             <CardTitle className="text-base flex items-center gap-2">
               <Database className="h-4 w-4" />
-              Trilha de Auditoria — Procedência por Indicador
+              {tx('Trilha de Auditoria — Procedência por Indicador')}
             </CardTitle>
             <CardDescription>
               {auditRows.length} indicadores processados neste cálculo
@@ -114,7 +115,7 @@ export function AssessmentAuditTrail({
                 className="h-6 px-2 text-xs"
                 onClick={() => setFilter(null)}
               >
-                Limpar filtro
+                {tx('Limpar filtro')}
               </Button>
             )}
             {Object.entries(summary).map(([type, count]) => (
@@ -138,13 +139,13 @@ export function AssessmentAuditTrail({
           <Table>
             <TableHeader className="sticky top-0 bg-background z-10">
               <TableRow>
-                <TableHead>Indicador</TableHead>
-                <TableHead>Pilar</TableHead>
-                <TableHead>Valor</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead>Procedência</TableHead>
-                <TableHead>Detalhe</TableHead>
-                <TableHead className="text-right">Peso</TableHead>
+                <TableHead>{tx('Indicador')}</TableHead>
+                <TableHead>{tx('Pilar')}</TableHead>
+                <TableHead>{tx('Valor')}</TableHead>
+                <TableHead>{tx('Score')}</TableHead>
+                <TableHead>{tx('Procedência')}</TableHead>
+                <TableHead>{tx('Detalhe')}</TableHead>
+                <TableHead className="text-right">{tx('Peso')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

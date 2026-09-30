@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 // v1.98.0 — Sumário Executivo de 1 página.
 //
 // Consolida a rodada calculada em um resumo imprimível: índices dos pilares,
@@ -78,7 +79,7 @@ export function ExecutiveSummary({
       <div className="flex justify-end no-print">
         <Button variant="outline" onClick={() => window.print()}>
           <Printer className="mr-2 h-4 w-4" />
-          Imprimir / Salvar PDF
+          {tx('Imprimir / Salvar PDF')}
         </Button>
       </div>
 
@@ -119,14 +120,14 @@ export function ExecutiveSummary({
 
             {interpretation && INTERPRETATION_INFO[interpretation] && (
               <p className="text-sm">
-                <strong>Interpretação territorial:</strong>{' '}
+                <strong>{tx('Interpretação territorial:')}</strong>{' '}
                 {INTERPRETATION_INFO[interpretation].label} — {INTERPRETATION_INFO[interpretation].description}
               </p>
             )}
 
             {igmaWarnings.length > 0 && (
               <div>
-                <h4 className="font-semibold text-sm mb-1">Avisos IGMA</h4>
+                <h4 className="font-semibold text-sm mb-1">{tx('Avisos IGMA')}</h4>
                 <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-0.5">
                   {igmaWarnings.map((w, i) => (
                     <li key={i}>{w}</li>
@@ -138,9 +139,9 @@ export function ExecutiveSummary({
             {/* Gargalos e forças */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="font-semibold text-sm mb-2">Principais gargalos</h4>
+                <h4 className="font-semibold text-sm mb-2">{tx('Principais gargalos')}</h4>
                 <ul className="space-y-1 text-sm">
-                  {bottlenecks.length === 0 && <li className="text-muted-foreground">Sem dados suficientes.</li>}
+                  {bottlenecks.length === 0 && <li className="text-muted-foreground">{tx('Sem dados suficientes.')}</li>}
                   {bottlenecks.map((s: any) => (
                     <li key={s.id} className="flex justify-between gap-3">
                       <span className="truncate">
@@ -154,9 +155,9 @@ export function ExecutiveSummary({
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-sm mb-2">Pontos fortes</h4>
+                <h4 className="font-semibold text-sm mb-2">{tx('Pontos fortes')}</h4>
                 <ul className="space-y-1 text-sm">
-                  {strengths.length === 0 && <li className="text-muted-foreground">Sem dados suficientes.</li>}
+                  {strengths.length === 0 && <li className="text-muted-foreground">{tx('Sem dados suficientes.')}</li>}
                   {strengths.map((s: any) => (
                     <li key={s.id} className="flex justify-between gap-3">
                       <span className="truncate">
@@ -173,7 +174,7 @@ export function ExecutiveSummary({
 
             {/* Próximos passos */}
             <div>
-              <h4 className="font-semibold text-sm mb-2">Próximos passos</h4>
+              <h4 className="font-semibold text-sm mb-2">{tx('Próximos passos')}</h4>
               <p className="text-sm text-muted-foreground mb-2">
                 {issues.length} gargalos identificados ({criticalIssues.length} críticos) e{' '}
                 {recommendations.length} capacitações prescritas.
@@ -186,7 +187,7 @@ export function ExecutiveSummary({
                   </li>
                 ))}
                 {recommendations.length === 0 && (
-                  <li className="text-muted-foreground">Nenhuma prescrição gerada para esta rodada.</li>
+                  <li className="text-muted-foreground">{tx('Nenhuma prescrição gerada para esta rodada.')}</li>
                 )}
               </ul>
             </div>
@@ -194,7 +195,7 @@ export function ExecutiveSummary({
             {/* Procedência */}
             <div className="border-t pt-3 text-xs text-muted-foreground">
               <p>
-                <strong>Procedência dos dados:</strong>{' '}
+                <strong>{tx('Procedência dos dados:')}</strong>{' '}
                 {sources.length > 0 ? sources.join(' · ') : 'Registros manuais da organização.'}
               </p>
               <p className="mt-1">

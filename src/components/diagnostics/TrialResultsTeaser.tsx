@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -47,7 +48,7 @@ export function TrialResultsTeaser() {
                 <Lock className="h-7 w-7 text-primary" />
               </div>
               <h3 className="text-xl font-display font-semibold">
-                Diagnóstico calculado com sucesso
+                {tx('Diagnóstico calculado com sucesso')}
               </h3>
               <p className="text-sm text-muted-foreground">
                 Sua rodada de teste foi concluída. Os resultados completos — scores dos pilares
@@ -58,11 +59,11 @@ export function TrialResultsTeaser() {
                 <Button asChild>
                   <Link to="/assinatura">
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Ver planos e liberar resultados
+                    {tx('Ver planos e liberar resultados')}
                   </Link>
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link to="/edu">Conhecer o SISTUR EDU</Link>
+                  <Link to="/edu">{tx('Conhecer o SISTUR EDU')}</Link>
                 </Button>
               </div>
             </div>

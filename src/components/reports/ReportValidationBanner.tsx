@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Info, Wrench, Eye, Download, Pencil, Save, Loader2, Zap, BadgeCheck } from 'lucide-react';
@@ -97,7 +98,7 @@ export function ReportValidationBanner({
         .maybeSingle();
       const orgId = a?.org_id;
       if (!orgId) {
-        toast.error('Diagnóstico não encontrado.');
+        toast.error(tx('Diagnóstico não encontrado.'));
         return;
       }
       const codes = Array.from(new Set(corrections.map((c) => c.indicator)));
@@ -132,7 +133,7 @@ export function ReportValidationBanner({
       }
 
       if (rows.length === 0) {
-        toast.warning('Nenhuma correção pôde ser aplicada automaticamente.');
+        toast.warning(tx('Nenhuma correção pôde ser aplicada automaticamente.'));
         return;
       }
 
@@ -171,10 +172,10 @@ export function ReportValidationBanner({
       .eq('id', reportId);
     setSavingReport(false);
     if (error) {
-      toast.error('Não foi possível salvar a edição do relatório.');
+      toast.error(tx('Não foi possível salvar a edição do relatório.'));
       return;
     }
-    toast.success('Relatório atualizado.');
+    toast.success(tx('Relatório atualizado.'));
     onReportContentSaved?.(editDraft);
     queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
     setEditReportOpen(false);
@@ -378,7 +379,7 @@ export function ReportValidationBanner({
     <>
       <Alert variant={variant} className="mb-4">
         <Icon className="h-4 w-4" />
-        <AlertTitle>Conferência de dados</AlertTitle>
+        <AlertTitle>{tx('Conferência de dados')}</AlertTitle>
         <AlertDescription className="space-y-2">
           <p className="text-sm">
             Antes de gerar este relatório, o sistema conferiu os valores citados contra a tabela
@@ -386,7 +387,7 @@ export function ReportValidationBanner({
           </p>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="outline" size="sm" onClick={() => setOpen(true)}>
-              Ver detalhes
+              {tx('Ver detalhes')}
             </Button>
             {canFixIndicator && correctionsCount > 0 && (
               <Button
@@ -416,7 +417,7 @@ export function ReportValidationBanner({
                 onClick={() => setEditReportOpen(true)}
               >
                 <Pencil className="h-3.5 w-3.5" />
-                Editar relatório
+                {tx('Editar relatório')}
               </Button>
             )}
           </div>
@@ -427,7 +428,7 @@ export function ReportValidationBanner({
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between gap-3 pr-6">
-              <span>Conferência de dados — detalhes</span>
+              <span>{tx('Conferência de dados — detalhes')}</span>
               <Button
                 type="button"
                 variant="outline"
@@ -436,7 +437,7 @@ export function ReportValidationBanner({
                 onClick={() => handleDownload(corrections, determIssues, aiIssues, data.validator_version)}
               >
                 <Download className="h-3.5 w-3.5" />
-                Baixar
+                {tx('Baixar')}
               </Button>
             </DialogTitle>
             <DialogDescription>
@@ -450,25 +451,25 @@ export function ReportValidationBanner({
             <div className="space-y-6">
               {/* O QUE FOI VALIDADO — escopo da auditoria */}
               <section className="rounded-md border border-border bg-muted/20 p-3 space-y-2">
-                <h4 className="text-sm font-semibold">O que foi validado</h4>
+                <h4 className="text-sm font-semibold">{tx('O que foi validado')}</h4>
                 <p className="text-xs text-muted-foreground">
                   Antes de salvar o relatório, o sistema executou três camadas de checagem cruzando
                   o texto gerado com fontes de verdade independentes:
                 </p>
                 <ul className="list-disc pl-5 space-y-1 text-xs text-muted-foreground">
                   <li>
-                    <span className="font-medium text-foreground">Auto-correção numérica determinística</span> —
+                    <span className="font-medium text-foreground">{tx('Auto-correção numérica determinística')}</span> —
                     cada valor citado na narrativa é comparado, indicador a indicador, com a tabela
                     oficial de auditoria do diagnóstico (fontes IBGE, CADASTUR, STN, DATASUS, INEP e
                     derivados).
                   </li>
                   <li>
-                    <span className="font-medium text-foreground">Motor de coerência</span> —
+                    <span className="font-medium text-foreground">{tx('Motor de coerência')}</span> —
                     verifica contradições internas, status (Adequado/Atenção/Crítico) coerentes com
                     os percentuais e citações dentro das faixas permitidas.
                   </li>
                   <li>
-                    <span className="font-medium text-foreground">Agente IA validador</span> —
+                    <span className="font-medium text-foreground">{tx('Agente IA validador')}</span> —
                     cruza o texto com a bibliografia canônica (Beni, IGMA, PNT, ODS) e sinaliza
                     afirmações sem respaldo nas fontes anexadas.
                   </li>
@@ -492,7 +493,7 @@ export function ReportValidationBanner({
                     Divergências corrigidas automaticamente ({correctionsCount})
                   </h4>
                   <p className="text-xs text-muted-foreground mb-2">
-                    <span className="font-medium text-foreground">Resolução:</span> o valor já foi
+                    <span className="font-medium text-foreground">{tx('Resolução:')}</span> o valor já foi
                     substituído pelo número oficial da tabela de auditoria antes do relatório ser
                     salvo. Nenhuma ação adicional é necessária — o documento já está consistente.
                   </p>
@@ -535,20 +536,20 @@ export function ReportValidationBanner({
                               }
                             >
                               <BadgeCheck className="h-3 w-3" />
-                              Corrigido na auditoria
+                              {tx('Corrigido na auditoria')}
                             </Badge>
                           ) : (
                             <Badge variant="outline" className="gap-1 text-muted-foreground">
-                              Pendente de fixação
+                              {tx('Pendente de fixação')}
                             </Badge>
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          <span className="font-medium text-foreground">Problema:</span> a IA citou{' '}
+                          <span className="font-medium text-foreground">{tx('Problema:')}</span> a IA citou{' '}
                           <span className="line-through">{c.from}</span>, divergente da tabela oficial.
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          <span className="font-medium text-foreground">Resolução:</span> valor
+                          <span className="font-medium text-foreground">{tx('Resolução:')}</span> valor
                           substituído por <span className="text-foreground font-medium">{c.to}</span>{' '}
                           (fonte oficial) — aplicado no texto final.
                         </div>
@@ -573,7 +574,7 @@ export function ReportValidationBanner({
                               }}
                             >
                               <Pencil className="h-3 w-3" />
-                              Editar no relatório
+                              {tx('Editar no relatório')}
                             </Button>
                           )}
                           {canFixIndicator && (
@@ -602,7 +603,7 @@ export function ReportValidationBanner({
                     Avisos determinísticos ({determIssues.length})
                   </h4>
                   <p className="text-xs text-muted-foreground mb-2">
-                    <span className="font-medium text-foreground">Resolução:</span> o motor de
+                    <span className="font-medium text-foreground">{tx('Resolução:')}</span> o motor de
                     coerência identificou estes pontos mas não tinha um valor oficial a substituir.
                     Revisão humana recomendada antes de publicar.
                   </p>
@@ -622,7 +623,7 @@ export function ReportValidationBanner({
                     Pontos sinalizados pelo agente IA validador ({aiIssues.length})
                   </h4>
                   <p className="text-xs text-muted-foreground mb-2">
-                    <span className="font-medium text-foreground">Resolução:</span> o agente
+                    <span className="font-medium text-foreground">{tx('Resolução:')}</span> o agente
                     identificou afirmações que não encontrou respaldo direto na bibliografia ou na
                     tabela de auditoria. Confirme ou ajuste manualmente antes de publicar — pode
                     ser tanto um falso positivo quanto uma fragilidade real do texto.
@@ -638,7 +639,7 @@ export function ReportValidationBanner({
               )}
 
               <p className="text-xs text-muted-foreground border-t border-border pt-3">
-                A tabela de auditoria do diagnóstico é a <span className="font-medium text-foreground">fonte de verdade</span> para
+                A tabela de auditoria do diagnóstico é a <span className="font-medium text-foreground">{tx('fonte de verdade')}</span> para
                 valores numéricos. As correções automáticas já foram aplicadas no texto;
                 apenas os itens listados como "para revisão manual" exigem ação.
               </p>
@@ -651,7 +652,7 @@ export function ReportValidationBanner({
       <Dialog open={editReportOpen} onOpenChange={setEditReportOpen}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Editar conteúdo do relatório</DialogTitle>
+            <DialogTitle>{tx('Editar conteúdo do relatório')}</DialogTitle>
             <DialogDescription>
               Ajuste o texto manualmente. A alteração é salva no relatório atual e refletida em
               exportações (DOCX/PDF/cópia). O histórico de quem editou fica registrado.
@@ -665,11 +666,11 @@ export function ReportValidationBanner({
           />
           <div className="flex justify-end gap-2">
             <Button variant="outline" size="sm" onClick={() => setEditReportOpen(false)} disabled={savingReport}>
-              Cancelar
+              {tx('Cancelar')}
             </Button>
             <Button size="sm" className="gap-1" onClick={saveReportEdit} disabled={savingReport || !editDraft}>
               {savingReport ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-              Salvar
+              {tx('Salvar')}
             </Button>
           </div>
         </DialogContent>
@@ -761,7 +762,7 @@ function IndicatorFixDialog({
     const numeric = valueRaw.trim() === '' ? null : Number(valueRaw.replace(',', '.'));
     if (valueRaw.trim() !== '' && Number.isNaN(numeric)) {
       setSaving(false);
-      toast.error('Valor numérico inválido.');
+      toast.error(tx('Valor numérico inválido.'));
       return;
     }
     const payload = {
@@ -781,7 +782,7 @@ function IndicatorFixDialog({
       toast.error(error.message || 'Não foi possível salvar o valor.');
       return;
     }
-    toast.success('Valor do indicador atualizado. Recalcule o diagnóstico para refletir no relatório.');
+    toast.success(tx('Valor do indicador atualizado. Recalcule o diagnóstico para refletir no relatório.'));
     onSaved();
   };
 
@@ -789,7 +790,7 @@ function IndicatorFixDialog({
     <Dialog open={!!correction} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Corrigir valor do indicador</DialogTitle>
+          <DialogTitle>{tx('Corrigir valor do indicador')}</DialogTitle>
           <DialogDescription>
             {correction?.indicator}
             {indicatorName ? ` — ${indicatorName}` : ''}
@@ -802,29 +803,29 @@ function IndicatorFixDialog({
         ) : (
           <div className="space-y-3">
             <div className="rounded-md border border-border bg-muted/30 p-2 text-xs">
-              <div>IA citou: <span className="line-through">{correction?.from}</span></div>
-              <div>Sugestão oficial: <span className="font-medium">{correction?.to}</span></div>
+              <div>{tx('IA citou:')} <span className="line-through">{correction?.from}</span></div>
+              <div>{tx('Sugestão oficial:')} <span className="font-medium">{correction?.to}</span></div>
             </div>
             <div className="space-y-1">
-              <Label htmlFor="vraw" className="text-xs">Valor numérico</Label>
-              <Input id="vraw" value={valueRaw} onChange={(e) => setValueRaw(e.target.value)} placeholder="ex.: 42.5" />
+              <Label htmlFor="vraw" className="text-xs">{tx('Valor numérico')}</Label>
+              <Input id="vraw" value={valueRaw} onChange={(e) => setValueRaw(e.target.value)} placeholder={tx('ex.: 42.5')} />
             </div>
             <div className="space-y-1">
               <Label htmlFor="vtext" className="text-xs">Valor textual (opcional)</Label>
               <Input id="vtext" value={valueText} onChange={(e) => setValueText(e.target.value)} />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="vsrc" className="text-xs">Fonte</Label>
+              <Label htmlFor="vsrc" className="text-xs">{tx('Fonte')}</Label>
               <Input id="vsrc" value={source} onChange={(e) => setSource(e.target.value)} />
             </div>
             <p className="text-xs text-muted-foreground">
-              Para refletir no relatório: após salvar, recalcule o diagnóstico e regenere o relatório.
+              {tx('Para refletir no relatório: após salvar, recalcule o diagnóstico e regenere o relatório.')}
             </p>
             <div className="flex justify-end gap-2 pt-1">
-              <Button variant="outline" size="sm" onClick={onClose} disabled={saving}>Cancelar</Button>
+              <Button variant="outline" size="sm" onClick={onClose} disabled={saving}>{tx('Cancelar')}</Button>
               <Button size="sm" className="gap-1" onClick={save} disabled={saving || !indicatorId}>
                 {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-                Salvar
+                {tx('Salvar')}
               </Button>
             </div>
           </div>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -127,7 +128,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
       </CardHeader>
       <CardContent className="space-y-4">
         {!dest?.latitude ? (
-          <p className="text-sm text-muted-foreground">Este destino ainda não tem coordenadas cadastradas.</p>
+          <p className="text-sm text-muted-foreground">{tx('Este destino ainda não tem coordenadas cadastradas.')}</p>
         ) : (
           <>
             <div className="grid gap-4 md:grid-cols-3 items-end">
@@ -135,20 +136,20 @@ export function GeomarketingPanel({ destinationId }: Props) {
                 <Label>Raio de influência: {radius} km</Label>
                 <Slider min={1} max={100} step={1} value={[radius]} onValueChange={v => setRadius(v[0])} />
               </div>
-              <div className="flex items-center gap-2"><Switch checked={showComp} onCheckedChange={setShowComp} /><Label>Concorrentes</Label></div>
-              <div className="flex items-center gap-2"><Switch checked={showHeat} onCheckedChange={setShowHeat} /><Label>Mapa de calor da oferta</Label></div>
+              <div className="flex items-center gap-2"><Switch checked={showComp} onCheckedChange={setShowComp} /><Label>{tx('Concorrentes')}</Label></div>
+              <div className="flex items-center gap-2"><Switch checked={showHeat} onCheckedChange={setShowHeat} /><Label>{tx('Mapa de calor da oferta')}</Label></div>
               <div className="flex items-center gap-2"><Switch checked={showBrand} onCheckedChange={setShowBrand} /><Label>Unidades da rede ({Math.max(0, (data?.units?.length ?? 0) - 1)})</Label></div>
-              <div className="flex items-center gap-2"><Switch checked={showOrigin} onCheckedChange={setShowOrigin} /><Label>Origem dos visitantes</Label></div>
+              <div className="flex items-center gap-2"><Switch checked={showOrigin} onCheckedChange={setShowOrigin} /><Label>{tx('Origem dos visitantes')}</Label></div>
             </div>
             <div className="rounded-md border p-3 space-y-2 text-sm">
               <p className="font-medium">Origem dos visitantes (por estado)</p>
               <div className="flex flex-wrap items-center gap-2">
-                <select className="h-9 rounded-md border bg-background px-2" value={newUf} onChange={e => setNewUf(e.target.value)} aria-label="Estado de origem">
+                <select className="h-9 rounded-md border bg-background px-2" value={newUf} onChange={e => setNewUf(e.target.value)} aria-label={tx('Estado de origem')}>
                   {Object.keys(UF_CAPITALS).map(uf => <option key={uf}>{uf}</option>)}
                 </select>
-                <input type="number" min={1} max={100} className="h-9 w-20 rounded-md border bg-background px-2" value={newPct} onChange={e => setNewPct(Number(e.target.value))} aria-label="Percentual" />
+                <input type="number" min={1} max={100} className="h-9 w-20 rounded-md border bg-background px-2" value={newPct} onChange={e => setNewPct(Number(e.target.value))} aria-label={tx('Percentual')} />
                 <span>%</span>
-                <button type="button" className="h-9 rounded-md bg-primary px-3 text-primary-foreground" onClick={() => saveOrigins({ ...origins, [newUf]: newPct })}>Adicionar</button>
+                <button type="button" className="h-9 rounded-md bg-primary px-3 text-primary-foreground" onClick={() => saveOrigins({ ...origins, [newUf]: newPct })}>{tx('Adicionar')}</button>
                 {Object.entries(origins).map(([uf, pct]) => (
                   <Badge key={uf} variant="secondary" className="cursor-pointer" onClick={() => { const o = { ...origins }; delete o[uf]; saveOrigins(o); }}>{uf} {pct}% ✕</Badge>
                 ))}
@@ -157,7 +158,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
             <div ref={mapEl} className="h-[420px] w-full rounded-md border z-0" />
             <div className="grid gap-3 md:grid-cols-3 text-sm">
               <div className="rounded-md border p-3">
-                <p className="text-muted-foreground">Concorrentes no raio</p>
+                <p className="text-muted-foreground">{tx('Concorrentes no raio')}</p>
                 <p className="text-2xl font-semibold">{inRadius.length}</p>
                 <p className="text-xs text-muted-foreground">{supply.toLocaleString('pt-BR')} avaliações somadas</p>
               </div>
@@ -171,11 +172,11 @@ export function GeomarketingPanel({ destinationId }: Props) {
                 {data?.events?.length ? data.events.slice(0, 4).map((e: any) => (
                   <p key={e.id} className="text-xs">{new Date(e.start_date).toLocaleDateString('pt-BR')} · {e.name}
                     {e.estimated_attendance ? <Badge variant="secondary" className="ml-1">{e.estimated_attendance.toLocaleString('pt-BR')}</Badge> : null}</p>
-                )) : <p className="text-xs text-muted-foreground">Nenhum evento futuro cadastrado.</p>}
+                )) : <p className="text-xs text-muted-foreground">{tx('Nenhum evento futuro cadastrado.')}</p>}
               </div>
             </div>
             {demand > 0 && supply > 0 && (
-              <p className="text-sm text-muted-foreground">Relação demanda/oferta no raio: <b>{Math.round(demand / supply).toLocaleString('pt-BR')}</b> visitantes por avaliação de concorrente — quanto maior, mais espaço de mercado.</p>
+              <p className="text-sm text-muted-foreground">{tx('Relação demanda/oferta no raio:')} <b>{Math.round(demand / supply).toLocaleString('pt-BR')}</b> visitantes por avaliação de concorrente — quanto maior, mais espaço de mercado.</p>
             )}
           </>
         )}

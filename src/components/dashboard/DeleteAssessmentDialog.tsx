@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import React, { useState } from 'react';
 import {
   AlertDialog,
@@ -101,7 +102,7 @@ export function DeleteAssessmentDialog({
         
         if (reportsError) {
           console.error('Error deleting reports:', reportsError);
-          toast.error('Erro ao excluir relatórios associados');
+          toast.error(tx('Erro ao excluir relatórios associados'));
           setIsDeleting(false);
           return;
         }
@@ -116,7 +117,7 @@ export function DeleteAssessmentDialog({
         
         if (projectsError) {
           console.error('Error deleting projects:', projectsError);
-          toast.error('Erro ao excluir projetos associados');
+          toast.error(tx('Erro ao excluir projetos associados'));
           setIsDeleting(false);
           return;
         }
@@ -130,7 +131,7 @@ export function DeleteAssessmentDialog({
 
       if (assessmentError) {
         console.error('Error deleting assessment:', assessmentError);
-        toast.error('Erro ao excluir diagnóstico. Tente novamente.');
+        toast.error(tx('Erro ao excluir diagnóstico. Tente novamente.'));
         setIsDeleting(false);
         return;
       }
@@ -152,14 +153,14 @@ export function DeleteAssessmentDialog({
       if (deletedItems.length > 0) {
         toast.success(`Diagnóstico e ${deletedItems.join(' e ')} excluídos com sucesso!`);
       } else {
-        toast.success('Diagnóstico excluído com sucesso!');
+        toast.success(tx('Diagnóstico excluído com sucesso!'));
       }
 
       handleOpenChange(false);
       onDeleted?.();
     } catch (error) {
       console.error('Error in delete operation:', error);
-      toast.error('Erro ao excluir. Tente novamente.');
+      toast.error(tx('Erro ao excluir. Tente novamente.'));
     } finally {
       setIsDeleting(false);
     }
@@ -178,20 +179,20 @@ export function DeleteAssessmentDialog({
           <AlertDialogDescription className="space-y-3">
             <p>
               Esta ação não pode ser desfeita. O diagnóstico <strong>"{assessmentTitle}"</strong> 
-              e todos os dados de indicadores, pontuações e planos de ação serão permanentemente excluídos.
+              {tx('e todos os dados de indicadores, pontuações e planos de ação serão permanentemente excluídos.')}
             </p>
             
             {isLoadingCounts && (
               <div className="flex items-center gap-2 text-muted-foreground py-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm">Verificando dados relacionados...</span>
+                <span className="text-sm">{tx('Verificando dados relacionados...')}</span>
               </div>
             )}
 
             {hasRelatedData && (
               <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3 space-y-3">
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-                  Este diagnóstico possui dados relacionados:
+                  {tx('Este diagnóstico possui dados relacionados:')}
                 </p>
                 
                 {relatedCounts.reports > 0 && (
@@ -229,14 +230,14 @@ export function DeleteAssessmentDialog({
                 )}
                 
                 <p className="text-xs text-amber-700 dark:text-amber-400">
-                  Se não selecionar, estes itens permanecerão sem vínculo ao diagnóstico.
+                  {tx('Se não selecionar, estes itens permanecerão sem vínculo ao diagnóstico.')}
                 </p>
               </div>
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>{tx('Cancelar')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
@@ -250,7 +251,7 @@ export function DeleteAssessmentDialog({
             ) : (
               <Trash2 className="h-4 w-4 mr-2" />
             )}
-            Excluir
+            {tx('Excluir')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
