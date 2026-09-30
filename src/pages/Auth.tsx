@@ -894,9 +894,12 @@ const Auth = () => {
       </div>
 
       {/* Right side - Forms */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-background relative">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 bg-background relative">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-accent/[0.02]" />
         <div className="relative z-10 w-full max-w-md animate-fade-in">
+          <div className="mb-6">
+            <LaunchBanner />
+          </div>
           {renderForm()}
         </div>
       </div>
