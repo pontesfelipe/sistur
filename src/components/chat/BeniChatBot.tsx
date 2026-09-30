@@ -13,7 +13,9 @@ import {
   RefreshCw,
   Volume2,
   VolumeX,
-  Square
+  Square,
+  Target,
+  ClipboardList
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
