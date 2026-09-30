@@ -271,7 +271,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
             <div key={section.label} className="mb-3">
               {section.label && (
                 <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  {section.label}
+                  {t(section.label)}
                 </div>
               )}
               <div className="space-y-0.5">

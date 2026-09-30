@@ -27,6 +27,8 @@ import { ChangePasswordDialog } from './ChangePasswordDialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface AppHeaderProps {
   title: string;
@@ -39,6 +41,7 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
   const { user, signOut } = useAuth();
   const { isViewingDemoData, isAdmin, isOrgAdmin, profile, roles } = useProfile();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
@@ -47,7 +50,7 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
 
   const handleSignOut = async () => {
     await signOut();
-    toast.success('Você saiu da sua conta');
+    toast.success(t('Você saiu da sua conta'));
     navigate('/auth');
   };
 
@@ -93,7 +96,7 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
               size="icon"
               className="md:hidden h-9 w-9"
               onClick={onMobileMenuClick}
-              aria-label="Abrir menu"
+              aria-label={t('Abrir menu')}
             >
               <Menu className="h-5 w-5" />
             </Button>
@@ -101,16 +104,16 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
           
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-lg md:text-xl font-display font-semibold text-foreground truncate">{title}</h1>
+              <h1 className="text-lg md:text-xl font-display font-semibold text-foreground truncate">{t(title)}</h1>
               {isViewingDemoData && (
                 <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300 text-xs shrink-0">
                   <Database className="h-3 w-3 sm:mr-1" />
-                  <span className="hidden sm:inline">Demo</span>
+                  <span className="hidden sm:inline">{t('Demo')}</span>
                 </Badge>
               )}
             </div>
             {subtitle && (
-              <p className="text-xs md:text-sm text-muted-foreground truncate hidden sm:block">{subtitle}</p>
+              <p className="text-xs md:text-sm text-muted-foreground truncate hidden sm:block">{t(subtitle)}</p>
             )}
           </div>
         </div>
@@ -119,6 +122,8 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
         <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0 pl-2">
           {/* Custom page actions */}
           {actions}
+
+          <LanguageSwitcher className="h-9 px-2" />
 
           {/* Notifications */}
           <NotificationsDropdown />
@@ -147,23 +152,23 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setProfileDialogOpen(true)}>
                 <User className="mr-2 h-4 w-4" />
-                Meu perfil
+                {t('Meu perfil')}
               </DropdownMenuItem>
               {!isOAuthUser && (
                 <DropdownMenuItem onClick={() => setPasswordDialogOpen(true)}>
                   <Lock className="mr-2 h-4 w-4" />
-                  Alterar Senha
+                  {t('Alterar Senha')}
                 </DropdownMenuItem>
               )}
               {(isAdmin || isOrgAdmin) && (
                 <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
                   <Settings className="mr-2 h-4 w-4" />
-                  Configurações
+                  {t('Configurações')}
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
-                Sair
+                {t('Sair')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -179,9 +184,9 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
       <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Meu Perfil</DialogTitle>
+            <DialogTitle>{t('Meu Perfil')}</DialogTitle>
             <DialogDescription>
-              Informações da sua conta no SISTUR
+              {t('Informações da sua conta no SISTUR')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -199,9 +204,9 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
             
             <div className="space-y-3">
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Nome Completo</Label>
+                <Label className="text-xs text-muted-foreground">{t('Nome Completo')}</Label>
                 <Input 
-                  value={profile?.full_name || user?.user_metadata?.full_name || 'Não informado'} 
+                  value={profile?.full_name || user?.user_metadata?.full_name || t('Não informado')} 
                   readOnly 
                   className="bg-muted"
                 />
@@ -217,33 +222,33 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
               </div>
               
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Tipo de Acesso</Label>
+                <Label className="text-xs text-muted-foreground">{t('Tipo de Acesso')}</Label>
                 <Input 
-                  value={getSystemAccessLabel()} 
+                  value={t(getSystemAccessLabel())} 
                   readOnly 
                   className="bg-muted"
                 />
               </div>
               
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Papéis</Label>
+                <Label className="text-xs text-muted-foreground">{t('Papéis')}</Label>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {roles.length > 0 ? (
                     roles.map((r, idx) => (
                       <Badge key={idx} variant="secondary">
-                        {getRoleLabel(r.role)}
+                        {t(getRoleLabel(r.role))}
                       </Badge>
                     ))
                   ) : (
-                    <span className="text-sm text-muted-foreground">Nenhum papel atribuído</span>
+                    <span className="text-sm text-muted-foreground">{t('Nenhum papel atribuído')}</span>
                   )}
                 </div>
               </div>
               
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Membro desde</Label>
+                <Label className="text-xs text-muted-foreground">{t('Membro desde')}</Label>
                 <Input 
-                  value={profile?.created_at ? new Date(profile.created_at).toLocaleDateString('pt-BR') : 'N/A'} 
+                  value={profile?.created_at ? new Date(profile.created_at).toLocaleDateString(i18n.language) : 'N/A'} 
                   readOnly 
                   className="bg-muted"
                 />
