@@ -859,7 +859,7 @@ const Auth = () => {
         </div>
 
         <p className="text-primary-foreground/50 text-sm relative z-10">
-          © 2025 SISTUR — Instituto Mario Beni. Todos os direitos reservados.
+          © 2026 SISTUR — Instituto Mario Beni. Todos os direitos reservados.
         </p>
       </div>
 
