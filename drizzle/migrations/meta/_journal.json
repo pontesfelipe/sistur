@@ -57,6 +57,13 @@
       "when": 1790706335030,
       "tag": "0007_fix_approve_audit_metadata",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790778871156,
+      "tag": "0008_plans_annual_prices",
+      "breakpoints": true
     }
   ]
 }

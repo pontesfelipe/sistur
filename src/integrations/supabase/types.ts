@@ -9107,6 +9107,7 @@ export type Database = {
       }
       plans: {
         Row: {
+          annual_price_cents: number | null
           audience: string
           billing_period: string
           code: string
@@ -9123,10 +9124,12 @@ export type Database = {
           seat_based: boolean
           sort_order: number
           stripe_price_id: string | null
+          stripe_price_id_annual: string | null
           updated_at: string
           version: number
         }
         Insert: {
+          annual_price_cents?: number | null
           audience: string
           billing_period?: string
           code: string
@@ -9143,10 +9146,12 @@ export type Database = {
           seat_based?: boolean
           sort_order?: number
           stripe_price_id?: string | null
+          stripe_price_id_annual?: string | null
           updated_at?: string
           version?: number
         }
         Update: {
+          annual_price_cents?: number | null
           audience?: string
           billing_period?: string
           code?: string
@@ -9163,6 +9168,7 @@ export type Database = {
           seat_based?: boolean
           sort_order?: number
           stripe_price_id?: string | null
+          stripe_price_id_annual?: string | null
           updated_at?: string
           version?: number
         }
