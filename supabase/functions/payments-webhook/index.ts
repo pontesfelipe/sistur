@@ -32,7 +32,7 @@ async function planIdFromPrice(priceId: string | null): Promise<string | null> {
   const { data } = await db()
     .from('plans')
     .select('id')
-    .eq('stripe_price_id', priceId)
+    .or(`stripe_price_id.eq.${priceId},stripe_price_id_annual.eq.${priceId}`)
     .maybeSingle();
   return (data as any)?.id ?? null;
 }
@@ -129,7 +129,7 @@ async function onPurchaseCompleted(session: any, env: StripeEnv) {
     const { data: plan } = await db()
       .from('plans')
       .select('name, price_cents')
-      .eq('stripe_price_id', priceId)
+      .or(`stripe_price_id.eq.${priceId},stripe_price_id_annual.eq.${priceId}`)
       .maybeSingle();
     if ((plan as any)?.name) itemName = (plan as any).name;
   }

@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
     let finalQty = isRecurring ? quantity : 1;
     if (isRecurring) {
       const { data: plan } = await supabase
-        .from('plans').select('seat_based, min_seats').eq('stripe_price_id', priceId).maybeSingle();
+        .from('plans').select('seat_based, min_seats').or(`stripe_price_id.eq.${priceId},stripe_price_id_annual.eq.${priceId}`).maybeSingle();
       finalQty = (plan as any)?.seat_based ? Math.max(finalQty, (plan as any).min_seats ?? 1) : 1;
     }
 
