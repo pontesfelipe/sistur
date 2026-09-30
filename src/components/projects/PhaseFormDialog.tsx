@@ -122,9 +122,9 @@ export function PhaseFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Editar Fase' : 'Nova Fase'}</DialogTitle>
+          <DialogTitle>{isEditing ? tx('Editar Fase') : tx('Nova Fase')}</DialogTitle>
           <DialogDescription>
-            {isEditing ? 'Atualize as informações da fase' : 'Adicione uma nova fase ao projeto'}
+            {isEditing ? tx('Atualize as informações da fase') : tx('Adicione uma nova fase ao projeto')}
           </DialogDescription>
         </DialogHeader>
 
@@ -161,7 +161,7 @@ export function PhaseFormDialog({
                 <SelectContent>
                   {PHASE_STATUS_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                      {tx(opt.label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -207,7 +207,7 @@ export function PhaseFormDialog({
             </Button>
             <Button type="submit" disabled={isPending || !name}>
               {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {isEditing ? 'Salvar Alterações' : 'Criar Fase'}
+              {isEditing ? tx('Salvar Alterações') : tx('Criar Fase')}
             </Button>
           </DialogFooter>
         </form>

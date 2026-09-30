@@ -165,9 +165,9 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
                       {plan.priority === 1 && (
                         <AlertTriangle className="h-4 w-4 text-destructive" />
                       )}
-                      <CardTitle className="text-base">{plan.title}</CardTitle>
+                      <CardTitle className="text-base">{tx(plan.title)}</CardTitle>
                     </div>
-                    <CardDescription>{plan.description}</CardDescription>
+                    <CardDescription>{tx(plan.description)}</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
                     {pillarConfig && (
@@ -177,7 +177,7 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
                     )}
                     <Badge className={statusConfig.color}>
                       <StatusIcon className="h-3 w-3 mr-1" />
-                      {statusConfig.label}
+                      {tx(statusConfig.label)}
                     </Badge>
                   </div>
                 </div>

@@ -305,7 +305,7 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
                               <Info className="h-3.5 w-3.5 text-muted-foreground" />
                             </TooltipTrigger>
                             <TooltipContent className="max-w-xs">
-                              {indicator.description}
+                              {tx(indicator.description)}
                             </TooltipContent>
                           </Tooltip>
                         )}
@@ -342,7 +342,7 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
                             </span>
                           </div>
                         </TooltipTrigger>
-                        <TooltipContent>{reliability.label}</TooltipContent>
+                        <TooltipContent>{tx(reliability.label)}</TooltipContent>
                       </Tooltip>
                     </TableCell>
                     <TableCell>

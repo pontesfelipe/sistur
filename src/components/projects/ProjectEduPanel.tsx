@@ -90,7 +90,7 @@ export function ProjectEduPanel({ projectId }: Props) {
                       is_mandatory: false,
                       enrollment_status: 'suggested',
                     })}>
-                      {already ? 'Vinculado' : 'Vincular'}
+                      {already ? tx('Vinculado') : tx('Vincular')}
                     </Button>
                   </div>
                 );
@@ -122,7 +122,7 @@ export function ProjectEduPanel({ projectId }: Props) {
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-medium text-sm">{e.course_title}</p>
                         {e.is_mandatory && <Badge variant="destructive">{tx('Obrigatório')}</Badge>}
-                        <Badge className={cn('text-white', info.color)}>{info.label}</Badge>
+                        <Badge className={cn('text-white', info.color)}>{tx(info.label)}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">
                         {e.user_name && `Aluno: ${e.user_name} · `}
@@ -134,7 +134,7 @@ export function ProjectEduPanel({ projectId }: Props) {
                       <Select value={e.enrollment_status} onValueChange={(v) => update.mutate({ id: e.id, updates: { enrollment_status: v as EduEnrollmentStatus, completed_at: v === 'completed' ? new Date().toISOString() : null } })}>
                         <SelectTrigger className="w-36 h-8"><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          {Object.entries(EDU_ENROLLMENT_STATUS_INFO).map(([k, info]) => <SelectItem key={k} value={k}>{info.label}</SelectItem>)}
+                          {Object.entries(EDU_ENROLLMENT_STATUS_INFO).map(([k, info]) => <SelectItem key={k} value={k}>{tx(info.label)}</SelectItem>)}
                         </SelectContent>
                       </Select>
                       <Button size="icon" variant="ghost" onClick={() => del.mutate({ id: e.id, projectId })}>

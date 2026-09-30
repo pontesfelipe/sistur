@@ -100,7 +100,7 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
               return (
                 <div key={t}>
                   <div className="flex items-center gap-2 mb-2 text-sm font-medium text-muted-foreground">
-                    <Icon className="h-4 w-4" /> {LINK_TYPE_LABELS[t]} ({items.length})
+                    <Icon className="h-4 w-4" /> {tx(LINK_TYPE_LABELS[t])} ({items.length})
                   </div>
                   <div className="space-y-2">
                     {items.map((l) => (
@@ -133,7 +133,7 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {(Object.keys(LINK_TYPE_LABELS) as ExternalLinkType[]).map((t) => (
-                    <SelectItem key={t} value={t}>{LINK_TYPE_LABELS[t]}</SelectItem>
+                    <SelectItem key={t} value={t}>{tx(LINK_TYPE_LABELS[t])}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -146,7 +146,7 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
                   {options.length === 0 ? (
                     <div className="p-2 text-xs text-muted-foreground">{tx('Nenhum item disponível')}</div>
                   ) : options.map((o) => (
-                    <SelectItem key={o.id} value={o.id}>{o.label}</SelectItem>
+                    <SelectItem key={o.id} value={o.id}>{tx(o.label)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

@@ -110,7 +110,7 @@ export function PreCalculationChecklist({ indicators, indicatorValues, tier, isE
                 <div className="flex items-center justify-between mb-2">
                   <span className={`flex items-center gap-2 text-sm font-medium ${meta.color}`}>
                     <Icon className="h-4 w-4" />
-                    {meta.label}
+                    {tx(meta.label)}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {data.filled}/{data.total}

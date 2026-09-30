@@ -60,7 +60,7 @@ function RaciSection({ taskId, projectId, canEdit }: { taskId: string; projectId
           return (
             <div key={role} className="flex items-start gap-3 text-sm">
               <Badge className={`${info.color} w-24 justify-center shrink-0`} variant="secondary">
-                {info.label}
+                {tx(info.label)}
               </Badge>
               <div className="flex-1 flex flex-wrap gap-1.5">
                 {entries.map((e) => (

@@ -115,7 +115,7 @@ export function ProjectMembersPanel({ projectId }: { projectId: string }) {
                     <div>
                       <p className="text-sm font-medium">{m.user_name || m.user_id.slice(0, 8)}</p>
                       <Badge variant="outline" className={cn('text-[10px] gap-1', info.color)}>
-                        <Icon className="h-3 w-3" /> {info.label}
+                        <Icon className="h-3 w-3" /> {tx(info.label)}
                       </Badge>
                     </div>
                   </div>

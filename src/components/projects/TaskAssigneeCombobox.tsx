@@ -54,7 +54,7 @@ export function TaskAssigneeCombobox({ value, displayName, onChange, placeholder
         <Command>
           <CommandInput placeholder={tx('Buscar pessoa...')} />
           <CommandList>
-            <CommandEmpty>{isLoading ? 'Carregando...' : 'Nenhum usuário encontrado.'}</CommandEmpty>
+            <CommandEmpty>{isLoading ? tx('Carregando...') : tx('Nenhum usuário encontrado.')}</CommandEmpty>
             <CommandGroup>
               {users.map((u) => (
                 <CommandItem

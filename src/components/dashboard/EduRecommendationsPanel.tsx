@@ -292,7 +292,7 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <h4 className="font-medium text-sm truncate group-hover:text-primary transition-colors">
-                        {rec.training.title}
+                        {tx(rec.training.title)}
                       </h4>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge 
@@ -352,7 +352,7 @@ function RecommendationItem({ rec, index }: { rec: DisplayRecommendation; index:
           </Badge>
         </div>
         <h4 className="font-medium text-sm">
-          {rec.training.title}
+          {tx(rec.training.title)}
         </h4>
         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
           {rec.reasonTemplate}

@@ -129,7 +129,7 @@ export function EnterpriseRegressionAlerts({ destinationId, diagnosticType, dest
             <TrendingDown className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="secondary">{PILLAR_LABELS[a.pillar]}</Badge>
+                <Badge variant="secondary">{tx(PILLAR_LABELS[a.pillar])}</Badge>
                 <span className="text-sm font-medium">{a.from}% → {a.to}%</span>
                 <span className="text-xs text-muted-foreground">
                   (−{a.drop1.toFixed(1)} e −{a.drop2.toFixed(1)} pp nas últimas 2 rodadas)
@@ -150,7 +150,7 @@ export function EnterpriseRegressionAlerts({ destinationId, diagnosticType, dest
             className="gap-2"
           >
             {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
-            {alreadySent ? 'Alerta já enviado' : 'Notificar por e-mail'}
+            {alreadySent ? tx('Alerta já enviado') : tx('Notificar por e-mail')}
           </Button>
         </div>
       </CardContent>

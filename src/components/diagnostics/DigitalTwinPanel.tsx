@@ -120,8 +120,8 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
           <div className="grid md:grid-cols-2 gap-4">
             {TWIN_LEVERS.map((l) => (
               <div key={l.id} className="space-y-1">
-                <div className="flex justify-between text-sm"><span className="font-medium">{l.label}</span><span>{intensities[l.id]}%</span></div>
-                <p className="text-xs text-muted-foreground">{l.description}</p>
+                <div className="flex justify-between text-sm"><span className="font-medium">{tx(l.label)}</span><span>{intensities[l.id]}%</span></div>
+                <p className="text-xs text-muted-foreground">{tx(l.description)}</p>
                 <Slider value={[intensities[l.id]]} min={0} max={100} step={5} aria-label={l.label}
                   onValueChange={([v]) => setIntensities({ ...intensities, [l.id]: v })} />
               </div>
@@ -175,7 +175,7 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
                   return (
                     <div key={p} className="flex justify-between text-sm">
                       <span>{p}: {Math.round(last[p] * 100)}%</span>
-                      <Badge variant="outline" className={SEVERITY_INFO[sev].color}>{SEVERITY_INFO[sev].label}</Badge>
+                      <Badge variant="outline" className={SEVERITY_INFO[sev].color}>{tx(SEVERITY_INFO[sev].label)}</Badge>
                     </div>
                   );
                 })}

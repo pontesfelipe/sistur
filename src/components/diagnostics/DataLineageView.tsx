@@ -570,7 +570,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
                     >
                       <div className="flex items-center gap-2 mb-1.5">
                         <Icon className="h-4 w-4" />
-                        <span className="text-xs font-semibold">{meta.label}</span>
+                        <span className="text-xs font-semibold">{tx(meta.label)}</span>
                       </div>
                       <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-bold tabular-nums">{count}</span>

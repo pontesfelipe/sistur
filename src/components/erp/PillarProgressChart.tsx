@@ -114,7 +114,7 @@ export function PillarProgressChart({ data, isLoading }: PillarProgressChartProp
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className={`text-xs ${severity.color}`}>
-                        {severity.label}
+                        {tx(severity.label)}
                       </Badge>
                       <span className="text-sm font-medium">
                         {scorePercent}%

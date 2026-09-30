@@ -261,10 +261,10 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
                       {item.priority === 1 && (
                         <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0" />
                       )}
-                      <p className="font-medium text-sm truncate">{item.title}</p>
+                      <p className="font-medium text-sm truncate">{tx(item.title)}</p>
                     </div>
                     {item.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{item.description}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{tx(item.description)}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -357,8 +357,8 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
                   {METHODOLOGY_OPTIONS.map(opt => (
                     <SelectItem key={opt.value} value={opt.value}>
                       <div>
-                        <span className="font-medium">{opt.label}</span>
-                        <span className="text-muted-foreground ml-2 text-xs">{opt.description}</span>
+                        <span className="font-medium">{tx(opt.label)}</span>
+                        <span className="text-muted-foreground ml-2 text-xs">{tx(opt.description)}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -420,7 +420,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
               return (
                 <div key={item.id} className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-muted/50 text-sm">
                   <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0" />
-                  <span className="flex-1 truncate">{item.title}</span>
+                  <span className="flex-1 truncate">{tx(item.title)}</span>
                   {pillarConfig && (
                     <Badge variant="outline" className={`text-xs ${pillarConfig.color}`}>
                       {item.pillar}

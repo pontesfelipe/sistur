@@ -92,7 +92,7 @@ export function ExternalDataQualityPanel() {
                   <Badge className={meta.color} variant="outline">{row.source}</Badge>
                   {ageBadge(row.age_days)}
                 </div>
-                <CardTitle className="text-base mt-2">{meta.label}</CardTitle>
+                <CardTitle className="text-base mt-2">{tx(meta.label)}</CardTitle>
                 <CardDescription className="flex items-center gap-1 text-xs">
                   <Calendar className="h-3 w-3" />
                   {row.last_collected_at

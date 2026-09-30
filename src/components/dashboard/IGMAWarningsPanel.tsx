@@ -104,7 +104,7 @@ export function IGMAWarningsPanel({
             >
               {IconComponent && <IconComponent className="h-4 w-4" />}
               <AlertTitle>
-                {msg.title}
+                {tx(msg.title)}
               </AlertTitle>
               <AlertDescription className="text-sm">
                 {msg.message}

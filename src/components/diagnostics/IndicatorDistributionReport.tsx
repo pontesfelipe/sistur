@@ -168,7 +168,7 @@ export function IndicatorDistributionReport() {
                 <div key={scope} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Icon className="h-4 w-4" style={{ color: scopeConfig[scope].color }} />
-                    <span className="text-sm">{scopeConfig[scope].label}</span>
+                    <span className="text-sm">{tx(scopeConfig[scope].label)}</span>
                   </div>
                   <Badge variant="secondary">{count}</Badge>
                 </div>
@@ -190,7 +190,7 @@ export function IndicatorDistributionReport() {
               <div key={pillar} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Badge variant={pillar.toLowerCase() as 'ra' | 'oe' | 'ao'} className="text-xs">
-                    {pillarConfig[pillar].label}
+                    {tx(pillarConfig[pillar].label)}
                   </Badge>
                   <span className="text-sm text-muted-foreground">{pillarConfig[pillar].fullName}</span>
                 </div>
@@ -215,7 +215,7 @@ export function IndicatorDistributionReport() {
                 <div key={tier} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Icon className="h-4 w-4" style={{ color: tierConfig[tier].color }} />
-                    <span className="text-sm">{tierConfig[tier].label}</span>
+                    <span className="text-sm">{tx(tierConfig[tier].label)}</span>
                   </div>
                   <Badge variant="secondary">{count}</Badge>
                 </div>
@@ -340,7 +340,7 @@ export function IndicatorDistributionReport() {
                           <div className="flex items-center gap-2">
                             <Icon className="h-4 w-4" style={{ color: scopeConfig[scope].color }} />
                             <div>
-                              <div className="font-medium">{scopeConfig[scope].label}</div>
+                              <div className="font-medium">{tx(scopeConfig[scope].label)}</div>
                               <div className="text-xs text-muted-foreground">({scopeTotal} total)</div>
                             </div>
                           </div>
@@ -348,7 +348,7 @@ export function IndicatorDistributionReport() {
                       )}
                       <TableCell>
                         <Badge variant={pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
-                          {pillarConfig[pillar].label}
+                          {tx(pillarConfig[pillar].label)}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-center">

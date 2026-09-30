@@ -105,9 +105,9 @@ export function MilestoneFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Editar Marco' : 'Novo Marco'}</DialogTitle>
+          <DialogTitle>{isEditing ? tx('Editar Marco') : tx('Novo Marco')}</DialogTitle>
           <DialogDescription>
-            {isEditing ? 'Atualize as informações do marco' : 'Adicione um novo marco ao projeto'}
+            {isEditing ? tx('Atualize as informações do marco') : tx('Adicione um novo marco ao projeto')}
           </DialogDescription>
         </DialogHeader>
 
@@ -155,7 +155,7 @@ export function MilestoneFormDialog({
                 <SelectContent>
                   {STATUS_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                      {tx(opt.label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -181,7 +181,7 @@ export function MilestoneFormDialog({
             </Button>
             <Button type="submit" disabled={isPending || !name || !targetDate}>
               {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {isEditing ? 'Salvar Alterações' : 'Criar Marco'}
+              {isEditing ? tx('Salvar Alterações') : tx('Criar Marco')}
             </Button>
           </DialogFooter>
         </form>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -149,7 +150,7 @@ export function EnterpriseSectorBenchmark({ currentDestinationId }: Props) {
             return (
               <div key={p} className="rounded-lg border p-3 bg-background">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">{PILLAR_LABELS[p]}</span>
+                  <span className="text-sm font-medium">{tx(PILLAR_LABELS[p])}</span>
                   <Badge variant={diff >= 0 ? 'default' : 'secondary'}>
                     {diff >= 0 ? '+' : ''}{diff} pp vs média
                   </Badge>

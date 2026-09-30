@@ -200,7 +200,7 @@ const Destinos = () => {
         <div className="text-center py-16">
           <MapPin className="mx-auto h-12 w-12 text-muted-foreground/50" />
           <h3 className="mt-4 text-lg font-semibold text-foreground">
-            {searchQuery ? 'Nenhum destino encontrado' : 'Nenhum destino cadastrado'}
+            {searchQuery ? tx('Nenhum destino encontrado') : tx('Nenhum destino cadastrado')}
           </h3>
           <p className="mt-2 text-muted-foreground">
             {searchQuery 

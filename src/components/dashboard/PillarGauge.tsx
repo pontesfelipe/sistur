@@ -87,7 +87,7 @@ export function PillarGauge({ pillar, score, severity, isCritical }: PillarGauge
               {percentage}%
             </span>
             <span className={cn('text-xs font-semibold', severityInfo.color)}>
-              {severityInfo.label}
+              {tx(severityInfo.label)}
             </span>
           </div>
         </div>

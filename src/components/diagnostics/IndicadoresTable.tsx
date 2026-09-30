@@ -246,11 +246,11 @@ export function IndicadoresTable({
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-muted-foreground">{tx('Direção:')}</span>
-              <p className="font-medium">{directionLabels[indicator.direction]}</p>
+              <p className="font-medium">{tx(directionLabels[indicator.direction])}</p>
             </div>
             <div>
               <span className="text-muted-foreground">{tx('Normalização:')}</span>
-              <p className="font-medium">{normLabels[indicator.normalization]}</p>
+              <p className="font-medium">{tx(normLabels[indicator.normalization])}</p>
             </div>
             <div>
               <span className="text-muted-foreground">{tx('Peso:')}</span>
@@ -264,7 +264,7 @@ export function IndicadoresTable({
           {indicator.description && (
             <div>
               <span className="text-muted-foreground text-sm">{tx('Descrição:')}</span>
-              <p className="text-sm mt-1">{indicator.description}</p>
+              <p className="text-sm mt-1">{tx(indicator.description)}</p>
             </div>
           )}
           {/* Guidance for enterprise indicators */}
@@ -375,18 +375,18 @@ export function IndicadoresTable({
           <>
             <Badge variant="outline" className={cn('gap-1 border', scopeLabels.territorial.bgColor)}>
               <Landmark className={cn('h-3 w-3', scopeLabels.territorial.color)} />
-              <span className={scopeLabels.territorial.color}>{scopeLabels.territorial.label}</span>
+              <span className={scopeLabels.territorial.color}>{tx(scopeLabels.territorial.label)}</span>
             </Badge>
             <Badge variant="outline" className={cn('gap-1 border', scopeLabels.enterprise.bgColor)}>
               <Hotel className={cn('h-3 w-3', scopeLabels.enterprise.color)} />
-              <span className={scopeLabels.enterprise.color}>{scopeLabels.enterprise.label}</span>
+              <span className={scopeLabels.enterprise.color}>{tx(scopeLabels.enterprise.label)}</span>
             </Badge>
           </>
         ) : (
           <Badge variant="outline" className={cn('gap-1 border', scopeInfo.bgColor)}>
             {indicatorScope === 'territorial' && <Landmark className={cn('h-3 w-3', scopeInfo.color)} />}
             {indicatorScope === 'enterprise' && <Hotel className={cn('h-3 w-3', scopeInfo.color)} />}
-            <span className={scopeInfo.color}>{scopeInfo.label}</span>
+            <span className={scopeInfo.color}>{tx(scopeInfo.label)}</span>
           </Badge>
         )}
       </button>
@@ -441,7 +441,7 @@ export function IndicadoresTable({
         )}
       >
         <TierIcon className={cn("h-3 w-3", tierInfo.color)} />
-        <span className={tierInfo.color}>{tierInfo.label}</span>
+        <span className={tierInfo.color}>{tx(tierInfo.label)}</span>
       </button>
     );
   };
@@ -575,7 +575,7 @@ export function IndicadoresTable({
                               )}
                             </div>
                             <div className="text-xs text-muted-foreground mt-0.5">
-                              {directionLabels[indicator.direction]}
+                              {tx(directionLabels[indicator.direction])}
                             </div>
                           </button>
                         </DialogTrigger>
@@ -616,7 +616,7 @@ export function IndicadoresTable({
                     <Badge variant={indicator.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
                       {indicator.pillar}
                     </Badge>
-                    <Badge variant="outline">{normLabels[indicator.normalization]}</Badge>
+                    <Badge variant="outline">{tx(normLabels[indicator.normalization])}</Badge>
                     {defaultInterpretation && (
                       <Badge variant="secondary" className="text-xs">
                         {interpretationLabels[defaultInterpretation] || defaultInterpretation}
@@ -742,7 +742,7 @@ export function IndicadoresTable({
                               )}
                             </div>
                             <span className="text-xs text-muted-foreground">
-                              {directionLabels[indicator.direction]}
+                              {tx(directionLabels[indicator.direction])}
                             </span>
                           </button>
                         </DialogTrigger>
@@ -811,7 +811,7 @@ export function IndicadoresTable({
                     </TableCell>
                     <TableCell>{renderTierEditor(indicator)}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{normLabels[indicator.normalization]}</Badge>
+                      <Badge variant="outline">{tx(normLabels[indicator.normalization])}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       {renderWeightEditor(indicator)}
@@ -851,7 +851,7 @@ export function IndicadoresTable({
         <div className="text-center py-16">
           <BarChart3 className="mx-auto h-12 w-12 text-muted-foreground/50" />
           <h3 className="mt-4 text-lg font-semibold text-foreground">
-            {indicators.length === 0 ? 'Nenhum indicador cadastrado' : 'Nenhum indicador encontrado'}
+            {indicators.length === 0 ? tx('Nenhum indicador cadastrado') : tx('Nenhum indicador encontrado')}
           </h3>
           <p className="mt-2 text-muted-foreground">
             {indicators.length === 0

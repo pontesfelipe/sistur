@@ -90,7 +90,7 @@ export function PillarTrendPanel({ destinationId, diagnosticType, currentAssessm
             {tx('Evolução temporal dos pilares')}
           </CardTitle>
           <CardDescription>
-            São necessárias pelo menos 2 rodadas calculadas {diagnosticType === 'enterprise' ? 'Enterprise' : 'Territoriais'} para exibir o histórico.
+            São necessárias pelo menos 2 rodadas calculadas {diagnosticType === 'enterprise' ? tx('Enterprise') : tx('Territoriais')} para exibir o histórico.
           </CardDescription>
         </CardHeader>
       </Card>

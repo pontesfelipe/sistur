@@ -586,7 +586,7 @@ export function ReportValidationBanner({
                               onClick={() => setFixIndicator(c)}
                             >
                               <Wrench className="h-3 w-3" />
-                              {isApplied ? 'Revisar valor fixado' : 'Corrigir indicador'}
+                              {isApplied ? tx('Revisar valor fixado') : tx('Corrigir indicador')}
                             </Button>
                           )}
                         </div>

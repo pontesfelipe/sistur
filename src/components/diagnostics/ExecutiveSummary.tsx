@@ -95,7 +95,7 @@ export function ExecutiveSummary({
                 Período: {formatDate(assessment?.period_start)} — {formatDate(assessment?.period_end)}
               </span>
               <span>Calculado em: {formatDate(assessment?.calculated_at)}</span>
-              <span>Tipo: {isEnterprise ? 'Empresarial' : 'Territorial'}</span>
+              <span>Tipo: {isEnterprise ? tx('Empresarial') : tx('Territorial')}</span>
               <span>Nível: {assessment?.tier || 'COMPLETE'}</span>
             </div>
           </CardHeader>
@@ -111,7 +111,7 @@ export function ExecutiveSummary({
                     </p>
                     <p className="text-3xl font-bold">{pct(ps.score)}</p>
                     <Badge variant="outline" className={SEVERITY_INFO[severity].color}>
-                      {SEVERITY_INFO[severity].label}
+                      {tx(SEVERITY_INFO[severity].label)}
                     </Badge>
                   </div>
                 );

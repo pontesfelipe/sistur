@@ -80,7 +80,7 @@ export function ProjectKanban({ tasks, onEdit }: { tasks: ProjectTask[]; onEdit?
               <div className="flex items-center justify-between px-3 py-2 border-b">
                 <div className="flex items-center gap-2">
                   <span className={cn('h-2 w-2 rounded-full', info.color)} />
-                  <span className="text-sm font-medium">{info.label}</span>
+                  <span className="text-sm font-medium">{tx(info.label)}</span>
                 </div>
                 <Badge variant="outline" className="text-xs">{items.length}</Badge>
               </div>
@@ -111,11 +111,11 @@ export function ProjectKanban({ tasks, onEdit }: { tasks: ProjectTask[]; onEdit?
                         <CardContent className="p-3 space-y-2">
                           <div className="flex items-start gap-2">
                             <GripVertical className="h-3 w-3 text-muted-foreground mt-1 shrink-0" />
-                            <p className="text-sm font-medium leading-snug line-clamp-3">{task.title}</p>
+                            <p className="text-sm font-medium leading-snug line-clamp-3">{tx(task.title)}</p>
                           </div>
                           <div className="flex items-center gap-1 flex-wrap pl-5">
                             <Badge variant="secondary" className={cn('text-[10px] text-white', pinfo.color)}>
-                              {pinfo.label}
+                              {tx(pinfo.label)}
                             </Badge>
                             {task.assignee_name && (
                               <Badge variant="outline" className="text-[10px] gap-0.5">

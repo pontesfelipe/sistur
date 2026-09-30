@@ -84,7 +84,7 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant={statusVariants[assessment.status]}>
-            {statusLabels[assessment.status]}
+            {tx(statusLabels[assessment.status])}
           </Badge>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -94,7 +94,7 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
                 tierInfo.color
               )}>
                 <TierIcon className="h-3 w-3" />
-                {tierInfo.label}
+                {tx(tierInfo.label)}
               </div>
             </TooltipTrigger>
             <TooltipContent>
@@ -108,7 +108,7 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
                 visInfo.className
               )}>
                 <VisIcon className="h-3 w-3" />
-                {visInfo.label}
+                {tx(visInfo.label)}
               </div>
             </TooltipTrigger>
             <TooltipContent>
@@ -124,11 +124,11 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
                 dtInfo.className
               )}>
                 <DtIcon className="h-3 w-3" />
-                {dtInfo.label}
+                {tx(dtInfo.label)}
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              {diagnosticType === 'territorial' ? 'Diagnóstico territorial (público)' : 'Diagnóstico empresarial (privado)'}
+              {diagnosticType === 'territorial' ? tx('Diagnóstico territorial (público)') : tx('Diagnóstico empresarial (privado)')}
             </TooltipContent>
           </Tooltip>
           {(assessment as any).expand_with_mandala && (
@@ -167,7 +167,7 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
       </div>
 
       <h3 className="mt-3 font-display font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-        {assessment.title}
+        {tx(assessment.title)}
       </h3>
 
       {assessment.destination && (

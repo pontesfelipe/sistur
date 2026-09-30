@@ -112,9 +112,9 @@ export function ProjectGovernance({ projectId }: Props) {
                           <p className="font-medium">{cp.name}</p>
                           {cp.pillar && cp.pillar !== 'GERAL' && <Badge variant="outline">{cp.pillar}</Badge>}
                           {cp.is_mandatory && <Badge variant="destructive">{tx('Obrigatório')}</Badge>}
-                          <Badge className={cn('text-white', info.color)}>{info.label}</Badge>
+                          <Badge className={cn('text-white', info.color)}>{tx(info.label)}</Badge>
                         </div>
-                        {cp.description && <p className="text-sm text-muted-foreground mt-1">{cp.description}</p>}
+                        {cp.description && <p className="text-sm text-muted-foreground mt-1">{tx(cp.description)}</p>}
                         {cp.due_date && (
                           <p className="text-xs text-muted-foreground mt-1">
                             Prazo: {format(new Date(cp.due_date), 'dd/MM/yyyy', { locale: ptBR })}
@@ -174,7 +174,7 @@ export function ProjectGovernance({ projectId }: Props) {
             <div className="space-y-2">
               {tasks.filter(t => raci.some(r => r.task_id === t.id)).map(task => (
                 <div key={task.id} className="border rounded p-3">
-                  <p className="font-medium text-sm">{task.title}</p>
+                  <p className="font-medium text-sm">{tx(task.title)}</p>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {raci.filter(r => r.task_id === task.id).map(r => {
                       const info = RACI_INFO[r.role];
@@ -273,7 +273,7 @@ export function ProjectGovernance({ projectId }: Props) {
               <Select value={raciForm.task_id} onValueChange={v => setRaciForm({ ...raciForm, task_id: v })}>
                 <SelectTrigger><SelectValue placeholder={tx('Selecione')} /></SelectTrigger>
                 <SelectContent>
-                  {tasks.map(t => <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>)}
+                  {tasks.map(t => <SelectItem key={t.id} value={t.id}>{tx(t.title)}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -282,7 +282,7 @@ export function ProjectGovernance({ projectId }: Props) {
               <Select value={raciForm.role} onValueChange={v => setRaciForm({ ...raciForm, role: v as RaciRole })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {Object.entries(RACI_INFO).map(([k, v]) => <SelectItem key={k} value={k}>{v.label} — {v.description}</SelectItem>)}
+                  {Object.entries(RACI_INFO).map(([k, v]) => <SelectItem key={k} value={k}>{tx(v.label)} — {v.description}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>

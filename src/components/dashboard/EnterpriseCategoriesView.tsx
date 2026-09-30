@@ -197,7 +197,7 @@ export function EnterpriseCategoriesView({ indicatorScores }: EnterpriseCategori
                     {pillarInfo?.name || pillarKey}
                   </Badge>
                   <Badge variant="outline" className={cn("text-xs", config.color, config.bgColor)}>
-                    {config.label}
+                    {tx(config.label)}
                   </Badge>
                 </div>
                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -266,7 +266,7 @@ export function EnterpriseCategoriesView({ indicatorScores }: EnterpriseCategori
                           </div>
                           <div className="flex items-center gap-3 mr-4">
                             <Badge variant="outline" className={cn("text-xs", config.color, config.bgColor)}>
-                              {config.label}
+                              {tx(config.label)}
                             </Badge>
                             <span className={cn("text-lg font-display font-bold", config.color)}>
                               {Math.round(category.avgScore * 100)}%

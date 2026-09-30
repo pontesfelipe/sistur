@@ -147,17 +147,17 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                           className={cn("text-xs h-5 gap-1", interpretationInfo.color)}
                         >
                           <InterpretationIcon interpretation={issue.interpretation as TerritorialInterpretation} />
-                          {interpretationInfo.label}
+                          {tx(interpretationInfo.label)}
                         </Badge>
                       </TooltipTrigger>
                       <TooltipContent className="max-w-xs">
-                        <p className="font-medium">{interpretationInfo.label}</p>
-                        <p className="text-xs text-muted-foreground">{interpretationInfo.description}</p>
+                        <p className="font-medium">{tx(interpretationInfo.label)}</p>
+                        <p className="text-xs text-muted-foreground">{tx(interpretationInfo.description)}</p>
                       </TooltipContent>
                     </Tooltip>
                   )}
                 </div>
-                <p className="mt-1.5 text-xs font-medium truncate">{issue.title}</p>
+                <p className="mt-1.5 text-xs font-medium truncate">{tx(issue.title)}</p>
 
                 {/* Evidence Indicators */}
                 {issue.evidence?.indicators && issue.evidence.indicators.length > 0 && (
