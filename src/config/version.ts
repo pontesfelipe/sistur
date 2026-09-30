@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 20,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.20.2",
+    date: "2026-09-30",
+    type: "patch" as const,
+    changes: [
+      "Idiomas (fase 2, segunda passada): filtros, selos de status/prioridade, fases de projeto e textos condicionais do Painel, Diagnósticos, Projetos e Relatórios traduzidos (cerca de 410 textos).",
+    ],
+  },
   {
     version: "2.20.1",
     date: "2026-09-30",
