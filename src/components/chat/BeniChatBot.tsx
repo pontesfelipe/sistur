@@ -13,7 +13,9 @@ import {
   RefreshCw,
   Volume2,
   VolumeX,
-  Square
+  Square,
+  Target,
+  ClipboardList
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -45,9 +47,11 @@ const MAX_FILE = 10 * 1024 * 1024;
 const ACCEPTED = '.pdf,.docx,.xlsx,.xls,.csv,.txt,.md,image/png,image/jpeg,image/webp';
 
 const SUGGESTED_QUESTIONS = [
+  { icon: Target, text: "Quais são os principais gargalos do meu destino hoje?", color: "text-rose-600" },
+  { icon: ClipboardList, text: "Como aplicar os 6 princípios de Beni no meu plano de ação?", color: "text-amber-600" },
   { icon: Leaf, text: "O que significa RA estar crítico?", color: "text-emerald-600" },
   { icon: Building2, text: "Como funciona a hierarquia RA → OE → AO?", color: "text-blue-600" },
-  { icon: Cog, text: "O que são as 6 regras do IGMA?", color: "text-amber-600" },
+  { icon: Cog, text: "Quais capacitações priorizar para a minha equipe?", color: "text-cyan-600" },
   { icon: BookOpen, text: "Explique a teoria sistêmica do turismo", color: "text-purple-600" },
 ];
 

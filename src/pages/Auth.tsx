@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, MapPin, BarChart3, GraduationCap, ArrowLeft } from 'lucide-react';
+import { Loader2, BarChart3, GraduationCap, ArrowLeft, Database, Sparkles, Info, Tag, HelpCircle } from 'lucide-react';
 import { z } from 'zod';
 
 // Validation schemas
@@ -30,6 +30,18 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string; fullName?: string }>({});
+
+  // True when the visitor landed here from a protected deep link.
+  const hasRedirect = (() => {
+    const raw = searchParams.get('redirect');
+    if (!raw) return false;
+    try {
+      const decoded = decodeURIComponent(raw);
+      return decoded.startsWith('/') && !decoded.startsWith('//') && decoded !== '/';
+    } catch {
+      return false;
+    }
+  })();
 
   // Check URL for reset mode (user clicked email link)
   useEffect(() => {
@@ -667,6 +679,14 @@ const Auth = () => {
               <CardDescription>
                 Entre com suas credenciais para acessar o sistema
               </CardDescription>
+              {hasRedirect && (
+                <div className="mt-4 flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 p-3 text-left">
+                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <p className="text-sm text-muted-foreground">
+                    Entre ou crie sua conta para acessar o conteúdo solicitado.
+                  </p>
+                </div>
+              )}
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSignIn} className="space-y-4">
@@ -792,6 +812,27 @@ const Auth = () => {
                     Não tem conta? Solicitar acesso
                   </Button>
                 </div>
+
+                <Separator />
+
+                <div className="flex flex-col items-center gap-1 sm:flex-row sm:justify-center sm:gap-4">
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="h-auto px-0 text-sm text-muted-foreground hover:text-primary"
+                    onClick={() => navigate('/planos')}
+                  >
+                    <Tag className="mr-1.5 h-3.5 w-3.5" />
+                    Conhecer planos e preços
+                  </Button>
+                  <a
+                    href="mailto:suporte@sistur.com.br?subject=Ajuda%20com%20o%20acesso%20ao%20SISTUR"
+                    className="inline-flex items-center text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+                  >
+                    <HelpCircle className="mr-1.5 h-3.5 w-3.5" />
+                    Preciso de ajuda
+                  </a>
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -829,9 +870,10 @@ const Auth = () => {
 
           <div className="space-y-5">
             {[
-              { icon: MapPin, title: 'Gestão de Destinos', desc: 'Cadastre e monitore seus destinos turísticos' },
-              { icon: BarChart3, title: 'Diagnóstico por Pilares', desc: 'Análise I-RA, I-OE e I-AO com identificação de gargalos' },
-              { icon: GraduationCap, title: 'SISTUR EDU', desc: 'Recomendações de capacitação personalizadas' },
+              { icon: BarChart3, title: 'Diagnóstico Sistêmico', desc: 'Análise dos pilares RA, OE e AO pela metodologia Mario Beni' },
+              { icon: Database, title: 'Ecossistema de Dados Oficiais', desc: 'IBGE, Cadastur, Mapa do Turismo e DataSUS integrados' },
+              { icon: Sparkles, title: 'Professor Beni (IA)', desc: 'Inteligência ancorada nos microdados do seu território' },
+              { icon: GraduationCap, title: 'SISTUR EDU', desc: 'Trilhas de capacitação adaptativas e certificados' },
             ].map(({ icon: FIcon, title: fTitle, desc }) => (
               <div key={fTitle} className="flex items-center gap-4 text-primary-foreground/90 group">
                 <div className="h-11 w-11 rounded-2xl bg-primary-foreground/15 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
@@ -847,7 +889,7 @@ const Auth = () => {
         </div>
 
         <p className="text-primary-foreground/50 text-sm relative z-10">
-          © 2025 SISTUR — Instituto Mario Beni. Todos os direitos reservados.
+          © 2026 SISTUR — Instituto Mario Beni. Todos os direitos reservados.
         </p>
       </div>
 
