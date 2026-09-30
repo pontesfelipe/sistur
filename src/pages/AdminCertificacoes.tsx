@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -45,7 +46,7 @@ const LEVEL_BADGE: Record<CertificationLevel, string> = {
 
 function copyCode(code: string) {
   navigator.clipboard.writeText(code);
-  toast.success("Código copiado");
+  toast.success(tx('Código copiado'));
 }
 
 function publicUrl(code: string) {
@@ -71,7 +72,7 @@ export default function AdminCertificacoes() {
 
   const handleIssue = async () => {
     if (!selectedOrg || !selectedLevel) {
-      toast.error("Selecione organização e nível");
+      toast.error(tx('Selecione organização e nível'));
       return;
     }
     const cfg = levels.find((l) => l.level === selectedLevel);
@@ -95,7 +96,7 @@ export default function AdminCertificacoes() {
 
   const handleRevoke = async () => {
     if (!revokeId || !revokeReason.trim()) {
-      toast.error("Informe o motivo da revogação");
+      toast.error(tx('Informe o motivo da revogação'));
       return;
     }
     await revoke.mutateAsync({ id: revokeId, reason: revokeReason });
@@ -104,16 +105,16 @@ export default function AdminCertificacoes() {
   };
 
   return (
-    <AppLayout title="Certificação Institucional">
+    <AppLayout title={tx('Certificação Institucional')}>
       <div className="space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <ShieldCheck className="h-7 w-7 text-primary" />
-              Certificação Institucional do Destino
+              {tx('Certificação Institucional do Destino')}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Emissão e gestão do Selo SISTUR para destinos turísticos.
+              {tx('Emissão e gestão do Selo SISTUR para destinos turísticos.')}
             </p>
           </div>
           <Button onClick={() => setOpenIssue(true)}>
@@ -132,12 +133,12 @@ export default function AdminCertificacoes() {
                   />
                   {l.display_name}
                 </CardTitle>
-                <CardDescription className="text-xs">{l.description}</CardDescription>
+                <CardDescription className="text-xs">{tx(l.description)}</CardDescription>
               </CardHeader>
               <CardContent className="text-xs text-muted-foreground space-y-1">
-                <div>Geral mín: <strong>{l.min_overall_score}%</strong></div>
-                <div>RA/OE/AO mín: <strong>{l.min_ra_score}% / {l.min_oe_score}% / {l.min_ao_score}%</strong></div>
-                <div>Validade: <strong>{l.validity_months} meses</strong></div>
+                <div>{tx('Geral mín:')} <strong>{l.min_overall_score}%</strong></div>
+                <div>{tx('RA/OE/AO mín:')} <strong>{l.min_ra_score}% / {l.min_oe_score}% / {l.min_ao_score}%</strong></div>
+                <div>{tx('Validade:')} <strong>{l.validity_months} meses</strong></div>
               </CardContent>
             </Card>
           ))}
@@ -145,24 +146,24 @@ export default function AdminCertificacoes() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Certificados emitidos</CardTitle>
+            <CardTitle>{tx('Certificados emitidos')}</CardTitle>
             <CardDescription>{certs.length} no total</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <p className="text-sm text-muted-foreground">Carregando...</p>
+              <p className="text-sm text-muted-foreground">{tx('Carregando...')}</p>
             ) : certs.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhum certificado emitido ainda.</p>
+              <p className="text-sm text-muted-foreground">{tx('Nenhum certificado emitido ainda.')}</p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Organização</TableHead>
-                    <TableHead>Nível</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Validade</TableHead>
-                    <TableHead>Código</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
+                    <TableHead>{tx('Organização')}</TableHead>
+                    <TableHead>{tx('Nível')}</TableHead>
+                    <TableHead>{tx('Status')}</TableHead>
+                    <TableHead>{tx('Validade')}</TableHead>
+                    <TableHead>{tx('Código')}</TableHead>
+                    <TableHead className="text-right">{tx('Ações')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -193,7 +194,7 @@ export default function AdminCertificacoes() {
                         {c.status === "ativo" && (
                           <Button size="sm" variant="ghost" className="text-destructive"
                             onClick={() => setRevokeId(c.id)}>
-                            Revogar
+                            {tx('Revogar')}
                           </Button>
                         )}
                       </TableCell>
@@ -209,16 +210,16 @@ export default function AdminCertificacoes() {
       <Dialog open={openIssue} onOpenChange={setOpenIssue}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Emitir novo certificado</DialogTitle>
+            <DialogTitle>{tx('Emitir novo certificado')}</DialogTitle>
             <DialogDescription>
-              O sistema avalia automaticamente o nível elegível com base no diagnóstico mais recente da organização.
+              {tx('O sistema avalia automaticamente o nível elegível com base no diagnóstico mais recente da organização.')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Organização</Label>
+              <Label>{tx('Organização')}</Label>
               <Select value={selectedOrg} onValueChange={setSelectedOrg}>
-                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tx('Selecione...')} /></SelectTrigger>
                 <SelectContent>
                   {orgs.map((o: any) => (
                     <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>
@@ -230,22 +231,22 @@ export default function AdminCertificacoes() {
             {selectedOrg && eligibility.data && (
               <Card className="bg-muted/40">
                 <CardContent className="pt-4 text-sm space-y-1">
-                  <div>Score geral: <strong>{Number(eligibility.data.overall_score).toFixed(1)}%</strong></div>
-                  <div>RA / OE / AO: <strong>
+                  <div>{tx('Score geral:')} <strong>{Number(eligibility.data.overall_score).toFixed(1)}%</strong></div>
+                  <div>{tx('RA / OE / AO:')} <strong>
                     {Number(eligibility.data.ra_score).toFixed(1)}% / {Number(eligibility.data.oe_score).toFixed(1)}% / {Number(eligibility.data.ao_score).toFixed(1)}%
                   </strong></div>
-                  <div>Nível elegível: <Badge>{eligibility.data.eligible_level ?? "Nenhum"}</Badge></div>
+                  <div>{tx('Nível elegível:')} <Badge>{eligibility.data.eligible_level ?? "Nenhum"}</Badge></div>
                 </CardContent>
               </Card>
             )}
             {selectedOrg && !eligibility.isLoading && !eligibility.data && (
-              <p className="text-sm text-muted-foreground">Sem diagnóstico calculado para esta organização.</p>
+              <p className="text-sm text-muted-foreground">{tx('Sem diagnóstico calculado para esta organização.')}</p>
             )}
 
             <div>
-              <Label>Nível</Label>
+              <Label>{tx('Nível')}</Label>
               <Select value={selectedLevel} onValueChange={(v) => setSelectedLevel(v as CertificationLevel)}>
-                <SelectTrigger><SelectValue placeholder="Selecione o nível..." /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tx('Selecione o nível...')} /></SelectTrigger>
                 <SelectContent>
                   {levels.map((l) => (
                     <SelectItem key={l.id} value={l.level}>{l.display_name}</SelectItem>
@@ -260,8 +261,8 @@ export default function AdminCertificacoes() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpenIssue(false)}>Cancelar</Button>
-            <Button onClick={handleIssue} disabled={issue.isPending}>Emitir</Button>
+            <Button variant="outline" onClick={() => setOpenIssue(false)}>{tx('Cancelar')}</Button>
+            <Button onClick={handleIssue} disabled={issue.isPending}>{tx('Emitir')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -269,13 +270,13 @@ export default function AdminCertificacoes() {
       <Dialog open={!!revokeId} onOpenChange={(o) => !o && setRevokeId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Revogar certificado</DialogTitle>
-            <DialogDescription>Informe o motivo. Esta ação é registrada e o certificado fica inválido publicamente.</DialogDescription>
+            <DialogTitle>{tx('Revogar certificado')}</DialogTitle>
+            <DialogDescription>{tx('Informe o motivo. Esta ação é registrada e o certificado fica inválido publicamente.')}</DialogDescription>
           </DialogHeader>
-          <Textarea value={revokeReason} onChange={(e) => setRevokeReason(e.target.value)} rows={4} placeholder="Motivo..." />
+          <Textarea value={revokeReason} onChange={(e) => setRevokeReason(e.target.value)} rows={4} placeholder={tx('Motivo...')} />
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRevokeId(null)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleRevoke} disabled={revoke.isPending}>Revogar</Button>
+            <Button variant="outline" onClick={() => setRevokeId(null)}>{tx('Cancelar')}</Button>
+            <Button variant="destructive" onClick={handleRevoke} disabled={revoke.isPending}>{tx('Revogar')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

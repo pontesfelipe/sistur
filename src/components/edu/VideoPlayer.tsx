@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
@@ -83,7 +84,7 @@ export function VideoPlayer({
     if (err && (err.code === MediaError.MEDIA_ERR_NETWORK || err.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED)) {
       savedTimeRef.current = video.currentTime || currentTime;
       setIsPlaying(false);
-      toast('Recarregando vídeo...');
+      toast(tx('Recarregando vídeo...'));
       refreshUrl();
     }
   }, [currentTime, refreshUrl]);
@@ -296,7 +297,7 @@ export function VideoPlayer({
         <div className="aspect-video bg-black flex items-center justify-center">
           <div className="text-center text-white">
             <Lock className="h-8 w-8 mx-auto mb-2 animate-pulse" />
-            <p className="text-sm text-gray-300">Preparando vídeo seguro...</p>
+            <p className="text-sm text-gray-300">{tx('Preparando vídeo seguro...')}</p>
           </div>
         </div>
       </Card>
@@ -310,12 +311,12 @@ export function VideoPlayer({
         <div className="aspect-video bg-black flex items-center justify-center">
           <div className="text-center text-white p-6">
             <AlertCircle className="h-10 w-10 mx-auto mb-3 text-destructive" />
-            <h3 className="font-semibold mb-1">Erro ao carregar vídeo</h3>
+            <h3 className="font-semibold mb-1">{tx('Erro ao carregar vídeo')}</h3>
             <p className="text-sm text-gray-300 mb-3">
               {urlError.message || 'Não foi possível acessar o vídeo'}
             </p>
             <p className="text-xs text-gray-400">
-              Verifique se você está logado e tem permissão para acessar este conteúdo.
+              {tx('Verifique se você está logado e tem permissão para acessar este conteúdo.')}
             </p>
           </div>
         </div>
@@ -344,12 +345,12 @@ export function VideoPlayer({
         {showPreviewBlock && (
           <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
             <div className="text-center text-white p-6">
-              <h3 className="text-xl font-semibold mb-2">Prévia gratuita encerrada</h3>
+              <h3 className="text-xl font-semibold mb-2">{tx('Prévia gratuita encerrada')}</h3>
               <p className="text-sm text-gray-300 mb-4">
-                Matricule-se para continuar assistindo
+                {tx('Matricule-se para continuar assistindo')}
               </p>
               <Button variant="secondary">
-                Matricular-se
+                {tx('Matricular-se')}
               </Button>
             </div>
           </div>

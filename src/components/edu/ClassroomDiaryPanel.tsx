@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,11 +17,11 @@ function fmtMinutes(min: number) {
 }
 
 function statusBadge(r: DiaryRow) {
-  if (r.fraud_flags > 0) return <Badge variant="destructive">Alerta</Badge>;
-  if (!r.last_seen_at) return <Badge variant="outline">Sem acesso</Badge>;
+  if (r.fraud_flags > 0) return <Badge variant="destructive">{tx('Alerta')}</Badge>;
+  if (!r.last_seen_at) return <Badge variant="outline">{tx('Sem acesso')}</Badge>;
   const days = (Date.now() - new Date(r.last_seen_at).getTime()) / 86400000;
-  if (days <= 7) return <Badge className="bg-emerald-500/15 text-emerald-700 border-emerald-500/30">Ativo</Badge>;
-  if (days <= 30) return <Badge variant="secondary">Inativo recente</Badge>;
+  if (days <= 7) return <Badge className="bg-emerald-500/15 text-emerald-700 border-emerald-500/30">{tx('Ativo')}</Badge>;
+  if (days <= 30) return <Badge variant="secondary">{tx('Inativo recente')}</Badge>;
   return <Badge variant="outline">Inativo &gt; 30d</Badge>;
 }
 
@@ -64,7 +65,7 @@ export function ClassroomDiaryPanel({ classroomId, classroomName }: Props) {
             <BookCheck className="h-5 w-5" /> Diário de Classe
           </CardTitle>
           <CardDescription>
-            Presença, progresso em atividades e desempenho em provas — consolidado por aluno.
+            {tx('Presença, progresso em atividades e desempenho em provas — consolidado por aluno.')}
           </CardDescription>
         </div>
         <Button variant="outline" size="sm" onClick={() => exportCsv(list, classroomName || '')} disabled={!list.length}>
@@ -73,29 +74,29 @@ export function ClassroomDiaryPanel({ classroomId, classroomName }: Props) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <Stat icon={<Users className="h-4 w-4" />} label="Alunos" value={String(stats.totalAlunos)} />
-          <Stat icon={<Activity className="h-4 w-4" />} label="Ativos (7d)" value={String(stats.ativos7d)} />
-          <Stat icon={<Clock className="h-4 w-4" />} label="Conclusão média" value={`${stats.taxaConclusaoMedia.toFixed(0)}%`} />
-          <Stat icon={<BookCheck className="h-4 w-4" />} label="Nota média" value={stats.mediaNota != null ? `${stats.mediaNota.toFixed(1)}%` : '—'} />
-          <Stat icon={<AlertTriangle className="h-4 w-4" />} label="Alertas" value={String(stats.alertas)} highlight={stats.alertas > 0} />
+          <Stat icon={<Users className="h-4 w-4" />} label={tx('Alunos')} value={String(stats.totalAlunos)} />
+          <Stat icon={<Activity className="h-4 w-4" />} label={tx('Ativos (7d)')} value={String(stats.ativos7d)} />
+          <Stat icon={<Clock className="h-4 w-4" />} label={tx('Conclusão média')} value={`${stats.taxaConclusaoMedia.toFixed(0)}%`} />
+          <Stat icon={<BookCheck className="h-4 w-4" />} label={tx('Nota média')} value={stats.mediaNota != null ? `${stats.mediaNota.toFixed(1)}%` : '—'} />
+          <Stat icon={<AlertTriangle className="h-4 w-4" />} label={tx('Alertas')} value={String(stats.alertas)} highlight={stats.alertas > 0} />
         </div>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : !list.length ? (
-          <p className="text-sm text-muted-foreground py-8 text-center">Sem alunos matriculados nesta sala.</p>
+          <p className="text-sm text-muted-foreground py-8 text-center">{tx('Sem alunos matriculados nesta sala.')}</p>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Aluno</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Presença</TableHead>
-                  <TableHead className="text-right">Tempo ativo</TableHead>
-                  <TableHead className="text-right">Atividades</TableHead>
-                  <TableHead className="text-right">Nota</TableHead>
-                  <TableHead>Última atividade</TableHead>
+                  <TableHead>{tx('Aluno')}</TableHead>
+                  <TableHead>{tx('Status')}</TableHead>
+                  <TableHead className="text-right">{tx('Presença')}</TableHead>
+                  <TableHead className="text-right">{tx('Tempo ativo')}</TableHead>
+                  <TableHead className="text-right">{tx('Atividades')}</TableHead>
+                  <TableHead className="text-right">{tx('Nota')}</TableHead>
+                  <TableHead>{tx('Última atividade')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

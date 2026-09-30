@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { eduTurmasNav } from '@/components/layout/eduSubNav';
@@ -68,14 +69,14 @@ const EduMinhasTurmas = () => {
   }, [activeId, classrooms]);
 
   return (
-    <AppLayout subNav={eduTurmasNav} title="Minhas Turmas">
+    <AppLayout subNav={eduTurmasNav} title={tx('Minhas Turmas')}>
       <div className="container max-w-5xl py-6 space-y-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Users className="h-6 w-6" /> Minhas Turmas
           </h1>
           <p className="text-sm text-muted-foreground">
-            Turmas em que você está matriculado e anúncios dos professores.
+            {tx('Turmas em que você está matriculado e anúncios dos professores.')}
           </p>
         </div>
 
@@ -85,7 +86,7 @@ const EduMinhasTurmas = () => {
         {!isLoading && classrooms.length === 0 && (
           <Card>
             <CardContent className="py-10 text-center text-sm text-muted-foreground">
-              Você ainda não está matriculado em nenhuma turma.
+              {tx('Você ainda não está matriculado em nenhuma turma.')}
             </CardContent>
           </Card>
         )}
@@ -104,7 +105,7 @@ const EduMinhasTurmas = () => {
                 </CardDescription>
               </CardHeader>
               {active.description && (
-                <CardContent className="text-sm text-muted-foreground">{active.description}</CardContent>
+                <CardContent className="text-sm text-muted-foreground">{tx(active.description)}</CardContent>
               )}
             </Card>
             <ClassroomAnnouncementsPanel classroomId={active.classroom_id} canManage={false} />
@@ -132,7 +133,7 @@ const EduMinhasTurmas = () => {
                   </CardHeader>
                   {c.description && (
                     <CardContent className="text-sm text-muted-foreground line-clamp-2">
-                      {c.description}
+                      {tx(c.description)}
                     </CardContent>
                   )}
                 </Card>

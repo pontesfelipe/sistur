@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useVerifyCertification } from "@/hooks/useDestinationCertifications";
@@ -34,10 +35,10 @@ export default function VerificarCertificado() {
         <header className="text-center">
           <h1 className="text-3xl font-bold flex items-center justify-center gap-2">
             <ShieldCheck className="h-8 w-8 text-primary" />
-            Verificação de Certificado SISTUR
+            {tx('Verificação de Certificado SISTUR')}
           </h1>
           <p className="text-muted-foreground mt-2 text-sm">
-            Valide a autenticidade do Selo Institucional do Destino.
+            {tx('Valide a autenticidade do Selo Institucional do Destino.')}
           </p>
         </header>
 
@@ -45,22 +46,22 @@ export default function VerificarCertificado() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ex: SISTUR-XXXX-XXXX-XXXX"
+            placeholder={tx('Ex: SISTUR-XXXX-XXXX-XXXX')}
             className="font-mono"
           />
-          <Button type="submit"><Search className="h-4 w-4 mr-1" /> Verificar</Button>
+          <Button type="submit"><Search className="h-4 w-4 mr-1" /> {tx('Verificar')}</Button>
         </form>
 
         {urlCode && (isLoading || isFetching) && (
-          <Card><CardContent className="pt-6 text-center text-muted-foreground">Consultando...</CardContent></Card>
+          <Card><CardContent className="pt-6 text-center text-muted-foreground">{tx('Consultando...')}</CardContent></Card>
         )}
 
         {urlCode && !isLoading && !cert && (
           <Card className="border-destructive/40">
             <CardContent className="pt-6 text-center space-y-2">
               <ShieldAlert className="h-10 w-10 text-destructive mx-auto" />
-              <p className="font-semibold">Certificado não encontrado</p>
-              <p className="text-sm text-muted-foreground">O código informado não consta em nossa base.</p>
+              <p className="font-semibold">{tx('Certificado não encontrado')}</p>
+              <p className="text-sm text-muted-foreground">{tx('O código informado não consta em nossa base.')}</p>
             </CardContent>
           </Card>
         )}
@@ -88,22 +89,22 @@ export default function VerificarCertificado() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                <Stat label="Geral" value={cert.overall_score} />
+                <Stat label={tx('Geral')} value={cert.overall_score} />
                 <Stat label="RA" value={cert.ra_score} />
                 <Stat label="OE" value={cert.oe_score} />
                 <Stat label="AO" value={cert.ao_score} />
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm pt-3 border-t">
                 <div>
-                  <p className="text-muted-foreground">Emitido em</p>
+                  <p className="text-muted-foreground">{tx('Emitido em')}</p>
                   <p className="font-medium">{new Date(cert.issued_at).toLocaleDateString("pt-BR")}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Válido até</p>
+                  <p className="text-muted-foreground">{tx('Válido até')}</p>
                   <p className="font-medium">{new Date(cert.valid_until).toLocaleDateString("pt-BR")}</p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-muted-foreground">Código de verificação</p>
+                  <p className="text-muted-foreground">{tx('Código de verificação')}</p>
                   <p className="font-mono text-xs">{cert.verification_code}</p>
                 </div>
               </div>
@@ -112,7 +113,7 @@ export default function VerificarCertificado() {
         )}
 
         <footer className="text-center text-xs text-muted-foreground">
-          SISTUR — Sistema Integrado de Suporte para Turismo em Regiões
+          {tx('SISTUR — Sistema Integrado de Suporte para Turismo em Regiões')}
         </footer>
       </div>
     </main>

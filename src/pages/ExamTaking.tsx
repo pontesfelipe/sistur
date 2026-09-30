@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -119,7 +120,7 @@ const ExamTaking = () => {
         // Warn when low on time
         if (prev === LOW_TIME_WARNING_SECONDS && !warnedLowTime) {
           setWarnedLowTime(true);
-          toast.warning('Atenção: restam apenas 2 minutos para finalizar o exame!');
+          toast.warning(tx('Atenção: restam apenas 2 minutos para finalizar o exame!'));
         }
         return prev - 1;
       });
@@ -151,10 +152,10 @@ const ExamTaking = () => {
     if (!examId || submitted) return;
     try {
       await handleSubmit();
-      toast.warning('Tempo esgotado! Exame enviado automaticamente.');
+      toast.warning(tx('Tempo esgotado! Exame enviado automaticamente.'));
     } catch (error) {
       console.error('Auto-submit error:', error);
-      toast.error('Erro ao enviar exame automaticamente. Por favor, tente enviar manualmente.');
+      toast.error(tx('Erro ao enviar exame automaticamente. Por favor, tente enviar manualmente.'));
       setSubmitted(false);
     }
   };
@@ -164,9 +165,9 @@ const ExamTaking = () => {
     try {
       await startExam.mutateAsync(examId);
       logInteraction('exam_start', examId, 'Início de prova');
-      toast.success('Exame iniciado!');
+      toast.success(tx('Exame iniciado!'));
     } catch (error) {
-      toast.error('Erro ao iniciar exame');
+      toast.error(tx('Erro ao iniciar exame'));
     }
   };
 
@@ -252,7 +253,7 @@ const ExamTaking = () => {
         ? 'Exame enviado! Questões dissertativas aguardam correção manual.'
         : 'Exame enviado com sucesso!');
     } catch (error) {
-      toast.error('Erro ao enviar exame');
+      toast.error(tx('Erro ao enviar exame'));
       setSubmitted(false);
     } finally {
       setIsSubmitting(false);
@@ -272,7 +273,7 @@ const ExamTaking = () => {
 
   if (examLoading) {
     return (
-      <AppLayout title="Carregando..." subtitle="Buscando informações do exame">
+      <AppLayout title={tx('Carregando...')} subtitle={tx('Buscando informações do exame')}>
         <div className="max-w-3xl mx-auto space-y-6">
           <Skeleton className="h-48 w-full" />
           <Skeleton className="h-64 w-full" />
@@ -283,11 +284,11 @@ const ExamTaking = () => {
 
   if (!exam) {
     return (
-      <AppLayout title="Exame não encontrado" subtitle="O exame solicitado não existe">
+      <AppLayout title={tx('Exame não encontrado')} subtitle={tx('O exame solicitado não existe')}>
         <div className="text-center py-12">
           <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground mb-4">Este exame não foi encontrado ou expirou.</p>
-          <Button onClick={() => navigate('/edu')}>Voltar ao Catálogo</Button>
+          <p className="text-muted-foreground mb-4">{tx('Este exame não foi encontrado ou expirou.')}</p>
+          <Button onClick={() => navigate('/edu')}>{tx('Voltar ao Catálogo')}</Button>
         </div>
       </AppLayout>
     );
@@ -306,7 +307,7 @@ const ExamTaking = () => {
         ?? ((attempt?.grading_mode === 'hybrid' || attempt?.grading_mode === 'manual') && resultPending);
 
     return (
-      <AppLayout title="Resultado do Exame" subtitle="Veja seu desempenho">
+      <AppLayout title={tx('Resultado do Exame')} subtitle={tx('Veja seu desempenho')}>
         <div className="max-w-2xl mx-auto">
           <Card className={needsGrading ? 'border-amber-500/50' : passed ? 'border-severity-good/50' : 'border-severity-critical/50'}>
             <CardHeader className="text-center">
@@ -318,7 +319,7 @@ const ExamTaking = () => {
                 <XCircle className="h-20 w-20 mx-auto mb-4 text-severity-critical" />
               )}
               <CardTitle className="text-3xl">
-                {needsGrading ? 'Aguardando Correção' : passed ? 'Parabéns!' : 'Não foi desta vez'}
+                {needsGrading ? 'Aguardando Correção' : passed ? tx('Parabéns!') : tx('Não foi desta vez')}
               </CardTitle>
               <CardDescription>
                 {needsGrading 
@@ -334,7 +335,7 @@ const ExamTaking = () => {
                   <p>Pontuação parcial (questões objetivas):</p>
                   <div className="text-4xl font-bold mt-2">{finalScore.toFixed(0)}%</div>
                   <p className="text-sm mt-3 text-amber-600 dark:text-amber-400">
-                    A nota final será calculada após a correção das questões dissertativas.
+                    {tx('A nota final será calculada após a correção das questões dissertativas.')}
                   </p>
                 </div>
               ) : (
@@ -354,12 +355,12 @@ const ExamTaking = () => {
             </CardContent>
             <CardFooter className="flex justify-center gap-4">
               <Button variant="outline" onClick={() => navigate('/edu')}>
-                Voltar ao Catálogo
+                {tx('Voltar ao Catálogo')}
               </Button>
               {passed && !needsGrading && (
                 <Button onClick={() => navigate('/certificados')}>
                   <Award className="mr-2 h-4 w-4" />
-                  Ver Certificados
+                  {tx('Ver Certificados')}
                 </Button>
               )}
             </CardFooter>
@@ -372,27 +373,27 @@ const ExamTaking = () => {
   // Exam not started yet
   if (exam.status === 'generated') {
     return (
-      <AppLayout title="Iniciar Exame" subtitle="Leia as instruções antes de começar">
+      <AppLayout title={tx('Iniciar Exame')} subtitle={tx('Leia as instruções antes de começar')}>
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-6 w-6" />
-                Instruções do Exame
+                {tx('Instruções do Exame')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                 <Timer className="h-5 w-5 text-muted-foreground" />
-                <span>Você terá tempo limitado para completar o exame</span>
+                <span>{tx('Você terá tempo limitado para completar o exame')}</span>
               </div>
               <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                 <AlertTriangle className="h-5 w-5 text-severity-moderate" />
-                <span>Uma vez iniciado, o exame não pode ser pausado</span>
+                <span>{tx('Uma vez iniciado, o exame não pode ser pausado')}</span>
               </div>
               <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                 <CheckCircle className="h-5 w-5 text-severity-good" />
-                <span>Responda todas as questões antes de enviar</span>
+                <span>{tx('Responda todas as questões antes de enviar')}</span>
               </div>
               <div className="pt-4 border-t space-y-3">
                 <p className="text-sm text-muted-foreground">
@@ -400,7 +401,7 @@ const ExamTaking = () => {
                 </p>
                 <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
                   <p className="text-xs text-blue-700 dark:text-blue-300">
-                    <strong>Aviso de Privacidade:</strong> Para fins de integridade acadêmica, 
+                    <strong>{tx('Aviso de Privacidade:')}</strong> Para fins de integridade acadêmica, 
                     registramos informações básicas do dispositivo durante o exame. Esses dados 
                     são automaticamente removidos após 90 dias conforme nossa política de retenção.
                   </p>
@@ -410,10 +411,10 @@ const ExamTaking = () => {
             <CardFooter className="flex justify-between">
               <Button variant="outline" onClick={() => navigate(-1)}>
                 <ChevronLeft className="mr-2 h-4 w-4" />
-                Voltar
+                {tx('Voltar')}
               </Button>
               <Button onClick={handleStartExam} disabled={startExam.isPending}>
-                Iniciar Exame
+                {tx('Iniciar Exame')}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </CardFooter>
@@ -429,7 +430,7 @@ const ExamTaking = () => {
   return (
     <AppLayout 
       title={`Questão ${currentQuestionIndex + 1} de ${totalQuestions}`}
-      subtitle="Selecione a resposta correta"
+      subtitle={tx('Selecione a resposta correta')}
     >
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Timer and Progress */}
@@ -454,7 +455,7 @@ const ExamTaking = () => {
             <div className="flex items-center gap-2 mb-2">
               <Badge variant="outline">Questão {currentQuestionIndex + 1}</Badge>
               {isEssayQuestion && (
-                <Badge variant="secondary">Dissertativa</Badge>
+                <Badge variant="secondary">{tx('Dissertativa')}</Badge>
               )}
             </div>
             <CardTitle className="text-lg leading-relaxed">
@@ -466,7 +467,7 @@ const ExamTaking = () => {
               <div className="space-y-3">
                 <RubricDisplay rubric={(currentQuestion as any)?.rubric} />
                 <Textarea
-                  placeholder="Digite sua resposta dissertativa..."
+                  placeholder={tx('Digite sua resposta dissertativa...')}
                   value={answers[currentQuestionId || ''] || ''}
                   onChange={(e) => currentQuestionId && handleAnswerChange(currentQuestionId, e.target.value)}
                   rows={8}
@@ -514,7 +515,7 @@ const ExamTaking = () => {
               </RadioGroup>
             ) : (
               <Textarea
-                placeholder="Digite sua resposta..."
+                placeholder={tx('Digite sua resposta...')}
                 value={answers[currentQuestionId || ''] || ''}
                 onChange={(e) => currentQuestionId && handleAnswerChange(currentQuestionId, e.target.value)}
                 rows={4}
@@ -528,12 +529,12 @@ const ExamTaking = () => {
               disabled={currentQuestionIndex === 0}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
-              Anterior
+              {tx('Anterior')}
             </Button>
             <div className="flex gap-2">
               {currentQuestionIndex < totalQuestions - 1 ? (
                 <Button onClick={() => setCurrentQuestionIndex(prev => prev + 1)}>
-                  Próxima
+                  {tx('Próxima')}
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
@@ -542,7 +543,7 @@ const ExamTaking = () => {
                   className="bg-green-600 hover:bg-green-700"
                 >
                   <Send className="mr-2 h-4 w-4" />
-                  Enviar Exame
+                  {tx('Enviar Exame')}
                 </Button>
               )}
             </div>
@@ -578,15 +579,15 @@ const ExamTaking = () => {
               Você respondeu {Object.keys(answers).length} de {totalQuestions} questões.
               {Object.keys(answers).length < totalQuestions && (
                 <span className="block mt-2 text-yellow-600">
-                  Atenção: Algumas questões não foram respondidas!
+                  {tx('Atenção: Algumas questões não foram respondidas!')}
                 </span>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Continuar Respondendo</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Continuar Respondendo')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleSubmit} disabled={submitted}>
-              Confirmar Envio
+              {tx('Confirmar Envio')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import type { ReactNode } from 'react';
 import { ArrowLeft, HelpCircle, Volume2, VolumeX, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -42,7 +43,7 @@ export function GameTopBar({
         className,
       )}
     >
-      <button type="button" onClick={onBack} aria-label="Voltar aos jogos" className={btn}>
+      <button type="button" onClick={onBack} aria-label={tx('Voltar aos jogos')} className={btn}>
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
       </button>
 
@@ -65,7 +66,7 @@ export function GameTopBar({
 
       <div className="flex items-center gap-0.5">
         {onRestart && (
-          <button type="button" onClick={onRestart} aria-label="Reiniciar jogo" className={btn}>
+          <button type="button" onClick={onRestart} aria-label={tx('Reiniciar jogo')} className={btn}>
             <RotateCcw className="h-4 w-4" aria-hidden="true" />
           </button>
         )}
@@ -75,14 +76,14 @@ export function GameTopBar({
             toggleMute();
             if (muted) play('click');
           }}
-          aria-label={muted ? 'Ativar som' : 'Desativar som'}
+          aria-label={muted ? tx('Ativar som') : tx('Desativar som')}
           aria-pressed={muted}
           className={btn}
         >
           {muted ? <VolumeX className="h-4 w-4" aria-hidden="true" /> : <Volume2 className="h-4 w-4" aria-hidden="true" />}
         </button>
         {onHelp && (
-          <button type="button" onClick={onHelp} aria-label="Como jogar" className={btn}>
+          <button type="button" onClick={onHelp} aria-label={tx('Como jogar')} className={btn}>
             <HelpCircle className="h-4 w-4" aria-hidden="true" />
           </button>
         )}

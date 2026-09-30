@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -53,10 +54,10 @@ export function SyllabusPanel({ training }: Props) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <GraduationCap className="h-5 w-5" />
-          Plano de Ensino
+          {tx('Plano de Ensino')}
         </CardTitle>
         <CardDescription>
-          Documento pedagógico formal — ementa, competências, carga horária e critérios de avaliação
+          {tx('Documento pedagógico formal — ementa, competências, carga horária e critérios de avaliação')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -72,15 +73,15 @@ export function SyllabusPanel({ training }: Props) {
         {(cargaT > 0 || cargaP > 0) && (
           <section className="grid grid-cols-3 gap-3">
             <div className="rounded-lg border p-3 text-center">
-              <p className="text-xs text-muted-foreground">Teórica</p>
+              <p className="text-xs text-muted-foreground">{tx('Teórica')}</p>
               <p className="text-lg font-semibold">{cargaT}h</p>
             </div>
             <div className="rounded-lg border p-3 text-center">
-              <p className="text-xs text-muted-foreground">Prática</p>
+              <p className="text-xs text-muted-foreground">{tx('Prática')}</p>
               <p className="text-lg font-semibold">{cargaP}h</p>
             </div>
             <div className="rounded-lg border p-3 text-center bg-primary/5">
-              <p className="text-xs text-muted-foreground">Total</p>
+              <p className="text-xs text-muted-foreground">{tx('Total')}</p>
               <p className="text-lg font-semibold text-primary">{cargaTotal}h</p>
             </div>
           </section>
@@ -112,7 +113,7 @@ export function SyllabusPanel({ training }: Props) {
 
         {prereqs.length > 0 && (
           <section>
-            <h4 className="text-sm font-semibold mb-2">Pré-requisitos</h4>
+            <h4 className="text-sm font-semibold mb-2">{tx('Pré-requisitos')}</h4>
             <div className="flex flex-wrap gap-2">
               {prereqs.map((p, i) => (
                 <Badge key={i} variant="outline" className="text-xs">{p}</Badge>
@@ -146,7 +147,7 @@ export function SyllabusPanel({ training }: Props) {
             </h4>
             {bibBasica.length > 0 && (
               <div className="mb-3">
-                <p className="text-xs font-medium uppercase text-muted-foreground mb-1">Básica</p>
+                <p className="text-xs font-medium uppercase text-muted-foreground mb-1">{tx('Básica')}</p>
                 <ul className="space-y-1 text-sm">
                   {bibBasica.map((b, i) => (
                     <li key={i}>
@@ -162,7 +163,7 @@ export function SyllabusPanel({ training }: Props) {
             )}
             {bibComp.length > 0 && (
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground mb-1">Complementar</p>
+                <p className="text-xs font-medium uppercase text-muted-foreground mb-1">{tx('Complementar')}</p>
                 <ul className="space-y-1 text-sm">
                   {bibComp.map((b, i) => (
                     <li key={i}>
@@ -181,7 +182,7 @@ export function SyllabusPanel({ training }: Props) {
 
         <Separator />
         <p className="text-xs text-muted-foreground">
-          Plano de ensino formal — base para certificação de carga horária e reconhecimento institucional.
+          {tx('Plano de ensino formal — base para certificação de carga horária e reconhecimento institucional.')}
         </p>
       </CardContent>
     </Card>

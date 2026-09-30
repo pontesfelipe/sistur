@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -113,7 +114,7 @@ export default function GamesHub() {
   ];
 
   return (
-    <AppLayout title="Jogos Educacionais">
+    <AppLayout title={tx('Jogos Educacionais')}>
       <div className="max-w-4xl mx-auto relative px-1 sm:px-0">
         <FloatingBgParticles />
 
@@ -122,7 +123,7 @@ export default function GamesHub() {
             <SpriteOrEmoji emoji="🎮" className="w-7 h-7 sm:w-8 sm:h-8" /> Jogos Educacionais
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1.5 sm:mt-2">
-            Aprenda sobre sustentabilidade e gestão territorial de forma divertida
+            {tx('Aprenda sobre sustentabilidade e gestão territorial de forma divertida')}
           </p>
         </div>
 
@@ -163,11 +164,11 @@ export default function GamesHub() {
                 <div className="mb-3 sm:mb-4">
                   <SpriteOrEmoji emoji={game.emoji} className="w-12 h-12 sm:w-14 sm:h-14" />
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold mb-1.5 sm:mb-2 leading-tight">{game.title}</h3>
-                <p className="text-[13px] sm:text-sm text-white/80 leading-relaxed line-clamp-3 sm:line-clamp-none">{game.description}</p>
+                <h3 className="text-xl sm:text-2xl font-bold mb-1.5 sm:mb-2 leading-tight">{tx(game.title)}</h3>
+                <p className="text-[13px] sm:text-sm text-white/80 leading-relaxed line-clamp-3 sm:line-clamp-none">{tx(game.description)}</p>
                 <div className="mt-4 inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-sm font-medium backdrop-blur group-hover:bg-white/30 transition-colors">
                   <game.icon className="h-4 w-4" />
-                  Jogar
+                  {tx('Jogar')}
                   <motion.span
                     className="inline-block"
                     animate={{ x: [0, 4, 0] }}

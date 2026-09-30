@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -96,12 +97,12 @@ export function RubricEditor({
         </div>
         <div className="flex items-center gap-2">
           <Switch checked={value.visible_to_student} onCheckedChange={(v) => update({ visible_to_student: v })} />
-          <span className="text-xs text-muted-foreground">Visível ao aluno</span>
+          <span className="text-xs text-muted-foreground">{tx('Visível ao aluno')}</span>
         </div>
       </div>
 
       {value.criteria.length === 0 && (
-        <p className="text-xs text-muted-foreground italic">Nenhum critério definido.</p>
+        <p className="text-xs text-muted-foreground italic">{tx('Nenhum critério definido.')}</p>
       )}
 
       <div className="space-y-3">
@@ -109,12 +110,12 @@ export function RubricEditor({
           <div key={ci} className="rounded-md border p-3 space-y-2">
             <div className="flex gap-2 items-end">
               <div className="flex-1">
-                <Label className="text-xs">Critério</Label>
-                <Input value={c.name} placeholder="Ex: Clareza argumentativa"
+                <Label className="text-xs">{tx('Critério')}</Label>
+                <Input value={c.name} placeholder={tx('Ex: Clareza argumentativa')}
                   onChange={(e) => updateCriterion(ci, { name: e.target.value })} />
               </div>
               <div className="w-28">
-                <Label className="text-xs">Pontos máx.</Label>
+                <Label className="text-xs">{tx('Pontos máx.')}</Label>
                 <Input type="number" min={0} value={c.max_points}
                   onChange={(e) => updateCriterion(ci, { max_points: Number(e.target.value) || 0 })} />
               </div>
@@ -128,7 +129,7 @@ export function RubricEditor({
               {(c.descriptors || []).map((d, di) => (
                 <div key={di} className="flex gap-2 items-start">
                   <Badge variant="outline" className="mt-2 shrink-0">N{di}</Badge>
-                  <Textarea rows={1} value={d} placeholder="Ex: Argumento ausente / pouco claro / consistente / sólido / excepcional"
+                  <Textarea rows={1} value={d} placeholder={tx('Ex: Argumento ausente / pouco claro / consistente / sólido / excepcional')}
                     onChange={(e) => updateDescriptor(ci, di, e.target.value)} />
                   <Button type="button" variant="ghost" size="icon" onClick={() => removeDescriptor(ci, di)}>
                     <Trash2 className="h-4 w-4 text-destructive" />

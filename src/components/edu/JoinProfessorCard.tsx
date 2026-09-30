@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 /**
  * Permite que um usuário já existente se vincule a um professor
  * informando (ou recebendo por link) o código de indicação.
@@ -35,7 +36,7 @@ export function JoinProfessorCard() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <GraduationCap className="h-5 w-5 text-primary" />
-          Vínculo com professor
+          {tx('Vínculo com professor')}
         </CardTitle>
         <CardDescription>
           Recebeu um código de um professor? Informe abaixo para entrar na lista de estudantes dele.
@@ -59,7 +60,7 @@ export function JoinProfessorCard() {
             <Input
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
-              placeholder="Ex.: PROF3XK9AB"
+              placeholder={tx('Ex.: PROF3XK9AB')}
               className="font-mono uppercase"
               maxLength={20}
             />
@@ -68,7 +69,7 @@ export function JoinProfessorCard() {
               disabled={!code.trim() || link.isPending}
             >
               {link.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-              Vincular
+              {tx('Vincular')}
             </Button>
           </div>
         )}

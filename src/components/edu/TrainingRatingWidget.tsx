@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 /**
  * SISEDU - Widget de Avaliação de Treinamento
  * Permite que alunos avaliem treinamentos com estrelas e comentário opcional
@@ -67,7 +68,7 @@ export function TrainingRatingWidget({ trainingId, trainingTitle }: TrainingRati
         <CardTitle className="text-sm flex items-center justify-between">
           <span className="flex items-center gap-2">
             <Star className="h-4 w-4 text-yellow-400" />
-            Avaliação
+            {tx('Avaliação')}
           </span>
           {count > 0 && (
             <Badge variant="secondary" className="text-xs">
@@ -81,7 +82,7 @@ export function TrainingRatingWidget({ trainingId, trainingTitle }: TrainingRati
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               {renderStars(myRating.rating)}
-              <span className="text-sm text-muted-foreground">Sua avaliação</span>
+              <span className="text-sm text-muted-foreground">{tx('Sua avaliação')}</span>
             </div>
             {myRating.comment && (
               <p className="text-sm text-muted-foreground italic">"{myRating.comment}"</p>
@@ -91,7 +92,7 @@ export function TrainingRatingWidget({ trainingId, trainingTitle }: TrainingRati
               setComment(myRating.comment ?? '');
               setShowForm(true);
             }}>
-              Editar avaliação
+              {tx('Editar avaliação')}
             </Button>
           </div>
         ) : (
@@ -101,7 +102,7 @@ export function TrainingRatingWidget({ trainingId, trainingTitle }: TrainingRati
             {showForm && (
               <div className="space-y-2 animate-fade-in">
                 <Textarea
-                  placeholder="Deixe um comentário (opcional)"
+                  placeholder={tx('Deixe um comentário (opcional)')}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   rows={2}
@@ -113,14 +114,14 @@ export function TrainingRatingWidget({ trainingId, trainingTitle }: TrainingRati
                     onClick={handleSubmit}
                     disabled={selectedRating === 0 || submitRating.isPending}
                   >
-                    Enviar
+                    {tx('Enviar')}
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => { setShowForm(false); setSelectedRating(0); setComment(''); }}
                   >
-                    Cancelar
+                    {tx('Cancelar')}
                   </Button>
                 </div>
               </div>

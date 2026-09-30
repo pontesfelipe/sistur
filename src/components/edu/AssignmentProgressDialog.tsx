@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
@@ -62,7 +63,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Acompanhamento da Atividade</DialogTitle>
+          <DialogTitle>{tx('Acompanhamento da Atividade')}</DialogTitle>
           <DialogDescription>
             {data?.assignment.title || 'Carregando...'}
           </DialogDescription>
@@ -83,7 +84,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                 <p className="text-2xl font-bold">{data.kpis.total_students}</p>
               </CardContent></Card>
               <Card><CardContent className="pt-4 pb-3 text-center">
-                <p className="text-xs text-muted-foreground mb-1">Conclusão</p>
+                <p className="text-xs text-muted-foreground mb-1">{tx('Conclusão')}</p>
                 <p className="text-2xl font-bold">{data.kpis.completion_rate}%</p>
                 <Progress value={data.kpis.completion_rate} className="h-1 mt-1" />
               </CardContent></Card>
@@ -100,7 +101,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                 <p className="text-2xl font-bold">{data.kpis.avg_score || 0}%</p>
               </CardContent></Card>
               <Card><CardContent className="pt-4 pb-3 text-center">
-                <p className="text-xs text-muted-foreground mb-1">Tentativas máx</p>
+                <p className="text-xs text-muted-foreground mb-1">{tx('Tentativas máx')}</p>
                 <p className="text-2xl font-bold">{data.assignment.max_attempts}</p>
                 <p className="text-[10px] text-muted-foreground">Mín. {data.assignment.min_score_pct}%</p>
               </CardContent></Card>
@@ -121,13 +122,13 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                     } ${meta.cls}`}
                   >
                     <Icon className="h-3 w-3" />
-                    {meta.label}: <strong>{count}</strong>
+                    {tx(meta.label)}: <strong>{count}</strong>
                   </button>
                 );
               })}
               {filter !== 'all' && (
                 <Button size="sm" variant="ghost" onClick={() => setFilter('all')}>
-                  Limpar filtro
+                  {tx('Limpar filtro')}
                 </Button>
               )}
             </div>
@@ -142,13 +143,13 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80 space-y-3">
-                  <Label className="text-xs">Enviar para:</Label>
+                  <Label className="text-xs">{tx('Enviar para:')}</Label>
                   <Select value={reminderMode} onValueChange={(v: any) => setReminderMode(v)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all_pending">Todos pendentes</SelectItem>
-                      <SelectItem value="not_started">Quem não iniciou</SelectItem>
-                      <SelectItem value="not_submitted">Quem não entregou</SelectItem>
+                      <SelectItem value="all_pending">{tx('Todos pendentes')}</SelectItem>
+                      <SelectItem value="not_started">{tx('Quem não iniciou')}</SelectItem>
+                      <SelectItem value="not_submitted">{tx('Quem não entregou')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button
@@ -158,7 +159,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                     onClick={() => assignmentId && remind.mutate({ assignmentId, mode: reminderMode })}
                   >
                     {remind.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                    Enviar lembrete
+                    {tx('Enviar lembrete')}
                   </Button>
                 </PopoverContent>
               </Popover>
@@ -171,7 +172,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80 space-y-3">
-                  <Label className="text-xs">Novo prazo</Label>
+                  <Label className="text-xs">{tx('Novo prazo')}</Label>
                   <Input
                     type="datetime-local"
                     value={newDueDate}
@@ -189,7 +190,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                     onClick={handleExtend}
                   >
                     {extend.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                    Prorrogar
+                    {tx('Prorrogar')}
                   </Button>
                 </PopoverContent>
               </Popover>
@@ -203,7 +204,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-72 space-y-3">
-                    <Label className="text-xs">Quantas tentativas extras adicionar</Label>
+                    <Label className="text-xs">{tx('Quantas tentativas extras adicionar')}</Label>
                     <Input
                       type="number"
                       min={1}
@@ -221,7 +222,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                       onClick={() => assignmentId && grant.mutate({ assignmentId, extraCount })}
                     >
                       {grant.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                      Liberar
+                      {tx('Liberar')}
                     </Button>
                   </PopoverContent>
                 </Popover>
@@ -239,11 +240,11 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Aluno</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Tentativas</TableHead>
-                        <TableHead>Melhor nota</TableHead>
-                        <TableHead>Última entrega</TableHead>
+                        <TableHead>{tx('Aluno')}</TableHead>
+                        <TableHead>{tx('Status')}</TableHead>
+                        <TableHead>{tx('Tentativas')}</TableHead>
+                        <TableHead>{tx('Melhor nota')}</TableHead>
+                        <TableHead>{tx('Última entrega')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -256,7 +257,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                             <TableCell>
                               <Badge variant="outline" className={`${meta.cls} text-xs`}>
                                 <Icon className="h-3 w-3 mr-1" />
-                                {meta.label}
+                                {tx(meta.label)}
                               </Badge>
                             </TableCell>
                             <TableCell className="text-sm">

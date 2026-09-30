@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo } from 'react';
 import { useClassrooms } from '@/hooks/useClassrooms';
 import { useClassroomDiary, diaryStats, type DiaryRow } from '@/hooks/useClassroomDiary';
@@ -85,10 +86,10 @@ function ClassroomBlock({ classroomId, classroomName }: ClassroomBlockProps) {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Aluno</TableHead>
-                        <TableHead>Conclusão</TableHead>
-                        <TableHead>Última atividade</TableHead>
-                        <TableHead>Alertas</TableHead>
+                        <TableHead>{tx('Aluno')}</TableHead>
+                        <TableHead>{tx('Conclusão')}</TableHead>
+                        <TableHead>{tx('Última atividade')}</TableHead>
+                        <TableHead>{tx('Alertas')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -143,7 +144,7 @@ export function ProfessorAnalyticsPanel() {
       <Card>
         <CardContent className="py-12 text-center text-muted-foreground">
           <TrendingUp className="h-10 w-10 mx-auto mb-3 opacity-30" />
-          Crie uma sala para começar a ver métricas dos seus alunos.
+          {tx('Crie uma sala para começar a ver métricas dos seus alunos.')}
         </CardContent>
       </Card>
     );
@@ -152,9 +153,9 @@ export function ProfessorAnalyticsPanel() {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold">Analytics por Turma</h3>
+        <h3 className="text-lg font-semibold">{tx('Analytics por Turma')}</h3>
         <p className="text-sm text-muted-foreground">
-          Progresso, frequência e identificação automática de alunos em risco.
+          {tx('Progresso, frequência e identificação automática de alunos em risco.')}
         </p>
       </div>
       <div className="space-y-4">

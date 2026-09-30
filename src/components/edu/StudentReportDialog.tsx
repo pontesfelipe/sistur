@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 /**
  * SISEDU - Relatório Individual do Aluno (para Professores)
  * Visão detalhada do progresso de um aluno específico
@@ -164,28 +165,28 @@ export function StudentReportDialog({ studentId, studentName, open, onClose }: S
                 <CardContent className="p-3 text-center">
                   <GraduationCap className="h-5 w-5 mx-auto mb-1 text-primary" />
                   <p className="text-xl font-bold">{stats.completedTrainings}</p>
-                  <p className="text-[10px] text-muted-foreground">Concluídos</p>
+                  <p className="text-[10px] text-muted-foreground">{tx('Concluídos')}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-3 text-center">
                   <Clock className="h-5 w-5 mx-auto mb-1 text-blue-500" />
                   <p className="text-xl font-bold">{formatTime(stats.totalTimeSeconds)}</p>
-                  <p className="text-[10px] text-muted-foreground">Estudo</p>
+                  <p className="text-[10px] text-muted-foreground">{tx('Estudo')}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-3 text-center">
                   <Target className="h-5 w-5 mx-auto mb-1 text-amber-500" />
                   <p className="text-xl font-bold">{stats.avgExamScore}%</p>
-                  <p className="text-[10px] text-muted-foreground">Média Exames</p>
+                  <p className="text-[10px] text-muted-foreground">{tx('Média Exames')}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-3 text-center">
                   <Award className="h-5 w-5 mx-auto mb-1 text-yellow-500" />
                   <p className="text-xl font-bold">{stats.certificates}</p>
-                  <p className="text-[10px] text-muted-foreground">Certificados</p>
+                  <p className="text-[10px] text-muted-foreground">{tx('Certificados')}</p>
                 </CardContent>
               </Card>
             </div>
@@ -193,7 +194,7 @@ export function StudentReportDialog({ studentId, studentName, open, onClose }: S
             {/* Progress by Pillar */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Progresso por Pilar</CardTitle>
+                <CardTitle className="text-sm">{tx('Progresso por Pilar')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {Object.entries(stats.progressByPillar).map(([pillar, data]) => (
@@ -212,7 +213,7 @@ export function StudentReportDialog({ studentId, studentName, open, onClose }: S
                 ))}
                 {Object.keys(stats.progressByPillar).length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-2">
-                    Nenhum dado de progresso ainda
+                    {tx('Nenhum dado de progresso ainda')}
                   </p>
                 )}
               </CardContent>
@@ -222,7 +223,7 @@ export function StudentReportDialog({ studentId, studentName, open, onClose }: S
             {(stats.examsPassed > 0 || stats.examsFailed > 0) && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">Desempenho em Exames</CardTitle>
+                  <CardTitle className="text-sm">{tx('Desempenho em Exames')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-4">
@@ -243,15 +244,15 @@ export function StudentReportDialog({ studentId, studentName, open, onClose }: S
             {stats.recentActivity.length > 0 && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">Atividade Recente</CardTitle>
+                  <CardTitle className="text-sm">{tx('Atividade Recente')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-xs">Data</TableHead>
-                        <TableHead className="text-xs">Treinamento</TableHead>
-                        <TableHead className="text-xs">Ação</TableHead>
+                        <TableHead className="text-xs">{tx('Data')}</TableHead>
+                        <TableHead className="text-xs">{tx('Treinamento')}</TableHead>
+                        <TableHead className="text-xs">{tx('Ação')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

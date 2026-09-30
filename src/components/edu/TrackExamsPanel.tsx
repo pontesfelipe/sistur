@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,10 +44,10 @@ export function TrackExamsPanel({ trackId, canManage }: TrackExamsPanelProps) {
           <div>
             <CardTitle className="flex items-center gap-2">
               <ClipboardList className="h-5 w-5 text-primary" />
-              Provas Finais da Trilha
+              {tx('Provas Finais da Trilha')}
             </CardTitle>
             <CardDescription>
-              Uma prova por pilar coberto pelos treinamentos. Aprovação garante o certificado.
+              {tx('Uma prova por pilar coberto pelos treinamentos. Aprovação garante o certificado.')}
             </CardDescription>
           </div>
 
@@ -59,7 +60,7 @@ export function TrackExamsPanel({ trackId, canManage }: TrackExamsPanelProps) {
                 disabled={generate.isPending}
               >
                 <Sparkles className="mr-2 h-4 w-4" />
-                {exams && exams.length > 0 ? 'Gerar faltantes' : 'Gerar provas'}
+                {exams && exams.length > 0 ? tx('Gerar faltantes') : tx('Gerar provas')}
               </Button>
 
               {exams && exams.length > 0 && (
@@ -67,7 +68,7 @@ export function TrackExamsPanel({ trackId, canManage }: TrackExamsPanelProps) {
                   <AlertDialogTrigger asChild>
                     <Button size="sm" variant="outline" disabled={generate.isPending}>
                       <RefreshCcw className="mr-2 h-4 w-4" />
-                      Regenerar
+                      {tx('Regenerar')}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -80,9 +81,9 @@ export function TrackExamsPanel({ trackId, canManage }: TrackExamsPanelProps) {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
                       <AlertDialogAction onClick={() => handleGenerate(true)}>
-                        Regenerar
+                        {tx('Regenerar')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -112,7 +113,7 @@ export function TrackExamsPanel({ trackId, canManage }: TrackExamsPanelProps) {
                   </Badge>
                   <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <p className="text-sm font-medium mb-3">{PILLAR_LABELS[te.pillar]}</p>
+                <p className="text-sm font-medium mb-3">{tx(PILLAR_LABELS[te.pillar])}</p>
                 <div className="space-y-1 text-xs text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <ClipboardList className="h-3 w-3" />
@@ -135,7 +136,7 @@ export function TrackExamsPanel({ trackId, canManage }: TrackExamsPanelProps) {
         ) : (
           <div className="text-center py-8 text-sm text-muted-foreground">
             <ClipboardList className="mx-auto h-10 w-10 text-muted-foreground/50 mb-2" />
-            <p>Nenhuma prova final configurada para esta trilha.</p>
+            <p>{tx('Nenhuma prova final configurada para esta trilha.')}</p>
             {canManage && (
               <p className="mt-1 text-xs">
                 Clique em "Gerar provas" para criar uma prova por pilar coberto.

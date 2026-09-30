@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -25,7 +26,7 @@ const ExamReview = () => {
 
   if (isLoading) {
     return (
-      <AppLayout title="Carregando..." subtitle="Buscando revisão do exame">
+      <AppLayout title={tx('Carregando...')} subtitle={tx('Buscando revisão do exame')}>
         <div className="max-w-3xl mx-auto space-y-6">
           <Skeleton className="h-48 w-full" />
           <Skeleton className="h-64 w-full" />
@@ -37,11 +38,11 @@ const ExamReview = () => {
 
   if (!review) {
     return (
-      <AppLayout title="Revisão não encontrada" subtitle="">
+      <AppLayout title={tx('Revisão não encontrada')} subtitle="">
         <div className="text-center py-12">
           <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground mb-4">Tentativa não encontrada.</p>
-          <Button onClick={() => navigate('/edu/historico')}>Voltar ao Histórico</Button>
+          <p className="text-muted-foreground mb-4">{tx('Tentativa não encontrada.')}</p>
+          <Button onClick={() => navigate('/edu/historico')}>{tx('Voltar ao Histórico')}</Button>
         </div>
       </AppLayout>
     );
@@ -51,7 +52,7 @@ const ExamReview = () => {
   const isPending = review.result === 'pending';
 
   return (
-    <AppLayout title="Revisão do Exame" subtitle={review.course_title || 'Prova'}>
+    <AppLayout title={tx('Revisão do Exame')} subtitle={review.course_title || 'Prova'}>
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Summary Card */}
         <Card className={isPending ? 'border-amber-500/50' : isPassed ? 'border-green-500/50' : 'border-red-500/50'}>
@@ -66,7 +67,7 @@ const ExamReview = () => {
                   ) : (
                     <XCircle className="h-5 w-5 text-red-500" />
                   )}
-                  {isPending ? 'Aguardando Correção' : isPassed ? 'Aprovado' : 'Reprovado'}
+                  {isPending ? 'Aguardando Correção' : isPassed ? tx('Aprovado') : tx('Reprovado')}
                 </CardTitle>
                 <CardDescription>
                   {review.submitted_at && `Realizada em ${new Date(review.submitted_at).toLocaleDateString('pt-BR', {
@@ -78,7 +79,7 @@ const ExamReview = () => {
               <div className="text-right">
                 <p className="text-3xl font-bold">{(review.score_pct || 0).toFixed(0)}%</p>
                 <p className="text-xs text-muted-foreground">
-                  {review.grading_mode === 'hybrid' && isPending ? 'Nota parcial' : 'Nota final'}
+                  {review.grading_mode === 'hybrid' && isPending ? tx('Nota parcial') : tx('Nota final')}
                 </p>
               </div>
             </div>
@@ -91,17 +92,17 @@ const ExamReview = () => {
           <CardContent>
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <p className="text-muted-foreground">Questões</p>
+                <p className="text-muted-foreground">{tx('Questões')}</p>
                 <p className="font-medium">{review.answers?.length || 0}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">Acertos</p>
+                <p className="text-muted-foreground">{tx('Acertos')}</p>
                 <p className="font-medium text-green-600">
                   {review.answers?.filter(a => a.is_correct === true).length || 0}
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Erros</p>
+                <p className="text-muted-foreground">{tx('Erros')}</p>
                 <p className="font-medium text-red-600">
                   {review.answers?.filter(a => a.is_correct === false).length || 0}
                 </p>
@@ -114,7 +115,7 @@ const ExamReview = () => {
         <div className="space-y-4">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Revisão das Questões
+            {tx('Revisão das Questões')}
           </h2>
 
           {review.answers?.map((answer, idx) => {
@@ -133,7 +134,7 @@ const ExamReview = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Badge variant="outline">Questão {idx + 1}</Badge>
-                      {isEssay && <Badge variant="secondary">Dissertativa</Badge>}
+                      {isEssay && <Badge variant="secondary">{tx('Dissertativa')}</Badge>}
                       {isPendingGrade ? (
                         <Badge variant="secondary" className="bg-amber-500/10 text-amber-700">
                           <Clock className="w-3 h-3 mr-1" />Aguardando
@@ -160,16 +161,16 @@ const ExamReview = () => {
                   {isEssay ? (
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs text-muted-foreground mb-1">Sua resposta:</p>
+                        <p className="text-xs text-muted-foreground mb-1">{tx('Sua resposta:')}</p>
                         <div className="bg-muted p-3 rounded-lg text-sm whitespace-pre-wrap">
-                          {answer.free_text_answer || <span className="italic text-muted-foreground">Sem resposta</span>}
+                          {answer.free_text_answer || <span className="italic text-muted-foreground">{tx('Sem resposta')}</span>}
                         </div>
                       </div>
                       {answer.grader_comment && (
                         <div>
                           <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
                             <MessageSquare className="h-3 w-3" />
-                            Comentário do professor:
+                            {tx('Comentário do professor:')}
                           </p>
                           <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg text-sm border border-blue-200 dark:border-blue-800">
                             {answer.grader_comment}
@@ -198,7 +199,7 @@ const ExamReview = () => {
                             <span className="flex-1">{opt.option_text}</span>
                             {isCorrectOpt && <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />}
                             {isSelected && !isCorrectOpt && <XCircle className="h-4 w-4 text-red-600 shrink-0" />}
-                            {isSelected && <Badge variant="outline" className="text-xs shrink-0">Sua resposta</Badge>}
+                            {isSelected && <Badge variant="outline" className="text-xs shrink-0">{tx('Sua resposta')}</Badge>}
                           </div>
                         );
                       })}
@@ -209,7 +210,7 @@ const ExamReview = () => {
                     <>
                       <Separator />
                       <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg">
-                        <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">Explicação:</p>
+                        <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">{tx('Explicação:')}</p>
                         <p className="text-sm text-blue-800 dark:text-blue-200">{answer.explanation}</p>
                       </div>
                     </>
@@ -224,12 +225,12 @@ const ExamReview = () => {
         <div className="flex justify-between pt-4">
           <Button variant="outline" onClick={() => navigate('/edu/historico')}>
             <ChevronLeft className="mr-2 h-4 w-4" />
-            Voltar ao Histórico
+            {tx('Voltar ao Histórico')}
           </Button>
           {isPassed && (
             <Button onClick={() => navigate('/certificados')}>
               <Award className="mr-2 h-4 w-4" />
-              Ver Certificados
+              {tx('Ver Certificados')}
             </Button>
           )}
         </div>

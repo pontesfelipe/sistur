@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -35,14 +36,14 @@ export function ClassroomLeaderboardPanel({ classroomId, showOptInToggle = true 
           <div>
             <CardTitle className="text-base flex items-center gap-2">
               <Trophy className="h-4 w-4 text-amber-500" />
-              Placar semanal
+              {tx('Placar semanal')}
             </CardTitle>
-            <CardDescription>XP ganho nos últimos 7 dias — apenas alunos que optaram aparecem.</CardDescription>
+            <CardDescription>{tx('XP ganho nos últimos 7 dias — apenas alunos que optaram aparecem.')}</CardDescription>
           </div>
           {showOptInToggle && (
             <div className="flex items-center gap-2">
               <Label htmlFor={`optin-${classroomId}`} className="text-xs">
-                Participar
+                {tx('Participar')}
               </Label>
               <Switch
                 id={`optin-${classroomId}`}
@@ -65,7 +66,7 @@ export function ClassroomLeaderboardPanel({ classroomId, showOptInToggle = true 
           </div>
         ) : !rows || rows.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6">
-            Nenhum aluno opt-in ainda. Ative a participação para começar.
+            {tx('Nenhum aluno opt-in ainda. Ative a participação para começar.')}
           </p>
         ) : (
           <div className="space-y-1.5">

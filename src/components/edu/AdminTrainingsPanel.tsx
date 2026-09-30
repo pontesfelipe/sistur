@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -226,12 +227,12 @@ export function AdminTrainingsPanel() {
     e.preventDefault();
     
     if (!formData.title.trim()) {
-      toast.error('Título é obrigatório');
+      toast.error(tx('Título é obrigatório'));
       return;
     }
     
     if (!formData.pillar) {
-      toast.error('Pilar é obrigatório');
+      toast.error(tx('Pilar é obrigatório'));
       return;
     }
 
@@ -260,7 +261,7 @@ export function AdminTrainingsPanel() {
         { trainingId: editingTraining.training_id, data: trainingData },
         {
           onSuccess: () => {
-            toast.success('Treinamento atualizado!');
+            toast.success(tx('Treinamento atualizado!'));
             handleCloseDialog();
           },
           onError: (error) => {
@@ -271,7 +272,7 @@ export function AdminTrainingsPanel() {
     } else {
       createTraining.mutate(trainingData, {
         onSuccess: () => {
-          toast.success('Treinamento criado!');
+          toast.success(tx('Treinamento criado!'));
           handleCloseDialog();
         },
         onError: (error) => {
@@ -290,7 +291,7 @@ export function AdminTrainingsPanel() {
     if (deletingTrainingId) {
       deleteTraining.mutate(deletingTrainingId, {
         onSuccess: () => {
-          toast.success('Treinamento excluído!');
+          toast.success(tx('Treinamento excluído!'));
           setIsDeleteDialogOpen(false);
           setDeletingTrainingId(null);
         },
@@ -303,14 +304,14 @@ export function AdminTrainingsPanel() {
 
   const handlePublish = (trainingId: string) => {
     publishTraining.mutate(trainingId, {
-      onSuccess: () => toast.success('Treinamento publicado!'),
+      onSuccess: () => toast.success(tx('Treinamento publicado!')),
       onError: (error) => toast.error(`Erro ao publicar: ${error.message}`),
     });
   };
 
   const handleArchive = (trainingId: string) => {
     archiveTraining.mutate(trainingId, {
-      onSuccess: () => toast.success('Treinamento arquivado!'),
+      onSuccess: () => toast.success(tx('Treinamento arquivado!')),
       onError: (error) => toast.error(`Erro ao arquivar: ${error.message}`),
     });
   };
@@ -342,19 +343,19 @@ export function AdminTrainingsPanel() {
         <TabsList className="w-full max-w-2xl">
           <TabsTrigger value="trainings" className="gap-2 flex-1">
             <GraduationCap className="h-4 w-4" />
-            Treinamentos
+            {tx('Treinamentos')}
           </TabsTrigger>
           <TabsTrigger value="questions" className="gap-2 flex-1">
             <HelpCircle className="h-4 w-4" />
-            Questões
+            {tx('Questões')}
           </TabsTrigger>
           <TabsTrigger value="exams" className="gap-2 flex-1">
             <ClipboardCheck className="h-4 w-4" />
-            Provas
+            {tx('Provas')}
           </TabsTrigger>
           <TabsTrigger value="certificates" className="gap-2 flex-1">
             <Award className="h-4 w-4" />
-            Certificados
+            {tx('Certificados')}
           </TabsTrigger>
         </TabsList>
 
@@ -364,31 +365,31 @@ export function AdminTrainingsPanel() {
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold">{stats.total}</div>
-                <p className="text-xs text-muted-foreground">Total</p>
+                <p className="text-xs text-muted-foreground">{tx('Total')}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-primary">{stats.courses}</div>
-                <p className="text-xs text-muted-foreground">Cursos</p>
+                <p className="text-xs text-muted-foreground">{tx('Cursos')}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-purple-600">{stats.lives}</div>
-                <p className="text-xs text-muted-foreground">Lives</p>
+                <p className="text-xs text-muted-foreground">{tx('Lives')}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-green-600">{stats.published}</div>
-                <p className="text-xs text-muted-foreground">Publicados</p>
+                <p className="text-xs text-muted-foreground">{tx('Publicados')}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-yellow-600">{stats.draft}</div>
-                <p className="text-xs text-muted-foreground">Rascunhos</p>
+                <p className="text-xs text-muted-foreground">{tx('Rascunhos')}</p>
               </CardContent>
             </Card>
           </div>
@@ -401,7 +402,7 @@ export function AdminTrainingsPanel() {
                   <div className="relative flex-1 min-w-[200px] max-w-xs">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Buscar treinamentos..."
+                      placeholder={tx('Buscar treinamentos...')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-9"
@@ -410,10 +411,10 @@ export function AdminTrainingsPanel() {
                   <Select value={filterPillar} onValueChange={(v) => setFilterPillar(v as PillarType | 'all')}>
                     <SelectTrigger className="w-[160px]">
                       <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Pilar" />
+                      <SelectValue placeholder={tx('Pilar')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos os pilares</SelectItem>
+                      <SelectItem value="all">{tx('Todos os pilares')}</SelectItem>
                       <SelectItem value="RA">RA</SelectItem>
                       <SelectItem value="AO">AO</SelectItem>
                       <SelectItem value="OE">OE</SelectItem>
@@ -421,34 +422,34 @@ export function AdminTrainingsPanel() {
                   </Select>
                   <Select value={filterType} onValueChange={(v) => setFilterType(v as TrainingType | 'all')}>
                     <SelectTrigger className="w-[140px]">
-                      <SelectValue placeholder="Tipo" />
+                      <SelectValue placeholder={tx('Tipo')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="course">Cursos</SelectItem>
-                      <SelectItem value="live">Lives</SelectItem>
+                      <SelectItem value="all">{tx('Todos')}</SelectItem>
+                      <SelectItem value="course">{tx('Cursos')}</SelectItem>
+                      <SelectItem value="live">{tx('Lives')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as TrainingStatus | 'all')}>
                     <SelectTrigger className="w-[140px]">
-                      <SelectValue placeholder="Status" />
+                      <SelectValue placeholder={tx('Status')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="draft">Rascunho</SelectItem>
-                      <SelectItem value="published">Publicado</SelectItem>
-                      <SelectItem value="archived">Arquivado</SelectItem>
+                      <SelectItem value="all">{tx('Todos')}</SelectItem>
+                      <SelectItem value="draft">{tx('Rascunho')}</SelectItem>
+                      <SelectItem value="published">{tx('Publicado')}</SelectItem>
+                      <SelectItem value="archived">{tx('Arquivado')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="flex gap-2">
                   <Button onClick={() => handleOpenCreate('course')} className="gap-2">
                     <GraduationCap className="h-4 w-4" />
-                    Novo Curso
+                    {tx('Novo Curso')}
                   </Button>
                   <Button onClick={() => handleOpenCreate('live')} variant="outline" className="gap-2">
                     <Video className="h-4 w-4" />
-                    Nova Live
+                    {tx('Nova Live')}
                   </Button>
                 </div>
               </div>
@@ -460,7 +461,7 @@ export function AdminTrainingsPanel() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-primary" />
-                Catálogo de Treinamentos
+                {tx('Catálogo de Treinamentos')}
               </CardTitle>
               <CardDescription>
                 {filteredTrainings?.length || 0} treinamento(s) encontrado(s)
@@ -469,14 +470,14 @@ export function AdminTrainingsPanel() {
             <CardContent>
               {isLoading ? (
                 <div className="flex items-center justify-center py-8 text-muted-foreground">
-                  Carregando treinamentos...
+                  {tx('Carregando treinamentos...')}
                 </div>
               ) : filteredTrainings?.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <GraduationCap className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                  <p className="text-muted-foreground">Nenhum treinamento encontrado</p>
+                  <p className="text-muted-foreground">{tx('Nenhum treinamento encontrado')}</p>
                   <Button variant="link" onClick={() => handleOpenCreate('course')}>
-                    Criar primeiro treinamento
+                    {tx('Criar primeiro treinamento')}
                   </Button>
                 </div>
               ) : (
@@ -484,11 +485,11 @@ export function AdminTrainingsPanel() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Treinamento</TableHead>
-                        <TableHead className="hidden md:table-cell">Pilar</TableHead>
-                        <TableHead className="hidden md:table-cell">Tipo</TableHead>
-                        <TableHead className="hidden lg:table-cell">Status</TableHead>
-                        <TableHead className="text-right">Ações</TableHead>
+                        <TableHead>{tx('Treinamento')}</TableHead>
+                        <TableHead className="hidden md:table-cell">{tx('Pilar')}</TableHead>
+                        <TableHead className="hidden md:table-cell">{tx('Tipo')}</TableHead>
+                        <TableHead className="hidden lg:table-cell">{tx('Status')}</TableHead>
+                        <TableHead className="text-right">{tx('Ações')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -496,7 +497,7 @@ export function AdminTrainingsPanel() {
                         <TableRow key={training.training_id}>
                           <TableCell>
                             <div className="flex flex-col">
-                              <span className="font-medium">{training.title}</span>
+                              <span className="font-medium">{tx(training.title)}</span>
                               {training.course_code && (
                                 <span className="text-xs text-muted-foreground">{training.course_code}</span>
                               )}
@@ -510,9 +511,9 @@ export function AdminTrainingsPanel() {
                           <TableCell className="hidden md:table-cell">
                             <Badge variant="outline">
                               {training.type === 'course' ? (
-                                <><GraduationCap className="h-3 w-3 mr-1" />Curso</>
+                                <><GraduationCap className="h-3 w-3 mr-1" />{tx('Curso')}</>
                               ) : (
-                                <><Video className="h-3 w-3 mr-1" />Live</>
+                                <><Video className="h-3 w-3 mr-1" />{tx('Live')}</>
                               )}
                             </Badge>
                           </TableCell>
@@ -531,23 +532,23 @@ export function AdminTrainingsPanel() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => handleOpenEdit(training)}>
                                   <Pencil className="h-4 w-4 mr-2" />
-                                  Editar
+                                  {tx('Editar')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleOpenAccessManager(training)}>
                                   <Shield className="h-4 w-4 mr-2" />
-                                  Acesso
+                                  {tx('Acesso')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 {training.status === 'draft' && (
                                   <DropdownMenuItem onClick={() => handlePublish(training.training_id)}>
                                     <Send className="h-4 w-4 mr-2" />
-                                    Publicar
+                                    {tx('Publicar')}
                                   </DropdownMenuItem>
                                 )}
                                 {training.status === 'published' && (
                                   <DropdownMenuItem onClick={() => handleArchive(training.training_id)}>
                                     <Archive className="h-4 w-4 mr-2" />
-                                    Arquivar
+                                    {tx('Arquivar')}
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuSeparator />
@@ -556,7 +557,7 @@ export function AdminTrainingsPanel() {
                                   className="text-destructive"
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
-                                  Excluir
+                                  {tx('Excluir')}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -589,7 +590,7 @@ export function AdminTrainingsPanel() {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingTraining ? 'Editar Treinamento' : 'Novo Treinamento'}
+              {editingTraining ? tx('Editar Treinamento') : tx('Novo Treinamento')}
             </DialogTitle>
             <DialogDescription>
               {editingTraining 
@@ -601,27 +602,27 @@ export function AdminTrainingsPanel() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Título *</Label>
+                <Label htmlFor="title">{tx('Título *')}</Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Título do treinamento"
+                  placeholder={tx('Título do treinamento')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="course_code">Código</Label>
+                <Label htmlFor="course_code">{tx('Código')}</Label>
                 <Input
                   id="course_code"
                   value={formData.course_code}
                   onChange={(e) => setFormData(prev => ({ ...prev, course_code: e.target.value }))}
-                  placeholder="Ex: RA-001"
+                  placeholder={tx('Ex: RA-001')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Tipo</Label>
+                <Label>{tx('Tipo')}</Label>
                 <Select 
                   value={formData.type} 
                   onValueChange={(v) => setFormData(prev => ({ ...prev, type: v as TrainingType }))}
@@ -630,20 +631,20 @@ export function AdminTrainingsPanel() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="course">Curso</SelectItem>
-                    <SelectItem value="live">Live</SelectItem>
+                    <SelectItem value="course">{tx('Curso')}</SelectItem>
+                    <SelectItem value="live">{tx('Live')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Pilar *</Label>
+                <Label>{tx('Pilar *')}</Label>
                 <Select 
                   value={formData.pillar} 
                   onValueChange={(v) => setFormData(prev => ({ ...prev, pillar: v as PillarType }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione o pilar" />
+                    <SelectValue placeholder={tx('Selecione o pilar')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="RA">{PILLAR_LABELS.RA}</SelectItem>
@@ -654,7 +655,7 @@ export function AdminTrainingsPanel() {
               </div>
 
               <div className="space-y-2">
-                <Label>Nível</Label>
+                <Label>{tx('Nível')}</Label>
                 <Select 
                   value={formData.level} 
                   onValueChange={(v) => setFormData(prev => ({ ...prev, level: v }))}
@@ -664,14 +665,14 @@ export function AdminTrainingsPanel() {
                   </SelectTrigger>
                   <SelectContent>
                     {LEVEL_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      <SelectItem key={opt.value} value={opt.value}>{tx(opt.label)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Público-alvo</Label>
+                <Label>{tx('Público-alvo')}</Label>
                 <Select 
                   value={formData.target_audience} 
                   onValueChange={(v) => setFormData(prev => ({ ...prev, target_audience: v }))}
@@ -681,7 +682,7 @@ export function AdminTrainingsPanel() {
                   </SelectTrigger>
                   <SelectContent>
                     {TARGET_AUDIENCE_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      <SelectItem key={opt.value} value={opt.value}>{tx(opt.label)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -702,7 +703,7 @@ export function AdminTrainingsPanel() {
               </div>
 
               <div className="space-y-2">
-                <Label>Status</Label>
+                <Label>{tx('Status')}</Label>
                 <Select 
                   value={formData.status} 
                   onValueChange={(v) => setFormData(prev => ({ ...prev, status: v as TrainingStatus }))}
@@ -711,39 +712,39 @@ export function AdminTrainingsPanel() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Rascunho</SelectItem>
-                    <SelectItem value="published">Publicado</SelectItem>
-                    <SelectItem value="archived">Arquivado</SelectItem>
+                    <SelectItem value="draft">{tx('Rascunho')}</SelectItem>
+                    <SelectItem value="published">{tx('Publicado')}</SelectItem>
+                    <SelectItem value="archived">{tx('Arquivado')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="objective">Objetivo</Label>
+              <Label htmlFor="objective">{tx('Objetivo')}</Label>
               <Textarea
                 id="objective"
                 value={formData.objective}
                 onChange={(e) => setFormData(prev => ({ ...prev, objective: e.target.value }))}
-                placeholder="Descreva o objetivo do treinamento"
+                placeholder={tx('Descreva o objetivo do treinamento')}
                 rows={2}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Descrição</Label>
+              <Label htmlFor="description">{tx('Descrição')}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Descrição completa do conteúdo"
+                placeholder={tx('Descrição completa do conteúdo')}
                 rows={3}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="video_url">URL do Vídeo</Label>
+                <Label htmlFor="video_url">{tx('URL do Vídeo')}</Label>
                 <Input
                   id="video_url"
                   value={formData.video_url}
@@ -753,7 +754,7 @@ export function AdminTrainingsPanel() {
               </div>
 
               <div className="space-y-2">
-                <Label>Provedor de Vídeo</Label>
+                <Label>{tx('Provedor de Vídeo')}</Label>
                 <Select 
                   value={formData.video_provider} 
                   onValueChange={(v) => setFormData(prev => ({ ...prev, video_provider: v }))}
@@ -762,17 +763,17 @@ export function AdminTrainingsPanel() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="youtube">YouTube</SelectItem>
-                    <SelectItem value="vimeo">Vimeo</SelectItem>
-                    <SelectItem value="supabase">Storage</SelectItem>
-                    <SelectItem value="mux">Mux</SelectItem>
+                    <SelectItem value="youtube">{tx('YouTube')}</SelectItem>
+                    <SelectItem value="vimeo">{tx('Vimeo')}</SelectItem>
+                    <SelectItem value="supabase">{tx('Storage')}</SelectItem>
+                    <SelectItem value="mux">{tx('Mux')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="thumbnail_url">URL da Thumbnail</Label>
+              <Label htmlFor="thumbnail_url">{tx('URL da Thumbnail')}</Label>
               <Input
                 id="thumbnail_url"
                 value={formData.thumbnail_url}
@@ -789,7 +790,7 @@ export function AdminTrainingsPanel() {
             )}
 
             <div className="space-y-4">
-              <Label>Materiais de Apoio</Label>
+              <Label>{tx('Materiais de Apoio')}</Label>
               <TrainingMaterialsManager
                 trainingId={formData.training_id}
                 materials={formData.materials}
@@ -803,15 +804,15 @@ export function AdminTrainingsPanel() {
                 checked={formData.active}
                 onCheckedChange={(checked) => setFormData(prev => ({ ...prev, active: checked }))}
               />
-              <Label htmlFor="active">Ativo</Label>
+              <Label htmlFor="active">{tx('Ativo')}</Label>
             </div>
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={handleCloseDialog}>
-                Cancelar
+                {tx('Cancelar')}
               </Button>
               <Button type="submit" disabled={createTraining.isPending || updateTraining.isPending}>
-                {editingTraining ? 'Salvar' : 'Criar'}
+                {editingTraining ? tx('Salvar') : tx('Criar')}
               </Button>
             </DialogFooter>
           </form>
@@ -822,15 +823,15 @@ export function AdminTrainingsPanel() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogTitle>{tx('Confirmar exclusão')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este treinamento? Esta ação não pode ser desfeita.
+              {tx('Tem certeza que deseja excluir este treinamento? Esta ação não pode ser desfeita.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx('Cancelar')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground">
-              Excluir
+              {tx('Excluir')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -843,7 +844,7 @@ export function AdminTrainingsPanel() {
             <DialogHeader>
               <DialogTitle>Gerenciar Acesso: {accessTraining.title}</DialogTitle>
               <DialogDescription>
-                Configure quem pode acessar este treinamento
+                {tx('Configure quem pode acessar este treinamento')}
               </DialogDescription>
             </DialogHeader>
             <TrainingAccessManager 

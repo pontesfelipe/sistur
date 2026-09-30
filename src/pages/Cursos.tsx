@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -88,8 +89,8 @@ const Cursos = () => {
 
   return (
     <AppLayout 
-      title="SISTUR EDU" 
-      subtitle="Prescrição de capacitação baseada em diagnóstico"
+      title={tx('SISTUR EDU')} 
+      subtitle={tx('Prescrição de capacitação baseada em diagnóstico')}
     >
       {/* Header Actions */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between mb-6">
@@ -97,7 +98,7 @@ const Cursos = () => {
           <div className="relative max-w-md flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar cursos..."
+              placeholder={tx('Buscar cursos...')}
               className="pl-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -105,30 +106,30 @@ const Cursos = () => {
           </div>
           <Select value={pillarFilter} onValueChange={setPillarFilter}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Pilar" />
+              <SelectValue placeholder={tx('Pilar')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="RA">IRA - Relações Ambientais</SelectItem>
-              <SelectItem value="OE">IOE - Org. Estrutural</SelectItem>
-              <SelectItem value="AO">IAO - Ações Operacionais</SelectItem>
+              <SelectItem value="all">{tx('Todos')}</SelectItem>
+              <SelectItem value="RA">{tx('IRA - Relações Ambientais')}</SelectItem>
+              <SelectItem value="OE">{tx('IOE - Org. Estrutural')}</SelectItem>
+              <SelectItem value="AO">{tx('IAO - Ações Operacionais')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={levelFilter} onValueChange={setLevelFilter}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Nível" />
+              <SelectValue placeholder={tx('Nível')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="BASICO">Básico</SelectItem>
-              <SelectItem value="INTERMEDIARIO">Intermediário</SelectItem>
-              <SelectItem value="AVANCADO">Avançado</SelectItem>
+              <SelectItem value="all">{tx('Todos')}</SelectItem>
+              <SelectItem value="BASICO">{tx('Básico')}</SelectItem>
+              <SelectItem value="INTERMEDIARIO">{tx('Intermediário')}</SelectItem>
+              <SelectItem value="AVANCADO">{tx('Avançado')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
-          Novo Curso
+          {tx('Novo Curso')}
         </Button>
       </div>
 
@@ -167,11 +168,11 @@ const Cursos = () => {
           <TabsList>
             <TabsTrigger value="prescriptions" className="gap-2">
               <Target className="h-4 w-4" />
-              Prescrições Ativas
+              {tx('Prescrições Ativas')}
             </TabsTrigger>
             <TabsTrigger value="catalog" className="gap-2">
               <GraduationCap className="h-4 w-4" />
-              Catálogo Completo
+              {tx('Catálogo Completo')}
             </TabsTrigger>
           </TabsList>
 
@@ -203,19 +204,19 @@ const Cursos = () => {
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <Badge variant={prescription.status === 'CRITICO' ? 'destructive' : 'secondary'}>
                                     {prescription.status === 'CRITICO' ? (
-                                      <><AlertTriangle className="h-3 w-3 mr-1" /> Crítico</>
+                                      <><AlertTriangle className="h-3 w-3 mr-1" /> {tx('Crítico')}</>
                                     ) : (
                                       'Atenção'
                                     )}
                                   </Badge>
                                   {prescription.interpretation && (
                                     <span className={`text-xs ${INTERPRETATION_INFO[prescription.interpretation].color}`}>
-                                      {INTERPRETATION_INFO[prescription.interpretation].label}
+                                      {tx(INTERPRETATION_INFO[prescription.interpretation].label)}
                                     </span>
                                   )}
                                   <span className="text-xs text-muted-foreground flex items-center gap-1">
                                     <Users className="h-3 w-3" />
-                                    {TARGET_AGENT_INFO[prescription.target_agent].label}
+                                    {tx(TARGET_AGENT_INFO[prescription.target_agent].label)}
                                   </span>
                                 </div>
                               </div>
@@ -234,13 +235,13 @@ const Cursos = () => {
                                   <Clock className="h-3 w-3" />
                                   {formatDuration(prescription.course.duration_minutes)}
                                 </span>
-                                <Badge variant="outline">{levelLabels[prescription.course.level]}</Badge>
+                                <Badge variant="outline">{tx(levelLabels[prescription.course.level])}</Badge>
                               </div>
                             )}
                             {prescription.course?.url && (
                               <Button variant="outline" size="sm" className="mt-3" asChild>
                                 <a href={prescription.course.url} target="_blank" rel="noopener noreferrer">
-                                  Acessar curso
+                                  {tx('Acessar curso')}
                                   <ExternalLink className="ml-2 h-3 w-3" />
                                 </a>
                               </Button>
@@ -256,10 +257,10 @@ const Cursos = () => {
               <div className="text-center py-16">
                 <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
                 <h3 className="mt-4 text-lg font-semibold text-foreground">
-                  Nenhuma prescrição ativa
+                  {tx('Nenhuma prescrição ativa')}
                 </h3>
                 <p className="mt-2 text-muted-foreground">
-                  Execute um diagnóstico para gerar prescrições de capacitação.
+                  {tx('Execute um diagnóstico para gerar prescrições de capacitação.')}
                 </p>
               </div>
             )}
@@ -281,7 +282,7 @@ const Cursos = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-2">
-                          <Badge variant="secondary">{levelLabels[course.level]}</Badge>
+                          <Badge variant="secondary">{tx(levelLabels[course.level])}</Badge>
                           {course.duration_minutes && (
                             <span className="flex items-center gap-1 text-xs text-muted-foreground">
                               <Clock className="h-3 w-3" />
@@ -290,14 +291,14 @@ const Cursos = () => {
                           )}
                         </div>
                         <h3 className="font-display font-semibold text-foreground group-hover:text-primary transition-colors">
-                          {course.title}
+                          {tx(course.title)}
                         </h3>
                       </div>
                     </div>
 
                     {course.description && (
                       <p className="mt-3 text-sm text-muted-foreground line-clamp-2">
-                        {course.description}
+                        {tx(course.description)}
                       </p>
                     )}
 
@@ -323,7 +324,7 @@ const Cursos = () => {
                       {course.target_agent && (
                         <Badge variant="outline" className="text-xs">
                           <Users className="h-3 w-3 mr-1" />
-                          {TARGET_AGENT_INFO[course.target_agent].label}
+                          {tx(TARGET_AGENT_INFO[course.target_agent].label)}
                         </Badge>
                       )}
                     </div>
@@ -335,7 +336,7 @@ const Cursos = () => {
                         asChild
                       >
                         <a href={course.url} target="_blank" rel="noopener noreferrer">
-                          Acessar curso
+                          {tx('Acessar curso')}
                           <ExternalLink className="ml-2 h-3 w-3" />
                         </a>
                       </Button>
@@ -347,7 +348,7 @@ const Cursos = () => {
               <div className="text-center py-16">
                 <GraduationCap className="mx-auto h-12 w-12 text-muted-foreground/50" />
                 <h3 className="mt-4 text-lg font-semibold text-foreground">
-                  Nenhum curso encontrado
+                  {tx('Nenhum curso encontrado')}
                 </h3>
                 <p className="mt-2 text-muted-foreground">
                   {searchQuery || pillarFilter !== 'all' || levelFilter !== 'all' 
@@ -356,7 +357,7 @@ const Cursos = () => {
                 </p>
                 <Button className="mt-4">
                   <Plus className="mr-2 h-4 w-4" />
-                  Novo Curso
+                  {tx('Novo Curso')}
                 </Button>
               </div>
             )}

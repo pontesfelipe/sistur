@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -31,16 +32,16 @@ export default function EduTrilhasAdaptativas() {
   const { data: paths, isLoading } = useAdaptivePaths();
 
   return (
-    <AppLayout subNav={eduAprenderNav} title="Trilhas Adaptativas">
+    <AppLayout subNav={eduAprenderNav} title={tx('Trilhas Adaptativas')}>
       <div className="container mx-auto p-4 sm:p-6 space-y-6">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
             <Sparkles className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Trilhas Adaptativas</h1>
+            <h1 className="text-2xl font-bold">{tx('Trilhas Adaptativas')}</h1>
             <p className="text-sm text-muted-foreground">
-              Percursos de aprendizagem que evoluem conforme seu desempenho e diagnóstico.
+              {tx('Percursos de aprendizagem que evoluem conforme seu desempenho e diagnóstico.')}
             </p>
           </div>
         </div>
@@ -53,7 +54,7 @@ export default function EduTrilhasAdaptativas() {
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
               <RouteIcon className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              Nenhuma trilha adaptativa publicada ainda.
+              {tx('Nenhuma trilha adaptativa publicada ainda.')}
             </CardContent>
           </Card>
         ) : (
@@ -63,7 +64,7 @@ export default function EduTrilhasAdaptativas() {
                 <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="text-base line-clamp-2">{p.title}</CardTitle>
+                      <CardTitle className="text-base line-clamp-2">{tx(p.title)}</CardTitle>
                       <PillarBadge pillar={p.pillar} />
                     </div>
                     {p.level && (
@@ -71,11 +72,11 @@ export default function EduTrilhasAdaptativas() {
                     )}
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="line-clamp-3">{p.description}</CardDescription>
+                    <CardDescription className="line-clamp-3">{tx(p.description)}</CardDescription>
                     {p.is_adaptive && (
                       <div className="mt-3 flex items-center gap-1.5 text-xs text-primary">
                         <Sparkles className="w-3.5 h-3.5" />
-                        Adaptativa
+                        {tx('Adaptativa')}
                       </div>
                     )}
                   </CardContent>
@@ -104,7 +105,7 @@ export function EduTrilhaAdaptativaDetalhe() {
 
   if (isLoading) {
     return (
-      <AppLayout subNav={eduAprenderNav} title="Trilhas Adaptativas">
+      <AppLayout subNav={eduAprenderNav} title={tx('Trilhas Adaptativas')}>
         <div className="container mx-auto p-6 space-y-4">
           <Skeleton className="h-8 w-2/3" />
           <Skeleton className="h-32 w-full" />
@@ -115,8 +116,8 @@ export function EduTrilhaAdaptativaDetalhe() {
 
   if (!data?.path) {
     return (
-      <AppLayout subNav={eduAprenderNav} title="Trilhas Adaptativas">
-        <div className="container mx-auto p-6 text-center text-muted-foreground">Trilha não encontrada.</div>
+      <AppLayout subNav={eduAprenderNav} title={tx('Trilhas Adaptativas')}>
+        <div className="container mx-auto p-6 text-center text-muted-foreground">{tx('Trilha não encontrada.')}</div>
       </AppLayout>
     );
   }
@@ -131,18 +132,18 @@ export function EduTrilhaAdaptativaDetalhe() {
   };
 
   return (
-    <AppLayout subNav={eduAprenderNav} title="Trilhas Adaptativas">
+    <AppLayout subNav={eduAprenderNav} title={tx('Trilhas Adaptativas')}>
       <div className="container mx-auto p-4 sm:p-6 space-y-6 max-w-4xl">
         <Button variant="ghost" size="sm" asChild>
-          <Link to="/edu/trilhas-adaptativas"><ChevronLeft className="w-4 h-4 mr-1" />Voltar</Link>
+          <Link to="/edu/trilhas-adaptativas"><ChevronLeft className="w-4 h-4 mr-1" />{tx('Voltar')}</Link>
         </Button>
 
         <Card>
           <CardHeader>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <CardTitle className="text-xl">{path.title}</CardTitle>
-                <CardDescription className="mt-2">{path.description}</CardDescription>
+                <CardTitle className="text-xl">{tx(path.title)}</CardTitle>
+                <CardDescription className="mt-2">{tx(path.description)}</CardDescription>
               </div>
               <PillarBadge pillar={path.pillar} />
             </div>
@@ -151,7 +152,7 @@ export function EduTrilhaAdaptativaDetalhe() {
             {enrollment ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Progresso</span>
+                  <span className="text-muted-foreground">{tx('Progresso')}</span>
                   <span className="font-medium">{completedCount} / {totalSteps} ({pct}%)</span>
                 </div>
                 <Progress value={pct} />
@@ -162,7 +163,7 @@ export function EduTrilhaAdaptativaDetalhe() {
                 disabled={enroll.isPending}
                 className="w-full sm:w-auto"
               >
-                Iniciar trilha
+                {tx('Iniciar trilha')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             )}
@@ -170,10 +171,10 @@ export function EduTrilhaAdaptativaDetalhe() {
         </Card>
 
         <div className="space-y-3">
-          <h2 className="text-lg font-semibold">Etapas</h2>
+          <h2 className="text-lg font-semibold">{tx('Etapas')}</h2>
           {steps.length === 0 && (
             <Card><CardContent className="py-8 text-center text-muted-foreground">
-              Nenhuma etapa cadastrada ainda.
+              {tx('Nenhuma etapa cadastrada ainda.')}
             </CardContent></Card>
           )}
           {steps.map((step, idx) => {
@@ -195,7 +196,7 @@ export function EduTrilhaAdaptativaDetalhe() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium">{idx + 1}. {step.title}</span>
-                      {step.is_optional && <Badge variant="outline" className="text-xs">Opcional</Badge>}
+                      {step.is_optional && <Badge variant="outline" className="text-xs">{tx('Opcional')}</Badge>}
                       {step.required_status && step.required_status !== 'any' && (
                         <Badge variant="outline" className="text-xs capitalize">
                           Trigger: {step.required_status}
@@ -203,12 +204,12 @@ export function EduTrilhaAdaptativaDetalhe() {
                       )}
                     </div>
                     {step.description && (
-                      <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{tx(step.description)}</p>
                     )}
                     <div className="flex gap-2 mt-3">
                       {step.training_id && (
                         <Button asChild size="sm" variant="outline" disabled={!unlocked}>
-                          <Link to={`/edu/treinamentos/${step.training_id}`}>Abrir curso</Link>
+                          <Link to={`/edu/treinamentos/${step.training_id}`}>{tx('Abrir curso')}</Link>
                         </Button>
                       )}
                       {enrollment && unlocked && !done && (
@@ -222,7 +223,7 @@ export function EduTrilhaAdaptativaDetalhe() {
                           })}
                           disabled={updateStep.isPending}
                         >
-                          Marcar como concluída
+                          {tx('Marcar como concluída')}
                         </Button>
                       )}
                     </div>

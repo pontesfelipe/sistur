@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { ResumeGameDialog } from '@/components/games/ResumeGameDialog';
 import { useNavigate } from 'react-router-dom';
@@ -109,7 +110,7 @@ export default function Game() {
       game.startGame();
       setActiveSessionId(sessionId);
       setPhase('playing');
-      toast.success('Aventura carregada! 🎮');
+      toast.success(tx('Aventura carregada! 🎮'));
     }
   }, [sessions, game]);
 
@@ -145,7 +146,7 @@ export default function Game() {
   const handleManualSave = useCallback(async () => {
     if (!activeSessionId) return;
     await sessions.saveSession(activeSessionId, game.toLegacyState() as any);
-    toast.success('Jogo salvo! 💾');
+    toast.success(tx('Jogo salvo! 💾'));
   }, [activeSessionId, sessions, game]);
 
   const handleBackToPicker = useCallback(async () => {
@@ -161,11 +162,11 @@ export default function Game() {
   const handlePlayCard = useCallback((index: number) => {
     const card = game.state.deck.hand[index];
     if (!card) {
-      toast.error('Carta inválida.');
+      toast.error(tx('Carta inválida.'));
       return;
     }
     if (card.category !== 'RA' && card.category !== 'OE' && card.category !== 'AO') {
-      toast.error('Categoria de carta desconhecida.');
+      toast.error(tx('Categoria de carta desconhecida.'));
       return;
     }
     const category = card.category;
@@ -177,14 +178,14 @@ export default function Game() {
     setTimeout(() => setScreenFlash(false), 400);
     setTimeout(() => setPlayEffect(null), 600);
     play('flip');
-    toast.success('Carta jogada! 🃏');
+    toast.success(tx('Carta jogada! 🃏'));
   }, [game, play]);
 
   const handleDiscardCard = useCallback((index: number) => {
     game.discardCard(index);
     setSelectedCardIndex(null);
     play('coin');
-    toast.info('Carta descartada (+1💰)');
+    toast.info(tx('Carta descartada (+1💰)'));
   }, [game, play]);
 
   const handleResolveEvent = useCallback((index: number) => {
@@ -222,7 +223,7 @@ export default function Game() {
     game.endTurn();
     setSelectedCardIndex(null);
     play('step');
-    toast('⚔️ Novo turno — ameaças surgem!', { icon: '🎴' });
+    toast(tx('⚔️ Novo turno — ameaças surgem!'), { icon: '🎴' });
   }, [game, play]);
 
   // Phase: Session picker
@@ -277,7 +278,7 @@ export default function Game() {
       <div className="relative z-10 flex items-center justify-between gap-2 px-2 sm:px-3 py-2 bg-slate-900/80 backdrop-blur-md border-b border-amber-500/10 flex-shrink-0 shadow-[0_1px_0_0_rgba(251,191,36,0.05)]">
         <button
           onClick={() => navigate('/')}
-          aria-label="Voltar"
+          aria-label={tx('Voltar')}
           className="flex items-center justify-center text-slate-400 hover:text-amber-300 min-h-[40px] min-w-[40px] rounded-lg hover:bg-slate-800/60 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -285,8 +286,8 @@ export default function Game() {
         <div className="flex items-center gap-1.5 min-w-0">
           <Swords className="h-4 w-4 text-amber-400 flex-shrink-0 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]" />
           <h1 className="text-[11px] sm:text-base font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-400 truncate">
-            <span className="sm:hidden">GUARDIÃO</span>
-            <span className="hidden sm:inline">GUARDIÃO DO TERRITÓRIO</span>
+            <span className="sm:hidden">{tx('GUARDIÃO')}</span>
+            <span className="hidden sm:inline">{tx('GUARDIÃO DO TERRITÓRIO')}</span>
           </h1>
         </div>
         <div className="flex items-center gap-0.5 flex-shrink-0">
@@ -298,15 +299,15 @@ export default function Game() {
           </span>
           <button
             onClick={handleManualSave}
-            aria-label="Salvar"
+            aria-label={tx('Salvar')}
             className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-amber-300 rounded-lg hover:bg-slate-800/60 transition-colors"
-            title="Salvar"
+            title={tx('Salvar')}
           >
             <Save className="h-4 w-4" />
           </button>
           <button
             onClick={toggleMute}
-            aria-label={muted ? 'Ativar som' : 'Desativar som'}
+            aria-label={muted ? tx('Ativar som') : tx('Desativar som')}
             aria-pressed={muted}
             className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-amber-300 rounded-lg hover:bg-slate-800/60 transition-colors"
           >
@@ -314,7 +315,7 @@ export default function Game() {
           </button>
           <button
             onClick={() => setShowTutorial(true)}
-            aria-label="Tutorial"
+            aria-label={tx('Tutorial')}
             className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-amber-300 rounded-lg hover:bg-slate-800/60 transition-colors"
           >
             <HelpCircle className="h-4 w-4" />
@@ -421,14 +422,14 @@ export default function Game() {
               className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg hover:bg-slate-800 transition-colors min-h-[44px] justify-center"
             >
               <ScrollText className="h-4 w-4 text-slate-400" />
-              <span className="text-[9px] text-slate-400">Log</span>
+              <span className="text-[9px] text-slate-400">{tx('Log')}</span>
             </button>
             <button
               onClick={() => setMobilePanel(mobilePanel === 'edu' ? null : 'edu')}
               className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg hover:bg-slate-800 transition-colors min-h-[44px] justify-center"
             >
               <GraduationCap className="h-4 w-4 text-slate-400" />
-              <span className="text-[9px] text-slate-400">Relatório</span>
+              <span className="text-[9px] text-slate-400">{tx('Relatório')}</span>
             </button>
           </div>
         </div>
@@ -438,7 +439,7 @@ export default function Game() {
       <MobileGameDrawer
         open={mobilePanel === 'log'}
         onClose={() => setMobilePanel(null)}
-        title="📜 Log de Eventos"
+        title={tx('📜 Log de Eventos')}
       >
         <EventLog log={game.state.eventLog} />
       </MobileGameDrawer>
@@ -446,7 +447,7 @@ export default function Game() {
       <MobileGameDrawer
         open={mobilePanel === 'edu'}
         onClose={() => setMobilePanel(null)}
-        title="📊 Relatório Educacional"
+        title={tx('📊 Relatório Educacional')}
       >
         <EduReport
           metrics={game.state.eduMetrics}
@@ -476,18 +477,18 @@ export default function Game() {
           >
             <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background: 'radial-gradient(ellipse at top, rgba(239,68,68,0.15), transparent 60%)' }} />
             <motion.div animate={{ rotate: [0, -8, 8, -4, 0] }} transition={{ duration: 0.6 }} className="relative text-6xl">💀</motion.div>
-            <h2 className="relative text-2xl font-black text-red-400">Fim de Jogo!</h2>
+            <h2 className="relative text-2xl font-black text-red-400">{tx('Fim de Jogo!')}</h2>
             <p className="relative text-sm text-slate-400">{game.state.gameOverReason || 'O destino turístico colapsou.'}</p>
             <div className="relative bg-slate-800/50 rounded-xl p-3 space-y-1 text-xs text-left text-slate-300 border border-slate-700/40">
-              <p><strong>Turnos:</strong> {game.state.turn}</p>
-              <p><strong>Pontuação:</strong> {game.state.totalScore}/{game.state.victoryTarget}</p>
-              <p><strong>Equilíbrio:</strong> {Math.round(equilibrium)}%</p>
-              <p><strong>Cartas jogadas:</strong> {game.state.totalCardsPlayed}</p>
-              <p><strong>Ameaças enfrentadas:</strong> {game.state.activeThreats.length}</p>
+              <p><strong>{tx('Turnos:')}</strong> {game.state.turn}</p>
+              <p><strong>{tx('Pontuação:')}</strong> {game.state.totalScore}/{game.state.victoryTarget}</p>
+              <p><strong>{tx('Equilíbrio:')}</strong> {Math.round(equilibrium)}%</p>
+              <p><strong>{tx('Cartas jogadas:')}</strong> {game.state.totalCardsPlayed}</p>
+              <p><strong>{tx('Ameaças enfrentadas:')}</strong> {game.state.activeThreats.length}</p>
             </div>
             <div className="relative flex gap-3">
-              <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors">📋 Sessões</button>
-              <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:opacity-90 transition-opacity">🔄 Nova Batalha</button>
+              <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors">{tx('📋 Sessões')}</button>
+              <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:opacity-90 transition-opacity">{tx('🔄 Nova Batalha')}</button>
             </div>
           </motion.div>
         </motion.div>
@@ -508,18 +509,18 @@ export default function Game() {
           >
             <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background: 'radial-gradient(ellipse at top, rgba(251,191,36,0.25), transparent 60%)' }} />
             <motion.div animate={{ y: [0, -8, 0], scale: [1, 1.08, 1] }} transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }} className="relative text-7xl drop-shadow-[0_0_18px_rgba(251,191,36,0.6)]">🏆</motion.div>
-            <h2 className="relative text-2xl font-black text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]">Você Venceu!</h2>
+            <h2 className="relative text-2xl font-black text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]">{tx('Você Venceu!')}</h2>
             <p className="relative text-sm text-amber-400">{game.state.victoryReason || 'Você equilibrou o destino!'}</p>
             <div className="relative bg-black/30 rounded-xl p-3 space-y-2 text-xs text-left text-amber-200 border border-amber-500/20">
-              <p><strong>Pontuação final:</strong> {game.state.totalScore}</p>
-              <p><strong>Turnos:</strong> {game.state.turn}</p>
-              <p><strong>Equilíbrio:</strong> {Math.round(equilibrium)}%</p>
-              <p><strong>Cartas jogadas:</strong> {game.state.totalCardsPlayed}</p>
-              <p><strong>Perfil:</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
+              <p><strong>{tx('Pontuação final:')}</strong> {game.state.totalScore}</p>
+              <p><strong>{tx('Turnos:')}</strong> {game.state.turn}</p>
+              <p><strong>{tx('Equilíbrio:')}</strong> {Math.round(equilibrium)}%</p>
+              <p><strong>{tx('Cartas jogadas:')}</strong> {game.state.totalCardsPlayed}</p>
+              <p><strong>{tx('Perfil:')}</strong> {PROFILE_INFO[dp.preset].emoji} {PROFILE_INFO[dp.preset].name}</p>
             </div>
             <div className="relative flex gap-3">
-              <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-amber-600 text-sm font-bold text-amber-300 hover:bg-amber-900/50 transition-colors">📋 Sessões</button>
-              <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors">🌟 Nova Batalha</button>
+              <button onClick={handleBackToPicker} className="flex-1 py-3 rounded-xl border border-amber-600 text-sm font-bold text-amber-300 hover:bg-amber-900/50 transition-colors">{tx('📋 Sessões')}</button>
+              <button onClick={handleNewGame} className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors">{tx('🌟 Nova Batalha')}</button>
             </div>
           </motion.div>
         </motion.div>

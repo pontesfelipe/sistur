@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 /**
  * SISTUR EDU - Certificate PDF Component
  * Generates a printable certificate with QR code for verification
@@ -318,11 +319,11 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
       <div className="flex gap-3 justify-center print:hidden">
         <Button onClick={handlePrint} className="gap-2">
           <Printer className="h-4 w-4" />
-          Imprimir Certificado
+          {tx('Imprimir Certificado')}
         </Button>
         <Button variant="outline" onClick={handlePrint} className="gap-2">
           <Download className="h-4 w-4" />
-          Salvar como PDF
+          {tx('Salvar como PDF')}
         </Button>
       </div>
 
@@ -387,7 +388,7 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
                     fontSize: '24px',
                     color: '#1a365d',
                   }}>
-                    SISTUR EDU
+                    {tx('SISTUR EDU')}
                   </span>
                 </div>
                 <div style={{ fontSize: '11px', color: '#64748b', textAlign: 'right' }}>
@@ -416,11 +417,11 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
                   letterSpacing: '4px',
                   textTransform: 'uppercase',
                 }}>
-                  CERTIFICADO
+                  {tx('CERTIFICADO')}
                 </h1>
                 
                 <p style={{ fontSize: '12px', color: '#64748b' }}>
-                  Certificamos que
+                  {tx('Certificamos que')}
                 </p>
                 
                 <h2 style={{
@@ -450,7 +451,7 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
                 {/* Date */}
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px' }}>
-                    Emitido em
+                    {tx('Emitido em')}
                   </div>
                   <div style={{ fontSize: '14px', fontWeight: 500, color: '#1a365d' }}>
                     {formattedDate}
@@ -461,10 +462,10 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ width: '160px', borderTop: '1px solid #334155', marginBottom: '4px' }} />
                   <div style={{ fontSize: '12px', fontWeight: 600, color: '#1a365d' }}>
-                    Coordenação SISTUR
+                    {tx('Coordenação SISTUR')}
                   </div>
                   <div style={{ fontSize: '10px', color: '#64748b' }}>
-                    Sistema de Turismo Sustentável
+                    {tx('Sistema de Turismo Sustentável')}
                   </div>
                 </div>
 
@@ -485,7 +486,7 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
                     />
                   </div>
                   <div style={{ fontSize: '9px', color: '#64748b', marginTop: '4px' }}>
-                    Escaneie para verificar
+                    {tx('Escaneie para verificar')}
                   </div>
                 </div>
               </div>
@@ -498,7 +499,7 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
       <div className="text-center text-sm text-muted-foreground print:hidden">
         <div className="flex items-center justify-center gap-2">
           <CheckCircle className="h-4 w-4 text-green-500" />
-          <span>Certificado verificável em: <code className="bg-muted px-2 py-0.5 rounded">{verifyUrl}</code></span>
+          <span>{tx('Certificado verificável em:')} <code className="bg-muted px-2 py-0.5 rounded">{verifyUrl}</code></span>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 /**
  * SISEDU - Importação CSV de Alunos para Turma
  */
@@ -92,7 +93,7 @@ export function ImportStudentsDialog({ classroomId, open, onClose, onImported }:
   const handleImport = async () => {
     const validStudents = students.filter(s => s.valid);
     if (validStudents.length === 0) {
-      toast.error('Nenhum aluno válido para importar');
+      toast.error(tx('Nenhum aluno válido para importar'));
       return;
     }
 
@@ -165,10 +166,10 @@ export function ImportStudentsDialog({ classroomId, open, onClose, onImported }:
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Importar Alunos via CSV
+            {tx('Importar Alunos via CSV')}
           </DialogTitle>
           <DialogDescription>
-            Envie um arquivo CSV com e-mails dos alunos para adicioná-los à turma em lote.
+            {tx('Envie um arquivo CSV com e-mails dos alunos para adicioná-los à turma em lote.')}
           </DialogDescription>
         </DialogHeader>
 
@@ -177,11 +178,11 @@ export function ImportStudentsDialog({ classroomId, open, onClose, onImported }:
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => fileRef.current?.click()} className="flex-1">
               <FileText className="h-4 w-4 mr-2" />
-              {students.length > 0 ? 'Trocar arquivo' : 'Selecionar CSV'}
+              {students.length > 0 ? tx('Trocar arquivo') : tx('Selecionar CSV')}
             </Button>
             <Button variant="ghost" size="sm" onClick={downloadTemplate}>
               <Download className="h-4 w-4 mr-1" />
-              Modelo
+              {tx('Modelo')}
             </Button>
           </div>
           <input
@@ -206,9 +207,9 @@ export function ImportStudentsDialog({ classroomId, open, onClose, onImported }:
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-xs">E-mail</TableHead>
-                      <TableHead className="text-xs">Nome</TableHead>
-                      <TableHead className="text-xs w-16">Status</TableHead>
+                      <TableHead className="text-xs">{tx('E-mail')}</TableHead>
+                      <TableHead className="text-xs">{tx('Nome')}</TableHead>
+                      <TableHead className="text-xs w-16">{tx('Status')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -240,7 +241,7 @@ export function ImportStudentsDialog({ classroomId, open, onClose, onImported }:
           {results && (
             <Card className="bg-muted/50">
               <CardContent className="p-3 text-sm">
-                <p className="font-medium">Resultado da Importação</p>
+                <p className="font-medium">{tx('Resultado da Importação')}</p>
                 <p className="text-green-600">{results.success} importados com sucesso</p>
                 {results.errors > 0 && (
                   <p className="text-destructive">{results.errors} erros</p>
@@ -252,7 +253,7 @@ export function ImportStudentsDialog({ classroomId, open, onClose, onImported }:
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Fechar
+            {tx('Fechar')}
           </Button>
           <Button
             onClick={handleImport}

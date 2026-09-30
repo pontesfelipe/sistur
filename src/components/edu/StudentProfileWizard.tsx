@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -173,7 +174,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
               <Sparkles className="h-10 w-10 text-primary" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">Personalize sua Jornada de Aprendizado</h2>
+              <h2 className="text-2xl font-bold">{tx('Personalize sua Jornada de Aprendizado')}</h2>
               <p className="text-muted-foreground mt-2 max-w-md mx-auto">
                 Responda algumas perguntas rápidas para que possamos recomendar 
                 cursos e trilhas que se encaixem perfeitamente no seu perfil.
@@ -182,11 +183,11 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
             <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span>~2 minutos</span>
+                <span>{tx('~2 minutos')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Target className="h-4 w-4" />
-                <span>Recomendações personalizadas</span>
+                <span>{tx('Recomendações personalizadas')}</span>
               </div>
             </div>
           </div>
@@ -213,7 +214,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
                       htmlFor={`area-${area.value}`}
                       className="flex items-center justify-center rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary cursor-pointer transition-colors"
                     >
-                      {area.label}
+                      {tx(area.label)}
                     </Label>
                   </div>
                 ))}
@@ -238,8 +239,8 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
                       htmlFor={`level-${level.value}`}
                       className="flex flex-col items-start rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary cursor-pointer transition-colors"
                     >
-                      <span className="font-medium">{level.label}</span>
-                      <span className="text-sm text-muted-foreground">{level.description}</span>
+                      <span className="font-medium">{tx(level.label)}</span>
+                      <span className="text-sm text-muted-foreground">{tx(level.description)}</span>
                     </Label>
                   </div>
                 ))}
@@ -252,7 +253,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
               </Label>
               <Input
                 id="job_role"
-                placeholder="Ex: Analista de Turismo, Secretário de Cultura..."
+                placeholder={tx('Ex: Analista de Turismo, Secretário de Cultura...')}
                 value={formData.job_role || ''}
                 onChange={(e) => setFormData({ ...formData, job_role: e.target.value })}
                 className="mt-2"
@@ -266,10 +267,10 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
           <div className="space-y-6">
             <div>
               <Label className="text-base font-medium">
-                Quais pilares do turismo sustentável te interessam?
+                {tx('Quais pilares do turismo sustentável te interessam?')}
               </Label>
               <p className="text-sm text-muted-foreground mt-1">
-                Selecione um ou mais pilares
+                {tx('Selecione um ou mais pilares')}
               </p>
               <div className="grid gap-3 mt-3">
                 {PILLARS.map((pillar) => (
@@ -284,8 +285,8 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
                   >
                     <div className={`w-4 h-4 rounded-full ${pillar.color}`} />
                     <div className="flex-1">
-                      <span className="font-medium">{pillar.label}</span>
-                      <p className="text-sm text-muted-foreground">{pillar.description}</p>
+                      <span className="font-medium">{tx(pillar.label)}</span>
+                      <p className="text-sm text-muted-foreground">{tx(pillar.description)}</p>
                     </div>
                     <Checkbox
                       checked={formData.interest_pillars?.includes(pillar.value) || false}
@@ -298,9 +299,9 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
 
             {(formData.interest_pillars?.length || 0) > 0 && (
               <div>
-                <Label className="text-base font-medium">Temas específicos de interesse</Label>
+                <Label className="text-base font-medium">{tx('Temas específicos de interesse')}</Label>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Selecione os temas que mais te atraem
+                  {tx('Selecione os temas que mais te atraem')}
                 </p>
                 <div className="space-y-4 mt-3">
                   {formData.interest_pillars?.map((pillar) => (
@@ -316,7 +317,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
                             className="cursor-pointer"
                             onClick={() => handleThemeToggle(theme.value)}
                           >
-                            {theme.label}
+                            {tx(theme.label)}
                           </Badge>
                         ))}
                       </div>
@@ -332,7 +333,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
         return (
           <div className="space-y-6">
             <div>
-              <Label className="text-base font-medium">Formato de aprendizado preferido</Label>
+              <Label className="text-base font-medium">{tx('Formato de aprendizado preferido')}</Label>
               <RadioGroup
                 value={formData.preferred_format || 'mixed'}
                 onValueChange={(value) => setFormData({ ...formData, preferred_format: value })}
@@ -350,7 +351,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
                       className="flex items-center justify-center gap-2 rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary cursor-pointer transition-colors"
                     >
                       <span className="text-xl">{format.icon}</span>
-                      <span>{format.label}</span>
+                      <span>{tx(format.label)}</span>
                     </Label>
                   </div>
                 ))}
@@ -359,7 +360,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
 
             <div>
               <Label className="text-base font-medium">
-                Quantas horas por semana você pode dedicar aos estudos?
+                {tx('Quantas horas por semana você pode dedicar aos estudos?')}
               </Label>
               <div className="flex items-center gap-4 mt-3">
                 <Input
@@ -375,14 +376,14 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
                   }
                   className="w-24"
                 />
-                <span className="text-muted-foreground">horas por semana</span>
+                <span className="text-muted-foreground">{tx('horas por semana')}</span>
               </div>
             </div>
 
             <div>
               <Label className="text-base font-medium">Quais são seus objetivos de aprendizado?</Label>
               <p className="text-sm text-muted-foreground mt-1">
-                Selecione todos que se aplicam
+                {tx('Selecione todos que se aplicam')}
               </p>
               <div className="grid grid-cols-2 gap-3 mt-3">
                 {LEARNING_GOALS.map((goal) => (
@@ -399,7 +400,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
                       checked={formData.learning_goals?.includes(goal.value) || false}
                       className="pointer-events-none"
                     />
-                    <span className="text-sm">{goal.label}</span>
+                    <span className="text-sm">{tx(goal.label)}</span>
                   </div>
                 ))}
               </div>
@@ -414,7 +415,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
               <CheckCircle2 className="h-10 w-10 text-green-600" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">Perfil Criado com Sucesso!</h2>
+              <h2 className="text-2xl font-bold">{tx('Perfil Criado com Sucesso!')}</h2>
               <p className="text-muted-foreground mt-2 max-w-md mx-auto">
                 Geramos recomendações personalizadas com base no seu perfil. 
                 Explore os cursos e trilhas sugeridos para você!
@@ -422,7 +423,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
             </div>
             <Button onClick={() => navigate('/edu')} className="mt-4">
               <Sparkles className="mr-2 h-4 w-4" />
-              Ver Minhas Recomendações
+              {tx('Ver Minhas Recomendações')}
             </Button>
           </div>
         );
@@ -468,12 +469,12 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
           </div>
           {onCancel && currentStep === 0 && (
             <Button variant="ghost" size="sm" onClick={onCancel}>
-              Pular
+              {tx('Pular')}
             </Button>
           )}
         </div>
         <Progress value={progress} className="h-1" />
-        <CardTitle className="mt-4">{STEPS[currentStep].title}</CardTitle>
+        <CardTitle className="mt-4">{tx(STEPS[currentStep].title)}</CardTitle>
         <CardDescription>
           {currentStep === 0 && 'Vamos personalizar sua experiência de aprendizado'}
           {currentStep === 1 && 'Conte-nos sobre sua atuação profissional'}
@@ -493,7 +494,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
               disabled={currentStep === 0}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
-              Voltar
+              {tx('Voltar')}
             </Button>
 
             {currentStep === STEPS.length - 2 ? (
@@ -504,18 +505,18 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Salvando...
+                    {tx('Salvando...')}
                   </>
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Gerar Recomendações
+                    {tx('Gerar Recomendações')}
                   </>
                 )}
               </Button>
             ) : (
               <Button onClick={handleNext} disabled={!canProceed()}>
-                Próximo
+                {tx('Próximo')}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             )}

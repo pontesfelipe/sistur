@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useRef, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -107,13 +108,13 @@ export default function Forum() {
 
   return (
     <AppLayout
-      title="Social Turismo"
-      subtitle="Compartilhe conhecimento, tire dúvidas e conecte-se com a comunidade"
+      title={tx('Social Turismo')}
+      subtitle={tx('Compartilhe conhecimento, tire dúvidas e conecte-se com a comunidade')}
       actions={
         !isDetailView ? (
-          <Button onClick={() => setShowCreateDialog(true)} className="gap-2" aria-label="Novo post">
+          <Button onClick={() => setShowCreateDialog(true)} className="gap-2" aria-label={tx('Novo post')}>
             <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Novo Post</span>
+            <span className="hidden sm:inline">{tx('Novo Post')}</span>
           </Button>
         ) : undefined
       }
@@ -135,7 +136,7 @@ export default function Forum() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar posts..."
+                  placeholder={tx('Buscar posts...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -143,12 +144,12 @@ export default function Forum() {
               </div>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Categoria" />
+                  <SelectValue placeholder={tx('Categoria')} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
                     <SelectItem key={cat.value} value={cat.value}>
-                      {cat.label}
+                      {tx(cat.label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -158,15 +159,15 @@ export default function Forum() {
             <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'org' | 'public')}>
               <TabsList className="w-full sm:w-auto">
                 <TabsTrigger value="all" className="flex-1 sm:flex-none gap-1">
-                  Todos
+                  {tx('Todos')}
                 </TabsTrigger>
                 <TabsTrigger value="org" className="flex-1 sm:flex-none gap-1">
                   <Users className="h-4 w-4" />
-                  Organização
+                  {tx('Organização')}
                 </TabsTrigger>
                 <TabsTrigger value="public" className="flex-1 sm:flex-none gap-1">
                   <Globe className="h-4 w-4" />
-                  Público
+                  {tx('Público')}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -182,13 +183,13 @@ export default function Forum() {
           ) : filteredPosts?.length === 0 ? (
             <div className="text-center py-12">
               <MessageSquarePlus className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="font-semibold text-lg mb-2">Nenhum post encontrado</h3>
+              <h3 className="font-semibold text-lg mb-2">{tx('Nenhum post encontrado')}</h3>
               <p className="text-muted-foreground mb-4">
-                {searchQuery ? 'Tente usar outros termos de busca' : 'Seja o primeiro a criar um post!'}
+                {searchQuery ? tx('Tente usar outros termos de busca') : tx('Seja o primeiro a criar um post!')}
               </p>
               <Button onClick={() => setShowCreateDialog(true)}>
                 <Plus className="h-4 w-4 mr-2" />
-                Criar Post
+                {tx('Criar Post')}
               </Button>
             </div>
           ) : (
@@ -211,7 +212,7 @@ export default function Forum() {
                     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                   ) : (
                     <Button variant="ghost" size="sm" onClick={() => fetchNextPage()}>
-                      Carregar mais
+                      {tx('Carregar mais')}
                     </Button>
                   )}
                 </div>

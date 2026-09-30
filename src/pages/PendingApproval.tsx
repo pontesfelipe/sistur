@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -59,22 +60,22 @@ export default function PendingApproval() {
           <div className="mx-auto h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mb-4">
             <Clock className="h-8 w-8 text-amber-600" />
           </div>
-          <CardTitle className="text-2xl font-display">Aguardando Aprovação</CardTitle>
+          <CardTitle className="text-2xl font-display">{tx('Aguardando Aprovação')}</CardTitle>
           <CardDescription className="text-base">
-            Sua solicitação de acesso foi recebida e está sendo analisada.
+            {tx('Sua solicitação de acesso foi recebida e está sendo analisada.')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="bg-muted/50 rounded-lg p-4 space-y-2">
             <p className="text-sm text-muted-foreground">
-              <strong>Nome:</strong> {profile?.full_name || 'Não informado'}
+              <strong>{tx('Nome:')}</strong> {profile?.full_name || 'Não informado'}
             </p>
             <p className="text-sm text-muted-foreground">
-              <strong>Email:</strong> {user?.email}
+              <strong>{tx('Email:')}</strong> {user?.email}
             </p>
             {profile?.system_access && (
               <p className="text-sm text-muted-foreground">
-                <strong>Acesso Solicitado:</strong> SISTUR {profile.system_access}
+                <strong>{tx('Acesso Solicitado:')}</strong> SISTUR {profile.system_access}
               </p>
             )}
           </div>
@@ -94,7 +95,7 @@ export default function PendingApproval() {
               className="w-full"
             >
               <RefreshCw className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-              {refreshing ? 'Verificando...' : 'Verificar Status'}
+              {refreshing ? tx('Verificando...') : tx('Verificar Status')}
             </Button>
             <Button
               variant="ghost"
@@ -102,7 +103,7 @@ export default function PendingApproval() {
               className="w-full"
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Sair
+              {tx('Sair')}
             </Button>
           </div>
         </CardContent>

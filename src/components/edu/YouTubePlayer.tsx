@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -311,7 +312,7 @@ export function YouTubePlayer({
     return (
       <Card className="overflow-hidden">
         <div className="aspect-video bg-black flex items-center justify-center">
-          <p className="text-white text-sm">URL de vídeo inválida</p>
+          <p className="text-white text-sm">{tx('URL de vídeo inválida')}</p>
         </div>
       </Card>
     );

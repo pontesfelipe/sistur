@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { eduTurmasNav } from '@/components/layout/eduSubNav';
@@ -140,19 +141,19 @@ export default function EduCalendario() {
       evento: { v: 'outline', label: 'Evento' },
     };
     const m = map[t] ?? { v: 'outline', label: 'Evento' };
-    return <Badge variant={m.v}>{m.label}</Badge>;
+    return <Badge variant={m.v}>{tx(m.label)}</Badge>;
   };
 
   return (
     <AppLayout subNav={eduTurmasNav}
-      title="Calendário Acadêmico"
-      subtitle="Lives, prazos e exames dos próximos 90 dias"
+      title={tx('Calendário Acadêmico')}
+      subtitle={tx('Lives, prazos e exames dos próximos 90 dias')}
       actions={
         <div className="flex gap-2">
           <CreateClassroomEventDialog />
           <Button variant="outline" onClick={handleExport} disabled={events.length === 0}>
             <Download className="h-4 w-4 mr-2" />
-            Exportar .ics
+            {tx('Exportar .ics')}
           </Button>
         </div>
       }
@@ -161,13 +162,13 @@ export default function EduCalendario() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Próximos eventos</CardTitle>
+            <CardTitle className="text-base">{tx('Próximos eventos')}</CardTitle>
           </CardHeader>
           <CardContent>
             {Object.keys(grouped).length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <Calendar className="h-12 w-12 mx-auto mb-3 opacity-40" />
-                <p>Nenhum evento agendado nos próximos 90 dias.</p>
+                <p>{tx('Nenhum evento agendado nos próximos 90 dias.')}</p>
               </div>
             ) : (
               <div className="space-y-5">
@@ -182,7 +183,7 @@ export default function EduCalendario() {
                           <div className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
                             {icon(e.type)}
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium line-clamp-1">{e.title}</p>
+                              <p className="font-medium line-clamp-1">{tx(e.title)}</p>
                               <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground mt-0.5">
                                 <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{format(e.date, 'HH:mm')}</span>
                                 {e.classroom && <span className="flex items-center gap-1"><UsersIcon className="h-3 w-3" />{e.classroom}</span>}
@@ -196,7 +197,7 @@ export default function EduCalendario() {
                                   </a>
                                 )}
                               </div>
-                              {e.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{e.description}</p>}
+                              {e.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{tx(e.description)}</p>}
                             </div>
                             <div className="flex items-center gap-1">
                               {badge(e.type)}

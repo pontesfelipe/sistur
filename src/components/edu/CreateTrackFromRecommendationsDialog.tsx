@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -95,22 +96,22 @@ export function CreateTrackFromRecommendationsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Criar trilha com essas sugestões</DialogTitle>
+          <DialogTitle>{tx('Criar trilha com essas sugestões')}</DialogTitle>
           <DialogDescription>
-            Selecione os cursos/lives recomendados e crie uma trilha para acompanhar seu progresso.
+            {tx('Selecione os cursos/lives recomendados e crie uma trilha para acompanhar seu progresso.')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto pr-2">
           {trainingRecommendations.length === 0 ? (
             <div className="rounded-md border p-4 text-sm text-muted-foreground">
-              Nenhuma recomendação de curso/live encontrada para montar uma trilha.
+              {tx('Nenhuma recomendação de curso/live encontrada para montar uma trilha.')}
             </div>
           ) : (
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Nome da trilha</label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Minha trilha personalizada" />
+                <label className="text-sm font-medium">{tx('Nome da trilha')}</label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={tx('Ex: Minha trilha personalizada')} />
               </div>
 
               <div className="space-y-2">
@@ -118,7 +119,7 @@ export function CreateTrackFromRecommendationsDialog({
                 <Input
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Uma trilha baseada nas minhas recomendações"
+                  placeholder={tx('Uma trilha baseada nas minhas recomendações')}
                 />
               </div>
 
@@ -133,7 +134,7 @@ export function CreateTrackFromRecommendationsDialog({
                     onClick={() => setSelectedTrainingIds(initialTrainingIds)}
                     disabled={trainingRecommendations.length === 0}
                   >
-                    Selecionar tudo
+                    {tx('Selecionar tudo')}
                   </Button>
                 </div>
 
@@ -168,7 +169,7 @@ export function CreateTrackFromRecommendationsDialog({
                             </div>
                             <div className="flex items-center gap-2 min-w-0">
                               <Icon className="h-4 w-4 text-muted-foreground" />
-                              <p className="font-medium text-sm truncate">{t.title}</p>
+                              <p className="font-medium text-sm truncate">{tx(t.title)}</p>
                             </div>
                           </div>
                         </button>
@@ -185,7 +186,7 @@ export function CreateTrackFromRecommendationsDialog({
                   className="mt-0.5"
                 />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">Gerar provas finais automaticamente</p>
+                  <p className="text-sm font-medium">{tx('Gerar provas finais automaticamente')}</p>
                   <p className="text-xs text-muted-foreground">
                     Cria uma prova por pilar coberto pelos treinamentos (20 questões, 70% nota mínima, 60 min).
                     Você pode pular e gerar depois.
@@ -198,18 +199,18 @@ export function CreateTrackFromRecommendationsDialog({
 
         <DialogFooter className="flex-shrink-0 pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
+            {tx('Cancelar')}
           </Button>
           <Button onClick={handleCreate} disabled={!canCreate || isSubmitting}>
             {isSubmitting ? (
               <>
                 <GraduationCap className="mr-2 h-4 w-4 animate-pulse" />
-                Criando...
+                {tx('Criando...')}
               </>
             ) : (
               <>
                 <GraduationCap className="mr-2 h-4 w-4" />
-                Criar trilha
+                {tx('Criar trilha')}
               </>
             )}
           </Button>

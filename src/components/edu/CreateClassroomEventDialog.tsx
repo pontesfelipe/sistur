@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -107,17 +108,17 @@ export function CreateClassroomEventDialog() {
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Criar evento da turma</DialogTitle>
+          <DialogTitle>{tx('Criar evento da turma')}</DialogTitle>
           <DialogDescription>
-            Os alunos matriculados serão notificados automaticamente.
+            {tx('Os alunos matriculados serão notificados automaticamente.')}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
-              <Label>Turma</Label>
+              <Label>{tx('Turma')}</Label>
               <Select value={classroomId} onValueChange={setClassroomId}>
-                <SelectTrigger><SelectValue placeholder="Escolha a turma" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tx('Escolha a turma')} /></SelectTrigger>
                 <SelectContent>
                   {classrooms.map(c => (
                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
@@ -126,15 +127,15 @@ export function CreateClassroomEventDialog() {
               </Select>
             </div>
             <div className="col-span-2">
-              <Label>Título</Label>
-              <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Ex.: Aula sobre IGMA" />
+              <Label>{tx('Título')}</Label>
+              <Input value={title} onChange={e => setTitle(e.target.value)} placeholder={tx('Ex.: Aula sobre IGMA')} />
             </div>
             <div>
-              <Label>Tipo</Label>
+              <Label>{tx('Tipo')}</Label>
               <Select value={type} onValueChange={v => setType(v as any)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                  {TYPES.map(t => <SelectItem key={t.value} value={t.value}>{tx(t.label)}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -152,11 +153,11 @@ export function CreateClassroomEventDialog() {
               </Select>
             </div>
             <div>
-              <Label>Data</Label>
+              <Label>{tx('Data')}</Label>
               <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
             </div>
             <div>
-              <Label>Horário</Label>
+              <Label>{tx('Horário')}</Label>
               <Input type="time" value={time} onChange={e => setTime(e.target.value)} />
             </div>
             <div>
@@ -168,23 +169,23 @@ export function CreateClassroomEventDialog() {
               <Input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
             </div>
             <div className="col-span-2">
-              <Label>Local</Label>
-              <Input value={location} onChange={e => setLocation(e.target.value)} placeholder="Sala 12 ou online" />
+              <Label>{tx('Local')}</Label>
+              <Input value={location} onChange={e => setLocation(e.target.value)} placeholder={tx('Sala 12 ou online')} />
             </div>
             <div className="col-span-2">
               <Label>Link (opcional)</Label>
               <Input value={link} onChange={e => setLink(e.target.value)} placeholder="https://meet..." />
             </div>
             <div className="col-span-2">
-              <Label>Descrição</Label>
+              <Label>{tx('Descrição')}</Label>
               <Textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} />
             </div>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
+          <Button variant="ghost" onClick={() => setOpen(false)}>{tx('Cancelar')}</Button>
           <Button onClick={handleSubmit} disabled={!title.trim() || !date || create.isPending}>
-            {create.isPending ? 'Criando...' : 'Criar e notificar'}
+            {create.isPending ? tx('Criando...') : tx('Criar e notificar')}
           </Button>
         </DialogFooter>
       </DialogContent>
