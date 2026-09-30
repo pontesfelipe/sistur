@@ -135,7 +135,7 @@ async function onPurchaseCompleted(session: any, env: StripeEnv) {
   }
 
   const amountLabel = session.amount_total != null
-    ? `R$ ${(session.amount_total / 100).toFixed(2).replace('.', ',')}${session.mode === 'subscription' ? '/mês' : ''}`
+    ? `R$ ${(session.amount_total / 100).toFixed(2).replace('.', ',')}${session.mode === 'subscription' ? (String(priceId ?? '').endsWith('_anual') ? '/ano' : '/mês') : ''}`
     : undefined;
 
   await sendTemplateEmailWithLog('purchase-confirmation', email, {
