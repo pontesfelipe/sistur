@@ -1,13 +1,15 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect } from 'react';
 import i18n from './index';
 
-/** Remonta a árvore quando o idioma muda, para que todas as telas usem o novo idioma. */
+/**
+ * Ao trocar de idioma, recarrega a página atual (mesma URL) para que todas as
+ * telas — inclusive textos calculados fora de hooks — usem o novo idioma.
+ */
 export function LanguageRoot({ children }: { children: ReactNode }) {
-  const [lng, setLng] = useState(i18n.language);
   useEffect(() => {
-    const onChange = (l: string) => setLng(l);
+    const onChange = () => window.location.reload();
     i18n.on('languageChanged', onChange);
     return () => { i18n.off('languageChanged', onChange); };
   }, []);
-  return <div key={lng} className="contents">{children}</div>;
+  return <>{children}</>;
 }
