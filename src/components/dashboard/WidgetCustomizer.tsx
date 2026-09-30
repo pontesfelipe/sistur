@@ -52,14 +52,14 @@ export function WidgetCustomizer({ isEnabled, toggleWidget, resetToDefaults, has
             return (
               <div key={cat}>
                 <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">
-                  {CATEGORY_LABELS[cat]}
+                  {tx(CATEGORY_LABELS[cat])}
                 </p>
                 <div className="space-y-2">
                   {widgets.map(widget => (
                     <div key={widget.id} className="flex items-center justify-between gap-2">
                       <Label htmlFor={`widget-${widget.id}`} className="flex-1 cursor-pointer">
-                        <span className="text-sm font-medium block">{widget.label}</span>
-                        <span className="text-xs text-muted-foreground">{widget.description}</span>
+                        <span className="text-sm font-medium block">{tx(widget.label)}</span>
+                        <span className="text-xs text-muted-foreground">{tx(widget.description)}</span>
                       </Label>
                       <Switch
                         id={`widget-${widget.id}`}

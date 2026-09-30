@@ -142,7 +142,7 @@ export function IntegratedTerritorialView({
                 key={p}
                 className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-2 md:items-center p-3 rounded-lg border bg-card"
               >
-                <div className="font-medium text-sm">{PILLAR_LABELS[p]}</div>
+                <div className="font-medium text-sm">{tx(PILLAR_LABELS[p])}</div>
                 <div className="text-sm">
                   <span className="text-muted-foreground">{tx('Empreend.:')} </span>
                   <span className={`font-semibold ${entSev?.color ?? ''}`}>
@@ -204,10 +204,10 @@ export function IntegratedTerritorialView({
                   {i.pillar}
                 </Badge>
                 <div className="text-sm">
-                  <div className="font-medium">{i.title}</div>
+                  <div className="font-medium">{tx(i.title)}</div>
                   {i.description && (
                     <div className="text-muted-foreground text-xs mt-0.5 line-clamp-2">
-                      {i.description}
+                      {tx(i.description)}
                     </div>
                   )}
                 </div>

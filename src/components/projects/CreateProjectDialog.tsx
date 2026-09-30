@@ -592,7 +592,7 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-xs text-muted-foreground">{info.description}</p>
+                        <p className="text-xs text-muted-foreground">{tx(info.description)}</p>
                       </CardContent>
                     </Card>
                   );

@@ -141,7 +141,7 @@ export function StaleAssessmentsPanel() {
                   )}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1 flex items-center gap-3">
-                  <span className="truncate">{r.title}</span>
+                  <span className="truncate">{tx(r.title)}</span>
                   {r.data_updated_at && (
                     <span className="flex items-center gap-1 shrink-0">
                       <Clock className="h-3 w-3" />

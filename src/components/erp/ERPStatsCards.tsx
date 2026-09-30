@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
@@ -95,7 +96,7 @@ export function ERPStatsCards({ stats, isLoading }: ERPStatsCardsProps) {
           <CardHeader className="relative pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <card.icon className={`h-4 w-4 ${card.color}`} />
-              {card.title}
+              {tx(card.title)}
             </CardTitle>
           </CardHeader>
           <CardContent className="relative">
@@ -103,7 +104,7 @@ export function ERPStatsCards({ stats, isLoading }: ERPStatsCardsProps) {
               {card.value}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {card.description}
+              {tx(card.description)}
             </p>
           </CardContent>
         </Card>

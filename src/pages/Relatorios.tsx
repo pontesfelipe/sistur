@@ -940,7 +940,7 @@ export default function Relatorios() {
                             return (
                               <SelectItem key={assessment.id} value={assessment.id}>
                                 <span className="flex items-center gap-2 max-w-full">
-                                  <span className="truncate">{assessment.title} — {dest?.name || 'Destino'}</span>
+                                  <span className="truncate">{tx(assessment.title)} — {dest?.name || 'Destino'}</span>
                                   <span className="text-muted-foreground text-xs whitespace-nowrap">
                                     {calcDate}{creatorName ? ` · ${creatorName}` : ''}
                                   </span>
@@ -1008,11 +1008,11 @@ export default function Relatorios() {
                               onClick={() => setRunInDemo(!runInDemo)}
                             >
                               <FlaskConical className="h-4 w-4" />
-                              {runInDemo ? 'Demo' : 'Produção'}
+                              {runInDemo ? tx('Demo') : tx('Produção')}
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {runInDemo ? 'Relatório será gerado no ambiente de demonstração' : 'Relatório será gerado no ambiente de produção'}
+                            {runInDemo ? tx('Relatório será gerado no ambiente de demonstração') : tx('Relatório será gerado no ambiente de produção')}
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -1051,7 +1051,7 @@ export default function Relatorios() {
                             onClick={() => setEnableComparison(!enableComparison)}
                           >
                             <FileText className="h-4 w-4" />
-                            {enableComparison ? 'Comparar rodadas' : 'Sem comparação'}
+                            {enableComparison ? tx('Comparar rodadas') : tx('Sem comparação')}
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -1077,7 +1077,7 @@ export default function Relatorios() {
                       ) : (
                         <>
                           <Sparkles className="h-4 w-4" />
-                          {hasSavedReportForSelected ? 'Gerar nova versão' : 'Gerar Relatório'}
+                          {hasSavedReportForSelected ? tx('Gerar nova versão') : tx('Gerar Relatório')}
                         </>
                       )}
                     </Button>
@@ -1370,7 +1370,7 @@ export default function Relatorios() {
                                   <p className="font-medium truncate">{r.destination_name}</p>
                                   <Badge variant="outline" className="text-[10px] gap-0.5 shrink-0">
                                     {r.diagnostic_type === 'enterprise' ? <Building2 className="h-2.5 w-2.5" /> : <Globe className="h-2.5 w-2.5" />}
-                                    {r.diagnostic_type === 'enterprise' ? 'Empresarial' : 'Territorial'}
+                                    {r.diagnostic_type === 'enterprise' ? tx('Empresarial') : tx('Territorial')}
                                   </Badge>
                                   {tierLabel && (
                                     <Badge variant="secondary" className="text-[10px] shrink-0">

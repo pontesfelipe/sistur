@@ -313,7 +313,7 @@ function ProjectCard({ project, onClick }: ProjectCardProps) {
             variant="secondary"
             className={cn('text-xs text-white shrink-0', statusInfo.color)}
           >
-            {statusInfo.label}
+            {tx(statusInfo.label)}
           </Badge>
         </div>
       </CardHeader>
@@ -330,7 +330,7 @@ function ProjectCard({ project, onClick }: ProjectCardProps) {
         {/* Assessment */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <FileText className="h-4 w-4" />
-          <span className="truncate">{project.assessment?.title}</span>
+          <span className="truncate">{tx(project.assessment?.title)}</span>
         </div>
 
         {/* Dates */}
@@ -354,7 +354,7 @@ function ProjectCard({ project, onClick }: ProjectCardProps) {
             variant="secondary"
             className={cn('text-xs text-white', priorityInfo.color)}
           >
-            {priorityInfo.label}
+            {tx(priorityInfo.label)}
           </Badge>
         </div>
       </CardContent>

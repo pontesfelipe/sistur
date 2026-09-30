@@ -74,7 +74,7 @@ export function IssueCard({ issue, onViewRecommendations }: IssueCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant={pillarVariant}>{pillarInfo.name}</Badge>
-            <Badge variant={severityVariant}>{severityInfo.label}</Badge>
+            <Badge variant={severityVariant}>{tx(severityInfo.label)}</Badge>
             {themeLabel ? (
               <Badge variant="outline" className="text-xs">
                 {themeLabel}
@@ -89,18 +89,18 @@ export function IssueCard({ issue, onViewRecommendations }: IssueCardProps) {
                     className={cn("text-xs gap-1", interpretationInfo.color)}
                   >
                     <InterpretationIcon interpretation={issue.interpretation!} />
-                    {interpretationInfo.label}
+                    {tx(interpretationInfo.label)}
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
-                  <p className="font-medium">{interpretationInfo.label}</p>
-                  <p className="text-xs text-muted-foreground">{interpretationInfo.description}</p>
+                  <p className="font-medium">{tx(interpretationInfo.label)}</p>
+                  <p className="text-xs text-muted-foreground">{tx(interpretationInfo.description)}</p>
                 </TooltipContent>
               </Tooltip>
             )}
           </div>
 
-          <h4 className="mt-2 font-medium text-foreground">{issue.title}</h4>
+          <h4 className="mt-2 font-medium text-foreground">{tx(issue.title)}</h4>
 
           {evidenceIndicators.length > 0 && (
             <div className="mt-2 text-sm text-muted-foreground">

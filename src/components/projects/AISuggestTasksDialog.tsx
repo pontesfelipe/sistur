@@ -134,8 +134,8 @@ export function AISuggestTasksDialog({
                       {s.indicator_code && <Badge className="text-xs font-mono bg-primary/10 text-primary">{s.indicator_code}</Badge>}
                       {s.estimated_hours && <span className="text-xs text-muted-foreground">{s.estimated_hours}h</span>}
                     </div>
-                    <p className="font-medium text-sm">{s.title}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{s.description}</p>
+                    <p className="font-medium text-sm">{tx(s.title)}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{tx(s.description)}</p>
                   </div>
                 </div>
               );

@@ -112,7 +112,7 @@ export function WhatIfSimulatorPanel({ indicatorScores, pillarScores }: Props) {
                 <div className="mt-2 flex items-center gap-2">
                   {severity && (
                     <Badge variant="outline" className={SEVERITY_INFO[severity].color}>
-                      {SEVERITY_INFO[severity].label}
+                      {tx(SEVERITY_INFO[severity].label)}
                     </Badge>
                   )}
                   {deltaPP !== null && deltaPP !== 0 && (
@@ -151,7 +151,7 @@ export function WhatIfSimulatorPanel({ indicatorScores, pillarScores }: Props) {
                   </span>
                   <span className="flex items-center gap-2">
                     <Badge variant="outline" className={SEVERITY_INFO[severity].color}>
-                      {SEVERITY_INFO[severity].label}
+                      {tx(SEVERITY_INFO[severity].label)}
                     </Badge>
                     <span className="font-semibold tabular-nums">{value}%</span>
                     {value !== base && (

@@ -205,7 +205,7 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
                 />
                 {indicator?.description && (
                   <p className="text-xs text-muted-foreground">
-                    {indicator.description}
+                    {tx(indicator.description)}
                   </p>
                 )}
               </div>

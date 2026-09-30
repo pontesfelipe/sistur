@@ -157,9 +157,9 @@ export function TaskFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={isEditing ? "max-w-3xl max-h-[90vh] overflow-y-auto" : "max-w-lg max-h-[90vh] overflow-y-auto"}>
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Editar Tarefa' : 'Nova Tarefa'}</DialogTitle>
+          <DialogTitle>{isEditing ? tx('Editar Tarefa') : tx('Nova Tarefa')}</DialogTitle>
           <DialogDescription>
-            {isEditing ? 'Atualize as informações da tarefa' : 'Adicione uma nova tarefa ao projeto'}
+            {isEditing ? tx('Atualize as informações da tarefa') : tx('Adicione uma nova tarefa ao projeto')}
           </DialogDescription>
         </DialogHeader>
 
@@ -239,7 +239,7 @@ export function TaskFormDialog({
                 <SelectContent>
                   {TASK_TYPE_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                      {tx(opt.label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -257,7 +257,7 @@ export function TaskFormDialog({
                 <SelectContent>
                   {Object.entries(TASK_STATUS_INFO).map(([key, info]) => (
                     <SelectItem key={key} value={key}>
-                      {info.label}
+                      {tx(info.label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -273,7 +273,7 @@ export function TaskFormDialog({
                 <SelectContent>
                   {Object.entries(PRIORITY_INFO).map(([key, info]) => (
                     <SelectItem key={key} value={key}>
-                      {info.label}
+                      {tx(info.label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -348,7 +348,7 @@ export function TaskFormDialog({
             </Button>
             <Button type="submit" disabled={isPending || !title}>
               {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {isEditing ? 'Salvar Alterações' : 'Criar Tarefa'}
+              {isEditing ? tx('Salvar Alterações') : tx('Criar Tarefa')}
             </Button>
           </DialogFooter>
         </form>

@@ -199,7 +199,7 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
                 <SelectContent>
                   {candidates.map((c: any) => (
                     <SelectItem key={c.id} value={c.id}>
-                      {c.title}
+                      {tx(c.title)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -214,7 +214,7 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
                 <SelectContent>
                   {candidates.map((c: any) => (
                     <SelectItem key={c.id} value={c.id}>
-                      {c.title}
+                      {tx(c.title)}
                     </SelectItem>
                   ))}
                 </SelectContent>

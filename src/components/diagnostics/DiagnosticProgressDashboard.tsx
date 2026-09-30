@@ -71,9 +71,9 @@ export function DiagnosticProgressDashboard({ status, hasIndicatorValues, hasRep
                     stepStatus === 'current' && 'text-foreground',
                     stepStatus === 'pending' && 'text-muted-foreground',
                   )}>
-                    {step.label}
+                    {tx(step.label)}
                   </p>
-                  <p className="text-[10px] text-muted-foreground hidden sm:block">{step.description}</p>
+                  <p className="text-[10px] text-muted-foreground hidden sm:block">{tx(step.description)}</p>
                 </div>
                 {i < STEPS.length - 1 && (
                   <ArrowRight className={cn(

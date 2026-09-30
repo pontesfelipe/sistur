@@ -821,7 +821,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                         ) : (
                           <Landmark className="h-4 w-4 text-blue-600" />
                         )}
-                        <span>{a.title} - {(a.destinations as any)?.name}</span>
+                        <span>{tx(a.title)} - {(a.destinations as any)?.name}</span>
                       </div>
                     </SelectItem>
                   );
@@ -843,7 +843,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                 </Badge>
               )}
               <Badge variant="outline">
-                Nível: {assessmentTier === 'SMALL' ? 'Essencial' : assessmentTier === 'MEDIUM' ? 'Estratégico' : 'Integral'}
+                Nível: {assessmentTier === 'SMALL' ? 'Essencial' : assessmentTier === 'MEDIUM' ? tx('Estratégico') : tx('Integral')}
               </Badge>
               {!isEnterpriseAssessment && (
                 <span>
@@ -1088,7 +1088,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           <HelpCircle className="h-4 w-4 text-muted-foreground shrink-0" />
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-xs bg-popover text-popover-foreground z-50">
-                                          {indicator.description}
+                                          {tx(indicator.description)}
                                         </TooltipContent>
                                       </Tooltip>
                                     )}
@@ -1225,7 +1225,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                           <SelectItem value={EMPTY_SELECT_VALUE}>{tx('Não informado')}</SelectItem>
                                           {fieldConfig.options.map((option) => (
                                             <SelectItem key={option.value} value={option.value}>
-                                              {option.label}
+                                              {tx(option.label)}
                                             </SelectItem>
                                           ))}
                                         </SelectContent>
@@ -1308,7 +1308,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                       </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                      {isIgnored ? 'Reativar indicador' : 'Ignorar indicador (não será considerado no cálculo)'}
+                                      {isIgnored ? tx('Reativar indicador') : tx('Ignorar indicador (não será considerado no cálculo)')}
                                     </TooltipContent>
                                   </Tooltip>
                                   {existingValue?.source && !hasUnsavedChanges && !isIgnored && (

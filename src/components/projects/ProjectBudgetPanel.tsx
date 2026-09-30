@@ -93,7 +93,7 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
                         {phase && <span className="text-xs text-muted-foreground">Fase: {phase.name}</span>}
                         {l.funding_source && <span className="text-xs text-muted-foreground">Fonte: {l.funding_source}</span>}
                       </div>
-                      <p className="font-medium text-sm mt-1 truncate">{l.description}</p>
+                      <p className="font-medium text-sm mt-1 truncate">{tx(l.description)}</p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-xs text-muted-foreground">{tx('Plan / Real')}</p>
@@ -132,7 +132,7 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
                   <Label>{tx('Status')}</Label>
                   <Select value={editing.status ?? "planned"} onValueChange={(v) => setEditing({ ...editing, status: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{BUDGET_STATUS.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
+                    <SelectContent>{BUDGET_STATUS.map((s) => <SelectItem key={s.value} value={s.value}>{tx(s.label)}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
               </div>

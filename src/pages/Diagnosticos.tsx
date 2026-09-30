@@ -253,7 +253,7 @@ const Diagnosticos = () => {
           {!isLoading && filteredAssessments.length === 0 && (
             <EmptyState
               icon={ClipboardList}
-              title={searchQuery || statusFilter !== 'all' ? 'Nenhum diagnóstico encontrado' : 'Nenhum diagnóstico cadastrado'}
+              title={searchQuery || statusFilter !== 'all' ? tx('Nenhum diagnóstico encontrado') : tx('Nenhum diagnóstico cadastrado')}
               description={searchQuery || statusFilter !== 'all'
                 ? 'Tente ajustar seus filtros para encontrar o que procura.'
                 : 'Comece avaliando um destino turístico para gerar insights e planos de ação.'}

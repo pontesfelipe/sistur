@@ -148,7 +148,7 @@ export function ProjectsOverviewCard({ projects, isLoading }: ProjectsOverviewCa
                         variant={statusConfig.variant}
                         className="text-xs shrink-0"
                       >
-                        {statusConfig.label}
+                        {tx(statusConfig.label)}
                       </Badge>
                     </div>
 

@@ -125,7 +125,7 @@ export function EditProjectDialog({ project, open, onOpenChange }: EditProjectDi
                 <SelectContent>
                   {Object.entries(PROJECT_STATUS_INFO).map(([key, info]) => (
                     <SelectItem key={key} value={key}>
-                      {info.label}
+                      {tx(info.label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -158,7 +158,7 @@ export function EditProjectDialog({ project, open, onOpenChange }: EditProjectDi
               <SelectContent>
                 {Object.entries(PRIORITY_INFO).map(([key, info]) => (
                   <SelectItem key={key} value={key}>
-                    {info.label}
+                    {tx(info.label)}
                   </SelectItem>
                 ))}
               </SelectContent>

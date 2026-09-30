@@ -364,7 +364,7 @@ const Index = () => {
                 <div>
                   <CardTitle className="text-lg font-display flex items-center gap-2">
                     {isEnterprise && <Hotel className="h-5 w-5 text-amber-600" />}
-                    {isEnterprise ? 'Performance Hoteleira' : 'Radiografia do Destino'}
+                    {isEnterprise ? tx('Performance Hoteleira') : tx('Radiografia do Destino')}
                   </CardTitle>
                   <CardDescription>
                     {selectedDestinationName 
@@ -384,7 +384,7 @@ const Index = () => {
                       <SelectValue placeholder={isEnterprise ? "Filtrar unidade" : "Filtrar destino"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{isEnterprise ? 'Todas as unidades' : 'Todos os destinos'}</SelectItem>
+                      <SelectItem value="all">{isEnterprise ? tx('Todas as unidades') : tx('Todos os destinos')}</SelectItem>
                       {activeDestinations?.map((dest) => (
                         <SelectItem key={dest.id} value={dest.id}>{dest.name}</SelectItem>
                       ))}
@@ -434,7 +434,7 @@ const Index = () => {
                         <div className="flex items-center gap-2">
                           <TrendingUp className="h-4 w-4 text-primary" />
                           <span className="font-medium text-sm">
-                            {isEnterprise ? 'Índice Geral Empresarial' : 'Índice Geral SISTUR'} (média)
+                            {isEnterprise ? tx('Índice Geral Empresarial') : tx('Índice Geral SISTUR')} (média)
                           </span>
                         </div>
                         <span className="font-mono font-semibold">{Math.round(averageScore * 100)}%</span>
@@ -508,7 +508,7 @@ const Index = () => {
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-lg font-display flex items-center gap-2">
                   {isEnterprise && <Hotel className="h-5 w-5 text-amber-600" />}
-                  {isEnterprise ? 'Pontos de Atenção' : 'Gargalos Identificados'}
+                  {isEnterprise ? tx('Pontos de Atenção') : tx('Gargalos Identificados')}
                 </CardTitle>
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/diagnosticos">
@@ -532,7 +532,7 @@ const Index = () => {
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-4">
-                    {isEnterprise ? 'Nenhum ponto de atenção identificado.' : 'Nenhum gargalo identificado.'}
+                    {isEnterprise ? tx('Nenhum ponto de atenção identificado.') : tx('Nenhum gargalo identificado.')}
                   </p>
                 )}
               </CardContent>
@@ -598,7 +598,7 @@ const Index = () => {
               <CardContent className="p-6">
                 <h3 className="font-display font-semibold text-lg mb-2 flex items-center gap-2">
                   {isEnterprise && <Hotel className="h-5 w-5" />}
-                  {isEnterprise ? 'Novo Diagnóstico Hoteleiro' : 'Iniciar Novo Diagnóstico'}
+                  {isEnterprise ? tx('Novo Diagnóstico Hoteleiro') : tx('Iniciar Novo Diagnóstico')}
                 </h3>
                 <p className="text-primary-foreground/80 text-sm mb-4">
                   {isEnterprise 
@@ -649,11 +649,11 @@ const Index = () => {
                           <StatusIcon className={`h-4 w-4 ${config.color}`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">{assessment.title}</p>
+                          <p className="font-medium text-sm truncate">{tx(assessment.title)}</p>
                           <p className="text-xs text-muted-foreground">{destination?.name}</p>
                         </div>
                         <Badge variant={assessment.status === 'DRAFT' ? 'draft' : assessment.status === 'DATA_READY' ? 'ready' : 'calculated'}>
-                          {config.label}
+                          {tx(config.label)}
                         </Badge>
                       </Link>
                     );

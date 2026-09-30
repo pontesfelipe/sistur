@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
@@ -117,7 +118,7 @@ export function EnterpriseKPICards({ kpis, stats, isLoading }: EnterpriseKPICard
           <CardHeader className="relative pb-1 p-3">
             <CardTitle className="text-xs font-medium flex items-center gap-1.5 text-muted-foreground">
               <card.icon className={`h-3.5 w-3.5 ${card.color}`} />
-              {card.title}
+              {tx(card.title)}
             </CardTitle>
           </CardHeader>
           <CardContent className="relative p-3 pt-0">
@@ -125,7 +126,7 @@ export function EnterpriseKPICards({ kpis, stats, isLoading }: EnterpriseKPICard
               {card.value}
             </div>
             <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
-              {card.description}
+              {tx(card.description)}
             </p>
           </CardContent>
         </Card>

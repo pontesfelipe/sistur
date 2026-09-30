@@ -236,12 +236,12 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
               variant="secondary"
               className={cn('text-white', statusInfo.color)}
             >
-              {statusInfo.label}
+              {tx(statusInfo.label)}
             </Badge>
             <Badge variant="outline">{methodologyInfo.name}</Badge>
           </div>
           {project.description && (
-            <p className="text-muted-foreground mt-2">{project.description}</p>
+            <p className="text-muted-foreground mt-2">{tx(project.description)}</p>
           )}
           <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
@@ -250,7 +250,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
             </span>
             <span className="flex items-center gap-1">
               <FileText className="h-4 w-4" />
-              {project.assessment?.title}
+              {tx(project.assessment?.title)}
             </span>
             {project.planned_start_date && (
               <span className="flex items-center gap-1">
@@ -293,7 +293,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
             <SelectContent>
               {Object.entries(PROJECT_STATUS_INFO).map(([key, info]) => (
                 <SelectItem key={key} value={key}>
-                  {info.label}
+                  {tx(info.label)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -438,7 +438,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                     <div key={task.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className={cn('w-2 h-2 rounded-full', priorityInfo.color)} />
-                        <span className="font-medium text-sm">{task.title}</span>
+                        <span className="font-medium text-sm">{tx(task.title)}</span>
                       </div>
                       <Select
                         value={task.status}
@@ -450,7 +450,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                         <SelectContent>
                           {Object.entries(TASK_STATUS_INFO).map(([key, info]) => (
                             <SelectItem key={key} value={key}>
-                              {info.label}
+                              {tx(info.label)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -477,7 +477,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                   <div className="flex-1">
                     <CardTitle className="text-lg">{phase.name}</CardTitle>
                     {phase.description && (
-                      <CardDescription>{phase.description}</CardDescription>
+                      <CardDescription>{tx(phase.description)}</CardDescription>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
@@ -616,7 +616,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                     <div className="flex-1 min-w-0">
                       <p className="font-medium">{milestone.name}</p>
                       {milestone.description && (
-                        <p className="text-sm text-muted-foreground truncate">{milestone.description}</p>
+                        <p className="text-sm text-muted-foreground truncate">{tx(milestone.description)}</p>
                       )}
                     </div>
                     <div className="text-right shrink-0">
@@ -787,7 +787,7 @@ function TaskRow({ task, onStatusChange, onEdit, onDelete }: TaskRowProps) {
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <div className={cn('w-2 h-2 rounded-full shrink-0', priorityInfo.color)} />
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-sm truncate">{task.title}</p>
+          <p className="font-medium text-sm truncate">{tx(task.title)}</p>
           <div className="flex items-center gap-2 mt-1">
             {task.assignee_name && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -820,7 +820,7 @@ function TaskRow({ task, onStatusChange, onEdit, onDelete }: TaskRowProps) {
           <SelectContent>
             {Object.entries(TASK_STATUS_INFO).map(([key, info]) => (
               <SelectItem key={key} value={key}>
-                {info.label}
+                {tx(info.label)}
               </SelectItem>
             ))}
           </SelectContent>
