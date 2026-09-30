@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 20,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.20.1",
+    date: "2026-09-30",
+    type: "patch" as const,
+    changes: [
+      "Idiomas (fase 2): Painel, Diagnósticos, Destinos, Projetos e Relatórios traduzidos para inglês e espanhol (cerca de 790 textos).",
+      "Relatórios com IA passam a ser escritos no idioma escolhido (valores seguem em R$).",
+      "Trocar de idioma atualiza todas as telas na hora.",
+    ],
+  },
   {
     version: "2.20.0",
     date: "2026-09-30",
