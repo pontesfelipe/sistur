@@ -812,6 +812,27 @@ const Auth = () => {
                     Não tem conta? Solicitar acesso
                   </Button>
                 </div>
+
+                <Separator />
+
+                <div className="flex flex-col items-center gap-1 sm:flex-row sm:justify-center sm:gap-4">
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="h-auto px-0 text-sm text-muted-foreground hover:text-primary"
+                    onClick={() => navigate('/planos')}
+                  >
+                    <Tag className="mr-1.5 h-3.5 w-3.5" />
+                    Conhecer planos e preços
+                  </Button>
+                  <a
+                    href="mailto:suporte@sistur.com.br?subject=Ajuda%20com%20o%20acesso%20ao%20SISTUR"
+                    className="inline-flex items-center text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+                  >
+                    <HelpCircle className="mr-1.5 h-3.5 w-3.5" />
+                    Preciso de ajuda
+                  </a>
+                </div>
               </form>
             </CardContent>
           </Card>
