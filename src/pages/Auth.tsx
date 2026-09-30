@@ -679,6 +679,14 @@ const Auth = () => {
               <CardDescription>
                 Entre com suas credenciais para acessar o sistema
               </CardDescription>
+              {hasRedirect && (
+                <div className="mt-4 flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 p-3 text-left">
+                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <p className="text-sm text-muted-foreground">
+                    Entre ou crie sua conta para acessar o conteúdo solicitado.
+                  </p>
+                </div>
+              )}
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSignIn} className="space-y-4">
