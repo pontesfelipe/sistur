@@ -168,9 +168,7 @@ function PlanCard({
                   onSelectPlan({ code: p.code, name: p.name });
                   return;
                 }
-                window.location.href = `mailto:contato@sistur.com.br?subject=${encodeURIComponent(
-                  `Interesse no plano ${p.name}`,
-                )}`;
+                window.location.href = `/planos?contato=${encodeURIComponent(p.code)}&plano=${encodeURIComponent(p.name)}`;
               }}
             >
               {p.quote_only ? 'Falar com o time' : canCheckout ? 'Assinar agora' : 'Quero contratar'}

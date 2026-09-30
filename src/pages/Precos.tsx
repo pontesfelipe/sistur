@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,6 +46,15 @@ export default function Precos() {
   const [selectedPlan, setSelectedPlan] = useState<{ code: string; name: string } | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const [searchParams] = useSearchParams();
+  useEffect(() => {
+    const code = searchParams.get('contato');
+    if (code) {
+      setSelectedPlan({ code, name: searchParams.get('plano') || code });
+      setLeadDialogOpen(true);
+    }
+  }, [searchParams]);
 
   const form = useForm<LeadFormValues>({
     resolver: zodResolver(leadSchema),
