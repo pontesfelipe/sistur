@@ -58,6 +58,9 @@ export interface Plan {
   sort_order: number;
   /** Preço correspondente no provedor de pagamento (checkout online) */
   stripe_price_id?: string | null;
+  /** Preço anual (15% de desconto) */
+  annual_price_cents?: number | null;
+  stripe_price_id_annual?: string | null;
 }
 
 /** Catálogo público de planos ativos. */
