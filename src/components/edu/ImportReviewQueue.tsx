@@ -56,6 +56,7 @@ import {
   type ImportedTraining,
 } from '@/hooks/useYoutubeIngestion';
 import { PILLAR_INFO } from '@/types/sistur';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 export function ImportReviewQueue() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -148,7 +149,7 @@ export function ImportReviewQueue() {
   };
   
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('pt-BR', {
+    return new Date(dateStr).toLocaleDateString(getIntlLocale(), {
       day: '2-digit',
       month: 'short',
       year: 'numeric',

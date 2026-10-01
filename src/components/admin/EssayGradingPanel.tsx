@@ -19,6 +19,7 @@ import {
 import { toast } from 'sonner';
 import { CheckCircle, Clock, FileText, Save, User } from 'lucide-react';
 import { RubricDisplay } from '@/components/edu/Rubric';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface EssayAnswer {
   attempt_id: string;
@@ -256,7 +257,7 @@ export function EssayGradingPanel() {
                     <Badge variant="outline" className="text-xs">
                       <Clock className="h-3 w-3 mr-1" />
                       {attempt.submitted_at
-                        ? new Date(attempt.submitted_at).toLocaleDateString('pt-BR', {
+                        ? new Date(attempt.submitted_at).toLocaleDateString(getIntlLocale(), {
                             day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
                           })
                         : '—'}

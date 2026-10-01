@@ -168,7 +168,7 @@ const VerifyCertificate = () => {
                   <div>
                     <p className="text-xs text-muted-foreground">{tx('Data de Emissão')}</p>
                     <p className="font-medium">
-                      {format(new Date(certificate.issued_at), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale() })}
+                      {format(new Date(certificate.issued_at), tx("dd 'de' MMMM 'de' yyyy"), { locale: getDateLocale() })}
                     </p>
                   </div>
                 </div>

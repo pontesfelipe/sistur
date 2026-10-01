@@ -120,12 +120,12 @@ export function RegressionAlertsPanel() {
                   </Badge>
                   <span className="text-xs text-muted-foreground">{tx("Período: {{v0}}", { v0: period })}</span>
                   <span className="text-xs text-muted-foreground">
-                    · {format(new Date(a.created_at), "dd 'de' MMM", { locale: getDateLocale() })}
+                    · {format(new Date(a.created_at), tx("dd 'de' MMM"), { locale: getDateLocale() })}
                   </span>
                 </div>
                 <p className="text-sm">{a.message}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Variação: {a.delta_pct.toFixed(1)}%
+                  {tx('Variação')}: {a.delta_pct.toFixed(1)}%
                 </p>
               </div>
               <div className="flex gap-1 shrink-0">

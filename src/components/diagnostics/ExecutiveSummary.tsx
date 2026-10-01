@@ -20,6 +20,7 @@ import {
   type Severity,
   type TerritorialInterpretation,
 } from '@/types/sistur';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface Props {
   assessment: any;
@@ -33,7 +34,7 @@ interface Props {
 }
 
 const formatDate = (value?: string | null) =>
-  value ? new Date(value).toLocaleDateString('pt-BR') : '—';
+  value ? new Date(value).toLocaleDateString(getIntlLocale()) : '—';
 
 const pct = (score: number) => `${Math.round((score ?? 0) * 100)}%`;
 
@@ -199,7 +200,7 @@ export function ExecutiveSummary({
                 {sources.length > 0 ? sources.join(' · ') : tx('Registros manuais da organização.')}
               </p>
               <p className="mt-1">
-                SISTUR v{APP_VERSION.full} — gerado em {new Date().toLocaleDateString('pt-BR')}
+                SISTUR v{APP_VERSION.full} — gerado em {new Date().toLocaleDateString(getIntlLocale())}
               </p>
             </div>
           </CardContent>

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowUp, ArrowDown, Minus, TrendingUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEVERITY_INFO, type Severity } from '@/types/sistur';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface Props {
   assessmentId: string;
@@ -87,7 +88,7 @@ export function RoundComparisonView({ assessmentId, destinationId, currentPillar
           {tx('Comparativo com Rodada Anterior')}
         </CardTitle>
         <CardDescription>
-          Comparando com: {previous.assessment.title} ({new Date(previous.assessment.calculated_at || previous.assessment.created_at).toLocaleDateString('pt-BR')})
+          Comparando com: {previous.assessment.title} ({new Date(previous.assessment.calculated_at || previous.assessment.created_at).toLocaleDateString(getIntlLocale())})
         </CardDescription>
       </CardHeader>
       <CardContent>

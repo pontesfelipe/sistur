@@ -24,6 +24,7 @@ import {
   Hotel
 } from 'lucide-react';
 import { filterBusinessOrganizations, getOrgDisplayName, isPendingOrganizationName, shouldIncludeUserInOrganization } from '@/lib/organizationVisibility';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface Organization {
   id: string;
@@ -433,7 +434,7 @@ export function OrganizationManagement() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {new Date(org.created_at).toLocaleDateString('pt-BR')}
+                    {new Date(org.created_at).toLocaleDateString(getIntlLocale())}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">

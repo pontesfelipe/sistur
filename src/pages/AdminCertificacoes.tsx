@@ -22,6 +22,7 @@ import {
   useEvaluateEligibility,
   type CertificationLevel,
 } from "@/hooks/useDestinationCertifications";
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 function useOrgs() {
   return useQuery({
@@ -179,7 +180,7 @@ export default function AdminCertificacoes() {
                         <Badge variant={c.status === "ativo" ? "default" : "secondary"}>{tx(String(c.status ?? ""))}</Badge>
                       </TableCell>
                       <TableCell className="text-xs">
-                        {new Date(c.valid_until).toLocaleDateString("pt-BR")}
+                        {new Date(c.valid_until).toLocaleDateString(getIntlLocale())}
                       </TableCell>
                       <TableCell className="font-mono text-xs">{c.verification_code}</TableCell>
                       <TableCell className="text-right space-x-1">

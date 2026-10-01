@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 import { tx } from "@/i18n/t";
+import { getIntlLocale } from '@/i18n/dateLocale';
 interface OrgOption {
   id: string;
   name: string;
@@ -487,7 +488,7 @@ export function UserManagement() {
                       {user.terms_accepted_at ? (
                         <div className="flex items-center gap-1.5 text-emerald-600">
                           <FileCheck className="h-4 w-4" />
-                          <span className="text-xs">{new Date(user.terms_accepted_at).toLocaleDateString('pt-BR')}</span>
+                          <span className="text-xs">{new Date(user.terms_accepted_at).toLocaleDateString(getIntlLocale())}</span>
                         </div>
                       ) : user.role === 'ADMIN' ? (
                         <span className="text-xs text-muted-foreground">—</span>
@@ -499,7 +500,7 @@ export function UserManagement() {
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {new Date(user.created_at).toLocaleDateString('pt-BR')}
+                      {new Date(user.created_at).toLocaleDateString(getIntlLocale())}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>

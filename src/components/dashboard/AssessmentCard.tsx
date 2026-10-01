@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useState } from 'react';
 import { DeleteAssessmentDialog } from './DeleteAssessmentDialog';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface AssessmentCardProps {
   assessment: Assessment & { tier?: string; creator?: { full_name: string } | null; visibility?: string; is_demo?: boolean; diagnostic_type?: string | null; expand_with_mandala?: boolean };
@@ -51,7 +52,7 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('pt-BR', {
+    return new Date(dateString).toLocaleDateString(getIntlLocale(), {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -183,8 +184,8 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
         <Clock className="h-4 w-4" />
         <span>
           {assessment.status === 'CALCULATED'
-            ? `Rodado em ${formatShortDate(assessment.calculated_at)}`
-            : `Criado em ${formatShortDate(assessment.created_at)}`}
+            ? tx('Rodado em {{date}}', { date: formatShortDate(assessment.calculated_at) })
+            : tx('Criado em {{date}}', { date: formatShortDate(assessment.created_at) })}
         </span>
       </div>
 

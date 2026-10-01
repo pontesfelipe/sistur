@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { usePlans, formatPlanPrice } from '@/hooks/useEntitlements';
 import { toast } from 'sonner';
 import { TrialConsumptionPanel } from '@/components/admin/TrialConsumptionPanel';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface OrgRow { id: string; name: string; org_kind: string | null }
 interface SubscriptionRow {
@@ -321,7 +322,7 @@ export default function AdminComercial() {
                         <TableCell>{s.seats}</TableCell>
                         <TableCell>
                           {s.current_period_end
-                            ? new Date(s.current_period_end).toLocaleDateString('pt-BR')
+                            ? new Date(s.current_period_end).toLocaleDateString(getIntlLocale())
                             : tx('Sem prazo')}
                         </TableCell>
                         <TableCell>{s.source}</TableCell>
@@ -420,7 +421,7 @@ export default function AdminComercial() {
                       <TableCell>{orgName(o.org_id)}</TableCell>
                       <TableCell>{o.feature}</TableCell>
                       <TableCell>{o.enabled ? 'Liberado' : 'Bloqueado'}</TableCell>
-                      <TableCell>{o.expires_at ? new Date(o.expires_at).toLocaleDateString('pt-BR') : tx('Sem prazo')}</TableCell>
+                      <TableCell>{o.expires_at ? new Date(o.expires_at).toLocaleDateString(getIntlLocale()) : tx('Sem prazo')}</TableCell>
                     </TableRow>
                   ))}
                   {!overrides?.length && (
@@ -515,7 +516,7 @@ export default function AdminComercial() {
                       <TableCell>{c.org_id ? orgName(c.org_id) : `Usuário ${c.user_id?.slice(0, 8)}`}</TableCell>
                       <TableCell>{c.balance}</TableCell>
                       <TableCell>{c.source}</TableCell>
-                      <TableCell>{new Date(c.expires_at).toLocaleDateString('pt-BR')}</TableCell>
+                      <TableCell>{new Date(c.expires_at).toLocaleDateString(getIntlLocale())}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{c.reason ?? '—'}</TableCell>
                     </TableRow>
                   ))}
@@ -626,7 +627,7 @@ export default function AdminComercial() {
                     {leads.map((lead) => (
                       <TableRow key={lead.id}>
                         <TableCell className="whitespace-nowrap text-sm">
-                          {new Date(lead.created_at).toLocaleDateString('pt-BR')}
+                          {new Date(lead.created_at).toLocaleDateString(getIntlLocale())}
                         </TableCell>
                         <TableCell className="font-medium">{lead.name}</TableCell>
                         <TableCell className="text-sm">

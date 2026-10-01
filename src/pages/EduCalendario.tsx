@@ -176,7 +176,7 @@ export default function EduCalendario() {
                 {Object.entries(grouped).map(([day, items]) => (
                   <div key={day}>
                     <p className="text-xs font-semibold uppercase text-muted-foreground mb-2">
-                      {format(new Date(day), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: getDateLocale() })}
+                      {format(new Date(day), tx("EEEE, dd 'de' MMMM 'de' yyyy"), { locale: getDateLocale() })}
                     </p>
                     <div className="space-y-2">
                       {items.map((e) => {

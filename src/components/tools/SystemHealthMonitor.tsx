@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import { tx } from "@/i18n/t";
+import { getIntlLocale } from '@/i18n/dateLocale';
 interface SystemStats {
   destinations: number;
   assessments: number;
@@ -124,7 +125,7 @@ export function SystemHealthMonitor() {
                 <p className="font-medium">{tx(String(health.label ?? ""))}</p>
                 {lastRefresh && (
                   <p className="text-xs text-muted-foreground">
-                    Atualizado em {lastRefresh.toLocaleTimeString('pt-BR')}
+                    Atualizado em {lastRefresh.toLocaleTimeString(getIntlLocale())}
                   </p>
                 )}
               </div>
@@ -227,7 +228,7 @@ export function SystemHealthMonitor() {
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
                   <span className="text-muted-foreground">{tx("Último diagnóstico calculado em:")}</span>
                   <span className="font-medium">
-                    {new Date(stats.lastAssessment).toLocaleDateString('pt-BR', {
+                    {new Date(stats.lastAssessment).toLocaleDateString(getIntlLocale(), {
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric',

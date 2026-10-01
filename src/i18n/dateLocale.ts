@@ -8,3 +8,11 @@ export const getDateLocale = () => {
   if (l.startsWith('es')) return es;
   return ptBR;
 };
+
+/** Locale BCP-47 para Intl/toLocaleDateString conforme o idioma atual. */
+export const getIntlLocale = () => {
+  const l = i18n.language || 'pt-BR';
+  if (l.startsWith('en')) return 'en-US';
+  if (l.startsWith('es')) return 'es-ES';
+  return 'pt-BR';
+};

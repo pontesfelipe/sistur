@@ -202,7 +202,7 @@ export const TrackCertificate = ({
     }, 250);
   };
 
-  const formattedDate = format(completedAt, "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale() });
+  const formattedDate = format(completedAt, tx("dd 'de' MMMM 'de' yyyy"), { locale: getDateLocale() });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

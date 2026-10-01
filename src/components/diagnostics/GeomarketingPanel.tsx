@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { MapPin } from 'lucide-react';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface Props { destinationId: string }
 
@@ -170,7 +171,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
               <div className="rounded-md border p-3">
                 <p className="text-muted-foreground">{tx("Próximos eventos (Observatório)")}</p>
                 {data?.events?.length ? data.events.slice(0, 4).map((e: any) => (
-                  <p key={e.id} className="text-xs">{new Date(e.start_date).toLocaleDateString('pt-BR')} · {e.name}
+                  <p key={e.id} className="text-xs">{new Date(e.start_date).toLocaleDateString(getIntlLocale())} · {e.name}
                     {e.estimated_attendance ? <Badge variant="secondary" className="ml-1">{e.estimated_attendance.toLocaleString('pt-BR')}</Badge> : null}</p>
                 )) : <p className="text-xs text-muted-foreground">{tx('Nenhum evento futuro cadastrado.')}</p>}
               </div>

@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertTriangle, TrendingUp, Users, Award, BarChart3, Activity } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface ClassroomBlockProps {
   classroomId: string;
@@ -105,7 +106,7 @@ function ClassroomBlock({ classroomId, classroomName }: ClassroomBlockProps) {
                             </TableCell>
                             <TableCell className="text-xs text-muted-foreground">
                               {r.last_seen_at
-                                ? new Date(r.last_seen_at).toLocaleDateString('pt-BR')
+                                ? new Date(r.last_seen_at).toLocaleDateString(getIntlLocale())
                                 : '— nunca acessou'}
                             </TableCell>
                             <TableCell>

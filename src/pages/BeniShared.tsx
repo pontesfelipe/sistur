@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
 import { tx } from "@/i18n/t";
+import { getIntlLocale } from '@/i18n/dateLocale';
 type Shared = { title: string; updated_at: string; messages: { role: string; content: string }[] };
 
 export default function BeniShared() {
@@ -32,7 +33,7 @@ export default function BeniShared() {
           <Card>
             <CardHeader>
               <CardTitle>{data.title}</CardTitle>
-              <p className="text-sm text-muted-foreground">Conversa com o Professor Beni · {new Date(data.updated_at).toLocaleDateString('pt-BR')}</p>
+              <p className="text-sm text-muted-foreground">Conversa com o Professor Beni · {new Date(data.updated_at).toLocaleDateString(getIntlLocale())}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               {data.messages.map((m, i) => (

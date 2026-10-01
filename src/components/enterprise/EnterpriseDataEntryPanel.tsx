@@ -44,6 +44,7 @@ import {
 import type { Database } from '@/integrations/supabase/types';
 
 import { tx } from "@/i18n/t";
+import { getIntlLocale } from '@/i18n/dateLocale';
 type Indicator = Database['public']['Tables']['indicators']['Row'];
 
 interface EnterpriseDataEntryPanelProps {
@@ -612,7 +613,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                       const existing = existingByIndicator.get(indicator.id);
                       const hasNonManualSource = existing?.source && existing.source !== 'Manual (Enterprise)' && existing.source !== 'Manual';
                       const referenceDate = existing?.reference_date
-                        ? new Date(existing.reference_date).toLocaleDateString('pt-BR')
+                        ? new Date(existing.reference_date).toLocaleDateString(getIntlLocale())
                         : null;
                        const observation = existing?.value_text;
                        const fieldConfig = getIndicatorFieldConfig({ code: (indicator as any).code, normalization: indicator.normalization });

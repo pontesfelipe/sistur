@@ -20,6 +20,7 @@ import {
   TrendingUp,
   ArrowUpCircle
 } from 'lucide-react';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface PerformanceMetrics {
   // Database metrics
@@ -255,7 +256,7 @@ export function PerformanceMetricsPanel() {
             </div>
             {lastRefresh && (
               <span className="text-xs text-muted-foreground shrink-0">
-                {lastRefresh.toLocaleTimeString('pt-BR')}
+                {lastRefresh.toLocaleTimeString(getIntlLocale())}
               </span>
             )}
           </div>

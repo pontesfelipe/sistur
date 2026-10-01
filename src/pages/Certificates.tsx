@@ -196,7 +196,7 @@ const Certificates = () => {
                   </CardTitle>
                   <CardDescription className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
-                    Emitido em {format(new Date(cert.issued_at), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale() })}
+                    Emitido em {format(new Date(cert.issued_at), tx("dd 'de' MMMM 'de' yyyy"), { locale: getDateLocale() })}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

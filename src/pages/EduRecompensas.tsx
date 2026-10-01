@@ -66,7 +66,7 @@ export default function EduRecompensas() {
           <div>
             <h1 className="text-2xl font-bold">{tx('Recompensas')}</h1>
             <p className="text-sm text-muted-foreground">
-              {xpLoading ? 'Carregando...' : `Você está no nível ${level} — desbloqueie itens conforme evolui.`}
+              {xpLoading ? tx('Carregando...') : tx('Você está no nível {{level}} — desbloqueie itens conforme evolui.', { level })}
             </p>
           </div>
         </div>

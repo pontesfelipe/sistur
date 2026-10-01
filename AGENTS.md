@@ -1,1 +1,2 @@
 - i18n: react-i18next with the pt-BR sentence as key (keySeparator off); only en/es JSON in src/i18n/locales. Why: incremental migration, untranslated text falls back to Portuguese.
+- i18n DOM safety net: src/i18n/domTranslator.ts swaps exact dictionary phrases in text nodes/attributes when lang≠pt-BR. Why: module-level constants (FAQ, help, tutorials) can't call t().

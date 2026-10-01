@@ -382,7 +382,7 @@ export default function Observatorio() {
                                 )}
                               </div>
                               <p className="text-xs text-muted-foreground mt-0.5">
-                                {hasData ? `${formatValue(Number(s!.total_value), m.unit)} · ${s!.data_points} ${s!.data_points === 1 ? "registro" : "registros"}` : "Sem dados em " + year}
+                                {hasData ? `${formatValue(Number(s!.total_value), m.unit)} · ${s!.data_points} ${s!.data_points === 1 ? tx("registro") : tx("registros")}` : tx("Sem dados em {{year}}", { year })}
                               </p>
                             </div>
 
@@ -480,7 +480,7 @@ export default function Observatorio() {
                       <div className="min-w-0">
                         <CardTitle className="text-base truncate">{ev.name}</CardTitle>
                         <CardDescription className="mt-1">
-                          {format(new Date(ev.start_date), "dd 'de' MMM", { locale: getDateLocale() })} – {format(new Date(ev.end_date), "dd 'de' MMM yyyy", { locale: getDateLocale() })}
+                          {format(new Date(ev.start_date), tx("dd 'de' MMM"), { locale: getDateLocale() })} – {format(new Date(ev.end_date), tx("dd 'de' MMM yyyy"), { locale: getDateLocale() })}
                         </CardDescription>
                       </div>
                       {ev.category && <Badge variant="secondary" className="capitalize">{ev.category}</Badge>}

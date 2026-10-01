@@ -23,6 +23,7 @@ import { getStripeEnvironment, isPaymentsConfigured } from '@/lib/stripe';
 import { useEntitlements } from '@/hooks/useEntitlements';
 import { useTrialState } from '@/hooks/useTrialState';
 import { useBeniQuota } from '@/hooks/useBeniQuota';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 const FEATURE_GRID: { key: string; label: string; icon: string }[] = [
   { key: 'erp', label: tx('Analítico territorial'), icon: '📊' },
@@ -218,7 +219,7 @@ export default function Subscription() {
               </div>
               <p className="text-sm text-muted-foreground max-w-xl">
                 {isCancelled
-                  ? `Seu plano ${planLabel} foi cancelado.${license?.expires_at ? ` O acesso segue até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''} Escolha um novo plano abaixo.`
+                  ? `Seu plano ${planLabel} foi cancelado.${license?.expires_at ? ` O acesso segue até ${new Date(license.expires_at).toLocaleDateString(getIntlLocale())}.` : ''} Escolha um novo plano abaixo.`
                   : hasSubscription || isPaidPlan
                   ? tx('Sua assinatura está ativa. Use Gerenciar conta para ajustar usuários, forma de pagamento e faturas.')
                   : inTrial
@@ -260,7 +261,7 @@ export default function Subscription() {
                 label={tx("Professor Beni")}
                 done={beniRemaining + beniCredits <= 0 && !beniUnlimited}
                 doneText="Perguntas de cortesia esgotadas"
-                openText={`${beniRemaining + beniCredits} pergunta(s) restante(s)`}
+                openText={tx('{{n}} pergunta(s) restante(s)', { n: beniRemaining + beniCredits })}
               />
             </div>
           )}

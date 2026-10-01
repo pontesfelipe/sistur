@@ -14,6 +14,7 @@ import { Trash2, Save, FolderPlus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { TWIN_LEVERS, projectScenario, type PillarKey } from '@/lib/revenueIntelligence';
 import { SEVERITY_INFO, getSeverityFromScore, type Severity } from '@/types/sistur';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 const PRESETS: Record<string, { drift: number; intensity: number }> = {
   Pessimista: { drift: -1.5, intensity: 0 },
@@ -140,7 +141,7 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
                 return (
                   <div key={s.id} className="flex items-center justify-between rounded border p-2 text-sm">
                     <button type="button" className="text-left hover:underline" onClick={() => loadScenario(s)}>
-                      <b>{s.name}</b> · {new Date(s.created_at).toLocaleDateString('pt-BR')}
+                      <b>{s.name}</b> · {new Date(s.created_at).toLocaleDateString(getIntlLocale())}
                       {l && <span className="text-muted-foreground"> — RA {Math.round(l.RA * 100)}% · OE {Math.round(l.OE * 100)}% · AO {Math.round(l.AO * 100)}%</span>}
                     </button>
                     <Button size="icon" variant="ghost" aria-label={tx('Excluir cenário')} onClick={() => deleteScenario(s.id)}><Trash2 className="h-4 w-4" /></Button>

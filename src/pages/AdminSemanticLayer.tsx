@@ -19,6 +19,7 @@ import { ArrowLeft, History, Plus, Save, Trash2, Download, Upload, FileUp, X } f
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Sparkles, Info, ShieldCheck, FileText, Loader2, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 type Entry = {
   id: string;
@@ -207,7 +208,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
 
   const loadSavedReportIntoAudit = (r: SavedReport) => {
     setAuditText(r.report_content || "");
-    setAuditFileName(`${r.destination_name ?? "Relatório"} — ${new Date(r.created_at).toLocaleDateString("pt-BR")}`);
+    setAuditFileName(`${r.destination_name ?? "Relatório"} — ${new Date(r.created_at).toLocaleDateString(getIntlLocale())}`);
     if (r.diagnostic_type === "enterprise" || r.diagnostic_type === "territorial") setAuditScope(r.diagnostic_type);
     setAuditResult(null);
     setAuditMeta(null);
@@ -962,7 +963,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                             {r.destination_name ?? r.assessment_id.slice(0, 8)}
                           </span>
                           <span className="text-muted-foreground shrink-0">
-                            {new Date(r.created_at).toLocaleDateString("pt-BR")} · {(r.report_content?.length ?? 0).toLocaleString("pt-BR")} chars
+                            {new Date(r.created_at).toLocaleDateString(getIntlLocale())} · {(r.report_content?.length ?? 0).toLocaleString("pt-BR")} chars
                           </span>
                         </button>
                       ))}

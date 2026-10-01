@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface TrialRow {
   subject_id: string;
@@ -22,7 +23,7 @@ interface TrialRow {
 }
 
 const fmt = (v: string | null) =>
-  v ? new Date(v).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '—';
+  v ? new Date(v).toLocaleDateString(getIntlLocale(), { day: '2-digit', month: '2-digit', year: '2-digit' }) : '—';
 
 /**
  * Trial por consumo (modelo atual): usuário novo tem o curso base + 10 perguntas

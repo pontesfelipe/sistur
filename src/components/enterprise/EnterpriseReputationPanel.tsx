@@ -12,6 +12,7 @@ import { useEnterpriseProfile } from '@/hooks/useEnterpriseProfiles';
 import { useProfile } from '@/hooks/useProfile';
 
 import { tx } from "@/i18n/t";
+import { getIntlLocale } from '@/i18n/dateLocale';
 const SOURCES = ['Google', 'TripAdvisor', 'Booking', 'Expedia', 'Decolar', 'Airbnb', 'Outro'];
 
 interface Props {
@@ -107,7 +108,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
               {snapshots.map((s) => (
                 <div key={s.id} className="flex items-center gap-3 p-3 border rounded-lg">
                   <Badge variant="outline">{s.source}</Badge>
-                  <div className="text-xs text-muted-foreground w-24">{new Date(s.snapshot_date).toLocaleDateString('pt-BR')}</div>
+                  <div className="text-xs text-muted-foreground w-24">{new Date(s.snapshot_date).toLocaleDateString(getIntlLocale())}</div>
                   <div className="flex items-center gap-1 font-semibold">
                     <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                     {s.rating != null ? Number(s.rating).toFixed(2) : '—'}
