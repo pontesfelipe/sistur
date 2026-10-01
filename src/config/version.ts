@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 23,
-  patch: 4,
+  minor: 24,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.24.0",
+    date: "2026-10-01",
+    type: "minor" as const,
+    changes: [
+      "Cadastro simplificado: removida a pergunta de módulo (Analítico/EDU) e de perfil educacional — o usuário só confirma a solicitação (com códigos opcionais de organização e professor) e o admin define o papel na aprovação.",
+      "Aprovações: removida a tag de módulo (ERP/EDU/Não definido) da lista de pendências; o seletor de papel agora oferece todos os papéis não privilegiados.",
+      "Perfil: removido o campo 'Tipo de Acesso' do cartão de perfil no topo; a tela de aguardando aprovação não exibe mais o módulo solicitado.",
+    ],
+  },
   {
     version: "2.23.4",
     date: "2026-10-01",
