@@ -991,7 +991,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                     {isError && <AlertCircle className="h-2.5 w-2.5" />}
                     {isNoData && <Info className="h-2.5 w-2.5" />}
                     {!isRunning && !isError && !isNoData && isSuccess && <CheckCircle2 className="h-2.5 w-2.5" />}
-                    {b.label}
+                    {tx(String(b.label ?? ""))}
                   </Badge>
                   {(isError || isNoData) && (
                     <button
@@ -1638,7 +1638,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 </SelectTrigger>
                 <SelectContent>
                   {PROPERTY_TYPES.map(type => (
-                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                    <SelectItem key={type.value} value={type.value}>{tx(String(type.label ?? ""))}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -1730,7 +1730,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               </SelectTrigger>
               <SelectContent>
                 {SEASONALITY_OPTIONS.map(opt => (
-                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  <SelectItem key={opt.value} value={opt.value}>{tx(String(opt.label ?? ""))}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -1750,7 +1750,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                   )}
                   onClick={() => toggleMarket(market.value)}
                 >
-                  {market.label}
+                  {tx(String(market.label ?? ""))}
                 </Badge>
               ))}
             </div>

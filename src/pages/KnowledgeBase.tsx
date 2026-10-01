@@ -357,7 +357,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
           {isApproved && !moderating && (
             <div className="flex items-center gap-2 text-sm bg-primary/5 border border-primary/20 rounded-lg p-3">
               <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
-              <span className="text-primary">{moderationResult.reason}</span>
+              <span className="text-primary">{tx(String(moderationResult.reason ?? ""))}</span>
             </div>
           )}
           {isRejected && !moderating && (
@@ -365,7 +365,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
               <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium text-destructive">{tx("Arquivo rejeitado")}</p>
-                <p className="text-destructive/80">{moderationResult.reason}</p>
+                <p className="text-destructive/80">{tx(String(moderationResult.reason ?? ""))}</p>
               </div>
             </div>
           )}
@@ -384,7 +384,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger><SelectValue placeholder={tx("Categoria")} /></SelectTrigger>
             <SelectContent>
-              {KB_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+              {KB_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{tx(String(c.label ?? ""))}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>

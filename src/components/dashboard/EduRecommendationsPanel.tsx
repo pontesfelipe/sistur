@@ -299,7 +299,7 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
                           variant={rec.status === 'CRÍTICO' ? 'destructive' : 'outline'} 
                           className="text-xs"
                         >
-                          {rec.status}
+                          {tx(String(rec.status ?? ""))}
                         </Badge>
                         <span className="text-xs text-muted-foreground truncate">
                           {rec.indicatorName}
@@ -348,14 +348,14 @@ function RecommendationItem({ rec, index }: { rec: DisplayRecommendation; index:
             variant={rec.status === 'CRÍTICO' ? 'destructive' : 'secondary'} 
             className="text-xs"
           >
-            {rec.status}
+            {tx(String(rec.status ?? ""))}
           </Badge>
         </div>
         <h4 className="font-medium text-sm">
           {tx(rec.training.title)}
         </h4>
         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-          {rec.reasonTemplate}
+          {tx(String(rec.reasonTemplate ?? ""))}
         </p>
         {rec.training.target_audience && (
           <div className="mt-2">

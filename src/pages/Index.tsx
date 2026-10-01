@@ -370,7 +370,7 @@ const Index = () => {
                     {selectedDestinationName 
                       ? `Dados de ${selectedDestinationName} (${activePillarData?.totalAssessments ?? 0} diagnóstico(s))`
                       : activePillarData?.totalAssessments 
-                        ? `Resumo de ${activePillarData.totalAssessments} diagnóstico(s) ${isEnterprise ? 'enterprise' : 'territorial'}(s)`
+                        ? (isEnterprise ? tx('Resumo de {{n}} diagnóstico(s) empresarial(is)', { n: activePillarData.totalAssessments }) : tx('Resumo de {{n}} diagnóstico(s) territorial(is)', { n: activePillarData.totalAssessments }))
                         : tx('Nenhum diagnóstico disponível')}
                   </CardDescription>
                 </div>
@@ -434,7 +434,7 @@ const Index = () => {
                         <div className="flex items-center gap-2">
                           <TrendingUp className="h-4 w-4 text-primary" />
                           <span className="font-medium text-sm">
-                            {isEnterprise ? tx('Índice Geral Empresarial') : tx('Índice Geral SISTUR')} (média)
+                            {isEnterprise ? tx('Índice Geral Empresarial (média)') : tx('Índice Geral SISTUR (média)')}
                           </span>
                         </div>
                         <span className="font-mono font-semibold">{Math.round(averageScore * 100)}%</span>

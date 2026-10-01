@@ -96,7 +96,7 @@ export function PricingPositioningSearch({ businessName, location, onAutoFill, o
               <div className="text-lg font-bold">{analysis.pricing_index ?? '—'}</div>
               {pos && PosIcon && (
                 <Badge variant="outline" className={`text-[10px] mt-1 ${pos.color}`}>
-                  <PosIcon className="h-3 w-3 mr-1" />{pos.label}
+                  <PosIcon className="h-3 w-3 mr-1" />{tx(String(pos.label ?? ""))}
                 </Badge>
               )}
             </div>

@@ -167,7 +167,7 @@ export function McpGuidePanel() {
           <Accordion type="single" collapsible className="w-full">
             {CONNECTORS.map((c) => (
               <AccordionItem key={c.label} value={c.label}>
-                <AccordionTrigger className="text-left">{c.label}</AccordionTrigger>
+                <AccordionTrigger className="text-left">{tx(String(c.label ?? ""))}</AccordionTrigger>
                 <AccordionContent>
                   <ol className="list-decimal space-y-2 pl-5 text-sm">
                     {c.steps.map((s, i) => (

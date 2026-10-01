@@ -227,7 +227,7 @@ const Cursos = () => {
                           </CardHeader>
                           <CardContent className="pt-2">
                             <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-md">
-                              {prescription.justification}
+                              {tx(String(prescription.justification ?? ""))}
                             </p>
                             {prescription.course?.duration_minutes && (
                               <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">

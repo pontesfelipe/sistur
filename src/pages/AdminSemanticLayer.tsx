@@ -1060,7 +1060,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                               <div className="flex items-center gap-2 flex-wrap">
                                 <span className="font-medium text-sm">{f.rule_title}</span>
                                 <code className="text-[10px] text-muted-foreground">{f.rule_key}</code>
-                                <Badge variant="outline" className="text-[10px] uppercase">{f.status}</Badge>
+                                <Badge variant="outline" className="text-[10px] uppercase">{tx(String(f.status ?? ""))}</Badge>
                               </div>
                               <p className="text-xs mt-1 text-foreground">{f.explanation}</p>
                               {f.evidence && (

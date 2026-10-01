@@ -79,7 +79,7 @@ export function LocalTransportSearch({ destinationName, state, onAutoFill, onAna
             <div className="text-xs font-medium mb-1">{tx("Modais identificados")}</div>
             <div className="flex flex-wrap gap-1">
               {analysis.modes_available.length === 0 ? <span className="text-xs text-muted-foreground">{tx("Nenhum modal detectado")}</span> :
-                analysis.modes_available.map((m) => <Badge key={m.key} variant="secondary" className="text-[10px]">{m.label}</Badge>)}
+                analysis.modes_available.map((m) => <Badge key={m.key} variant="secondary" className="text-[10px]">{tx(String(m.label ?? ""))}</Badge>)}
             </div>
           </div>
 

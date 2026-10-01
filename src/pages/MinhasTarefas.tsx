@@ -89,10 +89,10 @@ function TaskGroup({ title, tasks, collapsed }: { title: string; tasks: any[]; c
                 </p>
               </div>
               {sInfo && (
-                <Badge variant="secondary" className="text-[10px]">{sInfo.label}</Badge>
+                <Badge variant="secondary" className="text-[10px]">{tx(String(sInfo.label ?? ""))}</Badge>
               )}
               {pInfo && (
-                <Badge className={cn('text-[10px] text-white', pInfo.color)}>{pInfo.label}</Badge>
+                <Badge className={cn('text-[10px] text-white', pInfo.color)}>{tx(String(pInfo.label ?? ""))}</Badge>
               )}
               <Button asChild size="sm" variant="ghost">
                 <Link to={`/projetos?project=${t.project_id}`}>

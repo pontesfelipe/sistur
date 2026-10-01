@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/t";
 import { Globe, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         {SUPPORTED_LANGUAGES.map((l) => (
           <DropdownMenuItem key={l.code} onClick={() => i18n.changeLanguage(l.code)}>
             <Check className={`mr-2 h-4 w-4 ${l.code === current.code ? 'opacity-100' : 'opacity-0'}`} />
-            {l.label}
+            {tx(String(l.label ?? ""))}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

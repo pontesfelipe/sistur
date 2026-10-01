@@ -229,7 +229,7 @@ export function ExamManagementPanel() {
                           {new Date(appeal.created_at).toLocaleDateString('pt-BR')}
                         </TableCell>
                         <TableCell className="max-w-xs">
-                          <p className="text-sm line-clamp-2">{appeal.reason}</p>
+                          <p className="text-sm line-clamp-2">{tx(String(appeal.reason ?? ""))}</p>
                         </TableCell>
                         <TableCell>
                           <Badge variant={appeal.status === 'pending' ? 'secondary' : appeal.status === 'accepted' ? 'default' : 'destructive'}>

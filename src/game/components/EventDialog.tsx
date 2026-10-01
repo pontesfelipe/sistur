@@ -37,7 +37,7 @@ export function EventDialog({ event, onResolve }: EventDialogProps) {
               )}
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-sm">{choice.emoji} {choice.label}</span>
+                <span className="font-bold text-sm">{choice.emoji} {tx(String(choice.label ?? ""))}</span>
                 <span className="text-xs opacity-80">{tx(typeLabels[choice.type])}</span>
               </div>
               <div className="flex gap-2 mt-1 text-xs opacity-90">

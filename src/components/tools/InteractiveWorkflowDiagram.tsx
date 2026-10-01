@@ -182,7 +182,7 @@ export function InteractiveWorkflowDiagram() {
                   }`}
                 >
                   <step.icon className="h-5 w-5 mx-auto mb-1" />
-                  <p className="font-semibold text-sm">{step.label}</p>
+                  <p className="font-semibold text-sm">{tx(String(step.label ?? ""))}</p>
                   <p className="text-xs opacity-80">{step.sublabel}</p>
                   <ChevronDown className={`h-3 w-3 mx-auto mt-1 transition-transform ${selectedStep === step.id ? 'rotate-180' : ''}`} />
                 </button>

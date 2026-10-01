@@ -486,7 +486,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
             {divergences.map((d) => (
               <div key={d.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-background p-3">
                 <div className="text-sm">
-                  <div className="font-medium">{d.label}</div>
+                  <div className="font-medium">{tx(String(d.label ?? ""))}</div>
                   <div className="text-muted-foreground">
                     {tx("Seu valor:")} <span className="font-medium text-foreground">{d.manual}</span>
                     {' · '}Online: <span className="font-medium text-foreground">{d.online}</span>
@@ -730,7 +730,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                                     <SelectItem value={EMPTY_SELECT_VALUE}>{tx("Não informado")}</SelectItem>
                                     {fieldConfig.options.map((option) => (
                                       <SelectItem key={option.value} value={option.value}>
-                                        {option.label}
+                                        {tx(String(option.label ?? ""))}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>

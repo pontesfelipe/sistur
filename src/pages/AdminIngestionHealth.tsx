@@ -222,7 +222,7 @@ export default function AdminIngestionHealth() {
                           <div className="text-xs text-muted-foreground font-mono">{row.function_name}</div>
                         </div>
                         <Badge variant="outline" className={style.cls}>
-                          <Icon className="h-3 w-3 mr-1" /> {style.label}
+                          <Icon className="h-3 w-3 mr-1" /> {tx(String(style.label ?? ""))}
                         </Badge>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-xs">
@@ -308,7 +308,7 @@ export default function AdminIngestionHealth() {
                             r.status === 'partial' ? 'bg-severity-moderate/15 text-severity-moderate border-severity-moderate/30' :
                             'bg-muted text-muted-foreground'
                           }>
-                            {r.status}
+                            {tx(String(r.status ?? ""))}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right tabular-nums text-xs">{r.records_processed}</TableCell>

@@ -102,7 +102,7 @@ export function PillarProgressChart({ data, isLoading }: PillarProgressChartProp
                       />
                       <span className="font-medium">{pillarInfo?.name || pillar.pillar}</span>
                       <span className="text-xs text-muted-foreground">
-                        ({pillarInfo?.fullName})
+                        ({tx(String(pillarInfo?.fullName ?? ""))})
                       </span>
                       {hasMultipleDestinations && (
                         isExpanded ? (

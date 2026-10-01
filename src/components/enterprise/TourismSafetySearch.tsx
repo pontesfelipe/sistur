@@ -87,7 +87,7 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
               <Progress value={analysis.safety_score} className="h-1 mt-2" />
               {lvl && LvlIcon && (
                 <Badge variant="outline" className={`mt-2 text-[10px] ${lvl.color}`}>
-                  <LvlIcon className="h-3 w-3 mr-1" /> {lvl.label}
+                  <LvlIcon className="h-3 w-3 mr-1" /> {tx(String(lvl.label ?? ""))}
                 </Badge>
               )}
             </div>

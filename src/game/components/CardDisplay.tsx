@@ -37,7 +37,7 @@ export function CardDisplay({ card, onClick, onDiscard, disabled, tooExpensive, 
       {/* Card header with gradient */}
       <div className={cn('px-2 py-1.5 bg-gradient-to-r text-white', cat.gradient)}>
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold opacity-90">{typeInfo.emoji} {typeInfo.label}</span>
+          <span className="text-[10px] font-bold opacity-90">{typeInfo.emoji} {tx(String(typeInfo.label ?? ""))}</span>
           <span className="text-xs font-bold bg-white/20 rounded-full px-1.5">💰{card.cost}</span>
         </div>
       </div>

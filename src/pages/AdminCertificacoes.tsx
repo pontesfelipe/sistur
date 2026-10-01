@@ -176,7 +176,7 @@ export default function AdminCertificacoes() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={c.status === "ativo" ? "default" : "secondary"}>{c.status}</Badge>
+                        <Badge variant={c.status === "ativo" ? "default" : "secondary"}>{tx(String(c.status ?? ""))}</Badge>
                       </TableCell>
                       <TableCell className="text-xs">
                         {new Date(c.valid_until).toLocaleDateString("pt-BR")}

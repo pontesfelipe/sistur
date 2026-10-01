@@ -143,7 +143,7 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
               <SelectContent>
                 {categories.map((cat) => (
                   <SelectItem key={cat.value} value={cat.value}>
-                    {cat.label}
+                    {tx(String(cat.label ?? ""))}
                   </SelectItem>
                 ))}
               </SelectContent>

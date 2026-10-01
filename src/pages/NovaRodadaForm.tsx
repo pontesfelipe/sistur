@@ -585,7 +585,7 @@ export function NovaRodadaForm({
                           )}
                         >
                           <TierIcon className={cn("h-5 w-5", tier.color)} />
-                          {tier.label}
+                          {tx(String(tier.label ?? ""))}
                         </Label>
                         <p className="text-sm text-muted-foreground mt-1">
                           {tier.description}

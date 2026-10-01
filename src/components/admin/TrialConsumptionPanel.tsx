@@ -95,7 +95,7 @@ export function TrialConsumptionPanel() {
               <s.icon className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="text-2xl font-bold tabular-nums">{s.value}</p>
-                <p className="text-xs text-muted-foreground">{s.label}</p>
+                <p className="text-xs text-muted-foreground">{tx(String(s.label ?? ""))}</p>
               </div>
             </CardContent>
           </Card>
@@ -134,7 +134,7 @@ export function TrialConsumptionPanel() {
                 <TableBody>
                   {rows.map(r => (
                     <TableRow key={`${r.subject_kind}-${r.subject_id}`}>
-                      <TableCell className="font-medium">{r.label}</TableCell>
+                      <TableCell className="font-medium">{tx(String(r.label ?? ""))}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{r.subject_kind === 'org' ? 'Organização' : 'Usuário'}</Badge>
                       </TableCell>

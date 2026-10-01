@@ -622,7 +622,7 @@ export function DataValidationPanel({
                                 <SelectItem value={EMPTY_SELECT_VALUE}>{tx("Não informado")}</SelectItem>
                                 {fieldConfig.options.map((option) => (
                                   <SelectItem key={option.value} value={option.value}>
-                                    {option.label}
+                                    {tx(String(option.label ?? ""))}
                                   </SelectItem>
                                 ))}
                               </SelectContent>

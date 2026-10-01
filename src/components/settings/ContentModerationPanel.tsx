@@ -182,7 +182,7 @@ export function ContentModerationPanel() {
               {tx("Nível de Restrição")}
             </Label>
             <Badge variant="outline" className={strictnessInfo.color}>
-              {strictnessInfo.label}
+              {tx(String(strictnessInfo.label ?? ""))}
             </Badge>
           </div>
           

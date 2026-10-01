@@ -187,7 +187,7 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
             <div key={i} className="flex items-center gap-1.5 text-xs">
               <span>{obj.done ? '✅' : '⬜'}</span>
               <span className={cn(obj.done ? 'text-green-700 dark:text-green-400 line-through' : 'text-amber-700 dark:text-amber-300')}>
-                {obj.emoji} {obj.label}
+                {obj.emoji} {tx(String(obj.label ?? ""))}
               </span>
             </div>
           ))}

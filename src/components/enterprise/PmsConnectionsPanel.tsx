@@ -194,7 +194,7 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
                 <span className="font-medium text-sm">{PROVIDER_LABEL[c.provider as Provider] ?? c.provider}</span>
                 {c.property_name && <span className="text-xs text-muted-foreground">· {c.property_name}</span>}
                 <Badge variant={c.status === 'active' ? 'default' : c.status === 'error' ? 'destructive' : 'secondary'} className="text-[10px]">
-                  {c.status}
+                  {tx(String(c.status ?? ""))}
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
@@ -243,7 +243,7 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
             </div>
             {PROVIDER_AUTH[provider] === 'apikey' && PROVIDER_FIELDS[provider].map((f) => (
               <div key={f.key}>
-                <Label htmlFor={`cred-${f.key}`}>{f.label}</Label>
+                <Label htmlFor={`cred-${f.key}`}>{tx(String(f.label ?? ""))}</Label>
                 <Input
                   id={`cred-${f.key}`}
                   type={f.type ?? 'text'}

@@ -35,7 +35,7 @@ function statusBadge(status: string, expires_at: string | null) {
     nao_aplicavel: { label: 'N/A', cls: 'bg-muted text-muted-foreground border-border' },
   };
   const m = map[effective] || map.pendente;
-  return <Badge variant="outline" className={m.cls}>{m.label}</Badge>;
+  return <Badge variant="outline" className={m.cls}>{tx(String(m.label ?? ""))}</Badge>;
 }
 
 function formatCnpj(s: string) {
@@ -207,7 +207,7 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
                         >
                           <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            {STATUS_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                            {STATUS_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{tx(String(o.label ?? ""))}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>

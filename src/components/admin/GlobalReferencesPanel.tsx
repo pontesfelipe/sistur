@@ -205,7 +205,7 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger><SelectValue placeholder={tx("Categoria")} /></SelectTrigger>
             <SelectContent>
-              {REFERENCE_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+              {REFERENCE_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{tx(String(c.label ?? ""))}</SelectItem>)}
             </SelectContent>
           </Select>
           <Textarea

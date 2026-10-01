@@ -379,7 +379,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
                   <SelectContent className="max-h-72">
                     {indicators.map((i) => (
                       <SelectItem key={i.code} value={i.code}>
-                        {i.label}
+                        {tx(String(i.label ?? ""))}
                       </SelectItem>
                     ))}
                   </SelectContent>

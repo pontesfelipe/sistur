@@ -317,7 +317,7 @@ const ExamHistory = () => {
                           })}
                         </TableCell>
                         <TableCell className="max-w-xs">
-                          <p className="text-sm line-clamp-2">{appeal.reason}</p>
+                          <p className="text-sm line-clamp-2">{tx(String(appeal.reason ?? ""))}</p>
                         </TableCell>
                         <TableCell>{getAppealStatusBadge(appeal.status)}</TableCell>
                         <TableCell className="max-w-xs">

@@ -255,7 +255,7 @@ export default function Observatorio() {
                 <SelectTrigger className="w-64 h-8 text-sm"><SelectValue placeholder={tx("Selecionar...")} /></SelectTrigger>
                 <SelectContent>
                   {orgDestinations.map((d) => (
-                    <SelectItem key={d.org_id} value={d.org_id}>{d.label}</SelectItem>
+                    <SelectItem key={d.org_id} value={d.org_id}>{tx(String(d.label ?? ""))}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -321,7 +321,7 @@ export default function Observatorio() {
             <Card key={cat}>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium">{meta.label}</CardTitle>
+                  <CardTitle className="text-sm font-medium">{tx(String(meta.label ?? ""))}</CardTitle>
                   <Icon className={`h-4 w-4 ${meta.color}`} />
                 </div>
               </CardHeader>
@@ -361,7 +361,7 @@ export default function Observatorio() {
                 <Card key={cat}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
-                      <Icon className={`h-5 w-5 ${meta.color}`} /> {meta.label}
+                      <Icon className={`h-5 w-5 ${meta.color}`} /> {tx(String(meta.label ?? ""))}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -525,7 +525,7 @@ export default function Observatorio() {
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {MONTHS.map((m) => (
-                        <SelectItem key={String(m.v)} value={String(m.v)}>{m.label}</SelectItem>
+                        <SelectItem key={String(m.v)} value={String(m.v)}>{tx(String(m.label ?? ""))}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

@@ -417,7 +417,7 @@ export default function NovaRodada() {
                   {resumeAssessment.title} • {(resumeAssessment.destinations as any)?.name}
                 </p>
               </div>
-              <Badge variant={statusVariant}>{statusLabel}</Badge>
+              <Badge variant={statusVariant}>{tx(String(statusLabel ?? ""))}</Badge>
             </div>
           </div>
         );

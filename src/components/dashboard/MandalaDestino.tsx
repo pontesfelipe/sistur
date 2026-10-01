@@ -108,7 +108,7 @@ export function MandalaDestino({
             <p className="text-sm text-muted-foreground mt-1">{destinationName}</p>
           )}
           <p className="text-xs text-muted-foreground mt-1">
-            Visão sistêmica baseada em Mario Beni (2007)
+            {tx('Visão sistêmica baseada em Mario Beni (2007)')}
             {expandWithMandala && ' + MST (Tasso et al., 2024)'}
           </p>
         </div>

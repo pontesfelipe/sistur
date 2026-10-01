@@ -433,7 +433,7 @@ export function UserManagement() {
                           <SelectValue placeholder="—">
                             {accessInfo ? (
                               <Badge className={accessInfo.color}>
-                                {accessInfo.label}
+                                {tx(String(accessInfo.label ?? ""))}
                               </Badge>
                             ) : '—'}
                           </SelectValue>
@@ -463,7 +463,7 @@ export function UserManagement() {
                         <SelectTrigger className="w-[160px]">
                           <SelectValue>
                             <Badge className={roleInfo.color}>
-                              {roleInfo.label}
+                              {tx(String(roleInfo.label ?? ""))}
                             </Badge>
                           </SelectValue>
                         </SelectTrigger>

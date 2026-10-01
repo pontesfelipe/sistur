@@ -121,7 +121,7 @@ export default function Consorcios() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
                       <CardTitle className="text-base">{c.name}</CardTitle>
-                      <Badge variant={c.status === "active" ? "default" : "secondary"}>{c.status}</Badge>
+                      <Badge variant={c.status === "active" ? "default" : "secondary"}>{tx(String(c.status ?? ""))}</Badge>
                     </div>
                     {c.description && <CardDescription className="line-clamp-2">{c.description}</CardDescription>}
                   </CardHeader>

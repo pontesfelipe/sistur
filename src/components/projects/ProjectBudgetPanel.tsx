@@ -89,7 +89,7 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="outline" className="text-xs">{l.category}</Badge>
-                        <Badge variant="secondary" className="text-xs">{statusLabel}</Badge>
+                        <Badge variant="secondary" className="text-xs">{tx(String(statusLabel ?? ""))}</Badge>
                         {phase && <span className="text-xs text-muted-foreground">{tx("Fase: {{v0}}", { v0: phase.name })}</span>}
                         {l.funding_source && <span className="text-xs text-muted-foreground">{tx("Fonte: {{v0}}", { v0: l.funding_source })}</span>}
                       </div>

@@ -309,7 +309,7 @@ export function EmailDispatchPanel() {
                     {TEMPLATE_OPTIONS.filter(t => t.value !== 'custom-message').map(t => (
                       <SelectItem key={t.value} value={t.value}>
                         <div className="flex flex-col">
-                          <span>{t.label}</span>
+                          <span>{tx(String(t.label ?? ""))}</span>
                           <span className="text-xs text-muted-foreground">{t.description}</span>
                         </div>
                       </SelectItem>

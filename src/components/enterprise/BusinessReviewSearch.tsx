@@ -365,7 +365,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
               </SelectTrigger>
               <SelectContent>
                 {PROPERTY_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  <SelectItem key={t.value} value={t.value}>{tx(String(t.label ?? ""))}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

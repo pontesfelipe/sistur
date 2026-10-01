@@ -207,7 +207,7 @@ export function HealthCheckPanel() {
                           <CardContent className="py-3 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               {catInfo.icon}
-                              <span className="font-medium text-sm">{catInfo.label}</span>
+                              <span className="font-medium text-sm">{tx(String(catInfo.label ?? ""))}</span>
                               <Badge variant="outline" className="text-xs">{checks.length}</Badge>
                               {catFailed > 0 && <Badge variant="destructive" className="text-xs">{tx("{{v0}} falha(s)", { v0: catFailed })}</Badge>}
                               {catWarnings > 0 && <Badge className="text-xs bg-yellow-500/10 text-yellow-600 border-yellow-500/30">{tx("{{v0}} aviso(s)", { v0: catWarnings })}</Badge>}

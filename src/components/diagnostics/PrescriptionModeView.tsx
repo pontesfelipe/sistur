@@ -278,7 +278,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
                                     {courseTitle || 'Curso prescrito'}
                                   </p>
                                   <p className="text-xs text-muted-foreground line-clamp-2">
-                                    {p.justification}
+                                    {tx(String(p.justification ?? ""))}
                                   </p>
                                 </div>
                               </div>

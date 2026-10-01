@@ -77,7 +77,7 @@ export function EmpacotamentoPanel() {
             {ERP_MODULES.map((m) => (
               <div key={m.key} className="flex items-start justify-between p-3 rounded-lg border">
                 <div className="flex-1 pr-4">
-                  <Label className="text-base font-medium">{m.label}</Label>
+                  <Label className="text-base font-medium">{tx(String(m.label ?? ""))}</Label>
                   <p className="text-xs text-muted-foreground mt-1">{m.description}</p>
                 </div>
                 <Switch

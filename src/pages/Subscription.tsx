@@ -213,7 +213,7 @@ export default function Subscription() {
                     : inTrial ? 'bg-amber-500/20 text-amber-300'
                     : 'bg-primary/20 text-primary',
                 )}>
-                  {statusLabel}
+                  {tx(String(statusLabel ?? ""))}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground max-w-xl">
@@ -291,7 +291,7 @@ export default function Subscription() {
                     : 'border-dashed border-border bg-muted/20 text-muted-foreground',
                 )}>
                   <span className={cn('text-lg', !enabled && 'grayscale opacity-60')}>{f.icon}</span>
-                  <p className="text-xs font-medium flex-1 min-w-0 truncate">{f.label}</p>
+                  <p className="text-xs font-medium flex-1 min-w-0 truncate">{tx(String(f.label ?? ""))}</p>
                   {enabled
                     ? <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                     : <XCircle className="h-4 w-4 text-muted-foreground/60 shrink-0" />}

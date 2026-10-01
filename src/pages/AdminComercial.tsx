@@ -316,7 +316,7 @@ export default function AdminComercial() {
                         <TableCell>{orgName(s.org_id)}</TableCell>
                         <TableCell>{planName(s.plan_id)}</TableCell>
                         <TableCell>
-                          <Badge variant={s.status === 'active' ? 'default' : 'secondary'}>{s.status}</Badge>
+                          <Badge variant={s.status === 'active' ? 'default' : 'secondary'}>{tx(String(s.status ?? ""))}</Badge>
                         </TableCell>
                         <TableCell>{s.seats}</TableCell>
                         <TableCell>

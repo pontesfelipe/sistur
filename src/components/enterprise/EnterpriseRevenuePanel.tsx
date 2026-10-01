@@ -186,7 +186,7 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {CHANNEL_TYPES.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                        <SelectItem key={t.value} value={t.value}>{tx(String(t.label ?? ""))}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -231,7 +231,7 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
               <div className="ml-auto flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">{tx("Índice de sazonalidade:")}</span>
                 <Badge className={seasonalityLabel.color}>
-                  {seasonalityIndex.toFixed(3)} — {seasonalityLabel.label}
+                  {seasonalityIndex.toFixed(3)} — {tx(String(seasonalityLabel.label ?? ""))}
                 </Badge>
               </div>
             </div>

@@ -344,7 +344,7 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
                 {aggregates.map(a => (
                   <TableRow key={a.spec.code}>
                     <TableCell className="font-medium">
-                      {a.spec.label}
+                      {tx(String(a.spec.label ?? ""))}
                       <span className="text-xs text-muted-foreground ml-1">({a.spec.code})</span>
                     </TableCell>
                     <TableCell><code className="text-xs">{a.spec.csv}</code></TableCell>

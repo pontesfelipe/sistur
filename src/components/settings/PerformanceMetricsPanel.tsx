@@ -296,7 +296,7 @@ export function PerformanceMetricsPanel() {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className={statusColor(check.status)}>{check.icon}</span>
-                    <span className="text-sm font-medium">{check.label}</span>
+                    <span className="text-sm font-medium">{tx(String(check.label ?? ""))}</span>
                   </div>
                   <Badge variant={statusBadge(check.status)} className="text-xs">
                     {check.status === 'ok' ? 'OK' : check.status === 'warning' ? 'Atenção' : 'Crítico'}
