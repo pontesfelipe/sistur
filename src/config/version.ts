@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 22,
-  patch: 2,
+  minor: 23,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.23.0",
+    date: "2026-10-01",
+    type: "minor" as const,
+    changes: [
+      "E-mails no idioma de cada usuário: aprovação/solicitação de acesso, confirmação de compra, conquistas EDU, alertas do Observatório e de regressão e comunicados saem em português, inglês ou espanhol conforme o idioma salvo no perfil.",
+    ],
+  },
   {
     version: "2.22.2",
     date: "2026-10-01",
