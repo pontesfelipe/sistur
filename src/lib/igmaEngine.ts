@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 /**
  * SISTUR - Motor de Interpretação IGMA
  * Implementação dos Princípios Sistêmicos de Mario Beni
@@ -277,9 +278,9 @@ export const INTERPRETATION_LABELS: Record<TerritorialInterpretation, string> = 
  * Mapeia pillar para nomes completos
  */
 export const PILLAR_NAMES: Record<PillarType, string> = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 /**

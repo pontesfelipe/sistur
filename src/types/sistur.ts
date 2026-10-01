@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 // SISTUR Type Definitions
 
 export type Pillar = 'RA' | 'OE' | 'AO';
@@ -205,20 +206,20 @@ export interface PrescriptionCycle {
 export const PILLAR_INFO: Record<Pillar, { name: string; fullName: string; description: string; color: string }> = {
   RA: {
     name: 'I-RA',
-    fullName: 'Relações Ambientais',
-    description: 'Contexto territorial, sociedade, meio ambiente, dados demográficos e segurança pública',
+    fullName: tx('Relações Ambientais'),
+    description: tx('Contexto territorial, sociedade, meio ambiente, dados demográficos e segurança pública'),
     color: 'pillar-ra',
   },
   AO: {
     name: 'I-AO',
-    fullName: 'Ações Operacionais',
-    description: 'Governança pública, planejamento, orçamento e capacidade de tomada de decisão',
+    fullName: tx('Ações Operacionais'),
+    description: tx('Governança pública, planejamento, orçamento e capacidade de tomada de decisão'),
     color: 'pillar-ao',
   },
   OE: {
     name: 'I-OE',
-    fullName: 'Organização Estrutural',
-    description: 'Infraestrutura turística, serviços, mercado, produtos e entrega ao visitante',
+    fullName: tx('Organização Estrutural'),
+    description: tx('Infraestrutura turística, serviços, mercado, produtos e entrega ao visitante'),
     color: 'pillar-oe',
   },
 };
