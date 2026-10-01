@@ -2,6 +2,7 @@ import { tx } from "@/i18n/t";
 import { useState, useEffect, createContext, useContext, ReactNode, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useEntitlements } from '@/hooks/useEntitlements';
 
 export interface UserProfile {
   user_id: string;
