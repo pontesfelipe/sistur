@@ -28,7 +28,7 @@ const choiceTypeConfig = {
     selectedBg: 'bg-green-500/20',
     selectedBorder: 'border-green-400',
     glow: '0 0 20px rgba(34,197,94,0.3)',
-    label: '🌿 Sustentável',
+    label: tx('🌿 Sustentável'),
     particleColor: 'bg-green-400',
   },
   arriscado: {
@@ -38,7 +38,7 @@ const choiceTypeConfig = {
     selectedBg: 'bg-amber-500/20',
     selectedBorder: 'border-amber-400',
     glow: '0 0 20px rgba(245,158,11,0.3)',
-    label: '⚡ Arriscado',
+    label: tx('⚡ Arriscado'),
     particleColor: 'bg-amber-400',
   },
   neutro: {
@@ -48,7 +48,7 @@ const choiceTypeConfig = {
     selectedBg: 'bg-blue-500/20',
     selectedBorder: 'border-blue-400',
     glow: '0 0 20px rgba(59,130,246,0.3)',
-    label: '🔄 Neutro',
+    label: tx('🔄 Neutro'),
     particleColor: 'bg-blue-400',
   },
 };

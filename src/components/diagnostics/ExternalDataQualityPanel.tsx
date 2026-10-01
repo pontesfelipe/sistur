@@ -17,12 +17,12 @@ type DataQualityRow = {
 };
 
 const SOURCE_LABELS: Record<string, { label: string; color: string }> = {
-  IBGE: { label: 'IBGE — Demografia & Economia', color: 'bg-blue-500/10 text-blue-700 dark:text-blue-300' },
-  CADASTUR: { label: 'CADASTUR — Prestadores Turísticos', color: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' },
-  STN: { label: 'STN — Finanças Municipais', color: 'bg-amber-500/10 text-amber-700 dark:text-amber-300' },
-  DATASUS: { label: 'DATASUS — Saúde', color: 'bg-rose-500/10 text-rose-700 dark:text-rose-300' },
-  INEP: { label: 'INEP — Educação', color: 'bg-violet-500/10 text-violet-700 dark:text-violet-300' },
-  SISMAPA: { label: 'SISMAPA — Mapa do Turismo', color: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300' },
+  IBGE: { label: tx('IBGE — Demografia & Economia'), color: 'bg-blue-500/10 text-blue-700 dark:text-blue-300' },
+  CADASTUR: { label: tx('CADASTUR — Prestadores Turísticos'), color: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' },
+  STN: { label: tx('STN — Finanças Municipais'), color: 'bg-amber-500/10 text-amber-700 dark:text-amber-300' },
+  DATASUS: { label: tx('DATASUS — Saúde'), color: 'bg-rose-500/10 text-rose-700 dark:text-rose-300' },
+  INEP: { label: tx('INEP — Educação'), color: 'bg-violet-500/10 text-violet-700 dark:text-violet-300' },
+  SISMAPA: { label: tx('SISMAPA — Mapa do Turismo'), color: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300' },
 };
 
 function ageBadge(days: number | null) {
@@ -107,7 +107,7 @@ export function ExternalDataQualityPanel() {
                     <div className="font-semibold tabular-nums">{row.total_records.toLocaleString('pt-BR')}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="h-3 w-3" /> Municípios</div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="h-3 w-3" /> {tx("Municípios")}</div>
                     <div className="font-semibold tabular-nums">{row.distinct_municipalities.toLocaleString('pt-BR')}</div>
                   </div>
                 </div>

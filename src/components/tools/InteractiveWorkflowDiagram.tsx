@@ -17,6 +17,7 @@ import {
   Users
 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 interface WorkflowStep {
   id: number;
   label: string;
@@ -34,13 +35,13 @@ interface WorkflowStep {
 const workflowSteps: WorkflowStep[] = [
   {
     id: 1,
-    label: "Destino",
+    label: tx("Destino"),
     sublabel: "Seleção",
     color: "bg-blue-500",
     icon: MapPin,
     details: {
-      title: "Seleção do Destino Turístico",
-      description: "Primeiro passo é escolher o município ou destino turístico que será avaliado.",
+      title: tx("Seleção do Destino Turístico"),
+      description: tx("Primeiro passo é escolher o município ou destino turístico que será avaliado."),
       items: [
         "Cadastro do destino com código IBGE",
         "Definição de coordenadas geográficas",
@@ -52,13 +53,13 @@ const workflowSteps: WorkflowStep[] = [
   },
   {
     id: 2,
-    label: "Pré-preencher",
+    label: tx("Pré-preencher"),
     sublabel: "Dados Oficiais",
     color: "bg-cyan-500",
     icon: Database,
     details: {
-      title: "Pré-preenchimento de Dados Oficiais",
-      description: "Sistema busca automaticamente dados de fontes públicas nacionais, explicitando fonte, ano e nível de confiança.",
+      title: tx("Pré-preenchimento de Dados Oficiais"),
+      description: tx("Sistema busca automaticamente dados de fontes públicas nacionais, explicitando fonte, ano e nível de confiança."),
       items: [
         "IBGE: dados demográficos e econômicos",
         "DATASUS: saúde e bem-estar",
@@ -71,13 +72,13 @@ const workflowSteps: WorkflowStep[] = [
   },
   {
     id: 3,
-    label: "Validação",
+    label: tx("Validação"),
     sublabel: "Humana",
     color: "bg-indigo-500",
     icon: Activity,
     details: {
-      title: "Validação Humana Obrigatória",
-      description: "Usuário revisa, confirma ou ajusta cada valor antes do cálculo. Nenhum dado é 'verdade absoluta'.",
+      title: tx("Validação Humana Obrigatória"),
+      description: tx("Usuário revisa, confirma ou ajusta cada valor antes do cálculo. Nenhum dado é 'verdade absoluta'."),
       items: [
         "Visualização de fonte, ano e confiança",
         "Edição de valores quando necessário",
@@ -89,13 +90,13 @@ const workflowSteps: WorkflowStep[] = [
   },
   {
     id: 4,
-    label: "Cálculo",
+    label: tx("Cálculo"),
     sublabel: "Normalização + IGMA",
     color: "bg-purple-500",
     icon: Calculator,
     details: {
-      title: "Normalização e Motor IGMA (Mario Beni)",
-      description: "Valores são normalizados e processados pelo motor IGMA que aplica os 6 princípios sistêmicos de Mario Beni.",
+      title: tx("Normalização e Motor IGMA (Mario Beni)"),
+      description: tx("Valores são normalizados e processados pelo motor IGMA que aplica os 6 princípios sistêmicos de Mario Beni."),
       items: [
         "Normalização MIN_MAX, BANDS ou BINARY",
         "Regra 1: Prioridade RA - limitações ambientais bloqueiam OE",
@@ -110,13 +111,13 @@ const workflowSteps: WorkflowStep[] = [
   },
   {
     id: 5,
-    label: "Status",
+    label: tx("Status"),
     sublabel: "Automático",
     color: "bg-orange-500",
     icon: AlertTriangle,
     details: {
-      title: "Determinação Automática de Status",
-      description: "Status é calculado automaticamente com base no score normalizado. Nunca é editável manualmente.",
+      title: tx("Determinação Automática de Status"),
+      description: tx("Status é calculado automaticamente com base no score normalizado. Nunca é editável manualmente."),
       items: [
         "Score ≥ 67% → Adequado (verde)",
         "Score 34% – 66% → Atenção (amarelo)",
@@ -129,13 +130,13 @@ const workflowSteps: WorkflowStep[] = [
   },
   {
     id: 6,
-    label: "Prescrição",
+    label: tx("Prescrição"),
     sublabel: "Determinística",
     color: "bg-green-500",
     icon: GraduationCap,
     details: {
-      title: "Prescrição de Capacitação (SISTUR EDU)",
-      description: "Cursos são prescritos automaticamente com base em regras determinísticas e respeitando bloqueios IGMA.",
+      title: tx("Prescrição de Capacitação (SISTUR EDU)"),
+      description: tx("Cursos são prescritos automaticamente com base em regras determinísticas e respeitando bloqueios IGMA."),
       items: [
         "Indicador + Pilar + Status + Interpretação → Curso",
         "Bloqueios IGMA respeitados (ex: EDU_OE bloqueado)",
@@ -162,10 +163,10 @@ export function InteractiveWorkflowDiagram() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Layers className="h-5 w-5 text-primary" />
-          Fluxo do Diagnóstico SISTUR
+          {tx("Fluxo do Diagnóstico SISTUR")}
         </CardTitle>
         <CardDescription>
-          Clique em cada etapa para ver detalhes do processo
+          {tx("Clique em cada etapa para ver detalhes do processo")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -228,16 +229,16 @@ export function InteractiveWorkflowDiagram() {
 
         {/* Calculation Detail */}
         <div>
-          <p className="font-semibold text-sm mb-3">Fluxo de Cálculo de Scores</p>
+          <p className="font-semibold text-sm mb-3">{tx("Fluxo de Cálculo de Scores")}</p>
           <div className="bg-muted/30 rounded-lg p-4 space-y-3">
             <div className="flex flex-wrap items-center gap-2 text-sm">
-              <Badge variant="outline">Valor Bruto</Badge>
+              <Badge variant="outline">{tx("Valor Bruto")}</Badge>
               <span className="text-muted-foreground">→</span>
               <Badge variant="outline">Normalização (0-1)</Badge>
               <span className="text-muted-foreground">→</span>
-              <Badge variant="outline">Score × Peso</Badge>
+              <Badge variant="outline">{tx("Score × Peso")}</Badge>
               <span className="text-muted-foreground">→</span>
-              <Badge className="bg-primary">Score do Pilar</Badge>
+              <Badge className="bg-primary">{tx("Score do Pilar")}</Badge>
             </div>
             <p className="text-xs text-muted-foreground">
               Fórmula: Score_Pilar = Σ(Score_i × Peso_i) / Σ(Peso_i) — média ponderada dos indicadores
@@ -251,15 +252,15 @@ export function InteractiveWorkflowDiagram() {
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 text-center">
               <p className="font-bold text-green-600">≥ 0.67</p>
-              <p className="text-xs text-muted-foreground">Adequado</p>
+              <p className="text-xs text-muted-foreground">{tx("Adequado")}</p>
             </div>
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 text-center">
               <p className="font-bold text-yellow-600">0.34 – 0.66</p>
-              <p className="text-xs text-muted-foreground">Atenção</p>
+              <p className="text-xs text-muted-foreground">{tx("Atenção")}</p>
             </div>
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-center">
               <p className="font-bold text-red-600">≤ 0.33</p>
-              <p className="text-xs text-muted-foreground">Crítico</p>
+              <p className="text-xs text-muted-foreground">{tx("Crítico")}</p>
             </div>
           </div>
         </div>
@@ -268,7 +269,7 @@ export function InteractiveWorkflowDiagram() {
 
         {/* Prescriptions vs Reports */}
         <div>
-          <p className="font-semibold text-sm mb-3">Prescrições vs. Relatórios</p>
+          <p className="font-semibold text-sm mb-3">{tx("Prescrições vs. Relatórios")}</p>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="border rounded-lg p-4 space-y-2">
               <div className="flex items-center gap-2">
@@ -276,22 +277,22 @@ export function InteractiveWorkflowDiagram() {
                 <p className="font-semibold">Prescrições (SISTUR EDU)</p>
               </div>
               <div className="bg-muted/30 rounded p-2 text-xs font-mono">
-                Indicador + Pilar + Status + Interpretação → Curso
+                {tx("Indicador + Pilar + Status + Interpretação → Curso")}
               </div>
               <p className="text-xs text-muted-foreground">
-                100% determinístico, baseado em regras. Sem IA.
+                {tx("100% determinístico, baseado em regras. Sem IA.")}
               </p>
             </div>
             <div className="border rounded-lg p-4 space-y-2">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-blue-500" />
-                <p className="font-semibold">Relatórios</p>
+                <p className="font-semibold">{tx("Relatórios")}</p>
               </div>
               <div className="bg-muted/30 rounded p-2 text-xs font-mono">
-                Dados Diagnósticos → IA → Plano Estratégico
+                {tx("Dados Diagnósticos → IA → Plano Estratégico")}
               </div>
               <p className="text-xs text-muted-foreground">
-                IA para análise e síntese. Não prescreve cursos.
+                {tx("IA para análise e síntese. Não prescreve cursos.")}
               </p>
             </div>
           </div>

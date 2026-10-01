@@ -12,37 +12,37 @@ interface TutorialStep {
 
 const STEPS: TutorialStep[] = [
   {
-    title: 'Caça ao Tesouro Ecológico!',
+    title: tx('Caça ao Tesouro Ecológico!'),
     emoji: '🗺️',
     text: 'Explore o mapa, colete tesouros sustentáveis, evite armadilhas de poluição e resolva enigmas ambientais!',
     tip: 'Cada bioma tem seus próprios tesouros e perigos!',
   },
   {
-    title: 'Exploração',
+    title: tx('Exploração'),
     emoji: '🧭',
     text: 'Toque nas células adjacentes para se mover. Células não exploradas ficam cobertas por névoa — revele o mapa passo a passo!',
     tip: 'Você só pode andar para cima, baixo, esquerda ou direita.',
   },
   {
-    title: 'Tesouros',
+    title: tx('Tesouros'),
     emoji: '💎',
     text: 'Colete todos os 5 tesouros ecológicos escondidos no mapa! Cada um representa um recurso natural valioso do bioma.',
     tip: 'Tesouros valem pontos — colete todos para a pontuação máxima!',
   },
   {
-    title: 'Armadilhas',
+    title: tx('Armadilhas'),
     emoji: '☠️',
     text: 'Cuidado com armadilhas ambientais! Desmatamento, poluição e mineração ilegal causam dano à sua saúde.',
     tip: 'Se sua saúde chegar a zero, a missão falha!',
   },
   {
-    title: 'Enigmas',
+    title: tx('Enigmas'),
     emoji: '🧩',
     text: 'Ao encontrar um enigma, responda corretamente para ganhar pontos bônus! Errar não tira vida, mas você perde a recompensa.',
     tip: 'Os enigmas ensinam sobre sustentabilidade e ecologia!',
   },
   {
-    title: 'Objetivo',
+    title: tx('Objetivo'),
     emoji: '🏁',
     text: 'Colete o máximo de tesouros e chegue à saída 🚪 no canto inferior direito do mapa. Quanto mais tesouros, melhor sua pontuação!',
     tip: 'Boa sorte, explorador ecológico! 🌍',

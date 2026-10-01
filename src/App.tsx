@@ -20,6 +20,7 @@ import { ReportJobWatcherMount } from "@/components/ReportJobWatcherMount";
 import { LanguageSyncMount } from "@/components/LanguageSyncMount";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
+import { tx } from "@/i18n/t";
 // Wrap React.lazy to auto-recover from stale chunk errors after a redeploy.
 // When the browser has a cached index.html referencing an old hashed chunk
 // that no longer exists, the dynamic import fails. We force a one-time
@@ -162,7 +163,7 @@ const queryClient = new QueryClient({
 const PageLoader = () => (
   <div style={{display:'flex',justifyContent:'center',alignItems:'center',minHeight:'100vh',background:'#0a0e17',flexDirection:'column',gap:'16px'}}>
     <div style={{width:'40px',height:'40px',border:'3px solid #1e293b',borderTopColor:'#3b82f6',borderRadius:'50%',animation:'spin 1s linear infinite'}}></div>
-    <p style={{color:'#94a3b8',fontFamily:'system-ui,sans-serif',fontSize:'14px',margin:'0'}}>Carregando...</p>
+    <p style={{color:'#94a3b8',fontFamily:'system-ui,sans-serif',fontSize:'14px',margin:'0'}}>{tx("Carregando...")}</p>
   </div>
 );
 
@@ -185,7 +186,7 @@ const App = () => {
               <OrgModulesProvider>
               <ReportJobWatcherMount />
               <Suspense fallback={<PageLoader />}>
-              <ErrorBoundary label="routes">
+              <ErrorBoundary label={tx("routes")}>
               <Routes>
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/onboarding" element={<Onboarding />} />

@@ -10,6 +10,7 @@ import {
   Paperclip,
 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 type Message = {
   id?: string;
   role: 'user' | 'assistant';
@@ -56,10 +57,9 @@ export function ChatMessageList({
           <div className="bg-primary/10 rounded-full p-4 mb-4">
             <GraduationCap className="h-8 w-8 text-primary" />
           </div>
-          <h3 className="text-lg font-semibold mb-2">Bem-vindo ao SISTUR!</h3>
+          <h3 className="text-lg font-semibold mb-2">{tx("Bem-vindo ao SISTUR!")}</h3>
           <p className="text-sm text-muted-foreground text-center mb-6 max-w-sm">
-            Sou o Professor Mario Beni. Posso ajudá-lo a entender a teoria sistêmica 
-            do turismo e como ela se aplica ao seu território.
+            {tx("Sou o Professor Mario Beni. Posso ajudá-lo a entender a teoria sistêmica do turismo e como ela se aplica ao seu território.")}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
             {suggestedQuestions.map((q, idx) => (
@@ -116,7 +116,7 @@ export function ChatMessageList({
                     {message.content || (
                       <span className="flex items-center gap-2 text-muted-foreground">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Pensando...
+                        {tx("Pensando...")}
                       </span>
                     )}
                   </p>

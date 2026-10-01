@@ -63,14 +63,14 @@ export function ClassroomDiaryPanel({ classroomId, classroomName }: Props) {
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <BookCheck className="h-5 w-5" /> Diário de Classe
+            <BookCheck className="h-5 w-5" /> {tx("Diário de Classe")}
           </CardTitle>
           <CardDescription>
             {tx('Presença, progresso em atividades e desempenho em provas — consolidado por aluno.')}
           </CardDescription>
         </div>
         <Button variant="outline" size="sm" onClick={() => exportCsv(list, classroomName || '')} disabled={!list.length}>
-          <Download className="h-4 w-4 mr-2" /> Exportar CSV
+          <Download className="h-4 w-4 mr-2" /> {tx("Exportar CSV")}
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">

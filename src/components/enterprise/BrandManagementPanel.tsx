@@ -24,6 +24,7 @@ import {
 import { Building2, Plus, MapPin, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useEnterpriseBrands, useBrandUnits, BrandType, EnterpriseBrand } from '@/hooks/useEnterpriseBrands';
 
+import { tx } from "@/i18n/t";
 const BRAND_TYPE_LABELS: Record<BrandType, string> = {
   independent: 'Independente',
   chain: 'Rede',
@@ -115,41 +116,39 @@ export function BrandManagementPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Building2 className="h-5 w-5 text-primary" />
-          Marcas / Redes de Hotéis
+          {tx("Marcas / Redes de Hotéis")}
         </CardTitle>
         <CardDescription>
-          Uma marca agrupa unidades do mesmo empreendimento em municípios diferentes.
-          Cada unidade mantém seu próprio diagnóstico, e a marca permite consolidar a
-          análise de desempenho da rede em diferentes territórios.
+          {tx("Uma marca agrupa unidades do mesmo empreendimento em municípios diferentes. Cada unidade mantém seu próprio diagnóstico, e a marca permite consolidar a análise de desempenho da rede em diferentes territórios.")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex justify-end">
           <Button onClick={handleOpenNew}>
             <Plus className="h-4 w-4 mr-2" />
-            Nova marca
+            {tx("Nova marca")}
           </Button>
         </div>
 
         {isLoading ? (
           <div className="flex items-center gap-2 py-8 justify-center text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Carregando marcas...
+            <Loader2 className="h-4 w-4 animate-spin" /> {tx("Carregando marcas...")}
           </div>
         ) : brands.length === 0 ? (
           <div className="text-center py-10 text-muted-foreground">
             <Building2 className="h-10 w-10 mx-auto mb-3 opacity-40" />
-            <p className="text-sm">Nenhuma marca cadastrada ainda.</p>
-            <p className="text-xs">Marcas existentes aparecem automaticamente quando você cria diagnósticos empresariais.</p>
+            <p className="text-sm">{tx("Nenhuma marca cadastrada ainda.")}</p>
+            <p className="text-xs">{tx("Marcas existentes aparecem automaticamente quando você cria diagnósticos empresariais.")}</p>
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Marca</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead className="text-center">Unidades</TableHead>
-                <TableHead>Site</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
+                <TableHead>{tx("Marca")}</TableHead>
+                <TableHead>{tx("Tipo")}</TableHead>
+                <TableHead className="text-center">{tx("Unidades")}</TableHead>
+                <TableHead>{tx("Site")}</TableHead>
+                <TableHead className="text-right">{tx("Ações")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -190,48 +189,48 @@ export function BrandManagementPanel() {
             <DialogHeader>
               <DialogTitle>{editing ? 'Editar marca' : 'Nova marca / rede'}</DialogTitle>
               <DialogDescription>
-                Defina os dados da marca. As unidades em cada município são vinculadas via o diagnóstico empresarial.
+                {tx("Defina os dados da marca. As unidades em cada município são vinculadas via o diagnóstico empresarial.")}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Nome</Label>
+                <Label>{tx("Nome")}</Label>
                 <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label>Tipo</Label>
+                  <Label>{tx("Tipo")}</Label>
                   <Select value={form.brand_type} onValueChange={(v) => setForm({ ...form, brand_type: v as BrandType })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="independent">Independente</SelectItem>
-                      <SelectItem value="chain">Rede</SelectItem>
-                      <SelectItem value="franchise">Franquia</SelectItem>
-                      <SelectItem value="collection">Coleção</SelectItem>
+                      <SelectItem value="independent">{tx("Independente")}</SelectItem>
+                      <SelectItem value="chain">{tx("Rede")}</SelectItem>
+                      <SelectItem value="franchise">{tx("Franquia")}</SelectItem>
+                      <SelectItem value="collection">{tx("Coleção")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>UF da matriz</Label>
+                  <Label>{tx("UF da matriz")}</Label>
                   <Input
                     value={form.headquarters_uf}
                     onChange={(e) => setForm({ ...form, headquarters_uf: e.target.value.toUpperCase().slice(0, 2) })}
-                    placeholder="SP"
+                    placeholder={tx("SP")}
                     maxLength={2}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Site</Label>
+                <Label>{tx("Site")}</Label>
                 <Input value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} placeholder="https://..." />
               </div>
               <div className="space-y-2">
-                <Label>Notas</Label>
+                <Label>{tx("Notas")}</Label>
                 <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => { setOpen(false); resetForm(); }}>Cancelar</Button>
+              <Button variant="outline" onClick={() => { setOpen(false); resetForm(); }}>{tx("Cancelar")}</Button>
               <Button
                 onClick={handleSubmit}
                 disabled={!form.name.trim() || createBrand.isPending || updateBrand.isPending}

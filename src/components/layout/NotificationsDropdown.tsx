@@ -17,6 +17,7 @@ import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
+import { tx } from "@/i18n/t";
 const notificationIcons = {
   assessment_created: ClipboardList,
   assessment_calculated: Calculator,
@@ -81,7 +82,7 @@ export function NotificationsDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-96">
         <DropdownMenuLabel className="flex items-center justify-between">
-          <span>Notificações</span>
+          <span>{tx("Notificações")}</span>
           {unreadCount > 0 && (
             <span className="text-xs text-muted-foreground">{unreadCount} novas</span>
           )}
@@ -94,7 +95,7 @@ export function NotificationsDropdown() {
             <div className="px-2 py-1.5">
               <span className="text-xs font-semibold text-severity-critical flex items-center gap-1">
                 <TrendingDown className="h-3 w-3" />
-                Alertas de Regressão
+                {tx("Alertas de Regressão")}
               </span>
             </div>
             {regressionAlerts.map((notification) => (
@@ -113,7 +114,7 @@ export function NotificationsDropdown() {
                     </p>
                     {notification.severity === 'critical' && (
                       <Badge variant="destructive" className="text-[10px] px-1 py-0">
-                        Urgente
+                        {tx("Urgente")}
                       </Badge>
                     )}
                   </div>
@@ -143,11 +144,11 @@ export function NotificationsDropdown() {
         <ScrollArea className="h-64">
           {isLoading ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              Carregando...
+              {tx("Carregando...")}
             </div>
           ) : notifications.filter(n => n.type !== 'regression_alert').length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              Nenhuma outra notificação
+              {tx("Nenhuma outra notificação")}
             </div>
           ) : (
             notifications
@@ -188,7 +189,7 @@ export function NotificationsDropdown() {
               className="text-center text-sm text-primary cursor-pointer"
               onClick={() => navigate('/diagnosticos')}
             >
-              Ver todas atividades
+              {tx("Ver todas atividades")}
             </DropdownMenuItem>
           </>
         )}

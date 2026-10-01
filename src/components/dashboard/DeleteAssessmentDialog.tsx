@@ -174,11 +174,11 @@ export function DeleteAssessmentDialog({
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            Excluir diagnóstico?
+            {tx("Excluir diagnóstico?")}
           </AlertDialogTitle>
           <AlertDialogDescription className="space-y-3">
             <p>
-              Esta ação não pode ser desfeita. O diagnóstico <strong>"{assessmentTitle}"</strong> 
+              {tx("Esta ação não pode ser desfeita. O diagnóstico")} <strong>"{assessmentTitle}"</strong> 
               {tx('e todos os dados de indicadores, pontuações e planos de ação serão permanentemente excluídos.')}
             </p>
             

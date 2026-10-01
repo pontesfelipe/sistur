@@ -76,9 +76,9 @@ interface NormalizationViewProps {
 }
 
 const reliabilityIcons = {
-  AUTOMATICA: { icon: ShieldCheck, color: 'text-severity-good', label: 'Automático (Alta)' },
-  MANUAL: { icon: Shield, color: 'text-severity-moderate', label: 'Manual (Média)' },
-  ESTIMADA: { icon: ShieldAlert, color: 'text-severity-critical', label: 'Estimado (Baixa)' },
+  AUTOMATICA: { icon: ShieldCheck, color: 'text-severity-good', label: tx('Automático (Alta)') },
+  MANUAL: { icon: Shield, color: 'text-severity-moderate', label: tx('Manual (Média)') },
+  ESTIMADA: { icon: ShieldAlert, color: 'text-severity-critical', label: tx('Estimado (Baixa)') },
 };
 
 const normalizationLabels = {
@@ -192,8 +192,7 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
           <h3 className="font-display font-semibold">{tx('Transparência na Normalização')}</h3>
         </div>
         <p className="text-sm text-muted-foreground">
-          Esta visão mostra como cada indicador foi normalizado: valor bruto, fonte dos dados, 
-          regra de normalização aplicada e score final. Objetivo: auditoria e confiança pública.
+          {tx("Esta visão mostra como cada indicador foi normalizado: valor bruto, fonte dos dados, regra de normalização aplicada e score final. Objetivo: auditoria e confiança pública.")}
         </p>
       </div>
 
@@ -219,9 +218,9 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{tx('Todos')}</SelectItem>
-              <SelectItem value="ra">IRA</SelectItem>
-              <SelectItem value="oe">IOE</SelectItem>
-              <SelectItem value="ao">IAO</SelectItem>
+              <SelectItem value="ra">{tx("IRA")}</SelectItem>
+              <SelectItem value="oe">{tx("IOE")}</SelectItem>
+              <SelectItem value="ao">{tx("IAO")}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={themeFilter} onValueChange={setThemeFilter}>

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+import { tx } from "@/i18n/t";
 interface AlertRow {
   id: string;
   metric_id: string;
@@ -53,7 +54,7 @@ export function RegressionAlertsPanel() {
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["observatory", "alerts"] }),
-    onError: (e: any) => toast.error("Erro: " + (e?.message ?? "desconhecido")),
+    onError: (e: any) => toast.error(tx("Erro: ") + (e?.message ?? "desconhecido")),
   });
 
   // Dispara e-mail para alertas críticos ainda não notificados (idempotente: a edge function checa email_sent_at)
@@ -81,7 +82,7 @@ export function RegressionAlertsPanel() {
     return (
       <Card>
         <CardContent className="py-6 flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Verificando alertas...
+          <Loader2 className="h-4 w-4 animate-spin" /> {tx("Verificando alertas...")}
         </CardContent>
       </Card>
     );
@@ -97,7 +98,7 @@ export function RegressionAlertsPanel() {
           Alertas de regressão ({alerts.length})
         </CardTitle>
         <CardDescription>
-          Variações superiores a 10% em relação ao período anterior. Alertas críticos sinalizam quedas acima de 25%.
+          {tx("Variações superiores a 10% em relação ao período anterior. Alertas críticos sinalizam quedas acima de 25%.")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -133,7 +134,7 @@ export function RegressionAlertsPanel() {
                     size="sm"
                     variant="ghost"
                     onClick={() => update.mutate({ id: a.id, patch: { is_read: true } })}
-                    title="Marcar como lido"
+                    title={tx("Marcar como lido")}
                   >
                     <Check className="h-4 w-4" />
                   </Button>
@@ -142,7 +143,7 @@ export function RegressionAlertsPanel() {
                   size="sm"
                   variant="ghost"
                   onClick={() => update.mutate({ id: a.id, patch: { is_dismissed: true } })}
-                  title="Dispensar"
+                  title={tx("Dispensar")}
                 >
                   <BellOff className="h-4 w-4" />
                 </Button>

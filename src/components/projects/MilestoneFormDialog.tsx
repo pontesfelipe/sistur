@@ -36,9 +36,9 @@ interface MilestoneFormDialogProps {
 type MilestoneStatus = 'pending' | 'completed' | 'missed';
 
 const STATUS_OPTIONS: { value: MilestoneStatus; label: string }[] = [
-  { value: 'pending', label: 'Pendente' },
-  { value: 'completed', label: 'Concluído' },
-  { value: 'missed', label: 'Atrasado' },
+  { value: 'pending', label: tx('Pendente') },
+  { value: 'completed', label: tx('Concluído') },
+  { value: 'missed', label: tx('Atrasado') },
 ];
 
 export function MilestoneFormDialog({

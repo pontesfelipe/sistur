@@ -9,6 +9,7 @@ import { Upload, Download, FileSpreadsheet, AlertTriangle, CheckCircle2, Loader2
 import { toast } from "sonner";
 import { useUpsertMeasurement } from "@/hooks/useObservatorio";
 
+import { tx } from "@/i18n/t";
 type Metric = { id: string; code: string; name: string; unit: string };
 
 type ParsedRow = {
@@ -88,7 +89,7 @@ export function CsvImportDialog({ metrics }: { metrics: Metric[] }) {
     const text = await file.text();
     const grid = parseCsv(text);
     if (grid.length < 2) {
-      toast.error("CSV vazio ou inválido");
+      toast.error(tx("CSV vazio ou inválido"));
       return;
     }
     const header = grid[0].map((h) => h.trim().toLowerCase());
@@ -135,7 +136,7 @@ export function CsvImportDialog({ metrics }: { metrics: Metric[] }) {
   const handleImport = async () => {
     const valid = rows.filter((r) => !r.error && r.metric_id);
     if (valid.length === 0) {
-      toast.error("Nenhuma linha válida para importar");
+      toast.error(tx("Nenhuma linha válida para importar"));
       return;
     }
     setBusy(true);
@@ -170,27 +171,27 @@ export function CsvImportDialog({ metrics }: { metrics: Metric[] }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-          <Upload className="h-4 w-4 mr-2" /> Importar CSV
+          <Upload className="h-4 w-4 mr-2" /> {tx("Importar CSV")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Importar medições do Observatório por CSV</DialogTitle>
+          <DialogTitle>{tx("Importar medições do Observatório por CSV")}</DialogTitle>
         </DialogHeader>
 
         <Alert>
           <FileSpreadsheet className="h-4 w-4" />
-          <AlertTitle>Formato esperado</AlertTitle>
+          <AlertTitle>{tx("Formato esperado")}</AlertTitle>
           <AlertDescription className="text-xs space-y-1">
-            <div>Colunas: <code>metric_code, reference_year, reference_month, value, source, notes</code></div>
-            <div><code>reference_month</code> aceita 1–12 ou vazio (medição anual). <code>value</code> aceita vírgula ou ponto decimal.</div>
+            <div>{tx("Colunas:")} <code>{tx("metric_code, reference_year, reference_month, value, source, notes")}</code></div>
+            <div><code>{tx("reference_month")}</code> aceita 1–12 ou vazio (medição anual). <code>{tx("value")}</code> {tx("aceita vírgula ou ponto decimal.")}</div>
             <div>Use para importar FOHB (ocupação hoteleira), CGE/SECTUR estaduais ou qualquer outra fonte que não tenha API.</div>
           </AlertDescription>
         </Alert>
 
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="ghost" onClick={downloadTemplate}>
-            <Download className="h-4 w-4 mr-2" /> Baixar modelo
+            <Download className="h-4 w-4 mr-2" /> {tx("Baixar modelo")}
           </Button>
           <Input
             ref={fileRef}
@@ -221,12 +222,12 @@ export function CsvImportDialog({ metrics }: { metrics: Metric[] }) {
                 <TableHeader className="sticky top-0 bg-background z-10">
                   <TableRow>
                     <TableHead className="w-12">L#</TableHead>
-                    <TableHead>Métrica</TableHead>
-                    <TableHead>Ano</TableHead>
-                    <TableHead>Mês</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    <TableHead>Fonte</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{tx("Métrica")}</TableHead>
+                    <TableHead>{tx("Ano")}</TableHead>
+                    <TableHead>{tx("Mês")}</TableHead>
+                    <TableHead className="text-right">{tx("Valor")}</TableHead>
+                    <TableHead>{tx("Fonte")}</TableHead>
+                    <TableHead>{tx("Status")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -259,7 +260,7 @@ export function CsvImportDialog({ metrics }: { metrics: Metric[] }) {
         )}
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => { setOpen(false); setRows([]); }}>Cancelar</Button>
+          <Button variant="ghost" onClick={() => { setOpen(false); setRows([]); }}>{tx("Cancelar")}</Button>
           <Button onClick={handleImport} disabled={busy || validCount === 0}>
             {busy ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
             Importar {validCount > 0 ? `${validCount} linhas` : ""}

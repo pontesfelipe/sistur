@@ -142,7 +142,7 @@ export function BadgesAdminPanel() {
             {tx('Catálogo de Badges')}
           </h3>
           <p className="text-sm text-muted-foreground">
-            Crie e gerencie badges concedidas aos alunos. Use códigos estáveis (ex: <code>first_course</code>).
+            Crie e gerencie badges concedidas aos alunos. Use códigos estáveis (ex: <code>{tx("first_course")}</code>).
           </p>
         </div>
         <Button onClick={openCreate}>
@@ -202,7 +202,7 @@ export function BadgesAdminPanel() {
                   )}
                   <div className="flex items-center gap-2 pt-1">
                     <Badge variant="secondary">+{b.xp_reward} XP</Badge>
-                    {!b.active && <Badge variant="outline">inativa</Badge>}
+                    {!b.active && <Badge variant="outline">{tx("inativa")}</Badge>}
                   </div>
                 </CardContent>
               </Card>
@@ -293,7 +293,7 @@ export function BadgesAdminPanel() {
       <AlertDialog open={!!confirmDelete} onOpenChange={(v) => !v && setConfirmDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remover badge?</AlertDialogTitle>
+            <AlertDialogTitle>{tx("Remover badge?")}</AlertDialogTitle>
             <AlertDialogDescription>
               A badge "{confirmDelete?.title}" será excluída. Alunos que já a ganharam
               perderão a referência.

@@ -48,12 +48,12 @@ const formSchema = z.object({
 });
 
 const categories = [
-  { value: 'general', label: 'Geral' },
-  { value: 'question', label: 'Dúvida' },
-  { value: 'discussion', label: 'Discussão' },
-  { value: 'announcement', label: 'Anúncio' },
-  { value: 'resource', label: 'Recurso' },
-  { value: 'tip', label: 'Dica' },
+  { value: 'general', label: tx('Geral') },
+  { value: 'question', label: tx('Dúvida') },
+  { value: 'discussion', label: tx('Discussão') },
+  { value: 'announcement', label: tx('Anúncio') },
+  { value: 'resource', label: tx('Recurso') },
+  { value: 'tip', label: tx('Dica') },
 ];
 
 interface CreatePostDialogProps {

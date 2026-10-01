@@ -15,6 +15,7 @@ import { tutorialCategories, getTutorialForRole, getUserTutorialRole, type Tutor
 import { getDetailedTopicIds, getTopicDetail } from '@/data/tutorialSteps';
 
 
+import { tx } from "@/i18n/t";
 const ROLE_LABELS: Record<TutorialRole, string> = {
   ADMIN: 'Administrador',
   PROFESSOR: 'Professor',
@@ -59,8 +60,8 @@ export default function Ajuda() {
 
   return (
     <AppLayout subNav={ajudaNav}
-      title="Ajuda & Tutorial"
-      subtitle="Aprenda a usar o SISTUR passo a passo"
+      title={tx("Ajuda & Tutorial")}
+      subtitle={tx("Aprenda a usar o SISTUR passo a passo")}
     >
       <div className="space-y-6">
             {/* Header & progress */}
@@ -68,10 +69,10 @@ export default function Ajuda() {
               <div>
                 <h2 className="text-xl font-display font-bold text-foreground flex items-center gap-2">
                   <BookOpen className="h-5 w-5 text-primary" />
-                  Tutorial Passo a Passo
+                  {tx("Tutorial Passo a Passo")}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Aprenda a usar cada funcionalidade da plataforma
+                  {tx("Aprenda a usar cada funcionalidade da plataforma")}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -163,7 +164,7 @@ export default function Ajuda() {
                                   className="flex-1 text-xs h-8"
                                   onClick={() => navigate(`/tutorial/${step.id}`)}
                                 >
-                                  Ver tutorial completo
+                                  {tx("Ver tutorial completo")}
                                   <ChevronRight className="h-3 w-3 ml-1" />
                                 </Button>
                               )}
@@ -175,7 +176,7 @@ export default function Ajuda() {
                                   onClick={() => navigate(step.route!)}
                                 >
                                   <ExternalLink className="h-3 w-3 mr-1" />
-                                  Acessar
+                                  {tx("Acessar")}
                                 </Button>
                               )}
                               <Button
@@ -201,14 +202,14 @@ export default function Ajuda() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="h-5 w-5 text-primary" />
-              Precisa de mais ajuda?
+              {tx("Precisa de mais ajuda?")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
               Se você não encontrou a resposta que procurava, entre em contato com nossa equipe de suporte através do email{' '}
               <a href="mailto:suporte@sistur.com.br" className="text-primary hover:underline">
-                suporte@sistur.com.br
+                {tx("suporte@sistur.com.br")}
               </a>
             </p>
           </CardContent>

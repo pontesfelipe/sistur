@@ -11,11 +11,11 @@ interface Props {
 }
 
 const STEPS = [
-  { key: 'created', label: 'Rodada Criada', description: 'Diagnóstico configurado' },
-  { key: 'data', label: 'Dados Coletados', description: 'Indicadores preenchidos' },
-  { key: 'calculated', label: 'Índices Calculados', description: 'Scores e gargalos gerados' },
-  { key: 'report', label: 'Relatório Gerado', description: 'Plano de desenvolvimento' },
-  { key: 'project', label: 'Projeto Criado', description: 'Plano de ação em execução' },
+  { key: 'created', label: tx('Rodada Criada'), description: tx('Diagnóstico configurado') },
+  { key: 'data', label: tx('Dados Coletados'), description: tx('Indicadores preenchidos') },
+  { key: 'calculated', label: tx('Índices Calculados'), description: tx('Scores e gargalos gerados') },
+  { key: 'report', label: tx('Relatório Gerado'), description: tx('Plano de desenvolvimento') },
+  { key: 'project', label: tx('Projeto Criado'), description: tx('Plano de ação em execução') },
 ];
 
 export function DiagnosticProgressDashboard({ status, hasIndicatorValues, hasReport, hasProjects }: Props) {

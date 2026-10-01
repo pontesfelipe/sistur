@@ -50,14 +50,14 @@ function ClassroomBlock({ classroomId, classroomName }: ClassroomBlockProps) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="p-3 rounded-lg border bg-card">
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Users className="h-3 w-3" /> Conclusão média
+                  <Users className="h-3 w-3" /> {tx("Conclusão média")}
                 </div>
                 <div className="text-lg font-semibold mt-1">{stats.taxaConclusaoMedia.toFixed(0)}%</div>
                 <Progress value={stats.taxaConclusaoMedia} className="h-1.5 mt-1" />
               </div>
               <div className="p-3 rounded-lg border bg-card">
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Award className="h-3 w-3" /> Nota média
+                  <Award className="h-3 w-3" /> {tx("Nota média")}
                 </div>
                 <div className="text-lg font-semibold mt-1">
                   {stats.mediaNota != null ? `${stats.mediaNota.toFixed(0)}%` : '—'}
@@ -65,13 +65,13 @@ function ClassroomBlock({ classroomId, classroomName }: ClassroomBlockProps) {
               </div>
               <div className="p-3 rounded-lg border bg-card">
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Activity className="h-3 w-3" /> Ativos 7d
+                  <Activity className="h-3 w-3" /> {tx("Ativos 7d")}
                 </div>
                 <div className="text-lg font-semibold mt-1">{stats.ativos7d}</div>
               </div>
               <div className="p-3 rounded-lg border bg-card">
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <AlertTriangle className="h-3 w-3" /> Em risco
+                  <AlertTriangle className="h-3 w-3" /> {tx("Em risco")}
                 </div>
                 <div className="text-lg font-semibold mt-1 text-destructive">{atRisk.length}</div>
               </div>

@@ -71,7 +71,7 @@ const PHASE_DEFS: Array<{
 }> = [
   {
     key: 'pillars',
-    label: 'Pilares (RA · OE · AO)',
+    label: tx('Pilares (RA · OE · AO)'),
     description: tx("Geração paralela das 3 subseções por pilar"),
     icon: <Layers className="h-4 w-4" />,
     startStages: ['phase1_pillars_start', 'parallel_pipeline_enabled', 'parallel_provider_try'],
@@ -80,7 +80,7 @@ const PHASE_DEFS: Array<{
   },
   {
     key: 'envelope',
-    label: 'Envelope (capa, sumário, fechamento)',
+    label: tx('Envelope (capa, sumário, fechamento)'),
     description: tx("Montagem sequencial unindo os pilares"),
     icon: <Mail className="h-4 w-4" />,
     startStages: ['phase2_envelope_start'],
@@ -89,7 +89,7 @@ const PHASE_DEFS: Array<{
   },
   {
     key: 'validation',
-    label: 'Validação (determinística + IA)',
+    label: tx('Validação (determinística + IA)'),
     description: tx("Coerência numérica e revisão por agente"),
     icon: <ShieldCheck className="h-4 w-4" />,
     startStages: ['validation_deterministic_start', 'validation_agent_start'],
@@ -97,7 +97,7 @@ const PHASE_DEFS: Array<{
   },
   {
     key: 'persistence',
-    label: 'Persistência',
+    label: tx('Persistência'),
     description: tx("Gravação do relatório, validações e auditoria"),
     icon: <Database className="h-4 w-4" />,
     startStages: ['persist_lookup_existing'],
@@ -231,8 +231,8 @@ function ClaudeLivePipeline({ rows }: { rows: LogRow[] }) {
             <CardDescription className="text-xs mt-1">
               Trace {live.traceId?.slice(0, 14) ?? '—'} • {live.rowCount} eventos •{' '}
               último há {live.ageSec}s
-              {isStale && <span className="ml-2 text-severity-moderate">• sem novos eventos</span>}
-              {hasError && <span className="ml-2 text-destructive">• erro detectado</span>}
+              {isStale && <span className="ml-2 text-severity-moderate">{tx("• sem novos eventos")}</span>}
+              {hasError && <span className="ml-2 text-destructive">{tx("• erro detectado")}</span>}
             </CardDescription>
           </div>
           <Badge variant="outline" className="font-mono text-[10px]">
@@ -342,7 +342,7 @@ export default function AdminReportLogs() {
   return (
     <AppLayout
       title={tx("Logs do Gerador de Relatórios")}
-      subtitle="Eventos e erros da edge function generate-report (filtrado por provedor de IA)"
+      subtitle={tx("Eventos e erros da edge function generate-report (filtrado por provedor de IA)")}
     >
       <div className="space-y-6">
         {/* Live pipeline tracker — visível somente quando filtrando por Claude (default). */}
@@ -538,9 +538,9 @@ export default function AdminReportLogs() {
               <div className="space-y-3 text-sm">
                 <div className="grid grid-cols-2 gap-3">
                   <Field label={tx("Nível")} value={selected.level} />
-                  <Field label="Stage" value={selected.stage ?? '—'} mono />
-                  <Field label="Provider" value={selected.provider ? (PROVIDER_LABEL[selected.provider] ?? selected.provider) : '—'} />
-                  <Field label="Modelo" value={selected.model ?? '—'} mono />
+                  <Field label={tx("Stage")} value={selected.stage ?? '—'} mono />
+                  <Field label={tx("Provider")} value={selected.provider ? (PROVIDER_LABEL[selected.provider] ?? selected.provider) : '—'} />
+                  <Field label={tx("Modelo")} value={selected.model ?? '—'} mono />
                   <Field label={tx("Duração")} value={selected.duration_ms != null ? `${(selected.duration_ms / 1000).toFixed(1)}s` : '—'} />
                   <Field label={tx("Trace ID")} value={selected.trace_id ?? '—'} mono />
                   <Field label={tx("Job ID")} value={selected.job_id ?? '—'} mono />

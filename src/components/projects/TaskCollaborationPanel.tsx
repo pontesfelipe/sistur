@@ -21,10 +21,10 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 
 const RACI_INFO: Record<RaciRole, { label: string; color: string; hint: string }> = {
-  R: { label: 'Responsável',  color: 'bg-blue-100 text-blue-700',     hint: 'Executa a tarefa' },
-  A: { label: 'Aprovador',    color: 'bg-purple-100 text-purple-700', hint: 'Aprova a entrega' },
-  C: { label: 'Consultado',   color: 'bg-amber-100 text-amber-700',   hint: 'Fornece insumos' },
-  I: { label: 'Informado',    color: 'bg-gray-100 text-gray-700',     hint: 'Recebe atualizações' },
+  R: { label: tx('Responsável'),  color: 'bg-blue-100 text-blue-700',     hint: tx('Executa a tarefa') },
+  A: { label: tx('Aprovador'),    color: 'bg-purple-100 text-purple-700', hint: tx('Aprova a entrega') },
+  C: { label: tx('Consultado'),   color: 'bg-amber-100 text-amber-700',   hint: tx('Fornece insumos') },
+  I: { label: tx('Informado'),    color: 'bg-gray-100 text-gray-700',     hint: tx('Recebe atualizações') },
 };
 
 export function TaskCollaborationPanel({
@@ -51,7 +51,7 @@ function RaciSection({ taskId, projectId, canEdit }: { taskId: string; projectId
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <UserCheck className="h-4 w-4" /> Matriz RACI
+          <UserCheck className="h-4 w-4" /> {tx("Matriz RACI")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -78,7 +78,7 @@ function RaciSection({ taskId, projectId, canEdit }: { taskId: string; projectId
                   <Popover open={openRole === role} onOpenChange={(o) => setOpenRole(o ? role : null)}>
                     <PopoverTrigger asChild>
                       <Button size="sm" variant="ghost" className="h-6 px-2 text-xs">
-                        <Plus className="h-3 w-3 mr-1" /> adicionar
+                        <Plus className="h-3 w-3 mr-1" /> {tx("adicionar")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-64 p-0" align="start">
@@ -190,7 +190,7 @@ function ActivitySection({ taskId }: { taskId: string }) {
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <Clock className="h-4 w-4" /> Histórico
+          <Clock className="h-4 w-4" /> {tx("Histórico")}
         </CardTitle>
       </CardHeader>
       <CardContent>

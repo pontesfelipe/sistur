@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Props {
   businessName: string;
   location: string;
@@ -21,7 +22,7 @@ export function PublicComplaintsSearch({ businessName, location, onAutoFill, onA
 
   const run = async () => {
     if (!businessName?.trim()) {
-      toast.error('Informe o nome do estabelecimento.');
+      toast.error(tx('Informe o nome do estabelecimento.'));
       return;
     }
     setLoading(true);
@@ -42,9 +43,9 @@ export function PublicComplaintsSearch({ businessName, location, onAutoFill, onA
         values['ENT_TAXA_SOLUCAO_RECLAMACOES'] = data.analysis.reclame_aqui.solved_pct;
       }
       onAutoFill?.(values);
-      toast.success('Reclamações públicas analisadas');
+      toast.success(tx('Reclamações públicas analisadas'));
     } catch (e: any) {
-      toast.error('Erro ao buscar reclamações: ' + (e.message || ''));
+      toast.error(tx('Erro ao buscar reclamações: ') + (e.message || ''));
     } finally {
       setLoading(false);
     }
@@ -56,7 +57,7 @@ export function PublicComplaintsSearch({ businessName, location, onAutoFill, onA
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          Busca registros públicos de reclamações no Reclame Aqui e menções no Procon para preencher reputação pública e taxa de solução.
+          {tx("Busca registros públicos de reclamações no Reclame Aqui e menções no Procon para preencher reputação pública e taxa de solução.")}
         </p>
         <Button onClick={run} disabled={loading || !businessName} size="sm">
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
@@ -68,10 +69,10 @@ export function PublicComplaintsSearch({ businessName, location, onAutoFill, onA
         <div className="space-y-3">
           <Separator />
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">Reputação Pública</p><p className="text-2xl font-bold">{a.public_reputation_score ?? '—'}</p></CardContent></Card>
-            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">Nota RA</p><p className="text-2xl font-bold">{a.reclame_aqui?.ra_score ?? '—'}</p></CardContent></Card>
-            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">Reclamações</p><p className="text-2xl font-bold">{a.reclame_aqui?.total_complaints ?? '—'}</p></CardContent></Card>
-            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">Procon</p><p className="text-2xl font-bold">{a.procon?.mentions ?? 0}</p></CardContent></Card>
+            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">{tx("Reputação Pública")}</p><p className="text-2xl font-bold">{a.public_reputation_score ?? '—'}</p></CardContent></Card>
+            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">{tx("Nota RA")}</p><p className="text-2xl font-bold">{a.reclame_aqui?.ra_score ?? '—'}</p></CardContent></Card>
+            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">{tx("Reclamações")}</p><p className="text-2xl font-bold">{a.reclame_aqui?.total_complaints ?? '—'}</p></CardContent></Card>
+            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">{tx("Procon")}</p><p className="text-2xl font-bold">{a.procon?.mentions ?? 0}</p></CardContent></Card>
           </div>
 
           <Card><CardContent className="p-3 space-y-2">
@@ -88,18 +89,18 @@ export function PublicComplaintsSearch({ businessName, location, onAutoFill, onA
                 </div>
                 {a.reclame_aqui.url && (
                   <a href={a.reclame_aqui.url} target="_blank" rel="noreferrer" className="text-xs text-primary inline-flex items-center gap-1 hover:underline">
-                    <ExternalLink className="h-3 w-3" /> Ver perfil
+                    <ExternalLink className="h-3 w-3" /> {tx("Ver perfil")}
                   </a>
                 )}
               </>
             ) : (
-              <p className="text-xs text-muted-foreground">Nenhum perfil ativo identificado.</p>
+              <p className="text-xs text-muted-foreground">{tx("Nenhum perfil ativo identificado.")}</p>
             )}
           </CardContent></Card>
 
           {a.recommendations?.length > 0 && (
             <Card className="border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/10"><CardContent className="p-3 space-y-1.5">
-              <p className="text-xs font-medium">Recomendações</p>
+              <p className="text-xs font-medium">{tx("Recomendações")}</p>
               <ul className="text-xs text-muted-foreground list-disc list-inside space-y-1">
                 {a.recommendations.map((r: string, i: number) => <li key={i}>{r}</li>)}
               </ul>

@@ -15,23 +15,24 @@ import { UserPlus, Shield, User, Eye, Loader2, MoreHorizontal, Ban, Trash2, Refr
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
+import { tx } from "@/i18n/t";
 interface OrgOption {
   id: string;
   name: string;
 }
 
 const ROLE_INFO: Record<string, { label: string; color: string; icon: typeof Shield }> = {
-  ADMIN: { label: 'Administrador', color: 'bg-red-500/20 text-red-700', icon: Shield },
-  ORG_ADMIN: { label: 'Admin Org', color: 'bg-orange-500/20 text-orange-700', icon: Building2 },
-  ANALYST: { label: 'Analista', color: 'bg-blue-500/20 text-blue-700', icon: User },
-  VIEWER: { label: 'Visualizador', color: 'bg-gray-500/20 text-gray-700', icon: Eye },
-  ESTUDANTE: { label: 'Estudante', color: 'bg-green-500/20 text-green-700', icon: GraduationCap },
-  PROFESSOR: { label: 'Professor', color: 'bg-purple-500/20 text-purple-700', icon: GraduationCap },
+  ADMIN: { label: tx('Administrador'), color: 'bg-red-500/20 text-red-700', icon: Shield },
+  ORG_ADMIN: { label: tx('Admin Org'), color: 'bg-orange-500/20 text-orange-700', icon: Building2 },
+  ANALYST: { label: tx('Analista'), color: 'bg-blue-500/20 text-blue-700', icon: User },
+  VIEWER: { label: tx('Visualizador'), color: 'bg-gray-500/20 text-gray-700', icon: Eye },
+  ESTUDANTE: { label: tx('Estudante'), color: 'bg-green-500/20 text-green-700', icon: GraduationCap },
+  PROFESSOR: { label: tx('Professor'), color: 'bg-purple-500/20 text-purple-700', icon: GraduationCap },
 };
 
 const SYSTEM_ACCESS_INFO: Record<string, { label: string; color: string }> = {
-  ERP: { label: 'Analítico', color: 'bg-primary/20 text-primary' },
-  EDU: { label: 'EDU', color: 'bg-emerald-500/20 text-emerald-700' },
+  ERP: { label: tx('Analítico'), color: 'bg-primary/20 text-primary' },
+  EDU: { label: tx('EDU'), color: 'bg-emerald-500/20 text-emerald-700' },
 };
 
 // Roles for ERP system
@@ -83,7 +84,7 @@ export function UserManagement() {
       setOrgs(data || []);
     } catch (error) {
       console.error('Error loading orgs:', error);
-      toast.error('Erro ao carregar organizações');
+      toast.error(tx('Erro ao carregar organizações'));
     } finally {
       setLoadingOrgs(false);
     }
@@ -91,7 +92,7 @@ export function UserManagement() {
 
   const handleCreateUser = async () => {
     if (!formData.email || !formData.password || !formData.fullName || !formData.orgId || !formData.systemAccess || !formData.role) {
-      toast.error('Preencha todos os campos obrigatórios');
+      toast.error(tx('Preencha todos os campos obrigatórios'));
       return;
     }
 
@@ -121,7 +122,7 @@ export function UserManagement() {
       const targetUser = users.find(u => u.user_id === userId);
       if (targetUser && targetUser.system_access !== 'ERP') {
         await updateSystemAccess(userId, 'ERP');
-        toast.info('Acesso alterado automaticamente para Analítico', {
+        toast.info(tx('Acesso alterado automaticamente para Analítico'), {
           description: `O papel ${ROLE_INFO[newRole]?.label || newRole} requer acesso Analítico.`
         });
       }
@@ -142,13 +143,13 @@ export function UserManagement() {
       
       if (newAccess === 'EDU' && erpRoles.includes(targetUser.role)) {
         await updateUserRole(userId, 'ESTUDANTE');
-        toast.info('Papel alterado automaticamente para Estudante', {
-          description: 'Acesso EDU requer papel Estudante ou Professor.'
+        toast.info(tx('Papel alterado automaticamente para Estudante'), {
+          description: tx('Acesso EDU requer papel Estudante ou Professor.')
         });
       } else if (newAccess === 'ERP' && eduRoles.includes(targetUser.role)) {
         await updateUserRole(userId, 'VIEWER');
-        toast.info('Papel alterado automaticamente para Visualizador', {
-          description: 'Acesso Analítico requer papel Admin, Analista ou Visualizador.'
+        toast.info(tx('Papel alterado automaticamente para Visualizador'), {
+          description: tx('Acesso Analítico requer papel Admin, Analista ou Visualizador.')
         });
       }
     }
@@ -178,7 +179,7 @@ export function UserManagement() {
       <Card>
         <CardContent className="pt-6">
           <p className="text-center text-muted-foreground">
-            Acesso restrito a administradores.
+            {tx("Acesso restrito a administradores.")}
           </p>
         </CardContent>
       </Card>
@@ -191,7 +192,7 @@ export function UserManagement() {
         <CardContent className="pt-6">
           <div className="flex items-center justify-center gap-2">
             <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Carregando usuários...</span>
+            <span>{tx("Carregando usuários...")}</span>
           </div>
         </CardContent>
       </Card>
@@ -206,58 +207,58 @@ export function UserManagement() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-primary" />
-                Gerenciamento de Usuários
+                {tx("Gerenciamento de Usuários")}
               </CardTitle>
               <CardDescription>
-                Adicione e gerencie os usuários da sua organização
+                {tx("Adicione e gerencie os usuários da sua organização")}
               </CardDescription>
             </div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <UserPlus className="h-4 w-4 mr-2" />
-                  Novo Usuário
+                  {tx("Novo Usuário")}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Adicionar Novo Usuário</DialogTitle>
+                  <DialogTitle>{tx("Adicionar Novo Usuário")}</DialogTitle>
                   <DialogDescription>
-                    Preencha os dados do novo usuário. Ele receberá acesso imediato.
+                    {tx("Preencha os dados do novo usuário. Ele receberá acesso imediato.")}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Nome Completo *</Label>
+                    <Label htmlFor="fullName">{tx("Nome Completo *")}</Label>
                     <Input
                       id="fullName"
                       value={formData.fullName}
                       onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                      placeholder="Nome completo do usuário"
+                      placeholder={tx("Nome completo do usuário")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">{tx("Email *")}</Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="email@exemplo.com"
+                      placeholder={tx("email@exemplo.com")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Senha *</Label>
+                    <Label htmlFor="password">{tx("Senha *")}</Label>
                     <Input
                       id="password"
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                      placeholder="Senha inicial (mínimo 6 caracteres)"
+                      placeholder={tx("Senha inicial (mínimo 6 caracteres)")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="org">Organização *</Label>
+                    <Label htmlFor="org">{tx("Organização *")}</Label>
                     <Select 
                       value={formData.orgId} 
                       onValueChange={(value) => setFormData(prev => ({ ...prev, orgId: value }))}
@@ -276,25 +277,25 @@ export function UserManagement() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="systemAccess">Sistema de Acesso *</Label>
+                    <Label htmlFor="systemAccess">{tx("Sistema de Acesso *")}</Label>
                     <Select 
                       value={formData.systemAccess} 
                       onValueChange={(value) => setFormData(prev => ({ ...prev, systemAccess: value as 'ERP' | 'EDU' }))}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o sistema" />
+                        <SelectValue placeholder={tx("Selecione o sistema")} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="ERP">
                           <div className="flex items-center gap-2">
                             <Building2 className="h-4 w-4" />
-                            Analítico - Sistema Territorial
+                            {tx("Analítico - Sistema Territorial")}
                           </div>
                         </SelectItem>
                         <SelectItem value="EDU">
                           <div className="flex items-center gap-2">
                             <GraduationCap className="h-4 w-4" />
-                            EDU - Plataforma Educacional
+                            {tx("EDU - Plataforma Educacional")}
                           </div>
                         </SelectItem>
                       </SelectContent>
@@ -309,13 +310,13 @@ export function UserManagement() {
                   </div>
                   {formData.systemAccess && (
                     <div className="space-y-2">
-                      <Label htmlFor="role">Papel *</Label>
+                      <Label htmlFor="role">{tx("Papel *")}</Label>
                       <Select 
                         value={formData.role} 
                         onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione o papel" />
+                          <SelectValue placeholder={tx("Selecione o papel")} />
                         </SelectTrigger>
                         <SelectContent>
                           {formData.systemAccess === 'EDU' ? (
@@ -323,13 +324,13 @@ export function UserManagement() {
                               <SelectItem value="ESTUDANTE">
                                 <div className="flex items-center gap-2">
                                   <GraduationCap className="h-4 w-4" />
-                                  Estudante
+                                  {tx("Estudante")}
                                 </div>
                               </SelectItem>
                               <SelectItem value="PROFESSOR">
                                 <div className="flex items-center gap-2">
                                   <GraduationCap className="h-4 w-4" />
-                                  Professor
+                                  {tx("Professor")}
                                 </div>
                               </SelectItem>
                             </>
@@ -338,19 +339,19 @@ export function UserManagement() {
                               <SelectItem value="ADMIN">
                                 <div className="flex items-center gap-2">
                                   <Shield className="h-4 w-4" />
-                                  Administrador
+                                  {tx("Administrador")}
                                 </div>
                               </SelectItem>
                               <SelectItem value="ANALYST">
                                 <div className="flex items-center gap-2">
                                   <User className="h-4 w-4" />
-                                  Analista
+                                  {tx("Analista")}
                                 </div>
                               </SelectItem>
                               <SelectItem value="VIEWER">
                                 <div className="flex items-center gap-2">
                                   <Eye className="h-4 w-4" />
-                                  Visualizador
+                                  {tx("Visualizador")}
                                 </div>
                               </SelectItem>
                             </>
@@ -367,7 +368,7 @@ export function UserManagement() {
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                    Cancelar
+                    {tx("Cancelar")}
                   </Button>
                   <Button 
                     onClick={handleCreateUser} 
@@ -385,12 +386,12 @@ export function UserManagement() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Usuário</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Acesso</TableHead>
-                <TableHead>Papel</TableHead>
-                <TableHead>Termos</TableHead>
-                <TableHead>Data de Criação</TableHead>
+                <TableHead>{tx("Usuário")}</TableHead>
+                <TableHead>{tx("Email")}</TableHead>
+                <TableHead>{tx("Acesso")}</TableHead>
+                <TableHead>{tx("Papel")}</TableHead>
+                <TableHead>{tx("Termos")}</TableHead>
+                <TableHead>{tx("Data de Criação")}</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -413,7 +414,7 @@ export function UserManagement() {
                           <span className="font-medium">{user.full_name || 'Sem nome'}</span>
                           {user.is_blocked && (
                             <Badge variant="destructive" className="ml-2 text-xs">
-                              Bloqueado
+                              {tx("Bloqueado")}
                             </Badge>
                           )}
                         </div>
@@ -441,13 +442,13 @@ export function UserManagement() {
                           <SelectItem value="ERP">
                             <div className="flex items-center gap-2">
                               <Building2 className="h-4 w-4" />
-                              Analítico
+                              {tx("Analítico")}
                             </div>
                           </SelectItem>
                           <SelectItem value="EDU">
                             <div className="flex items-center gap-2">
                               <GraduationCap className="h-4 w-4" />
-                              EDU
+                              {tx("EDU")}
                             </div>
                           </SelectItem>
                         </SelectContent>
@@ -469,14 +470,14 @@ export function UserManagement() {
                         <SelectContent>
                           {user.system_access === 'EDU' ? (
                             <>
-                              <SelectItem value="ESTUDANTE">Estudante</SelectItem>
-                              <SelectItem value="PROFESSOR">Professor</SelectItem>
+                              <SelectItem value="ESTUDANTE">{tx("Estudante")}</SelectItem>
+                              <SelectItem value="PROFESSOR">{tx("Professor")}</SelectItem>
                             </>
                           ) : (
                             <>
-                              <SelectItem value="ADMIN">Administrador</SelectItem>
-                              <SelectItem value="ANALYST">Analista</SelectItem>
-                              <SelectItem value="VIEWER">Visualizador</SelectItem>
+                              <SelectItem value="ADMIN">{tx("Administrador")}</SelectItem>
+                              <SelectItem value="ANALYST">{tx("Analista")}</SelectItem>
+                              <SelectItem value="VIEWER">{tx("Visualizador")}</SelectItem>
                             </>
                           )}
                         </SelectContent>
@@ -493,7 +494,7 @@ export function UserManagement() {
                       ) : (
                         <div className="flex items-center gap-1.5 text-amber-600">
                           <AlertCircle className="h-4 w-4" />
-                          <span className="text-xs">Pendente</span>
+                          <span className="text-xs">{tx("Pendente")}</span>
                         </div>
                       )}
                     </TableCell>
@@ -515,12 +516,12 @@ export function UserManagement() {
                           {user.is_blocked ? (
                             <DropdownMenuItem onClick={() => handleBlockUser(user.user_id, false)}>
                               <RefreshCw className="h-4 w-4 mr-2" />
-                              Desbloquear
+                              {tx("Desbloquear")}
                             </DropdownMenuItem>
                           ) : (
                             <DropdownMenuItem onClick={() => handleBlockUser(user.user_id, true)}>
                               <Ban className="h-4 w-4 mr-2" />
-                              Bloquear Acesso
+                              {tx("Bloquear Acesso")}
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
@@ -531,23 +532,23 @@ export function UserManagement() {
                                 onSelect={(e) => e.preventDefault()}
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                Excluir Usuário
+                                {tx("Excluir Usuário")}
                               </DropdownMenuItem>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Excluir usuário?</AlertDialogTitle>
+                                <AlertDialogTitle>{tx("Excluir usuário?")}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Esta ação não pode ser desfeita. O usuário <strong>{user.full_name}</strong> ({user.email}) será permanentemente removido do sistema.
+                                  {tx("Esta ação não pode ser desfeita. O usuário")} <strong>{user.full_name}</strong> ({user.email}) será permanentemente removido do sistema.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
                                 <AlertDialogAction
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                   onClick={() => handleDeleteUser(user.user_id)}
                                 >
-                                  Excluir
+                                  {tx("Excluir")}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>

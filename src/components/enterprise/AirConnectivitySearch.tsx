@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Analysis {
   connectivity_score: number;
   connectivity_tier: string;
@@ -55,7 +56,7 @@ export function AirConnectivitySearch({ destinationId, onAutoFill, onAnalysisCap
       setAnalysis(a);
       onAnalysisCapture?.({ ...a, destinationId, searchedAt: new Date().toISOString() });
       onAutoFill?.({ ENT_CONECTIVIDADE_AEREA: a.connectivity_score });
-      toast.success('Conectividade aérea analisada');
+      toast.success(tx('Conectividade aérea analisada'));
     } catch (e: any) {
       console.error(e); toast.error(e?.message || 'Falha ao analisar conectividade');
     } finally { setLoading(false); }
@@ -76,16 +77,16 @@ export function AirConnectivitySearch({ destinationId, onAutoFill, onAnalysisCap
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 rounded-lg border bg-card">
-              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Plane className="h-3 w-3" /> Conectividade</div>
+              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Plane className="h-3 w-3" /> {tx("Conectividade")}</div>
               <div className="text-2xl font-bold">{analysis.connectivity_score}<span className="text-sm font-normal text-muted-foreground">/100</span></div>
               <Progress value={analysis.connectivity_score} className="h-1 mt-2" />
               <Badge variant="outline" className={`mt-2 text-[10px] capitalize ${TIER_COLOR[analysis.connectivity_tier] ?? ''}`}>{analysis.connectivity_tier.replace(/_/g, ' ')}</Badge>
             </div>
             <div className="p-3 rounded-lg border bg-card space-y-1 text-xs">
-              <div className="flex items-center justify-between"><span className="text-muted-foreground">Voos/semana</span><span className="font-bold">{analysis.flights_per_week ?? '—'}</span></div>
-              <div className="flex items-center justify-between"><span className="text-muted-foreground">Voos 12m</span><span className="font-bold">{analysis.total_flights_12m?.toLocaleString('pt-BR') ?? '—'}</span></div>
-              <div className="flex items-center justify-between"><span className="text-muted-foreground">Passageiros 12m</span><span className="font-bold">{analysis.total_passengers_12m?.toLocaleString('pt-BR') ?? '—'}</span></div>
-              <div className="flex items-center justify-between pt-1 border-t"><span className="text-muted-foreground">Internacional</span><span className="font-bold">{analysis.international_flights_share_pct ?? 0}%</span></div>
+              <div className="flex items-center justify-between"><span className="text-muted-foreground">{tx("Voos/semana")}</span><span className="font-bold">{analysis.flights_per_week ?? '—'}</span></div>
+              <div className="flex items-center justify-between"><span className="text-muted-foreground">{tx("Voos 12m")}</span><span className="font-bold">{analysis.total_flights_12m?.toLocaleString('pt-BR') ?? '—'}</span></div>
+              <div className="flex items-center justify-between"><span className="text-muted-foreground">{tx("Passageiros 12m")}</span><span className="font-bold">{analysis.total_passengers_12m?.toLocaleString('pt-BR') ?? '—'}</span></div>
+              <div className="flex items-center justify-between pt-1 border-t"><span className="text-muted-foreground">{tx("Internacional")}</span><span className="font-bold">{analysis.international_flights_share_pct ?? 0}%</span></div>
             </div>
           </div>
 
@@ -100,7 +101,7 @@ export function AirConnectivitySearch({ destinationId, onAutoFill, onAnalysisCap
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>
@@ -109,7 +110,7 @@ export function AirConnectivitySearch({ destinationId, onAutoFill, onAnalysisCap
 
           {analysis.source_url && (
             <a href={analysis.source_url} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">
-              <ExternalLink className="h-3 w-3" /> Fonte: ANAC
+              <ExternalLink className="h-3 w-3" /> {tx("Fonte: ANAC")}
             </a>
           )}
         </div>

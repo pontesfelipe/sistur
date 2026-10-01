@@ -134,8 +134,7 @@ export function OrgWeightsPanel() {
           {tx('Pesos Customizáveis da Organização')}
         </h3>
         <p className="text-sm text-muted-foreground">
-          Ajuste a importância relativa de cada pilar e indicador no Score Final do diagnóstico.
-          Mudanças marcam todos os diagnósticos calculados para recálculo.
+          {tx("Ajuste a importância relativa de cada pilar e indicador no Score Final do diagnóstico. Mudanças marcam todos os diagnósticos calculados para recálculo.")}
         </p>
       </div>
 

@@ -118,7 +118,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
         <ResumeGameDialog open={showResumeDialog} savedAt={resumeSavedAt} onResume={handleResumeGame} onNewGame={handleNewGameFromDialog} />
         <div className="absolute top-4 left-4 z-10">
           <Button variant="ghost" size="sm" onClick={onBack} className="gap-2">
-            <ArrowLeft className="h-4 w-4" /> Voltar
+            <ArrowLeft className="h-4 w-4" /> {tx("Voltar")}
           </Button>
         </div>
         <BiomeSelector onSelect={handleSelectBiome} />

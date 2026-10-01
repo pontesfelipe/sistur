@@ -29,6 +29,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAutoFillRunner, NoDataError } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 const normalizeSourcePlatform = (platform: string | null | undefined) => {
   const raw = (platform || 'Fonte').trim();
   const key = raw
@@ -151,13 +152,13 @@ interface BusinessReviewSearchProps {
 }
 
 const PROPERTY_TYPES = [
-  { value: 'hotel', label: 'Hotel' },
-  { value: 'resort', label: 'Resort' },
-  { value: 'pousada', label: 'Pousada' },
-  { value: 'hostel', label: 'Hostel' },
-  { value: 'restaurante', label: 'Restaurante' },
-  { value: 'atracao', label: 'Atração Turística' },
-  { value: 'operadora', label: 'Operadora/Agência' },
+  { value: 'hotel', label: tx('Hotel') },
+  { value: 'resort', label: tx('Resort') },
+  { value: 'pousada', label: tx('Pousada') },
+  { value: 'hostel', label: tx('Hostel') },
+  { value: 'restaurante', label: tx('Restaurante') },
+  { value: 'atracao', label: tx('Atração Turística') },
+  { value: 'operadora', label: tx('Operadora/Agência') },
 ];
 
 export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysisCapture, onBusinessNameChange, defaultBusinessName = '', defaultLocation = '', compact = false }: BusinessReviewSearchProps) {
@@ -197,7 +198,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
 
   const handleSearch = async () => {
     if (!businessName.trim() || !location.trim()) {
-      toast.error('Informe o nome do estabelecimento e a localização');
+      toast.error(tx('Informe o nome do estabelecimento e a localização'));
       return;
     }
 
@@ -221,7 +222,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
           }
         : data;
       setResult(normalizedData);
-      toast.success('Busca concluída!');
+      toast.success(tx('Busca concluída!'));
       if (normalizedData?.businessName) onBusinessNameChange?.(normalizedData.businessName);
 
       // Capture full analysis for persistence
@@ -267,12 +268,12 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
         }
         if (Object.keys(values).length > 0) {
           onAutoFill(values);
-          toast.success('Perfil e indicadores preenchidos automaticamente');
+          toast.success(tx('Perfil e indicadores preenchidos automaticamente'));
         }
       }
     } catch (err: any) {
       console.error('Search error:', err);
-      toast.error('Erro ao buscar reviews: ' + (err.message || 'Tente novamente'));
+      toast.error(tx('Erro ao buscar reviews: ') + (err.message || 'Tente novamente'));
     } finally {
       setIsSearching(false);
     }
@@ -316,9 +317,9 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
               <Search className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-lg">Busca de Reviews Online</CardTitle>
+              <CardTitle className="text-lg">{tx("Busca de Reviews Online")}</CardTitle>
               <CardDescription>
-                Pesquise avaliações em Google, TripAdvisor e outros
+                {tx("Pesquise avaliações em Google, TripAdvisor e outros")}
               </CardDescription>
             </div>
           </div>
@@ -330,11 +331,11 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
           <div className="space-y-1.5">
             <Label htmlFor="businessName" className="text-xs font-medium">
               <Hotel className="h-3 w-3 inline mr-1" />
-              Nome do Estabelecimento
+              {tx("Nome do Estabelecimento")}
             </Label>
             <Input
               id="businessName"
-              placeholder="Ex: Hotel Fasano"
+              placeholder={tx("Ex: Hotel Fasano")}
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
               disabled={isSearching}
@@ -343,11 +344,11 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
           <div className="space-y-1.5">
             <Label htmlFor="location" className="text-xs font-medium">
               <MapPin className="h-3 w-3 inline mr-1" />
-              Localização
+              {tx("Localização")}
             </Label>
             <Input
               id="location"
-              placeholder="Ex: São Paulo, SP"
+              placeholder={tx("Ex: São Paulo, SP")}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               disabled={isSearching}
@@ -357,7 +358,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
 
         <div className="flex items-end gap-3">
           <div className="flex-1 space-y-1.5">
-            <Label className="text-xs font-medium">Tipo</Label>
+            <Label className="text-xs font-medium">{tx("Tipo")}</Label>
             <Select value={propertyType} onValueChange={setPropertyType} disabled={isSearching}>
               <SelectTrigger>
                 <SelectValue />
@@ -373,12 +374,12 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
             {isSearching ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Buscando...
+                {tx("Buscando...")}
               </>
             ) : (
               <>
                 <Search className="h-4 w-4 mr-2" />
-                Buscar Reviews
+                {tx("Buscar Reviews")}
               </>
             )}
           </Button>
@@ -389,9 +390,9 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
           <div className="p-6 text-center space-y-3">
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
             <div>
-              <p className="font-medium">Pesquisando reviews online...</p>
+              <p className="font-medium">{tx("Pesquisando reviews online...")}</p>
               <p className="text-sm text-muted-foreground">
-                Google Maps, TripAdvisor, Booking.com e mais
+                {tx("Google Maps, TripAdvisor, Booking.com e mais")}
               </p>
             </div>
             <Progress value={45} className="max-w-xs mx-auto" />
@@ -425,7 +426,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                    <Card className="border-amber-200 dark:border-amber-800">
                     <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground mb-1">Nota Média</p>
+                      <p className="text-xs text-muted-foreground mb-1">{tx("Nota Média")}</p>
                       {renderStars(result.analysis.review_score)}
                       {result.analysis.review_count && (
                         <p className="text-xs text-muted-foreground mt-1">
@@ -437,15 +438,15 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
 
                   <Card className="border-purple-200 dark:border-purple-800">
                     <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground mb-1">Sentimento</p>
+                      <p className="text-xs text-muted-foreground mb-1">{tx("Sentimento")}</p>
                       {renderStars(result.analysis.sentiment_score)}
-                      <p className="text-xs text-muted-foreground mt-1">baseado nos comentários</p>
+                      <p className="text-xs text-muted-foreground mt-1">{tx("baseado nos comentários")}</p>
                     </CardContent>
                   </Card>
 
                   <Card className="border-blue-200 dark:border-blue-800">
                     <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground mb-1">Maturidade Digital</p>
+                      <p className="text-xs text-muted-foreground mb-1">{tx("Maturidade Digital")}</p>
                       <div className="flex items-center justify-center gap-1">
                         <TrendingUp className="h-4 w-4 text-blue-500" />
                         <span className="font-semibold">
@@ -462,7 +463,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                 {result.analysis.guest_experience_dimensions && (
                   <Card>
                     <CardContent className="p-4 space-y-3">
-                      <span className="text-xs font-medium">📊 Dimensões da Experiência do Hóspede</span>
+                      <span className="text-xs font-medium">{tx("📊 Dimensões da Experiência do Hóspede")}</span>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {Object.entries(result.analysis.guest_experience_dimensions).map(([key, val]) => (
                           val !== null && (
@@ -496,7 +497,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-primary" />
-                      <span className="font-medium text-sm">Análise de Sentimento</span>
+                      <span className="font-medium text-sm">{tx("Análise de Sentimento")}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">{result.analysis.sentiment_summary}</p>
 
@@ -504,7 +505,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                       {result.analysis.strengths.length > 0 && (
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-1 text-xs font-medium text-green-600">
-                            <ThumbsUp className="h-3 w-3" /> Pontos Fortes
+                            <ThumbsUp className="h-3 w-3" /> {tx("Pontos Fortes")}
                           </div>
                           <ul className="space-y-1">
                             {result.analysis.strengths.map((s, i) => (
@@ -520,7 +521,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                       {result.analysis.weaknesses.length > 0 && (
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-1 text-xs font-medium text-orange-600">
-                            <ThumbsDown className="h-3 w-3" /> Pontos de Atenção
+                            <ThumbsDown className="h-3 w-3" /> {tx("Pontos de Atenção")}
                           </div>
                           <ul className="space-y-1">
                             {result.analysis.weaknesses.map((w, i) => (
@@ -537,7 +538,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                     {/* Sample Quotes */}
                     {(result.analysis.sample_positive_quotes?.length > 0 || result.analysis.sample_negative_quotes?.length > 0) && (
                       <div className="space-y-2 pt-1">
-                        <span className="text-xs font-medium">💬 Comentários Representativos</span>
+                        <span className="text-xs font-medium">{tx("💬 Comentários Representativos")}</span>
                         {result.analysis.sample_positive_quotes?.map((q, i) => (
                           <blockquote key={`p-${i}`} className="text-xs italic text-muted-foreground border-l-2 border-green-400 pl-2">
                             "{q}"
@@ -553,7 +554,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
 
                     {result.analysis.recommendation && (
                       <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-                        <p className="text-xs font-medium text-primary mb-1">💡 Recomendação</p>
+                        <p className="text-xs font-medium text-primary mb-1">{tx("💡 Recomendação")}</p>
                         <p className="text-xs text-muted-foreground">{result.analysis.recommendation}</p>
                       </div>
                     )}
@@ -564,7 +565,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                 {result.analysis.sources.length > 0 && (
                   <Card>
                     <CardContent className="p-4 space-y-2">
-                      <span className="text-xs font-medium">Fontes Encontradas</span>
+                      <span className="text-xs font-medium">{tx("Fontes Encontradas")}</span>
                       <div className="space-y-1.5">
                         {dedupeReviewSources(result.analysis.sources).map((src, i) => (
                           <div key={i} className="flex items-center justify-between text-xs">
@@ -581,7 +582,7 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
                                 rel="noopener noreferrer"
                                 className="text-primary hover:underline flex items-center gap-1"
                               >
-                                Abrir <ExternalLink className="h-3 w-3" />
+                                {tx("Abrir")} <ExternalLink className="h-3 w-3" />
                               </a>
                             )}
                           </div>
@@ -595,8 +596,8 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
             ) : (
               <div className="p-4 text-center text-muted-foreground">
                 <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-amber-500" />
-                <p className="font-medium">Nenhuma análise disponível</p>
-                <p className="text-sm">Não foram encontrados dados suficientes para gerar uma análise.</p>
+                <p className="font-medium">{tx("Nenhuma análise disponível")}</p>
+                <p className="text-sm">{tx("Não foram encontrados dados suficientes para gerar uma análise.")}</p>
               </div>
             )}
           </div>

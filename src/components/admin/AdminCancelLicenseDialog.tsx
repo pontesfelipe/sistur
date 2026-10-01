@@ -73,8 +73,7 @@ export function AdminCancelLicenseDialog({
             <DialogTitle>{tx("Cancelar licença")}</DialogTitle>
           </div>
           <DialogDescription>
-            {tx("Cancelar o plano")} <strong>{planLabel}</strong> {tx("de")} <strong>{userName}</strong>.
-            O acesso será mantido até o fim do período vigente.
+            {tx("Cancelar o plano")} <strong>{planLabel}</strong> {tx("de")} <strong>{userName}</strong>{tx(". O acesso será mantido até o fim do período vigente.")}
           </DialogDescription>
         </DialogHeader>
 

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Network, Check, X, Loader2, Info } from "lucide-react";
 
+import { tx } from "@/i18n/t";
 /**
  * Bloco para `/configuracoes` mostrando convites de consórcio pendentes
  * direcionados à organização do usuário. Apenas ORG_ADMIN da org deve interagir,
@@ -26,10 +27,10 @@ export function PendingConsortiumInvitesPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Network className="h-5 w-5 text-primary" />
-          Convites para Consórcio
+          {tx("Convites para Consórcio")}
         </CardTitle>
         <CardDescription>
-          Sua organização foi convidada a participar de um arranjo regional.
+          {tx("Sua organização foi convidada a participar de um arranjo regional.")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -61,7 +62,7 @@ export function PendingConsortiumInvitesPanel() {
                 onClick={() => respond.mutate({ memberId: invite.id, accept: false })}
                 disabled={respond.isPending}
               >
-                <X className="h-3 w-3 mr-1" /> Recusar
+                <X className="h-3 w-3 mr-1" /> {tx("Recusar")}
               </Button>
               <Button
                 size="sm"

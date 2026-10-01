@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calculator, ArrowRight, TrendingUp, TrendingDown, Info } from 'lucide-react';
 import { getSeverityFromScore, type Severity } from '@/types/sistur';
 
+import { tx } from "@/i18n/t";
 interface NormalizationResult {
   score: number;
   status: Severity;
@@ -68,11 +69,11 @@ export function NormalizationCalculator() {
   const getStatusBadge = (status: Severity) => {
     switch (status) {
       case 'BOM':
-        return <Badge className="bg-green-500/20 text-green-700 border-green-500/30">Adequado</Badge>;
+        return <Badge className="bg-green-500/20 text-green-700 border-green-500/30">{tx("Adequado")}</Badge>;
       case 'MODERADO':
-        return <Badge className="bg-yellow-500/20 text-yellow-700 border-yellow-500/30">Atenção</Badge>;
+        return <Badge className="bg-yellow-500/20 text-yellow-700 border-yellow-500/30">{tx("Atenção")}</Badge>;
       case 'CRITICO':
-        return <Badge variant="destructive">Crítico</Badge>;
+        return <Badge variant="destructive">{tx("Crítico")}</Badge>;
     }
   };
 
@@ -81,24 +82,24 @@ export function NormalizationCalculator() {
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <Calculator className="h-4 w-4 mr-2" />
-          Abrir Calculadora
+          {tx("Abrir Calculadora")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calculator className="h-5 w-5 text-primary" />
-            Calculadora de Normalização
+            {tx("Calculadora de Normalização")}
           </DialogTitle>
           <DialogDescription>
-            Simule o cálculo de normalização de indicadores SISTUR
+            {tx("Simule o cálculo de normalização de indicadores SISTUR")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="normType">Tipo de Normalização</Label>
+              <Label htmlFor="normType">{tx("Tipo de Normalização")}</Label>
               <Select value={normType} onValueChange={(v) => setNormType(v as typeof normType)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -112,7 +113,7 @@ export function NormalizationCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="direction">Direção</Label>
+              <Label htmlFor="direction">{tx("Direção")}</Label>
               <Select value={direction} onValueChange={(v) => setDirection(v as typeof direction)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -121,13 +122,13 @@ export function NormalizationCalculator() {
                   <SelectItem value="HIGH_IS_BETTER">
                     <div className="flex items-center gap-2">
                       <TrendingUp className="h-4 w-4 text-green-500" />
-                      Maior é Melhor
+                      {tx("Maior é Melhor")}
                     </div>
                   </SelectItem>
                   <SelectItem value="LOW_IS_BETTER">
                     <div className="flex items-center gap-2">
                       <TrendingDown className="h-4 w-4 text-red-500" />
-                      Menor é Melhor
+                      {tx("Menor é Melhor")}
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -137,18 +138,18 @@ export function NormalizationCalculator() {
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="value">Valor Bruto</Label>
+              <Label htmlFor="value">{tx("Valor Bruto")}</Label>
               <Input
                 id="value"
                 type="number"
-                placeholder="Ex: 75"
+                placeholder={tx("Ex: 75")}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="minRef">Ref. Mínimo</Label>
+              <Label htmlFor="minRef">{tx("Ref. Mínimo")}</Label>
               <Input
                 id="minRef"
                 type="number"
@@ -159,7 +160,7 @@ export function NormalizationCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="maxRef">Ref. Máximo</Label>
+              <Label htmlFor="maxRef">{tx("Ref. Máximo")}</Label>
               <Input
                 id="maxRef"
                 type="number"
@@ -172,14 +173,14 @@ export function NormalizationCalculator() {
 
           <Button onClick={calculate} className="w-full">
             <ArrowRight className="h-4 w-4 mr-2" />
-            Calcular
+            {tx("Calcular")}
           </Button>
 
           {result && (
             <Card className="border-primary/20 bg-primary/5">
               <CardContent className="pt-4">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm text-muted-foreground">Score Normalizado</span>
+                  <span className="text-sm text-muted-foreground">{tx("Score Normalizado")}</span>
                   {getStatusBadge(result.status)}
                 </div>
                 <div className="text-4xl font-bold text-center mb-2">
@@ -191,9 +192,9 @@ export function NormalizationCalculator() {
                 <div className="mt-4 p-3 bg-muted/30 rounded-lg flex items-start gap-2">
                   <Info className="h-4 w-4 text-muted-foreground mt-0.5" />
                    <div className="text-xs text-muted-foreground">
-                    <p><strong>Adequado:</strong> Score ≥ 67%</p>
-                    <p><strong>Atenção:</strong> 34% ≤ Score &lt; 67%</p>
-                    <p><strong>Crítico:</strong> Score ≤ 33%</p>
+                    <p><strong>{tx("Adequado:")}</strong> {tx("Score ≥ 67%")}</p>
+                    <p><strong>{tx("Atenção:")}</strong> 34% ≤ Score &lt; 67%</p>
+                    <p><strong>{tx("Crítico:")}</strong> {tx("Score ≤ 33%")}</p>
                   </div>
                 </div>
               </CardContent>

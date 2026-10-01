@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Analysis {
   brand_strength_score: number;
   brand_tier: 'forte' | 'consolidada' | 'emergente' | 'baixa';
@@ -39,7 +40,7 @@ export function BrandStrengthSearch({ businessName, location, onAutoFill, onAnal
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
 
   const run = async () => {
-    if (!businessName?.trim()) { toast.error('Informe o nome'); return; }
+    if (!businessName?.trim()) { toast.error(tx('Informe o nome')); return; }
     setLoading(true); setAnalysis(null);
     try {
       const { data, error } = await supabase.functions.invoke('search-brand-strength', { body: { businessName, location } });
@@ -49,7 +50,7 @@ export function BrandStrengthSearch({ businessName, location, onAutoFill, onAnal
       setAnalysis(a);
       onAnalysisCapture?.({ ...a, businessName, location, searchedAt: new Date().toISOString() });
       onAutoFill?.({ ENT_FORCA_MARCA: a.brand_strength_score });
-      toast.success('Força da marca analisada');
+      toast.success(tx('Força da marca analisada'));
     } catch (e: any) {
       console.error(e); toast.error(e?.message || 'Falha ao analisar marca');
     } finally { setLoading(false); }
@@ -70,22 +71,22 @@ export function BrandStrengthSearch({ businessName, location, onAutoFill, onAnal
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 rounded-lg border bg-card">
-              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> Força da Marca</div>
+              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> {tx("Força da Marca")}</div>
               <div className="text-2xl font-bold">{analysis.brand_strength_score}<span className="text-sm font-normal text-muted-foreground">/100</span></div>
               <Progress value={analysis.brand_strength_score} className="h-1 mt-2" />
               <Badge variant="outline" className={`mt-2 text-[10px] capitalize ${TIER_COLOR[analysis.brand_tier]}`}>{analysis.brand_tier}</Badge>
             </div>
             <div className="p-3 rounded-lg border bg-card space-y-1 text-xs">
-              <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Globe className="h-3 w-3" /> Resultados</span><span className="font-bold">{analysis.total_results}</span></div>
-              <div className="flex items-center justify-between"><span className="text-muted-foreground">Domínios únicos</span><span className="font-bold">{analysis.unique_domains}</span></div>
-              <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Newspaper className="h-3 w-3" /> Mídia</span><span className="font-bold">{analysis.news_mentions.length}</span></div>
-              <div className="flex items-center justify-between pt-1 border-t"><span className="text-muted-foreground">OTAs</span><span className="font-bold">{analysis.ota_presence.length}</span></div>
+              <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Globe className="h-3 w-3" /> {tx("Resultados")}</span><span className="font-bold">{analysis.total_results}</span></div>
+              <div className="flex items-center justify-between"><span className="text-muted-foreground">{tx("Domínios únicos")}</span><span className="font-bold">{analysis.unique_domains}</span></div>
+              <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Newspaper className="h-3 w-3" /> {tx("Mídia")}</span><span className="font-bold">{analysis.news_mentions.length}</span></div>
+              <div className="flex items-center justify-between pt-1 border-t"><span className="text-muted-foreground">{tx("OTAs")}</span><span className="font-bold">{analysis.ota_presence.length}</span></div>
             </div>
           </div>
 
           {analysis.authority_mentions.length > 0 && (
             <div>
-              <div className="text-xs font-medium mb-1">Domínios de autoridade</div>
+              <div className="text-xs font-medium mb-1">{tx("Domínios de autoridade")}</div>
               <div className="flex flex-wrap gap-1">
                 {analysis.authority_mentions.map((d) => <Badge key={d} variant="secondary" className="text-[10px]">{d}</Badge>)}
               </div>
@@ -94,7 +95,7 @@ export function BrandStrengthSearch({ businessName, location, onAutoFill, onAnal
 
           {analysis.sample_results.length > 0 && (
             <div className="space-y-1">
-              <div className="text-xs font-medium">Amostras</div>
+              <div className="text-xs font-medium">{tx("Amostras")}</div>
               {analysis.sample_results.slice(0, 5).map((n, i) => (
                 <a key={i} href={n.url} target="_blank" rel="noreferrer" className="flex items-start gap-1 text-xs text-muted-foreground hover:text-primary">
                   <ExternalLink className="h-3 w-3 mt-0.5 shrink-0" /><span className="line-clamp-1">{n.title}</span>
@@ -105,7 +106,7 @@ export function BrandStrengthSearch({ businessName, location, onAutoFill, onAnal
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

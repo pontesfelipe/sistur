@@ -14,6 +14,7 @@ import {
 import { toast } from 'sonner';
 import { Loader2, Eye, EyeOff, Lock } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 interface ChangePasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -30,12 +31,12 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
     e.preventDefault();
 
     if (newPassword.length < 6) {
-      toast.error('A senha deve ter pelo menos 6 caracteres');
+      toast.error(tx('A senha deve ter pelo menos 6 caracteres'));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error('As senhas não coincidem');
+      toast.error(tx('As senhas não coincidem'));
       return;
     }
 
@@ -44,9 +45,9 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
     setLoading(false);
 
     if (error) {
-      toast.error('Erro ao alterar senha: ' + error.message);
+      toast.error(tx('Erro ao alterar senha: ') + error.message);
     } else {
-      toast.success('Senha alterada com sucesso!');
+      toast.success(tx('Senha alterada com sucesso!'));
       setNewPassword('');
       setConfirmPassword('');
       onOpenChange(false);
@@ -67,23 +68,23 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Lock className="h-5 w-5 text-primary" />
-            Alterar Senha
+            {tx("Alterar Senha")}
           </DialogTitle>
           <DialogDescription>
-            Digite sua nova senha. Ela deve ter pelo menos 6 caracteres.
+            {tx("Digite sua nova senha. Ela deve ter pelo menos 6 caracteres.")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="new-password">Nova Senha</Label>
+              <Label htmlFor="new-password">{tx("Nova Senha")}</Label>
               <div className="relative">
                 <Input
                   id="new-password"
                   type={showPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Digite a nova senha"
+                  placeholder={tx("Digite a nova senha")}
                   required
                   minLength={6}
                 />
@@ -103,13 +104,13 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
+              <Label htmlFor="confirm-password">{tx("Confirmar Nova Senha")}</Label>
               <Input
                 id="confirm-password"
                 type={showPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirme a nova senha"
+                placeholder={tx("Confirme a nova senha")}
                 required
                 minLength={6}
               />
@@ -122,7 +123,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
               onClick={() => handleOpenChange(false)}
               disabled={loading}
             >
-              Cancelar
+              {tx("Cancelar")}
             </Button>
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Props {
   destinationId: string;
   businessName: string;
@@ -22,7 +23,7 @@ export function CompetitorsAutoSearch({ destinationId, businessName, location, p
 
   const run = async () => {
     if (!businessName || !location) {
-      toast.error('Informe o nome do estabelecimento e a localização.');
+      toast.error(tx('Informe o nome do estabelecimento e a localização.'));
       return;
     }
     setLoading(true);
@@ -36,7 +37,7 @@ export function CompetitorsAutoSearch({ destinationId, businessName, location, p
       onCaptured?.(data?.count || 0);
       toast.success(`${data?.count || 0} concorrentes identificados`);
     } catch (e: any) {
-      toast.error('Erro ao buscar concorrentes: ' + (e.message || ''));
+      toast.error(tx('Erro ao buscar concorrentes: ') + (e.message || ''));
     } finally {
       setLoading(false);
     }
@@ -48,7 +49,7 @@ export function CompetitorsAutoSearch({ destinationId, businessName, location, p
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          Identifica automaticamente os principais concorrentes no destino com nota, volume de reviews e link da fonte.
+          {tx("Identifica automaticamente os principais concorrentes no destino com nota, volume de reviews e link da fonte.")}
         </p>
         <Button onClick={run} disabled={loading || !businessName || !location} size="sm">
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
@@ -90,7 +91,7 @@ export function CompetitorsAutoSearch({ destinationId, businessName, location, p
       )}
 
       {competitors && competitors.length === 0 && (
-        <p className="text-xs text-muted-foreground">Nenhum concorrente identificado nas buscas.</p>
+        <p className="text-xs text-muted-foreground">{tx("Nenhum concorrente identificado nas buscas.")}</p>
       )}
     </div>
   );

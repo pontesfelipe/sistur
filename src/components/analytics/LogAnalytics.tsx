@@ -27,6 +27,7 @@ import {
 import { format, formatDistanceToNow, subDays, startOfDay, endOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+import { tx } from "@/i18n/t";
 interface AuditEvent {
   id: string;
   event_type: string;
@@ -234,7 +235,7 @@ export function LogAnalytics() {
                   />
                 </PopoverContent>
               </Popover>
-              <span className="text-muted-foreground">até</span>
+              <span className="text-muted-foreground">{tx("até")}</span>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="justify-start text-left font-normal min-w-[140px]">
@@ -265,7 +266,7 @@ export function LogAnalytics() {
                   "bg-primary/10 text-primary"
                 )}
               >
-                7 dias
+                {tx("7 dias")}
               </Button>
               <Button 
                 variant="ghost" 
@@ -276,7 +277,7 @@ export function LogAnalytics() {
                   "bg-primary/10 text-primary"
                 )}
               >
-                30 dias
+                {tx("30 dias")}
               </Button>
               <Button 
                 variant="ghost" 
@@ -287,13 +288,13 @@ export function LogAnalytics() {
                   "bg-primary/10 text-primary"
                 )}
               >
-                90 dias
+                {tx("90 dias")}
               </Button>
             </div>
 
             <Button variant="outline" size="sm" onClick={fetchAnalytics}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Atualizar
+              {tx("Atualizar")}
             </Button>
           </div>
         </CardContent>
@@ -303,7 +304,7 @@ export function LogAnalytics() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Diagnósticos</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx("Diagnósticos")}</CardTitle>
             <Calculator className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -316,20 +317,20 @@ export function LogAnalytics() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Destinos</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx("Destinos")}</CardTitle>
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalDestinations}</div>
             <p className="text-xs text-muted-foreground">
-              criados no período
+              {tx("criados no período")}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Taxa de Cálculo</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx("Taxa de Cálculo")}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -339,20 +340,20 @@ export function LogAnalytics() {
                 : 0}%
             </div>
             <p className="text-xs text-muted-foreground">
-              diagnósticos finalizados
+              {tx("diagnósticos finalizados")}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Usuários Ativos</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx("Usuários Ativos")}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.activeUsers}</div>
             <p className="text-xs text-muted-foreground">
-              ativos no período
+              {tx("ativos no período")}
             </p>
           </CardContent>
         </Card>
@@ -364,7 +365,7 @@ export function LogAnalytics() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-primary" />
-              Eventos do Sistema
+              {tx("Eventos do Sistema")}
             </CardTitle>
             <CardDescription>
               {auditEvents.length} eventos no período selecionado
@@ -375,7 +376,7 @@ export function LogAnalytics() {
               {auditEvents.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                   <AlertCircle className="h-8 w-8 mb-2" />
-                  <p>Nenhum evento no período</p>
+                  <p>{tx("Nenhum evento no período")}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -427,7 +428,7 @@ export function LogAnalytics() {
                             )}
                             {(event.metadata as any).model_audit_status === 'not_available_before_logging_fix' && (
                               <Badge variant="outline" className="text-[10px] bg-muted text-muted-foreground">
-                                histórico sem modelo
+                                {tx("histórico sem modelo")}
                               </Badge>
                             )}
                             {(event.metadata as any).template && (
@@ -463,10 +464,10 @@ export function LogAnalytics() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-primary" />
-              Últimos Acessos
+              {tx("Últimos Acessos")}
             </CardTitle>
             <CardDescription>
-              Data do último login efetivo de cada usuário no período
+              {tx("Data do último login efetivo de cada usuário no período")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -474,7 +475,7 @@ export function LogAnalytics() {
               {recentLogins.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                   <Users className="h-8 w-8 mb-2" />
-                  <p>Nenhum acesso no período</p>
+                  <p>{tx("Nenhum acesso no período")}</p>
 
                 </div>
               ) : (

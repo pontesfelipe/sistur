@@ -50,19 +50,19 @@ interface TrainingAccessManagerProps {
 
 const ACCESS_TYPE_INFO = {
   public: {
-    label: 'Público',
+    label: tx('Público'),
     description: tx("Todos os usuários têm acesso"),
     icon: Globe,
     color: 'bg-green-500/10 text-green-700 border-green-500/20',
   },
   org: {
-    label: 'Organização',
+    label: tx('Organização'),
     description: tx("Apenas membros da organização"),
     icon: Building2,
     color: 'bg-blue-500/10 text-blue-700 border-blue-500/20',
   },
   user: {
-    label: 'Usuário',
+    label: tx('Usuário'),
     description: tx("Usuário específico"),
     icon: User,
     color: 'bg-purple-500/10 text-purple-700 border-purple-500/20',

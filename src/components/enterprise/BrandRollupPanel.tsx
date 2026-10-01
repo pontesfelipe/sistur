@@ -5,6 +5,7 @@ import { PILLAR_INFO } from '@/types/sistur';
 import type { UnitWithScores, BrandRollupRow } from '@/hooks/useBrandRollup';
 import { cn } from '@/lib/utils';
 
+import { tx } from "@/i18n/t";
 interface Props {
   brandName: string | null;
   units: UnitWithScores[];
@@ -40,7 +41,7 @@ export function BrandRollupPanel({ brandName, units, rollups }: Props) {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <Building2 className="h-5 w-5 text-primary" />
-          Marca: <span className="font-semibold">{brandName ?? 'Sem nome'}</span>
+          {tx("Marca:")} <span className="font-semibold">{brandName ?? 'Sem nome'}</span>
           <Badge variant="outline" className="ml-2">
             {units.length} unidades
           </Badge>
@@ -76,7 +77,7 @@ export function BrandRollupPanel({ brandName, units, rollups }: Props) {
         <div className="space-y-1">
           <div className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
             <TrendingDown className="h-3 w-3" />
-            Unidade mais frágil por pilar
+            {tx("Unidade mais frágil por pilar")}
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
             {(['RA', 'OE', 'AO'] as const).map((p) => {
@@ -97,7 +98,7 @@ export function BrandRollupPanel({ brandName, units, rollups }: Props) {
         <div>
           <div className="text-xs font-semibold text-muted-foreground uppercase mb-2 flex items-center gap-1">
             <Activity className="h-3 w-3" />
-            Ranking interno das unidades
+            {tx("Ranking interno das unidades")}
           </div>
           <div className="space-y-1">
             {ranked.map((u, idx) => (

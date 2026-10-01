@@ -30,6 +30,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
+import { tx } from "@/i18n/t";
 interface AppHeaderProps {
   title: string;
   subtitle?: string;
@@ -213,7 +214,7 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
               </div>
               
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Email</Label>
+                <Label className="text-xs text-muted-foreground">{tx("Email")}</Label>
                 <Input 
                   value={user?.email || ''} 
                   readOnly 

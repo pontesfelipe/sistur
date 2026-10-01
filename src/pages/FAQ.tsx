@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { MessageCircleQuestion, GraduationCap, BarChart3, Hotel } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 
+import { tx } from "@/i18n/t";
 interface FAQItem {
   question: string;
   answer: string;
@@ -324,7 +325,7 @@ export default function FAQ() {
   return (
     <>
     <Helmet>
-      <title>FAQ — Perguntas Frequentes | SISTUR</title>
+      <title>{tx("FAQ — Perguntas Frequentes | SISTUR")}</title>
       <meta name="description" content="Tire dúvidas sobre o SISTUR: pilares RA/OE/AO, Motor IGMA, trilhas EDU, certificados, indicadores territoriais e Empresarial." />
       <link rel="canonical" href="https://sistur.lovable.app/faq" />
       <meta property="og:title" content="FAQ — Perguntas Frequentes | SISTUR" />
@@ -341,8 +342,8 @@ export default function FAQ() {
       })}</script>
     </Helmet>
     <AppLayout subNav={ajudaNav}
-      title="Perguntas Frequentes"
-      subtitle="Tire suas dúvidas sobre o SISTUR"
+      title={tx("Perguntas Frequentes")}
+      subtitle={tx("Tire suas dúvidas sobre o SISTUR")}
     >
       <div className="max-w-3xl mx-auto space-y-6">
         {/* General Questions - Always visible */}
@@ -350,7 +351,7 @@ export default function FAQ() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageCircleQuestion className="h-5 w-5 text-primary" />
-              Sobre o SISTUR
+              {tx("Sobre o SISTUR")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -363,7 +364,7 @@ export default function FAQ() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageCircleQuestion className="h-5 w-5 text-primary" />
-              Perguntas por Módulo
+              {tx("Perguntas por Módulo")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -372,21 +373,21 @@ export default function FAQ() {
                 {showEDUTab && (
                   <TabsTrigger value="edu" className="flex items-center gap-2">
                     <GraduationCap className="h-4 w-4" />
-                    <span className="hidden sm:inline">SISTUR</span> EDU
+                    <span className="hidden sm:inline">{tx("SISTUR")}</span> {tx("EDU")}
                     <Badge variant="secondary" className="ml-1">{eduItems.length}</Badge>
                   </TabsTrigger>
                 )}
                 {showERPTab && (
                   <TabsTrigger value="erp" className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4" />
-                    <span className="hidden sm:inline">SISTUR</span> Analítico
+                    <span className="hidden sm:inline">{tx("SISTUR")}</span> {tx("Analítico")}
                     <Badge variant="secondary" className="ml-1">{erpItems.length}</Badge>
                   </TabsTrigger>
                 )}
                 {showEnterpriseTab && (
                   <TabsTrigger value="enterprise" className="flex items-center gap-2">
                     <Hotel className="h-4 w-4" />
-                    Empresarial
+                    {tx("Empresarial")}
                     <Badge variant="secondary" className="ml-1">{enterpriseItems.length}</Badge>
                   </TabsTrigger>
                 )}
@@ -398,7 +399,7 @@ export default function FAQ() {
                     renderFAQList(eduItems)
                   ) : (
                     <p className="text-sm text-muted-foreground text-center py-4">
-                      Nenhuma pergunta disponível para este módulo.
+                      {tx("Nenhuma pergunta disponível para este módulo.")}
                     </p>
                   )}
                 </TabsContent>
@@ -410,7 +411,7 @@ export default function FAQ() {
                     renderFAQList(erpItems)
                   ) : (
                     <p className="text-sm text-muted-foreground text-center py-4">
-                      Nenhuma pergunta disponível para este módulo.
+                      {tx("Nenhuma pergunta disponível para este módulo.")}
                     </p>
                   )}
                 </TabsContent>
@@ -422,7 +423,7 @@ export default function FAQ() {
                     renderFAQList(enterpriseItems)
                   ) : (
                     <p className="text-sm text-muted-foreground text-center py-4">
-                      Nenhuma pergunta disponível para este módulo.
+                      {tx("Nenhuma pergunta disponível para este módulo.")}
                     </p>
                   )}
                 </TabsContent>

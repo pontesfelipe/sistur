@@ -20,9 +20,9 @@ interface AssessmentCardProps {
 }
 
 const tierConfig = {
-  SMALL: { label: 'Essencial', icon: Zap, color: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-950/30 border-green-500/30' },
-  MEDIUM: { label: 'Estratégico', icon: Gauge, color: 'text-amber-600', bgClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/30' },
-  COMPLETE: { label: 'Integral', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
+  SMALL: { label: tx('Essencial'), icon: Zap, color: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-950/30 border-green-500/30' },
+  MEDIUM: { label: tx('Estratégico'), icon: Gauge, color: 'text-amber-600', bgClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/30' },
+  COMPLETE: { label: tx('Integral'), icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
 };
 
 export function AssessmentCard({ assessment, onDelete, isDemoContext }: AssessmentCardProps) {
@@ -30,9 +30,9 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
 
   const visibility = isDemoContext ? 'demo' : ((assessment as any).visibility || 'organization');
   const visibilityConfig = {
-    personal: { label: 'Pessoal', icon: Eye, className: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800' },
-    organization: { label: 'Organização', icon: Building2, className: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800' },
-    demo: { label: 'Demo', icon: Monitor, className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800' },
+    personal: { label: tx('Pessoal'), icon: Eye, className: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800' },
+    organization: { label: tx('Organização'), icon: Building2, className: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800' },
+    demo: { label: tx('Demo'), icon: Monitor, className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800' },
   };
   const visInfo = visibilityConfig[visibility as keyof typeof visibilityConfig] || visibilityConfig.organization;
   const VisIcon = visInfo.icon;
@@ -73,8 +73,8 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
 
   const diagnosticType = (assessment as any).diagnostic_type || 'territorial';
   const diagnosticTypeConfig = {
-    territorial: { label: 'Territorial', icon: Landmark, className: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800' },
-    enterprise: { label: 'Empresarial', icon: Hotel, className: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800' },
+    territorial: { label: tx('Territorial'), icon: Landmark, className: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800' },
+    enterprise: { label: tx('Empresarial'), icon: Hotel, className: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800' },
   };
   const dtInfo = diagnosticTypeConfig[diagnosticType as keyof typeof diagnosticTypeConfig] || diagnosticTypeConfig.territorial;
   const DtIcon = dtInfo.icon;

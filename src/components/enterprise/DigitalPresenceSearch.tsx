@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface DigitalPresenceAnalysis {
   own_website: { found: boolean; url: string | null; has_ssl: boolean | null };
   google_business: { found: boolean; completeness_score: number | null; has_photos: boolean | null; has_hours: boolean | null };
@@ -50,7 +51,7 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
 
   const runSearch = async () => {
     if (!businessName?.trim() || !location?.trim()) {
-      toast.error('Informe o nome do estabelecimento e a localização antes de buscar.');
+      toast.error(tx('Informe o nome do estabelecimento e a localização antes de buscar.'));
       return;
     }
     setLoading(true);
@@ -78,10 +79,10 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
         onAutoFill(values);
       }
 
-      toast.success('Presença digital analisada com sucesso');
+      toast.success(tx('Presença digital analisada com sucesso'));
     } catch (e: any) {
       console.error(e);
-      toast.error('Erro ao analisar presença digital: ' + (e.message || 'tente novamente'));
+      toast.error(tx('Erro ao analisar presença digital: ') + (e.message || 'tente novamente'));
     } finally {
       setLoading(false);
     }
@@ -96,7 +97,7 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
     <div className="space-y-4">
       {(businessName?.trim() || location?.trim()) && (
         <div className="flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="text-muted-foreground">Buscando:</span>
+          <span className="text-muted-foreground">{tx("Buscando:")}</span>
           {businessName?.trim() && (
             <Badge variant="secondary" className="text-[10px] gap-1">
               <Search className="h-3 w-3" />
@@ -124,7 +125,7 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
       {loading && (
         <div className="p-6 text-center space-y-2">
           <Loader2 className="h-7 w-7 animate-spin mx-auto text-primary" />
-          <p className="text-sm text-muted-foreground">Verificando OTAs, Google Business, site oficial e redes sociais...</p>
+          <p className="text-sm text-muted-foreground">{tx("Verificando OTAs, Google Business, site oficial e redes sociais...")}</p>
           <Progress value={45} className="max-w-xs mx-auto" />
         </div>
       )}
@@ -137,19 +138,19 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Card>
               <CardContent className="p-3 text-center">
-                <p className="text-[10px] text-muted-foreground uppercase">Maturidade Digital</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{tx("Maturidade Digital")}</p>
                 <p className="text-2xl font-bold">{analysis.digital_maturity_score}/5</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-3 text-center">
-                <p className="text-[10px] text-muted-foreground uppercase">OTAs</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{tx("OTAs")}</p>
                 <p className="text-2xl font-bold">{analysis.ota_coverage_pct}%</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-3 text-center">
-                <p className="text-[10px] text-muted-foreground uppercase">Redes Sociais</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{tx("Redes Sociais")}</p>
                 <p className="text-2xl font-bold">{analysis.social_coverage_pct}%</p>
               </CardContent>
             </Card>
@@ -166,7 +167,7 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
             <Card>
               <CardContent className="p-3 space-y-2">
                 <div className="flex items-center gap-2 text-sm font-medium">
-                  <Globe className="h-4 w-4" /> Site Oficial
+                  <Globe className="h-4 w-4" /> {tx("Site Oficial")}
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   {renderOk(analysis.own_website.found)} Site detectado
@@ -174,7 +175,7 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
                 {analysis.own_website.found && (
                   <>
                     <div className="flex items-center gap-2 text-xs">
-                      {renderOk(!!analysis.own_website.has_ssl)} <Lock className="h-3 w-3" /> HTTPS / SSL
+                      {renderOk(!!analysis.own_website.has_ssl)} <Lock className="h-3 w-3" /> {tx("HTTPS / SSL")}
                     </div>
                     {analysis.own_website.url && (
                       <a href={analysis.own_website.url} target="_blank" rel="noreferrer" className="text-xs text-primary inline-flex items-center gap-1 hover:underline truncate">
@@ -189,7 +190,7 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
             <Card>
               <CardContent className="p-3 space-y-2">
                 <div className="flex items-center gap-2 text-sm font-medium">
-                  <MapPin className="h-4 w-4" /> Google Business
+                  <MapPin className="h-4 w-4" /> {tx("Google Business")}
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   {renderOk(analysis.google_business.found)} Perfil detectado
@@ -233,20 +234,20 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
           <Card>
             <CardContent className="p-3 space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium">
-                <Sparkles className="h-4 w-4" /> Redes Sociais
+                <Sparkles className="h-4 w-4" /> {tx("Redes Sociais")}
               </div>
               <div className="flex flex-wrap gap-2">
                 <Badge variant={analysis.social_media.instagram ? 'default' : 'outline'} className={cn('text-[10px] gap-1', !analysis.social_media.instagram && 'opacity-50')}>
-                  <Instagram className="h-3 w-3" /> Instagram
+                  <Instagram className="h-3 w-3" /> {tx("Instagram")}
                 </Badge>
                 <Badge variant={analysis.social_media.facebook ? 'default' : 'outline'} className={cn('text-[10px] gap-1', !analysis.social_media.facebook && 'opacity-50')}>
-                  <Facebook className="h-3 w-3" /> Facebook
+                  <Facebook className="h-3 w-3" /> {tx("Facebook")}
                 </Badge>
                 <Badge variant={analysis.social_media.tiktok ? 'default' : 'outline'} className={cn('text-[10px] gap-1', !analysis.social_media.tiktok && 'opacity-50')}>
-                  TikTok
+                  {tx("TikTok")}
                 </Badge>
                 <Badge variant={analysis.social_media.youtube ? 'default' : 'outline'} className={cn('text-[10px] gap-1', !analysis.social_media.youtube && 'opacity-50')}>
-                  <Youtube className="h-3 w-3" /> YouTube
+                  <Youtube className="h-3 w-3" /> {tx("YouTube")}
                 </Badge>
               </div>
             </CardContent>
@@ -255,7 +256,7 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
           {analysis.recommendations.length > 0 && (
             <Card className="border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/10">
               <CardContent className="p-3 space-y-1.5">
-                <p className="text-xs font-medium">Recomendações</p>
+                <p className="text-xs font-medium">{tx("Recomendações")}</p>
                 <ul className="text-xs text-muted-foreground list-disc list-inside space-y-1">
                   {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
                 </ul>

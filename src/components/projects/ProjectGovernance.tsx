@@ -95,7 +95,7 @@ export function ProjectGovernance({ projectId }: Props) {
             <CardDescription>{tx('Marcos obrigatórios por pilar com evidência e aprovação')}</CardDescription>
           </div>
           <Button size="sm" onClick={() => setCpOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />Novo checkpoint
+            <Plus className="h-4 w-4 mr-2" />{tx("Novo checkpoint")}
           </Button>
         </CardHeader>
         <CardContent>
@@ -131,16 +131,16 @@ export function ProjectGovernance({ projectId }: Props) {
                       <div className="flex gap-1">
                         {cp.status === 'pending' && (
                           <Button size="sm" variant="outline" onClick={() => { setEvidenceOpen(cp); setEvidence({ url: cp.evidence_url || '', notes: cp.evidence_notes || '' }); }}>
-                            <Upload className="h-3 w-3 mr-1" />Submeter
+                            <Upload className="h-3 w-3 mr-1" />{tx("Submeter")}
                           </Button>
                         )}
                         {cp.status === 'submitted' && (
                           <>
                             <Button size="sm" variant="default" onClick={() => updateCheckpoint.mutate({ id: cp.id, updates: {}, action: 'approve' })}>
-                              <CheckCircle2 className="h-3 w-3 mr-1" />Aprovar
+                              <CheckCircle2 className="h-3 w-3 mr-1" />{tx("Aprovar")}
                             </Button>
                             <Button size="sm" variant="outline" onClick={() => updateCheckpoint.mutate({ id: cp.id, updates: { rejection_reason: 'Revisar evidência' }, action: 'reject' })}>
-                              <XCircle className="h-3 w-3 mr-1" />Rejeitar
+                              <XCircle className="h-3 w-3 mr-1" />{tx("Rejeitar")}
                             </Button>
                           </>
                         )}
@@ -165,7 +165,7 @@ export function ProjectGovernance({ projectId }: Props) {
             <CardDescription>{tx('Responsabilidades por tarefa')}</CardDescription>
           </div>
           <Button size="sm" onClick={() => setRaciOpen(true)} disabled={tasks.length === 0}>
-            <Plus className="h-4 w-4 mr-2" />Atribuir
+            <Plus className="h-4 w-4 mr-2" />{tx("Atribuir")}
           </Button>
         </CardHeader>
         <CardContent>

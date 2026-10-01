@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 const MONTH_LABELS = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 interface Analysis {
@@ -51,7 +52,7 @@ export function LocalEventsSearch({ destinationId, onAutoFill, onAnalysisCapture
         ENT_CALENDARIO_MATURIDADE: a.calendar_maturity_score,
       });
       onSeasonalitySuggestion?.(a.seasonality_pattern, a.peak_months);
-      toast.success('Eventos e sazonalidade analisados');
+      toast.success(tx('Eventos e sazonalidade analisados'));
     } catch (e: any) {
       console.error(e);
       toast.error(e?.message || 'Falha ao analisar eventos');
@@ -77,22 +78,22 @@ export function LocalEventsSearch({ destinationId, onAutoFill, onAnalysisCapture
 
           <div className="grid grid-cols-3 gap-3">
             <div className="p-3 rounded-lg border bg-emerald-500/5">
-              <div className="text-xs text-muted-foreground mb-1">Eventos públicos</div>
+              <div className="text-xs text-muted-foreground mb-1">{tx("Eventos públicos")}</div>
               <div className="text-lg font-bold">{analysis.public_events_count}</div>
             </div>
             <div className="p-3 rounded-lg border bg-blue-500/5">
-              <div className="text-xs text-muted-foreground mb-1">Eventos observatório</div>
+              <div className="text-xs text-muted-foreground mb-1">{tx("Eventos observatório")}</div>
               <div className="text-lg font-bold">{analysis.internal_events_count}</div>
             </div>
             <div className="p-3 rounded-lg border bg-purple-500/5">
-              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> Densidade</div>
+              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> {tx("Densidade")}</div>
               <div className="text-lg font-bold">{analysis.event_density_score}<span className="text-xs font-normal text-muted-foreground">/100</span></div>
             </div>
           </div>
 
           <div>
             <div className="flex items-center gap-1 text-xs font-medium mb-2">
-              <CalendarDays className="h-3 w-3" /> Distribuição por mês
+              <CalendarDays className="h-3 w-3" /> {tx("Distribuição por mês")}
               <Badge variant="outline" className="ml-2 text-[10px]">{analysis.seasonality_pattern}</Badge>
             </div>
             <div className="grid grid-cols-12 gap-1">
@@ -112,7 +113,7 @@ export function LocalEventsSearch({ destinationId, onAutoFill, onAnalysisCapture
 
           {analysis.detected_categories.length > 0 && (
             <div>
-              <div className="text-xs font-medium mb-1">Tipologias detectadas</div>
+              <div className="text-xs font-medium mb-1">{tx("Tipologias detectadas")}</div>
               <div className="flex flex-wrap gap-1">
                 {analysis.detected_categories.map((c) => <Badge key={c} variant="secondary" className="text-[10px] capitalize">{c}</Badge>)}
               </div>
@@ -121,7 +122,7 @@ export function LocalEventsSearch({ destinationId, onAutoFill, onAnalysisCapture
 
           {analysis.sample_events.length > 0 && (
             <div className="space-y-1">
-              <div className="text-xs font-medium">Amostras</div>
+              <div className="text-xs font-medium">{tx("Amostras")}</div>
               {analysis.sample_events.slice(0, 4).map((e, i) => (
                 <a key={i} href={e.url} target="_blank" rel="noreferrer" className="flex items-start gap-1 text-xs text-muted-foreground hover:text-primary">
                   <ExternalLink className="h-3 w-3 mt-0.5 shrink-0" />
@@ -133,7 +134,7 @@ export function LocalEventsSearch({ destinationId, onAutoFill, onAnalysisCapture
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

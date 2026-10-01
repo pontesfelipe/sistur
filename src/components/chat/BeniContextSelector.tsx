@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+import { tx } from "@/i18n/t";
 export interface BeniContext {
   assessment?: {
     id: string;
@@ -240,24 +241,24 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
         </DialogTrigger>
         <DialogContent className="sm:max-w-lg max-h-[80vh]">
           <DialogHeader>
-            <DialogTitle>Contexto da conversa</DialogTitle>
+            <DialogTitle>{tx("Contexto da conversa")}</DialogTitle>
             <DialogDescription>
-              Selecione diagnósticos, treinamentos ou projetos para que o Professor Beni tenha contexto sobre suas perguntas.
+              {tx("Selecione diagnósticos, treinamentos ou projetos para que o Professor Beni tenha contexto sobre suas perguntas.")}
             </DialogDescription>
           </DialogHeader>
           <Tabs value={selectedTab} onValueChange={setSelectedTab}>
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="assessments" className="text-xs gap-1">
                 <ClipboardList className="h-3 w-3" />
-                Diagnósticos
+                {tx("Diagnósticos")}
               </TabsTrigger>
               <TabsTrigger value="trainings" className="text-xs gap-1">
                 <GraduationCap className="h-3 w-3" />
-                Treinamentos
+                {tx("Treinamentos")}
               </TabsTrigger>
               <TabsTrigger value="projects" className="text-xs gap-1">
                 <FolderKanban className="h-3 w-3" />
-                Projetos
+                {tx("Projetos")}
               </TabsTrigger>
             </TabsList>
 
@@ -268,7 +269,7 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
                     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                   </div>
                 ) : !assessments?.length ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">Nenhum diagnóstico calculado encontrado.</p>
+                  <p className="text-sm text-muted-foreground text-center py-8">{tx("Nenhum diagnóstico calculado encontrado.")}</p>
                 ) : (
                   <div className="space-y-2 pr-2">
                     {assessments.map(a => {
@@ -313,7 +314,7 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
                     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                   </div>
                 ) : !trainings?.length ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">Nenhum treinamento disponível.</p>
+                  <p className="text-sm text-muted-foreground text-center py-8">{tx("Nenhum treinamento disponível.")}</p>
                 ) : (
                   <div className="space-y-2 pr-2">
                     {trainings.map(t => {
@@ -350,7 +351,7 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
                     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                   </div>
                 ) : !projects?.length ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">Nenhum projeto encontrado.</p>
+                  <p className="text-sm text-muted-foreground text-center py-8">{tx("Nenhum projeto encontrado.")}</p>
                 ) : (
                   <div className="space-y-2 pr-2">
                     {projects.map(p => {

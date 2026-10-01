@@ -31,6 +31,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
+import { tx } from "@/i18n/t";
 const UF_OPTIONS = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
   'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
@@ -54,8 +55,8 @@ const destinationSchema = z.object({
   name: z.string().trim().min(2, 'Nome deve ter pelo menos 2 caracteres').max(100, 'Nome muito longo'),
   uf: z.string().length(2, 'Selecione um estado'),
   ibge_code: z.string().regex(/^\d{7}$/, 'Código IBGE deve ter 7 dígitos').optional().or(z.literal('')),
-  latitude: nullableNumber({ min: -90, max: 90, message: 'Latitude inválida' }),
-  longitude: nullableNumber({ min: -180, max: 180, message: 'Longitude inválida' }),
+  latitude: nullableNumber({ min: -90, max: 90, message: tx('Latitude inválida') }),
+  longitude: nullableNumber({ min: -180, max: 180, message: tx('Longitude inválida') }),
 });
 
 type DestinationFormValues = {
@@ -309,11 +310,11 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
               name="name"
               render={({ field }) => (
                 <FormItem className="relative">
-                  <FormLabel>Nome do Destino</FormLabel>
+                  <FormLabel>{tx("Nome do Destino")}</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input 
-                        placeholder="Ex: Bonito" 
+                        placeholder={tx("Ex: Bonito")} 
                         {...field}
                         onChange={(e) => handleNameChange(e.target.value)}
                         className={cn(
@@ -391,7 +392,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o estado" />
+                        <SelectValue placeholder={tx("Selecione o estado")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -412,10 +413,10 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
               name="ibge_code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Código IBGE</FormLabel>
+                  <FormLabel>{tx("Código IBGE")}</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="Preenchido automaticamente" 
+                      placeholder={tx("Preenchido automaticamente")} 
                       maxLength={7} 
                       {...field} 
                       readOnly={!!selectedIBGE}
@@ -459,7 +460,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancelar
+                {tx("Cancelar")}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -21,13 +21,13 @@ import { useHaptic } from '@/hooks/useHaptic';
 import { Plus, Search, MessageSquarePlus, Users, Globe } from 'lucide-react';
 
 const categories = [
-  { value: 'all', label: 'Todas' },
-  { value: 'general', label: 'Geral' },
-  { value: 'question', label: 'Dúvida' },
-  { value: 'discussion', label: 'Discussão' },
-  { value: 'announcement', label: 'Anúncio' },
-  { value: 'resource', label: 'Recurso' },
-  { value: 'tip', label: 'Dica' },
+  { value: 'all', label: tx('Todas') },
+  { value: 'general', label: tx('Geral') },
+  { value: 'question', label: tx('Dúvida') },
+  { value: 'discussion', label: tx('Discussão') },
+  { value: 'announcement', label: tx('Anúncio') },
+  { value: 'resource', label: tx('Recurso') },
+  { value: 'tip', label: tx('Dica') },
 ];
 
 export default function Forum() {

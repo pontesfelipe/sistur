@@ -487,8 +487,7 @@ export function OrganizationUsersPanel() {
                       <AlertDialogHeader>
                         <AlertDialogTitle>{tx("Remover usuário da organização?")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          {tx("O usuário")} <strong>{user.full_name}</strong> será removido desta organização.
-                          Ele ainda terá acesso ao sistema, mas precisará ser adicionado a outra organização.
+                          {tx("O usuário")} <strong>{user.full_name}</strong> {tx("será removido desta organização. Ele ainda terá acesso ao sistema, mas precisará ser adicionado a outra organização.")}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>

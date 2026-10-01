@@ -228,7 +228,7 @@ const Destinos = () => {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir destino?</AlertDialogTitle>
+            <AlertDialogTitle>{tx("Excluir destino?")}</AlertDialogTitle>
             <AlertDialogDescription>
               {tx('Esta ação não pode ser desfeita. Todos os diagnósticos associados também serão excluídos.')}
             </AlertDialogDescription>

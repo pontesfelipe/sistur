@@ -49,6 +49,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
+import { tx } from "@/i18n/t";
 interface NavItem {
   name: string;
   href: string;
@@ -69,7 +70,7 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   {
-    label: 'Analítico',
+    label: tx('Analítico'),
     icon: Briefcase,
     items: [
       { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
@@ -81,7 +82,7 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: 'Gerenciamento de Projeto',
+    label: tx('Gerenciamento de Projeto'),
     icon: FolderKanban,
     items: [
       { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true, module: 'projetos' },
@@ -89,7 +90,7 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: 'Educação',
+    label: tx('Educação'),
     icon: GraduationCap,
     items: [
       { name: 'Minha Jornada', href: '/edu', icon: GraduationCap, requiresEDU: true, module: 'edu' },
@@ -101,7 +102,7 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: 'Recursos',
+    label: tx('Recursos'),
     icon: Lightbulb,
     items: [
       { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
@@ -312,7 +313,7 @@ export function AppSidebar() {
             <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
               <span className="text-primary-foreground font-display font-bold text-sm">S</span>
             </div>
-            <span className="font-display font-bold text-lg text-sidebar-foreground">SISTUR</span>
+            <span className="font-display font-bold text-lg text-sidebar-foreground">{tx("SISTUR")}</span>
           </Link>
         )}
         {collapsed && (

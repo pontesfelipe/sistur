@@ -29,35 +29,35 @@ const STRICTNESS_DETAILS: Record<number, {
   allowed: string[];
 }> = {
   1: {
-    label: 'Muito Permissivo',
+    label: tx('Muito Permissivo'),
     description: tx("Apenas conteúdo explícito é bloqueado"),
     color: 'text-green-600',
     blocked: ['Nudez explícita', 'Conteúdo sexual gráfico', 'Gore extremo'],
     allowed: ['Selfies e fotos pessoais', 'Memes e conteúdo informal', 'Fotos genéricas', 'Conteúdo profissional', 'Conteúdo turístico'],
   },
   2: {
-    label: 'Permissivo',
+    label: tx('Permissivo'),
     description: tx("Bloqueia conteúdo explícito e violento"),
     color: 'text-emerald-600',
     blocked: ['Nudez', 'Conteúdo sexual', 'Violência gráfica', 'Símbolos de ódio'],
     allowed: ['Selfies e fotos pessoais', 'Memes', 'Fotos genéricas', 'Conteúdo profissional', 'Conteúdo turístico'],
   },
   3: {
-    label: 'Moderado',
+    label: tx('Moderado'),
     description: tx("Equilíbrio entre permissividade e restrição"),
     color: 'text-amber-600',
     blocked: ['Nudez e conteúdo sexual', 'Violência', 'Discurso de ódio', 'Uso de drogas', 'Spam e memes', 'Informações pessoais (RG, cartões)'],
     allowed: ['Fotos de turismo', 'Fotos profissionais', 'Conteúdo educacional', 'Mapas e gráficos', 'Fotos normais do cotidiano'],
   },
   4: {
-    label: 'Restritivo',
+    label: tx('Restritivo'),
     description: tx("Aceita apenas conteúdo claramente profissional"),
     color: 'text-orange-600',
     blocked: ['Tudo que não é profissional/educacional', 'Selfies e fotos pessoais', 'Memes e conteúdo informal', 'Conteúdo não relacionado'],
     allowed: ['Destinos turísticos', 'Hotéis e paisagens', 'Eventos profissionais', 'Mapas e diagramas', 'Documentos e apresentações'],
   },
   5: {
-    label: 'Muito Restritivo',
+    label: tx('Muito Restritivo'),
     description: tx("Apenas conteúdo diretamente relacionado a turismo"),
     color: 'text-red-600',
     blocked: ['Tudo não-turístico', 'Conteúdo profissional genérico', 'Fotos pessoais', 'Memes', 'Qualquer conteúdo não-turístico'],

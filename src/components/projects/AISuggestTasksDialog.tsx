@@ -101,7 +101,7 @@ export function AISuggestTasksDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /> Sugerir tarefas com inteligência SISTUR</DialogTitle>
+          <DialogTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /> {tx("Sugerir tarefas com inteligência SISTUR")}</DialogTitle>
           <DialogDescription>
             {tx('A inteligência SISTUR analisa indicadores vinculados, fases e tarefas existentes para sugerir novas tarefas acionáveis.')}
           </DialogDescription>
@@ -109,7 +109,7 @@ export function AISuggestTasksDialog({
 
         {suggestions.length === 0 && !loading && (
           <div className="py-8 text-center">
-            <Button onClick={generate} size="lg"><Sparkles className="h-4 w-4 mr-2" /> Gerar sugestões</Button>
+            <Button onClick={generate} size="lg"><Sparkles className="h-4 w-4 mr-2" /> {tx("Gerar sugestões")}</Button>
           </div>
         )}
 
@@ -146,7 +146,7 @@ export function AISuggestTasksDialog({
         <DialogFooter>
           {suggestions.length > 0 && (
             <Button variant="outline" onClick={generate} disabled={loading}>
-              <RefreshCw className="h-4 w-4 mr-1" /> Regenerar
+              <RefreshCw className="h-4 w-4 mr-1" /> {tx("Regenerar")}
             </Button>
           )}
           <Button variant="ghost" onClick={() => onOpenChange(false)}>{tx('Cancelar')}</Button>

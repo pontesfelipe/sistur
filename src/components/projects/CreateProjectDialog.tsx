@@ -411,7 +411,7 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
       }
 
       toast({
-        title: 'Projeto criado com sucesso!',
+        title: tx('Projeto criado com sucesso!'),
         description: `${projectName} foi criado com ${tasks.length} tarefas`,
       });
 
@@ -422,7 +422,7 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
       console.error('Error creating project:', error);
       toast({
         title: tx('Erro ao criar projeto'),
-        description: error instanceof Error ? error.message : 'Erro desconhecido',
+        description: error instanceof Error ? error.message : tx('Erro desconhecido'),
         variant: 'destructive',
       });
     } finally {

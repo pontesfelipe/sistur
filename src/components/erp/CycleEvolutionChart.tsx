@@ -29,9 +29,9 @@ interface CycleEvolutionChartProps {
 }
 
 const chartConfig = {
-  plansCreated: { label: 'Planos Criados', color: 'hsl(var(--primary))' },
-  plansCompleted: { label: 'Planos Concluídos', color: 'hsl(142 76% 36%)' },
-  avgPillarScore: { label: 'Score Médio (%)', color: 'hsl(var(--accent))' },
+  plansCreated: { label: tx('Planos Criados'), color: 'hsl(var(--primary))' },
+  plansCompleted: { label: tx('Planos Concluídos'), color: 'hsl(142 76% 36%)' },
+  avgPillarScore: { label: tx('Score Médio (%)'), color: 'hsl(var(--accent))' },
 };
 
 export function CycleEvolutionChart({ 

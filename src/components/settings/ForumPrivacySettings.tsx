@@ -69,16 +69,14 @@ export function ForumPrivacySettings() {
         <Alert>
           <Shield className="h-4 w-4" />
           <AlertDescription className="text-sm">
-            <strong>{tx("Nota de segurança:")}</strong> Esta configuração afeta apenas posts com 
-            visibilidade <strong>{tx("pública")}</strong>. Em posts da sua organização, sua identidade 
-            sempre será visível para membros da mesma organização.
+            <strong>{tx("Nota de segurança:")}</strong> {tx("Esta configuração afeta apenas posts com visibilidade")} <strong>{tx("pública")}</strong>{tx(". Em posts da sua organização, sua identidade sempre será visível para membros da mesma organização.")}
           </AlertDescription>
         </Alert>
 
         <div className="text-xs text-muted-foreground space-y-1">
           <p>• <strong>{tx("Identidade visível:")}</strong> {tx("Nome e foto aparecem normalmente")}</p>
           <p>• <strong>{tx("Anônimo:")}</strong> {tx("Exibido como \"Usuário Anônimo\" sem foto")}</p>
-          <p>• Você ainda pode editar e excluir seus próprios posts</p>
+          <p>{tx("• Você ainda pode editar e excluir seus próprios posts")}</p>
         </div>
       </CardContent>
     </Card>

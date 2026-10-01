@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface SourceData { rating: number; count: number; samples: string[] }
 interface Analysis {
   consolidated_rating: number | null;
@@ -38,7 +39,7 @@ export function ConsolidatedReputationSearch({ businessName, location, onAutoFil
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
 
   const run = async () => {
-    if (!businessName?.trim()) { toast.error('Informe o nome'); return; }
+    if (!businessName?.trim()) { toast.error(tx('Informe o nome')); return; }
     setLoading(true); setAnalysis(null);
     try {
       const { data, error } = await supabase.functions.invoke('search-consolidated-reputation', { body: { businessName, location } });
@@ -48,7 +49,7 @@ export function ConsolidatedReputationSearch({ businessName, location, onAutoFil
       setAnalysis(a);
       onAnalysisCapture?.({ ...a, businessName, location, searchedAt: new Date().toISOString() });
       if (a.consolidated_score) onAutoFill?.({ ENT_REPUTACAO_CONSOLIDADA: a.consolidated_score });
-      toast.success('Reputação consolidada');
+      toast.success(tx('Reputação consolidada'));
     } catch (e: any) {
       console.error(e); toast.error(e?.message || 'Falha ao analisar reputação');
     } finally { setLoading(false); }
@@ -69,21 +70,21 @@ export function ConsolidatedReputationSearch({ businessName, location, onAutoFil
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 rounded-lg border bg-card">
-              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Star className="h-3 w-3" /> Nota Consolidada</div>
+              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Star className="h-3 w-3" /> {tx("Nota Consolidada")}</div>
               <div className="text-2xl font-bold">{analysis.consolidated_rating ?? '—'}<span className="text-sm font-normal text-muted-foreground">/10</span></div>
               <Progress value={analysis.consolidated_score} className="h-1 mt-2" />
               <Badge variant="outline" className={`mt-2 text-[10px] capitalize ${TIER_COLOR[analysis.reputation_tier]}`}>{analysis.reputation_tier.replace('_', ' ')}</Badge>
             </div>
             <div className="p-3 rounded-lg border bg-card text-xs">
-              <div className="text-muted-foreground mb-1">Fontes detectadas</div>
+              <div className="text-muted-foreground mb-1">{tx("Fontes detectadas")}</div>
               <div className="text-xl font-bold">{analysis.sources_count}</div>
-              <div className="text-[10px] text-muted-foreground mt-1">OTAs/portais com nota extraída</div>
+              <div className="text-[10px] text-muted-foreground mt-1">{tx("OTAs/portais com nota extraída")}</div>
             </div>
           </div>
 
           {Object.keys(analysis.sources).length > 0 && (
             <div className="space-y-1">
-              <div className="text-xs font-medium">Notas por fonte</div>
+              <div className="text-xs font-medium">{tx("Notas por fonte")}</div>
               <div className="grid grid-cols-2 gap-2">
                 {Object.entries(analysis.sources).map(([k, v]) => (
                   <div key={k} className="p-2 rounded border bg-card text-xs flex items-center justify-between">
@@ -106,7 +107,7 @@ export function ConsolidatedReputationSearch({ businessName, location, onAutoFil
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

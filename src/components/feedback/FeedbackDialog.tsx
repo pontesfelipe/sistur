@@ -9,30 +9,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MessageSquarePlus, Lightbulb, Bug, Loader2 } from 'lucide-react';
 import { useUserFeedback } from '@/hooks/useUserFeedback';
 
+import { tx } from "@/i18n/t";
 interface FeedbackDialogProps {
   trigger?: React.ReactNode;
 }
 
 const featureCategories = [
-  { value: 'nova_funcionalidade', label: 'Nova funcionalidade' },
-  { value: 'melhoria_ux', label: 'Melhoria de usabilidade (UX)' },
-  { value: 'integracao', label: 'Integração com outros sistemas' },
-  { value: 'relatorios', label: 'Novos relatórios/dashboards' },
-  { value: 'performance', label: 'Melhorias de performance' },
-  { value: 'documentacao', label: 'Documentação/Tutoriais' },
-  { value: 'mobile', label: 'Versão mobile/responsividade' },
-  { value: 'outro_sugestao', label: 'Outro' },
+  { value: 'nova_funcionalidade', label: tx('Nova funcionalidade') },
+  { value: 'melhoria_ux', label: tx('Melhoria de usabilidade (UX)') },
+  { value: 'integracao', label: tx('Integração com outros sistemas') },
+  { value: 'relatorios', label: tx('Novos relatórios/dashboards') },
+  { value: 'performance', label: tx('Melhorias de performance') },
+  { value: 'documentacao', label: tx('Documentação/Tutoriais') },
+  { value: 'mobile', label: tx('Versão mobile/responsividade') },
+  { value: 'outro_sugestao', label: tx('Outro') },
 ];
 
 const bugCategories = [
-  { value: 'erro_visual', label: 'Erro visual/layout quebrado' },
-  { value: 'erro_dados', label: 'Dados incorretos/não aparecem' },
-  { value: 'erro_login', label: 'Problema de login/autenticação' },
-  { value: 'erro_carregamento', label: 'Página não carrega/lenta' },
-  { value: 'erro_funcionalidade', label: 'Funcionalidade não funciona' },
-  { value: 'erro_calculo', label: 'Erro de cálculo/processamento' },
-  { value: 'erro_exportacao', label: 'Erro ao exportar/gerar relatório' },
-  { value: 'outro_bug', label: 'Outro' },
+  { value: 'erro_visual', label: tx('Erro visual/layout quebrado') },
+  { value: 'erro_dados', label: tx('Dados incorretos/não aparecem') },
+  { value: 'erro_login', label: tx('Problema de login/autenticação') },
+  { value: 'erro_carregamento', label: tx('Página não carrega/lenta') },
+  { value: 'erro_funcionalidade', label: tx('Funcionalidade não funciona') },
+  { value: 'erro_calculo', label: tx('Erro de cálculo/processamento') },
+  { value: 'erro_exportacao', label: tx('Erro ao exportar/gerar relatório') },
+  { value: 'outro_bug', label: tx('Outro') },
 ];
 
 export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
@@ -93,16 +94,16 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MessageSquarePlus className="h-5 w-5 text-primary" />
-            Enviar Feedback
+            {tx("Enviar Feedback")}
           </DialogTitle>
           <DialogDescription>
-            Sua opinião é importante para melhorar o SISTUR
+            {tx("Sua opinião é importante para melhorar o SISTUR")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-3">
-            <Label>Tipo de feedback</Label>
+            <Label>{tx("Tipo de feedback")}</Label>
             <RadioGroup 
               value={feedbackType} 
               onValueChange={(v) => handleTypeChange(v as 'feature' | 'bug')}
@@ -115,8 +116,8 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
                   className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary cursor-pointer transition-colors"
                 >
                   <Lightbulb className="h-6 w-6 mb-2 text-yellow-500" />
-                  <span className="text-sm font-medium">Sugestão</span>
-                  <span className="text-xs text-muted-foreground">Nova feature</span>
+                  <span className="text-sm font-medium">{tx("Sugestão")}</span>
+                  <span className="text-xs text-muted-foreground">{tx("Nova feature")}</span>
                 </Label>
               </div>
               <div className="relative">
@@ -126,18 +127,18 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
                   className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary cursor-pointer transition-colors"
                 >
                   <Bug className="h-6 w-6 mb-2 text-red-500" />
-                  <span className="text-sm font-medium">Bug</span>
-                  <span className="text-xs text-muted-foreground">Reportar erro</span>
+                  <span className="text-sm font-medium">{tx("Bug")}</span>
+                  <span className="text-xs text-muted-foreground">{tx("Reportar erro")}</span>
                 </Label>
               </div>
             </RadioGroup>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Categoria</Label>
+            <Label htmlFor="category">{tx("Categoria")}</Label>
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione uma categoria" />
+                <SelectValue placeholder={tx("Selecione uma categoria")} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
@@ -166,7 +167,7 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição detalhada</Label>
+            <Label htmlFor="description">{tx("Descrição detalhada")}</Label>
             <Textarea
               id="description"
               value={description}
@@ -182,13 +183,13 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
 
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancelar
+              {tx("Cancelar")}
             </Button>
             <Button type="submit" disabled={submitting || !title.trim() || !description.trim() || !category}>
               {submitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Enviando...
+                  {tx("Enviando...")}
                 </>
               ) : (
                 'Enviar Feedback'

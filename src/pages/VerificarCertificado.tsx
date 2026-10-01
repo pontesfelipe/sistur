@@ -90,9 +90,9 @@ export default function VerificarCertificado() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
                 <Stat label={tx('Geral')} value={cert.overall_score} />
-                <Stat label="RA" value={cert.ra_score} />
-                <Stat label="OE" value={cert.oe_score} />
-                <Stat label="AO" value={cert.ao_score} />
+                <Stat label={tx("RA")} value={cert.ra_score} />
+                <Stat label={tx("OE")} value={cert.oe_score} />
+                <Stat label={tx("AO")} value={cert.ao_score} />
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm pt-3 border-t">
                 <div>

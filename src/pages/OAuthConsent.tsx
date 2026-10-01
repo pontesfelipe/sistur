@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, ShieldCheck } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 type OAuthNamespace = {
   getAuthorizationDetails: (id: string) => Promise<{ data: any; error: { message: string } | null }>;
   approveAuthorization: (id: string) => Promise<{ data: any; error: { message: string } | null }>;
@@ -92,7 +93,7 @@ export default function OAuthConsent() {
           {!error && !details && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Carregando solicitação…
+              {tx("Carregando solicitação…")}
             </div>
           )}
           {!error && details && (
@@ -102,7 +103,7 @@ export default function OAuthConsent() {
                 Autorizar
               </Button>
               <Button disabled={busy} variant="outline" onClick={() => decide(false)} className="flex-1">
-                Recusar
+                {tx("Recusar")}
               </Button>
             </div>
           )}

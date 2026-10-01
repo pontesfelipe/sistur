@@ -53,7 +53,7 @@ export function ClassroomAnnouncementsPanel({ classroomId, canManage }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-base flex items-center gap-2">
-              <Megaphone className="h-4 w-4" /> Anúncios da Turma
+              <Megaphone className="h-4 w-4" /> {tx("Anúncios da Turma")}
             </CardTitle>
             <CardDescription>
               {announcements.length} {announcements.length === 1 ? 'anúncio publicado' : 'anúncios publicados'}
@@ -61,7 +61,7 @@ export function ClassroomAnnouncementsPanel({ classroomId, canManage }: Props) {
           </div>
           {canManage && (
             <Button size="sm" variant="outline" onClick={() => setShowForm((v) => !v)}>
-              <Plus className="h-4 w-4 mr-1" /> Novo anúncio
+              <Plus className="h-4 w-4 mr-1" /> {tx("Novo anúncio")}
             </Button>
           )}
         </div>
@@ -110,7 +110,7 @@ export function ClassroomAnnouncementsPanel({ classroomId, canManage }: Props) {
                 <h4 className="font-medium text-sm truncate">{tx(a.title)}</h4>
                 {a.pinned && (
                   <Badge variant="secondary" className="text-xs">
-                    <Pin className="h-3 w-3 mr-1" /> Fixado
+                    <Pin className="h-3 w-3 mr-1" /> {tx("Fixado")}
                   </Badge>
                 )}
               </div>

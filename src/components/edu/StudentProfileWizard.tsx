@@ -32,17 +32,17 @@ import {
 } from '@/hooks/useStudentProfile';
 
 const STEPS = [
-  { id: 'intro', title: 'Bem-vindo', icon: User },
-  { id: 'professional', title: 'Perfil Profissional', icon: User },
-  { id: 'interests', title: 'Interesses', icon: Target },
-  { id: 'preferences', title: 'Preferências', icon: BookOpen },
-  { id: 'complete', title: 'Concluído', icon: CheckCircle2 },
+  { id: 'intro', title: tx('Bem-vindo'), icon: User },
+  { id: 'professional', title: tx('Perfil Profissional'), icon: User },
+  { id: 'interests', title: tx('Interesses'), icon: Target },
+  { id: 'preferences', title: tx('Preferências'), icon: BookOpen },
+  { id: 'complete', title: tx('Concluído'), icon: CheckCircle2 },
 ];
 
 const PILLARS = [
-  { value: 'RA', label: 'Relações Ambientais', color: 'bg-pillar-ra', description: 'Sustentabilidade e meio ambiente' },
-  { value: 'OE', label: 'Organização Estrutural', color: 'bg-pillar-oe', description: 'Governança e planejamento' },
-  { value: 'AO', label: 'Ações Operacionais', color: 'bg-pillar-ao', description: 'Marketing e operações' },
+  { value: 'RA', label: tx('Relações Ambientais'), color: 'bg-pillar-ra', description: tx('Sustentabilidade e meio ambiente') },
+  { value: 'OE', label: tx('Organização Estrutural'), color: 'bg-pillar-oe', description: tx('Governança e planejamento') },
+  { value: 'AO', label: tx('Ações Operacionais'), color: 'bg-pillar-ao', description: tx('Marketing e operações') },
 ];
 
 interface StudentProfileWizardProps {
@@ -176,8 +176,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
             <div>
               <h2 className="text-2xl font-bold">{tx('Personalize sua Jornada de Aprendizado')}</h2>
               <p className="text-muted-foreground mt-2 max-w-md mx-auto">
-                Responda algumas perguntas rápidas para que possamos recomendar 
-                cursos e trilhas que se encaixem perfeitamente no seu perfil.
+                {tx("Responda algumas perguntas rápidas para que possamos recomendar cursos e trilhas que se encaixem perfeitamente no seu perfil.")}
               </p>
             </div>
             <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
@@ -197,7 +196,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
         return (
           <div className="space-y-6">
             <div>
-              <Label className="text-base font-medium">Qual é sua área de atuação?</Label>
+              <Label className="text-base font-medium">{tx("Qual é sua área de atuação?")}</Label>
               <RadioGroup
                 value={formData.occupation_area || ''}
                 onValueChange={(value) => setFormData({ ...formData, occupation_area: value })}
@@ -222,7 +221,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
             </div>
 
             <div>
-              <Label className="text-base font-medium">Qual seu nível de experiência?</Label>
+              <Label className="text-base font-medium">{tx("Qual seu nível de experiência?")}</Label>
               <RadioGroup
                 value={formData.experience_level || ''}
                 onValueChange={(value) => setFormData({ ...formData, experience_level: value })}
@@ -381,7 +380,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
             </div>
 
             <div>
-              <Label className="text-base font-medium">Quais são seus objetivos de aprendizado?</Label>
+              <Label className="text-base font-medium">{tx("Quais são seus objetivos de aprendizado?")}</Label>
               <p className="text-sm text-muted-foreground mt-1">
                 {tx('Selecione todos que se aplicam')}
               </p>
@@ -417,8 +416,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
             <div>
               <h2 className="text-2xl font-bold">{tx('Perfil Criado com Sucesso!')}</h2>
               <p className="text-muted-foreground mt-2 max-w-md mx-auto">
-                Geramos recomendações personalizadas com base no seu perfil. 
-                Explore os cursos e trilhas sugeridos para você!
+                {tx("Geramos recomendações personalizadas com base no seu perfil. Explore os cursos e trilhas sugeridos para você!")}
               </p>
             </div>
             <Button onClick={() => navigate('/edu')} className="mt-4">

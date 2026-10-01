@@ -26,6 +26,7 @@ import { useIndicators } from '@/hooks/useIndicators';
 import { useAssessmentUnits } from '@/hooks/useAssessmentUnits';
 import { supabase } from '@/integrations/supabase/client';
 
+import { tx } from "@/i18n/t";
 type DiagnosticType = 'territorial' | 'enterprise';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 
@@ -214,7 +215,7 @@ export function NovaRodadaDialogs({
             <Card>
               <CardContent className="py-12 text-center">
                 <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
-                <p className="text-muted-foreground">Carregando destino...</p>
+                <p className="text-muted-foreground">{tx("Carregando destino...")}</p>
               </CardContent>
             </Card>
           )
@@ -232,13 +233,12 @@ export function NovaRodadaDialogs({
             <Card>
               <CardContent className="py-12 text-center">
                 <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h4 className="font-medium mb-2">Código IBGE não disponível</h4>
+                <h4 className="font-medium mb-2">{tx("Código IBGE não disponível")}</h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  O destino selecionado não possui código IBGE cadastrado. 
-                  O pré-preenchimento automático requer o código IBGE para buscar dados oficiais.
+                  {tx("O destino selecionado não possui código IBGE cadastrado. O pré-preenchimento automático requer o código IBGE para buscar dados oficiais.")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Você pode prosseguir para preenchimento manual ou editar o destino para adicionar o código IBGE.
+                  {tx("Você pode prosseguir para preenchimento manual ou editar o destino para adicionar o código IBGE.")}
                 </p>
               </CardContent>
             </Card>
@@ -252,7 +252,7 @@ export function NovaRodadaDialogs({
           <div className="space-y-4">
             <Button variant="outline" onClick={onPreviousStep} className="mb-2">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar ao Perfil
+              {tx("Voltar ao Perfil")}
             </Button>
             {isMultiUnit && (
               <Alert>
@@ -286,7 +286,7 @@ export function NovaRodadaDialogs({
           <Card>
             <CardContent className="py-12 text-center">
               <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
-              <p className="text-muted-foreground">Carregando diagnóstico...</p>
+              <p className="text-muted-foreground">{tx("Carregando diagnóstico...")}</p>
             </CardContent>
           </Card>
         )
@@ -300,7 +300,7 @@ export function NovaRodadaDialogs({
           <Card>
             <CardContent className="py-12 text-center">
               <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
-              <p className="text-muted-foreground">Carregando diagnóstico...</p>
+              <p className="text-muted-foreground">{tx("Carregando diagnóstico...")}</p>
             </CardContent>
           </Card>
         )
@@ -313,7 +313,7 @@ export function NovaRodadaDialogs({
             <div className="flex justify-between">
               <Button variant="outline" onClick={onPreviousStep}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
+                {tx("Voltar")}
               </Button>
               <Button onClick={onNextStep}>
                 {validatedDataCount > 0 
@@ -333,10 +333,10 @@ export function NovaRodadaDialogs({
             <div className="flex justify-between">
               <Button variant="outline" onClick={onPreviousStep}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
+                {tx("Voltar")}
               </Button>
               <Button onClick={onNextStep}>
-                Continuar para Cálculo
+                {tx("Continuar para Cálculo")}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </div>

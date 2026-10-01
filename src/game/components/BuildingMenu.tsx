@@ -14,9 +14,9 @@ interface BuildingMenuProps {
 
 export function BuildingMenu({ selectedBuilding, onSelect, coins, level, grid }: BuildingMenuProps) {
   const categories = [
-    { key: 'RA' as const, label: '🌳 Natureza', color: 'border-green-500' },
-    { key: 'OE' as const, label: '🏗️ Conforto', color: 'border-blue-500' },
-    { key: 'AO' as const, label: '🤝 Organização', color: 'border-purple-500' },
+    { key: 'RA' as const, label: tx('🌳 Natureza'), color: 'border-green-500' },
+    { key: 'OE' as const, label: tx('🏗️ Conforto'), color: 'border-blue-500' },
+    { key: 'AO' as const, label: tx('🤝 Organização'), color: 'border-purple-500' },
   ];
 
   return (

@@ -28,6 +28,7 @@ import { NovaRodadaForm } from './NovaRodadaForm';
 import { NovaRodadaDialogs } from './NovaRodadaDialogs';
 import type { DraftUnit } from '@/components/enterprise/AssessmentUnitsManager';
 
+import { tx } from "@/i18n/t";
 type VisibilityType = 'organization' | 'personal' | 'demo';
 type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 type DiagnosticType = 'territorial' | 'enterprise';
@@ -42,13 +43,13 @@ interface WorkflowStep {
 }
 
 const WORKFLOW_STEPS: WorkflowStep[] = [
-  { id: 1, title: 'Escopo', description: 'Definir visibilidade', icon: Users },
-  { id: 2, title: 'Destino', description: 'Selecione ou crie um destino', icon: MapPin },
-  { id: 3, title: 'Diagnóstico', description: 'Configure a rodada de avaliação', icon: ClipboardList },
-  { id: 4, title: 'Pré-preenchimento', description: 'Validar dados oficiais', icon: Shield },
-  { id: 5, title: 'Preenchimento', description: 'Complementar dados manualmente', icon: DatabaseIcon },
-  { id: 6, title: 'Cálculo', description: 'Processar diagnóstico', icon: Calculator },
-  { id: 7, title: 'Relatório', description: 'Gerar plano de desenvolvimento', icon: FileText },
+  { id: 1, title: tx('Escopo'), description: tx('Definir visibilidade'), icon: Users },
+  { id: 2, title: tx('Destino'), description: tx('Selecione ou crie um destino'), icon: MapPin },
+  { id: 3, title: tx('Diagnóstico'), description: tx('Configure a rodada de avaliação'), icon: ClipboardList },
+  { id: 4, title: tx('Pré-preenchimento'), description: tx('Validar dados oficiais'), icon: Shield },
+  { id: 5, title: tx('Preenchimento'), description: tx('Complementar dados manualmente'), icon: DatabaseIcon },
+  { id: 6, title: tx('Cálculo'), description: tx('Processar diagnóstico'), icon: Calculator },
+  { id: 7, title: tx('Relatório'), description: tx('Gerar plano de desenvolvimento'), icon: FileText },
 ];
 
 export default function NovaRodada() {
@@ -108,8 +109,8 @@ export default function NovaRodada() {
   useEffect(() => {
     if (typeParam === 'enterprise' && orgData !== undefined && !hasEnterpriseAccess) {
       toast({
-        title: 'Diagnóstico enterprise indisponível',
-        description: 'Sua organização ainda não tem acesso ao diagnóstico enterprise. Fluxo territorial selecionado.',
+        title: tx('Diagnóstico enterprise indisponível'),
+        description: tx('Sua organização ainda não tem acesso ao diagnóstico enterprise. Fluxo territorial selecionado.'),
         variant: 'destructive',
       });
     }
@@ -231,7 +232,7 @@ export default function NovaRodada() {
       setIsResuming(false);
       if (!resumeToastShownRef.current) {
         resumeToastShownRef.current = true;
-        toast({ title: 'Diagnóstico carregado', description: `Retomando "${resumeAssessment.title}" de onde você parou.` });
+        toast({ title: tx('Diagnóstico carregado'), description: `Retomando "${resumeAssessment.title}" de onde você parou.` });
       }
     }
   }, [resumeAssessment, resumeDataLoaded, destinations, validatedValuesCount, resumeIndicatorCount]);
@@ -261,7 +262,7 @@ export default function NovaRodada() {
     setValidatedDataCount(validatedValues.length);
     const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
     if (!createdAssessmentId || !effectiveOrgId) {
-      toast({ title: 'Dados validados', description: `${validatedValues.length} indicadores validados e pré-preenchidos no formulário.` });
+      toast({ title: tx('Dados validados'), description: `${validatedValues.length} indicadores validados e pré-preenchidos no formulário.` });
       return;
     }
 
@@ -297,12 +298,12 @@ export default function NovaRodada() {
           if (error) throw error;
         }
       }
-      toast({ title: 'Dados validados', description: `${validatedValues.length} indicadores validados e pré-preenchidos no formulário.` });
+      toast({ title: tx('Dados validados'), description: `${validatedValues.length} indicadores validados e pré-preenchidos no formulário.` });
     } catch (err) {
       console.error('Error injecting validated values into indicator_values:', err);
       toast({
-        title: 'Validação salva com falha parcial',
-        description: err instanceof Error ? err.message : 'Alguns indicadores não puderam ser pré-preenchidos.',
+        title: tx('Validação salva com falha parcial'),
+        description: err instanceof Error ? err.message : tx('Alguns indicadores não puderam ser pré-preenchidos.'),
         variant: 'destructive',
       });
     }
@@ -311,12 +312,12 @@ export default function NovaRodada() {
   const handleNextStep = async () => {
     if (currentStep === 1) { setCurrentStep(2); }
     else if (currentStep === 2) {
-      if (!selectedDestination) { toast({ title: 'Selecione um destino', variant: 'destructive' }); return; }
+      if (!selectedDestination) { toast({ title: tx('Selecione um destino'), variant: 'destructive' }); return; }
       setCurrentStep(3);
     } else if (currentStep === 3) {
-      if (!assessmentTitle.trim()) { toast({ title: 'Informe o título do diagnóstico', variant: 'destructive' }); return; }
+      if (!assessmentTitle.trim()) { toast({ title: tx('Informe o título do diagnóstico'), variant: 'destructive' }); return; }
       if (periodStart && periodEnd && new Date(periodStart) > new Date(periodEnd)) {
-        toast({ title: 'Período inválido', description: 'A data de início deve ser anterior ou igual à data de fim.', variant: 'destructive' });
+        toast({ title: tx('Período inválido'), description: tx('A data de início deve ser anterior ou igual à data de fim.'), variant: 'destructive' });
         return;
       }
       if (createAssessment.isPending) return; // Guard against double-click creating duplicate assessments.
@@ -341,10 +342,10 @@ export default function NovaRodada() {
         const params = new URLSearchParams(searchParams);
         params.set('resume', result.id);
         setSearchParams(params, { replace: true });
-        toast({ title: 'Diagnóstico criado com sucesso!' });
+        toast({ title: tx('Diagnóstico criado com sucesso!') });
         setCurrentStep(4);
       } catch (error) {
-        toast({ title: 'Erro ao criar diagnóstico', variant: 'destructive' });
+        toast({ title: tx('Erro ao criar diagnóstico'), variant: 'destructive' });
         return;
       }
     } else if (currentStep === 4) { setCurrentStep(5); }
@@ -359,7 +360,7 @@ export default function NovaRodada() {
     const result = await createDestination.mutateAsync({ ...data, visibility });
     setSelectedDestination(result.id);
     setDestinationMode('select');
-    toast({ title: 'Destino criado com sucesso!' });
+    toast({ title: tx('Destino criado com sucesso!') });
   };
 
   const canProceed = () => {
@@ -374,10 +375,10 @@ export default function NovaRodada() {
 
   if (resumeLoading || (isResuming && !resumeDataLoaded && resumeIndicatorCount === undefined)) {
     return (
-      <AppLayout title="Carregando Diagnóstico" subtitle="Preparando para retomar de onde você parou...">
+      <AppLayout title={tx("Carregando Diagnóstico")} subtitle={tx("Preparando para retomar de onde você parou...")}>
         <div className="flex flex-col items-center justify-center py-20">
           <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-          <p className="text-muted-foreground">Carregando dados do diagnóstico...</p>
+          <p className="text-muted-foreground">{tx("Carregando dados do diagnóstico...")}</p>
         </div>
       </AppLayout>
     );

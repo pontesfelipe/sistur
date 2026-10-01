@@ -110,7 +110,7 @@ export function SyllabusEditor({ value, onChange }: Props) {
         onChange={(v) => onChange({ competencias: v })}
         placeholder={tx("Ex: Diagnosticar gargalos territoriais")} />
 
-      <ListEditor label="Habilidades (objetivos de aprendizagem)" items={value.habilidades || []}
+      <ListEditor label={tx("Habilidades (objetivos de aprendizagem)")} items={value.habilidades || []}
         onChange={(v) => onChange({ habilidades: v })}
         placeholder={tx("Ex: Aplicar a metodologia de Mario Beni")} />
 

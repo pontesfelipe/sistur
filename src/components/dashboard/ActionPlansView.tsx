@@ -32,31 +32,31 @@ interface ActionPlansViewProps {
 
 const STATUS_CONFIG = {
   PENDING: {
-    label: "Pendente",
+    label: tx("Pendente"),
     color: "bg-muted text-muted-foreground",
     icon: Clock,
   },
   IN_PROGRESS: {
-    label: "Em Andamento",
+    label: tx("Em Andamento"),
     color: "bg-primary/10 text-primary",
     icon: Play,
   },
   COMPLETED: {
-    label: "Concluído",
+    label: tx("Concluído"),
     color: "bg-green-500/10 text-green-600",
     icon: CheckCircle2,
   },
   CANCELLED: {
-    label: "Cancelado",
+    label: tx("Cancelado"),
     color: "bg-destructive/10 text-destructive",
     icon: XCircle,
   },
 };
 
 const PILLAR_CONFIG = {
-  RA: { label: "Relações Ambientais", color: "bg-green-500/10 text-green-600 border-green-500/20" },
-  OE: { label: "Organização Estrutural", color: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
-  AO: { label: "Ações Operacionais", color: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
+  RA: { label: tx("Relações Ambientais"), color: "bg-green-500/10 text-green-600 border-green-500/20" },
+  OE: { label: tx("Organização Estrutural"), color: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
+  AO: { label: tx("Ações Operacionais"), color: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
 };
 
 export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {

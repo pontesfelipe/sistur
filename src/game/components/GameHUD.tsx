@@ -179,9 +179,9 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
         <p className="text-xs font-bold mb-2 text-amber-800 dark:text-amber-200">{tx('🎯 Objetivo: Cidade do Futuro')}</p>
         <div className="space-y-1.5">
           {[
-            { done: level >= 5, label: 'Nível 5', emoji: '⭐' },
+            { done: level >= 5, label: tx('Nível 5'), emoji: '⭐' },
             { done: equilibrium >= 70, label: `Equilíbrio ≥ 70 (${Math.round(equilibrium)})`, emoji: '⚖️' },
-            { done: bars.ra >= 50 && bars.oe >= 50 && bars.ao >= 50, label: 'Barras ≥ 50', emoji: '📊' },
+            { done: bars.ra >= 50 && bars.oe >= 50 && bars.ao >= 50, label: tx('Barras ≥ 50'), emoji: '📊' },
             { done: visitors >= 200, label: `200+ Visitantes (${visitors})`, emoji: '👥' },
           ].map((obj, i) => (
             <div key={i} className="flex items-center gap-1.5 text-xs">

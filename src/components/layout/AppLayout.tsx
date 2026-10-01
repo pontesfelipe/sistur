@@ -8,6 +8,7 @@ import { useTrialNotifications } from '@/hooks/useTrialNotifications';
 import { cn } from '@/lib/utils';
 import { SubNav, type SubNavItem } from './SubNav';
 
+import { tx } from "@/i18n/t";
 interface AppLayoutProps {
   children: ReactNode;
   title: string;
@@ -27,7 +28,7 @@ export function AppLayout({ children, title, subtitle, actions, subNav }: AppLay
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none"
       >
-        Pular para o conteúdo
+        {tx("Pular para o conteúdo")}
       </a>
       {/* Desktop Sidebar */}
       <div className="hidden md:block">

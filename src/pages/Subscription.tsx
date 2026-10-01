@@ -25,14 +25,14 @@ import { useTrialState } from '@/hooks/useTrialState';
 import { useBeniQuota } from '@/hooks/useBeniQuota';
 
 const FEATURE_GRID: { key: string; label: string; icon: string }[] = [
-  { key: 'erp', label: 'Analítico territorial', icon: '📊' },
-  { key: 'enterprise', label: 'Diagnóstico empresarial', icon: '🏨' },
-  { key: 'edu', label: 'EDU', icon: '📚' },
-  { key: 'projects', label: 'Projetos', icon: '🗂️' },
-  { key: 'reports', label: 'Relatórios', icon: '📈' },
-  { key: 'observatory', label: 'Observatório', icon: '🛰️' },
-  { key: 'consortia', label: 'Consórcios', icon: '🤝' },
-  { key: 'beni', label: 'Professor Beni', icon: '🤖' },
+  { key: 'erp', label: tx('Analítico territorial'), icon: '📊' },
+  { key: 'enterprise', label: tx('Diagnóstico empresarial'), icon: '🏨' },
+  { key: 'edu', label: tx('EDU'), icon: '📚' },
+  { key: 'projects', label: tx('Projetos'), icon: '🗂️' },
+  { key: 'reports', label: tx('Relatórios'), icon: '📈' },
+  { key: 'observatory', label: tx('Observatório'), icon: '🛰️' },
+  { key: 'consortia', label: tx('Consórcios'), icon: '🤝' },
+  { key: 'beni', label: tx('Professor Beni'), icon: '🤖' },
 ];
 
 const FAQ: { q: string; a: string }[] = [

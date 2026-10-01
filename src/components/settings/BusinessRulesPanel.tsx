@@ -60,7 +60,7 @@ export function BusinessRulesPanel() {
       <Card className="overflow-hidden">
         <img
           src={heroImage}
-          alt="Ilustração do modelo de negócio SISTUR: destinos públicos, empreendimentos e educação conectados"
+          alt={tx("Ilustração do modelo de negócio SISTUR: destinos públicos, empreendimentos e educação conectados")}
           className="w-full h-40 sm:h-52 object-cover"
           width={1536}
           height={640}
@@ -72,8 +72,7 @@ export function BusinessRulesPanel() {
             {tx("Como o SISTUR funciona")}
           </CardTitle>
           <CardDescription>
-            Visão completa do modelo de acesso: planos, avaliação gratuita por consumo,
-            cotas do Professor Beni e regras fixas da metodologia.
+            {tx("Visão completa do modelo de acesso: planos, avaliação gratuita por consumo, cotas do Professor Beni e regras fixas da metodologia.")}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -95,8 +94,7 @@ export function BusinessRulesPanel() {
             <FlowStep icon={CreditCard} title={tx("Plano pago")} desc="Assinatura desbloqueia módulos completos" tone="accent" />
           </div>
           <p className="text-xs text-muted-foreground">
-            Não há trial por tempo (7 dias). O acesso de avaliação é por <strong>{tx("consumo")}</strong>:
-            termina quando o usuário conclui o curso base e esgota as perguntas gratuitas — sem data de expiração.
+            Não há trial por tempo (7 dias). O acesso de avaliação é por <strong>{tx("consumo")}</strong>: termina quando o usuário conclui o curso base e esgota as perguntas gratuitas — sem data de expiração.
           </p>
         </CardContent>
       </Card>
@@ -136,7 +134,7 @@ export function BusinessRulesPanel() {
                           </Badge>
                         )}
                         {features.erp && <Badge variant="outline">{tx("Analítico")}</Badge>}
-                        {features.edu && <Badge variant="outline">EDU</Badge>}
+                        {features.edu && <Badge variant="outline">{tx("EDU")}</Badge>}
                         {features.projects && <Badge variant="outline">{tx("Projetos")}</Badge>}
                       </div>
                       {p.code === 'empresarial' && (
@@ -286,7 +284,7 @@ export function BusinessRulesPanel() {
             <ArrowDown className="h-4 w-4 text-muted-foreground" />
           </div>
           <p className="text-center text-xs text-muted-foreground">
-            {tx("Dúvidas comerciais? A página pública")} <span className="font-mono">/planos</span> e o painel
+            {tx("Dúvidas comerciais? A página pública")} <span className="font-mono">{tx("/planos")}</span> e o painel
             Comercial (admin) refletem estas mesmas regras.
           </p>
         </CardContent>

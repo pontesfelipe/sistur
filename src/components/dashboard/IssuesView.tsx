@@ -119,9 +119,9 @@ export function IssuesView({ issues }: IssuesViewProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{tx('Todos')}</SelectItem>
-              <SelectItem value="ra">IRA</SelectItem>
-              <SelectItem value="oe">IOE</SelectItem>
-              <SelectItem value="ao">IAO</SelectItem>
+              <SelectItem value="ra">{tx("IRA")}</SelectItem>
+              <SelectItem value="oe">{tx("IOE")}</SelectItem>
+              <SelectItem value="ao">{tx("IAO")}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={severityFilter} onValueChange={setSeverityFilter}>

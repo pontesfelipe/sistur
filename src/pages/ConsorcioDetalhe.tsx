@@ -23,6 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+import { tx } from "@/i18n/t";
 function statusColor(s: string | null) {
   if (s === "ADEQUADO") return "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20";
   if (s === "ATENCAO") return "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20";
@@ -62,16 +63,16 @@ function InviteOrgDialog({ consortiumId }: { consortiumId: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="gap-2"><UserPlus className="h-4 w-4" /> Convidar município</Button>
+        <Button size="sm" className="gap-2"><UserPlus className="h-4 w-4" /> {tx("Convidar município")}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Convidar município</DialogTitle>
+          <DialogTitle>{tx("Convidar município")}</DialogTitle>
           <DialogDescription>
-            O município convidado precisará aceitar formalmente para participar do consórcio e compartilhar o resumo do diagnóstico.
+            {tx("O município convidado precisará aceitar formalmente para participar do consórcio e compartilhar o resumo do diagnóstico.")}
           </DialogDescription>
         </DialogHeader>
-        <Input placeholder="Buscar por nome..." value={q} onChange={(e) => setQ(e.target.value)} />
+        <Input placeholder={tx("Buscar por nome...")} value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="max-h-72 overflow-y-auto divide-y border rounded-md">
           {(orgs ?? []).map((o) => (
             <div key={o.id} className="flex items-center justify-between p-2 text-sm">
@@ -80,14 +81,14 @@ function InviteOrgDialog({ consortiumId }: { consortiumId: string }) {
                 {o.org_type && <div className="text-xs text-muted-foreground">{o.org_type}</div>}
               </div>
               <Button size="sm" variant="outline" disabled={invite.isPending} onClick={() => invite.mutate(o.id)}>
-                Convidar
+                {tx("Convidar")}
               </Button>
             </div>
           ))}
-          {!orgs?.length && <div className="p-4 text-sm text-muted-foreground text-center">Sem resultados</div>}
+          {!orgs?.length && <div className="p-4 text-sm text-muted-foreground text-center">{tx("Sem resultados")}</div>}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Fechar</Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>{tx("Fechar")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -108,7 +109,7 @@ export default function ConsorcioDetalhe() {
 
   if (isLoading) {
     return (
-      <AppLayout title="Consórcio">
+      <AppLayout title={tx("Consórcio")}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
@@ -118,12 +119,12 @@ export default function ConsorcioDetalhe() {
 
   if (!consortium) {
     return (
-      <AppLayout title="Consórcio">
+      <AppLayout title={tx("Consórcio")}>
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">Consórcio não encontrado ou sem permissão de acesso.</p>
+            <p className="text-muted-foreground">{tx("Consórcio não encontrado ou sem permissão de acesso.")}</p>
             <Link to="/consorcios">
-              <Button variant="link" className="mt-3">Voltar</Button>
+              <Button variant="link" className="mt-3">{tx("Voltar")}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -156,17 +157,17 @@ export default function ConsorcioDetalhe() {
         {myPendingInvite && (
           <Card className="border-primary/40 bg-primary/5">
             <CardHeader>
-              <CardTitle className="text-base">Convite pendente para o seu município</CardTitle>
+              <CardTitle className="text-base">{tx("Convite pendente para o seu município")}</CardTitle>
               <CardDescription>
                 Aceitar significa compartilhar a pontuação por pilar (RA/OE/AO) do último diagnóstico com os demais membros deste consórcio.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex gap-2">
               <Button size="sm" className="gap-2" disabled={respond.isPending} onClick={() => respond.mutate({ memberId: myPendingInvite.id, accept: true })}>
-                <Check className="h-4 w-4" /> Aceitar
+                <Check className="h-4 w-4" /> {tx("Aceitar")}
               </Button>
               <Button size="sm" variant="outline" className="gap-2" disabled={respond.isPending} onClick={() => respond.mutate({ memberId: myPendingInvite.id, accept: false })}>
-                <X className="h-4 w-4" /> Recusar
+                <X className="h-4 w-4" /> {tx("Recusar")}
               </Button>
             </CardContent>
           </Card>
@@ -174,33 +175,33 @@ export default function ConsorcioDetalhe() {
 
         <Tabs defaultValue="comparativo">
           <TabsList>
-            <TabsTrigger value="comparativo">Visão Regional</TabsTrigger>
+            <TabsTrigger value="comparativo">{tx("Visão Regional")}</TabsTrigger>
             <TabsTrigger value="municipios">Municípios ({members?.length ?? 0})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="comparativo" className="space-y-4 mt-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Comparativo por pilar</CardTitle>
+                <CardTitle className="text-base">{tx("Comparativo por pilar")}</CardTitle>
                 <CardDescription>
-                  Pontuação do último diagnóstico calculado de cada município que aceitou o consórcio.
+                  {tx("Pontuação do último diagnóstico calculado de cada município que aceitou o consórcio.")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {!comparison || comparison.length === 0 ? (
                   <p className="text-sm text-muted-foreground py-8 text-center">
-                    Ainda não há municípios com diagnóstico calculado neste consórcio.
+                    {tx("Ainda não há municípios com diagnóstico calculado neste consórcio.")}
                   </p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b text-left text-muted-foreground">
-                          <th className="py-2 pr-3 font-medium">Município</th>
+                          <th className="py-2 pr-3 font-medium">{tx("Município")}</th>
                           <th className="py-2 px-3 font-medium">RA</th>
                           <th className="py-2 px-3 font-medium">OE</th>
                           <th className="py-2 px-3 font-medium">AO</th>
-                          <th className="py-2 px-3 font-medium">Último cálculo</th>
+                          <th className="py-2 px-3 font-medium">{tx("Último cálculo")}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -247,14 +248,14 @@ export default function ConsorcioDetalhe() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle className="text-base">Municípios participantes</CardTitle>
-                  <CardDescription>Convidados, aceitos e recusados.</CardDescription>
+                  <CardTitle className="text-base">{tx("Municípios participantes")}</CardTitle>
+                  <CardDescription>{tx("Convidados, aceitos e recusados.")}</CardDescription>
                 </div>
                 {canAdminister && id && <InviteOrgDialog consortiumId={id} />}
               </CardHeader>
               <CardContent>
                 {!members || members.length === 0 ? (
-                  <p className="text-sm text-muted-foreground py-6 text-center">Nenhum município ainda.</p>
+                  <p className="text-sm text-muted-foreground py-6 text-center">{tx("Nenhum município ainda.")}</p>
                 ) : (
                   <div className="divide-y">
                     {members.map((m) => {

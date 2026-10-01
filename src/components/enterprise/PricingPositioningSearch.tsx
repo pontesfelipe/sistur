@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface PriceStats { min: number | null; max: number | null; avg: number | null; median: number | null; count: number; samples?: number[] }
 interface Analysis {
   own_property: PriceStats;
@@ -24,10 +25,10 @@ interface Props {
 }
 
 const POSITIONING_MAP: Record<string, { label: string; color: string; icon: any }> = {
-  premium: { label: 'Premium', color: 'text-purple-600', icon: TrendingUp },
-  aligned: { label: 'Alinhado', color: 'text-emerald-600', icon: Minus },
-  value: { label: 'Value', color: 'text-amber-600', icon: TrendingDown },
-  unknown: { label: 'Indeterminado', color: 'text-muted-foreground', icon: Minus },
+  premium: { label: tx('Premium'), color: 'text-purple-600', icon: TrendingUp },
+  aligned: { label: tx('Alinhado'), color: 'text-emerald-600', icon: Minus },
+  value: { label: tx('Value'), color: 'text-amber-600', icon: TrendingDown },
+  unknown: { label: tx('Indeterminado'), color: 'text-muted-foreground', icon: Minus },
 };
 
 export function PricingPositioningSearch({ businessName, location, onAutoFill, onAnalysisCapture }: Props) {
@@ -36,7 +37,7 @@ export function PricingPositioningSearch({ businessName, location, onAutoFill, o
 
   const run = async () => {
     if (!businessName?.trim()) {
-      toast.error('Informe o nome do estabelecimento.');
+      toast.error(tx('Informe o nome do estabelecimento.'));
       return;
     }
     setLoading(true);
@@ -54,7 +55,7 @@ export function PricingPositioningSearch({ businessName, location, onAutoFill, o
       if (a.own_property.avg != null) values['ENT_DIARIA_MEDIA'] = a.own_property.avg;
       if (a.pricing_index != null) values['ENT_INDICE_PRECO'] = a.pricing_index;
       if (Object.keys(values).length) onAutoFill?.(values);
-      toast.success('Posicionamento de preço analisado');
+      toast.success(tx('Posicionamento de preço analisado'));
     } catch (e: any) {
       console.error(e);
       toast.error(e?.message || 'Falha ao analisar preços');
@@ -103,7 +104,7 @@ export function PricingPositioningSearch({ businessName, location, onAutoFill, o
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

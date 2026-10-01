@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Network, Plus, Loader2 } from "lucide-react";
 
+import { tx } from "@/i18n/t";
 function slugify(s: string) {
   return s
     .normalize("NFD")
@@ -34,28 +35,28 @@ function CreateConsortiumDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="gap-2">
-          <Plus className="h-4 w-4" /> Novo Consórcio
+          <Plus className="h-4 w-4" /> {tx("Novo Consórcio")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Criar consórcio / região turística</DialogTitle>
+          <DialogTitle>{tx("Criar consórcio / região turística")}</DialogTitle>
           <DialogDescription>
-            Seu município será o líder do consórcio. Você poderá convidar outros municípios em seguida.
+            {tx("Seu município será o líder do consórcio. Você poderá convidar outros municípios em seguida.")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <Label>Nome</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Consórcio Vale Histórico" />
+            <Label>{tx("Nome")}</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={tx("Ex: Consórcio Vale Histórico")} />
           </div>
           <div>
             <Label>Descrição (opcional)</Label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Vocação, abrangência geográfica, objetivos..." />
+            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={tx("Vocação, abrangência geográfica, objetivos...")} />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>{tx("Cancelar")}</Button>
           <Button
             disabled={!name.trim() || !profile?.org_id || create.isPending}
             onClick={async () => {
@@ -83,16 +84,16 @@ export default function Consorcios() {
   const { data: list, isLoading } = useConsortia();
 
   return (
-    <AppLayout title="Consórcios">
+    <AppLayout title={tx("Consórcios")}>
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold flex items-center gap-2">
               <Network className="h-6 w-6 text-primary" />
-              Análise Regional / Consórcios
+              {tx("Análise Regional / Consórcios")}
             </h1>
             <p className="text-muted-foreground mt-1 max-w-2xl">
-              Agrupe municípios em um consórcio ou região turística para comparar diagnósticos e coordenar ações regionais. A comparação é privada entre os membros aceitos.
+              {tx("Agrupe municípios em um consórcio ou região turística para comparar diagnósticos e coordenar ações regionais. A comparação é privada entre os membros aceitos.")}
             </p>
           </div>
           <CreateConsortiumDialog />
@@ -106,9 +107,9 @@ export default function Consorcios() {
           <Card>
             <CardContent className="py-12 text-center">
               <Network className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground">Nenhum consórcio disponível ainda.</p>
+              <p className="text-muted-foreground">{tx("Nenhum consórcio disponível ainda.")}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Para criar um, seu município precisa ser o líder. Para participar, peça ao consórcio para convidar seu município.
+                {tx("Para criar um, seu município precisa ser o líder. Para participar, peça ao consórcio para convidar seu município.")}
               </p>
             </CardContent>
           </Card>

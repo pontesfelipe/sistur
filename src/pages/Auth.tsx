@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 
+import { tx } from "@/i18n/t";
 // Validation schemas
 const emailSchema = z.string().email('Email inválido');
 const passwordSchema = z.string().min(6, 'A senha deve ter pelo menos 6 caracteres');
@@ -187,7 +188,7 @@ const Auth = () => {
     setLoading(false);
 
     if (!error) {
-      toast.success('Login realizado com sucesso!');
+      toast.success(tx('Login realizado com sucesso!'));
       // Honor ?redirect=<path> so deep links survive login.
       const raw = searchParams.get('redirect');
       let target = '/';
@@ -223,13 +224,13 @@ const Auth = () => {
     });
 
     if (lower.includes('banned') || lower.includes('user is banned')) {
-      toast.error('Sua conta está bloqueada. Entre em contato com o administrador da sua organização.');
+      toast.error(tx('Sua conta está bloqueada. Entre em contato com o administrador da sua organização.'));
     } else if (msg.includes('Invalid login credentials')) {
-      toast.error('Email ou senha incorretos');
+      toast.error(tx('Email ou senha incorretos'));
     } else if (msg.includes('Email not confirmed')) {
-      toast.error('Confirme seu email antes de entrar. Verifique sua caixa de entrada.');
+      toast.error(tx('Confirme seu email antes de entrar. Verifique sua caixa de entrada.'));
     } else if (lower.includes('rate limit')) {
-      toast.error('Muitas tentativas. Aguarde alguns minutos e tente novamente.');
+      toast.error(tx('Muitas tentativas. Aguarde alguns minutos e tente novamente.'));
     } else if (isNetwork) {
       // Run a quick diagnostic so the user knows WHY
       const diag = await diagnoseNetworkFailure();
@@ -282,12 +283,12 @@ const Auth = () => {
 
     if (error) {
       if (error.message.includes('already registered')) {
-        toast.error('Este email já está cadastrado');
+        toast.error(tx('Este email já está cadastrado'));
       } else {
         toast.error(error.message);
       }
     } else {
-      toast.success('Conta criada com sucesso!');
+      toast.success(tx('Conta criada com sucesso!'));
       const ref = searchParams.get('ref');
       const orgref = searchParams.get('orgref');
       const params = new URLSearchParams();
@@ -343,7 +344,7 @@ const Auth = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success('Email de recuperação enviado! Verifique sua caixa de entrada.');
+      toast.success(tx('Email de recuperação enviado! Verifique sua caixa de entrada.'));
       setMode('login');
       setEmail('');
     }
@@ -361,7 +362,7 @@ const Auth = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success('Senha alterada com sucesso!');
+      toast.success(tx('Senha alterada com sucesso!'));
       navigate('/');
     }
   };
@@ -387,11 +388,11 @@ const Auth = () => {
                 <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
                   <span className="text-primary-foreground font-display font-bold text-sm">S</span>
                 </div>
-                <span className="font-display font-bold text-xl">SISTUR</span>
+                <span className="font-display font-bold text-xl">{tx("SISTUR")}</span>
               </div>
               <CardTitle className="text-2xl font-display">{t('Solicitar Acesso')}</CardTitle>
               <CardDescription>
-                Crie sua conta para acessar o SISTUR
+                {tx("Crie sua conta para acessar o SISTUR")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -414,7 +415,7 @@ const Auth = () => {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{tx("Email")}</Label>
                   <Input
                     id="signup-email"
                     type="email"
@@ -550,7 +551,7 @@ const Auth = () => {
                 <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
                   <span className="text-primary-foreground font-display font-bold text-sm">S</span>
                 </div>
-                <span className="font-display font-bold text-xl">SISTUR</span>
+                <span className="font-display font-bold text-xl">{tx("SISTUR")}</span>
               </div>
               <CardTitle className="text-2xl font-display">{t('Recuperar Senha')}</CardTitle>
               <CardDescription>
@@ -560,7 +561,7 @@ const Auth = () => {
             <CardContent>
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="forgot-email">Email</Label>
+                  <Label htmlFor="forgot-email">{tx("Email")}</Label>
                   <Input
                     id="forgot-email"
                     type="email"
@@ -611,7 +612,7 @@ const Auth = () => {
                 <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
                   <span className="text-primary-foreground font-display font-bold text-sm">S</span>
                 </div>
-                <span className="font-display font-bold text-xl">SISTUR</span>
+                <span className="font-display font-bold text-xl">{tx("SISTUR")}</span>
               </div>
               <CardTitle className="text-2xl font-display">{t('Nova Senha')}</CardTitle>
               <CardDescription>
@@ -677,7 +678,7 @@ const Auth = () => {
                 <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
                   <span className="text-primary-foreground font-display font-bold text-sm">S</span>
                 </div>
-                <span className="font-display font-bold text-xl">SISTUR</span>
+                <span className="font-display font-bold text-xl">{tx("SISTUR")}</span>
               </div>
               <h1 className="text-2xl font-semibold leading-none tracking-tight font-display">{t('Bem-vindo')}</h1>
               <CardDescription>
@@ -695,7 +696,7 @@ const Auth = () => {
             <CardContent>
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email">{tx("Email")}</Label>
                   <Input
                     id="login-email"
                     type="email"
@@ -858,7 +859,7 @@ const Auth = () => {
             <div className="h-12 w-12 rounded-2xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center">
               <span className="text-primary-foreground font-display font-bold text-2xl">S</span>
             </div>
-            <span className="font-display font-bold text-2xl text-primary-foreground">SISTUR</span>
+            <span className="font-display font-bold text-2xl text-primary-foreground">{tx("SISTUR")}</span>
           </div>
         </div>
 
@@ -877,7 +878,7 @@ const Auth = () => {
               { icon: BarChart3, title: t('Diagnóstico Sistêmico'), desc: t('Análise dos pilares RA, OE e AO pela metodologia Mario Beni') },
               { icon: Database, title: t('Ecossistema de Dados Oficiais'), desc: t('IBGE, Cadastur, Mapa do Turismo e DataSUS integrados') },
               { icon: Sparkles, title: t('Professor Beni (IA)'), desc: t('Inteligência ancorada nos microdados do seu território') },
-              { icon: GraduationCap, title: 'SISTUR EDU', desc: t('Trilhas de capacitação adaptativas e certificados') },
+              { icon: GraduationCap, title: tx('SISTUR EDU'), desc: t('Trilhas de capacitação adaptativas e certificados') },
             ].map(({ icon: FIcon, title: fTitle, desc }) => (
               <div key={fTitle} className="flex items-center gap-4 text-primary-foreground/90 group">
                 <div className="h-11 w-11 rounded-2xl bg-primary-foreground/15 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110">

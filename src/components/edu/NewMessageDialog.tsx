@@ -35,7 +35,7 @@ export function NewMessageDialog({ onPick }: Props) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="default">
-          <Plus className="h-4 w-4 mr-2" /> Nova mensagem
+          <Plus className="h-4 w-4 mr-2" /> {tx("Nova mensagem")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">

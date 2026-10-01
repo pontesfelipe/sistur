@@ -30,16 +30,16 @@ interface CreateProjectFromDiagnosticViewProps {
 }
 
 const PILLAR_CONFIG = {
-  RA: { label: "Relações Ambientais", color: "text-pillar-ra border-pillar-ra/30 bg-pillar-ra/10" },
-  OE: { label: "Organização Estrutural", color: "text-pillar-oe border-pillar-oe/30 bg-pillar-oe/10" },
-  AO: { label: "Ações Operacionais", color: "text-pillar-ao border-pillar-ao/30 bg-pillar-ao/10" },
+  RA: { label: tx("Relações Ambientais"), color: "text-pillar-ra border-pillar-ra/30 bg-pillar-ra/10" },
+  OE: { label: tx("Organização Estrutural"), color: "text-pillar-oe border-pillar-oe/30 bg-pillar-oe/10" },
+  AO: { label: tx("Ações Operacionais"), color: "text-pillar-ao border-pillar-ao/30 bg-pillar-ao/10" },
 };
 
 const METHODOLOGY_OPTIONS: { value: ProjectMethodology; label: string; description: string }[] = [
-  { value: "kanban", label: "Kanban", description: "Fluxo contínuo, ideal para equipes pequenas" },
-  { value: "scrum", label: "Scrum", description: "Sprints com entregas incrementais" },
-  { value: "waterfall", label: "Cascata", description: "Fases sequenciais com marcos definidos" },
-  { value: "safe", label: "SAFe", description: "Framework escalável para grandes organizações" },
+  { value: "kanban", label: tx("Kanban"), description: tx("Fluxo contínuo, ideal para equipes pequenas") },
+  { value: "scrum", label: tx("Scrum"), description: tx("Sprints com entregas incrementais") },
+  { value: "waterfall", label: tx("Cascata"), description: tx("Fases sequenciais com marcos definidos") },
+  { value: "safe", label: tx("SAFe"), description: tx("Framework escalável para grandes organizações") },
 ];
 
 export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }: CreateProjectFromDiagnosticViewProps) {
@@ -213,8 +213,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
                 {tx('Criar Projeto a partir do Diagnóstico')}
               </h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Selecione as ações identificadas pelo diagnóstico que deseja incluir como tarefas no novo projeto. 
-                Após selecionar, você poderá configurar os detalhes do projeto.
+                {tx("Selecione as ações identificadas pelo diagnóstico que deseja incluir como tarefas no novo projeto. Após selecionar, você poderá configurar os detalhes do projeto.")}
               </p>
             </div>
           </CardContent>

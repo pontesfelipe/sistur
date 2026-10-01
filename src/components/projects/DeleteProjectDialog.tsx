@@ -38,7 +38,7 @@ export function DeleteProjectDialog({ project, open, onOpenChange, onDeleted }: 
         <AlertDialogHeader>
           <AlertDialogTitle>{tx('Excluir Projeto')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Tem certeza que deseja excluir o projeto <strong>"{project.name}"</strong>?
+            {tx("Tem certeza que deseja excluir o projeto")} <strong>"{project.name}"</strong>?
             <br /><br />
             {tx('Esta ação não pode ser desfeita. Todas as fases, tarefas e marcos associados serão removidos.')}
           </AlertDialogDescription>

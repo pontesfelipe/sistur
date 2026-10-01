@@ -17,6 +17,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 
+import { tx } from "@/i18n/t";
 interface Props {
   destinationId: string;
 }
@@ -42,18 +43,18 @@ const PROVIDER_AUTH: Record<Provider, 'oauth' | 'apikey'> = {
 const PROVIDER_FIELDS: Record<Provider, { key: string; label: string; placeholder?: string; type?: string }[]> = {
   cloudbeds: [],
   stays: [
-    { key: 'client_id', label: 'Client ID', placeholder: 'Conta Stays' },
-    { key: 'api_key', label: 'API Key', type: 'password' },
+    { key: 'client_id', label: tx('Client ID'), placeholder: tx('Conta Stays') },
+    { key: 'api_key', label: tx('API Key'), type: 'password' },
   ],
   opera: [
-    { key: 'base_url', label: 'Base URL', placeholder: 'https://<tenant>.hospitality.oracleindustry.com' },
-    { key: 'client_id', label: 'Client ID' },
-    { key: 'client_secret', label: 'Client Secret', type: 'password' },
-    { key: 'app_key', label: 'App Key (x-app-key)', type: 'password' },
+    { key: 'base_url', label: tx('Base URL'), placeholder: 'https://<tenant>.hospitality.oracleindustry.com' },
+    { key: 'client_id', label: tx('Client ID') },
+    { key: 'client_secret', label: tx('Client Secret'), type: 'password' },
+    { key: 'app_key', label: tx('App Key (x-app-key)'), type: 'password' },
   ],
   hits: [
-    { key: 'api_key', label: 'API Key', type: 'password' },
-    { key: 'base_url', label: 'Base URL (opcional)', placeholder: 'https://api.hitsmobile.com.br/v1' },
+    { key: 'api_key', label: tx('API Key'), type: 'password' },
+    { key: 'base_url', label: tx('Base URL (opcional)'), placeholder: 'https://api.hitsmobile.com.br/v1' },
   ],
 };
 
@@ -118,7 +119,7 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
       setCredInputs({});
       if (PROVIDER_AUTH[provider] === 'oauth' && provider === 'cloudbeds') {
         if (!CLOUDBEDS_CLIENT_ID) {
-          toast.error('Credenciais OAuth Cloudbeds não configuradas. Conexão salva como pendente — ative depois.');
+          toast.error(tx('Credenciais OAuth Cloudbeds não configuradas. Conexão salva como pendente — ative depois.'));
           return;
         }
         const redirect = `${SUPABASE_FUNCTIONS_URL}/pms-oauth-callback?provider=cloudbeds`;
@@ -133,7 +134,7 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
         toast.success(`${PROVIDER_LABEL[provider]} conectado. Sync diário ativado.`);
       }
     },
-    onError: (e: any) => toast.error('Erro ao criar conexão: ' + (e?.message ?? '')),
+    onError: (e: any) => toast.error(tx('Erro ao criar conexão: ') + (e?.message ?? '')),
   });
 
   const syncNow = useMutation({
@@ -143,9 +144,9 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['pms-connections', destinationId] });
-      toast.success('Sincronização disparada.');
+      toast.success(tx('Sincronização disparada.'));
     },
-    onError: (e: any) => toast.error('Falha: ' + (e?.message ?? '')),
+    onError: (e: any) => toast.error(tx('Falha: ') + (e?.message ?? '')),
   });
 
   const removeConn = useMutation({
@@ -155,9 +156,9 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['pms-connections', destinationId] });
-      toast.success('Conexão removida.');
+      toast.success(tx('Conexão removida.'));
     },
-    onError: (e: any) => toast.error('Erro: ' + (e?.message ?? '')),
+    onError: (e: any) => toast.error(tx('Erro: ') + (e?.message ?? '')),
   });
 
   return (
@@ -167,25 +168,24 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
               <Plug className="h-5 w-5 text-primary" />
-              Conectores PMS
+              {tx("Conectores PMS")}
               <Badge variant="secondary" className="text-[10px]">
-                <Sparkles className="h-3 w-3 mr-1" /> Beta
+                <Sparkles className="h-3 w-3 mr-1" /> {tx("Beta")}
               </Badge>
             </CardTitle>
             <CardDescription>
-              Sincronização automática diária de ADR, RevPAR, ocupação e demais KPIs operacionais.
-              Substitui o CSV manual quando ativo.
+              {tx("Sincronização automática diária de ADR, RevPAR, ocupação e demais KPIs operacionais. Substitui o CSV manual quando ativo.")}
             </CardDescription>
           </div>
           <Button size="sm" onClick={() => setOpen(true)}>
-            <Plug className="h-3.5 w-3.5 mr-1" /> Conectar PMS
+            <Plug className="h-3.5 w-3.5 mr-1" /> {tx("Conectar PMS")}
           </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
         {isLoading && <Skeleton className="h-16" />}
         {!isLoading && (!conns || conns.length === 0) && (
-          <p className="text-sm text-muted-foreground">Nenhum PMS conectado. Use "Conectar PMS" para começar.</p>
+          <p className="text-sm text-muted-foreground">{tx("Nenhum PMS conectado. Use \"Conectar PMS\" para começar.")}</p>
         )}
         {(conns ?? []).map((c) => (
           <div key={c.id} className="rounded-lg border p-3 flex items-center gap-3 flex-wrap">
@@ -215,14 +215,14 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Conectar PMS</DialogTitle>
+            <DialogTitle>{tx("Conectar PMS")}</DialogTitle>
             <DialogDescription>
-              Integração opcional. Conecte apenas se você possui credenciais ativas no seu PMS — todos os adaptadores estão prontos.
+              {tx("Integração opcional. Conecte apenas se você possui credenciais ativas no seu PMS — todos os adaptadores estão prontos.")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div>
-              <Label htmlFor="prov">Provedor</Label>
+              <Label htmlFor="prov">{tx("Provedor")}</Label>
               <Select value={provider} onValueChange={(v) => { setProvider(v as Provider); setCredInputs({}); }}>
                 <SelectTrigger id="prov"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -235,11 +235,11 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
             </div>
             <div>
               <Label htmlFor="pid">ID da propriedade no PMS (opcional)</Label>
-              <Input id="pid" value={propertyId} onChange={(e) => setPropertyId(e.target.value)} placeholder="Ex.: 12345" />
+              <Input id="pid" value={propertyId} onChange={(e) => setPropertyId(e.target.value)} placeholder={tx("Ex.: 12345")} />
             </div>
             <div>
-              <Label htmlFor="pname">Apelido / nome da propriedade</Label>
-              <Input id="pname" value={propertyName} onChange={(e) => setPropertyName(e.target.value)} placeholder="Ex.: Hotel Bem-vindo Centro" />
+              <Label htmlFor="pname">{tx("Apelido / nome da propriedade")}</Label>
+              <Input id="pname" value={propertyName} onChange={(e) => setPropertyName(e.target.value)} placeholder={tx("Ex.: Hotel Bem-vindo Centro")} />
             </div>
             {PROVIDER_AUTH[provider] === 'apikey' && PROVIDER_FIELDS[provider].map((f) => (
               <div key={f.key}>
@@ -263,12 +263,12 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
             {provider === 'cloudbeds' && (
               <p className="text-xs text-muted-foreground flex items-start gap-1">
                 <ExternalLink className="h-3 w-3 mt-0.5 shrink-0" />
-                Você será redirecionado para autorizar no Cloudbeds. Ao retornar, a sincronização diária inicia automaticamente.
+                {tx("Você será redirecionado para autorizar no Cloudbeds. Ao retornar, a sincronização diária inicia automaticamente.")}
               </p>
             )}
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button variant="ghost" onClick={() => setOpen(false)}>{tx("Cancelar")}</Button>
             <Button onClick={() => createConn.mutate()} disabled={createConn.isPending}>
               {createConn.isPending && <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />}
               Continuar

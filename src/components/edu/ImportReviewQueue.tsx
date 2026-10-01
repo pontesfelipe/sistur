@@ -453,8 +453,7 @@ export function ImportReviewQueue() {
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-4">
               <p>
-                Esta ação irá buscar vídeos do canal e importá-los como rascunhos 
-                com classificação automática por pilar SISTUR.
+                {tx("Esta ação irá buscar vídeos do canal e importá-los como rascunhos com classificação automática por pilar SISTUR.")}
               </p>
               
               <div className="space-y-3 pt-2">
@@ -463,7 +462,7 @@ export function ImportReviewQueue() {
                   <Input
                     value={channelHandle}
                     onChange={(e) => setChannelHandle(e.target.value)}
-                    placeholder="@ProfessorMarioBeni"
+                    placeholder={tx("@ProfessorMarioBeni")}
                   />
                 </div>
                 

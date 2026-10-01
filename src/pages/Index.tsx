@@ -631,9 +631,9 @@ const Index = () => {
                 ) : recentAssessments && recentAssessments.length > 0 ? (
                   recentAssessments.slice(0, 3).map((assessment) => {
                     const statusConfig = {
-                      DRAFT: { icon: Clock, color: 'text-muted-foreground', bg: 'bg-muted', label: 'Rascunho', desc: 'Aguardando preenchimento' },
-                      DATA_READY: { icon: CheckCircle2, color: 'text-accent', bg: 'bg-accent/10', label: 'Dados Prontos', desc: 'Pronto para calcular' },
-                      CALCULATED: { icon: TrendingUp, color: 'text-severity-good', bg: 'bg-severity-good/10', label: 'Calculado', desc: 'Diagnóstico completo' },
+                      DRAFT: { icon: Clock, color: 'text-muted-foreground', bg: 'bg-muted', label: tx('Rascunho'), desc: 'Aguardando preenchimento' },
+                      DATA_READY: { icon: CheckCircle2, color: 'text-accent', bg: 'bg-accent/10', label: tx('Dados Prontos'), desc: 'Pronto para calcular' },
+                      CALCULATED: { icon: TrendingUp, color: 'text-severity-good', bg: 'bg-severity-good/10', label: tx('Calculado'), desc: 'Diagnóstico completo' },
                     };
                     const config = statusConfig[assessment.status as keyof typeof statusConfig] || statusConfig.DRAFT;
                     const StatusIcon = config.icon;

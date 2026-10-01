@@ -57,8 +57,8 @@ export default function GamesHub() {
   const games = [
     {
       id: 'tcg',
-      title: 'Guardião do Território',
-      description: 'Jogo de cartas estratégico onde você defende seu destino turístico construindo, gerenciando recursos e enfrentando ameaças.',
+      title: tx('Guardião do Território'),
+      description: tx('Jogo de cartas estratégico onde você defende seu destino turístico construindo, gerenciando recursos e enfrentando ameaças.'),
       emoji: '🃏',
       icon: Swords,
       gradient: 'from-purple-900 via-violet-800 to-indigo-900',
@@ -71,8 +71,8 @@ export default function GamesHub() {
     },
     {
       id: 'rpg',
-      title: 'Missão Bioma',
-      description: 'RPG narrativo onde suas escolhas determinam o destino de biomas brasileiros. Restaure a natureza através de decisões estratégicas.',
+      title: tx('Missão Bioma'),
+      description: tx('RPG narrativo onde suas escolhas determinam o destino de biomas brasileiros. Restaure a natureza através de decisões estratégicas.'),
       emoji: '🌍',
       icon: BookOpen,
       gradient: 'from-emerald-900 via-green-800 to-teal-900',
@@ -85,8 +85,8 @@ export default function GamesHub() {
     },
     {
       id: 'treasure',
-      title: 'Caça ao Tesouro Ecológico',
-      description: 'Explore mapas estilo campo minado, colete tesouros sustentáveis, evite armadilhas e resolva enigmas ambientais!',
+      title: tx('Caça ao Tesouro Ecológico'),
+      description: tx('Explore mapas estilo campo minado, colete tesouros sustentáveis, evite armadilhas e resolva enigmas ambientais!'),
       emoji: '🗺️',
       icon: Map,
       gradient: 'from-amber-900 via-orange-800 to-yellow-900',
@@ -99,8 +99,8 @@ export default function GamesHub() {
     },
     {
       id: 'memory',
-      title: 'Memória Ecológica',
-      description: 'Jogo da memória ambiental! Associe imagens a descrições sobre fauna, flora e sustentabilidade dos biomas brasileiros.',
+      title: tx('Memória Ecológica'),
+      description: tx('Jogo da memória ambiental! Associe imagens a descrições sobre fauna, flora e sustentabilidade dos biomas brasileiros.'),
       emoji: '🧠',
       icon: Brain,
       gradient: 'from-pink-900 via-rose-800 to-fuchsia-900',
@@ -120,7 +120,7 @@ export default function GamesHub() {
 
         <div className="mb-5 sm:mb-8 relative z-10">
           <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-            <SpriteOrEmoji emoji="🎮" className="w-7 h-7 sm:w-8 sm:h-8" /> Jogos Educacionais
+            <SpriteOrEmoji emoji="🎮" className="w-7 h-7 sm:w-8 sm:h-8" /> {tx("Jogos Educacionais")}
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1.5 sm:mt-2">
             {tx('Aprenda sobre sustentabilidade e gestão territorial de forma divertida')}

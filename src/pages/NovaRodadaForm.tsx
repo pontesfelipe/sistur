@@ -37,6 +37,7 @@ import { useMemo, useState } from 'react';
 import { BrandSelector } from '@/components/enterprise/BrandSelector';
 import { AssessmentUnitsManager, type DraftUnit } from '@/components/enterprise/AssessmentUnitsManager';
 
+import { tx } from "@/i18n/t";
 function DestinationCombobox({
   destinations,
   value,
@@ -79,9 +80,9 @@ function DestinationCombobox({
             itemValue.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
           }
         >
-          <CommandInput placeholder="Pesquisar por nome, UF ou IBGE..." />
+          <CommandInput placeholder={tx("Pesquisar por nome, UF ou IBGE...")} />
           <CommandList>
-            <CommandEmpty>Nenhum destino encontrado.</CommandEmpty>
+            <CommandEmpty>{tx("Nenhum destino encontrado.")}</CommandEmpty>
             <CommandGroup>
               {destinations.map((dest) => {
                 const label = `${dest.name} ${dest.uf ?? ''} ${dest.ibge_code ?? ''}`.trim();
@@ -130,8 +131,8 @@ interface WorkflowStep {
 const TIER_OPTIONS = [
   {
     value: 'COMPLETE' as DiagnosisTier,
-    label: 'Integral',
-    description: 'Todos os indicadores. Ideal para capitais, polos turísticos ou planejamento estratégico de longo prazo.',
+    label: tx('Integral'),
+    description: tx('Todos os indicadores. Ideal para capitais, polos turísticos ou planejamento estratégico de longo prazo.'),
     icon: Target,
     color: 'text-primary',
     bgColor: 'bg-primary/5 border-primary',
@@ -139,8 +140,8 @@ const TIER_OPTIONS = [
   },
   {
     value: 'MEDIUM' as DiagnosisTier,
-    label: 'Estratégico',
-    description: 'Indicadores core + críticos. Para cidades médias ou acompanhamento tático.',
+    label: tx('Estratégico'),
+    description: tx('Indicadores core + críticos. Para cidades médias ou acompanhamento tático.'),
     icon: Gauge,
     color: 'text-amber-600',
     bgColor: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500',
@@ -148,8 +149,8 @@ const TIER_OPTIONS = [
   },
   {
     value: 'SMALL' as DiagnosisTier,
-    label: 'Essencial',
-    description: 'Mínimo viável. Para municípios menores ou primeira avaliação rápida.',
+    label: tx('Essencial'),
+    description: tx('Mínimo viável. Para municípios menores ou primeira avaliação rápida.'),
     icon: Zap,
     color: 'text-green-600',
     bgColor: 'bg-green-50 dark:bg-green-950/30 border-green-500',
@@ -263,12 +264,12 @@ export function NovaRodadaForm({
           <div className="space-y-6">
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                Selecione o tipo de diagnóstico que deseja realizar.
+                {tx("Selecione o tipo de diagnóstico que deseja realizar.")}
               </p>
             </div>
             
             <div>
-              <Label className="text-sm font-medium mb-3 block">Tipo de Diagnóstico</Label>
+              <Label className="text-sm font-medium mb-3 block">{tx("Tipo de Diagnóstico")}</Label>
               <RadioGroup
                 value={diagnosticType}
                 onValueChange={(value) => onDiagnosticTypeChange(value as DiagnosticType)}
@@ -286,9 +287,9 @@ export function NovaRodadaForm({
                       <Landmark className="h-6 w-6 text-blue-600" />
                     </div>
                     <div>
-                      <p className="font-medium">Territorial</p>
+                      <p className="font-medium">{tx("Territorial")}</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Municípios e destinos turísticos. Dados de IBGE, DATASUS, INEP.
+                        {tx("Municípios e destinos turísticos. Dados de IBGE, DATASUS, INEP.")}
                       </p>
                     </div>
                   </Label>
@@ -318,18 +319,18 @@ export function NovaRodadaForm({
                       <Hotel className="h-6 w-6 text-amber-600" />
                     </div>
                     <div className="flex items-center gap-2 justify-center">
-                      <p className="font-medium">Empresarial</p>
+                      <p className="font-medium">{tx("Empresarial")}</p>
                       <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs">
                         <Sparkles className="h-2.5 w-2.5 mr-0.5" />
-                        PRO
+                        {tx("PRO")}
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Hotéis e resorts. RevPAR, NPS, Ocupação, KPIs hoteleiros.
+                      {tx("Hotéis e resorts. RevPAR, NPS, Ocupação, KPIs hoteleiros.")}
                     </p>
                     {!hasEnterpriseAccess && (
                       <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                        Requer acesso Empresarial habilitado
+                        {tx("Requer acesso Empresarial habilitado")}
                       </p>
                     )}
                   </Label>
@@ -351,7 +352,7 @@ export function NovaRodadaForm({
               <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
                 <p className="text-sm text-amber-800 dark:text-amber-200 flex items-center gap-2">
                   <Eye className="h-4 w-4" />
-                  <strong>Modo Demo ativo:</strong> Você pode criar dados no ambiente de demonstração.
+                  <strong>{tx("Modo Demo ativo:")}</strong> {tx("Você pode criar dados no ambiente de demonstração.")}
                 </p>
               </div>
             )}
@@ -371,11 +372,10 @@ export function NovaRodadaForm({
                 <div className="flex-1">
                   <Label htmlFor="organization" className="flex items-center gap-2 cursor-pointer font-medium">
                     <Users className="h-5 w-5 text-primary" />
-                    Compartilhado com a Organização
+                    {tx("Compartilhado com a Organização")}
                   </Label>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Todos os membros da sua organização poderão visualizar e colaborar 
-                    com este diagnóstico.
+                    {tx("Todos os membros da sua organização poderão visualizar e colaborar com este diagnóstico.")}
                   </p>
                 </div>
               </div>
@@ -393,7 +393,7 @@ export function NovaRodadaForm({
                     Apenas para mim (Pessoal)
                   </Label>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Somente você terá acesso a este diagnóstico.
+                    {tx("Somente você terá acesso a este diagnóstico.")}
                   </p>
                 </div>
               </div>
@@ -409,10 +409,10 @@ export function NovaRodadaForm({
                   <div className="flex-1">
                     <Label htmlFor="demo" className="flex items-center gap-2 cursor-pointer font-medium">
                       <Eye className="h-5 w-5 text-amber-600" />
-                      Ambiente de Demonstração
+                      {tx("Ambiente de Demonstração")}
                     </Label>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Os dados serão criados no ambiente de demonstração.
+                      {tx("Os dados serão criados no ambiente de demonstração.")}
                     </p>
                   </div>
                 </div>
@@ -428,10 +428,7 @@ export function NovaRodadaForm({
               <div className="space-y-4 mb-4">
                 <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
                   <p className="text-sm text-amber-900 dark:text-amber-200">
-                    <strong>Diagnóstico empresarial:</strong> uma marca pode ter
-                    várias unidades em municípios diferentes. Selecione a marca
-                    e adicione abaixo os municípios onde o empreendimento opera —
-                    o diagnóstico será único, mas a coleta de dados será por unidade.
+                    <strong>{tx("Diagnóstico empresarial:")}</strong> {tx("uma marca pode ter várias unidades em municípios diferentes. Selecione a marca e adicione abaixo os municípios onde o empreendimento opera — o diagnóstico será único, mas a coleta de dados será por unidade.")}
                   </p>
                 </div>
                 <BrandSelector
@@ -446,7 +443,7 @@ export function NovaRodadaForm({
                 />
                 {units.length === 0 && (
                   <p className="text-xs text-muted-foreground">
-                    Adicione pelo menos uma unidade para prosseguir.
+                    {tx("Adicione pelo menos uma unidade para prosseguir.")}
                   </p>
                 )}
               </div>
@@ -459,7 +456,7 @@ export function NovaRodadaForm({
                 onClick={() => onDestinationModeChange('select')}
                 className="flex-1"
               >
-                Selecionar existente
+                {tx("Selecionar existente")}
               </Button>
               <Button
                 variant={destinationMode === 'create' ? 'default' : 'outline'}
@@ -470,13 +467,13 @@ export function NovaRodadaForm({
                 className="flex-1"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Criar novo
+                {tx("Criar novo")}
               </Button>
             </div>
 
             {destinationMode === 'select' ? (
               <div className="space-y-2">
-                <Label>Destino turístico</Label>
+                <Label>{tx("Destino turístico")}</Label>
                 <DestinationCombobox
                   destinations={destinations}
                   value={selectedDestination}
@@ -484,7 +481,7 @@ export function NovaRodadaForm({
                 />
                 {selectedDestinationData && !selectedDestinationData.ibge_code && (
                   <p className="text-xs text-amber-600 dark:text-amber-400">
-                    ⚠️ Este destino não possui código IBGE. O pré-preenchimento automático não estará disponível.
+                    {tx("⚠️ Este destino não possui código IBGE. O pré-preenchimento automático não estará disponível.")}
                   </p>
                 )}
               </div>
@@ -494,7 +491,7 @@ export function NovaRodadaForm({
                   <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
                     <p className="text-sm text-green-700 dark:text-green-300 flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4" />
-                      <strong>Destino criado:</strong>{' '}
+                      <strong>{tx("Destino criado:")}</strong>{' '}
                       {destinations.find(d => d.id === selectedDestination)?.name}
                     </p>
                     <Button 
@@ -502,17 +499,17 @@ export function NovaRodadaForm({
                       className="p-0 h-auto text-green-700 dark:text-green-300"
                       onClick={onOpenDestinationForm}
                     >
-                      Criar outro destino
+                      {tx("Criar outro destino")}
                     </Button>
                   </div>
                 ) : (
                   <div className="p-4 bg-muted/50 rounded-lg text-center">
                     <p className="text-sm text-muted-foreground mb-3">
-                      Clique no botão abaixo para criar um novo destino com busca automática no IBGE.
+                      {tx("Clique no botão abaixo para criar um novo destino com busca automática no IBGE.")}
                     </p>
                     <Button onClick={onOpenDestinationForm}>
                       <Plus className="h-4 w-4 mr-2" />
-                      Criar Destino
+                      {tx("Criar Destino")}
                     </Button>
                   </div>
                 )}
@@ -527,9 +524,9 @@ export function NovaRodadaForm({
         {currentStep === 3 && (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label>Título do diagnóstico *</Label>
+              <Label>{tx("Título do diagnóstico *")}</Label>
               <Input
-                placeholder="Ex: Diagnóstico Bonito 2024"
+                placeholder={tx("Ex: Diagnóstico Bonito 2024")}
                 value={assessmentTitle}
                 onChange={(e) => onAssessmentTitleChange(e.target.value)}
               />
@@ -558,7 +555,7 @@ export function NovaRodadaForm({
             <div className="space-y-3">
               <Label className="flex items-center gap-2">
                 <Gauge className="h-4 w-4 text-primary" />
-                Nível de Diagnóstico
+                {tx("Nível de Diagnóstico")}
               </Label>
               <RadioGroup
                 value={selectedTier}
@@ -628,9 +625,9 @@ export function NovaRodadaForm({
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <Label htmlFor="mandala-toggle" className="font-medium cursor-pointer flex items-center gap-2">
-                        Expandir com Mandala da Sustentabilidade
+                        {tx("Expandir com Mandala da Sustentabilidade")}
                         <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/40 text-primary">
-                          MST
+                          {tx("MST")}
                         </Badge>
                       </Label>
                       <p className="text-sm text-muted-foreground mt-1">
@@ -648,16 +645,16 @@ export function NovaRodadaForm({
                   {expandWithMandala && (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-primary/15">
                       <div className="text-xs">
-                        <span className="font-medium text-severity-good">✓ 3 automáticos</span>
-                        <p className="text-muted-foreground">TSE, Anatel, CADASTUR</p>
+                        <span className="font-medium text-severity-good">{tx("✓ 3 automáticos")}</span>
+                        <p className="text-muted-foreground">{tx("TSE, Anatel, CADASTUR")}</p>
                       </div>
                       <div className="text-xs">
-                        <span className="font-medium text-amber-600">⚠ 6 manuais</span>
-                        <p className="text-muted-foreground">Coleta pelo gestor</p>
+                        <span className="font-medium text-amber-600">{tx("⚠ 6 manuais")}</span>
+                        <p className="text-muted-foreground">{tx("Coleta pelo gestor")}</p>
                       </div>
                       <div className="text-xs">
-                        <span className="font-medium text-primary">+ Não altera score</span>
-                        <p className="text-muted-foreground">Indicadores opcionais</p>
+                        <span className="font-medium text-primary">{tx("+ Não altera score")}</span>
+                        <p className="text-muted-foreground">{tx("Indicadores opcionais")}</p>
                       </div>
                     </div>
                   )}
@@ -667,11 +664,11 @@ export function NovaRodadaForm({
 
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                <strong>Destino selecionado:</strong>{' '}
+                <strong>{tx("Destino selecionado:")}</strong>{' '}
                 {selectedDestinationData?.name || 'Novo destino'}
                 {selectedDestinationData?.ibge_code && (
                   <span className="text-severity-good ml-2">
-                    ✓ Código IBGE disponível
+                    {tx("✓ Código IBGE disponível")}
                   </span>
                 )}
               </p>
@@ -683,9 +680,9 @@ export function NovaRodadaForm({
         {currentStep === 5 && (
           <div className="space-y-4">
             <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-              <h4 className="font-medium mb-2">Próximo passo: Complementar dados</h4>
+              <h4 className="font-medium mb-2">{tx("Próximo passo: Complementar dados")}</h4>
               <p className="text-sm text-muted-foreground mb-4">
-                Você será direcionado para a página de importação onde poderá:
+                {tx("Você será direcionado para a página de importação onde poderá:")}
               </p>
               <ul className="text-sm text-muted-foreground space-y-2">
                 <li className="flex items-center gap-2">
@@ -694,15 +691,15 @@ export function NovaRodadaForm({
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-severity-good" />
-                  Importar dados adicionais via arquivo CSV
+                  {tx("Importar dados adicionais via arquivo CSV")}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-severity-good" />
-                  Preencher dados manualmente por formulário
+                  {tx("Preencher dados manualmente por formulário")}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-severity-good" />
-                  Complementar indicadores não cobertos pelas fontes oficiais
+                  {tx("Complementar indicadores não cobertos pelas fontes oficiais")}
                 </li>
               </ul>
             </div>
@@ -710,13 +707,13 @@ export function NovaRodadaForm({
               <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
                 <p className="text-sm text-green-700 dark:text-green-300 flex items-center gap-2">
                   <Shield className="h-4 w-4" />
-                  <strong>{validatedDataCount} indicadores</strong> já foram pré-preenchidos e validados com dados oficiais.
+                  <strong>{validatedDataCount} indicadores</strong> {tx("já foram pré-preenchidos e validados com dados oficiais.")}
                 </p>
               </div>
             )}
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-sm">
-                <strong>Diagnóstico criado:</strong> {assessmentTitle}
+                <strong>{tx("Diagnóstico criado:")}</strong> {assessmentTitle}
               </p>
             </div>
           </div>
@@ -728,22 +725,22 @@ export function NovaRodadaForm({
             <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
               <h4 className="font-medium mb-2 flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-severity-good" />
-                Dados preenchidos com sucesso!
+                {tx("Dados preenchidos com sucesso!")}
               </h4>
               <p className="text-sm text-muted-foreground">
-                Agora você pode calcular o diagnóstico. O sistema irá:
+                {tx("Agora você pode calcular o diagnóstico. O sistema irá:")}
               </p>
               <ul className="text-sm text-muted-foreground mt-2 space-y-1">
-                <li>• Normalizar os indicadores</li>
+                <li>{tx("• Normalizar os indicadores")}</li>
                 <li>• Calcular scores dos pilares (RA, OE, AO)</li>
-                <li>• Identificar gargalos</li>
-                <li>• Gerar prescrições de capacitação</li>
+                <li>{tx("• Identificar gargalos")}</li>
+                <li>{tx("• Gerar prescrições de capacitação")}</li>
               </ul>
             </div>
             
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-sm">
-                <strong>Diagnóstico:</strong> {assessmentTitle}
+                <strong>{tx("Diagnóstico:")}</strong> {assessmentTitle}
               </p>
             </div>
             
@@ -753,7 +750,7 @@ export function NovaRodadaForm({
               onClick={onNavigateToCalculation}
             >
               <Calculator className="h-4 w-4 mr-2" />
-              Ir para Cálculo do Diagnóstico
+              {tx("Ir para Cálculo do Diagnóstico")}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
@@ -763,10 +760,9 @@ export function NovaRodadaForm({
         {currentStep === 7 && (
           <div className="space-y-4">
             <div className="p-4 bg-severity-good/10 rounded-lg border border-severity-good/20">
-              <h4 className="font-medium mb-2">Gerar relatório</h4>
+              <h4 className="font-medium mb-2">{tx("Gerar relatório")}</h4>
               <p className="text-sm text-muted-foreground">
-                Com o diagnóstico calculado, você poderá gerar um plano de desenvolvimento 
-                turístico personalizado usando a Mente Sistur.
+                {tx("Com o diagnóstico calculado, você poderá gerar um plano de desenvolvimento turístico personalizado usando a Mente Sistur.")}
               </p>
             </div>
           </div>
@@ -780,7 +776,7 @@ export function NovaRodadaForm({
             disabled={currentStep === 1}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
+            {tx("Voltar")}
           </Button>
           <Button
             onClick={onNextStep}

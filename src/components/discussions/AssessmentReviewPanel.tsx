@@ -35,6 +35,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+import { tx } from "@/i18n/t";
 interface IndicatorOpt {
   code: string;
   label: string;
@@ -169,7 +170,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
     if (!c.anchor_type || c.anchor_type === 'general') {
       return (
         <Badge variant="outline" className="text-[10px] gap-1">
-          <MessageSquare className="h-3 w-3" /> Diagnóstico
+          <MessageSquare className="h-3 w-3" /> {tx("Diagnóstico")}
         </Badge>
       );
     }
@@ -196,7 +197,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
               <MessageSquare className="h-5 w-5" />
-              Revisão técnica do diagnóstico
+              {tx("Revisão técnica do diagnóstico")}
             </CardTitle>
             <CardDescription>
               Comentários ancorados em pilares ou indicadores específicos, com responsável e status (aberto / resolvido).
@@ -221,20 +222,20 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
         <div className="flex flex-wrap items-center gap-2 border-b pb-3">
           <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
             <TabsList className="h-8">
-              <TabsTrigger value="all" className="text-xs h-6 px-2.5">Todos</TabsTrigger>
-              <TabsTrigger value="open" className="text-xs h-6 px-2.5">Abertos</TabsTrigger>
-              <TabsTrigger value="resolved" className="text-xs h-6 px-2.5">Resolvidos</TabsTrigger>
+              <TabsTrigger value="all" className="text-xs h-6 px-2.5">{tx("Todos")}</TabsTrigger>
+              <TabsTrigger value="open" className="text-xs h-6 px-2.5">{tx("Abertos")}</TabsTrigger>
+              <TabsTrigger value="resolved" className="text-xs h-6 px-2.5">{tx("Resolvidos")}</TabsTrigger>
             </TabsList>
           </Tabs>
           <div className="flex items-center gap-1.5 ml-auto">
             <Anchor className="h-3.5 w-3.5 text-muted-foreground" />
             <Select value={anchorFilter} onValueChange={setAnchorFilter}>
               <SelectTrigger className="h-8 w-[220px] text-xs">
-                <SelectValue placeholder="Filtrar por âncora" />
+                <SelectValue placeholder={tx("Filtrar por âncora")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as âncoras</SelectItem>
-                <SelectItem value="general">Sobre o diagnóstico</SelectItem>
+                <SelectItem value="all">{tx("Todas as âncoras")}</SelectItem>
+                <SelectItem value="general">{tx("Sobre o diagnóstico")}</SelectItem>
                 {pillarKeys.map((p) => (
                   <SelectItem key={p} value={`pillar:${p}`}>
                     Pilar {p} — {PILLAR_LABEL[p] || p}
@@ -284,7 +285,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
                       {anchorBadge(c)}
                       {isResolved && (
                         <Badge variant="outline" className="text-[10px] gap-1 border-emerald-500/40 text-emerald-700 dark:text-emerald-400">
-                          <CheckCircle2 className="h-3 w-3" /> Resolvido
+                          <CheckCircle2 className="h-3 w-3" /> {tx("Resolvido")}
                         </Badge>
                       )}
                       {assignee && !isResolved && (
@@ -314,7 +315,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
                             variant="ghost"
                             className="h-6 w-6"
                             onClick={() => del.mutate(c.id)}
-                            title="Remover"
+                            title={tx("Remover")}
                           >
                             <Trash2 className="h-3.5 w-3.5 text-destructive" />
                           </Button>
@@ -334,7 +335,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
         {/* Composer */}
         {canLoading ? null : !canComment ? (
           <p className="text-xs text-muted-foreground border-t pt-4">
-            Você não tem permissão para comentar aqui.
+            {tx("Você não tem permissão para comentar aqui.")}
           </p>
         ) : (
           <div className="border-t pt-4 space-y-3 relative">
@@ -350,16 +351,16 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="general">Sobre o diagnóstico</SelectItem>
-                  <SelectItem value="pillar">Sobre um pilar</SelectItem>
-                  <SelectItem value="indicator">Sobre um indicador</SelectItem>
+                  <SelectItem value="general">{tx("Sobre o diagnóstico")}</SelectItem>
+                  <SelectItem value="pillar">{tx("Sobre um pilar")}</SelectItem>
+                  <SelectItem value="indicator">{tx("Sobre um indicador")}</SelectItem>
                 </SelectContent>
               </Select>
 
               {anchorType === 'pillar' && (
                 <Select value={anchorRef ?? ''} onValueChange={setAnchorRef}>
                   <SelectTrigger className="h-9 text-xs">
-                    <SelectValue placeholder="Escolha o pilar" />
+                    <SelectValue placeholder={tx("Escolha o pilar")} />
                   </SelectTrigger>
                   <SelectContent>
                     {pillarKeys.map((p) => (
@@ -374,7 +375,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
               {anchorType === 'indicator' && (
                 <Select value={anchorRef ?? ''} onValueChange={setAnchorRef}>
                   <SelectTrigger className="h-9 text-xs">
-                    <SelectValue placeholder="Escolha o indicador" />
+                    <SelectValue placeholder={tx("Escolha o indicador")} />
                   </SelectTrigger>
                   <SelectContent className="max-h-72">
                     {indicators.map((i) => (
@@ -388,10 +389,10 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
 
               <Select value={assigneeId ?? '__none'} onValueChange={(v) => setAssigneeId(v === '__none' ? null : v)}>
                 <SelectTrigger className="h-9 text-xs">
-                  <SelectValue placeholder="Atribuir responsável (opcional)" />
+                  <SelectValue placeholder={tx("Atribuir responsável (opcional)")} />
                 </SelectTrigger>
                 <SelectContent className="max-h-72">
-                  <SelectItem value="__none">Sem responsável</SelectItem>
+                  <SelectItem value="__none">{tx("Sem responsável")}</SelectItem>
                   {allMembers.map((m) => (
                     <SelectItem key={m.user_id} value={m.user_id}>
                       {m.full_name}
@@ -405,7 +406,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
               ref={taRef}
               value={body}
               onChange={handleChange}
-              placeholder="Descreva a observação técnica. Use @ para mencionar membros."
+              placeholder={tx("Descreva a observação técnica. Use @ para mencionar membros.")}
               rows={3}
               maxLength={4000}
             />
@@ -450,7 +451,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <>
-                    <Send className="h-4 w-4 mr-2" /> Enviar revisão
+                    <Send className="h-4 w-4 mr-2" /> {tx("Enviar revisão")}
                   </>
                 )}
               </Button>

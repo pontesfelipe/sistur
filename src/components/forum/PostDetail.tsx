@@ -537,7 +537,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
       <AlertDialog open={showDeletePostDialog} onOpenChange={setShowDeletePostDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir post?</AlertDialogTitle>
+            <AlertDialogTitle>{tx("Excluir post?")}</AlertDialogTitle>
             <AlertDialogDescription>
               {tx('Esta ação não pode ser desfeita. O post e todas as respostas serão permanentemente excluídos.')}
             </AlertDialogDescription>
@@ -555,7 +555,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
       <AlertDialog open={!!replyToDelete} onOpenChange={() => setReplyToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir resposta?</AlertDialogTitle>
+            <AlertDialogTitle>{tx("Excluir resposta?")}</AlertDialogTitle>
             <AlertDialogDescription>
               {tx('Esta ação não pode ser desfeita.')}
             </AlertDialogDescription>

@@ -29,6 +29,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useProfileContext } from '@/contexts/ProfileContext';
 
+import { tx } from "@/i18n/t";
 // Mapeamento canônico CSV → ENT_* (apenas códigos já presentes em
 // enterprise_indicators e que aceitam dado mensal médio).
 interface MetricSpec {
@@ -42,16 +43,16 @@ interface MetricSpec {
 }
 
 const METRIC_SPECS: MetricSpec[] = [
-  { csv: 'occupancy_pct',    code: 'ENT_OCUPACAO',     label: 'Taxa de Ocupação',          unit: '%',           min: 0,    max: 100,    decimals: 1 },
-  { csv: 'adr_brl',          code: 'ENT_ADR',          label: 'Diária Média (ADR)',        unit: 'R$',          min: 0,    max: 10000,  decimals: 2 },
-  { csv: 'revpar_brl',       code: 'ENT_REVPAR',       label: 'RevPAR',                    unit: 'R$',          min: 0,    max: 10000,  decimals: 2 },
-  { csv: 'gop_pct',          code: 'ENT_GOP',          label: 'GOP',                       unit: '%',           min: -50,  max: 100,    decimals: 1 },
-  { csv: 'nps',              code: 'ENT_NPS',          label: 'NPS',                       unit: 'score',       min: -100, max: 100,    decimals: 1 },
-  { csv: 'turnover_pct',     code: 'ENT_TURNOVER',     label: 'Turnover',                  unit: '%',           min: 0,    max: 200,    decimals: 1 },
-  { csv: 'training_hours',   code: 'ENT_HORAS_TREINO', label: 'Horas de Treinamento',      unit: 'horas/ano',   min: 0,    max: 500,    decimals: 1 },
-  { csv: 'energy_kwh',       code: 'ENT_ENERGIA_KWH',  label: 'Consumo Energético/UH',     unit: 'kWh/UH/mês',  min: 0,    max: 1000,   decimals: 1 },
-  { csv: 'water_l',          code: 'ENT_AGUA_LITROS',  label: 'Consumo de Água/Hóspede',   unit: 'L/hóspede/d', min: 0,    max: 2000,   decimals: 1 },
-  { csv: 'repeat_guest_pct', code: 'ENT_RETORNO',      label: 'Taxa de Retorno',           unit: '%',           min: 0,    max: 100,    decimals: 1 },
+  { csv: 'occupancy_pct',    code: 'ENT_OCUPACAO',     label: tx('Taxa de Ocupação'),          unit: '%',           min: 0,    max: 100,    decimals: 1 },
+  { csv: 'adr_brl',          code: 'ENT_ADR',          label: tx('Diária Média (ADR)'),        unit: 'R$',          min: 0,    max: 10000,  decimals: 2 },
+  { csv: 'revpar_brl',       code: 'ENT_REVPAR',       label: tx('RevPAR'),                    unit: 'R$',          min: 0,    max: 10000,  decimals: 2 },
+  { csv: 'gop_pct',          code: 'ENT_GOP',          label: tx('GOP'),                       unit: '%',           min: -50,  max: 100,    decimals: 1 },
+  { csv: 'nps',              code: 'ENT_NPS',          label: tx('NPS'),                       unit: 'score',       min: -100, max: 100,    decimals: 1 },
+  { csv: 'turnover_pct',     code: 'ENT_TURNOVER',     label: tx('Turnover'),                  unit: '%',           min: 0,    max: 200,    decimals: 1 },
+  { csv: 'training_hours',   code: 'ENT_HORAS_TREINO', label: tx('Horas de Treinamento'),      unit: 'horas/ano',   min: 0,    max: 500,    decimals: 1 },
+  { csv: 'energy_kwh',       code: 'ENT_ENERGIA_KWH',  label: tx('Consumo Energético/UH'),     unit: 'kWh/UH/mês',  min: 0,    max: 1000,   decimals: 1 },
+  { csv: 'water_l',          code: 'ENT_AGUA_LITROS',  label: tx('Consumo de Água/Hóspede'),   unit: 'L/hóspede/d', min: 0,    max: 2000,   decimals: 1 },
+  { csv: 'repeat_guest_pct', code: 'ENT_RETORNO',      label: tx('Taxa de Retorno'),           unit: '%',           min: 0,    max: 100,    decimals: 1 },
 ];
 
 type ParsedRow = Record<string, string>;
@@ -150,16 +151,16 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
     setDone(false);
     setFileName(file.name);
     const reader = new FileReader();
-    reader.onerror = () => toast.error('Falha ao ler o arquivo.');
+    reader.onerror = () => toast.error(tx('Falha ao ler o arquivo.'));
     reader.onload = (e) => {
       const buffer = e.target?.result as ArrayBuffer;
-      if (!buffer) { toast.error('Arquivo vazio.'); return; }
+      if (!buffer) { toast.error(tx('Arquivo vazio.')); return; }
       let text = new TextDecoder('utf-8').decode(buffer);
       if (text.includes('\uFFFD')) text = new TextDecoder('windows-1252').decode(buffer);
       const cleaned = text.replace(/^\uFEFF/, '');
       const sep = detectSeparator(cleaned);
       const lines = cleaned.split(/\r?\n/).filter(l => l.trim().length > 0);
-      if (lines.length < 2) { toast.error('CSV precisa de cabeçalho + ao menos 1 linha de dados.'); return; }
+      if (lines.length < 2) { toast.error(tx('CSV precisa de cabeçalho + ao menos 1 linha de dados.')); return; }
       const header = parseCsvLine(lines[0], sep).map(h => h.toLowerCase());
       const dataRows: ParsedRow[] = lines.slice(1).map(line => {
         const cells = parseCsvLine(line, sep);
@@ -182,8 +183,8 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
   };
 
   const applyImport = async () => {
-    if (!effectiveOrgId) { toast.error('Organização não identificada.'); return; }
-    if (rows.length === 0 || validMetricCount === 0) { toast.error('Nada para importar.'); return; }
+    if (!effectiveOrgId) { toast.error(tx('Organização não identificada.')); return; }
+    if (rows.length === 0 || validMetricCount === 0) { toast.error(tx('Nada para importar.')); return; }
     setBusy(true);
     try {
       // 1) Resolver IDs dos enterprise_indicators
@@ -252,12 +253,12 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
 
       setDone(true);
       toast.success(`${valuesRows.length} indicadores operacionais importados`, {
-        description: 'O cálculo será atualizado quando você concluir o diagnóstico.',
+        description: tx('O cálculo será atualizado quando você concluir o diagnóstico.'),
       });
       onApplied?.();
     } catch (err: any) {
       console.error('PMS CSV import failed:', err);
-      toast.error('Falha ao importar CSV', { description: err?.message ?? 'Tente novamente.' });
+      toast.error(tx('Falha ao importar CSV'), { description: err?.message ?? 'Tente novamente.' });
     } finally {
       setBusy(false);
     }
@@ -279,7 +280,7 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
           </div>
           <Button variant="outline" size="sm" onClick={downloadTemplate}>
             <Download className="h-4 w-4 mr-2" />
-            Baixar template
+            {tx("Baixar template")}
           </Button>
         </div>
       </CardHeader>
@@ -295,7 +296,7 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
           <p className="text-sm font-medium">
             {fileName ?? 'Arraste o CSV aqui ou clique para selecionar'}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">Máx. 1 arquivo .csv</p>
+          <p className="text-xs text-muted-foreground mt-1">{tx("Máx. 1 arquivo .csv")}</p>
           <input
             ref={inputRef}
             type="file"
@@ -308,7 +309,7 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
         {/* Origem do PMS */}
         {rows.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap text-sm">
-            <span className="text-muted-foreground">Origem da planilha:</span>
+            <span className="text-muted-foreground">{tx("Origem da planilha:")}</span>
             {(['csv_generic', 'opera', 'cloudbeds', 'stays'] as const).map(s => (
               <Badge
                 key={s}
@@ -333,11 +334,11 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Indicador</TableHead>
-                  <TableHead>Coluna CSV</TableHead>
-                  <TableHead className="text-right">Média</TableHead>
-                  <TableHead className="text-right">Linhas válidas</TableHead>
-                  <TableHead className="text-right">Fora do range</TableHead>
+                  <TableHead>{tx("Indicador")}</TableHead>
+                  <TableHead>{tx("Coluna CSV")}</TableHead>
+                  <TableHead className="text-right">{tx("Média")}</TableHead>
+                  <TableHead className="text-right">{tx("Linhas válidas")}</TableHead>
+                  <TableHead className="text-right">{tx("Fora do range")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -383,11 +384,11 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
             </div>
             <Button onClick={applyImport} disabled={busy || validMetricCount === 0 || done}>
               {busy ? (
-                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Importando…</>
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {tx("Importando…")}</>
               ) : done ? (
-                <><CheckCircle2 className="h-4 w-4 mr-2" /> Importado</>
+                <><CheckCircle2 className="h-4 w-4 mr-2" /> {tx("Importado")}</>
               ) : (
-                <>Aplicar ao diagnóstico</>
+                <>{tx("Aplicar ao diagnóstico")}</>
               )}
             </Button>
           </div>

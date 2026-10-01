@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner, NoDataError } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Evidence { keyword: string; hits: number; samples: { title: string; url: string }[]; }
 
 interface Analysis {
@@ -54,7 +55,7 @@ export function UrbanAccessibilitySearch({ destinationId, onAutoFill, onAnalysis
       setAnalysis(a);
       onAnalysisCapture?.({ ...a, destinationId, searchedAt: new Date().toISOString() });
       onAutoFill?.({ ENT_ACESSIBILIDADE_SCORE: a.accessibility_score });
-      toast.success('Acessibilidade urbana analisada');
+      toast.success(tx('Acessibilidade urbana analisada'));
     } catch (e: any) {
       if (e?.name !== 'NoDataError') {
         console.error(e);
@@ -85,20 +86,20 @@ export function UrbanAccessibilitySearch({ destinationId, onAutoFill, onAnalysis
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 rounded-lg border bg-card">
-              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Accessibility className="h-3 w-3" /> Score</div>
+              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Accessibility className="h-3 w-3" /> {tx("Score")}</div>
               <div className="text-2xl font-bold">{analysis.accessibility_score}<span className="text-sm font-normal text-muted-foreground">/100</span></div>
               <Progress value={analysis.accessibility_score} className="h-1 mt-2" />
               <Badge variant="outline" className={`mt-2 text-[10px] capitalize ${TIER_COLOR[analysis.accessibility_tier] ?? ''}`}>{analysis.accessibility_tier}</Badge>
             </div>
             <div className="p-3 rounded-lg border bg-card space-y-1 text-xs">
-              <div className="flex items-center justify-between"><span className="text-muted-foreground">Dimensões com evidência</span><span className="font-bold">{analysis.dimensions_covered}/5</span></div>
-              <div className="flex items-center justify-between"><span className="text-muted-foreground">Menções totais</span><span className="font-bold">{analysis.total_evidence_hits}</span></div>
+              <div className="flex items-center justify-between"><span className="text-muted-foreground">{tx("Dimensões com evidência")}</span><span className="font-bold">{analysis.dimensions_covered}/5</span></div>
+              <div className="flex items-center justify-between"><span className="text-muted-foreground">{tx("Menções totais")}</span><span className="font-bold">{analysis.total_evidence_hits}</span></div>
             </div>
           </div>
 
           {analysis.evidence.length > 0 && (
             <div className="space-y-2">
-              <div className="text-xs font-medium">Evidências encontradas</div>
+              <div className="text-xs font-medium">{tx("Evidências encontradas")}</div>
               {analysis.evidence.map((e, i) => (
                 <div key={i} className="p-2 rounded border bg-card">
                   <div className="flex items-center justify-between text-xs">
@@ -120,7 +121,7 @@ export function UrbanAccessibilitySearch({ destinationId, onAutoFill, onAnalysis
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

@@ -29,6 +29,7 @@ import { useLearningRecommendations, type LearningRecommendation } from '@/hooks
 import { PILLAR_INFO, type Pillar } from '@/types/sistur';
 import { toast } from 'sonner';
 
+import { tx } from "@/i18n/t";
 // Results component shown after calculation
 const LearningResults = ({ 
   results, 
@@ -40,9 +41,9 @@ const LearningResults = ({
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Recomendações Personalizadas</h2>
+        <h2 className="text-2xl font-bold">{tx("Recomendações Personalizadas")}</h2>
         <Button variant="outline" onClick={onReset}>
-          Nova Consulta
+          {tx("Nova Consulta")}
         </Button>
       </div>
 
@@ -51,10 +52,10 @@ const LearningResults = ({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              🎯 Comece por Aqui
+              {tx("🎯 Comece por Aqui")}
             </CardTitle>
             <CardDescription>
-              Cursos mais relevantes com base nos indicadores selecionados
+              {tx("Cursos mais relevantes com base nos indicadores selecionados")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -105,7 +106,7 @@ const LearningResults = ({
                     </div>
                   </div>
                   <Button variant="outline" size="sm" asChild>
-                    <Link to={`/edu/training/${rec.entity_id}`}>Ver</Link>
+                    <Link to={`/edu/training/${rec.entity_id}`}>{tx("Ver")}</Link>
                   </Button>
                 </div>
               ))}
@@ -119,10 +120,10 @@ const LearningResults = ({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              📺 Lives Recomendadas
+              {tx("📺 Lives Recomendadas")}
             </CardTitle>
             <CardDescription>
-              Conteúdos audiovisuais para aprofundamento
+              {tx("Conteúdos audiovisuais para aprofundamento")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -156,10 +157,10 @@ const LearningResults = ({
         <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              🛤️ Trilha Recomendada
+              {tx("🛤️ Trilha Recomendada")}
             </CardTitle>
             <CardDescription>
-              Percurso formativo completo sugerido
+              {tx("Percurso formativo completo sugerido")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -174,7 +175,7 @@ const LearningResults = ({
                   </p>
                 </div>
                 <Button asChild>
-                  <Link to={`/edu/trilha/${rec.entity_id}`}>Ver Trilha</Link>
+                  <Link to={`/edu/trilha/${rec.entity_id}`}>{tx("Ver Trilha")}</Link>
                 </Button>
               </div>
             ))}
@@ -187,10 +188,10 @@ const LearningResults = ({
           <CardContent className="py-8 text-center">
             <AlertCircle className="mx-auto h-8 w-8 text-muted-foreground/50 mb-2" />
             <p className="text-muted-foreground">
-              Nenhuma recomendação encontrada para os indicadores selecionados.
+              {tx("Nenhuma recomendação encontrada para os indicadores selecionados.")}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Isso pode ocorrer se os mapeamentos indicador→curso ainda não foram importados.
+              {tx("Isso pode ocorrer se os mapeamentos indicador→curso ainda não foram importados.")}
             </p>
           </CardContent>
         </Card>
@@ -252,7 +253,7 @@ const Learning = () => {
 
   const handleGenerate = async () => {
     if (selectedIndicators.length === 0) {
-      toast.error('Selecione pelo menos um indicador');
+      toast.error(tx('Selecione pelo menos um indicador'));
       return;
     }
 
@@ -272,8 +273,8 @@ const Learning = () => {
   if (results) {
     return (
       <AppLayout 
-        title="Recomendações de Aprendizagem" 
-        subtitle="Cursos e lives baseados em seus indicadores"
+        title={tx("Recomendações de Aprendizagem")} 
+        subtitle={tx("Cursos e lives baseados em seus indicadores")}
       >
         <LearningResults results={results} onReset={handleReset} />
       </AppLayout>
@@ -284,14 +285,14 @@ const Learning = () => {
 
   return (
     <AppLayout 
-      title="Recomendações de Aprendizagem" 
-      subtitle="Selecione indicadores para gerar recomendações personalizadas"
+      title={tx("Recomendações de Aprendizagem")} 
+      subtitle={tx("Selecione indicadores para gerar recomendações personalizadas")}
     >
       <div className="mb-6">
         <Button variant="outline" asChild>
           <Link to="/edu">
             <ChevronLeft className="mr-2 h-4 w-4" />
-            Voltar ao Catálogo
+            {tx("Voltar ao Catálogo")}
           </Link>
         </Button>
       </div>
@@ -302,10 +303,9 @@ const Learning = () => {
           <div className="flex items-start gap-3">
             <Info className="h-5 w-5 text-primary mt-0.5" />
             <div>
-              <p className="font-medium">Como funciona?</p>
+              <p className="font-medium">{tx("Como funciona?")}</p>
               <p className="text-sm text-muted-foreground">
-                Selecione os indicadores IGMA que representam desafios ou áreas de melhoria do seu destino. 
-                O sistema irá recomendar cursos e lives mais relevantes com base no mapeamento IGMA→EDU.
+                {tx("Selecione os indicadores IGMA que representam desafios ou áreas de melhoria do seu destino. O sistema irá recomendar cursos e lives mais relevantes com base no mapeamento IGMA→EDU.")}
               </p>
             </div>
           </div>
@@ -320,7 +320,7 @@ const Learning = () => {
         <CardContent>
           <Select value={selectedTerritory} onValueChange={setSelectedTerritory}>
             <SelectTrigger className="w-full md:w-80">
-              <SelectValue placeholder="Selecione um destino" />
+              <SelectValue placeholder={tx("Selecione um destino")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">Nenhum (geral)</SelectItem>
@@ -339,7 +339,7 @@ const Learning = () => {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar indicadores..."
+            placeholder={tx("Buscar indicadores...")}
             className="pl-9"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -347,13 +347,13 @@ const Learning = () => {
         </div>
         <Select value={pillarFilter} onValueChange={setPillarFilter}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Pilar" />
+            <SelectValue placeholder={tx("Pilar")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os pilares</SelectItem>
-            <SelectItem value="RA">IRA - Relações Ambientais</SelectItem>
-            <SelectItem value="OE">IOE - Org. Estrutural</SelectItem>
-            <SelectItem value="AO">IAO - Ações Operacionais</SelectItem>
+            <SelectItem value="all">{tx("Todos os pilares")}</SelectItem>
+            <SelectItem value="RA">{tx("IRA - Relações Ambientais")}</SelectItem>
+            <SelectItem value="OE">{tx("IOE - Org. Estrutural")}</SelectItem>
+            <SelectItem value="AO">{tx("IAO - Ações Operacionais")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -362,7 +362,7 @@ const Learning = () => {
       <div className="flex items-center justify-between mb-4 p-4 rounded-lg bg-muted/50">
         <div>
           <span className="font-medium">{selectedIndicators.length}</span>
-          <span className="text-muted-foreground"> indicadores selecionados</span>
+          <span className="text-muted-foreground"> {tx("indicadores selecionados")}</span>
         </div>
         <Button 
           onClick={handleGenerate}
@@ -371,12 +371,12 @@ const Learning = () => {
           {isCalculating ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Calculando...
+              {tx("Calculando...")}
             </>
           ) : (
             <>
               <Sparkles className="mr-2 h-4 w-4" />
-              Gerar Recomendações
+              {tx("Gerar Recomendações")}
             </>
           )}
         </Button>

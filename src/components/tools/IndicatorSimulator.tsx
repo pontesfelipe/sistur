@@ -18,6 +18,7 @@ import {
   Info
 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 interface Indicator {
   code: string;
   name: string;
@@ -111,11 +112,11 @@ export function IndicatorSimulator() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'BOM':
-        return <Badge className="bg-green-500/20 text-green-700 border-green-500/30">Adequado</Badge>;
+        return <Badge className="bg-green-500/20 text-green-700 border-green-500/30">{tx("Adequado")}</Badge>;
       case 'MODERADO':
-        return <Badge className="bg-yellow-500/20 text-yellow-700 border-yellow-500/30">Atenção</Badge>;
+        return <Badge className="bg-yellow-500/20 text-yellow-700 border-yellow-500/30">{tx("Atenção")}</Badge>;
       case 'CRITICO':
-        return <Badge variant="destructive">Crítico</Badge>;
+        return <Badge variant="destructive">{tx("Crítico")}</Badge>;
       default:
         return null;
     }
@@ -135,17 +136,17 @@ export function IndicatorSimulator() {
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <FlaskConical className="h-4 w-4 mr-2" />
-          Simular Indicador
+          {tx("Simular Indicador")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FlaskConical className="h-5 w-5 text-primary" />
-            Simulador de Indicadores
+            {tx("Simulador de Indicadores")}
           </DialogTitle>
           <DialogDescription>
-            Simule o impacto de um valor em um indicador específico
+            {tx("Simule o impacto de um valor em um indicador específico")}
           </DialogDescription>
         </DialogHeader>
 
@@ -157,10 +158,10 @@ export function IndicatorSimulator() {
           ) : (
             <>
               <div className="space-y-2">
-                <Label>Indicador</Label>
+                <Label>{tx("Indicador")}</Label>
                 <Select value={selectedIndicator} onValueChange={setSelectedIndicator}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione um indicador" />
+                    <SelectValue placeholder={tx("Selecione um indicador")} />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px]">
                     {indicators.map((ind) => (
@@ -183,31 +184,31 @@ export function IndicatorSimulator() {
                     <CardContent className="pt-4">
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-muted-foreground">Direção:</span>
+                          <span className="text-muted-foreground">{tx("Direção:")}</span>
                           <div className="flex items-center gap-1 mt-1">
                             {currentIndicator.direction === 'HIGH_IS_BETTER' ? (
                               <>
                                 <TrendingUp className="h-4 w-4 text-green-500" />
-                                <span>Maior é Melhor</span>
+                                <span>{tx("Maior é Melhor")}</span>
                               </>
                             ) : (
                               <>
                                 <TrendingDown className="h-4 w-4 text-red-500" />
-                                <span>Menor é Melhor</span>
+                                <span>{tx("Menor é Melhor")}</span>
                               </>
                             )}
                           </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Peso:</span>
+                          <span className="text-muted-foreground">{tx("Peso:")}</span>
                           <p className="font-medium mt-1">{currentIndicator.weight}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Ref. Mínimo:</span>
+                          <span className="text-muted-foreground">{tx("Ref. Mínimo:")}</span>
                           <p className="font-medium mt-1">{currentIndicator.min_ref ?? 0}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Ref. Máximo:</span>
+                          <span className="text-muted-foreground">{tx("Ref. Máximo:")}</span>
                           <p className="font-medium mt-1">{currentIndicator.max_ref ?? 100}</p>
                         </div>
                       </div>
@@ -216,7 +217,7 @@ export function IndicatorSimulator() {
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label>Valor Simulado</Label>
+                      <Label>{tx("Valor Simulado")}</Label>
                       <span className="text-2xl font-bold text-primary">{value}</span>
                     </div>
                     <Slider
@@ -234,7 +235,7 @@ export function IndicatorSimulator() {
 
                   <Button onClick={simulate} className="w-full">
                     <ArrowRight className="h-4 w-4 mr-2" />
-                    Calcular
+                    {tx("Calcular")}
                   </Button>
                 </>
               )}
@@ -252,7 +253,7 @@ export function IndicatorSimulator() {
                       <div className="text-4xl font-bold text-primary">
                         {(result.score * 100).toFixed(1)}%
                       </div>
-                      <p className="text-sm text-muted-foreground">Score Normalizado</p>
+                      <p className="text-sm text-muted-foreground">{tx("Score Normalizado")}</p>
                     </div>
                     <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg">
                       <Info className="h-4 w-4 text-muted-foreground mt-0.5" />

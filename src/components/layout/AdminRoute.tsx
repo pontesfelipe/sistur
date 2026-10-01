@@ -4,6 +4,7 @@ import { useProfileContext } from '@/contexts/ProfileContext';
 import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { Loader2 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 interface AdminRouteProps {
   children: React.ReactNode;
   /** Quando true, apenas ADMIN de plataforma acessa (ORG_ADMIN é redirecionado). */
@@ -26,7 +27,7 @@ export function AdminRoute({ children, platformOnly = false }: AdminRouteProps) 
             <span className="text-primary-foreground font-display font-bold text-xl">S</span>
           </div>
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Verificando permissões...</p>
+          <p className="text-sm text-muted-foreground">{tx("Verificando permissões...")}</p>
         </div>
       </div>
     );

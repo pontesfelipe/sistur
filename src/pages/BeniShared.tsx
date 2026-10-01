@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 type Shared = { title: string; updated_at: string; messages: { role: string; content: string }[] };
 
 export default function BeniShared() {
@@ -22,11 +23,11 @@ export default function BeniShared() {
   return (
     <main className="min-h-screen bg-background py-10 px-4">
       <div className="mx-auto max-w-3xl space-y-4">
-        <Link to="/" className="text-sm font-semibold text-primary">SISTUR</Link>
+        <Link to="/" className="text-sm font-semibold text-primary">{tx("SISTUR")}</Link>
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : !data ? (
-          <Card><CardContent className="py-10 text-center text-muted-foreground">Este link não está disponível ou foi desativado.</CardContent></Card>
+          <Card><CardContent className="py-10 text-center text-muted-foreground">{tx("Este link não está disponível ou foi desativado.")}</CardContent></Card>
         ) : (
           <Card>
             <CardHeader>

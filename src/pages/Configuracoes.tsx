@@ -106,7 +106,7 @@ function DocumentDownloadItem({
         <div className="flex items-center gap-2 shrink-0">
           <p className="font-medium text-sm">{title}</p>
           <Badge variant="outline" className="text-xs">{version}</Badge>
-          {isReady && <Badge className="bg-green-600 text-white text-[10px]">DOCX</Badge>}
+          {isReady && <Badge className="bg-green-600 text-white text-[10px]">{tx("DOCX")}</Badge>}
         </div>
         <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
       </div>
@@ -213,7 +213,7 @@ export default function Configuracoes() {
             </TabsTrigger>
             <TabsTrigger value="regras-negocio" className="flex items-center gap-2 shrink-0">
               <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">Regras & Planos</span>
+              <span className="hidden sm:inline">{tx("Regras & Planos")}</span>
             </TabsTrigger>
             {isAdmin && (
               <TabsTrigger value="empacotamento" className="flex items-center gap-2 shrink-0">
@@ -253,9 +253,9 @@ export default function Configuracoes() {
                 </div>
                 
                 <div className="text-sm text-muted-foreground space-y-1">
-                  <p><strong>MAJOR</strong> (X.0.0): Mudanças incompatíveis ou grandes reformulações</p>
-                  <p><strong>MINOR</strong> (0.X.0): Novas funcionalidades compatíveis</p>
-                  <p><strong>PATCH</strong> (0.0.X): Correções de bugs e micro ajustes</p>
+                  <p><strong>{tx("MAJOR")}</strong> (X.0.0): Mudanças incompatíveis ou grandes reformulações</p>
+                  <p><strong>{tx("MINOR")}</strong> (0.X.0): Novas funcionalidades compatíveis</p>
+                  <p><strong>{tx("PATCH")}</strong> (0.0.X): Correções de bugs e micro ajustes</p>
                 </div>
 
                 {/* Version History */}
@@ -356,8 +356,7 @@ export default function Configuracoes() {
                   <div>
                     <p className="font-semibold text-foreground">{tx("Filosofia de Transformação")}</p>
                     <blockquote className="mt-2 text-sm italic text-foreground/80 border-l-2 border-primary pl-3">
-                      "Indicadores criam obrigação. Aprendizado é execução. Monitoramento fecha o ciclo. 
-                      O SISTUR não informa. O SISTUR transforma."
+                      {tx("\"Indicadores criam obrigação. Aprendizado é execução. Monitoramento fecha o ciclo. O SISTUR não informa. O SISTUR transforma.\"")}
                     </blockquote>
                   </div>
                 </div>
@@ -461,12 +460,12 @@ export default function Configuracoes() {
 
                   <ExternalReferenceItem
                     title={tx("IBGE / SIDRA")}
-                    description="API oficial — população estimada (tab. 6579) e PIB municipal (tab. 5938) usados no Observatório"
+                    description={tx("API oficial — população estimada (tab. 6579) e PIB municipal (tab. 5938) usados no Observatório")}
                     url="https://servicodados.ibge.gov.br/api/v3/agregados"
                   />
 
                   <ExternalReferenceItem
-                    title="CADASTUR"
+                    title={tx("CADASTUR")}
                     description={tx("Cadastro nacional de prestadores de serviços turísticos")}
                     url="https://cadastur.turismo.gov.br"
                   />
@@ -485,7 +484,7 @@ export default function Configuracoes() {
 
                   <ExternalReferenceItem
                     title={tx("Novo CAGED / MTE")}
-                    description="Empregos formais no turismo (base anual via IGMA; baseline mensal estimado pelo Observatório)"
+                    description={tx("Empregos formais no turismo (base anual via IGMA; baseline mensal estimado pelo Observatório)")}
                     url="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/novo-caged"
                   />
                 </CardContent>
@@ -504,9 +503,7 @@ export default function Configuracoes() {
               </CardHeader>
               <CardContent className="prose prose-sm max-w-none text-muted-foreground space-y-4">
                 <p>
-                  O SISTUR é uma infraestrutura de gestão baseada em evidências que transforma 
-                  indicadores públicos em decisões estratégicas e capacitação aplicada para 
-                  destinos turísticos brasileiros.
+                  {tx("O SISTUR é uma infraestrutura de gestão baseada em evidências que transforma indicadores públicos em decisões estratégicas e capacitação aplicada para destinos turísticos brasileiros.")}
                 </p>
                 
                 <div className="grid gap-4 md:grid-cols-2">
@@ -526,7 +523,7 @@ export default function Configuracoes() {
                       <li>• <strong className="text-pillar-ra">{tx("RA:")}</strong> Relações Ambientais (sustentabilidade)</li>
                       <li>• <strong className="text-pillar-oe">{tx("OE:")}</strong> Organização Estrutural (infraestrutura)</li>
                       <li>• <strong className="text-pillar-ao">{tx("AO:")}</strong> Ações Operacionais (execução)</li>
-                      <li>• 41 indicadores distribuídos entre os 3 pilares</li>
+                      <li>{tx("• 41 indicadores distribuídos entre os 3 pilares")}</li>
                     </ul>
                   </div>
                 </div>

@@ -36,10 +36,10 @@ interface PhaseFormDialogProps {
 }
 
 const PHASE_STATUS_OPTIONS: { value: PhaseStatus; label: string }[] = [
-  { value: 'pending', label: 'Pendente' },
-  { value: 'in_progress', label: 'Em Progresso' },
-  { value: 'completed', label: 'Concluído' },
-  { value: 'blocked', label: 'Bloqueado' },
+  { value: 'pending', label: tx('Pendente') },
+  { value: 'in_progress', label: tx('Em Progresso') },
+  { value: 'completed', label: tx('Concluído') },
+  { value: 'blocked', label: tx('Bloqueado') },
 ];
 
 export function PhaseFormDialog({

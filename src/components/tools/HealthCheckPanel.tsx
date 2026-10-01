@@ -14,12 +14,13 @@ import {
 import { useHealthCheck } from '@/hooks/useHealthCheck';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
+import { tx } from "@/i18n/t";
 const categoryLabels: Record<string, { label: string; icon: React.ReactNode }> = {
-  database: { label: 'Banco de Dados', icon: <Database className="h-4 w-4" /> },
-  edge_function: { label: 'Edge Functions', icon: <Zap className="h-4 w-4" /> },
-  data_integrity: { label: 'Integridade de Dados', icon: <Activity className="h-4 w-4" /> },
-  storage: { label: 'Armazenamento', icon: <HardDrive className="h-4 w-4" /> },
-  client_monitoring: { label: 'Monitoramento Client', icon: <Monitor className="h-4 w-4" /> },
+  database: { label: tx('Banco de Dados'), icon: <Database className="h-4 w-4" /> },
+  edge_function: { label: tx('Edge Functions'), icon: <Zap className="h-4 w-4" /> },
+  data_integrity: { label: tx('Integridade de Dados'), icon: <Activity className="h-4 w-4" /> },
+  storage: { label: tx('Armazenamento'), icon: <HardDrive className="h-4 w-4" /> },
+  client_monitoring: { label: tx('Monitoramento Client'), icon: <Monitor className="h-4 w-4" /> },
 };
 
 const statusColors: Record<string, string> = {
@@ -29,9 +30,7 @@ const statusColors: Record<string, string> = {
 };
 
 const statusIcons: Record<string, React.ReactNode> = {
-  pass: <CheckCircle2 className="h-4 w-4 text-green-500" />,
-  fail: <XCircle className="h-4 w-4 text-red-500" />,
-  warning: <AlertTriangle className="h-4 w-4 text-yellow-500" />,
+  pass: <CheckCircle2 className="h-4 w-4 text-green-500" />, fail: <XCircle className="h-4 w-4 text-red-500" />, warning: <AlertTriangle className="h-4 w-4 text-yellow-500" />,
 };
 
 export function HealthCheckPanel() {
@@ -76,25 +75,25 @@ export function HealthCheckPanel() {
         <div>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Activity className="h-5 w-5 text-primary" />
-            Verificação de Saúde do Sistema
+            {tx("Verificação de Saúde do Sistema")}
           </h3>
           <p className="text-sm text-muted-foreground">
-            Testa banco de dados, edge functions, armazenamento e integridade de dados
+            {tx("Testa banco de dados, edge functions, armazenamento e integridade de dados")}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={syncRegistry} disabled={syncing} size="sm">
             {syncing ? (
-              <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Sincronizando...</>
+              <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> {tx("Sincronizando...")}</>
             ) : (
-              <><RotateCcw className="h-4 w-4 mr-1" /> Sincronizar Testes</>
+              <><RotateCcw className="h-4 w-4 mr-1" /> {tx("Sincronizar Testes")}</>
             )}
           </Button>
           <Button onClick={runHealthCheck} disabled={running} size="lg">
             {running ? (
-              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Executando...</>
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {tx("Executando...")}</>
             ) : (
-              <><Play className="h-4 w-4 mr-2" /> Executar Verificação</>
+              <><Play className="h-4 w-4 mr-2" /> {tx("Executar Verificação")}</>
             )}
           </Button>
         </div>
@@ -104,7 +103,7 @@ export function HealthCheckPanel() {
       <div className="flex items-center gap-4 p-3 rounded-lg border bg-muted/30 text-sm">
         <div className="flex items-center gap-2">
           <GitCommit className="h-4 w-4 text-muted-foreground" />
-          <span className="text-muted-foreground">Registro:</span>
+          <span className="text-muted-foreground">{tx("Registro:")}</span>
           <Badge variant="secondary">{registryCount} testes</Badge>
         </div>
         {lastSync && (
@@ -124,7 +123,7 @@ export function HealthCheckPanel() {
 
       <Tabs defaultValue="current" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="current">Resultado Atual</TabsTrigger>
+          <TabsTrigger value="current">{tx("Resultado Atual")}</TabsTrigger>
           <TabsTrigger value="history">
             Histórico
             {history.length > 0 && (
@@ -138,7 +137,7 @@ export function HealthCheckPanel() {
             <Card>
               <CardContent className="py-8 flex flex-col items-center gap-3">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-muted-foreground">Executando verificações...</p>
+                <p className="text-muted-foreground">{tx("Executando verificações...")}</p>
                 <Progress value={30} className="w-48" />
               </CardContent>
             </Card>
@@ -148,8 +147,8 @@ export function HealthCheckPanel() {
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
                 <Activity className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                <p>Nenhuma verificação executada ainda.</p>
-                <p className="text-sm">Clique em "Executar Verificação" para iniciar.</p>
+                <p>{tx("Nenhuma verificação executada ainda.")}</p>
+                <p className="text-sm">{tx("Clique em \"Executar Verificação\" para iniciar.")}</p>
               </CardContent>
             </Card>
           )}
@@ -161,25 +160,25 @@ export function HealthCheckPanel() {
                 <Card>
                   <CardContent className="pt-4 pb-3 text-center">
                     <div className="text-2xl font-bold">{latestRun.total_checks}</div>
-                    <p className="text-xs text-muted-foreground">Total</p>
+                    <p className="text-xs text-muted-foreground">{tx("Total")}</p>
                   </CardContent>
                 </Card>
                 <Card className="border-green-500/30">
                   <CardContent className="pt-4 pb-3 text-center">
                     <div className="text-2xl font-bold text-green-500">{latestRun.passed}</div>
-                    <p className="text-xs text-muted-foreground">Aprovados</p>
+                    <p className="text-xs text-muted-foreground">{tx("Aprovados")}</p>
                   </CardContent>
                 </Card>
                 <Card className="border-red-500/30">
                   <CardContent className="pt-4 pb-3 text-center">
                     <div className="text-2xl font-bold text-red-500">{latestRun.failed}</div>
-                    <p className="text-xs text-muted-foreground">Falhas</p>
+                    <p className="text-xs text-muted-foreground">{tx("Falhas")}</p>
                   </CardContent>
                 </Card>
                 <Card className="border-yellow-500/30">
                   <CardContent className="pt-4 pb-3 text-center">
                     <div className="text-2xl font-bold text-yellow-500">{latestRun.warnings}</div>
-                    <p className="text-xs text-muted-foreground">Avisos</p>
+                    <p className="text-xs text-muted-foreground">{tx("Avisos")}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -187,7 +186,7 @@ export function HealthCheckPanel() {
               {/* Progress bar */}
               <div className="space-y-1">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Taxa de aprovação</span>
+                  <span className="text-muted-foreground">{tx("Taxa de aprovação")}</span>
                   <span className="font-medium">{passRate}%</span>
                 </div>
                 <Progress value={passRate} className="h-2" />
@@ -251,7 +250,7 @@ export function HealthCheckPanel() {
           ) : history.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                Nenhum histórico de verificações encontrado.
+                {tx("Nenhum histórico de verificações encontrado.")}
               </CardContent>
             </Card>
           ) : (
@@ -291,7 +290,7 @@ export function HealthCheckPanel() {
           )}
           <Button variant="outline" size="sm" className="mt-2" onClick={fetchHistory}>
             <RefreshCw className="h-4 w-4 mr-2" />
-            Atualizar
+            {tx("Atualizar")}
           </Button>
         </TabsContent>
       </Tabs>

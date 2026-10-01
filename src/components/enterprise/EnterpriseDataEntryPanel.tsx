@@ -43,6 +43,7 @@ import {
 } from '@/lib/indicatorFieldConfig';
 import type { Database } from '@/integrations/supabase/types';
 
+import { tx } from "@/i18n/t";
 type Indicator = Database['public']['Tables']['indicators']['Row'];
 
 interface EnterpriseDataEntryPanelProps {
@@ -381,7 +382,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
 
     const activeErrors = Object.entries(validationErrors).filter(([id, err]) => err && localValues[id]);
     if (activeErrors.length > 0) {
-      toast.error('Corrija os erros de validação antes de salvar', {
+      toast.error(tx('Corrija os erros de validação antes de salvar'), {
         description: `${activeErrors.length} indicador(es) com valores inválidos`,
       });
       return;
@@ -478,7 +479,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
               Divergência encontrada ({divergences.length})
             </CardTitle>
             <CardDescription>
-              Seu valor foi preservado. Compare com o que foi encontrado online e escolha qual manter.
+              {tx("Seu valor foi preservado. Compare com o que foi encontrado online e escolha qual manter.")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -487,16 +488,16 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                 <div className="text-sm">
                   <div className="font-medium">{d.label}</div>
                   <div className="text-muted-foreground">
-                    Seu valor: <span className="font-medium text-foreground">{d.manual}</span>
+                    {tx("Seu valor:")} <span className="font-medium text-foreground">{d.manual}</span>
                     {' · '}Online: <span className="font-medium text-foreground">{d.online}</span>
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => keepManualValue(d.id)}>
-                    Manter o meu
+                    {tx("Manter o meu")}
                   </Button>
                   <Button size="sm" variant="secondary" onClick={() => acceptOnlineValue(d.id, d.onlineRaw, d.label)}>
-                    Adotar online
+                    {tx("Adotar online")}
                   </Button>
                 </div>
               </div>
@@ -510,17 +511,17 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Hotel className="h-5 w-5 text-amber-600" />
-            Indicadores Enterprise
+            {tx("Indicadores Enterprise")}
           </CardTitle>
           <CardDescription>
-            Preencha os KPIs de hospitalidade para gerar o diagnóstico
+            {tx("Preencha os KPIs de hospitalidade para gerar o diagnóstico")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Overall Progress */}
           <div>
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-muted-foreground">Progresso geral</span>
+              <span className="text-muted-foreground">{tx("Progresso geral")}</span>
               <span className="font-medium">
                 {progress.filled} / {progress.total} indicadores
                 {progress.ignored > 0 && (
@@ -631,7 +632,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                               {isIgnored && (
                                 <Badge variant="outline" className="text-xs border-destructive/50 text-destructive">
                                   <EyeOff className="h-3 w-3 mr-1" />
-                                  Ignorado
+                                  {tx("Ignorado")}
                                 </Badge>
                               )}
                               {!isIgnored && isAutoFilled && (
@@ -662,7 +663,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                             {!isIgnored && guidance && (
                               <div className="mt-2 p-2 rounded bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
                                 <p className="text-xs text-blue-700 dark:text-blue-300">
-                                  <strong>💡 Como obter:</strong> {guidance.howToFind}
+                                  <strong>{tx("💡 Como obter:")}</strong> {guidance.howToFind}
                                 </p>
                                 {guidance.examples && (
                                   <p className="text-xs text-blue-600/80 dark:text-blue-400/80 mt-1">
@@ -694,7 +695,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                                     <TooltipTrigger asChild>
                                       <Badge variant="outline" className="text-[10px] font-normal gap-1 cursor-help">
                                         <MessageSquare className="h-3 w-3" />
-                                        Observação
+                                        {tx("Observação")}
                                       </Badge>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-xs">
@@ -726,7 +727,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                                     <SelectValue placeholder={isIgnored ? 'Ignorado' : 'Selecionar'} />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value={EMPTY_SELECT_VALUE}>Não informado</SelectItem>
+                                    <SelectItem value={EMPTY_SELECT_VALUE}>{tx("Não informado")}</SelectItem>
                                     {fieldConfig.options.map((option) => (
                                       <SelectItem key={option.value} value={option.value}>
                                         {option.label}

@@ -5,15 +5,16 @@ import { getEmojiSprite } from '@/game/spriteMap';
 import { cn } from '@/lib/utils';
 import type { BiomeStats } from '../types';
 
+import { tx } from "@/i18n/t";
 interface RPGStatusBarProps {
   stats: BiomeStats;
 }
 
 const STAT_CONFIG = [
-  { key: 'biodiversidade' as const, label: 'Biodiversidade', emoji: '🦜', color: 'bg-green-500' },
-  { key: 'poluicao' as const, label: 'Poluição', emoji: '🏭', color: 'bg-red-500', inverted: true },
-  { key: 'comunidade' as const, label: 'Comunidade', emoji: '👥', color: 'bg-blue-500' },
-  { key: 'recursos' as const, label: 'Recursos', emoji: '💰', color: 'bg-amber-500' },
+  { key: 'biodiversidade' as const, label: tx('Biodiversidade'), emoji: '🦜', color: 'bg-green-500' },
+  { key: 'poluicao' as const, label: tx('Poluição'), emoji: '🏭', color: 'bg-red-500', inverted: true },
+  { key: 'comunidade' as const, label: tx('Comunidade'), emoji: '👥', color: 'bg-blue-500' },
+  { key: 'recursos' as const, label: tx('Recursos'), emoji: '💰', color: 'bg-amber-500' },
 ];
 
 export function RPGStatusBar({ stats }: RPGStatusBarProps) {

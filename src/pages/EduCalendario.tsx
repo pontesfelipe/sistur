@@ -53,7 +53,7 @@ export default function EduCalendario() {
             date: d,
             type: 'live',
             href: `/edu/training/${t.training_id}`,
-            description: 'Aula ao vivo',
+            description: tx('Aula ao vivo'),
           });
         }
       }
@@ -132,16 +132,16 @@ export default function EduCalendario() {
 
   const badge = (t: EvtType) => {
     const map: Record<EvtType, { v: any; label: string }> = {
-      live: { v: 'destructive', label: 'Live' },
-      aula: { v: 'destructive', label: 'Aula' },
-      exam: { v: 'secondary', label: 'Exame' },
-      prova: { v: 'secondary', label: 'Prova' },
-      assignment_due: { v: 'default', label: 'Prazo' },
-      prazo: { v: 'default', label: 'Prazo' },
-      reuniao: { v: 'outline', label: 'Reunião' },
-      evento: { v: 'outline', label: 'Evento' },
+      live: { v: 'destructive', label: tx('Live') },
+      aula: { v: 'destructive', label: tx('Aula') },
+      exam: { v: 'secondary', label: tx('Exame') },
+      prova: { v: 'secondary', label: tx('Prova') },
+      assignment_due: { v: 'default', label: tx('Prazo') },
+      prazo: { v: 'default', label: tx('Prazo') },
+      reuniao: { v: 'outline', label: tx('Reunião') },
+      evento: { v: 'outline', label: tx('Evento') },
     };
-    const m = map[t] ?? { v: 'outline', label: 'Evento' };
+    const m = map[t] ?? { v: 'outline', label: tx('Evento') };
     return <Badge variant={m.v}>{tx(m.label)}</Badge>;
   };
 
@@ -194,7 +194,7 @@ export default function EduCalendario() {
                                 )}
                                 {e.link && (
                                   <a href={e.link} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-primary hover:underline" onClick={ev => ev.stopPropagation()}>
-                                    <LinkIcon className="h-3 w-3" />Acessar
+                                    <LinkIcon className="h-3 w-3" />{tx("Acessar")}
                                   </a>
                                 )}
                               </div>

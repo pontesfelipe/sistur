@@ -73,7 +73,7 @@ export function TrackExamsPanel({ trackId, canManage }: TrackExamsPanelProps) {
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Regenerar provas da trilha?</AlertDialogTitle>
+                      <AlertDialogTitle>{tx("Regenerar provas da trilha?")}</AlertDialogTitle>
                       <AlertDialogDescription>
                         Os rulesets atuais serão substituídos pela configuração padrão (20 questões,
                         70% nota mínima, 60 min, 2 tentativas). Tentativas já realizadas pelos alunos
@@ -139,7 +139,7 @@ export function TrackExamsPanel({ trackId, canManage }: TrackExamsPanelProps) {
             <p>{tx('Nenhuma prova final configurada para esta trilha.')}</p>
             {canManage && (
               <p className="mt-1 text-xs">
-                Clique em "Gerar provas" para criar uma prova por pilar coberto.
+                {tx("Clique em \"Gerar provas\" para criar uma prova por pilar coberto.")}
               </p>
             )}
           </div>

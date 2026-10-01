@@ -72,7 +72,7 @@ function ComplianceStatsCards({ userId }: { userId: string }) {
       <Card>
         <CardContent className="pt-4 pb-3">
           <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-            <Monitor className="h-3.5 w-3.5" /> Sessões
+            <Monitor className="h-3.5 w-3.5" /> {tx("Sessões")}
           </div>
           <p className="text-2xl font-bold">{stats.totalSessions}</p>
         </CardContent>
@@ -80,16 +80,16 @@ function ComplianceStatsCards({ userId }: { userId: string }) {
       <Card>
         <CardContent className="pt-4 pb-3">
           <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-            <Clock className="h-3.5 w-3.5" /> Tempo Total
+            <Clock className="h-3.5 w-3.5" /> {tx("Tempo Total")}
           </div>
-          <p className="text-2xl font-bold">{stats.totalDurationMinutes}<span className="text-sm font-normal text-muted-foreground"> min</span></p>
+          <p className="text-2xl font-bold">{stats.totalDurationMinutes}<span className="text-sm font-normal text-muted-foreground"> {tx("min")}</span></p>
           <p className="text-xs text-muted-foreground">{stats.totalActiveMinutes} ativos / {stats.totalIdleMinutes} inativos</p>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="pt-4 pb-3">
           <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-            <Activity className="h-3.5 w-3.5" /> Engajamento
+            <Activity className="h-3.5 w-3.5" /> {tx("Engajamento")}
           </div>
           <p className="text-2xl font-bold">{stats.activePercent}<span className="text-sm font-normal text-muted-foreground">%</span></p>
           <p className="text-xs text-muted-foreground">{tx('tempo ativo vs total')}</p>
@@ -98,7 +98,7 @@ function ComplianceStatsCards({ userId }: { userId: string }) {
       <Card>
         <CardContent className="pt-4 pb-3">
           <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-            <AlertTriangle className="h-3.5 w-3.5" /> Alertas
+            <AlertTriangle className="h-3.5 w-3.5" /> {tx("Alertas")}
           </div>
           <p className="text-2xl font-bold">{stats.totalFlags}</p>
           <div className="flex gap-1 mt-1">
@@ -138,7 +138,7 @@ function SessionDetailDialog({ session, open, onClose }: { session: LearningSess
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Eye className="h-5 w-5" /> Detalhes da Sessão
+            <Eye className="h-5 w-5" /> {tx("Detalhes da Sessão")}
           </DialogTitle>
         </DialogHeader>
 
@@ -223,10 +223,10 @@ function FraudReviewDialog({ flag, open, onClose }: { flag: FraudFlag | null; op
           />
           <div className="flex gap-2">
             <Button variant="destructive" className="flex-1" onClick={() => handleReview('confirmed')} disabled={reviewMutation.isPending}>
-              <UserX className="h-4 w-4 mr-2" /> Confirmar Fraude
+              <UserX className="h-4 w-4 mr-2" /> {tx("Confirmar Fraude")}
             </Button>
             <Button variant="outline" className="flex-1" onClick={() => handleReview('dismissed')} disabled={reviewMutation.isPending}>
-              <CheckCircle className="h-4 w-4 mr-2" /> Descartar
+              <CheckCircle className="h-4 w-4 mr-2" /> {tx("Descartar")}
             </Button>
           </div>
         </div>
@@ -293,7 +293,7 @@ export function ComplianceReportPanel() {
         <Tabs defaultValue="sessions" className="space-y-4">
           <TabsList>
             <TabsTrigger value="sessions" className="gap-2">
-              <Monitor className="h-4 w-4" /> Sessões
+              <Monitor className="h-4 w-4" /> {tx("Sessões")}
             </TabsTrigger>
             <TabsTrigger value="flags" className="gap-2">
               <AlertTriangle className="h-4 w-4" /> Alertas

@@ -22,9 +22,9 @@ const PILLAR_COLORS: Record<string, string> = {
 };
 
 function getSeverityFromScore(score: number): { label: string; color: string } {
-  if (score >= 0.7) return { label: 'Bom', color: 'text-severity-good' };
-  if (score >= 0.4) return { label: 'Moderado', color: 'text-severity-moderate' };
-  return { label: 'Crítico', color: 'text-severity-critical' };
+  if (score >= 0.7) return { label: tx('Bom'), color: 'text-severity-good' };
+  if (score >= 0.4) return { label: tx('Moderado'), color: 'text-severity-moderate' };
+  return { label: tx('Crítico'), color: 'text-severity-critical' };
 }
 
 export function PillarProgressChart({ data, isLoading }: PillarProgressChartProps) {

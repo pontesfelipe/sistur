@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+import { tx } from "@/i18n/t";
 interface Candidate {
   name: string;
   start_date: string;
@@ -52,12 +53,12 @@ export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: P
       setSources(data?.sources_consulted ?? []);
       setSearchedQuery(data?.query ?? null);
       if ((data?.candidates ?? []).length === 0) {
-        toast.info("Nenhum evento encontrado nas fontes consultadas");
+        toast.info(tx("Nenhum evento encontrado nas fontes consultadas"));
       } else {
         toast.success(`${data.candidates.length} sugestões encontradas`);
       }
     } catch (e: any) {
-      toast.error("Erro ao buscar: " + (e.message ?? "desconhecido"));
+      toast.error(tx("Erro ao buscar: ") + (e.message ?? "desconhecido"));
     } finally {
       setLoading(false);
     }
@@ -95,12 +96,12 @@ export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: P
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" disabled={disabled || !orgId}>
-          <Sparkles className="h-4 w-4 mr-2" /> Buscar eventos do município
+          <Sparkles className="h-4 w-4 mr-2" /> {tx("Buscar eventos do município")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Descoberta automática de eventos</DialogTitle>
+          <DialogTitle>{tx("Descoberta automática de eventos")}</DialogTitle>
           <DialogDescription>
             Consulta sites oficiais (prefeitura, secretaria de turismo) para sugerir eventos de {year}. Revise antes de importar.
           </DialogDescription>
@@ -110,10 +111,10 @@ export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: P
           {candidates.length === 0 && !loading && (
             <div className="text-center py-8 space-y-3">
               <p className="text-sm text-muted-foreground">
-                Clique em "Buscar agora" para consultar fontes públicas via Firecrawl.
+                {tx("Clique em \"Buscar agora\" para consultar fontes públicas via Firecrawl.")}
               </p>
               <Button onClick={runSearch}>
-                <Sparkles className="h-4 w-4 mr-2" /> Buscar agora
+                <Sparkles className="h-4 w-4 mr-2" /> {tx("Buscar agora")}
               </Button>
             </div>
           )}
@@ -121,7 +122,7 @@ export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: P
           {loading && (
             <div className="flex flex-col items-center py-12 gap-2">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">Buscando e extraindo eventos…</p>
+              <p className="text-sm text-muted-foreground">{tx("Buscando e extraindo eventos…")}</p>
             </div>
           )}
 
@@ -129,7 +130,7 @@ export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: P
             <>
               {searchedQuery && (
                 <p className="text-xs text-muted-foreground">
-                  Busca: <code className="text-xs">{searchedQuery}</code>
+                  {tx("Busca:")} <code className="text-xs">{searchedQuery}</code>
                 </p>
               )}
               <ScrollArea className="h-96 border rounded-md p-2">
@@ -158,7 +159,7 @@ export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: P
                             onClick={(e) => e.stopPropagation()}
                             className="text-xs text-primary inline-flex items-center gap-1 mt-1 hover:underline"
                           >
-                            <ExternalLink className="h-3 w-3" /> Fonte
+                            <ExternalLink className="h-3 w-3" /> {tx("Fonte")}
                           </a>
                         )}
                       </div>
@@ -177,10 +178,10 @@ export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: P
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>{tx("Cancelar")}</Button>
           {candidates.length > 0 && (
             <>
-              <Button variant="outline" onClick={runSearch} disabled={loading}>Nova busca</Button>
+              <Button variant="outline" onClick={runSearch} disabled={loading}>{tx("Nova busca")}</Button>
               <Button onClick={importSelected} disabled={selected.size === 0 || createEvent.isPending}>
                 {createEvent.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Importar {selected.size > 0 ? `(${selected.size})` : ""}

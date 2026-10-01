@@ -190,7 +190,7 @@ export function ReportStructurePanel() {
                     <Textarea
                       value={s.description}
                       onChange={e => updateSection(t.id, idx, { description: e.target.value })}
-                      placeholder="Descreva o que esta seção deve conter (tabelas, parágrafos, evidências…)"
+                      placeholder={tx("Descreva o que esta seção deve conter (tabelas, parágrafos, evidências…)")}
                       rows={2}
                       className="text-sm"
                     />

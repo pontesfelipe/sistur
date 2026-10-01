@@ -320,7 +320,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     // Cap file size (5 MB) to prevent locking the page on a bad drop.
     const MAX_BYTES = 5 * 1024 * 1024;
     if (file.size > MAX_BYTES) {
-      toast.error(tx('Arquivo muito grande'), { description: 'Tamanho máximo: 5 MB.' });
+      toast.error(tx('Arquivo muito grande'), { description: tx('Tamanho máximo: 5 MB.') });
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
@@ -389,7 +389,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
       if (lines.length < 2) {
         toast.error(tx('CSV sem linhas de dados'), {
-          description: 'Inclua o cabeçalho e ao menos uma linha de dados.',
+          description: tx('Inclua o cabeçalho e ao menos uma linha de dados.'),
         });
         return;
       }
@@ -444,7 +444,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         toast.success(`${validCount} linhas válidas`);
       } else {
         toast.warning(`${validCount} válidas, ${errorCount} com erro`, {
-          description: 'Revise a tabela abaixo antes de importar.',
+          description: tx('Revise a tabela abaixo antes de importar.'),
         });
       }
     };
@@ -888,13 +888,13 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-primary" />
                     <span className="text-xs text-muted-foreground">
-                      Pré-preenchido: <strong className="text-foreground">{preFilledCount}</strong>
+                      {tx("Pré-preenchido:")} <strong className="text-foreground">{preFilledCount}</strong>
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-accent" />
                     <span className="text-xs text-muted-foreground">
-                      Manual: <strong className="text-foreground">{manualCount}</strong>
+                      {tx("Manual:")} <strong className="text-foreground">{manualCount}</strong>
                     </span>
                   </div>
                   <div className="flex items-center gap-2 ml-auto">
@@ -1005,9 +1005,9 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-xs text-muted-foreground flex items-center gap-1" aria-live="polite">
-                          {autosaveStatus === 'saving' && (<><Loader2 className="h-3 w-3 animate-spin" /> Salvando rascunho…</>)}
-                          {autosaveStatus === 'saved' && (<><CheckCircle2 className="h-3 w-3 text-severity-good" /> Rascunho salvo</>)}
-                          {autosaveStatus === 'error' && (<><AlertCircle className="h-3 w-3 text-destructive" /> Falha no autosave</>)}
+                          {autosaveStatus === 'saving' && (<><Loader2 className="h-3 w-3 animate-spin" /> {tx("Salvando rascunho…")}</>)}
+                          {autosaveStatus === 'saved' && (<><CheckCircle2 className="h-3 w-3 text-severity-good" /> {tx("Rascunho salvo")}</>)}
+                          {autosaveStatus === 'error' && (<><AlertCircle className="h-3 w-3 text-destructive" /> {tx("Falha no autosave")}</>)}
                           {autosaveStatus === 'idle' && Object.keys(editedValues).length > 0 && (<>{tx('Alterações pendentes…')}</>)}
                         </span>
                         <Button onClick={handleSaveAllValues} disabled={bulkUpsertValues.isPending || errorCount > 0}>
@@ -1379,7 +1379,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                   <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm">
                     <p className="text-muted-foreground mb-2"># Linha de cabeçalho (obrigatória):</p>
                     <p className="text-foreground">{tx('codigo,valor,fonte')}</p>
-                    <p className="text-muted-foreground mt-3 mb-2"># Linhas de dados:</p>
+                    <p className="text-muted-foreground mt-3 mb-2">{tx("# Linhas de dados:")}</p>
                     <p className="text-foreground">{tx('RA001,75,IBGE')}</p>
                     <p className="text-foreground">{tx('RA002,92,Pesquisa Local')}</p>
                     <p className="text-foreground">{tx('OE001,8500,Manual')}</p>
@@ -1387,15 +1387,15 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                     <div className="p-3 bg-card border rounded-lg">
-                      <p className="font-medium mb-1">codigo</p>
+                      <p className="font-medium mb-1">{tx("codigo")}</p>
                       <p className="text-muted-foreground">Código do indicador (ex: RA001)</p>
                     </div>
                     <div className="p-3 bg-card border rounded-lg">
-                      <p className="font-medium mb-1">valor</p>
+                      <p className="font-medium mb-1">{tx("valor")}</p>
                       <p className="text-muted-foreground">{tx('Valor numérico do indicador')}</p>
                     </div>
                     <div className="p-3 bg-card border rounded-lg">
-                      <p className="font-medium mb-1">fonte</p>
+                      <p className="font-medium mb-1">{tx("fonte")}</p>
                       <p className="text-muted-foreground">Fonte dos dados (opcional)</p>
                     </div>
                   </div>

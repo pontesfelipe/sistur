@@ -12,6 +12,7 @@ import { Loader2, BarChart3, GraduationCap, Users, BookOpen, ArrowLeft, LogOut, 
 import { useLinkStudentReferral } from '@/hooks/useProfessorReferral';
 import { useLinkUserToOrg } from '@/hooks/useOrgReferral';
 
+import { tx } from "@/i18n/t";
 type SystemAccess = 'ERP' | 'EDU';
 type EduRole = 'ESTUDANTE' | 'PROFESSOR';
 
@@ -58,7 +59,7 @@ export default function Onboarding() {
     
     if (systemAccess === 'EDU') {
       if (!eduRole) {
-        toast.error('Selecione seu perfil educacional');
+        toast.error(tx('Selecione seu perfil educacional'));
         setSubmitting(false);
         return;
       }
@@ -80,16 +81,16 @@ export default function Onboarding() {
     setSubmitting(false);
 
     if (result.success) {
-      toast.success('Solicitação enviada! Aguarde aprovação do administrador.');
+      toast.success(tx('Solicitação enviada! Aguarde aprovação do administrador.'));
       navigate('/pending-approval');
     } else {
-      toast.error('Erro ao configurar acesso: ' + result.error);
+      toast.error(tx('Erro ao configurar acesso: ') + result.error);
     }
   };
 
   const handleContinue = () => {
     if (!systemAccess) {
-      toast.error('Selecione o tipo de acesso');
+      toast.error(tx('Selecione o tipo de acesso'));
       return;
     }
     
@@ -102,7 +103,7 @@ export default function Onboarding() {
 
   const handleEduContinue = () => {
     if (!eduRole) {
-      toast.error('Selecione seu perfil');
+      toast.error(tx('Selecione seu perfil'));
       return;
     }
     if (eduRole === 'ESTUDANTE') {
@@ -125,7 +126,7 @@ export default function Onboarding() {
             <div className="h-10 w-10 rounded-lg gradient-hero flex items-center justify-center">
               <span className="text-primary-foreground font-display font-bold text-lg">S</span>
             </div>
-            <span className="font-display font-bold text-2xl">SISTUR</span>
+            <span className="font-display font-bold text-2xl">{tx("SISTUR")}</span>
           </div>
           <CardTitle className="text-2xl font-display">
             {step === 1 ? 'Bem-vindo ao SISTUR!' : step === 2 ? 'Perfil Educacional' : 'Código do Professor'}
@@ -157,12 +158,12 @@ export default function Onboarding() {
                         <BarChart3 className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <p className="font-semibold text-lg">SISTUR Analítico</p>
-                        <p className="text-sm text-muted-foreground">Gestão de destinos turísticos</p>
+                        <p className="font-semibold text-lg">{tx("SISTUR Analítico")}</p>
+                        <p className="text-sm text-muted-foreground">{tx("Gestão de destinos turísticos")}</p>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground pl-15">
-                      Diagnósticos por pilares, indicadores, monitoramento analítico, relatórios e capacitação prescrita.
+                      {tx("Diagnósticos por pilares, indicadores, monitoramento analítico, relatórios e capacitação prescrita.")}
                     </p>
                   </Label>
                 </div>
@@ -178,12 +179,12 @@ export default function Onboarding() {
                         <GraduationCap className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <p className="font-semibold text-lg">SISTUR EDU</p>
-                        <p className="text-sm text-muted-foreground">Plataforma educacional</p>
+                        <p className="font-semibold text-lg">{tx("SISTUR EDU")}</p>
+                        <p className="text-sm text-muted-foreground">{tx("Plataforma educacional")}</p>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground pl-15">
-                      Cursos, trilhas de aprendizado e capacitação em turismo sustentável.
+                      {tx("Cursos, trilhas de aprendizado e capacitação em turismo sustentável.")}
                     </p>
                   </Label>
                 </div>
@@ -198,22 +199,22 @@ export default function Onboarding() {
                 <Input
                   value={orgCode}
                   onChange={e => setOrgCode(e.target.value.toUpperCase())}
-                  placeholder="Ex: ORGAB3XYZ"
+                  placeholder={tx("Ex: ORGAB3XYZ")}
                   maxLength={20}
                   className="font-mono tracking-widest"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Se recebeu um código de uma organização, insira para ingressar automaticamente.
+                  {tx("Se recebeu um código de uma organização, insira para ingressar automaticamente.")}
                 </p>
               </div>
 
               <Button onClick={handleContinue} disabled={!systemAccess || submitting} className="w-full">
-                {submitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Configurando...</>) : 'Continuar'}
+                {submitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />{tx("Configurando...")}</>) : 'Continuar'}
               </Button>
 
               <Button variant="ghost" onClick={handleLogout} className="w-full">
                 <LogOut className="mr-2 h-4 w-4" />
-                Sair e voltar ao login
+                {tx("Sair e voltar ao login")}
               </Button>
             </>
           ) : step === 2 ? (
@@ -234,12 +235,12 @@ export default function Onboarding() {
                         <Users className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <p className="font-semibold text-lg">Estudante</p>
-                        <p className="text-sm text-muted-foreground">Acesso às trilhas e cursos</p>
+                        <p className="font-semibold text-lg">{tx("Estudante")}</p>
+                        <p className="text-sm text-muted-foreground">{tx("Acesso às trilhas e cursos")}</p>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground pl-15">
-                      Aprenda sobre turismo sustentável através de cursos e trilhas de capacitação.
+                      {tx("Aprenda sobre turismo sustentável através de cursos e trilhas de capacitação.")}
                     </p>
                   </Label>
                 </div>
@@ -255,12 +256,12 @@ export default function Onboarding() {
                         <BookOpen className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <p className="font-semibold text-lg">Professor</p>
-                        <p className="text-sm text-muted-foreground">Gestão de cursos e conteúdo</p>
+                        <p className="font-semibold text-lg">{tx("Professor")}</p>
+                        <p className="text-sm text-muted-foreground">{tx("Gestão de cursos e conteúdo")}</p>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground pl-15">
-                      Gerencie salas, alunos, atividades e ganhe isenção trazendo 5+ alunos.
+                      {tx("Gerencie salas, alunos, atividades e ganhe isenção trazendo 5+ alunos.")}
                     </p>
                   </Label>
                 </div>
@@ -268,10 +269,10 @@ export default function Onboarding() {
 
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
-                  <ArrowLeft className="mr-2 h-4 w-4" />Voltar
+                  <ArrowLeft className="mr-2 h-4 w-4" />{tx("Voltar")}
                 </Button>
                 <Button onClick={handleEduContinue} disabled={!eduRole || submitting} className="flex-1">
-                  {submitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Configurando...</>) : 'Continuar'}
+                  {submitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />{tx("Configurando...")}</>) : 'Continuar'}
                 </Button>
               </div>
             </>
@@ -282,33 +283,33 @@ export default function Onboarding() {
                 <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
                   <Tag className="h-5 w-5 text-primary flex-shrink-0" />
                   <p className="text-sm">
-                    Se um professor compartilhou um código ou link de convite com você, insira abaixo. 
-                    <strong> Este campo é opcional.</strong>
+                    {tx("Se um professor compartilhou um código ou link de convite com você, insira abaixo.")} 
+                    <strong> {tx("Este campo é opcional.")}</strong>
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="referral-code">Código do Professor</Label>
+                  <Label htmlFor="referral-code">{tx("Código do Professor")}</Label>
                   <Input
                     id="referral-code"
                     value={referralCode}
                     onChange={e => setReferralCode(e.target.value.toUpperCase())}
-                    placeholder="Ex: PROFAB3XYZ"
+                    placeholder={tx("Ex: PROFAB3XYZ")}
                     maxLength={20}
                     className="font-mono text-center text-lg tracking-widest"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Deixe em branco se não possuir um código.
+                    {tx("Deixe em branco se não possuir um código.")}
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
-                  <ArrowLeft className="mr-2 h-4 w-4" />Voltar
+                  <ArrowLeft className="mr-2 h-4 w-4" />{tx("Voltar")}
                 </Button>
                 <Button onClick={handleSubmit} disabled={submitting} className="flex-1">
-                  {submitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Configurando...</>) : 'Confirmar'}
+                  {submitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />{tx("Configurando...")}</>) : 'Confirmar'}
                 </Button>
               </div>
             </>

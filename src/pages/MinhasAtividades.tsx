@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
+import { tx } from "@/i18n/t";
 const REASON_MSG: Record<string, string> = {
   not_yet_open: 'Esta atividade ainda não foi liberada.',
   past_due: 'O prazo desta atividade já encerrou.',
@@ -45,7 +46,7 @@ function AssignmentRow({ a }: { a: StudentAssignment }) {
         toast.error(REASON_MSG[res.reason || ''] || 'Não é possível iniciar agora');
         return;
       }
-      toast.success('Prova iniciada!');
+      toast.success(tx('Prova iniciada!'));
       navigate(`/edu/exam/${res.exam_id}`);
     } catch (e: any) {
       toast.error(e?.message || 'Falha ao iniciar a prova');
@@ -85,12 +86,12 @@ function AssignmentRow({ a }: { a: StudentAssignment }) {
             )}
             {a.last_attempt_result === 'passed' && (
               <Badge variant="outline" className="text-xs gap-1">
-                <CheckCircle2 className="h-3 w-3 text-success" /> Aprovado
+                <CheckCircle2 className="h-3 w-3 text-success" /> {tx("Aprovado")}
               </Badge>
             )}
             {a.last_attempt_result === 'failed' && (
               <Badge variant="outline" className="text-xs gap-1">
-                <AlertTriangle className="h-3 w-3 text-destructive" /> Reprovado
+                <AlertTriangle className="h-3 w-3 text-destructive" /> {tx("Reprovado")}
               </Badge>
             )}
           </div>
@@ -112,12 +113,12 @@ export default function MinhasAtividades() {
   const { data, isLoading } = useMyClassroomAssignments();
 
   return (
-    <AppLayout title="Minhas Atividades">
+    <AppLayout title={tx("Minhas Atividades")}>
       <div className="container max-w-4xl py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Minhas Atividades</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{tx("Minhas Atividades")}</h1>
           <p className="text-muted-foreground mt-1">
-            Provas, trilhas e treinamentos atribuídos pelos seus professores
+            {tx("Provas, trilhas e treinamentos atribuídos pelos seus professores")}
           </p>
         </div>
 
@@ -125,10 +126,10 @@ export default function MinhasAtividades() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ClipboardList className="h-5 w-5 text-primary" />
-              Atribuições
+              {tx("Atribuições")}
             </CardTitle>
             <CardDescription>
-              Atividades aparecem aqui assim que o professor as cria. Provas só podem ser iniciadas dentro da janela de disponibilidade.
+              {tx("Atividades aparecem aqui assim que o professor as cria. Provas só podem ser iniciadas dentro da janela de disponibilidade.")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -140,8 +141,8 @@ export default function MinhasAtividades() {
             ) : !data?.length ? (
               <EmptyState
                 icon={ClipboardList}
-                title="Nenhuma atividade atribuída"
-                description="Quando um professor atribuir provas, trilhas ou treinamentos, eles aparecerão aqui."
+                title={tx("Nenhuma atividade atribuída")}
+                description={tx("Quando um professor atribuir provas, trilhas ou treinamentos, eles aparecerão aqui.")}
               />
             ) : (
               <div className="space-y-3">

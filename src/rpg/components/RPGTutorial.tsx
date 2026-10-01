@@ -12,37 +12,37 @@ interface TutorialStep {
 
 const TUTORIAL_STEPS: TutorialStep[] = [
   {
-    title: 'Bem-vindo à Missão Bioma!',
+    title: tx('Bem-vindo à Missão Bioma!'),
     emoji: '🌿',
     text: 'Você é um agente de restauração ambiental! Sua missão é restaurar o bioma escolhido tomando as melhores decisões ao longo da jornada.',
     tip: 'Cada bioma tem sua própria história e desafios únicos!',
   },
   {
-    title: 'Escolha seu Bioma',
+    title: tx('Escolha seu Bioma'),
     emoji: '🗺️',
     text: 'Existem 5 biomas para explorar:\n🌳 Amazônia — floresta tropical\n🏖️ Litoral — ecossistema costeiro\n🌾 Cerrado — savana brasileira\n⛰️ Serra — região montanhosa\n🌵 Caatinga — semiárido nordestino',
     tip: 'Cada bioma tem desafios e histórias completamente diferentes!',
   },
   {
-    title: 'As 4 Barras Vitais',
+    title: tx('As 4 Barras Vitais'),
     emoji: '📊',
     text: '🦜 Biodiversidade — saúde dos ecossistemas\n🏭 Poluição — quanto menor, melhor!\n👥 Comunidade — bem-estar das pessoas\n💎 Recursos — materiais disponíveis',
     tip: 'Mantenha as barras equilibradas para um final feliz!',
   },
   {
-    title: 'Tipos de Escolha',
+    title: tx('Tipos de Escolha'),
     emoji: '🎭',
     text: '🌱 Sustentável — protege o bioma a longo prazo\n⚡ Arriscado — ganho rápido, mas pode prejudicar\n⚖️ Neutro — caminho seguro, sem extremos',
     tip: 'Escolhas sustentáveis nem sempre são as mais fáceis, mas valem a pena!',
   },
   {
-    title: 'Finais da História',
+    title: tx('Finais da História'),
     emoji: '🏁',
     text: 'Suas decisões determinam o destino do bioma:\n🌟 Restaurado — você salvou o bioma!\n💀 Degradado — o bioma não resistiu\n😐 Neutro — sobreviveu, mas poderia ser melhor',
     tip: 'Tente alcançar o final "Restaurado" em todos os biomas! 🏆',
   },
   {
-    title: 'Pronto para a missão!',
+    title: tx('Pronto para a missão!'),
     emoji: '🚀',
     text: 'Leia cada capítulo com atenção, pense nas consequências e escolha com sabedoria. O futuro do bioma está nas suas mãos!',
     tip: 'Boa sorte, agente restaurador! 🌍',

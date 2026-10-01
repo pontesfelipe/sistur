@@ -73,9 +73,9 @@ export function BattleBoard({ playerBoard, threats, scores, equilibrium, turn, s
               : 'radial-gradient(ellipse at center, rgba(239,68,68,0.6), transparent 70%)',
           }}
         />
-        <ScorePill icon="🌳" label="RA" value={scores.ra} max={100} color="bg-emerald-500" glowColor="shadow-emerald-500/30" />
-        <ScorePill icon="🏗️" label="OE" value={scores.oe} max={100} color="bg-blue-500" glowColor="shadow-blue-500/30" />
-        <ScorePill icon="🤝" label="AO" value={scores.ao} max={100} color="bg-purple-500" glowColor="shadow-purple-500/30" />
+        <ScorePill icon="🌳" label={tx("RA")} value={scores.ra} max={100} color="bg-emerald-500" glowColor="shadow-emerald-500/30" />
+        <ScorePill icon="🏗️" label={tx("OE")} value={scores.oe} max={100} color="bg-blue-500" glowColor="shadow-blue-500/30" />
+        <ScorePill icon="🤝" label={tx("AO")} value={scores.ao} max={100} color="bg-purple-500" glowColor="shadow-purple-500/30" />
         <div className="h-6 w-px bg-border" />
         <div className="flex flex-col items-center relative">
           <span className={cn(

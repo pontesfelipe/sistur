@@ -8,6 +8,7 @@ import {
   Sparkles, Search, Play, Upload, FileText, ArrowRight, ArrowLeft, BookOpen,
 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 interface Step {
   icon: typeof Sparkles;
   title: string;
@@ -18,8 +19,8 @@ interface Step {
 const STEPS: Step[] = [
   {
     icon: Sparkles,
-    title: 'Bem-vindo ao Diagnóstico Enterprise',
-    description: 'Em ~15 minutos você sai do zero para um diagnóstico operacional, reputacional e competitivo completo — sem digitar dados.',
+    title: tx('Bem-vindo ao Diagnóstico Enterprise'),
+    description: tx('Em ~15 minutos você sai do zero para um diagnóstico operacional, reputacional e competitivo completo — sem digitar dados.'),
     bullet: [
       '56 indicadores nos pilares RA, OE e AO',
       'Status determinístico (Adequado/Atenção/Crítico)',
@@ -28,8 +29,8 @@ const STEPS: Step[] = [
   },
   {
     icon: Search,
-    title: 'Passo 1 — Identificação',
-    description: 'Informe nome do empreendimento e CNPJ. O sistema valida na Receita e localiza o endereço automaticamente.',
+    title: tx('Passo 1 — Identificação'),
+    description: tx('Informe nome do empreendimento e CNPJ. O sistema valida na Receita e localiza o endereço automaticamente.'),
     bullet: [
       'Validação CNPJ via Receita Federal',
       'Pré-preenchimento de tipo, porte e razão social',
@@ -38,8 +39,8 @@ const STEPS: Step[] = [
   },
   {
     icon: Play,
-    title: 'Passo 2 — Rodar os 21 blocos automáticos',
-    description: 'Clique em "Rodar todos" e o SISTUR coleta dados de Google, Booking, TripAdvisor, ANAC, Anatel, DATASUS, IBGE e demais fontes públicas em paralelo.',
+    title: tx('Passo 2 — Rodar os 21 blocos automáticos'),
+    description: tx('Clique em "Rodar todos" e o SISTUR coleta dados de Google, Booking, TripAdvisor, ANAC, Anatel, DATASUS, IBGE e demais fontes públicas em paralelo.'),
     bullet: [
       'Toast por bloco com origem (Google, Booking, ANAC…)',
       'Retry individual em caso de falha',
@@ -48,8 +49,8 @@ const STEPS: Step[] = [
   },
   {
     icon: Upload,
-    title: 'Passo 3 — Importar CSV do PMS (opcional)',
-    description: 'No painel "Importação PMS/CSV", arraste o relatório mensal do seu PMS. Funciona com Opera, Cloudbeds, Stays ou qualquer planilha.',
+    title: tx('Passo 3 — Importar CSV do PMS (opcional)'),
+    description: tx('No painel "Importação PMS/CSV", arraste o relatório mensal do seu PMS. Funciona com Opera, Cloudbeds, Stays ou qualquer planilha.'),
     bullet: [
       '13 KPIs operacionais (ADR, RevPAR, GOPPAR, NPS…)',
       'Suporte UTF-8/Latin1 e vírgula decimal BR',
@@ -58,8 +59,8 @@ const STEPS: Step[] = [
   },
   {
     icon: FileText,
-    title: 'Passo 4 — Calcular e gerar relatório',
-    description: 'Com ≥50% dos indicadores preenchidos, o status é calculado. Em seguida gere o Relatório AI em 17 seções com plano 90 dias.',
+    title: tx('Passo 4 — Calcular e gerar relatório'),
+    description: tx('Com ≥50% dos indicadores preenchidos, o status é calculado. Em seguida gere o Relatório AI em 17 seções com plano 90 dias.'),
     bullet: [
       'PDF e DOCX em formato ABNT',
       'Concorrentes anonimizados (A/B/C)',
@@ -149,19 +150,19 @@ export function EnterpriseOnboardingTour({ destinationId, open, onOpenChange }: 
             disabled={step === 0}
             className="gap-1"
           >
-            <ArrowLeft className="h-4 w-4" /> Voltar
+            <ArrowLeft className="h-4 w-4" /> {tx("Voltar")}
           </Button>
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" onClick={() => close(false)}>
-              Pular
+              {tx("Pular")}
             </Button>
             {isLast ? (
               <Button size="sm" onClick={() => close(false)}>
-                Começar
+                {tx("Começar")}
               </Button>
             ) : (
               <Button size="sm" onClick={() => setStep((s) => s + 1)} className="gap-1">
-                Próximo <ArrowRight className="h-4 w-4" />
+                {tx("Próximo")} <ArrowRight className="h-4 w-4" />
               </Button>
             )}
           </div>

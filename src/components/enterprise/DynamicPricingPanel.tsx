@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { suggestPrices, computeLtv } from '@/lib/revenueIntelligence';
 import type { SeasonalityMonth } from '@/hooks/useEnterpriseRevenue';
 
+import { tx } from "@/i18n/t";
 const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 
@@ -39,7 +40,7 @@ export function DynamicPricingPanel({ months }: { months: SeasonalityMonth[] }) 
       body: { suggestions: suggestions.map((s) => ({ month: s.month, baseAdr: s.baseAdr, suggestedAdr: s.suggestedAdr, changePct: s.changePct, reasons: s.reasons })) },
     });
     setAiLoading(false);
-    if (error || !data?.items) { toast.error('Não foi possível gerar as justificativas agora. Tente de novo em instantes.'); return; }
+    if (error || !data?.items) { toast.error(tx('Não foi possível gerar as justificativas agora. Tente de novo em instantes.')); return; }
     setAiText(Object.fromEntries(data.items.map((i: any) => [i.month, i.text])));
   };
   const cur = suggestions.reduce((s, x) => s + (x.currentRevpar || 0), 0);
@@ -55,7 +56,7 @@ export function DynamicPricingPanel({ months }: { months: SeasonalityMonth[] }) 
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Sugestão de diária por mês com base em ocupação, eventos e referência de mercado. É só uma sugestão: nenhum preço é alterado em outros sistemas.
+        {tx("Sugestão de diária por mês com base em ocupação, eventos e referência de mercado. É só uma sugestão: nenhum preço é alterado em outros sistemas.")}
       </p>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {field('floor', 'Piso (R$)')}
@@ -88,7 +89,7 @@ export function DynamicPricingPanel({ months }: { months: SeasonalityMonth[] }) 
                   </span>
                 </span>
                 <div className="col-span-2">
-                  <Input type="number" min="0" placeholder="Eventos" value={events[s.month] || ''}
+                  <Input type="number" min="0" placeholder={tx("Eventos")} value={events[s.month] || ''}
                     onChange={(e) => setEvents({ ...events, [s.month]: Number(e.target.value) })} />
                 </div>
                 <span className="col-span-5 text-xs text-muted-foreground">{aiText[s.month] || s.reasons.join(' · ')}</span>
@@ -123,13 +124,13 @@ export function LtvPanel({ commissionPct }: { commissionPct: number }) {
         {f('cac', 'Custo de aquisição (R$)')}
       </div>
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded border p-3"><p className="text-xs text-muted-foreground">LTV</p><p className="text-2xl font-bold">{brl(r.ltv)}</p></div>
-        <div className="rounded border p-3"><p className="text-xs text-muted-foreground">CAC</p><p className="text-2xl font-bold">{brl(v.cac)}</p></div>
+        <div className="rounded border p-3"><p className="text-xs text-muted-foreground">{tx("LTV")}</p><p className="text-2xl font-bold">{brl(r.ltv)}</p></div>
+        <div className="rounded border p-3"><p className="text-xs text-muted-foreground">{tx("CAC")}</p><p className="text-2xl font-bold">{brl(v.cac)}</p></div>
         <div className="rounded border p-3">
-          <p className="text-xs text-muted-foreground">LTV / CAC</p>
+          <p className="text-xs text-muted-foreground">{tx("LTV / CAC")}</p>
           <p className="text-2xl font-bold">{r.ratio != null ? r.ratio.toFixed(1) : '—'}</p>
-          {r.healthy === false && <p className="text-xs text-severity-critical">Abaixo de 3: aquisição cara para o retorno.</p>}
-          {r.healthy && <p className="text-xs text-severity-good">Relação saudável.</p>}
+          {r.healthy === false && <p className="text-xs text-severity-critical">{tx("Abaixo de 3: aquisição cara para o retorno.")}</p>}
+          {r.healthy && <p className="text-xs text-severity-good">{tx("Relação saudável.")}</p>}
         </div>
       </div>
     </div>

@@ -14,6 +14,7 @@ import {
 import { getTopicDetail, type TutorialSubStep } from '@/data/tutorialSteps';
 import { tutorialCategories } from '@/data/tutorialData';
 
+import { tx } from "@/i18n/t";
 export default function TutorialDetail() {
   const navigate = useNavigate();
   const { topicId } = useParams<{ topicId: string }>();
@@ -36,12 +37,12 @@ export default function TutorialDetail() {
 
   if (!topic || !originalStep) {
     return (
-      <AppLayout title="Tutorial" subtitle="Tópico não encontrado">
+      <AppLayout title={tx("Tutorial")} subtitle={tx("Tópico não encontrado")}>
         <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <p className="text-muted-foreground">Tópico de tutorial não encontrado.</p>
+          <p className="text-muted-foreground">{tx("Tópico de tutorial não encontrado.")}</p>
           <Button onClick={() => navigate('/tutorial')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar ao Tutorial
+            {tx("Voltar ao Tutorial")}
           </Button>
         </div>
       </AppLayout>
@@ -77,7 +78,7 @@ export default function TutorialDetail() {
   const StepIcon = originalStep.step.icon;
 
   return (
-    <AppLayout title="Tutorial" subtitle={topic.title}>
+    <AppLayout title={tx("Tutorial")} subtitle={topic.title}>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-start gap-4">
@@ -105,7 +106,7 @@ export default function TutorialDetail() {
         {/* Progress */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Progresso do tópico</span>
+            <span className="text-muted-foreground">{tx("Progresso do tópico")}</span>
             <span className="font-medium">{totalDone}/{topic.subSteps.length} passos ({progressPct}%)</span>
           </div>
           <Progress value={progressPct} className="h-2" />
@@ -115,7 +116,7 @@ export default function TutorialDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
           {/* Step list sidebar */}
           <div className="hidden lg:block space-y-1">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Passos</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">{tx("Passos")}</p>
             {topic.subSteps.map((s, i) => {
               const done = completedSteps.has(s.id);
               const active = i === currentStep;
@@ -208,7 +209,7 @@ export default function TutorialDetail() {
                   <div className="rounded-xl overflow-hidden border bg-muted/30 aspect-video flex items-center justify-center">
                     <div className="text-center text-muted-foreground">
                       <Video className="h-10 w-10 mx-auto mb-2" />
-                      <p className="text-sm">Vídeo demonstrativo em breve</p>
+                      <p className="text-sm">{tx("Vídeo demonstrativo em breve")}</p>
                     </div>
                   </div>
                 )}
@@ -217,7 +218,7 @@ export default function TutorialDetail() {
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <BookOpen className="h-4 w-4 text-primary" />
-                    Detalhes
+                    {tx("Detalhes")}
                   </h3>
                   <ul className="space-y-2.5">
                     {subStep.details.map((detail, i) => (
@@ -270,7 +271,7 @@ export default function TutorialDetail() {
             <div className="flex items-center justify-between gap-4">
               <Button variant="outline" onClick={handlePrev} disabled={isFirst}>
                 <ChevronLeft className="h-4 w-4 mr-1" />
-                Anterior
+                {tx("Anterior")}
               </Button>
 
               <div className="flex items-center gap-2">
@@ -287,12 +288,12 @@ export default function TutorialDetail() {
 
               {isLast ? (
                 <Button onClick={() => navigate('/tutorial')}>
-                  Voltar ao Tutorial
+                  {tx("Voltar ao Tutorial")}
                   <ArrowLeft className="h-4 w-4 ml-1" />
                 </Button>
               ) : (
                 <Button onClick={handleNext}>
-                  Próximo
+                  {tx("Próximo")}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               )}
@@ -304,7 +305,7 @@ export default function TutorialDetail() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <BookOpen className="h-4 w-4" />
-                    Quer experimentar agora?
+                    {tx("Quer experimentar agora?")}
                   </div>
                   <Button variant="outline" size="sm" onClick={() => navigate(originalStep.step.route!)}>
                     Ir para {originalStep.step.title}

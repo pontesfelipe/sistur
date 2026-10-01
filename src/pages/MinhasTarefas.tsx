@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
+import { tx } from "@/i18n/t";
 export default function MinhasTarefas() {
   const { data: tasks = [], isLoading } = useMyTasks();
 
@@ -23,8 +24,8 @@ export default function MinhasTarefas() {
 
   return (
     <AppLayout
-      title="Minhas tarefas"
-      subtitle="Tarefas em que você é responsável ou aprovador, em todos os projetos da sua organização."
+      title={tx("Minhas tarefas")}
+      subtitle={tx("Tarefas em que você é responsável ou aprovador, em todos os projetos da sua organização.")}
     >
       <div className="container max-w-5xl py-6 space-y-6">
 
@@ -35,15 +36,15 @@ export default function MinhasTarefas() {
         ) : tasks.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center text-sm text-muted-foreground">
-              Você ainda não tem tarefas atribuídas.
+              {tx("Você ainda não tem tarefas atribuídas.")}
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-6">
-            <TaskGroup title="Em andamento" tasks={groups.em_andamento} />
-            {groups.bloqueadas.length > 0 && <TaskGroup title="Bloqueadas" tasks={groups.bloqueadas} />}
-            {groups.outras.length > 0 && <TaskGroup title="Outras" tasks={groups.outras} />}
-            {groups.concluidas.length > 0 && <TaskGroup title="Concluídas" tasks={groups.concluidas} collapsed />}
+            <TaskGroup title={tx("Em andamento")} tasks={groups.em_andamento} />
+            {groups.bloqueadas.length > 0 && <TaskGroup title={tx("Bloqueadas")} tasks={groups.bloqueadas} />}
+            {groups.outras.length > 0 && <TaskGroup title={tx("Outras")} tasks={groups.outras} />}
+            {groups.concluidas.length > 0 && <TaskGroup title={tx("Concluídas")} tasks={groups.concluidas} collapsed />}
           </div>
         )}
       </div>

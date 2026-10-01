@@ -65,6 +65,7 @@ import { BookOpen } from 'lucide-react';
 import { BrandSelector } from './BrandSelector';
 import { useBrandUnits } from '@/hooks/useEnterpriseBrands';
 
+import { tx } from "@/i18n/t";
 interface EnterpriseProfileStepProps {
   destinationId: string;
   destinationName: string;
@@ -81,28 +82,28 @@ interface EnterpriseProfileStepProps {
 }
 
 const PROPERTY_TYPES = [
-  { value: 'hotel', label: 'Hotel' },
-  { value: 'resort', label: 'Resort' },
-  { value: 'pousada', label: 'Pousada' },
-  { value: 'hostel', label: 'Hostel' },
-  { value: 'apart_hotel', label: 'Apart-Hotel' },
-  { value: 'flat', label: 'Flat' },
-  { value: 'camping', label: 'Camping/Glamping' },
+  { value: 'hotel', label: tx('Hotel') },
+  { value: 'resort', label: tx('Resort') },
+  { value: 'pousada', label: tx('Pousada') },
+  { value: 'hostel', label: tx('Hostel') },
+  { value: 'apart_hotel', label: tx('Apart-Hotel') },
+  { value: 'flat', label: tx('Flat') },
+  { value: 'camping', label: tx('Camping/Glamping') },
 ];
 
 const SEASONALITY_OPTIONS = [
-  { value: 'alta', label: 'Alta (predominantemente alta temporada)' },
-  { value: 'media', label: 'Média (equilibrado)' },
-  { value: 'baixa', label: 'Baixa (predominantemente baixa temporada)' },
-  { value: 'uniforme', label: 'Uniforme (sem sazonalidade)' },
+  { value: 'alta', label: tx('Alta (predominantemente alta temporada)') },
+  { value: 'media', label: tx('Média (equilibrado)') },
+  { value: 'baixa', label: tx('Baixa (predominantemente baixa temporada)') },
+  { value: 'uniforme', label: tx('Uniforme (sem sazonalidade)') },
 ];
 
 const TARGET_MARKETS = [
-  { value: 'corporativo', label: 'Corporativo' },
-  { value: 'lazer', label: 'Lazer' },
-  { value: 'familia', label: 'Família' },
-  { value: 'eventos', label: 'Eventos' },
-  { value: 'eco', label: 'Ecoturismo' },
+  { value: 'corporativo', label: tx('Corporativo') },
+  { value: 'lazer', label: tx('Lazer') },
+  { value: 'familia', label: tx('Família') },
+  { value: 'eventos', label: tx('Eventos') },
+  { value: 'eco', label: tx('Ecoturismo') },
 ];
 
 const DEFAULT_PROFILE_FORM_DATA: Partial<EnterpriseProfileInput> = {
@@ -221,27 +222,27 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   // global registry can render meaningful badges/toasts without coupling each
   // search component to the orchestrator.
   const BLOCK_META: Record<string, { label: string; source: string }> = {
-    reviews: { label: 'Reviews Online', source: 'Booking + TripAdvisor + Google (nota, volume, sentimento, NPS)' },
-    digital: { label: 'Presença Digital', source: 'Google + OTAs + redes sociais' },
-    context: { label: 'Contexto Municipal', source: 'IBGE + ANAC + ANATEL + Mapa do Turismo' },
-    complaints: { label: 'Reclamações Públicas', source: 'Reclame Aqui + Procon' },
-    competitors: { label: 'Concorrentes', source: 'Booking + TripAdvisor + Google' },
-    sustainability: { label: 'Sustentabilidade & ESG', source: 'Site oficial + certificadoras' },
-    pricing: { label: 'Preço & Posicionamento', source: 'OTAs + metabuscadores' },
-    events: { label: 'Eventos Locais', source: 'Sympla + Eventbrite + agendas municipais' },
-    safety: { label: 'Segurança Turística', source: 'SSP + notícias regionais' },
-    climate: { label: 'Clima & Conforto', source: 'INMET + dados históricos' },
-    transport: { label: 'Transporte Urbano', source: 'GTFS + ANTT + prefeituras' },
-    brand: { label: 'Força da Marca', source: 'Pesquisa web + menções' },
-    demand: { label: 'Demanda & Trends', source: 'Google Trends + buscas sazonais' },
-    reputation: { label: 'Reputação Consolidada OTAs', source: 'Booking + Expedia + TripAdvisor' },
-    social: { label: 'Redes Sociais', source: 'Instagram + Facebook + TikTok' },
-    air: { label: 'Conectividade Aérea', source: 'ANAC (anac_air_connectivity)' },
-    tariff: { label: 'Sazonalidade Tarifária', source: 'Derivado: demanda + eventos + ADR' },
-    telecom: { label: 'Conectividade Telecom', source: 'Anatel (anatel_coverage_cache)' },
-    accessibility: { label: 'Acessibilidade Urbana', source: 'Busca pública na web (5 dimensões)' },
-    health: { label: 'Infra. de Saúde do Entorno', source: 'DATASUS/CNES (datasus_health_cache)' },
-    cnpj: { label: 'CNPJ', source: 'Busca pública + Receita Federal (BrasilAPI)' },
+    reviews: { label: tx('Reviews Online'), source: 'Booking + TripAdvisor + Google (nota, volume, sentimento, NPS)' },
+    digital: { label: tx('Presença Digital'), source: 'Google + OTAs + redes sociais' },
+    context: { label: tx('Contexto Municipal'), source: 'IBGE + ANAC + ANATEL + Mapa do Turismo' },
+    complaints: { label: tx('Reclamações Públicas'), source: 'Reclame Aqui + Procon' },
+    competitors: { label: tx('Concorrentes'), source: 'Booking + TripAdvisor + Google' },
+    sustainability: { label: tx('Sustentabilidade & ESG'), source: 'Site oficial + certificadoras' },
+    pricing: { label: tx('Preço & Posicionamento'), source: 'OTAs + metabuscadores' },
+    events: { label: tx('Eventos Locais'), source: 'Sympla + Eventbrite + agendas municipais' },
+    safety: { label: tx('Segurança Turística'), source: 'SSP + notícias regionais' },
+    climate: { label: tx('Clima & Conforto'), source: 'INMET + dados históricos' },
+    transport: { label: tx('Transporte Urbano'), source: 'GTFS + ANTT + prefeituras' },
+    brand: { label: tx('Força da Marca'), source: 'Pesquisa web + menções' },
+    demand: { label: tx('Demanda & Trends'), source: 'Google Trends + buscas sazonais' },
+    reputation: { label: tx('Reputação Consolidada OTAs'), source: 'Booking + Expedia + TripAdvisor' },
+    social: { label: tx('Redes Sociais'), source: 'Instagram + Facebook + TikTok' },
+    air: { label: tx('Conectividade Aérea'), source: 'ANAC (anac_air_connectivity)' },
+    tariff: { label: tx('Sazonalidade Tarifária'), source: 'Derivado: demanda + eventos + ADR' },
+    telecom: { label: tx('Conectividade Telecom'), source: 'Anatel (anatel_coverage_cache)' },
+    accessibility: { label: tx('Acessibilidade Urbana'), source: 'Busca pública na web (5 dimensões)' },
+    health: { label: tx('Infra. de Saúde do Entorno'), source: 'DATASUS/CNES (datasus_health_cache)' },
+    cnpj: { label: tx('CNPJ'), source: 'Busca pública + Receita Federal (BrasilAPI)' },
   };
   useEffect(() => {
     Object.entries(BLOCK_META).forEach(([id, m]) => setAutoFillMeta(id, m));
@@ -322,7 +323,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     // Marca o cascade como já disparado para evitar que a conclusão do bloco
     // "reviews" (agora parte do Rodar todos) re-dispare handleRunAll em loop.
     setAutoCascadeTriggered(true);
-    toast.info('Iniciando preenchimento automático...');
+    toast.info(tx('Iniciando preenchimento automático...'));
     let okCount = 0;
     let failCount = 0;
     let noDataCount = 0;
@@ -347,7 +348,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       persistRunState();
     } catch (e: any) {
       console.error(e);
-      toast.error('Falha ao executar blocos: ' + (e?.message || 'erro desconhecido'));
+      toast.error(tx('Falha ao executar blocos: ') + (e?.message || 'erro desconhecido'));
     } finally {
       setRunAllLoading(false);
       setRunAllProgress(null);
@@ -429,7 +430,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           persistRunState();
         } catch (e: any) {
           console.error(e);
-          toast.error('Falha ao executar blocos: ' + (e?.message || 'erro desconhecido'));
+          toast.error(tx('Falha ao executar blocos: ') + (e?.message || 'erro desconhecido'));
         } finally {
           setRunAllLoading(false);
           setRunAllProgress(null);
@@ -440,28 +441,28 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
   // Resumo de progresso dos blocos automáticos (Step 4)
   const autoFillFlags = [
-    { key: 'reviews', label: 'Reviews Online', done: reviewAutoFilled },
-    { key: 'profile', label: 'Perfil do Empreendimento', done: profileAutoFilled },
-    { key: 'digital', label: 'Presença Digital', done: digitalAutoFilled },
-    { key: 'context', label: 'Contexto Municipal', done: contextAutoFilled },
-    { key: 'cnpj', label: 'CNPJ', done: !!cnpjData },
-    { key: 'complaints', label: 'Reclamações', done: complaintsAutoFilled },
-    { key: 'competitors', label: 'Concorrentes', done: (competitorsCount ?? 0) > 0 },
-    { key: 'sustainability', label: 'Sustentabilidade', done: sustainabilityAutoFilled },
-    { key: 'pricing', label: 'Preço/Posicionamento', done: pricingAutoFilled },
-    { key: 'events', label: 'Eventos Locais', done: eventsAutoFilled },
-    { key: 'safety', label: 'Segurança', done: safetyAutoFilled },
-    { key: 'climate', label: 'Clima/Conforto', done: climateAutoFilled },
-    { key: 'transport', label: 'Transporte', done: transportAutoFilled },
-    { key: 'brand', label: 'Força da Marca', done: brandAutoFilled },
-    { key: 'demand', label: 'Demanda/Trends', done: demandAutoFilled },
-    { key: 'reputation', label: 'Reputação OTAs', done: reputationAutoFilled },
-    { key: 'social', label: 'Redes Sociais', done: socialAutoFilled },
-    { key: 'air', label: 'Conectividade Aérea', done: airConnAutoFilled },
-    { key: 'tariff', label: 'Sazonalidade Tarifária', done: tariffSeasonalityAutoFilled },
-    { key: 'telecom', label: 'Telecom', done: telecomAutoFilled },
-    { key: 'accessibility', label: 'Acessibilidade', done: accessibilityAutoFilled },
-    { key: 'health', label: 'Saúde do Entorno', done: healthAutoFilled },
+    { key: 'reviews', label: tx('Reviews Online'), done: reviewAutoFilled },
+    { key: 'profile', label: tx('Perfil do Empreendimento'), done: profileAutoFilled },
+    { key: 'digital', label: tx('Presença Digital'), done: digitalAutoFilled },
+    { key: 'context', label: tx('Contexto Municipal'), done: contextAutoFilled },
+    { key: 'cnpj', label: tx('CNPJ'), done: !!cnpjData },
+    { key: 'complaints', label: tx('Reclamações'), done: complaintsAutoFilled },
+    { key: 'competitors', label: tx('Concorrentes'), done: (competitorsCount ?? 0) > 0 },
+    { key: 'sustainability', label: tx('Sustentabilidade'), done: sustainabilityAutoFilled },
+    { key: 'pricing', label: tx('Preço/Posicionamento'), done: pricingAutoFilled },
+    { key: 'events', label: tx('Eventos Locais'), done: eventsAutoFilled },
+    { key: 'safety', label: tx('Segurança'), done: safetyAutoFilled },
+    { key: 'climate', label: tx('Clima/Conforto'), done: climateAutoFilled },
+    { key: 'transport', label: tx('Transporte'), done: transportAutoFilled },
+    { key: 'brand', label: tx('Força da Marca'), done: brandAutoFilled },
+    { key: 'demand', label: tx('Demanda/Trends'), done: demandAutoFilled },
+    { key: 'reputation', label: tx('Reputação OTAs'), done: reputationAutoFilled },
+    { key: 'social', label: tx('Redes Sociais'), done: socialAutoFilled },
+    { key: 'air', label: tx('Conectividade Aérea'), done: airConnAutoFilled },
+    { key: 'tariff', label: tx('Sazonalidade Tarifária'), done: tariffSeasonalityAutoFilled },
+    { key: 'telecom', label: tx('Telecom'), done: telecomAutoFilled },
+    { key: 'accessibility', label: tx('Acessibilidade'), done: accessibilityAutoFilled },
+    { key: 'health', label: tx('Saúde do Entorno'), done: healthAutoFilled },
   ];
   const autoFillDone = autoFillFlags.filter((b) => b.done).length;
   const autoFillTotal = autoFillFlags.length;
@@ -489,7 +490,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     });
     if (hasDetectedProfileFields) {
       setProfileAutoFilled(true);
-      toast.success('Perfil do empreendimento preenchido automaticamente');
+      toast.success(tx('Perfil do empreendimento preenchido automaticamente'));
     }
   };
 
@@ -585,7 +586,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       ...prev,
       ...(yearsInOperation != null ? { years_in_operation: yearsInOperation } : {}),
     }));
-    toast.success('Dados cadastrais aplicados ao perfil');
+    toast.success(tx('Dados cadastrais aplicados ao perfil'));
   };
   const { profile, effectiveOrgId } = useProfileContext();
   const { profile: existingProfile, isLoading } = useEnterpriseProfile(destinationId);
@@ -766,12 +767,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enterprise-profile', destinationId] });
       queryClient.invalidateQueries({ queryKey: ['enterprise-profiles'] });
-      toast.success('Perfil do empreendimento salvo');
+      toast.success(tx('Perfil do empreendimento salvo'));
       onComplete();
     },
     onError: (error) => {
       console.error('Error saving profile:', error);
-      toast.error('Erro ao salvar perfil');
+      toast.error(tx('Erro ao salvar perfil'));
     }
   });
 
@@ -798,7 +799,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <CardContent className="py-12">
           <div className="flex items-center justify-center gap-2">
             <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Carregando perfil...</span>
+            <span>{tx("Carregando perfil...")}</span>
           </div>
         </CardContent>
       </Card>
@@ -821,7 +822,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Building2 className="h-4 w-4 text-primary" />
-            Identidade do empreendimento e da marca
+            {tx("Identidade do empreendimento e da marca")}
           </CardTitle>
           <CardDescription>
             Se este hotel faz parte de uma rede com unidades em outros municípios,
@@ -858,16 +859,15 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               onClick={() => setManageBrandsOpen(true)}
             >
               <Building2 className="h-3.5 w-3.5 mr-1.5" />
-              Gerenciar marcas da organização
+              {tx("Gerenciar marcas da organização")}
             </Button>
           </div>
           <Dialog open={manageBrandsOpen} onOpenChange={setManageBrandsOpen}>
             <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Marcas da organização</DialogTitle>
+                <DialogTitle>{tx("Marcas da organização")}</DialogTitle>
                 <DialogDescription>
-                  Crie, edite ou remova marcas/redes. As unidades de cada diagnóstico
-                  empresarial são associadas à marca nesta etapa.
+                  {tx("Crie, edite ou remova marcas/redes. As unidades de cada diagnóstico empresarial são associadas à marca nesta etapa.")}
                 </DialogDescription>
               </DialogHeader>
               <BrandManagementPanel />
@@ -875,7 +875,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           </Dialog>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="unit-name">Nome desta unidade</Label>
+              <Label htmlFor="unit-name">{tx("Nome desta unidade")}</Label>
               <Input
                 id="unit-name"
                 value={unitName}
@@ -917,7 +917,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                   Pré-preenchimento automático: {autoFillDone}/{autoFillTotal} itens
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Cada item abaixo busca ou aplica dados públicos para preencher o diagnóstico
+                  {tx("Cada item abaixo busca ou aplica dados públicos para preencher o diagnóstico")}
                 </div>
               </div>
             </div>
@@ -948,16 +948,16 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 size="sm"
                 variant="ghost"
                 onClick={() => setTourOpen(true)}
-                title="Abrir tour do módulo Enterprise"
+                title={tx("Abrir tour do módulo Enterprise")}
               >
                 <BookOpen className="h-3.5 w-3.5 mr-1" />
-                Tour
+                {tx("Tour")}
               </Button>
             </div>
           </div>
           {runAllLoading && runAllProgress && (
             <div className="mt-3 text-xs text-muted-foreground">
-              Executando bloco <span className="font-medium text-foreground">{runAllProgress.id}</span>
+              {tx("Executando bloco")} <span className="font-medium text-foreground">{runAllProgress.id}</span>
               {' '}({runAllProgress.index + 1}/{runAllProgress.total})
             </div>
           )}
@@ -1020,14 +1020,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       {!hasBusinessName && (
         <div className="rounded-lg border border-amber-500/40 bg-amber-50/60 dark:bg-amber-950/20 px-4 py-3 text-sm text-amber-900 dark:text-amber-200 flex items-center gap-2">
           <AlertCircle className="h-4 w-4 shrink-0" />
-          Informe o nome do empreendimento no campo abaixo antes de rodar as buscas.
+          {tx("Informe o nome do empreendimento no campo abaixo antes de rodar as buscas.")}
         </div>
       )}
 
       {/* === SECTION: 🏨 Sobre o Empreendimento === */}
       <div className="pt-4 pb-1">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-          🏨 Sobre o Empreendimento
+          {tx("🏨 Sobre o Empreendimento")}
         </h3>
       </div>
       {/* 1) Pré-preenchimento Automático via IA (ACIMA do perfil) */}
@@ -1039,20 +1039,20 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Reviews Online
+                {tx("Reviews Online")}
                 <Badge variant="secondary" className="text-[10px]">
                   <Sparkles className="h-3 w-3 mr-1" />
                   IA
                 </Badge>
               </CardTitle>
               <CardDescription>
-                Google, TripAdvisor e Booking — alimenta reputação, satisfação e maturidade digital
+                {tx("Google, TripAdvisor e Booking — alimenta reputação, satisfação e maturidade digital")}
               </CardDescription>
             </div>
             {reviewAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
                 <CheckCircle2 className="h-3 w-3 mr-1" />
-                Preenchido
+                {tx("Preenchido")}
               </Badge>
             )}
           </div>
@@ -1078,20 +1078,20 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Presença Digital Automática
+                {tx("Presença Digital Automática")}
                 <Badge variant="secondary" className="text-[10px]">
                   <Sparkles className="h-3 w-3 mr-1" />
-                  Auto
+                  {tx("Auto")}
                 </Badge>
               </CardTitle>
               <CardDescription>
-                Detecta site oficial, Google Business, OTAs e redes sociais — preenche maturidade digital e canal direto
+                {tx("Detecta site oficial, Google Business, OTAs e redes sociais — preenche maturidade digital e canal direto")}
               </CardDescription>
             </div>
             {digitalAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
                 <CheckCircle2 className="h-3 w-3 mr-1" />
-                Preenchido
+                {tx("Preenchido")}
               </Badge>
             )}
           </div>
@@ -1114,14 +1114,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Reclamações Públicas
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Reclamações Públicas")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Reclame Aqui e Procon — reputação pública e taxa de solução</CardDescription>
+              <CardDescription>{tx("Reclame Aqui e Procon — reputação pública e taxa de solução")}</CardDescription>
             </div>
             {complaintsAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+                <CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}
               </Badge>
             )}
           </div>
@@ -1144,10 +1144,10 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Concorrentes Automáticos
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Concorrentes Automáticos")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Benchmark competitivo via Booking, TripAdvisor e Google</CardDescription>
+              <CardDescription>{tx("Benchmark competitivo via Booking, TripAdvisor e Google")}</CardDescription>
             </div>
             {competitorsCount != null && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
@@ -1176,14 +1176,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Sustentabilidade & Acessibilidade
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Sustentabilidade & Acessibilidade")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Certificações ESG, práticas sustentáveis e acessibilidade detectadas no site e em fontes públicas</CardDescription>
+              <CardDescription>{tx("Certificações ESG, práticas sustentáveis e acessibilidade detectadas no site e em fontes públicas")}</CardDescription>
             </div>
             {sustainabilityAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+                <CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}
               </Badge>
             )}
           </div>
@@ -1207,13 +1207,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
                 Posicionamento de Preço (ADR)
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
               <CardDescription>Diária média estimada vs mercado a partir de OTAs públicas (Booking, Google, Hoteis.com)</CardDescription>
             </div>
             {pricingAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+                <CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}
               </Badge>
             )}
           </div>
@@ -1234,13 +1234,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-pink-500/10"><Sparkles className="h-5 w-5 text-pink-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Força da Marca
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Força da Marca")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Visibilidade orgânica: resultados de busca, autoridade de domínios, mídia e OTAs</CardDescription>
+              <CardDescription>{tx("Visibilidade orgânica: resultados de busca, autoridade de domínios, mídia e OTAs")}</CardDescription>
             </div>
             {brandAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1255,13 +1255,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-cyan-500/10"><Sparkles className="h-5 w-5 text-cyan-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Demanda & Tendências
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Demanda & Tendências")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Volume orgânico, sinais transacionais em OTAs, distribuição mensal e picos de interesse</CardDescription>
+              <CardDescription>{tx("Volume orgânico, sinais transacionais em OTAs, distribuição mensal e picos de interesse")}</CardDescription>
             </div>
             {demandAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1276,13 +1276,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-yellow-500/10"><Sparkles className="h-5 w-5 text-yellow-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Reputação Consolidada
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Reputação Consolidada")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Nota agregada de Booking, Google, TripAdvisor, Airbnb e demais OTAs em escala 0-10</CardDescription>
+              <CardDescription>{tx("Nota agregada de Booking, Google, TripAdvisor, Airbnb e demais OTAs em escala 0-10")}</CardDescription>
             </div>
             {reputationAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1297,13 +1297,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-fuchsia-500/10"><Sparkles className="h-5 w-5 text-fuchsia-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Presença em Redes Sociais
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Presença em Redes Sociais")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Instagram, Facebook, TikTok, YouTube e LinkedIn: perfis ativos e base estimada de seguidores</CardDescription>
+              <CardDescription>{tx("Instagram, Facebook, TikTok, YouTube e LinkedIn: perfis ativos e base estimada de seguidores")}</CardDescription>
             </div>
             {socialAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1314,7 +1314,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       {/* === SECTION: 📄 Cadastro Legal === */}
       <div className="pt-4 pb-1">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-          📄 Cadastro Legal
+          {tx("📄 Cadastro Legal")}
         </h3>
       </div>
       {/* 1.7) Validação CNPJ */}
@@ -1326,14 +1326,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Validação CNPJ & Dados Cadastrais
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Validação CNPJ & Dados Cadastrais")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Receita Federal: razão social, CNAE, situação cadastral e anos de operação</CardDescription>
+              <CardDescription>{tx("Receita Federal: razão social, CNAE, situação cadastral e anos de operação")}</CardDescription>
             </div>
             {cnpjData && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />Validado
+                <CheckCircle2 className="h-3 w-3 mr-1" />{tx("Validado")}
               </Badge>
             )}
           </div>
@@ -1350,7 +1350,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       {/* === SECTION: 🌎 Sobre o Município / Destino === */}
       <div className="pt-4 pb-1">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-          🌎 Sobre o Município / Destino
+          {tx("🌎 Sobre o Município / Destino")}
         </h3>
       </div>
       {/* 1.6) Contexto & Conectividade do Destino */}
@@ -1362,14 +1362,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Contexto & Conectividade do Destino
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Contexto & Conectividade do Destino")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>ANAC, ANATEL, eventos, Mapa do Turismo e contexto socioeconômico do município</CardDescription>
+              <CardDescription>{tx("ANAC, ANATEL, eventos, Mapa do Turismo e contexto socioeconômico do município")}</CardDescription>
             </div>
             {contextAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+                <CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}
               </Badge>
             )}
           </div>
@@ -1391,14 +1391,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Eventos & Sazonalidade Local
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Eventos & Sazonalidade Local")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Calendário de eventos públicos e observatório — detecta meses de pico e padrão sazonal</CardDescription>
+              <CardDescription>{tx("Calendário de eventos públicos e observatório — detecta meses de pico e padrão sazonal")}</CardDescription>
             </div>
             {eventsAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+                <CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}
               </Badge>
             )}
           </div>
@@ -1421,14 +1421,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Segurança Turística
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Segurança Turística")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Sinais públicos de segurança: notícias, presença de polícia turística e alertas ativos</CardDescription>
+              <CardDescription>{tx("Sinais públicos de segurança: notícias, presença de polícia turística e alertas ativos")}</CardDescription>
             </div>
             {safetyAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />Preenchido
+                <CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}
               </Badge>
             )}
           </div>
@@ -1448,13 +1448,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-sky-500/10"><Sparkles className="h-5 w-5 text-sky-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Conforto Climático
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Conforto Climático")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
               <CardDescription>Open-Meteo (5 anos): temperatura, chuva e melhores meses do destino</CardDescription>
             </div>
             {climateAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1469,13 +1469,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-orange-500/10"><Sparkles className="h-5 w-5 text-orange-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Transporte Intra-Destino
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Transporte Intra-Destino")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Apps, transporte público, transfer e alternativos disponíveis no destino</CardDescription>
+              <CardDescription>{tx("Apps, transporte público, transfer e alternativos disponíveis no destino")}</CardDescription>
             </div>
             {transportAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1490,13 +1490,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-sky-500/10"><Sparkles className="h-5 w-5 text-sky-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Conectividade Aérea
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Conectividade Aérea")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>ANAC — voos/semana, passageiros 12m e participação internacional do aeroporto do município</CardDescription>
+              <CardDescription>{tx("ANAC — voos/semana, passageiros 12m e participação internacional do aeroporto do município")}</CardDescription>
             </div>
             {airConnAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1511,13 +1511,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-cyan-500/10"><Sparkles className="h-5 w-5 text-cyan-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Conectividade Telecom
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Conectividade Telecom")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
               <CardDescription>Anatel — cobertura 4G, 5G e Wi-Fi público do município (afeta PMS cloud, OTA mobile e check-in digital)</CardDescription>
             </div>
             {telecomAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1532,13 +1532,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-indigo-500/10"><Sparkles className="h-5 w-5 text-indigo-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Acessibilidade Urbana
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Acessibilidade Urbana")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Pesquisa web por evidências de calçadas, rampas, sinalização tátil, transporte acessível e atrativos PCD no município</CardDescription>
+              <CardDescription>{tx("Pesquisa web por evidências de calçadas, rampas, sinalização tátil, transporte acessível e atrativos PCD no município")}</CardDescription>
             </div>
             {accessibilityAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1553,13 +1553,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-rose-500/10"><Sparkles className="h-5 w-5 text-rose-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Infraestrutura de Saúde do Entorno
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Auto</Badge>
+                {tx("Infraestrutura de Saúde do Entorno")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>DATASUS/CNES — hospitais, leitos, pronto-socorro 24h e densidade por 1k habitantes do município</CardDescription>
+              <CardDescription>{tx("DATASUS/CNES — hospitais, leitos, pronto-socorro 24h e densidade por 1k habitantes do município")}</CardDescription>
             </div>
             {healthAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1571,9 +1571,9 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
       {/* === SECTION: 🔄 Indicadores Derivados === */}
       <div className="pt-4 pb-1">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-          🔄 Indicadores Derivados
+          {tx("🔄 Indicadores Derivados")}
         </h3>
-        <p className="text-xs text-muted-foreground">Calculados automaticamente a partir dos blocos acima.</p>
+        <p className="text-xs text-muted-foreground">{tx("Calculados automaticamente a partir dos blocos acima.")}</p>
       </div>
       {/* 1.21) Sazonalidade Tarifária (derivada) */}
       <Card className="border-violet-500/30 bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:from-violet-950/20 dark:to-purple-950/10">
@@ -1582,13 +1582,13 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="p-2 rounded-lg bg-violet-500/10"><Sparkles className="h-5 w-5 text-violet-600" /></div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Sazonalidade Tarifária
-                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />Derivada</Badge>
+                {tx("Sazonalidade Tarifária")}
+                <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Derivada")}</Badge>
               </CardTitle>
-              <CardDescription>Cruza demanda orgânica, eventos locais e ADR mensal para mapear picos e baixas tarifárias</CardDescription>
+              <CardDescription>{tx("Cruza demanda orgânica, eventos locais e ADR mensal para mapear picos e baixas tarifárias")}</CardDescription>
             </div>
             {tariffSeasonalityAutoFilled && (
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Preenchido</Badge>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
             )}
           </div>
         </CardHeader>
@@ -1610,7 +1610,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               <Hotel className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <CardTitle className="text-lg">Perfil do Empreendimento</CardTitle>
+              <CardTitle className="text-lg">{tx("Perfil do Empreendimento")}</CardTitle>
               <CardDescription>{destinationName}</CardDescription>
             </div>
           </div>
@@ -1620,7 +1620,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             Essas informações contextualizam o diagnóstico e permitem benchmarks mais precisos para o seu tipo de empreendimento.
             {reviewAutoFilled && (
               <span className="text-primary font-medium ml-1">
-                Alguns campos foram preenchidos automaticamente pela busca de reviews.
+                {tx("Alguns campos foram preenchidos automaticamente pela busca de reviews.")}
               </span>
             )}
           </p>
@@ -1629,14 +1629,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="property_type">
-                Tipo de Empreendimento <span className="text-destructive">*</span>
+                {tx("Tipo de Empreendimento")} <span className="text-destructive">*</span>
               </Label>
               <Select 
                 value={formData.property_type} 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, property_type: value }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione..." />
+                  <SelectValue placeholder={tx("Selecione...")} />
                 </SelectTrigger>
                 <SelectContent>
                   {PROPERTY_TYPES.map(type => (
@@ -1653,7 +1653,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 onValueChange={(value) => setFormData(prev => ({ ...prev, star_rating: value ? parseInt(value) : null }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione..." />
+                  <SelectValue placeholder={tx("Selecione...")} />
                 </SelectTrigger>
                 <SelectContent>
                   {[1, 2, 3, 4, 5].map(rating => (
@@ -1675,12 +1675,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="space-y-2">
               <Label htmlFor="room_count">
                 <DoorOpen className="h-4 w-4 inline mr-1" />
-                Nº de UHs <span className="text-destructive">*</span>
+                {tx("Nº de UHs")} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="room_count"
                 type="number"
-                placeholder="Ex: 120"
+                placeholder={tx("Ex: 120")}
                 value={formData.room_count ?? ''}
                 onChange={(e) => handleNumberChange('room_count', e.target.value)}
               />
@@ -1689,12 +1689,12 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             <div className="space-y-2">
               <Label htmlFor="employee_count">
                 <Users className="h-4 w-4 inline mr-1" />
-                Nº de Funcionários
+                {tx("Nº de Funcionários")}
               </Label>
               <Input
                 id="employee_count"
                 type="number"
-                placeholder="Ex: 80"
+                placeholder={tx("Ex: 80")}
                 value={formData.employee_count ?? ''}
                 onChange={(e) => handleNumberChange('employee_count', e.target.value)}
               />
@@ -1710,7 +1710,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 min="0"
                 max="100"
                 step="0.1"
-                placeholder="Ex: 65"
+                placeholder={tx("Ex: 65")}
                 value={formData.average_occupancy_rate ?? ''}
                 onChange={(e) => handleNumberChange('average_occupancy_rate', e.target.value)}
               />
@@ -1721,14 +1721,14 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
           <div className="space-y-2">
             <Label htmlFor="seasonality">
               <Calendar className="h-4 w-4 inline mr-1" />
-              Sazonalidade
+              {tx("Sazonalidade")}
             </Label>
             <Select 
               value={formData.seasonality || ''} 
               onValueChange={(value) => setFormData(prev => ({ ...prev, seasonality: value || null }))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione..." />
+                <SelectValue placeholder={tx("Selecione...")} />
               </SelectTrigger>
               <SelectContent>
                 {SEASONALITY_OPTIONS.map(opt => (
@@ -1768,19 +1768,19 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               {isMinimallyComplete ? (
                 <>
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  Perfil mínimo preenchido. Você pode adicionar mais detalhes depois.
+                  {tx("Perfil mínimo preenchido. Você pode adicionar mais detalhes depois.")}
                 </>
               ) : (
                 <>
                   <Building2 className="h-4 w-4 text-amber-500" />
-                  Preencha ao menos o tipo e número de UHs para continuar.
+                  {tx("Preencha ao menos o tipo e número de UHs para continuar.")}
                 </>
               )}
             </div>
             <div className="flex items-center justify-between">
               {onBack && (
                 <Button variant="outline" onClick={onBack}>
-                  Voltar
+                  {tx("Voltar")}
                 </Button>
               )}
               <div className="flex gap-3 ml-auto">
@@ -1789,7 +1789,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                   onClick={onComplete}
                   disabled={saveProfile.isPending}
                 >
-                  Pular
+                  {tx("Pular")}
                 </Button>
                 <Button 
                   onClick={() => saveProfile.mutate()} 

@@ -97,7 +97,7 @@ export function AdaptivePathEditor() {
             <CardDescription>{tx('Crie percursos com etapas, pré-requisitos e gatilhos por status do diagnóstico.')}</CardDescription>
           </div>
           <Button size="sm" onClick={() => createPath.mutate({})} disabled={createPath.isPending}>
-            <Plus className="w-4 h-4 mr-1" /> Nova trilha
+            <Plus className="w-4 h-4 mr-1" /> {tx("Nova trilha")}
           </Button>
         </div>
       </CardHeader>
@@ -368,7 +368,7 @@ function PathStepsEditor({ pathId }: { pathId: string }) {
             </div>
           ))}
           <Button onClick={() => addStep.mutate()} variant="outline" className="w-full">
-            <Plus className="w-4 h-4 mr-1" /> Adicionar etapa
+            <Plus className="w-4 h-4 mr-1" /> {tx("Adicionar etapa")}
           </Button>
         </div>
       </DialogContent>

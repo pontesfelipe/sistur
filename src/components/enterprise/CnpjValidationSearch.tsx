@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner, NoDataError } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Props {
   initialCnpj?: string | null;
   onValidated?: (data: { cnpj: string; record: any; yearsInOperation: number | null }) => void;
@@ -43,7 +44,7 @@ export function CnpjValidationSearch({ initialCnpj, onValidated, businessName, l
   const run = async (override?: string) => {
     const digits = (override ?? cnpj).replace(/\D/g, '');
     if (digits.length !== 14) {
-      toast.error('Informe um CNPJ válido (14 dígitos).');
+      toast.error(tx('Informe um CNPJ válido (14 dígitos).'));
       return null;
     }
     setLoading(true);
@@ -64,10 +65,10 @@ export function CnpjValidationSearch({ initialCnpj, onValidated, businessName, l
       }
 
       onValidated?.({ cnpj: digits, record, yearsInOperation: years });
-      toast.success('CNPJ validado');
+      toast.success(tx('CNPJ validado'));
       return record;
     } catch (e: any) {
-      toast.error('Erro: ' + (e.message || ''));
+      toast.error(tx('Erro: ') + (e.message || ''));
       throw e;
     } finally {
       setLoading(false);
@@ -78,7 +79,7 @@ export function CnpjValidationSearch({ initialCnpj, onValidated, businessName, l
   const discoverAndValidate = async (silent = false) => {
     const name = (businessName || '').trim();
     if (!name) {
-      if (!silent) toast.error('Informe o nome do empreendimento no bloco Reviews para buscar o CNPJ.');
+      if (!silent) toast.error(tx('Informe o nome do empreendimento no bloco Reviews para buscar o CNPJ.'));
       throw new NoDataError('Sem nome do empreendimento para buscar CNPJ');
     }
     setDiscovering(true);
@@ -88,7 +89,7 @@ export function CnpjValidationSearch({ initialCnpj, onValidated, businessName, l
       });
       if (error) throw error;
       if (!resp?.success || !resp?.best?.cnpj) {
-        if (!silent) toast.info('Nenhum CNPJ encontrado em fontes públicas. Informe manualmente.');
+        if (!silent) toast.info(tx('Nenhum CNPJ encontrado em fontes públicas. Informe manualmente.'));
         throw new NoDataError(resp?.error || 'CNPJ não encontrado online');
       }
       const found: string = resp.best.cnpj;
@@ -116,7 +117,7 @@ export function CnpjValidationSearch({ initialCnpj, onValidated, businessName, l
     <div className="space-y-4">
       <div className="flex items-end gap-2">
         <div className="flex-1 space-y-1">
-          <label className="text-xs font-medium">CNPJ</label>
+          <label className="text-xs font-medium">{tx("CNPJ")}</label>
           <Input value={cnpj} onChange={(e) => setCnpj(formatCnpj(e.target.value))} placeholder="00.000.000/0000-00" />
         </div>
         <Button
@@ -137,7 +138,7 @@ export function CnpjValidationSearch({ initialCnpj, onValidated, businessName, l
       </div>
       {businessName?.trim() && !data && (
         <p className="text-[11px] text-muted-foreground">
-          Dica: clique em <span className="font-medium">Buscar online</span> para localizar o CNPJ de
+          {tx("Dica: clique em")} <span className="font-medium">{tx("Buscar online")}</span> {tx("para localizar o CNPJ de")}
           <span className="font-medium"> "{businessName}"</span>{location ? ` em ${location}` : ''} em fontes públicas.
         </p>
       )}
@@ -162,7 +163,7 @@ export function CnpjValidationSearch({ initialCnpj, onValidated, businessName, l
               </Badge>
               {data.cnae_principal && <Badge variant="outline" className="text-[10px]">CNAE {data.cnae_principal}</Badge>}
               {data.cadastur_status === 'requer_verificacao_manual' && (
-                <Badge variant="secondary" className="text-[10px]">CADASTUR relevante</Badge>
+                <Badge variant="secondary" className="text-[10px]">{tx("CADASTUR relevante")}</Badge>
               )}
             </div>
             {data.cnae_descricao && <p className="text-xs text-muted-foreground">{data.cnae_descricao}</p>}

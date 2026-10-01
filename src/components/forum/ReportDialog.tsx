@@ -22,12 +22,12 @@ import { useForum } from '@/hooks/useForum';
 import { Loader2, Flag } from 'lucide-react';
 
 const REPORT_REASONS = [
-  { value: 'spam', label: 'Spam ou propaganda' },
-  { value: 'offensive', label: 'Conteúdo ofensivo ou inadequado' },
-  { value: 'misinformation', label: 'Informação falsa ou enganosa' },
-  { value: 'harassment', label: 'Assédio ou bullying' },
-  { value: 'copyright', label: 'Violação de direitos autorais' },
-  { value: 'other', label: 'Outro motivo' },
+  { value: 'spam', label: tx('Spam ou propaganda') },
+  { value: 'offensive', label: tx('Conteúdo ofensivo ou inadequado') },
+  { value: 'misinformation', label: tx('Informação falsa ou enganosa') },
+  { value: 'harassment', label: tx('Assédio ou bullying') },
+  { value: 'copyright', label: tx('Violação de direitos autorais') },
+  { value: 'other', label: tx('Outro motivo') },
 ];
 
 interface ReportDialogProps {

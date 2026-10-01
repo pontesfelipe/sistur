@@ -69,7 +69,7 @@ export function ProjectEduPanel({ projectId }: Props) {
       {relevantRecs.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2"><Sparkles className="h-4 w-4 text-purple-500" /> Cursos recomendados pelo diagnóstico</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2"><Sparkles className="h-4 w-4 text-purple-500" /> {tx("Cursos recomendados pelo diagnóstico")}</CardTitle>
             <CardDescription>{tx('Prescrições EDU para os indicadores deste projeto')}</CardDescription>
           </CardHeader>
           <CardContent>

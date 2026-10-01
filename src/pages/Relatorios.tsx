@@ -1023,7 +1023,7 @@ export default function Relatorios() {
                   {isAdmin && (
                     <div className="w-52">
                       <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                        Modelo de IA <span className="text-[10px] uppercase tracking-wide text-amber-600">(admin)</span>
+                        {tx("Modelo de IA")} <span className="text-[10px] uppercase tracking-wide text-amber-600">(admin)</span>
                       </label>
                       <Select value={aiProvider} onValueChange={(v) => setAiProvider(v as typeof aiProvider)}>
                         <SelectTrigger>
@@ -1110,7 +1110,7 @@ export default function Relatorios() {
                         </Button>
                         <Button variant="outline" onClick={() => downloadPDF(reportRef, selectedAssessmentMeta?.diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial')} className="gap-2">
                           <FileText className="h-4 w-4" />
-                          PDF
+                          {tx("PDF")}
                         </Button>
                         <Button variant="outline" onClick={() => setCustomizationOpen(true)} className="gap-2">
                           <Settings2 className="h-4 w-4" />
@@ -1464,7 +1464,7 @@ export default function Relatorios() {
                         className="gap-2"
                       >
                         <FileText className="h-4 w-4" />
-                        PDF
+                        {tx("PDF")}
                       </Button>
                     </div>
                   )}

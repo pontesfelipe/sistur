@@ -69,10 +69,10 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-lg flex items-center gap-2"><Wallet className="h-5 w-5" /> Linhas de Orçamento</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2"><Wallet className="h-5 w-5" /> {tx("Linhas de Orçamento")}</CardTitle>
             <CardDescription>{tx('Planejamento e execução financeira por categoria e fase')}</CardDescription>
           </div>
-          <Button onClick={openNew} size="sm"><Plus className="h-4 w-4 mr-1" /> Nova linha</Button>
+          <Button onClick={openNew} size="sm"><Plus className="h-4 w-4 mr-1" /> {tx("Nova linha")}</Button>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -199,7 +199,7 @@ function ProjectRoiCard({ projectId, investment }: { projectId: string; investme
           <Label>Horizonte (anos)</Label>
           <Input type="number" min={1} max={10} value={years} onChange={(e) => setYears(Math.max(1, Number(e.target.value)))} />
         </div>
-        <div><p className="text-xs text-muted-foreground">ROI</p><p className="text-2xl font-semibold">{roi == null ? "—" : `${Math.round(roi)}%`}</p></div>
+        <div><p className="text-xs text-muted-foreground">{tx("ROI")}</p><p className="text-2xl font-semibold">{roi == null ? "—" : `${Math.round(roi)}%`}</p></div>
         <div><p className="text-xs text-muted-foreground">{tx('Payback')}</p><p className="text-2xl font-semibold">{paybackMonths == null ? "—" : `${Math.ceil(paybackMonths)} meses`}</p></div>
       </CardContent>
     </Card>

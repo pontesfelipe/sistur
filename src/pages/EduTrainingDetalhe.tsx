@@ -130,8 +130,7 @@ const EduTrainingDetalhe = () => {
           <CardHeader>
             <CardTitle className="text-lg">{tx('Conteúdo disponível nos planos')}</CardTitle>
             <CardDescription>
-              Você concluiu o curso base do teste gratuito. Para acessar este e todos os demais
-              treinamentos, com certificados e o Professor Beni sem limites, conheça os planos.
+              {tx("Você concluiu o curso base do teste gratuito. Para acessar este e todos os demais treinamentos, com certificados e o Professor Beni sem limites, conheça os planos.")}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">

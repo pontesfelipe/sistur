@@ -97,7 +97,7 @@ export function TrainingRatingWidget({ trainingId, trainingTitle }: TrainingRati
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">O que achou deste treinamento?</p>
+            <p className="text-sm text-muted-foreground">{tx("O que achou deste treinamento?")}</p>
             {renderStars(0, true)}
             {showForm && (
               <div className="space-y-2 animate-fade-in">

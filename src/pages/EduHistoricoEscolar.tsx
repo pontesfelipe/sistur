@@ -128,7 +128,7 @@ export default function EduHistoricoEscolar() {
                           <TableCell>
                             {r.certificate_id ? (
                               <Badge className="bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20">
-                                <Award className="h-3 w-3 mr-1" />Emitido
+                                <Award className="h-3 w-3 mr-1" />{tx("Emitido")}
                               </Badge>
                             ) : <span className="text-xs text-muted-foreground">—</span>}
                           </TableCell>

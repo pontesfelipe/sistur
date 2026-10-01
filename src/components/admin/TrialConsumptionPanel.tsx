@@ -72,7 +72,7 @@ export function TrialConsumptionPanel() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Trial convertido (acesso integral liberado)');
+      toast.success(tx('Trial convertido (acesso integral liberado)'));
       qc.invalidateQueries({ queryKey: ['admin-trial-state'] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -81,9 +81,9 @@ export function TrialConsumptionPanel() {
   const rows = data ?? [];
   const trialing = rows.filter(r => !r.converted_at);
   const stats = [
-    { label: 'Usuários em trial', value: trialing.filter(r => r.subject_kind === 'user').length, icon: Users },
-    { label: 'Organizações em trial', value: trialing.filter(r => r.subject_kind === 'org').length, icon: Building2 },
-    { label: 'Convertidos', value: rows.filter(r => r.converted_at).length, icon: CheckCircle2 },
+    { label: tx('Usuários em trial'), value: trialing.filter(r => r.subject_kind === 'user').length, icon: Users },
+    { label: tx('Organizações em trial'), value: trialing.filter(r => r.subject_kind === 'org').length, icon: Building2 },
+    { label: tx('Convertidos'), value: rows.filter(r => r.converted_at).length, icon: CheckCircle2 },
   ];
 
   return (
@@ -108,8 +108,7 @@ export function TrialConsumptionPanel() {
             <FlaskConical className="h-4 w-4" /> {tx("Trial por consumo")}
           </CardTitle>
           <CardDescription>
-            Usuário novo: curso base + 10 perguntas ao Professor Beni. Organização nova: 1 diagnóstico
-            com resultado em teaser e projetos bloqueados. Não há mais trial por tempo.
+            {tx("Usuário novo: curso base + 10 perguntas ao Professor Beni. Organização nova: 1 diagnóstico com resultado em teaser e projetos bloqueados. Não há mais trial por tempo.")}
           </CardDescription>
         </CardHeader>
         <CardContent>

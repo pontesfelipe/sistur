@@ -74,9 +74,9 @@ export function RoundComparisonView({ assessmentId, destinationId, currentPillar
 
   const getTrend = (current: number, prev: number) => {
     const diff = current - prev;
-    if (Math.abs(diff) < 0.02) return { icon: Minus, label: 'Estável', color: 'text-muted-foreground', diff: 0 };
-    if (diff > 0) return { icon: ArrowUp, label: 'Melhoria', color: 'text-green-600', diff };
-    return { icon: ArrowDown, label: 'Regressão', color: 'text-red-600', diff };
+    if (Math.abs(diff) < 0.02) return { icon: Minus, label: tx('Estável'), color: 'text-muted-foreground', diff: 0 };
+    if (diff > 0) return { icon: ArrowUp, label: tx('Melhoria'), color: 'text-green-600', diff };
+    return { icon: ArrowDown, label: tx('Regressão'), color: 'text-red-600', diff };
   };
 
   return (
