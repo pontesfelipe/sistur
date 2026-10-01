@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 23,
-  patch: 2,
+  patch: 3,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.23.3",
+    date: "2026-10-01",
+    type: "patch" as const,
+    changes: [
+      "Relatórios: o modelo Claude usado na geração com IA foi atualizado de Claude Sonnet 4.5 para Claude Sonnet 5.5 (a Anthropic vai aposentar o 4.5 em novembro de 2026).",
+    ],
+  },
   {
     version: "2.23.2",
     date: "2026-10-01",
