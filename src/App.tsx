@@ -17,6 +17,7 @@ import { ModuleRoute } from "@/components/layout/ModuleRoute";
 import { SplashScreen } from "@/components/SplashScreen";
 import { ClientErrorMonitor } from "@/components/ClientErrorMonitor";
 import { ReportJobWatcherMount } from "@/components/ReportJobWatcherMount";
+import { LanguageSyncMount } from "@/components/LanguageSyncMount";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Wrap React.lazy to auto-recover from stale chunk errors after a redeploy.
@@ -179,6 +180,7 @@ const App = () => {
             <AuthProvider>
               <ClientErrorMonitor />
               <ProfileProvider>
+              <LanguageSyncMount />
               <LicenseProvider>
               <OrgModulesProvider>
               <ReportJobWatcherMount />
