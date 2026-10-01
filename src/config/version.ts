@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 23,
-  patch: 3,
+  patch: 4,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.23.4",
+    date: "2026-10-01",
+    type: "patch" as const,
+    changes: [
+      "Histórico Escolar (/edu/boletim): corrigido o erro que impedia a página de carregar — a rotina do banco referenciava uma coluna inexistente; tentativas agora vêm do progresso do curso.",
+      "Idiomas: a escolha de idioma agora é salva na conta do usuário (antes a gravação nunca era enviada e o recarregamento da página cancelava a requisição).",
+    ],
+  },
   {
     version: "2.23.3",
     date: "2026-10-01",
