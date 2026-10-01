@@ -28,23 +28,23 @@ interface MandalaDestinoProps {
 
 // Subsystems per Mario Beni (2007) — Análise Estrutural do Turismo
 const PILLAR_SUBSYSTEMS: Record<Pillar, string[]> = {
-  RA: ['Ecológico', 'Social', 'Econômico', 'Cultural'],
-  OE: ['Superestrutura', 'Infraestrutura'],
-  AO: ['Mercado', 'Oferta', 'Demanda', 'Distribuição'],
+  RA: [tx('Ecológico'), tx('Social'), tx('Econômico'), tx('Cultural')],
+  OE: [tx('Superestrutura'), tx('Infraestrutura')],
+  AO: [tx('Mercado'), tx('Oferta'), tx('Demanda'), tx('Distribuição')],
 };
 
 // MST extra dimensions (Tasso, Silva & Nascimento, 2024)
 const MST_EXTRA_DIMENSIONS = [
-  'Tecnologia',
-  'Inclusão',
+  tx('Tecnologia'),
+  tx('Inclusão'),
   'TBC',
-  'Sensibilização',
+  tx('Sensibilização'),
 ];
 
 const PILLAR_LABEL: Record<Pillar, string> = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 const PILLAR_COLOR_VAR: Record<Pillar, string> = {
