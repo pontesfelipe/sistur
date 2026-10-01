@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 22,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.22.2",
+    date: "2026-10-01",
+    type: "patch" as const,
+    changes: [
+      "Traduções: proteção contra textos vazios ou chaves cruas — qualquer tradução ausente, vazia ou nula cai automaticamente na frase em português.",
+    ],
+  },
   {
     version: "2.22.1",
     date: "2026-10-01",

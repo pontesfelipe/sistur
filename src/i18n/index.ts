@@ -37,6 +37,16 @@ i18n.use(initReactI18next).init({
   nsSeparator: false,
   interpolation: { escapeValue: false },
   returnEmptyString: false,
+  returnNull: false,
+  saveMissing: false,
+  // Garantia extra: se uma chave estiver ausente (ou vazia/nula) em en/es,
+  // o i18next cai no pt-BR e, como o recurso pt-BR é vazio, devolve a própria
+  // chave — que é a frase em português. Ou seja, a tela nunca fica vazia
+  // nem mostra códigos crus de tradução.
+  parseMissingKeyHandler: (key) => key,
+  missingKeyHandler: (_lngs, _ns, key) => {
+    if (import.meta.env.DEV) console.warn(`[i18n] tradução ausente: "${key}"`);
+  },
 });
 
 const applyHtmlLang = (lng: string) => {
